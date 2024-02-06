@@ -1,13 +1,13 @@
-import { AppEpic } from "ducks";
-import { of } from "rxjs";
-import { catchError, filter, switchMap } from "rxjs/operators";
-import { actions as appRedirectActions } from "./app-redirect";
-import { actions as userInterfaceActions } from "./user-interface";
+import { AppEpic } from 'ducks';
+import { of } from 'rxjs';
+import { catchError, filter, switchMap } from 'rxjs/operators';
+import { actions as appRedirectActions } from './app-redirect';
+import { actions as userInterfaceActions } from './user-interface';
 
-import { LockWidgetNameEnum } from "types/user-interface";
-import { extractError } from "utils/net";
-import { slice } from "./approvals";
-import { transformDetailApprovalDtoToModel } from "./transform/approvals";
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { extractError } from 'utils/net';
+import { slice } from './approvals';
+import { transformDetailApprovalDtoToModel } from './transform/approvals';
 
 const getApproval: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -19,8 +19,8 @@ const getApproval: AppEpic = (action$, state$, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.getApprovalFailure({ error: extractError(err, "Failed to get Approval details") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get approval detail" }),
+                        slice.actions.getApprovalFailure({ error: extractError(err, 'Failed to get Approval details') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to get approval detail' }),
                     ),
                 ),
             ),
@@ -47,7 +47,7 @@ const listApprovals: AppEpic = (action$, state$, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.listApprovalsFailure({ error: extractError(err, "Failed to list Approvals") }),
+                            slice.actions.listApprovalsFailure({ error: extractError(err, 'Failed to list Approvals') }),
                             userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfApprovals),
                         ),
                     ),
@@ -71,8 +71,8 @@ const listUserApprovals: AppEpic = (action$, state$, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.listUserApprovalsFailure({ error: extractError(err, "Failed to list Approvals") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to list approvals" }),
+                            slice.actions.listUserApprovalsFailure({ error: extractError(err, 'Failed to list Approvals') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to list approvals' }),
                         ),
                     ),
                 ),
@@ -90,8 +90,8 @@ const approveApproval: AppEpic = (action$, state$, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.approveApprovalsFailure({ error: extractError(err, "Failed to approve Approval") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to approve approval" }),
+                        slice.actions.approveApprovalsFailure({ error: extractError(err, 'Failed to approve Approval') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to approve approval' }),
                     ),
                 ),
             ),
@@ -114,8 +114,8 @@ const approveApprovalRecipient: AppEpic = (action$, state$, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.approveApprovalsFailure({ error: extractError(err, "Failed to approve Approval recipient") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to approve approval recipient" }),
+                            slice.actions.approveApprovalsFailure({ error: extractError(err, 'Failed to approve Approval recipient') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to approve approval recipient' }),
                         ),
                     ),
                 ),
@@ -133,8 +133,8 @@ const rejectApproval: AppEpic = (action$, state$, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.rejectApprovalFailure({ error: extractError(err, "Failed to reject Approval") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to reject approval" }),
+                        slice.actions.rejectApprovalFailure({ error: extractError(err, 'Failed to reject Approval') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to reject approval' }),
                     ),
                 ),
             ),
@@ -157,8 +157,8 @@ const rejectApprovalRecipient: AppEpic = (action$, state$, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.rejectApprovalFailure({ error: extractError(err, "Failed to reject Approval recipient") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to reject approval recipient" }),
+                            slice.actions.rejectApprovalFailure({ error: extractError(err, 'Failed to reject Approval recipient') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to reject approval recipient' }),
                         ),
                     ),
                 ),

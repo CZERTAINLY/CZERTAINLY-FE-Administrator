@@ -1,25 +1,25 @@
-import { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
+import { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
 
-import { WidgetButtonProps } from "components/WidgetButtons";
+import { WidgetButtonProps } from 'components/WidgetButtons';
 
-import { ApiClients } from "api";
-import PagedList from "components/PagedList/PagedList";
-import { actions, selectors } from "ducks/cryptographic-keys";
-import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
-import { EntityType } from "ducks/filters";
-import { selectors as pagingSelectors } from "ducks/paging";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
-import Select from "react-select";
-import { Badge, Container } from "reactstrap";
-import { SearchRequestModel } from "types/certificate";
-import { KeyCompromiseReason, KeyUsage, PlatformEnum } from "types/openapi";
-import { LockWidgetNameEnum } from "types/user-interface";
-import { dateFormatter } from "utils/dateUtil";
-import KeyStateCircle from "../KeyStateCircle";
-import KeyStatusCircle from "../KeyStatusCircle";
+import { ApiClients } from 'api';
+import PagedList from 'components/PagedList/PagedList';
+import { actions, selectors } from 'ducks/cryptographic-keys';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { EntityType } from 'ducks/filters';
+import { selectors as pagingSelectors } from 'ducks/paging';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
+import Select from 'react-select';
+import { Badge, Container } from 'reactstrap';
+import { SearchRequestModel } from 'types/certificate';
+import { KeyCompromiseReason, KeyUsage, PlatformEnum } from 'types/openapi';
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { dateFormatter } from 'utils/dateUtil';
+import KeyStateCircle from '../KeyStateCircle';
+import KeyStatusCircle from '../KeyStatusCircle';
 
 function CryptographicKeyList() {
     const dispatch = useDispatch();
@@ -79,41 +79,41 @@ function CryptographicKeyList() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "check",
+                icon: 'check',
                 disabled: checkedRows.length === 0,
-                tooltip: "Enable",
+                tooltip: 'Enable',
                 onClick: () => {
                     onEnableClick();
                 },
             },
             {
-                icon: "times",
+                icon: 'times',
                 disabled: checkedRows.length === 0,
-                tooltip: "Disable",
+                tooltip: 'Disable',
                 onClick: () => {
                     onDisableClick();
                 },
             },
             {
-                icon: "key",
+                icon: 'key',
                 disabled: checkedRows.length === 0,
-                tooltip: "Update Key Usage",
+                tooltip: 'Update Key Usage',
                 onClick: () => {
                     setKeyUsageUpdate(true);
                 },
             },
             {
-                icon: "compromise",
+                icon: 'compromise',
                 disabled: checkedRows.length === 0,
-                tooltip: "Compromise",
+                tooltip: 'Compromise',
                 onClick: () => {
                     setConfirmCompromise(true);
                 },
             },
             {
-                icon: "destroy",
+                icon: 'destroy',
                 disabled: checkedRows.length === 0,
-                tooltip: "Destroy",
+                tooltip: 'Destroy',
                 onClick: () => {
                     setConfirmDestroy(true);
                 },
@@ -155,80 +155,80 @@ function CryptographicKeyList() {
     const cryptographicKeysTableHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "status",
-                content: "Status",
-                align: "center",
-                width: "1%",
+                id: 'status',
+                content: 'Status',
+                align: 'center',
+                width: '1%',
             },
             {
-                id: "state",
-                content: "State",
-                align: "center",
-                width: "1%",
+                id: 'state',
+                content: 'State',
+                align: 'center',
+                width: '1%',
             },
             {
-                id: "keyName",
-                content: "Name",
-                width: "15%",
+                id: 'keyName',
+                content: 'Name',
+                width: '15%',
             },
             {
-                id: "type",
-                content: "Type",
-                width: "15%",
+                id: 'type',
+                content: 'Type',
+                width: '15%',
             },
             {
-                id: "algorithm",
-                align: "center",
-                content: "Algorithm",
-                width: "15%",
+                id: 'algorithm',
+                align: 'center',
+                content: 'Algorithm',
+                width: '15%',
             },
             {
-                id: "size",
-                align: "center",
-                content: "Size",
-                width: "15%",
+                id: 'size',
+                align: 'center',
+                content: 'Size',
+                width: '15%',
             },
             {
-                id: "format",
-                align: "center",
-                content: "Format",
-                width: "15%",
+                id: 'format',
+                align: 'center',
+                content: 'Format',
+                width: '15%',
             },
             {
-                id: "creationTime",
-                align: "center",
-                content: "Creation Date",
-                width: "15%",
+                id: 'creationTime',
+                align: 'center',
+                content: 'Creation Date',
+                width: '15%',
             },
             {
-                id: "group",
-                align: "center",
-                content: "Group",
-                width: "15%",
+                id: 'group',
+                align: 'center',
+                content: 'Group',
+                width: '15%',
             },
             {
-                id: "owner",
-                align: "center",
-                content: "Owner",
-                width: "15%",
+                id: 'owner',
+                align: 'center',
+                content: 'Owner',
+                width: '15%',
             },
             {
-                id: "tokenProfile",
-                align: "center",
-                content: "Token Profile",
-                width: "15%",
+                id: 'tokenProfile',
+                align: 'center',
+                content: 'Token Profile',
+                width: '15%',
             },
             {
-                id: "tokenInstance",
-                align: "center",
-                content: "Token Instance",
-                width: "15%",
+                id: 'tokenInstance',
+                align: 'center',
+                content: 'Token Instance',
+                width: '15%',
             },
             {
-                id: "associations",
-                align: "center",
-                content: "Associations",
-                width: "15%",
+                id: 'associations',
+                align: 'center',
+                content: 'Associations',
+                width: '15%',
             },
         ],
         [],
@@ -242,9 +242,9 @@ function CryptographicKeyList() {
                     columns: [
                         <KeyStatusCircle status={cryptographicKey.enabled} />,
                         <KeyStateCircle state={cryptographicKey.state} />,
-                        <span style={{ whiteSpace: "nowrap" }}>
+                        <span style={{ whiteSpace: 'nowrap' }}>
                             <Link
-                                to={`./detail/${cryptographicKey.tokenInstanceUuid || "unknown"}/${cryptographicKey.keyWrapperUuid}/${
+                                to={`./detail/${cryptographicKey.tokenInstanceUuid || 'unknown'}/${cryptographicKey.keyWrapperUuid}/${
                                     cryptographicKey.uuid
                                 }`}
                             >
@@ -253,36 +253,36 @@ function CryptographicKeyList() {
                         </span>,
                         <Badge color="secondary">{getEnumLabel(keyTypeEnum, cryptographicKey.type)}</Badge>,
                         cryptographicKey.keyAlgorithm,
-                        cryptographicKey.length?.toString() || "unknown",
-                        cryptographicKey.format || "unknown",
-                        <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(cryptographicKey.creationTime) || ""}</span>,
+                        cryptographicKey.length?.toString() || 'unknown',
+                        cryptographicKey.format || 'unknown',
+                        <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(cryptographicKey.creationTime) || ''}</span>,
                         cryptographicKey.group ? (
                             <Link to={`../groups/detail/${cryptographicKey.group?.uuid}`}>
-                                {cryptographicKey.group.name ?? "Unassigned"}
+                                {cryptographicKey.group.name ?? 'Unassigned'}
                             </Link>
                         ) : (
-                            cryptographicKey.group ?? "Unassigned"
+                            cryptographicKey.group ?? 'Unassigned'
                         ),
                         cryptographicKey.ownerUuid ? (
-                            <Link to={`../users/detail/${cryptographicKey.ownerUuid}`}>{cryptographicKey.owner ?? "Unassigned"}</Link>
+                            <Link to={`../users/detail/${cryptographicKey.ownerUuid}`}>{cryptographicKey.owner ?? 'Unassigned'}</Link>
                         ) : (
-                            cryptographicKey.owner ?? "Unassigned"
+                            cryptographicKey.owner ?? 'Unassigned'
                         ),
                         cryptographicKey.tokenProfileName ? (
                             <Link to={`../tokenprofiles/detail/${cryptographicKey.tokenInstanceUuid}/${cryptographicKey.tokenProfileUuid}`}>
-                                {cryptographicKey.tokenProfileName ?? "Unassigned"}
+                                {cryptographicKey.tokenProfileName ?? 'Unassigned'}
                             </Link>
                         ) : (
-                            cryptographicKey.tokenProfileName ?? "Unassigned"
+                            cryptographicKey.tokenProfileName ?? 'Unassigned'
                         ),
                         cryptographicKey.tokenInstanceName ? (
                             <Link to={`../tokens/detail/${cryptographicKey.tokenInstanceUuid}`}>
-                                {cryptographicKey.tokenInstanceName ?? "Unassigned"}
+                                {cryptographicKey.tokenInstanceName ?? 'Unassigned'}
                             </Link>
                         ) : (
-                            cryptographicKey.tokenInstanceName ?? "Unassigned"
+                            cryptographicKey.tokenInstanceName ?? 'Unassigned'
                         ),
-                        cryptographicKey.associations?.toString() || "",
+                        cryptographicKey.associations?.toString() || '',
                     ],
                 };
             }),
@@ -325,7 +325,7 @@ function CryptographicKeyList() {
 
             <Dialog
                 isOpen={confirmCompromise}
-                caption={`Compromise ${checkedRows.length > 1 ? "Keys" : "Key"}`}
+                caption={`Compromise ${checkedRows.length > 1 ? 'Keys' : 'Key'}`}
                 body={
                     <div>
                         <p>You are about to mark the Key as compromised. Is this what you want to do?</p>
@@ -342,19 +342,19 @@ function CryptographicKeyList() {
                 }
                 toggle={() => setConfirmCompromise(false)}
                 buttons={[
-                    { color: "danger", onClick: onCompromise, body: "Yes" },
-                    { color: "secondary", onClick: () => setConfirmCompromise(false), body: "Cancel" },
+                    { color: 'danger', onClick: onCompromise, body: 'Yes' },
+                    { color: 'secondary', onClick: () => setConfirmCompromise(false), body: 'Cancel' },
                 ]}
             />
 
             <Dialog
                 isOpen={confirmDestroy}
-                caption={`Destroy ${checkedRows.length > 1 ? "Keys" : "Key"}`}
-                body={`You are about to destroy ${checkedRows.length > 1 ? "a Key" : "Keys"}. Is this what you want to do?`}
+                caption={`Destroy ${checkedRows.length > 1 ? 'Keys' : 'Key'}`}
+                body={`You are about to destroy ${checkedRows.length > 1 ? 'a Key' : 'Keys'}. Is this what you want to do?`}
                 toggle={() => setConfirmDestroy(false)}
                 buttons={[
-                    { color: "danger", onClick: onDestroy, body: "Yes, Destroy" },
-                    { color: "secondary", onClick: () => setConfirmDestroy(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDestroy, body: 'Yes, Destroy' },
+                    { color: 'secondary', onClick: () => setConfirmDestroy(false), body: 'Cancel' },
                 ]}
             />
 
@@ -364,8 +364,8 @@ function CryptographicKeyList() {
                 body={keyUsageBody}
                 toggle={() => setKeyUsageUpdate(false)}
                 buttons={[
-                    { color: "primary", onClick: onUpdateKeyUsageConfirmed, body: "Update" },
-                    { color: "secondary", onClick: () => setKeyUsageUpdate(false), body: "Cancel" },
+                    { color: 'primary', onClick: onUpdateKeyUsageConfirmed, body: 'Update' },
+                    { color: 'secondary', onClick: () => setKeyUsageUpdate(false), body: 'Cancel' },
                 ]}
             />
         </Container>

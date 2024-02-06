@@ -1,30 +1,30 @@
-import AttributeEditor from "components/Attributes/AttributeEditor";
-import ProgressButton from "components/ProgressButton";
-import Widget from "components/Widget";
-import { actions as connectorActions } from "ducks/connectors";
-import { actions as entityActions, selectors as entitySelectors } from "ducks/entities";
+import AttributeEditor from 'components/Attributes/AttributeEditor';
+import ProgressButton from 'components/ProgressButton';
+import Widget from 'components/Widget';
+import { actions as connectorActions } from 'ducks/connectors';
+import { actions as entityActions, selectors as entitySelectors } from 'ducks/entities';
 
-import { actions as locationActions, selectors as locationSelectors } from "ducks/locations";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { actions as locationActions, selectors as locationSelectors } from 'ducks/locations';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { Field, Form } from "react-final-form";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { Field, Form } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
 
-import Select from "react-select";
-import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from "reactstrap";
-import { AttributeDescriptorModel } from "types/attributes";
-import { LocationResponseModel } from "types/locations";
+import Select from 'react-select';
+import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
+import { AttributeDescriptorModel } from 'types/attributes';
+import { LocationResponseModel } from 'types/locations';
 
-import { mutators } from "utils/attributes/attributeEditorMutators";
-import { collectFormAttributes } from "utils/attributes/attributes";
+import { mutators } from 'utils/attributes/attributeEditorMutators';
+import { collectFormAttributes } from 'utils/attributes/attributes';
 
-import { EntityType } from "ducks/filters";
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from "utils/validators";
-import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
-import { selectors as pagingSelectors } from "../../../../ducks/paging";
-import { Resource } from "../../../../types/openapi";
-import TabLayout from "../../../Layout/TabLayout";
+import { EntityType } from 'ducks/filters';
+import { composeValidators, validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
+import { selectors as pagingSelectors } from '../../../../ducks/paging';
+import { Resource } from '../../../../types/openapi';
+import TabLayout from '../../../Layout/TabLayout';
 
 interface FormValues {
     name: string | undefined;
@@ -121,14 +121,14 @@ export default function LocationForm() {
                         uuid: id!,
                         entityUuid: values.entity!.value,
                         editLocationRequest: {
-                            description: values.description || "",
+                            description: values.description || '',
                             enabled: location!.enabled,
                             attributes: collectFormAttributes(
-                                "location",
+                                'location',
                                 [...(locationAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
                                 values,
                             ),
-                            customAttributes: collectFormAttributes("customLocation", resourceCustomAttributes, values),
+                            customAttributes: collectFormAttributes('customLocation', resourceCustomAttributes, values),
                         },
                     }),
                 );
@@ -138,14 +138,14 @@ export default function LocationForm() {
                         entityUuid: values.entity!.value,
                         addLocationRequest: {
                             name: values.name!,
-                            description: values.description || "",
+                            description: values.description || '',
                             enabled: true,
                             attributes: collectFormAttributes(
-                                "location",
+                                'location',
                                 [...(locationAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
                                 values,
                             ),
-                            customAttributes: collectFormAttributes("customLocation", resourceCustomAttributes, values),
+                            customAttributes: collectFormAttributes('customLocation', resourceCustomAttributes, values),
                         },
                     }),
                 );
@@ -158,9 +158,9 @@ export default function LocationForm() {
         navigate(-1);
     }, [navigate]);
 
-    const submitTitle = useMemo(() => (editMode ? "Save" : "Create"), [editMode]);
+    const submitTitle = useMemo(() => (editMode ? 'Save' : 'Create'), [editMode]);
 
-    const inProgressTitle = useMemo(() => (editMode ? "Saving..." : "Creating..."), [editMode]);
+    const inProgressTitle = useMemo(() => (editMode ? 'Saving...' : 'Creating...'), [editMode]);
 
     const optionsForEntities = useMemo(
         () =>
@@ -184,7 +184,7 @@ export default function LocationForm() {
         [editMode, location],
     );
 
-    const title = useMemo(() => (editMode ? `Edit Location: ${location?.name}` : "Add Location"), [editMode, location]);
+    const title = useMemo(() => (editMode ? `Edit Location: ${location?.name}` : 'Add Location'), [editMode, location]);
 
     return (
         <Widget title={title} busy={isBusy}>
@@ -241,19 +241,19 @@ export default function LocationForm() {
                                         placeholder="Select Entity"
                                         onChange={(event) => {
                                             onEntityChange(event);
-                                            form.mutators.clearAttributes("location");
-                                            form.mutators.setAttribute("storeKind", undefined);
+                                            form.mutators.clearAttributes('location');
+                                            form.mutators.setAttribute('storeKind', undefined);
                                             input.onChange(event);
                                         }}
                                         styles={{
                                             control: (provided) =>
                                                 meta.touched && meta.invalid
-                                                    ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } }
+                                                    ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
                                                     : { ...provided },
                                         }}
                                     />
 
-                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>
+                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
                                         {meta.error}
                                     </div>
                                 </FormGroup>
@@ -266,13 +266,13 @@ export default function LocationForm() {
                             <TabLayout
                                 tabs={[
                                     {
-                                        title: "Connector Attributes",
+                                        title: 'Connector Attributes',
                                         content:
                                             values.entity && locationAttributeDescriptors && locationAttributeDescriptors.length > 0 ? (
                                                 <AttributeEditor
                                                     id="location"
                                                     callbackParentUuid={
-                                                        location?.entityInstanceUuid ?? form.getFieldState("entity")?.value?.value
+                                                        location?.entityInstanceUuid ?? form.getFieldState('entity')?.value?.value
                                                     }
                                                     callbackResource={Resource.Locations}
                                                     attributeDescriptors={locationAttributeDescriptors}
@@ -285,7 +285,7 @@ export default function LocationForm() {
                                             ),
                                     },
                                     {
-                                        title: "Custom Attributes",
+                                        title: 'Custom Attributes',
                                         content: (
                                             <AttributeEditor
                                                 id="customLocation"

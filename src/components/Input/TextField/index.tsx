@@ -1,9 +1,9 @@
-import cx from "classnames";
-import { Field } from "react-final-form";
-import { FormFeedback, FormGroup, FormText, Input, InputGroup, InputGroupText, Label } from "reactstrap";
-import { InputType } from "reactstrap/types/lib/Input";
-import { composeValidators } from "utils/validators";
-import styles from "./TextField.module.scss";
+import cx from 'classnames';
+import { Field } from 'react-final-form';
+import { FormFeedback, FormGroup, FormText, Input, InputGroup, InputGroupText, Label } from 'reactstrap';
+import { InputType } from 'reactstrap/types/lib/Input';
+import { composeValidators } from 'utils/validators';
+import styles from './TextField.module.scss';
 
 interface InputGroupIcon {
     icon: string;
@@ -32,7 +32,7 @@ export default function TextField({ id, label, inputType, disabled = false, vali
                             {...input}
                             valid={!meta.error && meta.touched}
                             invalid={!!meta.error && meta.touched}
-                            type={inputType ?? "text"}
+                            type={inputType ?? 'text'}
                             id={id}
                             placeholder={label}
                             disabled={disabled}
@@ -43,7 +43,7 @@ export default function TextField({ id, label, inputType, disabled = false, vali
                                 onClick={() => (inputGroupIcon?.onClick ? inputGroupIcon?.onClick() : {})}
                             >
                                 {inputGroupIcon?.text && <span className="me-2">{inputGroupIcon.text}</span>}
-                                <i className={cx("fa", inputGroupIcon?.icon, styles.inputGroupIconStyle)} />
+                                <i className={cx('fa', inputGroupIcon?.icon, styles.inputGroupIconStyle)} />
                             </InputGroupText>
                         )}
                     </InputGroup>

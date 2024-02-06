@@ -1,6 +1,6 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { CertificateGroupRequestModel, CertificateGroupResponseModel } from "types/certificateGroups";
-import { createFeatureSelector } from "utils/ducks";
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { CertificateGroupRequestModel, CertificateGroupResponseModel } from 'types/certificateGroups';
+import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     checkedRows: string[];
@@ -29,7 +29,7 @@ export const initialState: State = {
 };
 
 export const slice = createSlice({
-    name: "certificateGroups",
+    name: 'certificateGroups',
 
     initialState,
 

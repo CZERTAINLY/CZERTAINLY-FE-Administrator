@@ -1,23 +1,23 @@
-import { AppEpic } from "ducks";
-import { of } from "rxjs";
-import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
+import { AppEpic } from 'ducks';
+import { of } from 'rxjs';
+import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
 
-import { extractError } from "utils/net";
-import { Resource } from "../types/openapi";
-import { actions as alertActions } from "./alerts";
-import { actions as appRedirectActions } from "./app-redirect";
-import { slice } from "./globalMetadata";
-import { actions as userInterfaceActions } from "./user-interface";
+import { extractError } from 'utils/net';
+import { Resource } from '../types/openapi';
+import { actions as alertActions } from './alerts';
+import { actions as appRedirectActions } from './app-redirect';
+import { slice } from './globalMetadata';
+import { actions as userInterfaceActions } from './user-interface';
 
-import { LockWidgetNameEnum } from "types/user-interface";
+import { LockWidgetNameEnum } from 'types/user-interface';
 import {
     transformConnectorMetadataResponseDtoToModel,
     transformGlobalMetadataCreateRequestModelToDto,
     transformGlobalMetadataDetailResponseDtoToModel,
     transformGlobalMetadataResponseDtoToModel,
     transformGlobalMetadataUpdateRequestModelToDto,
-} from "./transform/globalMetadata";
-import { transformNameAndUuidDtoToModel } from "./transform/locations";
+} from './transform/globalMetadata';
+import { transformNameAndUuidDtoToModel } from './transform/locations';
 
 const listGlobalMetadata: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -32,7 +32,7 @@ const listGlobalMetadata: AppEpic = (action$, state$, deps) => {
                 ),
                 catchError((err) =>
                     of(
-                        slice.actions.listGlobalMetadataFailure({ error: extractError(err, "Failed to get Global Metadata list") }),
+                        slice.actions.listGlobalMetadataFailure({ error: extractError(err, 'Failed to get Global Metadata list') }),
                         userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfGlobalMetadata),
                     ),
                 ),
@@ -56,8 +56,8 @@ const createGlobalMetadata: AppEpic = (action$, state$, deps) => {
                     ),
                     catchError((err) =>
                         of(
-                            slice.actions.createGlobalMetadataFailure({ error: extractError(err, "Failed to create global metadata") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to create global metadata" }),
+                            slice.actions.createGlobalMetadataFailure({ error: extractError(err, 'Failed to create global metadata') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to create global metadata' }),
                         ),
                     ),
                 ),
@@ -87,8 +87,8 @@ const updateGlobalMetadata: AppEpic = (action$, state$, deps) => {
                     ),
                     catchError((err) =>
                         of(
-                            slice.actions.updateGlobalMetadataFailure({ error: extractError(err, "Failed to update global metadata") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to update global metadata" }),
+                            slice.actions.updateGlobalMetadataFailure({ error: extractError(err, 'Failed to update global metadata') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to update global metadata' }),
                         ),
                     ),
                 ),
@@ -109,7 +109,7 @@ const getGlobalMetadata: AppEpic = (action$, state$, deps) => {
                 ),
                 catchError((err) =>
                     of(
-                        slice.actions.getGlobalMetadataFailure({ error: extractError(err, "Failed to get global metadata detail") }),
+                        slice.actions.getGlobalMetadataFailure({ error: extractError(err, 'Failed to get global metadata detail') }),
                         userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.GlobalMetadataDetails),
                     ),
                 ),
@@ -126,8 +126,8 @@ const getConnectorList: AppEpic = (action$, state$, deps) => {
                 map((connectors) => slice.actions.getConnectorListSuccess(connectors.map(transformNameAndUuidDtoToModel))),
                 catchError((err) =>
                     of(
-                        slice.actions.getConnectorListFailure({ error: extractError(err, "Failed to get list of connectors") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get list of connectors" }),
+                        slice.actions.getConnectorListFailure({ error: extractError(err, 'Failed to get list of connectors') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to get list of connectors' }),
                     ),
                 ),
             ),
@@ -143,8 +143,8 @@ const getConnectorMetadata: AppEpic = (action$, state$, deps) => {
                 map((metadata) => slice.actions.getConnectorMetadataSuccess(metadata.map(transformConnectorMetadataResponseDtoToModel))),
                 catchError((err) =>
                     of(
-                        slice.actions.getConnectorMetadataFailure({ error: extractError(err, "Failed to get list of connector metadata") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get list of connector metadata" }),
+                        slice.actions.getConnectorMetadataFailure({ error: extractError(err, 'Failed to get list of connector metadata') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to get list of connector metadata' }),
                     ),
                 ),
             ),
@@ -173,9 +173,9 @@ const promoteConnectorMetadata: AppEpic = (action$, state$, deps) => {
                     catchError((err) =>
                         of(
                             slice.actions.promoteConnectorMetadataFailure({
-                                error: extractError(err, "Failed to promote connector metadata"),
+                                error: extractError(err, 'Failed to promote connector metadata'),
                             }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to promote connector metadata" }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to promote connector metadata' }),
                         ),
                     ),
                 ),
@@ -189,12 +189,12 @@ const deleteGlobalMetadata: AppEpic = (action$, state$, deps) => {
         switchMap((action) =>
             deps.apiClients.globalMetadata.deleteGlobalMetadata({ uuid: action.payload }).pipe(
                 mergeMap(() =>
-                    of(slice.actions.deleteGlobalMetadataSuccess(action.payload), appRedirectActions.redirect({ url: "../../" })),
+                    of(slice.actions.deleteGlobalMetadataSuccess(action.payload), appRedirectActions.redirect({ url: '../../' })),
                 ),
                 catchError((err) =>
                     of(
-                        slice.actions.deleteGlobalMetadataFailure({ error: extractError(err, "Failed to delete global metadata") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to delete global metadata" }),
+                        slice.actions.deleteGlobalMetadataFailure({ error: extractError(err, 'Failed to delete global metadata') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to delete global metadata' }),
                     ),
                 ),
             ),
@@ -210,13 +210,13 @@ const bulkDeleteGlobalMetadata: AppEpic = (action$, state$, deps) => {
                 mergeMap(() =>
                     of(
                         slice.actions.bulkDeleteGlobalMetadataSuccess(action.payload),
-                        alertActions.success("Selected global metadata successfully deleted."),
+                        alertActions.success('Selected global metadata successfully deleted.'),
                     ),
                 ),
                 catchError((err) =>
                     of(
-                        slice.actions.bulkDeleteGlobalMetadataFailure({ error: extractError(err, "Failed to delete global metadata") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to delete global metadata" }),
+                        slice.actions.bulkDeleteGlobalMetadataFailure({ error: extractError(err, 'Failed to delete global metadata') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to delete global metadata' }),
                     ),
                 ),
             ),

@@ -1,35 +1,35 @@
-import AttributeEditor from "components/Attributes/AttributeEditor";
-import TabLayout from "components/Layout/TabLayout";
-import ProgressButton from "components/ProgressButton";
+import AttributeEditor from 'components/Attributes/AttributeEditor';
+import TabLayout from 'components/Layout/TabLayout';
+import ProgressButton from 'components/ProgressButton';
 
-import Widget from "components/Widget";
-import { selectors as authSelectors } from "ducks/auth";
-import { actions as groupActions, selectors as groupSelectors } from "ducks/certificateGroups";
-import { actions as connectorActions } from "ducks/connectors";
-import { actions as userActions, selectors as userSelectors } from "ducks/users";
+import Widget from 'components/Widget';
+import { selectors as authSelectors } from 'ducks/auth';
+import { actions as groupActions, selectors as groupSelectors } from 'ducks/certificateGroups';
+import { actions as connectorActions } from 'ducks/connectors';
+import { actions as userActions, selectors as userSelectors } from 'ducks/users';
 
-import { actions as cryptographicKeysActions, selectors as cryptographicKeysSelectors } from "ducks/cryptographic-keys";
-import { actions as tokenProfilesActions, selectors as tokenProfilesSelectors } from "ducks/token-profiles";
-import { FormApi } from "final-form";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Field, Form } from "react-final-form";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
-import Select, { SingleValue } from "react-select";
+import { actions as cryptographicKeysActions, selectors as cryptographicKeysSelectors } from 'ducks/cryptographic-keys';
+import { actions as tokenProfilesActions, selectors as tokenProfilesSelectors } from 'ducks/token-profiles';
+import { FormApi } from 'final-form';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Field, Form } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
+import Select, { SingleValue } from 'react-select';
 
-import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from "reactstrap";
-import { AttributeDescriptorModel } from "types/attributes";
-import { CertificateGroupResponseModel } from "types/certificateGroups";
-import { TokenProfileResponseModel } from "types/token-profiles";
-import { actions as userInterfaceActions } from "../../../../ducks/user-interface";
+import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
+import { AttributeDescriptorModel } from 'types/attributes';
+import { CertificateGroupResponseModel } from 'types/certificateGroups';
+import { TokenProfileResponseModel } from 'types/token-profiles';
+import { actions as userInterfaceActions } from '../../../../ducks/user-interface';
 
-import { mutators } from "utils/attributes/attributeEditorMutators";
-import { collectFormAttributes } from "utils/attributes/attributes";
+import { mutators } from 'utils/attributes/attributeEditorMutators';
+import { collectFormAttributes } from 'utils/attributes/attributes';
 
-import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from "utils/validators";
-import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
-import { KeyRequestType, PlatformEnum, Resource } from "../../../../types/openapi";
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { composeValidators, validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
+import { KeyRequestType, PlatformEnum, Resource } from '../../../../types/openapi';
 
 interface CryptographicKeyFormProps {
     usesGlobalModal?: boolean;
@@ -123,7 +123,7 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
             if (!type) return;
             dispatch(connectorActions.clearCallbackData());
             setGroupAttributesCallbackAttributes([]);
-            form.mutators.clearAttributes("cryptographicKey");
+            form.mutators.clearAttributes('cryptographicKey');
             dispatch(cryptographicKeysActions.clearKeyAttributeDescriptors());
             dispatch(
                 cryptographicKeysActions.listAttributeDescriptors({
@@ -168,11 +168,12 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                             name: values.name,
                             description: values.description,
                             attributes: collectFormAttributes(
-                                "cryptographicKey",
+                                'cryptographicKey',
                                 [...(cryptographicKeyAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
                                 values,
                             ),
-                            customAttributes: collectFormAttributes("customCryptographicKey", resourceCustomAttributes, values),
+                            customAttributes: collectFormAttributes('customCryptographicKey', resourceCustomAttributes, values),
+                            enabled: usesGlobalModal,
                         },
                         usesGlobalModal,
                     }),
@@ -232,13 +233,13 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
         if (!editMode) {
             return [
                 {
-                    title: "Connector Attributes",
+                    title: 'Connector Attributes',
                     content: !cryptographicKeyAttributeDescriptors ? (
                         <></>
                     ) : (
                         <AttributeEditor
                             id="cryptographicKey"
-                            callbackParentUuid={keyDetail?.tokenProfileUuid || form.getFieldState("tokenProfile")?.value?.value.uuid || ""}
+                            callbackParentUuid={keyDetail?.tokenProfileUuid || form.getFieldState('tokenProfile')?.value?.value.uuid || ''}
                             callbackResource={Resource.Keys}
                             attributeDescriptors={cryptographicKeyAttributeDescriptors || []}
                             groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
@@ -247,7 +248,7 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                     ),
                 },
                 {
-                    title: "Custom Attributes",
+                    title: 'Custom Attributes',
                     content: (
                         <AttributeEditor
                             id="customCryptographicKey"
@@ -260,7 +261,7 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
         } else {
             return [
                 {
-                    title: "Custom Attributes",
+                    title: 'Custom Attributes',
                     content: (
                         <AttributeEditor
                             id="customCryptographicKey"
@@ -275,11 +276,11 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
 
     const defaultValues: FormValues = useMemo(
         () => ({
-            name: editMode ? keyDetail?.name || "" : "",
-            description: editMode ? keyDetail?.description || "" : "",
+            name: editMode ? keyDetail?.name || '' : '',
+            description: editMode ? keyDetail?.description || '' : '',
             tokenProfile: editMode
                 ? keyDetail
-                    ? optionsForKeys.find((option) => option.value.uuid === (keyDetail.tokenProfileUuid || ""))
+                    ? optionsForKeys.find((option) => option.value.uuid === (keyDetail.tokenProfileUuid || ''))
                     : undefined
                 : undefined,
             group: editMode
@@ -297,7 +298,7 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
         [editMode, optionsForKeys, keyDetail],
     );
 
-    const title = useMemo(() => (editMode ? "Edit Key" : "Create Key"), [editMode]);
+    const title = useMemo(() => (editMode ? 'Edit Key' : 'Create Key'), [editMode]);
 
     return (
         <Widget title={title} busy={isBusy}>
@@ -361,7 +362,7 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                                             styles={{
                                                 control: (provided) =>
                                                     meta.touched && meta.invalid
-                                                        ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } }
+                                                        ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
                                                         : { ...provided },
                                             }}
                                         />
@@ -383,7 +384,7 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                                             className="form-control"
                                             placeholder="Enter Key Owner"
                                             disabled={!editMode}
-                                            value={auth?.username || ""}
+                                            value={auth?.username || ''}
                                             valid={!meta.touched || !meta.error}
                                             invalid={meta.touched && meta.error}
                                         />
@@ -411,12 +412,12 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                                         styles={{
                                             control: (provided) =>
                                                 meta.touched && meta.invalid
-                                                    ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } }
+                                                    ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
                                                     : { ...provided },
                                         }}
                                     />
 
-                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>
+                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
                                         {meta.error}
                                     </div>
                                 </FormGroup>
@@ -436,19 +437,19 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                                         placeholder="Select Token Profile"
                                         onChange={(event) => {
                                             onTokenProfileChange(event);
-                                            form.mutators.clearAttributes("cryptographicKey");
-                                            form.mutators.setAttribute("type", undefined);
+                                            form.mutators.clearAttributes('cryptographicKey');
+                                            form.mutators.setAttribute('type', undefined);
                                             input.onChange(event);
                                         }}
                                         styles={{
                                             control: (provided) =>
                                                 meta.touched && meta.invalid
-                                                    ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } }
+                                                    ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
                                                     : { ...provided },
                                         }}
                                     />
 
-                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>
+                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
                                         {meta.error}
                                     </div>
                                 </FormGroup>
@@ -475,12 +476,12 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                                             styles={{
                                                 control: (provided) =>
                                                     meta.touched && meta.invalid
-                                                        ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } }
+                                                        ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
                                                         : { ...provided },
                                             }}
                                         />
 
-                                        <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>
+                                        <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
                                             {meta.error}
                                         </div>
                                     </FormGroup>
@@ -497,8 +498,8 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                         <div className="d-flex justify-content-end">
                             <ButtonGroup>
                                 <ProgressButton
-                                    title={editMode ? "Update" : "Create"}
-                                    inProgressTitle={editMode ? "Updating..." : "Creating..."}
+                                    title={editMode ? 'Update' : 'Create'}
+                                    inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
                                     inProgress={submitting}
                                     disabled={pristine || submitting || !valid}
                                 />

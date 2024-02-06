@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { Pkcs10RequestAsn1Data, Pkcs10RequestBasicData, Pkcs10RequestExtendedData } from "./";
+import type { Pkcs10RequestAsn1Data, Pkcs10RequestBasicData, Pkcs10RequestExtendedData } from './';
 
 /**
  * @type RequestData

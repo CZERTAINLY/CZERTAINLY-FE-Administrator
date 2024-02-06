@@ -11,7 +11,9 @@
  * Do not edit the class manually.
  */
 
-import type { Resource } from "./";
+import type {
+    Resource,
+} from './';
 
 /**
  * @export
@@ -60,3 +62,5 @@ export interface NotificationDto {
      */
     targetObjectIdentification?: Array<string>;
 }
+
+

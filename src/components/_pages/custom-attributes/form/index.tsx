@@ -1,21 +1,21 @@
-import CheckboxField from "components/Input/CheckboxField";
-import DynamicContent from "components/Input/DynamicContent";
-import TextField from "components/Input/TextField";
-import ProgressButton from "components/ProgressButton";
-import Widget from "components/Widget";
+import CheckboxField from 'components/Input/CheckboxField';
+import DynamicContent from 'components/Input/DynamicContent';
+import TextField from 'components/Input/TextField';
+import ProgressButton from 'components/ProgressButton';
+import Widget from 'components/Widget';
 
-import { actions, selectors } from "ducks/customAttributes";
-import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
-import { useCallback, useEffect, useMemo } from "react";
-import { Field, Form } from "react-final-form";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
-import Select from "react-select";
-import { Form as BootstrapForm, Button, ButtonGroup, FormGroup, Label } from "reactstrap";
-import { CustomAttributeCreateRequestModel, CustomAttributeUpdateRequestModel } from "types/customAttributes";
-import { AttributeContentType, PlatformEnum } from "types/openapi";
-import { isObjectSame } from "utils/common-utils";
-import { validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from "utils/validators";
+import { actions, selectors } from 'ducks/customAttributes';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { useCallback, useEffect, useMemo } from 'react';
+import { Field, Form } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
+import Select from 'react-select';
+import { Form as BootstrapForm, Button, ButtonGroup, FormGroup, Label } from 'reactstrap';
+import { CustomAttributeCreateRequestModel, CustomAttributeUpdateRequestModel } from 'types/customAttributes';
+import { AttributeContentType, PlatformEnum } from 'types/openapi';
+import { isObjectSame } from 'utils/common-utils';
+import { validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
 
 export default function CustomAttributeForm() {
     const dispatch = useDispatch();
@@ -37,14 +37,14 @@ export default function CustomAttributeForm() {
         [isCreating, isFetchingDetail, isUpdating, isFetchingResources],
     );
 
-    type FormValues = Omit<CustomAttributeCreateRequestModel, "resources"> & { resources?: Array<{ label: string; value: string }> };
+    type FormValues = Omit<CustomAttributeCreateRequestModel, 'resources'> & { resources?: Array<{ label: string; value: string }> };
     const defaultValuesCreate: FormValues = useMemo(
         () => ({
-            name: "",
-            label: "",
-            description: "",
+            name: '',
+            label: '',
+            description: '',
             contentType: AttributeContentType.Text,
-            group: "",
+            group: '',
             list: false,
             multiSelect: false,
             visible: true,
@@ -101,7 +101,7 @@ export default function CustomAttributeForm() {
     }, [dispatch, editMode, id, customAttributeDetail?.uuid]);
 
     return (
-        <Widget title={editMode ? "Edit Custom Attribute" : "Add Custom Attribute"} busy={isBusy}>
+        <Widget title={editMode ? 'Edit Custom Attribute' : 'Add Custom Attribute'} busy={isBusy}>
             <Form<FormValues>
                 initialValues={editMode ? defaultValuesUpdate : defaultValuesCreate}
                 onSubmit={(values) => {
@@ -116,16 +116,16 @@ export default function CustomAttributeForm() {
                 {({ handleSubmit, pristine, submitting, valid, values, form }) => (
                     <BootstrapForm onSubmit={handleSubmit}>
                         <TextField
-                            label={"Name"}
-                            id={"name"}
+                            label={'Name'}
+                            id={'name'}
                             disabled={editMode}
                             validators={[validateRequired(), validateAlphaNumericWithSpecialChars()]}
                         />
-                        <TextField label={"Label"} id={"label"} validators={[validateRequired(), validateAlphaNumericWithSpecialChars()]} />
-                        <TextField label={"Description"} id={"description"} validators={[validateLength(0, 300)]} />
-                        <TextField label={"Group"} id={"group"} validators={[validateAlphaNumericWithSpecialChars()]} />
+                        <TextField label={'Label'} id={'label'} validators={[validateRequired(), validateAlphaNumericWithSpecialChars()]} />
+                        <TextField label={'Description'} id={'description'} validators={[validateLength(0, 300)]} />
+                        <TextField label={'Group'} id={'group'} validators={[validateAlphaNumericWithSpecialChars()]} />
 
-                        <Field name="resources" type={"text"}>
+                        <Field name="resources" type={'text'}>
                             {({ input }) => (
                                 <FormGroup>
                                     <Label for="resources">Resources</Label>
@@ -141,20 +141,20 @@ export default function CustomAttributeForm() {
                             )}
                         </Field>
 
-                        <CheckboxField label={"Required"} id={"required"} />
-                        <CheckboxField label={"Read Only"} id={"readOnly"} />
+                        <CheckboxField label={'Required'} id={'required'} />
+                        <CheckboxField label={'Read Only'} id={'readOnly'} />
                         <CheckboxField
-                            label={"List"}
-                            id={"list"}
-                            onChange={(value) => (!value ? form.change("multiSelect", false) : false)}
+                            label={'List'}
+                            id={'list'}
+                            onChange={(value) => (!value ? form.change('multiSelect', false) : false)}
                         />
-                        <CheckboxField label={"Multi Select"} id={"multiSelect"} disabled={!values["list"]} />
-                        <DynamicContent editable={!editMode} isList={!!values["list"]} />
+                        <CheckboxField label={'Multi Select'} id={'multiSelect'} disabled={!values['list']} />
+                        <DynamicContent editable={!editMode} isList={!!values['list']} />
                         <div className="d-flex justify-content-end">
                             <ButtonGroup>
                                 <ProgressButton
-                                    title={editMode ? "Update" : "Create"}
-                                    inProgressTitle={editMode ? "Updating..." : "Creating..."}
+                                    title={editMode ? 'Update' : 'Create'}
+                                    inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
                                     inProgress={submitting}
                                     disabled={submitting || !valid || areDefaultValuesSame(values)}
                                 />

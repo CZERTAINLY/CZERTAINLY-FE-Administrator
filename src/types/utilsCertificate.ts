@@ -1,4 +1,4 @@
-import { CertificateData, Pkcs10RequestAsn1Data, RequestData, X509CertificateAsn1Data, X509CertificateBasicData } from "./openapi/utils";
+import { CertificateData, Pkcs10RequestAsn1Data, RequestData, X509CertificateAsn1Data, X509CertificateBasicData } from './openapi/utils';
 
 export const isX509CertificateBasicData = (certData: CertificateData): certData is X509CertificateBasicData => {
     return (

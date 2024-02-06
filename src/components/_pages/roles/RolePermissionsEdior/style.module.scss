@@ -1,4 +1,4 @@
-@import "resources/styles/app";
+@import 'resources/styles/app';
 
 .container {
     display: flex;
@@ -20,7 +20,7 @@
     border-bottom: solid 1px #fff;
 }
 
-.resources > div[data-selected="true"] {
+.resources > div[data-selected='true'] {
     background-color: #ddd;
 }
 

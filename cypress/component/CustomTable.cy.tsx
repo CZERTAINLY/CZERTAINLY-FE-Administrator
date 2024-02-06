@@ -1,25 +1,25 @@
-import CustomTable, { TableHeader } from "components/CustomTable/index";
-import { useCallback, useMemo, useState } from "react";
-import "../../src/resources/styles/theme.scss";
+import CustomTable, { TableHeader } from 'components/CustomTable/index';
+import { useCallback, useMemo, useState } from 'react';
+import '../../src/resources/styles/theme.scss';
 
 const detailHeaders: TableHeader[] = [
     {
-        id: "columnOne",
-        content: "Column One",
+        id: 'columnOne',
+        content: 'Column One',
         sortable: true,
-        sort: "asc",
+        sort: 'asc',
     },
     {
-        id: "columnTwo",
-        content: "Column Two",
+        id: 'columnTwo',
+        content: 'Column Two',
     },
     {
-        id: "columnThree",
-        content: "Column Three",
+        id: 'columnThree',
+        content: 'Column Three',
     },
     {
-        id: "columnFour",
-        content: "Column Four",
+        id: 'columnFour',
+        content: 'Column Four',
     },
 ];
 
@@ -40,7 +40,7 @@ const CustomTableTest = () => {
         for (let i = 0; i < pageSize; i++) {
             data.push({
                 id: i,
-                columns: ["Test Data", "Test Data", "Test Data", "Test Data"],
+                columns: ['Test Data', 'Test Data', 'Test Data', 'Test Data'],
             });
         }
         return data;
@@ -72,15 +72,15 @@ const CustomTableTest = () => {
     );
 };
 
-describe("Create a table", () => {
-    it("should render a table", () => {
+describe('Create a table', () => {
+    it('should render a table', () => {
         cy.mount(<CustomTableTest />);
-        cy.get("table").should("be.visible");
+        cy.get('table').should('be.visible');
         cy.wait(1000);
-        cy.get(".form-select").select("5");
+        cy.get('.form-select').select('5');
         cy.wait(1000);
-        cy.get(".form-select").select("10");
+        cy.get('.form-select').select('10');
         cy.wait(1000);
-        cy.get(":nth-child(4) > .page-link").click();
+        cy.get(':nth-child(4) > .page-link').click();
     });
 });

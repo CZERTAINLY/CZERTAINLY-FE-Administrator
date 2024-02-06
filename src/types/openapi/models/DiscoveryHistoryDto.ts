@@ -11,7 +11,9 @@
  * Do not edit the class manually.
  */
 
-import type { DiscoveryStatus } from "./";
+import type {
+    DiscoveryStatus,
+} from './';
 
 /**
  * Discoveries
@@ -73,3 +75,5 @@ export interface DiscoveryHistoryDto {
      */
     connectorName: string;
 }
+
+

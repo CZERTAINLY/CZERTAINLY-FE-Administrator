@@ -1,4 +1,4 @@
-import cx from "classnames";
+import cx from 'classnames';
 import {
     Button,
     Card,
@@ -11,11 +11,11 @@ import {
     PopoverHeader,
     Row,
     UncontrolledPopover,
-} from "reactstrap";
-import { LockTypeEnum } from "types/user-interface";
-import styles from "./WidgetLock.module.scss";
+} from 'reactstrap';
+import { LockTypeEnum } from 'types/user-interface';
+import styles from './WidgetLock.module.scss';
 interface Props {
-    size?: "small" | "normal" | "large";
+    size?: 'small' | 'normal' | 'large';
     lockTitle?: string;
     lockText?: string;
     lockDetails?: string;
@@ -24,23 +24,23 @@ interface Props {
 
 // TODO: Add a refresh button
 const WidgetLock = ({
-    size = "normal",
-    lockTitle = "There was some problem",
-    lockText = "There was some issue please try again later",
+    size = 'normal',
+    lockTitle = 'There was some problem',
+    lockText = 'There was some issue please try again later',
     lockType = LockTypeEnum.GENERIC,
     lockDetails,
 }: Props) => {
     const iconClasses = cx(
         `fa ${styles.lockWidgetIcon}`,
-        { [styles.normal]: size === "normal" },
-        { [styles.small]: size === "small" },
-        { [styles.large]: size === "large" },
-        { "fa-triangle-exclamation": lockType === LockTypeEnum.GENERIC },
-        { "fa-house-laptop": lockType === LockTypeEnum.CLIENT },
-        { "fa-lock": lockType === LockTypeEnum.PERMISSION },
-        { "fa-wifi": lockType === LockTypeEnum.NETWORK },
-        { "fa-database": lockType === LockTypeEnum.SERVICE_ERROR },
-        { "fa-server": lockType === LockTypeEnum.SERVER_ERROR },
+        { [styles.normal]: size === 'normal' },
+        { [styles.small]: size === 'small' },
+        { [styles.large]: size === 'large' },
+        { 'fa-triangle-exclamation': lockType === LockTypeEnum.GENERIC },
+        { 'fa-house-laptop': lockType === LockTypeEnum.CLIENT },
+        { 'fa-lock': lockType === LockTypeEnum.PERMISSION },
+        { 'fa-wifi': lockType === LockTypeEnum.NETWORK },
+        { 'fa-database': lockType === LockTypeEnum.SERVICE_ERROR },
+        { 'fa-server': lockType === LockTypeEnum.SERVER_ERROR },
     );
 
     const renderPopOver = () => {
@@ -50,15 +50,15 @@ const WidgetLock = ({
                     <i className="fa fa-circle-info ms-1" id="UncontrolledTooltip" />
                 </Button>
                 <UncontrolledPopover placement="right" target="PopoverFocus" trigger="focus">
-                    <PopoverHeader className={cx("text-center", styles.popOverHeaderTitle)}>{lockTitle}</PopoverHeader>
-                    <PopoverBody className={cx("text-center")}>{lockDetails}</PopoverBody>
+                    <PopoverHeader className={cx('text-center', styles.popOverHeaderTitle)}>{lockTitle}</PopoverHeader>
+                    <PopoverBody className={cx('text-center')}>{lockDetails}</PopoverBody>
                 </UncontrolledPopover>
             </div>
         );
     };
 
     const getMainColWidthLg = () =>
-        size === "small" ? { offset: 2, size: 5 } : size === "normal" ? { offset: 3, size: 6 } : { offset: 0, size: 12 };
+        size === 'small' ? { offset: 2, size: 5 } : size === 'normal' ? { offset: 3, size: 6 } : { offset: 0, size: 12 };
 
     return (
         <Container fluid>
@@ -73,7 +73,7 @@ const WidgetLock = ({
                                 <Col xs={12} xl={{ offset: 0, size: 8 }}>
                                     <CardTitle
                                         className={cx(
-                                            "d-flex justify-content-center align-content-center align-items-center",
+                                            'd-flex justify-content-center align-content-center align-items-center',
                                             styles.cardTitle,
                                         )}
                                         tag="h5"

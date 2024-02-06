@@ -1,5 +1,5 @@
-import { UserAddRequestDto, UserAddRequestModel, UserResponseDto, UserResponseModel } from "types/users";
-import { transformAttributeRequestModelToDto } from "./attributes";
+import { UserAddRequestDto, UserAddRequestModel, UserResponseDto, UserResponseModel } from 'types/users';
+import { transformAttributeRequestModelToDto } from './attributes';
 
 export function transformUserResponseDtoToModel(user: UserResponseDto): UserResponseModel {
     return { ...user };

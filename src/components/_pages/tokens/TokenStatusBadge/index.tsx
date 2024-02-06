@@ -1,5 +1,5 @@
-import { Badge } from "reactstrap";
-import { TokenInstanceStatus } from "types/openapi";
+import { Badge } from 'reactstrap';
+import { TokenInstanceStatus } from 'types/openapi';
 
 interface Props {
     status: TokenInstanceStatus;

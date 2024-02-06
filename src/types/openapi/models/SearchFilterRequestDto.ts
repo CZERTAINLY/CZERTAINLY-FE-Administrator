@@ -11,7 +11,10 @@
  * Do not edit the class manually.
  */
 
-import type { SearchCondition, SearchGroup } from "./";
+import type {
+    SearchCondition,
+    SearchGroup,
+} from './';
 
 /**
  * Certificate filter input
@@ -25,7 +28,7 @@ export interface SearchFilterRequestDto {
      */
     searchGroup: SearchGroup;
     /**
-     * Field to search
+     * Field identifier of search filter. List of available fields with their identifiers can be retrieved from corresponding endpoint `GET /v1/{resource}/search`, e.g.: [**GET /v1/certificates/search**](../core-certificate/#tag/Certificate-Inventory/operation/getSearchableFieldInformation)
      * @type {string}
      * @memberof SearchFilterRequestDto
      */
@@ -42,3 +45,5 @@ export interface SearchFilterRequestDto {
      */
     value?: object;
 }
+
+

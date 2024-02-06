@@ -7,7 +7,7 @@ import {
     CustomAttributeResponseModel,
     CustomAttributeUpdateRequestDto,
     CustomAttributeUpdateRequestModel,
-} from "types/customAttributes";
+} from 'types/customAttributes';
 
 export function transformCustomAttributeResponseDtoToModel(customAttribute: CustomAttributeResponseDto): CustomAttributeResponseModel {
     return { ...customAttribute };

@@ -1,7 +1,7 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ApprovalModel, ApprovalUserModel, DetailApprovalModel, ResponseApprovalModel, UserApprovalModel } from "types/approvals";
-import { ApprovalDetailDtoStatusEnum, ApprovalDtoStatusEnum } from "types/openapi";
-import { createFeatureSelector } from "utils/ducks";
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { ApprovalModel, ApprovalUserModel, DetailApprovalModel, ResponseApprovalModel, UserApprovalModel } from 'types/approvals';
+import { ApprovalDetailDtoStatusEnum, ApprovalDtoStatusEnum } from 'types/openapi';
+import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     approvalDetails?: DetailApprovalModel;
@@ -30,7 +30,7 @@ export const initialState: State = {
 };
 
 export const slice = createSlice({
-    name: "approvals",
+    name: 'approvals',
 
     initialState,
 

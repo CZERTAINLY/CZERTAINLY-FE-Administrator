@@ -1,9 +1,9 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ApiClients } from "api";
-import { WritableDraft } from "immer/dist/internal";
-import { Observable } from "rxjs";
-import { SearchFieldListModel, SearchFilterModel } from "types/certificate";
-import { createFeatureSelector } from "utils/ducks";
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { ApiClients } from 'api';
+import { WritableDraft } from 'immer/dist/internal';
+import { Observable } from 'rxjs';
+import { SearchFieldListModel, SearchFilterModel } from 'types/certificate';
+import { createFeatureSelector } from 'utils/ducks';
 
 export const enum EntityType {
     ENTITY,
@@ -53,7 +53,7 @@ const updateFilterState = (state: WritableDraft<State>, entity: EntityType, call
 };
 
 export const slice = createSlice({
-    name: "filters",
+    name: 'filters',
 
     initialState,
 

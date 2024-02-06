@@ -11,7 +11,10 @@
  * Do not edit the class manually.
  */
 
-import type { GroupDto, KeyItemDto } from "./";
+import type {
+    GroupDto,
+    KeyItemDto,
+} from './';
 
 /**
  * Key Pair of the certificate

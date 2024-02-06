@@ -1,22 +1,22 @@
-import { Buffer } from "buffer";
-import { actions as userInterfaceActions } from "../../../../ducks/user-interface";
+import { Buffer } from 'buffer';
+import { actions as userInterfaceActions } from '../../../../ducks/user-interface';
 
-import { actions as alertActions } from "ducks/alerts";
-import { actions, selectors } from "ducks/certificates";
+import { actions as alertActions } from 'ducks/alerts';
+import { actions, selectors } from 'ducks/certificates';
 
-import { CertificateFormat, CertificateFormatEncoding } from "../../../../types/openapi";
+import { CertificateFormat, CertificateFormatEncoding } from '../../../../types/openapi';
 
-import { selectors as enumSelectors } from "ducks/enums";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { selectors as enumSelectors } from 'ducks/enums';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
-import { downloadFile } from "utils/certificate";
+import { downloadFile } from 'utils/certificate';
 
-import { PlatformEnum } from "types/openapi";
+import { PlatformEnum } from 'types/openapi';
 
-import DropDownListForm from "components/DropDownForm";
-import SwitchWidget from "components/SwitchWidget";
-import { Container, Label } from "reactstrap";
+import DropDownListForm from 'components/DropDownForm';
+import SwitchWidget from 'components/SwitchWidget';
+import { Container, Label } from 'reactstrap';
 
 // Adding eslint supress no-useless concat warning
 /* eslint-disable no-useless-concat */
@@ -42,17 +42,17 @@ const CertificateDownloadForm = () => {
     const [certificateDownloadSwitch, setCertificateDownload] = useState<ChainDownloadSwitchState>({ isDownloadTriggered: false });
     const [isDownloadFormCertificateChain, setIsDownloadFormCertificateChain] = useState<boolean>(false);
 
-    const fileNameToDownload = certificate?.commonName + "_" + certificate?.serialNumber;
+    const fileNameToDownload = certificate?.commonName + '_' + certificate?.serialNumber;
 
     const certificateFormatEncodingMap = useMemo(() => {
         return {
             [CertificateFormat.Raw]: {
-                [CertificateFormatEncoding.Pem]: ".pem",
-                [CertificateFormatEncoding.Der]: ".cer",
+                [CertificateFormatEncoding.Pem]: '.pem',
+                [CertificateFormatEncoding.Der]: '.cer',
             },
             [CertificateFormat.Pkcs7]: {
-                [CertificateFormatEncoding.Pem]: ".p7c",
-                [CertificateFormatEncoding.Der]: ".p7b",
+                [CertificateFormatEncoding.Pem]: '.p7c',
+                [CertificateFormatEncoding.Der]: '.p7b',
             },
         };
     }, []);
@@ -60,12 +60,12 @@ const CertificateDownloadForm = () => {
     const certificateChainFormatEncodingMap = useMemo(() => {
         return {
             [CertificateFormat.Raw]: {
-                [CertificateFormatEncoding.Pem]: ".pem",
+                [CertificateFormatEncoding.Pem]: '.pem',
                 [CertificateFormatEncoding.Der]: null,
             },
             [CertificateFormat.Pkcs7]: {
-                [CertificateFormatEncoding.Pem]: ".p7c",
-                [CertificateFormatEncoding.Der]: ".p7b",
+                [CertificateFormatEncoding.Pem]: '.p7c',
+                [CertificateFormatEncoding.Der]: '.p7b',
             },
         };
     }, []);
@@ -138,11 +138,11 @@ const CertificateDownloadForm = () => {
             certificateChainFormatEncodingMap[chainDownloadSwitch.certificateFormat]?.[chainDownloadSwitch.certificateEncoding];
 
         if (!extensionFormat) {
-            dispatch(alertActions.error("There was some error with the extension format."));
+            dispatch(alertActions.error('There was some error with the extension format.'));
             return;
         }
 
-        downloadFile(Buffer.from(certificateChainDownloadContent.content ?? "", "base64"), fileNameToDownload + "_chain" + extensionFormat);
+        downloadFile(Buffer.from(certificateChainDownloadContent.content ?? '', 'base64'), fileNameToDownload + '_chain' + extensionFormat);
 
         setTriggerChainDownload({ isDownloadTriggered: false });
     }, [certificateChainDownloadContent, chainDownloadSwitch, fileNameToDownload, certificateChainFormatEncodingMap, dispatch]);
@@ -166,10 +166,10 @@ const CertificateDownloadForm = () => {
             certificateFormatEncodingMap[certificateDownloadSwitch.certificateFormat]?.[certificateDownloadSwitch.certificateEncoding];
 
         if (!extensionFormat) {
-            dispatch(alertActions.error("There was some error with the extension format."));
+            dispatch(alertActions.error('There was some error with the extension format.'));
         }
 
-        downloadFile(Buffer.from(certificateDownloadContent.content ?? "", "base64"), fileNameToDownload + extensionFormat);
+        downloadFile(Buffer.from(certificateDownloadContent.content ?? '', 'base64'), fileNameToDownload + extensionFormat);
 
         setCertificateDownload({ isDownloadTriggered: false });
     }, [certificateDownloadContent, certificateDownloadSwitch, fileNameToDownload, certificateFormatEncodingMap, dispatch]);
@@ -205,13 +205,13 @@ const CertificateDownloadForm = () => {
                 }}
                 dropDownOptionsList={[
                     {
-                        formLabel: isDownloadFormCertificateChain ? "Certificate Chain Format" : "Certificate Format",
-                        formValue: "certificateFormat",
+                        formLabel: isDownloadFormCertificateChain ? 'Certificate Chain Format' : 'Certificate Format',
+                        formValue: 'certificateFormat',
                         options: certificateFormatOptions,
                     },
                     {
-                        formLabel: isDownloadFormCertificateChain ? "Certificate Chain Encoding" : "Certificate Encoding",
-                        formValue: "certificateEncoding",
+                        formLabel: isDownloadFormCertificateChain ? 'Certificate Chain Encoding' : 'Certificate Encoding',
+                        formValue: 'certificateEncoding',
 
                         options: certificateEncodingOptions,
                     },

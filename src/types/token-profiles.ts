@@ -1,4 +1,4 @@
-import { AttributeRequestModel, AttributeResponseModel } from "./attributes";
+import { AttributeRequestModel, AttributeResponseModel } from './attributes';
 import {
     AddTokenProfileRequestDto,
     BulkTokenProfileKeyUsageRequestDto,
@@ -6,16 +6,16 @@ import {
     TokenProfileDetailDto,
     TokenProfileDto,
     TokenProfileKeyUsageRequestDto,
-} from "./openapi";
+} from './openapi';
 
 export type TokenProfileAddRequestDto = AddTokenProfileRequestDto;
-export type TokenProfileAddRequestModel = Omit<TokenProfileAddRequestDto, "attributes | customAttributes"> & {
+export type TokenProfileAddRequestModel = Omit<TokenProfileAddRequestDto, 'attributes | customAttributes'> & {
     attributes: Array<AttributeRequestModel>;
     customAttributes?: Array<AttributeRequestModel>;
 };
 
 export type TokenProfileEditRequestDto = EditTokenProfileRequestDto;
-export type TokenProfileEditRequestModel = Omit<TokenProfileEditRequestDto, "attributes | customAttributes"> & {
+export type TokenProfileEditRequestModel = Omit<TokenProfileEditRequestDto, 'attributes | customAttributes'> & {
     attributes: Array<AttributeRequestModel>;
     customAttributes?: Array<AttributeRequestModel>;
 };
@@ -24,7 +24,7 @@ export type TokenProfileResponseDto = TokenProfileDto;
 export type TokenProfileResponseModel = TokenProfileResponseDto;
 
 export type TokenProfileDetailResponseDto = TokenProfileDetailDto;
-export type TokenProfileDetailResponseModel = Omit<TokenProfileDetailResponseDto, "attributes | customAttributes"> & {
+export type TokenProfileDetailResponseModel = Omit<TokenProfileDetailResponseDto, 'attributes | customAttributes'> & {
     attributes: Array<AttributeResponseModel>;
     customAttributes?: Array<AttributeResponseModel>;
 };

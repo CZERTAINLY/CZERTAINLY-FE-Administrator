@@ -1,14 +1,14 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AttributeDescriptorModel } from "types/attributes";
-import { SearchRequestModel } from "types/certificate";
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { AttributeDescriptorModel } from 'types/attributes';
+import { SearchRequestModel } from 'types/certificate';
 import {
     LocationAddRequestModel,
     LocationEditRequestModel,
     LocationIssueRequestModel,
     LocationPushRequestModel,
     LocationResponseModel,
-} from "types/locations";
-import { createFeatureSelector } from "utils/ducks";
+} from 'types/locations';
+import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     location?: LocationResponseModel;
@@ -61,7 +61,7 @@ export const initialState: State = {
 };
 
 export const slice = createSlice({
-    name: "locations",
+    name: 'locations',
 
     initialState,
 

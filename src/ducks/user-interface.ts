@@ -1,9 +1,9 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { createSelector } from "reselect";
-import { AjaxError } from "rxjs/ajax";
-import { GloablModalModel, LockWidgetNameEnum, WidgetLockErrorModel, WidgetLockModel } from "types/user-interface";
-import { createFeatureSelector } from "utils/ducks";
-import { getLockWidgetObject } from "utils/net";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSelector } from 'reselect';
+import { AjaxError } from 'rxjs/ajax';
+import { GloablModalModel, LockWidgetNameEnum, WidgetLockErrorModel, WidgetLockModel } from 'types/user-interface';
+import { createFeatureSelector } from 'utils/ducks';
+import { getLockWidgetObject } from 'utils/net';
 
 export type State = {
     widgetLocks: WidgetLockModel[];
@@ -18,7 +18,7 @@ export const initialState: State = {
     widgetLocks: [],
     globalModal: {
         title: undefined,
-        size: "sm",
+        size: 'sm',
         content: undefined,
         type: undefined,
         isOpen: false,
@@ -26,7 +26,7 @@ export const initialState: State = {
 };
 
 export const slice = createSlice({
-    name: "userInterface",
+    name: 'userInterface',
 
     initialState,
 

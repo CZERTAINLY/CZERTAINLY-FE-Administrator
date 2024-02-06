@@ -1,7 +1,7 @@
-import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
-import { useCallback } from "react";
-import { useSelector } from "react-redux";
-import { CertificateDetailResponseModel } from "types/certificate";
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { useCallback } from 'react';
+import { useSelector } from 'react-redux';
+import { CertificateDetailResponseModel } from 'types/certificate';
 import {
     CertificateEventHistoryDtoStatusEnum,
     CertificateState,
@@ -10,29 +10,29 @@ import {
     ComplianceRuleStatus,
     ComplianceStatus,
     PlatformEnum,
-} from "types/openapi";
+} from 'types/openapi';
 
 export const emptyCertificate: CertificateDetailResponseModel = {
-    uuid: "",
-    commonName: "",
-    serialNumber: "",
-    issuerCommonName: "",
-    certificateContent: "",
-    issuerDn: "",
-    subjectDn: "",
-    notBefore: "",
-    notAfter: "",
-    publicKeyAlgorithm: "",
-    signatureAlgorithm: "",
+    uuid: '',
+    commonName: '',
+    serialNumber: '',
+    issuerCommonName: '',
+    certificateContent: '',
+    issuerDn: '',
+    subjectDn: '',
+    notBefore: '',
+    notAfter: '',
+    publicKeyAlgorithm: '',
+    signatureAlgorithm: '',
     keySize: -1,
     keyUsage: [],
     extendedKeyUsage: [],
-    basicConstraints: "",
+    basicConstraints: '',
     state: CertificateState.PendingIssue,
     validationStatus: CertificateValidationStatus.NotChecked,
-    fingerprint: "",
+    fingerprint: '',
     certificateType: CertificateType.X509,
-    issuerSerialNumber: "",
+    issuerSerialNumber: '',
     subjectAlternativeNames: {},
     privateKeyAvailability: false,
     trustedCa: false,
@@ -44,25 +44,25 @@ export function formatPEM(pemString: string, csr?: boolean) {
     const wrapNeeded = PEM_STRING_LENGTH > LINE_LENGTH;
 
     if (wrapNeeded) {
-        let formattedString = "",
+        let formattedString = '',
             wrapIndex = 0;
 
         for (let i = LINE_LENGTH; i < PEM_STRING_LENGTH; i += LINE_LENGTH) {
-            formattedString += pemString.substring(wrapIndex, i) + "\r\n";
+            formattedString += pemString.substring(wrapIndex, i) + '\r\n';
             wrapIndex = i;
         }
 
         formattedString += pemString.substring(wrapIndex, PEM_STRING_LENGTH);
 
-        return `-----BEGIN CERTIFICATE${csr ? " REQUEST" : ""}-----\n${formattedString}\n-----END CERTIFICATE${csr ? " REQUEST" : ""}-----`;
+        return `-----BEGIN CERTIFICATE${csr ? ' REQUEST' : ''}-----\n${formattedString}\n-----END CERTIFICATE${csr ? ' REQUEST' : ''}-----`;
     } else {
-        return `-----BEGIN CERTIFICATE${csr ? " REQUEST" : ""}-----\n${pemString}\n-----END CERTIFICATE${csr ? " REQUEST" : ""}-----`;
+        return `-----BEGIN CERTIFICATE${csr ? ' REQUEST' : ''}-----\n${pemString}\n-----END CERTIFICATE${csr ? ' REQUEST' : ''}-----`;
     }
 }
 
 export function downloadFile(content: any, fileName: string) {
-    const element = document.createElement("a");
-    const file = new Blob([content], { type: "text/plain" });
+    const element = document.createElement('a');
+    const file = new Blob([content], { type: 'text/plain' });
     element.href = URL.createObjectURL(file);
     element.download = fileName;
     document.body.appendChild(element); // Required for this to work in FireFox
@@ -74,64 +74,64 @@ export function getCertificateStatusColor(
 ) {
     switch (status) {
         case CertificateState.Requested:
-            return "#3754a5";
+            return '#3754a5';
         case CertificateState.Archived:
-            return "#6c757d";
+            return '#6c757d';
         case CertificateState.Rejected:
-            return "#eb3349";
+            return '#eb3349';
         case CertificateState.Issued:
-            return "#1ab394";
+            return '#1ab394';
         case CertificateState.Failed:
-            return "#c7182c";
+            return '#c7182c';
         case CertificateState.PendingApproval:
-            return "#3754a5";
+            return '#3754a5';
         case CertificateState.PendingIssue:
-            return "#3782a5";
+            return '#3782a5';
         case CertificateState.PendingRevoke:
-            return "#eb3f33";
+            return '#eb3f33';
         case CertificateState.Revoked:
-            return "#632828";
+            return '#632828';
 
         case CertificateValidationStatus.Valid:
-            return "#1ab394";
+            return '#1ab394';
         case CertificateValidationStatus.Expired:
-            return "#eb3349";
+            return '#eb3349';
         case CertificateValidationStatus.Revoked:
-            return "#632828";
+            return '#632828';
         case CertificateValidationStatus.Expiring:
-            return "#f37d63";
+            return '#f37d63';
         case CertificateValidationStatus.Invalid:
-            return "#131212";
+            return '#131212';
         case CertificateValidationStatus.Inactive:
-            return "#6c757d";
+            return '#6c757d';
         case CertificateValidationStatus.NotChecked:
-            return "#7fa2c1";
+            return '#7fa2c1';
         case CertificateValidationStatus.Failed:
-            return "#9c0012";
+            return '#9c0012';
 
         case ComplianceStatus.Na:
-            return "#6c757d";
+            return '#6c757d';
         case ComplianceStatus.Nok:
-            return "#eb3349";
+            return '#eb3349';
         case ComplianceStatus.Ok:
-            return "#1ab394";
+            return '#1ab394';
         case ComplianceStatus.NotChecked:
-            return "#7fa2c1";
+            return '#7fa2c1';
 
         case ComplianceRuleStatus.Na:
-            return "#6c757d";
+            return '#6c757d';
         case ComplianceRuleStatus.Nok:
-            return "#eb3349";
+            return '#eb3349';
         case ComplianceRuleStatus.Ok:
-            return "#1ab394";
+            return '#1ab394';
 
         case CertificateEventHistoryDtoStatusEnum.Failed:
-            return "#eb3349";
+            return '#eb3349';
         case CertificateEventHistoryDtoStatusEnum.Success:
-            return "#1ab394";
+            return '#1ab394';
 
         default:
-            return "#6c757d";
+            return '#6c757d';
     }
 }
 
@@ -172,9 +172,9 @@ export function useGetStatusText() {
                     return getEnumLabel(certificateStatusEnum, status);
 
                 case CertificateEventHistoryDtoStatusEnum.Success:
-                    return "Success";
+                    return 'Success';
                 case CertificateEventHistoryDtoStatusEnum.Failed:
-                    return "Failed";
+                    return 'Failed';
 
                 case ComplianceStatus.Ok:
                 case ComplianceStatus.Nok:
@@ -188,7 +188,7 @@ export function useGetStatusText() {
                     return getEnumLabel(complianceRuleStatusEnum, status);
 
                 default:
-                    return "Unknown";
+                    return 'Unknown';
             }
         },
         [certificateStatusEnum, certificateValidationStatusEnum, complianceStatusEnum, complianceRuleStatusEnum],

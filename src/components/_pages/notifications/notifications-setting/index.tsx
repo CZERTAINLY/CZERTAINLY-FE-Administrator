@@ -1,17 +1,17 @@
-import TabLayout from "components/Layout/TabLayout";
-import ProgressButton from "components/ProgressButton";
-import Widget from "components/Widget";
-import { selectors as enumSelectors } from "ducks/enums";
-import { actions as notificationActions, selectors as notificationsSelectors } from "ducks/notifications";
-import { actions as settingsActions, selectors as settingsSelectors } from "ducks/settings";
-import { useCallback, useEffect, useMemo } from "react";
-import { Field, Form } from "react-final-form";
-import { useDispatch, useSelector } from "react-redux";
-import Select from "react-select";
-import { Form as BootstrapForm, ButtonGroup, Col, Container, FormGroup, Label, Row } from "reactstrap";
-import { PlatformEnum } from "types/openapi";
-import { isObjectSame, removeNullValues } from "utils/common-utils";
-import NotificationInstanceList from "../notifications-instances";
+import TabLayout from 'components/Layout/TabLayout';
+import ProgressButton from 'components/ProgressButton';
+import Widget from 'components/Widget';
+import { selectors as enumSelectors } from 'ducks/enums';
+import { actions as notificationActions, selectors as notificationsSelectors } from 'ducks/notifications';
+import { actions as settingsActions, selectors as settingsSelectors } from 'ducks/settings';
+import { useCallback, useEffect, useMemo } from 'react';
+import { Field, Form } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
+import Select from 'react-select';
+import { Form as BootstrapForm, ButtonGroup, Col, Container, FormGroup, Label, Row } from 'reactstrap';
+import { PlatformEnum } from 'types/openapi';
+import { isObjectSame, removeNullValues } from 'utils/common-utils';
+import NotificationInstanceList from '../notifications-instances';
 
 type FormValues = {
     notificationsMapping: {
@@ -72,7 +72,7 @@ const NotificationsSetting = () => {
             .reduce(
                 (acc, [key, value]) => {
                     const option = notificationsOptions.find((option) => option.value === value);
-                    acc[key] = { value, label: option?.label ?? "" };
+                    acc[key] = { value, label: option?.label ?? '' };
                     return acc;
                 },
                 {} as { [key: string]: { value: string; label: string } },
@@ -122,11 +122,11 @@ const NotificationsSetting = () => {
             <TabLayout
                 tabs={[
                     {
-                        title: "Notification Instances",
+                        title: 'Notification Instances',
                         content: <NotificationInstanceList />,
                     },
                     {
-                        title: "Configuration",
+                        title: 'Configuration',
                         content: (
                             <Widget
                                 refreshAction={getFreshNotificationSettings}
@@ -169,8 +169,8 @@ const NotificationsSetting = () => {
                                                 <div className="d-flex justify-content-end">
                                                     <ButtonGroup>
                                                         <ProgressButton
-                                                            title={"Apply"}
-                                                            inProgressTitle={"Applying.."}
+                                                            title={'Apply'}
+                                                            inProgressTitle={'Applying..'}
                                                             disabled={
                                                                 submitting || isUpdatingNotificationsSetting || areDefaultValuesSame(values)
                                                             }

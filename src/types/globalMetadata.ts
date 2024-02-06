@@ -4,7 +4,7 @@ import {
     GlobalMetadataCreateRequestDto as GlobalMetadataCreateRequestDtoOpenApi,
     GlobalMetadataDefinitionDetailDto,
     GlobalMetadataUpdateRequestDto as GlobalMetadataUpdateRequestDtoOpenApi,
-} from "./openapi";
+} from './openapi';
 
 export type GlobalMetadataResponseDto = AttributeDefinitionDto;
 export type GlobalMetadataResponseModel = GlobalMetadataResponseDto;

@@ -11,8 +11,8 @@ import {
     UserDetailModel,
     UserUpdateRequestDto,
     UserUpdateRequestModel,
-} from "types/auth";
-import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
+} from 'types/auth';
+import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from './attributes';
 
 export function transformResourceDtoToModel(resource: ResourceDto): ResourceModel {
     return {

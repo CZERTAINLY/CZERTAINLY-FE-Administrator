@@ -17,7 +17,8 @@
  * @enum {string}
  */
 export enum SchedulerJobExecutionStatus {
-    Started = "started",
-    Succeeded = "succeeded",
-    Failed = "failed",
+    Started = 'started',
+    Succeeded = 'succeeded',
+    Failed = 'failed'
 }
+

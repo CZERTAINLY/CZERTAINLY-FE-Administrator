@@ -1,50 +1,50 @@
-import { combineReducers } from "redux";
-import { initialState } from "./initial-state";
+import { combineReducers } from 'redux';
+import { initialState } from './initial-state';
 
-import { slice as acmeAccountsSlice } from "./acme-accounts";
-import { slice as acmeProfilesSlice } from "./acme-profiles";
-import { slice as scepProfilesSlice } from "./scep-profiles";
+import { slice as acmeAccountsSlice } from './acme-accounts';
+import { slice as acmeProfilesSlice } from './acme-profiles';
+import { slice as scepProfilesSlice } from './scep-profiles';
 
-import { alertsSlice } from "./alert-slice";
-import { slice as appRedirectSlice } from "./app-redirect";
-import { slice as auditLogsSlice } from "./auditLogs";
-import { slice as authSlice } from "./auth";
-import { slice as userInterfaceSlice } from "./user-interface";
+import { alertsSlice } from './alert-slice';
+import { slice as appRedirectSlice } from './app-redirect';
+import { slice as auditLogsSlice } from './auditLogs';
+import { slice as authSlice } from './auth';
+import { slice as userInterfaceSlice } from './user-interface';
 
-import { slice as profileApprovalSlice } from "./approval-profiles";
+import { slice as profileApprovalSlice } from './approval-profiles';
 
-import { slice as approvalSlice } from "./approvals";
+import { slice as approvalSlice } from './approvals';
 
-import { slice as authoritiesSlice } from "./authorities";
-import { slice as groupsSlice } from "./certificateGroups";
-import { slice as certificatesSlice } from "./certificates";
-import { slice as initialComplianceProfilesSlice } from "./compliance-profiles";
-import { slice as connectorsSlice } from "./connectors";
-import { slice as initialCredentialsSlice } from "./credentials";
-import { slice as cryptographicKeySlice } from "./cryptographic-keys";
-import { slice as cryptographicOperationsSlice } from "./cryptographic-operations";
-import { slice as customAttributesSlice } from "./customAttributes";
-import { slice as discoveriesSlice } from "./discoveries";
-import { slice as initialEntitiesSlice } from "./entities";
-import { slice as enumsSlice } from "./enums";
-import { slice as initialFiltersSlice } from "./filters";
-import { slice as globalMetadataSlice } from "./globalMetadata";
-import { slice as initialLocationsSlice } from "./locations";
-import { slice as notificationsSlice } from "./notifications";
-import { slice as pagingSlice } from "./paging";
-import { slice as raProfilesSlice } from "./ra-profiles";
+import { slice as authoritiesSlice } from './authorities';
+import { slice as groupsSlice } from './certificateGroups';
+import { slice as certificatesSlice } from './certificates';
+import { slice as initialComplianceProfilesSlice } from './compliance-profiles';
+import { slice as connectorsSlice } from './connectors';
+import { slice as initialCredentialsSlice } from './credentials';
+import { slice as cryptographicKeySlice } from './cryptographic-keys';
+import { slice as cryptographicOperationsSlice } from './cryptographic-operations';
+import { slice as customAttributesSlice } from './customAttributes';
+import { slice as discoveriesSlice } from './discoveries';
+import { slice as initialEntitiesSlice } from './entities';
+import { slice as enumsSlice } from './enums';
+import { slice as initialFiltersSlice } from './filters';
+import { slice as globalMetadataSlice } from './globalMetadata';
+import { slice as initialLocationsSlice } from './locations';
+import { slice as notificationsSlice } from './notifications';
+import { slice as pagingSlice } from './paging';
+import { slice as raProfilesSlice } from './ra-profiles';
 // import { reducers } from "./reducers";
-import { slice as rolesSlice } from "./roles";
-import { slice as schedulerSlice } from "./scheduler";
-import { slice as settingsSlice } from "./settings";
-import { slice as dashboardSlice } from "./statisticsDashboard";
-import { slice as tokenProfileSlice } from "./token-profiles";
-import { slice as tokenSlice } from "./tokens";
-import { slice as usersSlice } from "./users";
-import { slice as utilsActuatorSlice } from "./utilsActuator";
-import { slice as utilsCertificateSlice } from "./utilsCertificate";
-import { slice as utilsCertificateRequestSlice } from "./utilsCertificateRequest";
-import { slice as utilsOidSlice } from "./utilsOid";
+import { slice as rolesSlice } from './roles';
+import { slice as schedulerSlice } from './scheduler';
+import { slice as settingsSlice } from './settings';
+import { slice as dashboardSlice } from './statisticsDashboard';
+import { slice as tokenProfileSlice } from './token-profiles';
+import { slice as tokenSlice } from './tokens';
+import { slice as usersSlice } from './users';
+import { slice as utilsActuatorSlice } from './utilsActuator';
+import { slice as utilsCertificateSlice } from './utilsCertificate';
+import { slice as utilsCertificateRequestSlice } from './utilsCertificateRequest';
+import { slice as utilsOidSlice } from './utilsOid';
 export const reducers = combineReducers<typeof initialState, any>({
     [alertsSlice.name]: alertsSlice.reducer,
     [userInterfaceSlice.name]: userInterfaceSlice.reducer,

@@ -11,7 +11,9 @@
  * Do not edit the class manually.
  */
 
-import type { KeyCompromiseReason } from "./";
+import type {
+    KeyCompromiseReason,
+} from './';
 
 /**
  * @export
@@ -30,3 +32,5 @@ export interface CompromiseKeyRequestDto {
      */
     uuids?: Array<string>;
 }
+
+

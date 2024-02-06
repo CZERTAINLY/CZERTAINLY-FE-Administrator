@@ -7,11 +7,11 @@
   * LICENSE.txt file in the root directory of this source tree.
 */
 
-@import "src/resources/styles/app";
+@import 'src/resources/styles/app';
 
 .root {
     //background: $body-bg;
-    background-image: url("../../../../src/resources/images/czertainly-chain.png");
+    background-image: url('../../../../src/resources/images/czertainly-chain.png');
     background-position: center;
     background-size: cover;
 
@@ -70,7 +70,7 @@
 
                 i {
                     font-size: 1.25rem;
-                    color: theme-color("light");
+                    color: theme-color('light');
                 }
             }
         }
@@ -170,7 +170,7 @@
         width: 15px;
         height: 15px;
         border-radius: 50%;
-        background-color: theme-color("danger");
+        background-color: theme-color('danger');
     }
 }
 

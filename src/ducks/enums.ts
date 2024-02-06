@@ -1,7 +1,7 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { EnumItemModel, PlatformEnumModel } from "types/enums";
-import { PlatformEnum } from "types/openapi";
-import { createFeatureSelector } from "utils/ducks";
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { EnumItemModel, PlatformEnumModel } from 'types/enums';
+import { PlatformEnum } from 'types/openapi';
+import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     platformEnums: PlatformEnumModel;
@@ -12,7 +12,7 @@ export const initialState: State = {
 };
 
 export const slice = createSlice({
-    name: "enums",
+    name: 'enums',
     initialState,
     reducers: {
         getPlatformEnums: (state, action: PayloadAction<void>) => {

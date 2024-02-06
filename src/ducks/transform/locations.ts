@@ -17,8 +17,8 @@ import {
     MetadataModel,
     NameAndUuidDto,
     NameAndUuidModel,
-} from "types/locations";
-import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
+} from 'types/locations';
+import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from './attributes';
 
 export function transformNameAndUuidDtoToModel(name: NameAndUuidDto): NameAndUuidModel {
     return { ...name };

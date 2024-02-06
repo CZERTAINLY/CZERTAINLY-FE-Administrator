@@ -11,7 +11,10 @@
  * Do not edit the class manually.
  */
 
-import type { EndpointDto, FunctionGroupCode } from "./";
+import type {
+    EndpointDto,
+    FunctionGroupCode,
+} from './';
 
 /**
  * List of Function Groups implemented by the Connector
@@ -49,3 +52,5 @@ export interface FunctionGroupDto {
      */
     name: string;
 }
+
+

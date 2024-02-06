@@ -1,12 +1,12 @@
-import { of } from "rxjs";
-import { catchError, filter, map, switchMap } from "rxjs/operators";
+import { of } from 'rxjs';
+import { catchError, filter, map, switchMap } from 'rxjs/operators';
 
-import { AppEpic } from "ducks";
+import { AppEpic } from 'ducks';
 
-import { actions as appRedirectActions } from "./app-redirect";
+import { actions as appRedirectActions } from './app-redirect';
 
-import * as slice from "./auth";
-import { transformResourceDtoToModel, transformUserUpdateRequestModelToDto } from "./transform/auth";
+import * as slice from './auth';
+import { transformResourceDtoToModel, transformUserUpdateRequestModelToDto } from './transform/auth';
 
 const getProfile: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -18,7 +18,7 @@ const getProfile: AppEpic = (action$, state$, deps) => {
                 catchError((error) => {
                     return of(
                         slice.actions.getProfileFailure(),
-                        appRedirectActions.fetchError({ error, message: "Failed to get user profile" }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to get user profile' }),
                     );
                 }),
             ),
@@ -38,7 +38,7 @@ const updateProfile: AppEpic = (action$, state$, deps) => {
                     catchError((error) =>
                         of(
                             slice.actions.updateProfileFailure(),
-                            appRedirectActions.fetchError({ error, message: "Failed to update user profile" }),
+                            appRedirectActions.fetchError({ error, message: 'Failed to update user profile' }),
                         ),
                     ),
                 ),
@@ -67,7 +67,7 @@ const getResources: AppEpic = (action$, state$, deps) => {
                 catchError((err) =>
                     of(
                         slice.actions.getResourcesFailure(),
-                        appRedirectActions.fetchError({ error: err.payload.error, message: "Failed to get user resources" }),
+                        appRedirectActions.fetchError({ error: err.payload.error, message: 'Failed to get user resources' }),
                     ),
                 ),
             ),
@@ -85,7 +85,7 @@ const getObjectsForResource: AppEpic = (action$, state$, deps) => {
                 catchError((err) =>
                     of(
                         slice.actions.getObjectsForResourceFailure(),
-                        appRedirectActions.fetchError({ error: err.payload.error, message: "Failed to get objects list" }),
+                        appRedirectActions.fetchError({ error: err.payload.error, message: 'Failed to get objects list' }),
                     ),
                 ),
             ),

@@ -11,11 +11,11 @@
  * Do not edit the class manually.
  */
 
-import type { Observable } from "rxjs";
-import type { AjaxResponse } from "rxjs/ajax";
-import type { OidInfoResponseDto } from "../models";
-import type { OperationOpts } from "../runtime";
-import { BaseAPI, encodeURI, throwIfNullOrUndefined } from "../runtime";
+import type { Observable } from 'rxjs';
+import type { AjaxResponse } from 'rxjs/ajax';
+import type { OidInfoResponseDto } from '../models';
+import type { OperationOpts } from '../runtime';
+import { BaseAPI, encodeURI, throwIfNullOrUndefined } from '../runtime';
 
 export interface GetOidInfoRequest {
     identifier: string;
@@ -31,12 +31,12 @@ export class OIDUtilsAPIApi extends BaseAPI {
     getOidInfo({ identifier }: GetOidInfoRequest): Observable<OidInfoResponseDto>;
     getOidInfo({ identifier }: GetOidInfoRequest, opts?: OperationOpts): Observable<AjaxResponse<OidInfoResponseDto>>;
     getOidInfo({ identifier }: GetOidInfoRequest, opts?: OperationOpts): Observable<OidInfoResponseDto | AjaxResponse<OidInfoResponseDto>> {
-        throwIfNullOrUndefined(identifier, "identifier", "getOidInfo");
+        throwIfNullOrUndefined(identifier, 'identifier', 'getOidInfo');
 
         return this.request<OidInfoResponseDto>(
             {
-                url: "/v1/oid/{identifier}".replace("{identifier}", encodeURI(identifier)),
-                method: "GET",
+                url: '/v1/oid/{identifier}'.replace('{identifier}', encodeURI(identifier)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );

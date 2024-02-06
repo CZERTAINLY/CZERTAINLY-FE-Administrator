@@ -11,7 +11,7 @@ import {
     CryptographicKeyVerifyDataRequestModel,
     CryptographicKeyVerifyResponseDto,
     CryptographicKeyVerifyResponseModel,
-} from "types/cryptographic-operations";
+} from 'types/cryptographic-operations';
 
 export function transformCryptographicKeySignDataResponseDtoToModel(
     keyResponse: CryptographicKeySignResponseDto,

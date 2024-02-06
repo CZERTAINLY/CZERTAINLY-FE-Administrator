@@ -1,12 +1,12 @@
-import ProgressButton from "components/ProgressButton";
-import { Field, Form } from "react-final-form";
-import { Form as BootstrapForm, Button, ButtonGroup, Container } from "reactstrap";
+import ProgressButton from 'components/ProgressButton';
+import { Field, Form } from 'react-final-form';
+import { Form as BootstrapForm, Button, ButtonGroup, Container } from 'reactstrap';
 
-import Select from "react-select";
-import { FormGroup, Label } from "reactstrap";
+import Select from 'react-select';
+import { FormGroup, Label } from 'reactstrap';
 
-import { validateRequired } from "utils/validators";
-import style from "./dropDownForm.module.scss";
+import { validateRequired } from 'utils/validators';
+import style from './dropDownForm.module.scss';
 interface DropDownOptions {
     label: string;
     value: string | number;
@@ -54,7 +54,7 @@ const DropDownListForm = ({ onSubmit, onClose, dropDownOptionsList, isBusy = fal
                             <ButtonGroup className="ms-auto">
                                 <ProgressButton
                                     inProgress={isBusy}
-                                    title={isBusy ? "Submitting" : "Submit"}
+                                    title={isBusy ? 'Submitting' : 'Submit'}
                                     type="submit"
                                     color="primary"
                                     disabled={pristine || isBusy || !valid}
@@ -68,7 +68,7 @@ const DropDownListForm = ({ onSubmit, onClose, dropDownOptionsList, isBusy = fal
                         </div>
                     </BootstrapForm>
                 )}
-            </Form>{" "}
+            </Form>{' '}
         </Container>
     );
 };

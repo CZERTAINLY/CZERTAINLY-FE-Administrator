@@ -1,13 +1,13 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { createFeatureSelector } from "utils/ducks";
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createFeatureSelector } from 'utils/ducks';
 import {
     ConnectorMetadataResponseModel,
     GlobalMetadataCreateRequestModel,
     GlobalMetadataDetailResponseModel,
     GlobalMetadataResponseModel,
     GlobalMetadataUpdateRequestModel,
-} from "../types/globalMetadata";
-import { NameAndUuidModel } from "../types/locations";
+} from '../types/globalMetadata';
+import { NameAndUuidModel } from '../types/locations';
 
 export type State = {
     checkedRows: string[];
@@ -39,7 +39,7 @@ export const initialState: State = {
 };
 
 export const slice = createSlice({
-    name: "globalMetadata",
+    name: 'globalMetadata',
     initialState,
     reducers: {
         setCheckedRows: (state, action: PayloadAction<{ checkedRows: string[] }>) => {

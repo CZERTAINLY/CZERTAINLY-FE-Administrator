@@ -1,10 +1,10 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { createFeatureSelector } from "utils/ducks";
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createFeatureSelector } from 'utils/ducks';
 
-import { AttributeDescriptorModel, AttributeRequestModel } from "types/attributes";
-import { ConnectorResponseModel } from "types/connectors";
-import { TokenInstanceStatus } from "types/openapi";
-import { TokenDetailResponseModel, TokenRequestModel, TokenResponseModel } from "types/tokens";
+import { AttributeDescriptorModel, AttributeRequestModel } from 'types/attributes';
+import { ConnectorResponseModel } from 'types/connectors';
+import { TokenInstanceStatus } from 'types/openapi';
+import { TokenDetailResponseModel, TokenRequestModel, TokenResponseModel } from 'types/tokens';
 
 export type State = {
     checkedRows: string[];
@@ -41,7 +41,7 @@ export type State = {
 export const initialState: State = {
     checkedRows: [],
 
-    deleteErrorMessage: "",
+    deleteErrorMessage: '',
 
     tokens: [],
 
@@ -66,7 +66,7 @@ export const initialState: State = {
 };
 
 export const slice = createSlice({
-    name: "tokens",
+    name: 'tokens',
 
     initialState,
 
@@ -84,7 +84,7 @@ export const slice = createSlice({
         },
 
         clearDeleteErrorMessages: (state, action: PayloadAction<void>) => {
-            state.deleteErrorMessage = "";
+            state.deleteErrorMessage = '';
         },
 
         clearTokenProviderAttributeDescriptors: (state, action: PayloadAction<void>) => {
@@ -267,7 +267,7 @@ export const slice = createSlice({
         },
 
         deleteToken: (state, action: PayloadAction<{ uuid: string }>) => {
-            state.deleteErrorMessage = "";
+            state.deleteErrorMessage = '';
             state.isDeleting = true;
         },
 
@@ -282,7 +282,7 @@ export const slice = createSlice({
         },
 
         deleteTokenFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.deleteErrorMessage = action.payload.error || "Unknown error";
+            state.deleteErrorMessage = action.payload.error || 'Unknown error';
             state.isDeleting = false;
         },
 

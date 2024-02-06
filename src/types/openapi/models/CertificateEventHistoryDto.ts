@@ -63,7 +63,7 @@ export interface CertificateEventHistoryDto {
      * @type {{ [key: string]: object; }}
      * @memberof CertificateEventHistoryDto
      */
-    additionalInformation?: { [key: string]: object };
+    additionalInformation?: { [key: string]: object; };
 }
 
 /**
@@ -71,29 +71,30 @@ export interface CertificateEventHistoryDto {
  * @enum {string}
  */
 export enum CertificateEventHistoryDtoEventEnum {
-    IssueCertificate = "Issue Certificate",
-    RequestCertificate = "Request Certificate",
-    RenewCertificate = "Renew Certificate",
-    RekeyCertificate = "Rekey Certificate",
-    RevokeCertificate = "Revoke Certificate",
-    DeleteCertificate = "Delete Certificate",
-    ApproveActionRequested = "Approve action requested",
-    ApproveActionClosed = "Approve action closed",
-    UpdateState = "Update State",
-    UpdateValidationStatus = "Update Validation Status",
-    UpdateRaProfile = "Update RA Profile",
-    UpdateEntity = "Update Entity",
-    UpdateGroup = "Update Group",
-    UpdateOwner = "Update Owner",
-    UploadCertificate = "Upload Certificate",
-    CertificateDiscovered = "Certificate Discovered",
-    UpdateLocation = "Update Location",
+    IssueCertificate = 'Issue Certificate',
+    RequestCertificate = 'Request Certificate',
+    RenewCertificate = 'Renew Certificate',
+    RekeyCertificate = 'Rekey Certificate',
+    RevokeCertificate = 'Revoke Certificate',
+    DeleteCertificate = 'Delete Certificate',
+    ApproveActionRequested = 'Approve action requested',
+    ApproveActionClosed = 'Approve action closed',
+    UpdateState = 'Update State',
+    UpdateValidationStatus = 'Update Validation Status',
+    UpdateRaProfile = 'Update RA Profile',
+    UpdateEntity = 'Update Entity',
+    UpdateGroup = 'Update Group',
+    UpdateOwner = 'Update Owner',
+    UploadCertificate = 'Upload Certificate',
+    CertificateDiscovered = 'Certificate Discovered',
+    UpdateLocation = 'Update Location'
 }
 /**
  * @export
  * @enum {string}
  */
 export enum CertificateEventHistoryDtoStatusEnum {
-    Success = "SUCCESS",
-    Failed = "FAILED",
+    Success = 'SUCCESS',
+    Failed = 'FAILED'
 }
+

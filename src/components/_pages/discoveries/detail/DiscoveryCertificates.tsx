@@ -1,15 +1,15 @@
-import { TableDataRow, TableHeader } from "components/CustomTable";
+import { TableDataRow, TableHeader } from 'components/CustomTable';
 
-import Widget from "components/Widget";
+import Widget from 'components/Widget';
 
-import { actions, selectors } from "ducks/discoveries";
-import { useCallback, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { actions, selectors } from 'ducks/discoveries';
+import { useCallback, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 
-import { dateFormatter } from "utils/dateUtil";
-import PagedCustomTable from "../../../CustomTable/PagedCustomTable";
-import TabLayout from "../../../Layout/TabLayout";
+import { dateFormatter } from 'utils/dateUtil';
+import PagedCustomTable from '../../../CustomTable/PagedCustomTable';
+import TabLayout from '../../../Layout/TabLayout';
 
 interface Props {
     id: string;
@@ -40,28 +40,28 @@ export default function DiscoveryCertificates({ id }: Props) {
     const discoveryCertificatesHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "commonName",
-                content: "Common Name",
+                id: 'commonName',
+                content: 'Common Name',
             },
             {
-                id: "serialNumber",
-                content: "Serial Number",
+                id: 'serialNumber',
+                content: 'Serial Number',
             },
             {
-                id: "notAfter",
-                content: "Not After",
+                id: 'notAfter',
+                content: 'Not After',
             },
             {
-                id: "notBefore",
-                content: "Not Before",
+                id: 'notBefore',
+                content: 'Not Before',
             },
             {
-                id: "issuerCommonName",
-                content: "Issuer Common Name",
+                id: 'issuerCommonName',
+                content: 'Issuer Common Name',
             },
             {
-                id: "fingerprint",
-                content: "Fingerprint",
+                id: 'fingerprint',
+                content: 'Fingerprint',
             },
         ],
         [],
@@ -74,8 +74,8 @@ export default function DiscoveryCertificates({ id }: Props) {
                 columns: [
                     r.inventoryUuid ? <Link to={`../../certificates/detail/${r.inventoryUuid}`}>{r.commonName}</Link> : r.commonName,
                     r.serialNumber,
-                    <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(r.notAfter)}</span>,
-                    <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(r.notBefore)}</span>,
+                    <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(r.notAfter)}</span>,
+                    <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(r.notBefore)}</span>,
                     r.issuerCommonName,
                     r.fingerprint,
                 ],
@@ -98,9 +98,9 @@ export default function DiscoveryCertificates({ id }: Props) {
 
             <TabLayout
                 tabs={[
-                    { title: "All", onClick: () => setNewlyDiscovered(undefined), content: pagedTable },
-                    { title: "New", onClick: () => setNewlyDiscovered(true), content: pagedTable },
-                    { title: "Existing", onClick: () => setNewlyDiscovered(false), content: pagedTable },
+                    { title: 'All', onClick: () => setNewlyDiscovered(undefined), content: pagedTable },
+                    { title: 'New', onClick: () => setNewlyDiscovered(true), content: pagedTable },
+                    { title: 'Existing', onClick: () => setNewlyDiscovered(false), content: pagedTable },
                 ]}
                 onlyActiveTabContent={true}
             />

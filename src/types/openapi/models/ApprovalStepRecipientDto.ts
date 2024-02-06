@@ -66,8 +66,9 @@ export interface ApprovalStepRecipientDto {
  * @enum {string}
  */
 export enum ApprovalStepRecipientDtoStatusEnum {
-    Pending = "PENDING",
-    Approved = "APPROVED",
-    Rejected = "REJECTED",
-    Expired = "EXPIRED",
+    Pending = 'PENDING',
+    Approved = 'APPROVED',
+    Rejected = 'REJECTED',
+    Expired = 'EXPIRED'
 }
+

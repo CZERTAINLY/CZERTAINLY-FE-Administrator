@@ -1,5 +1,5 @@
-import LinksGroup from "./LinksGroup";
-import style from "./Sidebar.module.scss";
+import LinksGroup from './LinksGroup';
+import style from './Sidebar.module.scss';
 
 export default function Sidebar() {
     return (
@@ -16,8 +16,8 @@ export default function Sidebar() {
                         _key="accessControl"
                         header="Access Control"
                         childrenLinks={[
-                            { _key: "/users", name: "Users", link: "/users" },
-                            { _key: "/roles", name: "Roles", link: "/roles" },
+                            { _key: '/users', name: 'Users', link: '/users' },
+                            { _key: '/roles', name: 'Roles', link: '/roles' },
                         ]}
                     />
 
@@ -25,9 +25,9 @@ export default function Sidebar() {
                         _key="profiles"
                         header="Profiles"
                         childrenLinks={[
-                            { _key: "/raprofiles", name: "RA Profiles", link: "/raprofiles" },
-                            { _key: "/tokenprofiles", name: "Token Profiles", link: "/tokenprofiles" },
-                            { _key: "/complianceprofiles", name: "Compliance Profiles", link: "/complianceprofiles" },
+                            { _key: '/raprofiles', name: 'RA Profiles', link: '/raprofiles' },
+                            { _key: '/tokenprofiles', name: 'Token Profiles', link: '/tokenprofiles' },
+                            { _key: '/complianceprofiles', name: 'Compliance Profiles', link: '/complianceprofiles' },
                         ]}
                     />
 
@@ -35,12 +35,12 @@ export default function Sidebar() {
                         _key="inventory"
                         header="Inventory"
                         childrenLinks={[
-                            { _key: "/credentials", name: "Credentials", link: "/credentials" },
-                            { _key: "/authorities", name: "Authorities", link: "/authorities" },
-                            { _key: "/tokens", name: "Tokens", link: "/tokens" },
-                            { _key: "/groups", name: "Groups", link: "/groups" },
-                            { _key: "/entities", name: "Entities", link: "/entities" },
-                            { _key: "/locations", name: "Locations", link: "/locations" },
+                            { _key: '/credentials', name: 'Credentials', link: '/credentials' },
+                            { _key: '/authorities', name: 'Authorities', link: '/authorities' },
+                            { _key: '/tokens', name: 'Tokens', link: '/tokens' },
+                            { _key: '/groups', name: 'Groups', link: '/groups' },
+                            { _key: '/entities', name: 'Entities', link: '/entities' },
+                            { _key: '/locations', name: 'Locations', link: '/locations' },
                         ]}
                     />
 
@@ -48,9 +48,9 @@ export default function Sidebar() {
                         _key="protocols"
                         header="Protocols"
                         childrenLinks={[
-                            { _key: "/acmeaccounts", name: "ACME Accounts", link: "/acmeaccounts" },
-                            { _key: "/acmeprofiles", name: "ACME Profiles", link: "/acmeprofiles" },
-                            { _key: "/scepprofiles", name: "SCEP Profiles", link: "/scepprofiles" },
+                            { _key: '/acmeaccounts', name: 'ACME Accounts', link: '/acmeaccounts' },
+                            { _key: '/acmeprofiles', name: 'ACME Profiles', link: '/acmeprofiles' },
+                            { _key: '/scepprofiles', name: 'SCEP Profiles', link: '/scepprofiles' },
                         ]}
                     />
 
@@ -58,11 +58,11 @@ export default function Sidebar() {
                         _key="approvals"
                         header="Approvals"
                         childrenLinks={[
-                            { _key: "/approvalprofiles", name: "Approval Profiles", link: "/approvalprofiles" },
+                            { _key: '/approvalprofiles', name: 'Approval Profiles', link: '/approvalprofiles' },
                             {
-                                _key: "/approvals",
-                                name: "Approval List",
-                                link: "/approvals",
+                                _key: '/approvals',
+                                name: 'Approval List',
+                                link: '/approvals',
                             },
                         ]}
                     />
@@ -73,10 +73,10 @@ export default function Sidebar() {
                         _key="settings"
                         header="Settings"
                         childrenLinks={[
-                            { _key: "/settings", name: "Platform", link: "/settings" },
-                            { _key: "/customattributes", name: "Custom Attributes", link: "/customattributes" },
-                            { _key: "/globalmetadata", name: "Global Metadata", link: "/globalmetadata" },
-                            { _key: "/notificationsSetting", name: "Notifications", link: "/notificationssettings" },
+                            { _key: '/settings', name: 'Platform', link: '/settings' },
+                            { _key: '/customattributes', name: 'Custom Attributes', link: '/customattributes' },
+                            { _key: '/globalmetadata', name: 'Global Metadata', link: '/globalmetadata' },
+                            { _key: '/notificationsSetting', name: 'Notifications', link: '/notificationssettings' },
                         ]}
                     />
 

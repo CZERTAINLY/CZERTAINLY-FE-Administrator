@@ -1,20 +1,20 @@
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 
-import Dialog from "components/Dialog";
-import StatusBadge from "components/StatusBadge";
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
+import Dialog from 'components/Dialog';
+import StatusBadge from 'components/StatusBadge';
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
 
-import { actions, selectors } from "ducks/customAttributes";
-import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { actions, selectors } from 'ducks/customAttributes';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
 
-import { Badge, Container } from "reactstrap";
-import { PlatformEnum } from "types/openapi";
-import { LockWidgetNameEnum } from "types/user-interface";
-import { getAttributeContent } from "utils/attributes/attributes";
+import { Badge, Container } from 'reactstrap';
+import { PlatformEnum } from 'types/openapi';
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { getAttributeContent } from 'utils/attributes/attributes';
 
 export default function CustomAttributeDetail() {
     const dispatch = useDispatch();
@@ -43,7 +43,7 @@ export default function CustomAttributeDetail() {
     }, [getFreshCustomAttribute, id, customAttribute]);
 
     const onEditClick = useCallback(() => {
-        navigate(`../../edit/${customAttribute?.uuid}`, { relative: "path" });
+        navigate(`../../edit/${customAttribute?.uuid}`, { relative: 'path' });
     }, [customAttribute, navigate]);
 
     const onDeleteConfirmed = useCallback(() => {
@@ -55,25 +55,25 @@ export default function CustomAttributeDetail() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "pencil",
+                icon: 'pencil',
                 disabled: false,
-                tooltip: "Edit",
+                tooltip: 'Edit',
                 onClick: () => {
                     onEditClick();
                 },
             },
             {
-                icon: "trash",
+                icon: 'trash',
                 disabled: false,
-                tooltip: "Delete",
+                tooltip: 'Delete',
                 onClick: () => {
                     setConfirmDelete(true);
                 },
             },
             {
-                icon: customAttribute?.enabled ? "times" : "check",
+                icon: customAttribute?.enabled ? 'times' : 'check',
                 disabled: !customAttribute || isEnabling || isDisabling,
-                tooltip: customAttribute?.enabled ? "Disable" : "Enable",
+                tooltip: customAttribute?.enabled ? 'Disable' : 'Enable',
                 onClick: () =>
                     customAttribute?.enabled
                         ? dispatch(actions.disableCustomAttribute(customAttribute?.uuid))
@@ -88,12 +88,12 @@ export default function CustomAttributeDetail() {
     const detailHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "property",
-                content: "Property",
+                id: 'property',
+                content: 'Property',
             },
             {
-                id: "value",
-                content: "Value",
+                id: 'value',
+                content: 'Value',
             },
         ],
         [],
@@ -101,7 +101,7 @@ export default function CustomAttributeDetail() {
 
     const getBadge = (property: boolean | undefined, label: string) =>
         property ? (
-            <Badge style={{ margin: "1px" }} color="success">
+            <Badge style={{ margin: '1px' }} color="success">
                 {label}
             </Badge>
         ) : (
@@ -114,55 +114,55 @@ export default function CustomAttributeDetail() {
                 ? []
                 : [
                       {
-                          id: "uuid",
-                          columns: ["UUID", customAttribute.uuid],
+                          id: 'uuid',
+                          columns: ['UUID', customAttribute.uuid],
                       },
                       {
-                          id: "name",
-                          columns: ["Name", customAttribute.name],
+                          id: 'name',
+                          columns: ['Name', customAttribute.name],
                       },
                       {
-                          id: "label",
-                          columns: ["Label", customAttribute.label],
+                          id: 'label',
+                          columns: ['Label', customAttribute.label],
                       },
                       {
-                          id: "description",
-                          columns: ["Description", customAttribute.description],
+                          id: 'description',
+                          columns: ['Description', customAttribute.description],
                       },
                       {
-                          id: "group",
-                          columns: ["Group", customAttribute.group ?? ""],
+                          id: 'group',
+                          columns: ['Group', customAttribute.group ?? ''],
                       },
                       {
-                          id: "resources",
+                          id: 'resources',
                           columns: [
-                              "Resources",
+                              'Resources',
                               customAttribute.resources?.map((r, i) => (
-                                  <Badge key={i} style={{ margin: "1px" }} color="secondary">
+                                  <Badge key={i} style={{ margin: '1px' }} color="secondary">
                                       {getEnumLabel(resourceEnum, r)}
                                   </Badge>
-                              )) ?? "",
+                              )) ?? '',
                           ],
                       },
                       {
-                          id: "contentType",
-                          columns: ["Content Type", getEnumLabel(attributeContentTypeEnum, customAttribute.contentType)],
+                          id: 'contentType',
+                          columns: ['Content Type', getEnumLabel(attributeContentTypeEnum, customAttribute.contentType)],
                       },
                       {
-                          id: "content",
-                          columns: ["Content", getAttributeContent(customAttribute.contentType, customAttribute.content)],
+                          id: 'content',
+                          columns: ['Content', getAttributeContent(customAttribute.contentType, customAttribute.content)],
                       },
                       {
-                          id: "properties",
+                          id: 'properties',
                           columns: [
-                              "Properties",
+                              'Properties',
                               <>
-                                  <StatusBadge style={{ margin: "1px" }} enabled={customAttribute.enabled} />
-                                  {getBadge(customAttribute.visible, "Visible")}
-                                  {getBadge(customAttribute.required, "Required")}
-                                  {getBadge(customAttribute.readOnly, "Read Only")}
-                                  {getBadge(customAttribute.list, "List")}
-                                  {getBadge(customAttribute.multiSelect, "Multi Select")}
+                                  <StatusBadge style={{ margin: '1px' }} enabled={customAttribute.enabled} />
+                                  {getBadge(customAttribute.visible, 'Visible')}
+                                  {getBadge(customAttribute.required, 'Required')}
+                                  {getBadge(customAttribute.readOnly, 'Read Only')}
+                                  {getBadge(customAttribute.list, 'List')}
+                                  {getBadge(customAttribute.multiSelect, 'Multi Select')}
                               </>,
                           ],
                       },
@@ -189,8 +189,8 @@ export default function CustomAttributeDetail() {
                 body="You are about to delete an Custom Attribute. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
         </Container>

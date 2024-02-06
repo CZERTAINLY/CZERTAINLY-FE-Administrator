@@ -11,11 +11,16 @@
  * Do not edit the class manually.
  */
 
-import type { Observable } from "rxjs";
-import type { AjaxResponse } from "rxjs/ajax";
-import { BaseAPI, throwIfNullOrUndefined } from "../runtime";
-import type { OperationOpts, HttpHeaders } from "../runtime";
-import type { AddUserRequestDto, AuthenticationServiceExceptionDto, ErrorMessageDto, UserDetailDto } from "../models";
+import type { Observable } from 'rxjs';
+import type { AjaxResponse } from 'rxjs/ajax';
+import { BaseAPI, throwIfNullOrUndefined } from '../runtime';
+import type { OperationOpts, HttpHeaders } from '../runtime';
+import type {
+    AddUserRequestDto,
+    AuthenticationServiceExceptionDto,
+    ErrorMessageDto,
+    UserDetailDto,
+} from '../models';
 
 export interface AddAdminRequest {
     addUserRequestDto: AddUserRequestDto;
@@ -25,26 +30,25 @@ export interface AddAdminRequest {
  * no description
  */
 export class LocalOperationsApi extends BaseAPI {
+
     /**
      * Create Administrator
      */
-    addAdmin({ addUserRequestDto }: AddAdminRequest): Observable<UserDetailDto>;
-    addAdmin({ addUserRequestDto }: AddAdminRequest, opts?: OperationOpts): Observable<AjaxResponse<UserDetailDto>>;
+    addAdmin({ addUserRequestDto }: AddAdminRequest): Observable<UserDetailDto>
+    addAdmin({ addUserRequestDto }: AddAdminRequest, opts?: OperationOpts): Observable<AjaxResponse<UserDetailDto>>
     addAdmin({ addUserRequestDto }: AddAdminRequest, opts?: OperationOpts): Observable<UserDetailDto | AjaxResponse<UserDetailDto>> {
-        throwIfNullOrUndefined(addUserRequestDto, "addUserRequestDto", "addAdmin");
+        throwIfNullOrUndefined(addUserRequestDto, 'addUserRequestDto', 'addAdmin');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
-        return this.request<UserDetailDto>(
-            {
-                url: "/v1/local/admins",
-                method: "POST",
-                headers,
-                body: addUserRequestDto,
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<UserDetailDto>({
+            url: '/v1/local/admins',
+            method: 'POST',
+            headers,
+            body: addUserRequestDto,
+        }, opts?.responseOpts);
+    };
+
 }

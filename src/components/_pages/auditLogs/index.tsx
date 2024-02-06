@@ -1,20 +1,20 @@
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Widget from "components/Widget";
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Widget from 'components/Widget';
 
-import { actions as auditLogActions, selectors } from "ducks/auditLogs";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { actions as auditLogActions, selectors } from 'ducks/auditLogs';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from 'react-redux';
 
-import { Button, ButtonGroup, Container } from "reactstrap";
-import { AuditLogFilterModel } from "types/auditLogs";
-import { dateFormatter } from "utils/dateUtil";
+import { Button, ButtonGroup, Container } from 'reactstrap';
+import { AuditLogFilterModel } from 'types/auditLogs';
+import { dateFormatter } from 'utils/dateUtil';
 
-import styles from "./auditLogs.module.scss";
+import styles from './auditLogs.module.scss';
 
-import { LockWidgetNameEnum } from "types/user-interface";
-import AuditLogsFilters from "./AuditLogsFilters";
-import ObjectValues from "./ObjectValues";
+import { LockWidgetNameEnum } from 'types/user-interface';
+import AuditLogsFilters from './AuditLogsFilters';
+import ObjectValues from './ObjectValues';
 
 const defaultPageSize = 10;
 
@@ -56,7 +56,7 @@ function AuditLogs() {
     }, [getFreshData]);
 
     useEffect(() => {
-        const link = document.getElementById("exportLink");
+        const link = document.getElementById('exportLink');
         if (link && exportUrl) {
             link.click();
         }
@@ -93,12 +93,12 @@ function AuditLogs() {
     const exportPurgeButtonsNode = useMemo(
         () => (
             <ButtonGroup>
-                <Button color={"default"} onClick={exportCallback}>
+                <Button color={'default'} onClick={exportCallback}>
                     Export
                 </Button>
                 {/* Added eslint-disable-next-line because the anchor tag is blank and is used to download the file */}
                 {/* eslint-disable-next-line jsx-a11y/anchor-has-content */}
-                <a id={"exportLink"} href={exportUrl} download="auditLogs.zip" hidden={true} />
+                <a id={'exportLink'} href={exportUrl} download="auditLogs.zip" hidden={true} />
                 <Button type="submit" color="primary" onClick={purgeCallback}>
                     Purge
                 </Button>
@@ -110,54 +110,54 @@ function AuditLogs() {
     const auditLogsRowHeaders: TableHeader[] = useMemo(
         () => [
             {
-                content: "Id",
-                align: "left",
-                id: "id",
-                width: "5%",
+                content: 'Id',
+                align: 'left',
+                id: 'id',
+                width: '5%',
             },
             {
-                content: "Author",
+                content: 'Author',
                 // sortable: true,
-                align: "left",
-                id: "author",
-                width: "10%",
+                align: 'left',
+                id: 'author',
+                width: '10%',
             },
             {
-                content: "Created",
+                content: 'Created',
                 // sortable: true,
                 // sortType: "date",
-                id: "created",
-                width: "10%",
+                id: 'created',
+                width: '10%',
             },
             {
-                content: "Operation Status",
-                id: "",
-                width: "10%",
+                content: 'Operation Status',
+                id: '',
+                width: '10%',
             },
             {
-                content: "Origination",
-                id: "",
-                width: "5%",
+                content: 'Origination',
+                id: '',
+                width: '5%',
             },
             {
-                content: "Affected Data",
-                id: "",
-                width: "5%",
+                content: 'Affected Data',
+                id: '',
+                width: '5%',
             },
             {
-                content: "Object Identifier",
-                id: "",
-                width: "10%",
+                content: 'Object Identifier',
+                id: '',
+                width: '10%',
             },
             {
-                content: "Operation",
-                id: "",
-                width: "10%",
+                content: 'Operation',
+                id: '',
+                width: '10%',
             },
             {
-                content: "Additional Data",
-                id: "",
-                width: "10%",
+                content: 'Additional Data',
+                id: '',
+                width: '10%',
             },
         ],
         [],
@@ -170,15 +170,15 @@ function AuditLogs() {
                     id: log.id,
 
                     columns: [
-                        "" + log.id,
+                        '' + log.id,
                         log.author,
-                        <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(log.created)}</span>,
+                        <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(log.created)}</span>,
                         log.operationStatus,
                         log.origination,
                         log.affected,
                         log.objectIdentifier,
                         log.operation,
-                        log.additionalData ? <span className={styles.showMore}>Show more...</span> : "None",
+                        log.additionalData ? <span className={styles.showMore}>Show more...</span> : 'None',
                     ],
 
                     detailColumns: !log.additionalData ? undefined : [<></>, <ObjectValues obj={log.additionalData} />],

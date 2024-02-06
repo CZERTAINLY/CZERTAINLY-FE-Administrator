@@ -12,22 +12,23 @@
  */
 
 /**
- * Type of the attribute content.
+ * Type of the attribute content. 
  * @export
  * @enum {string}
  */
 export enum AttributeContentType {
-    String = "string",
-    Text = "text",
-    Integer = "integer",
-    Boolean = "boolean",
-    Float = "float",
-    Date = "date",
-    Time = "time",
-    Datetime = "datetime",
-    Secret = "secret",
-    File = "file",
-    Credential = "credential",
-    Codeblock = "codeblock",
-    Object = "object",
+    String = 'string',
+    Text = 'text',
+    Integer = 'integer',
+    Boolean = 'boolean',
+    Float = 'float',
+    Date = 'date',
+    Time = 'time',
+    Datetime = 'datetime',
+    Secret = 'secret',
+    File = 'file',
+    Credential = 'credential',
+    Codeblock = 'codeblock',
+    Object = 'object'
 }
+

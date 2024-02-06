@@ -1,27 +1,27 @@
-import AttributeEditor from "components/Attributes/AttributeEditor";
-import TabLayout from "components/Layout/TabLayout";
-import ProgressButton from "components/ProgressButton";
+import AttributeEditor from 'components/Attributes/AttributeEditor';
+import TabLayout from 'components/Layout/TabLayout';
+import ProgressButton from 'components/ProgressButton';
 
-import Widget from "components/Widget";
+import Widget from 'components/Widget';
 
-import { actions as acmeProfileActions, selectors as acmeProfileSelectors } from "ducks/acme-profiles";
-import { actions as connectorActions } from "ducks/connectors";
-import { actions as customAttributesActions, selectors as customAttributesSelectors } from "ducks/customAttributes";
-import { actions as raProfileActions, selectors as raProfileSelectors } from "ducks/ra-profiles";
+import { actions as acmeProfileActions, selectors as acmeProfileSelectors } from 'ducks/acme-profiles';
+import { actions as connectorActions } from 'ducks/connectors';
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
+import { actions as raProfileActions, selectors as raProfileSelectors } from 'ducks/ra-profiles';
 
-import { FormApi } from "final-form";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Field, Form } from "react-final-form";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
-import Select from "react-select";
-import { Form as BootstrapForm, Button, ButtonGroup, Col, FormFeedback, FormGroup, Input, Label, Row } from "reactstrap";
-import { AcmeProfileAddRequestModel, AcmeProfileEditRequestModel, AcmeProfileResponseModel } from "types/acme-profiles";
-import { AttributeDescriptorModel } from "types/attributes";
-import { RaProfileSimplifiedModel } from "types/ra-profiles";
+import { FormApi } from 'final-form';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Field, Form } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
+import Select from 'react-select';
+import { Form as BootstrapForm, Button, ButtonGroup, Col, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
+import { AcmeProfileAddRequestModel, AcmeProfileEditRequestModel, AcmeProfileResponseModel } from 'types/acme-profiles';
+import { AttributeDescriptorModel } from 'types/attributes';
+import { RaProfileSimplifiedModel } from 'types/ra-profiles';
 
-import { mutators } from "utils/attributes/attributeEditorMutators";
-import { collectFormAttributes } from "utils/attributes/attributes";
+import { mutators } from 'utils/attributes/attributeEditorMutators';
+import { collectFormAttributes } from 'utils/attributes/attributes';
 
 import {
     composeValidators,
@@ -31,8 +31,8 @@ import {
     validateInteger,
     validateLength,
     validateRequired,
-} from "utils/validators";
-import { Resource } from "../../../../types/openapi";
+} from 'utils/validators';
+import { Resource } from '../../../../types/openapi';
 
 interface FormValues {
     name: string;
@@ -124,16 +124,16 @@ export default function AcmeProfileForm() {
                 termsOfServiceChangeUrl: values.termsChangeUrl,
                 termsOfServiceChangeDisable: values.disableOrders,
                 issueCertificateAttributes: collectFormAttributes(
-                    "issuanceAttributes",
+                    'issuanceAttributes',
                     [...(raProfileIssuanceAttrDescs ?? []), ...issueGroupAttributesCallbackAttributes],
                     values,
                 ),
                 revokeCertificateAttributes: collectFormAttributes(
-                    "revocationAttributes",
+                    'revocationAttributes',
                     [...(raProfileRevocationAttrDescs ?? []), ...revokeGroupAttributesCallbackAttributes],
                     values,
                 ),
-                customAttributes: collectFormAttributes("customAcmeProfile", resourceCustomAttributes, values),
+                customAttributes: collectFormAttributes('customAcmeProfile', resourceCustomAttributes, values),
             };
             if (values.raProfile) {
                 request.raProfileUuid = values.raProfile.value;
@@ -168,8 +168,8 @@ export default function AcmeProfileForm() {
                 setRaProfile(undefined);
                 dispatch(raProfileActions.clearIssuanceAttributesDescriptors());
                 dispatch(raProfileActions.clearRevocationAttributesDescriptors());
-                form.mutators.clearAttributes("issuanceAttributes");
-                form.mutators.clearAttributes("revocationAttributes");
+                form.mutators.clearAttributes('issuanceAttributes');
+                form.mutators.clearAttributes('revocationAttributes');
                 return;
             }
 
@@ -197,15 +197,15 @@ export default function AcmeProfileForm() {
 
     const defaultValues: FormValues = useMemo(
         () => ({
-            name: editMode ? acmeProfile?.name || "" : "",
-            description: editMode ? acmeProfile?.description || "" : "",
-            dnsIpAddress: editMode ? acmeProfile?.dnsResolverIp || "" : "",
-            dnsPort: editMode ? acmeProfile?.dnsResolverPort || "" : "",
-            retryInterval: editMode ? acmeProfile?.retryInterval?.toString() || "30" : "30",
-            orderValidity: editMode ? acmeProfile?.validity?.toString() || "36000" : "36000",
-            termsUrl: editMode ? acmeProfile?.termsOfServiceUrl || "" : "",
-            webSite: editMode ? acmeProfile?.websiteUrl || "" : "",
-            termsChangeUrl: editMode ? acmeProfile?.termsOfServiceChangeUrl || "" : "",
+            name: editMode ? acmeProfile?.name || '' : '',
+            description: editMode ? acmeProfile?.description || '' : '',
+            dnsIpAddress: editMode ? acmeProfile?.dnsResolverIp || '' : '',
+            dnsPort: editMode ? acmeProfile?.dnsResolverPort || '' : '',
+            retryInterval: editMode ? acmeProfile?.retryInterval?.toString() || '30' : '30',
+            orderValidity: editMode ? acmeProfile?.validity?.toString() || '36000' : '36000',
+            termsUrl: editMode ? acmeProfile?.termsOfServiceUrl || '' : '',
+            webSite: editMode ? acmeProfile?.websiteUrl || '' : '',
+            termsChangeUrl: editMode ? acmeProfile?.termsOfServiceChangeUrl || '' : '',
             disableOrders: editMode ? acmeProfile?.termsOfServiceChangeDisable || false : false,
             requireTermsOfService: editMode ? acmeProfile?.requireTermsOfService || false : false,
             requireContact: editMode ? acmeProfile?.requireContact || false : false,
@@ -218,7 +218,7 @@ export default function AcmeProfileForm() {
         [editMode, acmeProfile, optionsForRaProfiles],
     );
 
-    const title = useMemo(() => (editMode ? "Edit ACME Profile" : "Create ACME Profile"), [editMode]);
+    const title = useMemo(() => (editMode ? 'Edit ACME Profile' : 'Create ACME Profile'), [editMode]);
 
     return (
         <Widget title={title} busy={isBusy}>
@@ -502,7 +502,7 @@ export default function AcmeProfileForm() {
                             <TabLayout
                                 tabs={[
                                     {
-                                        title: "Issue Attributes",
+                                        title: 'Issue Attributes',
                                         content:
                                             !raProfile || !raProfileIssuanceAttrDescs || raProfileIssuanceAttrDescs.length === 0 ? (
                                                 <></>
@@ -519,7 +519,7 @@ export default function AcmeProfileForm() {
                                             ),
                                     },
                                     {
-                                        title: "Revocation Attributes",
+                                        title: 'Revocation Attributes',
                                         content:
                                             !raProfile || !raProfileRevocationAttrDescs || raProfileRevocationAttrDescs.length === 0 ? (
                                                 <></>
@@ -536,7 +536,7 @@ export default function AcmeProfileForm() {
                                             ),
                                     },
                                     {
-                                        title: "Custom Attributes",
+                                        title: 'Custom Attributes',
                                         content: (
                                             <AttributeEditor
                                                 id="customAcmeProfile"
@@ -553,8 +553,8 @@ export default function AcmeProfileForm() {
                         <div className="d-flex justify-content-end">
                             <ButtonGroup>
                                 <ProgressButton
-                                    title={editMode ? "Update" : "Create"}
-                                    inProgressTitle={editMode ? "Updating..." : "Creating..."}
+                                    title={editMode ? 'Update' : 'Create'}
+                                    inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
                                     inProgress={submitting}
                                     disabled={pristine || submitting || !valid}
                                 />

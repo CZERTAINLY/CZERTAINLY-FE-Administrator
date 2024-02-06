@@ -1,9 +1,9 @@
-import CustomTable, { TableDataRow } from "components/CustomTable";
-import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
-import { useCallback, useMemo, useState } from "react";
-import { Form } from "react-final-form";
-import { useSelector } from "react-redux";
-import { Form as BootstrapForm } from "reactstrap";
+import CustomTable, { TableDataRow } from 'components/CustomTable';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { useCallback, useMemo, useState } from 'react';
+import { Form } from 'react-final-form';
+import { useSelector } from 'react-redux';
+import { Form as BootstrapForm } from 'reactstrap';
 import {
     AttributeDescriptorModel,
     AttributeResponseModel,
@@ -11,12 +11,12 @@ import {
     CustomAttributeModel,
     isCustomAttributeModelArray,
     isDataAttributeModel,
-} from "types/attributes";
-import { MetadataItemModel, MetadataModel } from "types/locations";
-import { PlatformEnum } from "types/openapi";
-import { getAttributeContent } from "utils/attributes/attributes";
-import ContentValueField from "../../Input/DynamicContent/ContentValueField";
-import WidgetButtons, { IconName } from "../../WidgetButtons";
+} from 'types/attributes';
+import { MetadataItemModel, MetadataModel } from 'types/locations';
+import { PlatformEnum } from 'types/openapi';
+import { getAttributeContent } from 'utils/attributes/attributes';
+import ContentValueField from '../../Input/DynamicContent/ContentValueField';
+import WidgetButtons, { IconName } from '../../WidgetButtons';
 
 export enum ATTRIBUTE_VIEWER_TYPE {
     ATTRIBUTE,
@@ -52,8 +52,8 @@ export default function AttributeViewer({
         const result = [];
         if (viewerType === ATTRIBUTE_VIEWER_TYPE.METADATA || viewerType === ATTRIBUTE_VIEWER_TYPE.METADATA_FLAT) {
             result.push({
-                id: "connector",
-                content: "Connector",
+                id: 'connector',
+                content: 'Connector',
                 sortable: true,
             });
         }
@@ -65,31 +65,31 @@ export default function AttributeViewer({
         ) {
             result.push(
                 {
-                    id: "name",
-                    content: "Name",
+                    id: 'name',
+                    content: 'Name',
                     sortable: true,
-                    width: "20%",
+                    width: '20%',
                 },
                 {
-                    id: "contentType",
-                    content: "Content Type",
+                    id: 'contentType',
+                    content: 'Content Type',
                     sortable: true,
-                    width: "20%",
+                    width: '20%',
                 },
                 {
-                    id: "content",
-                    content: "Content",
+                    id: 'content',
+                    content: 'Content',
                     sortable: true,
-                    width: "40%",
+                    width: '40%',
                 },
             );
         }
         if (viewerType === ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE_EDIT) {
             result.push({
-                id: "actions",
-                content: "Actions",
+                id: 'actions',
+                content: 'Actions',
                 sortable: false,
-                width: "15%",
+                width: '15%',
             });
         }
 
@@ -100,7 +100,7 @@ export default function AttributeViewer({
         (attribute: AttributeResponseModel | MetadataItemModel) => ({
             id: attribute.uuid || attribute.name,
             columns: [
-                attribute.label || attribute.name || "",
+                attribute.label || attribute.name || '',
                 getEnumLabel(contentTypeEnum, attribute.contentType),
                 getContent(attribute.contentType, attribute.content),
             ],
@@ -112,15 +112,15 @@ export default function AttributeViewer({
         (descriptor: AttributeDescriptorModel) => {
             const attribute = attributes?.find((a) => a.name === descriptor.name);
             return {
-                id: descriptor.uuid || "",
+                id: descriptor.uuid || '',
                 columns: [
                     isDataAttributeModel(descriptor) ? descriptor.properties.label : descriptor.name,
-                    isDataAttributeModel(descriptor) ? getEnumLabel(contentTypeEnum, descriptor.contentType) : "n/a",
+                    isDataAttributeModel(descriptor) ? getEnumLabel(contentTypeEnum, descriptor.contentType) : 'n/a',
                     isDataAttributeModel(descriptor)
                         ? attribute
                             ? getContent(attribute.contentType, attribute.content)
                             : getContent(descriptor.contentType, descriptor.content)
-                        : "",
+                        : '',
                 ],
             };
         },
@@ -129,7 +129,7 @@ export default function AttributeViewer({
 
     const getMetadataTableData = useCallback(
         (attribute: MetadataModel) => ({
-            id: attribute.connectorUuid || "",
+            id: attribute.connectorUuid || '',
             columns: [attribute.connectorName],
             detailColumns: [
                 <CustomTable
@@ -147,18 +147,18 @@ export default function AttributeViewer({
             const buttons = [];
             if (editingAttributesNames.find((a) => a === attributeName)) {
                 buttons.push({
-                    icon: "times" as IconName,
+                    icon: 'times' as IconName,
                     disabled: false,
-                    tooltip: "Cancel",
+                    tooltip: 'Cancel',
                     onClick: () => {
                         setEditingAttributesNames(editingAttributesNames.filter((n) => n !== attributeName));
                     },
                 });
             } else {
                 buttons.push({
-                    icon: "pencil" as IconName,
+                    icon: 'pencil' as IconName,
                     disabled: descriptor.properties.readOnly,
-                    tooltip: descriptor.properties.readOnly ? "Attribute is read only, edit is disabled" : "Edit",
+                    tooltip: descriptor.properties.readOnly ? 'Attribute is read only, edit is disabled' : 'Edit',
                     onClick: () => {
                         setEditingAttributesNames([...editingAttributesNames, attributeName]);
                     },
@@ -166,9 +166,9 @@ export default function AttributeViewer({
             }
             onRemove &&
                 buttons.push({
-                    icon: "trash" as IconName,
+                    icon: 'trash' as IconName,
                     disabled: descriptor.properties.required,
-                    tooltip: descriptor.properties.required ? "Attribute is required, can't be removed" : "Remove",
+                    tooltip: descriptor.properties.required ? "Attribute is required, can't be removed" : 'Remove',
                     onClick: () => onRemove(descriptor.uuid),
                 });
             return buttons;
@@ -186,9 +186,9 @@ export default function AttributeViewer({
                 .map((a) => {
                     const descriptor = descriptors.find((d) => d.name === a.name);
                     return {
-                        id: a.uuid || "",
+                        id: a.uuid || '',
                         columns: [
-                            a.label || "",
+                            a.label || '',
                             getEnumLabel(contentTypeEnum, a.contentType),
                             onSubmit && descriptor && editingAttributesNames.find((n) => n === a.name) ? (
                                 <Form onSubmit={() => {}}>

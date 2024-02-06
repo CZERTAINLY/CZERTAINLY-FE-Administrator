@@ -17,9 +17,10 @@
  * @enum {string}
  */
 export enum AttributeType {
-    Data = "data",
-    Group = "group",
-    Info = "info",
-    Meta = "meta",
-    Custom = "custom",
+    Data = 'data',
+    Group = 'group',
+    Info = 'info',
+    Meta = 'meta',
+    Custom = 'custom'
 }
+

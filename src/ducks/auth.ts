@@ -1,8 +1,8 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ResourceModel, UserDetailModel, UserUpdateRequestModel } from "types/auth";
-import { NameAndUuidModel } from "types/locations";
-import { Resource } from "types/openapi";
-import { createFeatureSelector } from "utils/ducks";
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { ResourceModel, UserDetailModel, UserUpdateRequestModel } from 'types/auth';
+import { NameAndUuidModel } from 'types/locations';
+import { Resource } from 'types/openapi';
+import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     profile?: UserDetailModel;
@@ -23,7 +23,7 @@ export const initialState: State = {
 };
 
 export const slice = createSlice({
-    name: "auth",
+    name: 'auth',
 
     initialState,
 

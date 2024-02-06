@@ -1,5 +1,5 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RaProfileSimplifiedModel } from "types/certificate";
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { RaProfileSimplifiedModel } from 'types/certificate';
 import {
     ComplianceProfileGroupListResponseModel,
     ComplianceProfileGroupRequestModel,
@@ -10,9 +10,9 @@ import {
     ComplianceProfileRuleAddResponseModel,
     ComplianceProfileRuleDeleteRequestModel,
     ComplianceProfileRuleListResponseModel,
-} from "types/complianceProfiles";
-import { BulkActionModel } from "types/connectors";
-import { createFeatureSelector } from "utils/ducks";
+} from 'types/complianceProfiles';
+import { BulkActionModel } from 'types/connectors';
+import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     checkedRows: string[];
@@ -49,7 +49,7 @@ export const initialState: State = {
 
     complianceProfiles: [],
 
-    deleteErrorMessage: "",
+    deleteErrorMessage: '',
     bulkDeleteErrorMessages: [],
 
     rules: [],
@@ -74,7 +74,7 @@ export const initialState: State = {
 };
 
 export const slice = createSlice({
-    name: "complianceProfiles",
+    name: 'complianceProfiles',
 
     initialState,
 
@@ -92,7 +92,7 @@ export const slice = createSlice({
         },
 
         clearDeleteErrorMessages: (state, action: PayloadAction<void>) => {
-            state.deleteErrorMessage = "";
+            state.deleteErrorMessage = '';
             state.bulkDeleteErrorMessages = [];
         },
 
@@ -137,7 +137,7 @@ export const slice = createSlice({
 
         deleteComplianceProfile: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isDeleting = true;
-            state.deleteErrorMessage = "";
+            state.deleteErrorMessage = '';
         },
 
         deleteComplianceProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
@@ -152,7 +152,7 @@ export const slice = createSlice({
 
         deleteComplianceProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isDeleting = false;
-            state.deleteErrorMessage = action.payload.error || "Unknown error";
+            state.deleteErrorMessage = action.payload.error || 'Unknown error';
         },
 
         bulkDeleteComplianceProfiles: (state, action: PayloadAction<{ uuids: string[] }>) => {

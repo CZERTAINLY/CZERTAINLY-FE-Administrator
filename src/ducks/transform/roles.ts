@@ -9,9 +9,9 @@ import {
     RoleRequestModel,
     SubjectPermissionsDto,
     SubjectPermissionsModel,
-} from "types/roles";
-import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
-import { transformUserResponseDtoToModel } from "./users";
+} from 'types/roles';
+import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from './attributes';
+import { transformUserResponseDtoToModel } from './users';
 
 export function transformRoleDetailDtoToModel(role: RoleDetailDto): RoleDetailModel {
     return {

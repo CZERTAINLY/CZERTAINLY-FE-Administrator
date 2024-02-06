@@ -11,7 +11,9 @@
  * Do not edit the class manually.
  */
 
-import type { KeyItemDto } from "./";
+import type {
+    KeyItemDto,
+} from './';
 
 /**
  * @export

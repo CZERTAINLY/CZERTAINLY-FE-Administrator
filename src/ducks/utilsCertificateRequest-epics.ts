@@ -1,12 +1,12 @@
-import { AppEpic } from "ducks";
-import { EMPTY, of } from "rxjs";
-import { catchError, filter, map, switchMap } from "rxjs/operators";
+import { AppEpic } from 'ducks';
+import { EMPTY, of } from 'rxjs';
+import { catchError, filter, map, switchMap } from 'rxjs/operators';
 
-import { extractError } from "utils/net";
-import { ParseRequestRequestTypeEnum } from "../types/openapi/utils";
-import { actions as appRedirectActions } from "./app-redirect";
+import { extractError } from 'utils/net';
+import { ParseRequestRequestTypeEnum } from '../types/openapi/utils';
+import { actions as appRedirectActions } from './app-redirect';
 
-import { slice } from "./utilsCertificateRequest";
+import { slice } from './utilsCertificateRequest';
 
 const parseCertificateRequest: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -26,9 +26,9 @@ const parseCertificateRequest: AppEpic = (action$, state$, deps) => {
                         catchError((err) =>
                             of(
                                 slice.actions.parseCertificateRequestFailure({
-                                    error: extractError(err, "Failed to get certificate request."),
+                                    error: extractError(err, 'Failed to get certificate request.'),
                                 }),
-                                appRedirectActions.fetchError({ error: err, message: "Failed to get certificate request." }),
+                                appRedirectActions.fetchError({ error: err, message: 'Failed to get certificate request.' }),
                             ),
                         ),
                     ) ?? EMPTY,

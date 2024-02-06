@@ -1,15 +1,15 @@
-import { AppEpic } from "ducks";
-import { iif, of } from "rxjs";
-import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
-import { extractError } from "utils/net";
-import { actions as alertActions } from "./alerts";
-import { actions as appRedirectActions } from "./app-redirect";
-import { slice } from "./ra-profiles";
-import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
-import { actions as userInterfaceActions } from "./user-interface";
+import { AppEpic } from 'ducks';
+import { iif, of } from 'rxjs';
+import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
+import { extractError } from 'utils/net';
+import { actions as alertActions } from './alerts';
+import { actions as appRedirectActions } from './app-redirect';
+import { slice } from './ra-profiles';
+import { transformAttributeDescriptorDtoToModel } from './transform/attributes';
+import { actions as userInterfaceActions } from './user-interface';
 
-import { LockWidgetNameEnum } from "types/user-interface";
-import { transformProfileApprovalDtoToModel } from "./transform/approval-profiles";
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { transformProfileApprovalDtoToModel } from './transform/approval-profiles';
 import {
     transformComplianceProfileSimplifiedDtoToModel,
     transformRaProfileAcmeDetailResponseDtoToModel,
@@ -19,7 +19,7 @@ import {
     transformRaProfileEditRequestModelToDto,
     transformRaProfileResponseDtoToModel,
     transformRaProfileScepDetailResponseDtoToModel,
-} from "./transform/ra-profiles";
+} from './transform/ra-profiles';
 
 const listRaProfiles: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -37,7 +37,7 @@ const listRaProfiles: AppEpic = (action$, state$, deps) => {
 
                 catchError((error) =>
                     of(
-                        slice.actions.listRaProfilesFailure({ error: extractError(error, "Failed to get RA profiles list") }),
+                        slice.actions.listRaProfilesFailure({ error: extractError(error, 'Failed to get RA profiles list') }),
                         userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfRAProfiles),
                     ),
                 ),
@@ -64,7 +64,7 @@ const getRaProfileDetail: AppEpic = (action$, state$, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.getRaProfileDetailFailure({ error: extractError(err, "Failed to get RA Profile detail") }),
+                            slice.actions.getRaProfileDetailFailure({ error: extractError(err, 'Failed to get RA Profile detail') }),
                             userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.RaProfileDetails),
                         ),
                     ),
@@ -96,8 +96,8 @@ const createRaProfile: AppEpic = (action$, state$, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.createRaProfileFailure({ error: extractError(err, "Failed to create profile") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to create profile" }),
+                            slice.actions.createRaProfileFailure({ error: extractError(err, 'Failed to create profile') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to create profile' }),
                         ),
                     ),
                 ),
@@ -136,7 +136,7 @@ const updateRaProfile: AppEpic = (action$, state$, deps) => {
                         ),
                     ),
 
-                    catchError((err) => of(slice.actions.updateRaProfileFailure({ error: extractError(err, "Failed to update profile") }))),
+                    catchError((err) => of(slice.actions.updateRaProfileFailure({ error: extractError(err, 'Failed to update profile') }))),
                 ),
         ),
     );
@@ -154,8 +154,8 @@ const enableRaProfile: AppEpic = (action$, state$, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.enableRaProfileFailure({ error: extractError(err, "Failed to enable profile") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to enable profile" }),
+                            slice.actions.enableRaProfileFailure({ error: extractError(err, 'Failed to enable profile') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to enable profile' }),
                         ),
                     ),
                 ),
@@ -175,8 +175,8 @@ const disableRaProfile: AppEpic = (action$, state$, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.enableRaProfileFailure({ error: extractError(err, "Failed to disable profile") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to disable profile" }),
+                            slice.actions.enableRaProfileFailure({ error: extractError(err, 'Failed to disable profile') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to disable profile' }),
                         ),
                     ),
                 ),
@@ -204,8 +204,8 @@ const deleteRaProfile: AppEpic = (action$, state$, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.deleteRaProfileFailure({ error: extractError(err, "Failed to delete profile") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to delete profile" }),
+                            slice.actions.deleteRaProfileFailure({ error: extractError(err, 'Failed to delete profile') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to delete profile' }),
                         ),
                     ),
                 ),
@@ -235,8 +235,8 @@ const activateAcme: AppEpic = (action$, state$, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.activateAcmeFailure({ error: extractError(err, "Failed to activate ACME") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to activate ACME" }),
+                            slice.actions.activateAcmeFailure({ error: extractError(err, 'Failed to activate ACME') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to activate ACME' }),
                         ),
                     ),
                 ),
@@ -255,8 +255,8 @@ const deactivateAcme: AppEpic = (action$, state$, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.deactivateAcmeFailure({ error: extractError(err, "Failed to deactivate ACME") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to deactivate ACME" }),
+                            slice.actions.deactivateAcmeFailure({ error: extractError(err, 'Failed to deactivate ACME') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to deactivate ACME' }),
                         ),
                     ),
                 ),
@@ -279,8 +279,8 @@ const getAcmeDetails: AppEpic = (action$, state$, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.getAcmeDetailsFailure({ error: extractError(err, "Failed to get ACME details") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to get ACME details" }),
+                            slice.actions.getAcmeDetailsFailure({ error: extractError(err, 'Failed to get ACME details') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to get ACME details' }),
                         ),
                     ),
                 ),
@@ -310,8 +310,8 @@ const activateScep: AppEpic = (action$, state$, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.activateScepFailure({ error: extractError(err, "Failed to activate SCEP") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to activate SCEP" }),
+                            slice.actions.activateScepFailure({ error: extractError(err, 'Failed to activate SCEP') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to activate SCEP' }),
                         ),
                     ),
                 ),
@@ -330,8 +330,8 @@ const deactivateScep: AppEpic = (action$, state$, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.deactivateScepFailure({ error: extractError(err, "Failed to deactivate SCEP") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to deactivate SCEP" }),
+                            slice.actions.deactivateScepFailure({ error: extractError(err, 'Failed to deactivate SCEP') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to deactivate SCEP' }),
                         ),
                     ),
                 ),
@@ -354,8 +354,8 @@ const getScepDetails: AppEpic = (action$, state$, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.getScepDetailsFailure({ error: extractError(err, "Failed to get SCEP details") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to get SCEP details" }),
+                            slice.actions.getScepDetailsFailure({ error: extractError(err, 'Failed to get SCEP details') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to get SCEP details' }),
                         ),
                     ),
                 ),
@@ -382,8 +382,8 @@ const listIssuanceAttributeDescriptors: AppEpic = (action$, state$, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.listIssuanceAttributesFailure({ error: extractError(err, "Failed to list issue attributes") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to list issue attributes" }),
+                            slice.actions.listIssuanceAttributesFailure({ error: extractError(err, 'Failed to list issue attributes') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to list issue attributes' }),
                         ),
                     ),
                 ),
@@ -412,9 +412,9 @@ const listRevocationAttributeDescriptors: AppEpic = (action$, state$, deps) => {
                     catchError((err) =>
                         of(
                             slice.actions.listRevocationAttributeDescriptorsFailure({
-                                error: extractError(err, "Failed to list revocation attributes"),
+                                error: extractError(err, 'Failed to list revocation attributes'),
                             }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to list revocation attributes" }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to list revocation attributes' }),
                         ),
                     ),
                 ),
@@ -431,8 +431,8 @@ const bulkEnableProfiles: AppEpic = (action$, state$, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.bulkEnableRaProfilesFailure({ error: extractError(err, "Failed to enable profiles") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to enable profiles" }),
+                        slice.actions.bulkEnableRaProfilesFailure({ error: extractError(err, 'Failed to enable profiles') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to enable profiles' }),
                     ),
                 ),
             ),
@@ -450,8 +450,8 @@ const bulkDisableProfiles: AppEpic = (action$, state$, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.bulkDisableRaProfilesFailure({ error: extractError(err, "Failed to disable profiles") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to disable profiles" }),
+                        slice.actions.bulkDisableRaProfilesFailure({ error: extractError(err, 'Failed to disable profiles') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to disable profiles' }),
                     ),
                 ),
             ),
@@ -467,14 +467,14 @@ const bulkDeleteProfiles: AppEpic = (action$, state$, deps) => {
                 mergeMap(() =>
                     of(
                         slice.actions.bulkDeleteRaProfilesSuccess({ uuids: action.payload.uuids }),
-                        alertActions.success("Selected RA profiles successfully deleted."),
+                        alertActions.success('Selected RA profiles successfully deleted.'),
                     ),
                 ),
 
                 catchError((err) =>
                     of(
-                        slice.actions.bulkDeleteRaProfilesFailure({ error: extractError(err, "Failed to delete profiles") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to delete profiles" }),
+                        slice.actions.bulkDeleteRaProfilesFailure({ error: extractError(err, 'Failed to delete profiles') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to delete profiles' }),
                     ),
                 ),
             ),
@@ -488,13 +488,13 @@ const checkCompliance: AppEpic = (action$, state$, deps) => {
         switchMap((action) =>
             deps.apiClients.raProfiles.checkRaProfileCompliance({ requestBody: action.payload.uuids }).pipe(
                 mergeMap(() =>
-                    of(slice.actions.checkComplianceSuccess(), alertActions.success("Compliance Check for the certificates initiated")),
+                    of(slice.actions.checkComplianceSuccess(), alertActions.success('Compliance Check for the certificates initiated')),
                 ),
 
                 catchError((err) =>
                     of(
-                        slice.actions.checkComplianceFailed({ error: extractError(err, "Failed to start compliance check") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to start compliance check" }),
+                        slice.actions.checkComplianceFailed({ error: extractError(err, 'Failed to start compliance check') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to start compliance check' }),
                     ),
                 ),
             ),
@@ -524,9 +524,9 @@ const associateRaProfile: AppEpic = (action$, state$, deps) => {
                     catchError((err) =>
                         of(
                             slice.actions.associateRaProfileFailed({
-                                error: extractError(err, "Failed to associate RA Profile to Compliance Profile"),
+                                error: extractError(err, 'Failed to associate RA Profile to Compliance Profile'),
                             }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to associate RA Profile to Compliance Profile" }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to associate RA Profile to Compliance Profile' }),
                         ),
                     ),
                 ),
@@ -556,11 +556,11 @@ const dissociateRaProfile: AppEpic = (action$, state$, deps) => {
                     catchError((err) =>
                         of(
                             slice.actions.dissociateRaProfileFailed({
-                                error: extractError(err, "Failed to dissociate RA Profile from Compliance Profile"),
+                                error: extractError(err, 'Failed to dissociate RA Profile from Compliance Profile'),
                             }),
                             appRedirectActions.fetchError({
                                 error: err,
-                                message: "Failed to dissociate RA Profile from Compliance Profile",
+                                message: 'Failed to dissociate RA Profile from Compliance Profile',
                             }),
                         ),
                     ),
@@ -588,7 +588,7 @@ const getComplianceProfilesForRaProfile: AppEpic = (action$, state$, deps) => {
                     catchError((err) =>
                         of(
                             slice.actions.getComplianceProfilesForRaProfileFailure({
-                                error: extractError(err, "Failed to get associated Compliance Profiles"),
+                                error: extractError(err, 'Failed to get associated Compliance Profiles'),
                             }),
                             userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.RaProfileComplianceDetails),
                         ),
@@ -615,7 +615,7 @@ const getAssociatedApprovalProfiles: AppEpic = (action$, state$, deps) => {
                 catchError((err) =>
                     of(
                         slice.actions.getAssociatedApprovalProfilesFailure({
-                            error: extractError(err, "Failed to get associated Approval Profiles"),
+                            error: extractError(err, 'Failed to get associated Approval Profiles'),
                         }),
                         userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfApprovalProfiles),
                     ),
@@ -648,11 +648,11 @@ const associateRAProfileWithApprovalProfile: AppEpic = (action$, state$, deps) =
                     catchError((err) =>
                         of(
                             slice.actions.associateRAProfileWithApprovalProfileFailure({
-                                error: extractError(err, "Failed to associate RA Profile with Approval Profile"),
+                                error: extractError(err, 'Failed to associate RA Profile with Approval Profile'),
                             }),
                             appRedirectActions.fetchError({
                                 error: err,
-                                message: "Failed to associate RA Profile with Approval Profile",
+                                message: 'Failed to associate RA Profile with Approval Profile',
                             }),
                         ),
                     ),
@@ -675,11 +675,11 @@ const disassociateRAProfileFromApprovalProfile: AppEpic = (action$, state$, deps
                     catchError((err) =>
                         of(
                             slice.actions.disassociateRAProfileFromApprovalProfileFailure({
-                                error: extractError(err, "Failed to disassociate RA Profile from Approval Profile"),
+                                error: extractError(err, 'Failed to disassociate RA Profile from Approval Profile'),
                             }),
                             appRedirectActions.fetchError({
                                 error: err,
-                                message: "Failed to disassociate RA Profile from Approval Profile",
+                                message: 'Failed to disassociate RA Profile from Approval Profile',
                             }),
                         ),
                     ),

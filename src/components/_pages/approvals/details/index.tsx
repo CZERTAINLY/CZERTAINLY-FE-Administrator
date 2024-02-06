@@ -1,18 +1,18 @@
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
-import StatusBadge from "components/StatusBadge";
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
-import { actions as approvalActions, selectors as approvalSelectors } from "ducks/approvals";
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
+import StatusBadge from 'components/StatusBadge';
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
+import { actions as approvalActions, selectors as approvalSelectors } from 'ducks/approvals';
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { Button, Col, Container, Input, Row } from "reactstrap";
-import { ApproverType, ProfileApprovalStepModel } from "types/approval-profiles";
-import { DetailApprovalStepModel } from "types/approvals";
-import { ApprovalDetailDtoStatusEnum } from "types/openapi";
-import { dateFormatter } from "utils/dateUtil";
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Button, Col, Container, Input, Row } from 'reactstrap';
+import { ApproverType, ProfileApprovalStepModel } from 'types/approval-profiles';
+import { DetailApprovalStepModel } from 'types/approvals';
+import { ApprovalDetailDtoStatusEnum } from 'types/openapi';
+import { dateFormatter } from 'utils/dateUtil';
 
 export default function ApprovalDetails() {
     const dispatch = useDispatch();
@@ -67,17 +67,17 @@ export default function ApprovalDetails() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "check",
+                icon: 'check',
                 disabled: approvalDetails?.status !== ApprovalDetailDtoStatusEnum.Pending,
-                tooltip: "Approve",
+                tooltip: 'Approve',
                 onClick: () => {
                     setRecipientApproveDialog(true);
                 },
             },
             {
-                icon: "times",
+                icon: 'times',
                 disabled: approvalDetails?.status !== ApprovalDetailDtoStatusEnum.Pending,
-                tooltip: "Reject",
+                tooltip: 'Reject',
                 onClick: () => {
                     setRecipientRejectDialog(true);
                 },
@@ -100,12 +100,12 @@ export default function ApprovalDetails() {
     const detailHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "property",
-                content: "Property",
+                id: 'property',
+                content: 'Property',
             },
             {
-                id: "value",
-                content: "Value",
+                id: 'value',
+                content: 'Value',
             },
         ],
         [],
@@ -117,34 +117,34 @@ export default function ApprovalDetails() {
                 ? []
                 : [
                       {
-                          id: "uuid",
-                          columns: ["UUID", approvalDetails.approvalUuid],
+                          id: 'uuid',
+                          columns: ['UUID', approvalDetails.approvalUuid],
                       },
                       {
-                          id: "name",
+                          id: 'name',
                           columns: [
-                              "Name",
+                              'Name',
                               approvalDetails.approvalProfileUuid ? (
                                   <Link to={`../../../approvalprofiles/detail/${approvalDetails.approvalProfileUuid}`}>
                                       {approvalDetails.approvalProfileName}
                                   </Link>
                               ) : (
-                                  ""
+                                  ''
                               ),
                           ],
                       },
                       {
-                          id: "description",
-                          columns: ["Description", approvalDetails.description || ""],
+                          id: 'description',
+                          columns: ['Description', approvalDetails.description || ''],
                       },
                       {
-                          id: "requestedBy",
-                          columns: ["Requested By", approvalDetails.creatorUsername || ""],
+                          id: 'requestedBy',
+                          columns: ['Requested By', approvalDetails.creatorUsername || ''],
                       },
                       {
-                          id: "status",
+                          id: 'status',
                           columns: [
-                              "Status",
+                              'Status',
                               <>
                                   <StatusBadge textStatus={approvalDetails.status} />
                                   <Button
@@ -162,31 +162,31 @@ export default function ApprovalDetails() {
                       },
 
                       {
-                          id: "createdAt",
-                          columns: ["Created At", dateFormatter(approvalDetails.createdAt)],
+                          id: 'createdAt',
+                          columns: ['Created At', dateFormatter(approvalDetails.createdAt)],
                       },
                       {
-                          id: "closedAt",
-                          columns: ["Closed At", approvalDetails.closedAt ? dateFormatter(approvalDetails.closedAt) : ""],
-                      },
-
-                      {
-                          id: "action",
-                          columns: ["Action", approvalDetails.resourceAction],
-                      },
-                      {
-                          id: "resource",
-                          columns: ["Resource", approvalDetails.resource || ""],
+                          id: 'closedAt',
+                          columns: ['Closed At', approvalDetails.closedAt ? dateFormatter(approvalDetails.closedAt) : ''],
                       },
 
                       {
-                          id: "expiry",
-                          columns: ["Expiry (in hours)", approvalDetails?.expiry ? approvalDetails.expiry.toString() : ""],
+                          id: 'action',
+                          columns: ['Action', approvalDetails.resourceAction],
+                      },
+                      {
+                          id: 'resource',
+                          columns: ['Resource', approvalDetails.resource || ''],
                       },
 
                       {
-                          id: "version",
-                          columns: ["Version", approvalDetails?.version.toString() || ""],
+                          id: 'expiry',
+                          columns: ['Expiry (in hours)', approvalDetails?.expiry ? approvalDetails.expiry.toString() : ''],
+                      },
+
+                      {
+                          id: 'version',
+                          columns: ['Version', approvalDetails?.version.toString() || ''],
                       },
                   ],
         [approvalDetails, navigate],
@@ -195,24 +195,24 @@ export default function ApprovalDetails() {
     const stepsHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "order",
-                content: "Order",
+                id: 'order',
+                content: 'Order',
             },
             {
-                id: "requiredApprovals",
-                content: "Required Approvals",
+                id: 'requiredApprovals',
+                content: 'Required Approvals',
             },
             {
-                id: "approverType",
-                content: "Approver Type",
+                id: 'approverType',
+                content: 'Approver Type',
             },
             {
-                id: "selectedApprover",
-                content: "Selected Approver",
+                id: 'selectedApprover',
+                content: 'Selected Approver',
             },
             {
-                id: "description",
-                content: "Description",
+                id: 'description',
+                content: 'Description',
             },
         ],
         [],
@@ -235,28 +235,28 @@ export default function ApprovalDetails() {
             id: recipient.approvalRecipientUuid,
             columns: [
                 <Link to={`../users/detail/${approvalStep.userUuid}`}>{recipient.username}</Link>,
-                recipient.closedAt ? dateFormatter(recipient.closedAt) : "",
+                recipient.closedAt ? dateFormatter(recipient.closedAt) : '',
                 <StatusBadge textStatus={recipient.status} />,
-                recipient.comment || "",
+                recipient.comment || '',
             ],
         }));
 
         const headers = [
             {
-                id: "recipient",
-                content: "Recipient",
+                id: 'recipient',
+                content: 'Recipient',
             },
             {
-                id: "closedAt",
-                content: "Closed At",
+                id: 'closedAt',
+                content: 'Closed At',
             },
             {
-                id: "status",
-                content: "Status",
+                id: 'status',
+                content: 'Status',
             },
             {
-                id: "comment",
-                content: "Comment",
+                id: 'comment',
+                content: 'Comment',
             },
         ];
 
@@ -272,13 +272,13 @@ export default function ApprovalDetails() {
                       columns: [
                           approvalStep.order.toString(),
 
-                          approvalStep?.requiredApprovals ? approvalStep.requiredApprovals.toString() : "",
+                          approvalStep?.requiredApprovals ? approvalStep.requiredApprovals.toString() : '',
 
-                          getApprovalType(approvalStep) || "",
+                          getApprovalType(approvalStep) || '',
 
-                          renderApproverRedirect(approvalStep) || "",
+                          renderApproverRedirect(approvalStep) || '',
 
-                          approvalStep.description || "",
+                          approvalStep.description || '',
                       ],
                       detailColumns: [
                           <></>,
@@ -286,7 +286,7 @@ export default function ApprovalDetails() {
                           <></>,
                           <></>,
                           <></>,
-                          approvalStep.approvalStepRecipients.length ? renderRecipiensDetails(approvalStep) : "",
+                          approvalStep.approvalStepRecipients.length ? renderRecipiensDetails(approvalStep) : '',
                       ],
                   })),
         [approvalDetails, renderApproverRedirect, renderRecipiensDetails],
@@ -320,8 +320,8 @@ export default function ApprovalDetails() {
                 caption="Accept approval?"
                 toggle={() => setRecipientApproveDialog(false)}
                 buttons={[
-                    { color: "primary", onClick: onApproveRecipient, body: "Yes, approve" },
-                    { color: "secondary", onClick: () => setRecipientApproveDialog(false), body: "Cancel" },
+                    { color: 'primary', onClick: onApproveRecipient, body: 'Yes, approve' },
+                    { color: 'secondary', onClick: () => setRecipientApproveDialog(false), body: 'Cancel' },
                 ]}
             />
 
@@ -336,8 +336,8 @@ export default function ApprovalDetails() {
                     </div>
                 }
                 buttons={[
-                    { color: "primary", onClick: onRejectRecipient, body: "Yes, reject" },
-                    { color: "secondary", onClick: () => setRecipientRejectDialog(false), body: "Cancel" },
+                    { color: 'primary', onClick: onRejectRecipient, body: 'Yes, reject' },
+                    { color: 'secondary', onClick: () => setRecipientRejectDialog(false), body: 'Cancel' },
                 ]}
             />
         </Container>

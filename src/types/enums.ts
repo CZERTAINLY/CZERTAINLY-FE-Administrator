@@ -1,4 +1,4 @@
-import { EnumItemDto as EnumItemDtoOpenApi } from "./openapi";
+import { EnumItemDto as EnumItemDtoOpenApi } from './openapi';
 
 export type EnumItemDto = EnumItemDtoOpenApi;
 export type EnumItemModel = EnumItemDto;

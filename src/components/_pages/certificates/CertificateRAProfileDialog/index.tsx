@@ -1,13 +1,13 @@
-import { useCallback, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useCallback, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
-import { actions } from "ducks/certificates";
-import { actions as raProfileActions, selectors as raProfileSelectors } from "ducks/ra-profiles";
+import { actions } from 'ducks/certificates';
+import { actions as raProfileActions, selectors as raProfileSelectors } from 'ducks/ra-profiles';
 
-import Select, { SingleValue } from "react-select";
+import Select, { SingleValue } from 'react-select';
 
-import Spinner from "components/Spinner";
-import { Button, ButtonGroup, FormGroup, Label } from "reactstrap";
+import Spinner from 'components/Spinner';
+import { Button, ButtonGroup, FormGroup, Label } from 'reactstrap';
 
 interface Props {
     uuids: string[];
@@ -37,8 +37,8 @@ export default function CertificateGroupDialog({ uuids, onCancel, onUpdate }: Pr
         if (!selectedRaProfile) return;
         dispatch(
             actions.bulkUpdateRaProfile({
-                raProfileRequest: { certificateUuids: uuids, raProfileUuid: selectedRaProfile.value.split(":#")[0], filters: [] },
-                authorityUuid: selectedRaProfile.value.split(":#")[1],
+                raProfileRequest: { certificateUuids: uuids, raProfileUuid: selectedRaProfile.value.split(':#')[0], filters: [] },
+                authorityUuid: selectedRaProfile.value.split(':#')[1],
             }),
         );
         onUpdate();
@@ -52,7 +52,7 @@ export default function CertificateGroupDialog({ uuids, onCancel, onUpdate }: Pr
                 <Select
                     id="raProfile"
                     options={raProfiles.map((raProfile) => ({
-                        value: raProfile.uuid + ":#" + raProfile.authorityInstanceUuid,
+                        value: raProfile.uuid + ':#' + raProfile.authorityInstanceUuid,
                         label: raProfile.name,
                     }))}
                     value={selectedRaProfile}

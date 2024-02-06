@@ -1,33 +1,33 @@
-import AttributeEditor from "components/Attributes/AttributeEditor";
-import SwitchField from "components/Input/SwitchField";
-import TextField from "components/Input/TextField";
-import TabLayout from "components/Layout/TabLayout";
-import ProgressButton from "components/ProgressButton";
+import AttributeEditor from 'components/Attributes/AttributeEditor';
+import SwitchField from 'components/Input/SwitchField';
+import TextField from 'components/Input/TextField';
+import TabLayout from 'components/Layout/TabLayout';
+import ProgressButton from 'components/ProgressButton';
 
-import Widget from "components/Widget";
+import Widget from 'components/Widget';
 
-import { actions as connectorActions } from "ducks/connectors";
-import { actions as customAttributesActions, selectors as customAttributesSelectors } from "ducks/customAttributes";
-import { actions as raProfileActions, selectors as raProfileSelectors } from "ducks/ra-profiles";
-import { actions as scepProfileActions, selectors as scepProfileSelectors } from "ducks/scep-profiles";
+import { actions as connectorActions } from 'ducks/connectors';
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
+import { actions as raProfileActions, selectors as raProfileSelectors } from 'ducks/ra-profiles';
+import { actions as scepProfileActions, selectors as scepProfileSelectors } from 'ducks/scep-profiles';
 
-import { FormApi } from "final-form";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Field, Form } from "react-final-form";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
-import Select from "react-select";
-import { Form as BootstrapForm, Button, ButtonGroup, FormGroup, Label } from "reactstrap";
-import { AttributeDescriptorModel } from "types/attributes";
-import { RaProfileSimplifiedModel } from "types/ra-profiles";
-import { ScepProfileAddRequestModel, ScepProfileEditRequestModel, ScepProfileResponseModel } from "types/scep-profiles";
+import { FormApi } from 'final-form';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Field, Form } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
+import Select from 'react-select';
+import { Form as BootstrapForm, Button, ButtonGroup, FormGroup, Label } from 'reactstrap';
+import { AttributeDescriptorModel } from 'types/attributes';
+import { RaProfileSimplifiedModel } from 'types/ra-profiles';
+import { ScepProfileAddRequestModel, ScepProfileEditRequestModel, ScepProfileResponseModel } from 'types/scep-profiles';
 
-import { mutators } from "utils/attributes/attributeEditorMutators";
-import { collectFormAttributes } from "utils/attributes/attributes";
+import { mutators } from 'utils/attributes/attributeEditorMutators';
+import { collectFormAttributes } from 'utils/attributes/attributes';
 
-import { validateAlphaNumericWithoutAccents, validateInteger, validateLength, validateRequired } from "utils/validators";
-import { KeyAlgorithm, Resource } from "../../../../types/openapi";
-import CertificateField from "../CertificateField";
+import { validateAlphaNumericWithoutAccents, validateInteger, validateLength, validateRequired } from 'utils/validators';
+import { KeyAlgorithm, Resource } from '../../../../types/openapi';
+import CertificateField from '../CertificateField';
 
 interface FormValues {
     name: string;
@@ -110,11 +110,11 @@ export default function ScepProfileForm() {
                 ...values,
                 caCertificateUuid: values.certificate!.value,
                 issueCertificateAttributes: collectFormAttributes(
-                    "issuanceAttributes",
+                    'issuanceAttributes',
                     [...(raProfileIssuanceAttrDescs ?? []), ...issueGroupAttributesCallbackAttributes],
                     values,
                 ),
-                customAttributes: collectFormAttributes("customScepProfile", resourceCustomAttributes, values),
+                customAttributes: collectFormAttributes('customScepProfile', resourceCustomAttributes, values),
             };
             if (values.raProfile) {
                 scepRequest.raProfileUuid = values.raProfile.value;
@@ -143,7 +143,7 @@ export default function ScepProfileForm() {
             if (!value) {
                 setRaProfile(undefined);
                 dispatch(raProfileActions.clearIssuanceAttributesDescriptors());
-                form.mutators.clearAttributes("issuanceAttributes");
+                form.mutators.clearAttributes('issuanceAttributes');
                 return;
             }
 
@@ -170,15 +170,15 @@ export default function ScepProfileForm() {
 
     const defaultValues = useMemo(
         () => ({
-            name: editMode ? scepProfileSelector?.name || "" : "",
-            description: editMode ? scepProfileSelector?.description || "" : "",
+            name: editMode ? scepProfileSelector?.name || '' : '',
+            description: editMode ? scepProfileSelector?.description || '' : '',
             renewalThreshold: editMode ? scepProfileSelector?.renewThreshold || 0 : 0,
             includeCaCertificate: editMode ? scepProfileSelector?.includeCaCertificate || false : false,
             includeCaCertificateChain: editMode ? scepProfileSelector?.includeCaCertificateChain || false : false,
             enableIntune: editMode ? scepProfileSelector?.enableIntune ?? false : false,
-            intuneTenant: editMode ? scepProfileSelector?.intuneTenant ?? "" : "",
-            intuneApplicationId: editMode ? scepProfileSelector?.intuneApplicationId ?? "" : "",
-            intuneApplicationKey: "",
+            intuneTenant: editMode ? scepProfileSelector?.intuneTenant ?? '' : '',
+            intuneApplicationId: editMode ? scepProfileSelector?.intuneApplicationId ?? '' : '',
+            intuneApplicationKey: '',
             raProfile: editMode
                 ? scepProfileSelector?.raProfile
                     ? optionsForRaProfiles.find((raProfile) => raProfile.value === scepProfileSelector.raProfile?.uuid)
@@ -195,7 +195,7 @@ export default function ScepProfileForm() {
         [editMode, scepProfileSelector, optionsForRaProfiles],
     );
 
-    const title = useMemo(() => (editMode ? "Edit SCEP Profile" : "Create SCEP Profile"), [editMode]);
+    const title = useMemo(() => (editMode ? 'Edit SCEP Profile' : 'Create SCEP Profile'), [editMode]);
 
     return (
         <Widget title={title} busy={isBusy}>
@@ -212,20 +212,20 @@ export default function ScepProfileForm() {
                     } = {};
                     if (values.enableIntune) {
                         if (!values.intuneTenant) {
-                            errors.intuneTenant = "Required Field";
+                            errors.intuneTenant = 'Required Field';
                         }
                         if (!values.intuneApplicationId) {
-                            errors.intuneApplicationId = "Required Field";
+                            errors.intuneApplicationId = 'Required Field';
                         }
                         if (!values.intuneApplicationKey) {
-                            errors.intuneApplicationKey = "Required Field";
+                            errors.intuneApplicationKey = 'Required Field';
                         }
                     }
                     if (
                         certificates?.find((c) => c.uuid === values.certificate?.value)?.publicKeyAlgorithm === KeyAlgorithm.Ecdsa &&
                         !values.challengePassword
                     ) {
-                        errors.challengePassword = "Required Field";
+                        errors.challengePassword = 'Required Field';
                     }
                     return errors;
                 }}
@@ -239,7 +239,7 @@ export default function ScepProfileForm() {
                             disabled={editMode}
                         />
                         <TextField id="description" label="Description" validators={[validateLength(0, 300)]} />
-                        <TextField id="challengePassword" label="Challenge Password" inputType={"password"} validators={[]} />
+                        <TextField id="challengePassword" label="Challenge Password" inputType={'password'} validators={[]} />
                         <TextField
                             id="renewalThreshold"
                             label="Renewal Threshold"
@@ -284,7 +284,7 @@ export default function ScepProfileForm() {
                             <TabLayout
                                 tabs={[
                                     {
-                                        title: "Issue Attributes",
+                                        title: 'Issue Attributes',
                                         content:
                                             !raProfile || !raProfileIssuanceAttrDescs || raProfileIssuanceAttrDescs.length === 0 ? (
                                                 <></>
@@ -301,7 +301,7 @@ export default function ScepProfileForm() {
                                             ),
                                     },
                                     {
-                                        title: "Custom Attributes",
+                                        title: 'Custom Attributes',
                                         content: (
                                             <AttributeEditor
                                                 id="customScepProfile"
@@ -318,8 +318,8 @@ export default function ScepProfileForm() {
                         <div className="d-flex justify-content-end">
                             <ButtonGroup>
                                 <ProgressButton
-                                    title={editMode ? "Update" : "Create"}
-                                    inProgressTitle={editMode ? "Updating..." : "Creating..."}
+                                    title={editMode ? 'Update' : 'Create'}
+                                    inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
                                     inProgress={submitting}
                                     disabled={pristine || submitting || !valid}
                                 />

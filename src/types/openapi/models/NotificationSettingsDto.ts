@@ -21,5 +21,5 @@ export interface NotificationSettingsDto {
      * @type {{ [key: string]: string; }}
      * @memberof NotificationSettingsDto
      */
-    notificationsMapping: { [key: string]: string };
+    notificationsMapping: { [key: string]: string; };
 }

@@ -1,11 +1,11 @@
-import { FormApi } from "final-form";
-import createDecorator from "final-form-calculate";
-import { useCallback } from "react";
-import { Field, Form } from "react-final-form";
-import { Button, ButtonGroup, Form as BootstrapForm, FormGroup, Input, Label } from "reactstrap";
+import { FormApi } from 'final-form';
+import createDecorator from 'final-form-calculate';
+import { useCallback } from 'react';
+import { Field, Form } from 'react-final-form';
+import { Button, ButtonGroup, Form as BootstrapForm, FormGroup, Input, Label } from 'reactstrap';
 
-import { AuditLogFilterModel } from "types/auditLogs";
-import styles from "./auditLogsFilters.module.scss";
+import { AuditLogFilterModel } from 'types/auditLogs';
+import styles from './auditLogsFilters.module.scss';
 
 interface Props {
     operations: string[];
@@ -17,7 +17,7 @@ interface Props {
 
 const dateCalculator = createDecorator(
     {
-        field: "createdFrom",
+        field: 'createdFrom',
         updates: {
             createdTo: (createdFromValue: string | undefined, allValues) => {
                 const dateTo = (allValues as AuditLogFilterModel).createdTo;
@@ -32,7 +32,7 @@ const dateCalculator = createDecorator(
         },
     },
     {
-        field: "createdTo",
+        field: 'createdTo',
         updates: {
             createdFrom: (createdToValue: string | undefined, allValues) => {
                 const dateFrom = (allValues as AuditLogFilterModel).createdFrom;
@@ -48,7 +48,7 @@ const dateCalculator = createDecorator(
     },
 );
 
-const normalizeAllValue = (value?: string) => (value === "- All -" ? undefined : value);
+const normalizeAllValue = (value?: string) => (value === '- All -' ? undefined : value);
 
 function AuditLogsFilters({ objects, operationStates, operations, onClear, onFilters }: Props) {
     const submitCallback = useCallback(

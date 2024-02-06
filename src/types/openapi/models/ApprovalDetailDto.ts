@@ -11,7 +11,10 @@
  * Do not edit the class manually.
  */
 
-import type { ApprovalDetailStepDto, Resource } from "./";
+import type {
+    ApprovalDetailStepDto,
+    Resource,
+} from './';
 
 /**
  * @export
@@ -120,8 +123,9 @@ export interface ApprovalDetailDto {
  * @enum {string}
  */
 export enum ApprovalDetailDtoStatusEnum {
-    Pending = "PENDING",
-    Approved = "APPROVED",
-    Rejected = "REJECTED",
-    Expired = "EXPIRED",
+    Pending = 'PENDING',
+    Approved = 'APPROVED',
+    Rejected = 'REJECTED',
+    Expired = 'EXPIRED'
 }
+
