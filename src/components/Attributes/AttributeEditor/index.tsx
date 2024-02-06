@@ -131,7 +131,7 @@ export default function AttributeEditor({
         (attributes: AttributeResponseModel[], path: string | undefined): any => {
             if (!path) return undefined;
 
-            if (!path.includes('.')) return attributes.find((a) => a.name === path)?.content;
+            if (!path.includes('.')) return getObjectPropertyValue(attributes.find((a) => a.name === path)?.content, 'value');
 
             let spath = path.split('.');
 
@@ -294,7 +294,8 @@ export default function AttributeEditor({
         if (
             attributeDescriptors === prevDescriptors &&
             attributes === prevAttributes &&
-            groupAttributesCallbackAttributes === prevGroupDescriptors
+            groupAttributesCallbackAttributes === prevGroupDescriptors &&
+            formState.values === previousFormValues
         )
             return;
 
@@ -434,6 +435,7 @@ export default function AttributeEditor({
         prevAttributes,
         prevGroupDescriptors,
         buildCallbackMappings,
+        formState.values,
     ]);
 
     /**
