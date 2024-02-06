@@ -1,29 +1,29 @@
-import AttributeEditor from "components/Attributes/AttributeEditor";
-import TabLayout from "components/Layout/TabLayout";
-import ProgressButton from "components/ProgressButton";
-import Widget from "components/Widget";
+import AttributeEditor from 'components/Attributes/AttributeEditor';
+import TabLayout from 'components/Layout/TabLayout';
+import ProgressButton from 'components/ProgressButton';
+import Widget from 'components/Widget';
 
-import { actions as alertActions } from "ducks/alerts";
-import { actions as authorityActions, selectors as authoritySelectors } from "ducks/authorities";
-import { actions as connectorActions } from "ducks/connectors";
-import { actions as customAttributesActions, selectors as customAttributesSelectors } from "ducks/customAttributes";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { actions as alertActions } from 'ducks/alerts';
+import { actions as authorityActions, selectors as authoritySelectors } from 'ducks/authorities';
+import { actions as connectorActions } from 'ducks/connectors';
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { Field, Form } from "react-final-form";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { Field, Form } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
 
-import Select, { SingleValue } from "react-select";
-import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from "reactstrap";
-import { AttributeDescriptorModel } from "types/attributes";
-import { AuthorityResponseModel } from "types/authorities";
-import { ConnectorResponseModel } from "types/connectors";
-import { FunctionGroupCode, Resource } from "types/openapi";
+import Select, { SingleValue } from 'react-select';
+import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
+import { AttributeDescriptorModel } from 'types/attributes';
+import { AuthorityResponseModel } from 'types/authorities';
+import { ConnectorResponseModel } from 'types/connectors';
+import { FunctionGroupCode, Resource } from 'types/openapi';
 
-import { mutators } from "utils/attributes/attributeEditorMutators";
-import { collectFormAttributes } from "utils/attributes/attributes";
+import { mutators } from 'utils/attributes/attributeEditorMutators';
+import { collectFormAttributes } from 'utils/attributes/attributes';
 
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from "utils/validators";
+import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
 
 interface FormValues {
     name: string | undefined;
@@ -96,7 +96,7 @@ export default function AuthorityForm() {
     useEffect(() => {
         if (!authorityProvider && editMode && authoritySelector?.uuid === id && authorityProviders && authorityProviders.length > 0) {
             if (!authoritySelector!.connectorUuid) {
-                dispatch(alertActions.error("Authority provider was probably deleted"));
+                dispatch(alertActions.error('Authority provider was probably deleted'));
                 return;
             }
 
@@ -113,7 +113,7 @@ export default function AuthorityForm() {
                     }),
                 );
             } else {
-                dispatch(alertActions.error("Authority provider not found"));
+                dispatch(alertActions.error('Authority provider not found'));
             }
         }
     }, [authorityProvider, dispatch, editMode, authoritySelector, authorityProviders, isFetchingAuthorityProviders, id]);
@@ -171,11 +171,11 @@ export default function AuthorityForm() {
                         uuid: id!,
                         updateAuthority: {
                             attributes: collectFormAttributes(
-                                "authority",
+                                'authority',
                                 [...(authorityProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
                                 values,
                             ),
-                            customAttributes: collectFormAttributes("customAuthority", resourceCustomAttributes, values),
+                            customAttributes: collectFormAttributes('customAuthority', resourceCustomAttributes, values),
                         },
                     }),
                 );
@@ -186,11 +186,11 @@ export default function AuthorityForm() {
                         connectorUuid: values.authorityProvider!.value,
                         kind: values.storeKind?.value!,
                         attributes: collectFormAttributes(
-                            "authority",
+                            'authority',
                             [...(authorityProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
                             values,
                         ),
-                        customAttributes: collectFormAttributes("customAuthority", resourceCustomAttributes, values),
+                        customAttributes: collectFormAttributes('customAuthority', resourceCustomAttributes, values),
                     }),
                 );
             }
@@ -202,9 +202,9 @@ export default function AuthorityForm() {
         navigate(-1);
     }, [navigate]);
 
-    const submitTitle = useMemo(() => (editMode ? "Save" : "Create"), [editMode]);
+    const submitTitle = useMemo(() => (editMode ? 'Save' : 'Create'), [editMode]);
 
-    const inProgressTitle = useMemo(() => (editMode ? "Saving..." : "Creating..."), [editMode]);
+    const inProgressTitle = useMemo(() => (editMode ? 'Saving...' : 'Creating...'), [editMode]);
 
     const optionsForAuthorityProviders = useMemo(
         () =>
@@ -243,7 +243,7 @@ export default function AuthorityForm() {
         [editMode, authority],
     );
 
-    const title = useMemo(() => (editMode ? `Edit authority ${authority?.name}` : "Create new authority"), [editMode, authority]);
+    const title = useMemo(() => (editMode ? `Edit authority ${authority?.name}` : 'Create new authority'), [editMode, authority]);
 
     return (
         <Widget title={title} busy={isBusy}>
@@ -283,26 +283,26 @@ export default function AuthorityForm() {
                                             placeholder="Select Authority Provider"
                                             onChange={(event) => {
                                                 onAuthorityProviderChange(event);
-                                                form.mutators.clearAttributes("authority");
-                                                form.mutators.setAttribute("storeKind", undefined);
+                                                form.mutators.clearAttributes('authority');
+                                                form.mutators.setAttribute('storeKind', undefined);
                                                 input.onChange(event);
                                             }}
                                             styles={{
                                                 control: (provided) =>
                                                     meta.touched && meta.invalid
-                                                        ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } }
+                                                        ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
                                                         : { ...provided },
                                             }}
                                         />
 
-                                        <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>
+                                        <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
                                             {meta.error}
                                         </div>
                                     </FormGroup>
                                 )}
                             </Field>
                         ) : (
-                            <Field name="authorityProvider" format={(value) => (value ? value.label : "")} validate={validateRequired()}>
+                            <Field name="authorityProvider" format={(value) => (value ? value.label : '')} validate={validateRequired()}>
                                 {({ input, meta }) => (
                                     <FormGroup>
                                         <Label for="authorityProvider">Authority Provider</Label>
@@ -339,12 +339,12 @@ export default function AuthorityForm() {
                                             styles={{
                                                 control: (provided) =>
                                                     meta.touched && meta.invalid
-                                                        ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } }
+                                                        ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
                                                         : { ...provided },
                                             }}
                                         />
 
-                                        <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>
+                                        <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
                                             Required Field
                                         </div>
                                     </FormGroup>
@@ -353,7 +353,7 @@ export default function AuthorityForm() {
                         ) : null}
 
                         {editMode && authority?.kind ? (
-                            <Field name="storeKind" format={(value) => (value ? value.label : "")}>
+                            <Field name="storeKind" format={(value) => (value ? value.label : '')}>
                                 {({ input, meta }) => (
                                     <FormGroup>
                                         <Label for="storeKind">Kind</Label>
@@ -377,7 +377,7 @@ export default function AuthorityForm() {
                             <TabLayout
                                 tabs={[
                                     {
-                                        title: "Connector Attributes",
+                                        title: 'Connector Attributes',
                                         content:
                                             authorityProvider &&
                                             values.storeKind &&
@@ -398,7 +398,7 @@ export default function AuthorityForm() {
                                             ),
                                     },
                                     {
-                                        title: "Custom Attributes",
+                                        title: 'Custom Attributes',
                                         content: (
                                             <AttributeEditor
                                                 id="customAuthority"

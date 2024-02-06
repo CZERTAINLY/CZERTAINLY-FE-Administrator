@@ -1,7 +1,7 @@
-import { CertificateDetailResponseModel } from "../../types/certificate";
-import { ParseCertificateResponseDto } from "../../types/openapi/utils";
-import { isX509CertificateAsn1Data, isX509CertificateBasicData } from "../../types/utilsCertificate";
-import { emptyCertificate } from "../../utils/certificate";
+import { CertificateDetailResponseModel } from '../../types/certificate';
+import { ParseCertificateResponseDto } from '../../types/openapi/utils';
+import { isX509CertificateAsn1Data, isX509CertificateBasicData } from '../../types/utilsCertificate';
+import { emptyCertificate } from '../../utils/certificate';
 
 export function transformParseCertificateResponseDtoToCertificateResponseDetailModel(
     cert: ParseCertificateResponseDto,

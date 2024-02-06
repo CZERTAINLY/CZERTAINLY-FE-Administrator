@@ -1,12 +1,12 @@
-import { AppEpic } from "ducks";
-import { from, of } from "rxjs";
-import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
-import { actions as appRedirectActions } from "./app-redirect";
-import { actions as userInterfaceActions } from "./user-interface";
+import { AppEpic } from 'ducks';
+import { from, of } from 'rxjs';
+import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
+import { actions as appRedirectActions } from './app-redirect';
+import { actions as userInterfaceActions } from './user-interface';
 
-import { LockWidgetNameEnum } from "types/user-interface";
-import * as slice from "./auditLogs";
-import { transformAuditLogDtoToModel, transformAuditLogFilterModelToDto, transformPageableModelToDto } from "./transform/auditLogs";
+import { LockWidgetNameEnum } from 'types/user-interface';
+import * as slice from './auditLogs';
+import { transformAuditLogDtoToModel, transformAuditLogFilterModelToDto, transformPageableModelToDto } from './transform/auditLogs';
 
 const listLogs: AppEpic = (action$, state, deps) => {
     return action$.pipe(
@@ -47,7 +47,7 @@ const listObjects: AppEpic = (action$, state, deps) => {
                 map((objectList) => slice.actions.listObjectsSuccess({ objectList })),
 
                 catchError((error) =>
-                    of(slice.actions.listObjectsFailure(), appRedirectActions.fetchError({ error, message: "Failed to get objects list" })),
+                    of(slice.actions.listObjectsFailure(), appRedirectActions.fetchError({ error, message: 'Failed to get objects list' })),
                 ),
             ),
         ),
@@ -64,7 +64,7 @@ const listOperations: AppEpic = (action$, state, deps) => {
                 catchError((error) =>
                     of(
                         slice.actions.listObjectsFailure(),
-                        appRedirectActions.fetchError({ error, message: "Failed to get operations list" }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to get operations list' }),
                     ),
                 ),
             ),
@@ -82,7 +82,7 @@ const listStatuses: AppEpic = (action$, state, deps) => {
                 catchError((error) =>
                     of(
                         slice.actions.listStatusesFailure(),
-                        appRedirectActions.fetchError({ error, message: "Failed to get statuses list" }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to get statuses list' }),
                     ),
                 ),
             ),
@@ -110,7 +110,7 @@ const purgeLogs: AppEpic = (action$, state, deps) => {
                     catchError((error) =>
                         of(
                             slice.actions.purgeLogsFailure(),
-                            appRedirectActions.fetchError({ error, message: "Failed to purge audit logs" }),
+                            appRedirectActions.fetchError({ error, message: 'Failed to purge audit logs' }),
                         ),
                     ),
                 ),
@@ -132,7 +132,7 @@ const exportLogs: AppEpic = (action$, state, deps) => {
                     catchError((error) =>
                         of(
                             slice.actions.exportLogsFailure(),
-                            appRedirectActions.fetchError({ error, message: "Failed to get audit logs export" }),
+                            appRedirectActions.fetchError({ error, message: 'Failed to get audit logs export' }),
                         ),
                     ),
                 ),

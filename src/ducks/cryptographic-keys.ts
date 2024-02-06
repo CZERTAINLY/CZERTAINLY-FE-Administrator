@@ -1,6 +1,6 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AttributeDescriptorModel } from "types/attributes";
-import { BulkActionModel } from "types/connectors";
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { AttributeDescriptorModel } from 'types/attributes';
+import { BulkActionModel } from 'types/connectors';
 import {
     CryptographicKeyAddRequestModel,
     CryptographicKeyBulkCompromiseRequestModel,
@@ -13,10 +13,10 @@ import {
     CryptographicKeyKeyUsageUpdateRequestModel,
     CryptographicKeyPairResponseModel,
     CryptographicKeyResponseModel,
-} from "types/cryptographic-keys";
-import { KeyRequestType, KeyState, KeyUsage } from "types/openapi";
-import { createFeatureSelector } from "utils/ducks";
-import { SearchRequestModel } from "../types/certificate";
+} from 'types/cryptographic-keys';
+import { KeyRequestType, KeyState, KeyUsage } from 'types/openapi';
+import { createFeatureSelector } from 'utils/ducks';
+import { SearchRequestModel } from '../types/certificate';
 
 export type State = {
     deleteErrorMessage: string;
@@ -55,7 +55,7 @@ export type State = {
 };
 
 export const initialState: State = {
-    deleteErrorMessage: "",
+    deleteErrorMessage: '',
     bulkDeleteErrorMessages: [],
 
     keyAttributeDescriptors: [],
@@ -89,7 +89,7 @@ export const initialState: State = {
 };
 
 export const slice = createSlice({
-    name: "cryptographicKeys",
+    name: 'cryptographicKeys',
 
     initialState,
 
@@ -103,7 +103,7 @@ export const slice = createSlice({
         },
 
         clearDeleteErrorMessages: (state, action: PayloadAction<void>) => {
-            state.deleteErrorMessage = "";
+            state.deleteErrorMessage = '';
             state.bulkDeleteErrorMessages = [];
         },
 

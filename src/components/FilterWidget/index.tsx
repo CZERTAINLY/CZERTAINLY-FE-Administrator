@@ -1,17 +1,17 @@
-import Widget from "components/Widget";
+import Widget from 'components/Widget';
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { ApiClients } from "api";
-import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
-import { EntityType, actions, selectors } from "ducks/filters";
-import { useDispatch, useSelector } from "react-redux";
-import Select, { MultiValue, SingleValue } from "react-select";
-import { Badge, Button, Col, FormGroup, Input, Label, Row } from "reactstrap";
-import { Observable } from "rxjs";
-import { SearchFieldListModel, SearchFilterModel } from "types/certificate";
-import { PlatformEnum, SearchCondition, SearchGroup, SearchableFieldType } from "types/openapi";
-import styles from "./FilterWidget.module.scss";
+import { ApiClients } from 'api';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { EntityType, actions, selectors } from 'ducks/filters';
+import { useDispatch, useSelector } from 'react-redux';
+import Select, { MultiValue, SingleValue } from 'react-select';
+import { Badge, Button, Col, FormGroup, Input, Label, Row } from 'reactstrap';
+import { Observable } from 'rxjs';
+import { SearchFieldListModel, SearchFilterModel } from 'types/certificate';
+import { PlatformEnum, SearchCondition, SearchGroup, SearchableFieldType } from 'types/openapi';
+import styles from './FilterWidget.module.scss';
 
 const noValue: { [condition in SearchCondition]: boolean } = {
     [SearchCondition.Equals]: false,
@@ -63,8 +63,8 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
 
     const booleanOptions = useMemo(
         () => [
-            { label: "True", value: true },
-            { label: "False", value: false },
+            { label: 'True', value: true },
+            { label: 'False', value: false },
         ],
         [],
     );
@@ -118,7 +118,7 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
 
         if (!field.multiValue) {
             const value = currentFilters[selectedFilter].value;
-            const label = field.platformEnum ? platformEnums[field.platformEnum][(value ?? "") as string].label : value;
+            const label = field.platformEnum ? platformEnums[field.platformEnum][(value ?? '') as string].label : value;
             setFilterValue({ label, value });
             return;
         }
@@ -135,7 +135,7 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
 
     const onUnselectFiltersClick = useCallback(
         (e: React.MouseEvent<HTMLDivElement>) => {
-            if ((e.target as HTMLDivElement).id === "unselectFilters") {
+            if ((e.target as HTMLDivElement).id === 'unselectFilters') {
                 setSelectedFilter(-1);
             }
         },
@@ -157,12 +157,12 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
             fieldIdentifier: filterField.value,
             condition: filterCondition.value,
             value: filterValue
-                ? typeof filterValue === "string"
+                ? typeof filterValue === 'string'
                     ? filterValue
                     : Array.isArray(filterValue)
                       ? filterValue.map((v) => (v as any).value)
                       : (filterValue as any).value
-                : "",
+                : '',
         };
         const newFilters =
             selectedFilter === -1
@@ -198,7 +198,7 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
         <>
             <Widget title={title} busy={isFetchingAvailableFilters} titleSize="larger">
                 <div id="unselectFilters" onClick={onUnselectFiltersClick}>
-                    <div style={{ width: "99%", borderBottom: "solid 1px silver", marginBottom: "1rem" }}>
+                    <div style={{ width: '99%', borderBottom: 'solid 1px silver', marginBottom: '1rem' }}>
                         <Row>
                             <Col>
                                 <FormGroup>
@@ -271,8 +271,8 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
                                     currentField?.type === SearchableFieldType.Number ? (
                                         <Input
                                             id="value"
-                                            type={currentField?.type === SearchableFieldType.Date ? "date" : "text"}
-                                            value={filterValue?.toString() || ""}
+                                            type={currentField?.type === SearchableFieldType.Date ? 'date' : 'text'}
+                                            value={filterValue?.toString() || ''}
                                             onChange={(e) => {
                                                 setFilterValue(JSON.parse(JSON.stringify(e.target.value)));
                                             }}
@@ -296,7 +296,7 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
                                                 filterField
                                                     ? (currentField?.value as string[])?.map((v) => {
                                                           const label = currentField.platformEnum
-                                                              ? platformEnums[currentField.platformEnum][(v ?? "") as string].label
+                                                              ? platformEnums[currentField.platformEnum][(v ?? '') as string].label
                                                               : v;
                                                           return { label, value: v };
                                                       })
@@ -316,12 +316,12 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
 
                             <Col md="auto">
                                 <Button
-                                    style={{ width: "7em", marginTop: "2em" }}
+                                    style={{ width: '7em', marginTop: '2em' }}
                                     color="primary"
                                     disabled={!filterField || !filterCondition || (!noValue[filterCondition.value] && !filterValue)}
                                     onClick={onUpdateFilterClick}
                                 >
-                                    {selectedFilter === -1 ? "Add" : "Update"}
+                                    {selectedFilter === -1 ? 'Add' : 'Update'}
                                 </Button>
                             </Col>
                         </Row>
@@ -337,20 +337,20 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
                                 : Array.isArray(f.value) && f.value.length > 1
                                   ? `(${f.value
                                         .map((v) => `'${field?.platformEnum ? platformEnums[field.platformEnum][v]?.label : v}'`)
-                                        .join(" OR ")})`
+                                        .join(' OR ')})`
                                   : f.value
                                     ? `'${
                                           field?.platformEnum
                                               ? platformEnums[field.platformEnum][f.value as unknown as string]?.label
                                               : f.value
                                       }'`
-                                    : "";
+                                    : '';
                         return (
                             <Badge
                                 className={styles.filterBadge}
                                 key={f.fieldIdentifier + i}
                                 onClick={() => toggleFilter(i)}
-                                color={selectedFilter === i ? "primary" : "secondary"}
+                                color={selectedFilter === i ? 'primary' : 'secondary'}
                             >
                                 <b>{getEnumLabel(searchGroupEnum, f.searchGroup)}&nbsp;</b>'{label}'&nbsp;
                                 {getEnumLabel(searchConditionEnum, f.condition)}&nbsp;

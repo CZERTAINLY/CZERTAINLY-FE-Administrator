@@ -10,7 +10,7 @@ import {
     ApprovalUserDto,
     Resource,
     UserApprovalDto,
-} from "./openapi";
+} from './openapi';
 
 export type ApprovalDtoStatusModel = ApprovalDtoStatusEnum;
 
@@ -21,32 +21,32 @@ export type ApprovalDetailDtoStatusModel = ApprovalDetailDtoStatusEnum;
 export type ApprovalDetailStepDtoStatusModel = ApprovalStepRecipientDtoStatusEnum;
 
 export type ApprovalDtoType = ApprovalDto;
-export type ApprovalModel = Omit<ApprovalDtoType, "status" | "resource"> & {
+export type ApprovalModel = Omit<ApprovalDtoType, 'status' | 'resource'> & {
     status: ApprovalDtoStatusModel;
     resource: ResourceModel;
 };
 
 export type RecipientApprovalStepDto = ApprovalStepRecipientDto;
-export type RecipientApprovalStepModel = Omit<RecipientApprovalStepDto, "status"> & {
+export type RecipientApprovalStepModel = Omit<RecipientApprovalStepDto, 'status'> & {
     status: ApprovalDetailStepDtoStatusModel;
 };
 
 export type UserApprovalModel = UserApprovalDto;
 
 export type DetailApprovalStepDto = ApprovalDetailStepDto;
-export type DetailApprovalStepModel = Omit<DetailApprovalStepDto, "approvalStepsRecipients"> & {
+export type DetailApprovalStepModel = Omit<DetailApprovalStepDto, 'approvalStepsRecipients'> & {
     approvalStepRecipients: Array<RecipientApprovalStepModel>;
 };
 
 export type DetailApprovalDto = ApprovalDetailDto;
-export type DetailApprovalModel = Omit<DetailApprovalDto, "status" | "resource" | "approvalSteps"> & {
+export type DetailApprovalModel = Omit<DetailApprovalDto, 'status' | 'resource' | 'approvalSteps'> & {
     status: ApprovalDetailDtoStatusModel;
     resource: ResourceModel;
     approvalSteps: Array<DetailApprovalStepModel>;
 };
 
 export type ResponseApprovalDto = ApprovalResponseDto;
-export type ResponseApprovalModel = Omit<ResponseApprovalDto, "approvals"> & {
+export type ResponseApprovalModel = Omit<ResponseApprovalDto, 'approvals'> & {
     approvals: Array<ApprovalModel>;
 };
 

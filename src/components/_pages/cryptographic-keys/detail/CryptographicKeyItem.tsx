@@ -1,25 +1,25 @@
-import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from "components/Attributes/AttributeViewer";
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
-import StatusBadge from "components/StatusBadge";
-import Widget from "components/Widget";
+import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from 'components/Attributes/AttributeViewer';
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
+import StatusBadge from 'components/StatusBadge';
+import Widget from 'components/Widget';
 
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import WidgetButtons, { WidgetButtonProps } from 'components/WidgetButtons';
 
-import { actions, selectors } from "ducks/cryptographic-keys";
+import { actions, selectors } from 'ducks/cryptographic-keys';
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import Select from "react-select";
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import Select from 'react-select';
 
-import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
-import { Badge, Button, Col, Row } from "reactstrap";
-import { CryptographicKeyHistoryModel, CryptographicKeyItemDetailResponseModel } from "types/cryptographic-keys";
-import { KeyCompromiseReason, KeyState, KeyUsage, PlatformEnum } from "types/openapi";
-import { dateFormatter } from "utils/dateUtil";
-import KeyStateBadge from "../KeyStateBadge";
-import KeyStatus from "../KeyStatus";
-import SignVerifyData from "./SignVerifyData";
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { Badge, Button, Col, Row } from 'reactstrap';
+import { CryptographicKeyHistoryModel, CryptographicKeyItemDetailResponseModel } from 'types/cryptographic-keys';
+import { KeyCompromiseReason, KeyState, KeyUsage, PlatformEnum } from 'types/openapi';
+import { dateFormatter } from 'utils/dateUtil';
+import KeyStateBadge from '../KeyStateBadge';
+import KeyStatus from '../KeyStatus';
+import SignVerifyData from './SignVerifyData';
 
 interface Props {
     keyUuid: string;
@@ -46,7 +46,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
 
     const [keyHistory, setKeyHistory] = useState<CryptographicKeyHistoryModel[]>([]);
 
-    const [currentInfoId, setCurrentInfoId] = useState("");
+    const [currentInfoId, setCurrentInfoId] = useState('');
 
     const [compromiseReason, setCompromiseReason] = useState<KeyCompromiseReason>();
 
@@ -116,7 +116,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 keyItemUuid: [keyItem.uuid],
                 tokenInstanceUuid: tokenInstanceUuid,
                 uuid: keyUuid,
-                redirect: totalKeyItems === 1 ? "../../../" : undefined,
+                redirect: totalKeyItems === 1 ? '../../../' : undefined,
             }),
         );
         setConfirmDelete(false);
@@ -152,65 +152,65 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "trash",
+                icon: 'trash',
                 disabled: false,
-                tooltip: "Delete",
+                tooltip: 'Delete',
                 onClick: () => {
                     setConfirmDelete(true);
                 },
             },
             {
-                icon: "check",
+                icon: 'check',
                 disabled: keyItem.enabled,
-                tooltip: "Enable",
+                tooltip: 'Enable',
                 onClick: () => {
                     onEnableClick();
                 },
             },
             {
-                icon: "times",
+                icon: 'times',
                 disabled: !keyItem.enabled,
-                tooltip: "Disable",
+                tooltip: 'Disable',
                 onClick: () => {
                     onDisableClick();
                 },
             },
             {
-                icon: "key",
+                icon: 'key',
                 disabled: false,
-                tooltip: "Update Key Usage",
+                tooltip: 'Update Key Usage',
                 onClick: () => {
                     setKeyUsageUpdate(true);
                 },
             },
             {
-                icon: "compromise",
+                icon: 'compromise',
                 disabled: ![KeyState.PreActive, KeyState.Active, KeyState.Deactivated].includes(keyItem.state),
-                tooltip: "Compromise",
+                tooltip: 'Compromise',
                 onClick: () => {
                     setConfirmCompromise(true);
                 },
             },
             {
-                icon: "destroy",
+                icon: 'destroy',
                 disabled: ![KeyState.PreActive, KeyState.Compromised, KeyState.Deactivated].includes(keyItem.state),
-                tooltip: "Destroy",
+                tooltip: 'Destroy',
                 onClick: () => {
                     setConfirmDestroy(true);
                 },
             },
             {
-                icon: "sign",
+                icon: 'sign',
                 disabled: keyItem.state !== KeyState.Active || !keyItem.enabled || !keyItem.usage.includes(KeyUsage.Sign),
-                tooltip: "Sign",
+                tooltip: 'Sign',
                 onClick: () => {
                     setSignData(true);
                 },
             },
             {
-                icon: "verify",
+                icon: 'verify',
                 disabled: keyItem.state !== KeyState.Active || !keyItem.enabled || !keyItem.usage.includes(KeyUsage.Verify),
-                tooltip: "Verify",
+                tooltip: 'Verify',
                 onClick: () => {
                     setVerifyData(true);
                 },
@@ -222,12 +222,12 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
     const detailHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "property",
-                content: "Property",
+                id: 'property',
+                content: 'Property',
             },
             {
-                id: "value",
-                content: "Value",
+                id: 'value',
+                content: 'Value',
             },
         ],
         [],
@@ -239,20 +239,20 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 ? []
                 : [
                       {
-                          id: "uuid",
-                          columns: ["UUID", keyItem.uuid],
+                          id: 'uuid',
+                          columns: ['UUID', keyItem.uuid],
                       },
                       {
-                          id: "name",
-                          columns: ["Name", keyItem.name],
+                          id: 'name',
+                          columns: ['Name', keyItem.name],
                       },
                       {
-                          id: "Type",
-                          columns: ["Type", getEnumLabel(keyTypeEnum, keyItem.type)],
+                          id: 'Type',
+                          columns: ['Type', getEnumLabel(keyTypeEnum, keyItem.type)],
                       },
                       {
-                          id: "keyAlgorithm",
-                          columns: ["Key Algorithm", keyItem.keyAlgorithm],
+                          id: 'keyAlgorithm',
+                          columns: ['Key Algorithm', keyItem.keyAlgorithm],
                       },
                   ],
         [keyItem, keyTypeEnum],
@@ -264,9 +264,9 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 ? []
                 : [
                       {
-                          id: "format",
+                          id: 'format',
                           columns: [
-                              "Key Format",
+                              'Key Format',
                               <div>
                                   {keyItem.format} &nbsp;&nbsp;&nbsp;
                                   <Button
@@ -281,9 +281,9 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                           ],
                       },
                       {
-                          id: "Usages",
+                          id: 'Usages',
                           columns: [
-                              "Key Usages",
+                              'Key Usages',
                               keyItem.usage.map((usage) => (
                                   <Badge key={usage} color="secondary" className="mr-xs">
                                       {usage}
@@ -292,13 +292,13 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                           ],
                       },
                       {
-                          id: "enabled",
-                          columns: ["Enabled", <StatusBadge enabled={keyItem!.enabled} />],
+                          id: 'enabled',
+                          columns: ['Enabled', <StatusBadge enabled={keyItem!.enabled} />],
                       },
                       {
-                          id: "state",
+                          id: 'state',
                           columns: [
-                              "State",
+                              'State',
                               keyItem.reason ? (
                                   <>
                                       <KeyStateBadge state={keyItem.state} />
@@ -316,28 +316,28 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
     const historyHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "time",
-                content: "Time",
+                id: 'time',
+                content: 'Time',
             },
             {
-                id: "user",
-                content: "User",
+                id: 'user',
+                content: 'User',
             },
             {
-                id: "event",
-                content: "Event",
+                id: 'event',
+                content: 'Event',
             },
             {
-                id: "status",
-                content: "Status",
+                id: 'status',
+                content: 'Status',
             },
             {
-                id: "message",
-                content: "Message",
+                id: 'message',
+                content: 'Message',
             },
             {
-                id: "additionalMessage",
-                content: "Additional Message",
+                id: 'additionalMessage',
+                content: 'Additional Message',
             },
         ],
         [],
@@ -360,7 +360,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                       return {
                           id: history.uuid,
                           columns: [
-                              <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(history.created)}</span>,
+                              <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(history.created)}</span>,
 
                               history.createdBy,
 
@@ -368,14 +368,14 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
 
                               <KeyStatus status={history.status} />,
 
-                              <div style={{ wordBreak: "break-all" }}>{history.message}</div>,
+                              <div style={{ wordBreak: 'break-all' }}>{history.message}</div>,
 
                               history.additionalInformation ? (
                                   <Button color="white" onClick={() => setCurrentInfoId(history.uuid)} title="Show Additional Information">
                                       <i className="fa fa-info-circle" aria-hidden="true"></i>
                                   </Button>
                               ) : (
-                                  ""
+                                  ''
                               ),
                           ],
                       };
@@ -411,12 +411,12 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
         for (let [key, value] of Object.entries(currentHistory![0]?.additionalInformation ?? {})) {
             returnList.push(
                 <tr>
-                    <td style={{ padding: "0.25em" }}>{key}</td>
-                    <td style={{ padding: "0.25em" }}>
+                    <td style={{ padding: '0.25em' }}>{key}</td>
+                    <td style={{ padding: '0.25em' }}>
                         <p
                             style={{
-                                whiteSpace: "pre-wrap",
-                                wordBreak: "break-all",
+                                whiteSpace: 'pre-wrap',
+                                wordBreak: 'break-all',
                             }}
                         >
                             {JSON.stringify(value)}
@@ -486,8 +486,8 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 body="You are about to delete Key. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
@@ -510,8 +510,8 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 }
                 toggle={() => setConfirmCompromise(false)}
                 buttons={[
-                    { color: "danger", onClick: onCompromise, body: "Yes" },
-                    { color: "secondary", onClick: () => setConfirmCompromise(false), body: "Cancel" },
+                    { color: 'danger', onClick: onCompromise, body: 'Yes' },
+                    { color: 'secondary', onClick: () => setConfirmCompromise(false), body: 'Cancel' },
                 ]}
             />
 
@@ -528,8 +528,8 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 }
                 toggle={() => setConfirmDestroy(false)}
                 buttons={[
-                    { color: "danger", onClick: onDestroy, body: "Yes, Destroy" },
-                    { color: "secondary", onClick: () => setConfirmDestroy(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDestroy, body: 'Yes, Destroy' },
+                    { color: 'secondary', onClick: () => setConfirmDestroy(false), body: 'Cancel' },
                 ]}
             />
 
@@ -537,7 +537,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 isOpen={signData}
                 caption="Sign Data"
                 body={SignVerifyData({
-                    action: "sign",
+                    action: 'sign',
                     visible: signData,
                     onClose: () => setSignData(false),
                     tokenUuid: tokenInstanceUuid,
@@ -554,7 +554,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 isOpen={verifyData}
                 caption="Verify Signature"
                 body={SignVerifyData({
-                    action: "verify",
+                    action: 'verify',
                     visible: verifyData,
                     onClose: () => setVerifyData(false),
                     tokenUuid: tokenInstanceUuid,
@@ -568,10 +568,10 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
             />
 
             <Dialog
-                isOpen={currentInfoId !== ""}
+                isOpen={currentInfoId !== ''}
                 caption={`Additional Information`}
                 body={additionalInfoEntry()}
-                toggle={() => setCurrentInfoId("")}
+                toggle={() => setCurrentInfoId('')}
                 buttons={[]}
                 size="lg"
             />
@@ -579,7 +579,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
             <Dialog
                 isOpen={displayKeyData}
                 caption={`Key Data`}
-                body={<div style={{ lineBreak: "anywhere" }}>{keyItem.keyData}</div>}
+                body={<div style={{ lineBreak: 'anywhere' }}>{keyItem.keyData}</div>}
                 toggle={() => setDisplayKeyData(false)}
                 buttons={[]}
                 size="lg"
@@ -591,8 +591,8 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 body={keyUsageBody}
                 toggle={() => setKeyUsageUpdate(false)}
                 buttons={[
-                    { color: "primary", onClick: onUpdateKeyUsageConfirmed, body: "Update" },
-                    { color: "secondary", onClick: () => setKeyUsageUpdate(false), body: "Cancel" },
+                    { color: 'primary', onClick: onUpdateKeyUsageConfirmed, body: 'Update' },
+                    { color: 'secondary', onClick: () => setKeyUsageUpdate(false), body: 'Cancel' },
                 ]}
             />
         </div>

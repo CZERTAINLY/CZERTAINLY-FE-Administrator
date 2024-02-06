@@ -1,18 +1,18 @@
-import { useCallback, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useCallback, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
-import { EntityType } from "ducks/filters";
-import { actions, selectors } from "ducks/notifications";
-import { selectors as pagingSelectors } from "ducks/paging";
+import { EntityType } from 'ducks/filters';
+import { actions, selectors } from 'ducks/notifications';
+import { selectors as pagingSelectors } from 'ducks/paging';
 
-import { TableDataRow, TableHeader } from "components/CustomTable";
-import PagedList from "components/PagedList/PagedList";
-import { WidgetButtonProps } from "components/WidgetButtons";
-import { useNavigate } from "react-router-dom";
-import { Button, Container } from "reactstrap";
-import { SearchRequestModel } from "types/certificate";
-import { LockWidgetNameEnum } from "types/user-interface";
-import { dateFormatter } from "utils/dateUtil";
+import { TableDataRow, TableHeader } from 'components/CustomTable';
+import PagedList from 'components/PagedList/PagedList';
+import { WidgetButtonProps } from 'components/WidgetButtons';
+import { useNavigate } from 'react-router-dom';
+import { Button, Container } from 'reactstrap';
+import { SearchRequestModel } from 'types/certificate';
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { dateFormatter } from 'utils/dateUtil';
 
 function NotificationsList() {
     const dispatch = useDispatch();
@@ -28,9 +28,9 @@ function NotificationsList() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "check",
+                icon: 'check',
                 disabled: checkedRows.length === 0,
-                tooltip: "Mark as read",
+                tooltip: 'Mark as read',
                 onClick: () => {
                     for (const uuid of checkedRows) {
                         dispatch(actions.markAsReadNotification({ uuid }));
@@ -44,14 +44,14 @@ function NotificationsList() {
     const notificationsRowHeaders: TableHeader[] = useMemo(
         () => [
             {
-                content: "Sent At",
-                id: "sent",
-                width: "10%",
+                content: 'Sent At',
+                id: 'sent',
+                width: '10%',
             },
             {
-                content: "Message",
-                id: "message",
-                width: "50%",
+                content: 'Message',
+                id: 'message',
+                width: '50%',
             },
         ],
         [],
@@ -65,7 +65,7 @@ function NotificationsList() {
                     dateFormatter(notification.sentAt),
                     <div
                         key={notification.uuid}
-                        className={notification.readAt ? "" : "fw-bolder"}
+                        className={notification.readAt ? '' : 'fw-bolder'}
                         onClick={(event) => {
                             event.stopPropagation();
                             if (!notification.readAt) {
@@ -78,11 +78,11 @@ function NotificationsList() {
                             <Button
                                 color="white"
                                 size="sm"
-                                className={"px-1 m-0"}
+                                className={'px-1 m-0'}
                                 onClick={() => {
                                     navigate(
                                         `/${notification.targetObjectType}/detail/${notification.targetObjectIdentification?.reduce(
-                                            (prev, curr) => prev + "/" + curr,
+                                            (prev, curr) => prev + '/' + curr,
                                         )}`,
                                     );
                                 }}

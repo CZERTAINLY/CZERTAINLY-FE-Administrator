@@ -1,14 +1,14 @@
-import cx from "classnames";
-import { useCallback, useState } from "react";
-import { useSelector } from "react-redux";
-import { Link, NavLink } from "react-router-dom";
-import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Nav, NavItem, Navbar } from "reactstrap";
+import cx from 'classnames';
+import { useCallback, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { Link, NavLink } from 'react-router-dom';
+import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Nav, NavItem, Navbar } from 'reactstrap';
 
-import { selectors } from "ducks/auth";
+import { selectors } from 'ducks/auth';
 
-import NotificationsOverview from "components/_pages/notifications/overview";
-import logo from "../../../resources/images/czertainly_white_H.svg";
-import style from "./Header.module.scss";
+import NotificationsOverview from 'components/_pages/notifications/overview';
+import logo from '../../../resources/images/czertainly_white_H.svg';
+import style from './Header.module.scss';
 
 interface Props {
     sidebarToggle: () => void;
@@ -32,7 +32,7 @@ function Header({ sidebarToggle }: Props) {
 
             <Nav>
                 <NavItem
-                    className={cx("visible-xs mr-4 d-sm-up-none", style.headerIcon, style.sidebarToggler)}
+                    className={cx('visible-xs mr-4 d-sm-up-none', style.headerIcon, style.sidebarToggler)}
                     href="#"
                     onClick={sidebarToggle}
                 >
@@ -45,12 +45,12 @@ function Header({ sidebarToggle }: Props) {
                 {!!profile ? (
                     <Dropdown isOpen={isOpen} toggle={toggleDropdown}>
                         <DropdownToggle nav>
-                            <i className={cx("fa fa-user-circle-o fa-2x", style.adminPhoto)} />
+                            <i className={cx('fa fa-user-circle-o fa-2x', style.adminPhoto)} />
                             <span className={style.adminName}>{profile.username}</span>
-                            <i className={cx("fa fa-angle-down ml-sm", style.arrow, { [style.arrowActive]: isOpen })} />
+                            <i className={cx('fa fa-angle-down ml-sm', style.arrow, { [style.arrowActive]: isOpen })} />
                         </DropdownToggle>
 
-                        <DropdownMenu style={{ width: "100%" }}>
+                        <DropdownMenu style={{ width: '100%' }}>
                             <DropdownItem>
                                 <NavLink to={`/userprofile`}>Profile</NavLink>
                             </DropdownItem>

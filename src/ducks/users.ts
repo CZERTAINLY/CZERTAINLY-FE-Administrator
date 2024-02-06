@@ -1,7 +1,7 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RoleResponseModel, UserDetailModel, UserUpdateRequestModel } from "types/auth";
-import { UserAddRequestModel, UserResponseModel } from "types/users";
-import { createFeatureSelector } from "utils/ducks";
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { RoleResponseModel, UserDetailModel, UserUpdateRequestModel } from 'types/auth';
+import { UserAddRequestModel, UserResponseModel } from 'types/users';
+import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     usersListCheckedRows: string[];
@@ -31,7 +31,7 @@ export const initialState: State = {
     usersListCheckedRows: [],
     userRolesListCheckedRows: [],
 
-    deleteErrorMessage: "",
+    deleteErrorMessage: '',
 
     users: [],
 
@@ -49,7 +49,7 @@ export const initialState: State = {
 };
 
 export const slice = createSlice({
-    name: "users",
+    name: 'users',
 
     initialState,
 
@@ -71,7 +71,7 @@ export const slice = createSlice({
         },
 
         clearDeleteErrorMessages: (state, action: PayloadAction<void>) => {
-            state.deleteErrorMessage = "";
+            state.deleteErrorMessage = '';
         },
 
         list: (state, action: PayloadAction<void>) => {
@@ -178,7 +178,7 @@ export const slice = createSlice({
         },
 
         deleteUserFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.deleteErrorMessage = action.payload.error || "Unknown error";
+            state.deleteErrorMessage = action.payload.error || 'Unknown error';
             state.isDeleting = false;
         },
 

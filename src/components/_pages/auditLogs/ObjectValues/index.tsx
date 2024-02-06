@@ -6,7 +6,7 @@ interface Props {
 function ObjectValues({ className, obj }: Props) {
     if (!obj) return null;
 
-    if (typeof obj !== "object") return obj;
+    if (typeof obj !== 'object') return obj;
 
     return (
         <ul className={className}>

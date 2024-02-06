@@ -1,4 +1,4 @@
-import { MutableState, Tools } from "final-form";
+import { MutableState, Tools } from 'final-form';
 
 export function mutators<T>() {
     return {
@@ -20,7 +20,7 @@ export function mutators<T>() {
          attributes = Object.keys(state.formState.initialValues || {}).filter(k => k.startsWith("__attributes__"))
          attributes.forEach(attribute => tools.setIn(state, `formState.initialValues.${attribute}`, undefined));*/
 
-            attributes = Object.keys(state.formState.values || {}).filter((k) => k.startsWith(`__attributes__${id ? id : ""}`));
+            attributes = Object.keys(state.formState.values || {}).filter((k) => k.startsWith(`__attributes__${id ? id : ''}`));
             attributes.forEach((attribute) => ((state.formState.values as any)[attribute] = undefined));
         },
     };

@@ -1,4 +1,4 @@
-import { SettingsPlatformDto, SettingsPlatformModel, SettingsUtilsDto, SettingsUtilsModel } from "../../types/settings";
+import { SettingsPlatformDto, SettingsPlatformModel, SettingsUtilsDto, SettingsUtilsModel } from '../../types/settings';
 
 export function transformSettingsUtilsDtoToModel(settings: SettingsUtilsDto): SettingsUtilsModel {
     return { ...settings };

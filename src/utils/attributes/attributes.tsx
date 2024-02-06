@@ -5,25 +5,25 @@ import {
     CodeBlockAttributeContentModel,
     isCustomAttributeModel,
     isDataAttributeModel,
-} from "types/attributes";
-import { AttributeContentType, FileAttributeContentData } from "types/openapi";
-import { utf8ToBase64 } from "utils/common-utils";
-import CodeBlock from "../../components/Attributes/CodeBlock";
+} from 'types/attributes';
+import { AttributeContentType, FileAttributeContentData } from 'types/openapi';
+import { utf8ToBase64 } from 'utils/common-utils';
+import CodeBlock from '../../components/Attributes/CodeBlock';
 
 export const attributeFieldNameTransform: { [name: string]: string } = {
-    name: "Name",
-    credentialProvider: "Credential Provider",
-    authorityProvider: "Authority Provider",
-    discoveryProvider: "Discovery Provider",
-    legacyAuthorityProvider: "Legacy Authority Provider",
-    complianceProvider: "Compliance Provider",
-    entityProvider: "Entity Provider",
-    cryptographyProvider: "Cryptography Provider",
-    notificationProvider: "Notification Provider",
+    name: 'Name',
+    credentialProvider: 'Credential Provider',
+    authorityProvider: 'Authority Provider',
+    discoveryProvider: 'Discovery Provider',
+    legacyAuthorityProvider: 'Legacy Authority Provider',
+    complianceProvider: 'Compliance Provider',
+    entityProvider: 'Entity Provider',
+    cryptographyProvider: 'Cryptography Provider',
+    notificationProvider: 'Notification Provider',
 };
 
 export const getAttributeContent = (contentType: AttributeContentType, content: BaseAttributeContentModel[] | undefined) => {
-    if (!content) return "Not set";
+    if (!content) return 'Not set';
 
     if (contentType === AttributeContentType.Codeblock && content.length > 0) {
         return <CodeBlock content={content[0] as CodeBlockAttributeContentModel} />;
@@ -32,7 +32,7 @@ export const getAttributeContent = (contentType: AttributeContentType, content: 
     const mapping = (content: BaseAttributeContentModel): string | JSX.Element | undefined => {
         switch (contentType) {
             case AttributeContentType.Boolean:
-                return content.data ? "true" : "false";
+                return content.data ? 'true' : 'false';
             case AttributeContentType.Credential:
             case AttributeContentType.Object:
             case AttributeContentType.File:
@@ -46,24 +46,24 @@ export const getAttributeContent = (contentType: AttributeContentType, content: 
             case AttributeContentType.Text:
                 return content.data.toString();
             case AttributeContentType.Secret:
-                return "*****";
+                return '*****';
         }
         return undefined;
     };
 
     const isFileAttributeContentData = (data: any): data is FileAttributeContentData => {
-        return typeof data === "object" && data !== null && "fileName" in data && "mimeType" in data;
+        return typeof data === 'object' && data !== null && 'fileName' in data && 'mimeType' in data;
     };
 
     const checkFileNameAndMimeType = (content: BaseAttributeContentModel): string | undefined => {
         if (isFileAttributeContentData(content.data)) {
             return `${content.data.fileName} (${content.data.mimeType})`;
         } else {
-            return "Unknown data type";
+            return 'Unknown data type';
         }
     };
 
-    return content.map((content) => mapping(content) ?? checkFileNameAndMimeType(content)).join(", ");
+    return content.map((content) => mapping(content) ?? checkFileNameAndMimeType(content)).join(', ');
 };
 
 const getAttributeFormValue = (contentType: AttributeContentType, item: any) => {
@@ -94,7 +94,7 @@ export function collectFormAttributes(
     for (const attribute in attributes) {
         if (!attributes.hasOwnProperty(attribute)) continue;
 
-        const info = attribute.split(":");
+        const info = attribute.split(':');
 
         const attributeName = info[0];
         // const attributeType = info[1];
@@ -202,7 +202,7 @@ export function collectFormAttributes(
             //       continue;
             //
             // }
-            if (typeof content.data !== "undefined" || Array.isArray(content)) {
+            if (typeof content.data !== 'undefined' || Array.isArray(content)) {
                 const attr: AttributeRequestModel = {
                     name: attributeName,
                     content: Array.isArray(content) ? content : [content],

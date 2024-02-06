@@ -1,37 +1,37 @@
-import AttributeEditor from "components/Attributes/AttributeEditor";
+import AttributeEditor from 'components/Attributes/AttributeEditor';
 
-import ProgressButton from "components/ProgressButton";
-import Widget from "components/Widget";
+import ProgressButton from 'components/ProgressButton';
+import Widget from 'components/Widget';
 
-import { actions as certificateActions, selectors as certificateSelectors } from "ducks/certificates";
-import { actions as connectorActions } from "ducks/connectors";
-import { actions as keyActions, selectors as keySelectors } from "ducks/cryptographic-keys";
-import { actions as cryptographyOperationActions, selectors as cryptographyOperationSelectors } from "ducks/cryptographic-operations";
-import { actions as tokenProfileActions, selectors as tokenProfileSelectors } from "ducks/token-profiles";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Field, Form } from "react-final-form";
+import { actions as certificateActions, selectors as certificateSelectors } from 'ducks/certificates';
+import { actions as connectorActions } from 'ducks/connectors';
+import { actions as keyActions, selectors as keySelectors } from 'ducks/cryptographic-keys';
+import { actions as cryptographyOperationActions, selectors as cryptographyOperationSelectors } from 'ducks/cryptographic-operations';
+import { actions as tokenProfileActions, selectors as tokenProfileSelectors } from 'ducks/token-profiles';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Field, Form } from 'react-final-form';
 
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from 'react-redux';
 
-import Select, { SingleValue } from "react-select";
-import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Label } from "reactstrap";
-import { AttributeDescriptorModel } from "types/attributes";
-import { CertificateDetailResponseModel } from "types/certificate";
-import { CryptographicKeyPairResponseModel } from "types/cryptographic-keys";
-import { KeyType } from "types/openapi";
-import { mutators } from "utils/attributes/attributeEditorMutators";
-import { collectFormAttributes } from "utils/attributes/attributes";
+import Select, { SingleValue } from 'react-select';
+import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Label } from 'reactstrap';
+import { AttributeDescriptorModel } from 'types/attributes';
+import { CertificateDetailResponseModel } from 'types/certificate';
+import { CryptographicKeyPairResponseModel } from 'types/cryptographic-keys';
+import { KeyType } from 'types/openapi';
+import { mutators } from 'utils/attributes/attributeEditorMutators';
+import { collectFormAttributes } from 'utils/attributes/attributes';
 
-import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from "ducks/utilsActuator";
-import { ParseRequestRequestDtoParseTypeEnum } from "types/openapi/utils";
-import { validateRequired } from "utils/validators";
-import { transformParseRequestResponseDtoToCertificateResponseDetailModel } from "../../../../ducks/transform/utilsCertificateRequest";
+import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from 'ducks/utilsActuator';
+import { ParseRequestRequestDtoParseTypeEnum } from 'types/openapi/utils';
+import { validateRequired } from 'utils/validators';
+import { transformParseRequestResponseDtoToCertificateResponseDetailModel } from '../../../../ducks/transform/utilsCertificateRequest';
 import {
     actions as utilsCertificateRequestActions,
     selectors as utilsCertificateRequestSelectors,
-} from "../../../../ducks/utilsCertificateRequest";
-import CertificateAttributes from "../../../CertificateAttributes";
-import FileUpload from "../../../Input/FileUpload/FileUpload";
+} from '../../../../ducks/utilsCertificateRequest';
+import CertificateAttributes from '../../../CertificateAttributes';
+import FileUpload from '../../../Input/FileUpload/FileUpload';
 
 interface FormValues {
     pkcs10: File | null;
@@ -61,7 +61,7 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
     const parsedCertificateRequest = useSelector(utilsCertificateRequestSelectors.parsedCertificateRequest);
 
     const [signatureAttributesCallbackAttributes, setSignatureAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
-    const [fileContent, setFileContent] = useState<string>("");
+    const [fileContent, setFileContent] = useState<string>('');
     const [certificateRequest, setCertificateRequest] = useState<CertificateDetailResponseModel | undefined>();
 
     const health = useSelector(utilsActuatorSelectors.health);
@@ -104,9 +104,9 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
                     authorityUuid: certificate.raProfile.authorityInstanceUuid,
                     rekey: {
                         pkcs10: fileContent ? fileContent : undefined,
-                        signatureAttributes: collectFormAttributes("signatureAttributes", signatureAttributeDescriptors, values),
-                        keyUuid: values.key?.value.uuid || "",
-                        tokenProfileUuid: values.tokenProfile?.value || "",
+                        signatureAttributes: collectFormAttributes('signatureAttributes', signatureAttributeDescriptors, values),
+                        keyUuid: values.key?.value.uuid || '',
+                        tokenProfileUuid: values.tokenProfile?.value || '',
                     },
                 }),
             );
@@ -172,8 +172,8 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
                 : null,
             tokenProfile: certificate?.key?.tokenProfileUuid
                 ? {
-                      label: certificate.key.tokenProfileName || "",
-                      value: certificate.key.tokenProfileUuid || "",
+                      label: certificate.key.tokenProfileName || '',
+                      value: certificate.key.tokenProfileUuid || '',
                   }
                 : null,
         }),
@@ -182,8 +182,8 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
 
     const inputOptions = useMemo(
         () => [
-            { label: "External", value: true },
-            { label: "Existing Key", value: false },
+            { label: 'External', value: true },
+            { label: 'Existing Key', value: false },
         ],
         [],
     );
@@ -219,7 +219,7 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
                         {values.uploadCsr?.value && certificate?.raProfile ? (
                             <>
                                 <FileUpload
-                                    fileType={"CSR"}
+                                    fileType={'CSR'}
                                     editable
                                     onFileContentLoaded={(fileContent) => {
                                         setFileContent(fileContent);

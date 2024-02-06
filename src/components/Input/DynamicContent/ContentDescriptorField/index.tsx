@@ -1,12 +1,12 @@
-import WidgetButtons from "components/WidgetButtons";
-import { useEffect, useMemo } from "react";
+import WidgetButtons from 'components/WidgetButtons';
+import { useEffect, useMemo } from 'react';
 
-import { Field, useForm, useFormState } from "react-final-form";
-import { Button, FormFeedback, FormGroup, Input, InputGroup, Label } from "reactstrap";
-import { AttributeContentType } from "types/openapi";
-import { getStepValue } from "utils/common-utils";
-import { composeValidators, validateRequired } from "utils/validators";
-import { ContentFieldConfiguration } from "../index";
+import { Field, useForm, useFormState } from 'react-final-form';
+import { Button, FormFeedback, FormGroup, Input, InputGroup, Label } from 'reactstrap';
+import { AttributeContentType } from 'types/openapi';
+import { getStepValue } from 'utils/common-utils';
+import { composeValidators, validateRequired } from 'utils/validators';
+import { ContentFieldConfiguration } from '../index';
 
 type Props = {
     isList: boolean;
@@ -16,11 +16,11 @@ type Props = {
 export default function ContentDescriptorField({ isList, contentType }: Props) {
     const form = useForm();
     const formState = useFormState();
-    const contentValues = formState.values["content"];
+    const contentValues = formState.values['content'];
 
     useEffect(() => {
         if (!isList && contentValues?.length > 1) {
-            form.change("content", contentValues.slice(0, 1));
+            form.change('content', contentValues.slice(0, 1));
         }
     }, [isList, contentValues, form]);
 
@@ -63,12 +63,12 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
                                     <WidgetButtons
                                         buttons={[
                                             {
-                                                icon: "trash",
+                                                icon: 'trash',
                                                 disabled: false,
-                                                tooltip: "Remove",
+                                                tooltip: 'Remove',
                                                 onClick: () => {
                                                     form.change(
-                                                        "content",
+                                                        'content',
                                                         contentValues.filter(
                                                             (_contentValue: any, filterIndex: number) => index !== filterIndex,
                                                         ),
@@ -107,15 +107,15 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
             })}
             {(isList || !contentValues || contentValues.length === 0) && (
                 <Button
-                    color={"default"}
+                    color={'default'}
                     onClick={() =>
-                        form.change("content", [
+                        form.change('content', [
                             ...(isList ? contentValues ?? [] : []),
                             { data: ContentFieldConfiguration[contentType].initial },
                         ])
                     }
                 >
-                    <i className={"fa fa-plus"} />
+                    <i className={'fa fa-plus'} />
                     &nbsp;Add Content
                 </Button>
             )}

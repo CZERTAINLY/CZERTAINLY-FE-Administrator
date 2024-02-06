@@ -1,31 +1,31 @@
-import { TableDataRow, TableHeader } from "components/CustomTable";
+import { TableDataRow, TableHeader } from 'components/CustomTable';
 
-import Dialog from "components/Dialog";
-import { WidgetButtonProps } from "components/WidgetButtons";
+import Dialog from 'components/Dialog';
+import { WidgetButtonProps } from 'components/WidgetButtons';
 
-import { actions, selectors } from "ducks/certificates";
-import { EntityType } from "ducks/filters";
-import { selectors as pagingSelectors } from "ducks/paging";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { actions, selectors } from 'ducks/certificates';
+import { EntityType } from 'ducks/filters';
+import { selectors as pagingSelectors } from 'ducks/paging';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 
-import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
-import { Badge, Container, DropdownItem, DropdownMenu, DropdownToggle, UncontrolledButtonDropdown } from "reactstrap";
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { Badge, Container, DropdownItem, DropdownMenu, DropdownToggle, UncontrolledButtonDropdown } from 'reactstrap';
 
-import { ApiClients } from "api";
-import PagedList from "components/PagedList/PagedList";
-import { actions as userAction, selectors as userSelectors } from "ducks/users";
-import { SearchRequestModel } from "types/certificate";
-import { LockWidgetNameEnum } from "types/user-interface";
-import { dateFormatter } from "utils/dateUtil";
-import { AttributeRequestModel } from "../../../../types/attributes";
-import { CertificateType, PlatformEnum } from "../../../../types/openapi";
-import CertificateGroupDialog from "../CertificateGroupDialog";
-import CertificateOwnerDialog from "../CertificateOwnerDialog";
-import CertificateRAProfileDialog from "../CertificateRAProfileDialog";
-import CertificateStatus from "../CertificateStatus";
-import CertificateUploadDialog from "../CertificateUploadDialog";
+import { ApiClients } from 'api';
+import PagedList from 'components/PagedList/PagedList';
+import { actions as userAction, selectors as userSelectors } from 'ducks/users';
+import { SearchRequestModel } from 'types/certificate';
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { dateFormatter } from 'utils/dateUtil';
+import { AttributeRequestModel } from '../../../../types/attributes';
+import { CertificateType, PlatformEnum } from '../../../../types/openapi';
+import CertificateGroupDialog from '../CertificateGroupDialog';
+import CertificateOwnerDialog from '../CertificateOwnerDialog';
+import CertificateRAProfileDialog from '../CertificateRAProfileDialog';
+import CertificateStatus from '../CertificateStatus';
+import CertificateUploadDialog from '../CertificateUploadDialog';
 
 interface Props {
     selectCertsOnly?: boolean;
@@ -118,7 +118,7 @@ export default function CertificateList({
                     <DropdownItem
                         key="pem"
                         onClick={() => {
-                            dispatch(actions.getCertificateContents({ uuids: checkedRows, format: "pem" }));
+                            dispatch(actions.getCertificateContents({ uuids: checkedRows, format: 'pem' }));
                         }}
                     >
                         PEM (.pem)
@@ -127,7 +127,7 @@ export default function CertificateList({
                     <DropdownItem
                         key="der"
                         onClick={() => {
-                            dispatch(actions.getCertificateContents({ uuids: checkedRows, format: "cer" }));
+                            dispatch(actions.getCertificateContents({ uuids: checkedRows, format: 'cer' }));
                         }}
                     >
                         DER (.cer)
@@ -144,25 +144,25 @@ export default function CertificateList({
                 ? []
                 : [
                       {
-                          icon: "upload",
+                          icon: 'upload',
                           disabled: false,
-                          tooltip: "Upload Certificate",
+                          tooltip: 'Upload Certificate',
                           onClick: () => {
                               setUpload(true);
                           },
                       },
                       {
-                          icon: "group",
+                          icon: 'group',
                           disabled: checkedRows.length === 0,
-                          tooltip: "Update Group",
+                          tooltip: 'Update Group',
                           onClick: () => {
                               setUpdateGroup(true);
                           },
                       },
                       {
-                          icon: "user",
+                          icon: 'user',
                           disabled: checkedRows.length === 0,
-                          tooltip: "Update Owner",
+                          tooltip: 'Update Owner',
                           onClick: () => {
                               getUserList();
                               setUpdateOwner(true);
@@ -170,17 +170,17 @@ export default function CertificateList({
                       },
                       // { icon: "cubes", disabled: true, tooltip: "Update Entity", onClick: () => { setUpdateEntity(true) } },
                       {
-                          icon: "plug",
+                          icon: 'plug',
                           disabled: checkedRows.length === 0,
-                          tooltip: "Update RA Profile",
+                          tooltip: 'Update RA Profile',
                           onClick: () => {
                               setUpdateRaProfile(true);
                           },
                       },
                       {
-                          icon: "download",
+                          icon: 'download',
                           disabled: checkedRows.length === 0,
-                          tooltip: "Download",
+                          tooltip: 'Download',
                           custom: downloadDropDown,
                           onClick: () => {},
                       },
@@ -191,98 +191,98 @@ export default function CertificateList({
     const certificatesRowHeaders: TableHeader[] = useMemo(
         () => [
             {
-                content: "State",
-                align: "center",
-                id: "state",
-                width: "5%",
+                content: 'State',
+                align: 'center',
+                id: 'state',
+                width: '5%',
             },
             {
-                content: "Validation",
-                align: "center",
-                id: "validation",
-                width: "5%",
+                content: 'Validation',
+                align: 'center',
+                id: 'validation',
+                width: '5%',
             },
             {
-                content: "Compliance",
+                content: 'Compliance',
                 //sortable: true,
-                align: "center",
-                id: "compliance",
-                width: "5%",
+                align: 'center',
+                id: 'compliance',
+                width: '5%',
             },
             {
-                content: "",
+                content: '',
                 //sortable: true,
-                align: "center",
-                id: "keyAvailability",
-                width: "1%",
+                align: 'center',
+                id: 'keyAvailability',
+                width: '1%',
             },
             {
-                content: "Common Name",
+                content: 'Common Name',
                 //sortable: true,
-                id: "commonName",
-                width: "10%",
+                id: 'commonName',
+                width: '10%',
             },
             {
-                content: "Valid From",
-                //sortable: true,
-                //sortType: "date",
-                id: "validFrom",
-                width: "15%",
-            },
-            {
-                content: "Expires At",
+                content: 'Valid From',
                 //sortable: true,
                 //sortType: "date",
-                id: "expiresAt",
-                width: "15%",
+                id: 'validFrom',
+                width: '15%',
             },
             {
-                content: "Group",
+                content: 'Expires At',
                 //sortable: true,
-                id: "group",
-                width: "15%",
+                //sortType: "date",
+                id: 'expiresAt',
+                width: '15%',
             },
             {
-                content: "RA Profile",
+                content: 'Group',
                 //sortable: true,
-                id: "raProfile",
-                width: "15%",
+                id: 'group',
+                width: '15%',
             },
             {
-                content: "Owner",
+                content: 'RA Profile',
                 //sortable: true,
-                id: "owner",
-                width: "15%",
+                id: 'raProfile',
+                width: '15%',
             },
             {
-                content: "Serial number",
+                content: 'Owner',
                 //sortable: true,
-                id: "serialNumber",
-                width: "15%",
+                id: 'owner',
+                width: '15%',
             },
             {
-                content: "Signature Algorithm",
+                content: 'Serial number',
                 //sortable: true,
-                id: "signatureAlgorithm",
-                width: "15%",
+                id: 'serialNumber',
+                width: '15%',
             },
             {
-                content: "Public Key Algorithm",
+                content: 'Signature Algorithm',
                 //sortable: true,
-                id: "publicKeyAlgorithm",
-                width: "15%",
+                id: 'signatureAlgorithm',
+                width: '15%',
             },
             {
-                content: "Issuer Common Name",
+                content: 'Public Key Algorithm',
                 //sortable: true,
-                id: "issuerCommonName",
-                width: "15%",
+                id: 'publicKeyAlgorithm',
+                width: '15%',
             },
             {
-                content: "Certificate Type",
+                content: 'Issuer Common Name',
                 //sortable: true,
-                id: "certificateType",
-                width: "15%",
+                id: 'issuerCommonName',
+                width: '15%',
+            },
+            {
+                content: 'Certificate Type',
+                //sortable: true,
+                id: 'certificateType',
+                width: '15%',
             },
         ],
         [],
@@ -296,51 +296,51 @@ export default function CertificateList({
                     columns: [
                         <CertificateStatus status={certificate.state} asIcon={true} />,
                         <CertificateStatus status={certificate.validationStatus} asIcon={true} />,
-                        certificate.complianceStatus ? <CertificateStatus status={certificate.complianceStatus} asIcon={true} /> : "",
+                        certificate.complianceStatus ? <CertificateStatus status={certificate.complianceStatus} asIcon={true} /> : '',
 
-                        certificate.privateKeyAvailability ? <i className="fa fa-key" aria-hidden="true"></i> : "",
+                        certificate.privateKeyAvailability ? <i className="fa fa-key" aria-hidden="true"></i> : '',
                         selectCertsOnly ? (
-                            certificate.commonName || "(empty)"
+                            certificate.commonName || '(empty)'
                         ) : (
-                            <Link to={`./detail/${certificate.uuid}`}>{certificate.commonName || "(empty)"}</Link>
+                            <Link to={`./detail/${certificate.uuid}`}>{certificate.commonName || '(empty)'}</Link>
                         ),
-                        certificate.notBefore ? <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(certificate.notBefore)}</span> : "",
-                        certificate.notAfter ? <span style={{ whiteSpace: "nowrap" }}>{dateFormatter(certificate.notAfter)}</span> : "",
+                        certificate.notBefore ? <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(certificate.notBefore)}</span> : '',
+                        certificate.notAfter ? <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(certificate.notAfter)}</span> : '',
                         certificate.group ? (
-                            <Link to={`../groups/detail/${certificate?.group.uuid}`}>{certificate.group.name ?? "Unassigned"}</Link>
+                            <Link to={`../groups/detail/${certificate?.group.uuid}`}>{certificate.group.name ?? 'Unassigned'}</Link>
                         ) : (
-                            certificate.group ?? "Unassigned"
+                            certificate.group ?? 'Unassigned'
                         ),
-                        <span style={{ whiteSpace: "nowrap" }}>
+                        <span style={{ whiteSpace: 'nowrap' }}>
                             {certificate.raProfile ? (
                                 <Link
                                     to={`../raprofiles/detail/${certificate?.raProfile.authorityInstanceUuid}/${certificate?.raProfile.uuid}`}
                                 >
-                                    {certificate.raProfile.name ?? "Unassigned"}
+                                    {certificate.raProfile.name ?? 'Unassigned'}
                                 </Link>
                             ) : (
-                                certificate.raProfile ?? "Unassigned"
+                                certificate.raProfile ?? 'Unassigned'
                             )}
                         </span>,
                         certificate?.ownerUuid ? (
-                            <Link to={`../users/detail/${certificate?.ownerUuid}`}>{certificate.owner ?? "Unassigned"}</Link>
+                            <Link to={`../users/detail/${certificate?.ownerUuid}`}>{certificate.owner ?? 'Unassigned'}</Link>
                         ) : (
-                            certificate.owner ?? "Unassigned"
+                            certificate.owner ?? 'Unassigned'
                         ),
-                        certificate.serialNumber || "",
+                        certificate.serialNumber || '',
                         certificate.signatureAlgorithm,
                         certificate.publicKeyAlgorithm,
                         certificate.issuerCommonName && certificate?.issuerCertificateUuid ? (
                             <Link to={`./detail/${certificate.issuerCertificateUuid}`}>{certificate.issuerCommonName}</Link>
                         ) : (
-                            certificate.issuerCommonName || ""
+                            certificate.issuerCommonName || ''
                         ),
                         certificate.certificateType ? (
-                            <Badge color={certificate.certificateType === CertificateType.X509 ? "primary" : "secondary"}>
+                            <Badge color={certificate.certificateType === CertificateType.X509 ? 'primary' : 'secondary'}>
                                 {getEnumLabel(certificateTypeEnum, certificate.certificateType)}
                             </Badge>
                         ) : (
-                            ""
+                            ''
                         ),
                     ],
                 };
@@ -416,8 +416,8 @@ export default function CertificateList({
                 body={`Update Entity`}
                 toggle={() => setUpdateEntity(false)}
                 buttons={[
-                    { color: "primary", onClick: () => {}, body: "Update" },
-                    { color: "secondary", onClick: () => setUpdateEntity(false), body: "Cancel" },
+                    { color: 'primary', onClick: () => {}, body: 'Update' },
+                    { color: 'secondary', onClick: () => setUpdateEntity(false), body: 'Cancel' },
                 ]}
             />
 

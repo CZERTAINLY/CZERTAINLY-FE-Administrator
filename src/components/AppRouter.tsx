@@ -1,117 +1,117 @@
-import { selectors } from "ducks/auth";
-import { useMemo } from "react";
-import { useSelector } from "react-redux";
-import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
-import AcmeAccountDetail from "./_pages/acme-accounts/detail";
+import { selectors } from 'ducks/auth';
+import { useMemo } from 'react';
+import { useSelector } from 'react-redux';
+import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
+import AcmeAccountDetail from './_pages/acme-accounts/detail';
 
-import AcmeAccountsList from "./_pages/acme-accounts/list";
-import AcmeProfileDetail from "./_pages/acme-profiles/detail";
-import AcmeProfileEdit from "./_pages/acme-profiles/form";
+import AcmeAccountsList from './_pages/acme-accounts/list';
+import AcmeProfileDetail from './_pages/acme-profiles/detail';
+import AcmeProfileEdit from './_pages/acme-profiles/form';
 
-import AcmeProfilesList from "./_pages/acme-profiles/list";
-import AuditLogs from "./_pages/auditLogs";
-import AuthorityDetail from "./_pages/authorities/detail";
-import AuthorityEdit from "./_pages/authorities/form";
+import AcmeProfilesList from './_pages/acme-profiles/list';
+import AuditLogs from './_pages/auditLogs';
+import AuthorityDetail from './_pages/authorities/detail';
+import AuthorityEdit from './_pages/authorities/form';
 
-import AuthoritiesList from "./_pages/authorities/list";
-import CertificateDetail from "./_pages/certificates/detail";
-import CertificateEdit from "./_pages/certificates/form";
+import AuthoritiesList from './_pages/authorities/list';
+import CertificateDetail from './_pages/certificates/detail';
+import CertificateEdit from './_pages/certificates/form';
 
-import CertificatesList from "./_pages/certificates/list";
-import ComplianceProfileDetail from "./_pages/compliance-profiles/detail";
-import ComplianceProfileEdit from "./_pages/compliance-profiles/form";
+import CertificatesList from './_pages/certificates/list';
+import ComplianceProfileDetail from './_pages/compliance-profiles/detail';
+import ComplianceProfileEdit from './_pages/compliance-profiles/form';
 
-import ComplianceProfilesList from "./_pages/compliance-profiles/list";
-import ConnectorDetail from "./_pages/connectors/detail";
-import ConnectorEdit from "./_pages/connectors/form";
+import ComplianceProfilesList from './_pages/compliance-profiles/list';
+import ConnectorDetail from './_pages/connectors/detail';
+import ConnectorEdit from './_pages/connectors/form';
 
-import ApprovalProfileDetails from "./_pages/approval-profiles/detail";
-import ApprovalProfilesForm from "./_pages/approval-profiles/form";
-import ApprovalProfiles from "./_pages/approval-profiles/list";
+import ApprovalProfileDetails from './_pages/approval-profiles/detail';
+import ApprovalProfilesForm from './_pages/approval-profiles/form';
+import ApprovalProfiles from './_pages/approval-profiles/list';
 
-import ApprovalDetails from "./_pages/approvals/details";
-import ApprovalsList from "./_pages/approvals/list";
+import ApprovalDetails from './_pages/approvals/details';
+import ApprovalsList from './_pages/approvals/list';
 
-import ConnectorsList from "./_pages/connectors/list";
-import CredentialDetail from "./_pages/credentials/detail";
-import CredentialEdit from "./_pages/credentials/form";
+import ConnectorsList from './_pages/connectors/list';
+import CredentialDetail from './_pages/credentials/detail';
+import CredentialEdit from './_pages/credentials/form';
 
-import CredentialsList from "./_pages/credentials/list";
-import CryptographicKeyDetail from "./_pages/cryptographic-keys/detail";
-import CryptographicKeyForm from "./_pages/cryptographic-keys/form";
-import CryptographicKeyList from "./_pages/cryptographic-keys/list";
-import CustomAttributesDetail from "./_pages/custom-attributes/detail";
-import CustomAttributesEdit from "./_pages/custom-attributes/form";
+import CredentialsList from './_pages/credentials/list';
+import CryptographicKeyDetail from './_pages/cryptographic-keys/detail';
+import CryptographicKeyForm from './_pages/cryptographic-keys/form';
+import CryptographicKeyList from './_pages/cryptographic-keys/list';
+import CustomAttributesDetail from './_pages/custom-attributes/detail';
+import CustomAttributesEdit from './_pages/custom-attributes/form';
 
-import CustomAttributesList from "./_pages/custom-attributes/list";
-import Dashboard from "./_pages/dashboard";
-import DiscoveryDetail from "./_pages/discoveries/detail";
-import DiscoveryEdit from "./_pages/discoveries/form";
+import CustomAttributesList from './_pages/custom-attributes/list';
+import Dashboard from './_pages/dashboard';
+import DiscoveryDetail from './_pages/discoveries/detail';
+import DiscoveryEdit from './_pages/discoveries/form';
 
-import DiscoveriesList from "./_pages/discoveries/list";
-import EntityDetail from "./_pages/entities/detail";
-import EntityEdit from "./_pages/entities/form";
+import DiscoveriesList from './_pages/discoveries/list';
+import EntityDetail from './_pages/entities/detail';
+import EntityEdit from './_pages/entities/form';
 
-import EntitiesList from "./_pages/entities/list";
-import GlobalMetadataDetail from "./_pages/global-metadata/detail";
-import GlobalMetadataEdit from "./_pages/global-metadata/form";
+import EntitiesList from './_pages/entities/list';
+import GlobalMetadataDetail from './_pages/global-metadata/detail';
+import GlobalMetadataEdit from './_pages/global-metadata/form';
 
-import ScepProfileDetail from "./_pages/scep-profiles/detail";
-import ScepProfileEdit from "./_pages/scep-profiles/form";
+import ScepProfileDetail from './_pages/scep-profiles/detail';
+import ScepProfileEdit from './_pages/scep-profiles/form';
 
-import ScepProfilesList from "./_pages/scep-profiles/list";
+import ScepProfilesList from './_pages/scep-profiles/list';
 
-import GlobalMetadataList from "./_pages/global-metadata/list";
-import GroupDetail from "./_pages/group/detail";
-import GroupEdit from "./_pages/group/form";
+import GlobalMetadataList from './_pages/global-metadata/list';
+import GroupDetail from './_pages/group/detail';
+import GroupEdit from './_pages/group/form';
 
-import GroupList from "./_pages/group/list";
+import GroupList from './_pages/group/list';
 
-import LocationDetail from "./_pages/locations/detail";
-import LocationEdit from "./_pages/locations/form";
+import LocationDetail from './_pages/locations/detail';
+import LocationEdit from './_pages/locations/form';
 
-import LocationsList from "./_pages/locations/list";
-import RaProfileDetail from "./_pages/ra-profiles/detail";
-import RaProfileEdit from "./_pages/ra-profiles/form";
+import LocationsList from './_pages/locations/list';
+import RaProfileDetail from './_pages/ra-profiles/detail';
+import RaProfileEdit from './_pages/ra-profiles/form';
 
-import RaProfilesList from "./_pages/ra-profiles/list";
-import RoleDetail from "./_pages/roles/detail";
+import RaProfilesList from './_pages/ra-profiles/list';
+import RoleDetail from './_pages/roles/detail';
 
-import PlatformSettingsDetail from "./_pages/platform-settings/detail";
-import PlatformSettingsEdit from "./_pages/platform-settings/form";
-import RolesList from "./_pages/roles/list";
-import RoleEdit from "./_pages/roles/RoleForm";
-import RolePermissions from "./_pages/roles/RolePermissionsForm";
-import RoleUsers from "./_pages/roles/RoleUsersForm";
-import TokenProfileDetail from "./_pages/token-profiles/detail";
-import TokenProfileForm from "./_pages/token-profiles/form";
-import TokenProfileList from "./_pages/token-profiles/list";
-import TokenDetail from "./_pages/tokens/detail";
-import TokenEdit from "./_pages/tokens/form";
+import PlatformSettingsDetail from './_pages/platform-settings/detail';
+import PlatformSettingsEdit from './_pages/platform-settings/form';
+import RolesList from './_pages/roles/list';
+import RoleEdit from './_pages/roles/RoleForm';
+import RolePermissions from './_pages/roles/RolePermissionsForm';
+import RoleUsers from './_pages/roles/RoleUsersForm';
+import TokenProfileDetail from './_pages/token-profiles/detail';
+import TokenProfileForm from './_pages/token-profiles/form';
+import TokenProfileList from './_pages/token-profiles/list';
+import TokenDetail from './_pages/tokens/detail';
+import TokenEdit from './_pages/tokens/form';
 
-import TokenList from "./_pages/tokens/list";
+import TokenList from './_pages/tokens/list';
 
-import UserProfileDetail from "./_pages/user-profile/detail";
-import UserProfileEdit from "./_pages/user-profile/form";
-import UserDetail from "./_pages/users/detail";
-import UserEdit from "./_pages/users/form";
+import UserProfileDetail from './_pages/user-profile/detail';
+import UserProfileEdit from './_pages/user-profile/form';
+import UserDetail from './_pages/users/detail';
+import UserEdit from './_pages/users/form';
 
-import UsersList from "./_pages/users/list";
-import AppLogin from "./AppLogin/AppLogin";
+import UsersList from './_pages/users/list';
+import AppLogin from './AppLogin/AppLogin';
 
-import AppRedirect from "./AppRedirect";
+import AppRedirect from './AppRedirect';
 
-import { Resource } from "types/openapi";
+import { Resource } from 'types/openapi';
 
-import NotificationsList from "./_pages/notifications/list";
-import NotificationInstanceDetail from "./_pages/notifications/notification-instance-details";
-import NotificationInstanceForm from "./_pages/notifications/notification-instance-form";
-import NotificationsSetting from "./_pages/notifications/notifications-setting";
+import NotificationsList from './_pages/notifications/list';
+import NotificationInstanceDetail from './_pages/notifications/notification-instance-details';
+import NotificationInstanceForm from './_pages/notifications/notification-instance-form';
+import NotificationsSetting from './_pages/notifications/notifications-setting';
 
-import SchedulerJobDetail from "./_pages/scheduler/detail";
-import SchedulerJobsList from "./_pages/scheduler/list";
-import Layout from "./Layout";
-import Spinner from "./Spinner";
+import SchedulerJobDetail from './_pages/scheduler/detail';
+import SchedulerJobsList from './_pages/scheduler/list';
+import Layout from './Layout';
+import Spinner from './Spinner';
 
 export default function AppRouter() {
     const profile = useSelector(selectors.profile);

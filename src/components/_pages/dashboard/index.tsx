@@ -1,19 +1,19 @@
-import { Col, Container, Row } from "reactstrap";
+import { Col, Container, Row } from 'reactstrap';
 
-import Spinner from "components/Spinner";
-import { selectors as enumSelectors } from "ducks/enums";
-import { EntityType } from "ducks/filters";
-import { actions, selectors } from "ducks/statisticsDashboard";
-import { useEffect, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { SearchCondition, SearchGroup } from "types/openapi";
-import { getCertificateDonutChartColors } from "utils/dashboard";
-import CountBadge from "./DashboardItem/CountBadge";
-import DonutChart from "./DashboardItem/DonutChart";
+import Spinner from 'components/Spinner';
+import { selectors as enumSelectors } from 'ducks/enums';
+import { EntityType } from 'ducks/filters';
+import { actions, selectors } from 'ducks/statisticsDashboard';
+import { useEffect, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { SearchCondition, SearchGroup } from 'types/openapi';
+import { getCertificateDonutChartColors } from 'utils/dashboard';
+import CountBadge from './DashboardItem/CountBadge';
+import DonutChart from './DashboardItem/DonutChart';
 const getDateInString = (daysOffset: number) => {
     const date = new Date();
     date.setDate(date.getDate() + daysOffset);
-    return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`;
+    return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
 };
 
 function Dashboard() {
@@ -63,7 +63,7 @@ function Dashboard() {
                 <Col>
                     <DonutChart
                         colorOptions={certificatesStateColorOptions}
-                        title={"Certificates by State"}
+                        title={'Certificates by State'}
                         data={dashboard?.certificateStatByState}
                         entity={EntityType.CERTIFICATE}
                         onSetFilter={(index, labels) => {
@@ -74,8 +74,8 @@ function Dashboard() {
                                 {
                                     searchGroup: SearchGroup.Property,
                                     condition: SearchCondition.Equals,
-                                    fieldIdentifier: "CERTIFICATE_STATE",
-                                    value: selectedCertificateState?.code ? [selectedCertificateState?.code] : [""],
+                                    fieldIdentifier: 'CERTIFICATE_STATE',
+                                    value: selectedCertificateState?.code ? [selectedCertificateState?.code] : [''],
                                 },
                             ];
                         }}
@@ -86,7 +86,7 @@ function Dashboard() {
                 <Col>
                     <DonutChart
                         colorOptions={certofocateValidationStatusColorOptions}
-                        title={"Certificates by Validation"}
+                        title={'Certificates by Validation'}
                         data={dashboard?.certificateStatByValidationStatus}
                         entity={EntityType.CERTIFICATE}
                         onSetFilter={(index, labels) => {
@@ -101,8 +101,8 @@ function Dashboard() {
                                 {
                                     searchGroup: SearchGroup.Property,
                                     condition: SearchCondition.Equals,
-                                    fieldIdentifier: "CERTIFICATE_VALIDATION_STATUS",
-                                    value: selectedCertificateValidationStatus?.code ? [selectedCertificateValidationStatus?.code] : [""],
+                                    fieldIdentifier: 'CERTIFICATE_VALIDATION_STATUS',
+                                    value: selectedCertificateValidationStatus?.code ? [selectedCertificateValidationStatus?.code] : [''],
                                 },
                             ];
                         }}
@@ -112,7 +112,7 @@ function Dashboard() {
 
                 <Col>
                     <DonutChart
-                        title={"Certificates by Compliance"}
+                        title={'Certificates by Compliance'}
                         data={dashboard?.certificateStatByComplianceStatus}
                         colorOptions={certificateComplianceColorOptions}
                         entity={EntityType.CERTIFICATE}
@@ -124,8 +124,8 @@ function Dashboard() {
                                 {
                                     searchGroup: SearchGroup.Property,
                                     condition: SearchCondition.Equals,
-                                    fieldIdentifier: "COMPLIANCE_STATUS",
-                                    value: selectedComplianceStatus?.code ? [selectedComplianceStatus?.code] : [""],
+                                    fieldIdentifier: 'COMPLIANCE_STATUS',
+                                    value: selectedComplianceStatus?.code ? [selectedComplianceStatus?.code] : [''],
                                 },
                             ];
                         }}
@@ -135,7 +135,7 @@ function Dashboard() {
 
                 <Col>
                     <DonutChart
-                        title={"Certificates by Type"}
+                        title={'Certificates by Type'}
                         data={dashboard?.certificateStatByType}
                         entity={EntityType.CERTIFICATE}
                         onSetFilter={(_index, _labels) => []}
@@ -145,42 +145,42 @@ function Dashboard() {
 
                 <Col>
                     <DonutChart
-                        title={"Certificates by Expiration in Days"}
+                        title={'Certificates by Expiration in Days'}
                         data={dashboard?.certificateStatByExpiry}
                         entity={EntityType.CERTIFICATE}
                         onSetFilter={(index, labels) => {
-                            if (labels[index] === "More") {
+                            if (labels[index] === 'More') {
                                 return [
                                     {
                                         searchGroup: SearchGroup.Property,
                                         condition: SearchCondition.Greater,
-                                        fieldIdentifier: "NOT_AFTER",
+                                        fieldIdentifier: 'NOT_AFTER',
                                         value: JSON.parse(JSON.stringify(getDateInString(90))),
                                     },
                                 ];
                             }
-                            if (labels[index] === "expired") {
+                            if (labels[index] === 'expired') {
                                 return [
                                     {
                                         searchGroup: SearchGroup.Property,
                                         condition: SearchCondition.Lesser,
-                                        fieldIdentifier: "NOT_AFTER",
+                                        fieldIdentifier: 'NOT_AFTER',
                                         value: JSON.parse(JSON.stringify(getDateInString(0))),
                                     },
                                 ];
                             }
-                            if (labels[index] === "60" || labels[index] === "90") {
+                            if (labels[index] === '60' || labels[index] === '90') {
                                 return [
                                     {
                                         searchGroup: SearchGroup.Property,
                                         condition: SearchCondition.Greater,
-                                        fieldIdentifier: "NOT_AFTER",
+                                        fieldIdentifier: 'NOT_AFTER',
                                         value: JSON.parse(JSON.stringify(getDateInString(+labels[index] - 30))),
                                     },
                                     {
                                         searchGroup: SearchGroup.Property,
                                         condition: SearchCondition.Lesser,
-                                        fieldIdentifier: "NOT_AFTER",
+                                        fieldIdentifier: 'NOT_AFTER',
                                         value: JSON.parse(JSON.stringify(getDateInString(+labels[index]))),
                                     },
                                 ];
@@ -189,13 +189,13 @@ function Dashboard() {
                                 {
                                     searchGroup: SearchGroup.Property,
                                     condition: SearchCondition.Greater,
-                                    fieldIdentifier: "NOT_AFTER",
+                                    fieldIdentifier: 'NOT_AFTER',
                                     value: JSON.parse(JSON.stringify(getDateInString(+labels[index] - 10))),
                                 },
                                 {
                                     searchGroup: SearchGroup.Property,
                                     condition: SearchCondition.Lesser,
-                                    fieldIdentifier: "NOT_AFTER",
+                                    fieldIdentifier: 'NOT_AFTER',
                                     value: JSON.parse(JSON.stringify(getDateInString(+labels[index]))),
                                 },
                             ];
@@ -206,14 +206,14 @@ function Dashboard() {
 
                 <Col>
                     <DonutChart
-                        title={"Certificates by Key Size"}
+                        title={'Certificates by Key Size'}
                         data={dashboard?.certificateStatByKeySize}
                         entity={EntityType.CERTIFICATE}
                         onSetFilter={(index, labels) => [
                             {
                                 searchGroup: SearchGroup.Property,
                                 condition: SearchCondition.Equals,
-                                fieldIdentifier: "KEY_SIZE",
+                                fieldIdentifier: 'KEY_SIZE',
                                 value: JSON.parse(JSON.stringify(labels[index])),
                             },
                         ]}
@@ -223,24 +223,24 @@ function Dashboard() {
 
                 <Col>
                     <DonutChart
-                        title={"Certificates by RA Profile"}
+                        title={'Certificates by RA Profile'}
                         data={dashboard?.raProfileStatByCertificateCount}
                         entity={EntityType.CERTIFICATE}
                         onSetFilter={(index, labels) =>
-                            labels[index] === "Unknown"
+                            labels[index] === 'Unknown'
                                 ? [
                                       {
                                           searchGroup: SearchGroup.Property,
                                           condition: SearchCondition.Empty,
-                                          fieldIdentifier: "RA_PROFILE_NAME",
-                                          value: JSON.parse(JSON.stringify("")),
+                                          fieldIdentifier: 'RA_PROFILE_NAME',
+                                          value: JSON.parse(JSON.stringify('')),
                                       },
                                   ]
                                 : [
                                       {
                                           searchGroup: SearchGroup.Property,
                                           condition: SearchCondition.Equals,
-                                          fieldIdentifier: "RA_PROFILE_NAME",
+                                          fieldIdentifier: 'RA_PROFILE_NAME',
                                           value: JSON.parse(JSON.stringify(labels[index])),
                                       },
                                   ]
@@ -251,24 +251,24 @@ function Dashboard() {
 
                 <Col>
                     <DonutChart
-                        title={"Certificates by Group"}
+                        title={'Certificates by Group'}
                         data={dashboard?.groupStatByCertificateCount}
                         entity={EntityType.CERTIFICATE}
                         onSetFilter={(index, labels) =>
-                            labels[index] === "Unassigned"
+                            labels[index] === 'Unassigned'
                                 ? [
                                       {
                                           searchGroup: SearchGroup.Property,
                                           condition: SearchCondition.Empty,
-                                          fieldIdentifier: "GROUP_NAME",
-                                          value: JSON.parse(JSON.stringify("")),
+                                          fieldIdentifier: 'GROUP_NAME',
+                                          value: JSON.parse(JSON.stringify('')),
                                       },
                                   ]
                                 : [
                                       {
                                           searchGroup: SearchGroup.Property,
                                           condition: SearchCondition.Equals,
-                                          fieldIdentifier: "GROUP_NAME",
+                                          fieldIdentifier: 'GROUP_NAME',
                                           value: JSON.parse(JSON.stringify(labels[index])),
                                       },
                                   ]
@@ -279,7 +279,7 @@ function Dashboard() {
 
                 <Col>
                     <DonutChart
-                        title={"Certificates by Constraints"}
+                        title={'Certificates by Constraints'}
                         data={dashboard?.certificateStatByBasicConstraints}
                         entity={EntityType.CERTIFICATE}
                         onSetFilter={(_index, _labels) => []}

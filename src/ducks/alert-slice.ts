@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { MessageModel } from "types/alerts";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { MessageModel } from 'types/alerts';
 
 export type State = {
     messages: MessageModel[];
@@ -12,7 +12,7 @@ export const initialState: State = {
 };
 
 export const alertsSlice = createSlice({
-    name: "alerts",
+    name: 'alerts',
 
     initialState,
 
@@ -25,7 +25,7 @@ export const alertsSlice = createSlice({
                     id: state.msgId,
                     time: Date.now(),
                     message: action.payload,
-                    color: "danger",
+                    color: 'danger',
                 });
                 state.msgId++;
             },
@@ -39,7 +39,7 @@ export const alertsSlice = createSlice({
                     id: state.msgId,
                     time: Date.now(),
                     message: action.payload,
-                    color: "success",
+                    color: 'success',
                 });
                 state.msgId++;
             },

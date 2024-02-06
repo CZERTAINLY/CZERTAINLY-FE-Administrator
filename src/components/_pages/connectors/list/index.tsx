@@ -1,19 +1,19 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
-import { Badge, Container, Table } from "reactstrap";
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { Badge, Container, Table } from 'reactstrap';
 
-import { actions, selectors } from "ducks/connectors";
+import { actions, selectors } from 'ducks/connectors';
 
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
 
-import { FunctionGroupModel } from "types/connectors";
-import { LockWidgetNameEnum } from "types/user-interface";
-import { attributeFieldNameTransform } from "utils/attributes/attributes";
-import { inventoryStatus } from "utils/connector";
+import { FunctionGroupModel } from 'types/connectors';
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { attributeFieldNameTransform } from 'utils/attributes/attributes';
+import { inventoryStatus } from 'utils/connector';
 
 export default function ConnectorList() {
     const dispatch = useDispatch();
@@ -84,33 +84,33 @@ export default function ConnectorList() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "plus",
+                icon: 'plus',
                 disabled: false,
-                tooltip: "Create",
+                tooltip: 'Create',
                 onClick: () => {
                     onAddClick();
                 },
             },
             {
-                icon: "trash",
+                icon: 'trash',
                 disabled: checkedRows.length === 0,
-                tooltip: "Delete",
+                tooltip: 'Delete',
                 onClick: () => {
                     setConfirmDelete(true);
                 },
             },
             {
-                icon: "plug",
+                icon: 'plug',
                 disabled: checkedRows.length === 0,
-                tooltip: "Reconnect",
+                tooltip: 'Reconnect',
                 onClick: () => {
                     onReconnectClick();
                 },
             },
             {
-                icon: "check",
+                icon: 'check',
                 disabled: checkedRows.length === 0,
-                tooltip: "Approve",
+                tooltip: 'Approve',
                 onClick: () => {
                     setConfirmAuthorize(true);
                 },
@@ -121,7 +121,7 @@ export default function ConnectorList() {
 
     const getKinds = useCallback((functionGroups: FunctionGroupModel[]) => {
         return functionGroups.map((group) => (
-            <div key={group.uuid} style={{ margin: "1px" }}>
+            <div key={group.uuid} style={{ margin: '1px' }}>
                 {group.kinds.map((kind) => (
                     <span key={kind}>
                         <Badge color="secondary">{kind}</Badge>
@@ -136,8 +136,8 @@ export default function ConnectorList() {
         (functionGroups: FunctionGroupModel[]) =>
             functionGroups.map((group) => (
                 <div key={group.uuid}>
-                    <Badge color="primary" style={{ margin: "1px" }}>
-                        {attributeFieldNameTransform[group.name || ""] || group.name}
+                    <Badge color="primary" style={{ margin: '1px' }}>
+                        {attributeFieldNameTransform[group.name || ''] || group.name}
                     </Badge>
                 </div>
             )),
@@ -147,7 +147,7 @@ export default function ConnectorList() {
     const forceDeleteBody = useMemo(
         () => (
             <div>
-                <div>Failed to delete {checkedRows.length > 1 ? "Connectors" : "a Connector"}. Please find the details below:</div>
+                <div>Failed to delete {checkedRows.length > 1 ? 'Connectors' : 'a Connector'}. Please find the details below:</div>
 
                 <Table className="table-hover" size="sm">
                     <thead>
@@ -178,36 +178,36 @@ export default function ConnectorList() {
     const connectorsRowHeaders: TableHeader[] = useMemo(
         () => [
             {
-                content: "Name",
+                content: 'Name',
                 sortable: true,
-                sort: "asc",
-                id: "connectorName",
-                width: "25%",
+                sort: 'asc',
+                id: 'connectorName',
+                width: '25%',
             },
             {
-                content: "Function Groups",
-                align: "center",
+                content: 'Function Groups',
+                align: 'center',
                 sortable: true,
-                id: "connectorFunctions",
-                width: "15%",
+                id: 'connectorFunctions',
+                width: '15%',
             },
             {
-                content: "Kinds",
+                content: 'Kinds',
                 sortable: true,
-                id: "kinds",
-                width: "15%",
-                align: "center",
+                id: 'kinds',
+                width: '15%',
+                align: 'center',
             },
             {
-                content: "URL",
+                content: 'URL',
                 sortable: true,
-                id: "connectorUrl",
+                id: 'connectorUrl',
             },
             {
-                content: "Status",
+                content: 'Status',
                 sortable: true,
-                id: "connectorStatus",
-                width: "5%",
+                id: 'connectorStatus',
+                width: '5%',
             },
         ],
         [],
@@ -221,15 +221,15 @@ export default function ConnectorList() {
                 return {
                     id: connector.uuid,
                     columns: [
-                        <span style={{ whiteSpace: "nowrap" }}>
+                        <span style={{ whiteSpace: 'nowrap' }}>
                             <Link to={`./detail/${connector.uuid}`}>{connector.name}</Link>
                         </span>,
 
-                        <span style={{ whiteSpace: "nowrap" }}>{getFunctionGroups(connector.functionGroups)}</span>,
+                        <span style={{ whiteSpace: 'nowrap' }}>{getFunctionGroups(connector.functionGroups)}</span>,
 
-                        <span style={{ whiteSpace: "nowrap" }}>{getKinds(connector.functionGroups)}</span>,
+                        <span style={{ whiteSpace: 'nowrap' }}>{getKinds(connector.functionGroups)}</span>,
 
-                        <span style={{ whiteSpace: "nowrap" }}>{connector.url}</span>,
+                        <span style={{ whiteSpace: 'nowrap' }}>{connector.url}</span>,
 
                         <Badge color={`${connectorStatus[1]}`}>{connectorStatus[0]}</Badge>,
                     ],
@@ -262,34 +262,34 @@ export default function ConnectorList() {
 
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete ${checkedRows.length > 1 ? "Connectors" : "a Connector"}`}
-                body={`You are about to delete ${checkedRows.length > 1 ? "Connectors" : "a Connector"}. Is this what you want to do?`}
+                caption={`Delete ${checkedRows.length > 1 ? 'Connectors' : 'a Connector'}`}
+                body={`You are about to delete ${checkedRows.length > 1 ? 'Connectors' : 'a Connector'}. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
             <Dialog
                 isOpen={confirmAuthorize}
-                caption={`Approve ${checkedRows.length > 1 ? "Connectors" : "a Connector"}`}
-                body={`You are about to approve a ${checkedRows.length > 1 ? "Connectors" : "a Connector"}. Is this what you want to do?`}
+                caption={`Approve ${checkedRows.length > 1 ? 'Connectors' : 'a Connector'}`}
+                body={`You are about to approve a ${checkedRows.length > 1 ? 'Connectors' : 'a Connector'}. Is this what you want to do?`}
                 toggle={() => setConfirmAuthorize(false)}
                 buttons={[
-                    { color: "danger", onClick: onAuthorizeConfirmed, body: "Yes, approve" },
-                    { color: "secondary", onClick: () => setConfirmAuthorize(false), body: "Cancel" },
+                    { color: 'danger', onClick: onAuthorizeConfirmed, body: 'Yes, approve' },
+                    { color: 'secondary', onClick: () => setConfirmAuthorize(false), body: 'Cancel' },
                 ]}
             />
 
             <Dialog
                 isOpen={confirmForceDelete}
-                caption={`Force Delete ${checkedRows.length > 1 ? "Connectors" : "a Connector"}`}
+                caption={`Force Delete ${checkedRows.length > 1 ? 'Connectors' : 'a Connector'}`}
                 body={forceDeleteBody}
                 toggle={() => setConfirmForceDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onForceDeleteConfirmed, body: "Force delete" },
-                    { color: "secondary", onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: "Cancel" },
+                    { color: 'danger', onClick: onForceDeleteConfirmed, body: 'Force delete' },
+                    { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
                 ]}
             />
         </Container>

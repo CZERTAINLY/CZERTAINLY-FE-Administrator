@@ -15,10 +15,10 @@ $margin-horizontal-variants: (
     0: 0,
 );
 
-@include property-variants(".mt", "margin-top", $margin-vertical-variants);
-@include property-variants(".mb", "margin-bottom", $margin-vertical-variants);
-@include property-variants(".ml", "margin-left", $margin-horizontal-variants);
-@include property-variants(".mr", "margin-right", $margin-horizontal-variants);
+@include property-variants('.mt', 'margin-top', $margin-vertical-variants);
+@include property-variants('.mb', 'margin-bottom', $margin-vertical-variants);
+@include property-variants('.ml', 'margin-left', $margin-horizontal-variants);
+@include property-variants('.mr', 'margin-right', $margin-horizontal-variants);
 
 $opacity-variants: (
     10: 0.1,
@@ -32,7 +32,7 @@ $opacity-variants: (
     90: 0.9,
 );
 
-@include property-variants(".opacity", "opacity", $opacity-variants);
+@include property-variants('.opacity', 'opacity', $opacity-variants);
 
 .fw-thin {
     font-weight: 200;
@@ -58,7 +58,7 @@ $opacity-variants: (
     color: $text-color;
 }
 
-@include bg-variant(".bg-dark", $text-color);
+@include bg-variant('.bg-dark', $text-color);
 
 .td-underline {
     text-decoration: underline;

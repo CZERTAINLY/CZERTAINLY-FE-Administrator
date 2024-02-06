@@ -1,7 +1,7 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { NotificationSettingsDto } from "types/openapi";
-import { createFeatureSelector } from "utils/ducks";
-import { SettingsPlatformModel } from "../types/settings";
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { NotificationSettingsDto } from 'types/openapi';
+import { createFeatureSelector } from 'utils/ducks';
+import { SettingsPlatformModel } from '../types/settings';
 
 export type State = {
     platformSettings?: SettingsPlatformModel;
@@ -20,7 +20,7 @@ export const initialState: State = {
 };
 
 export const slice = createSlice({
-    name: "settings",
+    name: 'settings',
     initialState,
     reducers: {
         getPlatformSettings: (state, action: PayloadAction<void>) => {

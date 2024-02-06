@@ -1,13 +1,13 @@
-import { useCallback, useEffect, useMemo } from "react";
-import { Field, useForm } from "react-final-form";
-import Select from "react-select";
-import { Col, FormFeedback, FormGroup, Input, InputGroup } from "reactstrap";
-import { getStepValue } from "utils/common-utils";
-import { BaseAttributeContentModel, CustomAttributeModel } from "../../../../types/attributes";
-import { AttributeContentType } from "../../../../types/openapi";
-import { composeValidators, validateRequired } from "../../../../utils/validators";
-import WidgetButtons from "../../../WidgetButtons";
-import { ContentFieldConfiguration } from "../index";
+import { useCallback, useEffect, useMemo } from 'react';
+import { Field, useForm } from 'react-final-form';
+import Select from 'react-select';
+import { Col, FormFeedback, FormGroup, Input, InputGroup } from 'reactstrap';
+import { getStepValue } from 'utils/common-utils';
+import { BaseAttributeContentModel, CustomAttributeModel } from '../../../../types/attributes';
+import { AttributeContentType } from '../../../../types/openapi';
+import { composeValidators, validateRequired } from '../../../../utils/validators';
+import WidgetButtons from '../../../WidgetButtons';
+import { ContentFieldConfiguration } from '../index';
 
 type Props = {
     descriptor: CustomAttributeModel;
@@ -45,16 +45,16 @@ export default function ContentValueField({ descriptor, initialContent, onSubmit
     const beforeOnSubmit = useCallback(
         (attributeUuid: string, content: BaseAttributeContentModel[]) => {
             const updatedContent = content.map((contentObject) => {
-                if (descriptor.contentType === "date") {
+                if (descriptor.contentType === 'date') {
                     const updatedDate = new Date(contentObject.data as string);
                     const formattedDate = updatedDate.toISOString().slice(0, 10);
                     return { ...contentObject, data: formattedDate };
                 }
-                if (descriptor.contentType === "time") {
+                if (descriptor.contentType === 'time') {
                     const timeString = contentObject.data as string;
-                    const timeStringSplit = timeString.split(":");
+                    const timeStringSplit = timeString.split(':');
                     if (timeStringSplit.length === 2) {
-                        return { ...contentObject, data: timeString + ":00" };
+                        return { ...contentObject, data: timeString + ':00' };
                     }
                     return contentObject;
                 } else {
@@ -75,7 +75,7 @@ export default function ContentValueField({ descriptor, initialContent, onSubmit
     };
 
     const getFieldContent = (input: any) => {
-        if (ContentFieldConfiguration[descriptor.contentType].type === "checkbox") {
+        if (ContentFieldConfiguration[descriptor.contentType].type === 'checkbox') {
             return [{ data: input.checked }];
         }
         if (!input.value) {
@@ -122,8 +122,8 @@ export default function ContentValueField({ descriptor, initialContent, onSubmit
                                     meta.touched && meta.invalid
                                         ? {
                                               ...provided,
-                                              border: "solid 1px red",
-                                              "&:hover": { border: "solid 1px red" },
+                                              border: 'solid 1px red',
+                                              '&:hover': { border: 'solid 1px red' },
                                           }
                                         : { ...provided },
                             }}
@@ -151,9 +151,9 @@ export default function ContentValueField({ descriptor, initialContent, onSubmit
                             <WidgetButtons
                                 buttons={[
                                     {
-                                        icon: "plus",
+                                        icon: 'plus',
                                         disabled: !inputContent || !meta.valid,
-                                        tooltip: "Save",
+                                        tooltip: 'Save',
                                         onClick: () => beforeOnSubmit(descriptor.uuid, inputContent),
                                     },
                                 ]}

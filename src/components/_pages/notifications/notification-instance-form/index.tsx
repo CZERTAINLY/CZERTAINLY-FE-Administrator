@@ -1,22 +1,22 @@
-import AttributeEditor from "components/Attributes/AttributeEditor";
-import TabLayout from "components/Layout/TabLayout";
-import ProgressButton from "components/ProgressButton";
-import Widget from "components/Widget";
-import { selectors as customAttributesSelectors } from "ducks/customAttributes";
-import { selectors as notificationSelectors, actions as notificationsActions } from "ducks/notifications";
-import { FormApi } from "final-form";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Field, Form } from "react-final-form";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
-import Select from "react-select";
-import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from "reactstrap";
-import { AttributeDescriptorModel, AttributeMappingModel } from "types/attributes";
-import { NotificationInstanceRequestModel } from "types/notifications";
-import { AttributeContentType, FunctionGroupCode } from "types/openapi";
-import { mutators } from "utils/attributes/attributeEditorMutators";
-import { collectFormAttributes } from "utils/attributes/attributes";
-import { composeValidators, validateAlphaNumericWithoutAccents, validateLength, validateRequired } from "utils/validators";
+import AttributeEditor from 'components/Attributes/AttributeEditor';
+import TabLayout from 'components/Layout/TabLayout';
+import ProgressButton from 'components/ProgressButton';
+import Widget from 'components/Widget';
+import { selectors as customAttributesSelectors } from 'ducks/customAttributes';
+import { selectors as notificationSelectors, actions as notificationsActions } from 'ducks/notifications';
+import { FormApi } from 'final-form';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Field, Form } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
+import Select from 'react-select';
+import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
+import { AttributeDescriptorModel, AttributeMappingModel } from 'types/attributes';
+import { NotificationInstanceRequestModel } from 'types/notifications';
+import { AttributeContentType, FunctionGroupCode } from 'types/openapi';
+import { mutators } from 'utils/attributes/attributeEditorMutators';
+import { collectFormAttributes } from 'utils/attributes/attributes';
+import { composeValidators, validateAlphaNumericWithoutAccents, validateLength, validateRequired } from 'utils/validators';
 
 interface SelectChangeValue {
     value: string;
@@ -43,7 +43,7 @@ const NotificationInstanceForm = () => {
     const isCreatingNotificationInstance = useSelector(notificationSelectors.isCreatingNotificationInstance);
 
     const editMode = useMemo(() => !!id, [id]);
-    const submitTitle = useMemo(() => (editMode ? "Save" : "Create"), [editMode]);
+    const submitTitle = useMemo(() => (editMode ? 'Save' : 'Create'), [editMode]);
 
     const isBusy = useMemo(
         () => isCreatingNotificationInstance || isFetchingNotificationInstanceDetail,
@@ -96,7 +96,7 @@ const NotificationInstanceForm = () => {
 
     const onSubmit = (values: NotificationInstanceRequestModel) => {
         const attributes = collectFormAttributes(
-            "notification",
+            'notification',
             [...(notificationProviderAttributesDescriptors ?? []), ...groupAttributesCallbackAttributes],
             values,
         );
@@ -159,7 +159,7 @@ const NotificationInstanceForm = () => {
         if (changedValue?.value === selectedNotificationInstanceProvider?.value) {
             return;
         }
-        form.change("connectorUuid", changedValue?.value);
+        form.change('connectorUuid', changedValue?.value);
         setSelectedNotificationInstanceProvider(changedValue);
         setSelectedKind(null);
     };
@@ -167,7 +167,7 @@ const NotificationInstanceForm = () => {
     const onNotificationInstanceKindChange = (changedValue: SelectChangeValue | null, form: FormApi<NotificationInstanceRequestModel>) => {
         if (!changedValue?.value) return;
         setSelectedKind(changedValue);
-        form.change("kind", changedValue?.value);
+        form.change('kind', changedValue?.value);
     };
 
     useEffect(() => {
@@ -218,16 +218,16 @@ const NotificationInstanceForm = () => {
             return {
                 attributes: [],
                 attributeMappings: [],
-                connectorUuid: "",
-                description: "",
-                kind: "",
-                name: "",
-                connectorName: "",
+                connectorUuid: '',
+                description: '',
+                kind: '',
+                name: '',
+                connectorName: '',
             };
         }
     }, [editMode, notificationDetails]);
 
-    const widgetTitle = useMemo(() => (editMode ? "Update Notification Instance" : "Add Notification Instance"), [editMode]);
+    const widgetTitle = useMemo(() => (editMode ? 'Update Notification Instance' : 'Add Notification Instance'), [editMode]);
 
     const handleMappingAttributeChange = (
         event: SelectChangeValue | null,
@@ -370,11 +370,11 @@ const NotificationInstanceForm = () => {
                         <TabLayout
                             tabs={[
                                 {
-                                    title: "Connector Attributes",
+                                    title: 'Connector Attributes',
                                     content: renderAttributeEditor(selectedKind?.value),
                                 },
                                 {
-                                    title: "Attribute Mappings",
+                                    title: 'Attribute Mappings',
                                     content: mappingAttributes?.length ? (
                                         <Widget>
                                             {mappingAttributes.map((mappingAttribute, i) => (

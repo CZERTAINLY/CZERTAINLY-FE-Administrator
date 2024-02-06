@@ -1,17 +1,17 @@
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
 
-import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
-import { actions, selectors } from "ducks/globalMetadata";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
-import { Container } from "reactstrap";
-import { PlatformEnum } from "types/openapi";
-import { LockWidgetNameEnum } from "types/user-interface";
-import ConnectorMetadataDialog from "./ConnectorMetadataDialog";
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { actions, selectors } from 'ducks/globalMetadata';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { Container } from 'reactstrap';
+import { PlatformEnum } from 'types/openapi';
+import { LockWidgetNameEnum } from 'types/user-interface';
+import ConnectorMetadataDialog from './ConnectorMetadataDialog';
 
 export default function GlobalMetadataList() {
     const dispatch = useDispatch();
@@ -52,9 +52,9 @@ export default function GlobalMetadataList() {
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
-            { icon: "plus", disabled: false, tooltip: "Create", onClick: () => navigate(`./add`) },
-            { icon: "push", disabled: false, tooltip: "Promote", onClick: () => setShowPromote(true) },
-            { icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete", onClick: () => setConfirmDelete(true) },
+            { icon: 'plus', disabled: false, tooltip: 'Create', onClick: () => navigate(`./add`) },
+            { icon: 'push', disabled: false, tooltip: 'Promote', onClick: () => setShowPromote(true) },
+            { icon: 'trash', disabled: checkedRows.length === 0, tooltip: 'Delete', onClick: () => setConfirmDelete(true) },
         ],
         [checkedRows, navigate],
     );
@@ -62,23 +62,23 @@ export default function GlobalMetadataList() {
     const globalMetadataTableHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "name",
-                content: "Name",
+                id: 'name',
+                content: 'Name',
                 sortable: true,
-                sort: "asc",
-                width: "20%",
+                sort: 'asc',
+                width: '20%',
             },
             {
-                id: "contentType",
-                content: "Content Type",
+                id: 'contentType',
+                content: 'Content Type',
                 sortable: true,
-                width: "20%",
+                width: '20%',
             },
             {
-                id: "description",
-                content: "Description",
+                id: 'description',
+                content: 'Description',
                 sortable: true,
-                width: "40%",
+                width: '40%',
             },
         ],
         [],
@@ -124,8 +124,8 @@ export default function GlobalMetadataList() {
                 body={`You are about to delete selected Global Metadata. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 

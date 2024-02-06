@@ -1,17 +1,17 @@
-import TabLayout from "components/Layout/TabLayout";
-import { selectors as profileApprovalSelectors } from "ducks/approval-profiles";
-import { actions as groupAction, selectors as groupSelectors } from "ducks/certificateGroups";
-import { actions as rolesActions, selectors as rolesSelectors } from "ducks/roles";
-import { actions as userAction, selectors as userSelectors } from "ducks/users";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Field, useForm } from "react-final-form";
-import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
-import Select from "react-select";
-import { Button, Col, FormFeedback, FormGroup, Input, Label, Row } from "reactstrap";
-import { ApprovalStepRequestModel, ApproverType } from "types/approval-profiles";
-import { composeValidators, validateLength, validateNonZeroInteger, validatePositiveInteger, validateRequired } from "utils/validators";
-import styles from "./approvalProfile.module.scss";
+import TabLayout from 'components/Layout/TabLayout';
+import { selectors as profileApprovalSelectors } from 'ducks/approval-profiles';
+import { actions as groupAction, selectors as groupSelectors } from 'ducks/certificateGroups';
+import { actions as rolesActions, selectors as rolesSelectors } from 'ducks/roles';
+import { actions as userAction, selectors as userSelectors } from 'ducks/users';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Field, useForm } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
+import Select from 'react-select';
+import { Button, Col, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
+import { ApprovalStepRequestModel, ApproverType } from 'types/approval-profiles';
+import { composeValidators, validateLength, validateNonZeroInteger, validatePositiveInteger, validateRequired } from 'utils/validators';
+import styles from './approvalProfile.module.scss';
 
 type Props = {
     approvalSteps: ApprovalStepRequestModel[];
@@ -23,7 +23,7 @@ type SelectOptionApprover = { label: string; value: string } | null;
 type SelectOptionApproverType = { label: string; value: string };
 
 const approverTypeOptions = Object.values(ApproverType).map((type) => ({
-    value: type.toLocaleLowerCase() + "Uuid",
+    value: type.toLocaleLowerCase() + 'Uuid',
     label: type,
 }));
 
@@ -67,27 +67,27 @@ export default function ApprovalStepField({ approvalSteps }: Props) {
         if (editMode && profileApprovalDetail?.approvalSteps.length) {
             const newSelectedApprovalTypeList: SelectOptionApproverType[] = profileApprovalDetail?.approvalSteps.map((step) => {
                 if (step.userUuid) {
-                    return { label: ApproverType.User, value: ApproverType.User.toLocaleLowerCase() + "Uuid" };
+                    return { label: ApproverType.User, value: ApproverType.User.toLocaleLowerCase() + 'Uuid' };
                 }
                 if (step.groupUuid) {
-                    return { label: ApproverType.Group, value: ApproverType.Group.toLocaleLowerCase() + "Uuid" };
+                    return { label: ApproverType.Group, value: ApproverType.Group.toLocaleLowerCase() + 'Uuid' };
                 }
                 if (step.roleUuid) {
-                    return { label: ApproverType.Role, value: ApproverType.Role.toLocaleLowerCase() + "Uuid" };
+                    return { label: ApproverType.Role, value: ApproverType.Role.toLocaleLowerCase() + 'Uuid' };
                 }
-                return { label: "", value: "" };
+                return { label: '', value: '' };
             });
             setselectedApprovalTypeList(newSelectedApprovalTypeList);
 
             const newSelectedApproverList: SelectOptionApprover[] = profileApprovalDetail?.approvalSteps.map((step) => {
                 if (step.userUuid) {
-                    return { label: users.find((user) => user.uuid === step.userUuid)?.username ?? "", value: step.userUuid };
+                    return { label: users.find((user) => user.uuid === step.userUuid)?.username ?? '', value: step.userUuid };
                 }
                 if (step.groupUuid) {
-                    return { label: groups.find((group) => group.uuid === step.groupUuid)?.name ?? "", value: step.groupUuid };
+                    return { label: groups.find((group) => group.uuid === step.groupUuid)?.name ?? '', value: step.groupUuid };
                 }
                 if (step.roleUuid) {
-                    return { label: roles.find((role) => role.uuid === step.roleUuid)?.name ?? "", value: step.roleUuid };
+                    return { label: roles.find((role) => role.uuid === step.roleUuid)?.name ?? '', value: step.roleUuid };
                 }
                 return null;
             });
@@ -175,7 +175,7 @@ export default function ApprovalStepField({ approvalSteps }: Props) {
             order: approvalSteps.length + 1,
         };
         const newApprovalSteps = [...approvalSteps, newStep];
-        form.change("approvalSteps", newApprovalSteps);
+        form.change('approvalSteps', newApprovalSteps);
         setSelectedTab(newApprovalSteps.length - 1);
     };
 
@@ -186,7 +186,7 @@ export default function ApprovalStepField({ approvalSteps }: Props) {
             const newApprovalSteps = approvalSteps.filter((step, i) => i !== index);
             const orderedApprovalSteps = newApprovalSteps.map((step, i) => ({ ...step, order: i + 1 }));
 
-            form.change("approvalSteps", orderedApprovalSteps);
+            form.change('approvalSteps', orderedApprovalSteps);
             updateAppoverAfterRemove(index);
 
             if (selectedTab === approvalSteps.length - 1) {

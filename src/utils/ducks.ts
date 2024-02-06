@@ -1,4 +1,4 @@
-import { createSelector } from "@reduxjs/toolkit";
+import { createSelector } from '@reduxjs/toolkit';
 
 export function createFeatureSelector<T>(featureName: string): (state: any) => T {
     return createSelector(

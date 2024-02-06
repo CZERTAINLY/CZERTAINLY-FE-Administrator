@@ -1,18 +1,18 @@
-import { useCallback, useEffect, useMemo } from "react";
-import { Field, Form } from "react-final-form";
-import { useDispatch, useSelector } from "react-redux";
-import Select from "react-select";
-import { Button, ButtonGroup, Form as BootstrapForm, FormGroup, Label } from "reactstrap";
+import { useCallback, useEffect, useMemo } from 'react';
+import { Field, Form } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
+import Select from 'react-select';
+import { Button, ButtonGroup, Form as BootstrapForm, FormGroup, Label } from 'reactstrap';
 
-import { mutators } from "utils/attributes/attributeEditorMutators";
+import { mutators } from 'utils/attributes/attributeEditorMutators';
 
-import { validateRequired } from "utils/validators";
+import { validateRequired } from 'utils/validators';
 
-import Spinner from "components/Spinner";
+import Spinner from 'components/Spinner';
 
-import { actions, selectors } from "ducks/compliance-profiles";
-import { actions as raActions } from "ducks/ra-profiles";
-import { RaProfileResponseModel } from "types/ra-profiles";
+import { actions, selectors } from 'ducks/compliance-profiles';
+import { actions as raActions } from 'ducks/ra-profiles';
+import { RaProfileResponseModel } from 'types/ra-profiles';
 
 interface Props {
     raProfile?: RaProfileResponseModel;
@@ -90,19 +90,19 @@ export default function AssociateComplianceProfileDialogBody({ raProfile, availa
                                         styles={{
                                             control: (provided) =>
                                                 meta.touched && meta.invalid
-                                                    ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } }
+                                                    ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
                                                     : { ...provided },
                                         }}
                                     />
 
-                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>
+                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
                                         Required Field
                                     </div>
                                 </FormGroup>
                             )}
                         </Field>
 
-                        <div style={{ textAlign: "right" }}>
+                        <div style={{ textAlign: 'right' }}>
                             <ButtonGroup>
                                 <Button type="submit" color="primary" disabled={pristine || submitting || !valid} onClick={handleSubmit}>
                                     Associate

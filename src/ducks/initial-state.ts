@@ -1,50 +1,50 @@
-import { slice as acmeAccountsSlice, initialState as initialAcmeAccountsState } from "./acme-accounts";
-import { slice as acmeProfilesSlice, initialState as initialAcmeProfilesState } from "./acme-profiles";
-import { initialState as initialScepProfilesState, slice as scepProfilesSlice } from "./scep-profiles";
+import { slice as acmeAccountsSlice, initialState as initialAcmeAccountsState } from './acme-accounts';
+import { slice as acmeProfilesSlice, initialState as initialAcmeProfilesState } from './acme-profiles';
+import { initialState as initialScepProfilesState, slice as scepProfilesSlice } from './scep-profiles';
 
 // import { slice as alertsSlice, initialState as initialAlertsState } from "./alerts";
-import { alertsSlice, initialState as initialAlertsState } from "./alert-slice";
-import { slice as appRedirectSlice, initialState as initialAppRedirectState } from "./app-redirect";
-import { slice as auditLogsSlice, initialState as initialAuditLogsState } from "./auditLogs";
-import { slice as authSlice, initialState as initialAuthState } from "./auth";
-import { initialState as initialWidgetLockState, slice as widgetLockSlice } from "./user-interface";
+import { alertsSlice, initialState as initialAlertsState } from './alert-slice';
+import { slice as appRedirectSlice, initialState as initialAppRedirectState } from './app-redirect';
+import { slice as auditLogsSlice, initialState as initialAuditLogsState } from './auditLogs';
+import { slice as authSlice, initialState as initialAuthState } from './auth';
+import { initialState as initialWidgetLockState, slice as widgetLockSlice } from './user-interface';
 
-import { initialState as initialProfileApprovalState, slice as profileApprovalSlice } from "./approval-profiles";
+import { initialState as initialProfileApprovalState, slice as profileApprovalSlice } from './approval-profiles';
 
-import { slice as approvalSlice, initialState as initialApprovalState } from "./approvals";
+import { slice as approvalSlice, initialState as initialApprovalState } from './approvals';
 
-import { slice as authoritiesSlice, initialState as initialAuthoritiesState } from "./authorities";
-import { slice as groupsSlice, initialState as initialGroupsState } from "./certificateGroups";
-import { slice as certificatesSlice, initialState as initialCertificatesState } from "./certificates";
-import { slice as initialComplianceProfilesSlice, initialState as initialComplianceProfilesState } from "./compliance-profiles";
-import { slice as connectorsSlice, initialState as initialConnectorsState } from "./connectors";
-import { slice as initialCredentialsSlice, initialState as initialCredentialsState } from "./credentials";
-import { slice as cryptographicKeySlice, initialState as initialCryptographicKeyAttributesState } from "./cryptographic-keys";
+import { slice as authoritiesSlice, initialState as initialAuthoritiesState } from './authorities';
+import { slice as groupsSlice, initialState as initialGroupsState } from './certificateGroups';
+import { slice as certificatesSlice, initialState as initialCertificatesState } from './certificates';
+import { slice as initialComplianceProfilesSlice, initialState as initialComplianceProfilesState } from './compliance-profiles';
+import { slice as connectorsSlice, initialState as initialConnectorsState } from './connectors';
+import { slice as initialCredentialsSlice, initialState as initialCredentialsState } from './credentials';
+import { slice as cryptographicKeySlice, initialState as initialCryptographicKeyAttributesState } from './cryptographic-keys';
 import {
     slice as cryptographicOperationsSlice,
     initialState as initialCryptographicOperationsAttributesState,
-} from "./cryptographic-operations";
-import { slice as customAttributesSlice, initialState as initialCustomAttributesState } from "./customAttributes";
-import { slice as discoveriesSlice, initialState as initialDiscoveriesState } from "./discoveries";
-import { slice as initialEntitiesSlice, initialState as initialEntitiesState } from "./entities";
-import { slice as enumsSlice, initialState as initialEnumsState } from "./enums";
-import { slice as initialFiltersSlice, initialState as initialFiltersState } from "./filters";
-import { slice as globalMetadataSlice, initialState as initialGlobalMetadataState } from "./globalMetadata";
-import { slice as initialLocationsSlice, initialState as initialLocationsState } from "./locations";
-import { initialState as initialNotificationsState, slice as notificationsSlice } from "./notifications";
-import { initialState as initialPagingState, slice as pagingSlice } from "./paging";
-import { initialState as initialRaProfilesState, slice as raProfilesSlice } from "./ra-profiles";
-import { initialState as initialRolesState, slice as rolesSlice } from "./roles";
-import { initialState as initialSchedulerState, slice as schedulerSlice } from "./scheduler";
-import { initialState as initialSettingsState, slice as settingsSlice } from "./settings";
-import { slice as dashboardSlice, initialState as initialDashboardState } from "./statisticsDashboard";
-import { initialState as initialTokenProfileAttributesState, slice as tokenProfileSlice } from "./token-profiles";
-import { initialState as initialTokenAttributesState, slice as tokenSlice } from "./tokens";
-import { initialState as initialUsersState, slice as usersSlice } from "./users";
-import { initialState as initialUtilsActuatorState, slice as utilsActuatorSlice } from "./utilsActuator";
-import { initialState as initialUtilsCertificateState, slice as utilsCertificateSlice } from "./utilsCertificate";
-import { initialState as initialUtilsCertificateRequestState, slice as utilsCertificateRequestSlice } from "./utilsCertificateRequest";
-import { initialState as initialUtilsOidState, slice as utilsOidSlice } from "./utilsOid";
+} from './cryptographic-operations';
+import { slice as customAttributesSlice, initialState as initialCustomAttributesState } from './customAttributes';
+import { slice as discoveriesSlice, initialState as initialDiscoveriesState } from './discoveries';
+import { slice as initialEntitiesSlice, initialState as initialEntitiesState } from './entities';
+import { slice as enumsSlice, initialState as initialEnumsState } from './enums';
+import { slice as initialFiltersSlice, initialState as initialFiltersState } from './filters';
+import { slice as globalMetadataSlice, initialState as initialGlobalMetadataState } from './globalMetadata';
+import { slice as initialLocationsSlice, initialState as initialLocationsState } from './locations';
+import { initialState as initialNotificationsState, slice as notificationsSlice } from './notifications';
+import { initialState as initialPagingState, slice as pagingSlice } from './paging';
+import { initialState as initialRaProfilesState, slice as raProfilesSlice } from './ra-profiles';
+import { initialState as initialRolesState, slice as rolesSlice } from './roles';
+import { initialState as initialSchedulerState, slice as schedulerSlice } from './scheduler';
+import { initialState as initialSettingsState, slice as settingsSlice } from './settings';
+import { slice as dashboardSlice, initialState as initialDashboardState } from './statisticsDashboard';
+import { initialState as initialTokenProfileAttributesState, slice as tokenProfileSlice } from './token-profiles';
+import { initialState as initialTokenAttributesState, slice as tokenSlice } from './tokens';
+import { initialState as initialUsersState, slice as usersSlice } from './users';
+import { initialState as initialUtilsActuatorState, slice as utilsActuatorSlice } from './utilsActuator';
+import { initialState as initialUtilsCertificateState, slice as utilsCertificateSlice } from './utilsCertificate';
+import { initialState as initialUtilsCertificateRequestState, slice as utilsCertificateRequestSlice } from './utilsCertificateRequest';
+import { initialState as initialUtilsOidState, slice as utilsOidSlice } from './utilsOid';
 
 export const initialState = {
     [alertsSlice.name]: initialAlertsState,

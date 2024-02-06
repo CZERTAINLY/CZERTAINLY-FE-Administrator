@@ -1,15 +1,15 @@
-@import "./nunito";
+@import './nunito';
 
-@import "/node_modules/bootstrap/scss/functions";
+@import '/node_modules/bootstrap/scss/functions';
 
-@import "variables";
+@import 'variables';
 
-@import "/node_modules/bootstrap/scss/bootstrap";
+@import '/node_modules/bootstrap/scss/bootstrap';
 //@import '../../node_modules/glyphicons-halflings/scss/glyphicons-halflings';
 //@import '../../node_modules/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox';
 
-@import "../fonts/fontawesome/css/fontawesome.min.css";
-@import "../fonts/fontawesome/css/solid.min.css";
-@import "../fonts/fontawesome/css/v4-shims.min.css";
+@import '../fonts/fontawesome/css/fontawesome.min.css';
+@import '../fonts/fontawesome/css/solid.min.css';
+@import '../fonts/fontawesome/css/v4-shims.min.css';
 
-@import "mixins", "overrides", "general", "utils";
+@import 'mixins', 'overrides', 'general', 'utils';

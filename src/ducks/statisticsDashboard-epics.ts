@@ -1,12 +1,12 @@
-import { of } from "rxjs";
-import { catchError, filter, map, switchMap } from "rxjs/operators";
+import { of } from 'rxjs';
+import { catchError, filter, map, switchMap } from 'rxjs/operators';
 
-import { AppEpic } from "ducks";
+import { AppEpic } from 'ducks';
 
-import { actions as appRedirectActions } from "./app-redirect";
+import { actions as appRedirectActions } from './app-redirect';
 
-import { slice } from "./statisticsDashboard";
-import { transformStatisticsDashboardDtoToModel } from "./transform/statisticsDashboard";
+import { slice } from './statisticsDashboard';
+import { transformStatisticsDashboardDtoToModel } from './transform/statisticsDashboard';
 
 const getDashboard: AppEpic = (action$, state, deps) => {
     return action$.pipe(
@@ -21,7 +21,7 @@ const getDashboard: AppEpic = (action$, state, deps) => {
                 catchError((error) => {
                     return of(
                         slice.actions.getDashboardFailed(),
-                        appRedirectActions.fetchError({ error, message: "Failed to get dashboard data" }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to get dashboard data' }),
                     );
                 }),
             ),

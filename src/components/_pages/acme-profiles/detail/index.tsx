@@ -1,19 +1,19 @@
-import AttributeViewer from "components/Attributes/AttributeViewer";
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
-import StatusBadge from "components/StatusBadge";
+import AttributeViewer from 'components/Attributes/AttributeViewer';
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
+import StatusBadge from 'components/StatusBadge';
 
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
 
-import { actions, selectors } from "ducks/acme-profiles";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { Col, Container, Row } from "reactstrap";
-import { LockWidgetNameEnum } from "types/user-interface";
-import { Resource } from "../../../../types/openapi";
-import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
+import { actions, selectors } from 'ducks/acme-profiles';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Col, Container, Row } from 'reactstrap';
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { Resource } from '../../../../types/openapi';
+import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 
 export default function AdministratorDetail() {
     const dispatch = useDispatch();
@@ -73,33 +73,33 @@ export default function AdministratorDetail() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "pencil",
+                icon: 'pencil',
                 disabled: false,
-                tooltip: "Edit",
+                tooltip: 'Edit',
                 onClick: () => {
                     onEditClick();
                 },
             },
             {
-                icon: "trash",
+                icon: 'trash',
                 disabled: false,
-                tooltip: "Delete",
+                tooltip: 'Delete',
                 onClick: () => {
                     setConfirmDelete(true);
                 },
             },
             {
-                icon: "check",
+                icon: 'check',
                 disabled: acmeProfile?.enabled || false,
-                tooltip: "Enable",
+                tooltip: 'Enable',
                 onClick: () => {
                     onEnableClick();
                 },
             },
             {
-                icon: "times",
+                icon: 'times',
                 disabled: !(acmeProfile?.enabled || false),
-                tooltip: "Disable",
+                tooltip: 'Disable',
                 onClick: () => {
                     onDisableClick();
                 },
@@ -111,12 +111,12 @@ export default function AdministratorDetail() {
     const tableHeader: TableHeader[] = useMemo(
         () => [
             {
-                id: "property",
-                content: "Property",
+                id: 'property',
+                content: 'Property',
             },
             {
-                id: "value",
-                content: "Value",
+                id: 'value',
+                content: 'Value',
             },
         ],
         [],
@@ -128,36 +128,36 @@ export default function AdministratorDetail() {
                 ? []
                 : [
                       {
-                          id: "uuid",
-                          columns: ["UUID", acmeProfile.uuid],
+                          id: 'uuid',
+                          columns: ['UUID', acmeProfile.uuid],
                       },
                       {
-                          id: "name",
-                          columns: ["Name", acmeProfile.name],
+                          id: 'name',
+                          columns: ['Name', acmeProfile.name],
                       },
                       {
-                          id: "description",
-                          columns: ["Description", acmeProfile.description || ""],
+                          id: 'description',
+                          columns: ['Description', acmeProfile.description || ''],
                       },
                       {
-                          id: "status",
-                          columns: ["Username", <StatusBadge enabled={acmeProfile.enabled} />],
+                          id: 'status',
+                          columns: ['Username', <StatusBadge enabled={acmeProfile.enabled} />],
                       },
                       {
-                          id: "websiteUrl",
-                          columns: ["Website URL", acmeProfile.websiteUrl || "N/A"],
+                          id: 'websiteUrl',
+                          columns: ['Website URL', acmeProfile.websiteUrl || 'N/A'],
                       },
                       {
-                          id: "retryInterval",
-                          columns: ["Retry Interval", `${acmeProfile.retryInterval || "N/A"} (seconds)`],
+                          id: 'retryInterval',
+                          columns: ['Retry Interval', `${acmeProfile.retryInterval || 'N/A'} (seconds)`],
                       },
                       {
-                          id: "orderValidity",
-                          columns: ["Order Validity", `${acmeProfile.validity || "N/A"} (seconds)`],
+                          id: 'orderValidity',
+                          columns: ['Order Validity', `${acmeProfile.validity || 'N/A'} (seconds)`],
                       },
                       {
-                          id: "directoryUrl",
-                          columns: ["Directory URL", acmeProfile.directoryUrl || "N/A"],
+                          id: 'directoryUrl',
+                          columns: ['Directory URL', acmeProfile.directoryUrl || 'N/A'],
                       },
                   ],
         [acmeProfile],
@@ -169,13 +169,13 @@ export default function AdministratorDetail() {
                 ? []
                 : [
                       {
-                          id: "uuid",
-                          columns: ["UUID", acmeProfile.raProfile.uuid],
+                          id: 'uuid',
+                          columns: ['UUID', acmeProfile.raProfile.uuid],
                       },
                       {
-                          id: "name",
+                          id: 'name',
                           columns: [
-                              "Name",
+                              'Name',
                               acmeProfile.raProfile?.uuid ? (
                                   <Link
                                       to={`../../raprofiles/detail/${acmeProfile.raProfile.authorityInstanceUuid}/${acmeProfile.raProfile.uuid}`}
@@ -183,13 +183,13 @@ export default function AdministratorDetail() {
                                       {acmeProfile.raProfile.name}
                                   </Link>
                               ) : (
-                                  ""
+                                  ''
                               ),
                           ],
                       },
                       {
-                          id: "status",
-                          columns: ["Status", <StatusBadge enabled={acmeProfile.raProfile.enabled} />],
+                          id: 'status',
+                          columns: ['Status', <StatusBadge enabled={acmeProfile.raProfile.enabled} />],
                       },
                   ],
         [acmeProfile],
@@ -201,12 +201,12 @@ export default function AdministratorDetail() {
                 ? []
                 : [
                       {
-                          id: "dnsResolverIpAddress",
-                          columns: ["DNS Resolver IP Address", acmeProfile.dnsResolverIp || "N/A"],
+                          id: 'dnsResolverIpAddress',
+                          columns: ['DNS Resolver IP Address', acmeProfile.dnsResolverIp || 'N/A'],
                       },
                       {
-                          id: "dnsResolverPort",
-                          columns: ["DNS Resolver Port", acmeProfile.dnsResolverPort || "N/A"],
+                          id: 'dnsResolverPort',
+                          columns: ['DNS Resolver Port', acmeProfile.dnsResolverPort || 'N/A'],
                       },
                   ],
         [acmeProfile],
@@ -218,36 +218,36 @@ export default function AdministratorDetail() {
                 ? []
                 : [
                       {
-                          id: "termsOfServiceUrl",
-                          columns: ["Terms of Service URL", acmeProfile.termsOfServiceUrl || "N/A"],
+                          id: 'termsOfServiceUrl',
+                          columns: ['Terms of Service URL', acmeProfile.termsOfServiceUrl || 'N/A'],
                       },
                       {
-                          id: "changesToTermsOfServiceUrl",
-                          columns: ["Changes of Terms of Service URL", acmeProfile.termsOfServiceChangeUrl || "N/A"],
+                          id: 'changesToTermsOfServiceUrl',
+                          columns: ['Changes of Terms of Service URL', acmeProfile.termsOfServiceChangeUrl || 'N/A'],
                       },
                       {
-                          id: "disableNewOrderPlacement",
+                          id: 'disableNewOrderPlacement',
                           columns: [
-                              "Disable new Order placement? (due to change in Terms Of Service)",
+                              'Disable new Order placement? (due to change in Terms Of Service)',
                               acmeProfile.termsOfServiceChangeDisable !== undefined
                                   ? acmeProfile.termsOfServiceChangeDisable
-                                      ? "Yes"
-                                      : "No"
-                                  : "N/A",
+                                      ? 'Yes'
+                                      : 'No'
+                                  : 'N/A',
                           ],
                       },
                       {
-                          id: "requireContact",
+                          id: 'requireContact',
                           columns: [
-                              "Require Contact information for new Accounts?",
-                              acmeProfile.requireContact !== undefined ? (acmeProfile.requireContact ? "Yes" : "No") : "N/A",
+                              'Require Contact information for new Accounts?',
+                              acmeProfile.requireContact !== undefined ? (acmeProfile.requireContact ? 'Yes' : 'No') : 'N/A',
                           ],
                       },
                       {
-                          id: "requireAgreement",
+                          id: 'requireAgreement',
                           columns: [
-                              "Require Agreement for new Accounts?",
-                              acmeProfile.requireTermsOfService !== undefined ? (acmeProfile.requireTermsOfService ? "Yes" : "No") : "N/A",
+                              'Require Agreement for new Accounts?',
+                              acmeProfile.requireTermsOfService !== undefined ? (acmeProfile.requireTermsOfService ? 'Yes' : 'No') : 'N/A',
                           ],
                       },
                   ],
@@ -255,7 +255,7 @@ export default function AdministratorDetail() {
     );
 
     const raProfileText = useMemo(
-        () => (raProfileDetailData.length > 0 ? "RA Profile Configuration" : "Default RA Profile not selected"),
+        () => (raProfileDetailData.length > 0 ? 'RA Profile Configuration' : 'Default RA Profile not selected'),
         [raProfileDetailData],
     );
 
@@ -336,8 +336,8 @@ export default function AdministratorDetail() {
                   Account(s). When deleted the ACME Account(s) will be revoked."
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
@@ -354,8 +354,8 @@ export default function AdministratorDetail() {
                 }
                 toggle={() => dispatch(actions.clearDeleteErrorMessages())}
                 buttons={[
-                    { color: "danger", onClick: onForceDeleteAcmeProfile, body: "Force" },
-                    { color: "secondary", onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: "Cancel" },
+                    { color: 'danger', onClick: onForceDeleteAcmeProfile, body: 'Force' },
+                    { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
                 ]}
             />
         </Container>

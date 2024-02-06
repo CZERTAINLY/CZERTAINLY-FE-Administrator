@@ -39,18 +39,18 @@ import {
     StringAttributeContent,
     TextAttributeContent,
     TimeAttributeContent,
-} from "./openapi";
+} from './openapi';
 
 export type BooleanAttributeContentDto = BooleanAttributeContent;
 export type BooleanAttributeContentModel = BooleanAttributeContentDto;
 
 export type CredentialAttributeContentDataDto = CredentialAttributeContentData;
-export type CredentialAttributeContentDataModel = Omit<CredentialAttributeContentDataDto, "attributes"> & {
+export type CredentialAttributeContentDataModel = Omit<CredentialAttributeContentDataDto, 'attributes'> & {
     attributes: Array<DataAttributeModel>;
 };
 
 export type CredentialAttributeContentDto = CredentialAttributeContent;
-export type CredentialAttributeContentModel = Omit<CredentialAttributeContentDto, "data"> & { data: CredentialAttributeContentDataModel };
+export type CredentialAttributeContentModel = Omit<CredentialAttributeContentDto, 'data'> & { data: CredentialAttributeContentDataModel };
 
 export type DateAttributeContentDto = DateAttributeContent;
 export type DateAttributeContentModel = DateAttributeContentDto;
@@ -62,13 +62,13 @@ export type FileAttributeContentDataDto = FileAttributeContentData;
 export type FileAttributeContentDataModel = FileAttributeContentDataDto;
 
 export type FileAttributeContentDto = FileAttributeContent;
-export type FileAttributeContentModel = Omit<FileAttributeContentDto, "data"> & { data: FileAttributeContentDataModel };
+export type FileAttributeContentModel = Omit<FileAttributeContentDto, 'data'> & { data: FileAttributeContentDataModel };
 
 export type CodeBlockAttributeContentDataDto = CodeBlockAttributeContentData;
 export type CodeBlockAttributeContentDataModel = CodeBlockAttributeContentDataDto;
 
 export type CodeBlockAttributeContentDto = CodeBlockAttributeContent;
-export type CodeBlockAttributeContentModel = Omit<CodeBlockAttributeContentDto, "data"> & { data: CodeBlockAttributeContentDataModel };
+export type CodeBlockAttributeContentModel = Omit<CodeBlockAttributeContentDto, 'data'> & { data: CodeBlockAttributeContentDataModel };
 
 export type FloatAttributeContentDto = FloatAttributeContent;
 export type FloatAttributeContentModel = FloatAttributeContentDto;
@@ -83,7 +83,7 @@ export type SecretAttributeContentDataDto = SecretAttributeContentData;
 export type SecretAttributeContentDataModel = SecretAttributeContentDataDto;
 
 export type SecretAttributeContentDto = SecretAttributeContent;
-export type SecretAttributeContentModel = Omit<SecretAttributeContentDto, "data"> & { data: SecretAttributeContentDataModel };
+export type SecretAttributeContentModel = Omit<SecretAttributeContentDto, 'data'> & { data: SecretAttributeContentDataModel };
 
 export type StringAttributeContentDto = StringAttributeContent;
 export type StringAttributeContentModel = StringAttributeContentDto;
@@ -111,13 +111,13 @@ export type BaseAttributeContentModel =
     | CodeBlockAttributeContentModel;
 
 export type AttributeRequestDto = RequestAttributeDto;
-export type AttributeRequestModel = Omit<AttributeRequestDto, "content"> & { content: Array<BaseAttributeContentModel> };
+export type AttributeRequestModel = Omit<AttributeRequestDto, 'content'> & { content: Array<BaseAttributeContentModel> };
 
 export type MappingAttributeDto = AttributeMappingDto;
 export type AttributeMappingModel = MappingAttributeDto;
 
 export type AttributeResponseDto = ResponseAttributeDto;
-export type AttributeResponseModel = Omit<AttributeResponseDto, "content"> & { content?: Array<BaseAttributeContentModel> };
+export type AttributeResponseModel = Omit<AttributeResponseDto, 'content'> & { content?: Array<BaseAttributeContentModel> };
 
 export type DataAttributePropertiesDto = DataAttributeProperties;
 export type DataAttributePropertiesModel = DataAttributePropertiesDto;
@@ -126,7 +126,7 @@ export type DateTimeAttributeConstraintDataDto = DateTimeAttributeConstraintData
 export type DateTimeAttributeConstraintDataModel = DateTimeAttributeConstraintDataDto;
 
 export type DateTimeAttributeConstraintDto = DateTimeAttributeConstraint;
-export type DateTimeAttributeConstraintModel = Omit<DateTimeAttributeConstraintDto, "data"> & {
+export type DateTimeAttributeConstraintModel = Omit<DateTimeAttributeConstraintDto, 'data'> & {
     data?: DateTimeAttributeConstraintDataModel;
 };
 
@@ -134,7 +134,7 @@ export type RangeAttributeConstraintDataDto = RangeAttributeConstraintData;
 export type RangeAttributeConstraintDataModel = RangeAttributeConstraintDataDto;
 
 export type RangeAttributeConstraintDto = RangeAttributeConstraint;
-export type RangeAttributeConstraintModel = Omit<RangeAttributeConstraintDto, "data"> & { data?: RangeAttributeConstraintDataModel };
+export type RangeAttributeConstraintModel = Omit<RangeAttributeConstraintDto, 'data'> & { data?: RangeAttributeConstraintDataModel };
 
 export type RegexpAttributeConstraintDto = RegexpAttributeConstraint;
 export type RegexpAttributeConstraintModel = RegexpAttributeConstraintDto;
@@ -149,10 +149,10 @@ export type AttributeCallbackMappingDto = AttributeCallbackMapping;
 export type AttributeCallbackMappingModel = AttributeCallbackMappingDto;
 
 export type AttributeCallbackDto = AttributeCallback;
-export type AttributeCallbackModel = Omit<AttributeCallbackDto, "mappings"> & { mappings: Array<AttributeCallbackMappingModel> };
+export type AttributeCallbackModel = Omit<AttributeCallbackDto, 'mappings'> & { mappings: Array<AttributeCallbackMappingModel> };
 
 export type DataAttributeDto = DataAttribute;
-export type DataAttributeModel = Omit<DataAttributeDto, "content | properties | constraints | attributeCallback"> & {
+export type DataAttributeModel = Omit<DataAttributeDto, 'content | properties | constraints | attributeCallback'> & {
     content?: Array<BaseAttributeContentModel>;
     properties: DataAttributePropertiesModel;
     constraints?: Array<BaseAttributeConstraintModel>;
@@ -160,7 +160,7 @@ export type DataAttributeModel = Omit<DataAttributeDto, "content | properties | 
 };
 
 export type GroupAttributeDto = GroupAttribute;
-export type GroupAttributeModel = Omit<GroupAttributeDto, "content | attributeCallback"> & {
+export type GroupAttributeModel = Omit<GroupAttributeDto, 'content | attributeCallback'> & {
     content?: Array<AttributeDescriptorModel>;
     attributeCallback?: AttributeCallbackModel;
 };
@@ -169,7 +169,7 @@ export type InfoAttributePropertiesDto = InfoAttributeProperties;
 export type InfoAttributePropertiesModel = InfoAttributePropertiesDto;
 
 export type InfoAttributeDto = InfoAttribute;
-export type InfoAttributeModel = Omit<InfoAttributeDto, "content | properties"> & {
+export type InfoAttributeModel = Omit<InfoAttributeDto, 'content | properties'> & {
     content: Array<BaseAttributeContentModel>;
     properties: InfoAttributePropertiesModel;
 };
@@ -178,7 +178,7 @@ export type CustomAttributePropertiesDto = CustomAttributeProperties;
 export type CustomAttributePropertiesModel = CustomAttributePropertiesDto;
 
 export type CustomAttributeDto = CustomAttribute;
-export type CustomAttributeModel = Omit<CustomAttributeDto, "content | properties"> & {
+export type CustomAttributeModel = Omit<CustomAttributeDto, 'content | properties'> & {
     content?: Array<BaseAttributeContentModel>;
     properties: CustomAttributePropertiesModel;
 };
@@ -187,7 +187,7 @@ export type MetadataAttributePropertiesDto = MetadataAttributeProperties;
 export type MetadataAttributePropertiesModel = MetadataAttributePropertiesDto;
 
 export type MetadataAttributeDto = MetadataAttribute;
-export type MetadataAttributeModel = Omit<MetadataAttributeDto, "content | properties"> & {
+export type MetadataAttributeModel = Omit<MetadataAttributeDto, 'content | properties'> & {
     content: Array<BaseAttributeContentModel>;
     properties: MetadataAttributePropertiesModel;
 };

@@ -1,5 +1,5 @@
-import { Field } from "react-final-form";
-import { FormGroup, Input, Label } from "reactstrap";
+import { Field } from 'react-final-form';
+import { FormGroup, Input, Label } from 'reactstrap';
 
 type Props = {
     id: string;
@@ -10,7 +10,7 @@ type Props = {
 
 export default function CheckboxField({ id, label, onChange = undefined, disabled = false }: Props) {
     return (
-        <Field name={id} type={"checkbox"}>
+        <Field name={id} type={'checkbox'}>
             {({ input }) => (
                 <FormGroup>
                     <Input

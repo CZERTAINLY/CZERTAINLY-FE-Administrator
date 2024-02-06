@@ -1,18 +1,18 @@
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
-import StatusBadge from "components/StatusBadge";
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
+import StatusBadge from 'components/StatusBadge';
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
 
-import { actions, selectors } from "ducks/customAttributes";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { actions, selectors } from 'ducks/customAttributes';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
 
-import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
-import { Badge, Container } from "reactstrap";
-import { PlatformEnum } from "types/openapi";
-import { LockWidgetNameEnum } from "types/user-interface";
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { Badge, Container } from 'reactstrap';
+import { PlatformEnum } from 'types/openapi';
+import { LockWidgetNameEnum } from 'types/user-interface';
 
 export default function CustomAttributesList() {
     const dispatch = useDispatch();
@@ -59,18 +59,18 @@ export default function CustomAttributesList() {
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
-            { icon: "plus", disabled: false, tooltip: "Create", onClick: onAddClick },
-            { icon: "trash", disabled: checkedRows.length === 0, tooltip: "Delete", onClick: () => setConfirmDelete(true) },
+            { icon: 'plus', disabled: false, tooltip: 'Create', onClick: onAddClick },
+            { icon: 'trash', disabled: checkedRows.length === 0, tooltip: 'Delete', onClick: () => setConfirmDelete(true) },
             {
-                icon: "check",
+                icon: 'check',
                 disabled: checkedRows.length === 0,
-                tooltip: "Enable",
+                tooltip: 'Enable',
                 onClick: () => dispatch(actions.bulkEnableCustomAttributes(checkedRows)),
             },
             {
-                icon: "times",
+                icon: 'times',
                 disabled: checkedRows.length === 0,
-                tooltip: "Disable",
+                tooltip: 'Disable',
                 onClick: () => dispatch(actions.bulkDisableCustomAttributes(checkedRows)),
             },
         ],
@@ -80,35 +80,35 @@ export default function CustomAttributesList() {
     const customAttributesTableHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "name",
-                content: "Name",
+                id: 'name',
+                content: 'Name',
                 sortable: true,
-                sort: "asc",
-                width: "8%",
+                sort: 'asc',
+                width: '8%',
             },
             {
-                id: "status",
-                content: "Status",
+                id: 'status',
+                content: 'Status',
                 sortable: true,
-                width: "5%",
+                width: '5%',
             },
             {
-                id: "contentType",
-                content: "Content Type",
+                id: 'contentType',
+                content: 'Content Type',
                 sortable: true,
-                width: "5%",
+                width: '5%',
             },
             {
-                id: "description",
-                content: "Description",
+                id: 'description',
+                content: 'Description',
                 sortable: true,
-                width: "20%",
+                width: '20%',
             },
             {
-                id: "resources",
-                content: "Resources",
+                id: 'resources',
+                content: 'Resources',
                 sortable: false,
-                width: "30%",
+                width: '30%',
             },
         ],
         [],
@@ -125,7 +125,7 @@ export default function CustomAttributesList() {
                     customAttribute.description,
                     <>
                         {customAttribute.resources.map((r, i) => (
-                            <Badge style={{ margin: "1px" }} color="secondary" key={i}>
+                            <Badge style={{ margin: '1px' }} color="secondary" key={i}>
                                 {getEnumLabel(resourcesEnum, r)}
                             </Badge>
                         ))}
@@ -158,14 +158,14 @@ export default function CustomAttributesList() {
 
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete ${checkedRows.length > 1 ? "Custom Attributes" : "Custom Attribute"}`}
+                caption={`Delete ${checkedRows.length > 1 ? 'Custom Attributes' : 'Custom Attribute'}`}
                 body={`You are about to delete ${
-                    checkedRows.length > 1 ? "Custom Attributes" : "Custom Attribute"
+                    checkedRows.length > 1 ? 'Custom Attributes' : 'Custom Attribute'
                 }. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
         </Container>

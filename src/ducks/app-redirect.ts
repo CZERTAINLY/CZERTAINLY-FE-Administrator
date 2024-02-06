@@ -1,6 +1,6 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AjaxError } from "rxjs/ajax";
-import { createFeatureSelector } from "utils/ducks";
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { AjaxError } from 'rxjs/ajax';
+import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     unauthorized: boolean;
@@ -15,7 +15,7 @@ export const initialState: State = {
 };
 
 export const slice = createSlice({
-    name: "appRedirect",
+    name: 'appRedirect',
 
     initialState,
 

@@ -11,8 +11,8 @@ import {
     TokenProfileKeyUsageUpdateRequestModel,
     TokenProfileResponseDto,
     TokenProfileResponseModel,
-} from "types/token-profiles";
-import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
+} from 'types/token-profiles';
+import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from './attributes';
 
 export function transformTokenProfileResponseDtoToModel(tokenResponse: TokenProfileResponseDto): TokenProfileResponseModel {
     return {

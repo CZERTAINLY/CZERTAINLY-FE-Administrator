@@ -1,4 +1,4 @@
-import { Buffer } from "buffer";
+import { Buffer } from 'buffer';
 
 export const removeNullValues = (obj: any): any => {
     if (obj === null || obj === undefined) {
@@ -9,7 +9,7 @@ export const removeNullValues = (obj: any): any => {
         return obj.map(removeNullValues).filter((val) => val !== null);
     }
 
-    if (typeof obj === "object") {
+    if (typeof obj === 'object') {
         const newObj: any = {};
         for (const [key, value] of Object.entries(obj)) {
             const newValue = removeNullValues(value);
@@ -28,7 +28,7 @@ export const capitalize = (str: string): string => {
 };
 
 export const getStepValue = (type: string) => {
-    if (type === "datetime" || type === "time" || type === "datetime-local") {
+    if (type === 'datetime' || type === 'time' || type === 'datetime-local') {
         return 1;
     } else return undefined;
 };
@@ -38,7 +38,7 @@ export const isObjectSame = (obj1: Record<string, unknown>, obj2: Record<string,
         return true;
     }
 
-    if (typeof obj1 !== "object" || obj1 === null || typeof obj2 !== "object" || obj2 === null) {
+    if (typeof obj1 !== 'object' || obj1 === null || typeof obj2 !== 'object' || obj2 === null) {
         return false;
     }
 
@@ -60,10 +60,10 @@ export const isObjectSame = (obj1: Record<string, unknown>, obj2: Record<string,
 
 export const utf8ToBase64 = (str: string): string => {
     // Return the Base64 string
-    return Buffer.from(str, "utf8").toString("base64");
+    return Buffer.from(str, 'utf8').toString('base64');
 };
 
 export const base64ToUtf8 = (str: string): string => {
     // Return the utf string
-    return Buffer.from(str, "base64").toString("utf8");
+    return Buffer.from(str, 'base64').toString('utf8');
 };

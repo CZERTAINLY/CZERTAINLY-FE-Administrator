@@ -1,20 +1,20 @@
-import CertificateAttributes from "components/CertificateAttributes";
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
-import StatusBadge from "components/StatusBadge";
+import CertificateAttributes from 'components/CertificateAttributes';
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
+import StatusBadge from 'components/StatusBadge';
 
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
-import { actions as certActions, selectors as certSelectors } from "ducks/certificates";
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
+import { actions as certActions, selectors as certSelectors } from 'ducks/certificates';
 
-import { actions, selectors } from "ducks/users";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { Badge, Container } from "reactstrap";
-import { LockWidgetNameEnum } from "types/user-interface";
-import { Resource } from "../../../../types/openapi";
-import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
+import { actions, selectors } from 'ducks/users';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Badge, Container } from 'reactstrap';
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { Resource } from '../../../../types/openapi';
+import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 
 export default function UserDetail() {
     const dispatch = useDispatch();
@@ -55,7 +55,7 @@ export default function UserDetail() {
     }, [getFreshCertificateDetails, id]);
 
     const onEditClick = useCallback(() => {
-        navigate(`../../edit/${user?.uuid}`, { relative: "path" });
+        navigate(`../../edit/${user?.uuid}`, { relative: 'path' });
     }, [navigate, user]);
 
     const onEnableClick = useCallback(() => {
@@ -80,33 +80,33 @@ export default function UserDetail() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "pencil",
+                icon: 'pencil',
                 disabled: user?.systemUser || false,
-                tooltip: "Edit",
+                tooltip: 'Edit',
                 onClick: () => {
                     onEditClick();
                 },
             },
             {
-                icon: "trash",
+                icon: 'trash',
                 disabled: user?.systemUser || false,
-                tooltip: "Delete",
+                tooltip: 'Delete',
                 onClick: () => {
                     setConfirmDelete(true);
                 },
             },
             {
-                icon: "check",
+                icon: 'check',
                 disabled: user?.enabled || user?.systemUser || false,
-                tooltip: "Enable",
+                tooltip: 'Enable',
                 onClick: () => {
                     onEnableClick();
                 },
             },
             {
-                icon: "times",
+                icon: 'times',
                 disabled: !(user?.enabled || false) || user?.systemUser || false,
-                tooltip: "Disable",
+                tooltip: 'Disable',
                 onClick: () => {
                     onDisableClick();
                 },
@@ -118,12 +118,12 @@ export default function UserDetail() {
     const detailHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "property",
-                content: "Property",
+                id: 'property',
+                content: 'Property',
             },
             {
-                id: "value",
-                content: "Value",
+                id: 'value',
+                content: 'Value',
             },
         ],
         [],
@@ -135,50 +135,50 @@ export default function UserDetail() {
                 ? []
                 : [
                       {
-                          id: "username",
-                          columns: ["Username", user.username],
+                          id: 'username',
+                          columns: ['Username', user.username],
                       },
                       {
-                          id: "group",
+                          id: 'group',
                           columns: [
-                              "Group",
+                              'Group',
                               user.groupUuid ? (
                                   <Link to={`../../groups/detail/${user.groupUuid}`}>{user.groupName}</Link>
                               ) : (
-                                  user.groupName ?? ""
+                                  user.groupName ?? ''
                               ),
                           ],
                       },
                       {
-                          id: "description",
-                          columns: ["Description", user.description || ""],
+                          id: 'description',
+                          columns: ['Description', user.description || ''],
                       },
                       {
-                          id: "firstName",
-                          columns: ["First name", user.firstName || ""],
+                          id: 'firstName',
+                          columns: ['First name', user.firstName || ''],
                       },
                       {
-                          id: "lastName",
-                          columns: ["Last name", user.lastName || ""],
+                          id: 'lastName',
+                          columns: ['Last name', user.lastName || ''],
                       },
                       {
-                          id: "email",
-                          columns: ["Email", user.email || ""],
+                          id: 'email',
+                          columns: ['Email', user.email || ''],
                       },
                       {
-                          id: "systemUser",
+                          id: 'systemUser',
                           columns: [
-                              "System user",
-                              <Badge color={!user.systemUser ? "success" : "danger"}>{user.systemUser ? "Yes" : "No"}</Badge>,
+                              'System user',
+                              <Badge color={!user.systemUser ? 'success' : 'danger'}>{user.systemUser ? 'Yes' : 'No'}</Badge>,
                           ],
                       },
                       {
-                          id: "enabled",
-                          columns: ["Status", <StatusBadge enabled={user.enabled} />],
+                          id: 'enabled',
+                          columns: ['Status', <StatusBadge enabled={user.enabled} />],
                       },
                       {
-                          id: "roles",
-                          columns: ["Roles", user.roles?.map((role) => role.name).join(", ") || ""],
+                          id: 'roles',
+                          columns: ['Roles', user.roles?.map((role) => role.name).join(', ') || ''],
                       },
                   ],
         [user],
@@ -214,8 +214,8 @@ export default function UserDetail() {
                 body="You are about to delete an User. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
         </Container>

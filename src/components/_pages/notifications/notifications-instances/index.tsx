@@ -1,13 +1,13 @@
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
-import { actions as notificationsActions, selectors as notificationsSelectors } from "ducks/notifications";
-import { useCallback, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
-import { Badge } from "reactstrap";
-import { LockWidgetNameEnum } from "types/user-interface";
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
+import { actions as notificationsActions, selectors as notificationsSelectors } from 'ducks/notifications';
+import { useCallback, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { Badge } from 'reactstrap';
+import { LockWidgetNameEnum } from 'types/user-interface';
 
 const NotificationInstanceList = () => {
     const dispatch = useDispatch();
@@ -41,17 +41,17 @@ const NotificationInstanceList = () => {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "plus",
+                icon: 'plus',
                 disabled: false,
-                tooltip: "Create",
+                tooltip: 'Create',
                 onClick: () => {
                     onAddClick();
                 },
             },
             {
-                icon: "trash",
+                icon: 'trash',
                 disabled: !checkedRows.length,
-                tooltip: "Delete",
+                tooltip: 'Delete',
                 onClick: () => {
                     setConfirmDelete(true);
                 },
@@ -62,31 +62,31 @@ const NotificationInstanceList = () => {
     const notificationInstanceHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "notificationInstanceName",
-                content: "Name",
+                id: 'notificationInstanceName',
+                content: 'Name',
                 sortable: true,
-                sort: "asc",
-                width: "auto",
+                sort: 'asc',
+                width: 'auto',
             },
             {
-                id: "description",
-                content: "Description",
+                id: 'description',
+                content: 'Description',
                 sortable: true,
-                width: "auto",
+                width: 'auto',
             },
             {
-                id: "notificationProvider",
-                content: "Notification Provider",
-                align: "center",
+                id: 'notificationProvider',
+                content: 'Notification Provider',
+                align: 'center',
                 sortable: true,
-                width: "15%",
+                width: '15%',
             },
             {
-                id: "kinds",
-                content: "Kinds",
+                id: 'kinds',
+                content: 'Kinds',
                 sortable: true,
-                align: "center",
-                width: "15%",
+                align: 'center',
+                width: '15%',
             },
         ],
         [],
@@ -103,10 +103,10 @@ const NotificationInstanceList = () => {
                               <Link to={`../../../notificationinstances/detail/${notificationInstance.uuid}`}>
                                   {notificationInstance.name}
                               </Link>
-                          ) || "",
-                          notificationInstance.description || "",
+                          ) || '',
+                          notificationInstance.description || '',
                           <Badge color="primary">{notificationInstance.connectorName}</Badge>,
-                          <Badge color="primary">{notificationInstance.kind}</Badge> || "",
+                          <Badge color="primary">{notificationInstance.kind}</Badge> || '',
                       ],
                   })),
         [notificationInstances],
@@ -144,8 +144,8 @@ const NotificationInstanceList = () => {
                 body={`You are about to delete a Notification Instance. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
         </>

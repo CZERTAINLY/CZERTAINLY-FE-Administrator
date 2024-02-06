@@ -7,9 +7,9 @@ import {
     AcmeProfileListResponseModel,
     AcmeProfileResponseDto,
     AcmeProfileResponseModel,
-} from "types/acme-profiles";
-import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
-import { transformRaProfileSimplifiedDtoToModel } from "./ra-profiles";
+} from 'types/acme-profiles';
+import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from './attributes';
+import { transformRaProfileSimplifiedDtoToModel } from './ra-profiles';
 
 export function transformAcmeProfileListResponseDtoToModel(acme: AcmeProfileListResponseDto): AcmeProfileListResponseModel {
     return { ...acme };

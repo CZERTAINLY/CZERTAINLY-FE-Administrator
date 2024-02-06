@@ -1,18 +1,18 @@
-import { EntityType, selectors as filterSelectors } from "ducks/filters";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { EntityType, selectors as filterSelectors } from 'ducks/filters';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
-import { ApiClients } from "api";
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
-import FilterWidget from "components/FilterWidget";
-import Widget from "components/Widget";
-import { IconName, WidgetButtonProps } from "components/WidgetButtons";
-import { actions, selectors } from "ducks/paging";
-import { Observable } from "rxjs";
-import { SearchFieldListModel, SearchFilterModel, SearchRequestModel } from "types/certificate";
-import { LockWidgetNameEnum } from "types/user-interface";
+import { ApiClients } from 'api';
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
+import FilterWidget from 'components/FilterWidget';
+import Widget from 'components/Widget';
+import { IconName, WidgetButtonProps } from 'components/WidgetButtons';
+import { actions, selectors } from 'ducks/paging';
+import { Observable } from 'rxjs';
+import { SearchFieldListModel, SearchFilterModel, SearchRequestModel } from 'types/certificate';
+import { LockWidgetNameEnum } from 'types/user-interface';
 
 interface Props {
     entity: EntityType;
@@ -106,17 +106,17 @@ function PagedList({
         const result = [];
         if (!addHidden) {
             result.push({
-                icon: "plus" as IconName,
+                icon: 'plus' as IconName,
                 disabled: false,
-                tooltip: "Create",
+                tooltip: 'Create',
                 onClick: () => navigate(`./add`),
             });
         }
         if (onDeleteCallback) {
             result.push({
-                icon: "trash" as IconName,
+                icon: 'trash' as IconName,
                 disabled: checkedRows.length === 0,
-                tooltip: "Delete",
+                tooltip: 'Delete',
                 onClick: () => setConfirmDelete(true),
             });
         }
@@ -176,8 +176,8 @@ function PagedList({
                     }. Is this what you want to do?`}
                     toggle={() => setConfirmDelete(false)}
                     buttons={[
-                        { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                        { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                        { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                     ]}
                 />
             )}

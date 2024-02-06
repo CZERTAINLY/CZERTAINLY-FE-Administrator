@@ -1,16 +1,16 @@
-import { useCallback, useEffect, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useCallback, useEffect, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
-import { Field, Form } from "react-final-form";
-import { Button, ButtonGroup, Container, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from "reactstrap";
+import { Field, Form } from 'react-final-form';
+import { Button, ButtonGroup, Container, Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
 
-import ProgressButton from "components/ProgressButton";
-import Widget from "components/Widget";
+import ProgressButton from 'components/ProgressButton';
+import Widget from 'components/Widget';
 
-import { actions, selectors } from "ducks/auth";
+import { actions, selectors } from 'ducks/auth';
 
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateEmail, validateLength } from "utils/validators";
+import { composeValidators, validateAlphaNumericWithSpecialChars, validateEmail, validateLength } from 'utils/validators';
 
 interface FormValues {
     description: string;
@@ -54,10 +54,10 @@ export default function UserProfileForm() {
 
     const defaultValues = useMemo(
         () => ({
-            description: profile?.description || "",
-            firstName: profile?.firstName || "",
-            lastName: profile?.lastName || "",
-            email: profile?.email || "",
+            description: profile?.description || '',
+            firstName: profile?.firstName || '',
+            lastName: profile?.lastName || '',
+            email: profile?.email || '',
         }),
         [profile?.description, profile?.email, profile?.firstName, profile?.lastName],
     );
@@ -144,7 +144,7 @@ export default function UserProfileForm() {
                                 <ButtonGroup>
                                     <ProgressButton
                                         title="Save"
-                                        inProgressTitle={"Saving..."}
+                                        inProgressTitle={'Saving...'}
                                         inProgress={submitting || isFetchingProfile || isUpdatingProfile}
                                         disabled={
                                             pristine ||

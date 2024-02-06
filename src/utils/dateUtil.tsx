@@ -1,9 +1,9 @@
-import { parseExpression } from "cron-parser";
-import cronstrue from "cronstrue";
+import { parseExpression } from 'cron-parser';
+import cronstrue from 'cronstrue';
 
 function leading0(s: string, count: number) {
     while (s.length < count) {
-        s = "0" + s;
+        s = '0' + s;
     }
 
     return s;
@@ -19,7 +19,7 @@ export function timeFormatter(date: any): string {
 
         return `${hours}:${minutes}:${seconds}`;
     } catch (error) {
-        console.debug("Unable to convert the given time to date object");
+        console.debug('Unable to convert the given time to date object');
         return date;
     }
 }
@@ -47,7 +47,7 @@ export function dateFormatter(date: any): string {
       }).format(new Date(date));
       */
     } catch (error) {
-        console.debug("Unable to convert the given date to date object");
+        console.debug('Unable to convert the given date to date object');
         return date;
     }
 }
@@ -56,7 +56,7 @@ const getCronTimes = (cronExpression: string | undefined) => {
     if (cronExpression) {
         try {
             const times = [];
-            const expression = parseExpression(cronExpression ?? "", { iterator: true });
+            const expression = parseExpression(cronExpression ?? '', { iterator: true });
             for (let i = 0; i < 5; i++) {
                 const value = expression.next().value;
                 times.push(value.toDate());
@@ -79,13 +79,13 @@ export const getCronExpression = (cronExpression: string | undefined) => {
             </ul>
         </>
     ) : (
-        ""
+        ''
     );
 };
 
 export const getCronExpressionString = (cronExpression: string | undefined) => {
     const times = getCronTimes(cronExpression);
-    return times ? `Next five executions:\n${times.map((t, i) => (i > 0 ? "\n" : "") + dateFormatter(t)).join("")}` : "";
+    return times ? `Next five executions:\n${times.map((t, i) => (i > 0 ? '\n' : '') + dateFormatter(t)).join('')}` : '';
 };
 
 export const getStrongFromCronExpression = (cronExpression: string | undefined) => {
@@ -99,7 +99,7 @@ export const getStrongFromCronExpression = (cronExpression: string | undefined) 
 
 export const formatTimeAgo = (input: any) => {
     const date = input instanceof Date ? input : new Date(input);
-    const formatter = new Intl.RelativeTimeFormat("en");
+    const formatter = new Intl.RelativeTimeFormat('en');
     const ranges = {
         years: 3600 * 24 * 365,
         months: 3600 * 24 * 30,

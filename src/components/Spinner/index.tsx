@@ -1,7 +1,7 @@
-import cx from "classnames";
-import { Spinner as StrapSpinner } from "reactstrap";
+import cx from 'classnames';
+import { Spinner as StrapSpinner } from 'reactstrap';
 
-import style from "./Spinner.module.scss";
+import style from './Spinner.module.scss';
 
 interface Props {
     active?: boolean;

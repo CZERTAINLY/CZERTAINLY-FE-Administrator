@@ -1,47 +1,47 @@
-import AttributeEditor from "components/Attributes/AttributeEditor";
+import AttributeEditor from 'components/Attributes/AttributeEditor';
 
-import ProgressButton from "components/ProgressButton";
-import Widget from "components/Widget";
+import ProgressButton from 'components/ProgressButton';
+import Widget from 'components/Widget';
 
-import { actions as certificateActions, selectors as certificateSelectors } from "ducks/certificates";
-import { actions as connectorActions } from "ducks/connectors";
-import { actions as keyActions } from "ducks/cryptographic-keys";
-import { selectors as cryptographyOperationSelectors } from "ducks/cryptographic-operations";
-import { actions as raProfileActions, selectors as raProfileSelectors } from "ducks/ra-profiles";
-import { actions as tokenProfileActions, selectors as tokenProfileSelectors } from "ducks/token-profiles";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Field, Form } from "react-final-form";
+import { actions as certificateActions, selectors as certificateSelectors } from 'ducks/certificates';
+import { actions as connectorActions } from 'ducks/connectors';
+import { actions as keyActions } from 'ducks/cryptographic-keys';
+import { selectors as cryptographyOperationSelectors } from 'ducks/cryptographic-operations';
+import { actions as raProfileActions, selectors as raProfileSelectors } from 'ducks/ra-profiles';
+import { actions as tokenProfileActions, selectors as tokenProfileSelectors } from 'ducks/token-profiles';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Field, Form } from 'react-final-form';
 
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
-import Select, { SingleValue } from "react-select";
-import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Label } from "reactstrap";
-import { AttributeDescriptorModel } from "types/attributes";
-import { CryptographicKeyPairResponseModel } from "types/cryptographic-keys";
-import { RaProfileResponseModel } from "types/ra-profiles";
-import { TokenProfileResponseModel } from "types/token-profiles";
-import { mutators } from "utils/attributes/attributeEditorMutators";
-import { collectFormAttributes } from "utils/attributes/attributes";
+import Select, { SingleValue } from 'react-select';
+import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Label } from 'reactstrap';
+import { AttributeDescriptorModel } from 'types/attributes';
+import { CryptographicKeyPairResponseModel } from 'types/cryptographic-keys';
+import { RaProfileResponseModel } from 'types/ra-profiles';
+import { TokenProfileResponseModel } from 'types/token-profiles';
+import { mutators } from 'utils/attributes/attributeEditorMutators';
+import { collectFormAttributes } from 'utils/attributes/attributes';
 
-import CustomSelectComponent from "components/CustomSelectComponent";
-import TokenProfileForm from "components/_pages/token-profiles/form";
-import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from "ducks/utilsActuator";
-import { ParseRequestRequestDtoParseTypeEnum } from "types/openapi/utils";
-import { validateRequired } from "utils/validators";
-import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
-import { transformParseRequestResponseDtoToCertificateResponseDetailModel } from "../../../../ducks/transform/utilsCertificateRequest";
-import { actions as userInterfaceActions } from "../../../../ducks/user-interface";
+import CustomSelectComponent from 'components/CustomSelectComponent';
+import TokenProfileForm from 'components/_pages/token-profiles/form';
+import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from 'ducks/utilsActuator';
+import { ParseRequestRequestDtoParseTypeEnum } from 'types/openapi/utils';
+import { validateRequired } from 'utils/validators';
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
+import { transformParseRequestResponseDtoToCertificateResponseDetailModel } from '../../../../ducks/transform/utilsCertificateRequest';
+import { actions as userInterfaceActions } from '../../../../ducks/user-interface';
 import {
     actions as utilsCertificateRequestActions,
     selectors as utilsCertificateRequestSelectors,
-} from "../../../../ducks/utilsCertificateRequest";
-import { CertificateDetailResponseModel } from "../../../../types/certificate";
-import { Resource } from "../../../../types/openapi";
-import CertificateAttributes from "../../../CertificateAttributes";
-import FileUpload from "../../../Input/FileUpload/FileUpload";
-import TabLayout from "../../../Layout/TabLayout";
-import RenderRequestKey from "./RenderRequestKey";
+} from '../../../../ducks/utilsCertificateRequest';
+import { CertificateDetailResponseModel } from '../../../../types/certificate';
+import { Resource } from '../../../../types/openapi';
+import CertificateAttributes from '../../../CertificateAttributes';
+import FileUpload from '../../../Input/FileUpload/FileUpload';
+import TabLayout from '../../../Layout/TabLayout';
+import RenderRequestKey from './RenderRequestKey';
 
 export interface FormValues {
     raProfile: SingleValue<{ label: string; value: RaProfileResponseModel }> | null;
@@ -71,7 +71,7 @@ export default function CertificateForm() {
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
     const [csrAttributesCallbackAttributes, setCsrAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
     const [signatureAttributesCallbackAttributes, setSignatureAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
-    const [fileContent, setFileContent] = useState<string>("");
+    const [fileContent, setFileContent] = useState<string>('');
 
     const [certificate, setCertificate] = useState<CertificateDetailResponseModel | undefined>();
     const health = useSelector(utilsActuatorSelectors.health);
@@ -99,7 +99,7 @@ export default function CertificateForm() {
             if (!values.raProfile) return;
 
             const attributes = collectFormAttributes(
-                "issuance_attributes",
+                'issuance_attributes',
                 [...(issuanceAttributeDescriptors[values.raProfile.value.uuid] ?? []), ...groupAttributesCallbackAttributes],
                 values,
             );
@@ -111,11 +111,11 @@ export default function CertificateForm() {
                     signRequest: {
                         pkcs10: fileContent,
                         attributes,
-                        csrAttributes: collectFormAttributes("csrAttributes", csrAttributeDescriptors, values),
-                        signatureAttributes: collectFormAttributes("signatureAttributes", signatureAttributeDescriptors, values),
+                        csrAttributes: collectFormAttributes('csrAttributes', csrAttributeDescriptors, values),
+                        signatureAttributes: collectFormAttributes('signatureAttributes', signatureAttributeDescriptors, values),
                         keyUuid: values.key?.value.uuid,
                         tokenProfileUuid: values.tokenProfile?.value.uuid,
-                        customAttributes: collectFormAttributes("customCertificate", resourceCustomAttributes, values),
+                        customAttributes: collectFormAttributes('customCertificate', resourceCustomAttributes, values),
                     },
                 }),
             );
@@ -184,17 +184,17 @@ export default function CertificateForm() {
         () => ({
             raProfile: null,
             pkcs10: null,
-            fileName: "",
-            contentType: "",
-            file: "",
+            fileName: '',
+            contentType: '',
+            file: '',
         }),
         [],
     );
 
     const inputOptions = useMemo(
         () => [
-            { label: "External", value: true },
-            { label: "Existing Key", value: false },
+            { label: 'External', value: true },
+            { label: 'Existing Key', value: false },
         ],
         [],
     );
@@ -255,7 +255,7 @@ export default function CertificateForm() {
                                 <>
                                     <FileUpload
                                         editable
-                                        fileType={"CSR"}
+                                        fileType={'CSR'}
                                         onFileContentLoaded={(fileContent) => {
                                             setFileContent(fileContent);
                                             if (health) {
@@ -306,8 +306,8 @@ export default function CertificateForm() {
                                                                         userInterfaceActions.showGlobalModal({
                                                                             content: <TokenProfileForm usesGlobalModal />,
                                                                             isOpen: true,
-                                                                            size: "lg",
-                                                                            title: "Add New Token Profile",
+                                                                            size: 'lg',
+                                                                            title: 'Add New Token Profile',
                                                                         }),
                                                                     );
                                                                 }}
@@ -328,7 +328,7 @@ export default function CertificateForm() {
                                         <TabLayout
                                             tabs={[
                                                 {
-                                                    title: "Request Attributes",
+                                                    title: 'Request Attributes',
                                                     content: (
                                                         <AttributeEditor
                                                             id="csrAttributes"
@@ -339,7 +339,7 @@ export default function CertificateForm() {
                                                     ),
                                                 },
                                                 {
-                                                    title: "Signature Attributes",
+                                                    title: 'Signature Attributes',
                                                     content: (
                                                         <AttributeEditor
                                                             id="signatureAttributes"
@@ -365,12 +365,12 @@ export default function CertificateForm() {
                             <TabLayout
                                 tabs={[
                                     {
-                                        title: "Connector Attributes",
+                                        title: 'Connector Attributes',
                                         content: (
                                             <AttributeEditor
                                                 id="issuance_attributes"
                                                 attributeDescriptors={
-                                                    issuanceAttributeDescriptors[values.raProfile?.value.uuid || "unknown"] || []
+                                                    issuanceAttributeDescriptors[values.raProfile?.value.uuid || 'unknown'] || []
                                                 }
                                                 callbackParentUuid={values.raProfile?.value.authorityInstanceUuid}
                                                 callbackResource={Resource.RaProfiles}
@@ -380,7 +380,7 @@ export default function CertificateForm() {
                                         ),
                                     },
                                     {
-                                        title: "Custom Attributes",
+                                        title: 'Custom Attributes',
                                         content: (
                                             <AttributeEditor
                                                 id="customCertificate"

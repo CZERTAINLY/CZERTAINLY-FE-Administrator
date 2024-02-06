@@ -1,6 +1,6 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { createFeatureSelector } from "utils/ducks";
-import { OidInfoResponseDto } from "../types/openapi/utils";
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createFeatureSelector } from 'utils/ducks';
+import { OidInfoResponseDto } from '../types/openapi/utils';
 
 export type State = {
     oidInfo?: OidInfoResponseDto;
@@ -12,7 +12,7 @@ export const initialState: State = {
 };
 
 export const slice = createSlice({
-    name: "utilsOid",
+    name: 'utilsOid',
     initialState,
     reducers: {
         getOidInfo: (state, action: PayloadAction<string>) => {

@@ -1,14 +1,14 @@
-import { of } from "rxjs";
-import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
+import { of } from 'rxjs';
+import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
 
-import { AppEpic } from "ducks";
-import { extractError } from "utils/net";
+import { AppEpic } from 'ducks';
+import { extractError } from 'utils/net';
 
-import { LockWidgetNameEnum } from "types/user-interface";
-import { slice } from "./acme-accounts";
-import { actions as appRedirectActions } from "./app-redirect";
-import { transformAcmeAccountListResponseDtoToModel, transformAcmeAccountResponseDtoToModel } from "./transform/acme-accounts";
-import { actions as userInterfaceActions } from "./user-interface";
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { slice } from './acme-accounts';
+import { actions as appRedirectActions } from './app-redirect';
+import { transformAcmeAccountListResponseDtoToModel, transformAcmeAccountResponseDtoToModel } from './transform/acme-accounts';
+import { actions as userInterfaceActions } from './user-interface';
 
 const listAcmeAccounts: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -25,7 +25,7 @@ const listAcmeAccounts: AppEpic = (action$, state$, deps) => {
                 ),
                 catchError((error) =>
                     of(
-                        slice.actions.listAcmeAccountsFailed({ error: extractError(error, "Failed to get ACME Accounts list") }),
+                        slice.actions.listAcmeAccountsFailed({ error: extractError(error, 'Failed to get ACME Accounts list') }),
                         userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfACMEAccounts),
                     ),
                 ),
@@ -50,7 +50,7 @@ const getAccountDetail: AppEpic = (action$, state$, deps) => {
 
                     catchError((error) =>
                         of(
-                            slice.actions.getAcmeAccountFailed({ error: extractError(error, "Failed to get ACME Account details") }),
+                            slice.actions.getAcmeAccountFailed({ error: extractError(error, 'Failed to get ACME Account details') }),
                             userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ACMEAccountDetails),
                         ),
                     ),
@@ -79,8 +79,8 @@ const revokeAcmeAccount: AppEpic = (action$, state$, deps) => {
 
                     catchError((error) =>
                         of(
-                            slice.actions.revokeAcmeAccountFailed({ error: extractError(error, "Failed to revoke ACME Account") }),
-                            appRedirectActions.fetchError({ error, message: "Failed to revoke ACME Account" }),
+                            slice.actions.revokeAcmeAccountFailed({ error: extractError(error, 'Failed to revoke ACME Account') }),
+                            appRedirectActions.fetchError({ error, message: 'Failed to revoke ACME Account' }),
                         ),
                     ),
                 ),
@@ -99,8 +99,8 @@ const enableAcmeAccount: AppEpic = (action$, state$, deps) => {
 
                     catchError((error) =>
                         of(
-                            slice.actions.enableAcmeAccountFailed({ error: extractError(error, "Failed to enable ACME Account") }),
-                            appRedirectActions.fetchError({ error, message: "Failed to enable ACME Account" }),
+                            slice.actions.enableAcmeAccountFailed({ error: extractError(error, 'Failed to enable ACME Account') }),
+                            appRedirectActions.fetchError({ error, message: 'Failed to enable ACME Account' }),
                         ),
                     ),
                 ),
@@ -119,8 +119,8 @@ const disableAcmeAccount: AppEpic = (action$, state$, deps) => {
 
                     catchError((error) =>
                         of(
-                            slice.actions.disableAcmeAccountFailed({ error: extractError(error, "Failed to disable ACME Account") }),
-                            appRedirectActions.fetchError({ error, message: "Failed to disable ACME Account" }),
+                            slice.actions.disableAcmeAccountFailed({ error: extractError(error, 'Failed to disable ACME Account') }),
+                            appRedirectActions.fetchError({ error, message: 'Failed to disable ACME Account' }),
                         ),
                     ),
                 ),
@@ -137,8 +137,8 @@ const bulkRevokeAcmeAccounts: AppEpic = (action$, state$, deps) => {
 
                 catchError((error) =>
                     of(
-                        slice.actions.bulkRevokeAcmeAccountsFailed({ error: extractError(error, "Failed to revoke ACME Accounts") }),
-                        appRedirectActions.fetchError({ error, message: "Failed to revoke ACME Accounts" }),
+                        slice.actions.bulkRevokeAcmeAccountsFailed({ error: extractError(error, 'Failed to revoke ACME Accounts') }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to revoke ACME Accounts' }),
                     ),
                 ),
             ),
@@ -155,8 +155,8 @@ const bulkEnableAcmeAccounts: AppEpic = (action$, state$, deps) => {
 
                 catchError((error) =>
                     of(
-                        slice.actions.bulkEnableAcmeAccountsFailed({ error: extractError(error, "Failed to enable ACME Accounts") }),
-                        appRedirectActions.fetchError({ error, message: "Failed to enable ACME Accounts" }),
+                        slice.actions.bulkEnableAcmeAccountsFailed({ error: extractError(error, 'Failed to enable ACME Accounts') }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to enable ACME Accounts' }),
                     ),
                 ),
             ),
@@ -173,8 +173,8 @@ const bulkDisableAcmeAccounts: AppEpic = (action$, state$, deps) => {
 
                 catchError((error) =>
                     of(
-                        slice.actions.bulkDisableAcmeAccountsFailed({ error: extractError(error, "Failed to disable ACME Accounts") }),
-                        appRedirectActions.fetchError({ error, message: "Failed to disable ACME Accounts" }),
+                        slice.actions.bulkDisableAcmeAccountsFailed({ error: extractError(error, 'Failed to disable ACME Accounts') }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to disable ACME Accounts' }),
                     ),
                 ),
             ),

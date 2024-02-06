@@ -1,6 +1,6 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { BulkActionModel } from "types/connectors";
-import { KeyUsage } from "types/openapi";
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { BulkActionModel } from 'types/connectors';
+import { KeyUsage } from 'types/openapi';
 import {
     TokenProfileAddRequestModel,
     TokenProfileDetailResponseModel,
@@ -8,8 +8,8 @@ import {
     TokenProfileKeyUsageBulkUpdateRequestModel,
     TokenProfileKeyUsageUpdateRequestModel,
     TokenProfileResponseModel,
-} from "types/token-profiles";
-import { createFeatureSelector } from "utils/ducks";
+} from 'types/token-profiles';
+import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     checkedRows: string[];
@@ -39,7 +39,7 @@ export type State = {
 export const initialState: State = {
     checkedRows: [],
 
-    deleteErrorMessage: "",
+    deleteErrorMessage: '',
     bulkDeleteErrorMessages: [],
 
     tokenProfiles: [],
@@ -60,7 +60,7 @@ export const initialState: State = {
 };
 
 export const slice = createSlice({
-    name: "tokenprofiles",
+    name: 'tokenprofiles',
 
     initialState,
 
@@ -78,7 +78,7 @@ export const slice = createSlice({
         },
 
         clearDeleteErrorMessages: (state, action: PayloadAction<void>) => {
-            state.deleteErrorMessage = "";
+            state.deleteErrorMessage = '';
             state.bulkDeleteErrorMessages = [];
         },
 

@@ -1,22 +1,22 @@
-import CertificateAttributes from "components/CertificateAttributes";
-import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from "ducks/utilsActuator";
-import { useEffect, useState } from "react";
-import { Form } from "react-final-form";
-import { useDispatch, useSelector } from "react-redux";
-import { Form as BootstrapForm, Button, ButtonGroup } from "reactstrap";
-import { CertificateDetailResponseModel } from "types/certificate";
-import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
-import { transformParseCertificateResponseDtoToCertificateResponseDetailModel } from "../../../../ducks/transform/utilsCertificate";
-import { actions as utilsCertificateActions, selectors as utilsCertificateSelectors } from "../../../../ducks/utilsCertificate";
-import { AttributeRequestModel } from "../../../../types/attributes";
-import { Resource } from "../../../../types/openapi";
-import { ParseCertificateRequestDtoParseTypeEnum } from "../../../../types/openapi/utils";
-import { mutators } from "../../../../utils/attributes/attributeEditorMutators";
-import { collectFormAttributes } from "../../../../utils/attributes/attributes";
-import AttributeEditor from "../../../Attributes/AttributeEditor";
-import FileUpload from "../../../Input/FileUpload/FileUpload";
-import TabLayout from "../../../Layout/TabLayout";
-import ProgressButton from "../../../ProgressButton";
+import CertificateAttributes from 'components/CertificateAttributes';
+import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from 'ducks/utilsActuator';
+import { useEffect, useState } from 'react';
+import { Form } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { Form as BootstrapForm, Button, ButtonGroup } from 'reactstrap';
+import { CertificateDetailResponseModel } from 'types/certificate';
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
+import { transformParseCertificateResponseDtoToCertificateResponseDetailModel } from '../../../../ducks/transform/utilsCertificate';
+import { actions as utilsCertificateActions, selectors as utilsCertificateSelectors } from '../../../../ducks/utilsCertificate';
+import { AttributeRequestModel } from '../../../../types/attributes';
+import { Resource } from '../../../../types/openapi';
+import { ParseCertificateRequestDtoParseTypeEnum } from '../../../../types/openapi/utils';
+import { mutators } from '../../../../utils/attributes/attributeEditorMutators';
+import { collectFormAttributes } from '../../../../utils/attributes/attributes';
+import AttributeEditor from '../../../Attributes/AttributeEditor';
+import FileUpload from '../../../Input/FileUpload/FileUpload';
+import TabLayout from '../../../Layout/TabLayout';
+import ProgressButton from '../../../ProgressButton';
 
 interface FormValues {}
 
@@ -30,11 +30,11 @@ interface Props {
     okButtonTitle?: string;
 }
 
-export default function CertificateUploadDialog({ onCancel, onUpload, okButtonTitle = "Upload" }: Props) {
+export default function CertificateUploadDialog({ onCancel, onUpload, okButtonTitle = 'Upload' }: Props) {
     const dispatch = useDispatch();
 
     const [certificate, setCertificate] = useState<CertificateDetailResponseModel | undefined>();
-    const [fileContent, setFileContent] = useState("");
+    const [fileContent, setFileContent] = useState('');
 
     const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
     const parsedCertificate = useSelector(utilsCertificateSelectors.parsedCertificate);
@@ -57,7 +57,7 @@ export default function CertificateUploadDialog({ onCancel, onUpload, okButtonTi
             onSubmit={(values) =>
                 onUpload({
                     fileContent: fileContent,
-                    customAttributes: collectFormAttributes("customUploadCertificate", resourceCustomAttributes, values),
+                    customAttributes: collectFormAttributes('customUploadCertificate', resourceCustomAttributes, values),
                     certificate: certificate,
                 })
             }
@@ -68,7 +68,7 @@ export default function CertificateUploadDialog({ onCancel, onUpload, okButtonTi
                     <div>
                         <FileUpload
                             editable
-                            fileType={"certificate"}
+                            fileType={'certificate'}
                             onFileContentLoaded={(fileContent) => {
                                 setFileContent(fileContent);
                                 if (health) {
@@ -94,7 +94,7 @@ export default function CertificateUploadDialog({ onCancel, onUpload, okButtonTi
                         <TabLayout
                             tabs={[
                                 {
-                                    title: "Custom Attributes",
+                                    title: 'Custom Attributes',
                                     content: (
                                         <AttributeEditor id="customUploadCertificate" attributeDescriptors={resourceCustomAttributes} />
                                     ),

@@ -1,5 +1,5 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AttributeDescriptorModel } from "types/attributes";
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { AttributeDescriptorModel } from 'types/attributes';
 import {
     CertificateBulkDeleteRequestModel,
     CertificateBulkDeleteResponseModel,
@@ -20,14 +20,14 @@ import {
     DownloadCertificateResponseModel,
     SearchRequestModel,
     ValidationCertificateResultModel,
-} from "types/certificate";
-import { CertificateGroupResponseModel } from "types/certificateGroups";
-import { LocationResponseModel } from "types/locations";
-import { ApprovalDto, DownloadCertificateChainRequest, DownloadCertificateRequest, ListCertificateApprovalsRequest } from "types/openapi";
-import { RaProfileResponseModel } from "types/ra-profiles";
-import { UserResponseModel } from "types/users";
-import { downloadFileZip } from "utils/download";
-import { createFeatureSelector } from "utils/ducks";
+} from 'types/certificate';
+import { CertificateGroupResponseModel } from 'types/certificateGroups';
+import { LocationResponseModel } from 'types/locations';
+import { ApprovalDto, DownloadCertificateChainRequest, DownloadCertificateRequest, ListCertificateApprovalsRequest } from 'types/openapi';
+import { RaProfileResponseModel } from 'types/ra-profiles';
+import { UserResponseModel } from 'types/users';
+import { downloadFileZip } from 'utils/download';
+import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     deleteErrorMessage: string;
@@ -87,7 +87,7 @@ export type State = {
 };
 
 export const initialState: State = {
-    deleteErrorMessage: "",
+    deleteErrorMessage: '',
 
     certificates: [],
 
@@ -137,7 +137,7 @@ export const initialState: State = {
 };
 
 export const slice = createSlice({
-    name: "certificates",
+    name: 'certificates',
 
     initialState,
 
@@ -151,7 +151,7 @@ export const slice = createSlice({
         },
 
         clearDeleteErrorMessages: (state, action: PayloadAction<void>) => {
-            state.deleteErrorMessage = "";
+            state.deleteErrorMessage = '';
         },
 
         clearCertificateDetail: (state, action: PayloadAction<void>) => {
@@ -333,7 +333,7 @@ export const slice = createSlice({
         },
 
         deleteCertificate: (state, action: PayloadAction<{ uuid: string }>) => {
-            state.deleteErrorMessage = "";
+            state.deleteErrorMessage = '';
             state.isDeleting = true;
         },
 
@@ -349,7 +349,7 @@ export const slice = createSlice({
 
         deleteCertificateFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isDeleting = false;
-            state.deleteErrorMessage = action.payload.error || "Unknown error";
+            state.deleteErrorMessage = action.payload.error || 'Unknown error';
         },
 
         updateGroup: (state, action: PayloadAction<{ uuid: string; updateGroupRequest: CertificateObjectModel }>) => {
@@ -629,7 +629,7 @@ export const slice = createSlice({
         },
 
         bulkDelete: (state, action: PayloadAction<CertificateBulkDeleteRequestModel>) => {
-            state.deleteErrorMessage = "";
+            state.deleteErrorMessage = '';
             state.isBulkDeleting = true;
         },
 
@@ -639,7 +639,7 @@ export const slice = createSlice({
 
         bulkDeleteFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isBulkDeleting = false;
-            state.deleteErrorMessage = action.payload.error || "Unknown error";
+            state.deleteErrorMessage = action.payload.error || 'Unknown error';
         },
 
         uploadCertificate: (state, action: PayloadAction<CertificateUploadModel>) => {

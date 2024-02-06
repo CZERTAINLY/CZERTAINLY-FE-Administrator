@@ -1,14 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
-import { Field, Form } from "react-final-form";
-import { useDispatch, useSelector } from "react-redux";
-import Select from "react-select";
-import { Form as BootstrapForm, Col, Row } from "reactstrap";
-import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../ducks/customAttributes";
-import { AttributeResponseModel, BaseAttributeContentModel, CustomAttributeModel } from "../../../types/attributes";
-import { Resource } from "../../../types/openapi";
-import ContentValueField from "../../Input/DynamicContent/ContentValueField";
-import Widget from "../../Widget";
-import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from "../AttributeViewer";
+import { useEffect, useMemo, useState } from 'react';
+import { Field, Form } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
+import Select from 'react-select';
+import { Form as BootstrapForm, Col, Row } from 'reactstrap';
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../ducks/customAttributes';
+import { AttributeResponseModel, BaseAttributeContentModel, CustomAttributeModel } from '../../../types/attributes';
+import { Resource } from '../../../types/openapi';
+import ContentValueField from '../../Input/DynamicContent/ContentValueField';
+import Widget from '../../Widget';
+import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from '../AttributeViewer';
 
 type Props = {
     resource: Resource;
@@ -69,7 +69,7 @@ export default function CustomAttributeWidget({ resource, resourceUuid, attribut
     );
 
     return (
-        <Widget title={"Custom Attributes"} busy={isFetchingResourceCustomAttributes || isUpdatingContent} titleSize="large">
+        <Widget title={'Custom Attributes'} busy={isFetchingResourceCustomAttributes || isUpdatingContent} titleSize="large">
             <AttributeViewer
                 attributes={loadedAttributes}
                 descriptors={resourceCustomAttributes}
@@ -86,7 +86,7 @@ export default function CustomAttributeWidget({ resource, resourceUuid, attribut
                             </h6>
                             <Row>
                                 <Col xs="6" sm="6" md="6" lg="6" xl="6">
-                                    <Field key={"selectCustomAttribute"} name={"selectCustomAttribute"}>
+                                    <Field key={'selectCustomAttribute'} name={'selectCustomAttribute'}>
                                         {({ input }) => (
                                             <Select
                                                 {...input}
@@ -106,7 +106,7 @@ export default function CustomAttributeWidget({ resource, resourceUuid, attribut
                                         <ContentValueField
                                             descriptor={attribute}
                                             onSubmit={(uuid, content) => {
-                                                form.change("selectCustomAttribute", undefined);
+                                                form.change('selectCustomAttribute', undefined);
                                                 setAttribute(undefined);
                                                 addCustomAttribute(uuid, content);
                                             }}

@@ -25,8 +25,8 @@ import {
     CryptographicKeyPairResponseModel,
     CryptographicKeyResponseDto,
     CryptographicKeyResponseModel,
-} from "types/cryptographic-keys";
-import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
+} from 'types/cryptographic-keys';
+import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from './attributes';
 
 export function transformCryptographicKeyResponseDtoToModel(keyResponse: CryptographicKeyResponseDto): CryptographicKeyResponseModel {
     return {

@@ -1,10 +1,10 @@
-import { AppEpic } from "ducks";
+import { AppEpic } from 'ducks';
 
-import { debounceTime, map, mergeMap, take } from "rxjs/operators";
-import { actions as authActions } from "./auth";
-import { actions as enumActions } from "./enums";
-import { actions as notificationsActions } from "./notifications";
-import { actions as settingsActions } from "./settings";
+import { debounceTime, map, mergeMap, take } from 'rxjs/operators';
+import { actions as authActions } from './auth';
+import { actions as enumActions } from './enums';
+import { actions as notificationsActions } from './notifications';
+import { actions as settingsActions } from './settings';
 
 const startup: AppEpic = (action$) =>
     action$.pipe(

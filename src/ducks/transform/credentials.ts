@@ -5,8 +5,8 @@ import {
     CredentialEditRequestModel,
     CredentialResponseDto,
     CredentialResponseModel,
-} from "types/credentials";
-import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
+} from 'types/credentials';
+import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from './attributes';
 
 export function transformCredentialResponseDtoToModel(credential: CredentialResponseDto): CredentialResponseModel {
     return {
