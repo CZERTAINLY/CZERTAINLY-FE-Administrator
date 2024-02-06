@@ -173,6 +173,7 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                                 values,
                             ),
                             customAttributes: collectFormAttributes('customCryptographicKey', resourceCustomAttributes, values),
+                            enabled: usesGlobalModal,
                         },
                         usesGlobalModal,
                     }),
