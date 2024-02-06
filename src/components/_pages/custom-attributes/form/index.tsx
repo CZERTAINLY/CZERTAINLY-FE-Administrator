@@ -141,7 +141,6 @@ export default function CustomAttributeForm() {
                             )}
                         </Field>
 
-                        <CheckboxField label={"Visible"} id={"visible"} />
                         <CheckboxField label={"Required"} id={"required"} />
                         <CheckboxField label={"Read Only"} id={"readOnly"} />
                         <CheckboxField
@@ -150,7 +149,6 @@ export default function CustomAttributeForm() {
                             onChange={(value) => (!value ? form.change("multiSelect", false) : false)}
                         />
                         <CheckboxField label={"Multi Select"} id={"multiSelect"} disabled={!values["list"]} />
-                        {values?.content ? values.content.length : 0}
                         <DynamicContent editable={!editMode} isList={!!values["list"]} />
                         <div className="d-flex justify-content-end">
                             <ButtonGroup>
