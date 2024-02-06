@@ -11,7 +11,9 @@
  * Do not edit the class manually.
  */
 
-import type { ApprovalStepRecipientDto } from './';
+import type {
+    ApprovalStepRecipientDto,
+} from './';
 
 /**
  * List of Approval steps related to this Approval

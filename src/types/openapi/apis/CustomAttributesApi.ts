@@ -97,203 +97,137 @@ export interface UpdateResourcesRequest {
  * no description
  */
 export class CustomAttributesApi extends BaseAPI {
+
     /**
      * Delete multiple Custom Attributes
      */
-    bulkDeleteCustomAttributes({ requestBody }: BulkDeleteCustomAttributesRequest): Observable<void>;
-    bulkDeleteCustomAttributes(
-        { requestBody }: BulkDeleteCustomAttributesRequest,
-        opts?: OperationOpts,
-    ): Observable<void | AjaxResponse<void>>;
-    bulkDeleteCustomAttributes(
-        { requestBody }: BulkDeleteCustomAttributesRequest,
-        opts?: OperationOpts,
-    ): Observable<void | AjaxResponse<void>> {
+    bulkDeleteCustomAttributes({ requestBody }: BulkDeleteCustomAttributesRequest): Observable<void>
+    bulkDeleteCustomAttributes({ requestBody }: BulkDeleteCustomAttributesRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    bulkDeleteCustomAttributes({ requestBody }: BulkDeleteCustomAttributesRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkDeleteCustomAttributes');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<void>(
-            {
-                url: '/v1/attributes/custom',
-                method: 'DELETE',
-                headers,
-                body: requestBody,
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<void>({
+            url: '/v1/attributes/custom',
+            method: 'DELETE',
+            headers,
+            body: requestBody,
+        }, opts?.responseOpts);
+    };
 
     /**
      * Disable multiple Custom Attributes
      */
-    bulkDisableCustomAttributes({ requestBody }: BulkDisableCustomAttributesRequest): Observable<void>;
-    bulkDisableCustomAttributes(
-        { requestBody }: BulkDisableCustomAttributesRequest,
-        opts?: OperationOpts,
-    ): Observable<void | AjaxResponse<void>>;
-    bulkDisableCustomAttributes(
-        { requestBody }: BulkDisableCustomAttributesRequest,
-        opts?: OperationOpts,
-    ): Observable<void | AjaxResponse<void>> {
+    bulkDisableCustomAttributes({ requestBody }: BulkDisableCustomAttributesRequest): Observable<void>
+    bulkDisableCustomAttributes({ requestBody }: BulkDisableCustomAttributesRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    bulkDisableCustomAttributes({ requestBody }: BulkDisableCustomAttributesRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkDisableCustomAttributes');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<void>(
-            {
-                url: '/v1/attributes/custom/disable',
-                method: 'PATCH',
-                headers,
-                body: requestBody,
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<void>({
+            url: '/v1/attributes/custom/disable',
+            method: 'PATCH',
+            headers,
+            body: requestBody,
+        }, opts?.responseOpts);
+    };
 
     /**
      * Enable multiple Custom Attributes
      */
-    bulkEnableCustomAttributes({ requestBody }: BulkEnableCustomAttributesRequest): Observable<void>;
-    bulkEnableCustomAttributes(
-        { requestBody }: BulkEnableCustomAttributesRequest,
-        opts?: OperationOpts,
-    ): Observable<void | AjaxResponse<void>>;
-    bulkEnableCustomAttributes(
-        { requestBody }: BulkEnableCustomAttributesRequest,
-        opts?: OperationOpts,
-    ): Observable<void | AjaxResponse<void>> {
+    bulkEnableCustomAttributes({ requestBody }: BulkEnableCustomAttributesRequest): Observable<void>
+    bulkEnableCustomAttributes({ requestBody }: BulkEnableCustomAttributesRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    bulkEnableCustomAttributes({ requestBody }: BulkEnableCustomAttributesRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkEnableCustomAttributes');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<void>(
-            {
-                url: '/v1/attributes/custom/enable',
-                method: 'PATCH',
-                headers,
-                body: requestBody,
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<void>({
+            url: '/v1/attributes/custom/enable',
+            method: 'PATCH',
+            headers,
+            body: requestBody,
+        }, opts?.responseOpts);
+    };
 
     /**
      * Create Custom Attribute
      */
-    createCustomAttribute({ customAttributeCreateRequestDto }: CreateCustomAttributeRequest): Observable<UuidDto>;
-    createCustomAttribute(
-        { customAttributeCreateRequestDto }: CreateCustomAttributeRequest,
-        opts?: OperationOpts,
-    ): Observable<AjaxResponse<UuidDto>>;
-    createCustomAttribute(
-        { customAttributeCreateRequestDto }: CreateCustomAttributeRequest,
-        opts?: OperationOpts,
-    ): Observable<UuidDto | AjaxResponse<UuidDto>> {
+    createCustomAttribute({ customAttributeCreateRequestDto }: CreateCustomAttributeRequest): Observable<UuidDto>
+    createCustomAttribute({ customAttributeCreateRequestDto }: CreateCustomAttributeRequest, opts?: OperationOpts): Observable<AjaxResponse<UuidDto>>
+    createCustomAttribute({ customAttributeCreateRequestDto }: CreateCustomAttributeRequest, opts?: OperationOpts): Observable<UuidDto | AjaxResponse<UuidDto>> {
         throwIfNullOrUndefined(customAttributeCreateRequestDto, 'customAttributeCreateRequestDto', 'createCustomAttribute');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<UuidDto>(
-            {
-                url: '/v1/attributes/custom',
-                method: 'POST',
-                headers,
-                body: customAttributeCreateRequestDto,
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<UuidDto>({
+            url: '/v1/attributes/custom',
+            method: 'POST',
+            headers,
+            body: customAttributeCreateRequestDto,
+        }, opts?.responseOpts);
+    };
 
     /**
      * Delete Value of a Custom Attribute for a Resource
      */
-    deleteAttributeContentForResource({
-        resourceName,
-        objectUuid,
-        attributeUuid,
-    }: DeleteAttributeContentForResourceRequest): Observable<Array<ResponseAttributeDto>>;
-    deleteAttributeContentForResource(
-        { resourceName, objectUuid, attributeUuid }: DeleteAttributeContentForResourceRequest,
-        opts?: OperationOpts,
-    ): Observable<AjaxResponse<Array<ResponseAttributeDto>>>;
-    deleteAttributeContentForResource(
-        { resourceName, objectUuid, attributeUuid }: DeleteAttributeContentForResourceRequest,
-        opts?: OperationOpts,
-    ): Observable<Array<ResponseAttributeDto> | AjaxResponse<Array<ResponseAttributeDto>>> {
+    deleteAttributeContentForResource({ resourceName, objectUuid, attributeUuid }: DeleteAttributeContentForResourceRequest): Observable<Array<ResponseAttributeDto>>
+    deleteAttributeContentForResource({ resourceName, objectUuid, attributeUuid }: DeleteAttributeContentForResourceRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<ResponseAttributeDto>>>
+    deleteAttributeContentForResource({ resourceName, objectUuid, attributeUuid }: DeleteAttributeContentForResourceRequest, opts?: OperationOpts): Observable<Array<ResponseAttributeDto> | AjaxResponse<Array<ResponseAttributeDto>>> {
         throwIfNullOrUndefined(resourceName, 'resourceName', 'deleteAttributeContentForResource');
         throwIfNullOrUndefined(objectUuid, 'objectUuid', 'deleteAttributeContentForResource');
         throwIfNullOrUndefined(attributeUuid, 'attributeUuid', 'deleteAttributeContentForResource');
 
-        return this.request<Array<ResponseAttributeDto>>(
-            {
-                url: '/v1/attributes/custom/resources/{resourceName}/objects/{objectUuid}/{attributeUuid}'
-                    .replace('{resourceName}', encodeURI(resourceName))
-                    .replace('{objectUuid}', encodeURI(objectUuid))
-                    .replace('{attributeUuid}', encodeURI(attributeUuid)),
-                method: 'DELETE',
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<Array<ResponseAttributeDto>>({
+            url: '/v1/attributes/custom/resources/{resourceName}/objects/{objectUuid}/{attributeUuid}'.replace('{resourceName}', encodeURI(resourceName)).replace('{objectUuid}', encodeURI(objectUuid)).replace('{attributeUuid}', encodeURI(attributeUuid)),
+            method: 'DELETE',
+        }, opts?.responseOpts);
+    };
 
     /**
      * Delete Custom Attribute
      */
-    deleteCustomAttribute({ uuid }: DeleteCustomAttributeRequest): Observable<void>;
-    deleteCustomAttribute({ uuid }: DeleteCustomAttributeRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
+    deleteCustomAttribute({ uuid }: DeleteCustomAttributeRequest): Observable<void>
+    deleteCustomAttribute({ uuid }: DeleteCustomAttributeRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
     deleteCustomAttribute({ uuid }: DeleteCustomAttributeRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'deleteCustomAttribute');
 
-        return this.request<void>(
-            {
-                url: '/v1/attributes/custom/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-                method: 'DELETE',
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<void>({
+            url: '/v1/attributes/custom/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+            method: 'DELETE',
+        }, opts?.responseOpts);
+    };
 
     /**
      * Disable Custom Attribute
      */
-    disableCustomAttribute({ uuid }: DisableCustomAttributeRequest): Observable<void>;
-    disableCustomAttribute({ uuid }: DisableCustomAttributeRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
+    disableCustomAttribute({ uuid }: DisableCustomAttributeRequest): Observable<void>
+    disableCustomAttribute({ uuid }: DisableCustomAttributeRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
     disableCustomAttribute({ uuid }: DisableCustomAttributeRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'disableCustomAttribute');
 
-        return this.request<void>(
-            {
-                url: '/v1/attributes/custom/{uuid}/disable'.replace('{uuid}', encodeURI(uuid)),
-                method: 'PATCH',
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<void>({
+            url: '/v1/attributes/custom/{uuid}/disable'.replace('{uuid}', encodeURI(uuid)),
+            method: 'PATCH',
+        }, opts?.responseOpts);
+    };
 
     /**
      * Edit Custom Attribute
      */
-    editCustomAttribute({
-        uuid,
-        customAttributeUpdateRequestDto,
-    }: EditCustomAttributeRequest): Observable<CustomAttributeDefinitionDetailDto>;
-    editCustomAttribute(
-        { uuid, customAttributeUpdateRequestDto }: EditCustomAttributeRequest,
-        opts?: OperationOpts,
-    ): Observable<AjaxResponse<CustomAttributeDefinitionDetailDto>>;
-    editCustomAttribute(
-        { uuid, customAttributeUpdateRequestDto }: EditCustomAttributeRequest,
-        opts?: OperationOpts,
-    ): Observable<CustomAttributeDefinitionDetailDto | AjaxResponse<CustomAttributeDefinitionDetailDto>> {
+    editCustomAttribute({ uuid, customAttributeUpdateRequestDto }: EditCustomAttributeRequest): Observable<CustomAttributeDefinitionDetailDto>
+    editCustomAttribute({ uuid, customAttributeUpdateRequestDto }: EditCustomAttributeRequest, opts?: OperationOpts): Observable<AjaxResponse<CustomAttributeDefinitionDetailDto>>
+    editCustomAttribute({ uuid, customAttributeUpdateRequestDto }: EditCustomAttributeRequest, opts?: OperationOpts): Observable<CustomAttributeDefinitionDetailDto | AjaxResponse<CustomAttributeDefinitionDetailDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'editCustomAttribute');
         throwIfNullOrUndefined(customAttributeUpdateRequestDto, 'customAttributeUpdateRequestDto', 'editCustomAttribute');
 
@@ -301,140 +235,92 @@ export class CustomAttributesApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<CustomAttributeDefinitionDetailDto>(
-            {
-                url: '/v1/attributes/custom/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-                method: 'PUT',
-                headers,
-                body: customAttributeUpdateRequestDto,
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<CustomAttributeDefinitionDetailDto>({
+            url: '/v1/attributes/custom/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+            method: 'PUT',
+            headers,
+            body: customAttributeUpdateRequestDto,
+        }, opts?.responseOpts);
+    };
 
     /**
      * Enable Custom Attribute
      */
-    enableCustomAttribute({ uuid }: EnableCustomAttributeRequest): Observable<void>;
-    enableCustomAttribute({ uuid }: EnableCustomAttributeRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
+    enableCustomAttribute({ uuid }: EnableCustomAttributeRequest): Observable<void>
+    enableCustomAttribute({ uuid }: EnableCustomAttributeRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
     enableCustomAttribute({ uuid }: EnableCustomAttributeRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'enableCustomAttribute');
 
-        return this.request<void>(
-            {
-                url: '/v1/attributes/custom/{uuid}/enable'.replace('{uuid}', encodeURI(uuid)),
-                method: 'PATCH',
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<void>({
+            url: '/v1/attributes/custom/{uuid}/enable'.replace('{uuid}', encodeURI(uuid)),
+            method: 'PATCH',
+        }, opts?.responseOpts);
+    };
 
     /**
      * Custom Attribute details
      */
-    getCustomAttribute({ uuid }: GetCustomAttributeRequest): Observable<CustomAttributeDefinitionDetailDto>;
-    getCustomAttribute(
-        { uuid }: GetCustomAttributeRequest,
-        opts?: OperationOpts,
-    ): Observable<AjaxResponse<CustomAttributeDefinitionDetailDto>>;
-    getCustomAttribute(
-        { uuid }: GetCustomAttributeRequest,
-        opts?: OperationOpts,
-    ): Observable<CustomAttributeDefinitionDetailDto | AjaxResponse<CustomAttributeDefinitionDetailDto>> {
+    getCustomAttribute({ uuid }: GetCustomAttributeRequest): Observable<CustomAttributeDefinitionDetailDto>
+    getCustomAttribute({ uuid }: GetCustomAttributeRequest, opts?: OperationOpts): Observable<AjaxResponse<CustomAttributeDefinitionDetailDto>>
+    getCustomAttribute({ uuid }: GetCustomAttributeRequest, opts?: OperationOpts): Observable<CustomAttributeDefinitionDetailDto | AjaxResponse<CustomAttributeDefinitionDetailDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'getCustomAttribute');
 
-        return this.request<CustomAttributeDefinitionDetailDto>(
-            {
-                url: '/v1/attributes/custom/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-                method: 'GET',
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<CustomAttributeDefinitionDetailDto>({
+            url: '/v1/attributes/custom/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+            method: 'GET',
+        }, opts?.responseOpts);
+    };
 
     /**
      * Get Custom Attributes for a resource
      */
-    getResourceCustomAttributes({ resource }: GetResourceCustomAttributesRequest): Observable<Array<CustomAttribute>>;
-    getResourceCustomAttributes(
-        { resource }: GetResourceCustomAttributesRequest,
-        opts?: OperationOpts,
-    ): Observable<AjaxResponse<Array<CustomAttribute>>>;
-    getResourceCustomAttributes(
-        { resource }: GetResourceCustomAttributesRequest,
-        opts?: OperationOpts,
-    ): Observable<Array<CustomAttribute> | AjaxResponse<Array<CustomAttribute>>> {
+    getResourceCustomAttributes({ resource }: GetResourceCustomAttributesRequest): Observable<Array<CustomAttribute>>
+    getResourceCustomAttributes({ resource }: GetResourceCustomAttributesRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<CustomAttribute>>>
+    getResourceCustomAttributes({ resource }: GetResourceCustomAttributesRequest, opts?: OperationOpts): Observable<Array<CustomAttribute> | AjaxResponse<Array<CustomAttribute>>> {
         throwIfNullOrUndefined(resource, 'resource', 'getResourceCustomAttributes');
 
-        return this.request<Array<CustomAttribute>>(
-            {
-                url: '/v1/attributes/custom/resources/{resource}'.replace('{resource}', encodeURI(resource)),
-                method: 'GET',
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<Array<CustomAttribute>>({
+            url: '/v1/attributes/custom/resources/{resource}'.replace('{resource}', encodeURI(resource)),
+            method: 'GET',
+        }, opts?.responseOpts);
+    };
 
     /**
      * Get available resources for Custom Attributes
      */
-    getResources(): Observable<Array<Resource>>;
-    getResources(opts?: OperationOpts): Observable<AjaxResponse<Array<Resource>>>;
+    getResources(): Observable<Array<Resource>>
+    getResources(opts?: OperationOpts): Observable<AjaxResponse<Array<Resource>>>
     getResources(opts?: OperationOpts): Observable<Array<Resource> | AjaxResponse<Array<Resource>>> {
-        return this.request<Array<Resource>>(
-            {
-                url: '/v1/attributes/custom/resources',
-                method: 'GET',
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<Array<Resource>>({
+            url: '/v1/attributes/custom/resources',
+            method: 'GET',
+        }, opts?.responseOpts);
+    };
 
     /**
      * List Custom Attributes
      */
-    listCustomAttributes({ attributeContentType }: ListCustomAttributesRequest): Observable<Array<CustomAttributeDefinitionDto>>;
-    listCustomAttributes(
-        { attributeContentType }: ListCustomAttributesRequest,
-        opts?: OperationOpts,
-    ): Observable<AjaxResponse<Array<CustomAttributeDefinitionDto>>>;
-    listCustomAttributes(
-        { attributeContentType }: ListCustomAttributesRequest,
-        opts?: OperationOpts,
-    ): Observable<Array<CustomAttributeDefinitionDto> | AjaxResponse<Array<CustomAttributeDefinitionDto>>> {
+    listCustomAttributes({ attributeContentType }: ListCustomAttributesRequest): Observable<Array<CustomAttributeDefinitionDto>>
+    listCustomAttributes({ attributeContentType }: ListCustomAttributesRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<CustomAttributeDefinitionDto>>>
+    listCustomAttributes({ attributeContentType }: ListCustomAttributesRequest, opts?: OperationOpts): Observable<Array<CustomAttributeDefinitionDto> | AjaxResponse<Array<CustomAttributeDefinitionDto>>> {
+
         const query: HttpQuery = {};
 
-        if (attributeContentType != null) {
-            query['attributeContentType'] = attributeContentType;
-        }
+        if (attributeContentType != null) { query['attributeContentType'] = attributeContentType; }
 
-        return this.request<Array<CustomAttributeDefinitionDto>>(
-            {
-                url: '/v1/attributes/custom',
-                method: 'GET',
-                query,
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<Array<CustomAttributeDefinitionDto>>({
+            url: '/v1/attributes/custom',
+            method: 'GET',
+            query,
+        }, opts?.responseOpts);
+    };
 
     /**
      * Update Value of a Custom Attribute for a Resource
      */
-    updateAttributeContentForResource({
-        resourceName,
-        objectUuid,
-        attributeUuid,
-        baseAttributeContentDto,
-    }: UpdateAttributeContentForResourceRequest): Observable<Array<ResponseAttributeDto>>;
-    updateAttributeContentForResource(
-        { resourceName, objectUuid, attributeUuid, baseAttributeContentDto }: UpdateAttributeContentForResourceRequest,
-        opts?: OperationOpts,
-    ): Observable<AjaxResponse<Array<ResponseAttributeDto>>>;
-    updateAttributeContentForResource(
-        { resourceName, objectUuid, attributeUuid, baseAttributeContentDto }: UpdateAttributeContentForResourceRequest,
-        opts?: OperationOpts,
-    ): Observable<Array<ResponseAttributeDto> | AjaxResponse<Array<ResponseAttributeDto>>> {
+    updateAttributeContentForResource({ resourceName, objectUuid, attributeUuid, baseAttributeContentDto }: UpdateAttributeContentForResourceRequest): Observable<Array<ResponseAttributeDto>>
+    updateAttributeContentForResource({ resourceName, objectUuid, attributeUuid, baseAttributeContentDto }: UpdateAttributeContentForResourceRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<ResponseAttributeDto>>>
+    updateAttributeContentForResource({ resourceName, objectUuid, attributeUuid, baseAttributeContentDto }: UpdateAttributeContentForResourceRequest, opts?: OperationOpts): Observable<Array<ResponseAttributeDto> | AjaxResponse<Array<ResponseAttributeDto>>> {
         throwIfNullOrUndefined(resourceName, 'resourceName', 'updateAttributeContentForResource');
         throwIfNullOrUndefined(objectUuid, 'objectUuid', 'updateAttributeContentForResource');
         throwIfNullOrUndefined(attributeUuid, 'attributeUuid', 'updateAttributeContentForResource');
@@ -444,25 +330,19 @@ export class CustomAttributesApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<Array<ResponseAttributeDto>>(
-            {
-                url: '/v1/attributes/custom/resources/{resourceName}/objects/{objectUuid}/{attributeUuid}'
-                    .replace('{resourceName}', encodeURI(resourceName))
-                    .replace('{objectUuid}', encodeURI(objectUuid))
-                    .replace('{attributeUuid}', encodeURI(attributeUuid)),
-                method: 'PATCH',
-                headers,
-                body: baseAttributeContentDto,
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<Array<ResponseAttributeDto>>({
+            url: '/v1/attributes/custom/resources/{resourceName}/objects/{objectUuid}/{attributeUuid}'.replace('{resourceName}', encodeURI(resourceName)).replace('{objectUuid}', encodeURI(objectUuid)).replace('{attributeUuid}', encodeURI(attributeUuid)),
+            method: 'PATCH',
+            headers,
+            body: baseAttributeContentDto,
+        }, opts?.responseOpts);
+    };
 
     /**
      * Associate Custom Attribute to Resource
      */
-    updateResources({ uuid, requestBody }: UpdateResourcesRequest): Observable<void>;
-    updateResources({ uuid, requestBody }: UpdateResourcesRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
+    updateResources({ uuid, requestBody }: UpdateResourcesRequest): Observable<void>
+    updateResources({ uuid, requestBody }: UpdateResourcesRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
     updateResources({ uuid, requestBody }: UpdateResourcesRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'updateResources');
         throwIfNullOrUndefined(requestBody, 'requestBody', 'updateResources');
@@ -471,14 +351,12 @@ export class CustomAttributesApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<void>(
-            {
-                url: '/v1/attributes/custom/{uuid}/resources'.replace('{uuid}', encodeURI(uuid)),
-                method: 'PATCH',
-                headers,
-                body: requestBody,
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<void>({
+            url: '/v1/attributes/custom/{uuid}/resources'.replace('{uuid}', encodeURI(uuid)),
+            method: 'PATCH',
+            headers,
+            body: requestBody,
+        }, opts?.responseOpts);
+    };
+
 }

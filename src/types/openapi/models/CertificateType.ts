@@ -18,5 +18,6 @@
  */
 export enum CertificateType {
     X509 = 'X.509',
-    Ssh = 'SSH',
+    Ssh = 'SSH'
 }
+

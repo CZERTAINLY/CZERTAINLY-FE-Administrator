@@ -22,5 +22,6 @@ export enum SearchableFieldType {
     List = 'list',
     Date = 'date',
     Datetime = 'datetime',
-    Boolean = 'boolean',
+    Boolean = 'boolean'
 }
+

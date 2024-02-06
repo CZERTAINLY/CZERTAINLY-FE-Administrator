@@ -71,18 +71,13 @@ export interface UpdateTokenInstanceRequest {
  * no description
  */
 export class TokenInstanceControllerApi extends BaseAPI {
+
     /**
      * Activate Token Instance
      */
-    activateTokenInstance({ uuid, requestAttributeDto }: ActivateTokenInstanceRequest): Observable<void>;
-    activateTokenInstance(
-        { uuid, requestAttributeDto }: ActivateTokenInstanceRequest,
-        opts?: OperationOpts,
-    ): Observable<void | AjaxResponse<void>>;
-    activateTokenInstance(
-        { uuid, requestAttributeDto }: ActivateTokenInstanceRequest,
-        opts?: OperationOpts,
-    ): Observable<void | AjaxResponse<void>> {
+    activateTokenInstance({ uuid, requestAttributeDto }: ActivateTokenInstanceRequest): Observable<void>
+    activateTokenInstance({ uuid, requestAttributeDto }: ActivateTokenInstanceRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    activateTokenInstance({ uuid, requestAttributeDto }: ActivateTokenInstanceRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'activateTokenInstance');
         throwIfNullOrUndefined(requestAttributeDto, 'requestAttributeDto', 'activateTokenInstance');
 
@@ -90,85 +85,67 @@ export class TokenInstanceControllerApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<void>(
-            {
-                url: '/v1/tokens/{uuid}/activate'.replace('{uuid}', encodeURI(uuid)),
-                method: 'PATCH',
-                headers,
-                body: requestAttributeDto,
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<void>({
+            url: '/v1/tokens/{uuid}/activate'.replace('{uuid}', encodeURI(uuid)),
+            method: 'PATCH',
+            headers,
+            body: requestAttributeDto,
+        }, opts?.responseOpts);
+    };
 
     /**
      * Create a new Token Instance
      */
-    createTokenInstance({ tokenInstanceRequestDto }: CreateTokenInstanceRequest): Observable<TokenInstanceDetailDto>;
-    createTokenInstance(
-        { tokenInstanceRequestDto }: CreateTokenInstanceRequest,
-        opts?: OperationOpts,
-    ): Observable<AjaxResponse<TokenInstanceDetailDto>>;
-    createTokenInstance(
-        { tokenInstanceRequestDto }: CreateTokenInstanceRequest,
-        opts?: OperationOpts,
-    ): Observable<TokenInstanceDetailDto | AjaxResponse<TokenInstanceDetailDto>> {
+    createTokenInstance({ tokenInstanceRequestDto }: CreateTokenInstanceRequest): Observable<TokenInstanceDetailDto>
+    createTokenInstance({ tokenInstanceRequestDto }: CreateTokenInstanceRequest, opts?: OperationOpts): Observable<AjaxResponse<TokenInstanceDetailDto>>
+    createTokenInstance({ tokenInstanceRequestDto }: CreateTokenInstanceRequest, opts?: OperationOpts): Observable<TokenInstanceDetailDto | AjaxResponse<TokenInstanceDetailDto>> {
         throwIfNullOrUndefined(tokenInstanceRequestDto, 'tokenInstanceRequestDto', 'createTokenInstance');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<TokenInstanceDetailDto>(
-            {
-                url: '/v1/tokens',
-                method: 'POST',
-                headers,
-                body: tokenInstanceRequestDto,
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<TokenInstanceDetailDto>({
+            url: '/v1/tokens',
+            method: 'POST',
+            headers,
+            body: tokenInstanceRequestDto,
+        }, opts?.responseOpts);
+    };
 
     /**
      * Deactivate Token Instance
      */
-    deactivateTokenInstance({ uuid }: DeactivateTokenInstanceRequest): Observable<void>;
-    deactivateTokenInstance({ uuid }: DeactivateTokenInstanceRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
+    deactivateTokenInstance({ uuid }: DeactivateTokenInstanceRequest): Observable<void>
+    deactivateTokenInstance({ uuid }: DeactivateTokenInstanceRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
     deactivateTokenInstance({ uuid }: DeactivateTokenInstanceRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'deactivateTokenInstance');
 
-        return this.request<void>(
-            {
-                url: '/v1/tokens/{uuid}/deactivate'.replace('{uuid}', encodeURI(uuid)),
-                method: 'PATCH',
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<void>({
+            url: '/v1/tokens/{uuid}/deactivate'.replace('{uuid}', encodeURI(uuid)),
+            method: 'PATCH',
+        }, opts?.responseOpts);
+    };
 
     /**
      * Delete Token Instance
      */
-    deleteTokenInstance({ uuid }: DeleteTokenInstanceRequest): Observable<void>;
-    deleteTokenInstance({ uuid }: DeleteTokenInstanceRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
+    deleteTokenInstance({ uuid }: DeleteTokenInstanceRequest): Observable<void>
+    deleteTokenInstance({ uuid }: DeleteTokenInstanceRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
     deleteTokenInstance({ uuid }: DeleteTokenInstanceRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'deleteTokenInstance');
 
-        return this.request<void>(
-            {
-                url: '/v1/tokens/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-                method: 'DELETE',
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<void>({
+            url: '/v1/tokens/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+            method: 'DELETE',
+        }, opts?.responseOpts);
+    };
 
     /**
      * Delete multiple Token Instance
      */
-    deleteTokenInstance1({ requestBody }: DeleteTokenInstance1Request): Observable<void>;
-    deleteTokenInstance1({ requestBody }: DeleteTokenInstance1Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
+    deleteTokenInstance1({ requestBody }: DeleteTokenInstance1Request): Observable<void>
+    deleteTokenInstance1({ requestBody }: DeleteTokenInstance1Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
     deleteTokenInstance1({ requestBody }: DeleteTokenInstance1Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(requestBody, 'requestBody', 'deleteTokenInstance1');
 
@@ -176,130 +153,88 @@ export class TokenInstanceControllerApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<void>(
-            {
-                url: '/v1/tokens/delete',
-                method: 'DELETE',
-                headers,
-                body: requestBody,
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<void>({
+            url: '/v1/tokens/delete',
+            method: 'DELETE',
+            headers,
+            body: requestBody,
+        }, opts?.responseOpts);
+    };
 
     /**
      * Get Token Instance Detail
      */
-    getTokenInstance({ uuid }: GetTokenInstanceRequest): Observable<TokenInstanceDetailDto>;
-    getTokenInstance({ uuid }: GetTokenInstanceRequest, opts?: OperationOpts): Observable<AjaxResponse<TokenInstanceDetailDto>>;
-    getTokenInstance(
-        { uuid }: GetTokenInstanceRequest,
-        opts?: OperationOpts,
-    ): Observable<TokenInstanceDetailDto | AjaxResponse<TokenInstanceDetailDto>> {
+    getTokenInstance({ uuid }: GetTokenInstanceRequest): Observable<TokenInstanceDetailDto>
+    getTokenInstance({ uuid }: GetTokenInstanceRequest, opts?: OperationOpts): Observable<AjaxResponse<TokenInstanceDetailDto>>
+    getTokenInstance({ uuid }: GetTokenInstanceRequest, opts?: OperationOpts): Observable<TokenInstanceDetailDto | AjaxResponse<TokenInstanceDetailDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'getTokenInstance');
 
-        return this.request<TokenInstanceDetailDto>(
-            {
-                url: '/v1/tokens/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-                method: 'GET',
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<TokenInstanceDetailDto>({
+            url: '/v1/tokens/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+            method: 'GET',
+        }, opts?.responseOpts);
+    };
 
     /**
      * List Token activation Attributes
      */
-    listTokenInstanceActivationAttributes({ uuid }: ListTokenInstanceActivationAttributesRequest): Observable<Array<BaseAttributeDto>>;
-    listTokenInstanceActivationAttributes(
-        { uuid }: ListTokenInstanceActivationAttributesRequest,
-        opts?: OperationOpts,
-    ): Observable<AjaxResponse<Array<BaseAttributeDto>>>;
-    listTokenInstanceActivationAttributes(
-        { uuid }: ListTokenInstanceActivationAttributesRequest,
-        opts?: OperationOpts,
-    ): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
+    listTokenInstanceActivationAttributes({ uuid }: ListTokenInstanceActivationAttributesRequest): Observable<Array<BaseAttributeDto>>
+    listTokenInstanceActivationAttributes({ uuid }: ListTokenInstanceActivationAttributesRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<BaseAttributeDto>>>
+    listTokenInstanceActivationAttributes({ uuid }: ListTokenInstanceActivationAttributesRequest, opts?: OperationOpts): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'listTokenInstanceActivationAttributes');
 
-        return this.request<Array<BaseAttributeDto>>(
-            {
-                url: '/v1/tokens/{uuid}/activate/attributes'.replace('{uuid}', encodeURI(uuid)),
-                method: 'GET',
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<Array<BaseAttributeDto>>({
+            url: '/v1/tokens/{uuid}/activate/attributes'.replace('{uuid}', encodeURI(uuid)),
+            method: 'GET',
+        }, opts?.responseOpts);
+    };
 
     /**
      * List Token Instances
      */
-    listTokenInstances(): Observable<Array<TokenInstanceDto>>;
-    listTokenInstances(opts?: OperationOpts): Observable<AjaxResponse<Array<TokenInstanceDto>>>;
+    listTokenInstances(): Observable<Array<TokenInstanceDto>>
+    listTokenInstances(opts?: OperationOpts): Observable<AjaxResponse<Array<TokenInstanceDto>>>
     listTokenInstances(opts?: OperationOpts): Observable<Array<TokenInstanceDto> | AjaxResponse<Array<TokenInstanceDto>>> {
-        return this.request<Array<TokenInstanceDto>>(
-            {
-                url: '/v1/tokens',
-                method: 'GET',
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<Array<TokenInstanceDto>>({
+            url: '/v1/tokens',
+            method: 'GET',
+        }, opts?.responseOpts);
+    };
 
     /**
      * List Token Profile Attributes
      */
-    listTokenProfileAttributes({ uuid }: ListTokenProfileAttributesRequest): Observable<Array<BaseAttributeDto>>;
-    listTokenProfileAttributes(
-        { uuid }: ListTokenProfileAttributesRequest,
-        opts?: OperationOpts,
-    ): Observable<AjaxResponse<Array<BaseAttributeDto>>>;
-    listTokenProfileAttributes(
-        { uuid }: ListTokenProfileAttributesRequest,
-        opts?: OperationOpts,
-    ): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
+    listTokenProfileAttributes({ uuid }: ListTokenProfileAttributesRequest): Observable<Array<BaseAttributeDto>>
+    listTokenProfileAttributes({ uuid }: ListTokenProfileAttributesRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<BaseAttributeDto>>>
+    listTokenProfileAttributes({ uuid }: ListTokenProfileAttributesRequest, opts?: OperationOpts): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'listTokenProfileAttributes');
 
-        return this.request<Array<BaseAttributeDto>>(
-            {
-                url: '/v1/tokens/{uuid}/tokenProfiles/attributes'.replace('{uuid}', encodeURI(uuid)),
-                method: 'GET',
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<Array<BaseAttributeDto>>({
+            url: '/v1/tokens/{uuid}/tokenProfiles/attributes'.replace('{uuid}', encodeURI(uuid)),
+            method: 'GET',
+        }, opts?.responseOpts);
+    };
 
     /**
      * Reload Token Instance status
      */
-    reloadStatus({ uuid }: ReloadStatusRequest): Observable<TokenInstanceDetailDto>;
-    reloadStatus({ uuid }: ReloadStatusRequest, opts?: OperationOpts): Observable<AjaxResponse<TokenInstanceDetailDto>>;
-    reloadStatus(
-        { uuid }: ReloadStatusRequest,
-        opts?: OperationOpts,
-    ): Observable<TokenInstanceDetailDto | AjaxResponse<TokenInstanceDetailDto>> {
+    reloadStatus({ uuid }: ReloadStatusRequest): Observable<TokenInstanceDetailDto>
+    reloadStatus({ uuid }: ReloadStatusRequest, opts?: OperationOpts): Observable<AjaxResponse<TokenInstanceDetailDto>>
+    reloadStatus({ uuid }: ReloadStatusRequest, opts?: OperationOpts): Observable<TokenInstanceDetailDto | AjaxResponse<TokenInstanceDetailDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'reloadStatus');
 
-        return this.request<TokenInstanceDetailDto>(
-            {
-                url: '/v1/tokens/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-                method: 'PATCH',
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<TokenInstanceDetailDto>({
+            url: '/v1/tokens/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+            method: 'PATCH',
+        }, opts?.responseOpts);
+    };
 
     /**
      * Update Token Instance
      */
-    updateTokenInstance({ uuid, tokenInstanceRequestDto }: UpdateTokenInstanceRequest): Observable<TokenInstanceDetailDto>;
-    updateTokenInstance(
-        { uuid, tokenInstanceRequestDto }: UpdateTokenInstanceRequest,
-        opts?: OperationOpts,
-    ): Observable<AjaxResponse<TokenInstanceDetailDto>>;
-    updateTokenInstance(
-        { uuid, tokenInstanceRequestDto }: UpdateTokenInstanceRequest,
-        opts?: OperationOpts,
-    ): Observable<TokenInstanceDetailDto | AjaxResponse<TokenInstanceDetailDto>> {
+    updateTokenInstance({ uuid, tokenInstanceRequestDto }: UpdateTokenInstanceRequest): Observable<TokenInstanceDetailDto>
+    updateTokenInstance({ uuid, tokenInstanceRequestDto }: UpdateTokenInstanceRequest, opts?: OperationOpts): Observable<AjaxResponse<TokenInstanceDetailDto>>
+    updateTokenInstance({ uuid, tokenInstanceRequestDto }: UpdateTokenInstanceRequest, opts?: OperationOpts): Observable<TokenInstanceDetailDto | AjaxResponse<TokenInstanceDetailDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'updateTokenInstance');
         throwIfNullOrUndefined(tokenInstanceRequestDto, 'tokenInstanceRequestDto', 'updateTokenInstance');
 
@@ -307,14 +242,12 @@ export class TokenInstanceControllerApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<TokenInstanceDetailDto>(
-            {
-                url: '/v1/tokens/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-                method: 'PUT',
-                headers,
-                body: tokenInstanceRequestDto,
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<TokenInstanceDetailDto>({
+            url: '/v1/tokens/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+            method: 'PUT',
+            headers,
+            body: tokenInstanceRequestDto,
+        }, opts?.responseOpts);
+    };
+
 }

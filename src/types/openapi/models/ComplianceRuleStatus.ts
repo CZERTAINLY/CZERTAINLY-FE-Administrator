@@ -19,5 +19,6 @@
 export enum ComplianceRuleStatus {
     Ok = 'ok',
     Nok = 'nok',
-    Na = 'na',
+    Na = 'na'
 }
+

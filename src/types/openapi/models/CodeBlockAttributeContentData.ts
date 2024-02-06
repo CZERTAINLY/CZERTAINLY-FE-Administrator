@@ -11,7 +11,9 @@
  * Do not edit the class manually.
  */
 
-import type { ProgrammingLanguageEnum } from './';
+import type {
+    ProgrammingLanguageEnum,
+} from './';
 
 /**
  * CodeBlock attribute content data
@@ -31,3 +33,5 @@ export interface CodeBlockAttributeContentData {
      */
     code: string;
 }
+
+

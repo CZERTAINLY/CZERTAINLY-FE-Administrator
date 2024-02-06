@@ -108,28 +108,26 @@ export interface ValidateAttributesRequest {
  * no description
  */
 export class ConnectorManagementApi extends BaseAPI {
+
     /**
      * Approve a Connector
      */
-    approve({ uuid }: ApproveRequest): Observable<void>;
-    approve({ uuid }: ApproveRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
+    approve({ uuid }: ApproveRequest): Observable<void>
+    approve({ uuid }: ApproveRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
     approve({ uuid }: ApproveRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'approve');
 
-        return this.request<void>(
-            {
-                url: '/v1/connectors/{uuid}/approve'.replace('{uuid}', encodeURI(uuid)),
-                method: 'PUT',
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<void>({
+            url: '/v1/connectors/{uuid}/approve'.replace('{uuid}', encodeURI(uuid)),
+            method: 'PUT',
+        }, opts?.responseOpts);
+    };
 
     /**
      * Approve multiple Connector
      */
-    bulkApprove({ requestBody }: BulkApproveRequest): Observable<void>;
-    bulkApprove({ requestBody }: BulkApproveRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
+    bulkApprove({ requestBody }: BulkApproveRequest): Observable<void>
+    bulkApprove({ requestBody }: BulkApproveRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
     bulkApprove({ requestBody }: BulkApproveRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkApprove');
 
@@ -137,51 +135,39 @@ export class ConnectorManagementApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<void>(
-            {
-                url: '/v1/connectors/approve',
-                method: 'PUT',
-                headers,
-                body: requestBody,
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<void>({
+            url: '/v1/connectors/approve',
+            method: 'PUT',
+            headers,
+            body: requestBody,
+        }, opts?.responseOpts);
+    };
 
     /**
      * Delete multiple Connectors
      */
-    bulkDeleteConnector({ requestBody }: BulkDeleteConnectorRequest): Observable<Array<BulkActionMessageDto>>;
-    bulkDeleteConnector(
-        { requestBody }: BulkDeleteConnectorRequest,
-        opts?: OperationOpts,
-    ): Observable<AjaxResponse<Array<BulkActionMessageDto>>>;
-    bulkDeleteConnector(
-        { requestBody }: BulkDeleteConnectorRequest,
-        opts?: OperationOpts,
-    ): Observable<Array<BulkActionMessageDto> | AjaxResponse<Array<BulkActionMessageDto>>> {
+    bulkDeleteConnector({ requestBody }: BulkDeleteConnectorRequest): Observable<Array<BulkActionMessageDto>>
+    bulkDeleteConnector({ requestBody }: BulkDeleteConnectorRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<BulkActionMessageDto>>>
+    bulkDeleteConnector({ requestBody }: BulkDeleteConnectorRequest, opts?: OperationOpts): Observable<Array<BulkActionMessageDto> | AjaxResponse<Array<BulkActionMessageDto>>> {
         throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkDeleteConnector');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<Array<BulkActionMessageDto>>(
-            {
-                url: '/v1/connectors',
-                method: 'DELETE',
-                headers,
-                body: requestBody,
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<Array<BulkActionMessageDto>>({
+            url: '/v1/connectors',
+            method: 'DELETE',
+            headers,
+            body: requestBody,
+        }, opts?.responseOpts);
+    };
 
     /**
      * Reconnect multiple Connectors
      */
-    bulkReconnect({ requestBody }: BulkReconnectRequest): Observable<void>;
-    bulkReconnect({ requestBody }: BulkReconnectRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
+    bulkReconnect({ requestBody }: BulkReconnectRequest): Observable<void>
+    bulkReconnect({ requestBody }: BulkReconnectRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
     bulkReconnect({ requestBody }: BulkReconnectRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkReconnect');
 
@@ -189,39 +175,33 @@ export class ConnectorManagementApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<void>(
-            {
-                url: '/v1/connectors/reconnect',
-                method: 'PUT',
-                headers,
-                body: requestBody,
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<void>({
+            url: '/v1/connectors/reconnect',
+            method: 'PUT',
+            headers,
+            body: requestBody,
+        }, opts?.responseOpts);
+    };
 
     /**
      * Check Health of a Connector
      */
-    checkHealth({ uuid }: CheckHealthRequest): Observable<HealthDto>;
-    checkHealth({ uuid }: CheckHealthRequest, opts?: OperationOpts): Observable<AjaxResponse<HealthDto>>;
+    checkHealth({ uuid }: CheckHealthRequest): Observable<HealthDto>
+    checkHealth({ uuid }: CheckHealthRequest, opts?: OperationOpts): Observable<AjaxResponse<HealthDto>>
     checkHealth({ uuid }: CheckHealthRequest, opts?: OperationOpts): Observable<HealthDto | AjaxResponse<HealthDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'checkHealth');
 
-        return this.request<HealthDto>(
-            {
-                url: '/v1/connectors/{uuid}/health'.replace('{uuid}', encodeURI(uuid)),
-                method: 'GET',
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<HealthDto>({
+            url: '/v1/connectors/{uuid}/health'.replace('{uuid}', encodeURI(uuid)),
+            method: 'GET',
+        }, opts?.responseOpts);
+    };
 
     /**
      * Connect to a Connector
      */
-    connect({ connectRequestDto }: ConnectRequest): Observable<Array<ConnectDto>>;
-    connect({ connectRequestDto }: ConnectRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<ConnectDto>>>;
+    connect({ connectRequestDto }: ConnectRequest): Observable<Array<ConnectDto>>
+    connect({ connectRequestDto }: ConnectRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<ConnectDto>>>
     connect({ connectRequestDto }: ConnectRequest, opts?: OperationOpts): Observable<Array<ConnectDto> | AjaxResponse<Array<ConnectDto>>> {
         throwIfNullOrUndefined(connectRequestDto, 'connectRequestDto', 'connect');
 
@@ -229,22 +209,19 @@ export class ConnectorManagementApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<Array<ConnectDto>>(
-            {
-                url: '/v1/connectors/connect',
-                method: 'PUT',
-                headers,
-                body: connectRequestDto,
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<Array<ConnectDto>>({
+            url: '/v1/connectors/connect',
+            method: 'PUT',
+            headers,
+            body: connectRequestDto,
+        }, opts?.responseOpts);
+    };
 
     /**
      * Create a new Connector
      */
-    createConnector({ connectorRequestDto }: CreateConnectorRequest): Observable<UuidDto>;
-    createConnector({ connectorRequestDto }: CreateConnectorRequest, opts?: OperationOpts): Observable<AjaxResponse<UuidDto>>;
+    createConnector({ connectorRequestDto }: CreateConnectorRequest): Observable<UuidDto>
+    createConnector({ connectorRequestDto }: CreateConnectorRequest, opts?: OperationOpts): Observable<AjaxResponse<UuidDto>>
     createConnector({ connectorRequestDto }: CreateConnectorRequest, opts?: OperationOpts): Observable<UuidDto | AjaxResponse<UuidDto>> {
         throwIfNullOrUndefined(connectorRequestDto, 'connectorRequestDto', 'createConnector');
 
@@ -252,43 +229,34 @@ export class ConnectorManagementApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<UuidDto>(
-            {
-                url: '/v1/connectors',
-                method: 'POST',
-                headers,
-                body: connectorRequestDto,
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<UuidDto>({
+            url: '/v1/connectors',
+            method: 'POST',
+            headers,
+            body: connectorRequestDto,
+        }, opts?.responseOpts);
+    };
 
     /**
      * Delete a Connector
      */
-    deleteConnector({ uuid }: DeleteConnectorRequest): Observable<void>;
-    deleteConnector({ uuid }: DeleteConnectorRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
+    deleteConnector({ uuid }: DeleteConnectorRequest): Observable<void>
+    deleteConnector({ uuid }: DeleteConnectorRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
     deleteConnector({ uuid }: DeleteConnectorRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'deleteConnector');
 
-        return this.request<void>(
-            {
-                url: '/v1/connectors/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-                method: 'DELETE',
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<void>({
+            url: '/v1/connectors/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+            method: 'DELETE',
+        }, opts?.responseOpts);
+    };
 
     /**
      * Edit a Connector
      */
-    editConnector({ uuid, connectorUpdateRequestDto }: EditConnectorRequest): Observable<ConnectorDto>;
-    editConnector({ uuid, connectorUpdateRequestDto }: EditConnectorRequest, opts?: OperationOpts): Observable<AjaxResponse<ConnectorDto>>;
-    editConnector(
-        { uuid, connectorUpdateRequestDto }: EditConnectorRequest,
-        opts?: OperationOpts,
-    ): Observable<ConnectorDto | AjaxResponse<ConnectorDto>> {
+    editConnector({ uuid, connectorUpdateRequestDto }: EditConnectorRequest): Observable<ConnectorDto>
+    editConnector({ uuid, connectorUpdateRequestDto }: EditConnectorRequest, opts?: OperationOpts): Observable<AjaxResponse<ConnectorDto>>
+    editConnector({ uuid, connectorUpdateRequestDto }: EditConnectorRequest, opts?: OperationOpts): Observable<ConnectorDto | AjaxResponse<ConnectorDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'editConnector');
         throwIfNullOrUndefined(connectorUpdateRequestDto, 'connectorUpdateRequestDto', 'editConnector');
 
@@ -296,180 +264,118 @@ export class ConnectorManagementApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<ConnectorDto>(
-            {
-                url: '/v1/connectors/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-                method: 'PUT',
-                headers,
-                body: connectorUpdateRequestDto,
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<ConnectorDto>({
+            url: '/v1/connectors/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+            method: 'PUT',
+            headers,
+            body: connectorUpdateRequestDto,
+        }, opts?.responseOpts);
+    };
 
     /**
      * Force Delete multiple Connectors
      */
-    forceDeleteConnector({ requestBody }: ForceDeleteConnectorRequest): Observable<Array<BulkActionMessageDto>>;
-    forceDeleteConnector(
-        { requestBody }: ForceDeleteConnectorRequest,
-        opts?: OperationOpts,
-    ): Observable<AjaxResponse<Array<BulkActionMessageDto>>>;
-    forceDeleteConnector(
-        { requestBody }: ForceDeleteConnectorRequest,
-        opts?: OperationOpts,
-    ): Observable<Array<BulkActionMessageDto> | AjaxResponse<Array<BulkActionMessageDto>>> {
+    forceDeleteConnector({ requestBody }: ForceDeleteConnectorRequest): Observable<Array<BulkActionMessageDto>>
+    forceDeleteConnector({ requestBody }: ForceDeleteConnectorRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<BulkActionMessageDto>>>
+    forceDeleteConnector({ requestBody }: ForceDeleteConnectorRequest, opts?: OperationOpts): Observable<Array<BulkActionMessageDto> | AjaxResponse<Array<BulkActionMessageDto>>> {
         throwIfNullOrUndefined(requestBody, 'requestBody', 'forceDeleteConnector');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<Array<BulkActionMessageDto>>(
-            {
-                url: '/v1/connectors/force',
-                method: 'DELETE',
-                headers,
-                body: requestBody,
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<Array<BulkActionMessageDto>>({
+            url: '/v1/connectors/force',
+            method: 'DELETE',
+            headers,
+            body: requestBody,
+        }, opts?.responseOpts);
+    };
 
     /**
      * Get Attributes from a Connector
      */
-    getAttributes({ uuid, functionGroup, kind }: GetAttributesRequest): Observable<Array<BaseAttributeDto>>;
-    getAttributes(
-        { uuid, functionGroup, kind }: GetAttributesRequest,
-        opts?: OperationOpts,
-    ): Observable<AjaxResponse<Array<BaseAttributeDto>>>;
-    getAttributes(
-        { uuid, functionGroup, kind }: GetAttributesRequest,
-        opts?: OperationOpts,
-    ): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
+    getAttributes({ uuid, functionGroup, kind }: GetAttributesRequest): Observable<Array<BaseAttributeDto>>
+    getAttributes({ uuid, functionGroup, kind }: GetAttributesRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<BaseAttributeDto>>>
+    getAttributes({ uuid, functionGroup, kind }: GetAttributesRequest, opts?: OperationOpts): Observable<Array<BaseAttributeDto> | AjaxResponse<Array<BaseAttributeDto>>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'getAttributes');
         throwIfNullOrUndefined(functionGroup, 'functionGroup', 'getAttributes');
         throwIfNullOrUndefined(kind, 'kind', 'getAttributes');
 
-        return this.request<Array<BaseAttributeDto>>(
-            {
-                url: '/v1/connectors/{uuid}/attributes/{functionGroup}/{kind}'
-                    .replace('{uuid}', encodeURI(uuid))
-                    .replace('{functionGroup}', encodeURI(functionGroup))
-                    .replace('{kind}', encodeURI(kind)),
-                method: 'GET',
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<Array<BaseAttributeDto>>({
+            url: '/v1/connectors/{uuid}/attributes/{functionGroup}/{kind}'.replace('{uuid}', encodeURI(uuid)).replace('{functionGroup}', encodeURI(functionGroup)).replace('{kind}', encodeURI(kind)),
+            method: 'GET',
+        }, opts?.responseOpts);
+    };
 
     /**
      * Get attributes of all Function Groups
      */
-    getAttributesAll({ uuid }: GetAttributesAllRequest): Observable<{ [key: string]: { [key: string]: Array<BaseAttributeDto> } }>;
-    getAttributesAll(
-        { uuid }: GetAttributesAllRequest,
-        opts?: OperationOpts,
-    ): Observable<AjaxResponse<{ [key: string]: { [key: string]: Array<BaseAttributeDto> } }>>;
-    getAttributesAll(
-        { uuid }: GetAttributesAllRequest,
-        opts?: OperationOpts,
-    ): Observable<
-        | { [key: string]: { [key: string]: Array<BaseAttributeDto> } }
-        | AjaxResponse<{ [key: string]: { [key: string]: Array<BaseAttributeDto> } }>
-    > {
+    getAttributesAll({ uuid }: GetAttributesAllRequest): Observable<{ [key: string]: { [key: string]: Array<BaseAttributeDto>; }; }>
+    getAttributesAll({ uuid }: GetAttributesAllRequest, opts?: OperationOpts): Observable<AjaxResponse<{ [key: string]: { [key: string]: Array<BaseAttributeDto>; }; }>>
+    getAttributesAll({ uuid }: GetAttributesAllRequest, opts?: OperationOpts): Observable<{ [key: string]: { [key: string]: Array<BaseAttributeDto>; }; } | AjaxResponse<{ [key: string]: { [key: string]: Array<BaseAttributeDto>; }; }>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'getAttributesAll');
 
-        return this.request<{ [key: string]: { [key: string]: Array<BaseAttributeDto> } }>(
-            {
-                url: '/v1/connectors/{uuid}/attributes'.replace('{uuid}', encodeURI(uuid)),
-                method: 'GET',
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<{ [key: string]: { [key: string]: Array<BaseAttributeDto>; }; }>({
+            url: '/v1/connectors/{uuid}/attributes'.replace('{uuid}', encodeURI(uuid)),
+            method: 'GET',
+        }, opts?.responseOpts);
+    };
 
     /**
      * Get details of a Connector
      */
-    getConnector({ uuid }: GetConnectorRequest): Observable<ConnectorDto>;
-    getConnector({ uuid }: GetConnectorRequest, opts?: OperationOpts): Observable<AjaxResponse<ConnectorDto>>;
+    getConnector({ uuid }: GetConnectorRequest): Observable<ConnectorDto>
+    getConnector({ uuid }: GetConnectorRequest, opts?: OperationOpts): Observable<AjaxResponse<ConnectorDto>>
     getConnector({ uuid }: GetConnectorRequest, opts?: OperationOpts): Observable<ConnectorDto | AjaxResponse<ConnectorDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'getConnector');
 
-        return this.request<ConnectorDto>(
-            {
-                url: '/v1/connectors/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-                method: 'GET',
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<ConnectorDto>({
+            url: '/v1/connectors/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+            method: 'GET',
+        }, opts?.responseOpts);
+    };
 
     /**
      * List Connectors by Function Group and Kind
      */
-    listConnectors({ functionGroup, kind, status }: ListConnectorsRequest): Observable<Array<ConnectorDto>>;
-    listConnectors(
-        { functionGroup, kind, status }: ListConnectorsRequest,
-        opts?: OperationOpts,
-    ): Observable<AjaxResponse<Array<ConnectorDto>>>;
-    listConnectors(
-        { functionGroup, kind, status }: ListConnectorsRequest,
-        opts?: OperationOpts,
-    ): Observable<Array<ConnectorDto> | AjaxResponse<Array<ConnectorDto>>> {
+    listConnectors({ functionGroup, kind, status }: ListConnectorsRequest): Observable<Array<ConnectorDto>>
+    listConnectors({ functionGroup, kind, status }: ListConnectorsRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<ConnectorDto>>>
+    listConnectors({ functionGroup, kind, status }: ListConnectorsRequest, opts?: OperationOpts): Observable<Array<ConnectorDto> | AjaxResponse<Array<ConnectorDto>>> {
+
         const query: HttpQuery = {};
 
-        if (functionGroup != null) {
-            query['functionGroup'] = functionGroup;
-        }
-        if (kind != null) {
-            query['kind'] = kind;
-        }
-        if (status != null) {
-            query['status'] = status;
-        }
+        if (functionGroup != null) { query['functionGroup'] = functionGroup; }
+        if (kind != null) { query['kind'] = kind; }
+        if (status != null) { query['status'] = status; }
 
-        return this.request<Array<ConnectorDto>>(
-            {
-                url: '/v1/connectors',
-                method: 'GET',
-                query,
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<Array<ConnectorDto>>({
+            url: '/v1/connectors',
+            method: 'GET',
+            query,
+        }, opts?.responseOpts);
+    };
 
     /**
      * Reconnect to a Connector
      */
-    reconnect({ uuid }: ReconnectRequest): Observable<Array<ConnectDto>>;
-    reconnect({ uuid }: ReconnectRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<ConnectDto>>>;
+    reconnect({ uuid }: ReconnectRequest): Observable<Array<ConnectDto>>
+    reconnect({ uuid }: ReconnectRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<ConnectDto>>>
     reconnect({ uuid }: ReconnectRequest, opts?: OperationOpts): Observable<Array<ConnectDto> | AjaxResponse<Array<ConnectDto>>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'reconnect');
 
-        return this.request<Array<ConnectDto>>(
-            {
-                url: '/v1/connectors/{uuid}/reconnect'.replace('{uuid}', encodeURI(uuid)),
-                method: 'PUT',
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<Array<ConnectDto>>({
+            url: '/v1/connectors/{uuid}/reconnect'.replace('{uuid}', encodeURI(uuid)),
+            method: 'PUT',
+        }, opts?.responseOpts);
+    };
 
     /**
      * Validate Attributes
      */
-    validateAttributes({ uuid, functionGroup, kind, requestAttributeDto }: ValidateAttributesRequest): Observable<void>;
-    validateAttributes(
-        { uuid, functionGroup, kind, requestAttributeDto }: ValidateAttributesRequest,
-        opts?: OperationOpts,
-    ): Observable<void | AjaxResponse<void>>;
-    validateAttributes(
-        { uuid, functionGroup, kind, requestAttributeDto }: ValidateAttributesRequest,
-        opts?: OperationOpts,
-    ): Observable<void | AjaxResponse<void>> {
+    validateAttributes({ uuid, functionGroup, kind, requestAttributeDto }: ValidateAttributesRequest): Observable<void>
+    validateAttributes({ uuid, functionGroup, kind, requestAttributeDto }: ValidateAttributesRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    validateAttributes({ uuid, functionGroup, kind, requestAttributeDto }: ValidateAttributesRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'validateAttributes');
         throwIfNullOrUndefined(functionGroup, 'functionGroup', 'validateAttributes');
         throwIfNullOrUndefined(kind, 'kind', 'validateAttributes');
@@ -479,17 +385,12 @@ export class ConnectorManagementApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<void>(
-            {
-                url: '/v1/connectors/{uuid}/{functionGroup}/{kind}/validate'
-                    .replace('{uuid}', encodeURI(uuid))
-                    .replace('{functionGroup}', encodeURI(functionGroup))
-                    .replace('{kind}', encodeURI(kind)),
-                method: 'POST',
-                headers,
-                body: requestAttributeDto,
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<void>({
+            url: '/v1/connectors/{uuid}/{functionGroup}/{kind}/validate'.replace('{uuid}', encodeURI(uuid)).replace('{functionGroup}', encodeURI(functionGroup)).replace('{kind}', encodeURI(kind)),
+            method: 'POST',
+            headers,
+            body: requestAttributeDto,
+        }, opts?.responseOpts);
+    };
+
 }

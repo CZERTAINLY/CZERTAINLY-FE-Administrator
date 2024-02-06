@@ -12,7 +12,7 @@
  */
 
 /**
- * Type of the attribute content.
+ * Type of the attribute content. 
  * @export
  * @enum {string}
  */
@@ -29,5 +29,6 @@ export enum AttributeContentType {
     File = 'file',
     Credential = 'credential',
     Codeblock = 'codeblock',
-    Object = 'object',
+    Object = 'object'
 }
+

@@ -12,12 +12,13 @@
  */
 
 /**
- * Group to search
+ * Field group of search filter
  * @export
  * @enum {string}
  */
 export enum SearchGroup {
     Meta = 'meta',
     Custom = 'custom',
-    Property = 'property',
+    Property = 'property'
 }
+

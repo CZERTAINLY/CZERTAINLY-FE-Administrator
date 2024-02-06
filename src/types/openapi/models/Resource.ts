@@ -43,5 +43,6 @@ export enum Resource {
     Tokens = 'tokens',
     Keys = 'keys',
     ApprovalProfiles = 'approvalProfiles',
-    Approvals = 'approvals',
+    Approvals = 'approvals'
 }
+

@@ -11,7 +11,9 @@
  * Do not edit the class manually.
  */
 
-import type { ComplianceGroupsResponseDto } from './';
+import type {
+    ComplianceGroupsResponseDto,
+} from './';
 
 /**
  * @export

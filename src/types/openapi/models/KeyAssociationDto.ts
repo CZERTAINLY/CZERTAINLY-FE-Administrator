@@ -11,7 +11,9 @@
  * Do not edit the class manually.
  */
 
-import type { Resource } from './';
+import type {
+    Resource,
+} from './';
 
 /**
  * List of associated items
@@ -37,3 +39,5 @@ export interface KeyAssociationDto {
      */
     resource: Resource;
 }
+
+

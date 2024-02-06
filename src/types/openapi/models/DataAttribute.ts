@@ -44,12 +44,12 @@ export interface DataAttribute {
      * @memberof DataAttribute
      */
     description?: string;
-    /**
+        /**
      * Content of the Attribute
      * @type {Array<BaseAttributeContent>}
      * @memberof DataAttribute
      */
-    content?: Array<BaseAttributeContentDto>;
+        content?: Array<BaseAttributeContentDto>;
     /**
      * @type {AttributeType}
      * @memberof DataAttribute
@@ -77,3 +77,5 @@ export interface DataAttribute {
      */
     attributeCallback?: AttributeCallback;
 }
+
+

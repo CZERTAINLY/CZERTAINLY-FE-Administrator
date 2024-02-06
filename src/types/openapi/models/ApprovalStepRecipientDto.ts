@@ -69,5 +69,6 @@ export enum ApprovalStepRecipientDtoStatusEnum {
     Pending = 'PENDING',
     Approved = 'APPROVED',
     Rejected = 'REJECTED',
-    Expired = 'EXPIRED',
+    Expired = 'EXPIRED'
 }
+

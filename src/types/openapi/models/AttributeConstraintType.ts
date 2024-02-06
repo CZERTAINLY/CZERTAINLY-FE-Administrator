@@ -19,5 +19,6 @@
 export enum AttributeConstraintType {
     RegExp = 'regExp',
     Range = 'range',
-    DateTime = 'dateTime',
+    DateTime = 'dateTime'
 }
+

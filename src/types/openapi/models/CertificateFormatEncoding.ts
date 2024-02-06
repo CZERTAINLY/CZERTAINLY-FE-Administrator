@@ -12,11 +12,12 @@
  */
 
 /**
- *
+ * 
  * @export
  * @enum {string}
  */
 export enum CertificateFormatEncoding {
     Pem = 'pem',
-    Der = 'der',
+    Der = 'der'
 }
+

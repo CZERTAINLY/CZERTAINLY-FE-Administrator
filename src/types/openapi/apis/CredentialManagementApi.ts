@@ -57,11 +57,12 @@ export interface GetCredentialRequest {
  * no description
  */
 export class CredentialManagementApi extends BaseAPI {
+
     /**
      * Delete multiple Credentials
      */
-    bulkDeleteCredential({ requestBody }: BulkDeleteCredentialRequest): Observable<void>;
-    bulkDeleteCredential({ requestBody }: BulkDeleteCredentialRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
+    bulkDeleteCredential({ requestBody }: BulkDeleteCredentialRequest): Observable<void>
+    bulkDeleteCredential({ requestBody }: BulkDeleteCredentialRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
     bulkDeleteCredential({ requestBody }: BulkDeleteCredentialRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkDeleteCredential');
 
@@ -69,22 +70,19 @@ export class CredentialManagementApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<void>(
-            {
-                url: '/v1/credentials',
-                method: 'DELETE',
-                headers,
-                body: requestBody,
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<void>({
+            url: '/v1/credentials',
+            method: 'DELETE',
+            headers,
+            body: requestBody,
+        }, opts?.responseOpts);
+    };
 
     /**
      * Add Credential
      */
-    createCredential({ credentialRequestDto }: CreateCredentialRequest): Observable<UuidDto>;
-    createCredential({ credentialRequestDto }: CreateCredentialRequest, opts?: OperationOpts): Observable<AjaxResponse<UuidDto>>;
+    createCredential({ credentialRequestDto }: CreateCredentialRequest): Observable<UuidDto>
+    createCredential({ credentialRequestDto }: CreateCredentialRequest, opts?: OperationOpts): Observable<AjaxResponse<UuidDto>>
     createCredential({ credentialRequestDto }: CreateCredentialRequest, opts?: OperationOpts): Observable<UuidDto | AjaxResponse<UuidDto>> {
         throwIfNullOrUndefined(credentialRequestDto, 'credentialRequestDto', 'createCredential');
 
@@ -92,63 +90,48 @@ export class CredentialManagementApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<UuidDto>(
-            {
-                url: '/v1/credentials',
-                method: 'POST',
-                headers,
-                body: credentialRequestDto,
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<UuidDto>({
+            url: '/v1/credentials',
+            method: 'POST',
+            headers,
+            body: credentialRequestDto,
+        }, opts?.responseOpts);
+    };
 
     /**
      * Delete Credential
      */
-    deleteCredential({ uuid }: DeleteCredentialRequest): Observable<void>;
-    deleteCredential({ uuid }: DeleteCredentialRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
+    deleteCredential({ uuid }: DeleteCredentialRequest): Observable<void>
+    deleteCredential({ uuid }: DeleteCredentialRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
     deleteCredential({ uuid }: DeleteCredentialRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'deleteCredential');
 
-        return this.request<void>(
-            {
-                url: '/v1/credentials/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-                method: 'DELETE',
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<void>({
+            url: '/v1/credentials/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+            method: 'DELETE',
+        }, opts?.responseOpts);
+    };
 
     /**
      * Disable Credential
      */
-    disableCredential({ uuid }: DisableCredentialRequest): Observable<void>;
-    disableCredential({ uuid }: DisableCredentialRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
+    disableCredential({ uuid }: DisableCredentialRequest): Observable<void>
+    disableCredential({ uuid }: DisableCredentialRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
     disableCredential({ uuid }: DisableCredentialRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'disableCredential');
 
-        return this.request<void>(
-            {
-                url: '/v1/credentials/{uuid}/disable'.replace('{uuid}', encodeURI(uuid)),
-                method: 'PATCH',
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<void>({
+            url: '/v1/credentials/{uuid}/disable'.replace('{uuid}', encodeURI(uuid)),
+            method: 'PATCH',
+        }, opts?.responseOpts);
+    };
 
     /**
      * Edit Credential
      */
-    editCredential({ uuid, credentialUpdateRequestDto }: EditCredentialRequest): Observable<CredentialDto>;
-    editCredential(
-        { uuid, credentialUpdateRequestDto }: EditCredentialRequest,
-        opts?: OperationOpts,
-    ): Observable<AjaxResponse<CredentialDto>>;
-    editCredential(
-        { uuid, credentialUpdateRequestDto }: EditCredentialRequest,
-        opts?: OperationOpts,
-    ): Observable<CredentialDto | AjaxResponse<CredentialDto>> {
+    editCredential({ uuid, credentialUpdateRequestDto }: EditCredentialRequest): Observable<CredentialDto>
+    editCredential({ uuid, credentialUpdateRequestDto }: EditCredentialRequest, opts?: OperationOpts): Observable<AjaxResponse<CredentialDto>>
+    editCredential({ uuid, credentialUpdateRequestDto }: EditCredentialRequest, opts?: OperationOpts): Observable<CredentialDto | AjaxResponse<CredentialDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'editCredential');
         throwIfNullOrUndefined(credentialUpdateRequestDto, 'credentialUpdateRequestDto', 'editCredential');
 
@@ -156,63 +139,52 @@ export class CredentialManagementApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<CredentialDto>(
-            {
-                url: '/v1/credentials/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-                method: 'PUT',
-                headers,
-                body: credentialUpdateRequestDto,
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<CredentialDto>({
+            url: '/v1/credentials/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+            method: 'PUT',
+            headers,
+            body: credentialUpdateRequestDto,
+        }, opts?.responseOpts);
+    };
 
     /**
      * Enable Credential
      */
-    enableCredential({ uuid }: EnableCredentialRequest): Observable<void>;
-    enableCredential({ uuid }: EnableCredentialRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
+    enableCredential({ uuid }: EnableCredentialRequest): Observable<void>
+    enableCredential({ uuid }: EnableCredentialRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
     enableCredential({ uuid }: EnableCredentialRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'enableCredential');
 
-        return this.request<void>(
-            {
-                url: '/v1/credentials/{uuid}/enable'.replace('{uuid}', encodeURI(uuid)),
-                method: 'PATCH',
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<void>({
+            url: '/v1/credentials/{uuid}/enable'.replace('{uuid}', encodeURI(uuid)),
+            method: 'PATCH',
+        }, opts?.responseOpts);
+    };
 
     /**
      * Details of a Credentials
      */
-    getCredential({ uuid }: GetCredentialRequest): Observable<CredentialDto>;
-    getCredential({ uuid }: GetCredentialRequest, opts?: OperationOpts): Observable<AjaxResponse<CredentialDto>>;
+    getCredential({ uuid }: GetCredentialRequest): Observable<CredentialDto>
+    getCredential({ uuid }: GetCredentialRequest, opts?: OperationOpts): Observable<AjaxResponse<CredentialDto>>
     getCredential({ uuid }: GetCredentialRequest, opts?: OperationOpts): Observable<CredentialDto | AjaxResponse<CredentialDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'getCredential');
 
-        return this.request<CredentialDto>(
-            {
-                url: '/v1/credentials/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-                method: 'GET',
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<CredentialDto>({
+            url: '/v1/credentials/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+            method: 'GET',
+        }, opts?.responseOpts);
+    };
 
     /**
      * List of All Credentials
      */
-    listCredentials(): Observable<Array<CredentialDto>>;
-    listCredentials(opts?: OperationOpts): Observable<AjaxResponse<Array<CredentialDto>>>;
+    listCredentials(): Observable<Array<CredentialDto>>
+    listCredentials(opts?: OperationOpts): Observable<AjaxResponse<Array<CredentialDto>>>
     listCredentials(opts?: OperationOpts): Observable<Array<CredentialDto> | AjaxResponse<Array<CredentialDto>>> {
-        return this.request<Array<CredentialDto>>(
-            {
-                url: '/v1/credentials',
-                method: 'GET',
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<Array<CredentialDto>>({
+            url: '/v1/credentials',
+            method: 'GET',
+        }, opts?.responseOpts);
+    };
+
 }

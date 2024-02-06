@@ -11,7 +11,9 @@
  * Do not edit the class manually.
  */
 
-import type { SchedulerJobExecutionStatus } from './';
+import type {
+    SchedulerJobExecutionStatus,
+} from './';
 
 /**
  * Scheduled jobs
@@ -67,3 +69,5 @@ export interface ScheduledJobDto {
      */
     lastExecutionStatus: SchedulerJobExecutionStatus;
 }
+
+

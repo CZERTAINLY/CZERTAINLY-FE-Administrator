@@ -33,17 +33,17 @@ export interface RequestAttributeCallback {
      * @type {{ [key: string]: object; }}
      * @memberof RequestAttributeCallback
      */
-    pathVariable?: { [key: string]: object };
+    pathVariable?: { [key: string]: object; };
     /**
      * Map of the query parameters supported by the callback method
      * @type {{ [key: string]: object; }}
      * @memberof RequestAttributeCallback
      */
-    requestParameter?: { [key: string]: object };
+    requestParameter?: { [key: string]: object; };
     /**
      * Request body for the callback method
      * @type {{ [key: string]: object; }}
      * @memberof RequestAttributeCallback
      */
-    body?: { [key: string]: object };
+    body?: { [key: string]: object; };
 }

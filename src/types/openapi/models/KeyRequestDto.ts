@@ -11,7 +11,9 @@
  * Do not edit the class manually.
  */
 
-import type { RequestAttributeDto } from './';
+import type {
+    RequestAttributeDto,
+} from './';
 
 /**
  * @export
@@ -48,4 +50,10 @@ export interface KeyRequestDto {
      * @memberof KeyRequestDto
      */
     customAttributes?: Array<RequestAttributeDto>;
+    /**
+     * Enabled status of created key. True = Enabled, False = Disabled
+     * @type {boolean}
+     * @memberof KeyRequestDto
+     */
+    enabled?: boolean;
 }

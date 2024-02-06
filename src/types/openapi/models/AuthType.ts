@@ -21,5 +21,6 @@ export enum AuthType {
     Basic = 'basic',
     Certificate = 'certificate',
     ApiKey = 'apiKey',
-    Jwt = 'jwt',
+    Jwt = 'jwt'
 }
+

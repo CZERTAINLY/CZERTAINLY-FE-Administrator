@@ -19,5 +19,6 @@
 export enum AttributeValueTarget {
     PathVariable = 'pathVariable',
     RequestParameter = 'requestParameter',
-    Body = 'body',
+    Body = 'body'
 }
+

@@ -20,5 +20,6 @@ export enum DiscoveryStatus {
     InProgress = 'inProgress',
     Failed = 'failed',
     Completed = 'completed',
-    Warning = 'warning',
+    Warning = 'warning'
 }
+

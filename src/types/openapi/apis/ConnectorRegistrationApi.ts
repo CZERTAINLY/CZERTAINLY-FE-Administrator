@@ -15,7 +15,11 @@ import type { Observable } from 'rxjs';
 import type { AjaxResponse } from 'rxjs/ajax';
 import { BaseAPI, throwIfNullOrUndefined } from '../runtime';
 import type { OperationOpts, HttpHeaders } from '../runtime';
-import type { ConnectorRequestDto, ErrorMessageDto, UuidDto } from '../models';
+import type {
+    ConnectorRequestDto,
+    ErrorMessageDto,
+    UuidDto,
+} from '../models';
 
 export interface RegisterRequest {
     connectorRequestDto: ConnectorRequestDto;
@@ -25,11 +29,12 @@ export interface RegisterRequest {
  * no description
  */
 export class ConnectorRegistrationApi extends BaseAPI {
+
     /**
      * Register a Connector
      */
-    register({ connectorRequestDto }: RegisterRequest): Observable<UuidDto>;
-    register({ connectorRequestDto }: RegisterRequest, opts?: OperationOpts): Observable<AjaxResponse<UuidDto>>;
+    register({ connectorRequestDto }: RegisterRequest): Observable<UuidDto>
+    register({ connectorRequestDto }: RegisterRequest, opts?: OperationOpts): Observable<AjaxResponse<UuidDto>>
     register({ connectorRequestDto }: RegisterRequest, opts?: OperationOpts): Observable<UuidDto | AjaxResponse<UuidDto>> {
         throwIfNullOrUndefined(connectorRequestDto, 'connectorRequestDto', 'register');
 
@@ -37,14 +42,12 @@ export class ConnectorRegistrationApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<UuidDto>(
-            {
-                url: '/v1/connector/register',
-                method: 'POST',
-                headers,
-                body: connectorRequestDto,
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<UuidDto>({
+            url: '/v1/connector/register',
+            method: 'POST',
+            headers,
+            body: connectorRequestDto,
+        }, opts?.responseOpts);
+    };
+
 }

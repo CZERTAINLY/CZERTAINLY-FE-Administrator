@@ -25,5 +25,6 @@ export enum CertificateState {
     Failed = 'failed',
     Issued = 'issued',
     Revoked = 'revoked',
-    Archived = 'archived',
+    Archived = 'archived'
 }
+

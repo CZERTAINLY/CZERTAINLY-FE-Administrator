@@ -23,5 +23,6 @@ export enum CertificateValidationCheck {
     OcspVerification = 'ocsp_verification',
     CrlVerification = 'crl_verification',
     BasicConstraints = 'basic_constraints',
-    KeyUsage = 'key_usage',
+    KeyUsage = 'key_usage'
 }
+

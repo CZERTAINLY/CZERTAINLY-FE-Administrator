@@ -12,11 +12,12 @@
  */
 
 /**
- *
+ * 
  * @export
  * @enum {string}
  */
 export enum KeyRequestType {
     Secret = 'secret',
-    KeyPair = 'keyPair',
+    KeyPair = 'keyPair'
 }
+

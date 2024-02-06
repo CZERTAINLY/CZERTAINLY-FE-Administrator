@@ -72,7 +72,7 @@ export interface AuditLogFilter {
  */
 export enum AuditLogFilterOperationStatusEnum {
     Success = 'SUCCESS',
-    Failure = 'FAILURE',
+    Failure = 'FAILURE'
 }
 /**
  * @export
@@ -114,7 +114,7 @@ export enum AuditLogFilterOriginationEnum {
     TokenInstance = 'TOKEN_INSTANCE',
     CryptographicKey = 'CRYPTOGRAPHIC_KEY',
     CryptographicOperations = 'CRYPTOGRAPHIC_OPERATIONS',
-    Scheduler = 'SCHEDULER',
+    Scheduler = 'SCHEDULER'
 }
 /**
  * @export
@@ -156,7 +156,7 @@ export enum AuditLogFilterAffectedEnum {
     TokenInstance = 'TOKEN_INSTANCE',
     CryptographicKey = 'CRYPTOGRAPHIC_KEY',
     CryptographicOperations = 'CRYPTOGRAPHIC_OPERATIONS',
-    Scheduler = 'SCHEDULER',
+    Scheduler = 'SCHEDULER'
 }
 /**
  * @export
@@ -186,5 +186,6 @@ export enum AuditLogFilterOperationEnum {
     Verify = 'VERIFY',
     Approve = 'APPROVE',
     Reject = 'REJECT',
-    Update = 'UPDATE',
+    Update = 'UPDATE'
 }
+

@@ -11,7 +11,10 @@
  * Do not edit the class manually.
  */
 
-import type { KeyUsage, TokenInstanceStatus } from './';
+import type {
+    KeyUsage,
+    TokenInstanceStatus,
+} from './';
 
 /**
  * @export
@@ -66,3 +69,5 @@ export interface TokenProfileDto {
      */
     usages: Array<KeyUsage>;
 }
+
+

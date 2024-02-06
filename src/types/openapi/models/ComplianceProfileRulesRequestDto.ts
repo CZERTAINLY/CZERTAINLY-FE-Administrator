@@ -11,7 +11,9 @@
  * Do not edit the class manually.
  */
 
-import type { ComplianceRequestRulesDto } from './';
+import type {
+    ComplianceRequestRulesDto,
+} from './';
 
 /**
  * Rules to be associated with the Compliance Profile. Profiles can be created without rules and can be added later

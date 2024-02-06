@@ -20,5 +20,6 @@ export enum KeyType {
     Secret = 'Secret',
     Public = 'Public',
     Private = 'Private',
-    Split = 'Split',
+    Split = 'Split'
 }
+

@@ -11,7 +11,9 @@
  * Do not edit the class manually.
  */
 
-import type { DataAttribute } from './';
+import type {
+    DataAttribute,
+} from './';
 
 /**
  * Credential attribute content data

@@ -57,5 +57,6 @@ export enum ProgrammingLanguageEnum {
     Vbnet = 'vbnet',
     Xquery = 'xquery',
     Xml = 'xml',
-    Yaml = 'yaml',
+    Yaml = 'yaml'
 }
+

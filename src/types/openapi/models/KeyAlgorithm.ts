@@ -21,5 +21,6 @@ export enum KeyAlgorithm {
     Ecdsa = 'ECDSA',
     Falcon = 'FALCON',
     CrystalsDilithium = 'CRYSTALS-Dilithium',
-    Sphincs = 'SPHINCS+',
+    Sphincs = 'SPHINCS+'
 }
+

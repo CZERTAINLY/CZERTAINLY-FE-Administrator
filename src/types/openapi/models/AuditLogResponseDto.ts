@@ -11,7 +11,9 @@
  * Do not edit the class manually.
  */
 
-import type { AuditLogDto } from './';
+import type {
+    AuditLogDto,
+} from './';
 
 /**
  * @export

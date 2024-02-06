@@ -24,5 +24,6 @@ export enum CertificateValidationStatus {
     Valid = 'valid',
     Revoked = 'revoked',
     Expiring = 'expiring',
-    Expired = 'expired',
+    Expired = 'expired'
 }
+

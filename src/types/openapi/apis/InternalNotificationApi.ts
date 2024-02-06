@@ -13,7 +13,11 @@
 
 import type { Observable } from 'rxjs';
 import type { AjaxResponse } from 'rxjs/ajax';
-import type { NotificationDto, NotificationRequestDto, NotificationResponseDto } from '../models';
+import type {
+    NotificationDto,
+    NotificationRequestDto,
+    NotificationResponseDto
+} from '../models';
 import type { HttpQuery, OperationOpts } from '../runtime';
 import { BaseAPI, encodeURI, throwIfNullOrUndefined } from '../runtime';
 
@@ -33,32 +37,27 @@ export interface MarkNotificationAsReadRequest {
  * no description
  */
 export class InternalNotificationApi extends BaseAPI {
+
     /**
      * Delete a notification for logged user
      */
-    deleteNotification({ uuid }: DeleteNotificationRequest): Observable<void>;
-    deleteNotification({ uuid }: DeleteNotificationRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
+    deleteNotification({ uuid }: DeleteNotificationRequest): Observable<void>
+    deleteNotification({ uuid }: DeleteNotificationRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
     deleteNotification({ uuid }: DeleteNotificationRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'deleteNotification');
 
-        return this.request<void>(
-            {
-                url: '/v1/notifications/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-                method: 'DELETE',
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<void>({
+            url: '/v1/notifications/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+            method: 'DELETE',
+        }, opts?.responseOpts);
+    };
 
     /**
      * List notifications for logged user
      */
-    listNotifications({ request }: ListNotificationsRequest): Observable<NotificationResponseDto>;
-    listNotifications({ request }: ListNotificationsRequest, opts?: OperationOpts): Observable<AjaxResponse<NotificationResponseDto>>;
-    listNotifications(
-        { request }: ListNotificationsRequest,
-        opts?: OperationOpts,
-    ): Observable<NotificationResponseDto | AjaxResponse<NotificationResponseDto>> {
+    listNotifications({ request }: ListNotificationsRequest): Observable<NotificationResponseDto>
+    listNotifications({ request }: ListNotificationsRequest, opts?: OperationOpts): Observable<AjaxResponse<NotificationResponseDto>>
+    listNotifications({ request }: ListNotificationsRequest, opts?: OperationOpts): Observable<NotificationResponseDto | AjaxResponse<NotificationResponseDto>> {
         throwIfNullOrUndefined(request, 'request', 'listNotifications');
 
         const query: HttpQuery = {};
@@ -66,33 +65,25 @@ export class InternalNotificationApi extends BaseAPI {
             Object.assign(query, request);
         }
 
-        return this.request<NotificationResponseDto>(
-            {
-                url: '/v1/notifications',
-                method: 'GET',
-                query,
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<NotificationResponseDto>({
+            url: '/v1/notifications',
+            method: 'GET',
+            query,
+        }, opts?.responseOpts);
+    };
 
     /**
      * Mark notification as read for logged user
      */
-    markNotificationAsRead({ uuid }: MarkNotificationAsReadRequest): Observable<NotificationDto>;
-    markNotificationAsRead({ uuid }: MarkNotificationAsReadRequest, opts?: OperationOpts): Observable<AjaxResponse<NotificationDto>>;
-    markNotificationAsRead(
-        { uuid }: MarkNotificationAsReadRequest,
-        opts?: OperationOpts,
-    ): Observable<NotificationDto | AjaxResponse<NotificationDto>> {
+    markNotificationAsRead({ uuid }: MarkNotificationAsReadRequest): Observable<NotificationDto>
+    markNotificationAsRead({ uuid }: MarkNotificationAsReadRequest, opts?: OperationOpts): Observable<AjaxResponse<NotificationDto>>
+    markNotificationAsRead({ uuid }: MarkNotificationAsReadRequest, opts?: OperationOpts): Observable<NotificationDto | AjaxResponse<NotificationDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'markNotificationAsRead');
 
-        return this.request<NotificationDto>(
-            {
-                url: '/v1/notifications/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-                method: 'PATCH',
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<NotificationDto>({
+            url: '/v1/notifications/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+            method: 'PATCH',
+        }, opts?.responseOpts);
+    };
+
 }

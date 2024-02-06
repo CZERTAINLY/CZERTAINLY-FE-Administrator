@@ -12,7 +12,7 @@
  */
 
 /**
- * Condition for the search
+ * Condition for the search filter
  * @export
  * @enum {string}
  */
@@ -32,5 +32,6 @@ export enum SearchCondition {
     Success = 'SUCCESS',
     Failed = 'FAILED',
     Unknown = 'UNKNOWN',
-    NotChecked = 'NOT_CHECKED',
+    NotChecked = 'NOT_CHECKED'
 }
+

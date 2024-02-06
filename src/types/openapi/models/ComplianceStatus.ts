@@ -20,5 +20,6 @@ export enum ComplianceStatus {
     NotChecked = 'not_checked',
     Ok = 'ok',
     Nok = 'nok',
-    Na = 'na',
+    Na = 'na'
 }
+

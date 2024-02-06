@@ -84,7 +84,7 @@ export interface AuditLogDto {
  */
 export enum AuditLogDtoOperationStatusEnum {
     Success = 'SUCCESS',
-    Failure = 'FAILURE',
+    Failure = 'FAILURE'
 }
 /**
  * @export
@@ -126,7 +126,7 @@ export enum AuditLogDtoOriginationEnum {
     TokenInstance = 'TOKEN_INSTANCE',
     CryptographicKey = 'CRYPTOGRAPHIC_KEY',
     CryptographicOperations = 'CRYPTOGRAPHIC_OPERATIONS',
-    Scheduler = 'SCHEDULER',
+    Scheduler = 'SCHEDULER'
 }
 /**
  * @export
@@ -168,7 +168,7 @@ export enum AuditLogDtoAffectedEnum {
     TokenInstance = 'TOKEN_INSTANCE',
     CryptographicKey = 'CRYPTOGRAPHIC_KEY',
     CryptographicOperations = 'CRYPTOGRAPHIC_OPERATIONS',
-    Scheduler = 'SCHEDULER',
+    Scheduler = 'SCHEDULER'
 }
 /**
  * @export
@@ -198,5 +198,6 @@ export enum AuditLogDtoOperationEnum {
     Verify = 'VERIFY',
     Approve = 'APPROVE',
     Reject = 'REJECT',
-    Update = 'UPDATE',
+    Update = 'UPDATE'
 }
+

@@ -11,7 +11,9 @@
  * Do not edit the class manually.
  */
 
-import type { ApprovalDto } from './';
+import type {
+    ApprovalDto,
+} from './';
 
 /**
  * @export
