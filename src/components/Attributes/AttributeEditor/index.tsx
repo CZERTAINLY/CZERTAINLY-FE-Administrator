@@ -131,7 +131,7 @@ export default function AttributeEditor({
         (attributes: AttributeResponseModel[], path: string | undefined): any => {
             if (!path) return undefined;
 
-            if (!path.includes('.')) return attributes.find((a) => a.name === path)?.content;
+            if (!path.includes('.')) return getObjectPropertyValue(attributes.find((a) => a.name === path)?.content, 'value');
 
             let spath = path.split('.');
 
@@ -493,7 +493,8 @@ export default function AttributeEditor({
 
                         if (mappings) {
                             const formAttributeName = `__attributes__${id}__.${descriptor.name}`;
-                            form.mutators.setAttribute(formAttributeName, undefined);
+                            // removed it as it was causing form value to be cleared  , it does not seem to be necessary and other places it is working without it
+                            // form.mutators.setAttribute(formAttributeName, undefined);
                             executeCallback(mappings, descriptor, formAttributeName);
                         }
                     }
@@ -504,14 +505,14 @@ export default function AttributeEditor({
         attributeDescriptors,
         groupAttributesCallbackAttributes,
         buildCallbackMappings,
-        form.mutators,
+        // removed it as it was causing form value to be cleared  , it does not seem to be necessary and other places it is working without it
+        // form.mutators,
         formState.values,
         id,
         isRunningCb,
         previousFormValues,
         executeCallback,
     ]);
-
     const ref = useRef(debounce((doCallbacksParam) => doCallbacksParam(), 600));
 
     useEffect(() => {
