@@ -1,7 +1,7 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ProfileApprovalModel } from "types/approval-profiles";
-import { AttributeDescriptorModel } from "types/attributes";
-import { BulkActionModel } from "types/connectors";
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { ProfileApprovalModel } from 'types/approval-profiles';
+import { AttributeDescriptorModel } from 'types/attributes';
+import { BulkActionModel } from 'types/connectors';
 import {
     ComplianceProfileSimplifiedModel,
     RaProfileAcmeDetailResponseModel,
@@ -11,8 +11,8 @@ import {
     RaProfileEditRequestModel,
     RaProfileResponseModel,
     RaProfileScepDetailResponseModel,
-} from "types/ra-profiles";
-import { createFeatureSelector } from "utils/ducks";
+} from 'types/ra-profiles';
+import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     checkedRows: string[];
@@ -66,7 +66,7 @@ export type State = {
 export const initialState: State = {
     checkedRows: [],
 
-    deleteErrorMessage: "",
+    deleteErrorMessage: '',
     bulkDeleteErrorMessages: [],
     associatedApprovalProfiles: [],
     raProfiles: [],
@@ -101,7 +101,7 @@ export const initialState: State = {
 };
 
 export const slice = createSlice({
-    name: "raprofiles",
+    name: 'raprofiles',
 
     initialState,
 
@@ -119,7 +119,7 @@ export const slice = createSlice({
         },
 
         clearDeleteErrorMessages: (state, action: PayloadAction<void>) => {
-            state.deleteErrorMessage = "";
+            state.deleteErrorMessage = '';
             state.bulkDeleteErrorMessages = [];
         },
 

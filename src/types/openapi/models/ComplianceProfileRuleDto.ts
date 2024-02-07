@@ -11,7 +11,10 @@
  * Do not edit the class manually.
  */
 
-import type { CertificateType, ResponseAttributeDto } from "./";
+import type {
+    CertificateType,
+    ResponseAttributeDto,
+} from './';
 
 /**
  * @export
@@ -84,3 +87,5 @@ export interface ComplianceProfileRuleDto {
      */
     complianceProfileName: string;
 }
+
+

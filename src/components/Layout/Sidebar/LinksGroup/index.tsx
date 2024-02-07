@@ -1,9 +1,9 @@
-import cx from "classnames";
-import React, { useCallback, useState } from "react";
-import { NavLink } from "react-router-dom";
-import { Collapse } from "reactstrap";
+import cx from 'classnames';
+import React, { useCallback, useState } from 'react';
+import { NavLink } from 'react-router-dom';
+import { Collapse } from 'reactstrap';
 
-import style from "./LinksGroup.module.scss";
+import style from './LinksGroup.module.scss';
 
 interface ChildrenLink {
     _key: string;
@@ -21,14 +21,14 @@ interface Props {
 }
 
 function LinksGroup(props: Props) {
-    const [isOpen, setIsOpen] = useState(window.location.href.includes("/app/acme"));
+    const [isOpen, setIsOpen] = useState(window.location.href.includes('/app/acme'));
 
     const toggle = useCallback(() => setIsOpen(!isOpen), [isOpen]);
 
     const createHeaderLink = () => {
         return (
             <li key={props._key} className={cx(style.headerLink, props.className)}>
-                <NavLink to={props.headerLink || ""} className={({ isActive }) => (isActive ? style.headerLinkActive : undefined)}>
+                <NavLink to={props.headerLink || ''} className={({ isActive }) => (isActive ? style.headerLinkActive : undefined)}>
                     <div>
                         <i className={props.glyph} /> <span className={style.menuLabel}>{props.header}</span>
                     </div>
@@ -39,7 +39,7 @@ function LinksGroup(props: Props) {
 
     const createChildLinks = () => {
         const matchClassName = cx(style.headerLink);
-        const arrowClassName = cx("fa fa-angle-down arrow", style.arrow, { [style.arrowActive]: isOpen });
+        const arrowClassName = cx('fa fa-angle-down arrow', style.arrow, { [style.arrowActive]: isOpen });
 
         return (
             <li key={props._key} className={cx(style.headerLink, props.className)}>

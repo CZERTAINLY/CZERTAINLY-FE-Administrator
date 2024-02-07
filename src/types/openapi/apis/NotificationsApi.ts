@@ -11,11 +11,11 @@
  * Do not edit the class manually.
  */
 
-import type { Observable } from "rxjs";
-import type { AjaxResponse } from "rxjs/ajax";
-import type { NotificationDto, NotificationRequestDto, NotificationResponseDto } from "../models";
-import type { HttpQuery, OperationOpts } from "../runtime";
-import { BaseAPI, encodeURI, throwIfNullOrUndefined } from "../runtime";
+import type { Observable } from 'rxjs';
+import type { AjaxResponse } from 'rxjs/ajax';
+import type { NotificationDto, NotificationRequestDto, NotificationResponseDto } from '../models';
+import type { HttpQuery, OperationOpts } from '../runtime';
+import { BaseAPI, encodeURI, throwIfNullOrUndefined } from '../runtime';
 
 export interface DeleteNotificationRequest {
     uuid: string;
@@ -39,12 +39,12 @@ export class NotificationsApi extends BaseAPI {
     deleteNotification({ uuid }: DeleteNotificationRequest): Observable<void>;
     deleteNotification({ uuid }: DeleteNotificationRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     deleteNotification({ uuid }: DeleteNotificationRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(uuid, "uuid", "deleteNotification");
+        throwIfNullOrUndefined(uuid, 'uuid', 'deleteNotification');
 
         return this.request<void>(
             {
-                url: "/v1/notifications/{uuid}".replace("{uuid}", encodeURI(uuid)),
-                method: "DELETE",
+                url: '/v1/notifications/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'DELETE',
             },
             opts?.responseOpts,
         );
@@ -59,7 +59,7 @@ export class NotificationsApi extends BaseAPI {
         { request }: ListNotificationsRequest,
         opts?: OperationOpts,
     ): Observable<NotificationResponseDto | AjaxResponse<NotificationResponseDto>> {
-        throwIfNullOrUndefined(request, "request", "listNotifications");
+        throwIfNullOrUndefined(request, 'request', 'listNotifications');
 
         const query: HttpQuery = {};
 
@@ -69,8 +69,8 @@ export class NotificationsApi extends BaseAPI {
 
         return this.request<NotificationResponseDto>(
             {
-                url: "/v1/notifications",
-                method: "GET",
+                url: '/v1/notifications',
+                method: 'GET',
                 query,
             },
             opts?.responseOpts,
@@ -86,12 +86,12 @@ export class NotificationsApi extends BaseAPI {
         { uuid }: MarkNotificationAsReadRequest,
         opts?: OperationOpts,
     ): Observable<NotificationDto | AjaxResponse<NotificationDto>> {
-        throwIfNullOrUndefined(uuid, "uuid", "markNotificationAsRead");
+        throwIfNullOrUndefined(uuid, 'uuid', 'markNotificationAsRead');
 
         return this.request<NotificationDto>(
             {
-                url: "/v1/notifications/{uuid}".replace("{uuid}", encodeURI(uuid)),
-                method: "PATCH",
+                url: '/v1/notifications/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'PATCH',
             },
             opts?.responseOpts,
         );

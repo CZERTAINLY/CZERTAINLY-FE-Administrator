@@ -1,16 +1,16 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
-import { Container, Table } from "reactstrap";
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { Container, Table } from 'reactstrap';
 
-import { actions, selectors } from "ducks/acme-profiles";
+import { actions, selectors } from 'ducks/acme-profiles';
 
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
-import StatusBadge from "components/StatusBadge";
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
-import { LockWidgetNameEnum } from "types/user-interface";
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
+import StatusBadge from 'components/StatusBadge';
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
+import { LockWidgetNameEnum } from 'types/user-interface';
 
 export default function AdministratorsList() {
     const dispatch = useDispatch();
@@ -79,33 +79,33 @@ export default function AdministratorsList() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "plus",
+                icon: 'plus',
                 disabled: false,
-                tooltip: "Create",
+                tooltip: 'Create',
                 onClick: () => {
                     onAddClick();
                 },
             },
             {
-                icon: "trash",
+                icon: 'trash',
                 disabled: checkedRows.length === 0,
-                tooltip: "Delete",
+                tooltip: 'Delete',
                 onClick: () => {
                     setConfirmDelete(true);
                 },
             },
             {
-                icon: "check",
+                icon: 'check',
                 disabled: checkedRows.length === 0,
-                tooltip: "Enable",
+                tooltip: 'Enable',
                 onClick: () => {
                     onEnableClick();
                 },
             },
             {
-                icon: "times",
+                icon: 'times',
                 disabled: checkedRows.length === 0,
-                tooltip: "Disable",
+                tooltip: 'Disable',
                 onClick: () => {
                     onDisableClick();
                 },
@@ -117,7 +117,7 @@ export default function AdministratorsList() {
     const forceDeleteBody = useMemo(
         () => (
             <div>
-                <div>Failed to delete {checkedRows.length > 1 ? "ACME Profiles" : "an ACME Profile"}. Please find the details below:</div>
+                <div>Failed to delete {checkedRows.length > 1 ? 'ACME Profiles' : 'an ACME Profile'}. Please find the details below:</div>
 
                 <Table className="table-hover" size="sm">
                     <thead>
@@ -148,37 +148,37 @@ export default function AdministratorsList() {
     const acmeProfilesTableHeader: TableHeader[] = useMemo(
         () => [
             {
-                id: "name",
-                content: "Name",
+                id: 'name',
+                content: 'Name',
                 sortable: true,
-                sort: "asc",
-                width: "10%",
+                sort: 'asc',
+                width: '10%',
             },
             {
-                id: "description",
-                content: "Description",
+                id: 'description',
+                content: 'Description',
                 sortable: true,
-                width: "10%",
+                width: '10%',
             },
             {
-                id: "raProfileName",
-                content: "RA Profile Name",
+                id: 'raProfileName',
+                content: 'RA Profile Name',
                 sortable: true,
-                width: "10%",
-                align: "center",
+                width: '10%',
+                align: 'center',
             },
             {
-                id: "directoryUrl",
-                content: "Directory URL",
+                id: 'directoryUrl',
+                content: 'Directory URL',
                 sortable: true,
-                width: "auto",
+                width: 'auto',
             },
             {
-                id: "status",
-                content: "Status",
-                align: "center",
+                id: 'status',
+                content: 'Status',
+                align: 'center',
                 sortable: true,
-                width: "7%",
+                width: '7%',
             },
         ],
         [],
@@ -190,21 +190,21 @@ export default function AdministratorsList() {
                 id: acmeProfile.uuid,
 
                 columns: [
-                    <span style={{ whiteSpace: "nowrap" }}>
+                    <span style={{ whiteSpace: 'nowrap' }}>
                         <Link to={`./detail/${acmeProfile.uuid}`}>{acmeProfile.name}</Link>
                     </span>,
 
-                    <span style={{ whiteSpace: "nowrap" }}>{acmeProfile.description || ""}</span>,
+                    <span style={{ whiteSpace: 'nowrap' }}>{acmeProfile.description || ''}</span>,
 
                     acmeProfile.raProfile ? (
                         <Link to={`../raprofiles/detail/${acmeProfile?.raProfile.authorityInstanceUuid}/${acmeProfile?.raProfile.uuid}`}>
-                            {acmeProfile.raProfile.name ?? "Unassigned"}
+                            {acmeProfile.raProfile.name ?? 'Unassigned'}
                         </Link>
                     ) : (
-                        acmeProfile.raProfile ?? "Unassigned"
+                        acmeProfile.raProfile ?? 'Unassigned'
                     ),
 
-                    acmeProfile.directoryUrl || "",
+                    acmeProfile.directoryUrl || '',
 
                     <StatusBadge enabled={acmeProfile.enabled} />,
                 ],
@@ -235,26 +235,26 @@ export default function AdministratorsList() {
 
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete ${checkedRows.length > 1 ? "ACME Profiles" : "an ACME Profile"}`}
+                caption={`Delete ${checkedRows.length > 1 ? 'ACME Profiles' : 'an ACME Profile'}`}
                 body={`You are about to delete ${
-                    checkedRows.length > 1 ? "ACME Profiles" : "an ACME Profile"
+                    checkedRows.length > 1 ? 'ACME Profiles' : 'an ACME Profile'
                 } which may have associated ACME
                    Account(s). When deleted the ACME Account(s) will be revoked. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
             <Dialog
                 isOpen={confirmForceDelete}
-                caption={`Force Delete ${checkedRows.length > 1 ? "ACME Profiles" : "an ACME Profile"}`}
+                caption={`Force Delete ${checkedRows.length > 1 ? 'ACME Profiles' : 'an ACME Profile'}`}
                 body={forceDeleteBody}
                 toggle={() => setConfirmForceDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onForceDeleteConfirmed, body: "Force delete" },
-                    { color: "secondary", onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: "Cancel" },
+                    { color: 'danger', onClick: onForceDeleteConfirmed, body: 'Force delete' },
+                    { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
                 ]}
             />
         </Container>

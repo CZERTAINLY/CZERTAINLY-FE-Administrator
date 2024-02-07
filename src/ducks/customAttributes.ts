@@ -1,13 +1,13 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
     CustomAttributeCreateRequestModel,
     CustomAttributeDetailResponseModel,
     CustomAttributeResponseModel,
     CustomAttributeUpdateRequestModel,
-} from "types/customAttributes";
-import { createFeatureSelector } from "utils/ducks";
-import { AttributeResponseModel, BaseAttributeContentModel, CustomAttributeModel } from "../types/attributes";
-import { AttributeContentType, Resource } from "../types/openapi";
+} from 'types/customAttributes';
+import { createFeatureSelector } from 'utils/ducks';
+import { AttributeResponseModel, BaseAttributeContentModel, CustomAttributeModel } from '../types/attributes';
+import { AttributeContentType, Resource } from '../types/openapi';
 
 type ResourceCustomAttributesContents = {
     resource: Resource;
@@ -63,7 +63,7 @@ export const initialState: State = {
 };
 
 export const slice = createSlice({
-    name: "customAttributes",
+    name: 'customAttributes',
     initialState,
     reducers: {
         setCheckedRows: (state, action: PayloadAction<{ checkedRows: string[] }>) => {

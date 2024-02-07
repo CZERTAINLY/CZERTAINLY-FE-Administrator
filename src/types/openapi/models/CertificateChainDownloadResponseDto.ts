@@ -11,7 +11,10 @@
  * Do not edit the class manually.
  */
 
-import type { CertificateFormat, CertificateFormatEncoding } from "./";
+import type {
+    CertificateFormat,
+    CertificateFormatEncoding,
+} from './';
 
 /**
  * @export
@@ -41,3 +44,5 @@ export interface CertificateChainDownloadResponseDto {
      */
     completeChain: boolean;
 }
+
+

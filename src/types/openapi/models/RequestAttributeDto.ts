@@ -11,7 +11,9 @@
  * Do not edit the class manually.
  */
 
-import type { BaseAttributeContentDto } from "./";
+import type {
+    BaseAttributeContentDto,
+} from './';
 
 /**
  * Request attribute to send attribute content for object

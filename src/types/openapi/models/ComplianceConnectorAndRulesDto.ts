@@ -11,7 +11,9 @@
  * Do not edit the class manually.
  */
 
-import type { ComplianceRulesDto } from "./";
+import type {
+    ComplianceRulesDto,
+} from './';
 
 /**
  * List of rules

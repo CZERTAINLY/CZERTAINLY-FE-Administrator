@@ -11,7 +11,10 @@
  * Do not edit the class manually.
  */
 
-import type { SearchFieldDataDto, SearchGroup } from "./";
+import type {
+    SearchFieldDataDto,
+    SearchGroup,
+} from './';
 
 /**
  * @export
@@ -30,3 +33,5 @@ export interface SearchFieldDataByGroupDto {
      */
     searchFieldData?: Array<SearchFieldDataDto>;
 }
+
+

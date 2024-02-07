@@ -11,7 +11,12 @@
  * Do not edit the class manually.
  */
 
-import type { CertificateState, CertificateValidationStatus, MetadataResponseDto, ResponseAttributeDto } from "./";
+import type {
+    CertificateState,
+    CertificateValidationStatus,
+    MetadataResponseDto,
+    ResponseAttributeDto,
+} from './';
 
 /**
  * List of Certificates in Location
@@ -72,3 +77,5 @@ export interface CertificateInLocationDto {
      */
     withKey?: boolean;
 }
+
+

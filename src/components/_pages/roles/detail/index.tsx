@@ -1,17 +1,17 @@
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
 
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
 
-import { actions, selectors } from "ducks/roles";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
-import { Badge, Container } from "reactstrap";
-import { LockWidgetNameEnum } from "types/user-interface";
-import { Resource } from "../../../../types/openapi";
-import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
+import { actions, selectors } from 'ducks/roles';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Badge, Container } from 'reactstrap';
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { Resource } from '../../../../types/openapi';
+import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 
 export default function UserDetail() {
     const dispatch = useDispatch();
@@ -73,33 +73,33 @@ export default function UserDetail() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "pencil",
+                icon: 'pencil',
                 disabled: role?.systemRole || false,
-                tooltip: "Edit",
+                tooltip: 'Edit',
                 onClick: () => {
                     onEditClick();
                 },
             },
             {
-                icon: "trash",
+                icon: 'trash',
                 disabled: role?.systemRole || false,
-                tooltip: "Delete",
+                tooltip: 'Delete',
                 onClick: () => {
                     setConfirmDelete(true);
                 },
             },
             {
-                icon: "user",
+                icon: 'user',
                 disabled: role?.systemRole || false,
-                tooltip: "Edit role users",
+                tooltip: 'Edit role users',
                 onClick: () => {
                     onEditRoleUsersClick();
                 },
             },
             {
-                icon: "lock",
+                icon: 'lock',
                 disabled: role?.systemRole || false,
-                tooltip: "Edit role permissions",
+                tooltip: 'Edit role permissions',
                 onClick: () => {
                     onEditRolePermissionsClick();
                 },
@@ -111,12 +111,12 @@ export default function UserDetail() {
     const detailHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "property",
-                content: "Property",
+                id: 'property',
+                content: 'Property',
             },
             {
-                id: "value",
-                content: "Value",
+                id: 'value',
+                content: 'Value',
             },
         ],
         [],
@@ -128,22 +128,22 @@ export default function UserDetail() {
                 ? []
                 : [
                       {
-                          id: "roleName",
-                          columns: ["Name", role.name],
+                          id: 'roleName',
+                          columns: ['Name', role.name],
                       },
                       {
-                          id: "description",
-                          columns: ["Description", role.description || ""],
+                          id: 'description',
+                          columns: ['Description', role.description || ''],
                       },
                       {
-                          id: "email",
-                          columns: ["Email", role.email || ""],
+                          id: 'email',
+                          columns: ['Email', role.email || ''],
                       },
                       {
-                          id: "systemRole",
+                          id: 'systemRole',
                           columns: [
-                              "System role ",
-                              <Badge color={!role.systemRole ? "success" : "danger"}>{role.systemRole ? "Yes" : "No"}</Badge>,
+                              'System role ',
+                              <Badge color={!role.systemRole ? 'success' : 'danger'}>{role.systemRole ? 'Yes' : 'No'}</Badge>,
                           ],
                       },
                   ],
@@ -153,24 +153,24 @@ export default function UserDetail() {
     const usersHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "username",
-                content: "Username",
+                id: 'username',
+                content: 'Username',
             },
             {
-                id: "descrtiption",
-                content: "Description",
+                id: 'descrtiption',
+                content: 'Description',
             },
             {
-                id: "firstName",
-                content: "First name",
+                id: 'firstName',
+                content: 'First name',
             },
             {
-                id: "lastName",
-                content: "Last name",
+                id: 'lastName',
+                content: 'Last name',
             },
             {
-                id: "email",
-                content: "Email",
+                id: 'email',
+                content: 'Email',
             },
         ],
         [],
@@ -183,11 +183,11 @@ export default function UserDetail() {
                 : role.users.map((user) => ({
                       id: user.uuid,
                       columns: [
-                          <span style={{ whiteSpace: "nowrap" }}>{user.username || ""}</span>,
-                          <span style={{ whiteSpace: "nowrap" }}>{user.description || ""}</span>,
-                          <span style={{ whiteSpace: "nowrap" }}>{user.firstName || ""}</span>,
-                          <span style={{ whiteSpace: "nowrap" }}>{user.lastName || ""}</span>,
-                          <span style={{ whiteSpace: "nowrap" }}>{user.email || ""}</span>,
+                          <span style={{ whiteSpace: 'nowrap' }}>{user.username || ''}</span>,
+                          <span style={{ whiteSpace: 'nowrap' }}>{user.description || ''}</span>,
+                          <span style={{ whiteSpace: 'nowrap' }}>{user.firstName || ''}</span>,
+                          <span style={{ whiteSpace: 'nowrap' }}>{user.lastName || ''}</span>,
+                          <span style={{ whiteSpace: 'nowrap' }}>{user.email || ''}</span>,
                       ],
                   })),
         [role],
@@ -196,31 +196,31 @@ export default function UserDetail() {
     const permsHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "resourceName",
-                content: "Resource",
-                width: "auto",
+                id: 'resourceName',
+                content: 'Resource',
+                width: 'auto',
             },
             {
-                id: "allActionsAllowed",
-                content: "All Actions",
-                width: "1%",
-                align: "center",
+                id: 'allActionsAllowed',
+                content: 'All Actions',
+                width: '1%',
+                align: 'center',
             },
             {
-                id: "actions",
-                content: "Allowed Actions",
-                width: "5%",
+                id: 'actions',
+                content: 'Allowed Actions',
+                width: '5%',
             },
             {
-                id: "denyActions",
-                content: "Denied Actions",
-                width: "5%",
+                id: 'denyActions',
+                content: 'Denied Actions',
+                width: '5%',
             },
             {
-                id: "noAllowedObjects",
-                content: "No. Objects",
-                width: "1%",
-                align: "center",
+                id: 'noAllowedObjects',
+                content: 'No. Objects',
+                width: '1%',
+                align: 'center',
             },
         ],
 
@@ -235,10 +235,10 @@ export default function UserDetail() {
                       id: resource.name,
                       columns: [
                           resource.name,
-                          <Badge color={!resource.allowAllActions ? "danger" : "success"}>{resource.allowAllActions ? "Yes" : "No"}</Badge>,
-                          <span style={{ whiteSpace: "nowrap" }}>{resource.actions.join(", ")}</span>,
+                          <Badge color={!resource.allowAllActions ? 'danger' : 'success'}>{resource.allowAllActions ? 'Yes' : 'No'}</Badge>,
+                          <span style={{ whiteSpace: 'nowrap' }}>{resource.actions.join(', ')}</span>,
                           <></>,
-                          resource.objects?.length.toString() || "0",
+                          resource.objects?.length.toString() || '0',
                       ],
                       detailColumns:
                           !resource.objects || resource.objects.length === 0
@@ -248,10 +248,10 @@ export default function UserDetail() {
                                     resource.objects.map((object) => <div key={object.name}>{object.name}</div>),
                                     <></>,
                                     resource.objects.map((object) => (
-                                        <div key={object.uuid}>{object.allow.join(",") || <span>&nbsp;</span>}</div>
+                                        <div key={object.uuid}>{object.allow.join(',') || <span>&nbsp;</span>}</div>
                                     )),
                                     resource.objects.map((object) => (
-                                        <div key={object.uuid}>{object.deny.join(",") || <span>&nbsp;</span>}</div>
+                                        <div key={object.uuid}>{object.deny.join(',') || <span>&nbsp;</span>}</div>
                                     )),
                                     <></>,
                                 ],
@@ -320,8 +320,8 @@ export default function UserDetail() {
                 body="You are about to delete an Role. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
         </Container>

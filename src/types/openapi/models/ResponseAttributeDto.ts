@@ -11,7 +11,11 @@
  * Do not edit the class manually.
  */
 
-import type { AttributeContentType, AttributeType, BaseAttributeContentDto } from "./";
+import type {
+    AttributeContentType,
+    AttributeType,
+    BaseAttributeContentDto,
+} from './';
 
 /**
  * Response attribute with content for object it belongs to
@@ -54,3 +58,5 @@ export interface ResponseAttributeDto {
      */
     content?: Array<BaseAttributeContentDto>;
 }
+
+

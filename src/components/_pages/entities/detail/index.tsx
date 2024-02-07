@@ -1,19 +1,19 @@
-import AttributeViewer from "components/Attributes/AttributeViewer";
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
+import AttributeViewer from 'components/Attributes/AttributeViewer';
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
 
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
 
-import { actions, selectors } from "ducks/entities";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { actions, selectors } from 'ducks/entities';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
-import { Container, Label } from "reactstrap";
-import { LockWidgetNameEnum } from "types/user-interface";
-import { Resource } from "../../../../types/openapi";
-import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
+import { Container, Label } from 'reactstrap';
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { Resource } from '../../../../types/openapi';
+import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 
 export default function EntityDetail() {
     const dispatch = useDispatch();
@@ -42,30 +42,30 @@ export default function EntityDetail() {
 
     const onEditClick = useCallback(() => {
         if (!entity) return;
-        navigate(`../../edit/${entity.uuid}`, { relative: "path" });
+        navigate(`../../edit/${entity.uuid}`, { relative: 'path' });
     }, [entity, navigate]);
 
     const onDeleteConfirmed = useCallback(() => {
         if (!entity) return;
 
-        dispatch(actions.deleteEntity({ uuid: entity.uuid, redirect: "../../" }));
+        dispatch(actions.deleteEntity({ uuid: entity.uuid, redirect: '../../' }));
         setConfirmDelete(false);
     }, [entity, dispatch]);
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "pencil",
+                icon: 'pencil',
                 disabled: false,
-                tooltip: "Edit",
+                tooltip: 'Edit',
                 onClick: () => {
                     onEditClick();
                 },
             },
             {
-                icon: "trash",
+                icon: 'trash',
                 disabled: false,
-                tooltip: "Delete",
+                tooltip: 'Delete',
                 onClick: () => {
                     setConfirmDelete(true);
                 },
@@ -77,12 +77,12 @@ export default function EntityDetail() {
     const detailHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "property",
-                content: "Property",
+                id: 'property',
+                content: 'Property',
             },
             {
-                id: "value",
-                content: "Value",
+                id: 'value',
+                content: 'Value',
             },
         ],
         [],
@@ -94,29 +94,29 @@ export default function EntityDetail() {
                 ? []
                 : [
                       {
-                          id: "uuid",
-                          columns: ["UUID", entity.uuid],
+                          id: 'uuid',
+                          columns: ['UUID', entity.uuid],
                       },
                       {
-                          id: "name",
-                          columns: ["Name", entity.name],
+                          id: 'name',
+                          columns: ['Name', entity.name],
                       },
                       {
-                          id: "kind",
-                          columns: ["Kind", entity.kind],
+                          id: 'kind',
+                          columns: ['Kind', entity.kind],
                       },
                       {
-                          id: "entityProviderUUID",
-                          columns: ["Entity Provider UUID", entity.connectorUuid],
+                          id: 'entityProviderUUID',
+                          columns: ['Entity Provider UUID', entity.connectorUuid],
                       },
                       {
-                          id: "entityProviderName",
+                          id: 'entityProviderName',
                           columns: [
-                              "Entity Provider Name",
+                              'Entity Provider Name',
                               entity.connectorUuid ? (
                                   <Link to={`../../connectors/detail/${entity.connectorUuid}`}>{entity.connectorName}</Link>
                               ) : (
-                                  ""
+                                  ''
                               ),
                           ],
                       },
@@ -155,8 +155,8 @@ export default function EntityDetail() {
                 body="You are about to delete Entity. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
         </Container>

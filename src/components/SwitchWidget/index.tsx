@@ -1,4 +1,4 @@
-import { FormGroup, Input, Label } from "reactstrap";
+import { FormGroup, Input, Label } from 'reactstrap';
 
 interface Props {
     label?: string;

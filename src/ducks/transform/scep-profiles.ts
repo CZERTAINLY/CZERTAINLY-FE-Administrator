@@ -7,10 +7,10 @@ import {
     ScepProfileListResponseModel,
     ScepProfileResponseDto,
     ScepProfileResponseModel,
-} from "types/scep-profiles";
-import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
-import { transformCertificateListResponseDtoToModel } from "./certificates";
-import { transformRaProfileSimplifiedDtoToModel } from "./ra-profiles";
+} from 'types/scep-profiles';
+import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from './attributes';
+import { transformCertificateListResponseDtoToModel } from './certificates';
+import { transformRaProfileSimplifiedDtoToModel } from './ra-profiles';
 
 export function transformScepProfileListResponseDtoToModel(scep: ScepProfileListResponseDto): ScepProfileListResponseModel {
     return { ...scep };

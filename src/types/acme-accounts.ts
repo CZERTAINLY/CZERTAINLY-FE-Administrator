@@ -1,7 +1,7 @@
 import {
     AcmeAccountListResponseDto as AcmeAccountListResponseDtoOpenApi,
     AcmeAccountResponseDto as AcmeAccountResponseDtoOpenApi,
-} from "./openapi";
+} from './openapi';
 
 export type AcmeAccountResponseDto = AcmeAccountResponseDtoOpenApi;
 export type AcmeAccountResponseModel = AcmeAccountResponseDto;

@@ -1,7 +1,7 @@
-import { CustomNode } from "components/FlowChart";
-import { ReactNode } from "react";
-import { Edge, NodeProps } from "reactflow";
-import { CertificateState, CertificateValidationStatus } from "./openapi";
+import { CustomNode } from 'components/FlowChart';
+import { ReactNode } from 'react';
+import { Edge, NodeProps } from 'reactflow';
+import { CertificateState, CertificateValidationStatus } from './openapi';
 
 export interface OtherProperties {
     propertyName: string;
@@ -16,7 +16,7 @@ export interface CustomNodeData {
     entityLabel: string;
     redirectUrl?: string;
     icon?: string;
-    handleHide?: "source" | "target";
+    handleHide?: 'source' | 'target';
     description?: string;
     otherProperties?: OtherProperties[];
     certificateNodeStatus?: CertificateState;

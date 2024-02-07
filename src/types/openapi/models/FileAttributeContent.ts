@@ -11,7 +11,9 @@
  * Do not edit the class manually.
  */
 
-import type { FileAttributeContentData } from "./";
+import type {
+    FileAttributeContentData,
+} from './';
 
 /**
  * @export

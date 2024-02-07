@@ -1,25 +1,25 @@
-import AttributeEditor from "components/Attributes/AttributeEditor";
-import Spinner from "components/Spinner";
+import AttributeEditor from 'components/Attributes/AttributeEditor';
+import Spinner from 'components/Spinner';
 
-import { actions as acmeProfilesActions, selectors as acmeProfilesSelectors } from "ducks/acme-profiles";
-import { actions as raProfilesActions, selectors as raProfilesSelectors } from "ducks/ra-profiles";
-import { actions as scepProfilesActions, selectors as scepProfilesSelectors } from "ducks/scep-profiles";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Field, Form } from "react-final-form";
-import { useDispatch, useSelector } from "react-redux";
-import Select from "react-select";
-import { Form as BootstrapForm, Button, ButtonGroup, FormGroup, Label } from "reactstrap";
-import { AttributeDescriptorModel, AttributeRequestModel } from "types/attributes";
+import { actions as acmeProfilesActions, selectors as acmeProfilesSelectors } from 'ducks/acme-profiles';
+import { actions as raProfilesActions, selectors as raProfilesSelectors } from 'ducks/ra-profiles';
+import { actions as scepProfilesActions, selectors as scepProfilesSelectors } from 'ducks/scep-profiles';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Field, Form } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
+import Select from 'react-select';
+import { Form as BootstrapForm, Button, ButtonGroup, FormGroup, Label } from 'reactstrap';
+import { AttributeDescriptorModel, AttributeRequestModel } from 'types/attributes';
 
-import { mutators } from "utils/attributes/attributeEditorMutators";
-import { collectFormAttributes } from "utils/attributes/attributes";
+import { mutators } from 'utils/attributes/attributeEditorMutators';
+import { collectFormAttributes } from 'utils/attributes/attributes';
 
-import { validateRequired } from "utils/validators";
-import TabLayout from "../../Layout/TabLayout";
+import { validateRequired } from 'utils/validators';
+import TabLayout from '../../Layout/TabLayout';
 
 export enum Protocol {
-    "ACME",
-    "SCEP",
+    'ACME',
+    'SCEP',
 }
 
 interface Props {
@@ -62,10 +62,10 @@ export default function ProtocolActivationDialogBody({ protocol, raProfileUuid, 
             dispatch(protocol === Protocol.ACME ? acmeProfilesActions.listAcmeProfiles() : scepProfilesActions.listScepProfiles());
             if (!raProfileUuid) return;
             dispatch(
-                raProfilesActions.listIssuanceAttributeDescriptors({ authorityUuid: authorityInstanceUuid || "", uuid: raProfileUuid }),
+                raProfilesActions.listIssuanceAttributeDescriptors({ authorityUuid: authorityInstanceUuid || '', uuid: raProfileUuid }),
             );
             dispatch(
-                raProfilesActions.listRevocationAttributeDescriptors({ authorityUuid: authorityInstanceUuid || "", uuid: raProfileUuid }),
+                raProfilesActions.listRevocationAttributeDescriptors({ authorityUuid: authorityInstanceUuid || '', uuid: raProfileUuid }),
             );
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -88,7 +88,7 @@ export default function ProtocolActivationDialogBody({ protocol, raProfileUuid, 
             const issuanceAttribs: AttributeRequestModel[] =
                 issuanceAttributes && issuanceAttributes.length > 0
                     ? collectFormAttributes(
-                          "issuanceAttributes",
+                          'issuanceAttributes',
                           [...(issuanceAttributes ?? []), ...issueGroupAttributesCallbackAttributes],
                           values,
                       ) || []
@@ -96,7 +96,7 @@ export default function ProtocolActivationDialogBody({ protocol, raProfileUuid, 
             const revocationAttribs: AttributeRequestModel[] =
                 revocationAttributes && revocationAttributes.length > 0
                     ? collectFormAttributes(
-                          "revocationAttributes",
+                          'revocationAttributes',
                           [...(revocationAttributes ?? []), ...revokeGroupAttributesCallbackAttributes],
                           values,
                       ) || []
@@ -104,7 +104,7 @@ export default function ProtocolActivationDialogBody({ protocol, raProfileUuid, 
             dispatch(
                 protocol === Protocol.ACME
                     ? raProfilesActions.activateAcme({
-                          authorityUuid: authorityInstanceUuid || "",
+                          authorityUuid: authorityInstanceUuid || '',
                           uuid: raProfileUuid,
                           acmeProfileUuid: values.profiles.value,
                           raProfileActivateAcmeRequest: {
@@ -113,7 +113,7 @@ export default function ProtocolActivationDialogBody({ protocol, raProfileUuid, 
                           },
                       })
                     : raProfilesActions.activateScep({
-                          authorityUuid: authorityInstanceUuid || "",
+                          authorityUuid: authorityInstanceUuid || '',
                           uuid: raProfileUuid,
                           scepProfileUuid: values.profiles.value,
                           raProfileActivateScepRequest: {
@@ -141,7 +141,7 @@ export default function ProtocolActivationDialogBody({ protocol, raProfileUuid, 
 
     const attributeTabs = [
         {
-            title: "Issue attributes",
+            title: 'Issue attributes',
             content:
                 !issuanceAttributes || issuanceAttributes.length === 0 ? (
                     <></>
@@ -163,7 +163,7 @@ export default function ProtocolActivationDialogBody({ protocol, raProfileUuid, 
     ];
     if (protocol === Protocol.ACME) {
         attributeTabs.push({
-            title: "Revocation attributes",
+            title: 'Revocation attributes',
             content:
                 !revocationAttributes || revocationAttributes.length === 0 ? (
                     <></>
@@ -203,12 +203,12 @@ export default function ProtocolActivationDialogBody({ protocol, raProfileUuid, 
                                         styles={{
                                             control: (provided) =>
                                                 meta.touched && meta.invalid
-                                                    ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } }
+                                                    ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
                                                     : { ...provided },
                                         }}
                                     />
 
-                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>
+                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
                                         Required Field
                                     </div>
                                 </FormGroup>
@@ -218,7 +218,7 @@ export default function ProtocolActivationDialogBody({ protocol, raProfileUuid, 
 
                         <TabLayout tabs={attributeTabs} />
 
-                        <div style={{ textAlign: "right" }}>
+                        <div style={{ textAlign: 'right' }}>
                             <ButtonGroup>
                                 <Button type="submit" color="primary" disabled={pristine || submitting || !valid} onClick={handleSubmit}>
                                     Activate

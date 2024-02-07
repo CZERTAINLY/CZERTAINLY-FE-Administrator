@@ -11,7 +11,11 @@
  * Do not edit the class manually.
  */
 
-import type { PlatformEnum, SearchCondition, SearchableFieldType } from "./";
+import type {
+    PlatformEnum,
+    SearchCondition,
+    SearchableFieldType,
+} from './';
 
 /**
  * List of search fields for specified search group
@@ -60,3 +64,5 @@ export interface SearchFieldDataDto {
      */
     multiValue?: boolean;
 }
+
+

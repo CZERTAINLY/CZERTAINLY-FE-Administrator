@@ -1,12 +1,12 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
     ProfileApprovalDetailModel,
     ProfileApprovalModel,
     ProfileApprovalRequestModel,
     ProfileApprovalResponseModel,
-} from "types/approval-profiles";
-import { UuidDto } from "types/openapi";
-import { createFeatureSelector } from "utils/ducks";
+} from 'types/approval-profiles';
+import { UuidDto } from 'types/openapi';
+import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     profileApprovalDetail?: ProfileApprovalDetailModel;
@@ -30,12 +30,12 @@ export const initialState: State = {
     isDeleting: false,
     isEnabling: false,
     isCreating: false,
-    deleteErrorMessage: "",
+    deleteErrorMessage: '',
     totalItems: undefined,
 };
 
 export const slice = createSlice({
-    name: "approvalProfiles",
+    name: 'approvalProfiles',
 
     initialState,
 
@@ -141,7 +141,7 @@ export const slice = createSlice({
 
         deleteApprovalProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isDeleting = false;
-            state.deleteErrorMessage = action.payload.error || "Unknown error";
+            state.deleteErrorMessage = action.payload.error || 'Unknown error';
         },
 
         editApprovalProfile: (state, action: PayloadAction<{ uuid: string; editProfileApproval: ProfileApprovalRequestModel }>) => {
@@ -156,7 +156,7 @@ export const slice = createSlice({
         },
 
         clearDeleteErrorMessages: (state, action: PayloadAction<void>) => {
-            state.deleteErrorMessage = "";
+            state.deleteErrorMessage = '';
         },
     },
 });

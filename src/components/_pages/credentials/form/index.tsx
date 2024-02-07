@@ -1,29 +1,29 @@
-import AttributeEditor from "components/Attributes/AttributeEditor";
-import ProgressButton from "components/ProgressButton";
-import Widget from "components/Widget";
-import { actions as connectorActions, actions as connectorsActions } from "ducks/connectors";
+import AttributeEditor from 'components/Attributes/AttributeEditor';
+import ProgressButton from 'components/ProgressButton';
+import Widget from 'components/Widget';
+import { actions as connectorActions, actions as connectorsActions } from 'ducks/connectors';
 
-import { actions, selectors } from "ducks/credentials";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { actions, selectors } from 'ducks/credentials';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { Field, Form } from "react-final-form";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { Field, Form } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
 
-import Select from "react-select";
-import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from "reactstrap";
-import { AttributeDescriptorModel } from "types/attributes";
-import { ConnectorResponseModel } from "types/connectors";
-import { CredentialResponseModel } from "types/credentials";
-import { mutators } from "utils/attributes/attributeEditorMutators";
+import Select from 'react-select';
+import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
+import { AttributeDescriptorModel } from 'types/attributes';
+import { ConnectorResponseModel } from 'types/connectors';
+import { CredentialResponseModel } from 'types/credentials';
+import { mutators } from 'utils/attributes/attributeEditorMutators';
 
-import { collectFormAttributes } from "utils/attributes/attributes";
+import { collectFormAttributes } from 'utils/attributes/attributes';
 
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from "utils/validators";
-import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
-import { actions as userInterfaceActions } from "../../../../ducks/user-interface";
-import { FunctionGroupCode, Resource } from "../../../../types/openapi";
-import TabLayout from "../../../Layout/TabLayout";
+import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
+import { actions as userInterfaceActions } from '../../../../ducks/user-interface';
+import { FunctionGroupCode, Resource } from '../../../../types/openapi';
+import TabLayout from '../../../Layout/TabLayout';
 
 interface CredentialFormProps {
     usesGlobalModal?: boolean;
@@ -139,11 +139,11 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
                         uuid: id!,
                         credentialRequest: {
                             attributes: collectFormAttributes(
-                                "credential",
+                                'credential',
                                 [...(credentialProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
                                 values,
                             ),
-                            customAttributes: collectFormAttributes("customCredential", resourceCustomAttributes, values),
+                            customAttributes: collectFormAttributes('customCredential', resourceCustomAttributes, values),
                         },
                     }),
                 );
@@ -156,11 +156,11 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
                             connectorUuid: values.credentialProvider!.value,
                             kind: values.storeKind?.value!,
                             attributes: collectFormAttributes(
-                                "credential",
+                                'credential',
                                 [...(credentialProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
                                 values,
                             ),
-                            customAttributes: collectFormAttributes("customCredential", resourceCustomAttributes, values),
+                            customAttributes: collectFormAttributes('customCredential', resourceCustomAttributes, values),
                         },
                     }),
                 );
@@ -181,9 +181,9 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
         navigate(-1);
     }, [navigate]);
 
-    const submitTitle = useMemo(() => (editMode ? "Save" : "Create"), [editMode]);
+    const submitTitle = useMemo(() => (editMode ? 'Save' : 'Create'), [editMode]);
 
-    const inProgressTitle = useMemo(() => (editMode ? "Saving..." : "Creating..."), [editMode]);
+    const inProgressTitle = useMemo(() => (editMode ? 'Saving...' : 'Creating...'), [editMode]);
 
     const optionsForCredentialProviders = useMemo(
         () =>
@@ -218,7 +218,7 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
         [editMode, credential],
     );
 
-    const title = useMemo(() => (editMode ? "Edit Credential" : "Create Credential"), [editMode]);
+    const title = useMemo(() => (editMode ? 'Edit Credential' : 'Create Credential'), [editMode]);
 
     return (
         <Widget title={title} busy={isBusy}>
@@ -263,19 +263,19 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
                                             styles={{
                                                 control: (provided) =>
                                                     meta.touched && meta.invalid
-                                                        ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } }
+                                                        ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
                                                         : { ...provided },
                                             }}
                                         />
 
-                                        <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>
+                                        <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
                                             {meta.error}
                                         </div>
                                     </FormGroup>
                                 )}
                             </Field>
                         ) : (
-                            <Field name="credentialProvider" format={(value) => (value ? value.label : "")} validate={validateRequired()}>
+                            <Field name="credentialProvider" format={(value) => (value ? value.label : '')} validate={validateRequired()}>
                                 {({ input, meta }) => (
                                     <FormGroup>
                                         <Label for="credentialProvider">Credential Provider</Label>
@@ -312,12 +312,12 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
                                             styles={{
                                                 control: (provided) =>
                                                     meta.touched && meta.invalid
-                                                        ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } }
+                                                        ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
                                                         : { ...provided },
                                             }}
                                         />
 
-                                        <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>
+                                        <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
                                             Required Field
                                         </div>
                                     </FormGroup>
@@ -326,7 +326,7 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
                         ) : null}
 
                         {editMode && credential?.kind ? (
-                            <Field name="storeKind" format={(value) => (value ? value.label : "")}>
+                            <Field name="storeKind" format={(value) => (value ? value.label : '')}>
                                 {({ input, meta }) => (
                                     <FormGroup>
                                         <Label for="storeKind">Kind</Label>
@@ -349,7 +349,7 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
                             <TabLayout
                                 tabs={[
                                     {
-                                        title: "Connector Attributes",
+                                        title: 'Connector Attributes',
                                         content:
                                             credentialProvider &&
                                             values.storeKind &&
@@ -367,7 +367,7 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
                                             ),
                                     },
                                     {
-                                        title: "Custom Attributes",
+                                        title: 'Custom Attributes',
                                         content: (
                                             <AttributeEditor
                                                 id="customCredential"

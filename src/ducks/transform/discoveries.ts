@@ -9,9 +9,9 @@ import {
     DiscoveryResponseDetailModel,
     DiscoveryResponseDto,
     DiscoveryResponseModel,
-} from "types/discoveries";
-import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
-import { transformMetadataDtoToModel } from "./locations";
+} from 'types/discoveries';
+import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from './attributes';
+import { transformMetadataDtoToModel } from './locations';
 
 export function transformDiscoveryResponseDtoToModel(discovery: DiscoveryResponseDto): DiscoveryResponseModel {
     return { ...discovery };

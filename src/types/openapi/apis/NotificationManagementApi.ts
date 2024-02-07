@@ -11,10 +11,10 @@
  * Do not edit the class manually.
  */
 
-import type { Observable } from "rxjs";
-import type { AjaxResponse } from "rxjs/ajax";
-import { BaseAPI, throwIfNullOrUndefined, encodeURI } from "../runtime";
-import type { OperationOpts, HttpHeaders } from "../runtime";
+import type { Observable } from 'rxjs';
+import type { AjaxResponse } from 'rxjs/ajax';
+import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
+import type { OperationOpts, HttpHeaders } from '../runtime';
 import type {
     AuthenticationServiceExceptionDto,
     DataAttribute,
@@ -23,7 +23,7 @@ import type {
     NotificationInstanceRequestDto,
     NotificationInstanceUpdateRequestDto,
     UuidDto,
-} from "../models";
+} from '../models';
 
 export interface CreateNotificationInstanceRequest {
     notificationInstanceRequestDto: NotificationInstanceRequestDto;
@@ -63,16 +63,16 @@ export class NotificationManagementApi extends BaseAPI {
         { notificationInstanceRequestDto }: CreateNotificationInstanceRequest,
         opts?: OperationOpts,
     ): Observable<UuidDto | AjaxResponse<UuidDto>> {
-        throwIfNullOrUndefined(notificationInstanceRequestDto, "notificationInstanceRequestDto", "createNotificationInstance");
+        throwIfNullOrUndefined(notificationInstanceRequestDto, 'notificationInstanceRequestDto', 'createNotificationInstance');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<UuidDto>(
             {
-                url: "/v1/notificationInstances",
-                method: "POST",
+                url: '/v1/notificationInstances',
+                method: 'POST',
                 headers,
                 body: notificationInstanceRequestDto,
             },
@@ -86,12 +86,12 @@ export class NotificationManagementApi extends BaseAPI {
     deleteNotificationInstance({ uuid }: DeleteNotificationInstanceRequest): Observable<void>;
     deleteNotificationInstance({ uuid }: DeleteNotificationInstanceRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
     deleteNotificationInstance({ uuid }: DeleteNotificationInstanceRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(uuid, "uuid", "deleteNotificationInstance");
+        throwIfNullOrUndefined(uuid, 'uuid', 'deleteNotificationInstance');
 
         return this.request<void>(
             {
-                url: "/v1/notificationInstances/{uuid}".replace("{uuid}", encodeURI(uuid)),
-                method: "DELETE",
+                url: '/v1/notificationInstances/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'DELETE',
             },
             opts?.responseOpts,
         );
@@ -112,17 +112,17 @@ export class NotificationManagementApi extends BaseAPI {
         { uuid, notificationInstanceUpdateRequestDto }: EditNotificationInstanceRequest,
         opts?: OperationOpts,
     ): Observable<NotificationInstanceDto | AjaxResponse<NotificationInstanceDto>> {
-        throwIfNullOrUndefined(uuid, "uuid", "editNotificationInstance");
-        throwIfNullOrUndefined(notificationInstanceUpdateRequestDto, "notificationInstanceUpdateRequestDto", "editNotificationInstance");
+        throwIfNullOrUndefined(uuid, 'uuid', 'editNotificationInstance');
+        throwIfNullOrUndefined(notificationInstanceUpdateRequestDto, 'notificationInstanceUpdateRequestDto', 'editNotificationInstance');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<NotificationInstanceDto>(
             {
-                url: "/v1/notificationInstances/{uuid}".replace("{uuid}", encodeURI(uuid)),
-                method: "PUT",
+                url: '/v1/notificationInstances/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'PUT',
                 headers,
                 body: notificationInstanceUpdateRequestDto,
             },
@@ -142,12 +142,12 @@ export class NotificationManagementApi extends BaseAPI {
         { uuid }: GetNotificationInstanceRequest,
         opts?: OperationOpts,
     ): Observable<NotificationInstanceDto | AjaxResponse<NotificationInstanceDto>> {
-        throwIfNullOrUndefined(uuid, "uuid", "getNotificationInstance");
+        throwIfNullOrUndefined(uuid, 'uuid', 'getNotificationInstance');
 
         return this.request<NotificationInstanceDto>(
             {
-                url: "/v1/notificationInstances/{uuid}".replace("{uuid}", encodeURI(uuid)),
-                method: "GET",
+                url: '/v1/notificationInstances/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -165,15 +165,15 @@ export class NotificationManagementApi extends BaseAPI {
         { connectorUuid, kind }: ListMappingAttributesRequest,
         opts?: OperationOpts,
     ): Observable<Array<DataAttribute> | AjaxResponse<Array<DataAttribute>>> {
-        throwIfNullOrUndefined(connectorUuid, "connectorUuid", "listMappingAttributes");
-        throwIfNullOrUndefined(kind, "kind", "listMappingAttributes");
+        throwIfNullOrUndefined(connectorUuid, 'connectorUuid', 'listMappingAttributes');
+        throwIfNullOrUndefined(kind, 'kind', 'listMappingAttributes');
 
         return this.request<Array<DataAttribute>>(
             {
-                url: "/v1/notificationInstances/attributes/mapping/{connectorUuid}/{kind}"
-                    .replace("{connectorUuid}", encodeURI(connectorUuid))
-                    .replace("{kind}", encodeURI(kind)),
-                method: "GET",
+                url: '/v1/notificationInstances/attributes/mapping/{connectorUuid}/{kind}'
+                    .replace('{connectorUuid}', encodeURI(connectorUuid))
+                    .replace('{kind}', encodeURI(kind)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -189,8 +189,8 @@ export class NotificationManagementApi extends BaseAPI {
     ): Observable<Array<NotificationInstanceDto> | AjaxResponse<Array<NotificationInstanceDto>>> {
         return this.request<Array<NotificationInstanceDto>>(
             {
-                url: "/v1/notificationInstances",
-                method: "GET",
+                url: '/v1/notificationInstances',
+                method: 'GET',
             },
             opts?.responseOpts,
         );

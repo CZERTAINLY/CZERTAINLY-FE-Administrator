@@ -11,8 +11,8 @@ import {
     EndpointModel,
     FunctionGroupDto,
     FunctionGroupModel,
-} from "types/connectors";
-import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
+} from 'types/connectors';
+import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from './attributes';
 
 export function transformBulkActionDtoToModel(error: BulkActionDto): BulkActionModel {
     return { ...error };

@@ -1,18 +1,18 @@
-import { iif, of } from "rxjs";
-import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
+import { iif, of } from 'rxjs';
+import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
 
-import { AppEpic } from "ducks";
-import { extractError } from "utils/net";
+import { AppEpic } from 'ducks';
+import { extractError } from 'utils/net';
 
-import { actions as appRedirectActions } from "./app-redirect";
-import { actions as userInterfaceActions } from "./user-interface";
+import { actions as appRedirectActions } from './app-redirect';
+import { actions as userInterfaceActions } from './user-interface';
 
-import * as slice from "./roles";
+import * as slice from './roles';
 
-import { LockWidgetNameEnum } from "types/user-interface";
-import { transformRoleResponseDtoToModel } from "./transform/auth";
-import { transformRoleDetailDtoToModel, transformRoleRequestModelToDto, transformSubjectPermissionsDtoToModel } from "./transform/roles";
-import { transformUserResponseDtoToModel } from "./transform/users";
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { transformRoleResponseDtoToModel } from './transform/auth';
+import { transformRoleDetailDtoToModel, transformRoleRequestModelToDto, transformSubjectPermissionsDtoToModel } from './transform/roles';
+import { transformUserResponseDtoToModel } from './transform/users';
 
 const list: AppEpic = (action$, state, deps) => {
     return action$.pipe(
@@ -28,7 +28,7 @@ const list: AppEpic = (action$, state, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.listFailure({ error: extractError(err, "Failed to get roles list") }),
+                        slice.actions.listFailure({ error: extractError(err, 'Failed to get roles list') }),
                         userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfRoles),
                     ),
                 ),
@@ -51,7 +51,7 @@ const getDetail: AppEpic = (action$, state, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.getDetailFailure({ error: extractError(err, "Failed to get role detail") }),
+                        slice.actions.getDetailFailure({ error: extractError(err, 'Failed to get role detail') }),
                         userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.RoleDetails),
                     ),
                 ),
@@ -74,8 +74,8 @@ const create: AppEpic = (action$, state, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.createFailure({ error: extractError(err, "Failed to create role") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to create role" }),
+                        slice.actions.createFailure({ error: extractError(err, 'Failed to create role') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to create role' }),
                     ),
                 ),
             ),
@@ -97,8 +97,8 @@ const update: AppEpic = (action$, state, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.updateFailure({ error: extractError(err, "Failed to update role") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to update role" }),
+                        slice.actions.updateFailure({ error: extractError(err, 'Failed to update role') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to update role' }),
                     ),
                 ),
             ),
@@ -124,8 +124,8 @@ const deleteRole: AppEpic = (action$, state, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.deleteFailure({ error: extractError(err, "Failed to delete role") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to delete role" }),
+                        slice.actions.deleteFailure({ error: extractError(err, 'Failed to delete role') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to delete role' }),
                     ),
                 ),
             ),
@@ -147,8 +147,8 @@ const getUsers: AppEpic = (action$, state, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.getUsersFailure({ error: extractError(err, "Failed to get role users") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get role users" }),
+                        slice.actions.getUsersFailure({ error: extractError(err, 'Failed to get role users') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to get role users' }),
                     ),
                 ),
             ),
@@ -167,8 +167,8 @@ const updateUsers: AppEpic = (action$, state, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.updateUsersFailure({ error: extractError(err, "Failed to update role users") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to update role users" }),
+                        slice.actions.updateUsersFailure({ error: extractError(err, 'Failed to update role users') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to update role users' }),
                     ),
                 ),
             ),
@@ -190,8 +190,8 @@ const getPermissions: AppEpic = (action$, state, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.getPermissionsFailure({ error: extractError(err, "Failed to get role permissions") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get role permissions" }),
+                        slice.actions.getPermissionsFailure({ error: extractError(err, 'Failed to get role permissions') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to get role permissions' }),
                     ),
                 ),
             ),
@@ -218,8 +218,8 @@ const updatePermissions: AppEpic = (action$, state, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.updatePermissionsFailure({ error: extractError(err, "Failed to update role permissions") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to update role permissions" }),
+                            slice.actions.updatePermissionsFailure({ error: extractError(err, 'Failed to update role permissions') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to update role permissions' }),
                         ),
                     ),
                 ),

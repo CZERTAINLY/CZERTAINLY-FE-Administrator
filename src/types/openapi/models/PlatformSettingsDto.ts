@@ -11,7 +11,9 @@
  * Do not edit the class manually.
  */
 
-import type { UtilsSettingsDto } from "./";
+import type {
+    UtilsSettingsDto,
+} from './';
 
 /**
  * @export

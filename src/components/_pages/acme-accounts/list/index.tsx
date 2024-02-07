@@ -1,18 +1,18 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
-import { Badge, Container } from "reactstrap";
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { Badge, Container } from 'reactstrap';
 
-import { actions, selectors } from "ducks/acme-accounts";
+import { actions, selectors } from 'ducks/acme-accounts';
 
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
-import StatusBadge from "components/StatusBadge";
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
+import StatusBadge from 'components/StatusBadge';
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
 
-import { LockWidgetNameEnum } from "types/user-interface";
-import { acmeAccountStatus } from "../acmeAccountStatus";
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { acmeAccountStatus } from '../acmeAccountStatus';
 
 export default function AcmeAccountList() {
     const dispatch = useDispatch();
@@ -62,25 +62,25 @@ export default function AcmeAccountList() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "cross-circle",
+                icon: 'cross-circle',
                 disabled: checkedRows.length === 0,
-                tooltip: "Revoke",
+                tooltip: 'Revoke',
                 onClick: () => {
                     setConfirmRevoke(true);
                 },
             },
             {
-                icon: "check",
+                icon: 'check',
                 disabled: checkedRows.length === 0,
-                tooltip: "Enable",
+                tooltip: 'Enable',
                 onClick: () => {
                     onEnableClick();
                 },
             },
             {
-                icon: "times",
+                icon: 'times',
                 disabled: checkedRows.length === 0,
-                tooltip: "Disable",
+                tooltip: 'Disable',
                 onClick: () => {
                     onDisableClick();
                 },
@@ -92,46 +92,46 @@ export default function AcmeAccountList() {
     const acmeAccountsTableHeader: TableHeader[] = useMemo(
         () => [
             {
-                id: "accountId",
-                content: "Account Id",
-                width: "auto",
+                id: 'accountId',
+                content: 'Account Id',
+                width: 'auto',
             },
             {
-                id: "ACME Profile Name",
-                content: "ACME Profile Name",
+                id: 'ACME Profile Name',
+                content: 'ACME Profile Name',
                 sortable: true,
-                sort: "asc",
-                width: "20%",
-                align: "center",
+                sort: 'asc',
+                width: '20%',
+                align: 'center',
             },
             {
-                id: "RA Profile Name",
-                content: "RA Profile Name",
-                align: "center",
+                id: 'RA Profile Name',
+                content: 'RA Profile Name',
+                align: 'center',
                 sortable: true,
-                width: "20%",
+                width: '20%',
             },
             {
-                id: "internalState",
-                content: "Internal State",
+                id: 'internalState',
+                content: 'Internal State',
                 sortable: true,
-                width: "10%",
-                align: "center",
+                width: '10%',
+                align: 'center',
             },
             {
-                id: "accountStatus",
-                content: "Account Status",
+                id: 'accountStatus',
+                content: 'Account Status',
                 sortable: true,
-                width: "10%",
-                align: "center",
+                width: '10%',
+                align: 'center',
             },
             {
-                id: "totalOrders",
-                content: "Total Orders",
+                id: 'totalOrders',
+                content: 'Total Orders',
                 sortable: true,
-                sortType: "numeric",
-                width: "10%",
-                align: "center",
+                sortType: 'numeric',
+                width: '10%',
+                align: 'center',
             },
         ],
         [],
@@ -150,20 +150,20 @@ export default function AcmeAccountList() {
 
                         acmeAccount.acmeProfileName ? (
                             <Link to={`../acmeprofiles/detail/${acmeAccount.acmeProfileUuid}`}>
-                                {acmeAccount.acmeProfileName ?? "Unassigned"}
+                                {acmeAccount.acmeProfileName ?? 'Unassigned'}
                             </Link>
                         ) : (
-                            acmeAccount.acmeProfileName ?? "Unassigned"
+                            acmeAccount.acmeProfileName ?? 'Unassigned'
                         ),
 
                         acmeAccount.raProfile ? (
                             <Link
                                 to={`../raprofiles/detail/${acmeAccount?.raProfile.authorityInstanceUuid}/${acmeAccount?.raProfile.uuid}`}
                             >
-                                {acmeAccount.raProfile.name ?? "Unassigned"}
+                                {acmeAccount.raProfile.name ?? 'Unassigned'}
                             </Link>
                         ) : (
-                            acmeAccount.raProfile ?? "Unassigned"
+                            acmeAccount.raProfile ?? 'Unassigned'
                         ),
 
                         <StatusBadge enabled={acmeAccount.enabled} />,
@@ -200,14 +200,14 @@ export default function AcmeAccountList() {
 
             <Dialog
                 isOpen={confirmRevoke}
-                caption={`Revoke ${checkedRows.length > 1 ? "ACME Accounts" : "an ACME Account"}`}
+                caption={`Revoke ${checkedRows.length > 1 ? 'ACME Accounts' : 'an ACME Account'}`}
                 body={`You are about to revoke ${
-                    checkedRows.length > 1 ? "ACME Accounts" : "an ACME Account"
+                    checkedRows.length > 1 ? 'ACME Accounts' : 'an ACME Account'
                 }. Is this what you want to do?`}
                 toggle={() => setConfirmRevoke(false)}
                 buttons={[
-                    { color: "danger", onClick: onRevokeConfirmed, body: "Yes, revoke" },
-                    { color: "secondary", onClick: () => setConfirmRevoke(false), body: "Cancel" },
+                    { color: 'danger', onClick: onRevokeConfirmed, body: 'Yes, revoke' },
+                    { color: 'secondary', onClick: () => setConfirmRevoke(false), body: 'Cancel' },
                 ]}
             />
         </Container>

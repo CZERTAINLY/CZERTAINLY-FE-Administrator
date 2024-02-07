@@ -1,9 +1,9 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AttributeDescriptorModel, AttributeRequestModel } from "types/attributes";
-import { SearchRequestModel } from "types/certificate";
-import { ConnectorResponseModel } from "types/connectors";
-import { EntityRequestModel, EntityResponseModel } from "types/entities";
-import { createFeatureSelector } from "utils/ducks";
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { AttributeDescriptorModel, AttributeRequestModel } from 'types/attributes';
+import { SearchRequestModel } from 'types/certificate';
+import { ConnectorResponseModel } from 'types/connectors';
+import { EntityRequestModel, EntityResponseModel } from 'types/entities';
+import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     entity?: EntityResponseModel;
@@ -38,7 +38,7 @@ export const initialState: State = {
 };
 
 export const slice = createSlice({
-    name: "entities",
+    name: 'entities',
 
     initialState,
 

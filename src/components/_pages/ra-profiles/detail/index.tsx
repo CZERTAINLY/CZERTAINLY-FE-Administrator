@@ -1,27 +1,27 @@
-import AttributeViewer from "components/Attributes/AttributeViewer";
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
-import ProgressButton from "components/ProgressButton";
-import StatusBadge from "components/StatusBadge";
+import AttributeViewer from 'components/Attributes/AttributeViewer';
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
+import ProgressButton from 'components/ProgressButton';
+import StatusBadge from 'components/StatusBadge';
 
-import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import Widget from 'components/Widget';
+import WidgetButtons, { WidgetButtonProps } from 'components/WidgetButtons';
 
-import { actions as approvalProfileActions } from "ducks/approval-profiles";
-import { actions as raProfilesActions, selectors as raProfilesSelectors } from "ducks/ra-profiles";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router";
-import { Link, useParams } from "react-router-dom";
+import { actions as approvalProfileActions } from 'ducks/approval-profiles';
+import { actions as raProfilesActions, selectors as raProfilesSelectors } from 'ducks/ra-profiles';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router';
+import { Link, useParams } from 'react-router-dom';
 
-import { Col, Container, Label, Row } from "reactstrap";
-import { Resource } from "../../../../types/openapi";
-import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
+import { Col, Container, Label, Row } from 'reactstrap';
+import { Resource } from '../../../../types/openapi';
+import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 
-import { LockWidgetNameEnum } from "types/user-interface";
-import AssociateApprovalProfileDialogBody from "../AssociateApprovalProfileDialogBody";
-import AssociateComplianceProfileDialogBody from "../AssociateComplianceProfileDialogBody";
-import ProtocolActivationDialogBody, { Protocol } from "../ProtocolActivationDialogBody";
+import { LockWidgetNameEnum } from 'types/user-interface';
+import AssociateApprovalProfileDialogBody from '../AssociateApprovalProfileDialogBody';
+import AssociateComplianceProfileDialogBody from '../AssociateComplianceProfileDialogBody';
+import ProtocolActivationDialogBody, { Protocol } from '../ProtocolActivationDialogBody';
 
 interface DeassociateApprovalProfileDialogState {
     isDialogOpen: boolean;
@@ -95,13 +95,13 @@ export default function RaProfileDetail() {
 
     const getFreshComplianceRaProfileDetail = useCallback(() => {
         if (!id || !authorityId) return;
-        if (authorityId === "unknown" || authorityId === "undefined") return;
+        if (authorityId === 'unknown' || authorityId === 'undefined') return;
         dispatch(raProfilesActions.getComplianceProfilesForRaProfile({ authorityUuid: authorityId, uuid: id }));
     }, [id, dispatch, authorityId]);
 
     const getFreshAvailableProtocols = useCallback(() => {
         if (!id || !authorityId) return;
-        if (authorityId === "unknown" || authorityId === "undefined") return;
+        if (authorityId === 'unknown' || authorityId === 'undefined') return;
 
         dispatch(raProfilesActions.getAcmeDetails({ authorityUuid: authorityId, uuid: id }));
         dispatch(raProfilesActions.getScepDetails({ authorityUuid: authorityId, uuid: id }));
@@ -109,13 +109,13 @@ export default function RaProfileDetail() {
 
     const getFreshAssociatedApprovalProfiles = useCallback(() => {
         if (!id || !authorityId) return;
-        if (authorityId === "unknown" || authorityId === "undefined") return;
+        if (authorityId === 'unknown' || authorityId === 'undefined') return;
 
         dispatch(raProfilesActions.getAssociatedApprovalProfiles({ authorityUuid: authorityId, raProfileUuid: id }));
     }, [id, dispatch, authorityId]);
 
     const getFreshAllApprovalProfiles = useCallback(() => {
-        if (authorityId === "unknown" || authorityId === "undefined") return;
+        if (authorityId === 'unknown' || authorityId === 'undefined') return;
 
         dispatch(approvalProfileActions.listApprovalProfiles());
     }, [dispatch, authorityId]);
@@ -139,14 +139,14 @@ export default function RaProfileDetail() {
 
         dispatch(raProfilesActions.getRaProfileDetail({ authorityUuid: authorityId, uuid: id }));
 
-        if (authorityId === "unknown" || authorityId === "undefined") return;
+        if (authorityId === 'unknown' || authorityId === 'undefined') return;
 
         dispatch(raProfilesActions.getComplianceProfilesForRaProfile({ authorityUuid: authorityId, uuid: id }));
     }, [id, dispatch, authorityId]);
 
     const onEditClick = useCallback(() => {
         if (!raProfile) return;
-        navigate(`../../../edit/${raProfile.authorityInstanceUuid}/${raProfile?.uuid}`, { relative: "path" });
+        navigate(`../../../edit/${raProfile.authorityInstanceUuid}/${raProfile?.uuid}`, { relative: 'path' });
     }, [navigate, raProfile]);
 
     const onEnableClick = useCallback(() => {
@@ -163,9 +163,9 @@ export default function RaProfileDetail() {
         if (!raProfile) return;
         dispatch(
             raProfilesActions.deleteRaProfile({
-                authorityUuid: raProfile.authorityInstanceUuid || "unknown",
+                authorityUuid: raProfile.authorityInstanceUuid || 'unknown',
                 uuid: raProfile.uuid,
-                redirect: "../../../",
+                redirect: '../../../',
             }),
         );
         setConfirmDelete(false);
@@ -219,7 +219,7 @@ export default function RaProfileDetail() {
             if (!raProfile) return;
 
             dispatch(
-                raProfilesActions.dissociateRaProfile({ uuid: raProfile.uuid, complianceProfileUuid: uuid, complianceProfileName: "" }),
+                raProfilesActions.dissociateRaProfile({ uuid: raProfile.uuid, complianceProfileUuid: uuid, complianceProfileName: '' }),
             );
         },
         [raProfile, dispatch],
@@ -228,41 +228,41 @@ export default function RaProfileDetail() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "pencil",
+                icon: 'pencil',
                 disabled: false,
-                tooltip: "Edit",
+                tooltip: 'Edit',
                 onClick: () => {
                     onEditClick();
                 },
             },
             {
-                icon: "trash",
+                icon: 'trash',
                 disabled: false,
-                tooltip: "Delete",
+                tooltip: 'Delete',
                 onClick: () => {
                     setConfirmDelete(true);
                 },
             },
             {
-                icon: "check",
+                icon: 'check',
                 disabled: !raProfile?.authorityInstanceUuid || raProfile?.enabled || false,
-                tooltip: "Enable",
+                tooltip: 'Enable',
                 onClick: () => {
                     onEnableClick();
                 },
             },
             {
-                icon: "times",
+                icon: 'times',
                 disabled: !raProfile?.authorityInstanceUuid || !(raProfile?.enabled || false),
-                tooltip: "Disable",
+                tooltip: 'Disable',
                 onClick: () => {
                     onDisableClick();
                 },
             },
             {
-                icon: "gavel",
+                icon: 'gavel',
                 disabled: !raProfile?.authorityInstanceUuid || false,
-                tooltip: "Check Compliance",
+                tooltip: 'Check Compliance',
                 onClick: () => {
                     setComplianceCheck(true);
                 },
@@ -274,9 +274,9 @@ export default function RaProfileDetail() {
     const complianceProfileButtons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "plus",
+                icon: 'plus',
                 disabled: false,
-                tooltip: "Associate Compliance Profile",
+                tooltip: 'Associate Compliance Profile',
                 onClick: () => {
                     setAssociateComplianceProfile(true);
                 },
@@ -288,9 +288,9 @@ export default function RaProfileDetail() {
     const approvalProfilesButtons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "plus",
+                icon: 'plus',
                 disabled: false,
-                tooltip: "Associate Approval Profile",
+                tooltip: 'Associate Approval Profile',
                 onClick: () => {
                     setAssociateApprovalProfileDialog(true);
                     getFreshAllApprovalProfiles();
@@ -303,24 +303,24 @@ export default function RaProfileDetail() {
     const approvalProfilesHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "approvalProfileName",
-                content: "Name",
+                id: 'approvalProfileName',
+                content: 'Name',
             },
             {
-                id: "description",
-                content: "Description",
+                id: 'description',
+                content: 'Description',
             },
             {
-                id: "enabled",
-                content: "Enabled",
+                id: 'enabled',
+                content: 'Enabled',
             },
             {
-                id: "expiry",
-                content: "Expiry (in hours)",
+                id: 'expiry',
+                content: 'Expiry (in hours)',
             },
             {
-                id: "action",
-                content: "Action",
+                id: 'action',
+                content: 'Action',
             },
         ],
         [],
@@ -335,18 +335,18 @@ export default function RaProfileDetail() {
                       columns: [
                           <Link to={`../../../approvalprofiles/detail/${profile!.uuid}`}>{profile!.name}</Link>,
 
-                          profile.description || "",
+                          profile.description || '',
 
                           <StatusBadge enabled={profile.enabled} />,
 
-                          profile?.expiry?.toString() || "",
+                          profile?.expiry?.toString() || '',
 
                           <WidgetButtons
                               buttons={[
                                   {
-                                      icon: "minus-square",
+                                      icon: 'minus-square',
                                       disabled: false,
-                                      tooltip: "Remove",
+                                      tooltip: 'Remove',
                                       onClick: () => {
                                           setConfirmDeassociateApprovalProfileDialog({
                                               associatedApprovalProfileName: profile.name,
@@ -365,16 +365,16 @@ export default function RaProfileDetail() {
     const complianceProfileHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "complianceProfileName",
-                content: "Name",
+                id: 'complianceProfileName',
+                content: 'Name',
             },
             {
-                id: "description",
-                content: "Description",
+                id: 'description',
+                content: 'Description',
             },
             {
-                id: "action",
-                content: "Action",
+                id: 'action',
+                content: 'Action',
             },
         ],
         [],
@@ -389,18 +389,18 @@ export default function RaProfileDetail() {
                       columns: [
                           <Link to={`../../../complianceprofiles/detail/${profile!.uuid}`}>{profile!.name}</Link>,
 
-                          profile.description || "",
+                          profile.description || '',
 
                           <WidgetButtons
                               buttons={[
                                   {
-                                      icon: "minus-square",
+                                      icon: 'minus-square',
                                       disabled: false,
-                                      tooltip: "Remove",
+                                      tooltip: 'Remove',
                                       onClick: () => {
                                           onDissociateComplianceProfile(profile.uuid);
                                       },
-                                      id: "ra" + profile.uuid,
+                                      id: 'ra' + profile.uuid,
                                   },
                               ]}
                           />,
@@ -412,12 +412,12 @@ export default function RaProfileDetail() {
     const detailHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "property",
-                content: "Property",
+                id: 'property',
+                content: 'Property',
             },
             {
-                id: "value",
-                content: "Value",
+                id: 'value',
+                content: 'Value',
             },
         ],
         [],
@@ -429,35 +429,35 @@ export default function RaProfileDetail() {
                 ? []
                 : [
                       {
-                          id: "uuid",
-                          columns: ["UUID", raProfile.uuid],
+                          id: 'uuid',
+                          columns: ['UUID', raProfile.uuid],
                       },
                       {
-                          id: "name",
-                          columns: ["Name", raProfile.name],
+                          id: 'name',
+                          columns: ['Name', raProfile.name],
                       },
                       {
-                          id: "description",
-                          columns: ["Description", raProfile.description || ""],
+                          id: 'description',
+                          columns: ['Description', raProfile.description || ''],
                       },
                       {
-                          id: "enabled",
-                          columns: ["Enabled", <StatusBadge enabled={raProfile!.enabled} />],
+                          id: 'enabled',
+                          columns: ['Enabled', <StatusBadge enabled={raProfile!.enabled} />],
                       },
                       {
-                          id: "authorityUuid",
-                          columns: ["Authority Instance UUID", raProfile.authorityInstanceUuid],
+                          id: 'authorityUuid',
+                          columns: ['Authority Instance UUID', raProfile.authorityInstanceUuid],
                       },
                       {
-                          id: "authorityName",
+                          id: 'authorityName',
                           columns: [
-                              "Authority Instance Name",
+                              'Authority Instance Name',
                               raProfile.authorityInstanceUuid ? (
                                   <Link to={`../../authorities/detail/${raProfile.authorityInstanceUuid}`}>
                                       {raProfile.authorityInstanceName}
                                   </Link>
                               ) : (
-                                  ""
+                                  ''
                               ),
                           ],
                       },
@@ -468,12 +468,12 @@ export default function RaProfileDetail() {
     const protocolProfileHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "property",
-                content: "",
+                id: 'property',
+                content: '',
             },
             {
-                id: "value",
-                content: "",
+                id: 'value',
+                content: '',
             },
         ],
         [],
@@ -485,16 +485,16 @@ export default function RaProfileDetail() {
                 ? []
                 : [
                       {
-                          id: "uuid",
-                          columns: ["UUID", acmeDetails.uuid || ""],
+                          id: 'uuid',
+                          columns: ['UUID', acmeDetails.uuid || ''],
                       },
                       {
-                          id: "name",
-                          columns: ["Name", acmeDetails.name || ""],
+                          id: 'name',
+                          columns: ['Name', acmeDetails.name || ''],
                       },
                       {
-                          id: "Directory URL",
-                          columns: ["Directory URL", acmeDetails.directoryUrl || ""],
+                          id: 'Directory URL',
+                          columns: ['Directory URL', acmeDetails.directoryUrl || ''],
                       },
                   ],
         [acmeDetails],
@@ -506,16 +506,16 @@ export default function RaProfileDetail() {
                 ? []
                 : [
                       {
-                          id: "uuid",
-                          columns: ["UUID", scepDetails.uuid || ""],
+                          id: 'uuid',
+                          columns: ['UUID', scepDetails.uuid || ''],
                       },
                       {
-                          id: "name",
-                          columns: ["Name", scepDetails.name || ""],
+                          id: 'name',
+                          columns: ['Name', scepDetails.name || ''],
                       },
                       {
-                          id: "URL",
-                          columns: ["URL", scepDetails.url || ""],
+                          id: 'URL',
+                          columns: ['URL', scepDetails.url || ''],
                       },
                   ],
         [scepDetails],
@@ -524,24 +524,24 @@ export default function RaProfileDetail() {
     const availableProtocolsHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "name",
-                content: "Protocol name",
+                id: 'name',
+                content: 'Protocol name',
                 sortable: true,
-                width: "10%",
-                sort: "asc",
+                width: '10%',
+                sort: 'asc',
             },
             {
-                id: "status",
-                content: "Status",
+                id: 'status',
+                content: 'Status',
                 sortable: true,
-                align: "center",
-                width: "10%",
+                align: 'center',
+                width: '10%',
             },
             {
-                id: "actions",
-                content: "Actions",
-                align: "center",
-                width: "10%",
+                id: 'actions',
+                content: 'Actions',
+                align: 'center',
+                width: '10%',
             },
         ],
         [],
@@ -550,15 +550,15 @@ export default function RaProfileDetail() {
     const availableProtocolsData: TableDataRow[] = useMemo(
         () => [
             {
-                id: "acme",
+                id: 'acme',
                 columns: [
-                    "ACME",
+                    'ACME',
                     <StatusBadge enabled={acmeDetails ? (acmeDetails.acmeAvailable ? true : false) : false} />,
                     <ProgressButton
                         className="btn btn-primary btn-sm"
                         type="button"
-                        title={acmeDetails?.acmeAvailable ? "Deactivate" : "Activate"}
-                        inProgressTitle={acmeDetails?.acmeAvailable ? "Deactivating..." : "Activating..."}
+                        title={acmeDetails?.acmeAvailable ? 'Deactivate' : 'Activate'}
+                        inProgressTitle={acmeDetails?.acmeAvailable ? 'Deactivating...' : 'Activating...'}
                         inProgress={isActivatingAcme || isDeactivatingAcme}
                         onClick={() => (acmeDetails?.acmeAvailable ? setConfirmDeactivateAcme(true) : openAcmeActivationDialog())}
                     />,
@@ -605,15 +605,15 @@ export default function RaProfileDetail() {
                 ],
             },
             {
-                id: "scep",
+                id: 'scep',
                 columns: [
-                    "SCEP",
+                    'SCEP',
                     <StatusBadge enabled={scepDetails ? (scepDetails.scepAvailable ? true : false) : false} />,
                     <ProgressButton
                         className="btn btn-primary btn-sm"
                         type="button"
-                        title={scepDetails?.scepAvailable ? "Deactivate" : "Activate"}
-                        inProgressTitle={scepDetails?.scepAvailable ? "Deactivating..." : "Activating..."}
+                        title={scepDetails?.scepAvailable ? 'Deactivate' : 'Activate'}
+                        inProgressTitle={scepDetails?.scepAvailable ? 'Deactivating...' : 'Activating...'}
                         inProgress={isActivatingScep || isDeactivatingScep}
                         onClick={() => (scepDetails?.scepAvailable ? setConfirmDeactivateScep(true) : openScepActivationDialog())}
                     />,
@@ -759,8 +759,8 @@ export default function RaProfileDetail() {
                   will be deleted as well. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
@@ -783,8 +783,8 @@ export default function RaProfileDetail() {
                 body="You are about to deactivate ACME protocol for the RA profile. Is this what you want to do?"
                 toggle={() => setConfirmDeactivateAcme(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeactivateAcmeConfirmed, body: "Yes, deactivate" },
-                    { color: "secondary", onClick: () => setConfirmDeactivateAcme(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeactivateAcmeConfirmed, body: 'Yes, deactivate' },
+                    { color: 'secondary', onClick: () => setConfirmDeactivateAcme(false), body: 'Cancel' },
                 ]}
             />
 
@@ -794,8 +794,8 @@ export default function RaProfileDetail() {
                 body="You are about to deactivate SCEP protocol for the RA profile. Is this what you want to do?"
                 toggle={() => setConfirmDeactivateScep(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeactivateScepConfirmed, body: "Yes, deactivate" },
-                    { color: "secondary", onClick: () => setConfirmDeactivateScep(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeactivateScepConfirmed, body: 'Yes, deactivate' },
+                    { color: 'secondary', onClick: () => setConfirmDeactivateScep(false), body: 'Cancel' },
                 ]}
             />
 
@@ -830,11 +830,11 @@ export default function RaProfileDetail() {
             <Dialog
                 isOpen={complianceCheck}
                 caption={`Initiate Compliance Check`}
-                body={"Initiate the compliance check for the certificates with RA Profile?"}
+                body={'Initiate the compliance check for the certificates with RA Profile?'}
                 toggle={() => setComplianceCheck(false)}
                 buttons={[
-                    { color: "primary", onClick: onComplianceCheck, body: "Yes" },
-                    { color: "secondary", onClick: () => setComplianceCheck(false), body: "Cancel" },
+                    { color: 'primary', onClick: onComplianceCheck, body: 'Yes' },
+                    { color: 'secondary', onClick: () => setComplianceCheck(false), body: 'Cancel' },
                 ]}
             />
 
@@ -871,14 +871,14 @@ export default function RaProfileDetail() {
                 toggle={() => setConfirmDeassociateApprovalProfileDialog(undefined)}
                 buttons={[
                     {
-                        color: "danger",
+                        color: 'danger',
                         onClick: () =>
                             confirmDeassociateApprovalProfileDialog
                                 ? onDissociateApprovalProfile(confirmDeassociateApprovalProfileDialog?.associatedApprovalProfileUuid)
                                 : {},
-                        body: "Yes",
+                        body: 'Yes',
                     },
-                    { color: "secondary", onClick: () => setConfirmDeassociateApprovalProfileDialog(undefined), body: "Cancel" },
+                    { color: 'secondary', onClick: () => setConfirmDeassociateApprovalProfileDialog(undefined), body: 'Cancel' },
                 ]}
             />
         </Container>

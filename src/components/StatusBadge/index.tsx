@@ -1,5 +1,5 @@
-import { Badge } from "reactstrap";
-import { ApprovalDetailDtoStatusEnum, ApprovalDtoStatusEnum, ApprovalStepRecipientDtoStatusEnum } from "types/openapi";
+import { Badge } from 'reactstrap';
+import { ApprovalDetailDtoStatusEnum, ApprovalDtoStatusEnum, ApprovalStepRecipientDtoStatusEnum } from 'types/openapi';
 
 interface Props {
     enabled?: boolean;

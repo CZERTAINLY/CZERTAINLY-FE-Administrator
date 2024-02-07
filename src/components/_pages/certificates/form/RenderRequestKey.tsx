@@ -1,17 +1,17 @@
-import CustomSelectComponent from "components/CustomSelectComponent";
-import CryptographicKeyForm from "components/_pages/cryptographic-keys/form";
-import { selectors as keySelectors } from "ducks/cryptographic-keys";
-import { actions as cryptographyOperationActions } from "ducks/cryptographic-operations";
-import { useCallback, useEffect, useMemo } from "react";
-import { Field, useForm } from "react-final-form";
-import { useDispatch, useSelector } from "react-redux";
-import Select, { SingleValue } from "react-select";
-import { FormFeedback, FormGroup, Label } from "reactstrap";
-import { CryptographicKeyPairResponseModel } from "types/cryptographic-keys";
-import { validateRequired } from "utils/validators";
-import { FormValues } from ".";
-import { actions as userInterfaceActions, selectors as userInterfaceSelectors } from "../../../../ducks/user-interface";
-import { KeyType } from "../../../../types/openapi";
+import CustomSelectComponent from 'components/CustomSelectComponent';
+import CryptographicKeyForm from 'components/_pages/cryptographic-keys/form';
+import { selectors as keySelectors } from 'ducks/cryptographic-keys';
+import { actions as cryptographyOperationActions } from 'ducks/cryptographic-operations';
+import { useCallback, useEffect, useMemo } from 'react';
+import { Field, useForm } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
+import Select, { SingleValue } from 'react-select';
+import { FormFeedback, FormGroup, Label } from 'reactstrap';
+import { CryptographicKeyPairResponseModel } from 'types/cryptographic-keys';
+import { validateRequired } from 'utils/validators';
+import { FormValues } from '.';
+import { actions as userInterfaceActions, selectors as userInterfaceSelectors } from '../../../../ducks/user-interface';
+import { KeyType } from '../../../../types/openapi';
 
 const RenderRequestKey = ({ values }: { values: FormValues }) => {
     const form = useForm();
@@ -54,7 +54,7 @@ const RenderRequestKey = ({ values }: { values: FormValues }) => {
         if (initiateFormCallback && formCallbackValue) {
             const newOption = keyOptions.find((option) => option.label === formCallbackValue);
             if (newOption) {
-                form.change("key", newOption);
+                form.change('key', newOption);
                 dispatch(userInterfaceActions.clearFormCallbackValue());
                 dispatch(userInterfaceActions.setInitiateFormCallback(false));
                 onKeyChange(newOption);
@@ -87,8 +87,8 @@ const RenderRequestKey = ({ values }: { values: FormValues }) => {
                                             userInterfaceActions.showGlobalModal({
                                                 content: <CryptographicKeyForm usesGlobalModal />,
                                                 isOpen: true,
-                                                size: "lg",
-                                                title: "Add New Key",
+                                                size: 'lg',
+                                                title: 'Add New Key',
                                             }),
                                         );
                                     }}

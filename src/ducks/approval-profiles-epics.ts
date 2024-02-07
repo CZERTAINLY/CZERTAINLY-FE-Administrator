@@ -1,17 +1,17 @@
-import { AppEpic } from "ducks";
-import { of } from "rxjs";
-import { catchError, filter, map, switchMap } from "rxjs/operators";
-import { actions as appRedirectActions } from "./app-redirect";
-import { actions as userInterfaceActions } from "./user-interface";
+import { AppEpic } from 'ducks';
+import { of } from 'rxjs';
+import { catchError, filter, map, switchMap } from 'rxjs/operators';
+import { actions as appRedirectActions } from './app-redirect';
+import { actions as userInterfaceActions } from './user-interface';
 
-import { LockWidgetNameEnum } from "types/user-interface";
-import { extractError } from "utils/net";
-import { slice } from "./approval-profiles";
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { extractError } from 'utils/net';
+import { slice } from './approval-profiles';
 import {
     transformProfileApprovalDetailDtoToModel,
     transformProfileApprovalRequestDtoToModel,
     transformProfileApprovalUpdateRequestDtoToModel,
-} from "./transform/approval-profiles";
+} from './transform/approval-profiles';
 
 const getApprovalProfile: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -33,7 +33,7 @@ const getApprovalProfile: AppEpic = (action$, state$, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.getApprovalProfileFailure({ error: extractError(err, "Failed to get Approval Profile details") }),
+                            slice.actions.getApprovalProfileFailure({ error: extractError(err, 'Failed to get Approval Profile details') }),
                             userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ApprovalProfileDetails),
                         ),
                     ),
@@ -59,8 +59,8 @@ const createApprovalProfile: AppEpic = (action$, state$, deps) => {
 
                     catchError((err) =>
                         of(
-                            appRedirectActions.fetchError({ error: err, message: "Failed to create approvalprofile" }),
-                            slice.actions.createApprovalProfileFailure({ error: extractError(err, "Failed to create Approval Profile") }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to create approvalprofile' }),
+                            slice.actions.createApprovalProfileFailure({ error: extractError(err, 'Failed to create Approval Profile') }),
                         ),
                     ),
                 ),
@@ -84,7 +84,7 @@ const listApprovalProfiles: AppEpic = (action$, state$, deps) => {
                 catchError((err) =>
                     of(
                         userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfApprovalProfiles),
-                        slice.actions.listApprovalProfilesFailure({ error: extractError(err, "Failed to get Approval Profiles list") }),
+                        slice.actions.listApprovalProfilesFailure({ error: extractError(err, 'Failed to get Approval Profiles list') }),
                     ),
                 ),
             ),
@@ -102,7 +102,7 @@ const enableApprovalProfile: AppEpic = (action$, state$, deps) => {
 
                 catchError((err) =>
                     of(
-                        appRedirectActions.fetchError({ error: err, message: "Failed to enable approval profile" }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to enable approval profile' }),
                         slice.actions.enableApprovalProfileFailure(err),
                     ),
                 ),
@@ -121,7 +121,7 @@ const disableApprovalProfile: AppEpic = (action$, state$, deps) => {
 
                 catchError((err) =>
                     of(
-                        appRedirectActions.fetchError({ error: err, message: "Failed to disable approval profile" }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to disable approval profile' }),
                         slice.actions.disableApprovalProfileFailure(err),
                     ),
                 ),
@@ -144,8 +144,8 @@ const deleteApprovalProfile: AppEpic = (action$, state$, deps) => {
                 ),
                 catchError((err) =>
                     of(
-                        appRedirectActions.fetchError({ error: err, message: "Failed to delete approval profile" }),
-                        slice.actions.deleteApprovalProfileFailure({ error: extractError(err, "Failed to delete Approval Profile") }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to delete approval profile' }),
+                        slice.actions.deleteApprovalProfileFailure({ error: extractError(err, 'Failed to delete Approval Profile') }),
                     ),
                 ),
             ),
@@ -172,7 +172,7 @@ const editApprovalProfile: AppEpic = (action$, state$, deps) => {
                     ),
                     catchError((err) =>
                         of(
-                            appRedirectActions.fetchError({ error: err, message: "Failed to update approval profile" }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to update approval profile' }),
                             slice.actions.editApprovalProfile(err),
                         ),
                     ),

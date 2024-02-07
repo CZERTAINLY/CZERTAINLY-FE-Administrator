@@ -1,4 +1,4 @@
-import { PaginationRequestDto, ScheduledJobDetailDto, ScheduledJobDto, ScheduledJobHistoryDto } from "./openapi";
+import { PaginationRequestDto, ScheduledJobDetailDto, ScheduledJobDto, ScheduledJobHistoryDto } from './openapi';
 
 export type SchedulerJobDto = ScheduledJobDto;
 export type SchedulerJobModel = SchedulerJobDto;

@@ -11,17 +11,17 @@
  * Do not edit the class manually.
  */
 
-import type { Observable } from "rxjs";
-import type { AjaxResponse } from "rxjs/ajax";
+import type { Observable } from 'rxjs';
+import type { AjaxResponse } from 'rxjs/ajax';
 import type {
     IdentifyCertificateRequestDto,
     IdentifyCertificateResponseDto,
     ParseCertificateRequestDto,
     ParseCertificateResponseDto,
     RandomCertificateResponseDto,
-} from "../models";
-import type { HttpHeaders, OperationOpts } from "../runtime";
-import { BaseAPI, encodeURI, throwIfNullOrUndefined } from "../runtime";
+} from '../models';
+import type { HttpHeaders, OperationOpts } from '../runtime';
+import { BaseAPI, encodeURI, throwIfNullOrUndefined } from '../runtime';
 
 export interface IdentifyCertificateRequest {
     identifyCertificateRequestDto: IdentifyCertificateRequestDto;
@@ -52,16 +52,16 @@ export class CertificateUtilsAPIApi extends BaseAPI {
         { identifyCertificateRequestDto }: IdentifyCertificateRequest,
         opts?: OperationOpts,
     ): Observable<IdentifyCertificateResponseDto | AjaxResponse<IdentifyCertificateResponseDto>> {
-        throwIfNullOrUndefined(identifyCertificateRequestDto, "identifyCertificateRequestDto", "identifyCertificate");
+        throwIfNullOrUndefined(identifyCertificateRequestDto, 'identifyCertificateRequestDto', 'identifyCertificate');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<IdentifyCertificateResponseDto>(
             {
-                url: "/v1/certificate/identify",
-                method: "POST",
+                url: '/v1/certificate/identify',
+                method: 'POST',
                 headers,
                 body: identifyCertificateRequestDto,
             },
@@ -81,17 +81,17 @@ export class CertificateUtilsAPIApi extends BaseAPI {
         { certificateType, parseCertificateRequestDto }: ParseCertificateRequest,
         opts?: OperationOpts,
     ): Observable<ParseCertificateResponseDto | AjaxResponse<ParseCertificateResponseDto>> {
-        throwIfNullOrUndefined(certificateType, "certificateType", "parseCertificate");
-        throwIfNullOrUndefined(parseCertificateRequestDto, "parseCertificateRequestDto", "parseCertificate");
+        throwIfNullOrUndefined(certificateType, 'certificateType', 'parseCertificate');
+        throwIfNullOrUndefined(parseCertificateRequestDto, 'parseCertificateRequestDto', 'parseCertificate');
 
         const headers: HttpHeaders = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         };
 
         return this.request<ParseCertificateResponseDto>(
             {
-                url: "/v1/certificate/{certificateType}/parse".replace("{certificateType}", encodeURI(certificateType)),
-                method: "POST",
+                url: '/v1/certificate/{certificateType}/parse'.replace('{certificateType}', encodeURI(certificateType)),
+                method: 'POST',
                 headers,
                 body: parseCertificateRequestDto,
             },
@@ -111,12 +111,12 @@ export class CertificateUtilsAPIApi extends BaseAPI {
         { certificateType }: RandomCertificateRequest,
         opts?: OperationOpts,
     ): Observable<RandomCertificateResponseDto | AjaxResponse<RandomCertificateResponseDto>> {
-        throwIfNullOrUndefined(certificateType, "certificateType", "randomCertificate");
+        throwIfNullOrUndefined(certificateType, 'certificateType', 'randomCertificate');
 
         return this.request<RandomCertificateResponseDto>(
             {
-                url: "/v1/certificate/{certificateType}/random".replace("{certificateType}", encodeURI(certificateType)),
-                method: "GET",
+                url: '/v1/certificate/{certificateType}/random'.replace('{certificateType}', encodeURI(certificateType)),
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -128,14 +128,14 @@ export class CertificateUtilsAPIApi extends BaseAPI {
  * @enum {string}
  */
 export enum ParseCertificateCertificateTypeEnum {
-    X509 = "X509",
-    Ssh = "SSH",
+    X509 = 'X509',
+    Ssh = 'SSH',
 }
 /**
  * @export
  * @enum {string}
  */
 export enum RandomCertificateCertificateTypeEnum {
-    X509 = "X509",
-    Ssh = "SSH",
+    X509 = 'X509',
+    Ssh = 'SSH',
 }

@@ -1,28 +1,28 @@
-import CertificateUploadDialog from "components/_pages/certificates/CertificateUploadDialog";
+import CertificateUploadDialog from 'components/_pages/certificates/CertificateUploadDialog';
 
-import CertificateAttributes from "components/CertificateAttributes";
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
-import ProgressButton from "components/ProgressButton";
+import CertificateAttributes from 'components/CertificateAttributes';
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
+import ProgressButton from 'components/ProgressButton';
 
-import Widget from "components/Widget";
-import { actions as groupActions, selectors as groupSelectors } from "ducks/certificateGroups";
-import { actions as certActions, selectors as certSelectors } from "ducks/certificates";
-import { selectors as pagingSelectors } from "ducks/paging";
-import { actions as rolesActions, selectors as rolesSelectors } from "ducks/roles";
+import Widget from 'components/Widget';
+import { actions as groupActions, selectors as groupSelectors } from 'ducks/certificateGroups';
+import { actions as certActions, selectors as certSelectors } from 'ducks/certificates';
+import { selectors as pagingSelectors } from 'ducks/paging';
+import { actions as rolesActions, selectors as rolesSelectors } from 'ducks/roles';
 
-import { actions as userActions, selectors as userSelectors } from "ducks/users";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Field, Form } from "react-final-form";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
-import Select from "react-select";
+import { actions as userActions, selectors as userSelectors } from 'ducks/users';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Field, Form } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
+import Select from 'react-select';
 
-import { Badge, Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, FormText, Input, Label } from "reactstrap";
-import { UserDetailModel } from "types/auth";
-import { CertificateDetailResponseModel, CertificateListResponseModel } from "types/certificate";
+import { Badge, Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, FormText, Input, Label } from 'reactstrap';
+import { UserDetailModel } from 'types/auth';
+import { CertificateDetailResponseModel, CertificateListResponseModel } from 'types/certificate';
 
-import { EntityType } from "ducks/filters";
+import { EntityType } from 'ducks/filters';
 import {
     composeValidators,
     validateAlphaNumericWithSpecialChars,
@@ -30,13 +30,13 @@ import {
     validateLength,
     validateRequired,
     validateUrlSafe,
-} from "utils/validators";
-import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
-import { CertificateState as CertStatus, Resource } from "../../../../types/openapi";
-import { mutators } from "../../../../utils/attributes/attributeEditorMutators";
-import { collectFormAttributes } from "../../../../utils/attributes/attributes";
-import AttributeEditor from "../../../Attributes/AttributeEditor";
-import TabLayout from "../../../Layout/TabLayout";
+} from 'utils/validators';
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
+import { CertificateState as CertStatus, Resource } from '../../../../types/openapi';
+import { mutators } from '../../../../utils/attributes/attributeEditorMutators';
+import { collectFormAttributes } from '../../../../utils/attributes/attributes';
+import AttributeEditor from '../../../Attributes/AttributeEditor';
+import TabLayout from '../../../Layout/TabLayout';
 
 interface FormValues {
     username: string;
@@ -45,7 +45,7 @@ interface FormValues {
     firstName: string;
     lastName: string;
     email: string;
-    inputType: { value: "upload" | "select" };
+    inputType: { value: 'upload' | 'select' };
     certFile: FileList | undefined;
     certificate: any;
     enabled: boolean;
@@ -85,15 +85,15 @@ function UserForm() {
 
     const [optionsForCertificate, setOptionsForCertificate] = useState<{ label: string; value: string }[]>([]);
 
-    const optionsForInput: { label: string; value: "upload" | "select" }[] = useMemo(
+    const optionsForInput: { label: string; value: 'upload' | 'select' }[] = useMemo(
         () => [
             {
-                label: "Upload a new Certificate",
-                value: "upload",
+                label: 'Upload a new Certificate',
+                value: 'upload',
             },
             {
-                label: "Choose Existing Certificate",
-                value: "select",
+                label: 'Choose Existing Certificate',
+                value: 'select',
             },
         ],
         [],
@@ -151,12 +151,12 @@ function UserForm() {
         } else {
             if (!user)
                 setUser({
-                    uuid: "",
-                    description: "",
-                    username: "",
-                    firstName: "",
-                    lastName: "",
-                    email: "",
+                    uuid: '',
+                    description: '',
+                    username: '',
+                    firstName: '',
+                    lastName: '',
+                    email: '',
                     enabled: false,
                     roles: [],
                     systemUser: false,
@@ -192,7 +192,7 @@ function UserForm() {
 
     useEffect(() => {
         const fpc = certificates
-            .filter((pagedCert) => !["expired", "revoked", "invalid"].includes(pagedCert.state))
+            .filter((pagedCert) => !['expired', 'revoked', 'invalid'].includes(pagedCert.state))
             .filter((pagedCert) => loadedCerts.find((loadedCert) => loadedCert.uuid === pagedCert.uuid) === undefined);
 
         if (fpc.length === 0) return;
@@ -233,13 +233,13 @@ function UserForm() {
                             email: values.email,
                             groupUuid: values.group?.value ?? undefined,
                             certificateUuid:
-                                values.inputType.value === "select"
+                                values.inputType.value === 'select'
                                     ? values.certificate
                                         ? values.certificate.value
                                         : undefined
                                     : undefined,
-                            certificateData: values.inputType?.value === "upload" && certToUpload ? certFileContent : undefined,
-                            customAttributes: collectFormAttributes("customUser", resourceCustomAttributes, values),
+                            certificateData: values.inputType?.value === 'upload' && certToUpload ? certFileContent : undefined,
+                            customAttributes: collectFormAttributes('customUser', resourceCustomAttributes, values),
                         },
                     }),
                 );
@@ -255,14 +255,14 @@ function UserForm() {
                             email: values.email || undefined,
                             groupUuid: values.group?.value ?? undefined,
                             enabled: values.enabled,
-                            certificateData: values.inputType?.value === "upload" && certToUpload ? certFileContent : undefined,
+                            certificateData: values.inputType?.value === 'upload' && certToUpload ? certFileContent : undefined,
                             certificateUuid:
-                                values.inputType?.value === "select"
+                                values.inputType?.value === 'select'
                                     ? values.certificate
                                         ? values.certificate?.value
                                         : undefined
                                     : undefined,
-                            customAttributes: collectFormAttributes("customUser", resourceCustomAttributes, values),
+                            customAttributes: collectFormAttributes('customUser', resourceCustomAttributes, values),
                         },
                     }),
                 );
@@ -288,18 +288,18 @@ function UserForm() {
         );
     }, [dispatch, currentPage, loadedCerts]);
 
-    const submitTitle = useMemo(() => (editMode ? "Save" : "Create"), [editMode]);
+    const submitTitle = useMemo(() => (editMode ? 'Save' : 'Create'), [editMode]);
 
-    const inProgressTitle = useMemo(() => (editMode ? "Saving..." : "Creating..."), [editMode]);
+    const inProgressTitle = useMemo(() => (editMode ? 'Saving...' : 'Creating...'), [editMode]);
 
     const defaultValues = useMemo(
         () => ({
-            username: editMode ? user?.username : "",
-            description: editMode ? user?.description : "",
+            username: editMode ? user?.username : '',
+            description: editMode ? user?.description : '',
             group: editMode && user?.groupName && user?.groupUuid ? { label: user.groupName, value: user.groupUuid } : undefined,
-            firstName: editMode ? user?.firstName || "" : "",
-            lastName: editMode ? user?.lastName : "",
-            email: editMode ? user?.email : "",
+            firstName: editMode ? user?.firstName || '' : '',
+            lastName: editMode ? user?.lastName : '',
+            email: editMode ? user?.email : '',
             enabled: editMode ? user?.enabled : true,
             systemUser: editMode ? user?.systemUser : false,
             inputType: optionsForInput[1],
@@ -311,25 +311,25 @@ function UserForm() {
     const rolesTableHeader: TableHeader[] = useMemo(
         () => [
             {
-                id: "roleName",
-                content: "Name",
+                id: 'roleName',
+                content: 'Name',
                 sortable: true,
-                sort: "asc",
-                width: "auto",
+                sort: 'asc',
+                width: 'auto',
             },
             {
-                id: "roleDescription",
-                content: "Role description",
+                id: 'roleDescription',
+                content: 'Role description',
                 sortable: true,
-                sort: "asc",
-                width: "auto",
+                sort: 'asc',
+                width: 'auto',
             },
             {
-                id: "systemRole",
-                content: "System role",
+                id: 'systemRole',
+                content: 'System role',
                 sortable: true,
-                sort: "asc",
-                width: "auto",
+                sort: 'asc',
+                width: 'auto',
             },
         ],
         [],
@@ -343,9 +343,9 @@ function UserForm() {
                 columns: [
                     role.name,
 
-                    role.description || "",
+                    role.description || '',
 
-                    <Badge color={!role.systemRole ? "success" : "danger"}>{role.systemRole ? "Yes" : "No"}</Badge>,
+                    <Badge color={!role.systemRole ? 'success' : 'danger'}>{role.systemRole ? 'Yes' : 'No'}</Badge>,
                 ],
             })),
 
@@ -380,7 +380,7 @@ function UserForm() {
             ),
         [editMode],
     );
-    const title = useMemo(() => (editMode ? "Edit user" : "Create user"), [editMode]);
+    const title = useMemo(() => (editMode ? 'Edit user' : 'Create user'), [editMode]);
 
     return (
         <>
@@ -529,7 +529,7 @@ function UserForm() {
                                 )}
                             </Field>
 
-                            {values.inputType.value === "upload" ? (
+                            {values.inputType.value === 'upload' ? (
                                 <FormGroup>
                                     <Label for="certFile">Client Certificate</Label>
 
@@ -571,8 +571,8 @@ function UserForm() {
                                                         meta.touched && meta.invalid
                                                             ? {
                                                                   ...provided,
-                                                                  border: "solid 1px red",
-                                                                  "&:hover": { border: "solid 1px red" },
+                                                                  border: 'solid 1px red',
+                                                                  '&:hover': { border: 'solid 1px red' },
                                                               }
                                                             : { ...provided },
                                                 }}
@@ -581,7 +581,7 @@ function UserForm() {
 
                                             <div
                                                 className="invalid-feedback"
-                                                style={meta.touched && meta.invalid ? { display: "block" } : {}}
+                                                style={meta.touched && meta.invalid ? { display: 'block' } : {}}
                                             >
                                                 {meta.error}
                                             </div>
@@ -594,7 +594,7 @@ function UserForm() {
                             <TabLayout
                                 tabs={[
                                     {
-                                        title: "Custom attributes",
+                                        title: 'Custom attributes',
                                         content: (
                                             <AttributeEditor
                                                 id="customUser"

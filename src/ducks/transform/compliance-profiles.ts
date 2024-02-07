@@ -35,13 +35,13 @@ import {
     ComplianceProfileRuleListResponseModel,
     ComplianceProfileRuleListResponseRuleDto,
     ComplianceProfileRuleListResponseRuleModel,
-} from "types/complianceProfiles";
+} from 'types/complianceProfiles';
 import {
     transformAttributeDescriptorDtoToModel,
     transformAttributeRequestModelToDto,
     transformAttributeResponseDtoToModel,
-} from "./attributes";
-import { transformRaProfileSimplifiedDtoToModel } from "./certificates";
+} from './attributes';
+import { transformRaProfileSimplifiedDtoToModel } from './certificates';
 
 export function transformComplianceProfileListRuleModelToDto(profileRule: ComplianceProfileListRuleModel): ComplianceProfileListRuleDto {
     return { ...profileRule };

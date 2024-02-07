@@ -1,17 +1,17 @@
-import { useCallback, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { useCallback, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
 
-import { Button, ButtonGroup, Container } from "reactstrap";
+import { Button, ButtonGroup, Container } from 'reactstrap';
 
-import ProgressButton from "components/ProgressButton";
-import Widget from "components/Widget";
+import ProgressButton from 'components/ProgressButton';
+import Widget from 'components/Widget';
 
-import { actions as authActions, selectors as authSelectors } from "ducks/auth";
-import { actions as rolesActions, selectors as rolesSelectors } from "ducks/roles";
+import { actions as authActions, selectors as authSelectors } from 'ducks/auth';
+import { actions as rolesActions, selectors as rolesSelectors } from 'ducks/roles';
 
-import { SubjectPermissionsModel } from "types/roles";
-import RolePermissionsEditor from "../RolePermissionsEdior";
+import { SubjectPermissionsModel } from 'types/roles';
+import RolePermissionsEditor from '../RolePermissionsEdior';
 
 function RoleForm() {
     const dispatch = useDispatch();
@@ -97,7 +97,7 @@ function RoleForm() {
     return (
         <Container className="themed-container" fluid>
             <Widget
-                title={`${roleSelector?.name || ""} Role Permissions`}
+                title={`${roleSelector?.name || ''} Role Permissions`}
                 busy={isFetchingRoleDetail || isFetchingPermissions || isFetchingResources || isUpdatingRolePermissions}
             >
                 <RolePermissionsEditor

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
 interface WindowSizes {
     width: number;
@@ -19,17 +19,17 @@ export function useWindowSize(): WindowSizes {
             });
         }
 
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
     }, []);
 
     return screenDimensions;
 }
 
 export enum DeviceType {
-    Mobile = "mobile",
-    Tablet = "tablet",
-    Desktop = "desktop",
+    Mobile = 'mobile',
+    Tablet = 'tablet',
+    Desktop = 'desktop',
 }
 
 export function useDeviceType(): DeviceType {
@@ -48,8 +48,8 @@ export function useDeviceType(): DeviceType {
         }
 
         handleResize();
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
     }, []);
 
     return deviceType;

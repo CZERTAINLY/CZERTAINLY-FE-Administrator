@@ -17,7 +17,7 @@ import type {
     DateTimeAttributeConstraintData,
     RangeAttributeConstraint,
     RegexpAttributeConstraint,
-} from "./";
+} from './';
 
 /**
  * @type BaseAttributeConstraint

@@ -1,13 +1,13 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { CertificateListResponseDto, CertificateListResponseModel } from "types/certificate";
-import { BulkActionModel } from "types/connectors";
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { CertificateListResponseDto, CertificateListResponseModel } from 'types/certificate';
+import { BulkActionModel } from 'types/connectors';
 import {
     ScepProfileAddRequestModel,
     ScepProfileEditRequestModel,
     ScepProfileListResponseModel,
     ScepProfileResponseModel,
-} from "types/scep-profiles";
-import { createFeatureSelector } from "utils/ducks";
+} from 'types/scep-profiles';
+import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     checkedRows: string[];
@@ -38,7 +38,7 @@ export const initialState: State = {
 
     scepProfiles: [],
 
-    deleteErrorMessage: "",
+    deleteErrorMessage: '',
     bulkDeleteErrorMessages: [],
 
     isFetchingList: false,
@@ -56,7 +56,7 @@ export const initialState: State = {
 };
 
 export const slice = createSlice({
-    name: "scepProfiles",
+    name: 'scepProfiles',
 
     initialState,
 
@@ -74,7 +74,7 @@ export const slice = createSlice({
         },
 
         clearDeleteErrorMessages: (state, action: PayloadAction<void>) => {
-            state.deleteErrorMessage = "";
+            state.deleteErrorMessage = '';
             state.bulkDeleteErrorMessages = [];
         },
 
@@ -168,7 +168,7 @@ export const slice = createSlice({
 
         deleteScepProfile: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isDeleting = true;
-            state.deleteErrorMessage = "";
+            state.deleteErrorMessage = '';
         },
 
         deleteScepProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
@@ -183,7 +183,7 @@ export const slice = createSlice({
 
         deleteScepProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isDeleting = false;
-            state.deleteErrorMessage = action.payload.error || "Unknown error";
+            state.deleteErrorMessage = action.payload.error || 'Unknown error';
         },
 
         enableScepProfile: (state, action: PayloadAction<{ uuid: string }>) => {

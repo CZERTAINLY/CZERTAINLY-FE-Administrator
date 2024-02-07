@@ -1,16 +1,16 @@
-import AttributeEditor from "components/Attributes/AttributeEditor";
+import AttributeEditor from 'components/Attributes/AttributeEditor';
 
-import { actions } from "ducks/compliance-profiles";
-import { useCallback, useState } from "react";
-import { Field, Form } from "react-final-form";
-import { useDispatch } from "react-redux";
+import { actions } from 'ducks/compliance-profiles';
+import { useCallback, useState } from 'react';
+import { Field, Form } from 'react-final-form';
+import { useDispatch } from 'react-redux';
 
-import { Button, ButtonGroup, Form as BootstrapForm, FormGroup } from "reactstrap";
-import { AttributeDescriptorModel } from "types/attributes";
+import { Button, ButtonGroup, Form as BootstrapForm, FormGroup } from 'reactstrap';
+import { AttributeDescriptorModel } from 'types/attributes';
 
-import { mutators } from "utils/attributes/attributeEditorMutators";
-import { collectFormAttributes } from "utils/attributes/attributes";
-import TabLayout from "../../../../Layout/TabLayout";
+import { mutators } from 'utils/attributes/attributeEditorMutators';
+import { collectFormAttributes } from 'utils/attributes/attributes';
+import TabLayout from '../../../../Layout/TabLayout';
 
 interface Props {
     complianceProfileUuid?: string;
@@ -48,7 +48,7 @@ export default function AddRuleWithAttributesDialogBody({
 
             const attribs =
                 attributes && attributes.length > 0
-                    ? collectFormAttributes("attributes", [...(attributes ?? []), ...groupAttributesCallbackAttributes], values) || []
+                    ? collectFormAttributes('attributes', [...(attributes ?? []), ...groupAttributesCallbackAttributes], values) || []
                     : [];
             dispatch(
                 actions.addRule({
@@ -85,7 +85,7 @@ export default function AddRuleWithAttributesDialogBody({
                                         <TabLayout
                                             tabs={[
                                                 {
-                                                    title: "Custom Attributes",
+                                                    title: 'Custom Attributes',
                                                     content: (
                                                         <AttributeEditor
                                                             id="attributes"
@@ -102,7 +102,7 @@ export default function AddRuleWithAttributesDialogBody({
                             </Field>
                         )}
 
-                        <div style={{ textAlign: "right" }}>
+                        <div style={{ textAlign: 'right' }}>
                             <ButtonGroup>
                                 <Button type="submit" color="primary" disabled={pristine || submitting || !valid} onClick={handleSubmit}>
                                     Add

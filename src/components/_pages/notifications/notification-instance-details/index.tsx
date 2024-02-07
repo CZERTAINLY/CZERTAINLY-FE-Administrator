@@ -1,14 +1,14 @@
-import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from "components/Attributes/AttributeViewer";
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
-import { actions as customAttributesActions, selectors as customAttributesSelectors } from "ducks/customAttributes";
-import { actions as notificationsActions, selectors as notificationsSelectors } from "ducks/notifications";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { Container, Label } from "reactstrap";
+import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from 'components/Attributes/AttributeViewer';
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
+import { actions as notificationsActions, selectors as notificationsSelectors } from 'ducks/notifications';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Container, Label } from 'reactstrap';
 const NotificationInstanceDetails = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
@@ -69,17 +69,17 @@ const NotificationInstanceDetails = () => {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "pencil",
+                icon: 'pencil',
                 disabled: false,
-                tooltip: "Edit",
+                tooltip: 'Edit',
                 onClick: () => {
                     onEditClick();
                 },
             },
             {
-                icon: "trash",
+                icon: 'trash',
                 disabled: false,
-                tooltip: "Delete",
+                tooltip: 'Delete',
                 onClick: () => {
                     setConfirmDelete(true);
                 },
@@ -91,12 +91,12 @@ const NotificationInstanceDetails = () => {
     const detailHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "property",
-                content: "Property",
+                id: 'property',
+                content: 'Property',
             },
             {
-                id: "value",
-                content: "Value",
+                id: 'value',
+                content: 'Value',
             },
         ],
         [],
@@ -108,29 +108,29 @@ const NotificationInstanceDetails = () => {
                 ? []
                 : [
                       {
-                          id: "uuid",
-                          columns: ["UUID", notificationInstance.uuid],
+                          id: 'uuid',
+                          columns: ['UUID', notificationInstance.uuid],
                       },
                       {
-                          id: "name",
-                          columns: ["Name", notificationInstance.name],
+                          id: 'name',
+                          columns: ['Name', notificationInstance.name],
                       },
                       {
-                          id: "description",
-                          columns: ["Description", notificationInstance.description || ""],
+                          id: 'description',
+                          columns: ['Description', notificationInstance.description || ''],
                       },
                       {
-                          id: "kind",
-                          columns: ["Kind", notificationInstance.kind || ""],
+                          id: 'kind',
+                          columns: ['Kind', notificationInstance.kind || ''],
                       },
                       {
-                          id: "notificationProviderUuid",
-                          columns: ["Notification Provider Uuid", notificationInstance.connectorUuid],
+                          id: 'notificationProviderUuid',
+                          columns: ['Notification Provider Uuid', notificationInstance.connectorUuid],
                       },
                       {
-                          id: "notificationProviderName",
+                          id: 'notificationProviderName',
                           columns: [
-                              "Notification Provider Name",
+                              'Notification Provider Name',
                               <Link to={`../../../connectors/detail/${notificationInstance.connectorUuid}`}>
                                   {notificationInstance.connectorName}
                               </Link>,
@@ -143,7 +143,7 @@ const NotificationInstanceDetails = () => {
     const getMappingAttributesContentType = useCallback(
         (attributeUuid: string) => {
             const mappingAttribute = mappingAttributes?.find((mappingAttribute) => mappingAttribute.uuid === attributeUuid);
-            return mappingAttribute?.contentType || "";
+            return mappingAttribute?.contentType || '';
         },
         [mappingAttributes],
     );
@@ -151,7 +151,7 @@ const NotificationInstanceDetails = () => {
     const getCustomAttributeName = useCallback(
         (attributeUuid: string) => {
             const customAttribute = customAttributes?.find((customAttribute) => customAttribute.uuid === attributeUuid);
-            return customAttribute?.name || "";
+            return customAttribute?.name || '';
         },
         [customAttributes],
     );
@@ -159,23 +159,23 @@ const NotificationInstanceDetails = () => {
     const attributeHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "attributeName",
-                content: "Attribute Name",
-                sort: "asc",
+                id: 'attributeName',
+                content: 'Attribute Name',
+                sort: 'asc',
                 sortable: true,
-                width: "auto",
+                width: 'auto',
             },
             {
-                id: "customAttributeName",
-                content: "Custom Attribute Name",
+                id: 'customAttributeName',
+                content: 'Custom Attribute Name',
                 sortable: true,
-                width: "auto",
+                width: 'auto',
             },
             {
-                id: "contentType",
-                content: "Content Type",
-                width: "auto",
-                align: "center",
+                id: 'contentType',
+                content: 'Content Type',
+                width: 'auto',
+                align: 'center',
             },
         ],
         [],
@@ -240,8 +240,8 @@ const NotificationInstanceDetails = () => {
                 body={`You are about to delete a Notification Instance. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
         </Container>

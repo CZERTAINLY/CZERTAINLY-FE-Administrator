@@ -1,6 +1,6 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { createFeatureSelector } from "utils/ducks";
-import { ParseRequestRequestDtoParseTypeEnum, ParseRequestResponseDto } from "../types/openapi/utils";
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createFeatureSelector } from 'utils/ducks';
+import { ParseRequestRequestDtoParseTypeEnum, ParseRequestResponseDto } from '../types/openapi/utils';
 
 export type State = {
     parsedCertificateRequest?: ParseRequestResponseDto;
@@ -12,7 +12,7 @@ export const initialState: State = {
 };
 
 export const slice = createSlice({
-    name: "utilsCertificateRequest",
+    name: 'utilsCertificateRequest',
     initialState,
     reducers: {
         reset: (state) => {

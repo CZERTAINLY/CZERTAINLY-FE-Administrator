@@ -1,17 +1,17 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
-import { Badge, Container } from "reactstrap";
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { Badge, Container } from 'reactstrap';
 
-import { actions, selectors } from "ducks/tokens";
+import { actions, selectors } from 'ducks/tokens';
 
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
-import TokenStatusBadge from "components/_pages/tokens/TokenStatusBadge";
-import { LockWidgetNameEnum } from "types/user-interface";
-import TokenActivationDialogBody from "../TokenActivationDialogBody";
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
+import TokenStatusBadge from 'components/_pages/tokens/TokenStatusBadge';
+import { LockWidgetNameEnum } from 'types/user-interface';
+import TokenActivationDialogBody from '../TokenActivationDialogBody';
 
 function TokenList() {
     const dispatch = useDispatch();
@@ -42,7 +42,7 @@ function TokenList() {
     }, [getFreshData]);
 
     const onAddClick = useCallback(() => {
-        navigate("./add");
+        navigate('./add');
     }, [navigate]);
 
     const setCheckedRows = useCallback(
@@ -69,33 +69,33 @@ function TokenList() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "plus",
+                icon: 'plus',
                 disabled: false,
-                tooltip: "Create",
+                tooltip: 'Create',
                 onClick: () => {
                     onAddClick();
                 },
             },
             {
-                icon: "trash",
+                icon: 'trash',
                 disabled: checkedRows.length === 0,
-                tooltip: "Delete",
+                tooltip: 'Delete',
                 onClick: () => {
                     setConfirmDelete(true);
                 },
             },
             {
-                icon: "check",
+                icon: 'check',
                 disabled: checkedRows.length !== 1,
-                tooltip: "Activate",
+                tooltip: 'Activate',
                 onClick: () => {
                     setActivateToken(true);
                 },
             },
             {
-                icon: "times",
+                icon: 'times',
                 disabled: checkedRows.length !== 1,
-                tooltip: "Deactivate",
+                tooltip: 'Deactivate',
                 onClick: () => {
                     setConfirmDeactivation(true);
                 },
@@ -107,39 +107,39 @@ function TokenList() {
     const tokenRowHeader: TableHeader[] = useMemo(
         () => [
             {
-                content: "Name",
+                content: 'Name',
                 sortable: true,
-                sort: "asc",
-                id: "tokenName",
-                width: "auto",
+                sort: 'asc',
+                id: 'tokenName',
+                width: 'auto',
             },
             {
-                content: "Cryptography Provider",
-                align: "center",
+                content: 'Cryptography Provider',
+                align: 'center',
                 sortable: true,
-                id: "tokenProvider",
-                width: "15%",
+                id: 'tokenProvider',
+                width: '15%',
             },
             {
-                content: "Kind",
-                align: "center",
+                content: 'Kind',
+                align: 'center',
                 sortable: true,
-                id: "kind",
-                width: "15%",
+                id: 'kind',
+                width: '15%',
             },
             {
-                content: "Status",
-                align: "center",
+                content: 'Status',
+                align: 'center',
                 sortable: true,
-                id: "status",
-                width: "15%",
+                id: 'status',
+                width: '15%',
             },
             {
-                content: "Token Profiles",
-                align: "center",
+                content: 'Token Profiles',
+                align: 'center',
                 sortable: true,
-                id: "tokenProfiles",
-                width: "15%",
+                id: 'tokenProfiles',
+                width: '15%',
             },
         ],
         [],
@@ -154,9 +154,9 @@ function TokenList() {
                     <Link to={`./detail/${token.uuid}`}>{token.name}</Link>,
 
                     token.connectorName ? (
-                        <Link to={`../connectors/detail/${token.connectorUuid}`}>{token.connectorName ?? "Unassigned"}</Link>
+                        <Link to={`../connectors/detail/${token.connectorUuid}`}>{token.connectorName ?? 'Unassigned'}</Link>
                     ) : (
-                        token.connectorName ?? "Unassigned"
+                        token.connectorName ?? 'Unassigned'
                     ),
 
                     <Badge color="secondary">{token.kind}</Badge>,
@@ -193,12 +193,12 @@ function TokenList() {
 
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete ${checkedRows.length > 1 ? "Tokens" : "a Token"}`}
-                body={`You are about to delete ${checkedRows.length > 1 ? "Tokens" : "a Token"}. Is this what you want to do?`}
+                caption={`Delete ${checkedRows.length > 1 ? 'Tokens' : 'a Token'}`}
+                body={`You are about to delete ${checkedRows.length > 1 ? 'Tokens' : 'a Token'}. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
@@ -209,8 +209,8 @@ function TokenList() {
                   related to the token not work. Is this what you want to do?"
                 toggle={() => setConfirmDeactivation(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeactivationConfirmed, body: "Deactivate" },
-                    { color: "secondary", onClick: () => setConfirmDeactivation(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeactivationConfirmed, body: 'Deactivate' },
+                    { color: 'secondary', onClick: () => setConfirmDeactivation(false), body: 'Cancel' },
                 ]}
             />
 

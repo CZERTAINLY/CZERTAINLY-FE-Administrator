@@ -1,6 +1,6 @@
-import cx from "classnames";
-import { useEffect, useMemo, useState } from "react";
-import { Nav, NavItem, NavLink, TabContent, TabPane } from "reactstrap";
+import cx from 'classnames';
+import { useEffect, useMemo, useState } from 'react';
+import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
 
 type Props = {
     tabs: {
@@ -35,7 +35,7 @@ export default function TabLayout({ tabs, onlyActiveTabContent = false, selected
                 {memoizedTabs.map((t, i) => (
                     <NavItem key={`nav-${i}`}>
                         <NavLink
-                            className={cx({ active: activeTab === i, "p-0": selectedTab !== undefined })}
+                            className={cx({ active: activeTab === i, 'p-0': selectedTab !== undefined })}
                             onClick={() => {
                                 if (t.disabled) {
                                     return;

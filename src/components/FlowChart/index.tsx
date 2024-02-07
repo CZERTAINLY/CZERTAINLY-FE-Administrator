@@ -1,8 +1,8 @@
-import Widget from "components/Widget";
-import dagre from "dagre";
-import { useCallback, useEffect, useState } from "react";
+import Widget from 'components/Widget';
+import dagre from 'dagre';
+import { useCallback, useEffect, useState } from 'react';
 
-import cx from "classnames";
+import cx from 'classnames';
 import {
     Background,
     BackgroundVariant,
@@ -16,13 +16,13 @@ import {
     Viewport,
     applyEdgeChanges,
     applyNodeChanges,
-} from "reactflow";
-import "reactflow/dist/style.css";
-import { CustomNodeData } from "types/flowchart";
-import FloatingEdge from "./CustomEdge";
-import FloatingConnectionLine from "./CustomEdge/FloatingConnectionLine";
-import CustomFlowNode from "./CustomFlowNode";
-import style from "./flowChart.module.scss";
+} from 'reactflow';
+import 'reactflow/dist/style.css';
+import { CustomNodeData } from 'types/flowchart';
+import FloatingEdge from './CustomEdge';
+import FloatingConnectionLine from './CustomEdge/FloatingConnectionLine';
+import CustomFlowNode from './CustomFlowNode';
+import style from './flowChart.module.scss';
 const nodeTypes = { customFlowNode: CustomFlowNode };
 
 export interface CustomNode extends Node {
@@ -46,8 +46,8 @@ dagreGraph.setDefaultEdgeLabel(() => ({}));
 export const nodeWidth = 400;
 export const nodeHeight = 100;
 
-const getLayoutedElements = (nodes: CustomNode[], edges: Edge[], direction = "TB") => {
-    const isHorizontal = direction === "LR";
+const getLayoutedElements = (nodes: CustomNode[], edges: Edge[], direction = 'TB') => {
+    const isHorizontal = direction === 'LR';
     dagreGraph.setGraph({ rankdir: direction });
 
     nodes.forEach((node) => {

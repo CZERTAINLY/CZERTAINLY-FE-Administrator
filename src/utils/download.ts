@@ -1,13 +1,13 @@
-import "jszip";
+import 'jszip';
 
-import { Buffer } from "buffer";
-import { saveAs } from "file-saver";
+import { Buffer } from 'buffer';
+import { saveAs } from 'file-saver';
 
-import JSZip from "jszip";
-import { CertificateContentResponseModel, CertificateDetailResponseModel } from "types/certificate";
+import JSZip from 'jszip';
+import { CertificateContentResponseModel, CertificateDetailResponseModel } from 'types/certificate';
 
 export function downloadFile(content: any, fileName: string, type?: string) {
-    const element = document.createElement("a");
+    const element = document.createElement('a');
 
     var byteNumbers = new Array(content.length);
     for (var i = 0; i < content.length; i++) {
@@ -16,7 +16,7 @@ export function downloadFile(content: any, fileName: string, type?: string) {
     var byteArray = new Uint8Array(byteNumbers);
 
     if (!type) {
-        type = "text/plain";
+        type = 'text/plain';
     }
 
     const file = new Blob([byteArray], { type: type });
@@ -42,17 +42,17 @@ export function downloadFileZip(
 
         let content: string | Buffer;
 
-        if (fileType === "pem") {
-            content = formatPEM(certificate.certificateContent || "");
+        if (fileType === 'pem') {
+            content = formatPEM(certificate.certificateContent || '');
         } else {
-            content = Buffer.from(certificate.certificateContent || "", "base64");
+            content = Buffer.from(certificate.certificateContent || '', 'base64');
         }
 
-        zip.file(certificate.commonName.replace("*.", "_.") + "_" + certificate.serialNumber + "." + fileType, content);
+        zip.file(certificate.commonName.replace('*.', '_.') + '_' + certificate.serialNumber + '.' + fileType, content);
     }
 
-    zip.generateAsync({ type: "blob" }).then((content) => {
-        saveAs(content, "CertificateDownload " + new Date().toISOString().replace(" ", "_") + ".zip");
+    zip.generateAsync({ type: 'blob' }).then((content) => {
+        saveAs(content, 'CertificateDownload ' + new Date().toISOString().replace(' ', '_') + '.zip');
     });
 }
 
@@ -63,11 +63,11 @@ export function formatPEM(pemString: string) {
     const wrapNeeded = PEM_STRING_LENGTH > LINE_LENGTH;
 
     if (wrapNeeded) {
-        let formattedString = "",
+        let formattedString = '',
             wrapIndex = 0;
 
         for (let i = LINE_LENGTH; i < PEM_STRING_LENGTH; i += LINE_LENGTH) {
-            formattedString += pemString.substring(wrapIndex, i) + "\r\n";
+            formattedString += pemString.substring(wrapIndex, i) + '\r\n';
             wrapIndex = i;
         }
 

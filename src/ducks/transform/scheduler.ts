@@ -7,7 +7,7 @@ import {
     SchedulerJobHistoryDto,
     SchedulerJobHistoryModel,
     SchedulerJobModel,
-} from "types/scheduler";
+} from 'types/scheduler';
 
 export function transformSchedulerJobDtoToModel(schedulerJob: SchedulerJobDto): SchedulerJobModel {
     return { ...schedulerJob };

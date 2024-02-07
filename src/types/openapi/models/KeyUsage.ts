@@ -17,10 +17,11 @@
  * @enum {string}
  */
 export enum KeyUsage {
-    Sign = "sign",
-    Verify = "verify",
-    Encrypt = "encrypt",
-    Decrypt = "decrypt",
-    Wrap = "wrap",
-    Unwrap = "unwrap",
+    Sign = 'sign',
+    Verify = 'verify',
+    Encrypt = 'encrypt',
+    Decrypt = 'decrypt',
+    Wrap = 'wrap',
+    Unwrap = 'unwrap'
 }
+

@@ -1,13 +1,13 @@
-import { useCallback, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useCallback, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
-import { actions as groupsActions, selectors as groupsSelectors } from "ducks/certificateGroups";
-import { actions } from "ducks/certificates";
+import { actions as groupsActions, selectors as groupsSelectors } from 'ducks/certificateGroups';
+import { actions } from 'ducks/certificates';
 
-import Select, { SingleValue } from "react-select";
+import Select, { SingleValue } from 'react-select';
 
-import Spinner from "components/Spinner";
-import { Button, ButtonGroup, FormGroup, Label } from "reactstrap";
+import Spinner from 'components/Spinner';
+import { Button, ButtonGroup, FormGroup, Label } from 'reactstrap';
 
 interface Props {
     uuids: string[];

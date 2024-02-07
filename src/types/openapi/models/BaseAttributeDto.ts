@@ -23,7 +23,7 @@ import type {
     GroupAttribute,
     InfoAttribute,
     MetadataAttribute,
-} from "./";
+} from './';
 
 /**
  * @type BaseAttributeDto

@@ -9,7 +9,7 @@ import {
     RecipientApprovalStepModel,
     ResponseApprovalDto,
     ResponseApprovalModel,
-} from "types/approvals";
+} from 'types/approvals';
 
 export function transformApprovalDtoToModel(approval: ApprovalDtoType): ApprovalModel {
     return {

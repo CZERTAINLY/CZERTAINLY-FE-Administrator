@@ -1,13 +1,13 @@
-import cx from "classnames";
-import { useCallback, useState } from "react";
-import { Outlet } from "react-router-dom";
+import cx from 'classnames';
+import { useCallback, useState } from 'react';
+import { Outlet } from 'react-router-dom';
 
-import Alerts from "components/Alerts";
-import GlobalModal from "components/GlobalModal";
-import Footer from "components/Layout/Footer";
-import Header from "components/Layout/Header";
-import Sidebar from "components/Layout/Sidebar";
-import style from "./Layout.module.scss";
+import Alerts from 'components/Alerts';
+import GlobalModal from 'components/GlobalModal';
+import Footer from 'components/Layout/Footer';
+import Header from 'components/Layout/Header';
+import Sidebar from 'components/Layout/Sidebar';
+import style from './Layout.module.scss';
 
 function Layout() {
     const [sidebarOpen, setSidebarOpen] = useState(false);

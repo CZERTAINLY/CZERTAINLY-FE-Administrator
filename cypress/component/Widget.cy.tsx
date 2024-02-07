@@ -1,33 +1,33 @@
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
-import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-import { LockTypeEnum, LockWidgetNameEnum, WidgetLockErrorModel } from "types/user-interface";
-import { actions as userInterfaceActions } from "../../src/ducks/user-interface";
-import "../../src/resources/styles/theme.scss";
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
+import { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { LockTypeEnum, LockWidgetNameEnum, WidgetLockErrorModel } from 'types/user-interface';
+import { actions as userInterfaceActions } from '../../src/ducks/user-interface';
+import '../../src/resources/styles/theme.scss';
 const buttons: WidgetButtonProps[] = [
     {
-        icon: "pencil",
+        icon: 'pencil',
         disabled: true,
-        tooltip: "Edit",
+        tooltip: 'Edit',
         onClick: () => {},
     },
     {
-        icon: "plus",
+        icon: 'plus',
         disabled: true,
-        tooltip: "Create",
+        tooltip: 'Create',
         onClick: () => {},
     },
     {
-        icon: "times",
+        icon: 'times',
         disabled: true,
-        tooltip: "Disable",
+        tooltip: 'Disable',
         onClick: () => {},
     },
     {
-        icon: "trash",
+        icon: 'trash',
         disabled: true,
-        tooltip: "Delete",
+        tooltip: 'Delete',
         onClick: () => {},
     },
 ];
@@ -50,13 +50,13 @@ const TestWidget = () => {
     );
 };
 
-describe("Test Widget Component", () => {
-    it("should render Widget Component with buttons and refresh action", () => {
+describe('Test Widget Component', () => {
+    it('should render Widget Component with buttons and refresh action', () => {
         cy.mount(<TestWidget />);
         cy.wait(1500);
-        cy.get(".fa-refresh").click();
+        cy.get('.fa-refresh').click();
         cy.wait(500);
-        cy.get("h5").should("contain", "Test Widget");
+        cy.get('h5').should('contain', 'Test Widget');
     });
 });
 
@@ -66,10 +66,10 @@ const TestWidgetLockedGeneric = () => {
     useEffect(() => {
         if (isBusy) {
             const err: WidgetLockErrorModel = {
-                lockText: "Test lock generic error",
+                lockText: 'Test lock generic error',
                 lockType: LockTypeEnum.GENERIC,
-                lockTitle: "Test lock error",
-                lockDetails: "Test lock details error",
+                lockTitle: 'Test lock error',
+                lockDetails: 'Test lock details error',
             };
             dispatch(userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ConnectorDetails));
         }
@@ -97,15 +97,15 @@ const TestWidgetLockedGeneric = () => {
     );
 };
 
-describe("Test Widget Component with generic lock", () => {
-    it("should render Widget Component with buttons and refresh action", () => {
+describe('Test Widget Component with generic lock', () => {
+    it('should render Widget Component with buttons and refresh action', () => {
         cy.mount(<TestWidgetLockedGeneric />);
         cy.wait(1500);
-        cy.get("h5").should("contain", "Test Widget");
-        cy.get(".fa-refresh").click();
+        cy.get('h5').should('contain', 'Test Widget');
+        cy.get('.fa-refresh').click();
         cy.wait(2000);
-        cy.get("h5").should("contain", "Test lock error");
-        cy.get(".fa-triangle-exclamation").should("exist");
+        cy.get('h5').should('contain', 'Test lock error');
+        cy.get('.fa-triangle-exclamation').should('exist');
     });
 });
 
@@ -115,10 +115,10 @@ const TestWidgetLockedClient = () => {
     useEffect(() => {
         if (isBusy) {
             const err: WidgetLockErrorModel = {
-                lockText: "Test lock client error",
+                lockText: 'Test lock client error',
                 lockType: LockTypeEnum.CLIENT,
-                lockTitle: "Test lock client error",
-                lockDetails: "Test lock details client error",
+                lockTitle: 'Test lock client error',
+                lockDetails: 'Test lock details client error',
             };
             dispatch(userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ConnectorDetails));
         }
@@ -146,15 +146,15 @@ const TestWidgetLockedClient = () => {
     );
 };
 
-describe("Test Widget Component with client lock", () => {
-    it("should render Widget Component with buttons and refresh action", () => {
+describe('Test Widget Component with client lock', () => {
+    it('should render Widget Component with buttons and refresh action', () => {
         cy.mount(<TestWidgetLockedClient />);
         cy.wait(1500);
-        cy.get("h5").should("contain", "Test Widget");
-        cy.get(".fa-refresh").click();
+        cy.get('h5').should('contain', 'Test Widget');
+        cy.get('.fa-refresh').click();
         cy.wait(2000);
-        cy.get("h5").should("contain", "Test lock client error");
-        cy.get(".fa-house-laptop").should("exist");
+        cy.get('h5').should('contain', 'Test lock client error');
+        cy.get('.fa-house-laptop').should('exist');
     });
 });
 
@@ -185,15 +185,15 @@ const TestWidgetLockedPermission = () => {
     );
 };
 
-describe("Test Widget Component with permission lock", () => {
-    it("should render Widget Component with buttons and refresh action", () => {
+describe('Test Widget Component with permission lock', () => {
+    it('should render Widget Component with buttons and refresh action', () => {
         cy.mount(<TestWidgetLockedPermission />);
         cy.wait(1500);
-        cy.get("h5").should("contain", "Test Widget");
-        cy.get(".fa-refresh").click();
+        cy.get('h5').should('contain', 'Test Widget');
+        cy.get('.fa-refresh').click();
         cy.wait(2000);
-        cy.get("h5").should("contain", "Test Widget Lock");
-        cy.get(".fa-lock").should("not.exist");
+        cy.get('h5').should('contain', 'Test Widget Lock');
+        cy.get('.fa-lock').should('not.exist');
     });
 });
 
@@ -202,10 +202,10 @@ const TestWidgetLockedService = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         const err: WidgetLockErrorModel = {
-            lockText: "Test lock service error",
+            lockText: 'Test lock service error',
             lockType: LockTypeEnum.SERVICE_ERROR,
-            lockTitle: "Test lock service error",
-            lockDetails: "Test lock details service error",
+            lockTitle: 'Test lock service error',
+            lockDetails: 'Test lock details service error',
         };
         dispatch(userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ConnectorDetails));
     }, [isBusy]);
@@ -234,15 +234,15 @@ const TestWidgetLockedService = () => {
     );
 };
 
-describe("Test Widget Component with service lock", () => {
-    it("should render Widget Component with buttons and refresh action", () => {
+describe('Test Widget Component with service lock', () => {
+    it('should render Widget Component with buttons and refresh action', () => {
         cy.mount(<TestWidgetLockedService />);
         cy.wait(1500);
-        cy.get("h5").should("contain", "Test Widget");
-        cy.get(".fa-refresh").click();
+        cy.get('h5').should('contain', 'Test Widget');
+        cy.get('.fa-refresh').click();
         cy.wait(2000);
-        cy.get("h5").should("contain", "Test lock service error");
-        cy.get(".fa-database").should("exist");
+        cy.get('h5').should('contain', 'Test lock service error');
+        cy.get('.fa-database').should('exist');
     });
 });
 
@@ -252,10 +252,10 @@ const TestWidgetLockedServer = () => {
 
     useEffect(() => {
         const err: WidgetLockErrorModel = {
-            lockText: "Test lock server error",
+            lockText: 'Test lock server error',
             lockType: LockTypeEnum.SERVER_ERROR,
-            lockTitle: "Test lock server error",
-            lockDetails: "Test lock details server error",
+            lockTitle: 'Test lock server error',
+            lockDetails: 'Test lock details server error',
         };
         dispatch(userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ConnectorDetails));
     }, [isBusy]);
@@ -284,15 +284,15 @@ const TestWidgetLockedServer = () => {
     );
 };
 
-describe("Test Widget Component with server lock", () => {
-    it("should render Widget Component with buttons and refresh action", () => {
+describe('Test Widget Component with server lock', () => {
+    it('should render Widget Component with buttons and refresh action', () => {
         cy.mount(<TestWidgetLockedServer />);
         cy.wait(1500);
-        cy.get("h5").should("contain", "Test Widget");
-        cy.get(".fa-refresh").click();
+        cy.get('h5').should('contain', 'Test Widget');
+        cy.get('.fa-refresh').click();
         cy.wait(2000);
-        cy.get("h5").should("contain", "Test lock server error");
-        cy.get(".fa-server").should("exist");
+        cy.get('h5').should('contain', 'Test lock server error');
+        cy.get('.fa-server').should('exist');
     });
 });
 
@@ -302,10 +302,10 @@ const TestWidgetLockedNetwork = () => {
 
     useEffect(() => {
         const err: WidgetLockErrorModel = {
-            lockText: "Test lock network error",
+            lockText: 'Test lock network error',
             lockType: LockTypeEnum.NETWORK,
-            lockTitle: "Test lock network error",
-            lockDetails: "Test lock details network error",
+            lockTitle: 'Test lock network error',
+            lockDetails: 'Test lock details network error',
         };
         dispatch(userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ConnectorDetails));
     }, [isBusy]);
@@ -334,14 +334,14 @@ const TestWidgetLockedNetwork = () => {
     );
 };
 
-describe("Test Widget Component with network lock", () => {
-    it("should render Widget Component with buttons and refresh action", () => {
+describe('Test Widget Component with network lock', () => {
+    it('should render Widget Component with buttons and refresh action', () => {
         cy.mount(<TestWidgetLockedNetwork />);
         cy.wait(1500);
-        cy.get("h5").should("contain", "Test Widget");
-        cy.get(".fa-refresh").click();
+        cy.get('h5').should('contain', 'Test Widget');
+        cy.get('.fa-refresh').click();
         cy.wait(2000);
-        cy.get("h5").should("contain", "Test lock network error");
-        cy.get(".fa-wifi").should("exist");
+        cy.get('h5').should('contain', 'Test lock network error');
+        cy.get('.fa-wifi').should('exist');
     });
 });

@@ -1,21 +1,21 @@
-import AttributeEditor from "components/Attributes/AttributeEditor";
-import ProgressButton from "components/ProgressButton";
-import Widget from "components/Widget";
+import AttributeEditor from 'components/Attributes/AttributeEditor';
+import ProgressButton from 'components/ProgressButton';
+import Widget from 'components/Widget';
 
-import { actions, selectors } from "ducks/certificateGroups";
-import { actions as customAttributesActions, selectors as customAttributesSelectors } from "ducks/customAttributes";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { actions, selectors } from 'ducks/certificateGroups';
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { Field, Form } from "react-final-form";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
-import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from "reactstrap";
-import { CertificateGroupResponseModel } from "types/certificateGroups";
-import { Resource } from "types/openapi";
-import { mutators } from "utils/attributes/attributeEditorMutators";
-import { collectFormAttributes } from "utils/attributes/attributes";
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateEmail, validateLength, validateRequired } from "utils/validators";
-import TabLayout from "../../../Layout/TabLayout";
+import { Field, Form } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
+import { CertificateGroupResponseModel } from 'types/certificateGroups';
+import { Resource } from 'types/openapi';
+import { mutators } from 'utils/attributes/attributeEditorMutators';
+import { collectFormAttributes } from 'utils/attributes/attributes';
+import { composeValidators, validateAlphaNumericWithSpecialChars, validateEmail, validateLength, validateRequired } from 'utils/validators';
+import TabLayout from '../../../Layout/TabLayout';
 
 interface FormValues {
     name: string;
@@ -55,7 +55,7 @@ export default function GroupForm() {
                             name: values.name,
                             description: values.description,
                             email: values.email,
-                            customAttributes: collectFormAttributes("customGroup", resourceCustomAttributes, values),
+                            customAttributes: collectFormAttributes('customGroup', resourceCustomAttributes, values),
                         },
                     }),
                 );
@@ -65,7 +65,7 @@ export default function GroupForm() {
                         name: values.name,
                         description: values.description,
                         email: values.email,
-                        customAttributes: collectFormAttributes("customGroup", resourceCustomAttributes, values),
+                        customAttributes: collectFormAttributes('customGroup', resourceCustomAttributes, values),
                     }),
                 );
             }
@@ -86,14 +86,14 @@ export default function GroupForm() {
 
     const defaultValues: FormValues = useMemo(
         () => ({
-            name: editMode ? group?.name || "" : "",
-            description: editMode ? group?.description || "" : "",
-            email: editMode ? group?.email || "" : "",
+            name: editMode ? group?.name || '' : '',
+            description: editMode ? group?.description || '' : '',
+            email: editMode ? group?.email || '' : '',
         }),
         [editMode, group],
     );
 
-    const title = useMemo(() => (editMode ? "Edit Group" : "Add Group"), [editMode]);
+    const title = useMemo(() => (editMode ? 'Edit Group' : 'Add Group'), [editMode]);
 
     return (
         <Widget title={title} busy={isBusy}>
@@ -164,7 +164,7 @@ export default function GroupForm() {
                             <TabLayout
                                 tabs={[
                                     {
-                                        title: "Custom Attributes",
+                                        title: 'Custom Attributes',
                                         content: (
                                             <AttributeEditor
                                                 id="customGroup"
@@ -180,8 +180,8 @@ export default function GroupForm() {
                         <div className="d-flex justify-content-end">
                             <ButtonGroup>
                                 <ProgressButton
-                                    title={editMode ? "Update" : "Create"}
-                                    inProgressTitle={editMode ? "Updating..." : "Creating..."}
+                                    title={editMode ? 'Update' : 'Create'}
+                                    inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
                                     inProgress={submitting}
                                     disabled={pristine || submitting || !valid}
                                 />

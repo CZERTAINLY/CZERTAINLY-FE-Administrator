@@ -1,16 +1,16 @@
-import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from "ducks/utilsActuator";
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Button, ButtonGroup, FormGroup, Label } from "reactstrap";
-import { ParseRequestRequestDtoParseTypeEnum } from "types/openapi/utils";
-import { transformParseRequestResponseDtoToCertificateResponseDetailModel } from "../../../../ducks/transform/utilsCertificateRequest";
+import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from 'ducks/utilsActuator';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Button, ButtonGroup, FormGroup, Label } from 'reactstrap';
+import { ParseRequestRequestDtoParseTypeEnum } from 'types/openapi/utils';
+import { transformParseRequestResponseDtoToCertificateResponseDetailModel } from '../../../../ducks/transform/utilsCertificateRequest';
 import {
     actions as utilsCertificateRequestActions,
     selectors as utilsCertificateRequestSelectors,
-} from "../../../../ducks/utilsCertificateRequest";
-import { CertificateDetailResponseModel } from "../../../../types/certificate";
-import CertificateAttributes from "../../../CertificateAttributes";
-import FileUpload from "../../../Input/FileUpload/FileUpload";
+} from '../../../../ducks/utilsCertificateRequest';
+import { CertificateDetailResponseModel } from '../../../../types/certificate';
+import CertificateAttributes from '../../../CertificateAttributes';
+import FileUpload from '../../../Input/FileUpload/FileUpload';
 
 interface Props {
     onCancel: () => void;
@@ -21,7 +21,7 @@ interface Props {
 export default function CertificateRenewDialog({ onCancel, allowWithoutFile, onRenew }: Props) {
     const dispatch = useDispatch();
 
-    const [fileContent, setFileContent] = useState("");
+    const [fileContent, setFileContent] = useState('');
     const [uploadCsr, setUploadCsr] = useState(false);
     const [certificate, setCertificate] = useState<CertificateDetailResponseModel | undefined>();
 
@@ -66,7 +66,7 @@ export default function CertificateRenewDialog({ onCancel, allowWithoutFile, onR
                 <>
                     <FileUpload
                         editable
-                        fileType={"CSR"}
+                        fileType={'CSR'}
                         onFileContentLoaded={(fileContent) => {
                             setFileContent(fileContent);
                             if (health) {

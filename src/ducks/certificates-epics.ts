@@ -1,18 +1,18 @@
-import { AppEpic } from "ducks";
-import { of } from "rxjs";
-import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
-import { extractError } from "utils/net";
-import { actions as alertActions } from "./alerts";
-import { actions as appRedirectActions } from "./app-redirect";
+import { AppEpic } from 'ducks';
+import { of } from 'rxjs';
+import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
+import { extractError } from 'utils/net';
+import { actions as alertActions } from './alerts';
+import { actions as appRedirectActions } from './app-redirect';
 
-import * as slice from "./certificates";
-import { transformAttributeDescriptorDtoToModel, transformAttributeResponseDtoToModel } from "./transform/attributes";
-import { transformCertificateGroupResponseDtoToModel } from "./transform/certificateGroups";
+import * as slice from './certificates';
+import { transformAttributeDescriptorDtoToModel, transformAttributeResponseDtoToModel } from './transform/attributes';
+import { transformCertificateGroupResponseDtoToModel } from './transform/certificateGroups';
 
-import { store } from "index";
-import { LockWidgetNameEnum } from "types/user-interface";
-import { EntityType } from "./filters";
-import { actions as pagingActions } from "./paging";
+import { store } from 'index';
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { EntityType } from './filters';
+import { actions as pagingActions } from './paging';
 import {
     transformCertificateBulkDeleteRequestModelToDto,
     transformCertificateBulkDeleteResponseDtoToModel,
@@ -29,10 +29,10 @@ import {
     transformCertificateSignRequestModelToDto,
     transformCertificateUploadModelToDto,
     transformSearchRequestModelToDto,
-} from "./transform/certificates";
-import { transformLocationResponseDtoToModel } from "./transform/locations";
-import { transformRaProfileResponseDtoToModel } from "./transform/ra-profiles";
-import { actions as userInterfaceActions } from "./user-interface";
+} from './transform/certificates';
+import { transformLocationResponseDtoToModel } from './transform/locations';
+import { transformRaProfileResponseDtoToModel } from './transform/ra-profiles';
+import { actions as userInterfaceActions } from './user-interface';
 
 const listCertificates: AppEpic = (action$, state, deps) => {
     return action$.pipe(
@@ -76,7 +76,7 @@ const getCertificateDetail: AppEpic = (action$, state, deps) => {
                 ),
                 catchError((err) =>
                     of(
-                        slice.actions.getCertificateDetailFailure({ error: extractError(err, "Failed to get certificate detail") }),
+                        slice.actions.getCertificateDetailFailure({ error: extractError(err, 'Failed to get certificate detail') }),
                         userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.CertificateDetailsWidget),
                     ),
                 ),
@@ -95,9 +95,9 @@ const getCertificateValidationResult: AppEpic = (action$, state, deps) => {
                 catchError((err) =>
                     of(
                         slice.actions.getCertificateValidationResultFailure({
-                            error: extractError(err, "Failed to get certificate validation result"),
+                            error: extractError(err, 'Failed to get certificate validation result'),
                         }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get certificate validation result" }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to get certificate validation result' }),
                     ),
                 ),
             ),
@@ -125,8 +125,8 @@ const issueCertificate: AppEpic = (action$, state, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.issueCertificateFailure({ error: extractError(err, "Failed to issue certificate") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to issue certificate" }),
+                            slice.actions.issueCertificateFailure({ error: extractError(err, 'Failed to issue certificate') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to issue certificate' }),
                         ),
                     ),
                 ),
@@ -149,14 +149,14 @@ const issueCertificateNew: AppEpic = (action$, state, deps) => {
                         of(
                             slice.actions.issueCertificateSuccess({ uuid: operation.uuid, certificateData: operation.certificateData }),
                             appRedirectActions.redirect({ url: `../${operation.uuid}` }),
-                            alertActions.success("Issue new certificate operation successfully initiated"),
+                            alertActions.success('Issue new certificate operation successfully initiated'),
                         ),
                     ),
 
                     catchError((err) =>
                         of(
-                            slice.actions.issueCertificateFailure({ error: extractError(err, "Failed to issue certificate") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to issue certificate" }),
+                            slice.actions.issueCertificateFailure({ error: extractError(err, 'Failed to issue certificate') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to issue certificate' }),
                         ),
                     ),
                 ),
@@ -179,15 +179,15 @@ const revokeCertificate: AppEpic = (action$, state, deps) => {
                     mergeMap(() =>
                         of(
                             slice.actions.revokeCertificateSuccess({ uuid: action.payload.uuid }),
-                            alertActions.success("Revoke certificate operation successfully initiated"),
+                            alertActions.success('Revoke certificate operation successfully initiated'),
                             slice.actions.getCertificateHistory({ uuid: action.payload.uuid }),
                         ),
                     ),
 
                     catchError((err) =>
                         of(
-                            slice.actions.revokeCertificateFailure({ error: extractError(err, "Failed to revoke certificate") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to revoke certificate" }),
+                            slice.actions.revokeCertificateFailure({ error: extractError(err, 'Failed to revoke certificate') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to revoke certificate' }),
                         ),
                     ),
                 ),
@@ -216,8 +216,8 @@ const renewCertificate: AppEpic = (action$, state, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.renewCertificateFailure({ error: extractError(err, "Failed to renew certificate") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to renew certificate" }),
+                            slice.actions.renewCertificateFailure({ error: extractError(err, 'Failed to renew certificate') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to renew certificate' }),
                         ),
                     ),
                 ),
@@ -246,8 +246,8 @@ const rekeyCertificate: AppEpic = (action$, state, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.rekeyCertificateFailure({ error: extractError(err, "Failed to rekey certificate") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to rekey certificate" }),
+                            slice.actions.rekeyCertificateFailure({ error: extractError(err, 'Failed to rekey certificate') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to rekey certificate' }),
                         ),
                     ),
                 ),
@@ -271,7 +271,7 @@ const getCertificateHistory: AppEpic = (action$, state, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.getCertificateHistoryFailure({ error: extractError(err, "Failed to get certificate history") }),
+                        slice.actions.getCertificateHistoryFailure({ error: extractError(err, 'Failed to get certificate history') }),
                         userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.CertificateEventHistory),
                     ),
                 ),
@@ -296,7 +296,7 @@ const listCertificateLocations: AppEpic = (action$, state, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.listCertificateLocationsFailure({ error: extractError(err, "Failed to list certificate locations") }),
+                        slice.actions.listCertificateLocationsFailure({ error: extractError(err, 'Failed to list certificate locations') }),
                         userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.CertificationLocations),
                     ),
                 ),
@@ -313,14 +313,14 @@ const deleteCertificate: AppEpic = (action$, state, deps) => {
                 mergeMap(() =>
                     of(
                         slice.actions.deleteCertificateSuccess({ uuid: action.payload.uuid }),
-                        appRedirectActions.redirect({ url: "../../" }),
+                        appRedirectActions.redirect({ url: '../../' }),
                     ),
                 ),
 
                 catchError((err) =>
                     of(
-                        slice.actions.deleteCertificateFailure({ error: extractError(err, "Failed to delete certificate") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to delete certificate" }),
+                        slice.actions.deleteCertificateFailure({ error: extractError(err, 'Failed to delete certificate') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to delete certificate' }),
                     ),
                 ),
             ),
@@ -353,8 +353,8 @@ const updateGroup: AppEpic = (action$, state, deps) => {
 
                             catchError((err) =>
                                 of(
-                                    slice.actions.updateGroupFailure({ error: extractError(err, "Failed to update group") }),
-                                    appRedirectActions.fetchError({ error: err, message: "Failed to update group" }),
+                                    slice.actions.updateGroupFailure({ error: extractError(err, 'Failed to update group') }),
+                                    appRedirectActions.fetchError({ error: err, message: 'Failed to update group' }),
                                 ),
                             ),
                         ),
@@ -362,8 +362,8 @@ const updateGroup: AppEpic = (action$, state, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.updateGroupFailure({ error: extractError(err, "Failed to update group") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to update group" }),
+                            slice.actions.updateGroupFailure({ error: extractError(err, 'Failed to update group') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to update group' }),
                         ),
                     ),
                 ),
@@ -378,7 +378,7 @@ const deleteGroup: AppEpic = (action$, state, deps) => {
             deps.apiClients.certificates
                 .updateCertificateObjects({
                     uuid: action.payload.uuid,
-                    certificateUpdateObjectsDto: { groupUuid: "" },
+                    certificateUpdateObjectsDto: { groupUuid: '' },
                 })
                 .pipe(
                     mergeMap(() =>
@@ -392,15 +392,15 @@ const deleteGroup: AppEpic = (action$, state, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.deleteGroupFailure({ error: extractError(err, "Failed to delete group") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to delete group" }),
+                            slice.actions.deleteGroupFailure({ error: extractError(err, 'Failed to delete group') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to delete group' }),
                         ),
                     ),
 
                     catchError((err) =>
                         of(
-                            slice.actions.deleteGroupFailure({ error: extractError(err, "Failed to delete group") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to delete group" }),
+                            slice.actions.deleteGroupFailure({ error: extractError(err, 'Failed to delete group') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to delete group' }),
                         ),
                     ),
                 ),
@@ -438,8 +438,8 @@ const updateRaProfile: AppEpic = (action$, state, deps) => {
 
                                 catchError((err) =>
                                     of(
-                                        slice.actions.updateRaProfileFailure({ error: extractError(err, "Failed to update RA profile") }),
-                                        appRedirectActions.fetchError({ error: err, message: "Failed to update RA profile" }),
+                                        slice.actions.updateRaProfileFailure({ error: extractError(err, 'Failed to update RA profile') }),
+                                        appRedirectActions.fetchError({ error: err, message: 'Failed to update RA profile' }),
                                     ),
                                 ),
                             ),
@@ -447,8 +447,8 @@ const updateRaProfile: AppEpic = (action$, state, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.updateRaProfileFailure({ error: extractError(err, "Failed to update RA profile") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to update RA profile" }),
+                            slice.actions.updateRaProfileFailure({ error: extractError(err, 'Failed to update RA profile') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to update RA profile' }),
                         ),
                     ),
                 ),
@@ -463,7 +463,7 @@ const deleteRaProfile: AppEpic = (action$, state, deps) => {
             deps.apiClients.certificates
                 .updateCertificateObjects({
                     uuid: action.payload.uuid,
-                    certificateUpdateObjectsDto: { raProfileUuid: "" },
+                    certificateUpdateObjectsDto: { raProfileUuid: '' },
                 })
                 .pipe(
                     mergeMap(() =>
@@ -477,15 +477,15 @@ const deleteRaProfile: AppEpic = (action$, state, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.deleteRaProfileFailure({ error: extractError(err, "Failed to delete RA profile") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to delete RA profile" }),
+                            slice.actions.deleteRaProfileFailure({ error: extractError(err, 'Failed to delete RA profile') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to delete RA profile' }),
                         ),
                     ),
 
                     catchError((err) =>
                         of(
-                            slice.actions.deleteRaProfileFailure({ error: extractError(err, "Failed to delete RA profile") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to delete RA profile" }),
+                            slice.actions.deleteRaProfileFailure({ error: extractError(err, 'Failed to delete RA profile') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to delete RA profile' }),
                         ),
                     ),
                 ),
@@ -515,8 +515,8 @@ const updateOwner: AppEpic = (action$, state, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.updateOwnerFailure({ error: extractError(err, "Failed to update owner") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to update owner" }),
+                            slice.actions.updateOwnerFailure({ error: extractError(err, 'Failed to update owner') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to update owner' }),
                         ),
                     ),
                 ),
@@ -531,7 +531,7 @@ const deleteOwner: AppEpic = (action$, state, deps) => {
             deps.apiClients.certificates
                 .updateCertificateObjects({
                     uuid: action.payload.uuid,
-                    certificateUpdateObjectsDto: { ownerUuid: "" },
+                    certificateUpdateObjectsDto: { ownerUuid: '' },
                 })
                 .pipe(
                     mergeMap(() =>
@@ -545,15 +545,15 @@ const deleteOwner: AppEpic = (action$, state, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.deleteOwnerFailure({ error: extractError(err, "Failed to delete owner") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to delete owner" }),
+                            slice.actions.deleteOwnerFailure({ error: extractError(err, 'Failed to delete owner') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to delete owner' }),
                         ),
                     ),
 
                     catchError((err) =>
                         of(
-                            slice.actions.deleteOwnerFailure({ error: extractError(err, "Failed to delete owner") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to delete owner" }),
+                            slice.actions.deleteOwnerFailure({ error: extractError(err, 'Failed to delete owner') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to delete owner' }),
                         ),
                     ),
                 ),
@@ -584,9 +584,9 @@ const updateCertificateTrustedStatus: AppEpic = (action$, state, deps) => {
                     catchError((err) =>
                         of(
                             slice.actions.updateCertificateTrustedStatusFailure({
-                                error: extractError(err, "Failed to update certificate trusted status"),
+                                error: extractError(err, 'Failed to update certificate trusted status'),
                             }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to update certificate trusted status" }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to update certificate trusted status' }),
                         ),
                     ),
                 ),
@@ -614,8 +614,8 @@ const bulkUpdateGroup: AppEpic = (action$, state, deps) => {
 
                             catchError((err) =>
                                 of(
-                                    slice.actions.updateOwnerFailure({ error: extractError(err, "Failed to bulk update update group") }),
-                                    appRedirectActions.fetchError({ error: err, message: "Failed to bulk update update group" }),
+                                    slice.actions.updateOwnerFailure({ error: extractError(err, 'Failed to bulk update update group') }),
+                                    appRedirectActions.fetchError({ error: err, message: 'Failed to bulk update update group' }),
                                 ),
                             ),
                         ),
@@ -623,8 +623,8 @@ const bulkUpdateGroup: AppEpic = (action$, state, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.updateOwnerFailure({ error: extractError(err, "Failed to bulk update update group") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to bulk update update group" }),
+                            slice.actions.updateOwnerFailure({ error: extractError(err, 'Failed to bulk update update group') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to bulk update update group' }),
                         ),
                     ),
                 ),
@@ -640,7 +640,7 @@ const bulkDeleteGroup: AppEpic = (action$, state, deps) => {
                 .bulkUpdateCertificateObjects({
                     multipleCertificateObjectUpdateDto: transformCertificateBulkObjectModelToDto({
                         certificateUuids: action.payload.certificateUuids,
-                        groupUuid: "",
+                        groupUuid: '',
                     }),
                 })
                 .pipe(
@@ -649,14 +649,14 @@ const bulkDeleteGroup: AppEpic = (action$, state, deps) => {
                             slice.actions.bulkDeleteGroupSuccess({
                                 uuids: action.payload.certificateUuids!,
                             }),
-                            alertActions.success("Delete operation for selected certificates groups completed."),
+                            alertActions.success('Delete operation for selected certificates groups completed.'),
                         ),
                     ),
 
                     catchError((err) =>
                         of(
-                            slice.actions.updateOwnerFailure({ error: extractError(err, "Failed to bulk delete certificates groups") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to bulk delete certificates groups" }),
+                            slice.actions.updateOwnerFailure({ error: extractError(err, 'Failed to bulk delete certificates groups') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to bulk delete certificates groups' }),
                         ),
                     ),
                 ),
@@ -695,9 +695,9 @@ const bulkUpdateRaProfile: AppEpic = (action$, state, deps) => {
                                 catchError((err) =>
                                     of(
                                         slice.actions.updateOwnerFailure({
-                                            error: extractError(err, "Failed to bulk update update RA profile"),
+                                            error: extractError(err, 'Failed to bulk update update RA profile'),
                                         }),
-                                        appRedirectActions.fetchError({ error: err, message: "Failed to bulk update update RA profile" }),
+                                        appRedirectActions.fetchError({ error: err, message: 'Failed to bulk update update RA profile' }),
                                     ),
                                 ),
                             ),
@@ -705,8 +705,8 @@ const bulkUpdateRaProfile: AppEpic = (action$, state, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.updateOwnerFailure({ error: extractError(err, "Failed to bulk update update RA profile") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to bulk update update RA profile" }),
+                            slice.actions.updateOwnerFailure({ error: extractError(err, 'Failed to bulk update update RA profile') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to bulk update update RA profile' }),
                         ),
                     ),
                 ),
@@ -722,7 +722,7 @@ const bulkDeleteRaProfile: AppEpic = (action$, state, deps) => {
                 .bulkUpdateCertificateObjects({
                     multipleCertificateObjectUpdateDto: transformCertificateBulkObjectModelToDto({
                         certificateUuids: action.payload.certificateUuids,
-                        raProfileUuid: "",
+                        raProfileUuid: '',
                     }),
                 })
                 .pipe(
@@ -731,16 +731,16 @@ const bulkDeleteRaProfile: AppEpic = (action$, state, deps) => {
                             slice.actions.bulkDeleteRaProfileSuccess({
                                 uuids: action.payload.certificateUuids!,
                             }),
-                            alertActions.success("Delete operation for selected Certificates RA profiles completed."),
+                            alertActions.success('Delete operation for selected Certificates RA profiles completed.'),
                         ),
                     ),
 
                     catchError((err) =>
                         of(
                             slice.actions.updateOwnerFailure({
-                                error: extractError(err, "Failed to bulk delete Certificates RA profiles"),
+                                error: extractError(err, 'Failed to bulk delete Certificates RA profiles'),
                             }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to bulk delete Certificates RA profiles" }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to bulk delete Certificates RA profiles' }),
                         ),
                     ),
                 ),
@@ -766,8 +766,8 @@ const bulkUpdateOwner: AppEpic = (action$, state, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.updateOwnerFailure({ error: extractError(err, "Failed to bulk update update owner") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to bulk update update owner" }),
+                            slice.actions.updateOwnerFailure({ error: extractError(err, 'Failed to bulk update update owner') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to bulk update update owner' }),
                         ),
                     ),
                 ),
@@ -783,7 +783,7 @@ const bulkDeleteOwner: AppEpic = (action$, state, deps) => {
                 .bulkUpdateCertificateObjects({
                     multipleCertificateObjectUpdateDto: transformCertificateBulkObjectModelToDto({
                         certificateUuids: action.payload.certificateUuids,
-                        ownerUuid: "",
+                        ownerUuid: '',
                     }),
                 })
                 .pipe(
@@ -792,14 +792,14 @@ const bulkDeleteOwner: AppEpic = (action$, state, deps) => {
                             slice.actions.bulkDeleteOwnerSuccess({
                                 uuids: action.payload.certificateUuids!,
                             }),
-                            alertActions.success("Delete operation for selected certificates owners completed."),
+                            alertActions.success('Delete operation for selected certificates owners completed.'),
                         ),
                     ),
 
                     catchError((err) =>
                         of(
-                            slice.actions.updateOwnerFailure({ error: extractError(err, "Failed to bulk delete certificates owners") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to bulk delete certificates owners" }),
+                            slice.actions.updateOwnerFailure({ error: extractError(err, 'Failed to bulk delete certificates owners') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to bulk delete certificates owners' }),
                         ),
                     ),
                 ),
@@ -817,14 +817,14 @@ const bulkDelete: AppEpic = (action$, state, deps) => {
                     mergeMap((result) =>
                         of(
                             slice.actions.bulkDeleteSuccess({ response: transformCertificateBulkDeleteResponseDtoToModel(result) }),
-                            alertActions.success("Delete operation for selected certificates initiated."),
+                            alertActions.success('Delete operation for selected certificates initiated.'),
                         ),
                     ),
 
                     catchError((err) =>
                         of(
-                            slice.actions.bulkDeleteFailure({ error: extractError(err, "Failed to bulk delete certificates") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to bulk delete certificates" }),
+                            slice.actions.bulkDeleteFailure({ error: extractError(err, 'Failed to bulk delete certificates') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to bulk delete certificates' }),
                         ),
                     ),
                 ),
@@ -848,8 +848,8 @@ const uploadCertificate: AppEpic = (action$, state, deps) => {
 
                         catchError((err) =>
                             of(
-                                slice.actions.uploadCertificateFailure({ error: extractError(err, "Failed to upload certificate") }),
-                                appRedirectActions.fetchError({ error: err, message: "Failed to upload certificate" }),
+                                slice.actions.uploadCertificateFailure({ error: extractError(err, 'Failed to upload certificate') }),
+                                appRedirectActions.fetchError({ error: err, message: 'Failed to upload certificate' }),
                             ),
                         ),
                     ),
@@ -857,8 +857,8 @@ const uploadCertificate: AppEpic = (action$, state, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.uploadCertificateFailure({ error: extractError(err, "Failed to upload certificate") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to upload certificate" }),
+                        slice.actions.uploadCertificateFailure({ error: extractError(err, 'Failed to upload certificate') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to upload certificate' }),
                     ),
                 ),
             ),
@@ -885,8 +885,8 @@ const getIssuanceAttributes: AppEpic = (action$, state, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.getIssuanceAttributesFailure({ error: extractError(err, "Failed to get issue attributes") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to get issue attributes" }),
+                            slice.actions.getIssuanceAttributesFailure({ error: extractError(err, 'Failed to get issue attributes') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to get issue attributes' }),
                         ),
                     ),
                 ),
@@ -914,9 +914,9 @@ const getRevocationAttributes: AppEpic = (action$, state, deps) => {
                     catchError((err) =>
                         of(
                             slice.actions.getRevocationAttributesFailure({
-                                error: extractError(err, "Failed to get revocation attributes"),
+                                error: extractError(err, 'Failed to get revocation attributes'),
                             }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to get revocation attributes" }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to get revocation attributes' }),
                         ),
                     ),
                 ),
@@ -934,13 +934,13 @@ const checkCompliance: AppEpic = (action$, state$, deps) => {
                 })
                 .pipe(
                     mergeMap(() =>
-                        of(slice.actions.checkComplianceSuccess(), alertActions.success("Compliance Check for the certificates initiated")),
+                        of(slice.actions.checkComplianceSuccess(), alertActions.success('Compliance Check for the certificates initiated')),
                     ),
 
                     catchError((err) =>
                         of(
-                            slice.actions.checkComplianceFailed({ error: extractError(err, "Failed to start compliance check") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to start compliance check" }),
+                            slice.actions.checkComplianceFailed({ error: extractError(err, 'Failed to start compliance check') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to start compliance check' }),
                         ),
                     ),
                 ),
@@ -961,8 +961,8 @@ const getCsrAttributes: AppEpic = (action$, state, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.getCsrAttributesFailure({ error: extractError(err, "Failed to get CSR generation attributes") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get CSR generation attributes" }),
+                        slice.actions.getCsrAttributesFailure({ error: extractError(err, 'Failed to get CSR generation attributes') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to get CSR generation attributes' }),
                     ),
                 ),
             ),
@@ -985,8 +985,8 @@ const getCertificateContent: AppEpic = (action$, state$, deps) => {
 
                 catchError((error) =>
                     of(
-                        slice.actions.getCertificateContentsFailure({ error: extractError(error, "Failed to download certificates") }),
-                        appRedirectActions.fetchError({ error, message: "Failed to download certificates" }),
+                        slice.actions.getCertificateContentsFailure({ error: extractError(error, 'Failed to download certificates') }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to download certificates' }),
                     ),
                 ),
             ),
@@ -1004,9 +1004,9 @@ const listCertificateApprovals: AppEpic = (action$, state$, deps) => {
                 catchError((error) =>
                     of(
                         slice.actions.listCertificateApprovalsFailure({
-                            error: extractError(error, "Failed to list certificate approvals"),
+                            error: extractError(error, 'Failed to list certificate approvals'),
                         }),
-                        appRedirectActions.fetchError({ error, message: "Failed to list certificate approvals" }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to list certificate approvals' }),
                     ),
                 ),
             ),
@@ -1024,9 +1024,9 @@ const getCertificateChain: AppEpic = (action$, state$, deps) => {
                 catchError((error) =>
                     of(
                         slice.actions.getCertificateChainFailure({
-                            error: extractError(error, "Failed to get certificate chain"),
+                            error: extractError(error, 'Failed to get certificate chain'),
                         }),
-                        appRedirectActions.fetchError({ error, message: "Failed to get certificate chain" }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to get certificate chain' }),
                     ),
                 ),
             ),
@@ -1044,9 +1044,9 @@ const downloadCertificateChain: AppEpic = (action$, state$, deps) => {
                 catchError((error) =>
                     of(
                         slice.actions.downloadCertificateChainFailure({
-                            error: extractError(error, "Failed to download certificate chain"),
+                            error: extractError(error, 'Failed to download certificate chain'),
                         }),
-                        appRedirectActions.fetchError({ error, message: "Failed to download certificate chain" }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to download certificate chain' }),
                     ),
                 ),
             ),
@@ -1064,9 +1064,9 @@ const downloadCertificate: AppEpic = (action$, state$, deps) => {
                 catchError((error) =>
                     of(
                         slice.actions.downloadCertificateFailure({
-                            error: extractError(error, "Failed to download certificate"),
+                            error: extractError(error, 'Failed to download certificate'),
                         }),
-                        appRedirectActions.fetchError({ error, message: "Failed to download certificate" }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to download certificate' }),
                     ),
                 ),
             ),

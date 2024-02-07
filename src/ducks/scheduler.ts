@@ -1,7 +1,7 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { SearchRequestModel } from "types/certificate";
-import { SchedulerJobDetailModel, SchedulerJobHistoryModel, SchedulerJobModel } from "types/scheduler";
-import { createFeatureSelector } from "utils/ducks";
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { SearchRequestModel } from 'types/certificate';
+import { SchedulerJobDetailModel, SchedulerJobHistoryModel, SchedulerJobModel } from 'types/scheduler';
+import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     schedulerJob?: SchedulerJobDetailModel;
@@ -23,7 +23,7 @@ export const initialState: State = {
 };
 
 export const slice = createSlice({
-    name: "scheduler",
+    name: 'scheduler',
 
     initialState,
 

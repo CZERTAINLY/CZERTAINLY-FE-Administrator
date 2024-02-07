@@ -1,13 +1,13 @@
-import { Badge } from "reactstrap";
+import { Badge } from 'reactstrap';
 import {
     CertificateEventHistoryDtoStatusEnum,
     CertificateState,
     CertificateValidationStatus,
     ComplianceRuleStatus,
     ComplianceStatus,
-} from "types/openapi";
-import { getCertificateStatusColor, useGetStatusText } from "utils/certificate";
-import { capitalize } from "utils/common-utils";
+} from 'types/openapi';
+import { getCertificateStatusColor, useGetStatusText } from 'utils/certificate';
+import { capitalize } from 'utils/common-utils';
 
 interface Props {
     status: CertificateState | CertificateValidationStatus | CertificateEventHistoryDtoStatusEnum | ComplianceStatus | ComplianceRuleStatus;

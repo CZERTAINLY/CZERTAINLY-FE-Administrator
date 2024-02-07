@@ -11,7 +11,9 @@
  * Do not edit the class manually.
  */
 
-import type { AttributeCallbackMapping } from "./";
+import type {
+    AttributeCallbackMapping,
+} from './';
 
 /**
  * Optional definition of callback for getting the content of the Attribute based on the action

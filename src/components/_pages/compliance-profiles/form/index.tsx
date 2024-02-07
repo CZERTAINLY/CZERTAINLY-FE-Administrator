@@ -1,22 +1,22 @@
-import ProgressButton from "components/ProgressButton";
+import ProgressButton from 'components/ProgressButton';
 
-import Widget from "components/Widget";
+import Widget from 'components/Widget';
 
-import { actions, selectors } from "ducks/compliance-profiles";
-import { useCallback, useEffect, useMemo } from "react";
+import { actions, selectors } from 'ducks/compliance-profiles';
+import { useCallback, useEffect, useMemo } from 'react';
 
-import { Field, Form } from "react-final-form";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from "reactstrap";
+import { Field, Form } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
 
-import { mutators } from "utils/attributes/attributeEditorMutators";
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from "utils/validators";
-import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
-import { Resource } from "../../../../types/openapi";
-import { collectFormAttributes } from "../../../../utils/attributes/attributes";
-import AttributeEditor from "../../../Attributes/AttributeEditor";
-import TabLayout from "../../../Layout/TabLayout";
+import { mutators } from 'utils/attributes/attributeEditorMutators';
+import { composeValidators, validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
+import { Resource } from '../../../../types/openapi';
+import { collectFormAttributes } from '../../../../utils/attributes/attributes';
+import AttributeEditor from '../../../Attributes/AttributeEditor';
+import TabLayout from '../../../Layout/TabLayout';
 
 interface FormValues {
     name: string;
@@ -43,7 +43,7 @@ function ComplianceProfileForm() {
                 actions.createComplianceProfile({
                     name: values.name,
                     description: values.description,
-                    customAttributes: collectFormAttributes("customCompliance", resourceCustomAttributes, values),
+                    customAttributes: collectFormAttributes('customCompliance', resourceCustomAttributes, values),
                 }),
             );
         },
@@ -56,8 +56,8 @@ function ComplianceProfileForm() {
 
     const defaultValues: FormValues = useMemo(
         () => ({
-            name: "",
-            description: "",
+            name: '',
+            description: '',
         }),
         [],
     );
@@ -109,7 +109,7 @@ function ComplianceProfileForm() {
                             <TabLayout
                                 tabs={[
                                     {
-                                        title: "Custom Attributes",
+                                        title: 'Custom Attributes',
                                         content: <AttributeEditor id="customCompliance" attributeDescriptors={resourceCustomAttributes} />,
                                     },
                                 ]}
@@ -119,8 +119,8 @@ function ComplianceProfileForm() {
                         <div className="d-flex justify-content-end">
                             <ButtonGroup>
                                 <ProgressButton
-                                    title={"Create"}
-                                    inProgressTitle={"Creating..."}
+                                    title={'Create'}
+                                    inProgressTitle={'Creating...'}
                                     inProgress={submitting}
                                     disabled={pristine || submitting || !valid}
                                 />

@@ -1,12 +1,12 @@
 export function jsxInnerText(obj: JSX.Element): string {
-    var buf = "";
+    var buf = '';
 
     if (obj) {
         var type = typeof obj;
 
-        if (type === "string" || type === "number" || type === "boolean") {
+        if (type === 'string' || type === 'number' || type === 'boolean') {
             buf += obj.toString();
-        } else if (type === "object") {
+        } else if (type === 'object') {
             var children = null;
 
             if (Array.isArray(obj)) {

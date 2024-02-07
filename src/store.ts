@@ -1,11 +1,11 @@
-import { configureStore } from "@reduxjs/toolkit";
-import { AnyAction, applyMiddleware, compose } from "redux";
-import { createEpicMiddleware } from "redux-observable";
+import { configureStore } from '@reduxjs/toolkit';
+import { AnyAction, applyMiddleware, compose } from 'redux';
+import { createEpicMiddleware } from 'redux-observable';
 
-import { backendClient } from "./api";
-import { AppState, epics } from "./ducks";
-import { initialState } from "./ducks/initial-state";
-import { reducers } from "./ducks/reducers";
+import { backendClient } from './api';
+import { AppState, epics } from './ducks';
+import { initialState } from './ducks/initial-state';
+import { reducers } from './ducks/reducers';
 
 export default function configure() {
     const epicMiddleware = createEpicMiddleware<AnyAction, AnyAction, AppState>({
@@ -29,7 +29,7 @@ export default function configure() {
 
     epicMiddleware.run(epics);
 
-    store.dispatch({ type: "@@app/INIT" });
+    store.dispatch({ type: '@@app/INIT' });
 
     return store;
 }

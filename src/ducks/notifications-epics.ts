@@ -1,26 +1,27 @@
-import { AnyAction } from "@reduxjs/toolkit";
-import { AppEpic } from "ducks";
-import { store } from "index";
-import { of } from "rxjs";
-import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
-import { FunctionGroupCode } from "types/openapi";
-import { LockWidgetNameEnum } from "types/user-interface";
-import { extractError } from "utils/net";
-import { actions as alertActions } from "./alerts";
-import { actions as appRedirectActions } from "./app-redirect";
-import { actions as authActions } from "./auth";
-import { EntityType } from "./filters";
-import { slice } from "./notifications";
-import { actions as pagingActions } from "./paging";
-import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
-import { transformSearchRequestModelToDto } from "./transform/certificates";
-import { transformConnectorResponseDtoToModel } from "./transform/connectors";
+import { AnyAction } from '@reduxjs/toolkit';
+import { AppEpic } from 'ducks';
+import { store } from 'index';
+import { of } from 'rxjs';
+import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
+import { FunctionGroupCode } from 'types/openapi';
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { extractError } from 'utils/net';
+import { actions as alertActions } from './alerts';
+import { actions as appRedirectActions } from './app-redirect';
+import { actions as authActions } from './auth';
+import { EntityType } from './filters';
+import { slice } from './notifications';
+import { actions as pagingActions } from './paging';
+import { transformAttributeDescriptorDtoToModel } from './transform/attributes';
+import { transformSearchRequestModelToDto } from './transform/certificates';
+import { transformConnectorResponseDtoToModel } from './transform/connectors';
+import { actions as userInterfaceActions } from './user-interface';
+
 import {
     transformNotificationDtoToModel,
     transformNotificationInstanceDtoToModel,
     transformNotificationInstanceModelToDto,
-} from "./transform/notifications";
-import { actions as userInterfaceActions } from "./user-interface";
+} from './transform/notifications';
 
 const listOverviewNotifications: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -37,7 +38,7 @@ const listOverviewNotifications: AppEpic = (action$, state$, deps) => {
                 catchError((err) =>
                     of(
                         slice.actions.listOverviewNotificationsFailure({
-                            error: extractError(err, "Failed to list overview notification"),
+                            error: extractError(err, 'Failed to list overview notification'),
                         }),
                         appRedirectActions.setUnAuthorized(),
                         authActions.resetProfile(),
@@ -89,8 +90,8 @@ const deleteNotification: AppEpic = (action$, state$, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.deleteNotificationFailure({ error: extractError(err, "Failed to delete notification") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to delete notification" }),
+                        slice.actions.deleteNotificationFailure({ error: extractError(err, 'Failed to delete notification') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to delete notification' }),
                     ),
                 ),
             ),
@@ -112,8 +113,8 @@ const markAsReadNotification: AppEpic = (action$, state$, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.markAsReadNotificationFailure({ error: extractError(err, "Failed to mark notification as read") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to mark notification as read" }),
+                        slice.actions.markAsReadNotificationFailure({ error: extractError(err, 'Failed to mark notification as read') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to mark notification as read' }),
                     ),
                 ),
             ),
@@ -136,7 +137,7 @@ const listNotificationInstances: AppEpic = (action$, state$, deps) => {
                 catchError((err) =>
                     of(
                         slice.actions.listNotificationInstancesFailure({
-                            error: extractError(err, "Failed to list notification instances"),
+                            error: extractError(err, 'Failed to list notification instances'),
                         }),
                         userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.NotificationStore),
                     ),
@@ -159,17 +160,17 @@ export const listNotificationProviders: AppEpic = (action$, state, deps) => {
                 catchError((error) =>
                     of(
                         slice.actions.listNotificationProvidersFailure({
-                            error: extractError(error, "Failed to get Entity Provider list"),
+                            error: extractError(error, 'Failed to get Entity Provider list'),
                         }),
                         appRedirectActions.fetchError({
                             error,
-                            message: "Failed to get Entity Provider list",
+                            message: 'Failed to get Entity Provider list',
                         }),
                     ),
                 ),
             ),
         ),
-        catchError((error) => of(appRedirectActions.fetchError({ error: error, message: "Failed to get Entity Provider list" }))),
+        catchError((error) => of(appRedirectActions.fetchError({ error: error, message: 'Failed to get Entity Provider list' }))),
         map((action) => action as AnyAction),
     );
 };
@@ -184,9 +185,9 @@ const getNotificationInstance: AppEpic = (action$, state$, deps) => {
                 catchError((err) =>
                     of(
                         slice.actions.getNotificationInstanceFailure({
-                            error: extractError(err, "Failed to get notification instance details"),
+                            error: extractError(err, 'Failed to get notification instance details'),
                         }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get notification instance" }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to get notification instance' }),
                     ),
                 ),
             ),
@@ -204,16 +205,16 @@ const createNotificationInstance: AppEpic = (action$, state$, deps) => {
                     mergeMap((res) =>
                         of(
                             slice.actions.createNotificationInstanceSuccess(),
-                            alertActions.success("Notifications Instance added successfully."),
+                            alertActions.success('Notifications Instance added successfully.'),
                             appRedirectActions.redirect({ url: `/notificationinstances/detail/${res.uuid}` }),
                         ),
                     ),
                     catchError((err) =>
                         of(
                             slice.actions.createNotificationInstanceFailure({
-                                error: extractError(err, "Failed to create notification instance"),
+                                error: extractError(err, 'Failed to create notification instance'),
                             }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to create notification instance" }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to create notification instance' }),
                         ),
                     ),
                 ),
@@ -234,16 +235,16 @@ const editNotificationInstance: AppEpic = (action$, state$, deps) => {
                     mergeMap((res) =>
                         of(
                             slice.actions.editNotificationInstanceSuccess(),
-                            alertActions.success("Notifications Instance updated successfully."),
+                            alertActions.success('Notifications Instance updated successfully.'),
                             appRedirectActions.redirect({ url: `/notificationinstances/detail/${res.uuid}` }),
                         ),
                     ),
                     catchError((err) =>
                         of(
                             slice.actions.editNotificationInstanceFailure({
-                                error: extractError(err, "Failed to edit notification instance"),
+                                error: extractError(err, 'Failed to edit notification instance'),
                             }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to edit notification instance" }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to edit notification instance' }),
                         ),
                     ),
                 ),
@@ -271,11 +272,11 @@ const getNotificationAttributesDescriptors: AppEpic = (action$, state$, deps) =>
                     catchError((err) =>
                         of(
                             slice.actions.getNotificationAttributeDescriptorsFailure({
-                                error: extractError(err, "Failed to get notification provider attributes descriptors"),
+                                error: extractError(err, 'Failed to get notification provider attributes descriptors'),
                             }),
                             appRedirectActions.fetchError({
                                 error: err,
-                                message: "Failed to get notification provider attributes descriptors",
+                                message: 'Failed to get notification provider attributes descriptors',
                             }),
                         ),
                     ),
@@ -292,16 +293,16 @@ const deleteNotificationInstance: AppEpic = (action$, state$, deps) => {
                 mergeMap((res) =>
                     of(
                         slice.actions.deleteNotificationInstanceSuccess({ uuid: action.payload.uuid }),
-                        alertActions.success("Notifications Instance deleted successfully."),
+                        alertActions.success('Notifications Instance deleted successfully.'),
                         appRedirectActions.redirect({ url: `../../../notificationssettings` }),
                     ),
                 ),
                 catchError((err) =>
                     of(
                         slice.actions.deleteNotificationInstanceFailure({
-                            error: extractError(err, "Failed to delete notification instance"),
+                            error: extractError(err, 'Failed to delete notification instance'),
                         }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to delete notification instance" }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to delete notification instance' }),
                     ),
                 ),
             ),
@@ -318,9 +319,9 @@ const listMappingAttributes: AppEpic = (action$, state$, deps) => {
                 catchError((err) =>
                     of(
                         slice.actions.listMappingAttributesFailure({
-                            error: extractError(err, "Failed to get mapping attributes"),
+                            error: extractError(err, 'Failed to get mapping attributes'),
                         }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get mapping attributes" }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to get mapping attributes' }),
                     ),
                 ),
             ),

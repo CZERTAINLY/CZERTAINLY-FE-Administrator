@@ -1,18 +1,18 @@
-import AttributeEditor from "components/Attributes/AttributeEditor";
-import Spinner from "components/Spinner";
+import AttributeEditor from 'components/Attributes/AttributeEditor';
+import Spinner from 'components/Spinner';
 
-import { actions, selectors } from "ducks/cryptographic-operations";
-import { useCallback, useEffect, useState } from "react";
-import { Field, Form } from "react-final-form";
-import { useDispatch, useSelector } from "react-redux";
-import { Form as BootstrapForm, Button, ButtonGroup, FormGroup, Label } from "reactstrap";
-import { AttributeDescriptorModel, AttributeRequestModel } from "types/attributes";
-import { KeyAlgorithm } from "types/openapi";
+import { actions, selectors } from 'ducks/cryptographic-operations';
+import { useCallback, useEffect, useState } from 'react';
+import { Field, Form } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { Form as BootstrapForm, Button, ButtonGroup, FormGroup, Label } from 'reactstrap';
+import { AttributeDescriptorModel, AttributeRequestModel } from 'types/attributes';
+import { KeyAlgorithm } from 'types/openapi';
 
-import { mutators } from "utils/attributes/attributeEditorMutators";
-import { collectFormAttributes } from "utils/attributes/attributes";
-import FileUpload from "../../../Input/FileUpload/FileUpload";
-import TabLayout from "../../../Layout/TabLayout";
+import { mutators } from 'utils/attributes/attributeEditorMutators';
+import { collectFormAttributes } from 'utils/attributes/attributes';
+import FileUpload from '../../../Input/FileUpload/FileUpload';
+import TabLayout from '../../../Layout/TabLayout';
 
 interface Props {
     tokenUuid?: string;
@@ -21,7 +21,7 @@ interface Props {
     keyItemUuid?: string;
     algorithm?: KeyAlgorithm;
     visible: boolean;
-    action: "sign" | "verify";
+    action: 'sign' | 'verify';
     onClose: () => void;
 }
 
@@ -34,8 +34,8 @@ export default function SignVerifyData({ tokenUuid, tokenProfileUuid, keyUuid, k
 
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 
-    const [fileContent, setFileContent] = useState<string>("");
-    const [signatureContent, setSignatureContent] = useState<string>("");
+    const [fileContent, setFileContent] = useState<string>('');
+    const [signatureContent, setSignatureContent] = useState<string>('');
 
     useEffect(
         () => {
@@ -65,15 +65,15 @@ export default function SignVerifyData({ tokenUuid, tokenProfileUuid, keyUuid, k
 
             const attribs: AttributeRequestModel[] =
                 attributes && attributes.length > 0
-                    ? collectFormAttributes("attributes", [...(attributes ?? []), ...groupAttributesCallbackAttributes], values) || []
+                    ? collectFormAttributes('attributes', [...(attributes ?? []), ...groupAttributesCallbackAttributes], values) || []
                     : [];
-            if (action === "sign") {
+            if (action === 'sign') {
                 dispatch(
                     actions.signData({
                         tokenInstanceUuid: tokenUuid,
-                        keyItemUuid: keyItemUuid || "",
-                        uuid: keyUuid || "",
-                        tokenProfileUuid: tokenProfileUuid || "",
+                        keyItemUuid: keyItemUuid || '',
+                        uuid: keyUuid || '',
+                        tokenProfileUuid: tokenProfileUuid || '',
                         request: {
                             signatureAttributes: attribs,
                             data: [{ data: fileContent }],
@@ -84,9 +84,9 @@ export default function SignVerifyData({ tokenUuid, tokenProfileUuid, keyUuid, k
                 dispatch(
                     actions.verifyData({
                         tokenInstanceUuid: tokenUuid,
-                        keyItemUuid: keyItemUuid || "",
-                        uuid: keyUuid || "",
-                        tokenProfileUuid: tokenProfileUuid || "",
+                        keyItemUuid: keyItemUuid || '',
+                        uuid: keyUuid || '',
+                        tokenProfileUuid: tokenProfileUuid || '',
                         request: {
                             signatureAttributes: attribs,
                             signatures: [{ data: signatureContent }],
@@ -127,14 +127,14 @@ export default function SignVerifyData({ tokenUuid, tokenProfileUuid, keyUuid, k
                                     <FileUpload
                                         id="data"
                                         editable
-                                        fileType={"data"}
+                                        fileType={'data'}
                                         onFileContentLoaded={(fileContent) => setFileContent(fileContent)}
                                     />
                                 </FormGroup>
                             )}
                         </Field>
 
-                        {action === "verify" ? (
+                        {action === 'verify' ? (
                             <Field name="signature">
                                 {({ input, meta }) => (
                                     <FormGroup>
@@ -142,7 +142,7 @@ export default function SignVerifyData({ tokenUuid, tokenProfileUuid, keyUuid, k
                                         <FileUpload
                                             editable
                                             id="signature"
-                                            fileType={"signature"}
+                                            fileType={'signature'}
                                             onFileContentLoaded={(fileContent) => setSignatureContent(fileContent)}
                                         />
                                     </FormGroup>
@@ -163,7 +163,7 @@ export default function SignVerifyData({ tokenUuid, tokenProfileUuid, keyUuid, k
                                         <TabLayout
                                             tabs={[
                                                 {
-                                                    title: "Connector Attributes",
+                                                    title: 'Connector Attributes',
                                                     content: (
                                                         <AttributeEditor
                                                             id="attributes"
@@ -180,15 +180,15 @@ export default function SignVerifyData({ tokenUuid, tokenProfileUuid, keyUuid, k
                             </Field>
                         )}
 
-                        <div style={{ textAlign: "right" }}>
+                        <div style={{ textAlign: 'right' }}>
                             <ButtonGroup>
                                 <Button
                                     type="submit"
                                     color="primary"
-                                    disabled={(action === "verify" ? !signatureContent : false) || !fileContent || submitting || !valid}
+                                    disabled={(action === 'verify' ? !signatureContent : false) || !fileContent || submitting || !valid}
                                     onClick={handleSubmit}
                                 >
-                                    {action === "sign" ? "Sign" : "Verify"}
+                                    {action === 'sign' ? 'Sign' : 'Verify'}
                                 </Button>
 
                                 <Button type="button" color="secondary" onClick={onClose}>
