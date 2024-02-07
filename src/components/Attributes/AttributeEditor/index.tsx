@@ -294,8 +294,7 @@ export default function AttributeEditor({
         if (
             attributeDescriptors === prevDescriptors &&
             attributes === prevAttributes &&
-            groupAttributesCallbackAttributes === prevGroupDescriptors &&
-            formState.values === previousFormValues
+            groupAttributesCallbackAttributes === prevGroupDescriptors
         )
             return;
 
@@ -435,7 +434,6 @@ export default function AttributeEditor({
         prevAttributes,
         prevGroupDescriptors,
         buildCallbackMappings,
-        formState.values,
     ]);
 
     /**
@@ -495,7 +493,8 @@ export default function AttributeEditor({
 
                         if (mappings) {
                             const formAttributeName = `__attributes__${id}__.${descriptor.name}`;
-                            form.mutators.setAttribute(formAttributeName, undefined);
+                            // removed it as it was causing form value to be cleared  , it does not seem to be necessary and other places it is working without it
+                            // form.mutators.setAttribute(formAttributeName, undefined);
                             executeCallback(mappings, descriptor, formAttributeName);
                         }
                     }
