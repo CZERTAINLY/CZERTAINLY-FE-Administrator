@@ -505,14 +505,14 @@ export default function AttributeEditor({
         attributeDescriptors,
         groupAttributesCallbackAttributes,
         buildCallbackMappings,
-        form.mutators,
+        // removed it as it was causing form value to be cleared  , it does not seem to be necessary and other places it is working without it
+        // form.mutators,
         formState.values,
         id,
         isRunningCb,
         previousFormValues,
         executeCallback,
     ]);
-
     const ref = useRef(debounce((doCallbacksParam) => doCallbacksParam(), 600));
 
     useEffect(() => {
