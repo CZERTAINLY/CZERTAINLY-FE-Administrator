@@ -1,15 +1,14 @@
+import { AnyAction } from "@reduxjs/toolkit";
 import { AppEpic } from "ducks";
+import { store } from "index";
 import { of } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
+import { FunctionGroupCode } from "types/openapi";
+import { LockWidgetNameEnum } from "types/user-interface";
 import { extractError } from "utils/net";
 import { actions as alertActions } from "./alerts";
 import { actions as appRedirectActions } from "./app-redirect";
-import { actions as userInterfaceActions } from "./user-interface";
-
-import { AnyAction } from "@reduxjs/toolkit";
-import { store } from "index";
-import { FunctionGroupCode } from "types/openapi";
-import { LockWidgetNameEnum } from "types/user-interface";
+import { actions as authActions } from "./auth";
 import { EntityType } from "./filters";
 import { slice } from "./notifications";
 import { actions as pagingActions } from "./paging";
@@ -21,6 +20,7 @@ import {
     transformNotificationInstanceDtoToModel,
     transformNotificationInstanceModelToDto,
 } from "./transform/notifications";
+import { actions as userInterfaceActions } from "./user-interface";
 
 const listOverviewNotifications: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -33,7 +33,6 @@ const listOverviewNotifications: AppEpic = (action$, state$, deps) => {
                         userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.NotificationsOverview),
                     ),
                 ),
-                // window.location.href = (window as any).__ENV__.LOGOUT_URL;
 
                 catchError((err) =>
                     of(
@@ -41,6 +40,7 @@ const listOverviewNotifications: AppEpic = (action$, state$, deps) => {
                             error: extractError(err, "Failed to list overview notification"),
                         }),
                         appRedirectActions.setUnAuthorized(),
+                        authActions.resetProfile(),
                         userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.NotificationsOverview),
                     ),
                 ),

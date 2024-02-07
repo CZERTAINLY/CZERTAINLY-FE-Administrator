@@ -8,7 +8,6 @@ import { selectors as pagingSelectors } from "ducks/paging";
 import { TableDataRow, TableHeader } from "components/CustomTable";
 import PagedList from "components/PagedList/PagedList";
 import { WidgetButtonProps } from "components/WidgetButtons";
-import { selectors as authSelectors } from "ducks/auth";
 import { useNavigate } from "react-router-dom";
 import { Button, Container } from "reactstrap";
 import { SearchRequestModel } from "types/certificate";
@@ -23,7 +22,6 @@ function NotificationsList() {
     const isDeleting = useSelector(selectors.isDeleting);
     const isMarking = useSelector(selectors.isMarking);
     const isBusy = isDeleting || isMarking;
-    const profile = useSelector(authSelectors.profile);
 
     const checkedRows = useSelector(pagingSelectors.checkedRows(EntityType.NOTIFICATIONS));
 

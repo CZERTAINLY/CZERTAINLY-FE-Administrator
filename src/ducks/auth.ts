@@ -57,6 +57,10 @@ export const slice = createSlice({
             state.isFetchingProfile = false;
         },
 
+        resetProfile(state, action: PayloadAction<void>) {
+            state.profile = undefined;
+        },
+
         updateProfile(state, action: PayloadAction<{ profile: UserUpdateRequestModel; redirect?: string }>) {
             state.isUpdatingProfile = true;
         },
