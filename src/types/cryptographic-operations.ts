@@ -1,4 +1,4 @@
-import { AttributeRequestModel } from "./attributes";
+import { AttributeRequestModel } from './attributes';
 import {
     RandomDataRequestDto,
     RandomDataResponseDto,
@@ -8,10 +8,10 @@ import {
     SignDataResponseDto,
     VerifyDataRequestDto,
     VerifyDataResponseDto,
-} from "./openapi";
+} from './openapi';
 
 export type CryptographicKeySignDataRequestDto = SignDataRequestDto;
-export type CryptographicKeySignDataRequestModel = Omit<CryptographicKeySignDataRequestDto, "data"> & {
+export type CryptographicKeySignDataRequestModel = Omit<CryptographicKeySignDataRequestDto, 'data'> & {
     data: Array<SignatureRequestData>;
 };
 
@@ -25,7 +25,7 @@ export type CryptographicKeySignResponseDataDto = SignatureResponseData;
 export type CryptographicKeySignResponseDataModel = CryptographicKeySignResponseDataDto;
 
 export type CryptographicKeyVerifyDataRequestDto = VerifyDataRequestDto;
-export type CryptographicKeyVerifyDataRequestModel = Omit<CryptographicKeyVerifyDataRequestDto, "data"> & {
+export type CryptographicKeyVerifyDataRequestModel = Omit<CryptographicKeyVerifyDataRequestDto, 'data'> & {
     data: Array<SignatureRequestData>;
 };
 
@@ -36,7 +36,7 @@ export type CryptographicKeyVerificationResponseDataDto = SignatureResponseData;
 export type CryptographicKeyVerificationResponseDataModel = CryptographicKeyVerificationResponseDataDto;
 
 export type CryptographicKeyRandomDataRequestDto = RandomDataRequestDto;
-export type CryptographicKeyRandomDataRequestModel = Omit<CryptographicKeyRandomDataRequestDto, "attributes"> & {
+export type CryptographicKeyRandomDataRequestModel = Omit<CryptographicKeyRandomDataRequestDto, 'attributes'> & {
     attributes?: Array<AttributeRequestModel>;
 };
 

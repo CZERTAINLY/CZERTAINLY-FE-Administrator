@@ -1,16 +1,16 @@
-import AttributeEditor from "components/Attributes/AttributeEditor";
-import Spinner from "components/Spinner";
+import AttributeEditor from 'components/Attributes/AttributeEditor';
+import Spinner from 'components/Spinner';
 
-import { actions, selectors } from "ducks/tokens";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Field, Form } from "react-final-form";
-import { useDispatch, useSelector } from "react-redux";
-import { Form as BootstrapForm, Button, ButtonGroup, FormGroup } from "reactstrap";
-import { AttributeDescriptorModel, AttributeRequestModel } from "types/attributes";
+import { actions, selectors } from 'ducks/tokens';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Field, Form } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { Form as BootstrapForm, Button, ButtonGroup, FormGroup } from 'reactstrap';
+import { AttributeDescriptorModel, AttributeRequestModel } from 'types/attributes';
 
-import { mutators } from "utils/attributes/attributeEditorMutators";
-import { collectFormAttributes } from "utils/attributes/attributes";
-import TabLayout from "../../Layout/TabLayout";
+import { mutators } from 'utils/attributes/attributeEditorMutators';
+import { collectFormAttributes } from 'utils/attributes/attributes';
+import TabLayout from '../../Layout/TabLayout';
 
 interface Props {
     tokenUuid?: string;
@@ -36,7 +36,7 @@ export default function TokenActivationDialogBody({ tokenUuid, visible, onClose 
         () => {
             if (!visible) return;
             if (!tokenUuid) return;
-            dispatch(actions.listActivationAttributeDescriptors({ uuid: tokenUuid || "" }));
+            dispatch(actions.listActivationAttributeDescriptors({ uuid: tokenUuid || '' }));
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [visible],
@@ -49,7 +49,7 @@ export default function TokenActivationDialogBody({ tokenUuid, visible, onClose 
             const activationAttribs: AttributeRequestModel[] =
                 activationAttributes && activationAttributes.length > 0
                     ? collectFormAttributes(
-                          "activationAttributes",
+                          'activationAttributes',
                           [...(activationAttributes ?? []), ...activationGroupAttributesCallbackAttributes],
                           values,
                       ) || []
@@ -77,7 +77,7 @@ export default function TokenActivationDialogBody({ tokenUuid, visible, onClose 
                         <TabLayout
                             tabs={[
                                 {
-                                    title: "Issue attributes",
+                                    title: 'Issue attributes',
                                     content:
                                         !activationAttributes || activationAttributes.length === 0 ? (
                                             <></>
@@ -101,7 +101,7 @@ export default function TokenActivationDialogBody({ tokenUuid, visible, onClose 
                             ]}
                         />
 
-                        <div style={{ textAlign: "right" }}>
+                        <div style={{ textAlign: 'right' }}>
                             <ButtonGroup>
                                 <Button type="submit" color="primary" disabled={pristine || submitting || !valid} onClick={handleSubmit}>
                                     Activate

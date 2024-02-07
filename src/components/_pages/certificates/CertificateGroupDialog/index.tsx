@@ -1,13 +1,13 @@
-import { useCallback, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useCallback, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
-import { actions as groupsActions, selectors as groupsSelectors } from "ducks/certificateGroups";
-import { actions } from "ducks/certificates";
+import { actions as groupsActions, selectors as groupsSelectors } from 'ducks/certificateGroups';
+import { actions } from 'ducks/certificates';
 
-import Select, { SingleValue } from "react-select";
+import Select, { SingleValue } from 'react-select';
 
-import Spinner from "components/Spinner";
-import { Button, ButtonGroup, FormGroup, Label } from "reactstrap";
+import Spinner from 'components/Spinner';
+import { Button, ButtonGroup, FormGroup, Label } from 'reactstrap';
 
 interface Props {
     uuids: string[];
@@ -34,6 +34,11 @@ export default function CertificateGroupDialog({ uuids, onCancel, onUpdate }: Pr
         onUpdate();
     }, [dispatch, onUpdate, selectedGroup, uuids]);
 
+    const removeGroup = useCallback(() => {
+        dispatch(actions.bulkDeleteGroup({ certificateUuids: uuids }));
+        onUpdate();
+    }, [dispatch, onUpdate, uuids]);
+
     return (
         <>
             <FormGroup>
@@ -49,6 +54,9 @@ export default function CertificateGroupDialog({ uuids, onCancel, onUpdate }: Pr
 
             <div className="d-flex justify-content-end">
                 <ButtonGroup>
+                    <Button color="danger" onClick={removeGroup}>
+                        <span className="text-white">Remove</span>
+                    </Button>
                     <Button color="primary" onClick={updateGroup} disabled={!selectedGroup}>
                         Update
                     </Button>

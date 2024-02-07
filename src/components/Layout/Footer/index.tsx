@@ -1,6 +1,6 @@
-import cx from "classnames";
+import cx from 'classnames';
 
-import style from "./Footer.module.scss";
+import style from './Footer.module.scss';
 
 interface Props {
     className?: string;

@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useCallback, useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
-import { actions } from "ducks/certificates";
+import { actions } from 'ducks/certificates';
 
-import Select from "react-select";
-import { Button, ButtonGroup, FormGroup } from "reactstrap";
-import { UserResponseModel } from "types/users";
+import Select from 'react-select';
+import { Button, ButtonGroup, FormGroup } from 'reactstrap';
+import { UserResponseModel } from 'types/users';
 
 interface Props {
     uuids: string[];
@@ -24,7 +24,7 @@ export default function CertificateOwnerDialog({ uuids, onCancel, onUpdate, user
         setUserOptions(
             users.map((user) => ({
                 value: user.uuid,
-                label: `${user.firstName ? user.firstName + " " : ""}${user.lastName ? user.lastName + " " : ""}(${user.username})`,
+                label: `${user.firstName ? user.firstName + ' ' : ''}${user.lastName ? user.lastName + ' ' : ''}(${user.username})`,
             })),
         );
     }, [dispatch, users]);
@@ -41,6 +41,11 @@ export default function CertificateOwnerDialog({ uuids, onCancel, onUpdate, user
         onUpdate();
     }, [dispatch, onUpdate, ownerUuid, users, uuids]);
 
+    const removeOwner = useCallback(() => {
+        dispatch(actions.bulkDeleteOwner({ certificateUuids: uuids }));
+        onUpdate();
+    }, [dispatch, onUpdate, uuids]);
+
     return (
         <>
             <FormGroup>
@@ -55,6 +60,10 @@ export default function CertificateOwnerDialog({ uuids, onCancel, onUpdate, user
 
             <div className="d-flex justify-content-end">
                 <ButtonGroup>
+                    <Button color="danger" onClick={removeOwner}>
+                        <span className="text-white">Remove</span>
+                    </Button>
+
                     <Button color="primary" onClick={updateOwner} disabled={!ownerUuid}>
                         Update
                     </Button>

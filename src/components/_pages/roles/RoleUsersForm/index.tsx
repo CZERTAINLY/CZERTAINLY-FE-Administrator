@@ -1,16 +1,16 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
 
-import { Button, ButtonGroup, Container } from "reactstrap";
+import { Button, ButtonGroup, Container } from 'reactstrap';
 
-import ProgressButton from "components/ProgressButton";
-import Widget from "components/Widget";
+import ProgressButton from 'components/ProgressButton';
+import Widget from 'components/Widget';
 
-import { actions as rolesActions, selectors as rolesSelectors } from "ducks/roles";
-import { actions as userActions, selectors as usersSelectors } from "ducks/users";
+import { actions as rolesActions, selectors as rolesSelectors } from 'ducks/roles';
+import { actions as userActions, selectors as usersSelectors } from 'ducks/users';
 
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 
 function RoleForm() {
     const dispatch = useDispatch();
@@ -54,25 +54,25 @@ function RoleForm() {
     const usersTableHeader: TableHeader[] = useMemo(
         () => [
             {
-                id: "userName",
-                content: "Username",
+                id: 'userName',
+                content: 'Username',
                 sortable: true,
-                sort: "asc",
-                width: "auto",
+                sort: 'asc',
+                width: 'auto',
             },
             {
-                id: "firstName",
-                content: "First Name",
-                sortable: true,
-            },
-            {
-                id: "lastName",
-                content: "Last Name",
+                id: 'firstName',
+                content: 'First Name',
                 sortable: true,
             },
             {
-                id: "email",
-                content: "Email",
+                id: 'lastName',
+                content: 'Last Name',
+                sortable: true,
+            },
+            {
+                id: 'email',
+                content: 'Email',
                 sortable: true,
             },
         ],
@@ -84,7 +84,7 @@ function RoleForm() {
             usersSelector.map((user) => ({
                 id: user.uuid,
 
-                columns: [user.username, user.firstName || "", user.lastName || "", user.email || ""],
+                columns: [user.username, user.firstName || '', user.lastName || '', user.email || ''],
             })),
 
         [usersSelector],
@@ -92,7 +92,7 @@ function RoleForm() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title={`${roleSelector?.name || ""} Role Users `} busy={isFetchingRoleDetail || isFetchingUsers || isUpdatingUsers}>
+            <Widget title={`${roleSelector?.name || ''} Role Users `} busy={isFetchingRoleDetail || isFetchingUsers || isUpdatingUsers}>
                 <br />
 
                 <CustomTable

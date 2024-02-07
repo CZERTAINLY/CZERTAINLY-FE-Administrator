@@ -1,20 +1,20 @@
-import { useCallback, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
-import { Badge, Container } from "reactstrap";
+import { useCallback, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { Badge, Container } from 'reactstrap';
 
-import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
-import { EntityType } from "ducks/filters";
-import { selectors as pagingSelectors } from "ducks/paging";
-import { actions, selectors } from "ducks/scheduler";
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { EntityType } from 'ducks/filters';
+import { selectors as pagingSelectors } from 'ducks/paging';
+import { actions, selectors } from 'ducks/scheduler';
 
-import BooleanBadge from "components/BooleanBadge/BooleanBadge";
-import { TableDataRow, TableHeader } from "components/CustomTable";
-import PagedList from "components/PagedList/PagedList";
-import { WidgetButtonProps } from "components/WidgetButtons";
-import { SearchRequestModel } from "types/certificate";
-import { PlatformEnum, SchedulerJobExecutionStatus } from "types/openapi";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import BooleanBadge from 'components/BooleanBadge/BooleanBadge';
+import { TableDataRow, TableHeader } from 'components/CustomTable';
+import PagedList from 'components/PagedList/PagedList';
+import { WidgetButtonProps } from 'components/WidgetButtons';
+import { SearchRequestModel } from 'types/certificate';
+import { PlatformEnum, SchedulerJobExecutionStatus } from 'types/openapi';
+import { LockWidgetNameEnum } from 'types/user-interface';
 
 function SchedulerJobsList() {
     const dispatch = useDispatch();
@@ -43,17 +43,17 @@ function SchedulerJobsList() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "check",
+                icon: 'check',
                 disabled: checkedRows.length === 0,
-                tooltip: "Enable",
+                tooltip: 'Enable',
                 onClick: () => {
                     onEnableClick();
                 },
             },
             {
-                icon: "times",
+                icon: 'times',
                 disabled: checkedRows.length === 0,
-                tooltip: "Disable",
+                tooltip: 'Disable',
                 onClick: () => {
                     onDisableClick();
                 },
@@ -65,51 +65,51 @@ function SchedulerJobsList() {
     const schedulerJobsRowHeaders: TableHeader[] = useMemo(
         () => [
             {
-                content: "Name",
+                content: 'Name',
                 sortable: true,
-                sort: "asc",
-                id: "name",
-                width: "auto",
+                sort: 'asc',
+                id: 'name',
+                width: 'auto',
             },
             {
-                content: "Job Type",
+                content: 'Job Type',
                 sortable: true,
-                sort: "asc",
-                id: "jobtype",
-                width: "auto",
+                sort: 'asc',
+                id: 'jobtype',
+                width: 'auto',
             },
             {
-                content: "Cron Expression",
-                id: "cron",
-                width: "60%",
+                content: 'Cron Expression',
+                id: 'cron',
+                width: '60%',
             },
             {
-                content: "Last Execution Status",
+                content: 'Last Execution Status',
                 sortable: true,
-                sort: "asc",
-                id: "status",
-                width: "auto",
+                sort: 'asc',
+                id: 'status',
+                width: 'auto',
             },
             {
-                content: "System",
+                content: 'System',
                 sortable: true,
-                sort: "asc",
-                id: "system",
-                width: "auto",
+                sort: 'asc',
+                id: 'system',
+                width: 'auto',
             },
             {
-                content: "One Time Only",
+                content: 'One Time Only',
                 sortable: true,
-                sort: "asc",
-                id: "onetime",
-                width: "auto",
+                sort: 'asc',
+                id: 'onetime',
+                width: 'auto',
             },
             {
-                content: "Enabled",
+                content: 'Enabled',
                 sortable: true,
-                sort: "asc",
-                id: "enabled",
-                width: "auto",
+                sort: 'asc',
+                id: 'enabled',
+                width: 'auto',
             },
         ],
         [],
@@ -126,10 +126,10 @@ function SchedulerJobsList() {
                     <Badge
                         color={
                             schedulerJob.lastExecutionStatus === SchedulerJobExecutionStatus.Failed
-                                ? "danger"
+                                ? 'danger'
                                 : schedulerJob.lastExecutionStatus === SchedulerJobExecutionStatus.Succeeded
-                                ? "success"
-                                : "primary"
+                                  ? 'success'
+                                  : 'primary'
                         }
                     >
                         {getEnumLabel(schedulerJobExecutionStatusEnum, schedulerJob.lastExecutionStatus)}

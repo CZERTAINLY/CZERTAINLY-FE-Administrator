@@ -1,11 +1,17 @@
-import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
-import { Field, useForm, useFormState } from "react-final-form";
-import { useSelector } from "react-redux";
-import { FormFeedback, FormGroup, Input, Label } from "reactstrap";
-import { InputType } from "reactstrap/types/lib/Input";
-import { AttributeContentType, PlatformEnum } from "types/openapi";
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateFloat, validateInteger, validateRequired } from "utils/validators";
-import ContentDescriptorField from "./ContentDescriptorField";
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { Field, useForm, useFormState } from 'react-final-form';
+import { useSelector } from 'react-redux';
+import { FormFeedback, FormGroup, Input, Label } from 'reactstrap';
+import { InputType } from 'reactstrap/types/lib/Input';
+import { AttributeContentType, PlatformEnum } from 'types/openapi';
+import {
+    composeValidators,
+    validateAlphaNumericWithSpecialChars,
+    validateFloat,
+    validateInteger,
+    validateRequired,
+} from 'utils/validators';
+import ContentDescriptorField from './ContentDescriptorField';
 
 const AllowedAttributeContentType = [
     AttributeContentType.String,
@@ -28,46 +34,49 @@ export const ContentFieldConfiguration: {
 } = {
     [AttributeContentType.Text]: {
         validators: [validateAlphaNumericWithSpecialChars()],
-        type: "textarea",
-        initial: "",
+        type: 'textarea',
+        initial: '',
     },
     [AttributeContentType.String]: {
         validators: [validateAlphaNumericWithSpecialChars()],
-        type: "text",
-        initial: "",
+        type: 'text',
+        initial: '',
     },
     [AttributeContentType.Integer]: {
         validators: [validateInteger()],
-        type: "number",
-        initial: 0,
+        type: 'number',
+        initial: '0',
     },
     [AttributeContentType.Float]: {
         validators: [validateFloat()],
-        type: "number",
-        initial: 0,
+        type: 'number',
+        initial: '0',
     },
     [AttributeContentType.Boolean]: {
-        type: "checkbox",
+        type: 'checkbox',
         initial: false,
     },
     [AttributeContentType.Datetime]: {
-        type: "datetime-local",
-        initial: "",
+        validators: [validateRequired()],
+        type: 'datetime-local',
+        initial: '',
     },
     [AttributeContentType.Date]: {
-        type: "date",
-        initial: "",
+        validators: [validateRequired()],
+        type: 'date',
+        initial: '',
     },
     [AttributeContentType.Time]: {
-        type: "time",
-        initial: "",
+        validators: [validateRequired()],
+        type: 'time',
+        initial: '',
     },
 };
 
 export default function DynamicContent({ editable, isList }: Props) {
     const form = useForm();
     const formState = useFormState();
-    const contentTypeValue = formState.values["contentType"];
+    const contentTypeValue = formState.values['contentType'];
     const attributeContentTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AttributeContentType));
 
     return (
@@ -86,7 +95,7 @@ export default function DynamicContent({ editable, isList }: Props) {
                             disabled={!editable}
                             onChange={(e) => {
                                 input.onChange(e);
-                                form.change("content", []);
+                                form.change('content', []);
                             }}
                         >
                             {AllowedAttributeContentType.map((contentType) => (

@@ -1,14 +1,14 @@
-import { useCallback, useEffect, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useCallback, useEffect, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
-import { Container } from "reactstrap";
+import { Container } from 'reactstrap';
 
-import { actions, selectors } from "ducks/auth";
+import { actions, selectors } from 'ducks/auth';
 
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
 
 export default function UserProfileDetail() {
     const dispatch = useDispatch();
@@ -28,9 +28,9 @@ export default function UserProfileDetail() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "pencil",
+                icon: 'pencil',
                 disabled: profile?.systemUser || false,
-                tooltip: "Edit",
+                tooltip: 'Edit',
                 onClick: () => {
                     onEditClick();
                 },
@@ -42,12 +42,12 @@ export default function UserProfileDetail() {
     const detailHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "property",
-                content: "Property",
+                id: 'property',
+                content: 'Property',
             },
             {
-                id: "value",
-                content: "Value",
+                id: 'value',
+                content: 'Value',
             },
         ],
         [],
@@ -59,24 +59,24 @@ export default function UserProfileDetail() {
                 ? []
                 : [
                       {
-                          id: "username",
-                          columns: ["Username", profile.username],
+                          id: 'username',
+                          columns: ['Username', profile.username],
                       },
                       {
-                          id: "description",
-                          columns: ["Description", profile.description || ""],
+                          id: 'description',
+                          columns: ['Description', profile.description || ''],
                       },
                       {
-                          id: "firstName",
-                          columns: ["First name", profile.firstName || ""],
+                          id: 'firstName',
+                          columns: ['First name', profile.firstName || ''],
                       },
                       {
-                          id: "lastName",
-                          columns: ["Last name", profile.lastName || ""],
+                          id: 'lastName',
+                          columns: ['Last name', profile.lastName || ''],
                       },
                       {
-                          id: "email",
-                          columns: ["Email", profile.email || ""],
+                          id: 'email',
+                          columns: ['Email', profile.email || ''],
                       },
                   ],
         [profile],

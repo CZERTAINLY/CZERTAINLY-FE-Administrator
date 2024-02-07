@@ -1,33 +1,33 @@
-import AttributeViewer from "components/Attributes/AttributeViewer";
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
-import TabLayout from "components/Layout/TabLayout";
+import AttributeViewer from 'components/Attributes/AttributeViewer';
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
+import TabLayout from 'components/Layout/TabLayout';
 
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
 
-import { actions, selectors } from "ducks/cryptographic-keys";
+import { actions, selectors } from 'ducks/cryptographic-keys';
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router";
-import { Link, useParams } from "react-router-dom";
-import Select from "react-select";
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router';
+import { Link, useParams } from 'react-router-dom';
+import Select from 'react-select';
 
-import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
-import { Col, Container, Label, Row } from "reactstrap";
-import { KeyCompromiseReason, KeyState, KeyType, PlatformEnum, Resource } from "types/openapi";
-import { LockWidgetNameEnum } from "types/widget-locks";
-import { dateFormatter } from "utils/dateUtil";
-import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
-import CryptographicKeyItem from "./CryptographicKeyItem";
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { Col, Container, Label, Row } from 'reactstrap';
+import { KeyCompromiseReason, KeyState, KeyType, PlatformEnum, Resource } from 'types/openapi';
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { dateFormatter } from 'utils/dateUtil';
+import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
+import CryptographicKeyItem from './CryptographicKeyItem';
 
 export default function CryptographicKeyDetail() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const { id, tokenId, keyItemUuid } = useParams();
-    const relativePath = keyItemUuid ? "../../../.." : "../../..";
+    const relativePath = keyItemUuid ? '../../../..' : '../../..';
 
     const cryptographicKey = useSelector(selectors.cryptographicKey);
     const state = useSelector(selectors.state);
@@ -67,7 +67,7 @@ export default function CryptographicKeyDetail() {
 
     const onEditClick = useCallback(() => {
         if (!cryptographicKey) return;
-        navigate(`${relativePath}/edit/${cryptographicKey.tokenInstanceUuid}/${cryptographicKey?.uuid}`, { relative: "path" });
+        navigate(`${relativePath}/edit/${cryptographicKey.tokenInstanceUuid}/${cryptographicKey?.uuid}`, { relative: 'path' });
     }, [navigate, cryptographicKey, relativePath]);
 
     const onEnableClick = useCallback(() => {
@@ -97,7 +97,7 @@ export default function CryptographicKeyDetail() {
         dispatch(
             actions.deleteCryptographicKey({
                 keyItemUuid: [],
-                tokenInstanceUuid: cryptographicKey.tokenInstanceUuid || "unknown",
+                tokenInstanceUuid: cryptographicKey.tokenInstanceUuid || 'unknown',
                 uuid: cryptographicKey.uuid,
                 redirect: cryptographicKey.items.length > 1 ? `${relativePath}/` : undefined,
             }),
@@ -144,55 +144,55 @@ export default function CryptographicKeyDetail() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "pencil",
+                icon: 'pencil',
                 disabled: false,
-                tooltip: "Edit",
+                tooltip: 'Edit',
                 onClick: () => {
                     onEditClick();
                 },
             },
             {
-                icon: "trash",
+                icon: 'trash',
                 disabled: false,
-                tooltip: "Delete",
+                tooltip: 'Delete',
                 onClick: () => {
                     setConfirmDelete(true);
                 },
             },
             {
-                icon: "check",
+                icon: 'check',
                 disabled: cryptographicKey?.items.every((item) => item.enabled) ?? false,
-                tooltip: "Enable",
+                tooltip: 'Enable',
                 onClick: () => {
                     onEnableClick();
                 },
             },
             {
-                icon: "times",
+                icon: 'times',
                 disabled: cryptographicKey?.items.every((item) => !item.enabled) ?? false,
-                tooltip: "Disable",
+                tooltip: 'Disable',
                 onClick: () => {
                     onDisableClick();
                 },
             },
             {
-                icon: "compromise",
+                icon: 'compromise',
                 disabled:
                     cryptographicKey?.items.every(
                         (item) => ![KeyState.PreActive, KeyState.Active, KeyState.Deactivated].includes(item.state),
                     ) ?? false,
-                tooltip: "Compromise",
+                tooltip: 'Compromise',
                 onClick: () => {
                     setConfirmCompromise(true);
                 },
             },
             {
-                icon: "destroy",
+                icon: 'destroy',
                 disabled:
                     cryptographicKey?.items.every(
                         (item) => ![KeyState.PreActive, KeyState.Compromised, KeyState.Deactivated].includes(item.state),
                     ) ?? false,
-                tooltip: "Destroy",
+                tooltip: 'Destroy',
                 onClick: () => {
                     setConfirmDestroy(true);
                 },
@@ -204,12 +204,12 @@ export default function CryptographicKeyDetail() {
     const detailHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "property",
-                content: "Property",
+                id: 'property',
+                content: 'Property',
             },
             {
-                id: "value",
-                content: "Value",
+                id: 'value',
+                content: 'Value',
             },
         ],
         [],
@@ -218,16 +218,16 @@ export default function CryptographicKeyDetail() {
     const associationHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "name",
-                content: "Name",
+                id: 'name',
+                content: 'Name',
             },
             {
-                id: "uuid",
-                content: "UUID",
+                id: 'uuid',
+                content: 'UUID',
             },
             {
-                id: "resource",
-                content: "Resource",
+                id: 'resource',
+                content: 'Resource',
             },
         ],
         [],
@@ -260,42 +260,42 @@ export default function CryptographicKeyDetail() {
                 ? []
                 : [
                       {
-                          id: "uuid",
-                          columns: ["UUID", cryptographicKey.uuid],
+                          id: 'uuid',
+                          columns: ['UUID', cryptographicKey.uuid],
                       },
                       {
-                          id: "name",
-                          columns: ["Name", cryptographicKey.name],
+                          id: 'name',
+                          columns: ['Name', cryptographicKey.name],
                       },
                       {
-                          id: "description",
-                          columns: ["Description", cryptographicKey.description || ""],
+                          id: 'description',
+                          columns: ['Description', cryptographicKey.description || ''],
                       },
                       {
-                          id: "creationTime",
-                          columns: ["Creation Time", dateFormatter(cryptographicKey.creationTime) || ""],
+                          id: 'creationTime',
+                          columns: ['Creation Time', dateFormatter(cryptographicKey.creationTime) || ''],
                       },
                       {
-                          id: "tokenName",
+                          id: 'tokenName',
                           columns: [
-                              "Token Instance Name",
+                              'Token Instance Name',
                               cryptographicKey.tokenInstanceUuid ? (
                                   <Link to={`${relativePath}/tokens/detail/${cryptographicKey.tokenInstanceUuid}`}>
                                       {cryptographicKey.tokenInstanceName}
                                   </Link>
                               ) : (
-                                  ""
+                                  ''
                               ),
                           ],
                       },
                       {
-                          id: "tokenUuid",
-                          columns: ["Token Instance UUID", cryptographicKey.tokenInstanceUuid],
+                          id: 'tokenUuid',
+                          columns: ['Token Instance UUID', cryptographicKey.tokenInstanceUuid],
                       },
                       {
-                          id: "tokenProfileName",
+                          id: 'tokenProfileName',
                           columns: [
-                              "Token Profile Name",
+                              'Token Profile Name',
                               cryptographicKey.tokenInstanceUuid && cryptographicKey.tokenProfileUuid ? (
                                   <Link
                                       to={`${relativePath}/tokenprofiles/detail/${cryptographicKey.tokenInstanceUuid}/${cryptographicKey.tokenProfileUuid}`}
@@ -303,37 +303,37 @@ export default function CryptographicKeyDetail() {
                                       {cryptographicKey.tokenProfileName}
                                   </Link>
                               ) : (
-                                  ""
+                                  ''
                               ),
                           ],
                       },
                       {
-                          id: "tokenProfileUuid",
-                          columns: ["Token Profile UUID", cryptographicKey.tokenProfileUuid || "Unassigned"],
+                          id: 'tokenProfileUuid',
+                          columns: ['Token Profile UUID', cryptographicKey.tokenProfileUuid || 'Unassigned'],
                       },
                       {
-                          id: "owner",
+                          id: 'owner',
                           columns: [
-                            "Owner",
-                            cryptographicKey.ownerUuid? (
-                                <Link to={`${relativePath}/users/detail/${cryptographicKey.ownerUuid}`}>
-                                    {cryptographicKey.owner ?? "Unassigned"}
-                                </Link>
-                            ) : (
-                                cryptographicKey.owner || "Unassigned"
-                            ),
+                              'Owner',
+                              cryptographicKey.ownerUuid ? (
+                                  <Link to={`${relativePath}/users/detail/${cryptographicKey.ownerUuid}`}>
+                                      {cryptographicKey.owner ?? 'Unassigned'}
+                                  </Link>
+                              ) : (
+                                  cryptographicKey.owner || 'Unassigned'
+                              ),
                           ],
                       },
                       {
-                          id: "groupName",
+                          id: 'groupName',
                           columns: [
-                              "Group Name",
+                              'Group Name',
                               cryptographicKey.group ? (
                                   <Link to={`${relativePath}/groups/detail/${cryptographicKey.group.uuid}`}>
                                       {cryptographicKey.group.name}
                                   </Link>
                               ) : (
-                                  ""
+                                  ''
                               ),
                           ],
                       },
@@ -421,8 +421,8 @@ export default function CryptographicKeyDetail() {
                 body="You are about to delete Token Profile. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
@@ -445,8 +445,8 @@ export default function CryptographicKeyDetail() {
                 }
                 toggle={() => setConfirmCompromise(false)}
                 buttons={[
-                    { color: "danger", onClick: onCompromise, body: "Yes" },
-                    { color: "secondary", onClick: () => setConfirmCompromise(false), body: "Cancel" },
+                    { color: 'danger', onClick: onCompromise, body: 'Yes' },
+                    { color: 'secondary', onClick: () => setConfirmCompromise(false), body: 'Cancel' },
                 ]}
             />
 
@@ -456,8 +456,8 @@ export default function CryptographicKeyDetail() {
                 body={`You are about to destroy the Key. Is this what you want to do?`}
                 toggle={() => setConfirmDestroy(false)}
                 buttons={[
-                    { color: "danger", onClick: onDestroy, body: "Yes, Destroy" },
-                    { color: "secondary", onClick: () => setConfirmDestroy(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDestroy, body: 'Yes, Destroy' },
+                    { color: 'secondary', onClick: () => setConfirmDestroy(false), body: 'Cancel' },
                 ]}
             />
         </Container>

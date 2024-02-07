@@ -1,5 +1,5 @@
-import { AjaxError } from "rxjs/ajax";
-import { ErrorCodeDetailMap, ErrorCodeTexteMap, ErrorMessageObjectModel, LockTypeEnum } from "types/widget-locks";
+import { AjaxError } from 'rxjs/ajax';
+import { ErrorCodeDetailMap, ErrorCodeTexteMap, LockTypeEnum, WidgetLockErrorModel } from 'types/user-interface';
 
 export function extractError(err: Error, headline: string): string {
     if (!err) return headline;
@@ -18,9 +18,9 @@ function getLockEnumFromStatus(status: number): LockTypeEnum {
     return LockTypeEnum.GENERIC;
 }
 
-export function getLockWidgetObject(error: AjaxError): ErrorMessageObjectModel {
+export function getLockWidgetObject(error: AjaxError): WidgetLockErrorModel {
     if (error?.response?.message && error.response.code) {
-        const lockTitle = ErrorCodeTexteMap[error.response.code as keyof typeof ErrorCodeTexteMap] || "Something went wrong";
+        const lockTitle = ErrorCodeTexteMap[error.response.code as keyof typeof ErrorCodeTexteMap] || 'Something went wrong';
         return {
             lockTitle,
             lockText: error.response.message,
@@ -31,31 +31,31 @@ export function getLockWidgetObject(error: AjaxError): ErrorMessageObjectModel {
 
     if (error.status === 422)
         return {
-            lockTitle: "Validation Error",
-            lockText: "There was a problem in validating the request",
+            lockTitle: 'Validation Error',
+            lockText: 'There was a problem in validating the request',
             lockType: getLockEnumFromStatus(error.status),
         };
     else if (error.status > 400 && error.status < 500)
         return {
-            lockTitle: "Client Error",
-            lockText: "There was some problem at the client side",
+            lockTitle: 'Client Error',
+            lockText: 'There was some problem at the client side',
             lockType: getLockEnumFromStatus(error.status),
         };
     else if (error.status === 503)
         return {
-            lockTitle: "Service unavailable",
-            lockText: "There was some issue with the service",
+            lockTitle: 'Service unavailable',
+            lockText: 'There was some issue with the service',
             lockType: getLockEnumFromStatus(error.status),
         };
     else if (error.status > 500 && error.status < 600)
         return {
-            lockTitle: "Server Error",
-            lockText: "There was some issue with the server",
+            lockTitle: 'Server Error',
+            lockText: 'There was some issue with the server',
             lockType: getLockEnumFromStatus(error.status),
         };
     return {
-        lockTitle: "Something went wrong",
-        lockText: "There was some issue please try again later",
+        lockTitle: 'Something went wrong',
+        lockText: 'There was some issue please try again later',
         lockType: LockTypeEnum.GENERIC,
     };
 }

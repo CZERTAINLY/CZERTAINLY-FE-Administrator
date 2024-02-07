@@ -1,14 +1,14 @@
-import { actions as approvalProfileActions, selectors as approvalProfileSelectors } from "ducks/approval-profiles";
-import { actions as raProfilesActions, selectors as raProfilesSelectors } from "ducks/ra-profiles";
-import Select from "react-select";
-import { Form as BootstrapForm, Button, ButtonGroup, FormGroup, Label } from "reactstrap";
+import { actions as approvalProfileActions, selectors as approvalProfileSelectors } from 'ducks/approval-profiles';
+import { actions as raProfilesActions, selectors as raProfilesSelectors } from 'ducks/ra-profiles';
+import Select from 'react-select';
+import { Form as BootstrapForm, Button, ButtonGroup, FormGroup, Label } from 'reactstrap';
 
-import { useCallback, useEffect, useMemo } from "react";
-import { Field, Form } from "react-final-form";
-import { useDispatch, useSelector } from "react-redux";
-import { RaProfileResponseModel } from "types/ra-profiles";
-import { mutators } from "utils/attributes/attributeEditorMutators";
-import { validateRequired } from "utils/validators";
+import { useCallback, useEffect, useMemo } from 'react';
+import { Field, Form } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { RaProfileResponseModel } from 'types/ra-profiles';
+import { mutators } from 'utils/attributes/attributeEditorMutators';
+import { validateRequired } from 'utils/validators';
 
 interface Props {
     visible: boolean;
@@ -29,7 +29,7 @@ const AssociateApprovalProfileDialogBody = ({ raProfile, visible, onClose, avail
         if (!visible) return;
 
         dispatch(approvalProfileActions.listApprovalProfiles());
-    }, []);
+    }, [dispatch, visible]);
 
     const optionsForApprovalProfiles = useMemo(
         () =>
@@ -76,19 +76,19 @@ const AssociateApprovalProfileDialogBody = ({ raProfile, visible, onClose, avail
                                         styles={{
                                             control: (provided) =>
                                                 meta.touched && meta.invalid
-                                                    ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } }
+                                                    ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
                                                     : { ...provided },
                                         }}
                                     />
 
-                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>
+                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
                                         Required Field
                                     </div>
                                 </FormGroup>
                             )}
                         </Field>
 
-                        <div style={{ textAlign: "right" }}>
+                        <div style={{ textAlign: 'right' }}>
                             <ButtonGroup>
                                 <Button
                                     type="submit"

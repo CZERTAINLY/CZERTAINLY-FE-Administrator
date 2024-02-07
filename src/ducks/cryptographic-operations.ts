@@ -1,5 +1,5 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AttributeDescriptorModel } from "types/attributes";
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { AttributeDescriptorModel } from 'types/attributes';
 import {
     CryptographicKeyRandomDataRequestModel,
     CryptographicKeyRandomDataResponseModel,
@@ -7,10 +7,10 @@ import {
     CryptographicKeySignResponseModel,
     CryptographicKeyVerifyDataRequestModel,
     CryptographicKeyVerifyResponseModel,
-} from "types/cryptographic-operations";
-import { KeyAlgorithm } from "types/openapi";
-import { downloadFile } from "utils/download";
-import { createFeatureSelector } from "utils/ducks";
+} from 'types/cryptographic-operations';
+import { KeyAlgorithm } from 'types/openapi';
+import { downloadFile } from 'utils/download';
+import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     signatureAttributeDescriptors?: AttributeDescriptorModel[];
@@ -45,7 +45,7 @@ export const initialState: State = {
 };
 
 export const slice = createSlice({
-    name: "cryptographicOperations",
+    name: 'cryptographicOperations',
 
     initialState,
 
@@ -154,7 +154,7 @@ export const slice = createSlice({
 
         signDataSuccess: (state, action: PayloadAction<{ uuid: string; signature: CryptographicKeySignResponseModel }>) => {
             state.isSigning = false;
-            downloadFile(atob(action.payload.signature?.signatures[0]?.data), "signature.sign", "application/octet-stream");
+            downloadFile(atob(action.payload.signature?.signatures[0]?.data), 'signature.sign', 'application/octet-stream');
         },
 
         signDataFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -176,7 +176,7 @@ export const slice = createSlice({
 
         verifyDataSuccess: (state, action: PayloadAction<{ uuid: string; signature: CryptographicKeyVerifyResponseModel }>) => {
             state.isVerifying = false;
-            downloadFile(JSON.stringify(action.payload.signature), "verification-result.json");
+            downloadFile(JSON.stringify(action.payload.signature), 'verification-result.json');
         },
 
         verifyDataFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -195,7 +195,7 @@ export const slice = createSlice({
             action: PayloadAction<{ uuid: string; randomData: CryptographicKeyRandomDataResponseModel }>,
         ) => {
             state.isGeneratingRandomData = false;
-            downloadFile(atob(action.payload.randomData.data), "generated-random-data");
+            downloadFile(atob(action.payload.randomData.data), 'generated-random-data');
         },
 
         generateRandomDataFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {

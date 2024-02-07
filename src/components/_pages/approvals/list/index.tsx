@@ -1,19 +1,19 @@
-import { actions as approvalActions, selectors as approvalSelectors } from "ducks/approvals";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
-import { Button, Container } from "reactstrap";
+import { actions as approvalActions, selectors as approvalSelectors } from 'ducks/approvals';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { Button, Container } from 'reactstrap';
 // import { selectors as profileApprovalSelector } from "ducks/approval-profiles";
 
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
-import TabLayout from "components/Layout/TabLayout";
-import StatusBadge from "components/StatusBadge";
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
-import { ApprovalDtoStatusEnum } from "types/openapi";
-import { LockWidgetNameEnum } from "types/widget-locks";
-import { dateFormatter } from "utils/dateUtil";
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
+import TabLayout from 'components/Layout/TabLayout';
+import StatusBadge from 'components/StatusBadge';
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
+import { ApprovalDtoStatusEnum } from 'types/openapi';
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { dateFormatter } from 'utils/dateUtil';
 
 export default function ApprovalsList() {
     const dispatch = useDispatch();
@@ -100,26 +100,26 @@ export default function ApprovalsList() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "check",
+                icon: 'check',
                 disabled: !checkedRows.length || selectedApprovalStatus !== ApprovalDtoStatusEnum.Pending,
-                tooltip: "Approve",
+                tooltip: 'Approve',
                 hidden: !showAllApprovals,
                 onClick: () => {
                     setApproveApprovalDialogOpen(true);
                 },
             },
             {
-                icon: "times",
+                icon: 'times',
                 disabled: !checkedRows.length || selectedApprovalStatus !== ApprovalDtoStatusEnum.Pending,
                 hidden: !showAllApprovals,
-                tooltip: "Reject",
+                tooltip: 'Reject',
                 onClick: () => {
                     setRejectApprovalDialogOpen(true);
                 },
             },
             {
-                icon: "history",
-                tooltip: "Show History",
+                icon: 'history',
+                tooltip: 'Show History',
                 disabled: showAllApprovals,
                 hidden: showAllApprovals,
                 onClick: () => {
@@ -133,40 +133,40 @@ export default function ApprovalsList() {
     const approvalProfilesTableHeader: TableHeader[] = useMemo(
         () => [
             {
-                id: "approvalUUID",
-                content: "Approval UUID ",
-                sort: "asc",
+                id: 'approvalUUID',
+                content: 'Approval UUID ',
+                sort: 'asc',
             },
             {
-                id: "approvalProfile",
-                content: "Approval Profile",
+                id: 'approvalProfile',
+                content: 'Approval Profile',
             },
             {
-                id: "status",
-                content: "Status",
+                id: 'status',
+                content: 'Status',
             },
             {
-                id: "requestedBy",
-                content: "Requested By",
+                id: 'requestedBy',
+                content: 'Requested By',
             },
             {
-                id: "resource",
-                content: "Resource",
-            },
-
-            {
-                id: "action",
-                content: "Action",
+                id: 'resource',
+                content: 'Resource',
             },
 
             {
-                id: "createdAt",
-                content: "Created At",
+                id: 'action',
+                content: 'Action',
             },
 
             {
-                id: "closedAt",
-                content: "Closed At",
+                id: 'createdAt',
+                content: 'Created At',
+            },
+
+            {
+                id: 'closedAt',
+                content: 'Closed At',
             },
         ],
         [],
@@ -194,26 +194,26 @@ export default function ApprovalsList() {
                             <i className="fa fa-circle-arrow-right"></i>
                         </Button>
                     </>
-                ) || "",
-                approval.creatorUsername? (
-                    <Link to={`../users/detail/${approval.creatorUuid}`}>{approval.creatorUsername ?? "Unassigned"}</Link>
+                ) || '',
+                approval.creatorUsername ? (
+                    <Link to={`../users/detail/${approval.creatorUuid}`}>{approval.creatorUsername ?? 'Unassigned'}</Link>
                 ) : (
-                    approval.creatorUsername ?? "Unassigned"
+                    approval.creatorUsername ?? 'Unassigned'
                 ),
-                approval.resource || "",
-                approval.resourceAction || "",
-                approval.createdAt ? dateFormatter(approval.createdAt) : "",
-                approval.closedAt ? dateFormatter(approval.closedAt) : "",
+                approval.resource || '',
+                approval.resourceAction || '',
+                approval.createdAt ? dateFormatter(approval.createdAt) : '',
+                approval.closedAt ? dateFormatter(approval.closedAt) : '',
             ],
         }));
-    }, [approvals, userApprovals, showAllApprovals]);
+    }, [approvals, userApprovals, showAllApprovals, navigate]);
 
     return (
         <Container className="themed-container" fluid>
             <TabLayout
                 tabs={[
                     {
-                        title: "My Approvals",
+                        title: 'My Approvals',
                         content: (
                             <Widget
                                 title="My Approvals"
@@ -253,7 +253,7 @@ export default function ApprovalsList() {
                         },
                     },
                     {
-                        title: "List of Approvals",
+                        title: 'List of Approvals',
                         content: (
                             <Widget
                                 title="List of Approvals"
@@ -302,8 +302,8 @@ export default function ApprovalsList() {
                 body="Are you sure you want to accept the selected Approval?"
                 toggle={() => setApproveApprovalDialogOpen(false)}
                 buttons={[
-                    { color: "primary", onClick: onApproveApprover, body: "Yes, approve" },
-                    { color: "secondary", onClick: () => setApproveApprovalDialogOpen(false), body: "Cancel" },
+                    { color: 'primary', onClick: onApproveApprover, body: 'Yes, approve' },
+                    { color: 'secondary', onClick: () => setApproveApprovalDialogOpen(false), body: 'Cancel' },
                 ]}
             />
 
@@ -313,8 +313,8 @@ export default function ApprovalsList() {
                 body="Are you sure you want to reject the selected Approval?"
                 toggle={() => setRejectApprovalDialogOpen(false)}
                 buttons={[
-                    { color: "primary", onClick: onRejectApprover, body: "Yes, reject" },
-                    { color: "secondary", onClick: () => setRejectApprovalDialogOpen(false), body: "Cancel" },
+                    { color: 'primary', onClick: onRejectApprover, body: 'Yes, reject' },
+                    { color: 'secondary', onClick: () => setRejectApprovalDialogOpen(false), body: 'Cancel' },
                 ]}
             />
         </Container>

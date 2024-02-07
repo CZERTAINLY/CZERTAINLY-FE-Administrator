@@ -32,17 +32,18 @@ import {
     StatisticsDashboardApi,
     TokenProfileManagementApi,
     UserManagementApi,
-} from "types/openapi";
-import { TokenInstanceControllerApi } from "types/openapi/apis/TokenInstanceControllerApi";
+} from 'types/openapi';
+import { TokenInstanceControllerApi } from 'types/openapi/apis/TokenInstanceControllerApi';
 import {
     ActuatorApi,
     CertificateUtilsAPIApi,
     CertificationRequestUtilsAPIApi,
     Configuration as ConfigurationUtils,
-} from "types/openapi/utils";
-import { OIDUtilsAPIApi } from "./types/openapi/utils";
+} from 'types/openapi/utils';
+import { OIDUtilsAPIApi } from './types/openapi/utils';
 
-const configuration = new Configuration({ basePath: (window as any).__ENV__.API_URL });
+const apiUrl = (window as any).__ENV__?.API_URL || '/api';
+const configuration = new Configuration({ basePath: apiUrl });
 
 export interface ApiClients {
     auth: AuthenticationManagementApi;
@@ -121,7 +122,7 @@ export const backendClient: ApiClients = {
 };
 
 export const updateBackendUtilsClients = (url: string | undefined) => {
-    if (url && url !== "") {
+    if (url && url !== '') {
         const configuration = new ConfigurationUtils({ basePath: url });
         backendClient.utilsCertificate = new CertificateUtilsAPIApi(configuration);
         backendClient.utilsOid = new OIDUtilsAPIApi(configuration);

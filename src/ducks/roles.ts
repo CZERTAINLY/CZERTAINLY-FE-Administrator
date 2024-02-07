@@ -1,8 +1,8 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RoleResponseModel } from "types/auth";
-import { RoleDetailModel, RolePermissionsModel, RoleRequestModel, SubjectPermissionsModel } from "types/roles";
-import { UserResponseModel } from "types/users";
-import { createFeatureSelector } from "utils/ducks";
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { RoleResponseModel } from 'types/auth';
+import { RoleDetailModel, RolePermissionsModel, RoleRequestModel, SubjectPermissionsModel } from 'types/roles';
+import { UserResponseModel } from 'types/users';
+import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     rolesListCheckedRows: string[];
@@ -34,7 +34,7 @@ export const initialState: State = {
     rolesListCheckedRows: [],
     permissionsListCheckedRows: [],
 
-    deleteErrorMessage: "",
+    deleteErrorMessage: '',
 
     roles: [],
 
@@ -50,7 +50,7 @@ export const initialState: State = {
 };
 
 export const slice = createSlice({
-    name: "roles",
+    name: 'roles',
 
     initialState,
 
@@ -72,7 +72,7 @@ export const slice = createSlice({
         },
 
         clearDeleteErrorMessages: (state, action: PayloadAction<void>) => {
-            state.deleteErrorMessage = "";
+            state.deleteErrorMessage = '';
         },
 
         list: (state, action: PayloadAction<void>) => {

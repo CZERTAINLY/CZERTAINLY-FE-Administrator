@@ -1,39 +1,39 @@
-import AttributeEditor from "components/Attributes/AttributeEditor";
-import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from "components/Attributes/AttributeViewer";
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
-import ProgressButton from "components/ProgressButton";
-import Spinner from "components/Spinner";
-import StatusBadge from "components/StatusBadge";
-import CertificateList from "components/_pages/certificates/list";
+import AttributeEditor from 'components/Attributes/AttributeEditor';
+import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from 'components/Attributes/AttributeViewer';
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
+import ProgressButton from 'components/ProgressButton';
+import Spinner from 'components/Spinner';
+import StatusBadge from 'components/StatusBadge';
+import CertificateList from 'components/_pages/certificates/list';
 
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
 
-import { actions, selectors } from "ducks/locations";
-import { actions as raActions, selectors as raSelectors } from "ducks/ra-profiles";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Field, Form } from "react-final-form";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import Select from "react-select";
+import { actions, selectors } from 'ducks/locations';
+import { actions as raActions, selectors as raSelectors } from 'ducks/ra-profiles';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Field, Form } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import Select from 'react-select';
 
-import { Badge, Form as BootstrapForm, Button, ButtonGroup, Container, FormGroup, Label } from "reactstrap";
-import { AttributeDescriptorModel } from "types/attributes";
+import { Badge, Form as BootstrapForm, Button, ButtonGroup, Container, FormGroup, Label } from 'reactstrap';
+import { AttributeDescriptorModel } from 'types/attributes';
 
-import { mutators } from "utils/attributes/attributeEditorMutators";
-import { collectFormAttributes, getAttributeContent } from "utils/attributes/attributes";
-import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
+import { mutators } from 'utils/attributes/attributeEditorMutators';
+import { collectFormAttributes, getAttributeContent } from 'utils/attributes/attributes';
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
 
-import { LockWidgetNameEnum } from "types/widget-locks";
-import { validateRequired } from "utils/validators";
-import { CertificateState, Resource } from "../../../../types/openapi";
-import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
-import TabLayout from "../../../Layout/TabLayout";
-import CertificateStatusBadge from "../../../_pages/certificates/CertificateStatus";
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { validateRequired } from 'utils/validators';
+import { CertificateState, Resource } from '../../../../types/openapi';
+import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
+import TabLayout from '../../../Layout/TabLayout';
+import CertificateStatusBadge from '../../../_pages/certificates/CertificateStatus';
 
-import cx from "classnames";
-import style from "./locationDetail.module.scss";
+import cx from 'classnames';
+import style from './locationDetail.module.scss';
 
 export default function LocationDetail() {
     const dispatch = useDispatch();
@@ -120,7 +120,7 @@ export default function LocationDetail() {
 
     const onEditClick = useCallback(() => {
         if (!location) return;
-        navigate(`../../../edit/${location.entityInstanceUuid}/${location.uuid}`, { relative: "path" });
+        navigate(`../../../edit/${location.entityInstanceUuid}/${location.uuid}`, { relative: 'path' });
     }, [location, navigate]);
 
     const onEnableClick = useCallback(() => {
@@ -175,7 +175,7 @@ export default function LocationDetail() {
             if (selectedCerts.length === 0 || !location) return;
 
             const attrs = collectFormAttributes(
-                "pushAttributes",
+                'pushAttributes',
                 [...(pushAttributeDescriptors ?? []), ...pushGroupAttributesCallbackAttributes],
                 values,
             );
@@ -199,22 +199,22 @@ export default function LocationDetail() {
             if (!location) return;
 
             const issueAttrs = collectFormAttributes(
-                "issueAttributes",
+                'issueAttributes',
                 [...(issuanceAttributeDescriptors ?? []), ...issueGroupAttributesCallbackAttributes],
                 values,
             );
             const csrAttrs = collectFormAttributes(
-                "csrAttributes",
+                'csrAttributes',
                 [...(csrAttributeDescriptors ?? []), ...csrGroupAttributesCallbackAttributes],
                 values,
             );
-            const certificateCustomAttributes = collectFormAttributes("customCertificate", resourceCustomAttributes, values);
+            const certificateCustomAttributes = collectFormAttributes('customCertificate', resourceCustomAttributes, values);
             dispatch(
                 actions.issueCertificate({
                     entityUuid: location.entityInstanceUuid,
                     locationUuid: location.uuid,
                     issueRequest: {
-                        raProfileUuid: values.raProfile.value.split(":#")[0],
+                        raProfileUuid: values.raProfile.value.split(':#')[0],
                         csrAttributes: csrAttrs,
                         issueAttributes: issueAttrs,
                         certificateCustomAttributes: certificateCustomAttributes,
@@ -237,40 +237,40 @@ export default function LocationDetail() {
     const onDeleteConfirmed = useCallback(() => {
         if (!location) return;
 
-        dispatch(actions.deleteLocation({ entityUuid: location.entityInstanceUuid, uuid: location.uuid, redirect: "../../../" }));
+        dispatch(actions.deleteLocation({ entityUuid: location.entityInstanceUuid, uuid: location.uuid, redirect: '../../../' }));
         setConfirmDelete(false);
     }, [location, dispatch]);
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "pencil",
+                icon: 'pencil',
                 disabled: false,
-                tooltip: "Edit",
+                tooltip: 'Edit',
                 onClick: () => {
                     onEditClick();
                 },
             },
             {
-                icon: "trash",
+                icon: 'trash',
                 disabled: false,
-                tooltip: "Delete",
+                tooltip: 'Delete',
                 onClick: () => {
                     setConfirmDelete(true);
                 },
             },
             {
-                icon: "check",
+                icon: 'check',
                 disabled: location?.enabled || false,
-                tooltip: "Enable",
+                tooltip: 'Enable',
                 onClick: () => {
                     onEnableClick();
                 },
             },
             {
-                icon: "times",
+                icon: 'times',
                 disabled: !location?.enabled || false,
-                tooltip: "Disable",
+                tooltip: 'Disable',
                 onClick: () => {
                     onDisableClick();
                 },
@@ -287,58 +287,58 @@ export default function LocationDetail() {
     const certButtons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "trash",
+                icon: 'trash',
                 disabled: certCheckedRows.length === 0,
-                tooltip: "Remove",
+                tooltip: 'Remove',
                 onClick: () => {
                     setConfirmRemoveDialog(true);
                 },
             },
             {
-                icon: "push",
+                icon: 'push',
                 disabled: !location?.supportMultipleEntries && (location ? location.certificates.length > 0 : false),
-                tooltip: "Push",
+                tooltip: 'Push',
                 onClick: () => {
                     setPushDialog(true);
                 },
             },
             {
-                icon: "cubes",
+                icon: 'cubes',
                 disabled: !location?.supportKeyManagement,
-                tooltip: "Issue",
+                tooltip: 'Issue',
                 onClick: () => {
                     setIssueDialog(true);
                 },
             },
             {
-                icon: "retweet",
+                icon: 'retweet',
                 disabled: certCheckedRows.length === 0 || selectedCertificateDetails?.state === CertificateState.Requested,
-                tooltip: "Renew",
+                tooltip: 'Renew',
                 onClick: () => {
                     onRenewClick();
                 },
             },
             {
-                icon: "sync",
+                icon: 'sync',
                 disabled: false,
-                tooltip: "Sync",
+                tooltip: 'Sync',
                 onClick: () => {
                     onSyncClick();
                 },
             },
         ],
-        [certCheckedRows.length, location, onRenewClick, onSyncClick],
+        [certCheckedRows.length, location, onRenewClick, onSyncClick, selectedCertificateDetails?.state],
     );
 
     const detailHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "property",
-                content: "Property",
+                id: 'property',
+                content: 'Property',
             },
             {
-                id: "value",
-                content: "Value",
+                id: 'value',
+                content: 'Value',
             },
         ],
         [],
@@ -350,33 +350,33 @@ export default function LocationDetail() {
                 ? []
                 : [
                       {
-                          id: "uuid",
-                          columns: ["UUID", location.uuid],
+                          id: 'uuid',
+                          columns: ['UUID', location.uuid],
                       },
                       {
-                          id: "name",
-                          columns: ["Name", location.name],
+                          id: 'name',
+                          columns: ['Name', location.name],
                       },
                       {
-                          id: "description",
-                          columns: ["Description", location.description || ""],
+                          id: 'description',
+                          columns: ['Description', location.description || ''],
                       },
                       {
-                          id: "status",
-                          columns: ["Status", <StatusBadge enabled={location.enabled} />],
+                          id: 'status',
+                          columns: ['Status', <StatusBadge enabled={location.enabled} />],
                       },
                       {
-                          id: "entityUuid",
-                          columns: ["Entity UUID", location.entityInstanceUuid],
+                          id: 'entityUuid',
+                          columns: ['Entity UUID', location.entityInstanceUuid],
                       },
                       {
-                          id: "entityName",
+                          id: 'entityName',
                           columns: [
-                              "Entity Name",
+                              'Entity Name',
                               location.entityInstanceUuid ? (
                                   <Link to={`../../entities/detail/${location.entityInstanceUuid}`}>{location.entityInstanceName}</Link>
                               ) : (
-                                  ""
+                                  ''
                               ),
                           ],
                       },
@@ -387,39 +387,39 @@ export default function LocationDetail() {
     const certHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "cn",
-                content: "Common Name",
+                id: 'cn',
+                content: 'Common Name',
                 sortable: true,
-                width: "15%",
+                width: '15%',
             },
             {
-                id: "cs",
-                content: "State",
+                id: 'cs',
+                content: 'State',
                 sortable: true,
-                width: "15%",
+                width: '15%',
             },
             {
-                id: "vs",
-                content: "Validation Status",
+                id: 'vs',
+                content: 'Validation Status',
                 sortable: true,
-                width: "15%",
+                width: '15%',
             },
             {
-                id: "pk",
-                align: "center",
-                content: "Private Key",
+                id: 'pk',
+                align: 'center',
+                content: 'Private Key',
                 sortable: true,
-                width: "5%",
+                width: '5%',
             },
             {
-                id: "metadata",
-                content: "Metadata",
-                width: "40%",
+                id: 'metadata',
+                content: 'Metadata',
+                width: '40%',
             },
             {
-                id: "CSR Detail",
-                content: "CSR Detail",
-                width: "35%",
+                id: 'CSR Detail',
+                content: 'CSR Detail',
+                width: '35%',
             },
         ],
         [],
@@ -437,28 +437,28 @@ export default function LocationDetail() {
                               key={cert.certificateUuid}
                               to={`../../../certificates/detail/${cert.certificateUuid}`}
                           >
-                              {cert.commonName || "empty"}
+                              {cert.commonName || 'empty'}
                           </Link>,
                           <CertificateStatusBadge status={cert.state} />,
                           <CertificateStatusBadge status={cert.validationStatus} />,
                           cert.withKey ? <Badge color="success">Yes</Badge> : <Badge color="danger">No</Badge>,
 
                           !cert.metadata || cert.metadata.length === 0 ? (
-                              ""
+                              ''
                           ) : (
                               <div
-                                  style={{ whiteSpace: "nowrap", textOverflow: "ellipsis", maxWidth: "20em", overflow: "hidden" }}
+                                  style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', maxWidth: '20em', overflow: 'hidden' }}
                                   className={cx({ [style.newCertificateColumn]: cert.state === CertificateState.Requested })}
                               >
-                                  {cert.metadata.map((atr) => atr.connectorName + " (" + atr.items.length + ")").join(", ")}
+                                  {cert.metadata.map((atr) => atr.connectorName + ' (' + atr.items.length + ')').join(', ')}
                               </div>
                           ),
 
                           !cert.csrAttributes || cert.csrAttributes.length === 0 ? (
-                              ""
+                              ''
                           ) : (
-                              <div style={{ whiteSpace: "nowrap", textOverflow: "ellipsis", maxWidth: "20em", overflow: "hidden" }}>
-                                  {cert.csrAttributes.map((atr) => getAttributeContent(atr.contentType, atr.content) ?? "").join(", ")}
+                              <div style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', maxWidth: '20em', overflow: 'hidden' }}>
+                                  {cert.csrAttributes.map((atr) => getAttributeContent(atr.contentType, atr.content) ?? '').join(', ')}
                               </div>
                           ),
                       ],
@@ -489,7 +489,7 @@ export default function LocationDetail() {
             <TabLayout
                 tabs={[
                     {
-                        title: "Details",
+                        title: 'Details',
                         content: (
                             <Widget>
                                 <Widget
@@ -536,7 +536,7 @@ export default function LocationDetail() {
                         ),
                     },
                     {
-                        title: "Attributes",
+                        title: 'Attributes',
                         content: (
                             <Widget>
                                 <Widget title="Attributes" titleSize="large">
@@ -571,14 +571,14 @@ export default function LocationDetail() {
                 body="You are about to delete Location. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
             <Dialog
                 isOpen={confirmRemoveDialog}
-                caption={`Remove ${certCheckedRows.length === 1 ? "certificate" : "certificates"} from the location`}
+                caption={`Remove ${certCheckedRows.length === 1 ? 'certificate' : 'certificates'} from the location`}
                 body={
                     <>
                         You are about to remove certificates from the location:
@@ -587,7 +587,7 @@ export default function LocationDetail() {
                             const cert = location?.certificates.find((c) => c.certificateUuid === uuid);
                             return cert ? (
                                 <>
-                                    {cert.commonName || "empty"}
+                                    {cert.commonName || 'empty'}
                                     <br />
                                 </>
                             ) : (
@@ -601,8 +601,8 @@ export default function LocationDetail() {
                 }
                 toggle={() => setConfirmRemoveDialog(false)}
                 buttons={[
-                    { color: "danger", onClick: onRemoveConfirmed, body: "Yes, remove" },
-                    { color: "secondary", onClick: () => setConfirmRemoveDialog(false), body: "Cancel" },
+                    { color: 'danger', onClick: onRemoveConfirmed, body: 'Yes, remove' },
+                    { color: 'secondary', onClick: () => setConfirmRemoveDialog(false), body: 'Cancel' },
                 ]}
             />
 
@@ -631,7 +631,7 @@ export default function LocationDetail() {
                                         setGroupAttributesCallbackAttributes={setPushGroupAttributesCallbackAttributes}
                                     />
 
-                                    <div style={{ textAlign: "right" }}>
+                                    <div style={{ textAlign: 'right' }}>
                                         <ButtonGroup>
                                             <ProgressButton
                                                 inProgress={isPushingCertificate}
@@ -682,7 +682,7 @@ export default function LocationDetail() {
                                                     maxMenuHeight={140}
                                                     menuPlacement="auto"
                                                     options={raProfiles.map((p) => ({
-                                                        value: p.uuid + ":#" + p.authorityInstanceUuid,
+                                                        value: p.uuid + ':#' + p.authorityInstanceUuid,
                                                         label: p.name,
                                                     }))}
                                                     placeholder="Select RA profile"
@@ -691,8 +691,8 @@ export default function LocationDetail() {
                                                             meta.touched && meta.invalid
                                                                 ? {
                                                                       ...provided,
-                                                                      border: "solid 1px red",
-                                                                      "&:hover": { border: "solid 1px red" },
+                                                                      border: 'solid 1px red',
+                                                                      '&:hover': { border: 'solid 1px red' },
                                                                   }
                                                                 : { ...provided },
                                                     }}
@@ -700,8 +700,8 @@ export default function LocationDetail() {
                                                         input.onChange(value);
                                                         dispatch(
                                                             raActions.listIssuanceAttributeDescriptors({
-                                                                authorityUuid: value.value.split(":#")[1],
-                                                                uuid: value.value.split(":#")[0],
+                                                                authorityUuid: value.value.split(':#')[1],
+                                                                uuid: value.value.split(':#')[0],
                                                             }),
                                                         );
                                                     }}
@@ -709,7 +709,7 @@ export default function LocationDetail() {
 
                                                 <div
                                                     className="invalid-feedback"
-                                                    style={meta.touched && meta.invalid ? { display: "block" } : {}}
+                                                    style={meta.touched && meta.invalid ? { display: 'block' } : {}}
                                                 >
                                                     {meta.error}
                                                 </div>
@@ -722,7 +722,7 @@ export default function LocationDetail() {
                                     <TabLayout
                                         tabs={[
                                             {
-                                                title: "Certificate Signing Request Attributes",
+                                                title: 'Certificate Signing Request Attributes',
                                                 content: csrAttributeDescriptors ? (
                                                     <AttributeEditor
                                                         id="csrAttributes"
@@ -735,7 +735,7 @@ export default function LocationDetail() {
                                                 ),
                                             },
                                             {
-                                                title: "RA Profile Issue Attributes",
+                                                title: 'RA Profile Issue Attributes',
                                                 content: issuanceAttributeDescriptors ? (
                                                     <AttributeEditor
                                                         id="issueAttributes"
@@ -748,7 +748,7 @@ export default function LocationDetail() {
                                                 ),
                                             },
                                             {
-                                                title: "Certificate Custom Attributes",
+                                                title: 'Certificate Custom Attributes',
                                                 content: (
                                                     <AttributeEditor
                                                         id="customCertificate"
@@ -759,7 +759,7 @@ export default function LocationDetail() {
                                         ]}
                                     />
 
-                                    <div style={{ textAlign: "right" }}>
+                                    <div style={{ textAlign: 'right' }}>
                                         <ButtonGroup>
                                             <ProgressButton
                                                 inProgress={isPushingCertificate}

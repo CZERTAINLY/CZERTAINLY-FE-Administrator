@@ -1,4 +1,4 @@
-import { Badge } from "reactstrap";
+import { Badge } from 'reactstrap';
 
 interface Props {
     status?: boolean;

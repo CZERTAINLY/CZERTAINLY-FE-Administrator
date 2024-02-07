@@ -3,7 +3,7 @@ import {
     AcmeAccountListResponseModel,
     AcmeAccountResponseDto,
     AcmeAccountResponseModel,
-} from "types/acme-accounts";
+} from 'types/acme-accounts';
 
 export function transformAcmeAccountResponseDtoToModel(acme: AcmeAccountResponseDto): AcmeAccountResponseModel {
     return { ...acme };

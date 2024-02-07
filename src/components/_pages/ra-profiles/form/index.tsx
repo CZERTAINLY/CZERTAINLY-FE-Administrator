@@ -1,29 +1,29 @@
-import AttributeEditor from "components/Attributes/AttributeEditor";
-import ProgressButton from "components/ProgressButton";
+import AttributeEditor from 'components/Attributes/AttributeEditor';
+import ProgressButton from 'components/ProgressButton';
 
-import Widget from "components/Widget";
-import { actions as authoritiesActions, selectors as authoritiesSelectors } from "ducks/authorities";
-import { actions as connectorActions } from "ducks/connectors";
+import Widget from 'components/Widget';
+import { actions as authoritiesActions, selectors as authoritiesSelectors } from 'ducks/authorities';
+import { actions as connectorActions } from 'ducks/connectors';
 
-import { actions as raProfilesActions, selectors as raProfilesSelectors } from "ducks/ra-profiles";
-import { FormApi } from "final-form";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Field, Form } from "react-final-form";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
-import Select from "react-select";
+import { actions as raProfilesActions, selectors as raProfilesSelectors } from 'ducks/ra-profiles';
+import { FormApi } from 'final-form';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Field, Form } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
+import Select from 'react-select';
 
-import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from "reactstrap";
-import { AttributeDescriptorModel } from "types/attributes";
-import { RaProfileResponseModel } from "types/ra-profiles";
+import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
+import { AttributeDescriptorModel } from 'types/attributes';
+import { RaProfileResponseModel } from 'types/ra-profiles';
 
-import { mutators } from "utils/attributes/attributeEditorMutators";
-import { collectFormAttributes } from "utils/attributes/attributes";
+import { mutators } from 'utils/attributes/attributeEditorMutators';
+import { collectFormAttributes } from 'utils/attributes/attributes';
 
-import {composeValidators, validateAlphaNumericWithSpecialChars, validateLength, validateRequired} from "utils/validators";
-import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
-import { Resource } from "../../../../types/openapi";
-import TabLayout from "../../../Layout/TabLayout";
+import { composeValidators, validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
+import { Resource } from '../../../../types/openapi';
+import TabLayout from '../../../Layout/TabLayout';
 
 interface FormValues {
     name: string;
@@ -81,7 +81,7 @@ export default function RaProfileForm() {
         (authorityUuid: string, form: FormApi<FormValues>) => {
             dispatch(connectorActions.clearCallbackData());
             setGroupAttributesCallbackAttributes([]);
-            form.mutators.clearAttributes("ra-profile");
+            form.mutators.clearAttributes('ra-profile');
             if (raProfile) setRaProfile({ ...raProfile, attributes: [] });
             dispatch(authoritiesActions.clearRAProfilesAttributesDescriptors());
             dispatch(authoritiesActions.getRAProfilesAttributesDescriptors({ authorityUuid }));
@@ -105,11 +105,11 @@ export default function RaProfileForm() {
                             enabled: raProfile!.enabled,
                             description: values.description,
                             attributes: collectFormAttributes(
-                                "ra-profile",
+                                'ra-profile',
                                 [...(raProfileAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
                                 values,
                             ),
-                            customAttributes: collectFormAttributes("customRaProfile", resourceCustomAttributes, values),
+                            customAttributes: collectFormAttributes('customRaProfile', resourceCustomAttributes, values),
                         },
                     }),
                 );
@@ -121,11 +121,11 @@ export default function RaProfileForm() {
                             name: values.name,
                             description: values.description,
                             attributes: collectFormAttributes(
-                                "ra-profile",
+                                'ra-profile',
                                 [...(raProfileAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
                                 values,
                             ),
-                            customAttributes: collectFormAttributes("customRaProfile", resourceCustomAttributes, values),
+                            customAttributes: collectFormAttributes('customRaProfile', resourceCustomAttributes, values),
                         },
                     }),
                 );
@@ -145,8 +145,8 @@ export default function RaProfileForm() {
 
     const defaultValues: FormValues = useMemo(
         () => ({
-            name: editMode ? raProfile?.name || "" : "",
-            description: editMode ? raProfile?.description || "" : "",
+            name: editMode ? raProfile?.name || '' : '',
+            description: editMode ? raProfile?.description || '' : '',
             authority: editMode
                 ? raProfile
                     ? optionsForAuthorities.find((option) => option.value === raProfile.authorityInstanceUuid)
@@ -156,7 +156,7 @@ export default function RaProfileForm() {
         [editMode, optionsForAuthorities, raProfile],
     );
 
-    const title = useMemo(() => (editMode ? "Edit RA Profile" : "Create RA Profile"), [editMode]);
+    const title = useMemo(() => (editMode ? 'Edit RA Profile' : 'Create RA Profile'), [editMode]);
 
     return (
         <Widget title={title} busy={isBusy}>
@@ -183,7 +183,7 @@ export default function RaProfileForm() {
                             )}
                         </Field>
 
-                        <Field name="description" validate={composeValidators(validateLength(0,300))}>
+                        <Field name="description" validate={composeValidators(validateLength(0, 300))}>
                             {({ input, meta }) => (
                                 <FormGroup>
                                     <Label for="description">Description</Label>
@@ -222,12 +222,12 @@ export default function RaProfileForm() {
                                         styles={{
                                             control: (provided) =>
                                                 meta.touched && meta.invalid
-                                                    ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } }
+                                                    ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
                                                     : { ...provided },
                                         }}
                                     />
 
-                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>
+                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
                                         {meta.error}
                                     </div>
                                 </FormGroup>
@@ -238,14 +238,14 @@ export default function RaProfileForm() {
                         <TabLayout
                             tabs={[
                                 {
-                                    title: "Connector Attributes",
+                                    title: 'Connector Attributes',
                                     content: !raProfileAttributeDescriptors ? (
                                         <></>
                                     ) : (
                                         <AttributeEditor
                                             id="ra-profile"
                                             callbackParentUuid={
-                                                raProfile?.authorityInstanceUuid || form.getFieldState("authority")?.value?.value
+                                                raProfile?.authorityInstanceUuid || form.getFieldState('authority')?.value?.value
                                             }
                                             callbackResource={Resource.RaProfiles}
                                             attributeDescriptors={raProfileAttributeDescriptors}
@@ -256,7 +256,7 @@ export default function RaProfileForm() {
                                     ),
                                 },
                                 {
-                                    title: "Custom Attributes",
+                                    title: 'Custom Attributes',
                                     content: (
                                         <AttributeEditor
                                             id="customRaProfile"
@@ -271,8 +271,8 @@ export default function RaProfileForm() {
                         <div className="d-flex justify-content-end">
                             <ButtonGroup>
                                 <ProgressButton
-                                    title={editMode ? "Update" : "Create"}
-                                    inProgressTitle={editMode ? "Updating..." : "Creating..."}
+                                    title={editMode ? 'Update' : 'Create'}
+                                    inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
                                     inProgress={submitting}
                                     disabled={pristine || submitting || !valid}
                                 />

@@ -56,7 +56,7 @@ jobs:
 
           const workflows = [
             'build.yml',
-            'publish-package.yml',
+            'cypress-component.yml',
             'workflow_run_pruner.yml'
           ]
 

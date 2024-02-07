@@ -1,27 +1,21 @@
-import ProgressButton from "components/ProgressButton";
+import ProgressButton from 'components/ProgressButton';
 
-import Widget from "components/Widget";
+import Widget from 'components/Widget';
 
-import { actions as rolesActions, selectors as rolesSelectors } from "ducks/roles";
-import { useCallback, useEffect, useMemo } from "react";
-import { Field, Form } from "react-final-form";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { actions as rolesActions, selectors as rolesSelectors } from 'ducks/roles';
+import { useCallback, useEffect, useMemo } from 'react';
+import { Field, Form } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
 
-import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from "reactstrap";
-import {
-    composeValidators,
-    validateAlphaNumericWithSpecialChars,
-    validateEmail,
-    validateLength,
-    validateRequired
-} from "utils/validators";
-import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
-import { Resource } from "../../../../types/openapi";
-import { mutators } from "../../../../utils/attributes/attributeEditorMutators";
-import { collectFormAttributes } from "../../../../utils/attributes/attributes";
-import AttributeEditor from "../../../Attributes/AttributeEditor";
-import TabLayout from "../../../Layout/TabLayout";
+import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
+import { composeValidators, validateAlphaNumericWithSpecialChars, validateEmail, validateLength, validateRequired } from 'utils/validators';
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
+import { Resource } from '../../../../types/openapi';
+import { mutators } from '../../../../utils/attributes/attributeEditorMutators';
+import { collectFormAttributes } from '../../../../utils/attributes/attributes';
+import AttributeEditor from '../../../Attributes/AttributeEditor';
+import TabLayout from '../../../Layout/TabLayout';
 
 interface FormValues {
     name: string;
@@ -58,7 +52,7 @@ function RoleForm() {
                             name: values.name,
                             description: values.description,
                             email: values.email ? values.email : undefined,
-                            customAttributes: collectFormAttributes("customRole", resourceCustomAttributes, values),
+                            customAttributes: collectFormAttributes('customRole', resourceCustomAttributes, values),
                         },
                     }),
                 );
@@ -68,7 +62,7 @@ function RoleForm() {
                         name: values.name,
                         description: values.description,
                         email: values.email ? values.email : undefined,
-                        customAttributes: collectFormAttributes("customRole", resourceCustomAttributes, values),
+                        customAttributes: collectFormAttributes('customRole', resourceCustomAttributes, values),
                     }),
                 );
             }
@@ -81,20 +75,20 @@ function RoleForm() {
         navigate(-1);
     }, [navigate]);
 
-    const submitTitle = useMemo(() => (editMode ? "Save" : "Create"), [editMode]);
+    const submitTitle = useMemo(() => (editMode ? 'Save' : 'Create'), [editMode]);
 
-    const inProgressTitle = useMemo(() => (editMode ? "Saving..." : "Creating..."), [editMode]);
+    const inProgressTitle = useMemo(() => (editMode ? 'Saving...' : 'Creating...'), [editMode]);
 
     const defaultValues: FormValues = useMemo(
         () => ({
-            name: editMode ? roleSelector?.name || "" : "",
-            description: editMode ? roleSelector?.description || "" : "",
-            email: editMode ? roleSelector?.email || "" : "",
+            name: editMode ? roleSelector?.name || '' : '',
+            description: editMode ? roleSelector?.description || '' : '',
+            email: editMode ? roleSelector?.email || '' : '',
         }),
         [editMode, roleSelector],
     );
 
-    const title = useMemo(() => (editMode ? "Edit Role" : "Add Role"), [editMode]);
+    const title = useMemo(() => (editMode ? 'Edit Role' : 'Add Role'), [editMode]);
 
     return (
         <>
@@ -121,7 +115,7 @@ function RoleForm() {
                                 )}
                             </Field>
 
-                            <Field name="description" validate={composeValidators(validateLength(0,300))} >
+                            <Field name="description" validate={composeValidators(validateLength(0, 300))}>
                                 {({ input, meta }) => (
                                     <FormGroup>
                                         <Label for="description">Description</Label>
@@ -164,7 +158,7 @@ function RoleForm() {
                             <TabLayout
                                 tabs={[
                                     {
-                                        title: "Custom Attributes",
+                                        title: 'Custom Attributes',
                                         content: (
                                             <AttributeEditor
                                                 id="customRole"

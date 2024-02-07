@@ -1,5 +1,5 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { createFeatureSelector } from "utils/ducks";
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     health?: object;
@@ -11,7 +11,7 @@ export const initialState: State = {
 };
 
 export const slice = createSlice({
-    name: "utilsActuator",
+    name: 'utilsActuator',
     initialState,
     reducers: {
         reset: (state) => {

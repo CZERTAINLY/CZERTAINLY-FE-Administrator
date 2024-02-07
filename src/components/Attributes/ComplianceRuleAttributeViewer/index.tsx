@@ -1,7 +1,7 @@
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import { useCallback, useMemo } from "react";
-import { AttributeDescriptorModel, AttributeResponseModel, isDataAttributeModel } from "types/attributes";
-import { getAttributeContent } from "utils/attributes/attributes";
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import { useCallback, useMemo } from 'react';
+import { AttributeDescriptorModel, AttributeResponseModel, isDataAttributeModel } from 'types/attributes';
+import { getAttributeContent } from 'utils/attributes/attributes';
 
 export interface Props {
     attributes?: AttributeResponseModel[];
@@ -15,16 +15,16 @@ export default function ComplianceRuleAttributeViewer({ attributes, descriptorAt
     const tableHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "name",
-                content: "Name",
+                id: 'name',
+                content: 'Name',
                 sortable: true,
-                width: "20%",
+                width: '20%',
             },
             {
-                id: "value",
-                content: "Value",
+                id: 'value',
+                content: 'Value',
                 sortable: true,
-                width: "80%",
+                width: '80%',
             },
         ],
         [],
@@ -33,11 +33,11 @@ export default function ComplianceRuleAttributeViewer({ attributes, descriptorAt
     const tableData: TableDataRow[] = useMemo(() => {
         const attributeRows = attributes?.map((attribute) => ({
             id: attribute.uuid || attribute.name,
-            columns: [attribute.name || "", getContent(attribute.contentType, attribute.content)],
+            columns: [attribute.name || '', getContent(attribute.contentType, attribute.content)],
         }));
         const descriptorRows = descriptorAttributes?.filter(isDataAttributeModel).map((attribute) => ({
             id: attribute.uuid || attribute.name,
-            columns: [attribute.name || "", getContent(attribute.contentType, attribute.content)],
+            columns: [attribute.name || '', getContent(attribute.contentType, attribute.content)],
         }));
         return [...(attributeRows ?? []), ...(descriptorRows ?? [])];
     }, [attributes, descriptorAttributes, getContent]);

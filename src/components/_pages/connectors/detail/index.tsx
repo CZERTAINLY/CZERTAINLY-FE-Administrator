@@ -1,28 +1,28 @@
-import AttributeDescriptorViewer from "components/Attributes/AttributeDescriptorViewer";
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
+import AttributeDescriptorViewer from 'components/Attributes/AttributeDescriptorViewer';
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
 
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
 
-import { actions, selectors } from "ducks/connectors";
-import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { actions, selectors } from 'ducks/connectors';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
 
-import Select from "react-select";
-import { Badge, Col, Container, Row, Table } from "reactstrap";
-import { AttributeDescriptorModel } from "types/attributes";
-import { FunctionGroupModel } from "types/connectors";
+import Select from 'react-select';
+import { Badge, Col, Container, Row, Table } from 'reactstrap';
+import { AttributeDescriptorModel } from 'types/attributes';
+import { FunctionGroupModel } from 'types/connectors';
 
-import { attributeFieldNameTransform } from "utils/attributes/attributes";
-import { inventoryStatus } from "utils/connector";
-import { ConnectorStatus, HealthStatus, PlatformEnum, Resource } from "../../../../types/openapi";
-import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
+import { attributeFieldNameTransform } from 'utils/attributes/attributes';
+import { inventoryStatus } from 'utils/connector';
+import { ConnectorStatus, HealthStatus, PlatformEnum, Resource } from '../../../../types/openapi';
+import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 
-import { LockWidgetNameEnum } from "types/widget-locks";
-import styles from "./connectorDetails.module.scss";
+import { LockWidgetNameEnum } from 'types/user-interface';
+import styles from './connectorDetails.module.scss';
 
 export default function ConnectorDetail() {
     const dispatch = useDispatch();
@@ -39,7 +39,6 @@ export default function ConnectorDetail() {
     const isFetchingAllAttributes = useSelector(selectors.isFetchingAllAttributes);
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
     const isFetchingHealth = useSelector(selectors.isFetchingHealth);
-    const isFetchingAttributes = useSelector(selectors.isFetchingAttributes);
     const isReconnecting = useSelector(selectors.isReconnecting);
     const isBulkReconnecting = useSelector(selectors.isBulkReconnecting);
     const isAuthorizing = useSelector(selectors.isAuthorizing);
@@ -105,7 +104,7 @@ export default function ConnectorDetail() {
 
     const onEditClick = useCallback(() => {
         if (!connector) return;
-        navigate(`../../edit/${connector.uuid}`, { relative: "path" });
+        navigate(`../../edit/${connector.uuid}`, { relative: 'path' });
     }, [connector, navigate]);
 
     const onReconnectClick = useCallback(() => {
@@ -144,33 +143,33 @@ export default function ConnectorDetail() {
     const widgetButtons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "pencil",
+                icon: 'pencil',
                 disabled: false,
-                tooltip: "Edit",
+                tooltip: 'Edit',
                 onClick: () => {
                     onEditClick();
                 },
             },
             {
-                icon: "trash",
+                icon: 'trash',
                 disabled: false,
-                tooltip: "Delete",
+                tooltip: 'Delete',
                 onClick: () => {
                     setConfirmDelete(true);
                 },
             },
             {
-                icon: "plug",
+                icon: 'plug',
                 disabled: false,
-                tooltip: "Reconnect",
+                tooltip: 'Reconnect',
                 onClick: () => {
                     onReconnectClick();
                 },
             },
             {
-                icon: "check",
+                icon: 'check',
                 disabled: connector ? connector.status === ConnectorStatus.Connected : false,
-                tooltip: "Approve",
+                tooltip: 'Approve',
                 onClick: () => {
                     setConfirmAuthorize(true);
                 },
@@ -182,12 +181,12 @@ export default function ConnectorDetail() {
     const attributesHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "property",
-                content: "Property",
+                id: 'property',
+                content: 'Property',
             },
             {
-                id: "value",
-                content: "Value",
+                id: 'value',
+                content: 'Value',
             },
         ],
         [],
@@ -200,24 +199,24 @@ export default function ConnectorDetail() {
 
         return [
             {
-                id: "uuid",
-                columns: ["UUID", connector.uuid],
+                id: 'uuid',
+                columns: ['UUID', connector.uuid],
             },
             {
-                id: "name",
-                columns: ["Name", connector.name],
+                id: 'name',
+                columns: ['Name', connector.name],
             },
             {
-                id: "url",
-                columns: ["URL", connector.url],
+                id: 'url',
+                columns: ['URL', connector.url],
             },
             {
-                id: "status",
-                columns: ["Status", <Badge color={`${connectorStatus[1]}`}>{connectorStatus[0]}</Badge>],
+                id: 'status',
+                columns: ['Status', <Badge color={`${connectorStatus[1]}`}>{connectorStatus[0]}</Badge>],
             },
             {
-                id: "authType",
-                columns: ["Auth Type", getEnumLabel(authTypeEnum, connector.authType)],
+                id: 'authType',
+                columns: ['Auth Type', getEnumLabel(authTypeEnum, connector.authType)],
             },
         ];
     }, [connector, authTypeEnum]);
@@ -225,12 +224,12 @@ export default function ConnectorDetail() {
     const functionalityHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "functionGroup",
-                content: "Function Group",
+                id: 'functionGroup',
+                content: 'Function Group',
             },
             {
-                id: "kind",
-                content: "Kind",
+                id: 'kind',
+                content: 'Kind',
             },
         ],
         [],
@@ -258,72 +257,70 @@ export default function ConnectorDetail() {
         <div>
             <h5>
                 &nbsp;&nbsp;&nbsp;&nbsp;
-                {["up", "ok", "healthy"].includes(health ? health.status : "unknown") ? (
-                    <i className="fa fa-check-circle" style={{ color: "green" }} aria-hidden="true" />
-                ) : ["down", "failed", "notOk", "nok", "nOk"].includes(health ? health.status : "unknown") ? (
-                    <i className="fa fa-exclamation-circle" style={{ color: "red" }} aria-hidden="true" />
+                {['up', 'ok', 'healthy'].includes(health ? health.status : 'unknown') ? (
+                    <i className="fa fa-check-circle" style={{ color: 'green' }} aria-hidden="true" />
+                ) : ['down', 'failed', 'notOk', 'nok', 'nOk'].includes(health ? health.status : 'unknown') ? (
+                    <i className="fa fa-exclamation-circle" style={{ color: 'red' }} aria-hidden="true" />
                 ) : (
-                    <i className="fa fa-question-circle" style={{ color: "grey" }} aria-hidden="true" />
+                    <i className="fa fa-question-circle" style={{ color: 'grey' }} aria-hidden="true" />
                 )}
             </h5>
         </div>
     );
 
-    const renderStatusBadge = useCallback(
-        (status?: HealthStatus) => {
-            if (!status) return <Badge color="light">Unknown</Badge>;
-            switch (status) {
-                case HealthStatus.Ok:
-                    return <Badge color="success">{status}</Badge>;
-                case HealthStatus.Nok:
-                    return <Badge color="danger">{status}</Badge>;
-                case HealthStatus.Unknown:
-                    return <Badge color="light">{status}</Badge>;
-                default:
-                    return <Badge color="warning">{status}</Badge>;
-            }
-        },
-        [health],
-    );
+    const renderStatusBadge = useCallback((status?: HealthStatus) => {
+        if (!status) return <Badge color="light">Unknown</Badge>;
+        switch (status) {
+            case HealthStatus.Ok:
+                return <Badge color="success">{status}</Badge>;
+            case HealthStatus.Nok:
+                return <Badge color="danger">{status}</Badge>;
+            case HealthStatus.Unknown:
+                return <Badge color="light">{status}</Badge>;
+            default:
+                return <Badge color="warning">{status}</Badge>;
+        }
+    }, []);
 
     const healthBody = useCallback(() => {
         if (!health?.parts) return <></>;
 
         return Object.entries(health?.parts).map(([key, value]) =>
-            ["ok", "failed", "down", "nok", "unknown"].includes(value.status) ? (
+            ['ok', 'failed', 'down', 'nok', 'unknown'].includes(value.status) ? (
                 <tr>
                     <td>{key}</td>
                     <td>{renderStatusBadge(value.status)}</td>
-                    <td>{value?.description || ""}</td>
+                    <td>{value?.description || ''}</td>
                 </tr>
             ) : (
                 <tr>
                     <td>{key}</td>
                     <td>
-                        <Badge color="success">{value.status || "OK"}</Badge>
+                        <Badge color="success">{value.status || 'OK'}</Badge>
                     </td>
-                    <td>{value?.description || ""}</td>
+                    <td>{value?.description || ''}</td>
                 </tr>
             ),
         );
-    }, [health]);
+    }, [health, renderStatusBadge]);
+
     const endPointsHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "name",
+                id: 'name',
                 sortable: true,
-                sort: "asc",
-                content: "Name",
+                sort: 'asc',
+                content: 'Name',
             },
             {
-                id: "context",
+                id: 'context',
                 sortable: true,
-                content: "Context",
+                content: 'Context',
             },
             {
-                id: "method",
+                id: 'method',
                 sortable: true,
-                content: "Method",
+                content: 'Method',
             },
         ],
         [],
@@ -340,7 +337,7 @@ export default function ConnectorDetail() {
 
     const functionGroupSelectData =
         connector?.functionGroups?.map((group) => ({
-            label: attributeFieldNameTransform[group?.name || ""] || group?.name,
+            label: attributeFieldNameTransform[group?.name || ''] || group?.name,
             value: group.functionGroupCode,
         })) || [];
 
@@ -387,7 +384,7 @@ export default function ConnectorDetail() {
                                 <tr key="healthCheckStatus">
                                     <td className="fw-bold">Overall Health</td>
                                     <td>{renderStatusBadge(health?.status)}</td>
-                                    <td>{health?.description || ""}</td>
+                                    <td>{health?.description || ''}</td>
                                 </tr>
                                 {healthBody()}
                             </tbody>
@@ -407,16 +404,16 @@ export default function ConnectorDetail() {
             <Widget title="Function Group Details" busy={isFetchingDetail || isReconnecting} titleSize="large">
                 <hr />
                 <Row xs="1" sm="2" md="3" lg="3" xl="4">
-                    <Col style={{ display: "inline-block" }}>
+                    <Col style={{ display: 'inline-block' }}>
                         <Select
                             maxMenuHeight={140}
                             options={functionGroupSelectData}
                             value={{
-                                label: attributeFieldNameTransform[currentFunctionGroup?.name || ""] || currentFunctionGroup?.name,
+                                label: attributeFieldNameTransform[currentFunctionGroup?.name || ''] || currentFunctionGroup?.name,
                                 value: currentFunctionGroup?.functionGroupCode,
                             }}
                             menuPlacement="auto"
-                            onChange={(event) => onFunctionGroupChange(event?.value || "")}
+                            onChange={(event) => onFunctionGroupChange(event?.value || '')}
                         />
                     </Col>
                 </Row>
@@ -442,7 +439,7 @@ export default function ConnectorDetail() {
                                 placeholder={currentFunctionGroup?.kinds[0]}
                                 menuPlacement="auto"
                                 key="connectorFunctionGroupKindDropdown"
-                                onChange={(event) => onFunctionGroupKindChange(event?.value || "")}
+                                onChange={(event) => onFunctionGroupKindChange(event?.value || '')}
                             />
                         </Col>
                     </Row>
@@ -460,8 +457,8 @@ export default function ConnectorDetail() {
                 body="You are about to delete an Connector. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
@@ -471,13 +468,13 @@ export default function ConnectorDetail() {
                 body="You are about to approve an Connector. Is this what you want to do?"
                 toggle={() => setConfirmAuthorize(false)}
                 buttons={[
-                    { color: "success", onClick: onAuthorizeConfirmed, body: "Yes, approve" },
-                    { color: "secondary", onClick: () => setConfirmAuthorize(false), body: "Cancel" },
+                    { color: 'success', onClick: onAuthorizeConfirmed, body: 'Yes, approve' },
+                    { color: 'secondary', onClick: () => setConfirmAuthorize(false), body: 'Cancel' },
                 ]}
             />
 
             <Dialog
-                isOpen={deleteErrorMessage !== ""}
+                isOpen={deleteErrorMessage !== ''}
                 caption="Delete Connector"
                 body={
                     <>
@@ -489,8 +486,8 @@ export default function ConnectorDetail() {
                 }
                 toggle={() => dispatch(actions.clearDeleteErrorMessages())}
                 buttons={[
-                    { color: "danger", onClick: onForceDeleteConnector, body: "Force" },
-                    { color: "secondary", onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: "Cancel" },
+                    { color: 'danger', onClick: onForceDeleteConnector, body: 'Force' },
+                    { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
                 ]}
             />
         </Container>

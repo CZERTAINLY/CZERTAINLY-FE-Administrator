@@ -1,21 +1,21 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
-import { Badge, Container } from "reactstrap";
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { Badge, Container } from 'reactstrap';
 
-import { actions, selectors } from "ducks/token-profiles";
+import { actions, selectors } from 'ducks/token-profiles';
 
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
-import StatusBadge from "components/StatusBadge";
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
-import TokenStatusBadge from "components/_pages/tokens/TokenStatusBadge";
-import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
-import Select from "react-select";
-import { KeyUsage, PlatformEnum } from "types/openapi";
-import { TokenProfileResponseModel } from "types/token-profiles";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
+import StatusBadge from 'components/StatusBadge';
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
+import TokenStatusBadge from 'components/_pages/tokens/TokenStatusBadge';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import Select from 'react-select';
+import { KeyUsage, PlatformEnum } from 'types/openapi';
+import { TokenProfileResponseModel } from 'types/token-profiles';
+import { LockWidgetNameEnum } from 'types/user-interface';
 
 function TokenProfileList() {
     const dispatch = useDispatch();
@@ -91,41 +91,41 @@ function TokenProfileList() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "plus",
+                icon: 'plus',
                 disabled: false,
-                tooltip: "Create",
+                tooltip: 'Create',
                 onClick: () => {
                     onAddClick();
                 },
             },
             {
-                icon: "trash",
+                icon: 'trash',
                 disabled: checkedRows.length === 0,
-                tooltip: "Delete",
+                tooltip: 'Delete',
                 onClick: () => {
                     setConfirmDelete(true);
                 },
             },
             {
-                icon: "check",
+                icon: 'check',
                 disabled: checkedRows.length === 0,
-                tooltip: "Enable",
+                tooltip: 'Enable',
                 onClick: () => {
                     onEnableClick();
                 },
             },
             {
-                icon: "times",
+                icon: 'times',
                 disabled: checkedRows.length === 0,
-                tooltip: "Disable",
+                tooltip: 'Disable',
                 onClick: () => {
                     onDisableClick();
                 },
             },
             {
-                icon: "key",
+                icon: 'key',
                 disabled: checkedRows.length === 0,
-                tooltip: "Update Key Usage",
+                tooltip: 'Update Key Usage',
                 onClick: () => {
                     setKeyUsageUpdate(true);
                 },
@@ -165,42 +165,42 @@ function TokenProfileList() {
     const tokenProfilesTableHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "name",
-                content: "Name",
+                id: 'name',
+                content: 'Name',
                 sortable: true,
-                sort: "asc",
-                width: "15%",
+                sort: 'asc',
+                width: '15%',
             },
             {
-                id: "description",
-                content: "Description",
+                id: 'description',
+                content: 'Description',
                 sortable: true,
             },
             {
-                id: "usages",
-                align: "center",
-                content: "Usages",
+                id: 'usages',
+                align: 'center',
+                content: 'Usages',
             },
             {
-                id: "token",
-                align: "center",
-                content: "Token",
+                id: 'token',
+                align: 'center',
+                content: 'Token',
                 sortable: true,
-                width: "15%",
+                width: '15%',
             },
             {
-                id: "tokenStatus",
-                align: "center",
-                content: "Token Status",
+                id: 'tokenStatus',
+                align: 'center',
+                content: 'Token Status',
                 sortable: true,
-                width: "15%",
+                width: '15%',
             },
             {
-                id: "status",
-                align: "center",
-                content: "Status",
+                id: 'status',
+                align: 'center',
+                content: 'Status',
                 sortable: true,
-                width: "7%",
+                width: '7%',
             },
         ],
         [],
@@ -225,18 +225,20 @@ function TokenProfileList() {
                 id: tokenProfile.uuid,
 
                 columns: [
-                    <span style={{ whiteSpace: "nowrap" }}>
-                        <Link to={`./detail/${tokenProfile.tokenInstanceUuid || "unknown"}/${tokenProfile.uuid}`}>{tokenProfile.name}</Link>
+                    <span style={{ whiteSpace: 'nowrap' }}>
+                        <Link to={`./detail/${tokenProfile.tokenInstanceUuid || 'unknown'}/${tokenProfile.uuid}`}>{tokenProfile.name}</Link>
                     </span>,
 
-                    <span style={{ whiteSpace: "nowrap" }}>{tokenProfile.description || ""}</span>,
+                    <span style={{ whiteSpace: 'nowrap' }}>{tokenProfile.description || ''}</span>,
 
                     <>{getTokenProfileUsages(tokenProfile)}</>,
 
-                    tokenProfile.tokenInstanceName? (
-                        <Link to={`../tokens/detail/${tokenProfile.tokenInstanceUuid}`}>{tokenProfile.tokenInstanceName ?? "Unassigned"}</Link>
+                    tokenProfile.tokenInstanceName ? (
+                        <Link to={`../tokens/detail/${tokenProfile.tokenInstanceUuid}`}>
+                            {tokenProfile.tokenInstanceName ?? 'Unassigned'}
+                        </Link>
                     ) : (
-                        tokenProfile.tokenInstanceName ?? "Unassigned"
+                        tokenProfile.tokenInstanceName ?? 'Unassigned'
                     ),
 
                     <TokenStatusBadge status={tokenProfile.tokenInstanceStatus} />,
@@ -270,12 +272,12 @@ function TokenProfileList() {
 
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete Token ${checkedRows.length > 1 ? "Profiles" : "Profile"}`}
-                body={`You are about to delete ${checkedRows.length > 1 ? "a Token Profile" : "RA profiles"}. Is this what you want to do?`}
+                caption={`Delete Token ${checkedRows.length > 1 ? 'Profiles' : 'Profile'}`}
+                body={`You are about to delete ${checkedRows.length > 1 ? 'a Token Profile' : 'RA profiles'}. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
@@ -285,8 +287,8 @@ function TokenProfileList() {
                 body={keyUsageBody}
                 toggle={() => setKeyUsageUpdate(false)}
                 buttons={[
-                    { color: "primary", onClick: onUpdateKeyUsageConfirmed, body: "Update" },
-                    { color: "secondary", onClick: () => setKeyUsageUpdate(false), body: "Cancel" },
+                    { color: 'primary', onClick: onUpdateKeyUsageConfirmed, body: 'Update' },
+                    { color: 'secondary', onClick: () => setKeyUsageUpdate(false), body: 'Cancel' },
                 ]}
             />
         </Container>

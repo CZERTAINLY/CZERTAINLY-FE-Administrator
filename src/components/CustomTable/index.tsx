@@ -1,17 +1,17 @@
-import cx from "classnames";
-import React, { Fragment, useCallback, useEffect, useMemo, useState } from "react";
-import { Input, Pagination, PaginationItem, PaginationLink, Table } from "reactstrap";
-import { jsxInnerText } from "utils/jsxInnerText";
+import cx from 'classnames';
+import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
+import { Input, Pagination, PaginationItem, PaginationLink, Table } from 'reactstrap';
+import { jsxInnerText } from 'utils/jsxInnerText';
 
-import styles from "./CustomTable.module.scss";
+import styles from './CustomTable.module.scss';
 
 export interface TableHeader {
     id: string;
     content: string | JSX.Element;
-    align?: "left" | "center" | "right";
+    align?: 'left' | 'center' | 'right';
     sortable?: boolean;
-    sort?: "asc" | "desc";
-    sortType?: "string" | "numeric" | "date";
+    sort?: 'asc' | 'desc';
+    sortType?: 'string' | 'numeric' | 'date';
     width?: string;
 }
 
@@ -71,9 +71,9 @@ function CustomTable({
     const [pageSize, setPageSize] = useState(10);
     const [totalPages, setTotalPages] = useState(1);
 
-    const [searchKey, setSearchKey] = useState<string>("");
-    const [sortColumn, setSortColumn] = useState<string>("");
-    const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+    const [searchKey, setSearchKey] = useState<string>('');
+    const [sortColumn, setSortColumn] = useState<string>('');
+    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
     const [expandedRow, setExpandedRow] = useState<string | number>();
 
@@ -124,7 +124,7 @@ function CustomTable({
 
         if (sortCol) {
             setSortColumn(sortCol.id);
-            setSortOrder(sortCol.sort || "asc");
+            setSortOrder(sortCol.sort || 'asc');
         }
     }, [tblHeaders]);
 
@@ -132,9 +132,9 @@ function CustomTable({
         () => {
             const filtered = searchKey
                 ? [...data].filter((row) => {
-                      let rowStr = "";
+                      let rowStr = '';
                       row.columns.forEach((col) => {
-                          rowStr += typeof col === "string" ? col : jsxInnerText(col as JSX.Element);
+                          rowStr += typeof col === 'string' ? col : jsxInnerText(col as JSX.Element);
                       });
                       return rowStr.toLowerCase().includes(searchKey.toLowerCase());
                   })
@@ -150,30 +150,30 @@ function CustomTable({
             const sortColumnIndex = tblHeaders.findIndex((h) => h.sort);
 
             if (sortColumnIndex >= 0) {
-                const sortDirection = sortCol.sort || "asc";
+                const sortDirection = sortCol.sort || 'asc';
 
                 filtered.sort((a, b) => {
                     const aVal =
-                        typeof a.columns[sortColumnIndex] === "string"
+                        typeof a.columns[sortColumnIndex] === 'string'
                             ? (a.columns[sortColumnIndex] as string).toLowerCase()
                             : jsxInnerText(a.columns[sortColumnIndex] as JSX.Element).toLowerCase();
                     const bVal =
-                        typeof b.columns[sortColumnIndex] === "string"
+                        typeof b.columns[sortColumnIndex] === 'string'
                             ? (b.columns[sortColumnIndex] as string).toLowerCase()
                             : jsxInnerText(b.columns[sortColumnIndex] as JSX.Element).toLowerCase();
 
                     switch (sortCol.sortType) {
-                        case "date":
-                            const aDate = new Date(aVal.replace(/ at /g, " "));
-                            const bDate = new Date(bVal.replace(/ at /g, " "));
-                            return sortDirection === "asc" ? aDate.getTime() - bDate.getTime() : bDate.getTime() - aDate.getTime();
+                        case 'date':
+                            const aDate = new Date(aVal.replace(/ at /g, ' '));
+                            const bDate = new Date(bVal.replace(/ at /g, ' '));
+                            return sortDirection === 'asc' ? aDate.getTime() - bDate.getTime() : bDate.getTime() - aDate.getTime();
 
-                        case "numeric":
-                            return sortDirection === "asc" ? parseFloat(aVal) - parseFloat(bVal) : parseFloat(bVal) - parseFloat(aVal);
+                        case 'numeric':
+                            return sortDirection === 'asc' ? parseFloat(aVal) - parseFloat(bVal) : parseFloat(bVal) - parseFloat(aVal);
 
                         default:
                             if (aVal === bVal) return 0;
-                            return aVal > bVal ? (sortDirection === "asc" ? 1 : -1) : sortDirection === "asc" ? -1 : 1;
+                            return aVal > bVal ? (sortDirection === 'asc' ? 1 : -1) : sortDirection === 'asc' ? -1 : 1;
                     }
                 });
             }
@@ -214,9 +214,9 @@ function CustomTable({
 
             if (
                 hasDetails &&
-                target.localName !== "input" &&
-                target.localName !== "button" &&
-                (target.localName !== "i" || target.hasAttribute("data-expander"))
+                target.localName !== 'input' &&
+                target.localName !== 'button' &&
+                (target.localName !== 'i' || target.hasAttribute('data-expander'))
             ) {
                 if (expandedRow === rowId) {
                     setExpandedRow(undefined);
@@ -230,9 +230,9 @@ function CustomTable({
                 return;
             }
 
-            if (e.target instanceof HTMLInputElement && e.target.type === "checkbox") return;
+            if (e.target instanceof HTMLInputElement && e.target.type === 'checkbox') return;
 
-            const id = e.currentTarget.getAttribute("data-id");
+            const id = e.currentTarget.getAttribute('data-id');
             if (!id) return;
 
             if (!multiSelect) {
@@ -263,7 +263,7 @@ function CustomTable({
 
     const onRowCheckboxClick = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
-            const id = e.target.getAttribute("data-id");
+            const id = e.target.getAttribute('data-id');
             if (!id) return;
 
             if (!multiSelect) {
@@ -291,7 +291,7 @@ function CustomTable({
         (e: React.MouseEvent<HTMLTableCellElement>) => {
             if (!tblHeaders) return;
 
-            const sortColumn = e.currentTarget.getAttribute("data-id");
+            const sortColumn = e.currentTarget.getAttribute('data-id');
 
             const hdr = tblHeaders?.find((header) => header.id === sortColumn);
             if (!hdr) return;
@@ -299,7 +299,7 @@ function CustomTable({
             const column = tblHeaders?.findIndex((header) => header.id === sortColumn);
             if (column === undefined || column === -1) return;
 
-            const sort = hdr.sort === "asc" ? "desc" : "asc";
+            const sort = hdr.sort === 'asc' ? 'desc' : 'asc';
 
             const headers: TableHeader[] = tblHeaders.map((header) => ({
                 ...header,
@@ -332,8 +332,8 @@ function CustomTable({
     const header = useMemo(() => {
         const columns = tblHeaders ? [...tblHeaders] : [];
 
-        if (hasCheckboxes) columns.unshift({ id: "__checkbox__", content: "", sortable: false, width: "0%" });
-        if (hasDetails) columns.unshift({ id: "details", content: "", sortable: false, width: "1%" });
+        if (hasCheckboxes) columns.unshift({ id: '__checkbox__', content: '', sortable: false, width: '0%' });
+        if (hasDetails) columns.unshift({ id: 'details', content: '', sortable: false, width: '1%' });
         return columns.map((header) => (
             <Fragment key={header.id}>
                 <th
@@ -342,7 +342,7 @@ function CustomTable({
                     {...(header.sortable ? { onClick: onColumnSortClick } : {})}
                     style={{ ...(header.width ? { width: header.width } : {}), ...(header.align ? { textAlign: header.align } : {}) }}
                 >
-                    {header.id === "__checkbox__" ? (
+                    {header.id === '__checkbox__' ? (
                         hasAllCheckBox && multiSelect ? (
                             <input type="checkbox" checked={checkAllChecked} onChange={onCheckAllCheckboxClick} />
                         ) : (
@@ -352,12 +352,12 @@ function CustomTable({
                         <>
                             {header.content}
                             &nbsp;
-                            {header.sort === "asc" ? (
+                            {header.sort === 'asc' ? (
                                 <>
                                     <i className="fa fa-arrow-up" />
                                     <i className="fa fa-arrow-down" style={{ opacity: 0.25 }} />
                                 </>
-                            ) : header.sort === "desc" ? (
+                            ) : header.sort === 'desc' ? (
                                 <>
                                     <i className="fa fa-arrow-up" style={{ opacity: 0.25 }} />
                                     <i className="fa fa-arrow-down" />
@@ -519,7 +519,7 @@ function CustomTable({
             )}
 
             <div className="table-responsive">
-                <Table className={cx("table-hover", styles.logsTable)} size="sm">
+                <Table className={cx('table-hover', styles.logsTable)} size="sm">
                     {!hasHeader ? (
                         <></>
                     ) : (
@@ -552,20 +552,20 @@ function CustomTable({
 
                     {pagination}
 
-                    <div style={{ textAlign: "right" }}>
+                    <div style={{ textAlign: 'right' }}>
                         {paginationData ? (
                             <div>
-                                Showing {(paginationData.page - 1) * paginationData.pageSize + 1} to{" "}
+                                Showing {(paginationData.page - 1) * paginationData.pageSize + 1} to{' '}
                                 {(paginationData.page - 1) * paginationData.pageSize + paginationData.loadedPageSize >
                                 paginationData.totalItems
                                     ? paginationData.totalItems
-                                    : (paginationData.page - 1) * paginationData.pageSize + paginationData.loadedPageSize}{" "}
+                                    : (paginationData.page - 1) * paginationData.pageSize + paginationData.loadedPageSize}{' '}
                                 items of {paginationData.totalItems}
                             </div>
                         ) : (
                             <div>
-                                Showing {(page - 1) * pageSize + (tblData.length > 0 ? 1 : 0)} to{" "}
-                                {(page - 1) * pageSize + pageSize > tblData.length ? tblData.length : (page - 1) * pageSize + pageSize} of{" "}
+                                Showing {(page - 1) * pageSize + (tblData.length > 0 ? 1 : 0)} to{' '}
+                                {(page - 1) * pageSize + pageSize > tblData.length ? tblData.length : (page - 1) * pageSize + pageSize} of{' '}
                                 {tblData.length} entries
                             </div>
                         )}

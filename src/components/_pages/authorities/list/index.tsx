@@ -1,15 +1,15 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
-import { Badge, Container, Table } from "reactstrap";
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { Badge, Container, Table } from 'reactstrap';
 
-import { actions, selectors } from "ducks/authorities";
+import { actions, selectors } from 'ducks/authorities';
 
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
+import { LockWidgetNameEnum } from 'types/user-interface';
 
 function AuthorityList() {
     const dispatch = useDispatch();
@@ -46,7 +46,7 @@ function AuthorityList() {
     }, [bulkDeleteErrorMessages]);
 
     const onAddClick = useCallback(() => {
-        navigate("./add");
+        navigate('./add');
     }, [navigate]);
 
     const setCheckedRows = useCallback(
@@ -70,17 +70,17 @@ function AuthorityList() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "plus",
+                icon: 'plus',
                 disabled: false,
-                tooltip: "Create",
+                tooltip: 'Create',
                 onClick: () => {
                     onAddClick();
                 },
             },
             {
-                icon: "trash",
+                icon: 'trash',
                 disabled: checkedRows.length === 0,
-                tooltip: "Delete",
+                tooltip: 'Delete',
                 onClick: () => {
                     setConfirmDelete(true);
                 },
@@ -92,25 +92,25 @@ function AuthorityList() {
     const authoritiesRowHeaders: TableHeader[] = useMemo(
         () => [
             {
-                content: "Name",
+                content: 'Name',
                 sortable: true,
-                sort: "asc",
-                id: "authorityName",
-                width: "auto",
+                sort: 'asc',
+                id: 'authorityName',
+                width: 'auto',
             },
             {
-                content: "Authority Provider",
-                align: "center",
+                content: 'Authority Provider',
+                align: 'center',
                 sortable: true,
-                id: "auhtorityProvider",
-                width: "15%",
+                id: 'auhtorityProvider',
+                width: '15%',
             },
             {
-                content: "Kinds",
-                align: "center",
+                content: 'Kinds',
+                align: 'center',
                 sortable: true,
-                id: "kinds",
-                width: "15%",
+                id: 'kinds',
+                width: '15%',
             },
         ],
         [],
@@ -124,10 +124,10 @@ function AuthorityList() {
                 columns: [
                     <Link to={`./detail/${authority.uuid}`}>{authority.name}</Link>,
 
-                    authority.connectorName? (
-                        <Link to={`../connectors/detail/${authority.connectorUuid}`}>{authority.connectorName ?? "Unassigned"}</Link>
+                    authority.connectorName ? (
+                        <Link to={`../connectors/detail/${authority.connectorUuid}`}>{authority.connectorName ?? 'Unassigned'}</Link>
                     ) : (
-                        authority.connectorName ?? "Unassigned"
+                        authority.connectorName ?? 'Unassigned'
                     ),
 
                     <Badge color="primary">{authority.kind}</Badge>,
@@ -139,7 +139,7 @@ function AuthorityList() {
     const forceDeleteBody = useMemo(
         () => (
             <div>
-                <div>Failed to delete {checkedRows.length > 1 ? "Authorities" : "an Authority"}. Please find the details below:</div>
+                <div>Failed to delete {checkedRows.length > 1 ? 'Authorities' : 'an Authority'}. Please find the details below:</div>
 
                 <Table className="table-hover" size="sm">
                     <thead>
@@ -191,23 +191,23 @@ function AuthorityList() {
 
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete ${checkedRows.length > 1 ? "Authorities" : "an Authority"}`}
-                body={`You are about to delete ${checkedRows.length > 1 ? "Authorities" : "a Authority"}. Is this what you want to do?`}
+                caption={`Delete ${checkedRows.length > 1 ? 'Authorities' : 'an Authority'}`}
+                body={`You are about to delete ${checkedRows.length > 1 ? 'Authorities' : 'a Authority'}. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
             <Dialog
                 isOpen={confirmForceDelete}
-                caption={`Force Delete ${checkedRows.length > 1 ? "Authorities" : "an Authority"}`}
+                caption={`Force Delete ${checkedRows.length > 1 ? 'Authorities' : 'an Authority'}`}
                 body={forceDeleteBody}
                 toggle={() => setConfirmForceDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onForceDeleteConfirmed, body: "Force delete" },
-                    { color: "secondary", onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: "Cancel" },
+                    { color: 'danger', onClick: onForceDeleteConfirmed, body: 'Force delete' },
+                    { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
                 ]}
             />
         </Container>

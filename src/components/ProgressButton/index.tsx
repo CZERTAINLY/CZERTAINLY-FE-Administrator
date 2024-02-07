@@ -1,4 +1,4 @@
-import { Button, Spinner } from "reactstrap";
+import { Button, Spinner } from 'reactstrap';
 
 interface Props {
     disabled?: boolean;
@@ -7,7 +7,7 @@ interface Props {
     inProgressTitle?: string;
     color?: string;
     className?: string;
-    type?: "submit" | "reset" | "button";
+    type?: 'submit' | 'reset' | 'button';
     onClick?: () => void;
 }
 
@@ -16,9 +16,9 @@ function ProgressButton({
     title,
     inProgressTitle = title,
     disabled = false,
-    color = "primary",
-    className = "btn btn-primary",
-    type = "submit",
+    color = 'primary',
+    className = 'btn btn-primary',
+    type = 'submit',
     onClick,
 }: Props) {
     return (

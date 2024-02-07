@@ -1,16 +1,16 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
-import { Badge, Container } from "reactstrap";
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { Badge, Container } from 'reactstrap';
 
-import { actions, selectors } from "ducks/users";
+import { actions, selectors } from 'ducks/users';
 
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
-import StatusBadge from "components/StatusBadge";
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
+import StatusBadge from 'components/StatusBadge';
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
+import { LockWidgetNameEnum } from 'types/user-interface';
 
 export default function UsersList() {
     const dispatch = useDispatch();
@@ -88,33 +88,33 @@ export default function UsersList() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "plus",
+                icon: 'plus',
                 disabled: false,
-                tooltip: "Create",
+                tooltip: 'Create',
                 onClick: () => {
                     onAddClick();
                 },
             },
             {
-                icon: "trash",
+                icon: 'trash',
                 disabled: checkedRows.length === 0 || isSystemUserSelected,
-                tooltip: "Delete",
+                tooltip: 'Delete',
                 onClick: () => {
                     setConfirmDelete(true);
                 },
             },
             {
-                icon: "check",
+                icon: 'check',
                 disabled: isSystemUserSelected || !canEnable,
-                tooltip: "Enable",
+                tooltip: 'Enable',
                 onClick: () => {
                     onEnableClick();
                 },
             },
             {
-                icon: "times",
+                icon: 'times',
                 disabled: isSystemUserSelected || !canDisable,
-                tooltip: "Disable",
+                tooltip: 'Disable',
                 onClick: () => {
                     onDisableClick();
                 },
@@ -126,53 +126,53 @@ export default function UsersList() {
     const userTableHeader: TableHeader[] = useMemo(
         () => [
             {
-                id: "username",
-                content: "Username",
+                id: 'username',
+                content: 'Username',
                 sortable: true,
-                sort: "asc",
-                width: "10%",
+                sort: 'asc',
+                width: '10%',
             },
             {
-                id: "group",
-                content: "Group",
-                sortable: true,
-            },
-            {
-                id: "description",
-                content: "Description",
-                sortable: true,
-                width: "5%",
-            },
-            {
-                id: "firstName",
-                content: "First name",
-                sortable: true,
-                width: "5%",
-            },
-            {
-                id: "lastName",
-                content: "Last name",
-                sortable: true,
-                width: "5%",
-            },
-            {
-                id: "email",
-                content: "Email",
+                id: 'group',
+                content: 'Group',
                 sortable: true,
             },
             {
-                id: "systemUser",
-                content: "System user",
-                align: "center",
+                id: 'description',
+                content: 'Description',
                 sortable: true,
-                width: "7%",
+                width: '5%',
             },
             {
-                id: "userStatus",
-                content: "Status",
-                align: "center",
+                id: 'firstName',
+                content: 'First name',
                 sortable: true,
-                width: "7%",
+                width: '5%',
+            },
+            {
+                id: 'lastName',
+                content: 'Last name',
+                sortable: true,
+                width: '5%',
+            },
+            {
+                id: 'email',
+                content: 'Email',
+                sortable: true,
+            },
+            {
+                id: 'systemUser',
+                content: 'System user',
+                align: 'center',
+                sortable: true,
+                width: '7%',
+            },
+            {
+                id: 'userStatus',
+                content: 'Status',
+                align: 'center',
+                sortable: true,
+                width: '7%',
             },
         ],
         [],
@@ -184,23 +184,23 @@ export default function UsersList() {
                 id: user.uuid,
 
                 columns: [
-                    <span style={{ whiteSpace: "nowrap" }}>
+                    <span style={{ whiteSpace: 'nowrap' }}>
                         <Link to={`./detail/${user.uuid}`}>{user.username}</Link>
                     </span>,
 
-                    <span style={{ whiteSpace: "nowrap" }}>
+                    <span style={{ whiteSpace: 'nowrap' }}>
                         {user.groupUuid ? <Link to={`../groups/detail/${user.groupUuid}`}>{user.groupName}</Link> : user.groupName}
                     </span>,
 
-                    <span style={{ whiteSpace: "nowrap" }}>{user.description || ""}</span>,
+                    <span style={{ whiteSpace: 'nowrap' }}>{user.description || ''}</span>,
 
-                    <span style={{ whiteSpace: "nowrap" }}>{user.firstName || ""}</span>,
+                    <span style={{ whiteSpace: 'nowrap' }}>{user.firstName || ''}</span>,
 
-                    <span style={{ whiteSpace: "nowrap" }}>{user.lastName || ""}</span>,
+                    <span style={{ whiteSpace: 'nowrap' }}>{user.lastName || ''}</span>,
 
-                    <span style={{ whiteSpace: "nowrap" }}>{user.email || ""}</span>,
+                    <span style={{ whiteSpace: 'nowrap' }}>{user.email || ''}</span>,
 
-                    <Badge color={!user.systemUser ? "success" : "danger"}>{user.systemUser ? "Yes" : "No"}</Badge>,
+                    <Badge color={!user.systemUser ? 'success' : 'danger'}>{user.systemUser ? 'Yes' : 'No'}</Badge>,
 
                     <StatusBadge enabled={user.enabled} />,
                 ],
@@ -231,12 +231,12 @@ export default function UsersList() {
 
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete ${checkedRows.length > 1 ? "Users" : "an User"}`}
-                body={`You are about to delete ${checkedRows.length > 1 ? "Users" : "an User"}. Is this what you want to do?`}
+                caption={`Delete ${checkedRows.length > 1 ? 'Users' : 'an User'}`}
+                body={`You are about to delete ${checkedRows.length > 1 ? 'Users' : 'an User'}. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
         </Container>

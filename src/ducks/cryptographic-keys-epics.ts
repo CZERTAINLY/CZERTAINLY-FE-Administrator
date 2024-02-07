@@ -1,18 +1,18 @@
-import { AppEpic } from "ducks";
-import { iif, of } from "rxjs";
-import { catchError, concatMap, filter, map, mergeMap, switchMap } from "rxjs/operators";
-import { LockWidgetNameEnum } from "types/widget-locks";
-import { extractError } from "utils/net";
-import { actions as alertActions } from "./alerts";
-import { actions as appRedirectActions } from "./app-redirect";
-import { slice } from "./cryptographic-keys";
-import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
-import { transformSearchRequestModelToDto } from "./transform/certificates";
-import { actions as widgetLockActions } from "./widget-locks";
+import { AppEpic } from 'ducks';
+import { iif, of } from 'rxjs';
+import { catchError, concatMap, filter, map, mergeMap, switchMap } from 'rxjs/operators';
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { extractError } from 'utils/net';
+import { actions as alertActions } from './alerts';
+import { actions as appRedirectActions } from './app-redirect';
+import { slice } from './cryptographic-keys';
+import { transformAttributeDescriptorDtoToModel } from './transform/attributes';
+import { transformSearchRequestModelToDto } from './transform/certificates';
+import { actions as userInterfaceActions } from './user-interface';
 
-import { store } from "index";
-import { EntityType } from "./filters";
-import { actions as pagingActions } from "./paging";
+import { store } from 'index';
+import { EntityType } from './filters';
+import { actions as pagingActions } from './paging';
 import {
     transformCryptographicKeyAddRequestModelToDto,
     transformCryptographicKeyBulkCompromiseModelToDto,
@@ -23,7 +23,7 @@ import {
     transformCryptographicKeyPairResponseDtoToModel,
     transformCryptographicKeyResponseDtoToModel,
     transformKeyHistoryDtoToModel,
-} from "./transform/cryptographic-keys";
+} from './transform/cryptographic-keys';
 
 const listCryptographicKeys: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -39,14 +39,14 @@ const listCryptographicKeys: AppEpic = (action$, state$, deps) => {
                                 list.cryptographicKeys.map(transformCryptographicKeyResponseDtoToModel),
                             ),
                             pagingActions.listSuccess({ entity: EntityType.KEY, totalItems: list.totalItems }),
-                            widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfKeys),
+                            userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfKeys),
                         ),
                     ),
 
                     catchError((error) =>
                         of(
                             pagingActions.listFailure(EntityType.KEY),
-                            widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfKeys),
+                            userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfKeys),
                         ),
                     ),
                 );
@@ -67,8 +67,8 @@ const listCryptographicKeyPairs: AppEpic = (action$, state$, deps) => {
 
                 catchError((error) =>
                     of(
-                        slice.actions.listCryptographicKeyPairFailure({ error: extractError(error, "Failed to get key list") }),
-                        appRedirectActions.fetchError({ error, message: "Failed to get key list" }),
+                        slice.actions.listCryptographicKeyPairFailure({ error: extractError(error, 'Failed to get key list') }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to get key list' }),
                     ),
                 ),
             ),
@@ -88,14 +88,14 @@ const getCryptographicKeyDetail: AppEpic = (action$, state$, deps) => {
                             slice.actions.getCryptographicKeyDetailSuccess({
                                 cryptographicKey: transformCryptographicKeyDetailResponseDtoToModel(profileDto),
                             }),
-                            widgetLockActions.removeWidgetLock(LockWidgetNameEnum.keyDetails),
+                            userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.keyDetails),
                         ),
                     ),
 
                     catchError((err) =>
                         of(
-                            slice.actions.getCryptographicKeyDetailFailure({ error: extractError(err, "Failed to get Key detail") }),
-                            widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.keyDetails),
+                            slice.actions.getCryptographicKeyDetailFailure({ error: extractError(err, 'Failed to get Key detail') }),
+                            userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.keyDetails),
                         ),
                     ),
                 ),
@@ -124,9 +124,9 @@ const getAttributesDescriptors: AppEpic = (action$, state, deps) => {
                     catchError((err) =>
                         of(
                             slice.actions.listAttributeDescriptorsFailure({
-                                error: extractError(err, "Failed to get Attribute to create key"),
+                                error: extractError(err, 'Failed to get Attribute to create key'),
                             }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to get Attributes to create key" }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to get Attributes to create key' }),
                         ),
                     ),
                 ),
@@ -148,19 +148,34 @@ const createCryptographicKey: AppEpic = (action$, state$, deps) => {
                 })
                 .pipe(
                     mergeMap((obj) =>
-                        of(
-                            slice.actions.createCryptographicKeySuccess({
-                                uuid: obj.uuid,
-                                tokenInstanceUuid: action.payload.tokenInstanceUuid,
-                            }),
-                            appRedirectActions.redirect({ url: `../detail/${action.payload.tokenInstanceUuid}/${obj.uuid}` }),
+                        iif(
+                            () => !!action.payload.usesGlobalModal,
+                            of(
+                                slice.actions.createCryptographicKeySuccess({
+                                    uuid: obj.uuid,
+                                    tokenInstanceUuid: action.payload.tokenInstanceUuid,
+                                }),
+                                userInterfaceActions.hideGlobalModal(),
+                                slice.actions.listCryptographicKeyPairs({
+                                    tokenProfileUuid: action.payload.tokenProfileUuid,
+                                }),
+                                userInterfaceActions.setInitiateFormCallback(true),
+                                userInterfaceActions.setFormCallbackValue(action.payload.cryptographicKeyAddRequest.name),
+                            ),
+                            of(
+                                slice.actions.createCryptographicKeySuccess({
+                                    uuid: obj.uuid,
+                                    tokenInstanceUuid: action.payload.tokenInstanceUuid,
+                                }),
+                                appRedirectActions.redirect({ url: `../detail/${action.payload.tokenInstanceUuid}/${obj.uuid}` }),
+                            ),
                         ),
                     ),
 
                     catchError((err) =>
                         of(
-                            slice.actions.createCryptographicKeyFailure({ error: extractError(err, "Failed to create Key") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to create Key" }),
+                            slice.actions.createCryptographicKeyFailure({ error: extractError(err, 'Failed to create Key') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to create Key' }),
                         ),
                     ),
                 ),
@@ -200,7 +215,7 @@ const updateCryptographicKey: AppEpic = (action$, state$, deps) => {
                     ),
 
                     catchError((err) =>
-                        of(slice.actions.updateCryptographicKeyFailure({ error: extractError(err, "Failed to update Key") })),
+                        of(slice.actions.updateCryptographicKeyFailure({ error: extractError(err, 'Failed to update Key') })),
                     ),
                 ),
         ),
@@ -217,8 +232,8 @@ const syncCryptographicKeys: AppEpic = (action$, state$, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.syncKeysFailure({ error: extractError(err, "Failed to sync Keys") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to sync Keys" }),
+                        slice.actions.syncKeysFailure({ error: extractError(err, 'Failed to sync Keys') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to sync Keys' }),
                     ),
                 ),
             ),
@@ -256,7 +271,7 @@ const enableCryptographicKey: AppEpic = (action$, state$, deps) => {
                                     keyUuid: action.payload.uuid,
                                 }),
                             ),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to enable key" }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to enable key' }),
                         );
                     }),
                 ),
@@ -296,7 +311,7 @@ const disableCryptographicKey: AppEpic = (action$, state$, deps) => {
                                     keyUuid: action.payload.uuid,
                                 }),
                             ),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to disable key" }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to disable key' }),
                         ),
                     ),
                 ),
@@ -336,8 +351,8 @@ const deleteCryptographicKey: AppEpic = (action$, state$, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.deleteCryptographicKeyFailure({ error: extractError(err, "Failed to delete Keys") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to delete Keys" }),
+                            slice.actions.deleteCryptographicKeyFailure({ error: extractError(err, 'Failed to delete Keys') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to delete Keys' }),
                         ),
                     ),
                 ),
@@ -354,8 +369,8 @@ const bulkEnableCryptographicKeys: AppEpic = (action$, state$, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.bulkEnableCryptographicKeysFailure({ error: extractError(err, "Failed to enable Keys") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to enable Keys" }),
+                        slice.actions.bulkEnableCryptographicKeysFailure({ error: extractError(err, 'Failed to enable Keys') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to enable Keys' }),
                     ),
                 ),
             ),
@@ -373,8 +388,8 @@ const bulkDisableCryptographicKeys: AppEpic = (action$, state$, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.bulkDisableCryptographicKeysFailure({ error: extractError(err, "Failed to disable Keys") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to disable Keys" }),
+                        slice.actions.bulkDisableCryptographicKeysFailure({ error: extractError(err, 'Failed to disable Keys') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to disable Keys' }),
                     ),
                 ),
             ),
@@ -390,14 +405,14 @@ const bulkDeleteCryptographicKeys: AppEpic = (action$, state$, deps) => {
                 mergeMap(() =>
                     of(
                         slice.actions.bulkDeleteCryptographicKeysSuccess({ uuids: action.payload.uuids }),
-                        alertActions.success("Selected keys successfully deleted."),
+                        alertActions.success('Selected keys successfully deleted.'),
                     ),
                 ),
 
                 catchError((err) =>
                     of(
-                        slice.actions.bulkDeleteCryptographicKeysFailure({ error: extractError(err, "Failed to delete Keys") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to delete Keys" }),
+                        slice.actions.bulkDeleteCryptographicKeysFailure({ error: extractError(err, 'Failed to delete Keys') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to delete Keys' }),
                     ),
                 ),
             ),
@@ -418,7 +433,7 @@ const bulkEnableCryptographicKeyItems: AppEpic = (action$, state$, deps) => {
                             requestUuids: action.payload.uuids,
                             failedUuids: err.response,
                         }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to enable keys" }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to enable keys' }),
                     ),
                 ),
             ),
@@ -440,7 +455,7 @@ const bulkDisableCryptographicKeyItems: AppEpic = (action$, state$, deps) => {
                             requestUuids: action.payload.uuids,
                             failedUuids: err.response,
                         }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to disable keys" }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to disable keys' }),
                     ),
                 ),
             ),
@@ -456,14 +471,14 @@ const bulkDeleteCryptographicKeyItems: AppEpic = (action$, state$, deps) => {
                 mergeMap(() =>
                     of(
                         slice.actions.bulkDeleteCryptographicKeyItemsSuccess({ uuids: action.payload.uuids }),
-                        alertActions.success("Selected key items successfully deleted."),
+                        alertActions.success('Selected key items successfully deleted.'),
                     ),
                 ),
 
                 catchError((err) =>
                     of(
-                        slice.actions.bulkDeleteCryptographicKeyItemsFailure({ error: extractError(err, "Failed to delete Keys") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to delete Keys" }),
+                        slice.actions.bulkDeleteCryptographicKeyItemsFailure({ error: extractError(err, 'Failed to delete Keys') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to delete Keys' }),
                     ),
                 ),
             ),
@@ -493,8 +508,8 @@ const updateKeyUsage: AppEpic = (action$, state$, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.updateKeyUsageFailure({ error: extractError(err, "Failed to Update Key Usages") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to Update Key Usages" }),
+                            slice.actions.updateKeyUsageFailure({ error: extractError(err, 'Failed to Update Key Usages') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to Update Key Usages' }),
                         ),
                     ),
                 ),
@@ -511,8 +526,8 @@ const bulkUpdateKeyUsage: AppEpic = (action$, state$, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.bulkUpdateKeyUsageFailure({ error: extractError(err, "Failed to Update Key Usages") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to Update Key Usages" }),
+                        slice.actions.bulkUpdateKeyUsageFailure({ error: extractError(err, 'Failed to Update Key Usages') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to Update Key Usages' }),
                     ),
                 ),
             ),
@@ -536,7 +551,7 @@ const bulkUpdateKeyItemsUsage: AppEpic = (action$, state$, deps) => {
                             failedUuids: err.response,
                             usages: action.payload.usage.usage,
                         }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to Update Key Usages" }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to Update Key Usages' }),
                     ),
                 ),
             ),
@@ -576,7 +591,7 @@ const compromiseCryptographicKey: AppEpic = (action$, state$, deps) => {
                                     keyUuid: action.payload.uuid,
                                 }),
                             ),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to mark the key as Compromised" }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to mark the key as Compromised' }),
                         ),
                     ),
                 ),
@@ -600,9 +615,9 @@ const bulkCompromiseCryptographicKeys: AppEpic = (action$, state$, deps) => {
                     catchError((err) =>
                         of(
                             slice.actions.bulkCompromiseCryptographicKeysFailure({
-                                error: extractError(err, "Failed to mark the Keys as Compromised"),
+                                error: extractError(err, 'Failed to mark the Keys as Compromised'),
                             }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to mark the Keys as Compromised" }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to mark the Keys as Compromised' }),
                         ),
                     ),
                 ),
@@ -631,7 +646,7 @@ const bulkCompromiseCryptographicKeyItems: AppEpic = (action$, state$, deps) => 
                                 requestUuids: action.payload.request.uuids ?? [],
                                 failedUuids: err.response,
                             }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to mark the keys as Compromised" }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to mark the keys as Compromised' }),
                         ),
                     ),
                 ),
@@ -671,7 +686,7 @@ const destroyCryptographicKey: AppEpic = (action$, state$, deps) => {
                                     keyUuid: action.payload.uuid,
                                 }),
                             ),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to destroy the key" }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to destroy the key' }),
                         ),
                     ),
                 ),
@@ -688,8 +703,8 @@ const bulkDestroyCryptographicKeys: AppEpic = (action$, state$, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.bulkDestroyCryptographicKeysFailure({ error: extractError(err, "Failed to destroy the key") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to destroy the key" }),
+                        slice.actions.bulkDestroyCryptographicKeysFailure({ error: extractError(err, 'Failed to destroy the key') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to destroy the key' }),
                     ),
                 ),
             ),
@@ -710,7 +725,7 @@ const bulkDestroyCryptographicKeyItems: AppEpic = (action$, state$, deps) => {
                             requestUuids: action.payload.uuids,
                             failedUuids: err.response,
                         }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to destroy the key" }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to destroy the key' }),
                     ),
                 ),
             ),
@@ -738,8 +753,8 @@ const getKeyHistory: AppEpic = (action$, state, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.getHistoryFailure({ error: extractError(err, "Failed to get history") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to get history" }),
+                            slice.actions.getHistoryFailure({ error: extractError(err, 'Failed to get history') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to get history' }),
                         ),
                     ),
                 ),

@@ -1,18 +1,18 @@
-import Spinner from "components/Spinner";
-import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from "ducks/utilsActuator";
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Button } from "reactstrap";
-import { transformParseCertificateResponseDtoToAsn1String } from "../../../../ducks/transform/utilsCertificate";
-import { actions as utilsCertificateActions, selectors as utilsCertificateSelectors } from "../../../../ducks/utilsCertificate";
+import Spinner from 'components/Spinner';
+import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from 'ducks/utilsActuator';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Button } from 'reactstrap';
+import { transformParseCertificateResponseDtoToAsn1String } from '../../../../ducks/transform/utilsCertificate';
+import { actions as utilsCertificateActions, selectors as utilsCertificateSelectors } from '../../../../ducks/utilsCertificate';
 import {
     actions as utilsCertificateRequestActions,
     selectors as utilsCertificateRequestSelectors,
-} from "../../../../ducks/utilsCertificateRequest";
+} from '../../../../ducks/utilsCertificateRequest';
 
-import { transformParseRequestResponseDtoToCertificateResponseDetailModelToAsn1String } from "ducks/transform/utilsCertificateRequest";
-import { ParseCertificateRequestDtoParseTypeEnum, ParseRequestRequestDtoParseTypeEnum } from "../../../../types/openapi/utils";
-import Dialog from "../../../Dialog";
+import { transformParseRequestResponseDtoToCertificateResponseDetailModelToAsn1String } from 'ducks/transform/utilsCertificateRequest';
+import { ParseCertificateRequestDtoParseTypeEnum, ParseRequestRequestDtoParseTypeEnum } from '../../../../types/openapi/utils';
+import Dialog from '../../../Dialog';
 
 interface Props {
     content: string;
@@ -44,13 +44,13 @@ export default function Asn1Dialog({ content, isCSR }: Props) {
         if (parsedCertificate && !isCSR) {
             setAsn1(transformParseCertificateResponseDtoToAsn1String(parsedCertificate));
         }
-    }, [parsedCertificate]);
+    }, [parsedCertificate, isCSR]);
 
     useEffect(() => {
         if (parsedCertificateRequest && isCSR) {
             setAsn1(transformParseRequestResponseDtoToCertificateResponseDetailModelToAsn1String(parsedCertificateRequest));
         }
-    }, [parsedCertificateRequest]);
+    }, [parsedCertificateRequest, isCSR]);
 
     return (
         <>
@@ -85,11 +85,11 @@ export default function Asn1Dialog({ content, isCSR }: Props) {
             </Button>
             <Dialog
                 isOpen={!!asn1}
-                size={"lg"}
+                size={'lg'}
                 caption="ASN.1 Structure"
                 body={<pre>{asn1}</pre>}
                 toggle={() => setAsn1(undefined)}
-                buttons={[{ color: "primary", onClick: () => setAsn1(undefined), body: "Close" }]}
+                buttons={[{ color: 'primary', onClick: () => setAsn1(undefined), body: 'Close' }]}
             />
         </>
     );

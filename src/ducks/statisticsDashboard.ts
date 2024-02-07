@@ -1,6 +1,6 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { createFeatureSelector } from "utils/ducks";
-import { StatisticsDashboardModel } from "../types/statisticsDashboard";
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createFeatureSelector } from 'utils/ducks';
+import { StatisticsDashboardModel } from '../types/statisticsDashboard';
 
 export type State = {
     isFetching: boolean;
@@ -13,7 +13,7 @@ export const initialState: State = {
 };
 
 export const slice = createSlice({
-    name: "statisticsDashboard",
+    name: 'statisticsDashboard',
 
     initialState,
 

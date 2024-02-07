@@ -1,12 +1,12 @@
-import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
-import { useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Button, FormGroup, Input, Label } from "reactstrap";
-import { PlatformEnum } from "types/openapi";
-import { actions, selectors } from "../../../../ducks/globalMetadata";
-import CustomTable, { TableDataRow, TableHeader } from "../../../CustomTable";
-import Dialog from "../../../Dialog";
-import Spinner from "../../../Spinner";
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Button, FormGroup, Input, Label } from 'reactstrap';
+import { PlatformEnum } from 'types/openapi';
+import { actions, selectors } from '../../../../ducks/globalMetadata';
+import CustomTable, { TableDataRow, TableHeader } from '../../../CustomTable';
+import Dialog from '../../../Dialog';
+import Spinner from '../../../Spinner';
 
 type Props = {
     show: boolean;
@@ -45,22 +45,22 @@ export default function ConnectorMetadataDialog({ show, setShow }: Props) {
     const connectorMetadataTableHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "name",
-                content: "Name",
+                id: 'name',
+                content: 'Name',
                 sortable: true,
-                sort: "asc",
-                width: "20%",
+                sort: 'asc',
+                width: '20%',
             },
             {
-                id: "contentType",
-                content: "Content Type",
+                id: 'contentType',
+                content: 'Content Type',
                 sortable: true,
-                width: "20%",
+                width: '20%',
             },
             {
-                id: "promote",
-                content: "Promote",
-                width: "20%",
+                id: 'promote',
+                content: 'Promote',
+                width: '20%',
             },
         ],
         [],
@@ -75,10 +75,10 @@ export default function ConnectorMetadataDialog({ show, setShow }: Props) {
                     getEnumLabel(attributeContentTypeEnum, metadata.contentType),
                     <Button
                         key={metadata.uuid}
-                        color={"primary"}
+                        color={'primary'}
                         onClick={() => dispatch(actions.promoteConnectorMetadata({ uuid: metadata.uuid, connectorUuid: connectorUuid }))}
                     >
-                        <i className={"fa fa-arrow-circle-up"} />
+                        <i className={'fa fa-arrow-circle-up'} />
                         &nbsp;Promote
                     </Button>,
                 ],
@@ -120,7 +120,7 @@ export default function ConnectorMetadataDialog({ show, setShow }: Props) {
                 </>
             }
             toggle={() => setShow(false)}
-            buttons={[{ color: "secondary", onClick: () => setShow(false), body: "Cancel" }]}
+            buttons={[{ color: 'secondary', onClick: () => setShow(false), body: 'Cancel' }]}
         />
     );
 }

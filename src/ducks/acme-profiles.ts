@@ -1,12 +1,12 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
     AcmeProfileAddRequestModel,
     AcmeProfileEditRequestModel,
     AcmeProfileListResponseModel,
     AcmeProfileResponseModel,
-} from "types/acme-profiles";
-import { BulkActionModel } from "types/connectors";
-import { createFeatureSelector } from "utils/ducks";
+} from 'types/acme-profiles';
+import { BulkActionModel } from 'types/connectors';
+import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     checkedRows: string[];
@@ -35,7 +35,7 @@ export const initialState: State = {
 
     acmeProfiles: [],
 
-    deleteErrorMessage: "",
+    deleteErrorMessage: '',
     bulkDeleteErrorMessages: [],
 
     isFetchingList: false,
@@ -52,7 +52,7 @@ export const initialState: State = {
 };
 
 export const slice = createSlice({
-    name: "acmeProfiles",
+    name: 'acmeProfiles',
 
     initialState,
 
@@ -70,7 +70,7 @@ export const slice = createSlice({
         },
 
         clearDeleteErrorMessages: (state, action: PayloadAction<void>) => {
-            state.deleteErrorMessage = "";
+            state.deleteErrorMessage = '';
             state.bulkDeleteErrorMessages = [];
         },
 
@@ -151,7 +151,7 @@ export const slice = createSlice({
 
         deleteAcmeProfile: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isDeleting = true;
-            state.deleteErrorMessage = "";
+            state.deleteErrorMessage = '';
         },
 
         deleteAcmeProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
@@ -166,7 +166,7 @@ export const slice = createSlice({
 
         deleteAcmeProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isDeleting = false;
-            state.deleteErrorMessage = action.payload.error || "Unknown error";
+            state.deleteErrorMessage = action.payload.error || 'Unknown error';
         },
 
         enableAcmeProfile: (state, action: PayloadAction<{ uuid: string }>) => {

@@ -1,16 +1,16 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
-import { Badge, Container, Table } from "reactstrap";
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { Badge, Container, Table } from 'reactstrap';
 
-import { actions, selectors } from "ducks/compliance-profiles";
+import { actions, selectors } from 'ducks/compliance-profiles';
 
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
-import { ComplianceProfileListRuleModel } from "types/complianceProfiles";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
+import { ComplianceProfileListRuleModel } from 'types/complianceProfiles';
+import { LockWidgetNameEnum } from 'types/user-interface';
 
 export default function AdministratorsList() {
     const dispatch = useDispatch();
@@ -75,25 +75,25 @@ export default function AdministratorsList() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "plus",
+                icon: 'plus',
                 disabled: false,
-                tooltip: "Create",
+                tooltip: 'Create',
                 onClick: () => {
                     onAddClick();
                 },
             },
             {
-                icon: "gavel",
+                icon: 'gavel',
                 disabled: checkedRows.length === 0,
-                tooltip: "Check Compliance",
+                tooltip: 'Check Compliance',
                 onClick: () => {
                     setComplianceCheck(true);
                 },
             },
             {
-                icon: "trash",
+                icon: 'trash',
                 disabled: checkedRows.length === 0,
-                tooltip: "Delete",
+                tooltip: 'Delete',
                 onClick: () => {
                     setConfirmDelete(true);
                 },
@@ -103,7 +103,7 @@ export default function AdministratorsList() {
     );
 
     const getComplianceItems = useCallback((complianceItems: ComplianceProfileListRuleModel[], lookingFor: string) => {
-        if (lookingFor === "groups") {
+        if (lookingFor === 'groups') {
             let sum = complianceItems.map((item) => item.numberOfGroups || 0).reduce((a, b) => a + b, 0);
 
             return (
@@ -130,7 +130,7 @@ export default function AdministratorsList() {
         () => (
             <div>
                 <div>
-                    Failed to delete {checkedRows.length > 1 ? "Compliance Profiles" : "an Compliance Profile"}. Please find the details
+                    Failed to delete {checkedRows.length > 1 ? 'Compliance Profiles' : 'an Compliance Profile'}. Please find the details
                     below:
                 </div>
 
@@ -163,22 +163,22 @@ export default function AdministratorsList() {
     const complianceProfilesTableHeader: TableHeader[] = useMemo(
         () => [
             {
-                id: "name",
-                content: "Name",
+                id: 'name',
+                content: 'Name',
                 sortable: true,
-                sort: "asc",
+                sort: 'asc',
             },
             {
-                id: "description",
-                content: "Description",
+                id: 'description',
+                content: 'Description',
             },
             {
-                id: "totalRules",
-                content: "Total Rules",
+                id: 'totalRules',
+                content: 'Total Rules',
             },
             {
-                id: "totalGroups",
-                content: "Total Groups",
+                id: 'totalGroups',
+                content: 'Total Groups',
             },
         ],
         [],
@@ -192,11 +192,11 @@ export default function AdministratorsList() {
                 columns: [
                     <Link to={`./detail/${complianceProfile.uuid}`}>{complianceProfile.name}</Link>,
 
-                    complianceProfile.description || "",
+                    complianceProfile.description || '',
 
-                    <>{getComplianceItems(complianceProfile.rules, "rules")}</>,
+                    <>{getComplianceItems(complianceProfile.rules, 'rules')}</>,
 
-                    <>{getComplianceItems(complianceProfile.rules, "groups")}</>,
+                    <>{getComplianceItems(complianceProfile.rules, 'groups')}</>,
                 ],
             })),
         [complianceProfiles, getComplianceItems],
@@ -225,37 +225,37 @@ export default function AdministratorsList() {
 
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete ${checkedRows.length > 1 ? "Compliance Profiles" : "a Compliance Profile"}`}
+                caption={`Delete ${checkedRows.length > 1 ? 'Compliance Profiles' : 'a Compliance Profile'}`}
                 body={`You are about to delete ${
-                    checkedRows.length > 1 ? "Compliance Profiles" : "a Compliance Profile"
+                    checkedRows.length > 1 ? 'Compliance Profiles' : 'a Compliance Profile'
                 } which may have associated RA
                    Profiles(s). Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
             <Dialog
                 isOpen={confirmForceDelete}
-                caption={`Force Delete ${checkedRows.length > 1 ? "Compliance Profiles" : "a Compliance Profile"}`}
+                caption={`Force Delete ${checkedRows.length > 1 ? 'Compliance Profiles' : 'a Compliance Profile'}`}
                 body={forceDeleteBody}
                 toggle={() => setConfirmForceDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onForceDeleteConfirmed, body: "Force delete" },
-                    { color: "secondary", onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: "Cancel" },
+                    { color: 'danger', onClick: onForceDeleteConfirmed, body: 'Force delete' },
+                    { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
                 ]}
             />
 
             <Dialog
                 isOpen={complianceCheck}
                 caption={`Initiate Compliance Check`}
-                body={"Initiate the compliance check for the selected Compliance Profile(s)?"}
+                body={'Initiate the compliance check for the selected Compliance Profile(s)?'}
                 toggle={() => setComplianceCheck(false)}
                 buttons={[
-                    { color: "primary", onClick: onComplianceCheckConfirmed, body: "Yes" },
-                    { color: "secondary", onClick: () => setComplianceCheck(false), body: "Cancel" },
+                    { color: 'primary', onClick: onComplianceCheckConfirmed, body: 'Yes' },
+                    { color: 'secondary', onClick: () => setComplianceCheck(false), body: 'Cancel' },
                 ]}
             />
         </Container>

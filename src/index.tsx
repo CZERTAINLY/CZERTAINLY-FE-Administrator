@@ -1,19 +1,20 @@
-import React from "react";
-import { createRoot } from "react-dom/client";
-import { Provider } from "react-redux";
-import AppRouter from "./components/AppRouter";
-import reportWebVitals from "./reportWebVitals";
-import configureStore from "./store";
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import { Provider } from 'react-redux';
+import 'reactflow/dist/style.css';
+import AppRouter from './components/AppRouter';
+import reportWebVitals from './reportWebVitals';
+import configureStore from './store';
 
-import "./resources/styles/theme.scss";
+import './resources/styles/theme.scss';
 
-const container = document.getElementById("root")!;
+const container = document.getElementById('root')!;
 const root = createRoot(container);
 
 export const store = configureStore();
 
 root.render(
-    process.env.NODE_ENV === "development" ? (
+    process.env.NODE_ENV === 'development' ? (
         <Provider store={store}>
             <AppRouter />
         </Provider>

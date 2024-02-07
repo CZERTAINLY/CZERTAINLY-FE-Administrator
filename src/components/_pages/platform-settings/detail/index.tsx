@@ -1,16 +1,16 @@
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import TabLayout from "components/Layout/TabLayout";
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import TabLayout from 'components/Layout/TabLayout';
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
 
-import { actions, selectors } from "ducks/settings";
-import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from "ducks/utilsActuator";
-import { useCallback, useEffect, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { actions, selectors } from 'ducks/settings';
+import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from 'ducks/utilsActuator';
+import { useCallback, useEffect, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
-import { Container } from "reactstrap";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { Container } from 'reactstrap';
+import { LockWidgetNameEnum } from 'types/user-interface';
 
 export default function PlatformSettingsDetail() {
     const dispatch = useDispatch();
@@ -45,9 +45,9 @@ export default function PlatformSettingsDetail() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "pencil",
+                icon: 'pencil',
                 disabled: false,
-                tooltip: "Edit",
+                tooltip: 'Edit',
                 onClick: () => {
                     onEditClick();
                 },
@@ -59,12 +59,12 @@ export default function PlatformSettingsDetail() {
     const headers: TableHeader[] = useMemo(
         () => [
             {
-                id: "setting",
-                content: "Setting",
+                id: 'setting',
+                content: 'Setting',
             },
             {
-                id: "value",
-                content: "Value",
+                id: 'value',
+                content: 'Value',
             },
         ],
         [],
@@ -76,19 +76,19 @@ export default function PlatformSettingsDetail() {
                 ? []
                 : [
                       {
-                          id: "utilsUrl",
+                          id: 'utilsUrl',
                           columns: [
-                              "Utils Service URL",
+                              'Utils Service URL',
                               (
                                   <>
                                       {platformSettings.utils.utilsServiceUrl}&nbsp;
                                       {health ? (
-                                          <i className="fa fa-check-circle" style={{ color: "green" }} aria-hidden="true" />
+                                          <i className="fa fa-check-circle" style={{ color: 'green' }} aria-hidden="true" />
                                       ) : (
-                                          <i className="fa fa-exclamation-circle" style={{ color: "red" }} aria-hidden="true" />
+                                          <i className="fa fa-exclamation-circle" style={{ color: 'red' }} aria-hidden="true" />
                                       )}
                                   </>
-                              ) ?? "n/a",
+                              ) ?? 'n/a',
                           ],
                       },
                   ],
@@ -108,9 +108,9 @@ export default function PlatformSettingsDetail() {
                 <TabLayout
                     tabs={[
                         {
-                            title: "Utils",
+                            title: 'Utils',
                             content: (
-                                <div style={{ paddingTop: "1.5em", paddingBottom: "1.5em" }}>
+                                <div style={{ paddingTop: '1.5em', paddingBottom: '1.5em' }}>
                                     <CustomTable headers={headers} data={data} />
                                 </div>
                             ),

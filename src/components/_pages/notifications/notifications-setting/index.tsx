@@ -1,17 +1,17 @@
-import TabLayout from "components/Layout/TabLayout";
-import ProgressButton from "components/ProgressButton";
-import Widget from "components/Widget";
-import { selectors as enumSelectors } from "ducks/enums";
-import { actions as notificationActions, selectors as notificationsSelectors } from "ducks/notifications";
-import { actions as settingsActions, selectors as settingsSelectors } from "ducks/settings";
-import { useCallback, useEffect, useMemo } from "react";
-import { Field, Form } from "react-final-form";
-import { useDispatch, useSelector } from "react-redux";
-import Select from "react-select";
-import { Form as BootstrapForm, ButtonGroup, Col, Container, FormGroup, Label, Row } from "reactstrap";
-import { PlatformEnum } from "types/openapi";
-import { removeNullValues } from "utils/common-utils";
-import NotificationInstanceList from "../notifications-instances";
+import TabLayout from 'components/Layout/TabLayout';
+import ProgressButton from 'components/ProgressButton';
+import Widget from 'components/Widget';
+import { selectors as enumSelectors } from 'ducks/enums';
+import { actions as notificationActions, selectors as notificationsSelectors } from 'ducks/notifications';
+import { actions as settingsActions, selectors as settingsSelectors } from 'ducks/settings';
+import { useCallback, useEffect, useMemo } from 'react';
+import { Field, Form } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
+import Select from 'react-select';
+import { Form as BootstrapForm, ButtonGroup, Col, Container, FormGroup, Label, Row } from 'reactstrap';
+import { PlatformEnum } from 'types/openapi';
+import { isObjectSame, removeNullValues } from 'utils/common-utils';
+import NotificationInstanceList from '../notifications-instances';
 
 type FormValues = {
     notificationsMapping: {
@@ -41,7 +41,7 @@ const NotificationsSetting = () => {
 
     useEffect(() => {
         dispatch(notificationActions.listNotificationInstances());
-    }, []);
+    }, [dispatch]);
 
     const isBusy = useMemo(
         () => isFetchingInstances || isUpdatingNotificationsSetting || isFetchingNotificationsSetting,
@@ -69,11 +69,14 @@ const NotificationsSetting = () => {
         if (!notificationsSettings) return {};
         const notificationsMapping = Object.entries(notificationsSettings.notificationsMapping)
             .filter(([key, value]) => notificationsOptions.find((option) => option.value === value)?.label !== undefined)
-            .reduce((acc, [key, value]) => {
-                const option = notificationsOptions.find((option) => option.value === value);
-                acc[key] = { value, label: option?.label ?? "" };
-                return acc;
-            }, {} as { [key: string]: { value: string; label: string } });
+            .reduce(
+                (acc, [key, value]) => {
+                    const option = notificationsOptions.find((option) => option.value === value);
+                    acc[key] = { value, label: option?.label ?? '' };
+                    return acc;
+                },
+                {} as { [key: string]: { value: string; label: string } },
+            );
 
         return { notificationsMapping };
     }, [notificationsSettings, notificationsOptions]);
@@ -84,15 +87,21 @@ const NotificationsSetting = () => {
 
             const filteredValues = Object.entries(values.notificationsMapping)
                 .filter(([key, value]) => value?.value != null)
-                .reduce((acc, [key, value]) => {
-                    acc[key] = value.value;
-                    return acc;
-                }, {} as { [key: string]: string });
+                .reduce(
+                    (acc, [key, value]) => {
+                        acc[key] = value.value;
+                        return acc;
+                    },
+                    {} as { [key: string]: string },
+                );
 
-            const submitValues = Object.entries(filteredValues).reduce((acc, [key, value]) => {
-                acc[key] = value.toString();
-                return acc;
-            }, {} as { [key: string]: string });
+            const submitValues = Object.entries(filteredValues).reduce(
+                (acc, [key, value]) => {
+                    acc[key] = value.toString();
+                    return acc;
+                },
+                {} as { [key: string]: string },
+            );
 
             dispatch(settingsActions.updateNotificationsSettings({ notificationsMapping: submitValues }));
         },
@@ -102,8 +111,8 @@ const NotificationsSetting = () => {
     const areDefaultValuesSame = useCallback(
         (values: FormValues) => {
             const nonNullValues = removeNullValues(values);
-            const isObjectSame = JSON.stringify(nonNullValues) === JSON.stringify(initialValues);
-            return isObjectSame;
+            const areValuesSame = isObjectSame(nonNullValues, initialValues);
+            return areValuesSame;
         },
         [initialValues],
     );
@@ -113,11 +122,11 @@ const NotificationsSetting = () => {
             <TabLayout
                 tabs={[
                     {
-                        title: "Notification Instances",
+                        title: 'Notification Instances',
                         content: <NotificationInstanceList />,
                     },
                     {
-                        title: "Configuration",
+                        title: 'Configuration',
                         content: (
                             <Widget
                                 refreshAction={getFreshNotificationSettings}
@@ -160,8 +169,8 @@ const NotificationsSetting = () => {
                                                 <div className="d-flex justify-content-end">
                                                     <ButtonGroup>
                                                         <ProgressButton
-                                                            title={"Apply"}
-                                                            inProgressTitle={"Applying.."}
+                                                            title={'Apply'}
+                                                            inProgressTitle={'Applying..'}
                                                             disabled={
                                                                 submitting || isUpdatingNotificationsSetting || areDefaultValuesSame(values)
                                                             }

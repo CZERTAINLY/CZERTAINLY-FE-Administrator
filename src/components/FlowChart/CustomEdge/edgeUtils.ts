@@ -1,5 +1,5 @@
-import { Position } from "reactflow";
-import { CustomNode, nodeHeight, nodeWidth } from "..";
+import { Position } from 'reactflow';
+import { CustomNode, nodeHeight, nodeWidth } from '..';
 
 function getNodeIntersection(intersectionNode: CustomNode, targetNode: CustomNode) {
     const { positionAbsolute: intersectionNodePosition } = intersectionNode;

@@ -1,6 +1,6 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AuditLogFilterModel, AuditLogItemModel } from "types/auditLogs";
-import { createFeatureSelector } from "utils/ducks";
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { AuditLogFilterModel, AuditLogItemModel } from 'types/auditLogs';
+import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     pageNumber: number;
@@ -47,7 +47,7 @@ export const initialState: State = {
 };
 
 export const slice = createSlice({
-    name: "auditlog",
+    name: 'auditlog',
 
     initialState,
 

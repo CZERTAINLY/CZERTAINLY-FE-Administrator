@@ -1,18 +1,18 @@
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 
-import Dialog from "components/Dialog";
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
+import Dialog from 'components/Dialog';
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
 
-import { actions, selectors } from "ducks/globalMetadata";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { actions, selectors } from 'ducks/globalMetadata';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
 
-import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
-import { Badge, Container } from "reactstrap";
-import { PlatformEnum } from "types/openapi";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { Badge, Container } from 'reactstrap';
+import { PlatformEnum } from 'types/openapi';
+import { LockWidgetNameEnum } from 'types/user-interface';
 
 export default function GlobalMetadataDetail() {
     const dispatch = useDispatch();
@@ -39,7 +39,7 @@ export default function GlobalMetadataDetail() {
     }, [dispatch, globalMetadata, id]);
 
     const onEditClick = useCallback(() => {
-        navigate(`../../edit/${globalMetadata?.uuid}`, { relative: "path" });
+        navigate(`../../edit/${globalMetadata?.uuid}`, { relative: 'path' });
     }, [globalMetadata, navigate]);
 
     const onDeleteConfirmed = useCallback(() => {
@@ -51,17 +51,17 @@ export default function GlobalMetadataDetail() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "pencil",
+                icon: 'pencil',
                 disabled: false,
-                tooltip: "Edit",
+                tooltip: 'Edit',
                 onClick: () => {
                     onEditClick();
                 },
             },
             {
-                icon: "trash",
+                icon: 'trash',
                 disabled: false,
-                tooltip: "Delete",
+                tooltip: 'Delete',
                 onClick: () => {
                     setConfirmDelete(true);
                 },
@@ -73,12 +73,12 @@ export default function GlobalMetadataDetail() {
     const detailHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "property",
-                content: "Property",
+                id: 'property',
+                content: 'Property',
             },
             {
-                id: "value",
-                content: "Value",
+                id: 'value',
+                content: 'Value',
             },
         ],
         [],
@@ -90,33 +90,33 @@ export default function GlobalMetadataDetail() {
                 ? []
                 : [
                       {
-                          id: "uuid",
-                          columns: ["UUID", globalMetadata.uuid],
+                          id: 'uuid',
+                          columns: ['UUID', globalMetadata.uuid],
                       },
                       {
-                          id: "name",
-                          columns: ["Name", globalMetadata.name],
+                          id: 'name',
+                          columns: ['Name', globalMetadata.name],
                       },
                       {
-                          id: "label",
-                          columns: ["Label", globalMetadata.label],
+                          id: 'label',
+                          columns: ['Label', globalMetadata.label],
                       },
                       {
-                          id: "description",
-                          columns: ["Description", globalMetadata.description],
+                          id: 'description',
+                          columns: ['Description', globalMetadata.description],
                       },
                       {
-                          id: "contentType",
-                          columns: ["Content Type", getEnumLabel(attributeContentTypeEnum, globalMetadata.contentType)],
+                          id: 'contentType',
+                          columns: ['Content Type', getEnumLabel(attributeContentTypeEnum, globalMetadata.contentType)],
                       },
                       {
-                          id: "group",
-                          columns: ["Group", globalMetadata.group ?? ""],
+                          id: 'group',
+                          columns: ['Group', globalMetadata.group ?? ''],
                       },
                       {
-                          id: "visible",
+                          id: 'visible',
                           columns: [
-                              "Visible",
+                              'Visible',
                               globalMetadata.visible ? <Badge color="success">Yes</Badge> : <Badge color="danger">No</Badge>,
                           ],
                       },
@@ -143,8 +143,8 @@ export default function GlobalMetadataDetail() {
                 body="You are about to delete a Global Metadata. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
         </Container>

@@ -11,7 +11,7 @@
  * Do not edit the class manually.
  */
 
-import type { DiscoveryDto, SchedulerJobInfoDto } from "./";
+import type { DiscoveryDto, SchedulerJobInfoDto } from './';
 
 /**
  * @export

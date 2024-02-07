@@ -1,26 +1,26 @@
-import { AppEpic } from "ducks";
-import { iif, of } from "rxjs";
-import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
-import { extractError } from "utils/net";
-import { FunctionGroupCode, UuidDto } from "../types/openapi";
-import { actions as alertActions } from "./alerts";
-import { actions as appRedirectActions } from "./app-redirect";
-import { actions as widgetLockActions } from "./widget-locks";
+import { AppEpic } from 'ducks';
+import { iif, of } from 'rxjs';
+import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
+import { extractError } from 'utils/net';
+import { FunctionGroupCode, UuidDto } from '../types/openapi';
+import { actions as alertActions } from './alerts';
+import { actions as appRedirectActions } from './app-redirect';
+import { actions as userInterfaceActions } from './user-interface';
 
-import { store } from "index";
-import { LockWidgetNameEnum } from "types/widget-locks";
-import { slice } from "./discoveries";
-import { EntityType } from "./filters";
-import { actions as pagingActions } from "./paging";
-import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
-import { transformSearchRequestModelToDto } from "./transform/certificates";
-import { transformConnectorResponseDtoToModel } from "./transform/connectors";
+import { store } from 'index';
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { slice } from './discoveries';
+import { EntityType } from './filters';
+import { actions as pagingActions } from './paging';
+import { transformAttributeDescriptorDtoToModel } from './transform/attributes';
+import { transformSearchRequestModelToDto } from './transform/certificates';
+import { transformConnectorResponseDtoToModel } from './transform/connectors';
 import {
     transformDiscoveryCertificateListDtoToModel,
     transformDiscoveryRequestModelToDto,
     transformDiscoveryResponseDetailDtoToModel,
     transformDiscoveryResponseDtoToModel,
-} from "./transform/discoveries";
+} from './transform/discoveries';
 
 const listDiscoveries: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -32,14 +32,14 @@ const listDiscoveries: AppEpic = (action$, state$, deps) => {
                     of(
                         slice.actions.listDiscoveriesSuccess(discoveryResponse.discoveries.map(transformDiscoveryResponseDtoToModel)),
                         pagingActions.listSuccess({ entity: EntityType.DISCOVERY, totalItems: discoveryResponse.totalItems }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.DiscoveriesStore),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.DiscoveriesStore),
                     ),
                 ),
 
                 catchError((err) =>
                     of(
                         pagingActions.listFailure(EntityType.DISCOVERY),
-                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.DiscoveriesStore),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.DiscoveriesStore),
                     ),
                 ),
             );
@@ -56,13 +56,13 @@ const getDiscoveryDetail: AppEpic = (action$, state$, deps) => {
                 switchMap((discoveryDto) =>
                     of(
                         slice.actions.getDiscoveryDetailSuccess({ discovery: transformDiscoveryResponseDetailDtoToModel(discoveryDto) }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.DiscoveryDetails),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.DiscoveryDetails),
                     ),
                 ),
                 catchError((err) =>
                     of(
-                        slice.actions.getDiscoveryDetailFailure({ error: extractError(err, "Failed to get Discovery detail") }),
-                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.DiscoveryDetails),
+                        slice.actions.getDiscoveryDetailFailure({ error: extractError(err, 'Failed to get Discovery detail') }),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.DiscoveryDetails),
                     ),
                 ),
             ),
@@ -83,8 +83,8 @@ const listDiscoveryProviders: AppEpic = (action$, state, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.listDiscoveryProvidersFailure({ error: extractError(err, "Failed to get Discovery Provider list") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get Discovery Provider list" }),
+                        slice.actions.listDiscoveryProvidersFailure({ error: extractError(err, 'Failed to get Discovery Provider list') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to get Discovery Provider list' }),
                     ),
                 ),
             ),
@@ -112,9 +112,9 @@ const getDiscoveryProviderAttributesDescriptors: AppEpic = (action$, state, deps
                     catchError((err) =>
                         of(
                             slice.actions.getDiscoveryProviderAttributeDescriptorsFailure({
-                                error: extractError(err, "Failed to get Discovery Provider Attribute list"),
+                                error: extractError(err, 'Failed to get Discovery Provider Attribute list'),
                             }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to get Discovery Provider Attribute list" }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to get Discovery Provider Attribute list' }),
                         ),
                     ),
                 ),
@@ -133,9 +133,9 @@ const getDiscoveryCertificates: AppEpic = (action$, state, deps) => {
                 catchError((err) =>
                     of(
                         slice.actions.getDiscoveryCertificatesFailure({
-                            error: extractError(err, "Failed to get Discovery Certificates list"),
+                            error: extractError(err, 'Failed to get Discovery Certificates list'),
                         }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get Discovery Certificates list" }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to get Discovery Certificates list' }),
                     ),
                 ),
             ),
@@ -147,7 +147,7 @@ const createDiscovery: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.createDiscovery.match),
         switchMap((action) => {
-            const url = action.payload.scheduled ? "../../jobs/detail/" : "../detail/";
+            const url = action.payload.scheduled ? '../../jobs/detail/' : '../detail/';
             return iif(
                 () => action.payload.scheduled,
                 deps.apiClients.discoveries.scheduleDiscovery({
@@ -166,8 +166,8 @@ const createDiscovery: AppEpic = (action$, state$, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.createDiscoveryFailure({ error: extractError(err, "Failed to create discovery") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to create discovery" }),
+                        slice.actions.createDiscoveryFailure({ error: extractError(err, 'Failed to create discovery') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to create discovery' }),
                     ),
                 ),
             );
@@ -181,13 +181,13 @@ const deleteDiscovery: AppEpic = (action$, state$, deps) => {
         switchMap((action) =>
             deps.apiClients.discoveries.deleteDiscovery({ uuid: action.payload.uuid }).pipe(
                 mergeMap(() =>
-                    of(slice.actions.deleteDiscoverySuccess({ uuid: action.payload.uuid }), appRedirectActions.redirect({ url: "../../" })),
+                    of(slice.actions.deleteDiscoverySuccess({ uuid: action.payload.uuid }), appRedirectActions.redirect({ url: '../../' })),
                 ),
 
                 catchError((err) =>
                     of(
-                        slice.actions.deleteDiscoveryFailure({ error: extractError(err, "Failed to delete discovery") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to delete discovery" }),
+                        slice.actions.deleteDiscoveryFailure({ error: extractError(err, 'Failed to delete discovery') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to delete discovery' }),
                     ),
                 ),
             ),
@@ -203,14 +203,14 @@ const bulkDeleteDiscovery: AppEpic = (action$, state$, deps) => {
                 mergeMap(() =>
                     of(
                         slice.actions.bulkDeleteDiscoverySuccess({ uuids: action.payload.uuids }),
-                        alertActions.success("Selected discoveries successfully deleted."),
+                        alertActions.success('Selected discoveries successfully deleted.'),
                     ),
                 ),
 
                 catchError((err) =>
                     of(
-                        slice.actions.bulkDeleteDiscoveryFailure({ error: extractError(err, "Failed to bulk delete Discoveries") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to bulk delete Discoveries" }),
+                        slice.actions.bulkDeleteDiscoveryFailure({ error: extractError(err, 'Failed to bulk delete Discoveries') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to bulk delete Discoveries' }),
                     ),
                 ),
             ),

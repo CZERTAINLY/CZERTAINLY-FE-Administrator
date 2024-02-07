@@ -1,5 +1,5 @@
-import { Field } from "react-final-form";
-import { FormGroup, Input, Label } from "reactstrap";
+import { Field } from 'react-final-form';
+import { FormGroup, Input, Label } from 'reactstrap';
 
 type viewOnly = {
     checked: boolean;
@@ -15,7 +15,7 @@ type Props = {
 
 export default function SwitchField({ id, label, onChange = undefined, disabled = false, viewOnly }: Props) {
     return !viewOnly ? (
-        <Field name={id} type={"checkbox"}>
+        <Field name={id} type={'checkbox'}>
             {({ input }) => (
                 <FormGroup switch>
                     <Input

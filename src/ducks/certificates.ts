@@ -1,10 +1,9 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AttributeDescriptorModel } from "types/attributes";
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { AttributeDescriptorModel } from 'types/attributes';
 import {
     CertificateBulkDeleteRequestModel,
     CertificateBulkDeleteResponseModel,
     CertificateBulkObjectModel,
-    CertificateChainDownloadResponseModel,
     CertificateChainResponseModel,
     CertificateComplianceCheckModel,
     CertificateContentResponseModel,
@@ -17,16 +16,18 @@ import {
     CertificateRevokeRequestModel,
     CertificateSignRequestModel,
     CertificateUploadModel,
+    DownloadCertificateChainResponseModel,
+    DownloadCertificateResponseModel,
     SearchRequestModel,
     ValidationCertificateResultModel,
-} from "types/certificate";
-import { CertificateGroupResponseModel } from "types/certificateGroups";
-import { LocationResponseModel } from "types/locations";
-import { ApprovalDto, DownloadCertificateChainRequest, ListCertificateApprovalsRequest } from "types/openapi";
-import { RaProfileResponseModel } from "types/ra-profiles";
-import { UserResponseModel } from "types/users";
-import { downloadFileZip } from "utils/download";
-import { createFeatureSelector } from "utils/ducks";
+} from 'types/certificate';
+import { CertificateGroupResponseModel } from 'types/certificateGroups';
+import { LocationResponseModel } from 'types/locations';
+import { ApprovalDto, DownloadCertificateChainRequest, DownloadCertificateRequest, ListCertificateApprovalsRequest } from 'types/openapi';
+import { RaProfileResponseModel } from 'types/ra-profiles';
+import { UserResponseModel } from 'types/users';
+import { downloadFileZip } from 'utils/download';
+import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     deleteErrorMessage: string;
@@ -41,7 +42,8 @@ export type State = {
     validationResult?: ValidationCertificateResultModel;
     approvals?: ApprovalDto[];
     certificateChain?: CertificateChainResponseModel;
-    certificateChainDownloadContent?: CertificateChainDownloadResponseModel;
+    certificateChainDownloadContent?: DownloadCertificateChainResponseModel;
+    certificateDownloadContent?: DownloadCertificateResponseModel;
 
     isFetchingValidationResult: boolean;
 
@@ -50,6 +52,7 @@ export type State = {
     isFetchingLocations: boolean;
     isFetchingApprovals: boolean;
     isFetchingCertificateChain: boolean;
+    isFetchingCertificateDownloadContent: boolean;
     isFetchingCertificateChainDownloadContent: boolean;
 
     isIssuing: boolean;
@@ -63,6 +66,7 @@ export type State = {
     isUpdatingGroup: boolean;
     isUpdatingRaProfile: boolean;
     isUpdatingOwner: boolean;
+    isUpdatingTrustedStatus: boolean;
 
     isBulkUpdatingGroup: boolean;
     isBulkUpdatingRaProfile: boolean;
@@ -83,7 +87,7 @@ export type State = {
 };
 
 export const initialState: State = {
-    deleteErrorMessage: "",
+    deleteErrorMessage: '',
 
     certificates: [],
 
@@ -98,6 +102,7 @@ export const initialState: State = {
     isFetchingHistory: false,
     isFetchingLocations: false,
     isFetchingCertificateChain: false,
+    isFetchingCertificateDownloadContent: false,
     isFetchingCertificateChainDownloadContent: false,
 
     isIssuing: false,
@@ -111,6 +116,7 @@ export const initialState: State = {
     isUpdatingGroup: false,
     isUpdatingRaProfile: false,
     isUpdatingOwner: false,
+    isUpdatingTrustedStatus: false,
 
     isBulkUpdatingGroup: false,
     isBulkUpdatingRaProfile: false,
@@ -131,7 +137,7 @@ export const initialState: State = {
 };
 
 export const slice = createSlice({
-    name: "certificates",
+    name: 'certificates',
 
     initialState,
 
@@ -145,7 +151,7 @@ export const slice = createSlice({
         },
 
         clearDeleteErrorMessages: (state, action: PayloadAction<void>) => {
-            state.deleteErrorMessage = "";
+            state.deleteErrorMessage = '';
         },
 
         clearCertificateDetail: (state, action: PayloadAction<void>) => {
@@ -327,7 +333,7 @@ export const slice = createSlice({
         },
 
         deleteCertificate: (state, action: PayloadAction<{ uuid: string }>) => {
-            state.deleteErrorMessage = "";
+            state.deleteErrorMessage = '';
             state.isDeleting = true;
         },
 
@@ -343,7 +349,7 @@ export const slice = createSlice({
 
         deleteCertificateFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isDeleting = false;
-            state.deleteErrorMessage = action.payload.error || "Unknown error";
+            state.deleteErrorMessage = action.payload.error || 'Unknown error';
         },
 
         updateGroup: (state, action: PayloadAction<{ uuid: string; updateGroupRequest: CertificateObjectModel }>) => {
@@ -362,6 +368,46 @@ export const slice = createSlice({
 
         updateGroupFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdatingGroup = false;
+        },
+
+        deleteGroup: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isUpdatingGroup = true;
+        },
+
+        deleteGroupSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isUpdatingGroup = false;
+
+            const certificateIndex = state.certificates.findIndex((certificate) => certificate.uuid === action.payload.uuid);
+
+            if (certificateIndex >= 0) state.certificates[certificateIndex].group = undefined;
+
+            if (state.certificateDetail?.uuid === action.payload.uuid) state.certificateDetail.group = undefined;
+        },
+
+        deleteGroupFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isUpdatingGroup = false;
+        },
+
+        updateCertificateTrustedStatus: (
+            state,
+            action: PayloadAction<{ uuid: string; updateCertificateTrustedStatusRequest: CertificateObjectModel }>,
+        ) => {
+            state.isUpdatingTrustedStatus = true;
+        },
+
+        updateCertificateTrustedStatusSuccess: (state, action: PayloadAction<{ uuid: string; trustedCa?: boolean }>) => {
+            state.isUpdatingTrustedStatus = false;
+
+            const certificateIndex = state.certificates.findIndex((certificate) => certificate.uuid === action.payload.uuid);
+
+            if (certificateIndex >= 0) state.certificates[certificateIndex].trustedCa = action.payload.trustedCa ?? false;
+
+            if (state.certificateDetail?.uuid === action.payload.uuid)
+                state.certificateDetail.trustedCa = action.payload.trustedCa ?? false;
+        },
+
+        updateCertificateTrustedStatusFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isUpdatingTrustedStatus = false;
         },
 
         updateRaProfile: (
@@ -388,6 +434,24 @@ export const slice = createSlice({
             state.isUpdatingRaProfile = false;
         },
 
+        deleteRaProfile: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isUpdatingRaProfile = true;
+        },
+
+        deleteRaProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isUpdatingRaProfile = false;
+
+            const certificateIndex = state.certificates.findIndex((certificate) => certificate.uuid === action.payload.uuid);
+
+            if (certificateIndex >= 0) state.certificates[certificateIndex].raProfile = undefined;
+
+            if (state.certificateDetail?.uuid === action.payload.uuid) state.certificateDetail.raProfile = undefined;
+        },
+
+        deleteRaProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isUpdatingRaProfile = false;
+        },
+
         updateOwner: (
             state,
             action: PayloadAction<{ uuid: string; user: UserResponseModel; updateOwnerRequest: CertificateObjectModel }>,
@@ -402,10 +466,37 @@ export const slice = createSlice({
 
             if (certificateIndex >= 0) state.certificates[certificateIndex].owner = action.payload.user.username;
 
-            if (state.certificateDetail?.uuid === action.payload.uuid) state.certificateDetail.owner = action.payload.user.username;
+            if (state.certificateDetail?.uuid === action.payload.uuid) {
+                state.certificateDetail.owner = action.payload.user.username;
+                state.certificateDetail.ownerUuid = action.payload.user.uuid;
+            }
         },
 
         updateOwnerFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isUpdatingOwner = false;
+        },
+
+        deleteOwner: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isUpdatingOwner = true;
+        },
+
+        deleteOwnerSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isUpdatingOwner = false;
+
+            const certificateIndex = state.certificates.findIndex((certificate) => certificate.uuid === action.payload.uuid);
+
+            if (certificateIndex >= 0) {
+                state.certificates[certificateIndex].owner = undefined;
+                state.certificates[certificateIndex].ownerUuid = undefined;
+            }
+
+            if (state.certificateDetail?.uuid === action.payload.uuid) {
+                state.certificateDetail.ownerUuid = undefined;
+                state.certificateDetail.owner = undefined;
+            }
+        },
+
+        deleteOwnerFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdatingOwner = false;
         },
 
@@ -422,6 +513,22 @@ export const slice = createSlice({
                 if (certificateIndex >= 0) state.certificates[certificateIndex].group = action.payload.group;
 
                 if (state.certificateDetail?.uuid === uuid) state.certificateDetail.group = action.payload.group;
+            });
+        },
+
+        bulkDeleteGroup: (state, action: PayloadAction<{ certificateUuids: string[] }>) => {
+            state.isBulkUpdatingGroup = true;
+        },
+
+        bulkDeleteGroupSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.isBulkUpdatingGroup = false;
+
+            action.payload.uuids.forEach((uuid) => {
+                const certificateIndex = state.certificates.findIndex((certificate) => certificate.uuid === uuid);
+
+                if (certificateIndex >= 0) state.certificates[certificateIndex].group = undefined;
+
+                if (state.certificateDetail?.uuid === uuid) state.certificateDetail.group = undefined;
             });
         },
 
@@ -445,6 +552,26 @@ export const slice = createSlice({
             });
         },
 
+        bulkDeleteRaProfile: (state, action: PayloadAction<{ certificateUuids: string[] }>) => {
+            state.isBulkUpdatingRaProfile = true;
+        },
+
+        bulkDeleteRaProfileSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.isBulkUpdatingRaProfile = false;
+
+            action.payload.uuids.forEach((uuid) => {
+                const certificateIndex = state.certificates.findIndex((certificate) => certificate.uuid === uuid);
+
+                if (certificateIndex >= 0) state.certificates[certificateIndex].raProfile = undefined;
+
+                if (state.certificateDetail?.uuid === uuid) state.certificateDetail.raProfile = undefined;
+            });
+        },
+
+        bulkDeleteRaProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isBulkUpdatingRaProfile = false;
+        },
+
         bulkUpdateRaProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isBulkUpdatingRaProfile = false;
         },
@@ -459,9 +586,15 @@ export const slice = createSlice({
             action.payload.uuids.forEach((uuid) => {
                 const certificateIndex = state.certificates.findIndex((certificate) => certificate.uuid === uuid);
 
-                if (certificateIndex >= 0) state.certificates[certificateIndex].owner = action.payload.user.username;
+                if (certificateIndex >= 0) {
+                    state.certificates[certificateIndex].owner = action.payload.user.username;
+                    state.certificates[certificateIndex].ownerUuid = action.payload.user.uuid;
+                }
 
-                if (state.certificateDetail?.uuid === uuid) state.certificateDetail.owner = action.payload.user.username;
+                if (state.certificateDetail?.uuid === uuid) {
+                    state.certificateDetail.owner = action.payload.user.username;
+                    state.certificateDetail.ownerUuid = action.payload.user.uuid;
+                }
             });
         },
 
@@ -469,8 +602,34 @@ export const slice = createSlice({
             state.isBulkUpdatingOwner = false;
         },
 
+        bulkDeleteOwner: (state, action: PayloadAction<{ certificateUuids: string[] }>) => {
+            state.isBulkUpdatingOwner = true;
+        },
+
+        bulkDeleteOwnerSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.isBulkUpdatingOwner = false;
+
+            action.payload.uuids.forEach((uuid) => {
+                const certificateIndex = state.certificates.findIndex((certificate) => certificate.uuid === uuid);
+
+                if (certificateIndex >= 0) {
+                    state.certificates[certificateIndex].owner = undefined;
+                    state.certificates[certificateIndex].ownerUuid = undefined;
+                }
+
+                if (state.certificateDetail?.uuid === uuid) {
+                    state.certificateDetail.ownerUuid = undefined;
+                    state.certificateDetail.owner = undefined;
+                }
+            });
+        },
+
+        bulkDeleteOwnerFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isBulkUpdatingOwner = false;
+        },
+
         bulkDelete: (state, action: PayloadAction<CertificateBulkDeleteRequestModel>) => {
-            state.deleteErrorMessage = "";
+            state.deleteErrorMessage = '';
             state.isBulkDeleting = true;
         },
 
@@ -480,7 +639,7 @@ export const slice = createSlice({
 
         bulkDeleteFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isBulkDeleting = false;
-            state.deleteErrorMessage = action.payload.error || "Unknown error";
+            state.deleteErrorMessage = action.payload.error || 'Unknown error';
         },
 
         uploadCertificate: (state, action: PayloadAction<CertificateUploadModel>) => {
@@ -602,7 +761,7 @@ export const slice = createSlice({
 
         downloadCertificateChainSuccess: (
             state,
-            action: PayloadAction<{ certificateChainDownloadContent: CertificateChainDownloadResponseModel }>,
+            action: PayloadAction<{ certificateChainDownloadContent: DownloadCertificateChainResponseModel }>,
         ) => {
             state.isFetchingCertificateChainDownloadContent = false;
             state.certificateChainDownloadContent = action.payload.certificateChainDownloadContent;
@@ -610,6 +769,21 @@ export const slice = createSlice({
 
         downloadCertificateChainFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingCertificateChainDownloadContent = false;
+        },
+
+        downloadCertificate: (state, action: PayloadAction<DownloadCertificateRequest>) => {
+            state.certificateDownloadContent = undefined;
+            state.isFetchingCertificateDownloadContent = true;
+        },
+
+        downloadCertificateSuccess: (state, action: PayloadAction<{ certificateDownloadContent: DownloadCertificateResponseModel }>) => {
+            state.certificateDownloadContent = action.payload.certificateDownloadContent;
+            state.isFetchingCertificateDownloadContent = false;
+        },
+
+        downloadCertificateFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.certificateDownloadContent = undefined;
+            state.isFetchingCertificateDownloadContent = false;
         },
     },
 });
@@ -623,7 +797,7 @@ const certificateChain = createSelector(state, (state) => state.certificateChain
 
 const certificateDetail = createSelector(state, (state) => state.certificateDetail);
 const certificateChainDownloadContent = createSelector(state, (state) => state.certificateChainDownloadContent);
-
+const certificateDownloadContent = createSelector(state, (state) => state.certificateDownloadContent);
 const certificateHistory = createSelector(state, (state) => state.certificateHistory);
 const certificateLocations = createSelector(state, (state) => state.certificateLocations);
 const issuanceAttributes = createSelector(state, (state) => state.issuanceAttributes);
@@ -646,6 +820,7 @@ const isBulkDeleting = createSelector(state, (state) => state.isBulkDeleting);
 const isUpdatingGroup = createSelector(state, (state) => state.isUpdatingGroup);
 const isUpdatingRaProfile = createSelector(state, (state) => state.isUpdatingRaProfile);
 const isUpdatingOwner = createSelector(state, (state) => state.isUpdatingOwner);
+const isUpdatingTrustedStatus = createSelector(state, (state) => state.isUpdatingTrustedStatus);
 
 const isBulkUpdatingGroup = createSelector(state, (state) => state.isBulkUpdatingGroup);
 const isBulkUpdatingRaProfile = createSelector(state, (state) => state.isBulkUpdatingRaProfile);
@@ -665,12 +840,18 @@ const csrAttributeDescriptors = createSelector(state, (state) => state.csrAttrib
 const isFetchingContents = createSelector(state, (state) => state.isFetchingContents);
 const isFetchingCertificateChain = createSelector(state, (state) => state.isFetchingCertificateChain);
 
+const isFetchingCertificateDownloadContent = createSelector(state, (state) => state.isFetchingCertificateDownloadContent);
+const isFetchingCertificateChainDownloadContent = createSelector(state, (state) => state.isFetchingCertificateChainDownloadContent);
+
 export const selectors = {
     state,
     deleteErrorMessage,
     certificates,
     certificateDetail,
     certificateChainDownloadContent,
+    isFetchingCertificateDownloadContent,
+    isFetchingCertificateChainDownloadContent,
+    certificateDownloadContent,
     certificateHistory,
     certificateLocations,
     issuanceAttributes,
@@ -686,6 +867,7 @@ export const selectors = {
     isRekeying,
     isDeleting,
     isBulkDeleting,
+    isUpdatingTrustedStatus,
     isUpdatingGroup,
     isUpdatingRaProfile,
     isUpdatingOwner,

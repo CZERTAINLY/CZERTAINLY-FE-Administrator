@@ -1,22 +1,22 @@
-import AttributeViewer from "components/Attributes/AttributeViewer";
-import CustomAttributeWidget from "components/Attributes/CustomAttributeWidget";
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
-import SwitchField from "components/Input/SwitchField";
-import StatusBadge from "components/StatusBadge";
-import Widget from "components/Widget";
+import AttributeViewer from 'components/Attributes/AttributeViewer';
+import CustomAttributeWidget from 'components/Attributes/CustomAttributeWidget';
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
+import SwitchField from 'components/Input/SwitchField';
+import StatusBadge from 'components/StatusBadge';
+import Widget from 'components/Widget';
 
-import { WidgetButtonProps } from "components/WidgetButtons";
-import CertificateStatus from "components/_pages/certificates/CertificateStatus";
+import { WidgetButtonProps } from 'components/WidgetButtons';
+import CertificateStatus from 'components/_pages/certificates/CertificateStatus';
 
-import { actions, selectors } from "ducks/scep-profiles";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Form } from "react-final-form";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { Container } from "reactstrap";
-import { Resource } from "types/openapi";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { actions, selectors } from 'ducks/scep-profiles';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Form } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Container } from 'reactstrap';
+import { Resource } from 'types/openapi';
+import { LockWidgetNameEnum } from 'types/user-interface';
 
 export default function ScepProfileDetail() {
     const dispatch = useDispatch();
@@ -76,33 +76,33 @@ export default function ScepProfileDetail() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "pencil",
+                icon: 'pencil',
                 disabled: false,
-                tooltip: "Edit",
+                tooltip: 'Edit',
                 onClick: () => {
                     onEditClick();
                 },
             },
             {
-                icon: "trash",
+                icon: 'trash',
                 disabled: false,
-                tooltip: "Delete",
+                tooltip: 'Delete',
                 onClick: () => {
                     setConfirmDelete(true);
                 },
             },
             {
-                icon: "check",
+                icon: 'check',
                 disabled: scepProfile?.enabled || false,
-                tooltip: "Enable",
+                tooltip: 'Enable',
                 onClick: () => {
                     onEnableClick();
                 },
             },
             {
-                icon: "times",
+                icon: 'times',
                 disabled: !(scepProfile?.enabled || false),
-                tooltip: "Disable",
+                tooltip: 'Disable',
                 onClick: () => {
                     onDisableClick();
                 },
@@ -114,12 +114,12 @@ export default function ScepProfileDetail() {
     const tableHeader: TableHeader[] = useMemo(
         () => [
             {
-                id: "property",
-                content: "Property",
+                id: 'property',
+                content: 'Property',
             },
             {
-                id: "value",
-                content: "Value",
+                id: 'value',
+                content: 'Value',
             },
         ],
         [],
@@ -131,29 +131,29 @@ export default function ScepProfileDetail() {
                 ? []
                 : [
                       {
-                          id: "uuid",
-                          columns: ["UUID", scepProfile.uuid],
+                          id: 'uuid',
+                          columns: ['UUID', scepProfile.uuid],
                       },
                       {
-                          id: "name",
-                          columns: ["Name", scepProfile.name],
+                          id: 'name',
+                          columns: ['Name', scepProfile.name],
                       },
                       {
-                          id: "description",
-                          columns: ["Description", scepProfile.description || ""],
+                          id: 'description',
+                          columns: ['Description', scepProfile.description || ''],
                       },
                       {
-                          id: "status",
-                          columns: ["Status", <StatusBadge enabled={scepProfile.enabled} />],
+                          id: 'status',
+                          columns: ['Status', <StatusBadge enabled={scepProfile.enabled} />],
                       },
                       {
-                          id: "renewThreshold",
-                          columns: ["Renew Threshold", scepProfile.renewThreshold?.toString() || "N/A"],
+                          id: 'renewThreshold',
+                          columns: ['Renew Threshold', scepProfile.renewThreshold?.toString() || 'N/A'],
                       },
                       {
-                          id: "includeCaCertificate",
+                          id: 'includeCaCertificate',
                           columns: [
-                              "Include CA Certificate",
+                              'Include CA Certificate',
                               <Form
                                   onSubmit={() => {}}
                                   render={() => (
@@ -168,9 +168,9 @@ export default function ScepProfileDetail() {
                           ],
                       },
                       {
-                          id: "includeCaCertificateChain",
+                          id: 'includeCaCertificateChain',
                           columns: [
-                              "Include CA Certificate Chain",
+                              'Include CA Certificate Chain',
                               <Form
                                   onSubmit={() => {}}
                                   render={() => (
@@ -185,9 +185,9 @@ export default function ScepProfileDetail() {
                           ],
                       },
                       {
-                          id: "intuneEnabled",
+                          id: 'intuneEnabled',
                           columns: [
-                              "Intune Enabled",
+                              'Intune Enabled',
                               <Form
                                   onSubmit={() => {}}
                                   render={() => (
@@ -202,8 +202,8 @@ export default function ScepProfileDetail() {
                           ],
                       },
                       {
-                          id: "scepUrl",
-                          columns: ["URL", scepProfile.scepUrl || "N/A"],
+                          id: 'scepUrl',
+                          columns: ['URL', scepProfile.scepUrl || 'N/A'],
                       },
                   ],
         [scepProfile],
@@ -215,12 +215,12 @@ export default function ScepProfileDetail() {
                 ? []
                 : [
                       {
-                          id: "intuneTenant",
-                          columns: ["Intune Tenant", scepProfile.intuneTenant ?? ""],
+                          id: 'intuneTenant',
+                          columns: ['Intune Tenant', scepProfile.intuneTenant ?? ''],
                       },
                       {
-                          id: "intuneApplicationId",
-                          columns: ["Intune Application ID", scepProfile.intuneApplicationId ?? ""],
+                          id: 'intuneApplicationId',
+                          columns: ['Intune Application ID', scepProfile.intuneApplicationId ?? ''],
                       },
                   ],
         [scepProfile],
@@ -232,13 +232,13 @@ export default function ScepProfileDetail() {
                 ? []
                 : [
                       {
-                          id: "uuid",
-                          columns: ["UUID", scepProfile.raProfile.uuid],
+                          id: 'uuid',
+                          columns: ['UUID', scepProfile.raProfile.uuid],
                       },
                       {
-                          id: "name",
+                          id: 'name',
                           columns: [
-                              "Name",
+                              'Name',
                               scepProfile.raProfile?.uuid ? (
                                   <Link
                                       to={`../../raprofiles/detail/${scepProfile.raProfile.authorityInstanceUuid}/${scepProfile.raProfile.uuid}`}
@@ -246,13 +246,13 @@ export default function ScepProfileDetail() {
                                       {scepProfile.raProfile.name}
                                   </Link>
                               ) : (
-                                  ""
+                                  ''
                               ),
                           ],
                       },
                       {
-                          id: "status",
-                          columns: ["Status", <StatusBadge enabled={scepProfile.raProfile.enabled} />],
+                          id: 'status',
+                          columns: ['Status', <StatusBadge enabled={scepProfile.raProfile.enabled} />],
                       },
                   ],
         [scepProfile],
@@ -264,32 +264,32 @@ export default function ScepProfileDetail() {
                 ? []
                 : [
                       {
-                          id: "uuid",
-                          columns: ["UUID", scepProfile.caCertificate.uuid],
+                          id: 'uuid',
+                          columns: ['UUID', scepProfile.caCertificate.uuid],
                       },
                       {
-                          id: "name",
+                          id: 'name',
                           columns: [
-                              "Name",
+                              'Name',
                               scepProfile.caCertificate?.uuid ? (
                                   <Link to={`../../certificates/detail/${scepProfile.caCertificate.uuid}`}>
                                       {scepProfile.caCertificate.commonName}
                                   </Link>
                               ) : (
-                                  ""
+                                  ''
                               ),
                           ],
                       },
                       {
-                          id: "status",
-                          columns: ["Status", <CertificateStatus status={scepProfile.caCertificate.state} />],
+                          id: 'status',
+                          columns: ['Status', <CertificateStatus status={scepProfile.caCertificate.state} />],
                       },
                   ],
         [scepProfile],
     );
 
     const RAProfileDetailsTitle = useMemo(
-        () => (raProfileDetailData.length > 0 ? "RA Profile Configuration" : "Default RA Profile not selected"),
+        () => (raProfileDetailData.length > 0 ? 'RA Profile Configuration' : 'Default RA Profile not selected'),
         [raProfileDetailData],
     );
 
@@ -315,12 +315,12 @@ export default function ScepProfileDetail() {
             )}
 
             {scepProfile && scepProfile.enableIntune && (
-                <Widget title={"Intune Configuration"} busy={isBusy}>
+                <Widget title={'Intune Configuration'} busy={isBusy}>
                     <CustomTable headers={tableHeader} data={intuneDetailData} />
                 </Widget>
             )}
 
-            <Widget title={"CA Certificate Configuration"} busy={isBusy} titleSize="large">
+            <Widget title={'CA Certificate Configuration'} busy={isBusy} titleSize="large">
                 {certificateDetailData.length === 0 ? (
                     <></>
                 ) : (
@@ -355,8 +355,8 @@ export default function ScepProfileDetail() {
                   Account(s). When deleted the SCEP Account(s) will be revoked."
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
@@ -373,8 +373,8 @@ export default function ScepProfileDetail() {
                 }
                 toggle={() => dispatch(actions.clearDeleteErrorMessages())}
                 buttons={[
-                    { color: "danger", onClick: onForceDeleteScepProfile, body: "Force" },
-                    { color: "secondary", onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: "Cancel" },
+                    { color: 'danger', onClick: onForceDeleteScepProfile, body: 'Force' },
+                    { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
                 ]}
             />
         </Container>

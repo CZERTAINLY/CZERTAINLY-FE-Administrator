@@ -7,7 +7,7 @@ import {
     AuditLogModel,
     PageableDto,
     PageableModel,
-} from "types/auditLogs";
+} from 'types/auditLogs';
 
 export function transformPageableModelToDto(pageable: PageableModel): PageableDto {
     return { ...pageable };

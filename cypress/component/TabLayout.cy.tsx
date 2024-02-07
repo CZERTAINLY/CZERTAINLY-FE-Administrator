@@ -1,6 +1,6 @@
-import TabLayout from "components/Layout/TabLayout";
-import Widget from "components/Widget";
-import "../../src/resources/styles/theme.scss";
+import TabLayout from 'components/Layout/TabLayout';
+import Widget from 'components/Widget';
+import '../../src/resources/styles/theme.scss';
 
 const TestTabLayout = () => {
     return (
@@ -31,14 +31,14 @@ const TestTabLayout = () => {
     );
 };
 
-describe("Tab Layout component", () => {
-    it("should render tab layout with 2 tabs", () => {
+describe('Tab Layout component', () => {
+    it('should render tab layout with 2 tabs', () => {
         cy.mount(<TestTabLayout />);
-        cy.get("#tabOneContent").should("have.text", "Tab 1 content");
-        cy.get("#tabTwoContent").should("have.text", "Tab 2 content");
+        cy.get('#tabOneContent').should('have.text', 'Tab 1 content');
+        cy.get('#tabTwoContent').should('have.text', 'Tab 2 content');
         cy.wait(1000);
-        cy.get("#tabTwoTitle").should("have.text", "Tab 2").click();
+        cy.get('#tabTwoTitle').should('have.text', 'Tab 2').click();
         cy.wait(1000);
-        cy.get("#tabOneTitle").should("have.text", "Tab 1").click();
+        cy.get('#tabOneTitle').should('have.text', 'Tab 1').click();
     });
 });

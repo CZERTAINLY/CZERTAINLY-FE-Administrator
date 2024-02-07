@@ -1,30 +1,32 @@
-import AttributeEditor from "components/Attributes/AttributeEditor";
-import SwitchField from "components/Input/SwitchField";
-import TextField from "components/Input/TextField";
-import TabLayout from "components/Layout/TabLayout";
-import ProgressButton from "components/ProgressButton";
-import Widget from "components/Widget";
-import { actions as connectorActions } from "ducks/connectors";
-import { actions as customAttributesActions, selectors as customAttributesSelectors } from "ducks/customAttributes";
+import AttributeEditor from 'components/Attributes/AttributeEditor';
+import SwitchField from 'components/Input/SwitchField';
+import TextField from 'components/Input/TextField';
+import TabLayout from 'components/Layout/TabLayout';
+import ProgressButton from 'components/ProgressButton';
+import Widget from 'components/Widget';
+import { actions as connectorActions } from 'ducks/connectors';
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
 
-import { actions as discoveryActions, selectors as discoverySelectors } from "ducks/discoveries";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { actions as discoveryActions, selectors as discoverySelectors } from 'ducks/discoveries';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { actions as userInterfaceActions } from '../../../../ducks/user-interface';
 
-import { Field, Form } from "react-final-form";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Field, Form } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
-import Select from "react-select";
-import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from "reactstrap";
-import { AttributeDescriptorModel } from "types/attributes";
-import { ConnectorResponseModel } from "types/connectors";
-import { FunctionGroupCode, Resource } from "types/openapi";
+import Select from 'react-select';
+import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
+import { AttributeDescriptorModel } from 'types/attributes';
+import { ConnectorResponseModel } from 'types/connectors';
+import { FunctionGroupCode, Resource } from 'types/openapi';
 
-import { mutators } from "utils/attributes/attributeEditorMutators";
-import { collectFormAttributes } from "utils/attributes/attributes";
+import Cron from 'react-cron-generator';
+import { mutators } from 'utils/attributes/attributeEditorMutators';
+import { collectFormAttributes } from 'utils/attributes/attributes';
 
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateQuartzCronExpression, validateRequired } from "utils/validators";
-
+import { getStrongFromCronExpression } from 'utils/dateUtil';
+import { composeValidators, validateAlphaNumericWithSpecialChars, validateQuartzCronExpression, validateRequired } from 'utils/validators';
 interface FormValues {
     name: string | undefined;
     discoveryProvider: { value: string; label: string } | undefined;
@@ -43,15 +45,12 @@ export default function DiscoveryForm() {
     const discoveryProviderAttributeDescriptors = useSelector(discoverySelectors.discoveryProviderAttributeDescriptors);
     const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
     const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
-
     const isFetchingDiscoveryDetail = useSelector(discoverySelectors.isFetchingDetail);
     const isFetchingDiscoveryProviders = useSelector(discoverySelectors.isFetchingDiscoveryProviders);
     const isFetchingAttributeDescriptors = useSelector(discoverySelectors.isFetchingDiscoveryProviderAttributeDescriptors);
     const isCreating = useSelector(discoverySelectors.isCreating);
-
     const [init, setInit] = useState(true);
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
-
     const [discoveryProvider, setDiscoveryProvider] = useState<ConnectorResponseModel>();
 
     const isBusy = useMemo(
@@ -114,11 +113,11 @@ export default function DiscoveryForm() {
                         connectorUuid: values.discoveryProvider!.value,
                         kind: values.storeKind?.value!,
                         attributes: collectFormAttributes(
-                            "discovery",
+                            'discovery',
                             [...(discoveryProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
                             values,
                         ),
-                        customAttributes: collectFormAttributes("customDiscovery", resourceCustomAttributes, values),
+                        customAttributes: collectFormAttributes('customDiscovery', resourceCustomAttributes, values),
                     },
                     scheduled: values.scheduled,
                     jobName: values.jobName,
@@ -173,12 +172,51 @@ export default function DiscoveryForm() {
                                     label="Job Name"
                                     validators={[validateRequired(), validateAlphaNumericWithSpecialChars()]}
                                 />
+
                                 <TextField
                                     id="cronExpression"
                                     label="Cron Expression"
                                     validators={[validateRequired(), validateQuartzCronExpression(values.cronExpression)]}
                                     // description={getCronExpression(values.cronExpression)}
+                                    description={getStrongFromCronExpression(values.cronExpression)}
+                                    inputGroupIcon={{
+                                        icon: 'fa fa-stopwatch',
+                                        onClick: () => {
+                                            dispatch(
+                                                userInterfaceActions.showGlobalModal({
+                                                    content: (
+                                                        <div>
+                                                            <div className="d-flex justify-content-center">
+                                                                <Cron
+                                                                    value={values.cronExpression}
+                                                                    onChange={(e) => {
+                                                                        dispatch(
+                                                                            userInterfaceActions.setOkButtonCallback(() => {
+                                                                                dispatch(userInterfaceActions.hideGlobalModal());
+                                                                                form.mutators.setAttribute('cronExpression', e);
+                                                                            }),
+                                                                        );
+                                                                    }}
+                                                                    showResultText={true}
+                                                                    showResultCron={true}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    ),
+                                                    showCancelButton: true,
+                                                    okButtonCallback: () => {
+                                                        dispatch(userInterfaceActions.hideGlobalModal());
+                                                    },
+                                                    showOkButton: true,
+                                                    isOpen: true,
+                                                    size: 'lg',
+                                                    title: 'Select Cron timings',
+                                                }),
+                                            );
+                                        },
+                                    }}
                                 />
+
                                 <SwitchField id="oneTime" label="One Time Only" />
                             </>
                         )}
@@ -216,19 +254,19 @@ export default function DiscoveryForm() {
                                         placeholder="Select Discovery Provider"
                                         onChange={(event) => {
                                             onDiscoveryProviderChange(event);
-                                            form.mutators.clearAttributes("discovery");
-                                            form.mutators.setAttribute("storeKind", undefined);
+                                            form.mutators.clearAttributes('discovery');
+                                            form.mutators.setAttribute('storeKind', undefined);
                                             input.onChange(event);
                                         }}
                                         styles={{
                                             control: (provided) =>
                                                 meta.touched && meta.invalid
-                                                    ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } }
+                                                    ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
                                                     : { ...provided },
                                         }}
                                     />
 
-                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>
+                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
                                         {meta.error}
                                     </div>
                                 </FormGroup>
@@ -254,12 +292,12 @@ export default function DiscoveryForm() {
                                             styles={{
                                                 control: (provided) =>
                                                     meta.touched && meta.invalid
-                                                        ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } }
+                                                        ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
                                                         : { ...provided },
                                             }}
                                         />
 
-                                        <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>
+                                        <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
                                             Required Field
                                         </div>
                                     </FormGroup>
@@ -272,7 +310,7 @@ export default function DiscoveryForm() {
                             <TabLayout
                                 tabs={[
                                     {
-                                        title: "Connector Attributes",
+                                        title: 'Connector Attributes',
                                         content:
                                             discoveryProvider &&
                                             values.storeKind &&
@@ -292,7 +330,7 @@ export default function DiscoveryForm() {
                                             ),
                                     },
                                     {
-                                        title: "Custom Attributes",
+                                        title: 'Custom Attributes',
                                         content: (
                                             <AttributeEditor
                                                 id="customDiscovery"

@@ -1,28 +1,28 @@
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 
-import ProgressButton from "components/ProgressButton";
-import Widget from "components/Widget";
+import ProgressButton from 'components/ProgressButton';
+import Widget from 'components/Widget';
 
-import { actions as connectorActions, selectors as connectorSelectors } from "ducks/connectors";
-import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Field, Form } from "react-final-form";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { actions as connectorActions, selectors as connectorSelectors } from 'ducks/connectors';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Field, Form } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
 
-import Select from "react-select";
-import { Badge, Form as BootstrapForm, Button, ButtonGroup, Container, FormFeedback, FormGroup, Input, Label, Table } from "reactstrap";
-import { ConnectorResponseModel, EndpointModel } from "types/connectors";
-import { AuthType, ConnectorStatus, PlatformEnum, Resource } from "types/openapi";
+import Select from 'react-select';
+import { Badge, Form as BootstrapForm, Button, ButtonGroup, Container, FormFeedback, FormGroup, Input, Label, Table } from 'reactstrap';
+import { ConnectorResponseModel, EndpointModel } from 'types/connectors';
+import { AuthType, ConnectorStatus, PlatformEnum, Resource } from 'types/openapi';
 
-import { attributeFieldNameTransform, collectFormAttributes } from "utils/attributes/attributes";
+import { attributeFieldNameTransform, collectFormAttributes } from 'utils/attributes/attributes';
 
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired, validateUrl } from "utils/validators";
-import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
-import { mutators } from "../../../../utils/attributes/attributeEditorMutators";
-import AttributeEditor from "../../../Attributes/AttributeEditor";
-import TabLayout from "../../../Layout/TabLayout";
-import InventoryStatusBadge from "../ConnectorStatus";
+import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired, validateUrl } from 'utils/validators';
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
+import { mutators } from '../../../../utils/attributes/attributeEditorMutators';
+import AttributeEditor from '../../../Attributes/AttributeEditor';
+import TabLayout from '../../../Layout/TabLayout';
+import InventoryStatusBadge from '../ConnectorStatus';
 
 interface FormValues {
     uuid: string;
@@ -39,7 +39,7 @@ export default function ConnectorForm() {
     const { id } = useParams();
 
     const editMode = useMemo(() => !!id, [id]);
-    const connectorWidgetTitle = useMemo(() => (editMode ? "Edit Connector" : "Create Connector"), [editMode]);
+    const connectorWidgetTitle = useMemo(() => (editMode ? 'Edit Connector' : 'Create Connector'), [editMode]);
 
     const optionsForAuth: { label: string; value: AuthType }[] = useMemo(
         () => [
@@ -77,10 +77,10 @@ export default function ConnectorForm() {
         editMode ? optionsForAuth.find((opt) => opt.value === connector?.authType) || optionsForAuth[0] : optionsForAuth[0],
     );
 
-    const submitTitle = useMemo(() => (editMode ? "Save" : "Create"), [editMode]);
-    const connectTitle = useMemo(() => (editMode ? "Reconnect" : "Connect"), [editMode]);
-    const inProgressTitle = useMemo(() => (editMode ? "Saving..." : "Creating..."), [editMode]);
-    const connectProgressTitle = useMemo(() => (editMode ? "Reconnecting..." : "Connecting..."), [editMode]);
+    const submitTitle = useMemo(() => (editMode ? 'Save' : 'Create'), [editMode]);
+    const connectTitle = useMemo(() => (editMode ? 'Reconnect' : 'Connect'), [editMode]);
+    const inProgressTitle = useMemo(() => (editMode ? 'Saving...' : 'Creating...'), [editMode]);
+    const connectProgressTitle = useMemo(() => (editMode ? 'Reconnecting...' : 'Connecting...'), [editMode]);
 
     useEffect(() => {
         dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Connectors));
@@ -100,9 +100,9 @@ export default function ConnectorForm() {
             dispatch(connectorActions.clearCallbackData());
 
             setConnector({
-                uuid: "",
-                name: "",
-                url: "",
+                uuid: '',
+                name: '',
+                url: '',
                 authType: AuthType.None,
                 status: ConnectorStatus.Offline,
                 functionGroups: [],
@@ -121,7 +121,7 @@ export default function ConnectorForm() {
                         connectorUpdateRequest: {
                             url: values.url,
                             authType: selectedAuthType.value,
-                            customAttributes: collectFormAttributes("customConnector", resourceCustomAttributes, values),
+                            customAttributes: collectFormAttributes('customConnector', resourceCustomAttributes, values),
                             // authAttributes: []
                         },
                     }),
@@ -132,7 +132,7 @@ export default function ConnectorForm() {
                         name: values.name,
                         url: values.url,
                         authType: selectedAuthType.value,
-                        customAttributes: collectFormAttributes("customConnector", resourceCustomAttributes, values),
+                        customAttributes: collectFormAttributes('customConnector', resourceCustomAttributes, values),
                         // authAttributes: []
                     }),
                 );
@@ -172,20 +172,20 @@ export default function ConnectorForm() {
     const endPointsHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "name",
+                id: 'name',
                 sortable: true,
-                sort: "asc",
-                content: "Name",
+                sort: 'asc',
+                content: 'Name',
             },
             {
-                id: "context",
+                id: 'context',
                 sortable: true,
-                content: "Context",
+                content: 'Context',
             },
             {
-                id: "method",
+                id: 'method',
                 sortable: true,
-                content: "Method",
+                content: 'Method',
             },
         ],
         [],
@@ -193,8 +193,8 @@ export default function ConnectorForm() {
 
     const defaultValues = useMemo(
         () => ({
-            name: editMode ? connector?.name : "",
-            url: editMode ? connector?.url || "" : "",
+            name: editMode ? connector?.name : '',
+            url: editMode ? connector?.url || '' : '',
             authenticationType: editMode
                 ? optionsForAuth.find((opt) => opt.value === connector?.authType) || optionsForAuth[0]
                 : optionsForAuth[0],
@@ -244,7 +244,7 @@ export default function ConnectorForm() {
 
                                             <div
                                                 className="invalid-feedback"
-                                                style={meta.touched && meta.invalid ? { display: "block" } : {}}
+                                                style={meta.touched && meta.invalid ? { display: 'block' } : {}}
                                             >
                                                 {meta.error}
                                             </div>
@@ -320,7 +320,7 @@ export default function ConnectorForm() {
                                     <TabLayout
                                         tabs={[
                                             {
-                                                title: "Custom Attributes",
+                                                title: 'Custom Attributes',
                                                 content: (
                                                     <AttributeEditor
                                                         id="customConnector"
@@ -336,7 +336,7 @@ export default function ConnectorForm() {
                                 <div className="d-flex justify-content-end">
                                     <ButtonGroup>
                                         <Button
-                                            color="success"
+                                            color="primary"
                                             onClick={() => onConnectClick(values)}
                                             disabled={submitting || isConnecting || isReconnecting}
                                         >
@@ -374,7 +374,7 @@ export default function ConnectorForm() {
                                                     {connectionDetails.map((functionGroup) => (
                                                         <div>
                                                             <Badge color="primary">
-                                                                {attributeFieldNameTransform[functionGroup?.name || ""] ||
+                                                                {attributeFieldNameTransform[functionGroup?.name || ''] ||
                                                                     functionGroup?.name}
                                                             </Badge>
                                                             &nbsp;
@@ -388,11 +388,11 @@ export default function ConnectorForm() {
                                     {connectionDetails && connectionDetails.length > 0 ? (
                                         <div>
                                             <b>Connector Functionality Description</b>
-                                            <hr />{" "}
+                                            <hr />{' '}
                                             {connectionDetails.map((functionGroup) => (
                                                 <Widget
                                                     key={functionGroup.name}
-                                                    title={attributeFieldNameTransform[functionGroup?.name || ""] || functionGroup?.name}
+                                                    title={attributeFieldNameTransform[functionGroup?.name || ''] || functionGroup?.name}
                                                     titleSize="large"
                                                     widgetExtraTopNode={
                                                         <div className="fa-pull-right mt-n-xs ms-auto">
@@ -416,7 +416,10 @@ export default function ConnectorForm() {
 
                                     {connectionDetails && connectionDetails.length > 0 ? (
                                         <div>
-                                            <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}>
+                                            <Field
+                                                name="name"
+                                                validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}
+                                            >
                                                 {({ input, meta }) => (
                                                     <FormGroup>
                                                         <Label for="name">Connector Name</Label>

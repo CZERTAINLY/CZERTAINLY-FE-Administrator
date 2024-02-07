@@ -1,7 +1,7 @@
-import { store } from "index";
-import { createSelector } from "reselect";
-import { createFeatureSelector } from "utils/ducks";
-import { alertsSlice, State } from "./alert-slice";
+import { store } from 'index';
+import { createSelector } from 'reselect';
+import { createFeatureSelector } from 'utils/ducks';
+import { alertsSlice, State } from './alert-slice';
 
 const selectState = createFeatureSelector<State>(alertsSlice.name);
 

@@ -1,15 +1,15 @@
-import { AppEpic } from "ducks";
-import { of } from "rxjs";
-import { catchError, filter, mergeMap, switchMap } from "rxjs/operators";
+import { AppEpic } from 'ducks';
+import { of } from 'rxjs';
+import { catchError, filter, mergeMap, switchMap } from 'rxjs/operators';
 
-import { extractError } from "utils/net";
-import { actions as alertActions } from "./alerts";
-import { actions as appRedirectActions } from "./app-redirect";
-import { slice } from "./certificateGroups";
-import { actions as widgetLockActions } from "./widget-locks";
+import { extractError } from 'utils/net';
+import { actions as alertActions } from './alerts';
+import { actions as appRedirectActions } from './app-redirect';
+import { slice } from './certificateGroups';
+import { actions as userInterfaceActions } from './user-interface';
 
-import { LockWidgetNameEnum } from "types/widget-locks";
-import { transformCertificateGroupRequestModelToDto, transformCertificateGroupResponseDtoToModel } from "./transform/certificateGroups";
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { transformCertificateGroupRequestModelToDto, transformCertificateGroupResponseDtoToModel } from './transform/certificateGroups';
 
 const listGroups: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -21,14 +21,14 @@ const listGroups: AppEpic = (action$, state$, deps) => {
                         slice.actions.listGroupsSuccess({
                             groups: list.map(transformCertificateGroupResponseDtoToModel),
                         }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfGroups),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfGroups),
                     ),
                 ),
 
                 catchError((err) =>
                     of(
-                        slice.actions.listGroupsFailure({ error: extractError(err, "Failed to get Group list") }),
-                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfGroups),
+                        slice.actions.listGroupsFailure({ error: extractError(err, 'Failed to get Group list') }),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfGroups),
                     ),
                 ),
             ),
@@ -46,14 +46,14 @@ const getGroupDetail: AppEpic = (action$, state$, deps) => {
                         slice.actions.getGroupDetailSuccess({
                             group: transformCertificateGroupResponseDtoToModel(groupDto),
                         }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.GroupDetails),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.GroupDetails),
                     ),
                 ),
 
                 catchError((err) =>
                     of(
-                        slice.actions.getGroupDetailFailure({ error: extractError(err, "Failed to get Group detail") }),
-                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.GroupDetails),
+                        slice.actions.getGroupDetailFailure({ error: extractError(err, 'Failed to get Group detail') }),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.GroupDetails),
                     ),
                 ),
             ),
@@ -78,8 +78,8 @@ const createGroup: AppEpic = (action$, state$, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.createGroupFailure({ error: extractError(err, "Failed to create group") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to create group" }),
+                            slice.actions.createGroupFailure({ error: extractError(err, 'Failed to create group') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to create group' }),
                         ),
                     ),
                 ),
@@ -106,8 +106,8 @@ const updateGroup: AppEpic = (action$, state$, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.updateGroupFailure({ error: extractError(err, "Failed to update group") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to update group" }),
+                            slice.actions.updateGroupFailure({ error: extractError(err, 'Failed to update group') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to update group' }),
                         ),
                     ),
                 ),
@@ -121,13 +121,13 @@ const deleteGroup: AppEpic = (action$, state$, deps) => {
         switchMap((action) =>
             deps.apiClients.certificateGroups.deleteGroup({ uuid: action.payload.uuid }).pipe(
                 mergeMap(() =>
-                    of(slice.actions.deleteGroupSuccess({ uuid: action.payload.uuid }), appRedirectActions.redirect({ url: "../../" })),
+                    of(slice.actions.deleteGroupSuccess({ uuid: action.payload.uuid }), appRedirectActions.redirect({ url: '../../' })),
                 ),
 
                 catchError((err) =>
                     of(
-                        slice.actions.deleteGroupFailure({ error: extractError(err, "Failed to delete group") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to delete group" }),
+                        slice.actions.deleteGroupFailure({ error: extractError(err, 'Failed to delete group') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to delete group' }),
                     ),
                 ),
             ),
@@ -143,14 +143,14 @@ const bulkDeleteProfiles: AppEpic = (action$, state$, deps) => {
                 mergeMap(() =>
                     of(
                         slice.actions.bulkDeleteGroupsSuccess({ uuids: action.payload.uuids }),
-                        alertActions.success("Selected groups successfully deleted."),
+                        alertActions.success('Selected groups successfully deleted.'),
                     ),
                 ),
 
                 catchError((err) =>
                     of(
-                        slice.actions.bulkDeleteGroupsFailure({ error: extractError(err, "Failed to delete groups") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to delete groups" }),
+                        slice.actions.bulkDeleteGroupsFailure({ error: extractError(err, 'Failed to delete groups') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to delete groups' }),
                     ),
                 ),
             ),

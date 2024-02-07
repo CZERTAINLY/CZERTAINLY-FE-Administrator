@@ -1,22 +1,23 @@
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
 
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
 
-import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
-import { actions, selectors } from "ducks/scheduler";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { actions, selectors } from 'ducks/scheduler';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 
-import { Badge, Container } from "reactstrap";
+import { Badge, Container } from 'reactstrap';
 
-import SwitchField from "components/Input/SwitchField";
-import { PlatformEnum, SchedulerJobExecutionStatus } from "types/openapi";
-import { LockWidgetNameEnum } from "types/widget-locks";
-import { getCronExpressionString } from "utils/dateUtil";
-import SchedulerJobHistory from "./SchedulerJobHistory";
+import SwitchField from 'components/Input/SwitchField';
+import { PlatformEnum, SchedulerJobExecutionStatus } from 'types/openapi';
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { getStrongFromCronExpression } from 'utils/dateUtil';
+
+import SchedulerJobHistory from './SchedulerJobHistory';
 
 export default function SchedulerJobDetail() {
     const dispatch = useDispatch();
@@ -54,25 +55,25 @@ export default function SchedulerJobDetail() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "trash",
+                icon: 'trash',
                 disabled: schedulerJob?.system ?? true,
-                tooltip: "Delete",
+                tooltip: 'Delete',
                 onClick: () => {
                     setConfirmDelete(true);
                 },
             },
             {
-                icon: "check",
+                icon: 'check',
                 disabled: schedulerJob?.enabled ?? true,
-                tooltip: "Enable",
+                tooltip: 'Enable',
                 onClick: () => {
                     dispatch(actions.enableSchedulerJob({ uuid: schedulerJob!.uuid }));
                 },
             },
             {
-                icon: "times",
+                icon: 'times',
                 disabled: !Boolean(schedulerJob?.enabled),
-                tooltip: "Disable",
+                tooltip: 'Disable',
                 onClick: () => {
                     dispatch(actions.disableSchedulerJob({ uuid: schedulerJob!.uuid }));
                 },
@@ -84,12 +85,12 @@ export default function SchedulerJobDetail() {
     const detailHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "property",
-                content: "Property",
+                id: 'property',
+                content: 'Property',
             },
             {
-                id: "value",
-                content: "Value",
+                id: 'value',
+                content: 'Value',
             },
         ],
         [],
@@ -101,40 +102,40 @@ export default function SchedulerJobDetail() {
                 ? []
                 : [
                       {
-                          id: "uuid",
-                          columns: ["UUID", schedulerJob.uuid],
+                          id: 'uuid',
+                          columns: ['UUID', schedulerJob.uuid],
                       },
                       {
-                          id: "name",
-                          columns: ["Name", schedulerJob.jobName],
+                          id: 'name',
+                          columns: ['Name', schedulerJob.jobName],
                       },
                       {
-                          id: "jobType",
-                          columns: ["Job Type", schedulerJob.jobType ?? ""],
+                          id: 'jobType',
+                          columns: ['Job Type', schedulerJob.jobType ?? ''],
                       },
                       {
-                          id: "oneTime",
-                          columns: ["One Time Only", <SwitchField label="" viewOnly={{ checked: schedulerJob.oneTime }} id="oneTime" />],
+                          id: 'oneTime',
+                          columns: ['One Time Only', <SwitchField label="" viewOnly={{ checked: schedulerJob.oneTime }} id="oneTime" />],
                       },
                       {
-                          id: "system",
-                          columns: ["System Job", <SwitchField label="" viewOnly={{ checked: schedulerJob.system }} id="system" />],
+                          id: 'system',
+                          columns: ['System Job', <SwitchField label="" viewOnly={{ checked: schedulerJob.system }} id="system" />],
                       },
                       {
-                          id: "enabled",
-                          columns: ["Enabled", <SwitchField label="" viewOnly={{ checked: schedulerJob.enabled }} id="enabled" />],
+                          id: 'enabled',
+                          columns: ['Enabled', <SwitchField label="" viewOnly={{ checked: schedulerJob.enabled }} id="enabled" />],
                       },
                       {
-                          id: "status",
+                          id: 'status',
                           columns: [
-                              "Last Execution Status",
+                              'Last Execution Status',
                               <Badge
                                   color={
                                       schedulerJob.lastExecutionStatus === SchedulerJobExecutionStatus.Failed
-                                          ? "danger"
+                                          ? 'danger'
                                           : schedulerJob.lastExecutionStatus === SchedulerJobExecutionStatus.Succeeded
-                                          ? "success"
-                                          : "primary"
+                                            ? 'success'
+                                            : 'primary'
                                   }
                               >
                                   {getEnumLabel(schedulerJobExecutionStatusEnum, schedulerJob.lastExecutionStatus)}
@@ -142,12 +143,12 @@ export default function SchedulerJobDetail() {
                           ],
                       },
                       {
-                          id: "cron",
+                          id: 'cron',
                           columns: [
-                              "Cron Expression",
+                              'Cron Expression',
                               <>
                                   {schedulerJob.cronExpression}&nbsp;
-                                  <i className="fa fa-info-circle" title={getCronExpressionString(schedulerJob.cronExpression)}></i>
+                                  <i className="fa fa-info-circle" title={getStrongFromCronExpression(schedulerJob.cronExpression)}></i>
                               </>,
                           ],
                       },
@@ -178,8 +179,8 @@ export default function SchedulerJobDetail() {
                 body="You are about to delete Scheduled Job. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
         </Container>

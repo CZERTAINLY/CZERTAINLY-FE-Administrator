@@ -11,10 +11,10 @@
  * Do not edit the class manually.
  */
 
-import type { Observable } from "rxjs";
-import type { AjaxResponse } from "rxjs/ajax";
-import type { OperationOpts } from "../runtime";
-import { BaseAPI } from "../runtime";
+import type { Observable } from 'rxjs';
+import type { AjaxResponse } from 'rxjs/ajax';
+import type { OperationOpts } from '../runtime';
+import { BaseAPI } from '../runtime';
 
 /**
  * no description
@@ -28,8 +28,8 @@ export class ActuatorApi extends BaseAPI {
     health(opts?: OperationOpts): Observable<object | AjaxResponse<object>> {
         return this.request<object>(
             {
-                url: "/health",
-                method: "GET",
+                url: '/health',
+                method: 'GET',
             },
             opts?.responseOpts,
         );
@@ -43,8 +43,8 @@ export class ActuatorApi extends BaseAPI {
     healthPath(opts?: OperationOpts): Observable<object | AjaxResponse<object>> {
         return this.request<object>(
             {
-                url: "/health/**",
-                method: "GET",
+                url: '/health/**',
+                method: 'GET',
             },
             opts?.responseOpts,
         );

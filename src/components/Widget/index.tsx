@@ -1,20 +1,20 @@
-import cx from "classnames";
-import React, { useCallback } from "react";
+import cx from 'classnames';
+import React, { useCallback } from 'react';
 
-import Spinner from "components/Spinner";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
-import WidgetLock from "components/WidgetLock";
-import { selectors } from "ducks/widget-locks";
-import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
-import { LockWidgetNameEnum } from "types/widget-locks";
-import style from "./Widget.module.scss";
+import Spinner from 'components/Spinner';
+import WidgetButtons, { WidgetButtonProps } from 'components/WidgetButtons';
+import WidgetLock from 'components/WidgetLock';
+import { selectors } from 'ducks/user-interface';
+import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { LockWidgetNameEnum } from 'types/user-interface';
+import style from './Widget.module.scss';
 
 interface Props {
     title?: string;
     titleLink?: string;
-    titleSize?: "small" | "medium" | "large" | "larger";
-    titleBoldness?: "normal" | "bold" | "bolder";
+    titleSize?: 'small' | 'medium' | 'large' | 'larger';
+    titleBoldness?: 'normal' | 'bold' | 'bolder';
     className?: string;
     children?: React.ReactNode | React.ReactNode[];
     busy?: boolean;
@@ -23,15 +23,15 @@ interface Props {
     widgetButtons?: WidgetButtonProps[];
     widgetExtraTopNode?: React.ReactNode;
     hideWidgetButtons?: boolean;
-    lockSize?: "small" | "normal" | "large";
+    lockSize?: 'small' | 'normal' | 'large';
 }
 
 function Widget({
-    title = "",
+    title = '',
     titleLink,
-    titleSize = "medium",
+    titleSize = 'medium',
     widgetButtons,
-    titleBoldness = "normal",
+    titleBoldness = 'normal',
     className,
     children = [],
     busy = false,
@@ -39,7 +39,7 @@ function Widget({
     refreshAction,
     widgetExtraTopNode,
     hideWidgetButtons = false,
-    lockSize = "normal",
+    lockSize = 'normal',
 }: Props) {
     const widgetLock = useSelector(selectors.selectWidgetLocks).find((lock) => lock.widgetName === widgetLockName);
 
@@ -48,13 +48,13 @@ function Widget({
             <h5
                 className={cx(
                     style.title,
-                    { "fw-bold": titleBoldness === "bold" },
-                    { "fw-bolder": titleBoldness === "bolder" },
-                    { "fw-normal": titleBoldness === "normal" },
-                    { [style.titleMedium]: titleSize === "medium" },
-                    { [style.titleLarge]: titleSize === "large" },
-                    { [style.titleSmall]: titleSize === "small" },
-                    { [style.titleXL]: titleSize === "larger" },
+                    { 'fw-bold': titleBoldness === 'bold' },
+                    { 'fw-bolder': titleBoldness === 'bolder' },
+                    { 'fw-normal': titleBoldness === 'normal' },
+                    { [style.titleMedium]: titleSize === 'medium' },
+                    { [style.titleLarge]: titleSize === 'large' },
+                    { [style.titleSmall]: titleSize === 'small' },
+                    { [style.titleXL]: titleSize === 'larger' },
                 )}
             >
                 {title}
@@ -66,7 +66,7 @@ function Widget({
     const renderRefreshButton = () =>
         refreshAction ? (
             <div className="ms-2 mb-1 me-auto">
-                <i onClick={refreshAction} className={cx(style.refreshIcon, "fa fa-refresh ")} />
+                <i onClick={refreshAction} className={cx(style.refreshIcon, 'fa fa-refresh ')} />
             </div>
         ) : null;
 

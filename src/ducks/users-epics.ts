@@ -1,16 +1,16 @@
-import { iif, of } from "rxjs";
-import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
+import { iif, of } from 'rxjs';
+import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
 
-import { AppEpic } from "ducks";
-import { extractError } from "utils/net";
+import { AppEpic } from 'ducks';
+import { extractError } from 'utils/net';
 
-import { actions as appRedirectActions } from "./app-redirect";
-import { slice } from "./users";
-import { actions as widgetLockActions } from "./widget-locks";
+import { actions as appRedirectActions } from './app-redirect';
+import { actions as userInterfaceActions } from './user-interface';
+import { slice } from './users';
 
-import { LockWidgetNameEnum } from "types/widget-locks";
-import { transformRoleResponseDtoToModel, transformUserDetailDtoToModel, transformUserUpdateRequestModelToDto } from "./transform/auth";
-import { transformUserAddRequestModelToDto, transformUserResponseDtoToModel } from "./transform/users";
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { transformRoleResponseDtoToModel, transformUserDetailDtoToModel, transformUserUpdateRequestModelToDto } from './transform/auth';
+import { transformUserAddRequestModelToDto, transformUserResponseDtoToModel } from './transform/users';
 
 const list: AppEpic = (action$, state, deps) => {
     return action$.pipe(
@@ -22,14 +22,14 @@ const list: AppEpic = (action$, state, deps) => {
                         slice.actions.listSuccess({
                             users: list.map(transformUserResponseDtoToModel),
                         }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfUsers),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfUsers),
                     ),
                 ),
 
                 catchError((err) =>
                     of(
-                        slice.actions.listFailure({ error: extractError(err, "Failed to get user list") }),
-                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfUsers),
+                        slice.actions.listFailure({ error: extractError(err, 'Failed to get user list') }),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfUsers),
                     ),
                 ),
             ),
@@ -47,13 +47,13 @@ const getDetail: AppEpic = (action$, state, deps) => {
                         slice.actions.getDetailSuccess({
                             user: transformUserDetailDtoToModel(detail),
                         }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.UserDetails),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.UserDetails),
                     ),
                 ),
                 catchError((err) =>
                     of(
-                        slice.actions.getDetailFailure({ error: extractError(err, "Failed to load user detail") }),
-                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.UserDetails),
+                        slice.actions.getDetailFailure({ error: extractError(err, 'Failed to load user detail') }),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.UserDetails),
                     ),
                 ),
             ),
@@ -83,8 +83,8 @@ const create: AppEpic = (action$, state, deps) => {
 
                             catchError((err) =>
                                 of(
-                                    slice.actions.createFailure({ error: extractError(err, "Failed to update user roles") }),
-                                    appRedirectActions.fetchError({ error: err, message: "Failed to update user roles" }),
+                                    slice.actions.createFailure({ error: extractError(err, 'Failed to update user roles') }),
+                                    appRedirectActions.fetchError({ error: err, message: 'Failed to update user roles' }),
                                 ),
                             ),
                         ),
@@ -92,8 +92,8 @@ const create: AppEpic = (action$, state, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.createFailure({ error: extractError(err, "Failed to create user") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to create user" }),
+                        slice.actions.createFailure({ error: extractError(err, 'Failed to create user') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to create user' }),
                     ),
                 ),
             ),
@@ -122,8 +122,8 @@ const update: AppEpic = (action$, state, deps) => {
 
                             catchError((err) =>
                                 of(
-                                    slice.actions.updateFailure({ error: extractError(err, "Failed to update user roles") }),
-                                    appRedirectActions.fetchError({ error: err, message: "Failed to update user roles" }),
+                                    slice.actions.updateFailure({ error: extractError(err, 'Failed to update user roles') }),
+                                    appRedirectActions.fetchError({ error: err, message: 'Failed to update user roles' }),
                                 ),
                             ),
                         ),
@@ -131,8 +131,8 @@ const update: AppEpic = (action$, state, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.updateFailure({ error: extractError(err, "Failed to update user") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to update user" }),
+                            slice.actions.updateFailure({ error: extractError(err, 'Failed to update user') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to update user' }),
                         ),
                     ),
                 ),
@@ -158,8 +158,8 @@ const deleteUser: AppEpic = (action$, state, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.deleteUserFailure({ error: extractError(err, "Failed to delete user") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to delete user" }),
+                        slice.actions.deleteUserFailure({ error: extractError(err, 'Failed to delete user') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to delete user' }),
                     ),
                 ),
             ),
@@ -176,8 +176,8 @@ const enable: AppEpic = (action$, state, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.enableFailure({ error: extractError(err, "Failed to enable user") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to enable user" }),
+                        slice.actions.enableFailure({ error: extractError(err, 'Failed to enable user') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to enable user' }),
                     ),
                 ),
             ),
@@ -194,8 +194,8 @@ const disable: AppEpic = (action$, state, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.disableFailure({ error: extractError(err, "Failed to disable user") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to disable user" }),
+                        slice.actions.disableFailure({ error: extractError(err, 'Failed to disable user') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to disable user' }),
                     ),
                 ),
             ),
@@ -214,8 +214,8 @@ const getRoles: AppEpic = (action$, state, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.getRolesFailure({ error: extractError(err, "Failed to get roles") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get roles" }),
+                        slice.actions.getRolesFailure({ error: extractError(err, 'Failed to get roles') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to get roles' }),
                     ),
                 ),
             ),
@@ -232,8 +232,8 @@ const updateRoles: AppEpic = (action$, state, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.updateRolesFailure({ error: extractError(err, "Failed to update roles") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to update roles" }),
+                        slice.actions.updateRolesFailure({ error: extractError(err, 'Failed to update roles') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to update roles' }),
                     ),
                 ),
             ),
@@ -250,8 +250,8 @@ const addRole: AppEpic = (action$, state, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.addRoleFailure({ error: extractError(err, "Failed to add role") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to add role" }),
+                        slice.actions.addRoleFailure({ error: extractError(err, 'Failed to add role') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to add role' }),
                     ),
                 ),
             ),
@@ -268,8 +268,8 @@ const removeRole: AppEpic = (action$, state, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.removeRoleFailure({ error: extractError(err, "Failed to remove role") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to remove role" }),
+                        slice.actions.removeRoleFailure({ error: extractError(err, 'Failed to remove role') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to remove role' }),
                     ),
                 ),
             ),

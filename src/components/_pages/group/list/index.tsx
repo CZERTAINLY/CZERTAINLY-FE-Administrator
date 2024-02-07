@@ -1,15 +1,15 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
 
-import { actions, selectors } from "ducks/certificateGroups";
+import { actions, selectors } from 'ducks/certificateGroups';
 
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
-import { Container } from "reactstrap";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
+import { Container } from 'reactstrap';
+import { LockWidgetNameEnum } from 'types/user-interface';
 
 export default function GroupList() {
     const dispatch = useDispatch();
@@ -55,17 +55,17 @@ export default function GroupList() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "plus",
+                icon: 'plus',
                 disabled: false,
-                tooltip: "Create",
+                tooltip: 'Create',
                 onClick: () => {
                     onAddClick();
                 },
             },
             {
-                icon: "trash",
+                icon: 'trash',
                 disabled: checkedRows.length === 0,
-                tooltip: "Delete",
+                tooltip: 'Delete',
                 onClick: () => {
                     setConfirmDelete(true);
                 },
@@ -77,24 +77,24 @@ export default function GroupList() {
     const groupsTableHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "name",
-                content: "Name",
+                id: 'name',
+                content: 'Name',
                 sortable: true,
-                sort: "asc",
-                width: "15%",
+                sort: 'asc',
+                width: '15%',
             },
             {
-                id: "description",
-                content: "Description",
+                id: 'description',
+                content: 'Description',
                 sortable: true,
             },
             {
-                id: "email",
-                content: "Email",
+                id: 'email',
+                content: 'Email',
                 sortable: true,
-                sort: "asc",
-                width: "15%",
-            }
+                sort: 'asc',
+                width: '15%',
+            },
         ],
         [],
     );
@@ -104,7 +104,7 @@ export default function GroupList() {
             groups.map((group) => ({
                 id: group.uuid,
 
-                columns: [<Link to={`./detail/${group.uuid}`}>{group.name}</Link>, group.description || "", group.email || ""],
+                columns: [<Link to={`./detail/${group.uuid}`}>{group.name}</Link>, group.description || '', group.email || ''],
             })),
         [groups],
     );
@@ -132,12 +132,12 @@ export default function GroupList() {
 
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete ${checkedRows.length > 1 ? "Groups" : "Profile"}`}
-                body={`You are about to delete ${checkedRows.length > 1 ? "a Group" : "Groups"}. Is this what you want to do?`}
+                caption={`Delete ${checkedRows.length > 1 ? 'Groups' : 'Profile'}`}
+                body={`You are about to delete ${checkedRows.length > 1 ? 'a Group' : 'Groups'}. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
         </Container>

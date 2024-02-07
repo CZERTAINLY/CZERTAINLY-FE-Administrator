@@ -1,20 +1,20 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useParams } from "react-router-dom";
-import { Badge, Container } from "reactstrap";
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useParams } from 'react-router-dom';
+import { Badge, Container } from 'reactstrap';
 
-import { actions, selectors } from "ducks/acme-accounts";
+import { actions, selectors } from 'ducks/acme-accounts';
 
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
-import StatusBadge from "components/StatusBadge";
-import StatusCircle from "components/StatusCircle";
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
+import StatusBadge from 'components/StatusBadge';
+import StatusCircle from 'components/StatusCircle';
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
 
-import { AccountStatus } from "types/openapi";
-import { LockWidgetNameEnum } from "types/widget-locks";
-import { acmeAccountStatus } from "../acmeAccountStatus";
+import { AccountStatus } from 'types/openapi';
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { acmeAccountStatus } from '../acmeAccountStatus';
 
 export default function AcmeAccountDetail() {
     const dispatch = useDispatch();
@@ -60,25 +60,25 @@ export default function AcmeAccountDetail() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "cross-circle",
+                icon: 'cross-circle',
                 disabled: acmeAccount ? acmeAccount.status !== AccountStatus.Valid : true,
-                tooltip: "Revoke",
+                tooltip: 'Revoke',
                 onClick: () => {
                     setConfirmRevoke(true);
                 },
             },
             {
-                icon: "check",
+                icon: 'check',
                 disabled: acmeAccount ? acmeAccount.enabled || acmeAccount.status !== AccountStatus.Valid : true,
-                tooltip: "Enable",
+                tooltip: 'Enable',
                 onClick: () => {
                     onEnableClick();
                 },
             },
             {
-                icon: "times",
+                icon: 'times',
                 disabled: acmeAccount ? !acmeAccount.enabled : true,
-                tooltip: "Disable",
+                tooltip: 'Disable',
                 onClick: () => {
                     onDisableClick();
                 },
@@ -90,12 +90,12 @@ export default function AcmeAccountDetail() {
     const detailHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "property",
-                content: "Property",
+                id: 'property',
+                content: 'Property',
             },
             {
-                id: "value",
-                content: "Value",
+                id: 'value',
+                content: 'Value',
             },
         ],
         [],
@@ -108,50 +108,55 @@ export default function AcmeAccountDetail() {
 
         return [
             {
-                id: "uuid",
-                columns: ["UUID", acmeAccount.uuid],
+                id: 'uuid',
+                columns: ['UUID', acmeAccount.uuid],
             },
             {
-                id: "accountId",
-                columns: ["Account Id", acmeAccount.accountId],
+                id: 'accountId',
+                columns: ['Account Id', acmeAccount.accountId],
             },
             {
-                id: "raProfileName",
-                columns: ["RA Profile Name",
+                id: 'raProfileName',
+                columns: [
+                    'RA Profile Name',
                     acmeAccount.raProfile ? (
-                        <Link to={`../../../raprofiles/detail/${acmeAccount?.raProfile.authorityInstanceUuid}/${acmeAccount?.raProfile.uuid}`}>{acmeAccount?.raProfile.name ?? "Unassigned"}</Link>
+                        <Link
+                            to={`../../../raprofiles/detail/${acmeAccount?.raProfile.authorityInstanceUuid}/${acmeAccount?.raProfile.uuid}`}
+                        >
+                            {acmeAccount?.raProfile.name ?? 'Unassigned'}
+                        </Link>
                     ) : (
-                        ""
+                        ''
                     ),
                 ],
             },
             {
-                id: "acmeProfileName",
+                id: 'acmeProfileName',
                 columns: [
-                    "ACME Profile Name",
+                    'ACME Profile Name',
                     acmeAccount.acmeProfileUuid ? (
                         <Link to={`../../../acmeprofiles/detail/${acmeAccount.acmeProfileUuid}`}>{acmeAccount.acmeProfileName}</Link>
                     ) : (
-                        ""
+                        ''
                     ),
                 ],
             },
             {
-                id: "internalState",
-                columns: ["Internal State", <StatusBadge enabled={acmeAccount.enabled} />],
+                id: 'internalState',
+                columns: ['Internal State', <StatusBadge enabled={acmeAccount.enabled} />],
             },
             {
-                id: "accountStatus",
-                columns: ["Account Status", <Badge color={accountStatus[1]}>{accountStatus[0]}</Badge>],
+                id: 'accountStatus',
+                columns: ['Account Status', <Badge color={accountStatus[1]}>{accountStatus[0]}</Badge>],
             },
             {
-                id: "Terms of Service Agreed",
-                columns: ["Terms of Service Agreed", <StatusCircle status={acmeAccount.termsOfServiceAgreed} />],
+                id: 'Terms of Service Agreed',
+                columns: ['Terms of Service Agreed', <StatusCircle status={acmeAccount.termsOfServiceAgreed} />],
             },
             {
-                id: "contacts",
+                id: 'contacts',
                 columns: [
-                    "Contacts",
+                    'Contacts',
                     <>
                         {acmeAccount.contact.map((contact) => (
                             <div key={contact}>{contact}</div>
@@ -165,12 +170,12 @@ export default function AcmeAccountDetail() {
     const orderHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "orders",
-                content: "Orders",
+                id: 'orders',
+                content: 'Orders',
             },
             {
-                id: "count",
-                content: "Count",
+                id: 'count',
+                content: 'Count',
             },
         ],
         [],
@@ -182,24 +187,24 @@ export default function AcmeAccountDetail() {
                 ? []
                 : [
                       {
-                          id: "Successful orders",
-                          columns: ["Successful orders", acmeAccount.successfulOrders.toString()],
+                          id: 'Successful orders',
+                          columns: ['Successful orders', acmeAccount.successfulOrders.toString()],
                       },
                       {
-                          id: "Valid orders",
-                          columns: ["Valid orders", acmeAccount.validOrders.toString()],
+                          id: 'Valid orders',
+                          columns: ['Valid orders', acmeAccount.validOrders.toString()],
                       },
                       {
-                          id: "Pending orders",
-                          columns: ["Pending orders", acmeAccount.pendingOrders.toString()],
+                          id: 'Pending orders',
+                          columns: ['Pending orders', acmeAccount.pendingOrders.toString()],
                       },
                       {
-                          id: "Failed orders",
-                          columns: ["Failed orders", acmeAccount.failedOrders.toString()],
+                          id: 'Failed orders',
+                          columns: ['Failed orders', acmeAccount.failedOrders.toString()],
                       },
                       {
-                          id: "Processing orders",
-                          columns: ["Processing orders", acmeAccount.processingOrders.toString()],
+                          id: 'Processing orders',
+                          columns: ['Processing orders', acmeAccount.processingOrders.toString()],
                       },
                   ],
         [acmeAccount],
@@ -228,8 +233,8 @@ export default function AcmeAccountDetail() {
                 body="You are about to revoke an ACME Account. Is this what you want to do?"
                 toggle={() => setConfirmRevoke(false)}
                 buttons={[
-                    { color: "danger", onClick: onRevokeConfirmed, body: "Yes, revoke" },
-                    { color: "secondary", onClick: () => setConfirmRevoke(false), body: "Cancel" },
+                    { color: 'danger', onClick: onRevokeConfirmed, body: 'Yes, revoke' },
+                    { color: 'secondary', onClick: () => setConfirmRevoke(false), body: 'Cancel' },
                 ]}
             />
         </Container>

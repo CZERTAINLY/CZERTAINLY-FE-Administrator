@@ -1,5 +1,5 @@
-import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
-import styles from "./Dialog.module.scss";
+import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import styles from './Dialog.module.scss';
 
 interface DialogButton {
     color: string;
@@ -14,7 +14,7 @@ interface Props {
     caption?: string | JSX.Element;
     body?: string | JSX.Element;
     buttons?: DialogButton[];
-    size?: "sm" | "lg" | "xl";
+    size?: 'sm' | 'lg' | 'xl';
 }
 
 export default function Dialog(props: Props) {

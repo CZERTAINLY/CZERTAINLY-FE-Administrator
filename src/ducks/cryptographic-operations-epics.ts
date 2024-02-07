@@ -1,13 +1,13 @@
-import { of } from "rxjs";
-import { catchError, filter, map, switchMap } from "rxjs/operators";
+import { of } from 'rxjs';
+import { catchError, filter, map, switchMap } from 'rxjs/operators';
 
-import { AppEpic } from "ducks";
-import { extractError } from "utils/net";
+import { AppEpic } from 'ducks';
+import { extractError } from 'utils/net';
 
-import { actions as appRedirectActions } from "./app-redirect";
-import { slice } from "./cryptographic-operations";
+import { actions as appRedirectActions } from './app-redirect';
+import { slice } from './cryptographic-operations';
 
-import { transformAttributeDescriptorDtoToModel } from "./transform/attributes";
+import { transformAttributeDescriptorDtoToModel } from './transform/attributes';
 import {
     transformCryptographicKeyRandomDataRequestModelToDto,
     transformCryptographicKeyRandomDataResponseDtoToModel,
@@ -15,7 +15,7 @@ import {
     transformCryptographicKeySignRequestModelToDto,
     transformCryptographicKeyVerifyDataResponseDtoToModel,
     transformCryptographicKeyVerifyRequestModelToDto,
-} from "./transform/cryptographic-operations";
+} from './transform/cryptographic-operations';
 
 const getSignatureAttributesDescriptors: AppEpic = (action$, state, deps) => {
     return action$.pipe(
@@ -40,9 +40,9 @@ const getSignatureAttributesDescriptors: AppEpic = (action$, state, deps) => {
                     catchError((err) =>
                         of(
                             slice.actions.listSignatureAttributesFailure({
-                                error: extractError(err, "Failed to get Signature Attribute Descriptor list"),
+                                error: extractError(err, 'Failed to get Signature Attribute Descriptor list'),
                             }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to get Signature Attribute Descriptor list" }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to get Signature Attribute Descriptor list' }),
                         ),
                     ),
                 ),
@@ -73,9 +73,9 @@ const getCipherAttributesDescriptors: AppEpic = (action$, state, deps) => {
                     catchError((err) =>
                         of(
                             slice.actions.listCipherAttributesFailure({
-                                error: extractError(err, "Failed to get Cipher Attribute Descriptor list"),
+                                error: extractError(err, 'Failed to get Cipher Attribute Descriptor list'),
                             }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to get Cipher Attribute Descriptor list" }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to get Cipher Attribute Descriptor list' }),
                         ),
                     ),
                 ),
@@ -102,11 +102,11 @@ const getRandomAttributesDescriptors: AppEpic = (action$, state, deps) => {
                     catchError((err) =>
                         of(
                             slice.actions.listRandomAttributesFailure({
-                                error: extractError(err, "Failed to get Random Data Generation Attribute Descriptor list"),
+                                error: extractError(err, 'Failed to get Random Data Generation Attribute Descriptor list'),
                             }),
                             appRedirectActions.fetchError({
                                 error: err,
-                                message: "Failed to get Random Data Generation Attribute Descriptor list",
+                                message: 'Failed to get Random Data Generation Attribute Descriptor list',
                             }),
                         ),
                     ),
@@ -138,8 +138,8 @@ const signData: AppEpic = (action$, state$, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.signDataFailure({ error: extractError(err, "Failed to Sign the data") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to Sign the data" }),
+                            slice.actions.signDataFailure({ error: extractError(err, 'Failed to Sign the data') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to Sign the data' }),
                         ),
                     ),
                 ),
@@ -170,8 +170,8 @@ const verifyData: AppEpic = (action$, state$, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.verifyDataFailure({ error: extractError(err, "Failed to Verify the data") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to Verify the data" }),
+                            slice.actions.verifyDataFailure({ error: extractError(err, 'Failed to Verify the data') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to Verify the data' }),
                         ),
                     ),
                 ),
@@ -199,8 +199,8 @@ const generateRandomData: AppEpic = (action$, state$, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.generateRandomDataFailure({ error: extractError(err, "Failed to generate random data") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to generate random data" }),
+                            slice.actions.generateRandomDataFailure({ error: extractError(err, 'Failed to generate random data') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to generate random data' }),
                         ),
                     ),
                 ),

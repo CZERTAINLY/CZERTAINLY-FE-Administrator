@@ -1,15 +1,15 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
-import { Container } from "reactstrap";
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { Container } from 'reactstrap';
 
-import { actions as profileApprovalActions, selectors as profileApprovalSelector } from "ducks/approval-profiles";
+import { actions as profileApprovalActions, selectors as profileApprovalSelector } from 'ducks/approval-profiles';
 
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import StatusBadge from "components/StatusBadge";
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import StatusBadge from 'components/StatusBadge';
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
+import { LockWidgetNameEnum } from 'types/user-interface';
 
 export default function ApprovalProfilesList() {
     const dispatch = useDispatch();
@@ -38,9 +38,9 @@ export default function ApprovalProfilesList() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "plus",
+                icon: 'plus',
                 disabled: false,
-                tooltip: "Create",
+                tooltip: 'Create',
                 onClick: () => {
                     onAddClick();
                 },
@@ -52,31 +52,31 @@ export default function ApprovalProfilesList() {
     const approvalProfilesTableHeader: TableHeader[] = useMemo(
         () => [
             {
-                id: "name",
-                content: "Name",
+                id: 'name',
+                content: 'Name',
                 sortable: true,
-                sort: "asc",
+                sort: 'asc',
             },
             {
-                id: "description",
-                content: "Description",
+                id: 'description',
+                content: 'Description',
             },
             {
-                id: "isEnabled",
-                content: "Enabled",
+                id: 'isEnabled',
+                content: 'Enabled',
             },
             {
-                id: "version",
-                content: "Version",
+                id: 'version',
+                content: 'Version',
             },
 
             {
-                id: "approvalSteps",
-                content: "Approval Steps",
+                id: 'approvalSteps',
+                content: 'Approval Steps',
             },
             {
-                id: "associations",
-                content: "Associations",
+                id: 'associations',
+                content: 'Associations',
             },
         ],
         [],
@@ -90,7 +90,7 @@ export default function ApprovalProfilesList() {
                 columns: [
                     <Link to={`./detail/${approvalProfile.uuid}`}>{approvalProfile.name}</Link>,
 
-                    approvalProfile.description || "",
+                    approvalProfile.description || '',
 
                     <StatusBadge enabled={approvalProfile.enabled} />,
 

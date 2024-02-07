@@ -1,16 +1,16 @@
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
-import { Badge, Container } from "reactstrap";
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { Badge, Container } from 'reactstrap';
 
-import { actions, selectors } from "ducks/ra-profiles";
+import { actions, selectors } from 'ducks/ra-profiles';
 
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
-import StatusBadge from "components/StatusBadge";
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
+import StatusBadge from 'components/StatusBadge';
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
+import { LockWidgetNameEnum } from 'types/user-interface';
 
 function RaProfileList() {
     const dispatch = useDispatch();
@@ -74,41 +74,41 @@ function RaProfileList() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "plus",
+                icon: 'plus',
                 disabled: false,
-                tooltip: "Create",
+                tooltip: 'Create',
                 onClick: () => {
                     onAddClick();
                 },
             },
             {
-                icon: "trash",
+                icon: 'trash',
                 disabled: checkedRows.length === 0,
-                tooltip: "Delete",
+                tooltip: 'Delete',
                 onClick: () => {
                     setConfirmDelete(true);
                 },
             },
             {
-                icon: "check",
+                icon: 'check',
                 disabled: checkedRows.length === 0,
-                tooltip: "Enable",
+                tooltip: 'Enable',
                 onClick: () => {
                     onEnableClick();
                 },
             },
             {
-                icon: "times",
+                icon: 'times',
                 disabled: checkedRows.length === 0,
-                tooltip: "Disable",
+                tooltip: 'Disable',
                 onClick: () => {
                     onDisableClick();
                 },
             },
             {
-                icon: "gavel",
+                icon: 'gavel',
                 disabled: checkedRows.length === 0,
-                tooltip: "Check Compliance",
+                tooltip: 'Check Compliance',
                 onClick: () => {
                     setComplianceCheck(true);
                 },
@@ -120,37 +120,37 @@ function RaProfileList() {
     const raProfilesTableHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "name",
-                content: "Name",
+                id: 'name',
+                content: 'Name',
                 sortable: true,
-                sort: "asc",
-                width: "15%",
+                sort: 'asc',
+                width: '15%',
             },
             {
-                id: "description",
-                content: "Description",
+                id: 'description',
+                content: 'Description',
                 sortable: true,
             },
             {
-                id: "authority",
-                align: "center",
-                content: "Authority",
+                id: 'authority',
+                align: 'center',
+                content: 'Authority',
                 sortable: true,
-                width: "15%",
+                width: '15%',
             },
             {
-                id: "enabledProtocols",
-                content: "Enabled Protocols",
-                align: "center",
+                id: 'enabledProtocols',
+                content: 'Enabled Protocols',
+                align: 'center',
                 sortable: true,
-                width: "20%",
+                width: '20%',
             },
             {
-                id: "status",
-                align: "center",
-                content: "Status",
+                id: 'status',
+                align: 'center',
+                content: 'Status',
                 sortable: true,
-                width: "7%",
+                width: '7%',
             },
         ],
         [],
@@ -181,16 +181,18 @@ function RaProfileList() {
                 id: raProfile.uuid,
 
                 columns: [
-                    <span style={{ whiteSpace: "nowrap" }}>
-                        <Link to={`./detail/${raProfile.authorityInstanceUuid || "unknown"}/${raProfile.uuid}`}>{raProfile.name}</Link>
+                    <span style={{ whiteSpace: 'nowrap' }}>
+                        <Link to={`./detail/${raProfile.authorityInstanceUuid || 'unknown'}/${raProfile.uuid}`}>{raProfile.name}</Link>
                     </span>,
 
-                    <span style={{ whiteSpace: "nowrap" }}>{raProfile.description || ""}</span>,
+                    <span style={{ whiteSpace: 'nowrap' }}>{raProfile.description || ''}</span>,
 
-                    raProfile.authorityInstanceName? (
-                        <Link to={`../authorities/detail/${raProfile.authorityInstanceUuid}`}>{raProfile.authorityInstanceName ?? "Unassigned"}</Link>
+                    raProfile.authorityInstanceName ? (
+                        <Link to={`../authorities/detail/${raProfile.authorityInstanceUuid}`}>
+                            {raProfile.authorityInstanceName ?? 'Unassigned'}
+                        </Link>
                     ) : (
-                        raProfile.authorityInstanceName ?? "Unassigned"
+                        raProfile.authorityInstanceName ?? 'Unassigned'
                     ),
 
                     getProtocolsForDisplay(raProfile.enabledProtocols),
@@ -224,23 +226,23 @@ function RaProfileList() {
 
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete RA ${checkedRows.length > 1 ? "Profiles" : "Profile"}`}
-                body={`You are about to delete ${checkedRows.length > 1 ? "a RA Profile" : "RA profiles"}. Is this what you want to do?`}
+                caption={`Delete RA ${checkedRows.length > 1 ? 'Profiles' : 'Profile'}`}
+                body={`You are about to delete ${checkedRows.length > 1 ? 'a RA Profile' : 'RA profiles'}. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
             <Dialog
                 isOpen={complianceCheck}
                 caption={`Initiate Compliance Check`}
-                body={"Initiate the compliance check for the selected RA Profile(s)?"}
+                body={'Initiate the compliance check for the selected RA Profile(s)?'}
                 toggle={() => setComplianceCheck(false)}
                 buttons={[
-                    { color: "primary", onClick: onComplianceCheckConfirmed, body: "Yes" },
-                    { color: "secondary", onClick: () => setComplianceCheck(false), body: "Cancel" },
+                    { color: 'primary', onClick: onComplianceCheckConfirmed, body: 'Yes' },
+                    { color: 'secondary', onClick: () => setComplianceCheck(false), body: 'Cancel' },
                 ]}
             />
         </Container>

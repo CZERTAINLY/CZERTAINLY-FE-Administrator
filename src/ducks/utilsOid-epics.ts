@@ -1,11 +1,11 @@
-import { AppEpic } from "ducks";
-import { EMPTY, of } from "rxjs";
-import { catchError, filter, map, switchMap } from "rxjs/operators";
+import { AppEpic } from 'ducks';
+import { EMPTY, of } from 'rxjs';
+import { catchError, filter, map, switchMap } from 'rxjs/operators';
 
-import { extractError } from "utils/net";
-import { actions as appRedirectActions } from "./app-redirect";
+import { extractError } from 'utils/net';
+import { actions as appRedirectActions } from './app-redirect';
 
-import { slice } from "./utilsOid";
+import { slice } from './utilsOid';
 
 const getOidInfo: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -16,8 +16,8 @@ const getOidInfo: AppEpic = (action$, state$, deps) => {
                     map((oidInfo) => slice.actions.getOidInfoSuccess(oidInfo)),
                     catchError((err) =>
                         of(
-                            slice.actions.getOidInfoFailure({ error: extractError(err, "Failed to get OID.") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to get OID." }),
+                            slice.actions.getOidInfoFailure({ error: extractError(err, 'Failed to get OID.') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to get OID.' }),
                         ),
                     ),
                 ) ?? EMPTY,

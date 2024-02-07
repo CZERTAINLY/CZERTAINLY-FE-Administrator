@@ -1,18 +1,18 @@
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 
-import Dialog from "components/Dialog";
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
+import Dialog from 'components/Dialog';
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
 
-import { actions, selectors } from "ducks/certificateGroups";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { actions, selectors } from 'ducks/certificateGroups';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
 
-import { Container } from "reactstrap";
-import { LockWidgetNameEnum } from "types/widget-locks";
-import { Resource } from "../../../../types/openapi";
-import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
+import { Container } from 'reactstrap';
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { Resource } from '../../../../types/openapi';
+import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 
 export default function GroupDetail() {
     const dispatch = useDispatch();
@@ -35,7 +35,7 @@ export default function GroupDetail() {
     }, [getFreshGroupDetails, id]);
 
     const onEditClick = useCallback(() => {
-        navigate(`../../edit/${group?.uuid}`, { relative: "path" });
+        navigate(`../../edit/${group?.uuid}`, { relative: 'path' });
     }, [group, navigate]);
 
     const onDeleteConfirmed = useCallback(() => {
@@ -48,17 +48,17 @@ export default function GroupDetail() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "pencil",
+                icon: 'pencil',
                 disabled: false,
-                tooltip: "Edit",
+                tooltip: 'Edit',
                 onClick: () => {
                     onEditClick();
                 },
             },
             {
-                icon: "trash",
+                icon: 'trash',
                 disabled: false,
-                tooltip: "Delete",
+                tooltip: 'Delete',
                 onClick: () => {
                     setConfirmDelete(true);
                 },
@@ -70,12 +70,12 @@ export default function GroupDetail() {
     const detailHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "property",
-                content: "Property",
+                id: 'property',
+                content: 'Property',
             },
             {
-                id: "value",
-                content: "Value",
+                id: 'value',
+                content: 'Value',
             },
         ],
         [],
@@ -87,20 +87,20 @@ export default function GroupDetail() {
                 ? []
                 : [
                       {
-                          id: "uuid",
-                          columns: ["UUID", group.uuid],
+                          id: 'uuid',
+                          columns: ['UUID', group.uuid],
                       },
                       {
-                          id: "name",
-                          columns: ["Name", group.name],
+                          id: 'name',
+                          columns: ['Name', group.name],
                       },
                       {
-                          id: "email",
-                          columns: ["Email", group.email || ""],
+                          id: 'email',
+                          columns: ['Email', group.email || ''],
                       },
                       {
-                          id: "description",
-                          columns: ["Description", group.description || ""],
+                          id: 'description',
+                          columns: ['Description', group.description || ''],
                       },
                   ],
         [group],
@@ -127,8 +127,8 @@ export default function GroupDetail() {
                 body="You are about to delete an Group. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
         </Container>

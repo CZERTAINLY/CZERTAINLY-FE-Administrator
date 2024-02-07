@@ -1,21 +1,21 @@
-import { AppEpic } from "ducks";
-import { iif, of } from "rxjs";
-import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
-import { extractError } from "utils/net";
-import { actions as appRedirectActions } from "./app-redirect";
-import { actions as widgetLockActions } from "./widget-locks";
+import { AppEpic } from 'ducks';
+import { iif, of } from 'rxjs';
+import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
+import { extractError } from 'utils/net';
+import { actions as appRedirectActions } from './app-redirect';
+import { actions as userInterfaceActions } from './user-interface';
 
-import { store } from "index";
-import { LockWidgetNameEnum } from "types/widget-locks";
-import { EntityType } from "./filters";
-import { actions as pagingActions } from "./paging";
-import { slice } from "./scheduler";
-import { transformSearchRequestModelToDto } from "./transform/certificates";
+import { store } from 'index';
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { EntityType } from './filters';
+import { actions as pagingActions } from './paging';
+import { slice } from './scheduler';
+import { transformSearchRequestModelToDto } from './transform/certificates';
 import {
     transformSchedulerJobDetailDtoToModel,
     transformSchedulerJobDtoToModel,
     transformSchedulerJobHistoryDtoToModel,
-} from "./transform/scheduler";
+} from './transform/scheduler';
 
 const listSchedulerJobs: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -27,14 +27,14 @@ const listSchedulerJobs: AppEpic = (action$, state$, deps) => {
                     of(
                         slice.actions.listSchedulerJobsSuccess(response.scheduledJobs.map(transformSchedulerJobDtoToModel)),
                         pagingActions.listSuccess({ entity: EntityType.SCHEDULER, totalItems: response.totalItems }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfScheduler),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfScheduler),
                     ),
                 ),
 
                 catchError((err) =>
                     of(
                         pagingActions.listFailure(EntityType.SCHEDULER),
-                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfScheduler),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfScheduler),
                     ),
                 ),
             );
@@ -51,14 +51,14 @@ const getSchedulerJob: AppEpic = (action$, state$, deps) => {
                 switchMap((response) =>
                     of(
                         slice.actions.getSchedulerJobDetailSuccess(transformSchedulerJobDetailDtoToModel(response)),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.SchedulerJobDetail),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.SchedulerJobDetail),
                     ),
                 ),
 
                 catchError((err) =>
                     of(
-                        slice.actions.getSchedulerJobDetailFailure({ error: extractError(err, "Failed to get Scheduled Job detail") }),
-                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.SchedulerJobDetail),
+                        slice.actions.getSchedulerJobDetailFailure({ error: extractError(err, 'Failed to get Scheduled Job detail') }),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.SchedulerJobDetail),
                     ),
                 ),
             ),
@@ -83,14 +83,14 @@ const listSchedulerJobHistory: AppEpic = (action$, state$, deps) => {
                                 response.scheduledJobHistory.map(transformSchedulerJobHistoryDtoToModel),
                             ),
                             pagingActions.listSuccess({ entity: EntityType.SCHEDULER_HISTORY, totalItems: response.totalItems }),
-                            widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfSchedulerHistory),
+                            userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfSchedulerHistory),
                         ),
                     ),
 
                     catchError((err) =>
                         of(
                             pagingActions.listFailure(EntityType.SCHEDULER_HISTORY),
-                            widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfSchedulerHistory),
+                            userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfSchedulerHistory),
                         ),
                     ),
                 );
@@ -108,7 +108,7 @@ const deleteSchedulerJob: AppEpic = (action$, state$, deps) => {
                         () => action.payload.redirect,
                         of(
                             slice.actions.deleteSchedulerJobSuccess({ uuid: action.payload.uuid }),
-                            appRedirectActions.redirect({ url: "../../" }),
+                            appRedirectActions.redirect({ url: '../../' }),
                         ),
                         of(slice.actions.deleteSchedulerJobSuccess({ uuid: action.payload.uuid })),
                     ),
@@ -116,8 +116,8 @@ const deleteSchedulerJob: AppEpic = (action$, state$, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.deleteSchedulerJobFailure({ error: extractError(err, "Failed to delete Scheduled Job") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to delete Scheduled Job" }),
+                        slice.actions.deleteSchedulerJobFailure({ error: extractError(err, 'Failed to delete Scheduled Job') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to delete Scheduled Job' }),
                     ),
                 ),
             ),
@@ -134,8 +134,8 @@ const enableSchedulerJob: AppEpic = (action$, state$, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.enableSchedulerJobFailure({ error: extractError(err, "Failed to enable Scheduled Job") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to enable Scheduled Job" }),
+                        slice.actions.enableSchedulerJobFailure({ error: extractError(err, 'Failed to enable Scheduled Job') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to enable Scheduled Job' }),
                     ),
                 ),
             ),
@@ -152,8 +152,8 @@ const disableSchedulerJob: AppEpic = (action$, state$, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.disableSchedulerJobFailure({ error: extractError(err, "Failed to disable Scheduled Job") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to disable Scheduled Job" }),
+                        slice.actions.disableSchedulerJobFailure({ error: extractError(err, 'Failed to disable Scheduled Job') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to disable Scheduled Job' }),
                     ),
                 ),
             ),

@@ -1,29 +1,29 @@
-import ComplianceRuleAttributeViewer from "components/Attributes/ComplianceRuleAttributeViewer";
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
-import StatusBadge from "components/StatusBadge";
+import ComplianceRuleAttributeViewer from 'components/Attributes/ComplianceRuleAttributeViewer';
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
+import StatusBadge from 'components/StatusBadge';
 
-import Widget from "components/Widget";
-import WidgetButtons, { WidgetButtonProps } from "components/WidgetButtons";
+import Widget from 'components/Widget';
+import WidgetButtons, { WidgetButtonProps } from 'components/WidgetButtons';
 
-import { actions, selectors } from "ducks/compliance-profiles";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useParams } from "react-router-dom";
-import Select from "react-select";
+import { actions, selectors } from 'ducks/compliance-profiles';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useParams } from 'react-router-dom';
+import Select from 'react-select';
 
-import { Badge, Button, Col, Container, Label, Row } from "reactstrap";
+import { Badge, Button, Col, Container, Label, Row } from 'reactstrap';
 import {
     ComplianceProfileGroupListResponseGroupModel,
     ComplianceProfileResponseGroupGroupModel,
     ComplianceProfileResponseRuleRuleModel,
     ComplianceProfileRuleListResponseRuleModel,
-} from "types/complianceProfiles";
-import { LockWidgetNameEnum } from "types/widget-locks";
-import { Resource } from "../../../../types/openapi";
-import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
-import AddRuleWithAttributesDialogBody from "../form/AddRuleWithAttributesDialogBody/index.";
-import AssociateRaProfileDialogBody from "../form/AssociateRaProfileDialogBody/AssociateRaProfileDialogBody";
+} from 'types/complianceProfiles';
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { Resource } from '../../../../types/openapi';
+import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
+import AddRuleWithAttributesDialogBody from '../form/AddRuleWithAttributesDialogBody/index.';
+import AssociateRaProfileDialogBody from '../form/AssociateRaProfileDialogBody/AssociateRaProfileDialogBody';
 
 export default function ComplianceProfileDetail() {
     const dispatch = useDispatch();
@@ -55,8 +55,8 @@ export default function ComplianceProfileDetail() {
 
     const [currentGroupUuidForDisplay, setCurrentGroupUuidForDisplay] = useState<string>();
 
-    const [selectionFilter, setSelectionFilter] = useState<string>("Selected");
-    const [objectFilter, setObjectFilter] = useState<string>("Groups & Rules");
+    const [selectionFilter, setSelectionFilter] = useState<string>('Selected');
+    const [objectFilter, setObjectFilter] = useState<string>('Groups & Rules');
 
     const getFreshComplianceProfileDetails = useCallback(() => {
         if (!id) return;
@@ -84,7 +84,7 @@ export default function ComplianceProfileDetail() {
         for (let connector of rules) {
             for (let rule of connector.rules) {
                 const keyString =
-                    (rule.groupUuid || "unknown") + ":#" + connector.connectorUuid + ":#" + connector.kind + ":#" + connector.connectorName;
+                    (rule.groupUuid || 'unknown') + ':#' + connector.connectorUuid + ':#' + connector.kind + ':#' + connector.connectorName;
 
                 if (groupRuleMapping[keyString]) {
                     groupRuleMapping[keyString].push(rule);
@@ -106,7 +106,7 @@ export default function ComplianceProfileDetail() {
         for (let connector of profile?.rules || []) {
             if (connector.rules) {
                 for (let rule of connector.rules) {
-                    alreadyAssociatedRuleUuidsLcl.push(rule.uuid + ":#" + connector.connectorUuid + ":#" + connector.kind);
+                    alreadyAssociatedRuleUuidsLcl.push(rule.uuid + ':#' + connector.connectorUuid + ':#' + connector.kind);
                 }
             }
         }
@@ -114,7 +114,7 @@ export default function ComplianceProfileDetail() {
         for (let connector of profile?.groups || []) {
             if (connector.groups) {
                 for (let group of connector.groups) {
-                    alreadyAssociatedGroupUuidsLcl.push(group.uuid + ":#" + connector.connectorUuid + ":#" + connector.kind);
+                    alreadyAssociatedGroupUuidsLcl.push(group.uuid + ':#' + connector.connectorUuid + ':#' + connector.kind);
                 }
             }
         }
@@ -172,7 +172,7 @@ export default function ComplianceProfileDetail() {
                     kind: kind,
                     groupUuid: group.uuid,
                     groupName: group.name,
-                    description: group.description || "",
+                    description: group.description || '',
                     addRequest: { groupUuid: group.uuid, connectorUuid: connectorUuid, kind: kind },
                 }),
             );
@@ -228,17 +228,17 @@ export default function ComplianceProfileDetail() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "gavel",
+                icon: 'gavel',
                 disabled: false,
-                tooltip: "Check Compliance",
+                tooltip: 'Check Compliance',
                 onClick: () => {
                     setComplianceCheck(true);
                 },
             },
             {
-                icon: "trash",
+                icon: 'trash',
                 disabled: false,
-                tooltip: "Delete",
+                tooltip: 'Delete',
                 onClick: () => {
                     setConfirmDelete(true);
                 },
@@ -250,9 +250,9 @@ export default function ComplianceProfileDetail() {
     const raProfileButtons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "plus",
+                icon: 'plus',
                 disabled: false,
-                tooltip: "Associate RA Profile",
+                tooltip: 'Associate RA Profile',
                 onClick: () => {
                     setAddRaProfile(true);
                 },
@@ -278,19 +278,19 @@ export default function ComplianceProfileDetail() {
     const ruleGroupHeader: TableHeader[] = useMemo(
         () => [
             {
-                id: "type",
-                content: "Type",
-                width: "10%",
+                id: 'type',
+                content: 'Type',
+                width: '10%',
             },
             {
-                id: "action",
-                content: "Action",
-                width: "10%",
+                id: 'action',
+                content: 'Action',
+                width: '10%',
             },
             {
-                id: "description",
-                content: "Description",
-                width: "50%",
+                id: 'description',
+                content: 'Description',
+                width: '50%',
             },
         ],
         [],
@@ -299,12 +299,12 @@ export default function ComplianceProfileDetail() {
     const detailHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "property",
-                content: "Property",
+                id: 'property',
+                content: 'Property',
             },
             {
-                id: "value",
-                content: "Value",
+                id: 'value',
+                content: 'Value',
             },
         ],
         [],
@@ -316,16 +316,16 @@ export default function ComplianceProfileDetail() {
                 ? []
                 : [
                       {
-                          id: "uuid",
-                          columns: ["UUID", profile.uuid],
+                          id: 'uuid',
+                          columns: ['UUID', profile.uuid],
                       },
                       {
-                          id: "name",
-                          columns: ["Name", profile.name],
+                          id: 'name',
+                          columns: ['Name', profile.name],
                       },
                       {
-                          id: "description",
-                          columns: ["Description", profile.description || ""],
+                          id: 'description',
+                          columns: ['Description', profile.description || ''],
                       },
                   ],
         [profile],
@@ -334,37 +334,37 @@ export default function ComplianceProfileDetail() {
     const getRuleMoreData = useCallback((rule: ComplianceProfileRuleListResponseRuleModel, connectorName: string, kind: string) => {
         return [
             {
-                id: "connectorName",
-                columns: ["Connector Name", connectorName],
+                id: 'connectorName',
+                columns: ['Connector Name', connectorName],
             },
             {
-                id: "connectorKind",
-                columns: ["Kind", kind],
+                id: 'connectorKind',
+                columns: ['Kind', kind],
             },
             {
-                id: "uuid",
-                columns: ["UUID", rule.uuid],
+                id: 'uuid',
+                columns: ['UUID', rule.uuid],
             },
             {
-                id: "name",
-                columns: ["Name", rule.name],
+                id: 'name',
+                columns: ['Name', rule.name],
             },
             {
-                id: "description",
-                columns: ["Description", rule.description || ""],
+                id: 'description',
+                columns: ['Description', rule.description || ''],
             },
             {
-                id: "groupUuid",
-                columns: ["Group UUID", rule.groupUuid || ""],
+                id: 'groupUuid',
+                columns: ['Group UUID', rule.groupUuid || ''],
             },
             {
-                id: "certificateType",
-                columns: ["Certificate Type", rule.certificateType || ""],
+                id: 'certificateType',
+                columns: ['Certificate Type', rule.certificateType || ''],
             },
             {
-                id: "attributes",
+                id: 'attributes',
                 columns: [
-                    "Attributes",
+                    'Attributes',
                     rule.attributes ? <ComplianceRuleAttributeViewer descriptorAttributes={rule.attributes} /> : <>No attributes</>,
                 ],
             },
@@ -374,37 +374,37 @@ export default function ComplianceProfileDetail() {
     const getRuleMoreDataRule = useCallback((rule: ComplianceProfileResponseRuleRuleModel, connectorName: string, kind: string) => {
         return [
             {
-                id: "connectorName",
-                columns: ["Connector Name", connectorName],
+                id: 'connectorName',
+                columns: ['Connector Name', connectorName],
             },
             {
-                id: "connectorKind",
-                columns: ["Kind", kind],
+                id: 'connectorKind',
+                columns: ['Kind', kind],
             },
             {
-                id: "uuid",
-                columns: ["UUID", rule.uuid],
+                id: 'uuid',
+                columns: ['UUID', rule.uuid],
             },
             {
-                id: "name",
-                columns: ["Name", rule.name],
+                id: 'name',
+                columns: ['Name', rule.name],
             },
             {
-                id: "description",
-                columns: ["Description", rule.description || ""],
+                id: 'description',
+                columns: ['Description', rule.description || ''],
             },
             {
-                id: "groupUuid",
-                columns: ["Group UUID", ""],
+                id: 'groupUuid',
+                columns: ['Group UUID', ''],
             },
             {
-                id: "certificateType",
-                columns: ["Certificate Type", rule.certificateType || ""],
+                id: 'certificateType',
+                columns: ['Certificate Type', rule.certificateType || ''],
             },
             {
-                id: "attributes",
+                id: 'attributes',
                 columns: [
-                    "Attributes",
+                    'Attributes',
                     rule.attributes ? <ComplianceRuleAttributeViewer attributes={rule.attributes} /> : <>No attributes</>,
                 ],
             },
@@ -414,12 +414,12 @@ export default function ComplianceProfileDetail() {
     const ruleHeader: TableHeader[] = useMemo(
         () => [
             {
-                id: "name",
-                content: "Name",
+                id: 'name',
+                content: 'Name',
             },
             {
-                id: "description",
-                content: "Description",
+                id: 'description',
+                content: 'Description',
             },
         ],
         [],
@@ -431,12 +431,12 @@ export default function ComplianceProfileDetail() {
         if (!currentGroupUuidForDisplay) return [];
 
         let data: TableDataRow[] = [];
-        let dataSplit = currentGroupUuidForDisplay.split(":#");
+        let dataSplit = currentGroupUuidForDisplay.split(':#');
 
-        for (const rule of (groupRuleMapping && groupRuleMapping[currentGroupUuidForDisplay || ""]) ?? []) {
+        for (const rule of (groupRuleMapping && groupRuleMapping[currentGroupUuidForDisplay || '']) ?? []) {
             data.push({
                 id: `${rule.uuid}-${dataSplit[1]}`,
-                columns: [rule.name, rule.description || ""],
+                columns: [rule.name, rule.description || ''],
                 detailColumns: [
                     <></>,
                     <></>,
@@ -451,16 +451,16 @@ export default function ComplianceProfileDetail() {
     const raProfileHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "raProfileName",
-                content: "Name",
+                id: 'raProfileName',
+                content: 'Name',
             },
             {
-                id: "status",
-                content: "Status",
+                id: 'status',
+                content: 'Status',
             },
             {
-                id: "action",
-                content: "Action",
+                id: 'action',
+                content: 'Action',
             },
         ],
         [],
@@ -482,9 +482,9 @@ export default function ComplianceProfileDetail() {
                           <WidgetButtons
                               buttons={[
                                   {
-                                      icon: "minus-square",
+                                      icon: 'minus-square',
                                       disabled: false,
-                                      tooltip: "Remove",
+                                      tooltip: 'Remove',
                                       onClick: () => {
                                           onDissociateRaProfile(raProfile.uuid);
                                       },
@@ -499,24 +499,24 @@ export default function ComplianceProfileDetail() {
     const getGroupMoreData = useCallback((group: ComplianceProfileResponseGroupGroupModel, connectorName: string, kind: string) => {
         return [
             {
-                id: "connectorName",
-                columns: ["Connector Name", connectorName],
+                id: 'connectorName',
+                columns: ['Connector Name', connectorName],
             },
             {
-                id: "connectorKind",
-                columns: ["Kind", kind],
+                id: 'connectorKind',
+                columns: ['Kind', kind],
             },
             {
-                id: "uuid",
-                columns: ["UUID", group.uuid],
+                id: 'uuid',
+                columns: ['UUID', group.uuid],
             },
             {
-                id: "name",
-                columns: ["Name", group.name],
+                id: 'name',
+                columns: ['Name', group.name],
             },
             {
-                id: "description",
-                columns: ["Description", group.description || ""],
+                id: 'description',
+                columns: ['Description', group.description || ''],
             },
         ];
     }, []);
@@ -527,12 +527,12 @@ export default function ComplianceProfileDetail() {
 
         let data: TableDataRow[] = [];
 
-        if (["Selected", "All"].includes(selectionFilter) && ["Groups & Rules", "Groups"].includes(objectFilter)) {
+        if (['Selected', 'All'].includes(selectionFilter) && ['Groups & Rules', 'Groups'].includes(objectFilter)) {
             for (const connector of profile.groups) {
                 if (connector.groups && connector.connectorUuid && connector.kind && connector.connectorName) {
                     for (const group of connector.groups) {
                         const keyString =
-                            group.uuid + ":#" + connector.connectorUuid + ":#" + connector.kind + ":#" + connector.connectorName;
+                            group.uuid + ':#' + connector.connectorUuid + ':#' + connector.kind + ':#' + connector.connectorName;
 
                         data.push({
                             id: `${group.uuid}-${connector.connectorUuid}`,
@@ -549,7 +549,7 @@ export default function ComplianceProfileDetail() {
                                             onDeleteGroup(connector.connectorUuid!, connector.kind!, group);
                                         }}
                                     >
-                                        <i className="fa fa-times" style={{ color: "red" }} />
+                                        <i className="fa fa-times" style={{ color: 'red' }} />
                                     </Button>
                                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                     <Button
@@ -560,7 +560,7 @@ export default function ComplianceProfileDetail() {
                                             setCurrentGroupUuidForDisplay(keyString);
                                         }}
                                     >
-                                        <i className="fa fa-info" style={{ color: "auto" }} />
+                                        <i className="fa fa-info" style={{ color: 'auto' }} />
                                     </Button>
                                 </div>,
 
@@ -585,7 +585,7 @@ export default function ComplianceProfileDetail() {
             }
         }
 
-        if (["Selected", "All"].includes(selectionFilter) && ["Groups & Rules", "Rules"].includes(objectFilter)) {
+        if (['Selected', 'All'].includes(selectionFilter) && ['Groups & Rules', 'Rules'].includes(objectFilter)) {
             for (const connector of profile.rules) {
                 if (connector.rules && connector.connectorUuid && connector.kind && connector.connectorName) {
                     for (const rule of connector.rules) {
@@ -604,7 +604,7 @@ export default function ComplianceProfileDetail() {
                                             onDeleteRule(connector.connectorUuid!, connector.kind!, rule);
                                         }}
                                     >
-                                        <i className="fa fa-times" style={{ color: "red" }} />
+                                        <i className="fa fa-times" style={{ color: 'red' }} />
                                     </Button>
                                 </>,
                                 rule.description || rule.name,
@@ -628,7 +628,7 @@ export default function ComplianceProfileDetail() {
                 if (connector.groups && connector.connectorName && connector.kind) {
                     for (const group of connector.groups) {
                         const keyString =
-                            group.uuid + ":#" + connector.connectorUuid + ":#" + connector.kind + ":#" + connector.connectorName;
+                            group.uuid + ':#' + connector.connectorUuid + ':#' + connector.kind + ':#' + connector.connectorName;
 
                         if (!groupRuleMapping) continue;
 
@@ -645,7 +645,7 @@ export default function ComplianceProfileDetail() {
                                             color="white"
                                             title={`Rule is part of the group '${group.name}' and cannot be removed separately`}
                                         >
-                                            <i className="fa fa-times" style={{ color: "grey" }} />
+                                            <i className="fa fa-times" style={{ color: 'grey' }} />
                                         </Button>
                                     </>,
 
@@ -668,12 +668,12 @@ export default function ComplianceProfileDetail() {
             }
         }
 
-        if (["Unselected", "All"].includes(selectionFilter) && ["Groups & Rules", "Groups"].includes(objectFilter)) {
+        if (['Unselected', 'All'].includes(selectionFilter) && ['Groups & Rules', 'Groups'].includes(objectFilter)) {
             for (const connector of groups) {
                 for (const group of connector.groups) {
-                    if (alreadyAssociatedGroupUuids.includes(group.uuid + ":#" + connector.connectorUuid + ":#" + connector.kind)) continue;
+                    if (alreadyAssociatedGroupUuids.includes(group.uuid + ':#' + connector.connectorUuid + ':#' + connector.kind)) continue;
 
-                    const keyString = group.uuid + ":#" + connector.connectorUuid + ":#" + connector.kind + ":#" + connector.connectorName;
+                    const keyString = group.uuid + ':#' + connector.connectorUuid + ':#' + connector.kind + ':#' + connector.connectorName;
 
                     data.push({
                         id: `${group.uuid}-${connector.connectorUuid}`,
@@ -690,7 +690,7 @@ export default function ComplianceProfileDetail() {
                                         onAddGroup(connector.connectorUuid, connector.connectorName, connector.kind, group);
                                     }}
                                 >
-                                    <i className="fa fa-plus" style={{ color: "auto" }} />
+                                    <i className="fa fa-plus" style={{ color: 'auto' }} />
                                 </Button>
                                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                 <Button
@@ -701,7 +701,7 @@ export default function ComplianceProfileDetail() {
                                         setCurrentGroupUuidForDisplay(keyString);
                                     }}
                                 >
-                                    <i className="fa fa-info" style={{ color: "auto" }} />
+                                    <i className="fa fa-info" style={{ color: 'auto' }} />
                                 </Button>
                             </div>,
 
@@ -719,10 +719,10 @@ export default function ComplianceProfileDetail() {
             }
         }
 
-        if (["Unselected", "All"].includes(selectionFilter) && ["Groups & Rules", "Rules"].includes(objectFilter)) {
+        if (['Unselected', 'All'].includes(selectionFilter) && ['Groups & Rules', 'Rules'].includes(objectFilter)) {
             for (const connector of rules) {
                 for (const rule of connector.rules) {
-                    if (alreadyAssociatedRuleUuids.includes(rule.uuid + ":#" + connector.connectorUuid + ":#" + connector.kind)) continue;
+                    if (alreadyAssociatedRuleUuids.includes(rule.uuid + ':#' + connector.connectorUuid + ':#' + connector.kind)) continue;
 
                     data.push({
                         id: `${rule.uuid}-${connector.connectorUuid}`,
@@ -745,7 +745,7 @@ export default function ComplianceProfileDetail() {
                                             : onAddRule(connector.connectorUuid, connector.kind, rule);
                                     }}
                                 >
-                                    <i className="fa fa-plus" style={{ color: "auto" }} />
+                                    <i className="fa fa-plus" style={{ color: 'auto' }} />
                                 </Button>
                             </>,
                             rule.description || rule.name,
@@ -783,12 +783,12 @@ export default function ComplianceProfileDetail() {
     ]);
 
     const selectionFilterData =
-        ["Selected", "All", "Unselected"].map((input) => ({
+        ['Selected', 'All', 'Unselected'].map((input) => ({
             label: input,
             value: input,
         })) || [];
 
-    const optionFilterData = ["Groups & Rules", "Rules", "Groups"].map((input) => ({ label: input, value: input })) || [];
+    const optionFilterData = ['Groups & Rules', 'Rules', 'Groups'].map((input) => ({ label: input, value: input })) || [];
 
     return (
         <Container className="themed-container" fluid>
@@ -842,9 +842,9 @@ export default function ComplianceProfileDetail() {
                         <Select
                             maxMenuHeight={140}
                             options={selectionFilterData}
-                            value={{ label: selectionFilter || "Selected", value: selectionFilter || "Selected" }}
+                            value={{ label: selectionFilter || 'Selected', value: selectionFilter || 'Selected' }}
                             menuPlacement="auto"
-                            onChange={(event) => setSelectionFilter(event?.value || "")}
+                            onChange={(event) => setSelectionFilter(event?.value || '')}
                         />
                     </Col>
                     <Col>
@@ -852,9 +852,9 @@ export default function ComplianceProfileDetail() {
                         <Select
                             maxMenuHeight={140}
                             options={optionFilterData}
-                            value={{ label: objectFilter || "Groups & Rules", value: objectFilter || "Groups & Rules" }}
+                            value={{ label: objectFilter || 'Groups & Rules', value: objectFilter || 'Groups & Rules' }}
                             menuPlacement="auto"
-                            onChange={(event) => setObjectFilter(event?.value || "")}
+                            onChange={(event) => setObjectFilter(event?.value || '')}
                         />
                     </Col>
                 </Row>
@@ -869,7 +869,7 @@ export default function ComplianceProfileDetail() {
                 size="lg"
                 body={<CustomTable headers={ruleHeader} data={ruleData} hasPagination={true} hasDetails={true} />}
                 toggle={onCloseGroupRuleDetail}
-                buttons={[{ color: "secondary", onClick: () => onCloseGroupRuleDetail(), body: "Cancel" }]}
+                buttons={[{ color: 'secondary', onClick: () => onCloseGroupRuleDetail(), body: 'Cancel' }]}
             />
 
             <Dialog
@@ -878,8 +878,8 @@ export default function ComplianceProfileDetail() {
                 body="You are about to delete a Compliance Profile. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
@@ -896,8 +896,8 @@ export default function ComplianceProfileDetail() {
                 }
                 toggle={() => dispatch(actions.clearDeleteErrorMessages())}
                 buttons={[
-                    { color: "danger", onClick: onForceDeleteComplianceProfile, body: "Force" },
-                    { color: "secondary", onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: "Cancel" },
+                    { color: 'danger', onClick: onForceDeleteComplianceProfile, body: 'Force' },
+                    { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
                 ]}
             />
 
@@ -936,11 +936,11 @@ export default function ComplianceProfileDetail() {
             <Dialog
                 isOpen={complianceCheck}
                 caption={`Initiate Compliance Check`}
-                body={"Initiate the compliance check for the Compliance Profile?"}
+                body={'Initiate the compliance check for the Compliance Profile?'}
                 toggle={() => setComplianceCheck(false)}
                 buttons={[
-                    { color: "primary", onClick: onComplianceCheck, body: "Yes" },
-                    { color: "secondary", onClick: () => setComplianceCheck(false), body: "Cancel" },
+                    { color: 'primary', onClick: onComplianceCheck, body: 'Yes' },
+                    { color: 'secondary', onClick: () => setComplianceCheck(false), body: 'Cancel' },
                 ]}
             />
         </Container>

@@ -1,20 +1,20 @@
-import { AppEpic } from "ducks";
-import { iif, of } from "rxjs";
-import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
-import { extractError } from "utils/net";
+import { AppEpic } from 'ducks';
+import { iif, of } from 'rxjs';
+import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
+import { extractError } from 'utils/net';
 
-import { LockWidgetNameEnum } from "types/widget-locks";
-import { actions as alertActions } from "./alerts";
-import { actions as appRedirectActions } from "./app-redirect";
-import { slice } from "./scep-profiles";
-import { transformCertificateListResponseDtoToModel } from "./transform/certificates";
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { actions as alertActions } from './alerts';
+import { actions as appRedirectActions } from './app-redirect';
+import { slice } from './scep-profiles';
+import { transformCertificateListResponseDtoToModel } from './transform/certificates';
 import {
     transformScepProfileAddRequestModelToDto,
     transformScepProfileEditRequestModelToDto,
     transformScepProfileListResponseDtoToModel,
     transformScepProfileResponseDtoToModel,
-} from "./transform/scep-profiles";
-import { actions as widgetLockActions } from "./widget-locks";
+} from './transform/scep-profiles';
+import { actions as userInterfaceActions } from './user-interface';
 
 const listScepProfiles: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -26,14 +26,14 @@ const listScepProfiles: AppEpic = (action$, state$, deps) => {
                         slice.actions.listScepProfilesSuccess({
                             scepProfileList: scepProfiles.map(transformScepProfileListResponseDtoToModel),
                         }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfSCEPProfiles),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfSCEPProfiles),
                     ),
                 ),
 
                 catchError((error) =>
                     of(
-                        slice.actions.listScepProfilesFailure({ error: extractError(error, "Failed to get SCEP Profiles list") }),
-                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfSCEPProfiles),
+                        slice.actions.listScepProfilesFailure({ error: extractError(error, 'Failed to get SCEP Profiles list') }),
+                        userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfSCEPProfiles),
                     ),
                 ),
             ),
@@ -55,9 +55,9 @@ const listScepCaCertificates: AppEpic = (action$, state$, deps) => {
                 catchError((error) =>
                     of(
                         slice.actions.listScepCaCertificatesFailure({
-                            error: extractError(error, "Failed to get SCEP CA Certificates list"),
+                            error: extractError(error, 'Failed to get SCEP CA Certificates list'),
                         }),
-                        appRedirectActions.fetchError({ error, message: "Failed to get SCEP CA Certificates list" }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to get SCEP CA Certificates list' }),
                     ),
                 ),
             ),
@@ -74,14 +74,14 @@ const getScepProfileDetail: AppEpic = (action$, state$, deps) => {
                 switchMap((detail) =>
                     of(
                         slice.actions.getScepProfileSuccess({ scepProfile: transformScepProfileResponseDtoToModel(detail) }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.SCEPProfileDetails),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.SCEPProfileDetails),
                     ),
                 ),
 
                 catchError((error) =>
                     of(
-                        slice.actions.getScepProfileFailure({ error: extractError(error, "Failed to get SCEP Profile details") }),
-                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.SCEPProfileDetails),
+                        slice.actions.getScepProfileFailure({ error: extractError(error, 'Failed to get SCEP Profile details') }),
+                        userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.SCEPProfileDetails),
                     ),
                 ),
             ),
@@ -106,8 +106,8 @@ const createScepProfile: AppEpic = (action$, state$, deps) => {
 
                     catchError((error) =>
                         of(
-                            slice.actions.createScepProfileFailure({ error: extractError(error, "Failed to create SCEP Profile") }),
-                            appRedirectActions.fetchError({ error, message: "Failed to create SCEP Profile" }),
+                            slice.actions.createScepProfileFailure({ error: extractError(error, 'Failed to create SCEP Profile') }),
+                            appRedirectActions.fetchError({ error, message: 'Failed to create SCEP Profile' }),
                         ),
                     ),
                 ),
@@ -135,8 +135,8 @@ const updateScepProfile: AppEpic = (action$, state$, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.updateScepProfileFailure({ error: extractError(err, "Failed to update SCEP Profile") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to update SCEP Profile" }),
+                            slice.actions.updateScepProfileFailure({ error: extractError(err, 'Failed to update SCEP Profile') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to update SCEP Profile' }),
                         ),
                     ),
                 ),
@@ -152,14 +152,14 @@ const deleteScepProfile: AppEpic = (action$, state$, deps) => {
                 mergeMap(() =>
                     of(
                         slice.actions.deleteScepProfileSuccess({ uuid: action.payload.uuid }),
-                        appRedirectActions.redirect({ url: "../../" }),
+                        appRedirectActions.redirect({ url: '../../' }),
                     ),
                 ),
 
                 catchError((err) =>
                     of(
-                        slice.actions.deleteScepProfileFailure({ error: extractError(err, "Failed to delete SCEP Profile") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to delete SCEP Profile" }),
+                        slice.actions.deleteScepProfileFailure({ error: extractError(err, 'Failed to delete SCEP Profile') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to delete SCEP Profile' }),
                     ),
                 ),
             ),
@@ -176,8 +176,8 @@ const enableScepProfile: AppEpic = (action$, state$, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.enableScepProfileFailure({ error: extractError(err, "Failed to enable SCEP Profile") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to enable SCEP Profile" }),
+                        slice.actions.enableScepProfileFailure({ error: extractError(err, 'Failed to enable SCEP Profile') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to enable SCEP Profile' }),
                     ),
                 ),
             ),
@@ -194,8 +194,8 @@ const disableScepProfile: AppEpic = (action$, state$, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.disableScepProfileFailure({ error: extractError(err, "Failed to disable SCEP Profile") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to disable SCEP Profile" }),
+                        slice.actions.disableScepProfileFailure({ error: extractError(err, 'Failed to disable SCEP Profile') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to disable SCEP Profile' }),
                     ),
                 ),
             ),
@@ -212,14 +212,14 @@ const bulkDeleteScepProfiles: AppEpic = (action$, state$, deps) => {
                 mergeMap((errors) =>
                     of(
                         slice.actions.bulkDeleteScepProfilesSuccess({ uuids: action.payload.uuids, errors }),
-                        alertActions.success("Selected SCEP profiles successfully deleted."),
+                        alertActions.success('Selected SCEP profiles successfully deleted.'),
                     ),
                 ),
 
                 catchError((err) =>
                     of(
-                        slice.actions.bulkDeleteScepProfilesFailure({ error: extractError(err, "Failed to delete SCEP Accounts") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to delete SCEP Accounts" }),
+                        slice.actions.bulkDeleteScepProfilesFailure({ error: extractError(err, 'Failed to delete SCEP Accounts') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to delete SCEP Accounts' }),
                     ),
                 ),
             ),
@@ -254,8 +254,8 @@ const bulkForceDeleteScepProfiles: AppEpic = (action$, state$, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.bulkForceDeleteScepProfilesFailure({ error: extractError(err, "Failed to delete SCEP Accounts") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to delete SCEP Accounts" }),
+                        slice.actions.bulkForceDeleteScepProfilesFailure({ error: extractError(err, 'Failed to delete SCEP Accounts') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to delete SCEP Accounts' }),
                     ),
                 ),
             ),
@@ -272,8 +272,8 @@ const bulkEnableScepProfiles: AppEpic = (action$, state$, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.bulkEnableScepProfilesFailure({ error: extractError(err, "Failed to enable SCEP Accounts") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to enable SCEP Accounts" }),
+                        slice.actions.bulkEnableScepProfilesFailure({ error: extractError(err, 'Failed to enable SCEP Accounts') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to enable SCEP Accounts' }),
                     ),
                 ),
             ),
@@ -290,8 +290,8 @@ const bulkDisableScepProfiles: AppEpic = (action$, state$, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.bulkDisableScepProfilesFailure({ error: extractError(err, "Failed to disable SCEP Accounts") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to disable SCEP Accounts" }),
+                        slice.actions.bulkDisableScepProfilesFailure({ error: extractError(err, 'Failed to disable SCEP Accounts') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to disable SCEP Accounts' }),
                     ),
                 ),
             ),

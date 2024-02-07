@@ -1,18 +1,18 @@
-import AttributeViewer from "components/Attributes/AttributeViewer";
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
+import AttributeViewer from 'components/Attributes/AttributeViewer';
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
 
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
 
-import { actions, selectors } from "ducks/authorities";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { Container, Label } from "reactstrap";
-import { LockWidgetNameEnum } from "types/widget-locks";
-import { Resource } from "../../../../types/openapi";
-import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
+import { actions, selectors } from 'ducks/authorities';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Container, Label } from 'reactstrap';
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { Resource } from '../../../../types/openapi';
+import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 
 export default function AuthorityDetail() {
     const dispatch = useDispatch();
@@ -43,7 +43,7 @@ export default function AuthorityDetail() {
 
     const onEditClick = useCallback(() => {
         if (!authority) return;
-        navigate(`../../edit/${authority.uuid}`, { relative: "path" });
+        navigate(`../../edit/${authority.uuid}`, { relative: 'path' });
     }, [authority, navigate]);
 
     const onDeleteConfirmed = useCallback(() => {
@@ -62,17 +62,17 @@ export default function AuthorityDetail() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "pencil",
+                icon: 'pencil',
                 disabled: false,
-                tooltip: "Edit",
+                tooltip: 'Edit',
                 onClick: () => {
                     onEditClick();
                 },
             },
             {
-                icon: "trash",
+                icon: 'trash',
                 disabled: false,
-                tooltip: "Delete",
+                tooltip: 'Delete',
                 onClick: () => {
                     setConfirmDelete(true);
                 },
@@ -84,12 +84,12 @@ export default function AuthorityDetail() {
     const detailHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "property",
-                content: "Property",
+                id: 'property',
+                content: 'Property',
             },
             {
-                id: "value",
-                content: "Value",
+                id: 'value',
+                content: 'Value',
             },
         ],
         [],
@@ -101,29 +101,29 @@ export default function AuthorityDetail() {
                 ? []
                 : [
                       {
-                          id: "uuid",
-                          columns: ["UUID", authority.uuid],
+                          id: 'uuid',
+                          columns: ['UUID', authority.uuid],
                       },
                       {
-                          id: "name",
-                          columns: ["Name", authority.name],
+                          id: 'name',
+                          columns: ['Name', authority.name],
                       },
                       {
-                          id: "kind",
-                          columns: ["Kind", authority.kind],
+                          id: 'kind',
+                          columns: ['Kind', authority.kind],
                       },
                       {
-                          id: "authorityProviderUUID",
-                          columns: ["Authority Provider UUID", authority.connectorUuid],
+                          id: 'authorityProviderUUID',
+                          columns: ['Authority Provider UUID', authority.connectorUuid],
                       },
                       {
-                          id: "authorityProviderName",
+                          id: 'authorityProviderName',
                           columns: [
-                              "Authority Provider Name",
+                              'Authority Provider Name',
                               authority.connectorUuid ? (
                                   <Link to={`../../connectors/detail/${authority.connectorUuid}`}>{authority.connectorName}</Link>
                               ) : (
-                                  ""
+                                  ''
                               ),
                           ],
                       },
@@ -168,13 +168,13 @@ export default function AuthorityDetail() {
                   related to the authority will fail. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
             <Dialog
-                isOpen={deleteErrorMessage !== ""}
+                isOpen={deleteErrorMessage !== ''}
                 caption="Delete Authority"
                 body={
                     <>
@@ -186,8 +186,8 @@ export default function AuthorityDetail() {
                 }
                 toggle={() => dispatch(actions.clearDeleteErrorMessages())}
                 buttons={[
-                    { color: "danger", onClick: onForceDeleteAuthority, body: "Force" },
-                    { color: "secondary", onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: "Cancel" },
+                    { color: 'danger', onClick: onForceDeleteAuthority, body: 'Force' },
+                    { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
                 ]}
             />
         </Container>

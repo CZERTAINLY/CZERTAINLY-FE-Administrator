@@ -9,7 +9,7 @@ import {
     GlobalMetadataResponseModel,
     GlobalMetadataUpdateRequestDto,
     GlobalMetadataUpdateRequestModel,
-} from "types/globalMetadata";
+} from 'types/globalMetadata';
 
 export function transformGlobalMetadataResponseDtoToModel(metadata: GlobalMetadataResponseDto): GlobalMetadataResponseModel {
     return { ...metadata };

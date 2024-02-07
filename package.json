@@ -1,6 +1,6 @@
 {
     "name": "czertainly-administrator",
-    "version": "2.10.0",
+    "version": "2.11.0",
     "homepage": ".",
     "private": true,
     "dependencies": {
@@ -23,6 +23,7 @@
         "classnames": "^2.3.2",
         "cron-expression-validator": "^1.0.20",
         "cron-parser": "^4.8.1",
+        "cronstrue": "^2.47.0",
         "dagre": "^0.8.5",
         "dompurify": "^3.0.0",
         "file-saver": "^2.0.5",
@@ -34,9 +35,9 @@
         "lodash.debounce": "^4.0.8",
         "marked": "^7.0.0",
         "npm": "^9.0.0",
-        "prettier": "^3.0.0",
         "react": "^18.2.0",
         "react-apexcharts": "^1.4.0",
+        "react-cron-generator": "^2.0.10",
         "react-dom": "^18.2.0",
         "react-final-form": "^6.5.9",
         "react-redux": "^8.0.5",
@@ -55,8 +56,10 @@
     "scripts": {
         "start": "react-scripts start",
         "build": "react-scripts build",
+        "lint": "eslint && prettier --check \"**/**.{ts,js,tsx}\" \"*.{json,md,yml}\"",
         "test": "react-scripts test",
         "eject": "react-scripts eject",
+        "prepare": "husky install",
         "generate-types": "openapi-generator-cli generate --generator-key typescript-rxjs-remote && prettier --write \"src/types/openapi/apis/*.ts\" && prettier --write \"src/types/openapi/models/*.ts\"",
         "generate-types-local": "openapi-generator-cli generate --generator-key typescript-rxjs-local && prettier --write \"src/types/openapi/apis/*.ts\" && prettier --write \"src/types/openapi/models/*.ts\"",
         "generate-types-utils": "openapi-generator-cli generate --generator-key typescript-rxjs-utils && prettier --write \"src/types/openapi/utils/apis/*.ts\" && prettier --write \"src/types/openapi/utils/models/*.ts\""
@@ -80,6 +83,8 @@
         ]
     },
     "devDependencies": {
-        "cypress": "^13.1.0"
+        "cypress": "^13.6.1",
+        "husky": "^8.0.3",
+        "prettier": "^3.1.1"
     }
 }

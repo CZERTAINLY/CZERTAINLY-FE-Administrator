@@ -1,22 +1,22 @@
-import { iif, of } from "rxjs";
-import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
+import { iif, of } from 'rxjs';
+import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
 
-import { AppEpic } from "ducks";
-import { extractError } from "utils/net";
+import { AppEpic } from 'ducks';
+import { extractError } from 'utils/net';
 
-import { store } from "index";
-import { actions as appRedirectActions } from "./app-redirect";
-import { slice } from "./entities";
-import { EntityType } from "./filters";
-import { actions as pagingActions } from "./paging";
-import { actions as widgetLockActions } from "./widget-locks";
+import { store } from 'index';
+import { actions as appRedirectActions } from './app-redirect';
+import { slice } from './entities';
+import { EntityType } from './filters';
+import { actions as pagingActions } from './paging';
+import { actions as userInterfaceActions } from './user-interface';
 
-import { FunctionGroupCode } from "types/openapi";
-import { LockWidgetNameEnum } from "types/widget-locks";
-import { transformAttributeDescriptorDtoToModel, transformAttributeRequestModelToDto } from "./transform/attributes";
-import { transformSearchRequestModelToDto } from "./transform/certificates";
-import { transformConnectorResponseDtoToModel } from "./transform/connectors";
-import { transformEntityRequestModelToDto, transformEntityResponseDtoToModel } from "./transform/entities";
+import { FunctionGroupCode } from 'types/openapi';
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { transformAttributeDescriptorDtoToModel, transformAttributeRequestModelToDto } from './transform/attributes';
+import { transformSearchRequestModelToDto } from './transform/certificates';
+import { transformConnectorResponseDtoToModel } from './transform/connectors';
+import { transformEntityRequestModelToDto, transformEntityResponseDtoToModel } from './transform/entities';
 
 const listEntityProviders: AppEpic = (action$, state, deps) => {
     return action$.pipe(
@@ -31,8 +31,8 @@ const listEntityProviders: AppEpic = (action$, state, deps) => {
 
                 catchError((error) =>
                     of(
-                        slice.actions.listEntityProvidersFailure({ error: extractError(error, "Failed to get Entity Provider list") }),
-                        appRedirectActions.fetchError({ error, message: "Failed to get Entity Provider list" }),
+                        slice.actions.listEntityProvidersFailure({ error: extractError(error, 'Failed to get Entity Provider list') }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to get Entity Provider list' }),
                     ),
                 ),
             ),
@@ -60,9 +60,9 @@ const getEntityProviderAttributesDescriptors: AppEpic = (action$, state, deps) =
                     catchError((error) =>
                         of(
                             slice.actions.getEntityProviderAttributeDescriptorsFailure({
-                                error: extractError(error, "Failed to get Entity Provider Attribute Descriptor list"),
+                                error: extractError(error, 'Failed to get Entity Provider Attribute Descriptor list'),
                             }),
-                            appRedirectActions.fetchError({ error, message: "Failed to get Entity Provider Attribute Descriptor list" }),
+                            appRedirectActions.fetchError({ error, message: 'Failed to get Entity Provider Attribute Descriptor list' }),
                         ),
                     ),
                 ),
@@ -82,14 +82,14 @@ const listEntities: AppEpic = (action$, state$, deps) => {
                         of(
                             slice.actions.listEntitiesSuccess(entityResponse.entities.map(transformEntityResponseDtoToModel)),
                             pagingActions.listSuccess({ entity: EntityType.ENTITY, totalItems: entityResponse.totalItems }),
-                            widgetLockActions.removeWidgetLock(LockWidgetNameEnum.EntityStore),
+                            userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.EntityStore),
                         ),
                     ),
 
                     catchError((error) =>
                         of(
                             pagingActions.listFailure(EntityType.ENTITY),
-                            widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.EntityStore),
+                            userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.EntityStore),
                         ),
                     ),
                 );
@@ -105,14 +105,14 @@ const getEntityDetail: AppEpic = (action$, state$, deps) => {
                 switchMap((entity) =>
                     of(
                         slice.actions.getEntityDetailSuccess({ entity: transformEntityResponseDtoToModel(entity) }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.EntityDetails),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.EntityDetails),
                     ),
                 ),
 
                 catchError((error) =>
                     of(
-                        slice.actions.getEntityDetailFailure({ error: extractError(error, "Failed to get Entity detail") }),
-                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.EntityDetails),
+                        slice.actions.getEntityDetailFailure({ error: extractError(error, 'Failed to get Entity detail') }),
+                        userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.EntityDetails),
                     ),
                 ),
             ),
@@ -136,8 +136,8 @@ const addEntity: AppEpic = (action$, state$, deps) => {
 
                     catchError((error) =>
                         of(
-                            slice.actions.addEntityFailure({ error: extractError(error, "Failed to add Entity") }),
-                            appRedirectActions.fetchError({ error, message: "Failed to add Entity" }),
+                            slice.actions.addEntityFailure({ error: extractError(error, 'Failed to add Entity') }),
+                            appRedirectActions.fetchError({ error, message: 'Failed to add Entity' }),
                         ),
                     ),
                 ),
@@ -167,8 +167,8 @@ const updateEntity: AppEpic = (action$, state$, deps) => {
 
                     catchError((error) =>
                         of(
-                            slice.actions.updateEntityFailure({ error: extractError(error, "Failed to update Entity") }),
-                            appRedirectActions.fetchError({ error, message: "Failed to update Entity" }),
+                            slice.actions.updateEntityFailure({ error: extractError(error, 'Failed to update Entity') }),
+                            appRedirectActions.fetchError({ error, message: 'Failed to update Entity' }),
                         ),
                     ),
                 ),
@@ -194,8 +194,8 @@ const deleteEntity: AppEpic = (action$, state$, deps) => {
 
                 catchError((error) =>
                     of(
-                        slice.actions.deleteEntityFailure({ error: extractError(error, "Failed to delete Entity") }),
-                        appRedirectActions.fetchError({ error, message: "Failed to delete Entity" }),
+                        slice.actions.deleteEntityFailure({ error: extractError(error, 'Failed to delete Entity') }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to delete Entity' }),
                     ),
                 ),
             ),
@@ -217,9 +217,9 @@ const listLocationAttributeDescriptors: AppEpic = (action$, state$, deps) => {
                 catchError((error) =>
                     of(
                         slice.actions.listLocationAttributeDescriptorsFailure({
-                            error: extractError(error, "Failed to get Location Attribute Descriptors"),
+                            error: extractError(error, 'Failed to get Location Attribute Descriptors'),
                         }),
-                        appRedirectActions.fetchError({ error, message: "Failed to get Location Attribute Descriptors" }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to get Location Attribute Descriptors' }),
                     ),
                 ),
             ),

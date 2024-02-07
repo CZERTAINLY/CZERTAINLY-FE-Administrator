@@ -1,7 +1,7 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { WritableDraft } from "immer/dist/internal";
-import { createFeatureSelector } from "utils/ducks";
-import { EntityType } from "./filters";
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { WritableDraft } from 'immer/dist/internal';
+import { createFeatureSelector } from 'utils/ducks';
+import { EntityType } from './filters';
 
 export type Paging = {
     entity: EntityType;
@@ -39,7 +39,7 @@ const updatePagingState = (state: WritableDraft<State>, entity: EntityType, call
 };
 
 export const slice = createSlice({
-    name: "pagings",
+    name: 'pagings',
 
     initialState,
 

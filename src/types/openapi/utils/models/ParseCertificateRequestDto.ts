@@ -35,7 +35,7 @@ export interface ParseCertificateRequestDto {
  * @enum {string}
  */
 export enum ParseCertificateRequestDtoParseTypeEnum {
-    Basic = "BASIC",
-    Extended = "EXTENDED",
-    Asn1 = "ASN1",
+    Basic = 'BASIC',
+    Extended = 'EXTENDED',
+    Asn1 = 'ASN1',
 }

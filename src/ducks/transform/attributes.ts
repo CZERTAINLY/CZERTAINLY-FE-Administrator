@@ -10,9 +10,9 @@ import {
     AttributeResponseModel,
     CustomAttributeDto,
     CustomAttributeModel,
-} from "types/attributes";
-import { CallbackAttributeDto, CallbackAttributeModel, HealthDto, HealthModel } from "types/connectors";
-import { AttributeMappingDto } from "types/openapi";
+} from 'types/attributes';
+import { CallbackAttributeDto, CallbackAttributeModel, HealthDto, HealthModel } from 'types/connectors';
+import { AttributeMappingDto } from 'types/openapi';
 
 export function transformAttributeResponseDtoToModel(attribute: AttributeResponseDto): AttributeResponseModel {
     return {

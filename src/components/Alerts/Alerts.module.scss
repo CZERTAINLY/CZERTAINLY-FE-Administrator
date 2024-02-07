@@ -5,12 +5,13 @@
     bottom: 60px;
     padding: 0 30px;
     white-space: pre-line;
+    z-index: 9999;
 }
 
 .alert {
 }
 
-.alert[data-hiding="true"] {
+.alert[data-hiding='true'] {
     transition: 3s;
     opacity: 0;
 }

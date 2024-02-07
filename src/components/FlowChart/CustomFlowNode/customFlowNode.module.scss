@@ -1,4 +1,4 @@
-@import "src/resources/styles/app";
+@import 'src/resources/styles/app';
 
 .customNodeBackground {
     position: relative;
@@ -8,7 +8,7 @@
     border-radius: 10px;
     display: flex;
     flex-direction: column;
-    align-items: start;
+    align-items: flex-start;
     width: 400px;
     min-height: 55px;
     border-style: solid;

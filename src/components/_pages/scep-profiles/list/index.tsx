@@ -1,16 +1,16 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
-import { Badge, Container, Table } from "reactstrap";
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { Container, Table } from 'reactstrap';
 
-import { actions, selectors } from "ducks/scep-profiles";
+import { actions, selectors } from 'ducks/scep-profiles';
 
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
-import StatusBadge from "components/StatusBadge";
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
+import StatusBadge from 'components/StatusBadge';
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
+import { LockWidgetNameEnum } from 'types/user-interface';
 
 export default function ScepProfiles() {
     const dispatch = useDispatch();
@@ -79,33 +79,33 @@ export default function ScepProfiles() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "plus",
+                icon: 'plus',
                 disabled: false,
-                tooltip: "Create",
+                tooltip: 'Create',
                 onClick: () => {
                     onAddClick();
                 },
             },
             {
-                icon: "trash",
+                icon: 'trash',
                 disabled: checkedRows.length === 0,
-                tooltip: "Delete",
+                tooltip: 'Delete',
                 onClick: () => {
                     setConfirmDelete(true);
                 },
             },
             {
-                icon: "check",
+                icon: 'check',
                 disabled: checkedRows.length === 0,
-                tooltip: "Enable",
+                tooltip: 'Enable',
                 onClick: () => {
                     onEnableClick();
                 },
             },
             {
-                icon: "times",
+                icon: 'times',
                 disabled: checkedRows.length === 0,
-                tooltip: "Disable",
+                tooltip: 'Disable',
                 onClick: () => {
                     onDisableClick();
                 },
@@ -117,7 +117,7 @@ export default function ScepProfiles() {
     const forceDeleteBody = useMemo(
         () => (
             <div>
-                <div>Failed to delete {checkedRows.length > 1 ? "SCEP Profiles" : "a SCEP Profile"}. Please find the details below:</div>
+                <div>Failed to delete {checkedRows.length > 1 ? 'SCEP Profiles' : 'a SCEP Profile'}. Please find the details below:</div>
 
                 <Table className="table-hover" size="sm">
                     <thead>
@@ -148,45 +148,45 @@ export default function ScepProfiles() {
     const scepProfilesTableHeader: TableHeader[] = useMemo(
         () => [
             {
-                id: "name",
-                content: "Name",
+                id: 'name',
+                content: 'Name',
                 sortable: true,
-                sort: "asc",
-                width: "10%",
+                sort: 'asc',
+                width: '10%',
             },
             {
-                id: "description",
-                content: "Description",
+                id: 'description',
+                content: 'Description',
                 sortable: true,
-                width: "10%",
+                width: '10%',
             },
             {
-                id: "raProfileName",
-                content: "RA Profile Name",
+                id: 'raProfileName',
+                content: 'RA Profile Name',
                 sortable: true,
-                width: "10%",
-                align: "center",
+                width: '10%',
+                align: 'center',
             },
             {
-                id: "status",
-                content: "Status",
-                align: "center",
+                id: 'status',
+                content: 'Status',
+                align: 'center',
                 sortable: true,
-                width: "7%",
+                width: '7%',
             },
             {
-                id: "scepUrl",
-                content: "SCEP URL",
+                id: 'scepUrl',
+                content: 'SCEP URL',
                 sortable: true,
-                width: "10%",
-                align: "center",
+                width: '10%',
+                align: 'center',
             },
             {
-                id: "enableIntune",
-                content: "Intune",
-                align: "center",
+                id: 'enableIntune',
+                content: 'Intune',
+                align: 'center',
                 sortable: true,
-                width: "7%",
+                width: '7%',
             },
         ],
         [],
@@ -198,20 +198,22 @@ export default function ScepProfiles() {
                 id: scepProfile.uuid,
 
                 columns: [
-                    <span style={{ whiteSpace: "nowrap" }}>
+                    <span style={{ whiteSpace: 'nowrap' }}>
                         <Link to={`./detail/${scepProfile.uuid}`}>{scepProfile.name}</Link>
                     </span>,
 
-                    <span style={{ whiteSpace: "nowrap" }}>{scepProfile.description || ""}</span>,
+                    <span style={{ whiteSpace: 'nowrap' }}>{scepProfile.description || ''}</span>,
 
-                    scepProfile.raProfile? (
-                        <Link to={`../raprofiles/detail/${scepProfile?.raProfile.authorityInstanceUuid}/${scepProfile?.raProfile.uuid}`}>{scepProfile.raProfile.name ?? "Unassigned"}</Link>
+                    scepProfile.raProfile ? (
+                        <Link to={`../raprofiles/detail/${scepProfile?.raProfile.authorityInstanceUuid}/${scepProfile?.raProfile.uuid}`}>
+                            {scepProfile.raProfile.name ?? 'Unassigned'}
+                        </Link>
                     ) : (
-                        scepProfile.raProfile ?? "Unassigned"
+                        scepProfile.raProfile ?? 'Unassigned'
                     ),
 
                     <StatusBadge enabled={scepProfile.enabled} />,
-                    <span style={{ whiteSpace: "nowrap" }}>{scepProfile.scepUrl || ""}</span>,
+                    <span style={{ whiteSpace: 'nowrap' }}>{scepProfile.scepUrl || ''}</span>,
                     <StatusBadge enabled={scepProfile.enableIntune} />,
                 ],
             })),
@@ -241,25 +243,25 @@ export default function ScepProfiles() {
 
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete ${checkedRows.length > 1 ? "SCEP Profiles" : "a SCEP Profile"}`}
+                caption={`Delete ${checkedRows.length > 1 ? 'SCEP Profiles' : 'a SCEP Profile'}`}
                 body={`You are about to delete ${
-                    checkedRows.length > 1 ? "SCEP Profiles" : "a SCEP Profile"
+                    checkedRows.length > 1 ? 'SCEP Profiles' : 'a SCEP Profile'
                 } which may have associated SCEP Account(s). When deleted the SCEP Account(s) will be revoked. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
             <Dialog
                 isOpen={confirmForceDelete}
-                caption={`Force Delete ${checkedRows.length > 1 ? "SCEP Profiles" : "a SCEP Profile"}`}
+                caption={`Force Delete ${checkedRows.length > 1 ? 'SCEP Profiles' : 'a SCEP Profile'}`}
                 body={forceDeleteBody}
                 toggle={() => setConfirmForceDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onForceDeleteConfirmed, body: "Force delete" },
-                    { color: "secondary", onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: "Cancel" },
+                    { color: 'danger', onClick: onForceDeleteConfirmed, body: 'Force delete' },
+                    { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
                 ]}
             />
         </Container>

@@ -1,24 +1,23 @@
-import cx from "classnames";
-import { actions as alertActions } from "ducks/alerts";
-import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
-import { Handle, Position } from "reactflow";
-import "reactflow/dist/style.css";
-import { Button, Collapse } from "reactstrap";
-import { EntityNodeProps } from "types/flowchart";
-import { CertificateValidationStatus } from "types/openapi";
-import style from "./customFlowNode.module.scss";
+import cx from 'classnames';
+import { actions as alertActions } from 'ducks/alerts';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { Handle, Position } from 'reactflow';
+import { Button, Collapse } from 'reactstrap';
+import { EntityNodeProps } from 'types/flowchart';
+import { CertificateValidationStatus } from 'types/openapi';
+import style from './customFlowNode.module.scss';
 export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }: EntityNodeProps) {
     const [collapse, setCollapse] = useState(false);
 
-    const [status, setStatus] = useState("+");
+    const [status, setStatus] = useState('+');
     // TODO: Use this during dynamic flowchart updates
     // const onEntering = () => setStatus("Opening...");
     // const onExiting = () => setStatus("Closing...");
     const dispatch = useDispatch();
-    const onEntered = () => setStatus("-");
-    const onExited = () => setStatus("+");
+    const onEntered = () => setStatus('-');
+    const onExited = () => setStatus('+');
     const toggle = () => setCollapse(!collapse);
 
     const getStatusClasses = () => {
@@ -70,7 +69,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }:
 
     return (
         <>
-            <Handle hidden={data.handleHide === "target"} className={cx(style.handleUp)} type="target" position={Position.Top} />
+            <Handle hidden={data.handleHide === 'target'} className={cx(style.handleUp)} type="target" position={Position.Top} />
 
             <div
                 className={cx(
@@ -92,11 +91,11 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }:
                 <div className="d-flex my-1">
                     <i className={cx(style.iconStyle, data.icon, getStatusClasses())}></i>
 
-                    <h6 className={cx(style.customNodeCardTitle, "my-auto ms-2")}>{data.customNodeCardTitle}</h6>
+                    <h6 className={cx(style.customNodeCardTitle, 'my-auto ms-2')}>{data.customNodeCardTitle}</h6>
                 </div>
 
                 {data.redirectUrl ? (
-                    <div className={cx("d-flex ms-2", style.entityLabel)}>
+                    <div className={cx('d-flex ms-2', style.entityLabel)}>
                         <h6>Entity Name :</h6>
                         &nbsp;
                         <Link to={data.redirectUrl}>
@@ -104,7 +103,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }:
                         </Link>
                     </div>
                 ) : (
-                    <div className={cx("d-flex ms-2", style.entityLabel)}>
+                    <div className={cx('d-flex ms-2', style.entityLabel)}>
                         <h6>Entity Name :</h6>
                         &nbsp;
                         <h6>{data.entityLabel}</h6>
@@ -122,7 +121,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }:
                     <>
                         <Collapse isOpen={collapse} onEntered={onEntered} onExited={onExited}>
                             <div className={cx(style.listContainer, { [style.listContainerDragging]: dragging })}>
-                                <ul className={cx("list-group ps-2", style.listStyle)}>
+                                <ul className={cx('list-group ps-2', style.listStyle)}>
                                     {data.otherProperties.map((property, index) => (
                                         <li key={index} className="list-group-item text-wrap p-0 ">
                                             <span className={style.propertyName}>{property.propertyName} : </span>
@@ -132,7 +131,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }:
                                             {property?.copyable && property?.propertyValue && (
                                                 <i
                                                     onClick={() => {
-                                                        if (typeof property.propertyValue === "string") {
+                                                        if (typeof property.propertyValue === 'string') {
                                                             navigator.clipboard
                                                                 .writeText(property.propertyValue)
                                                                 .then(
@@ -165,7 +164,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }:
                     </>
                 )}
             </div>
-            <Handle hidden={data.handleHide === "source"} className={style.handleDown} type="source" position={Position.Bottom} id="a" />
+            <Handle hidden={data.handleHide === 'source'} className={style.handleDown} type="source" position={Position.Bottom} id="a" />
         </>
     );
 }

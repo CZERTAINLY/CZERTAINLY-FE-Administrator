@@ -1,15 +1,15 @@
-import { AppEpic } from "ducks";
-import { of } from "rxjs";
-import { catchError, filter, mergeMap, switchMap } from "rxjs/operators";
+import { AppEpic } from 'ducks';
+import { of } from 'rxjs';
+import { catchError, filter, mergeMap, switchMap } from 'rxjs/operators';
 
-import { LockWidgetNameEnum } from "types/widget-locks";
-import { extractError } from "utils/net";
-import { updateBackendUtilsClients } from "../api";
-import { actions as alertActions } from "./alerts";
-import { actions as appRedirectActions } from "./app-redirect";
-import { slice } from "./settings";
-import { transformSettingsPlatformDtoToModel } from "./transform/settings";
-import { actions as widgetLockActions } from "./widget-locks";
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { extractError } from 'utils/net';
+import { updateBackendUtilsClients } from '../api';
+import { actions as alertActions } from './alerts';
+import { actions as appRedirectActions } from './app-redirect';
+import { slice } from './settings';
+import { transformSettingsPlatformDtoToModel } from './transform/settings';
+import { actions as userInterfaceActions } from './user-interface';
 
 const getPlatformSettings: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -21,13 +21,13 @@ const getPlatformSettings: AppEpic = (action$, state$, deps) => {
                     updateBackendUtilsClients(platformSettingsModel.utils.utilsServiceUrl);
                     return of(
                         slice.actions.getPlatformSettingsSuccess(platformSettingsModel),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.PlatformSettings),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.PlatformSettings),
                     );
                 }),
                 catchError((err) =>
                     of(
-                        slice.actions.getPlatformSettingsFailure({ error: extractError(err, "Failed to get platform settings") }),
-                        widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.PlatformSettings),
+                        slice.actions.getPlatformSettingsFailure({ error: extractError(err, 'Failed to get platform settings') }),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.PlatformSettings),
                     ),
                 ),
             ),
@@ -46,8 +46,8 @@ const updatePlatformSettings: AppEpic = (action$, state$, deps) => {
                 }),
                 catchError((err) =>
                     of(
-                        slice.actions.updatePlatformSettingsFailure({ error: extractError(err, "Failed to update platform settings") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to update platform settings" }),
+                        slice.actions.updatePlatformSettingsFailure({ error: extractError(err, 'Failed to update platform settings') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to update platform settings' }),
                     ),
                 ),
             ),
@@ -65,8 +65,8 @@ const getNotificationsSettings: AppEpic = (action$, state$, deps) => {
                 }),
                 catchError((err) =>
                     of(
-                        slice.actions.getNotificationsSettingsFailure({ error: extractError(err, "Failed to get notifications settings") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to get notifications settings" }),
+                        slice.actions.getNotificationsSettingsFailure({ error: extractError(err, 'Failed to get notifications settings') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to get notifications settings' }),
                     ),
                 ),
             ),
@@ -82,15 +82,15 @@ const updateNotificationsSettings: AppEpic = (action$, state$, deps) => {
                 mergeMap(() => {
                     return of(
                         slice.actions.updateNotificationsSettingsSuccess(action.payload),
-                        alertActions.success("Notifications settings updated successfully."),
+                        alertActions.success('Notifications settings updated successfully.'),
                     );
                 }),
                 catchError((err) =>
                     of(
                         slice.actions.updateNotificationsSettingsFailure({
-                            error: extractError(err, "Failed to update notifications settings"),
+                            error: extractError(err, 'Failed to update notifications settings'),
                         }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to update notifications settings" }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to update notifications settings' }),
                     ),
                 ),
             ),

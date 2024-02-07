@@ -1,19 +1,19 @@
-import { useCallback, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
-import { Badge, Container } from "reactstrap";
+import { useCallback, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { Badge, Container } from 'reactstrap';
 
-import { EntityType } from "ducks/filters";
-import { actions, selectors } from "ducks/locations";
-import { selectors as pagingSelectors } from "ducks/paging";
+import { EntityType } from 'ducks/filters';
+import { actions, selectors } from 'ducks/locations';
+import { selectors as pagingSelectors } from 'ducks/paging';
 
-import { ApiClients } from "api";
-import { TableDataRow, TableHeader } from "components/CustomTable";
-import PagedList from "components/PagedList/PagedList";
-import StatusBadge from "components/StatusBadge";
-import { WidgetButtonProps } from "components/WidgetButtons";
-import { SearchRequestModel } from "types/certificate";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { ApiClients } from 'api';
+import { TableDataRow, TableHeader } from 'components/CustomTable';
+import PagedList from 'components/PagedList/PagedList';
+import StatusBadge from 'components/StatusBadge';
+import { WidgetButtonProps } from 'components/WidgetButtons';
+import { SearchRequestModel } from 'types/certificate';
+import { LockWidgetNameEnum } from 'types/user-interface';
 
 function LocationList() {
     const dispatch = useDispatch();
@@ -29,30 +29,30 @@ function LocationList() {
 
     const onEnableClick = useCallback(() => {
         for (const uuid of checkedRows) {
-            dispatch(actions.enableLocation({ entityUuid: locations.find((data) => data.uuid === uuid)?.entityInstanceUuid || "", uuid }));
+            dispatch(actions.enableLocation({ entityUuid: locations.find((data) => data.uuid === uuid)?.entityInstanceUuid || '', uuid }));
         }
     }, [checkedRows, dispatch, locations]);
 
     const onDisableClick = useCallback(() => {
         for (const uuid of checkedRows) {
-            dispatch(actions.disableLocation({ entityUuid: locations.find((data) => data.uuid === uuid)?.entityInstanceUuid || "", uuid }));
+            dispatch(actions.disableLocation({ entityUuid: locations.find((data) => data.uuid === uuid)?.entityInstanceUuid || '', uuid }));
         }
     }, [checkedRows, dispatch, locations]);
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "check",
+                icon: 'check',
                 disabled: checkedRows.length === 0,
-                tooltip: "Enable",
+                tooltip: 'Enable',
                 onClick: () => {
                     onEnableClick();
                 },
             },
             {
-                icon: "times",
+                icon: 'times',
                 disabled: checkedRows.length === 0,
-                tooltip: "Disable",
+                tooltip: 'Disable',
                 onClick: () => {
                     onDisableClick();
                 },
@@ -64,44 +64,44 @@ function LocationList() {
     const locationsRowHeaders: TableHeader[] = useMemo(
         () => [
             {
-                content: "Name",
+                content: 'Name',
                 sortable: true,
-                sort: "asc",
-                id: "locationName",
-                width: "auto",
+                sort: 'asc',
+                id: 'locationName',
+                width: 'auto',
             },
             {
-                content: "Description",
+                content: 'Description',
                 sortable: true,
-                id: "locationDescription",
-                width: "auto",
+                id: 'locationDescription',
+                width: 'auto',
             },
             {
-                content: "Entity",
+                content: 'Entity',
                 sortable: true,
-                id: "locationEntity",
-                width: "auto",
+                id: 'locationEntity',
+                width: 'auto',
             },
             {
-                content: "Multiple Entries",
-                align: "center",
+                content: 'Multiple Entries',
+                align: 'center',
                 sortable: true,
-                id: "multiEntries",
-                width: "auto",
+                id: 'multiEntries',
+                width: 'auto',
             },
             {
-                content: "Key Management",
-                align: "center",
+                content: 'Key Management',
+                align: 'center',
                 sortable: true,
-                id: "keyMgmt",
-                width: "auto",
+                id: 'keyMgmt',
+                width: 'auto',
             },
             {
-                content: "Status",
-                align: "center",
+                content: 'Status',
+                align: 'center',
                 sortable: true,
-                id: "Status",
-                width: "15%",
+                id: 'Status',
+                width: '15%',
             },
         ],
         [],
@@ -113,11 +113,11 @@ function LocationList() {
                 id: location.uuid,
                 columns: [
                     <Link to={`./detail/${location.entityInstanceUuid}/${location.uuid}`}>{location.name}</Link>,
-                    location.description || "",
-                    location.entityInstanceName? (
-                        <Link to={`../entities/detail/${location.entityInstanceUuid}`}>{location.entityInstanceName ?? "Unassigned"}</Link>
+                    location.description || '',
+                    location.entityInstanceName ? (
+                        <Link to={`../entities/detail/${location.entityInstanceUuid}`}>{location.entityInstanceName ?? 'Unassigned'}</Link>
                     ) : (
-                        location.entityInstanceName ?? "Unassigned"
+                        location.entityInstanceName ?? 'Unassigned'
                     ),
                     location.supportMultipleEntries ? <Badge color="success">Yes</Badge> : <Badge color="danger">No</Badge>,
                     location.supportKeyManagement ? <Badge color="success">Yes</Badge> : <Badge color="danger">No</Badge>,
@@ -138,7 +138,7 @@ function LocationList() {
                     uuids.map((uuid) =>
                         dispatch(
                             actions.deleteLocation({
-                                entityUuid: locations.find((data) => data.uuid === uuid)?.entityInstanceUuid || "",
+                                entityUuid: locations.find((data) => data.uuid === uuid)?.entityInstanceUuid || '',
                                 uuid,
                             }),
                         ),

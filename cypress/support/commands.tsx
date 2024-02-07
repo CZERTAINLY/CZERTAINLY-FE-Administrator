@@ -1,11 +1,11 @@
-import { configureStore } from "@reduxjs/toolkit";
-import { mount } from "cypress/react18";
-import { reducers } from "ducks/reducers";
-import React from "react";
-import { Provider } from "react-redux";
-import { HashRouter } from "react-router-dom";
+import { configureStore } from '@reduxjs/toolkit';
+import { mount } from 'cypress/react18';
+import { reducers } from 'ducks/reducers';
+import React from 'react';
+import { Provider } from 'react-redux';
+import { HashRouter } from 'react-router-dom';
 
-Cypress.Commands.add("mount", (component, options = {}) => {
+Cypress.Commands.add('mount', (component, options = {}) => {
     // Use the default store if one is not provided
     const { ...mountOptions } = options;
     const reduxStore = configureStore({
@@ -31,6 +31,6 @@ Cypress.Commands.add("mount", (component, options = {}) => {
 
 // Cypress.Commands.add("mount", mount);
 
-Cypress.Commands.add("dataCy", (value) => {
+Cypress.Commands.add('dataCy', (value) => {
     return cy.get(`[data-cy=${value}]`);
 });

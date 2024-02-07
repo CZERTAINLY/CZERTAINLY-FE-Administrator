@@ -1,15 +1,15 @@
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
-import StatusBadge from "components/StatusBadge";
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
-import { actions as profileApprovalActions, selectors as profileApprovalSelectors } from "ducks/approval-profiles";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { Col, Container, Row } from "reactstrap";
-import { ApproverType, ProfileApprovalStepModel } from "types/approval-profiles";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
+import StatusBadge from 'components/StatusBadge';
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
+import { actions as profileApprovalActions, selectors as profileApprovalSelectors } from 'ducks/approval-profiles';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Col, Container, Row } from 'reactstrap';
+import { ApproverType, ProfileApprovalStepModel } from 'types/approval-profiles';
+import { LockWidgetNameEnum } from 'types/user-interface';
 
 const ApprovalProfileDetails = () => {
     const dispatch = useDispatch();
@@ -60,42 +60,42 @@ const ApprovalProfileDetails = () => {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "pencil",
+                icon: 'pencil',
                 disabled: false,
-                tooltip: "Edit",
+                tooltip: 'Edit',
                 onClick: () => onEditClick(),
             },
             {
-                icon: "check",
+                icon: 'check',
                 disabled: profileApprovalDetail?.enabled || false,
-                tooltip: "Enable",
+                tooltip: 'Enable',
                 onClick: () => onEnableClick(),
             },
             {
-                icon: "times",
+                icon: 'times',
                 disabled: !(profileApprovalDetail?.enabled || false),
-                tooltip: "Disable",
+                tooltip: 'Disable',
                 onClick: () => onDisableClick(),
             },
             {
-                icon: "trash",
+                icon: 'trash',
                 disabled: false,
-                tooltip: "Delete",
+                tooltip: 'Delete',
                 onClick: () => setConfirmDelete(true),
             },
         ],
-        [profileApprovalDetail, , onDisableClick, onEnableClick, onEditClick],
+        [profileApprovalDetail, onDisableClick, onEnableClick, onEditClick],
     );
 
     const detailHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "property",
-                content: "Property",
+                id: 'property',
+                content: 'Property',
             },
             {
-                id: "value",
-                content: "Value",
+                id: 'value',
+                content: 'Value',
             },
         ],
         [],
@@ -107,36 +107,36 @@ const ApprovalProfileDetails = () => {
                 ? []
                 : [
                       {
-                          id: "uuid",
-                          columns: ["UUID", profileApprovalDetail.uuid],
+                          id: 'uuid',
+                          columns: ['UUID', profileApprovalDetail.uuid],
                       },
                       {
-                          id: "name",
-                          columns: ["Name", profileApprovalDetail.name],
+                          id: 'name',
+                          columns: ['Name', profileApprovalDetail.name],
                       },
                       {
-                          id: "description",
-                          columns: ["Description", profileApprovalDetail.description || ""],
-                      },
-
-                      {
-                          id: "associations",
-                          columns: ["Associations", profileApprovalDetail?.associations.toString() || ""],
+                          id: 'description',
+                          columns: ['Description', profileApprovalDetail.description || ''],
                       },
 
                       {
-                          id: "status",
-                          columns: ["Status", <StatusBadge enabled={profileApprovalDetail.enabled} />],
+                          id: 'associations',
+                          columns: ['Associations', profileApprovalDetail?.associations.toString() || ''],
                       },
 
                       {
-                          id: "expiry",
-                          columns: ["Expiry (in hours)", profileApprovalDetail?.expiry ? profileApprovalDetail.expiry.toString() : ""],
+                          id: 'status',
+                          columns: ['Status', <StatusBadge enabled={profileApprovalDetail.enabled} />],
                       },
 
                       {
-                          id: "version",
-                          columns: ["Version", profileApprovalDetail?.version.toString() || ""],
+                          id: 'expiry',
+                          columns: ['Expiry (in hours)', profileApprovalDetail?.expiry ? profileApprovalDetail.expiry.toString() : ''],
+                      },
+
+                      {
+                          id: 'version',
+                          columns: ['Version', profileApprovalDetail?.version.toString() || ''],
                       },
                   ],
         [profileApprovalDetail],
@@ -145,24 +145,24 @@ const ApprovalProfileDetails = () => {
     const stepsHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "order",
-                content: "Order",
+                id: 'order',
+                content: 'Order',
             },
             {
-                id: "description",
-                content: "Description",
+                id: 'description',
+                content: 'Description',
             },
             {
-                id: "requiredApprovals",
-                content: "Required Approvals",
+                id: 'requiredApprovals',
+                content: 'Required Approvals',
             },
             {
-                id: "approverType",
-                content: "Approver Type",
+                id: 'approverType',
+                content: 'Approver Type',
             },
             {
-                id: "selectedApprover",
-                content: "Selected Approver",
+                id: 'selectedApprover',
+                content: 'Selected Approver',
             },
         ],
         [],
@@ -201,13 +201,13 @@ const ApprovalProfileDetails = () => {
                       columns: [
                           profile.order.toString(),
 
-                          profile.description || "",
+                          profile.description || '',
 
-                          profile?.requiredApprovals ? profile.requiredApprovals.toString() : "",
+                          profile?.requiredApprovals ? profile.requiredApprovals.toString() : '',
 
-                          getApprovalType(profile) || "",
+                          getApprovalType(profile) || '',
 
-                          renderApproverRedirect(profile) || "",
+                          renderApproverRedirect(profile) || '',
                       ],
                   })),
         [profileApprovalDetail, renderApproverRedirect],
@@ -242,8 +242,8 @@ const ApprovalProfileDetails = () => {
                   Account(s). When deleted the Approval Account(s) will be revoked."
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
@@ -260,7 +260,7 @@ const ApprovalProfileDetails = () => {
                 }
                 toggle={() => dispatch(profileApprovalActions.clearDeleteErrorMessages())}
                 buttons={[
-                    { color: "secondary", onClick: () => dispatch(profileApprovalActions.clearDeleteErrorMessages()), body: "Cancel" },
+                    { color: 'secondary', onClick: () => dispatch(profileApprovalActions.clearDeleteErrorMessages()), body: 'Cancel' },
                 ]}
             />
         </Container>

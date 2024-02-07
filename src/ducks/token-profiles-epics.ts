@@ -1,19 +1,19 @@
-import { AppEpic } from "ducks";
-import { iif, of } from "rxjs";
-import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
-import { extractError } from "utils/net";
-import { actions as alertActions } from "./alerts";
-import { actions as appRedirectActions } from "./app-redirect";
-import { slice } from "./token-profiles";
-import { actions as widgetLockActions } from "./widget-locks";
+import { AppEpic } from 'ducks';
+import { iif, of } from 'rxjs';
+import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
+import { extractError } from 'utils/net';
+import { actions as alertActions } from './alerts';
+import { actions as appRedirectActions } from './app-redirect';
+import { slice } from './token-profiles';
+import { actions as userInterfaceActions } from './user-interface';
 
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { LockWidgetNameEnum } from 'types/user-interface';
 import {
     transformTokenProfileAddRequestModelToDto,
     transformTokenProfileDetailResponseDtoToModel,
     transformTokenProfileEditRequestModelToDto,
     transformTokenProfileResponseDtoToModel,
-} from "./transform/token-profiles";
+} from './transform/token-profiles';
 
 const listTokenProfiles: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -25,14 +25,14 @@ const listTokenProfiles: AppEpic = (action$, state$, deps) => {
                         slice.actions.listTokenProfilesSuccess({
                             tokenProfiles: list.map(transformTokenProfileResponseDtoToModel),
                         }),
-                        widgetLockActions.removeWidgetLock(LockWidgetNameEnum.ListOfTokenProfiles),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfTokenProfiles),
                     ),
                 ),
 
                 catchError((error) =>
                     of(
-                        slice.actions.listTokenProfilesFailure({ error: extractError(error, "Failed to get Token profiles list") }),
-                        widgetLockActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfTokenProfiles),
+                        slice.actions.listTokenProfilesFailure({ error: extractError(error, 'Failed to get Token profiles list') }),
+                        userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfTokenProfiles),
                     ),
                 ),
             ),
@@ -52,14 +52,14 @@ const getTokenProfileDetail: AppEpic = (action$, state$, deps) => {
                             slice.actions.getTokenProfileDetailSuccess({
                                 tokenProfile: transformTokenProfileDetailResponseDtoToModel(profileDto),
                             }),
-                            widgetLockActions.removeWidgetLock(LockWidgetNameEnum.TokenProfileDetails),
+                            userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.TokenProfileDetails),
                         ),
                     ),
 
                     catchError((err) =>
                         of(
-                            slice.actions.getTokenProfileDetailFailure({ error: extractError(err, "Failed to get Token Profile detail") }),
-                            widgetLockActions.insertWidgetLock(err, LockWidgetNameEnum.TokenProfileDetails),
+                            slice.actions.getTokenProfileDetailFailure({ error: extractError(err, 'Failed to get Token Profile detail') }),
+                            userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.TokenProfileDetails),
                         ),
                     ),
                 ),
@@ -79,19 +79,30 @@ const createTokenProfile: AppEpic = (action$, state$, deps) => {
                 })
                 .pipe(
                     mergeMap((obj) =>
-                        of(
-                            slice.actions.createTokenProfileSuccess({
-                                uuid: obj.uuid,
-                                tokenInstanceUuid: action.payload.tokenInstanceUuid,
-                            }),
-                            appRedirectActions.redirect({ url: `../detail/${action.payload.tokenInstanceUuid}/${obj.uuid}` }),
+                        iif(
+                            () => !!action.payload.usesGlobalModal,
+                            of(
+                                slice.actions.createTokenProfileSuccess({
+                                    uuid: obj.uuid,
+                                    tokenInstanceUuid: action.payload.tokenInstanceUuid,
+                                }),
+                                userInterfaceActions.hideGlobalModal(),
+                                slice.actions.listTokenProfiles({ enabled: true }),
+                            ),
+                            of(
+                                slice.actions.createTokenProfileSuccess({
+                                    uuid: obj.uuid,
+                                    tokenInstanceUuid: action.payload.tokenInstanceUuid,
+                                }),
+                                appRedirectActions.redirect({ url: `../detail/${action.payload.tokenInstanceUuid}/${obj.uuid}` }),
+                            ),
                         ),
                     ),
 
                     catchError((err) =>
                         of(
-                            slice.actions.createTokenProfileFailure({ error: extractError(err, "Failed to create profile") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to create profile" }),
+                            slice.actions.createTokenProfileFailure({ error: extractError(err, 'Failed to create profile') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to create profile' }),
                         ),
                     ),
                 ),
@@ -131,7 +142,7 @@ const updateTokenProfile: AppEpic = (action$, state$, deps) => {
                     ),
 
                     catchError((err) =>
-                        of(slice.actions.updateTokenProfileFailure({ error: extractError(err, "Failed to update profile") })),
+                        of(slice.actions.updateTokenProfileFailure({ error: extractError(err, 'Failed to update profile') })),
                     ),
                 ),
         ),
@@ -150,8 +161,8 @@ const enableTokenProfile: AppEpic = (action$, state$, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.enableTokenProfileFailure({ error: extractError(err, "Failed to enable profile") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to enable profile" }),
+                            slice.actions.enableTokenProfileFailure({ error: extractError(err, 'Failed to enable profile') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to enable profile' }),
                         ),
                     ),
                 ),
@@ -171,8 +182,8 @@ const disableTokenProfile: AppEpic = (action$, state$, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.enableTokenProfileFailure({ error: extractError(err, "Failed to disable profile") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to disable profile" }),
+                            slice.actions.enableTokenProfileFailure({ error: extractError(err, 'Failed to disable profile') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to disable profile' }),
                         ),
                     ),
                 ),
@@ -200,8 +211,8 @@ const deleteTokenProfile: AppEpic = (action$, state$, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.deleteTokenProfileFailure({ error: extractError(err, "Failed to delete profile") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to delete profile" }),
+                            slice.actions.deleteTokenProfileFailure({ error: extractError(err, 'Failed to delete profile') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to delete profile' }),
                         ),
                     ),
                 ),
@@ -218,8 +229,8 @@ const bulkEnableProfiles: AppEpic = (action$, state$, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.bulkEnableTokenProfilesFailure({ error: extractError(err, "Failed to enable profiles") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to enable profiles" }),
+                        slice.actions.bulkEnableTokenProfilesFailure({ error: extractError(err, 'Failed to enable profiles') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to enable profiles' }),
                     ),
                 ),
             ),
@@ -237,8 +248,8 @@ const bulkDisableProfiles: AppEpic = (action$, state$, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.bulkDisableTokenProfilesFailure({ error: extractError(err, "Failed to disable profiles") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to disable profiles" }),
+                        slice.actions.bulkDisableTokenProfilesFailure({ error: extractError(err, 'Failed to disable profiles') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to disable profiles' }),
                     ),
                 ),
             ),
@@ -254,14 +265,14 @@ const bulkDeleteProfiles: AppEpic = (action$, state$, deps) => {
                 mergeMap(() =>
                     of(
                         slice.actions.bulkDeleteTokenProfilesSuccess({ uuids: action.payload.uuids }),
-                        alertActions.success("Selected profiles successfully deleted."),
+                        alertActions.success('Selected profiles successfully deleted.'),
                     ),
                 ),
 
                 catchError((err) =>
                     of(
-                        slice.actions.bulkDeleteTokenProfilesFailure({ error: extractError(err, "Failed to delete profiles") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to delete profiles" }),
+                        slice.actions.bulkDeleteTokenProfilesFailure({ error: extractError(err, 'Failed to delete profiles') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to delete profiles' }),
                     ),
                 ),
             ),
@@ -285,8 +296,8 @@ const updateKeyUsage: AppEpic = (action$, state$, deps) => {
 
                     catchError((err) =>
                         of(
-                            slice.actions.updateKeyUsageFailure({ error: extractError(err, "Failed to enable profile") }),
-                            appRedirectActions.fetchError({ error: err, message: "Failed to Update Key Usages" }),
+                            slice.actions.updateKeyUsageFailure({ error: extractError(err, 'Failed to enable profile') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to Update Key Usages' }),
                         ),
                     ),
                 ),
@@ -303,8 +314,8 @@ const bulkUpdateKeyUsage: AppEpic = (action$, state$, deps) => {
 
                 catchError((err) =>
                     of(
-                        slice.actions.bulkEnableTokenProfilesFailure({ error: extractError(err, "Failed to enable profiles") }),
-                        appRedirectActions.fetchError({ error: err, message: "Failed to enable profiles" }),
+                        slice.actions.bulkEnableTokenProfilesFailure({ error: extractError(err, 'Failed to enable profiles') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to enable profiles' }),
                     ),
                 ),
             ),

@@ -1,22 +1,22 @@
-import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from "components/Attributes/AttributeViewer";
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
-import TokenStatusBadge from "components/_pages/tokens/TokenStatusBadge";
+import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from 'components/Attributes/AttributeViewer';
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
+import TokenStatusBadge from 'components/_pages/tokens/TokenStatusBadge';
 
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
 
-import { actions as keyActions, selectors as keySelectors } from "ducks/cryptographic-keys";
-import { actions, selectors } from "ducks/tokens";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { Container, Label } from "reactstrap";
-import { Resource, TokenInstanceStatus } from "types/openapi";
-import { LockWidgetNameEnum } from "types/widget-locks";
-import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
-import TokenActivationDialogBody from "../TokenActivationDialogBody";
-import RandomDataGeneration from "./RandomDataGeneration";
+import { actions as keyActions, selectors as keySelectors } from 'ducks/cryptographic-keys';
+import { actions, selectors } from 'ducks/tokens';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Container, Label } from 'reactstrap';
+import { Resource, TokenInstanceStatus } from 'types/openapi';
+import { LockWidgetNameEnum } from 'types/user-interface';
+import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
+import TokenActivationDialogBody from '../TokenActivationDialogBody';
+import RandomDataGeneration from './RandomDataGeneration';
 
 export default function TokenDetail() {
     const dispatch = useDispatch();
@@ -63,7 +63,7 @@ export default function TokenDetail() {
 
     const onEditClick = useCallback(() => {
         if (!token) return;
-        navigate(`../../edit/${token.uuid}`, { relative: "path" });
+        navigate(`../../edit/${token.uuid}`, { relative: 'path' });
     }, [token, navigate]);
 
     const onDeleteConfirmed = useCallback(() => {
@@ -95,57 +95,57 @@ export default function TokenDetail() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "pencil",
+                icon: 'pencil',
                 disabled: false,
-                tooltip: "Edit",
+                tooltip: 'Edit',
                 onClick: () => {
                     onEditClick();
                 },
             },
             {
-                icon: "trash",
+                icon: 'trash',
                 disabled: false,
-                tooltip: "Delete",
+                tooltip: 'Delete',
                 onClick: () => {
                     setConfirmDelete(true);
                 },
             },
             {
-                icon: "reload",
+                icon: 'reload',
                 disabled: false,
-                tooltip: "Reload Status",
+                tooltip: 'Reload Status',
                 onClick: () => {
                     onReload();
                 },
             },
             {
-                icon: "refresh",
+                icon: 'refresh',
                 disabled: token?.status.status !== TokenInstanceStatus.Activated,
-                tooltip: "Sync Keys",
+                tooltip: 'Sync Keys',
                 onClick: () => {
                     onSync();
                 },
             },
             {
-                icon: "check",
+                icon: 'check',
                 disabled: token?.status.status !== TokenInstanceStatus.Deactivated,
-                tooltip: "Activate",
+                tooltip: 'Activate',
                 onClick: () => {
                     setActivateToken(true);
                 },
             },
             {
-                icon: "times",
+                icon: 'times',
                 disabled: token?.status.status !== TokenInstanceStatus.Activated,
-                tooltip: "Deactivate",
+                tooltip: 'Deactivate',
                 onClick: () => {
                     setConfirmDeactivation(true);
                 },
             },
             {
-                icon: "random",
+                icon: 'random',
                 disabled: token?.status.status !== TokenInstanceStatus.Activated,
-                tooltip: "Generate Random",
+                tooltip: 'Generate Random',
                 onClick: () => {
                     setRandomDataGeneration(true);
                 },
@@ -157,12 +157,12 @@ export default function TokenDetail() {
     const detailHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "property",
-                content: "Property",
+                id: 'property',
+                content: 'Property',
             },
             {
-                id: "value",
-                content: "Value",
+                id: 'value',
+                content: 'Value',
             },
         ],
         [],
@@ -174,39 +174,39 @@ export default function TokenDetail() {
                 ? []
                 : [
                       {
-                          id: "uuid",
-                          columns: ["UUID", token.uuid],
+                          id: 'uuid',
+                          columns: ['UUID', token.uuid],
                       },
                       {
-                          id: "name",
-                          columns: ["Name", token.name],
+                          id: 'name',
+                          columns: ['Name', token.name],
                       },
                       {
-                          id: "status",
-                          columns: ["Status", <TokenStatusBadge status={token.status.status} />],
+                          id: 'status',
+                          columns: ['Status', <TokenStatusBadge status={token.status.status} />],
                       },
                       {
-                          id: "cryptographyProviderUUID",
-                          columns: ["Cryptography Provider UUID", token.connectorUuid || ""],
+                          id: 'cryptographyProviderUUID',
+                          columns: ['Cryptography Provider UUID', token.connectorUuid || ''],
                       },
                       {
-                          id: "cryptographyProviderName",
+                          id: 'cryptographyProviderName',
                           columns: [
-                              "Cryptography Provider Name",
+                              'Cryptography Provider Name',
                               token.connectorUuid ? (
                                   <Link to={`../../connectors/detail/${token.connectorUuid}`}>{token.connectorName}</Link>
                               ) : (
-                                  ""
+                                  ''
                               ),
                           ],
                       },
                       {
-                          id: "kind",
-                          columns: ["Kind", token.kind || ""],
+                          id: 'kind',
+                          columns: ['Kind', token.kind || ''],
                       },
                       {
-                          id: "tokenProfiles",
-                          columns: ["Number of Token Profiles", token.tokenProfiles.toString()],
+                          id: 'tokenProfiles',
+                          columns: ['Number of Token Profiles', token.tokenProfiles.toString()],
                       },
                   ],
         [token],
@@ -253,8 +253,8 @@ export default function TokenDetail() {
                   related to the token will fail. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
@@ -265,8 +265,8 @@ export default function TokenDetail() {
                   related to the token not work. Is this what you want to do?"
                 toggle={() => setConfirmDeactivation(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeactivationConfirmed, body: "Deactivate" },
-                    { color: "secondary", onClick: () => setConfirmDeactivation(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeactivationConfirmed, body: 'Deactivate' },
+                    { color: 'secondary', onClick: () => setConfirmDeactivation(false), body: 'Cancel' },
                 ]}
             />
 

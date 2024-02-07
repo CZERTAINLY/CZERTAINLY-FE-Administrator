@@ -1,29 +1,29 @@
-import AttributeEditor from "components/Attributes/AttributeEditor";
-import ProgressButton from "components/ProgressButton";
-import Widget from "components/Widget";
+import AttributeEditor from 'components/Attributes/AttributeEditor';
+import ProgressButton from 'components/ProgressButton';
+import Widget from 'components/Widget';
 
-import { actions as alertActions } from "ducks/alerts";
-import { actions as connectorActions } from "ducks/connectors";
-import { actions as entityActions, selectors as entitySelectors } from "ducks/entities";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { actions as alertActions } from 'ducks/alerts';
+import { actions as connectorActions } from 'ducks/connectors';
+import { actions as entityActions, selectors as entitySelectors } from 'ducks/entities';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { Field, Form } from "react-final-form";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { Field, Form } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
 
-import Select from "react-select";
-import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from "reactstrap";
-import { AttributeDescriptorModel } from "types/attributes";
-import { ConnectorResponseModel } from "types/connectors";
-import { EntityResponseModel } from "types/entities";
-import { FunctionGroupCode, Resource } from "types/openapi";
+import Select from 'react-select';
+import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
+import { AttributeDescriptorModel } from 'types/attributes';
+import { ConnectorResponseModel } from 'types/connectors';
+import { EntityResponseModel } from 'types/entities';
+import { FunctionGroupCode, Resource } from 'types/openapi';
 
-import { mutators } from "utils/attributes/attributeEditorMutators";
-import { collectFormAttributes } from "utils/attributes/attributes";
+import { mutators } from 'utils/attributes/attributeEditorMutators';
+import { collectFormAttributes } from 'utils/attributes/attributes';
 
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from "utils/validators";
-import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
-import TabLayout from "../../../Layout/TabLayout";
+import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
+import TabLayout from '../../../Layout/TabLayout';
 
 interface FormValues {
     name: string | undefined;
@@ -94,7 +94,7 @@ export default function EntityForm() {
     useEffect(() => {
         if (!entityProvider && editMode && entitySelector?.uuid === id && entityProviders && entityProviders.length > 0) {
             if (!entitySelector!.connectorUuid) {
-                dispatch(alertActions.error("Entity provider was probably deleted"));
+                dispatch(alertActions.error('Entity provider was probably deleted'));
                 return;
             }
 
@@ -109,7 +109,7 @@ export default function EntityForm() {
                     }),
                 );
             } else {
-                dispatch(alertActions.error("Entity provider not found"));
+                dispatch(alertActions.error('Entity provider not found'));
             }
         }
     }, [entityProvider, dispatch, editMode, id, entitySelector, entityProviders, isFetchingEntityProviders]);
@@ -146,11 +146,11 @@ export default function EntityForm() {
                     entityActions.updateEntity({
                         uuid: id!,
                         attributes: collectFormAttributes(
-                            "entity",
+                            'entity',
                             [...(entityProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
                             values,
                         ),
-                        customAttributes: collectFormAttributes("customEntity", resourceCustomAttributes, values),
+                        customAttributes: collectFormAttributes('customEntity', resourceCustomAttributes, values),
                     }),
                 );
             } else {
@@ -160,11 +160,11 @@ export default function EntityForm() {
                         connectorUuid: values.entityProvider!.value,
                         kind: values.storeKind?.value!,
                         attributes: collectFormAttributes(
-                            "entity",
+                            'entity',
                             [...(entityProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
                             values,
                         ),
-                        customAttributes: collectFormAttributes("customEntity", resourceCustomAttributes, values),
+                        customAttributes: collectFormAttributes('customEntity', resourceCustomAttributes, values),
                     }),
                 );
             }
@@ -176,9 +176,9 @@ export default function EntityForm() {
         navigate(-1);
     }, [navigate]);
 
-    const submitTitle = useMemo(() => (editMode ? "Save" : "Create"), [editMode]);
+    const submitTitle = useMemo(() => (editMode ? 'Save' : 'Create'), [editMode]);
 
-    const inProgressTitle = useMemo(() => (editMode ? "Saving..." : "Creating..."), [editMode]);
+    const inProgressTitle = useMemo(() => (editMode ? 'Saving...' : 'Creating...'), [editMode]);
 
     const optionsForEntityProviders = useMemo(
         () =>
@@ -209,7 +209,7 @@ export default function EntityForm() {
         [editMode, entity],
     );
 
-    const title = useMemo(() => (editMode ? "Edit Entity" : "Create Entity"), [editMode]);
+    const title = useMemo(() => (editMode ? 'Edit Entity' : 'Create Entity'), [editMode]);
 
     return (
         <Widget title={title} busy={isBusy}>
@@ -249,26 +249,26 @@ export default function EntityForm() {
                                             placeholder="Select Entity Provider"
                                             onChange={(event) => {
                                                 onEntityProviderChange(event);
-                                                form.mutators.clearAttributes("entity");
-                                                form.mutators.setAttribute("storeKind", undefined);
+                                                form.mutators.clearAttributes('entity');
+                                                form.mutators.setAttribute('storeKind', undefined);
                                                 input.onChange(event);
                                             }}
                                             styles={{
                                                 control: (provided) =>
                                                     meta.touched && meta.invalid
-                                                        ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } }
+                                                        ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
                                                         : { ...provided },
                                             }}
                                         />
 
-                                        <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>
+                                        <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
                                             {meta.error}
                                         </div>
                                     </FormGroup>
                                 )}
                             </Field>
                         ) : (
-                            <Field name="entityProvider" format={(value) => (value ? value.label : "")} validate={validateRequired()}>
+                            <Field name="entityProvider" format={(value) => (value ? value.label : '')} validate={validateRequired()}>
                                 {({ input, meta }) => (
                                     <FormGroup>
                                         <Label for="entityProvider">Entity Provider</Label>
@@ -305,12 +305,12 @@ export default function EntityForm() {
                                             styles={{
                                                 control: (provided) =>
                                                     meta.touched && meta.invalid
-                                                        ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } }
+                                                        ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
                                                         : { ...provided },
                                             }}
                                         />
 
-                                        <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>
+                                        <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
                                             Required Field
                                         </div>
                                     </FormGroup>
@@ -319,7 +319,7 @@ export default function EntityForm() {
                         ) : null}
 
                         {editMode && entity?.kind ? (
-                            <Field name="storeKind" format={(value) => (value ? value.label : "")}>
+                            <Field name="storeKind" format={(value) => (value ? value.label : '')}>
                                 {({ input, meta }) => (
                                     <FormGroup>
                                         <Label for="storeKind">Kind</Label>
@@ -342,7 +342,7 @@ export default function EntityForm() {
                             <TabLayout
                                 tabs={[
                                     {
-                                        title: "Connector Attributes",
+                                        title: 'Connector Attributes',
                                         content:
                                             entityProvider &&
                                             values.storeKind &&
@@ -363,7 +363,7 @@ export default function EntityForm() {
                                             ),
                                     },
                                     {
-                                        title: "Custom Attributes",
+                                        title: 'Custom Attributes',
                                         content: (
                                             <AttributeEditor
                                                 id="customEntity"

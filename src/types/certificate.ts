@@ -1,21 +1,20 @@
-import { AttributeRequestModel, AttributeResponseModel } from "./attributes";
-import { CertificateGroupResponseModel } from "./certificateGroups";
-import { LocationResponseModel, MetadataModel } from "./locations";
+import { AttributeRequestModel, AttributeResponseModel } from './attributes';
+import { CertificateGroupResponseModel } from './certificateGroups';
+import { LocationResponseModel, MetadataModel } from './locations';
 import {
     BulkOperationResponse,
     CertificateChainDownloadResponseDto,
-    CertificateChainDownloadResponseDtoFormatEnum,
     CertificateChainResponseDto,
     CertificateComplianceCheckDto,
     CertificateComplianceResultDto,
     CertificateContentDto,
     CertificateDetailDto as CertificateDetailResponseDtoOpenApi,
+    CertificateDownloadResponseDto,
     CertificateDto,
     CertificateEventHistoryDto,
     CertificateUpdateObjectsDto,
     CertificateValidationCheck,
     CertificateValidationCheckDto,
-    CertificateValidationDto as CertificateValidationDtoOpenApi,
     CertificateValidationResultDto,
     CertificateValidationStatus,
     ClientCertificateRekeyRequestDto,
@@ -30,11 +29,10 @@ import {
     SearchRequestDto as SearchRequestDtoOpenApi,
     SimplifiedRaProfileDto,
     UploadCertificateRequestDto,
-} from "./openapi";
-// import { CertificateValidationDto as CertificateValidationDtoOpenApi } from "./openapi/models/CertificateValidationDto";
+} from './openapi';
 
 export type ValidationCertificateCheckDto = CertificateValidationCheckDto;
-export type ValidationCertificateCheckModel = Omit<CertificateValidationCheckDto, "validationCheck | status | message"> & {
+export type ValidationCertificateCheckModel = Omit<CertificateValidationCheckDto, 'validationCheck | status | message'> & {
     validationCheck: CertificateValidationCheck;
     status: CertificateValidationStatus;
     message?: string;
@@ -42,7 +40,7 @@ export type ValidationCertificateCheckModel = Omit<CertificateValidationCheckDto
 
 export type ValidationCertificateResultDto = CertificateValidationResultDto;
 
-export type ValidationCertificateResultModel = Omit<ValidationCertificateResultDto, "resultStatus" | "validationCheckResults"> & {
+export type ValidationCertificateResultModel = Omit<ValidationCertificateResultDto, 'resultStatus' | 'validationCheckResults'> & {
     resultStatus: CertificateValidationStatus;
     validationCheckResults?: Array<ValidationCertificateCheckModel>;
 };
@@ -50,20 +48,20 @@ export type SearchFilterDto = SearchFilterRequestDto;
 export type SearchFilterModel = SearchFilterDto;
 
 export type SearchRequestDto = SearchRequestDtoOpenApi;
-export type SearchRequestModel = Omit<SearchRequestDto, "filters"> & { filters?: Array<SearchFilterModel> };
+export type SearchRequestModel = Omit<SearchRequestDto, 'filters'> & { filters?: Array<SearchFilterModel> };
 
 export type RaProfileSimplifiedDto = SimplifiedRaProfileDto;
 export type RaProfileSimplifiedModel = RaProfileSimplifiedDto;
 
 export type CertificateComplianceResponseDto = CertificateComplianceResultDto;
-export type CertificateComplianceResponseModel = Omit<CertificateComplianceResponseDto, "attributes"> & {
+export type CertificateComplianceResponseModel = Omit<CertificateComplianceResponseDto, 'attributes'> & {
     attributes?: Array<AttributeResponseModel>;
 };
 
 export type CertificateDetailResponseDto = CertificateDetailResponseDtoOpenApi;
 export type CertificateDetailResponseModel = Omit<
     CertificateDetailResponseDto,
-    "metadata | raProfile | locations | group | nonCompliantRules | customAttributes"
+    'metadata | raProfile | locations | group | nonCompliantRules | customAttributes'
 > & {
     metadata?: Array<MetadataModel>;
     raProfile?: RaProfileSimplifiedModel;
@@ -76,13 +74,10 @@ export type CertificateDetailResponseModel = Omit<
 export type CertificateListResponseDto = CertificateDto;
 export type CertificateListResponseModel = CertificateListResponseDto;
 
-export type CertificateValidationDto = CertificateValidationDtoOpenApi;
-export type CertificateValidationModel = CertificateValidationDto;
-
 export type CertificateSignRequestDto = ClientCertificateSignRequestDto;
 export type CertificateSignRequestModel = Omit<
     CertificateSignRequestDto,
-    "attributes | customAttributes | csrAttributes | signatureAttributes"
+    'attributes | customAttributes | csrAttributes | signatureAttributes'
 > & {
     attributes: Array<AttributeRequestModel>;
     customAttributes?: Array<AttributeRequestModel>;
@@ -91,7 +86,7 @@ export type CertificateSignRequestModel = Omit<
 };
 
 export type CertificateRevokeRequestDto = ClientCertificateRevocationDto;
-export type CertificateRevokeRequestModel = Omit<CertificateRevokeRequestDto, "attributes"> & { attributes: Array<AttributeRequestModel> };
+export type CertificateRevokeRequestModel = Omit<CertificateRevokeRequestDto, 'attributes'> & { attributes: Array<AttributeRequestModel> };
 
 export type CertificateRenewRequestDto = ClientCertificateRenewRequestDto;
 export type CertificateRenewRequestModel = CertificateRenewRequestDto;
@@ -103,7 +98,7 @@ export type SearchFieldDto = SearchFieldDataDto;
 export type SearchFieldModel = SearchFieldDto;
 
 export type SearchFieldListDto = SearchFieldDataByGroupDto;
-export type SearchFieldListModel = Omit<SearchFieldListDto, "searchFieldData"> & { searchFieldData?: Array<SearchFieldModel> };
+export type SearchFieldListModel = Omit<SearchFieldListDto, 'searchFieldData'> & { searchFieldData?: Array<SearchFieldModel> };
 
 export type CertificateHistoryDto = CertificateEventHistoryDto;
 export type CertificateHistoryModel = CertificateHistoryDto;
@@ -112,10 +107,10 @@ export type CertificateObjectDto = CertificateUpdateObjectsDto;
 export type CertificateObjectModel = CertificateObjectDto;
 
 export type CertificateBulkObjectDto = MultipleCertificateObjectUpdateDto;
-export type CertificateBulkObjectModel = Omit<CertificateBulkObjectDto, "filters"> & { filters?: Array<SearchFilterModel> };
+export type CertificateBulkObjectModel = Omit<CertificateBulkObjectDto, 'filters'> & { filters?: Array<SearchFilterModel> };
 
 export type CertificateBulkDeleteRequestDto = RemoveCertificateDto;
-export type CertificateBulkDeleteRequestModel = Omit<CertificateBulkDeleteRequestDto, "filters"> & { filters?: Array<SearchFilterModel> };
+export type CertificateBulkDeleteRequestModel = Omit<CertificateBulkDeleteRequestDto, 'filters'> & { filters?: Array<SearchFilterModel> };
 
 export type CertificateBulkDeleteResponseDto = BulkOperationResponse;
 export type CertificateBulkDeleteResponseModel = CertificateBulkDeleteResponseDto;
@@ -130,11 +125,12 @@ export type CertificateContentResponseDto = CertificateContentDto;
 export type CertificateContentResponseModel = CertificateContentResponseDto;
 
 export type ChainCertificateResponseDto = CertificateChainResponseDto;
-export type CertificateChainResponseModel = Omit<ChainCertificateResponseDto, "certificates"> & {
+export type CertificateChainResponseModel = Omit<ChainCertificateResponseDto, 'certificates'> & {
     certificates?: Array<CertificateDetailResponseModel>;
 };
 
-export type CertificateChainDownloadResponseModel = CertificateChainDownloadResponseDto;
-export type CertificateChainDownloadResponseDtoModel = Omit<CertificateChainDownloadResponseModel, "format"> & {
-    format: CertificateChainDownloadResponseDtoFormatEnum;
-};
+export type DownloadChainCertificateResponseDto = CertificateChainDownloadResponseDto;
+export type DownloadCertificateChainResponseModel = DownloadChainCertificateResponseDto;
+
+export type DownloadCertificateResponseDto = CertificateDownloadResponseDto;
+export type DownloadCertificateResponseModel = DownloadCertificateResponseDto;

@@ -1,17 +1,17 @@
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 
-import Dialog from "components/Dialog";
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
+import Dialog from 'components/Dialog';
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
 
-import { actions as authActions, selectors as authSelectors } from "ducks/auth";
-import { useCallback, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Input } from "reactstrap";
-import { ResourceModel } from "types/auth";
-import { SubjectPermissionsModel } from "types/roles";
+import { actions as authActions, selectors as authSelectors } from 'ducks/auth';
+import { useCallback, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Input } from 'reactstrap';
+import { ResourceModel } from 'types/auth';
+import { SubjectPermissionsModel } from 'types/roles';
 
-import style from "./style.module.scss";
+import style from './style.module.scss';
 
 interface Props {
     resources?: ResourceModel[];
@@ -42,15 +42,15 @@ function RolePermissionsEditor({
 
     const getPermissions = useCallback(
         (resource: ResourceModel) => {
-            if (permissions.allowAllResources) return "All actions allowed";
+            if (permissions.allowAllResources) return 'All actions allowed';
 
             const perms = permissions?.resources.find((r) => r.name === resource.name);
 
-            if (perms?.allowAllActions) return "All actions allowed";
+            if (perms?.allowAllActions) return 'All actions allowed';
 
-            const actions = perms?.actions.join(", ");
+            const actions = perms?.actions.join(', ');
 
-            return actions ? actions : "No permissions assigned";
+            return actions ? actions : 'No permissions assigned';
         },
         [permissions],
     );
@@ -116,7 +116,7 @@ function RolePermissionsEditor({
     );
 
     const setOLP = useCallback(
-        (resourceUuid: string, objectUuid: string, objectName: string, action: string, permissions: "allow" | "deny") => {
+        (resourceUuid: string, objectUuid: string, objectName: string, action: string, permissions: 'allow' | 'deny') => {
             const resource = resources?.find((r) => r.uuid === resourceUuid);
             if (!resource) return;
 
@@ -128,11 +128,11 @@ function RolePermissionsEditor({
                 const objectPermissions = resourcePermissions.objects?.find((o) => o.uuid === objectUuid);
 
                 if (objectPermissions) {
-                    if (permissions === "allow") {
+                    if (permissions === 'allow') {
                         if (!objectPermissions.allow.includes(action)) objectPermissions.allow.push(action);
                         if (objectPermissions.deny.includes(action))
                             objectPermissions.deny = objectPermissions.deny.filter((a) => a !== action);
-                    } else if (permissions === "deny") {
+                    } else if (permissions === 'deny') {
                         if (!objectPermissions.deny.includes(action)) objectPermissions.deny.push(action);
                         if (objectPermissions.allow.includes(action))
                             objectPermissions.allow = objectPermissions.allow.filter((a) => a !== action);
@@ -143,8 +143,8 @@ function RolePermissionsEditor({
                     resourcePermissions.objects.push({
                         uuid: objectUuid,
                         name: objectName,
-                        allow: permissions === "allow" ? [action] : [],
-                        deny: permissions === "deny" ? [action] : [],
+                        allow: permissions === 'allow' ? [action] : [],
+                        deny: permissions === 'deny' ? [action] : [],
                     });
                 }
             } else {
@@ -156,8 +156,8 @@ function RolePermissionsEditor({
                         {
                             uuid: objectUuid,
                             name: objectName,
-                            allow: permissions === "allow" ? [action] : [],
-                            deny: permissions === "deny" ? [action] : [],
+                            allow: permissions === 'allow' ? [action] : [],
+                            deny: permissions === 'deny' ? [action] : [],
                         },
                     ],
                 });
@@ -235,11 +235,11 @@ function RolePermissionsEditor({
     const objectHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "objectName",
-                content: "Name",
+                id: 'objectName',
+                content: 'Name',
                 sortable: true,
-                sort: "asc",
-                align: "left",
+                sort: 'asc',
+                align: 'left',
             },
 
             ...(currentResource?.actions.map(
@@ -248,9 +248,9 @@ function RolePermissionsEditor({
                         id: action.name,
                         content: action.displayName,
                         sortable: false,
-                        align: "center",
-                        width: "5em",
-                    } as TableHeader),
+                        align: 'center',
+                        width: '5em',
+                    }) as TableHeader,
             ) || []),
         ],
         [currentResource],
@@ -263,7 +263,7 @@ function RolePermissionsEditor({
                 ?.objects?.map((object) => ({
                     id: object.uuid,
                     columns: [
-                        <span style={{ whiteSpace: "nowrap" }}>{object.name}</span>,
+                        <span style={{ whiteSpace: 'nowrap' }}>{object.name}</span>,
 
                         ...(currentResource?.actions.map((action) => (
                             <label
@@ -284,7 +284,7 @@ function RolePermissionsEditor({
                                             object.uuid,
                                             object.name,
                                             action.name,
-                                            e.target.checked ? "allow" : "deny",
+                                            e.target.checked ? 'allow' : 'deny',
                                         )
                                     }
                                 />
@@ -362,7 +362,7 @@ function RolePermissionsEditor({
 
         if (!perms) {
             perms = {
-                name: currentResource?.name || "",
+                name: currentResource?.name || '',
                 allowAllActions: false,
                 actions: [],
                 objects: [],
@@ -377,7 +377,7 @@ function RolePermissionsEditor({
             const object = objects?.find((o) => o.uuid === uuid);
 
             if (!object || !perms) {
-                console.error("Unexpected error!");
+                console.error('Unexpected error!');
                 return;
             }
 
@@ -396,33 +396,33 @@ function RolePermissionsEditor({
     const buttons: WidgetButtonProps[] = useMemo(() => {
         return [
             {
-                icon: "plus",
+                icon: 'plus',
                 disabled: false,
-                tooltip: "Add object",
+                tooltip: 'Add object',
                 onClick: () => {
                     onAddClick();
                 },
             },
             {
-                icon: "trash",
+                icon: 'trash',
                 disabled: selectedObjects.length === 0,
-                tooltip: "Remove objects",
+                tooltip: 'Remove objects',
                 onClick: () => {
                     onRemoveClick();
                 },
             },
             {
-                icon: "check",
+                icon: 'check',
                 disabled: selectedObjects.length === 0,
-                tooltip: "Allow all actions",
+                tooltip: 'Allow all actions',
                 onClick: () => {
                     onAllowAllClick();
                 },
             },
             {
-                icon: "times",
+                icon: 'times',
                 disabled: selectedObjects.length === 0,
-                tooltip: "Deny all actions",
+                tooltip: 'Deny all actions',
                 onClick: () => {
                     onDenyAllClick();
                 },
@@ -433,11 +433,11 @@ function RolePermissionsEditor({
     const objectsToSelect: TableHeader[] = useMemo(
         () => [
             {
-                id: "objectName",
-                content: "Name",
+                id: 'objectName',
+                content: 'Name',
                 sortable: true,
-                sort: "asc",
-                align: "left",
+                sort: 'asc',
+                align: 'left',
             },
         ],
         [],
@@ -452,7 +452,7 @@ function RolePermissionsEditor({
                 .map((object) => ({
                     id: object.uuid,
 
-                    columns: [<span style={{ whiteSpace: "nowrap" }}>{object.name}</span>],
+                    columns: [<span style={{ whiteSpace: 'nowrap' }}>{object.name}</span>],
                 })) || [],
         [currentResource, objects, permissions],
     );
@@ -518,8 +518,8 @@ function RolePermissionsEditor({
                 toggle={() => setObjectListDialog(false)}
                 size="lg"
                 buttons={[
-                    { disabled: objectsToAdd.length === 0, color: "primary", onClick: () => addSelectedObjects(), body: "Ok" },
-                    { color: "secondary", onClick: () => setObjectListDialog(false), body: "Close" },
+                    { disabled: objectsToAdd.length === 0, color: 'primary', onClick: () => addSelectedObjects(), body: 'Ok' },
+                    { color: 'secondary', onClick: () => setObjectListDialog(false), body: 'Close' },
                 ]}
             />
         </>

@@ -1,31 +1,35 @@
-import AttributeEditor from "components/Attributes/AttributeEditor";
-import ProgressButton from "components/ProgressButton";
+import AttributeEditor from 'components/Attributes/AttributeEditor';
+import ProgressButton from 'components/ProgressButton';
 
-import Widget from "components/Widget";
-import { actions as connectorActions } from "ducks/connectors";
+import Widget from 'components/Widget';
+import { actions as connectorActions } from 'ducks/connectors';
+import { actions as userInterfaceActions } from '../../../../ducks/user-interface';
 
-import { actions as tokenProfilesActions, selectors as tokenProfilesSelectors } from "ducks/token-profiles";
-import { actions as tokensActions, selectors as tokensSelectors } from "ducks/tokens";
-import { FormApi } from "final-form";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Field, Form } from "react-final-form";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
-import Select from "react-select";
+import { actions as tokenProfilesActions, selectors as tokenProfilesSelectors } from 'ducks/token-profiles';
+import { actions as tokensActions, selectors as tokensSelectors } from 'ducks/tokens';
+import { FormApi } from 'final-form';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Field, Form } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
+import Select from 'react-select';
 
-import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from "reactstrap";
-import { AttributeDescriptorModel } from "types/attributes";
-import { TokenProfileDetailResponseModel } from "types/token-profiles";
+import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
+import { AttributeDescriptorModel } from 'types/attributes';
+import { TokenProfileDetailResponseModel } from 'types/token-profiles';
 
-import { mutators } from "utils/attributes/attributeEditorMutators";
-import { collectFormAttributes } from "utils/attributes/attributes";
+import { mutators } from 'utils/attributes/attributeEditorMutators';
+import { collectFormAttributes } from 'utils/attributes/attributes';
 
-import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
-import {composeValidators, validateAlphaNumericWithSpecialChars, validateLength, validateRequired} from "utils/validators";
-import { actions as customAttributesActions, selectors as customAttributesSelectors } from "../../../../ducks/customAttributes";
-import { KeyUsage, PlatformEnum, Resource } from "../../../../types/openapi";
-import TabLayout from "../../../Layout/TabLayout";
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { composeValidators, validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
+import { KeyUsage, PlatformEnum, Resource } from '../../../../types/openapi';
+import TabLayout from '../../../Layout/TabLayout';
 
+interface TokenProfileFormFormProps {
+    usesGlobalModal?: boolean;
+}
 interface FormValues {
     name: string;
     description: string;
@@ -33,7 +37,7 @@ interface FormValues {
     usages: { value: KeyUsage; label: string }[];
 }
 
-export default function TokenProfileForm() {
+export default function TokenProfileForm({ usesGlobalModal = false }: TokenProfileFormFormProps) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -87,7 +91,7 @@ export default function TokenProfileForm() {
         (tokenUuid: string, form: FormApi<FormValues>) => {
             dispatch(connectorActions.clearCallbackData());
             setGroupAttributesCallbackAttributes([]);
-            form.mutators.clearAttributes("ra-profile");
+            form.mutators.clearAttributes('ra-profile');
             if (tokenProfile) setTokenProfile({ ...tokenProfile });
             dispatch(tokensActions.clearTokenProfileAttributesDescriptors());
             dispatch(tokensActions.getTokenProfileAttributesDescriptors({ tokenUuid }));
@@ -111,11 +115,11 @@ export default function TokenProfileForm() {
                             enabled: tokenProfile!.enabled,
                             description: values.description,
                             attributes: collectFormAttributes(
-                                "token-profile",
+                                'token-profile',
                                 [...(tokenProfileAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
                                 values,
                             ),
-                            customAttributes: collectFormAttributes("customTokenProfile", resourceCustomAttributes, values),
+                            customAttributes: collectFormAttributes('customTokenProfile', resourceCustomAttributes, values),
                             usage: values.usages.map((item) => item.value),
                         },
                     }),
@@ -124,15 +128,16 @@ export default function TokenProfileForm() {
                 dispatch(
                     tokenProfilesActions.createTokenProfile({
                         tokenInstanceUuid: values.token!.value,
+                        usesGlobalModal,
                         tokenProfileAddRequest: {
                             name: values.name,
                             description: values.description,
                             attributes: collectFormAttributes(
-                                "token-profile",
+                                'token-profile',
                                 [...(tokenProfileAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
                                 values,
                             ),
-                            customAttributes: collectFormAttributes("customTokenProfile", resourceCustomAttributes, values),
+                            customAttributes: collectFormAttributes('customTokenProfile', resourceCustomAttributes, values),
                             usage: values.usages.map((item) => item.value),
                         },
                     }),
@@ -147,6 +152,7 @@ export default function TokenProfileForm() {
             tokenProfileAttributeDescriptors,
             groupAttributesCallbackAttributes,
             resourceCustomAttributes,
+            usesGlobalModal,
         ],
     );
 
@@ -161,8 +167,8 @@ export default function TokenProfileForm() {
 
     const defaultValues: FormValues = useMemo(
         () => ({
-            name: editMode ? tokenProfile?.name || "" : "",
-            description: editMode ? tokenProfile?.description || "" : "",
+            name: editMode ? tokenProfile?.name || '' : '',
+            description: editMode ? tokenProfile?.description || '' : '',
             token: editMode
                 ? tokenProfile
                     ? optionsForAuthorities.find((option) => option.value === tokenProfile.tokenInstanceUuid)
@@ -173,7 +179,7 @@ export default function TokenProfileForm() {
         [editMode, optionsForAuthorities, tokenProfile],
     );
 
-    const title = useMemo(() => (editMode ? "Edit Token Profile" : "Create Token Profile"), [editMode]);
+    const title = useMemo(() => (editMode ? 'Edit Token Profile' : 'Create Token Profile'), [editMode]);
 
     const keyUsageOptions = () => {
         let options: { value: KeyUsage; label: string }[] = [];
@@ -211,7 +217,7 @@ export default function TokenProfileForm() {
                             )}
                         </Field>
 
-                        <Field name="description" validate={composeValidators(validateLength(0,300))}>
+                        <Field name="description" validate={composeValidators(validateLength(0, 300))}>
                             {({ input, meta }) => (
                                 <FormGroup>
                                     <Label for="description">Description</Label>
@@ -250,12 +256,12 @@ export default function TokenProfileForm() {
                                         styles={{
                                             control: (provided) =>
                                                 meta.touched && meta.invalid
-                                                    ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } }
+                                                    ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
                                                     : { ...provided },
                                         }}
                                     />
 
-                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>
+                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
                                         {meta.error}
                                     </div>
                                 </FormGroup>
@@ -281,12 +287,12 @@ export default function TokenProfileForm() {
                                         styles={{
                                             control: (provided) =>
                                                 meta.touched && meta.invalid
-                                                    ? { ...provided, border: "solid 1px red", "&:hover": { border: "solid 1px red" } }
+                                                    ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
                                                     : { ...provided },
                                         }}
                                     />
 
-                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: "block" } : {}}>
+                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
                                         {meta.error}
                                     </div>
                                 </FormGroup>
@@ -297,14 +303,14 @@ export default function TokenProfileForm() {
                         <TabLayout
                             tabs={[
                                 {
-                                    title: "Connector Attributes",
+                                    title: 'Connector Attributes',
                                     content: !tokenProfileAttributeDescriptors ? (
                                         <></>
                                     ) : (
                                         <AttributeEditor
                                             id="token-profile"
                                             callbackParentUuid={
-                                                tokenProfile?.tokenInstanceUuid || form.getFieldState("token")?.value?.value
+                                                tokenProfile?.tokenInstanceUuid || form.getFieldState('token')?.value?.value
                                             }
                                             callbackResource={Resource.TokenProfiles}
                                             attributeDescriptors={tokenProfileAttributeDescriptors}
@@ -315,7 +321,7 @@ export default function TokenProfileForm() {
                                     ),
                                 },
                                 {
-                                    title: "Custom Attributes",
+                                    title: 'Custom Attributes',
                                     content: (
                                         <AttributeEditor
                                             id="customTokenProfile"
@@ -330,13 +336,16 @@ export default function TokenProfileForm() {
                         <div className="d-flex justify-content-end">
                             <ButtonGroup>
                                 <ProgressButton
-                                    title={editMode ? "Update" : "Create"}
-                                    inProgressTitle={editMode ? "Updating..." : "Creating..."}
+                                    title={editMode ? 'Update' : 'Create'}
+                                    inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
                                     inProgress={submitting}
                                     disabled={pristine || submitting || !valid}
                                 />
-
-                                <Button color="default" onClick={onCancelClick} disabled={submitting}>
+                                <Button
+                                    color="default"
+                                    onClick={() => (usesGlobalModal ? dispatch(userInterfaceActions.hideGlobalModal()) : onCancelClick())}
+                                    disabled={submitting}
+                                >
                                     Cancel
                                 </Button>
                             </ButtonGroup>

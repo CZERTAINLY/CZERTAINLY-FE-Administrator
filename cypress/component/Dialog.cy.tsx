@@ -1,6 +1,6 @@
-import Dialog from "components/Dialog/index";
-import { useState } from "react";
-import "../../src/resources/styles/theme.scss";
+import Dialog from 'components/Dialog/index';
+import { useState } from 'react';
+import '../../src/resources/styles/theme.scss';
 
 const TestDialog = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -11,14 +11,14 @@ const TestDialog = () => {
 
     const buttons = [
         {
-            color: "danger",
+            color: 'danger',
             onClick: () => setIsOpen(false),
-            body: "Yes",
+            body: 'Yes',
         },
         {
-            color: "secondary",
+            color: 'secondary',
             onClick: toggleDialog,
-            body: "Cancel",
+            body: 'Cancel',
         },
     ];
 
@@ -30,16 +30,16 @@ const TestDialog = () => {
     );
 };
 
-describe("Dialog component", () => {
-    it("should open and close the test dialog", () => {
+describe('Dialog component', () => {
+    it('should open and close the test dialog', () => {
         cy.mount(<TestDialog />);
-        cy.contains("Open Dialog").click();
+        cy.contains('Open Dialog').click();
         cy.wait(250);
-        cy.contains("Test Dialog");
+        cy.contains('Test Dialog');
         cy.wait(250);
-        cy.contains("Cancel").click();
-        cy.contains("Open Dialog").click();
+        cy.contains('Cancel').click();
+        cy.contains('Open Dialog').click();
         cy.wait(250);
-        cy.contains("Yes").click();
+        cy.contains('Yes').click();
     });
 });

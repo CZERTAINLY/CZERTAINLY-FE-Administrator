@@ -1,18 +1,18 @@
-import AttributeViewer from "components/Attributes/AttributeViewer";
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
+import AttributeViewer from 'components/Attributes/AttributeViewer';
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
 
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
 
-import { actions, selectors } from "ducks/credentials";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { Container } from "reactstrap";
-import { LockWidgetNameEnum } from "types/widget-locks";
-import { Resource } from "../../../../types/openapi";
-import CustomAttributeWidget from "../../../Attributes/CustomAttributeWidget";
+import { actions, selectors } from 'ducks/credentials';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Container } from 'reactstrap';
+import { LockWidgetNameEnum } from 'types/user-interface';
+import { Resource } from '../../../../types/openapi';
+import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 
 function CredentialDetail() {
     const dispatch = useDispatch();
@@ -59,17 +59,17 @@ function CredentialDetail() {
     const widgetButtons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "pencil",
+                icon: 'pencil',
                 disabled: false,
-                tooltip: "Edit",
+                tooltip: 'Edit',
                 onClick: () => {
                     onEditClick();
                 },
             },
             {
-                icon: "trash",
+                icon: 'trash',
                 disabled: false,
-                tooltip: "Delete",
+                tooltip: 'Delete',
                 onClick: () => {
                     setConfirmDelete(true);
                 },
@@ -81,12 +81,12 @@ function CredentialDetail() {
     const detailHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: "property",
-                content: "Property",
+                id: 'property',
+                content: 'Property',
             },
             {
-                id: "value",
-                content: "Value",
+                id: 'value',
+                content: 'Value',
             },
         ],
         [],
@@ -98,31 +98,31 @@ function CredentialDetail() {
                 ? []
                 : [
                       {
-                          id: "uuid",
-                          columns: ["UUID", credential.uuid],
+                          id: 'uuid',
+                          columns: ['UUID', credential.uuid],
                       },
                       {
-                          id: "name",
-                          columns: ["Name", credential.name],
+                          id: 'name',
+                          columns: ['Name', credential.name],
                       },
                       {
-                          id: "kind",
-                          columns: ["Kind", credential.kind],
+                          id: 'kind',
+                          columns: ['Kind', credential.kind],
                       },
                       {
-                          id: "credentialProviderName",
+                          id: 'credentialProviderName',
                           columns: [
-                              "Credential Provider Name",
+                              'Credential Provider Name',
                               credential.connectorUuid ? (
                                   <Link to={`../../connectors/detail/${credential.connectorUuid}`}>{credential.connectorName}</Link>
                               ) : (
-                                  ""
+                                  ''
                               ),
                           ],
                       },
                       {
-                          id: "credentialProviderUuid",
-                          columns: ["Credential Provider UUID", credential.connectorUuid],
+                          id: 'credentialProviderUuid',
+                          columns: ['Credential Provider UUID', credential.connectorUuid],
                       },
                   ],
         [credential],
@@ -164,13 +164,13 @@ function CredentialDetail() {
                 body="You are about to delete an Credential. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
             <Dialog
-                isOpen={deleteErrorMessage !== ""}
+                isOpen={deleteErrorMessage !== ''}
                 caption="Delete Connector"
                 body={
                     <>
@@ -182,8 +182,8 @@ function CredentialDetail() {
                 }
                 toggle={() => dispatch(actions.clearDeleteErrorMessages())}
                 buttons={[
-                    { color: "danger", onClick: onForceDeleteConfirmed, body: "Force" },
-                    { color: "secondary", onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: "Cancel" },
+                    { color: 'danger', onClick: onForceDeleteConfirmed, body: 'Force' },
+                    { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
                 ]}
             />
         </Container>

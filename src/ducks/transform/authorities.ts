@@ -5,8 +5,8 @@ import {
     AuthorityResponseModel,
     AuthorityUpdateRequestDto,
     AuthorityUpdateRequestModel,
-} from "types/authorities";
-import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
+} from 'types/authorities';
+import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from './attributes';
 
 export function transformAuthorityResponseDtoToModel(authorityResponseDto: AuthorityResponseDto): AuthorityResponseModel {
     return {

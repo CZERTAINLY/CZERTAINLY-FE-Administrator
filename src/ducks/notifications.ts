@@ -1,10 +1,10 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AttributeDescriptorModel, DataAttributeModel } from "types/attributes";
-import { SearchRequestModel } from "types/certificate";
-import { ConnectorResponseModel } from "types/connectors";
-import { NotificationInstanceModel, NotificationInstanceRequestModel, NotificationModel } from "types/notifications";
-import { ListMappingAttributesRequest } from "types/openapi";
-import { createFeatureSelector } from "utils/ducks";
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { AttributeDescriptorModel, DataAttributeModel } from 'types/attributes';
+import { SearchRequestModel } from 'types/certificate';
+import { ConnectorResponseModel } from 'types/connectors';
+import { NotificationInstanceModel, NotificationInstanceRequestModel, NotificationModel } from 'types/notifications';
+import { ListMappingAttributesRequest } from 'types/openapi';
+import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     overviewNotifications: NotificationModel[];
@@ -48,7 +48,7 @@ export const initialState: State = {
 };
 
 export const slice = createSlice({
-    name: "notifications",
+    name: 'notifications',
 
     initialState,
 

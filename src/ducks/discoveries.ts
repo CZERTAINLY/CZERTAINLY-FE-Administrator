@@ -1,15 +1,15 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AttributeDescriptorModel } from "types/attributes";
-import { SearchRequestModel } from "types/certificate";
-import { ConnectorResponseModel } from "types/connectors";
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { AttributeDescriptorModel } from 'types/attributes';
+import { SearchRequestModel } from 'types/certificate';
+import { ConnectorResponseModel } from 'types/connectors';
 import {
     DiscoveryCertificateListModel,
     DiscoveryRequestModel,
     DiscoveryResponseDetailModel,
     DiscoveryResponseModel,
-} from "types/discoveries";
-import { createFeatureSelector } from "utils/ducks";
-import { GetDiscoveryCertificatesRequest } from "../types/openapi";
+} from 'types/discoveries';
+import { createFeatureSelector } from 'utils/ducks';
+import { GetDiscoveryCertificatesRequest } from '../types/openapi';
 
 export type State = {
     discovery?: DiscoveryResponseDetailModel;
@@ -44,7 +44,7 @@ export const initialState: State = {
 };
 
 export const slice = createSlice({
-    name: "discoveries",
+    name: 'discoveries',
 
     initialState,
 

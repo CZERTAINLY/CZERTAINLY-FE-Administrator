@@ -1,10 +1,11 @@
-import Widget from "components/Widget";
+import Widget from 'components/Widget';
 
-import { actions as connectorActions, selectors as connectorSelectors } from "ducks/connectors";
-import debounce from "lodash.debounce";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useForm, useFormState } from "react-final-form";
-import { useDispatch, useSelector } from "react-redux";
+import { actions as connectorActions, selectors as connectorSelectors } from 'ducks/connectors';
+import { selectors as userInterfaceSelectors } from 'ducks/user-interface';
+import debounce from 'lodash.debounce';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useForm, useFormState } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
 import {
     AttributeCallbackMappingModel,
     AttributeDescriptorModel,
@@ -19,10 +20,11 @@ import {
     isDataAttributeModel,
     isGroupAttributeModel,
     isInfoAttributeModel,
-} from "types/attributes";
-import { CallbackAttributeModel } from "types/connectors";
-import { AttributeContentType, AttributeValueTarget, FunctionGroupCode, Resource } from "types/openapi";
-import { Attribute } from "./Attribute";
+} from 'types/attributes';
+import { CallbackAttributeModel } from 'types/connectors';
+import { AttributeContentType, AttributeValueTarget, FunctionGroupCode, Resource } from 'types/openapi';
+import { base64ToUtf8 } from 'utils/common-utils';
+import { Attribute } from './Attribute';
 
 // same empty array is used to prevent re-rendering of the component
 // !!! never modify the attributes field inside of the component !!!
@@ -60,7 +62,7 @@ export default function AttributeEditor({
     const formState = useFormState();
 
     const isRunningCallback = useSelector(connectorSelectors.isRunningCallback);
-
+    const initiateAttributeCallback = useSelector(userInterfaceSelectors.selectInitiateAttributeCallback);
     // data from callbacks
     const callbackData = useSelector(connectorSelectors.callbackData);
 
@@ -93,7 +95,7 @@ export default function AttributeEditor({
      * Gets the value from the object property identified by path
      */
     const getObjectPropertyValue = useCallback((object: any, path: string) => {
-        const pathParts = path.split(".");
+        const pathParts = path.split('.');
 
         let currentObject = object;
 
@@ -129,11 +131,11 @@ export default function AttributeEditor({
         (attributes: AttributeResponseModel[], path: string | undefined): any => {
             if (!path) return undefined;
 
-            if (!path.includes(".")) return attributes.find((a) => a.name === path)?.content;
+            if (!path.includes('.')) return getObjectPropertyValue(attributes.find((a) => a.name === path)?.content, 'value');
 
-            let spath = path.split(".");
+            let spath = path.split('.');
 
-            return getObjectPropertyValue(attributes.find((a) => a.name === spath[0])?.content, spath.slice(1).join("."));
+            return getObjectPropertyValue(attributes.find((a) => a.name === spath[0])?.content, spath.slice(1).join('.'));
         },
         [getObjectPropertyValue],
     );
@@ -146,28 +148,28 @@ export default function AttributeEditor({
             const attributeFromValue = getAttributeValue(attributes, mapping.from);
 
             const formAttributes = !formState.values[`__attributes__${id}__`] ? undefined : formState.values[`__attributes__${id}__`];
-            const formMappingName = mapping.from ? (mapping.from.includes(".") ? mapping.from.split(".")[0] : mapping.from) : "";
+            const formMappingName = mapping.from ? (mapping.from.includes('.') ? mapping.from.split('.')[0] : mapping.from) : '';
             const formAttribute = formAttributes
                 ? Object.keys(formAttributes).find((key) => key.startsWith(`${formMappingName}`))
                 : undefined;
 
             // only lists are supported now, because of this the 'value' is added to the path as the list selected option is { label: "", value: "" }
             const formMappingPath = mapping.from
-                ? mapping.from.includes(".")
-                    ? "value." + mapping.from.split(".").slice(1).join(".")
-                    : "value"
-                : "value";
+                ? mapping.from.includes('.')
+                    ? 'value.' + mapping.from.split('.').slice(1).join('.')
+                    : 'value'
+                : 'value';
             const currentContent = formAttribute
                 ? getObjectPropertyValue(formAttributes[formAttribute], formMappingPath) ?? formAttributes[formAttribute]
                 : undefined;
 
             const depDescriptor = attributeDescriptors.find(
-                (d) => d.name === (mapping.from ? (mapping.from.includes(".") ? mapping.from.split(".")[0] : mapping.from) : ""),
+                (d) => d.name === (mapping.from ? (mapping.from.includes('.') ? mapping.from.split('.')[0] : mapping.from) : ''),
             );
             const depDescriptorValue = depDescriptor ? getObjectPropertyValue(depDescriptor, `content.${formMappingPath}`) : undefined;
 
             const groupDescriptor = groupAttributesCallbackAttributes.find(
-                (d) => d.name === (mapping.from ? (mapping.from.includes(".") ? mapping.from.split(".")[0] : mapping.from) : ""),
+                (d) => d.name === (mapping.from ? (mapping.from.includes('.') ? mapping.from.split('.')[0] : mapping.from) : ''),
             );
             const groupDescriptorValue = groupDescriptor
                 ? getObjectPropertyValue(groupDescriptor, `content.${formMappingPath}`)
@@ -196,8 +198,8 @@ export default function AttributeEditor({
             let hasUndefinedMapping = false;
 
             const data: CallbackAttributeModel = {
-                uuid: "",
-                name: "",
+                uuid: '',
+                name: '',
                 pathVariable: {},
                 requestParameter: {},
                 body: {},
@@ -206,7 +208,7 @@ export default function AttributeEditor({
             if (isDataAttributeModel(descriptor) || isGroupAttributeModel(descriptor)) {
                 descriptor.attributeCallback?.mappings.forEach((mapping) => {
                     let value = mapping.value || getCurrentFromMappingValue(mapping);
-                    if (typeof value === "object" && value.hasOwnProperty("data")) value = value.data;
+                    if (typeof value === 'object' && value.hasOwnProperty('data')) value = value.data;
                     if (value === undefined) hasUndefinedMapping = true;
 
                     mapping.targets.forEach((target) => {
@@ -262,10 +264,9 @@ export default function AttributeEditor({
     const groupedAttributesDescriptors: { [key: string]: (DataAttributeModel | InfoAttributeModel | CustomAttributeModel)[] } =
         useMemo(() => {
             const grouped: { [key: string]: (DataAttributeModel | InfoAttributeModel | CustomAttributeModel)[] } = {};
-
             [...attributeDescriptors, ...groupAttributesCallbackAttributes].forEach((descriptor) => {
                 if (isDataAttributeModel(descriptor) || isInfoAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
-                    const groupName = descriptor.properties.group || "__";
+                    const groupName = descriptor.properties.group || '__';
                     grouped[groupName] ? grouped[groupName].push(descriptor) : (grouped[groupName] = [descriptor]);
                 }
             });
@@ -349,11 +350,11 @@ export default function AttributeEditor({
                             );
                             form.mutators.setAttribute(
                                 `${formAttributeName}.fileName`,
-                                (attribute.content as FileAttributeContentModel[])[0].data.fileName || "unknown",
+                                (attribute.content as FileAttributeContentModel[])[0].data.fileName || 'unknown',
                             );
                             form.mutators.setAttribute(
                                 `${formAttributeName}.mimeType`,
-                                (attribute.content as FileAttributeContentModel[])[0].data.mimeType || "unknown",
+                                (attribute.content as FileAttributeContentModel[])[0].data.mimeType || 'unknown',
                             );
                         } else if (descriptor.content) {
                             form.mutators.setAttribute(
@@ -362,11 +363,11 @@ export default function AttributeEditor({
                             );
                             form.mutators.setAttribute(
                                 `${formAttributeName}.fileName`,
-                                (descriptor.content as FileAttributeContentModel[])[0].data.fileName || "unknown",
+                                (descriptor.content as FileAttributeContentModel[])[0].data.fileName || 'unknown',
                             );
                             form.mutators.setAttribute(
                                 `${formAttributeName}.mimeType`,
-                                (descriptor.content as FileAttributeContentModel[])[0].data.mimeType || "unknown",
+                                (descriptor.content as FileAttributeContentModel[])[0].data.mimeType || 'unknown',
                             );
                         }
                         return;
@@ -404,7 +405,7 @@ export default function AttributeEditor({
                         (formAttributeValue as CodeBlockAttributeContentDataModel).code !== undefined
                     ) {
                         formAttributeValue = {
-                            code: atob((formAttributeValue as CodeBlockAttributeContentDataModel).code),
+                            code: base64ToUtf8((formAttributeValue as CodeBlockAttributeContentDataModel).code),
                             language: (formAttributeValue as CodeBlockAttributeContentDataModel).language,
                         };
                     }
@@ -484,7 +485,7 @@ export default function AttributeEditor({
 
                 // check if any of the changed attributes is in the 'from' list
                 for (const fromName in fromNames) {
-                    const attributeName = fromNames[fromName].includes(".") ? fromNames[fromName].split(".")[0] : fromNames[fromName];
+                    const attributeName = fromNames[fromName].includes('.') ? fromNames[fromName].split('.')[0] : fromNames[fromName];
 
                     // if there is any attribute changed on which the current descriptor depends, clear the form field and perform the callback
                     if (changedAttributes[attributeName]) {
@@ -492,7 +493,8 @@ export default function AttributeEditor({
 
                         if (mappings) {
                             const formAttributeName = `__attributes__${id}__.${descriptor.name}`;
-                            form.mutators.setAttribute(formAttributeName, undefined);
+                            // removed it as it was causing form value to be cleared  , it does not seem to be necessary and other places it is working without it
+                            // form.mutators.setAttribute(formAttributeName, undefined);
                             executeCallback(mappings, descriptor, formAttributeName);
                         }
                     }
@@ -503,19 +505,58 @@ export default function AttributeEditor({
         attributeDescriptors,
         groupAttributesCallbackAttributes,
         buildCallbackMappings,
-        form.mutators,
+        // removed it as it was causing form value to be cleared  , it does not seem to be necessary and other places it is working without it
+        // form.mutators,
         formState.values,
         id,
         isRunningCb,
         previousFormValues,
         executeCallback,
     ]);
-
     const ref = useRef(debounce((doCallbacksParam) => doCallbacksParam(), 600));
 
     useEffect(() => {
         ref.current(doCallbacks);
     }, [doCallbacks]);
+
+    useEffect(() => {
+        if (!initiateAttributeCallback) return;
+        let newOptions: { [attributeName: string]: { label: string; value: any }[] } = {};
+        const descriptorsToLoad = [...attributeDescriptors, ...groupAttributesCallbackAttributes];
+        setPrevGroupDescriptors(groupAttributesCallbackAttributes);
+        setPrevDescriptors(attributeDescriptors);
+        setPrevAttributes(attributes);
+        descriptorsToLoad.forEach((descriptor) => {
+            if (isDataAttributeModel(descriptor) || isGroupAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
+                const formAttributeName = `__attributes__${id}__.${descriptor.name}`;
+
+                if (
+                    (isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) &&
+                    descriptor.properties.list &&
+                    Array.isArray(descriptor.content)
+                ) {
+                    newOptions = {
+                        ...newOptions,
+                        [formAttributeName]: descriptor.content.map((data) => ({
+                            label: data.reference ?? data.data.toString(),
+                            value: data,
+                        })),
+                    };
+                }
+
+                if (isDataAttributeModel(descriptor) || isGroupAttributeModel(descriptor)) {
+                    if (descriptor.attributeCallback) {
+                        let mappings = buildCallbackMappings(descriptor);
+                        if (mappings) {
+                            executeCallback(mappings, descriptor, formAttributeName);
+                        }
+                    }
+                }
+            }
+        });
+        // This effect should only be called if the initiateAttributeCallback value is updated
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [initiateAttributeCallback]);
 
     /**
      * Obtains values from attribute callbacks and updates the form values / options accordingly
@@ -527,10 +568,28 @@ export default function AttributeEditor({
             if (callbackData[callbackId] === previousCallbackData[callbackId]) continue;
             if (!callbackData[callbackId]) continue;
 
-            // Update options
             if (Array.isArray(callbackData[callbackId])) {
                 const groupCallbackAttributes: AttributeDescriptorModel[] = callbackData[callbackId].filter(isAttributeDescriptorModel);
-                setGroupAttributesCallbackAttributes(groupCallbackAttributes);
+                // Check if there are any other attributes in the callback data before setting it as empty
+                if (!groupCallbackAttributes.length) {
+                    const callbackDataArray = Object.values(callbackData);
+                    for (let i = 0; i < callbackDataArray.length; i++) {
+                        if (Array.isArray(callbackDataArray[i])) {
+                            const groupCallbackAttributesOther: AttributeDescriptorModel[] =
+                                callbackDataArray[i].filter(isAttributeDescriptorModel);
+
+                            if (groupCallbackAttributesOther.length) {
+                                groupCallbackAttributes.push(groupCallbackAttributesOther[i]);
+                            }
+                        }
+                    }
+                }
+                const descriptors = [...attributeDescriptors, ...groupAttributesCallbackAttributes];
+                const descriptor = descriptors.find((d) => `__attributes__${id}__.${d.name}` === callbackId);
+
+                if (descriptor && `__attributes__${id}__.${descriptor.name}` === callbackId) {
+                    setGroupAttributesCallbackAttributes(groupCallbackAttributes);
+                }
 
                 const groupCallbackAttributesContentOpts = groupCallbackAttributes.reduce((acc, attr) => {
                     if (isDataAttributeModel(attr) || isInfoAttributeModel(attr)) {
@@ -562,8 +621,6 @@ export default function AttributeEditor({
 
                 setOptions({ ...options, ...opts });
 
-                const descriptors = [...attributeDescriptors, ...groupAttributesCallbackAttributes];
-                const descriptor = descriptors.find((d) => `__attributes__${id}__.${d.name}` === callbackId);
                 if (descriptor && isDataAttributeModel(descriptor) && !descriptor.properties.list) {
                     form.mutators.setAttribute(callbackId, callbackData[callbackId][0].reference ?? callbackData[callbackId][0].data);
                 }
@@ -579,13 +636,13 @@ export default function AttributeEditor({
 
     const attrs = useMemo(() => {
         const attrs: JSX.Element[] = [];
-
         for (const group in groupedAttributesDescriptors)
             attrs.push(
-                <Widget key={group} title={group === "__" ? "" : group} busy={isRunningCb}>
+                <Widget key={group} title={group === '__' ? '' : group} busy={isRunningCb}>
                     {groupedAttributesDescriptors[group].map((descriptor) => (
                         <div key={descriptor.name}>
                             <Attribute
+                                busy={isRunningCb}
                                 name={`__attributes__${id}__.${descriptor.name}`}
                                 descriptor={descriptor}
                                 options={options[`__attributes__${id}__.${descriptor.name}`]}

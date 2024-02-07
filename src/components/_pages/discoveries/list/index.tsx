@@ -1,17 +1,17 @@
-import { useCallback, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
-import { Badge, Container } from "reactstrap";
+import { useCallback, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { Badge, Container } from 'reactstrap';
 
-import { actions, selectors } from "ducks/discoveries";
-import { EntityType } from "ducks/filters";
+import { actions, selectors } from 'ducks/discoveries';
+import { EntityType } from 'ducks/filters';
 
-import { ApiClients } from "api";
-import { TableDataRow, TableHeader } from "components/CustomTable";
-import PagedList from "components/PagedList/PagedList";
-import { SearchRequestModel } from "types/certificate";
-import { LockWidgetNameEnum } from "types/widget-locks";
-import DiscoveryStatus from "../DiscoveryStatus";
+import { ApiClients } from 'api';
+import { TableDataRow, TableHeader } from 'components/CustomTable';
+import PagedList from 'components/PagedList/PagedList';
+import { SearchRequestModel } from 'types/certificate';
+import { LockWidgetNameEnum } from 'types/user-interface';
+import DiscoveryStatus from '../DiscoveryStatus';
 
 function DiscoveryList() {
     const dispatch = useDispatch();
@@ -24,40 +24,40 @@ function DiscoveryList() {
     const discoveriesRowHeaders: TableHeader[] = useMemo(
         () => [
             {
-                content: "Name",
+                content: 'Name',
                 sortable: true,
-                sort: "asc",
-                id: "discoveryName",
-                width: "auto",
+                sort: 'asc',
+                id: 'discoveryName',
+                width: 'auto',
             },
             {
-                content: "Discovery Provider",
-                align: "center",
+                content: 'Discovery Provider',
+                align: 'center',
                 sortable: true,
-                id: "discoveryProvider",
-                width: "15%",
+                id: 'discoveryProvider',
+                width: '15%',
             },
             {
-                content: "Kinds",
-                align: "center",
+                content: 'Kinds',
+                align: 'center',
                 sortable: true,
-                id: "kinds",
-                width: "15%",
+                id: 'kinds',
+                width: '15%',
             },
             {
-                content: "Status",
-                align: "center",
+                content: 'Status',
+                align: 'center',
                 sortable: true,
-                id: "status",
-                width: "15%",
+                id: 'status',
+                width: '15%',
             },
             {
-                content: "Total Certificates",
-                align: "center",
+                content: 'Total Certificates',
+                align: 'center',
                 sortable: true,
-                sortType: "numeric",
-                id: "totalCertificates",
-                width: "15%",
+                sortType: 'numeric',
+                id: 'totalCertificates',
+                width: '15%',
             },
         ],
         [],
@@ -69,14 +69,14 @@ function DiscoveryList() {
                 id: discovery.uuid,
                 columns: [
                     <Link to={`./detail/${discovery.uuid}`}>{discovery.name}</Link>,
-                    discovery.connectorName? (
-                        <Link to={`../connectors/detail/${discovery.connectorUuid}`}>{discovery.connectorName ?? "Unassigned"}</Link>
+                    discovery.connectorName ? (
+                        <Link to={`../connectors/detail/${discovery.connectorUuid}`}>{discovery.connectorName ?? 'Unassigned'}</Link>
                     ) : (
-                        discovery.connectorName ?? "Unassigned"
+                        discovery.connectorName ?? 'Unassigned'
                     ),
                     <Badge color="secondary">{discovery.kind}</Badge>,
                     <DiscoveryStatus status={discovery.status} />,
-                    discovery.totalCertificatesDiscovered?.toString() || "0",
+                    discovery.totalCertificatesDiscovered?.toString() || '0',
                 ],
             })),
         [discoveries],

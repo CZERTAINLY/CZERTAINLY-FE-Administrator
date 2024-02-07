@@ -1,15 +1,15 @@
-import CustomTable, { TableDataRow, TableHeader } from "components/CustomTable";
-import Dialog from "components/Dialog";
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
 
-import Widget from "components/Widget";
-import { WidgetButtonProps } from "components/WidgetButtons";
+import Widget from 'components/Widget';
+import { WidgetButtonProps } from 'components/WidgetButtons';
 
-import { actions, selectors } from "ducks/roles";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
-import { Badge, Container } from "reactstrap";
-import { LockWidgetNameEnum } from "types/widget-locks";
+import { actions, selectors } from 'ducks/roles';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { Badge, Container } from 'reactstrap';
+import { LockWidgetNameEnum } from 'types/user-interface';
 
 export default function RolesList() {
     const dispatch = useDispatch();
@@ -72,33 +72,33 @@ export default function RolesList() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: "plus",
+                icon: 'plus',
                 disabled: false,
-                tooltip: "Create",
+                tooltip: 'Create',
                 onClick: () => {
                     onAddClick();
                 },
             },
             {
-                icon: "trash",
+                icon: 'trash',
                 disabled: checkedRows.length === 0 || isSystemRoleSelected,
-                tooltip: "Delete",
+                tooltip: 'Delete',
                 onClick: () => {
                     setConfirmDelete(true);
                 },
             },
             {
-                icon: "user",
+                icon: 'user',
                 disabled: checkedRows.length !== 1 || isSystemRoleSelected,
-                tooltip: "Edit role users",
+                tooltip: 'Edit role users',
                 onClick: () => {
                     onEditRoleUsersClick();
                 },
             },
             {
-                icon: "lock",
+                icon: 'lock',
                 disabled: checkedRows.length !== 1 || isSystemRoleSelected,
-                tooltip: "Edit role permissions",
+                tooltip: 'Edit role permissions',
                 onClick: () => {
                     onEditRolePermissionsClick();
                 },
@@ -110,33 +110,33 @@ export default function RolesList() {
     const rolesTableHeader: TableHeader[] = useMemo(
         () => [
             {
-                id: "roleName",
-                content: "Role name",
+                id: 'roleName',
+                content: 'Role name',
                 sortable: true,
-                sort: "asc",
-                width: "auto",
+                sort: 'asc',
+                width: 'auto',
             },
             {
-                id: "roleDescription",
-                content: "Role description",
+                id: 'roleDescription',
+                content: 'Role description',
                 sortable: true,
-                sort: "asc",
-                width: "auto",
+                sort: 'asc',
+                width: 'auto',
             },
             {
-                id: "email",
-                content: "Email",
+                id: 'email',
+                content: 'Email',
                 sortable: true,
-                sort: "asc",
-                width: "auto",
+                sort: 'asc',
+                width: 'auto',
             },
             {
-                id: "systemRole",
-                content: "System role",
+                id: 'systemRole',
+                content: 'System role',
                 sortable: true,
-                sort: "asc",
-                width: "auto",
-                align: "center",
+                sort: 'asc',
+                width: 'auto',
+                align: 'center',
             },
         ],
         [],
@@ -148,15 +148,15 @@ export default function RolesList() {
                 id: role.uuid,
 
                 columns: [
-                    <span style={{ whiteSpace: "nowrap" }}>
+                    <span style={{ whiteSpace: 'nowrap' }}>
                         <Link to={`./detail/${role.uuid}`}>{role.name}</Link>
                     </span>,
 
-                    role.description || "",
+                    role.description || '',
 
-                    role.email || "",
+                    role.email || '',
 
-                    <Badge color={!role.systemRole ? "success" : "danger"}>{role.systemRole ? "Yes" : "No"}</Badge>,
+                    <Badge color={!role.systemRole ? 'success' : 'danger'}>{role.systemRole ? 'Yes' : 'No'}</Badge>,
                 ],
             })),
         [roles],
@@ -185,12 +185,12 @@ export default function RolesList() {
 
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete ${checkedRows.length > 1 ? "Roles" : "an Role"}`}
-                body={`You are about to delete ${checkedRows.length > 1 ? "Roles" : "an Role"}. Is this what you want to do?`}
+                caption={`Delete ${checkedRows.length > 1 ? 'Roles' : 'an Role'}`}
+                body={`You are about to delete ${checkedRows.length > 1 ? 'Roles' : 'an Role'}. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
-                    { color: "danger", onClick: onDeleteConfirmed, body: "Yes, delete" },
-                    { color: "secondary", onClick: () => setConfirmDelete(false), body: "Cancel" },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
         </Container>

@@ -1,18 +1,18 @@
-import CheckboxField from "components/Input/CheckboxField";
-import TextField from "components/Input/TextField";
-import ProgressButton from "components/ProgressButton";
-import Widget from "components/Widget";
+import CheckboxField from 'components/Input/CheckboxField';
+import TextField from 'components/Input/TextField';
+import ProgressButton from 'components/ProgressButton';
+import Widget from 'components/Widget';
 
-import { selectors as enumSelectors, getEnumLabel } from "ducks/enums";
-import { actions, selectors } from "ducks/globalMetadata";
-import { useCallback, useEffect, useMemo } from "react";
-import { Field, Form } from "react-final-form";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
-import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from "reactstrap";
-import { GlobalMetadataCreateRequestModel, GlobalMetadataUpdateRequestModel } from "types/globalMetadata";
-import { AttributeContentType, PlatformEnum } from "types/openapi";
-import {composeValidators, validateAlphaNumericWithSpecialChars, validateLength, validateRequired} from "utils/validators";
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { actions, selectors } from 'ducks/globalMetadata';
+import { useCallback, useEffect, useMemo } from 'react';
+import { Field, Form } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
+import { GlobalMetadataCreateRequestModel, GlobalMetadataUpdateRequestModel } from 'types/globalMetadata';
+import { AttributeContentType, PlatformEnum } from 'types/openapi';
+import { composeValidators, validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
 
 export default function GlobalMetadataForm() {
     const dispatch = useDispatch();
@@ -32,11 +32,11 @@ export default function GlobalMetadataForm() {
 
     const defaultValuesCreate: GlobalMetadataCreateRequestModel = useMemo(
         () => ({
-            name: "",
-            label: "",
-            description: "",
+            name: '',
+            label: '',
+            description: '',
             contentType: AttributeContentType.Text,
-            group: "",
+            group: '',
             visible: true,
         }),
         [],
@@ -66,7 +66,7 @@ export default function GlobalMetadataForm() {
     }, [dispatch, editMode, id, globalMetadataDetail?.uuid]);
 
     return (
-        <Widget title={editMode ? "Edit Global Metadata" : "Add Global Metadata"} busy={isBusy}>
+        <Widget title={editMode ? 'Edit Global Metadata' : 'Add Global Metadata'} busy={isBusy}>
             <Form<GlobalMetadataCreateRequestModel>
                 initialValues={editMode ? defaultValuesUpdate : defaultValuesCreate}
                 onSubmit={onSubmit}
@@ -74,13 +74,13 @@ export default function GlobalMetadataForm() {
                 {({ handleSubmit, pristine, submitting, valid, values, form }) => (
                     <BootstrapForm onSubmit={handleSubmit}>
                         <TextField
-                            label={"Name"}
-                            id={"name"}
+                            label={'Name'}
+                            id={'name'}
                             disabled={editMode}
                             validators={[validateRequired(), validateAlphaNumericWithSpecialChars()]}
                         />
-                        <TextField label={"Label"} id={"label"} validators={[validateRequired(), validateAlphaNumericWithSpecialChars()]} />
-                        <TextField label={"Description"} id={"description"} validators={[validateLength(0,300)]} />
+                        <TextField label={'Label'} id={'label'} validators={[validateRequired(), validateAlphaNumericWithSpecialChars()]} />
+                        <TextField label={'Description'} id={'description'} validators={[validateLength(0, 300)]} />
 
                         <Field name="contentType" validate={composeValidators(validateRequired())}>
                             {({ input, meta }) => (
@@ -106,15 +106,15 @@ export default function GlobalMetadataForm() {
                             )}
                         </Field>
 
-                        <TextField label={"Group"} id={"group"} validators={[validateAlphaNumericWithSpecialChars()]} />
+                        <TextField label={'Group'} id={'group'} validators={[validateAlphaNumericWithSpecialChars()]} />
 
-                        <CheckboxField label={"Visible"} id={"visible"} />
+                        <CheckboxField label={'Visible'} id={'visible'} />
 
                         <div className="d-flex justify-content-end">
                             <ButtonGroup>
                                 <ProgressButton
-                                    title={editMode ? "Update" : "Create"}
-                                    inProgressTitle={editMode ? "Updating..." : "Creating..."}
+                                    title={editMode ? 'Update' : 'Create'}
+                                    inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
                                     inProgress={submitting}
                                     disabled={pristine || submitting || !valid}
                                 />

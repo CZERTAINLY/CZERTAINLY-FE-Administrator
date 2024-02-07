@@ -3,8 +3,8 @@ import {
     CertificateGroupRequestModel,
     CertificateGroupResponseDto,
     CertificateGroupResponseModel,
-} from "types/certificateGroups";
-import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from "./attributes";
+} from 'types/certificateGroups';
+import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from './attributes';
 
 export function transformCertificateGroupRequestModelToDto(group: CertificateGroupRequestModel): CertificateGroupRequestDto {
     return {

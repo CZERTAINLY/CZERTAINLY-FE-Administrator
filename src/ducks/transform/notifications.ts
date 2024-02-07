@@ -1,11 +1,11 @@
-import { NotificationInstanceModel, NotificationInstanceRequestModel, NotificationModel } from "types/notifications";
-import { NotificationDto, NotificationInstanceDto, NotificationInstanceRequestDto } from "types/openapi";
+import { NotificationInstanceModel, NotificationInstanceRequestModel, NotificationModel } from 'types/notifications';
+import { NotificationDto, NotificationInstanceDto, NotificationInstanceRequestDto } from 'types/openapi';
 import {
     transformAttributeMappingDtoToModel,
     transformAttributeMappingModelToDto,
     transformAttributeRequestModelToDto,
     transformAttributeResponseDtoToModel,
-} from "./attributes";
+} from './attributes';
 
 export function transformNotificationDtoToModel(notification: NotificationDto): NotificationModel {
     return { ...notification };

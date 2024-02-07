@@ -1,25 +1,27 @@
-import ProgressButton from "components/ProgressButton";
+import ProgressButton from 'components/ProgressButton';
 
-import Widget from "components/Widget";
+import Widget from 'components/Widget';
 
-import { actions as profileApprovalActions, selectors as profileApprovalSelectors } from "ducks/approval-profiles";
-import { useCallback, useEffect, useMemo } from "react";
+import { actions as profileApprovalActions, selectors as profileApprovalSelectors } from 'ducks/approval-profiles';
+import { useCallback, useEffect, useMemo } from 'react';
 
-import { Field, Form } from "react-final-form";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
-import { Form as BootstrapForm, Button, ButtonGroup, Col, FormFeedback, FormGroup, Input, Label, Row } from "reactstrap";
+import { Field, Form } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Form as BootstrapForm, Button, ButtonGroup, Col, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
 
-import { ApprovalStepRequestModel, ProfileApprovalRequestModel } from "types/approval-profiles";
-import { mutators } from "utils/attributes/attributeEditorMutators";
+import { ApprovalStepRequestModel, ProfileApprovalRequestModel } from 'types/approval-profiles';
+import { mutators } from 'utils/attributes/attributeEditorMutators';
+import { isObjectSame } from 'utils/common-utils';
 import {
     composeValidators,
-    validateAlphaNumericWithSpecialChars, validateLength,
+    validateAlphaNumericWithSpecialChars,
+    validateLength,
     validateNonZeroInteger,
     validatePositiveInteger,
     validateRequired,
-} from "utils/validators";
-import ApprovalStepField from "./approval-step-field";
+} from 'utils/validators';
+import ApprovalStepField from './approval-step-field';
 
 const defaultApprovalSteps: ApprovalStepRequestModel[] = [
     {
@@ -52,7 +54,7 @@ function ApprovalProfileForm() {
             editMode && profileApprovalDetail
                 ? profileApprovalDetail
                 : {
-                      name: "",
+                      name: '',
                       enabled: false,
                       approvalSteps: defaultApprovalSteps,
                   },
@@ -61,8 +63,8 @@ function ApprovalProfileForm() {
 
     const areDefaultValuesSame = useCallback(
         (values: ProfileApprovalRequestModel) => {
-            const isObjectSame = JSON.stringify(values) === JSON.stringify(defaultValues);
-            return isObjectSame;
+            const areValuesSame = isObjectSame(values, defaultValues);
+            return areValuesSame;
         },
         [defaultValues],
     );
@@ -85,7 +87,7 @@ function ApprovalProfileForm() {
     }, [navigate]);
 
     return (
-        <Widget title={editMode ? "Edit Approval Profile" : "Add Approval Profile"} busy={isBusy}>
+        <Widget title={editMode ? 'Edit Approval Profile' : 'Add Approval Profile'} busy={isBusy}>
             <Form
                 initialValues={defaultValues}
                 validate={(values) => {
@@ -98,7 +100,7 @@ function ApprovalProfileForm() {
                         return !roleUuid && !groupUuid && !userUuid;
                     });
                     if (inValidSteps) {
-                        errors.approvalStepsInValid = "Approval Steps are not valid";
+                        errors.approvalStepsInValid = 'Approval Steps are not valid';
                     }
                     return errors;
                 }}
@@ -152,7 +154,7 @@ function ApprovalProfileForm() {
                             </Col>
                         </Row>
 
-                        <Field name="description" validate={composeValidators(validateLength(0,300))}>
+                        <Field name="description" validate={composeValidators(validateLength(0, 300))}>
                             {({ input, meta }) => (
                                 <FormGroup>
                                     <Label htmlFor="description">Profile Description</Label>
@@ -179,8 +181,8 @@ function ApprovalProfileForm() {
                         <div className="d-flex justify-content-end">
                             <ButtonGroup>
                                 <ProgressButton
-                                    title={editMode ? "Update" : "Create"}
-                                    inProgressTitle={editMode ? "Updating..." : "Creating..."}
+                                    title={editMode ? 'Update' : 'Create'}
+                                    inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
                                     inProgress={submitting}
                                     disabled={submitting || !valid || errors?.approvalStepsInValid || areDefaultValuesSame(values)}
                                 />
