@@ -1,7 +1,7 @@
 import { AnyAction } from '@reduxjs/toolkit';
 import { AppEpic } from 'ducks';
 import { store } from 'index';
-import { of } from 'rxjs';
+import { iif, of } from 'rxjs';
 import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
 import { FunctionGroupCode } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
@@ -36,13 +36,21 @@ const listOverviewNotifications: AppEpic = (action$, state$, deps) => {
                 ),
 
                 catchError((err) =>
-                    of(
-                        slice.actions.listOverviewNotificationsFailure({
-                            error: extractError(err, 'Failed to list overview notification'),
-                        }),
-                        appRedirectActions.setUnAuthorized(),
-                        authActions.resetProfile(),
-                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.NotificationsOverview),
+                    iif(
+                        () => err?.status === 401,
+                        of(
+                            appRedirectActions.setUnAuthorized(),
+                            authActions.resetProfile(),
+                            slice.actions.listOverviewNotificationsFailure({
+                                error: extractError(err, 'Failed to list overview notification'),
+                            }),
+                        ),
+                        of(
+                            userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.NotificationsOverview),
+                            slice.actions.listOverviewNotificationsFailure({
+                                error: extractError(err, 'Failed to list overview notification'),
+                            }),
+                        ),
                     ),
                 ),
             ),
