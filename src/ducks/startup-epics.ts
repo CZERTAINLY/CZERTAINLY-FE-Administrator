@@ -1,10 +1,10 @@
 import { AppEpic } from 'ducks';
 
-import { debounceTime, map, mergeMap, take } from 'rxjs/operators';
+import { actions as settingsActions } from 'ducks/settings';
+import { debounceTime, filter, map, mergeMap, take } from 'rxjs/operators';
 import { actions as authActions } from './auth';
 import { actions as enumActions } from './enums';
 import { actions as notificationsActions } from './notifications';
-import { actions as settingsActions } from './settings';
 
 const startup: AppEpic = (action$) =>
     action$.pipe(
@@ -17,9 +17,10 @@ const startup: AppEpic = (action$) =>
         ]),
     );
 
-const repeated: AppEpic = (action$) =>
+const repeated: AppEpic = (action$, state) =>
     action$.pipe(
         debounceTime(30000),
+        filter(() => !!state?.value?.auth?.profile?.uuid),
         map(() => notificationsActions.listOverviewNotifications()),
     );
 

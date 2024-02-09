@@ -96,7 +96,6 @@ function NotificationsList() {
             })),
         [notifications, dispatch, navigate],
     );
-
     const onListCallback = useCallback(
         (pagination: SearchRequestModel) => dispatch(actions.listNotifications({ unread: false, pagination })),
         [dispatch],

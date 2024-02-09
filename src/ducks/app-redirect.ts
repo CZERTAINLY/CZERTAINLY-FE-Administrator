@@ -24,6 +24,10 @@ export const slice = createSlice({
             state.unauthorized = false;
         },
 
+        setUnAuthorized: (state, action: PayloadAction<void>) => {
+            state.unauthorized = true;
+        },
+
         clearGoBack: (state, action: PayloadAction<void>) => {
             state.goBack = false;
         },

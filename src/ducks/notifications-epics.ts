@@ -1,21 +1,22 @@
+import { AnyAction } from '@reduxjs/toolkit';
 import { AppEpic } from 'ducks';
-import { of } from 'rxjs';
+import { store } from 'index';
+import { iif, of } from 'rxjs';
 import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
+import { FunctionGroupCode } from 'types/openapi';
+import { LockWidgetNameEnum } from 'types/user-interface';
 import { extractError } from 'utils/net';
 import { actions as alertActions } from './alerts';
 import { actions as appRedirectActions } from './app-redirect';
-import { actions as userInterfaceActions } from './user-interface';
-
-import { AnyAction } from '@reduxjs/toolkit';
-import { store } from 'index';
-import { FunctionGroupCode } from 'types/openapi';
-import { LockWidgetNameEnum } from 'types/user-interface';
+import { actions as authActions } from './auth';
 import { EntityType } from './filters';
 import { slice } from './notifications';
 import { actions as pagingActions } from './paging';
 import { transformAttributeDescriptorDtoToModel } from './transform/attributes';
 import { transformSearchRequestModelToDto } from './transform/certificates';
 import { transformConnectorResponseDtoToModel } from './transform/connectors';
+import { actions as userInterfaceActions } from './user-interface';
+
 import {
     transformNotificationDtoToModel,
     transformNotificationInstanceDtoToModel,
@@ -35,11 +36,21 @@ const listOverviewNotifications: AppEpic = (action$, state$, deps) => {
                 ),
 
                 catchError((err) =>
-                    of(
-                        slice.actions.listOverviewNotificationsFailure({
-                            error: extractError(err, 'Failed to list overview notification'),
-                        }),
-                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.NotificationsOverview),
+                    iif(
+                        () => err?.status === 401,
+                        of(
+                            appRedirectActions.setUnAuthorized(),
+                            authActions.resetProfile(),
+                            slice.actions.listOverviewNotificationsFailure({
+                                error: extractError(err, 'Failed to list overview notification'),
+                            }),
+                        ),
+                        of(
+                            userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.NotificationsOverview),
+                            slice.actions.listOverviewNotificationsFailure({
+                                error: extractError(err, 'Failed to list overview notification'),
+                            }),
+                        ),
                     ),
                 ),
             ),
