@@ -120,7 +120,7 @@ export default function UserDetail() {
                 },
             },
         ],
-        [user, onEditClick, onDisableClick, onEnableClick, isBusy, setConfirmDelete, user?.systemUser],
+        [user, onEditClick, onDisableClick, onEnableClick, isBusy, setConfirmDelete],
     );
 
     const detailHeaders: TableHeader[] = useMemo(
