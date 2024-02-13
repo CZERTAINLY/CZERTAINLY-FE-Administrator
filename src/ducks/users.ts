@@ -80,8 +80,8 @@ export const slice = createSlice({
         },
 
         listSuccess: (state, action: PayloadAction<{ users: UserResponseModel[] }>) => {
-            state.isFetchingList = false;
             state.users = action.payload.users;
+            state.isFetchingList = false;
         },
 
         listFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -96,8 +96,6 @@ export const slice = createSlice({
         },
 
         getDetailSuccess: (state, action: PayloadAction<{ user: UserDetailModel }>) => {
-            state.isFetchingDetail = false;
-
             state.user = action.payload.user;
 
             const userIndex = state.users.findIndex((user) => user.uuid === action.payload.user.uuid);
@@ -107,6 +105,8 @@ export const slice = createSlice({
             } else {
                 state.users.push(action.payload.user);
             }
+
+            state.isFetchingDetail = false;
         },
 
         getDetailFailure: (state, acttion: PayloadAction<{ error: string | undefined }>) => {
@@ -124,8 +124,8 @@ export const slice = createSlice({
         },
 
         createSuccess: (state, action: PayloadAction<{ user: UserDetailModel }>) => {
-            state.isCreating = false;
             state.users.push(action.payload.user);
+            state.isCreating = false;
         },
 
         createFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -144,8 +144,6 @@ export const slice = createSlice({
         },
 
         updateSuccess: (state, action: PayloadAction<{ user: UserDetailModel }>) => {
-            state.isUpdating = false;
-
             const userIndex = state.users.findIndex((user) => user.uuid === action.payload.user.uuid);
 
             if (userIndex >= 0) {
@@ -155,6 +153,7 @@ export const slice = createSlice({
             }
 
             if (state.user?.uuid === action.payload.user.uuid) state.user = action.payload.user;
+            state.isUpdating = false;
         },
 
         updateFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -166,8 +165,6 @@ export const slice = createSlice({
         },
 
         deleteUserSuccess: (state, action: PayloadAction<{ uuid: string; redirect?: string }>) => {
-            state.isDeleting = false;
-
             state.usersListCheckedRows = [];
 
             const userIndex = state.users.findIndex((user) => user.uuid === action.payload.uuid);
@@ -175,6 +172,7 @@ export const slice = createSlice({
             if (userIndex >= 0) state.users.splice(userIndex, 1);
 
             if (state.user?.uuid === action.payload.uuid) state.user = undefined;
+            state.isDeleting = false;
         },
 
         deleteUserFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -187,12 +185,12 @@ export const slice = createSlice({
         },
 
         enableSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
-            state.isEnabling = false;
-
             const admin = state.users.find((administrator) => administrator.uuid === action.payload.uuid);
             if (admin) admin.enabled = true;
 
             if (state.user?.uuid === action.payload.uuid) state.user.enabled = true;
+
+            state.isEnabling = false;
         },
 
         enableFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -204,13 +202,13 @@ export const slice = createSlice({
         },
 
         disableSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
-            state.isDisabling = false;
-
             const admin = state.users.find((administrator) => administrator.uuid === action.payload.uuid);
 
             if (admin) admin.enabled = false;
 
             if (state.user?.uuid === action.payload.uuid) state.user.enabled = false;
+
+            state.isDisabling = false;
         },
 
         disableFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -222,9 +220,8 @@ export const slice = createSlice({
         },
 
         getRolesSuccess: (state, action: PayloadAction<{ uuid: string; roles: RoleResponseModel[] }>) => {
-            state.isFetchingRoles = false;
-
             state.userRoles = action.payload.roles;
+            state.isFetchingRoles = false;
         },
 
         getRolesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -237,11 +234,10 @@ export const slice = createSlice({
         },
 
         updateRolesSuccess: (state, action: PayloadAction<{ user: UserDetailModel }>) => {
-            state.isUpdatingRoles = false;
-
             state.userRoles = action.payload.user.roles;
 
             if (state.user?.uuid === action.payload.user.uuid) state.user = action.payload.user;
+            state.isUpdatingRoles = false;
         },
 
         updateRolesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -253,11 +249,10 @@ export const slice = createSlice({
         },
 
         addRoleSuccess: (state, action: PayloadAction<{ user: UserDetailModel }>) => {
-            state.isAddingRole = false;
-
             state.userRoles = action.payload.user.roles;
 
             if (state.user?.uuid === action.payload.user.uuid) state.user = action.payload.user;
+            state.isAddingRole = false;
         },
 
         addRoleFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -269,11 +264,10 @@ export const slice = createSlice({
         },
 
         removeRoleSuccess: (state, action: PayloadAction<{ user: UserDetailModel }>) => {
-            state.isRemovingRole = false;
-
             state.userRoles = action.payload.user.roles;
 
             if (state.user?.uuid === action.payload.user.uuid) state.user = action.payload.user;
+            state.isRemovingRole = false;
         },
 
         removeRoleFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {

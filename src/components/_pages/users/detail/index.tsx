@@ -7,6 +7,7 @@ import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as certActions, selectors as certSelectors } from 'ducks/certificates';
 
+import { selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { actions, selectors } from 'ducks/users';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -27,6 +28,8 @@ export default function UserDetail() {
     const isFetchingRoles = useSelector(selectors.isFetchingRoles);
     const isDisabling = useSelector(selectors.isDisabling);
     const isEnabling = useSelector(selectors.isEnabling);
+    const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
+    const isUpdatingContent = useSelector(customAttributesSelectors.isUpdatingContent);
 
     const certificate = useSelector(certSelectors.certificateDetail);
     const isFetchingCertificateDetail = useSelector(certSelectors.isFetchingDetail);
@@ -77,11 +80,16 @@ export default function UserDetail() {
         setConfirmDelete(false);
     }, [user, dispatch]);
 
+    const isBusy = useMemo(
+        () => isFetchingDetail || isFetchingRoles || isFetchingResourceCustomAttributes || isUpdatingContent || isFetchingCertificateDetail,
+        [isFetchingDetail, isFetchingRoles, isFetchingResourceCustomAttributes, isUpdatingContent, isFetchingCertificateDetail],
+    );
+
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
                 icon: 'pencil',
-                disabled: user?.systemUser || false,
+                disabled: isBusy || user?.systemUser || false,
                 tooltip: 'Edit',
                 onClick: () => {
                     onEditClick();
@@ -112,7 +120,7 @@ export default function UserDetail() {
                 },
             },
         ],
-        [user, onEditClick, onDisableClick, onEnableClick],
+        [user, onEditClick, onDisableClick, onEnableClick, isBusy, setConfirmDelete, user?.systemUser],
     );
 
     const detailHeaders: TableHeader[] = useMemo(
