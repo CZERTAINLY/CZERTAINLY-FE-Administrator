@@ -68,6 +68,7 @@ function UserForm() {
     const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
     const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
 
+    const isFetchingResourceSecondaryCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceSecondaryCustomAttributes);
     const isFetchingUserDetail = useSelector(userSelectors.isFetchingDetail);
     const isFetchingRoles = useSelector(rolesSelectors.isFetchingList);
 
@@ -77,6 +78,7 @@ function UserForm() {
     const isCreatingUser = useSelector(userSelectors.isCreating);
     const isUpdatingUser = useSelector(userSelectors.isUpdating);
 
+    const isUpdatingContent = useSelector(customAttributesSelectors.isUpdatingContent);
     const [loadedCerts, setLoadedCerts] = useState<CertificateListResponseModel[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [user, setUser] = useState<UserDetailModel>();
@@ -84,6 +86,30 @@ function UserForm() {
     const [userRoles, setUserRoles] = useState<string[]>([]);
 
     const [optionsForCertificate, setOptionsForCertificate] = useState<{ label: string; value: string }[]>([]);
+
+    const isBusy = useMemo(
+        () =>
+            isFetchingUserDetail ||
+            isFetchingCertsList ||
+            isFetchingCertDetail ||
+            isFetchingRoles ||
+            isUpdatingUser ||
+            isCreatingUser ||
+            isFetchingResourceCustomAttributes ||
+            isFetchingResourceSecondaryCustomAttributes ||
+            isUpdatingContent,
+        [
+            isFetchingUserDetail,
+            isFetchingCertsList,
+            isFetchingCertDetail,
+            isFetchingRoles,
+            isUpdatingUser,
+            isCreatingUser,
+            isFetchingResourceCustomAttributes,
+            isFetchingResourceSecondaryCustomAttributes,
+            isUpdatingContent,
+        ],
+    );
 
     const optionsForInput: { label: string; value: 'upload' | 'select' }[] = useMemo(
         () => [
@@ -382,24 +408,32 @@ function UserForm() {
     );
     const title = useMemo(() => (editMode ? 'Edit user' : 'Create user'), [editMode]);
 
+    const renderCustomAttributesEditor = useCallback(() => {
+        if (isBusy || !user?.customAttributes) return <></>;
+        return (
+            <TabLayout
+                tabs={[
+                    {
+                        title: 'Custom attributes',
+                        content: (
+                            <AttributeEditor
+                                id="customUser"
+                                attributeDescriptors={resourceCustomAttributes}
+                                attributes={user?.customAttributes}
+                            />
+                        ),
+                    },
+                ]}
+            />
+        );
+    }, [resourceCustomAttributes, user, isBusy]);
+
     return (
         <>
             <Form onSubmit={onSubmit} initialValues={defaultValues} mutators={{ ...mutators<FormValues>() }}>
                 {({ handleSubmit, pristine, submitting, values, valid }) => (
                     <BootstrapForm onSubmit={handleSubmit}>
-                        <Widget
-                            title={title}
-                            busy={
-                                isFetchingUserDetail ||
-                                isFetchingCertsList ||
-                                isFetchingCertDetail ||
-                                isFetchingRoles ||
-                                isUpdatingUser ||
-                                isCreatingUser ||
-                                isFetchingResourceCustomAttributes
-                            }
-                            widgetExtraTopNode={enableCheckButton}
-                        >
+                        <Widget title={title} busy={isBusy} widgetExtraTopNode={enableCheckButton}>
                             <Field name="username" validate={composeValidators(validateRequired(), validateUrlSafe())}>
                                 {({ input, meta }) => (
                                     <FormGroup>
@@ -591,21 +625,7 @@ function UserForm() {
                             )}
 
                             <br />
-                            <TabLayout
-                                tabs={[
-                                    {
-                                        title: 'Custom attributes',
-                                        content: (
-                                            <AttributeEditor
-                                                id="customUser"
-                                                attributeDescriptors={resourceCustomAttributes}
-                                                attributes={user?.customAttributes}
-                                            />
-                                        ),
-                                    },
-                                ]}
-                            />
-
+                            {renderCustomAttributesEditor()}
                             <br />
 
                             <p>Assigned User Roles</p>
