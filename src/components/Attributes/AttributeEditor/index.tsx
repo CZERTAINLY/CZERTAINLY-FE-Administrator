@@ -31,7 +31,7 @@ import { Attribute } from './Attribute';
 const emptyAttributes: AttributeResponseModel[] = [];
 const emptyGroupAttributesCallbackAttributes: AttributeDescriptorModel[] = [];
 
-interface Props {
+export interface Props {
     id: string;
     attributeDescriptors: AttributeDescriptorModel[];
     groupAttributesCallbackAttributes?: AttributeDescriptorModel[];
@@ -123,7 +123,6 @@ export default function AttributeEditor({
         for (const k in isRunningCallback) isRunningCb = isRunningCb || isRunningCallback[k];
         return isRunningCb;
     }, [isRunningCallback]);
-
     /**
      * Gets the value of the attribute identified by the path (attributeName.propertyName.propertyName...)
      */

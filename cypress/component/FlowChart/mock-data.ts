@@ -1,9 +1,9 @@
-import FlowChart, { CustomNode } from 'components/FlowChart';
+import { CustomNode } from 'components/FlowChart';
 import { Edge, MarkerType, Position } from 'reactflow';
 import { CertificateState, CertificateValidationStatus } from 'types/openapi';
-import '../../src/resources/styles/theme.scss';
+import '../../../src/resources/styles/theme.scss';
 
-const nodes: CustomNode[] = [
+export const nodes: CustomNode[] = [
     {
         id: '1',
         type: 'customFlowNode',
@@ -121,7 +121,7 @@ const nodes: CustomNode[] = [
         sourcePosition: Position.Bottom,
     },
 ];
-const edges: Edge[] = [
+export const edges: Edge[] = [
     {
         id: 'e1-6',
         source: '6',
@@ -150,20 +150,3 @@ const edges: Edge[] = [
         },
     },
 ];
-
-const TestFlowChart = () => {
-    return (
-        <div>
-            <FlowChart flowChartTitle="Test Flow Chart" flowChartNodes={nodes} flowChartEdges={edges} />
-        </div>
-    );
-};
-
-describe('FlowChart', () => {
-    it('should render', () => {
-        cy.mount(<TestFlowChart />);
-        cy.get('h5').should('contain', 'Test Flow Chart');
-        cy.get('.react-flow__node').should('have.length', nodes.length);
-        cy.get('.react-flow__edge').should('have.length', edges.length);
-    });
-});

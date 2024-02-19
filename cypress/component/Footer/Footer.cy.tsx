@@ -1,5 +1,5 @@
 import Footer from 'components/Layout/Footer';
-import '../../src/resources/styles/theme.scss';
+import '../../../src/resources/styles/theme.scss';
 
 describe('Footer component', () => {
     it('should render footer', () => {

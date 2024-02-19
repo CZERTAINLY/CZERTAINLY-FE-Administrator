@@ -1,5 +1,5 @@
 import Sidebar from 'components/Layout/Sidebar';
-import '../../src/resources/styles/theme.scss';
+import '../../../src/resources/styles/theme.scss';
 
 describe('Sidebar component', () => {
     it('should render sidebar', () => {

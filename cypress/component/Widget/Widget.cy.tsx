@@ -3,8 +3,8 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { LockTypeEnum, LockWidgetNameEnum, WidgetLockErrorModel } from 'types/user-interface';
-import { actions as userInterfaceActions } from '../../src/ducks/user-interface';
-import '../../src/resources/styles/theme.scss';
+import { actions as userInterfaceActions } from '../../../src/ducks/user-interface';
+import '../../../src/resources/styles/theme.scss';
 const buttons: WidgetButtonProps[] = [
     {
         icon: 'pencil',
@@ -55,7 +55,7 @@ describe('Test Widget Component', () => {
         cy.mount(<TestWidget />);
         cy.wait(1500);
         cy.get('.fa-refresh').click();
-        cy.wait(500);
+        cy.wait(200);
         cy.get('h5').should('contain', 'Test Widget');
     });
 });
@@ -103,7 +103,7 @@ describe('Test Widget Component with generic lock', () => {
         cy.wait(1500);
         cy.get('h5').should('contain', 'Test Widget');
         cy.get('.fa-refresh').click();
-        cy.wait(2000);
+        cy.wait(200);
         cy.get('h5').should('contain', 'Test lock error');
         cy.get('.fa-triangle-exclamation').should('exist');
     });
@@ -152,7 +152,7 @@ describe('Test Widget Component with client lock', () => {
         cy.wait(1500);
         cy.get('h5').should('contain', 'Test Widget');
         cy.get('.fa-refresh').click();
-        cy.wait(2000);
+        cy.wait(200);
         cy.get('h5').should('contain', 'Test lock client error');
         cy.get('.fa-house-laptop').should('exist');
     });
@@ -191,7 +191,7 @@ describe('Test Widget Component with permission lock', () => {
         cy.wait(1500);
         cy.get('h5').should('contain', 'Test Widget');
         cy.get('.fa-refresh').click();
-        cy.wait(2000);
+        cy.wait(200);
         cy.get('h5').should('contain', 'Test Widget Lock');
         cy.get('.fa-lock').should('not.exist');
     });
@@ -240,7 +240,7 @@ describe('Test Widget Component with service lock', () => {
         cy.wait(1500);
         cy.get('h5').should('contain', 'Test Widget');
         cy.get('.fa-refresh').click();
-        cy.wait(2000);
+        cy.wait(200);
         cy.get('h5').should('contain', 'Test lock service error');
         cy.get('.fa-database').should('exist');
     });
@@ -290,7 +290,7 @@ describe('Test Widget Component with server lock', () => {
         cy.wait(1500);
         cy.get('h5').should('contain', 'Test Widget');
         cy.get('.fa-refresh').click();
-        cy.wait(2000);
+        cy.wait(200);
         cy.get('h5').should('contain', 'Test lock server error');
         cy.get('.fa-server').should('exist');
     });
@@ -340,7 +340,7 @@ describe('Test Widget Component with network lock', () => {
         cy.wait(1500);
         cy.get('h5').should('contain', 'Test Widget');
         cy.get('.fa-refresh').click();
-        cy.wait(2000);
+        cy.wait(200);
         cy.get('h5').should('contain', 'Test lock network error');
         cy.get('.fa-wifi').should('exist');
     });

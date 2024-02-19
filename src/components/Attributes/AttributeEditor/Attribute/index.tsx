@@ -42,6 +42,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
     const attributeCallbackValue = useSelector(userInterfaceSelectors.selectAttributeCallbackValue);
     const initiateAttributeCallback = useSelector(userInterfaceSelectors.selectInitiateAttributeCallback);
     const dispatch = useDispatch();
+
     useEffect(() => {
         if (descriptor?.name) {
             const addNewAttributeValue = AddNewAttributeList.find((a) => a.name === descriptor.name);

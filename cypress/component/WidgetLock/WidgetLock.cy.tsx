@@ -1,5 +1,5 @@
 import WidgetLock from 'components/WidgetLock/index';
-import '../../src/resources/styles/theme.scss';
+import '../../../src/resources/styles/theme.scss';
 
 describe('Widget Lock component', () => {
     it("should render widget lock with lock title 'Test Lock' & lock text 'Test lock text", () => {

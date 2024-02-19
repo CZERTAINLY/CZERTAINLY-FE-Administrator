@@ -1,27 +1,7 @@
-import CustomTable, { TableHeader } from 'components/CustomTable/index';
+import CustomTable from 'components/CustomTable/index';
 import { useCallback, useMemo, useState } from 'react';
-import '../../src/resources/styles/theme.scss';
-
-const detailHeaders: TableHeader[] = [
-    {
-        id: 'columnOne',
-        content: 'Column One',
-        sortable: true,
-        sort: 'asc',
-    },
-    {
-        id: 'columnTwo',
-        content: 'Column Two',
-    },
-    {
-        id: 'columnThree',
-        content: 'Column Three',
-    },
-    {
-        id: 'columnFour',
-        content: 'Column Four',
-    },
-];
+import '../../../src/resources/styles/theme.scss';
+import detailHeaders from './mock-data';
 
 const CustomTableTest = () => {
     const [page, setPage] = useState(1);
