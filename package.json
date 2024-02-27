@@ -55,7 +55,6 @@
     },
     "scripts": {
         "start": "react-scripts start",
-        "cypress": "cypress open",
         "build": "react-scripts build",
         "lint": "eslint && prettier --check \"**/**.{ts,js,tsx}\" \"*.{json,md,yml}\"",
         "test": "react-scripts test",
