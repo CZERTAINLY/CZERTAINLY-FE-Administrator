@@ -10,7 +10,7 @@ import ContentValueField from '../../Input/DynamicContent/ContentValueField';
 import Widget from '../../Widget';
 import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from '../AttributeViewer';
 
-type Props = {
+export type Props = {
     resource: Resource;
     resourceUuid: string;
     attributes: AttributeResponseModel[] | undefined;

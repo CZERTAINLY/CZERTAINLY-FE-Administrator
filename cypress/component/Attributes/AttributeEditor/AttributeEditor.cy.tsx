@@ -1,7 +1,7 @@
 import AttributeEditor, { Props as AttributeProps } from 'components/Attributes/AttributeEditor';
 import { Form } from 'react-final-form';
-import { CustomAttributeModel, InfoAttributeModel, MetadataAttributeModel } from 'types/attributes';
-import { AttributeContentType, AttributeType } from 'types/openapi';
+import { CustomAttributeModel, InfoAttributeModel } from 'types/attributes';
+import { AttributeType } from 'types/openapi';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 import '../../../../src/resources/styles/theme.scss';
 
@@ -119,27 +119,6 @@ const infoAttributeEditorProps: AttributeProps = {
             },
         },
     ] as InfoAttributeModel[],
-};
-
-const metaDatAttributeEditorProps: AttributeProps = {
-    id: 'meta-data-attribute-1',
-    attributeDescriptors: [
-        {
-            contentType: AttributeContentType.Text,
-            name: 'test-name-1',
-            type: AttributeType.Meta,
-            uuid: 'test-uuid-1',
-            properties: {
-                label: 'Test Label 1',
-                visible: true,
-            },
-            content: [
-                {
-                    data: 'test-data-1',
-                },
-            ],
-        },
-    ] as MetadataAttributeModel[],
 };
 
 describe('AttributeEditor component 1', () => {
