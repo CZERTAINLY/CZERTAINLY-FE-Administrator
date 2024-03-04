@@ -7,7 +7,7 @@ import { alertsSlice, initialState as initialAlertsState } from './alert-slice';
 import { slice as appRedirectSlice, initialState as initialAppRedirectState } from './app-redirect';
 import { slice as auditLogsSlice, initialState as initialAuditLogsState } from './auditLogs';
 import { slice as authSlice, initialState as initialAuthState } from './auth';
-import { initialState as initialWidgetLockState, slice as widgetLockSlice } from './user-interface';
+import { slice as initialUserInterfaceSlice, initialState as initialUserInterfaceState } from './user-interface';
 
 import { initialState as initialProfileApprovalState, slice as profileApprovalSlice } from './approval-profiles';
 
@@ -48,7 +48,7 @@ import { initialState as initialUtilsOidState, slice as utilsOidSlice } from './
 
 export const initialState = {
     [alertsSlice.name]: initialAlertsState,
-    [widgetLockSlice.name]: initialWidgetLockState,
+    [initialUserInterfaceSlice.name]: initialUserInterfaceState,
     [appRedirectSlice.name]: initialAppRedirectState,
     [authSlice.name]: initialAuthState,
     [dashboardSlice.name]: initialDashboardState,

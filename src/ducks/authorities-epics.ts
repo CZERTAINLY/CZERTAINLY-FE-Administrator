@@ -98,11 +98,11 @@ const getAuthorityProviderAttributesDescriptors: AppEpic = (action$, state, deps
                     kind: action.payload.kind,
                 })
                 .pipe(
-                    map((attributeDescriptors) =>
-                        slice.actions.getAuthorityProviderAttributesDescriptorsSuccess({
+                    map((attributeDescriptors) => {
+                        return slice.actions.getAuthorityProviderAttributesDescriptorsSuccess({
                             attributeDescriptor: attributeDescriptors.map(transformAttributeDescriptorDtoToModel),
-                        }),
-                    ),
+                        });
+                    }),
 
                     catchError((err) =>
                         of(

@@ -309,6 +309,9 @@ export default function AttributeEditor({
         setPrevAttributes(attributes);
 
         descriptorsToLoad.forEach((descriptor) => {
+            if (isGroupAttributeModel(descriptor)) {
+                console.log('-------------------------------------------- groupeditor found!!!!!!!!!!!!!!!!!!!');
+            }
             if (isDataAttributeModel(descriptor) || isGroupAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
                 const formAttributeName = `__attributes__${id}__.${descriptor.name}`;
 
