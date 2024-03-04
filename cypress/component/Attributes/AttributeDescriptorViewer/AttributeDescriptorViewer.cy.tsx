@@ -1,56 +1,33 @@
-import AttributeDescriptorViewer, { Props as AttributeDescriptorViewerProps } from 'components/Attributes/AttributeDescriptorViewer';
-import { actions as userInterfaceActions } from 'ducks/user-interface';
+import AttributeDescriptorViewer from 'components/Attributes/AttributeDescriptorViewer';
 
-import { InfoAttributeModel } from 'types/attributes';
-import { LockTypeEnum, LockWidgetNameEnum } from 'types/user-interface';
 import '../../../../src/resources/styles/theme.scss';
+import {
+    customAttributeDescriptorProps,
+    dataAttributeDescriptorProps,
+    groupAttributeDescriptorProps,
+    infoAttributeDescriptorProps,
+} from './mock-data';
 
-const infoAttributeEditorProps: AttributeDescriptorViewerProps = {
-    attributeDescriptors: [
-        {
-            content: [{ data: 'test-data-1', reference: 'test-reference-1' }],
-            contentType: 'string',
-            description: 'test-description-1',
-            name: 'test-name-1',
-            type: 'info',
-            uuid: 'test-uuid-1',
-            properties: {
-                label: 'Test Label 1',
-                visible: true,
-                group: 'test-group-1',
-            },
-        },
-        {
-            content: [{ data: 'test-data-2', reference: 'test-reference-2' }],
-            contentType: 'string',
-            description: 'test-description-2',
-            name: 'test-name-2',
-            type: 'info',
-            uuid: 'test-uuid-2',
-            properties: {
-                label: 'Test Label 2',
-                visible: true,
-                group: 'test-group-2',
-            },
-        },
-    ] as InfoAttributeModel[],
-};
-describe('AttributeDescriptorViewer', () => {
-    it('should render info attribute editor', () => {
-        cy.mount(<AttributeDescriptorViewer attributeDescriptors={infoAttributeEditorProps.attributeDescriptors} />);
+describe('AttributeDescriptorViewer component 1 (Info Attribute Model)', () => {
+    it('should render AttributeDescriptorViewer (Info Attribute Model)', () => {
+        cy.mount(<AttributeDescriptorViewer attributeDescriptors={infoAttributeDescriptorProps.attributeDescriptors} />);
+    });
+});
 
-        cy.window()
-            .its('store')
-            .invoke(
-                'dispatch',
-                userInterfaceActions.insertWidgetLock(
-                    {
-                        lockTitle: 'test',
-                        lockText: 'test lock',
-                        lockType: LockTypeEnum.GENERIC,
-                    },
-                    LockWidgetNameEnum.ConnectorDetails,
-                ),
-            );
+describe('AttributeDescriptorViewer component 2 (Custom Attribute Model)', () => {
+    it('should render AttributeDescriptorViewer (Custom Attribute Model)', () => {
+        cy.mount(<AttributeDescriptorViewer attributeDescriptors={customAttributeDescriptorProps.attributeDescriptors} />);
+    });
+});
+
+describe('AttributeDescriptorViewer component 3 (Data Attribute Model)', () => {
+    it('should render AttributeDescriptorViewer (Data Attribute Model)', () => {
+        cy.mount(<AttributeDescriptorViewer attributeDescriptors={dataAttributeDescriptorProps.attributeDescriptors} />);
+    });
+});
+
+describe('AttributeDescriptorViewer component 4 (Group Attribute Model)', () => {
+    it('should render AttributeDescriptorViewer (Group Attribute Model)', () => {
+        cy.mount(<AttributeDescriptorViewer attributeDescriptors={groupAttributeDescriptorProps.attributeDescriptors} />);
     });
 });

@@ -27,9 +27,3 @@ declare global {
         store: typeof reduxStore; // Replace 'any' with the type of your Redux store
     }
 }
-
-// declare global {
-//     interface Window {
-//       store: any; // Replace 'any' with the type of your Redux store
-//     }
-//   }

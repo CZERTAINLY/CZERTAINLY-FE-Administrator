@@ -1,11 +1,8 @@
-import ComplianceRuleAttributeViewer, {
-    Props as ComplianceRuleAttributeViewerProps,
-} from 'components/Attributes/ComplianceRuleAttributeViewer';
+import { Props as ComplianceRuleAttributeViewerProps } from 'components/Attributes/ComplianceRuleAttributeViewer';
 import { AttributeResponseModel } from 'types/attributes';
 import { AttributeContentType, AttributeType } from 'types/openapi';
-import '../../../../src/resources/styles/theme.scss';
 
-const complianceRuleAttributeViewerProps: ComplianceRuleAttributeViewerProps = {
+export const complianceRuleAttributeViewerProps: ComplianceRuleAttributeViewerProps = {
     attributes: [
         {
             contentType: AttributeContentType.String,
@@ -35,9 +32,3 @@ const complianceRuleAttributeViewerProps: ComplianceRuleAttributeViewerProps = {
         },
     ] as AttributeResponseModel[],
 };
-
-describe('Compliance Attribute Viewer', () => {
-    it('should render ComplianceRuleAttributeViewer', () => {
-        cy.mount(<ComplianceRuleAttributeViewer attributes={complianceRuleAttributeViewerProps.attributes} />);
-    });
-});
