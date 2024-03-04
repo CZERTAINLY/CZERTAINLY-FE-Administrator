@@ -1,7 +1,7 @@
 import CustomAttributeWidget, { Props as CustomAttributeWidgetProps } from 'components/Attributes/CustomAttributeWidget';
 import { actions as customAttributesActions } from 'ducks/customAttributes';
 import { transformCustomAttributeDtoToModel } from 'ducks/transform/attributes';
-import { CustomAttributeModel } from 'types/attributes';
+import { AttributeResponseModel, CustomAttributeDto } from 'types/attributes';
 import { AttributeContentType, AttributeType, Resource } from 'types/openapi';
 import '../../../../src/resources/styles/theme.scss';
 
@@ -52,9 +52,9 @@ const successData = [
             multiSelect: false,
         },
     },
-] as CustomAttributeModel[];
+] as CustomAttributeDto[];
 
-const infoAttributeEditorProps: CustomAttributeWidgetProps = {
+const customAttributeWidgetProps: CustomAttributeWidgetProps = {
     resource: Resource.Certificates,
     resourceUuid: 'e0264f92-b3bc-496b-b48c-e687863c8288',
     attributes: [
@@ -82,44 +82,16 @@ const infoAttributeEditorProps: CustomAttributeWidgetProps = {
                 },
             ],
         },
-    ],
-    // attributes: [
-    //     {
-    //         contentType: AttributeContentType.String,
-    //         label: 'Test Label 1',
-    //         name: 'test-name-1',
-    //         type: AttributeType.Info,
-    //         uuid: 'test-uuid-1',
-    //         content: [
-    //             {
-    //                 data: 'test-data-1',
-    //                 reference: 'test-reference-1',
-    //             },
-    //         ],
-    //     },
-    //     {
-    //         contentType: AttributeContentType.Boolean,
-    //         label: 'Test Label 2',
-    //         name: 'test-name-2',
-    //         type: AttributeType.Info,
-    //         uuid: 'test-uuid-2',
-    //         content: [
-    //             {
-    //                 data: true,
-    //                 reference: 'test-reference-2',
-    //             },
-    //         ],
-    //     },
-    // ] as AttributeResponseModel[],
+    ] as AttributeResponseModel[],
 };
 describe('CustomAttributeWidget', () => {
     it('should render info attribute editor', () => {
         cy.mount(<></>);
         cy.mount(
             <CustomAttributeWidget
-                resource={infoAttributeEditorProps.resource}
-                resourceUuid={infoAttributeEditorProps.resourceUuid}
-                attributes={infoAttributeEditorProps.attributes}
+                resource={customAttributeWidgetProps.resource}
+                resourceUuid={customAttributeWidgetProps.resourceUuid}
+                attributes={customAttributeWidgetProps.attributes}
             />,
         )
             .wait(1000)
@@ -129,12 +101,5 @@ describe('CustomAttributeWidget', () => {
                 'dispatch',
                 customAttributesActions.listResourceCustomAttributesSuccess(successData.map(transformCustomAttributeDtoToModel)),
             );
-
-        cy.window()
-            .its('store')
-            .invoke('getState')
-            .then((state) => {
-                console.log('store', state);
-            });
     });
 });

@@ -1,4 +1,4 @@
-import AttributeEditor, { Props as AttributeProps } from 'components/Attributes/AttributeEditor';
+import AttributeEditor, { Props as AttributeEditorProps } from 'components/Attributes/AttributeEditor';
 import { actions as authorityActions, selectors as authoritySelectors } from 'ducks/authorities';
 import { actions as connectorActions } from 'ducks/connectors';
 import { actions as raProfileActions, selectors as raProfilesSelectors } from 'ducks/ra-profiles';
@@ -8,16 +8,24 @@ import { transformConnectorResponseDtoToModel } from 'ducks/transform/connectors
 import { useEffect, useState } from 'react';
 import { Form } from 'react-final-form';
 import { useSelector } from 'react-redux';
-import { AttributeDescriptorDto, AttributeDescriptorModel, CustomAttributeModel, InfoAttributeModel } from 'types/attributes';
+import { AttributeDescriptorModel, CustomAttributeModel, InfoAttributeModel } from 'types/attributes';
 import { ConnectorResponseModel } from 'types/connectors';
-import { AttributeType, AuthorityInstanceDto, BaseAttributeDto, ConnectorDto, FunctionGroupCode, Resource } from 'types/openapi';
+import {
+    AttributeType,
+    AuthorityInstanceDto,
+    ConnectorDto,
+    DataAttribute,
+    FunctionGroupCode,
+    GroupAttribute,
+    Resource,
+} from 'types/openapi';
 import { RaProfileResponseModel } from 'types/ra-profiles';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 import '../../../../src/resources/styles/theme.scss';
 
 // import { actions as authoritiesActions, selectors as authoritiesSelectors } from 'ducks/authorities';
 
-const customAttributeEditorProps: AttributeProps = {
+const customAttributeEditorProps: AttributeEditorProps = {
     id: 'test',
     attributeDescriptors: [
         {
@@ -101,38 +109,6 @@ const customAttributeEditorProps: AttributeProps = {
     ] as CustomAttributeModel[],
 };
 
-const infoAttributeEditorProps: AttributeProps = {
-    id: 'test1',
-    attributeDescriptors: [
-        {
-            content: [{ data: 'test-data-1', reference: 'test-reference-1' }],
-            contentType: 'string',
-            description: 'test-description-1',
-            name: 'test-name-1',
-            type: 'info',
-            uuid: 'test-uuid-1',
-            properties: {
-                label: 'Test Label 1',
-                visible: true,
-                group: 'test-group-1',
-            },
-        },
-        {
-            content: [{ data: 'test-data-2', reference: 'test-reference-2' }],
-            contentType: 'string',
-            description: 'test-description-2',
-            name: 'test-name-2',
-            type: 'info',
-            uuid: 'test-uuid-2',
-            properties: {
-                label: 'Test Label 2',
-                visible: true,
-                group: 'test-group-2',
-            },
-        },
-    ] as InfoAttributeModel[],
-};
-
 describe('AttributeEditor component 1 (Custom Attribute)', () => {
     it('should render Custom attribute editor', () => {
         cy.mount(
@@ -166,6 +142,38 @@ describe('AttributeEditor component 1 (Custom Attribute)', () => {
         cy.get('input').eq(3).should('have.attr', 'type', 'text');
     });
 });
+
+const infoAttributeEditorProps: AttributeEditorProps = {
+    id: 'test1',
+    attributeDescriptors: [
+        {
+            content: [{ data: 'test-data-1', reference: 'test-reference-1' }],
+            contentType: 'string',
+            description: 'test-description-1',
+            name: 'test-name-1',
+            type: 'info',
+            uuid: 'test-uuid-1',
+            properties: {
+                label: 'Test Label 1',
+                visible: true,
+                group: 'test-group-1',
+            },
+        },
+        {
+            content: [{ data: 'test-data-2', reference: 'test-reference-2' }],
+            contentType: 'string',
+            description: 'test-description-2',
+            name: 'test-name-2',
+            type: 'info',
+            uuid: 'test-uuid-2',
+            properties: {
+                label: 'Test Label 2',
+                visible: true,
+                group: 'test-group-2',
+            },
+        },
+    ] as InfoAttributeModel[],
+};
 
 describe('AttributeEditor component 2 ()', () => {
     it('should render info attribute editor', () => {
@@ -338,8 +346,8 @@ const dataAttributeDescriptors = [
             ],
         },
     },
-] as BaseAttributeDto[];
-const data = [
+] as DataAttribute[];
+const dataCallback = [
     {
         reference: 'lab01-testssh',
         data: {
@@ -1254,7 +1262,10 @@ describe('AttributeEditor component 3 (DataAttribute`)', () => {
             .wait(3000)
             .window()
             .its('store')
-            .invoke('dispatch', connectorActions.callbackSuccess({ callbackId: '__attributes__authority__.credential', data }));
+            .invoke(
+                'dispatch',
+                connectorActions.callbackSuccess({ callbackId: '__attributes__authority__.credential', data: dataCallback }),
+            );
     });
 });
 
@@ -1841,7 +1852,7 @@ const groupAttributeDescriptors = [
             multiSelect: false,
         },
     },
-] as AttributeDescriptorDto[];
+] as GroupAttribute[];
 
 const groupCallbackData = [
     {
