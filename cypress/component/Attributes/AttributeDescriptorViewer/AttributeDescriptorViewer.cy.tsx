@@ -1,5 +1,4 @@
 import AttributeDescriptorViewer from 'components/Attributes/AttributeDescriptorViewer';
-
 import '../../../../src/resources/styles/theme.scss';
 import {
     customAttributeDescriptorProps,

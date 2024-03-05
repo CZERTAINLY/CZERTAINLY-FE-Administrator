@@ -9,7 +9,7 @@ export const infoAttributeDescriptorProps: AttributeDescriptorViewerProps = {
             contentType: 'string',
             description: 'test-description-1',
             name: 'test-name-1',
-            type: 'info',
+            type: AttributeType.Info,
             uuid: 'test-uuid-1',
             properties: {
                 label: 'Test Label 1',
@@ -22,7 +22,7 @@ export const infoAttributeDescriptorProps: AttributeDescriptorViewerProps = {
             contentType: 'string',
             description: 'test-description-2',
             name: 'test-name-2',
-            type: 'info',
+            type: AttributeType.Info,
             uuid: 'test-uuid-2',
             properties: {
                 label: 'Test Label 2',
@@ -39,7 +39,7 @@ export const customAttributeDescriptorProps: AttributeDescriptorViewerProps = {
             uuid: 'test-uuid-1',
             name: 'test-name-1',
             description: 'test-description-1',
-            type: AttributeType.Data,
+            type: AttributeType.Custom,
             contentType: 'string',
             properties: {
                 label: 'Test Label 1',
@@ -67,7 +67,7 @@ export const customAttributeDescriptorProps: AttributeDescriptorViewerProps = {
                     data: false,
                 },
             ],
-            type: AttributeType.Data,
+            type: AttributeType.Custom,
             contentType: 'boolean',
             properties: {
                 label: 'Test Label 2',
@@ -87,7 +87,7 @@ export const customAttributeDescriptorProps: AttributeDescriptorViewerProps = {
                     data: 5985,
                 },
             ],
-            type: AttributeType.Data,
+            type: AttributeType.Custom,
             contentType: 'integer',
             properties: {
                 label: 'Test Label 3',
@@ -102,7 +102,7 @@ export const customAttributeDescriptorProps: AttributeDescriptorViewerProps = {
             uuid: 'test-uuid-4',
             name: 'test-name-4',
             description: 'test-description-4',
-            type: AttributeType.Data,
+            type: AttributeType.Custom,
             contentType: 'credential',
             properties: {
                 label: 'Test Label 4',
@@ -122,7 +122,7 @@ export const dataAttributeDescriptorProps: AttributeDescriptorViewerProps = {
             uuid: '93ca0ba2-3863-4ffa-a469-fd14ab3992bf',
             name: 'address',
             description: 'Address of ADCS server.',
-            type: 'data',
+            type: AttributeType.Data,
             contentType: 'string',
             properties: {
                 label: 'MS-ADCS Address',
@@ -215,7 +215,7 @@ export const groupAttributeDescriptorProps: AttributeDescriptorViewerProps = {
                     data: 'configstring',
                 },
             ],
-            type: AttributeType.Data,
+            type: AttributeType.Group,
             contentType: 'string',
             properties: {
                 label: 'Select CA Method',
@@ -236,7 +236,7 @@ export const groupAttributeDescriptorProps: AttributeDescriptorViewerProps = {
                     data: 'b0d18653-14b1-41de-a1b3-8286f07f1c7d',
                 },
             ],
-            type: AttributeType.Data,
+            type: AttributeType.Group,
             contentType: 'string',
             properties: {
                 label: 'Authority UUID',
@@ -645,7 +645,7 @@ export const groupAttributeDescriptorProps: AttributeDescriptorViewerProps = {
                     },
                 },
             ],
-            type: AttributeType.Data,
+            type: AttributeType.Group,
             contentType: 'object',
             properties: {
                 label: 'Certificate Template Name',

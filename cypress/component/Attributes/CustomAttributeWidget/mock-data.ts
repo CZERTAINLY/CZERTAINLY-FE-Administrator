@@ -56,9 +56,9 @@ export const customAttributeWidgetProps: CustomAttributeWidgetProps = {
     resourceUuid: 'e0264f92-b3bc-496b-b48c-e687863c8288',
     attributes: [
         {
-            uuid: '4b42fe2c-2d59-4a62-8880-38a47d2c7db2',
-            name: 'Distribution method',
-            label: 'Distribution method',
+            uuid: 'tuuid-1',
+            name: 'Test',
+            label: 'Test',
             type: AttributeType.Custom,
             contentType: AttributeContentType.String,
             content: [
@@ -68,7 +68,7 @@ export const customAttributeWidgetProps: CustomAttributeWidgetProps = {
             ],
         },
         {
-            uuid: 'c189d9fd-6671-4b84-8e9e-f9c91d81982f',
+            uuid: 'tuuid-2',
             name: 'Test',
             label: 'Test',
             type: AttributeType.Custom,
@@ -76,6 +76,30 @@ export const customAttributeWidgetProps: CustomAttributeWidgetProps = {
             content: [
                 {
                     data: 'Default content',
+                },
+            ],
+        },
+        {
+            uuid: 'tuuid-3',
+            name: 'Test',
+            label: 'Test',
+            type: AttributeType.Custom,
+            contentType: AttributeContentType.Boolean,
+            content: [
+                {
+                    data: 'true',
+                },
+            ],
+        },
+        {
+            uuid: 'tuuid-4',
+            name: 'Test',
+            label: 'Test',
+            type: AttributeType.Custom,
+            contentType: AttributeContentType.Integer,
+            content: [
+                {
+                    data: '100',
                 },
             ],
         },

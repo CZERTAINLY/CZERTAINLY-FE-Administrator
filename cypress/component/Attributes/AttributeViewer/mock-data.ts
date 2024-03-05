@@ -1,9 +1,9 @@
 import { Props as AttributeViewerProps } from 'components/Attributes/AttributeViewer';
-import { AttributeResponseModel } from 'types/attributes';
+import { AttributeResponseModel, DataAttributeModel } from 'types/attributes';
 import { MetadataModel } from 'types/locations';
 import { AttributeContentType, AttributeType } from 'types/openapi';
 
-export const customAttributeViewerProps: AttributeViewerProps = {
+export const attributeViewerProps: AttributeViewerProps = {
     attributes: [
         {
             contentType: AttributeContentType.String,
@@ -13,7 +13,7 @@ export const customAttributeViewerProps: AttributeViewerProps = {
             uuid: 'test-uuid-1',
             content: [
                 {
-                    data: 'test-data-1',
+                    data: 'test-attribute-data-1',
                     reference: 'test-reference-1',
                 },
             ],
@@ -185,4 +185,32 @@ export const customAttributeViewerProps: AttributeViewerProps = {
             ],
         },
     ] as MetadataModel[],
+    descriptors: [
+        {
+            content: [{ data: 'test-descriptor-data-1', reference: 'test-descriptor-reference-1' }],
+            contentType: AttributeContentType.String,
+            description: 'test-descriptor-1',
+            name: 'test-name-1',
+            type: AttributeType.Data,
+            uuid: 'test-uuid-1',
+            properties: {
+                label: 'Test Label 1',
+                visible: true,
+                group: 'test-group-1',
+            },
+        },
+        {
+            content: [{ data: 'test-descriptor-data-2', reference: 'test-descriptor-reference-2' }],
+            contentType: AttributeContentType.String,
+            description: 'test-descriptor-2',
+            name: 'test-descriptor-name-2',
+            type: AttributeType.Data,
+            uuid: 'test-uuid-2',
+            properties: {
+                label: 'Test Label 2',
+                visible: true,
+                group: 'test-group-2',
+            },
+        },
+    ] as DataAttributeModel[],
 };
