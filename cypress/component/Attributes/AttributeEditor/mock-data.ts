@@ -9,17 +9,22 @@ export const customAttributeEditorProps: AttributeEditorProps = {
         {
             uuid: 'test-uuid-1',
             name: 'test-name-1',
-            description: 'test-description-1',
-            type: AttributeType.Data,
+            description: 'test-description-string-1',
+            type: AttributeType.Custom,
             contentType: AttributeContentType.String,
             properties: {
-                label: 'Test Label 1',
+                label: 'Test property string',
                 visible: true,
                 required: true,
                 readOnly: false,
                 list: false,
                 multiSelect: false,
             },
+            // content: [
+            //     {
+            //         data: 'test-data-1',
+            //     },
+            // ],
             constraints: [
                 {
                     description: 'Test Description 1',
@@ -32,16 +37,16 @@ export const customAttributeEditorProps: AttributeEditorProps = {
         {
             uuid: 'test-uuid-2',
             name: 'test-name-2',
-            description: 'test-description-2',
-            content: [
-                {
-                    data: false,
-                },
-            ],
-            type: AttributeType.Data,
+            description: 'test-description-boolean-2',
+            // content: [
+            //     {
+            //         data: true,
+            //     },
+            // ],
+            type: AttributeType.Custom,
             contentType: AttributeContentType.Boolean,
             properties: {
-                label: 'Test Label 2',
+                label: 'Test property boolean',
                 visible: true,
                 required: true,
                 readOnly: false,
@@ -52,16 +57,16 @@ export const customAttributeEditorProps: AttributeEditorProps = {
         {
             uuid: 'test-uuid-3',
             name: 'test-name-3',
-            description: 'test-description-3',
-            content: [
-                {
-                    data: 5985,
-                },
-            ],
-            type: AttributeType.Data,
+            description: 'test-description-integer-3',
+            // content: [
+            //     {
+            //         data: 5985,
+            //     },
+            // ],
+            type: AttributeType.Custom,
             contentType: AttributeContentType.Integer,
             properties: {
-                label: 'Test Label 3',
+                label: 'Test property integer',
                 visible: true,
                 required: true,
                 readOnly: false,
@@ -72,15 +77,163 @@ export const customAttributeEditorProps: AttributeEditorProps = {
         {
             uuid: 'test-uuid-4',
             name: 'test-name-4',
-            description: 'test-description-4',
-            type: AttributeType.Data,
+            description: 'test-description-drop-down-4',
+            type: AttributeType.Custom,
             contentType: AttributeContentType.Credential,
             properties: {
-                label: 'Test Label 4',
+                label: 'Test property drop down',
                 visible: true,
                 required: true,
                 readOnly: false,
                 list: true,
+                multiSelect: true,
+            },
+            content: [
+                {
+                    data: 'test-default-content-1',
+                },
+                {
+                    data: 'test-default-content-2',
+                },
+            ],
+        },
+        {
+            uuid: 'test-uuid-5',
+            name: 'test-name-5',
+            label: 'Test property codeblock',
+            type: AttributeType.Custom,
+            contentType: AttributeContentType.Codeblock,
+            properties: {
+                label: 'Test property codeblock',
+                group: 'test-group',
+            },
+            // content: [
+            //     {
+            //         data: {
+            //             code: 'PGgxPk9EUE9WRcSOPC9oMT4KPGRpdj5Qb8SNw610YW1lIGtvxL5rbyBjZXJ0aWZpa8OhdG92IHR1IGplLjwvZGl2PgoKPHVsPgogIDxsaT5TdWJqZWN0OiAke25vdGlmaWNhdGlvbkRhdGEuc3ViamVjdERufTwvbGk+CiAgPGxpPlNlcmlhbCBOdW1iZXI6ICR7bm90aWZpY2F0aW9uRGF0YS5zZXJpYWxOdW1iZXJ9PC9saT4KICA8bGk+SXNzdWVyOiAke25vdGlmaWNhdGlvbkRhdGEuaXNzdWVyRG59PC9saT4KPC91bD4=',
+            //             language: 'html',
+            //         },
+            //     },
+            // ],
+        },
+        {
+            uuid: 'test-uuid-6',
+            name: 'test-name-6',
+            label: 'test float property',
+            type: AttributeType.Custom,
+            contentType: AttributeContentType.Float,
+            properties: {
+                label: 'test float property',
+                group: 'test-group',
+                visible: true,
+                required: true,
+                readOnly: false,
+                list: false,
+                multiSelect: false,
+            },
+            // content: [
+            //     {
+            //         data: '1.1',
+            //     },
+            // ],
+        },
+        {
+            uuid: 'test-uuid-7',
+            name: 'test-name-7',
+            label: 'test date property',
+            type: AttributeType.Custom,
+            contentType: AttributeContentType.Date,
+            properties: {
+                label: 'test date property',
+                group: 'test-group',
+                visible: true,
+                required: true,
+                readOnly: false,
+                list: false,
+                multiSelect: false,
+            },
+            // content: [
+            //     {
+            //         data: '2022-01-01',
+            //     },
+            // ],
+        },
+        {
+            uuid: 'test-uuid-8',
+            name: 'test-name-8',
+            label: 'test datetime property',
+            type: AttributeType.Custom,
+            contentType: AttributeContentType.Datetime,
+            properties: {
+                label: 'test datetime property',
+                group: 'test-group',
+                visible: true,
+                required: true,
+                readOnly: false,
+                list: false,
+                multiSelect: false,
+            },
+            // content: [
+            //     {
+            //         data: '2022-01-01T00:00:00',
+            //     },
+            // ],
+        },
+        {
+            uuid: 'test-uuid-9',
+            name: 'test-name-9',
+            label: 'test text property',
+            type: AttributeType.Custom,
+            contentType: AttributeContentType.Text,
+            properties: {
+                label: 'test-property-text',
+                group: 'test-group',
+                visible: true,
+                required: true,
+                readOnly: false,
+                list: false,
+                multiSelect: false,
+            },
+            // content: [
+            //     {
+            //         data: 'test-text',
+            //     },
+            // ],
+        },
+        {
+            uuid: 'test-uuid-10',
+            name: 'test-name-10',
+            label: 'test date property',
+            type: AttributeType.Custom,
+            contentType: AttributeContentType.Time,
+            properties: {
+                label: 'test-property-time',
+                group: 'test-group',
+                visible: true,
+                required: true,
+                readOnly: false,
+                list: false,
+                multiSelect: false,
+            },
+            // content: [
+            //     {
+            //         data: '00:00:00',
+            //     },
+            // ],
+        },
+        {
+            uuid: 'test-uuid-11',
+            name: 'test-name-11',
+            label: 'test date property',
+            type: AttributeType.Custom,
+            contentType: AttributeContentType.File,
+            properties: {
+                label: 'test-property-file',
+                group: 'test-group',
+                visible: true,
+                required: true,
+                readOnly: false,
+                list: false,
                 multiSelect: false,
             },
         },
@@ -98,7 +251,6 @@ export const infoAttributeEditorProps: AttributeEditorProps = {
             type: 'info',
             uuid: 'test-uuid-1',
             properties: {
-                label: 'Test Label 1',
                 visible: true,
                 group: 'test-group-1',
             },
