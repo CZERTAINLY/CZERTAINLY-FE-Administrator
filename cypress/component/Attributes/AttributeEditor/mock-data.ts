@@ -248,25 +248,226 @@ export const infoAttributeEditorProps: AttributeEditorProps = {
             contentType: AttributeContentType.String,
             description: 'test-description-1',
             name: 'test-name-1',
-            type: 'info',
+            type: AttributeType.Info,
             uuid: 'test-uuid-1',
             properties: {
+                label: 'Test Label String 1',
                 visible: true,
                 group: 'test-group-1',
             },
         },
         {
             content: [{ data: 'test-data-2', reference: 'test-reference-2' }],
-            contentType: AttributeContentType.String,
+            contentType: AttributeContentType.Text,
             description: 'test-description-2',
             name: 'test-name-2',
-            type: 'info',
+            type: AttributeType.Info,
             uuid: 'test-uuid-2',
             properties: {
-                label: 'Test Label 2',
+                label: 'Test Label Text 2',
+                visible: true,
+                group: 'test-group-1',
+            },
+        },
+        {
+            content: [
+                {
+                    data: '2022-01-01',
+                },
+            ],
+            contentType: AttributeContentType.Date,
+            description: 'test-description-3',
+            name: 'test-name-3',
+            type: AttributeType.Info,
+            uuid: 'test-uuid-3',
+            properties: {
+                label: 'Test Label date 3',
                 visible: true,
                 group: 'test-group-2',
             },
+        },
+        {
+            contentType: AttributeContentType.Datetime,
+            description: 'test-description-4',
+            name: 'test-name-4',
+            type: AttributeType.Info,
+            uuid: 'test-uuid-3',
+            properties: {
+                label: 'Test Label datetime 4',
+                visible: true,
+                group: 'test-group-2',
+            },
+            content: [
+                {
+                    data: '2022-01-01T00:00:00',
+                },
+            ],
+        },
+        {
+            contentType: AttributeContentType.Time,
+            description: 'test-description-5',
+            name: 'test-name-5',
+            type: AttributeType.Info,
+            uuid: 'test-uuid-5',
+            properties: {
+                label: 'Test Label time 5',
+                visible: true,
+                group: 'test-group-2',
+            },
+            content: [
+                {
+                    data: '00:00:00',
+                },
+            ],
+        },
+        {
+            contentType: AttributeContentType.Integer,
+            description: 'test-description-6',
+            name: 'test-name-6',
+            type: AttributeType.Info,
+            uuid: 'test-uuid-6',
+            properties: {
+                label: 'Test Label integer 6',
+                visible: true,
+                group: 'test-group-3',
+            },
+            content: [
+                {
+                    data: 123,
+                },
+            ],
+        },
+        {
+            contentType: AttributeContentType.Float,
+            description: 'test-description-7',
+            name: 'test-name-7',
+            type: AttributeType.Info,
+            uuid: 'test-uuid-7',
+            properties: {
+                label: 'Test Label float 7',
+                visible: true,
+                group: 'test-group-3',
+            },
+            content: [
+                {
+                    data: '1.5',
+                },
+            ],
+        },
+        {
+            contentType: AttributeContentType.Codeblock,
+            description: 'test-description-8',
+            name: 'test-name-8',
+            type: AttributeType.Info,
+            uuid: 'test-uuid-8',
+            properties: {
+                label: 'test-property-codeblock',
+                group: 'test-group-4',
+                visible: true,
+                required: true,
+                readOnly: false,
+                list: false,
+                multiSelect: false,
+            },
+            content: [
+                {
+                    data: {
+                        code: 'PGgxPk9EUE9WRcSOPC9oMT4KPGRpdj5Qb8SNw610YW1lIGtvxL5rbyBjZXJ0aWZpa8OhdG92IHR1IGplLjwvZGl2PgoKPHVsPgogIDxsaT5TdWJqZWN0OiAke25vdGlmaWNhdGlvbkRhdGEuc3ViamVjdERufTwvbGk+CiAgPGxpPlNlcmlhbCBOdW1iZXI6ICR7bm90aWZpY2F0aW9uRGF0YS5zZXJpYWxOdW1iZXJ9PC9saT4KICA8bGk+SXNzdWVyOiAke25vdGlmaWNhdGlvbkRhdGEuaXNzdWVyRG59PC9saT4KPC91bD4=',
+                        language: 'html',
+                    },
+                },
+            ],
+        },
+        {
+            contentType: AttributeContentType.File,
+            description: 'test-description-9',
+            name: 'test-name-9',
+            type: AttributeType.Info,
+            uuid: 'test-uuid-9',
+            properties: {
+                label: 'test-property-file',
+                group: 'test-group-4',
+                visible: true,
+                required: true,
+                readOnly: false,
+                list: false,
+                multiSelect: false,
+            },
+            content: [{ data: 'test-file', reference: 'test.txt' }],
+        },
+        {
+            uuid: 'test-uuid-10',
+            name: 'test-name-10',
+            description: 'test-description-drop-down-4',
+            type: AttributeType.Info,
+            contentType: AttributeContentType.Credential,
+            properties: {
+                group: 'test-group-5',
+                label: 'Test property Credential',
+                visible: true,
+                required: true,
+                readOnly: false,
+                list: true,
+                multiSelect: true,
+            },
+            content: [
+                {
+                    data: 'test-default-content-1',
+                    reference: 'test-reference-content-1',
+                },
+                {
+                    data: 'test-default-content-2',
+                    reference: 'test-reference-content-2',
+                },
+            ],
+        },
+        {
+            uuid: 'test-uuid-11',
+            name: 'test-name-11',
+            description: 'test-description-secret',
+            contentType: AttributeContentType.Secret,
+            type: AttributeType.Info,
+            properties: {
+                group: 'test-group-5',
+                label: 'Test property secret',
+                visible: true,
+                required: true,
+                readOnly: false,
+                list: false,
+                multiSelect: false,
+            },
+            content: [
+                {
+                    data: {
+                        name: 'password-test',
+                        display_name: 'test-reference-secret',
+                    },
+                    reference: 'test-reference-secret',
+                },
+            ],
+        },
+        {
+            uuid: 'test-uuid-12',
+            name: 'test-name-12',
+            label: 'Test object',
+            type: AttributeType.Info,
+            contentType: AttributeContentType.Object,
+            properties: {
+                group: 'test-group-5',
+                label: 'Test property Object',
+            },
+            content: [
+                {
+                    reference: 'Web Server',
+                    data: {
+                        name: 'WebServer',
+                        display_name: 'Web Server',
+                        schema_version: '1',
+                        version: '4.1',
+                        oid: '1.3.6.1.4.1.311.21.8.16335329.656368.4341948.8708353.10624234.204.1.16',
+                    },
+                },
+            ],
         },
     ] as InfoAttributeModel[],
 };
