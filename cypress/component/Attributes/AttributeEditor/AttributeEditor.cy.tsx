@@ -1,30 +1,38 @@
 import AttributeEditor from 'components/Attributes/AttributeEditor';
-import { actions as authorityActions, selectors as authoritySelectors } from 'ducks/authorities';
+import { actions as authoritiesActions, actions as authorityActions, selectors as authoritySelectors } from 'ducks/authorities';
 import { actions as connectorActions } from 'ducks/connectors';
+import { actions as customAttributesActions } from 'ducks/customAttributes';
 import { actions as raProfileActions, selectors as raProfilesSelectors } from 'ducks/ra-profiles';
-import { transformAttributeDescriptorDtoToModel } from 'ducks/transform/attributes';
+import { transformAttributeDescriptorDtoToModel, transformCustomAttributeDtoToModel } from 'ducks/transform/attributes';
 import { transformAuthorityResponseDtoToModel } from 'ducks/transform/authorities';
 import { transformConnectorResponseDtoToModel } from 'ducks/transform/connectors';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Form } from 'react-final-form';
 import { useSelector } from 'react-redux';
 import { AttributeDescriptorModel } from 'types/attributes';
 import { ConnectorResponseModel } from 'types/connectors';
 import { FunctionGroupCode, Resource } from 'types/openapi';
-import { RaProfileResponseModel } from 'types/ra-profiles';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 import '../../../../src/resources/styles/theme.scss';
 import {
+    authoritiesSuccess,
     authorityDetailSuccessObject,
     connectorsSuccessObject,
     customAttributeEditorProps,
     dataAttributeDescriptors,
     dataCallback,
     groupAttributeDescriptors,
+    groupAttributesSuccessCustomData,
     groupCallbackData,
     infoAttributeEditorProps,
     raProfileDetailSuccessObject,
 } from './mock-data';
+
+interface FormValues {
+    name: string;
+    description: string;
+    authority: { value: any; label: string } | undefined;
+}
 
 describe('AttributeEditor component 1 (Custom Attribute)', () => {
     it('should render Custom attribute editor', () => {
@@ -187,8 +195,8 @@ const DataAttributeEditorComponent = () => {
 
 describe('AttributeEditor component 3 (DataAttribute)', () => {
     it('should render data attribute editor', () => {
-        cy.mount(<DataAttributeEditorComponent />)
-            .wait(3000)
+        cy.mount(<DataAttributeEditorComponent />);
+        cy.wait(100)
             .window()
             .its('store')
             .invoke(
@@ -197,7 +205,7 @@ describe('AttributeEditor component 3 (DataAttribute)', () => {
                     authority: transformAuthorityResponseDtoToModel(authorityDetailSuccessObject),
                 }),
             )
-            .wait(3000)
+            .wait(100)
             .window()
             .its('store')
             .invoke(
@@ -206,7 +214,7 @@ describe('AttributeEditor component 3 (DataAttribute)', () => {
                     attributeDescriptor: dataAttributeDescriptors.map(transformAttributeDescriptorDtoToModel),
                 }),
             )
-            .wait(3000)
+            .wait(100)
             .window()
             .its('store')
             .invoke(
@@ -215,13 +223,37 @@ describe('AttributeEditor component 3 (DataAttribute)', () => {
                     connectors: connectorsSuccessObject.map(transformConnectorResponseDtoToModel),
                 }),
             )
-            .wait(3000)
+            .wait(100)
             .window()
             .its('store')
             .invoke(
                 'dispatch',
                 connectorActions.callbackSuccess({ callbackId: '__attributes__authority__.credential', data: dataCallback }),
             );
+
+        cy.get('label').eq(0).should('contain.text', 'MS-ADCS Address');
+        cy.get('input').eq(0).should('have.attr', 'type', 'text');
+        cy.get('input').eq(0).should('have.value', 'data.cveradar.com');
+        cy.get('small').eq(0).should('contain.text', 'Address of ADCS server.');
+
+        cy.get('label').eq(1).should('contain.text', 'HTTPS Enabled');
+        cy.get('input').eq(1).should('have.attr', 'type', 'checkbox');
+        cy.get('input').eq(1).should('not.be.checked');
+        cy.get('small').eq(1).should('contain.text', 'Use https for connection with ADCS server');
+
+        cy.get('label').eq(2).should('contain.text', 'Port');
+        cy.get('input').eq(2).should('have.attr', 'type', 'number');
+        cy.get('input').eq(2).should('have.value', '80');
+        cy.get('small').eq(2).should('contain.text', 'Define WinRM port, default port for http is 5985 and for https 5986');
+
+        cy.get('label').eq(3).should('contain.text', 'Credential');
+        cy.get('input').eq(3).should('have.attr', 'type', 'text');
+        cy.get('small').eq(3).should('contain.text', 'Credential for the communication');
+        cy.get('div')
+            .filter((index, element) => {
+                return Array.from(element.classList).some((className) => className.includes('singleValue'));
+            })
+            .should('contain.text', 'adcs-lab02-login');
     });
 });
 
@@ -229,8 +261,29 @@ const GroupAttributeEditorComponent = () => {
     const raProfileSelector = useSelector(raProfilesSelectors.raProfile);
     const raProfileAttributeDescriptors = useSelector(authoritySelectors.raProfileAttributeDescriptors);
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
-    const [raProfile, setRaProfile] = useState<RaProfileResponseModel>();
+    const editMode = true;
+    const authorities = useSelector(authoritySelectors.authorities);
 
+    const optionsForAuthorities = useMemo(
+        () =>
+            authorities.map((authority) => ({
+                value: authority.uuid,
+                label: authority.name,
+            })),
+        [authorities],
+    );
+    const defaultValues: FormValues = useMemo(
+        () => ({
+            name: editMode ? raProfileSelector?.name || '' : '',
+            description: editMode ? raProfileSelector?.description || '' : '',
+            authority: editMode
+                ? raProfileSelector
+                    ? optionsForAuthorities.find((option) => option.value === raProfileSelector.authorityInstanceUuid)
+                    : undefined
+                : undefined,
+        }),
+        [editMode, optionsForAuthorities, raProfileSelector], // Dependencies array
+    );
     if (!raProfileAttributeDescriptors) {
         return <></>;
     }
@@ -240,16 +293,17 @@ const GroupAttributeEditorComponent = () => {
             onSubmit={() => {
                 console.log('submit');
             }}
-            mutators={{ ...mutators() }}
+            initialValues={defaultValues}
+            mutators={{ ...mutators<FormValues>() }}
         >
-            {({ handleSubmit }) => (
+            {({ handleSubmit, form }) => (
                 <form onSubmit={handleSubmit}>
                     <AttributeEditor
                         id="ra-profile"
-                        callbackParentUuid={raProfile?.authorityInstanceUuid}
+                        callbackParentUuid={raProfileSelector?.authorityInstanceUuid || form.getFieldState('authority')?.value?.value}
                         callbackResource={Resource.RaProfiles}
                         attributeDescriptors={raProfileAttributeDescriptors}
-                        attributes={raProfile?.attributes}
+                        attributes={raProfileSelector?.attributes}
                         groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
                         setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
                     />
@@ -264,8 +318,24 @@ describe('AttributeEditor component 4 (GroupAttribute)', () => {
         cy.mount(<GroupAttributeEditorComponent />);
         cy.window()
             .its('store')
+            .invoke(
+                'dispatch',
+                authoritiesActions.listAuthoritiesSuccess({ authorityList: authoritiesSuccess.map(transformAuthorityResponseDtoToModel) }),
+            )
+            .wait(100)
+            .window()
+            .its('store')
             .invoke('dispatch', raProfileActions.getRaProfileDetailSuccess({ raProfile: raProfileDetailSuccessObject }))
-            .wait(3000)
+            .wait(100)
+            .window()
+            .its('store')
+            .invoke(
+                'dispatch',
+                customAttributesActions.listResourceCustomAttributesSuccess(
+                    groupAttributesSuccessCustomData.map(transformCustomAttributeDtoToModel),
+                ),
+            )
+            .wait(100)
             .window()
             .its('store')
             .invoke(
@@ -275,7 +345,7 @@ describe('AttributeEditor component 4 (GroupAttribute)', () => {
                     attributesDescriptors: groupAttributeDescriptors.map(transformAttributeDescriptorDtoToModel),
                 }),
             )
-            .wait(3000)
+            .wait(100)
             .window()
             .its('store')
             .invoke(
@@ -285,5 +355,22 @@ describe('AttributeEditor component 4 (GroupAttribute)', () => {
                     data: groupCallbackData,
                 }),
             );
+
+        cy.get('label').eq(0).should('contain.text', 'Select CA Method');
+        cy.get('small').eq(0).should('contain.text', 'Select how the CA will be chosen, either by ComputerName or search');
+
+        cy.get('label').eq(1).should('contain.text', 'Certificate Template Name');
+        cy.get('small').eq(1).should('contain.text', 'Select certificate templates to use');
+
+        cy.get('label').eq(2).should('contain.text', 'CA Name');
+        cy.get('small').eq(2).should('contain.text', 'Identification of the certification authority');
+
+        cy.get('div')
+            .filter((index, element) => {
+                return Array.from(element.classList).some((className) => className.includes('singleValue'));
+            })
+            .should('contain.text', 'Search for all available CAs')
+            .should('contain.text', 'Web Server')
+            .should('contain.text', 'Demo MS Sub CA');
     });
 });

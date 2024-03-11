@@ -1,5 +1,5 @@
 import { Props as AttributeEditorProps } from 'components/Attributes/AttributeEditor';
-import { CustomAttributeModel, InfoAttributeModel } from 'types/attributes';
+import { CustomAttributeDto, CustomAttributeModel, InfoAttributeModel } from 'types/attributes';
 import {
     AttributeContentType,
     AttributeType,
@@ -2077,3 +2077,129 @@ export const groupCallbackData = [
         ],
     },
 ];
+
+export const authoritiesSuccess = [
+    {
+        uuid: 'e244af09-f043-4db9-8f73-3201d3ab87b9',
+        name: 'ms-adcs-lab02-authority',
+        attributes: [],
+        status: 'connected',
+        connectorUuid: '5dcd1aa6-91b7-4d12-9495-c38d43993326',
+        connectorName: 'MS-ADCS-Connector',
+        kind: 'ADCS',
+    },
+    {
+        uuid: '4b893a50-c5a8-4e5c-b3ec-ea8eddf540b6',
+        name: 'ejbca',
+        attributes: [],
+        status: 'connected',
+        connectorUuid: '4de45721-e88b-4bc8-b5b5-cedff5c72472',
+        connectorName: 'EJBCA-NG-Connector',
+        kind: 'EJBCA',
+    },
+    {
+        uuid: 'af545449-0a01-41d9-9f96-6ffc3811386f',
+        name: 'ejbca.3key.company',
+        attributes: [],
+        status: 'connected',
+        connectorUuid: '4de45721-e88b-4bc8-b5b5-cedff5c72472',
+        connectorName: 'EJBCA-NG-Connector',
+        kind: 'EJBCA',
+    },
+    {
+        uuid: 'f698283a-a9b9-4fb6-a0db-780321b75b55',
+        name: 'EJBCA-Legacy-Authority',
+        attributes: [],
+        status: 'connected',
+        connectorUuid: 'a6f47841-08d7-4948-ad1d-802d34ec9d2c',
+        connectorName: 'Legacy-EJBCA-Connector',
+        kind: 'LegacyEjbca',
+    },
+    {
+        uuid: '59c908cd-15ed-4ca0-a183-6237fd65d1f1',
+        name: 'ADCS-through-proxy',
+        attributes: [],
+        status: 'connected',
+        connectorUuid: '5dcd1aa6-91b7-4d12-9495-c38d43993326',
+        connectorName: 'MS-ADCS-Connector',
+        kind: 'ADCS',
+    },
+    {
+        uuid: '1075fb80-9eb9-444d-bb93-0b7fc7a1ffe9',
+        name: '00',
+        attributes: [],
+        status: 'connected',
+        connectorUuid: '5dcd1aa6-91b7-4d12-9495-c38d43993326',
+        connectorName: 'MS-ADCS-Connector',
+        kind: 'ADCS',
+    },
+    {
+        uuid: '15d8337a-0e1c-4d92-9857-179493129c66',
+        name: 'TstPQC',
+        attributes: [],
+        status: 'connected',
+        connectorUuid: '4de45721-e88b-4bc8-b5b5-cedff5c72472',
+        connectorName: 'EJBCA-NG-Connector',
+        kind: 'EJBCA',
+    },
+    {
+        uuid: 'ff79f77b-afa1-4c91-8679-5cc9eca9141c',
+        name: 'ConzertPQCAuthority',
+        attributes: [],
+        status: 'connected',
+        connectorUuid: '4de45721-e88b-4bc8-b5b5-cedff5c72472',
+        connectorName: 'EJBCA-NG-Connector',
+        kind: 'EJBCA',
+    },
+    {
+        uuid: 'ecab8ed4-4e0f-445d-ad86-2da544c8f4a9',
+        name: 'lab02-ADCS-sefira-test',
+        attributes: [],
+        status: 'connected',
+        connectorUuid: '5dcd1aa6-91b7-4d12-9495-c38d43993326',
+        connectorName: 'MS-ADCS-Connector',
+        kind: 'ADCS',
+    },
+    {
+        uuid: '4a87e1a2-c9bf-4f32-a4a9-2f0612f15be7',
+        name: 'pyADCS-lab02-Authority',
+        attributes: [],
+        status: 'connected',
+        connectorUuid: '0647b608-00b3-4d3b-a83b-24e3b6718c42',
+        connectorName: 'PyADCS-Connector',
+        kind: 'PyADCS-WinRM',
+    },
+    {
+        uuid: 'bac21fad-a383-454e-9a80-4b8f5c84c28e',
+        name: 'TstPYADCS',
+        attributes: [],
+        status: 'connected',
+        connectorUuid: '0647b608-00b3-4d3b-a83b-24e3b6718c42',
+        connectorName: 'PyADCS-Connector',
+        kind: 'PyADCS-WinRM',
+    },
+] as AuthorityInstanceDto[];
+
+export const groupAttributesSuccessCustomData = [
+    {
+        uuid: 'c189d9fd-6671-4b84-8e9e-f9c91d81982f',
+        name: 'Test',
+        description: '',
+        content: [
+            {
+                data: 'Default content',
+            },
+        ],
+        type: 'custom',
+        contentType: 'string',
+        properties: {
+            label: 'Test',
+            visible: true,
+            group: '',
+            required: false,
+            readOnly: false,
+            list: false,
+            multiSelect: false,
+        },
+    },
+] as CustomAttributeDto[];
