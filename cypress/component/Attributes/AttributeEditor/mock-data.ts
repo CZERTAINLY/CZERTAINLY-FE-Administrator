@@ -1,6 +1,14 @@
 import { Props as AttributeEditorProps } from 'components/Attributes/AttributeEditor';
 import { CustomAttributeModel, InfoAttributeModel } from 'types/attributes';
-import { AttributeContentType, AttributeType, AuthorityInstanceDto, ConnectorDto, DataAttribute, GroupAttribute } from 'types/openapi';
+import {
+    AttributeContentType,
+    AttributeType,
+    AuthorityInstanceDto,
+    ConnectorDto,
+    DataAttribute,
+    GroupAttribute,
+    ProgrammingLanguageEnum,
+} from 'types/openapi';
 import { RaProfileResponseModel } from 'types/ra-profiles';
 
 export const customAttributeEditorProps: AttributeEditorProps = {
@@ -49,7 +57,7 @@ export const customAttributeEditorProps: AttributeEditorProps = {
                 label: 'Test property boolean',
                 visible: true,
                 required: true,
-                readOnly: false,
+                readOnly: true,
                 list: false,
                 multiSelect: false,
             },
@@ -107,14 +115,15 @@ export const customAttributeEditorProps: AttributeEditorProps = {
                 label: 'Test property codeblock',
                 group: 'test-group',
             },
-            // content: [
-            //     {
-            //         data: {
-            //             code: 'PGgxPk9EUE9WRcSOPC9oMT4KPGRpdj5Qb8SNw610YW1lIGtvxL5rbyBjZXJ0aWZpa8OhdG92IHR1IGplLjwvZGl2PgoKPHVsPgogIDxsaT5TdWJqZWN0OiAke25vdGlmaWNhdGlvbkRhdGEuc3ViamVjdERufTwvbGk+CiAgPGxpPlNlcmlhbCBOdW1iZXI6ICR7bm90aWZpY2F0aW9uRGF0YS5zZXJpYWxOdW1iZXJ9PC9saT4KICA8bGk+SXNzdWVyOiAke25vdGlmaWNhdGlvbkRhdGEuaXNzdWVyRG59PC9saT4KPC91bD4=',
-            //             language: 'html',
-            //         },
-            //     },
-            // ],
+            content: [
+                {
+                    data: {
+                        // code: 'PGgxPk9EUE9WRcSOPC9oMT4KPGRpdj5Qb8SNw610YW1lIGtvxL5rbyBjZXJ0aWZpa8OhdG92IHR1IGplLjwvZGl2PgoKPHVsPgogIDxsaT5TdWJqZWN0OiAke25vdGlmaWNhdGlvbkRhdGEuc3ViamVjdERufTwvbGk+CiAgPGxpPlNlcmlhbCBOdW1iZXI6ICR7bm90aWZpY2F0aW9uRGF0YS5zZXJpYWxOdW1iZXJ9PC9saT4KICA8bGk+SXNzdWVyOiAke25vdGlmaWNhdGlvbkRhdGEuaXNzdWVyRG59PC9saT4KPC91bD4=',
+                        code: '',
+                        language: ProgrammingLanguageEnum.Html,
+                    },
+                },
+            ],
         },
         {
             uuid: 'test-uuid-6',
@@ -236,6 +245,30 @@ export const customAttributeEditorProps: AttributeEditorProps = {
                 list: false,
                 multiSelect: false,
             },
+        },
+        {
+            uuid: 'test-uuid-12',
+            name: 'test-name-12',
+            label: 'test object property',
+            type: AttributeType.Custom,
+            contentType: AttributeContentType.Object,
+            properties: {
+                label: 'test-property-object',
+                group: 'test-group',
+                visible: false,
+                required: true,
+                readOnly: false,
+                list: false,
+                multiSelect: false,
+            },
+            // content: [
+            //     {
+            //         data: {
+            //             name: 'WebServer',
+            //             display_name: 'Web Server',
+            //             schema_version: '1',
+            //             version: '4.1',
+            //             oid: '
         },
     ] as CustomAttributeModel[],
 };

@@ -45,14 +45,12 @@ describe('AttributeEditor component 1 (Custom Attribute)', () => {
                 )}
             </Form>,
         );
-        // cy.get('label').should('have.length', 10);
-        // // check label text
         cy.get('label').eq(0).should('contain.text', 'Test property string');
         cy.get('input').eq(0).should('have.attr', 'type', 'text');
         cy.get('input').eq(0).should('have.attr', 'placeholder', 'Enter Test property string');
 
         cy.get('label').eq(1).should('contain.text', 'Test property boolean');
-        cy.get('input').eq(1).should('have.attr', 'type', 'checkbox');
+        cy.get('input').eq(1).should('have.attr', 'type', 'checkbox').should('have.attr', 'disabled');
         cy.get('input').eq(1).should('have.attr', 'placeholder', 'Enter Test property boolean');
 
         cy.get('label').eq(2).should('contain.text', 'Test property integer');
@@ -64,7 +62,7 @@ describe('AttributeEditor component 1 (Custom Attribute)', () => {
 
         cy.get('label').eq(4).should('contain.text', 'Test property codeblock');
         cy.get('label').eq(5).should('contain.text', '(javascript)');
-        // Test property codeblock (javascript)
+        cy.get('textarea').eq(0).should('have.attr', 'class', 'npm__react-simple-code-editor__textarea');
 
         cy.get('label').eq(6).should('contain.text', 'test float property');
         cy.get('input').eq(5).should('have.attr', 'type', 'number').should('have.attr', 'placeholder', 'Enter test float property');
@@ -84,6 +82,10 @@ describe('AttributeEditor component 1 (Custom Attribute)', () => {
         cy.get('label').eq(11).should('contain.text', 'test-property-file');
         cy.get('label').eq(12).should('contain.text', 'File content');
         cy.get('.text-muted').eq(0).should('contain.text', 'Select or Drag & Drop file to Drop Zone.');
+
+        cy.get('input').eq(13).should('have.attr', 'type', 'hidden');
+
+        cy.get('h5').eq(0).should('contain.text', 'test-group');
     });
 });
 
@@ -106,21 +108,36 @@ describe('AttributeEditor component 2 (Info Attribute)', () => {
                 )}
             </Form>,
         );
+        cy.get('h5').eq(0).should('contain.text', 'test-group-1');
+        cy.get('h5').eq(1).should('contain.text', 'test-group-2');
+        cy.get('h5').eq(2).should('contain.text', 'test-group-3');
+        cy.get('h5').eq(3).should('contain.text', 'test-group-4');
+        cy.get('h5').eq(4).should('contain.text', 'test-group-5');
 
-        // cy.get('h5').should('have.length', 2);
-        // // check h5 text content
-        // cy.get('h5').eq(0).should('contain.text', 'test-group-1');
-        // cy.get('h5').eq(1).should('contain.text', 'test-group-2');
+        cy.get('.card-header').eq(0).should('contain.text', 'Test Label String 1');
+        cy.get('.card-header').eq(1).should('contain.text', 'Test Label Text 2');
+        cy.get('.card-header').eq(2).should('contain.text', 'Test Label date 3');
+        cy.get('.card-header').eq(3).should('contain.text', 'Test Label datetime 4');
+        cy.get('.card-header').eq(4).should('contain.text', 'Test Label time 5');
+        cy.get('.card-header').eq(5).should('contain.text', 'Test Label integer 6');
+        cy.get('.card-header').eq(6).should('contain.text', 'Test Label float 7');
 
-        // cy.get('div').should('have.class', 'card-header');
-        // // check card-header text content
-        // cy.get('div.card-header').should('contain.text', 'Test Label 1');
-        // cy.get('div.card-header').should('contain.text', 'Test Label 1');
+        cy.get('.card-header').eq(8).should('contain.text', 'test-property-file');
+        cy.get('.card-header').eq(9).should('contain.text', 'Test property Credential');
+        cy.get('.card-header').eq(10).should('contain.text', 'Test property secret');
+        cy.get('.card-header').eq(11).should('contain.text', 'Test property Object');
 
-        // cy.get('div').should('have.class', 'card-body');
-        // // check card-body text content
-        // cy.get('div.card-body').should('contain.text', 'test-data-2');
-        // cy.get('div.card-body').should('contain.text', 'test-data-2');
+        cy.get('p').eq(0).should('contain.text', 'test-data-1');
+        cy.get('p').eq(1).should('contain.text', 'test-data-2');
+        cy.get('p').eq(2).should('contain.text', '2022-01-01');
+        cy.get('p').eq(3).should('contain.text', '2022-01-01');
+        cy.get('p').eq(4).should('contain.text', '00:00:00');
+        cy.get('p').eq(5).should('contain.text', '123');
+        cy.get('p').eq(6).should('contain.text', '1.5');
+        cy.get('p').eq(7).should('contain.text', '[object Object]');
+        cy.get('p').eq(8).should('contain.text', 'test.txt');
+        cy.get('p').eq(9).should('contain.text', 'test-reference-content-1, test-reference-content-2');
+        cy.get('p').eq(10).should('contain.text', 'Web Server');
     });
 });
 
