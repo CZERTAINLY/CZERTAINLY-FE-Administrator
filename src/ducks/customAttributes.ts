@@ -68,6 +68,14 @@ export const slice = createSlice({
     name: 'customAttributes',
     initialState,
     reducers: {
+        resetState: (state, action: PayloadAction<void>) => {
+            Object.keys(state).forEach((key) => {
+                if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined;
+            });
+
+            Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));
+        },
+
         setCheckedRows: (state, action: PayloadAction<{ checkedRows: string[] }>) => {
             state.checkedRows = action.payload.checkedRows;
         },

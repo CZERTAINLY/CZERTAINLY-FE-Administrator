@@ -1,7 +1,7 @@
 import AttributeEditor from 'components/Attributes/AttributeEditor';
 import { actions as authoritiesActions, actions as authorityActions, selectors as authoritySelectors } from 'ducks/authorities';
 import { actions as connectorActions } from 'ducks/connectors';
-import { actions as customAttributesActions } from 'ducks/customAttributes';
+import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { actions as raProfileActions, selectors as raProfilesSelectors } from 'ducks/ra-profiles';
 import { transformAttributeDescriptorDtoToModel, transformCustomAttributeDtoToModel } from 'ducks/transform/attributes';
 import { transformAuthorityResponseDtoToModel } from 'ducks/transform/authorities';
@@ -15,8 +15,10 @@ import { FunctionGroupCode, Resource } from 'types/openapi';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 import '../../../../src/resources/styles/theme.scss';
 import {
+    attributeDescriptorConstraintCheck,
     authoritiesSuccess,
     authorityDetailSuccessObject,
+    authorityProvidersList,
     connectorsSuccessObject,
     customAttributeEditorProps,
     dataAttributeDescriptors,
@@ -28,7 +30,7 @@ import {
     raProfileDetailSuccessObject,
 } from './mock-data';
 
-interface FormValues {
+interface GroupAttributeTestFormValues {
     name: string;
     description: string;
     authority: { value: any; label: string } | undefined;
@@ -272,7 +274,7 @@ const GroupAttributeEditorComponent = () => {
             })),
         [authorities],
     );
-    const defaultValues: FormValues = useMemo(
+    const defaultValues: GroupAttributeTestFormValues = useMemo(
         () => ({
             name: editMode ? raProfileSelector?.name || '' : '',
             description: editMode ? raProfileSelector?.description || '' : '',
@@ -294,7 +296,7 @@ const GroupAttributeEditorComponent = () => {
                 console.log('submit');
             }}
             initialValues={defaultValues}
-            mutators={{ ...mutators<FormValues>() }}
+            mutators={{ ...mutators<GroupAttributeTestFormValues>() }}
         >
             {({ handleSubmit, form }) => (
                 <form onSubmit={handleSubmit}>
@@ -372,5 +374,115 @@ describe('AttributeEditor component 4 (GroupAttribute)', () => {
             .should('contain.text', 'Search for all available CAs')
             .should('contain.text', 'Web Server')
             .should('contain.text', 'Demo MS Sub CA');
+
+        cy.window()
+            .its('store')
+            .invoke('dispatch', connectorActions.resetState())
+            .wait(100)
+            .window()
+            .its('store')
+            .invoke('dispatch', authorityActions.resetState())
+            .wait(100)
+            .window()
+            .its('store')
+            .invoke('dispatch', customAttributesActions.resetState())
+            .wait(100)
+            .window()
+            .its('store')
+            .invoke('dispatch', raProfileActions.resetState())
+            .wait(100)
+            .window()
+            .its('store')
+            .invoke('dispatch', authoritiesActions.resetState());
+    });
+});
+
+interface ConstraintCheckAttributeTestFormValues {
+    name: string | undefined;
+    authorityProvider: { value: string; label: string } | undefined;
+    storeKind: { value: string; label: string } | undefined;
+}
+
+const ConstraintCheckAttributeEditorComponent = () => {
+    const authorityProviderAttributeDescriptors = useSelector(authoritySelectors.authorityProviderAttributeDescriptors) || [];
+    const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
+    const authoritySelector = useSelector(authoritySelectors.authority);
+    const [authorityProvider, setAuthorityProvider] = useState<ConnectorResponseModel>();
+    const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
+    const editMode = true;
+
+    const defaultValues: ConstraintCheckAttributeTestFormValues = useMemo(
+        () => ({
+            name: editMode ? authoritySelector?.name || undefined : undefined,
+            authorityProvider: editMode
+                ? authoritySelector
+                    ? { value: authoritySelector.connectorUuid, label: authoritySelector.connectorName }
+                    : undefined
+                : undefined,
+            storeKind: editMode
+                ? authoritySelector
+                    ? { value: authoritySelector?.kind, label: authoritySelector?.kind }
+                    : undefined
+                : undefined,
+        }),
+        [editMode, authoritySelector],
+    );
+
+    console.log('authorityProviderAttributeDescriptors', authorityProviderAttributeDescriptors);
+
+    return (
+        <Form
+            onSubmit={() => {
+                console.log('submit');
+            }}
+            initialValues={defaultValues}
+            mutators={{ ...mutators<ConstraintCheckAttributeTestFormValues>() }}
+        >
+            {({ handleSubmit, form, values }) => (
+                <form onSubmit={handleSubmit}>
+                    <AttributeEditor
+                        id="authority"
+                        attributeDescriptors={authorityProviderAttributeDescriptors}
+                        attributes={authoritySelector?.attributes}
+                        connectorUuid={authorityProvider?.uuid || ''}
+                        functionGroupCode={FunctionGroupCode.AuthorityProvider}
+                        kind={undefined}
+                        groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                        setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                    />
+                </form>
+            )}
+        </Form>
+    );
+};
+
+describe('AttributeEditor component 5 (ConstraintCheckAttribute Component)', () => {
+    it('should render constraint check attribute editor', () => {
+        cy.mount(<ConstraintCheckAttributeEditorComponent />);
+        cy.window()
+            .its('store')
+            .invoke(
+                'dispatch',
+                authoritiesActions.listAuthorityProvidersSuccess({
+                    connectors: authorityProvidersList.map(transformConnectorResponseDtoToModel),
+                }),
+            )
+            .wait(100)
+            .window()
+            .its('store')
+            .invoke('dispatch', customAttributesActions.listResourceCustomAttributesSuccess([]))
+            .wait(100)
+            .window()
+            .its('store')
+            .invoke(
+                'dispatch',
+                authorityActions.getAuthorityProviderAttributesDescriptorsSuccess({
+                    attributeDescriptor: attributeDescriptorConstraintCheck.map(transformAttributeDescriptorDtoToModel),
+                }),
+            );
+
+        cy.get('input[name="__attributes__authority__.authority_server_address"]').should('exist').type('test.');
+        cy.get('body').click(100, 100);
+        cy.get('.invalid-feedback').should('exist').should('contain.text', 'Enter Valid Address');
     });
 });
