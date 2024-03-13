@@ -19,6 +19,7 @@ import {
     authoritiesSuccess,
     authorityDetailSuccessObject,
     authorityProvidersList,
+    callbackConstraintCheck,
     connectorsSuccessObject,
     customAttributeEditorProps,
     dataAttributeDescriptors,
@@ -480,6 +481,23 @@ describe('AttributeEditor component 5 (ConstraintCheckAttribute Component)', () 
                     attributeDescriptor: attributeDescriptorConstraintCheck.map(transformAttributeDescriptorDtoToModel),
                 }),
             );
+
+        cy.get('#react-select-7-input').should('exist').click();
+        cy.get('#react-select-7-option-0').should('exist').should('contain.text', 'Basic').click();
+
+        cy.window()
+            .its('store')
+            .invoke(
+                'dispatch',
+                connectorActions.callbackSuccess({
+                    callbackId: '__attributes__authority__.authority_credential',
+                    data: callbackConstraintCheck,
+                }),
+            )
+            .wait(100);
+
+        cy.get('#react-select-8-input').should('exist').click();
+        cy.get('#react-select-8-option-0').should('exist').should('contain.text', 'lab01-testssh').click();
 
         cy.get('input[name="__attributes__authority__.authority_server_address"]').should('exist').type('test.');
         cy.get('body').click(100, 100);

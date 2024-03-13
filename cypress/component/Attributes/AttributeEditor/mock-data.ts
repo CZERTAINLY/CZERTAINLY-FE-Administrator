@@ -3060,3 +3060,76 @@ export const attributeDescriptorConstraintCheck = [
         },
     },
 ] as AttributeDescriptorDto[];
+
+export const callbackConstraintCheck = [
+    {
+        reference: 'lab01-testssh',
+        data: {
+            uuid: '91c105e3-29d4-46e5-88c3-2ba7fb1fbd40',
+            name: 'lab01-testssh',
+        },
+    },
+    {
+        reference: 'statecredmodal112',
+        data: {
+            uuid: '42ea93c3-8725-4d26-a87e-e0ea92f3c29c',
+            name: 'statecredmodal112',
+        },
+    },
+    {
+        reference: 'adcs-lab02-login',
+        data: {
+            uuid: '34e58936-c041-4aa6-8ae7-ab2157da290b',
+            name: 'adcs-lab02-login',
+        },
+    },
+    {
+        reference: 'adcs-sefira-test',
+        data: {
+            uuid: 'c3aa7609-e5ba-492e-b64b-2d3e6bad3b0d',
+            name: 'adcs-sefira-test',
+        },
+    },
+    {
+        reference: 'optncallback',
+        data: {
+            uuid: '871c2d8f-0831-44cb-a0e5-bc34fc3452c3',
+            name: 'optncallback',
+        },
+    },
+    {
+        reference: 'newoptna',
+        data: {
+            uuid: '75993605-a81d-4d53-b278-f471c9658cc6',
+            name: 'newoptna',
+        },
+    },
+    {
+        reference: 'initiateAttributeCallbackstateredux',
+        data: {
+            uuid: '2b761650-f5bb-4894-9ba4-54b1498b9bb6',
+            name: 'initiateAttributeCallbackstateredux',
+        },
+    },
+    {
+        reference: 'initiateAttributeCallbackstateredux12',
+        data: {
+            uuid: '005a0fe6-b891-41e7-bcfb-1a759389adc0',
+            name: 'initiateAttributeCallbackstateredux12',
+        },
+    },
+    {
+        reference: 'lab03-testssh',
+        data: {
+            uuid: 'cfc0953d-e57c-4038-8e5a-c2f636a68071',
+            name: 'lab03-testssh',
+        },
+    },
+    {
+        reference: 'tempnewtest',
+        data: {
+            uuid: '4a509d31-3725-442c-9c5e-d0a4bb6c4138',
+            name: 'tempnewtest',
+        },
+    },
+];
