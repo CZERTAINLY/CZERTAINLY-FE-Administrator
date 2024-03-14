@@ -1,13 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { createSelector } from 'reselect';
 import { AjaxError } from 'rxjs/ajax';
-import { GloablModalModel, LockWidgetNameEnum, WidgetLockErrorModel, WidgetLockModel } from 'types/user-interface';
+import { GlobalModalModel, LockWidgetNameEnum, WidgetLockErrorModel, WidgetLockModel } from 'types/user-interface';
 import { createFeatureSelector } from 'utils/ducks';
 import { getLockWidgetObject } from 'utils/net';
 
 export type State = {
     widgetLocks: WidgetLockModel[];
-    globalModal: GloablModalModel;
+    globalModal: GlobalModalModel;
     initiateAttributeCallback?: boolean;
     attributeCallbackValue?: string;
     initiateFormCallback?: boolean;
@@ -57,7 +57,7 @@ export const slice = createSlice({
             state.widgetLocks = state.widgetLocks.filter((widgetLock) => widgetLock.widgetName !== action.payload);
         },
 
-        showGlobalModal: (state, action: PayloadAction<GloablModalModel>) => {
+        showGlobalModal: (state, action: PayloadAction<GlobalModalModel>) => {
             state.globalModal = action.payload;
         },
 

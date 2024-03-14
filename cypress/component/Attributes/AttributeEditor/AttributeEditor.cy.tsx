@@ -1,56 +1,54 @@
 import AttributeEditor from 'components/Attributes/AttributeEditor';
-import { actions as authoritiesActions, actions as authorityActions, selectors as authoritySelectors } from 'ducks/authorities';
+import GlobalModal from 'components/GlobalModal';
+import TabLayout from 'components/Layout/TabLayout';
+import { actions as authoritiesActions, selectors as authoritySelectors } from 'ducks/authorities';
+import { actions as certificateGroupActions } from 'ducks/certificateGroups';
+import { selectors as certificateSelectors } from 'ducks/certificates';
 import { actions as connectorActions } from 'ducks/connectors';
+import { actions as credentialActions } from 'ducks/credentials';
+import { actions as cryptographicKeyActions, selectors as cryptographicKeysSelectors } from 'ducks/cryptographic-keys';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
+import { actions as entityActions, selectors as entitySelectors } from 'ducks/entities';
 import { actions as raProfileActions, selectors as raProfilesSelectors } from 'ducks/ra-profiles';
+import { actions as tokenProfileActions } from 'ducks/token-profiles';
 import { transformAttributeDescriptorDtoToModel, transformCustomAttributeDtoToModel } from 'ducks/transform/attributes';
 import { transformAuthorityResponseDtoToModel } from 'ducks/transform/authorities';
+import { transformCertificateGroupResponseDtoToModel } from 'ducks/transform/certificateGroups';
 import { transformConnectorResponseDtoToModel } from 'ducks/transform/connectors';
+import { transformTokenProfileResponseDtoToModel } from 'ducks/transform/token-profiles';
+import { actions as userInterfaceActions } from 'ducks/user-interface';
 import { useEffect, useMemo, useState } from 'react';
 import { Form } from 'react-final-form';
 import { useSelector } from 'react-redux';
 import { AttributeDescriptorModel } from 'types/attributes';
 import { ConnectorResponseModel } from 'types/connectors';
+import { EntityResponseModel } from 'types/entities';
 import { FunctionGroupCode, Resource } from 'types/openapi';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 import '../../../../src/resources/styles/theme.scss';
 import {
-    attributeDescriptorConstraintCheck,
-    authoritiesSuccess,
-    authorityDetailSuccessObject,
-    authorityProvidersList,
-    callbackConstraintCheck,
-    connectorsSuccessObject,
-    customAttributeEditorProps,
-    dataAttributeDescriptors,
-    dataCallback,
-    groupAttributeDescriptors,
-    groupAttributesSuccessCustomData,
-    groupCallbackData,
-    infoAttributeEditorProps,
-    raProfileDetailSuccessObject,
+    ConstraintCheckAttributeTestFormValues,
+    GlobalModalAttributeEditorFormValues,
+    GroupAttributeTestFormValues,
+    TabAttributeFormValues,
+    constraintCheckAttributeEditorMockData,
+    customAttributeEditorMockData,
+    dataAttributeMockData,
+    globalModalAttributeEditorMockData,
+    groupAttributeAtributeEditorMockData,
+    infoAttributeEditorMockData,
+    tabAttributeEditorMockData,
 } from './mock-data';
-
-interface GroupAttributeTestFormValues {
-    name: string;
-    description: string;
-    authority: { value: any; label: string } | undefined;
-}
 
 describe('AttributeEditor component 1 (Custom Attribute)', () => {
     it('should render Custom attribute editor', () => {
         cy.mount(
-            <Form
-                onSubmit={() => {
-                    console.log('submit');
-                }}
-                mutators={{ ...mutators() }}
-            >
+            <Form onSubmit={() => {}} mutators={{ ...mutators() }}>
                 {({ handleSubmit }) => (
                     <form onSubmit={handleSubmit}>
                         <AttributeEditor
-                            id={customAttributeEditorProps.id}
-                            attributeDescriptors={customAttributeEditorProps.attributeDescriptors}
+                            id={customAttributeEditorMockData.id}
+                            attributeDescriptors={customAttributeEditorMockData.attributeDescriptors}
                         />
                     </form>
                 )}
@@ -103,17 +101,12 @@ describe('AttributeEditor component 1 (Custom Attribute)', () => {
 describe('AttributeEditor component 2 (Info Attribute)', () => {
     it('should render info attribute editor', () => {
         cy.mount(
-            <Form
-                onSubmit={() => {
-                    console.log('submit');
-                }}
-                mutators={{ ...mutators() }}
-            >
+            <Form onSubmit={() => {}} mutators={{ ...mutators() }}>
                 {({ handleSubmit }) => (
                     <form onSubmit={handleSubmit}>
                         <AttributeEditor
-                            id={infoAttributeEditorProps.id}
-                            attributeDescriptors={infoAttributeEditorProps.attributeDescriptors}
+                            id={infoAttributeEditorMockData.id}
+                            attributeDescriptors={infoAttributeEditorMockData.attributeDescriptors}
                         />
                     </form>
                 )}
@@ -171,12 +164,7 @@ const DataAttributeEditorComponent = () => {
     if (!authorityProvider?.uuid || !authoritySelector?.attributes?.length) return <></>;
     return (
         <>
-            <Form
-                onSubmit={() => {
-                    console.log('submit');
-                }}
-                mutators={{ ...mutators() }}
-            >
+            <Form onSubmit={() => {}} mutators={{ ...mutators() }}>
                 {({ handleSubmit }) => (
                     <form onSubmit={handleSubmit}>
                         <AttributeEditor
@@ -204,8 +192,8 @@ describe('AttributeEditor component 3 (DataAttribute)', () => {
             .its('store')
             .invoke(
                 'dispatch',
-                authorityActions.getAuthorityDetailSuccess({
-                    authority: transformAuthorityResponseDtoToModel(authorityDetailSuccessObject),
+                authoritiesActions.getAuthorityDetailSuccess({
+                    authority: transformAuthorityResponseDtoToModel(dataAttributeMockData.authorityResponseDtoObject),
                 }),
             )
             .wait(100)
@@ -213,8 +201,8 @@ describe('AttributeEditor component 3 (DataAttribute)', () => {
             .its('store')
             .invoke(
                 'dispatch',
-                authorityActions.getAuthorityProviderAttributesDescriptorsSuccess({
-                    attributeDescriptor: dataAttributeDescriptors.map(transformAttributeDescriptorDtoToModel),
+                authoritiesActions.getAuthorityProviderAttributesDescriptorsSuccess({
+                    attributeDescriptor: dataAttributeMockData.dataAttributeArray.map(transformAttributeDescriptorDtoToModel),
                 }),
             )
             .wait(100)
@@ -222,8 +210,8 @@ describe('AttributeEditor component 3 (DataAttribute)', () => {
             .its('store')
             .invoke(
                 'dispatch',
-                authorityActions.listAuthorityProvidersSuccess({
-                    connectors: connectorsSuccessObject.map(transformConnectorResponseDtoToModel),
+                authoritiesActions.listAuthorityProvidersSuccess({
+                    connectors: dataAttributeMockData.connectorDtotArray.map(transformConnectorResponseDtoToModel),
                 }),
             )
             .wait(100)
@@ -231,7 +219,10 @@ describe('AttributeEditor component 3 (DataAttribute)', () => {
             .its('store')
             .invoke(
                 'dispatch',
-                connectorActions.callbackSuccess({ callbackId: '__attributes__authority__.credential', data: dataCallback }),
+                connectorActions.callbackSuccess({
+                    callbackId: '__attributes__authority__.credential',
+                    data: dataAttributeMockData.callbackSuccessObjectArray,
+                }),
             );
 
         cy.get('label').eq(0).should('contain.text', 'MS-ADCS Address');
@@ -257,6 +248,23 @@ describe('AttributeEditor component 3 (DataAttribute)', () => {
                 return Array.from(element.classList).some((className) => className.includes('singleValue'));
             })
             .should('contain.text', 'adcs-lab02-login');
+
+        cy.wait(100)
+            .window()
+            .its('store')
+            .invoke('dispatch', authoritiesActions.resetState())
+            .wait(100)
+            .window()
+            .its('store')
+            .invoke('dispatch', authoritiesActions.resetState())
+            .wait(100)
+            .window()
+            .its('store')
+            .invoke('dispatch', authoritiesActions.resetState())
+            .wait(100)
+            .window()
+            .its('store')
+            .invoke('dispatch', connectorActions.resetState());
     });
 });
 
@@ -292,13 +300,7 @@ const GroupAttributeEditorComponent = () => {
     }
 
     return (
-        <Form
-            onSubmit={() => {
-                console.log('submit');
-            }}
-            initialValues={defaultValues}
-            mutators={{ ...mutators<GroupAttributeTestFormValues>() }}
-        >
+        <Form onSubmit={() => {}} initialValues={defaultValues} mutators={{ ...mutators<GroupAttributeTestFormValues>() }}>
             {({ handleSubmit, form }) => (
                 <form onSubmit={handleSubmit}>
                     <AttributeEditor
@@ -323,19 +325,24 @@ describe('AttributeEditor component 4 (GroupAttribute)', () => {
             .its('store')
             .invoke(
                 'dispatch',
-                authoritiesActions.listAuthoritiesSuccess({ authorityList: authoritiesSuccess.map(transformAuthorityResponseDtoToModel) }),
+                authoritiesActions.listAuthoritiesSuccess({
+                    authorityList: groupAttributeAtributeEditorMockData.authorityInstanceDtoArray.map(transformAuthorityResponseDtoToModel),
+                }),
             )
             .wait(100)
             .window()
             .its('store')
-            .invoke('dispatch', raProfileActions.getRaProfileDetailSuccess({ raProfile: raProfileDetailSuccessObject }))
+            .invoke(
+                'dispatch',
+                raProfileActions.getRaProfileDetailSuccess({ raProfile: groupAttributeAtributeEditorMockData.raProfileResponseModel }),
+            )
             .wait(100)
             .window()
             .its('store')
             .invoke(
                 'dispatch',
                 customAttributesActions.listResourceCustomAttributesSuccess(
-                    groupAttributesSuccessCustomData.map(transformCustomAttributeDtoToModel),
+                    groupAttributeAtributeEditorMockData.customAttributeDtoArray.map(transformCustomAttributeDtoToModel),
                 ),
             )
             .wait(100)
@@ -343,9 +350,11 @@ describe('AttributeEditor component 4 (GroupAttribute)', () => {
             .its('store')
             .invoke(
                 'dispatch',
-                authorityActions.getRAProfilesAttributesDescriptorsSuccess({
-                    authorityUuid: raProfileDetailSuccessObject.authorityInstanceUuid,
-                    attributesDescriptors: groupAttributeDescriptors.map(transformAttributeDescriptorDtoToModel),
+                authoritiesActions.getRAProfilesAttributesDescriptorsSuccess({
+                    authorityUuid: groupAttributeAtributeEditorMockData.raProfileResponseModel.authorityInstanceUuid,
+                    attributesDescriptors: groupAttributeAtributeEditorMockData.groupAttributeArray.map(
+                        transformAttributeDescriptorDtoToModel,
+                    ),
                 }),
             )
             .wait(100)
@@ -355,7 +364,7 @@ describe('AttributeEditor component 4 (GroupAttribute)', () => {
                 'dispatch',
                 connectorActions.callbackSuccess({
                     callbackId: '__attributes__ra-profile__.raprofile_ca_select_group',
-                    data: groupCallbackData,
+                    data: groupAttributeAtributeEditorMockData.callbackSuccessObjectArray,
                 }),
             );
 
@@ -382,7 +391,7 @@ describe('AttributeEditor component 4 (GroupAttribute)', () => {
             .wait(100)
             .window()
             .its('store')
-            .invoke('dispatch', authorityActions.resetState())
+            .invoke('dispatch', authoritiesActions.resetState())
             .wait(100)
             .window()
             .its('store')
@@ -397,12 +406,6 @@ describe('AttributeEditor component 4 (GroupAttribute)', () => {
             .invoke('dispatch', authoritiesActions.resetState());
     });
 });
-
-interface ConstraintCheckAttributeTestFormValues {
-    name: string | undefined;
-    authorityProvider: { value: string; label: string } | undefined;
-    storeKind: { value: string; label: string } | undefined;
-}
 
 const ConstraintCheckAttributeEditorComponent = () => {
     const authorityProviderAttributeDescriptors = useSelector(authoritySelectors.authorityProviderAttributeDescriptors) || [];
@@ -429,16 +432,8 @@ const ConstraintCheckAttributeEditorComponent = () => {
         [editMode, authoritySelector],
     );
 
-    console.log('authorityProviderAttributeDescriptors', authorityProviderAttributeDescriptors);
-
     return (
-        <Form
-            onSubmit={() => {
-                console.log('submit');
-            }}
-            initialValues={defaultValues}
-            mutators={{ ...mutators<ConstraintCheckAttributeTestFormValues>() }}
-        >
+        <Form onSubmit={() => {}} initialValues={defaultValues} mutators={{ ...mutators<ConstraintCheckAttributeTestFormValues>() }}>
             {({ handleSubmit, form, values }) => (
                 <form onSubmit={handleSubmit}>
                     <AttributeEditor
@@ -457,7 +452,7 @@ const ConstraintCheckAttributeEditorComponent = () => {
     );
 };
 
-describe('AttributeEditor component 5 (ConstraintCheckAttribute Component)', () => {
+describe('AttributeEditor component 5 (ConstraintCheckAttributeEditor Component)', () => {
     it('should render constraint check attribute editor', () => {
         cy.mount(<ConstraintCheckAttributeEditorComponent />);
         cy.window()
@@ -465,7 +460,7 @@ describe('AttributeEditor component 5 (ConstraintCheckAttribute Component)', () 
             .invoke(
                 'dispatch',
                 authoritiesActions.listAuthorityProvidersSuccess({
-                    connectors: authorityProvidersList.map(transformConnectorResponseDtoToModel),
+                    connectors: constraintCheckAttributeEditorMockData.connectorResponseDtoArray.map(transformConnectorResponseDtoToModel),
                 }),
             )
             .wait(100)
@@ -477,8 +472,10 @@ describe('AttributeEditor component 5 (ConstraintCheckAttribute Component)', () 
             .its('store')
             .invoke(
                 'dispatch',
-                authorityActions.getAuthorityProviderAttributesDescriptorsSuccess({
-                    attributeDescriptor: attributeDescriptorConstraintCheck.map(transformAttributeDescriptorDtoToModel),
+                authoritiesActions.getAuthorityProviderAttributesDescriptorsSuccess({
+                    attributeDescriptor: constraintCheckAttributeEditorMockData.attributeDescriptorDtoArray.map(
+                        transformAttributeDescriptorDtoToModel,
+                    ),
                 }),
             );
 
@@ -491,7 +488,7 @@ describe('AttributeEditor component 5 (ConstraintCheckAttribute Component)', () 
                 'dispatch',
                 connectorActions.callbackSuccess({
                     callbackId: '__attributes__authority__.authority_credential',
-                    data: callbackConstraintCheck,
+                    data: constraintCheckAttributeEditorMockData.callbackSuccessObjectArray,
                 }),
             )
             .wait(100);
@@ -502,5 +499,310 @@ describe('AttributeEditor component 5 (ConstraintCheckAttribute Component)', () 
         cy.get('input[name="__attributes__authority__.authority_server_address"]').should('exist').type('test.');
         cy.get('body').click(100, 100);
         cy.get('.invalid-feedback').should('exist').should('contain.text', 'Enter Valid Address');
+
+        cy.window().its('store').invoke('dispatch', authoritiesActions.resetState());
+        cy.window().its('store').invoke('dispatch', connectorActions.resetState());
+        cy.window().its('store').invoke('dispatch', customAttributesActions.resetState());
+    });
+});
+
+const TabAttributeEditor = () => {
+    const issuanceAttributeDescriptors = useSelector(certificateSelectors.issuanceAttributes);
+    const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
+    const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
+    const cryptographicKeyAttributeDescriptors = useSelector(cryptographicKeysSelectors.keyAttributeDescriptors);
+    const keyDetail = useSelector(cryptographicKeysSelectors.cryptographicKey);
+
+    const defaultValues: TabAttributeFormValues = useMemo(
+        () => ({
+            raProfile: null,
+            pkcs10: null,
+            fileName: '',
+            contentType: '',
+            file: '',
+        }),
+        [],
+    );
+
+    return (
+        <Form initialValues={defaultValues} onSubmit={() => {}} mutators={{ ...mutators<TabAttributeFormValues>() }}>
+            {({ handleSubmit, valid, submitting, values, form }) => (
+                <form onSubmit={handleSubmit}>
+                    <TabLayout
+                        tabs={[
+                            {
+                                title: 'Connector Attributes',
+                                content: (
+                                    <AttributeEditor
+                                        id="cryptographicKey"
+                                        callbackParentUuid={
+                                            keyDetail?.tokenProfileUuid || form.getFieldState('tokenProfile')?.value?.value.uuid || ''
+                                        }
+                                        callbackResource={Resource.Keys}
+                                        attributeDescriptors={cryptographicKeyAttributeDescriptors || []}
+                                        groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                                        setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                                    />
+                                ),
+                            },
+                            {
+                                title: 'Custom Attributes',
+                                content: (
+                                    <AttributeEditor
+                                        id="customCryptographicKey"
+                                        attributeDescriptors={resourceCustomAttributes}
+                                        attributes={keyDetail?.customAttributes}
+                                    />
+                                ),
+                            },
+                        ]}
+                    />
+                </form>
+            )}
+        </Form>
+    );
+};
+
+describe('AttributeEditor component 6 (TabAttributeEditor Component)', () => {
+    it('should render tab attribute editor', () => {
+        cy.mount(<TabAttributeEditor />);
+
+        cy.window()
+            .its('store')
+            .invoke(
+                'dispatch',
+                tokenProfileActions.listTokenProfilesSuccess({
+                    tokenProfiles: tabAttributeEditorMockData.tokenProfileDtoArray.map(transformTokenProfileResponseDtoToModel),
+                }),
+            )
+            .wait(100)
+            .window()
+            .its('store')
+            .invoke(
+                'dispatch',
+                certificateGroupActions.listGroupsSuccess({
+                    groups: tabAttributeEditorMockData.certificateGroupSelectArray.map(transformCertificateGroupResponseDtoToModel),
+                }),
+            )
+            .wait(100)
+            .window()
+            .its('store')
+            .invoke(
+                'dispatch',
+                customAttributesActions.listResourceCustomAttributesSuccess(
+                    tabAttributeEditorMockData.customAttributeDtoArray.map(transformCustomAttributeDtoToModel),
+                ),
+            )
+            .wait(100)
+            .window()
+            .its('store')
+            .invoke(
+                'dispatch',
+                cryptographicKeyActions.listAttributeDescriptorsSuccess({
+                    uuid: '6c78130f-8aa3-4862-9a93-61329347f1bd',
+                    attributeDescriptors: tabAttributeEditorMockData.baseAttributeDtoArray.map(transformAttributeDescriptorDtoToModel),
+                }),
+            );
+
+        cy.get('input').eq(0).should('have.attr', 'type', 'text');
+        cy.get('input').eq(0).should('have.attr', 'placeholder', 'Enter Cryptographic Key Alias').type('test-key');
+
+        cy.get('.nav-link').eq(1).should('contain.text', 'Custom Attributes').click();
+
+        cy.get('#react-select-10-input').should('exist').click();
+        cy.get('#react-select-10-option-0').should('exist').click();
+
+        cy.get('.nav-link').eq(0).should('contain.text', 'Connector Attributes').click();
+
+        cy.get('#react-select-11-input').should('exist').click();
+        cy.get('#react-select-11-option-0').should('exist').click();
+
+        cy.wait(100)
+            .window()
+            .its('store')
+            .invoke(
+                'dispatch',
+                connectorActions.callbackSuccess({
+                    callbackId: '__attributes__cryptographicKey__.group_keySpec',
+                    data: tabAttributeEditorMockData.callbackSuccessObjectArray,
+                }),
+            );
+
+        cy.get('#react-select-12-input').should('exist').click();
+        cy.get('#react-select-12-option-0').should('exist').click();
+
+        cy.window().its('store').invoke('dispatch', cryptographicKeyActions.resetState());
+        cy.window().its('store').invoke('dispatch', certificateGroupActions.resetState());
+        cy.window().its('store').invoke('dispatch', tokenProfileActions.resetState());
+        cy.window().its('store').invoke('dispatch', customAttributesActions.resetState());
+    });
+});
+
+const GlobalModalAttributeEditor = () => {
+    const editMode = false;
+    const entitySelector = useSelector(entitySelectors.entity);
+    const [entity, setEntity] = useState<EntityResponseModel>();
+    const [entityProvider, setEntityProvider] = useState<ConnectorResponseModel>();
+    const entityProviderAttributeDescriptors = useSelector(entitySelectors.entityProviderAttributeDescriptors);
+    const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
+    const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
+    const defaultValues: GlobalModalAttributeEditorFormValues = useMemo(
+        () => ({
+            name: editMode ? entity?.name || undefined : undefined,
+            entityProvider: editMode ? (entity ? { value: entity.connectorUuid, label: entity.connectorName } : undefined) : undefined,
+            storeKind: editMode ? (entity ? { value: entity?.kind, label: entity?.kind } : undefined) : undefined,
+        }),
+        [editMode, entity],
+    );
+
+    return (
+        <>
+            <Form initialValues={defaultValues} onSubmit={() => {}} mutators={{ ...mutators<GlobalModalAttributeEditorFormValues>() }}>
+                {({ handleSubmit, pristine, submitting, values, valid, form }) => (
+                    <TabLayout
+                        tabs={[
+                            {
+                                title: 'Connector Attributes',
+                                content: (
+                                    <AttributeEditor
+                                        id="entity"
+                                        attributeDescriptors={entityProviderAttributeDescriptors || []}
+                                        attributes={entity?.attributes}
+                                        connectorUuid={entityProvider?.uuid || ''}
+                                        functionGroupCode={FunctionGroupCode.EntityProvider}
+                                        kind={values?.storeKind?.value}
+                                        groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                                        setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                                    />
+                                ),
+                            },
+                            {
+                                title: 'Custom Attributes',
+                                content: (
+                                    <AttributeEditor
+                                        id="customEntity"
+                                        attributeDescriptors={resourceCustomAttributes}
+                                        attributes={entity?.customAttributes}
+                                    />
+                                ),
+                            },
+                        ]}
+                    />
+                )}
+            </Form>
+            <GlobalModal />
+        </>
+    );
+};
+
+describe('AttributeEditor component 7 (GlobalModalAttributeEditor Component)', () => {
+    it('should render tab attribute editor', () => {
+        cy.mount(<GlobalModalAttributeEditor />);
+        cy.window()
+            .its('store')
+            .invoke(
+                'dispatch',
+                entityActions.listEntityProvidersSuccess({
+                    providers: globalModalAttributeEditorMockData.connectorDtoArrayOne.map(transformConnectorResponseDtoToModel),
+                }),
+            )
+            .wait(100)
+            .window()
+            .its('store')
+            .invoke('dispatch', customAttributesActions.listResourceCustomAttributesSuccess([]))
+            .wait(100)
+            .window()
+            .its('store')
+            .invoke(
+                'dispatch',
+                entityActions.getEntityProviderAttributesDescriptorsSuccess({
+                    attributeDescriptor: globalModalAttributeEditorMockData.baseAttributeDtoArrayOne.map(
+                        transformAttributeDescriptorDtoToModel,
+                    ),
+                }),
+            );
+
+        cy.get('input[name="__attributes__entity__.host"]').should('exist').type('test');
+        cy.get('#react-select-13-input').should('exist').click();
+        cy.get('#react-select-13-option-0').should('exist').click();
+        cy.window()
+            .its('store')
+            .invoke(
+                'dispatch',
+                connectorActions.callbackSuccess({
+                    callbackId: '__attributes__entity__.credential',
+                    data: globalModalAttributeEditorMockData.callbackSuccessObjectArrayOne,
+                }),
+            );
+        cy.get('#react-select-14-input').should('exist').click();
+        cy.get('.fa-add').should('exist').click();
+
+        cy.wait(100)
+            .window()
+            .its('store')
+            .invoke('dispatch', userInterfaceActions.showGlobalModal({ ...globalModalAttributeEditorMockData.globalModalModelObject }))
+            .wait(100)
+            .window()
+            .its('store')
+            .invoke('dispatch', customAttributesActions.listCustomAttributesSuccess([]))
+            .wait(100)
+            .window()
+            .its('store')
+            .invoke(
+                'dispatch',
+                credentialActions.listCredentialProvidersSuccess({
+                    connectors: globalModalAttributeEditorMockData.connectorDtoArrayTwo.map(transformConnectorResponseDtoToModel),
+                }),
+            )
+            .wait(100)
+            .window()
+            .its('store')
+            .invoke('dispatch', customAttributesActions.listResourceCustomAttributesSuccess([]))
+            .wait(100);
+
+        cy.get('input[name="name"]').should('exist').type('test-credential');
+        cy.get('#react-select-15-input').should('exist').click();
+        cy.get('#react-select-15-option-0').should('exist').click();
+
+        cy.get('#react-select-16-input').should('exist').click();
+        cy.get('#react-select-16-option-1').should('exist').click();
+
+        cy.wait(100)
+            .window()
+            .its('store')
+            .invoke(
+                'dispatch',
+                credentialActions.getCredentialProviderAttributesDescriptorsSuccess({
+                    credentialProviderAttributesDescriptors: globalModalAttributeEditorMockData.baseAttributeDtoArrayTwo.map(
+                        transformAttributeDescriptorDtoToModel,
+                    ),
+                }),
+            )
+            .wait(100)
+            .window()
+            .its('store')
+            .invoke('dispatch', credentialActions.createCredentialSuccess({ uuid: '2b2c6e64-9081-4750-a062-c84be728202d' }))
+            .wait(100)
+            .window()
+            .its('store')
+            .invoke('dispatch', userInterfaceActions.hideGlobalModal())
+            .wait(100)
+            .window()
+            .its('store')
+            .invoke('dispatch', userInterfaceActions.setInitiateAttributeCallback(true))
+            .wait(100)
+            .window()
+            .its('store')
+            .invoke('dispatch', userInterfaceActions.setAttributeCallbackValue('testabc123'))
+            .wait(100)
+            .window()
+            .its('store')
+            .invoke(
+                'dispatch',
+                connectorActions.callbackSuccess({
+                    callbackId: '__attributes__entity__.credential',
+                    data: globalModalAttributeEditorMockData.callbackSuccessObjectArrayTwo,
+                }),
+            );
     });
 });
