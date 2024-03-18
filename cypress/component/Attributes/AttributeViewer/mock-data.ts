@@ -31,6 +31,22 @@ export const attributeViewerProps: AttributeViewerProps = {
                 },
             ],
         },
+
+        {
+            contentType: AttributeContentType.Codeblock,
+            label: 'Test Label 3',
+            name: 'test-name-3',
+            type: AttributeType.Data,
+            uuid: 'test-uuid-3',
+            content: [
+                {
+                    data: {
+                        code: 'PGgxPk9EUE9WRcSOPC9oMT4KPGRpdj5Qb8SNw610YW1lIGtvxL5rbyBjZXJ0aWZpa8OhdG92IHR1IGplLjwvZGl2PgoKPHVsPgogIDxsaT5TdWJqZWN0OiAke25vdGlmaWNhdGlvbkRhdGEuc3ViamVjdERufTwvbGk+CiAgPGxpPlNlcmlhbCBOdW1iZXI6ICR7bm90aWZpY2F0aW9uRGF0YS5zZXJpYWxOdW1iZXJ9PC9saT4KICA8bGk+SXNzdWVyOiAke25vdGlmaWNhdGlvbkRhdGEuaXNzdWVyRG59PC9saT4KPC91bD4=',
+                        language: 'html',
+                    },
+                },
+            ],
+        },
     ] as AttributeResponseModel[],
     metadata: [
         {

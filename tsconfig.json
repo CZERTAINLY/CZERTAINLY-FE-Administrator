@@ -18,5 +18,5 @@
         "jsx": "react-jsx"
     },
     "include": ["src", "cypress", "cypress.d.ts"],
-    "files": ["src/types/global.d.ts"]
+    "files": ["src/types/global.d.ts", "./cypress/component/Attributes/CustomAttributeWidget/newFile.tsx"]
 }
