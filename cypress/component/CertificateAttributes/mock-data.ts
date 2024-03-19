@@ -1,8 +1,7 @@
-import CertificateAttributes from 'components/CertificateAttributes';
-import Widget from 'components/Widget';
 import { CertificateDetailResponseModel } from 'types/certificate';
 import { CertificateState, CertificateType, CertificateValidationStatus, ComplianceStatus } from 'types/openapi';
-import '../../src/resources/styles/theme.scss';
+import '../../../src/resources/styles/theme.scss';
+
 const cert: CertificateDetailResponseModel = {
     uuid: '9681f2d6-ba06-4d71-81f0-8d8d63d7b494',
     commonName: 'demo.3key.test',
@@ -77,18 +76,4 @@ const cert: CertificateDetailResponseModel = {
     relatedCertificates: [],
 };
 
-const TestCertificateAttributes = () => {
-    return (
-        <Widget title="Certificate Attributes">
-            <CertificateAttributes certificate={cert} />
-        </Widget>
-    );
-};
-
-describe('CertificateAttributes component', () => {
-    it('should render certificate attributes', () => {
-        cy.mount(<TestCertificateAttributes />);
-        cy.get('h5').should('have.text', 'Certificate Attributes');
-        cy.wait(500);
-    });
-});
+export default cert;

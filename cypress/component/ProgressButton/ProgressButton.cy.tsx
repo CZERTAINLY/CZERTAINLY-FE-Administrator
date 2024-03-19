@@ -1,6 +1,6 @@
 import ProgressButton from 'components/ProgressButton/index';
 import { useState } from 'react';
-import '../../src/resources/styles/theme.scss';
+import '../../../src/resources/styles/theme.scss';
 
 const TestProgressButton = () => {
     const [inProgress, setInProgress] = useState(false);

@@ -1,6 +1,6 @@
 import Header from 'components/Layout/Header';
 import { useCallback, useState } from 'react';
-import '../../src/resources/styles/theme.scss';
+import '../../../src/resources/styles/theme.scss';
 
 const TestHeader = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);

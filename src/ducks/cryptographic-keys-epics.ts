@@ -258,7 +258,6 @@ const enableCryptographicKey: AppEpic = (action$, state$, deps) => {
                     ),
 
                     catchError((err) => {
-                        console.log(err.response);
                         return of(
                             slice.actions.enableCryptographicKeyFailure({
                                 requestUuids: action.payload.keyItemUuid,

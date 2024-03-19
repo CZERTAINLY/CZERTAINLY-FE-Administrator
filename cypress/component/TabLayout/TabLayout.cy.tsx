@@ -1,6 +1,6 @@
 import TabLayout from 'components/Layout/TabLayout';
 import Widget from 'components/Widget';
-import '../../src/resources/styles/theme.scss';
+import '../../../src/resources/styles/theme.scss';
 
 const TestTabLayout = () => {
     return (

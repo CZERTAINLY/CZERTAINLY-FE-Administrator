@@ -240,7 +240,7 @@ export default function RaProfileForm() {
                                 {
                                     title: 'Connector Attributes',
                                     content: !raProfileAttributeDescriptors ? (
-                                        <></>
+                                        <>Group Attr</>
                                     ) : (
                                         <AttributeEditor
                                             id="ra-profile"

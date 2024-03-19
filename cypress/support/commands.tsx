@@ -17,7 +17,10 @@ Cypress.Commands.add('mount', (component, options = {}) => {
             }),
         // preloadedState: initialState,
     });
-
+    // expose store when run in Cypress
+    if (window.Cypress) {
+        window.store = reduxStore;
+    }
     // const reduxStore = configure();
     const wrapped = (
         <React.Fragment>

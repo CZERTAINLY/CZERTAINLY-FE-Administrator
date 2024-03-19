@@ -98,7 +98,7 @@ export interface WidgetLockErrorModel {
     lockType: LockTypeEnum;
 }
 
-export interface GloablModalModel {
+export interface GlobalModalModel {
     title?: string;
     size?: 'sm' | 'lg';
     content: string | JSX.Element | undefined;

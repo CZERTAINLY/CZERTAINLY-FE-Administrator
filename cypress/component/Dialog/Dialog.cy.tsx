@@ -1,6 +1,6 @@
 import Dialog from 'components/Dialog/index';
 import { useState } from 'react';
-import '../../src/resources/styles/theme.scss';
+import '../../../src/resources/styles/theme.scss';
 
 const TestDialog = () => {
     const [isOpen, setIsOpen] = useState(false);
