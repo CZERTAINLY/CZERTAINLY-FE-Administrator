@@ -169,8 +169,6 @@ export const groupAttributeDescriptorProps: AttributeDescriptorViewerProps = {
             description: 'For identification of select CA method',
             type: AttributeType.Group,
             attributeCallback: {
-                // callbackContext: '/v1/callbacks/raProfile/caSelect/{ca_select_method}/{authority_instance_uuid}',
-                // callbackMethod: 'GET',
                 mappings: [
                     {
                         from: 'raprofile_authority_uuid.data',
