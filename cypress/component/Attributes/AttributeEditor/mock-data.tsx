@@ -462,7 +462,7 @@ export const infoAttributeEditorMockData: AttributeEditorProps = {
                         display_name: 'Web Server',
                         schema_version: '1',
                         version: '4.1',
-                        oid: '1.3.6.1.4.1.311.21.8.16335329.656368.4341948.8708353.10624234.204.1.16',
+                        oid: '1.16',
                     },
                 },
             ],

@@ -118,29 +118,6 @@ export const customAttributeDescriptorProps: AttributeDescriptorViewerProps = {
 
 export const dataAttributeDescriptorProps: AttributeDescriptorViewerProps = {
     attributeDescriptors: [
-        // {
-        //     uuid: '93ca0ba2-3863-4ffa-a469-fd14ab3992bf',
-        //     name: 'address',
-        //     description: 'Address of ADCS server.',
-        //     type: AttributeType.Data,
-        //     contentType: 'string',
-        //     properties: {
-        //         label: 'MS-ADCS Address',
-        //         visible: true,
-        //         required: true,
-        //         readOnly: false,
-        //         list: false,
-        //         multiSelect: false,
-        //     },
-        //     constraints: [
-        //         {
-        //             description: 'Address of ADCS Server',
-        //             errorMessage: 'Enter Valid Address',
-        //             type: 'regExp',
-        //             data: '^((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])|(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]))$',
-        //         },
-        //     ],
-        // },
         {
             uuid: 'd9f79ba6-47e5-437b-a7bc-82dbafa9cf01',
             name: 'https',
@@ -181,80 +158,19 @@ export const dataAttributeDescriptorProps: AttributeDescriptorViewerProps = {
                 multiSelect: false,
             },
         },
-        // {
-        //     uuid: 'd9f79ba6-47e5-437b-a7bc-82dbafa9cf03',
-        //     name: 'credential',
-        //     description: 'Credential for the communication',
-        //     type: AttributeType.Data,
-        //     contentType: AttributeContentType.Credential,
-        //     properties: {
-        //         label: 'Credential',
-        //         visible: true,
-        //         required: true,
-        //         readOnly: false,
-        //         list: true,
-        //         multiSelect: false,
-        //     },
-        // },
     ] as DataAttributeModel[],
 };
 
 export const groupAttributeDescriptorProps: AttributeDescriptorViewerProps = {
     attributeDescriptors: [
-        // {
-        //     uuid: '9b5b38a2-9bcc-4178-8d02-7817cc3f3ada',
-        //     name: 'raprofile_select_ca_method',
-        //     description: 'Select how the CA will be chosen, either by ComputerName or search',
-        //     content: [
-        //         {
-        //             reference: 'Search for all available CAs',
-        //             data: 'search',
-        //         },
-        //         {
-        //             reference: 'Use the ConfigString to select existing CA',
-        //             data: 'configstring',
-        //         },
-        //     ],
-        //     type: AttributeType.Group,
-        //     contentType: 'string',
-        //     properties: {
-        //         label: 'Select CA Method',
-        //         visible: true,
-        //         required: true,
-        //         readOnly: false,
-        //         list: true,
-        //         multiSelect: false,
-        //     },
-        // },
-        // {
-        //     uuid: '8c4c213a-9bd4-4d49-9812-a539a2deac16',
-        //     name: 'raprofile_authority_uuid',
-        //     description: 'UUID of selected authority',
-        //     content: [
-        //         {
-        //             reference: 'b0d18653-14b1-41de-a1b3-8286f07f1c7d',
-        //             data: 'b0d18653-14b1-41de-a1b3-8286f07f1c7d',
-        //         },
-        //     ],
-        //     type: AttributeType.Group,
-        //     contentType: 'string',
-        //     properties: {
-        //         label: 'Authority UUID',
-        //         visible: false,
-        //         required: true,
-        //         readOnly: false,
-        //         list: false,
-        //         multiSelect: false,
-        //     },
-        // },
         {
             uuid: '0f26f6a0-94ca-420b-bbd8-4324218d7692',
             name: 'raprofile_ca_select_group',
             description: 'For identification of select CA method',
             type: AttributeType.Group,
             attributeCallback: {
-                callbackContext: '/v1/callbacks/raProfile/caSelect/{ca_select_method}/{authority_instance_uuid}',
-                callbackMethod: 'GET',
+                // callbackContext: '/v1/callbacks/raProfile/caSelect/{ca_select_method}/{authority_instance_uuid}',
+                // callbackMethod: 'GET',
                 mappings: [
                     {
                         from: 'raprofile_authority_uuid.data',

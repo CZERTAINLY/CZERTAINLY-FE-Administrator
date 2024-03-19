@@ -207,7 +207,7 @@ export const certificateDetailSuccess = {
     commonName: '*.google.com',
     serialNumber: '123',
     issuerCommonName: 'GTS CA 1C3',
-    issuerDn: 'CN=GTS CA 1C3, O=Google Trust Services LLC, C=US',
+    issuerDn: 'CN',
     subjectDn: 'CN=*.google.com',
     notBefore: '2024-02-19T08:03:54.000+00:00',
     notAfter: '2024-05-13T08:03:53.000+00:00',
