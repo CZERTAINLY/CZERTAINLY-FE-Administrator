@@ -26,6 +26,7 @@ import { EntityResponseModel } from 'types/entities';
 import { FunctionGroupCode, Resource } from 'types/openapi';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 import '../../../../src/resources/styles/theme.scss';
+import { callbackWait, clickWait, componentLoadWait, reduxActionWait } from '../../../utils/constants';
 import {
     ConstraintCheckAttributeTestFormValues,
     GlobalModalAttributeEditorFormValues,
@@ -53,7 +54,7 @@ describe('Custom AttributeEditor component', () => {
                     </form>
                 )}
             </Form>,
-        );
+        ).wait(componentLoadWait);
     });
 
     it(`🟢 Label should be "Test property string"
@@ -167,7 +168,7 @@ describe('Info Attribute AttributeEditor', () => {
                     </form>
                 )}
             </Form>,
-        );
+        ).wait(componentLoadWait);
     });
     it(`🟢 h5 must contain "test-group-1"
         🟢 card-header must contain "Test Label String 1"
@@ -276,8 +277,8 @@ const DataAttributeEditorComponent = () => {
 
 describe('Data Attribute AttributeEditor', () => {
     beforeEach(() => {
-        cy.mount(<DataAttributeEditorComponent />);
-        cy.wait(100)
+        cy.mount(<DataAttributeEditorComponent />).wait(componentLoadWait);
+        cy.wait(reduxActionWait)
             .window()
             .its('store')
             .invoke(
@@ -286,7 +287,7 @@ describe('Data Attribute AttributeEditor', () => {
                     authority: transformAuthorityResponseDtoToModel(dataAttributeMockData.authorityResponseDtoObject),
                 }),
             )
-            .wait(100)
+            .wait(reduxActionWait)
             .window()
             .its('store')
             .invoke(
@@ -295,7 +296,7 @@ describe('Data Attribute AttributeEditor', () => {
                     attributeDescriptor: dataAttributeMockData.dataAttributeArray.map(transformAttributeDescriptorDtoToModel),
                 }),
             )
-            .wait(100)
+            .wait(reduxActionWait)
             .window()
             .its('store')
             .invoke(
@@ -304,7 +305,7 @@ describe('Data Attribute AttributeEditor', () => {
                     connectors: dataAttributeMockData.connectorDtoArray.map(transformConnectorResponseDtoToModel),
                 }),
             )
-            .wait(100)
+            .wait(reduxActionWait)
             .window()
             .its('store')
             .invoke(
@@ -313,7 +314,8 @@ describe('Data Attribute AttributeEditor', () => {
                     callbackId: '__attributes__authority__.credential',
                     data: dataAttributeMockData.callbackSuccessObjectArray,
                 }),
-            );
+            )
+            .wait(callbackWait);
     });
 
     it(`🟢 Label should be "MS-ADCS Address"
@@ -366,8 +368,8 @@ describe('Data Attribute AttributeEditor', () => {
         cy.get('input').eq(0).should('have.value', 'data.cveradar.com').clear().type('test.com');
         cy.get('input').eq(1).should('not.be.checked').check();
         cy.get('input').eq(2).should('have.value', '80').type('80');
-        cy.get('#react-select-19-input').should('exist').click();
-        cy.get('#react-select-19-option-0').should('exist').click();
+        cy.get('#react-select-19-input').should('exist').click().wait(clickWait);
+        cy.get('#react-select-19-option-0').should('exist').click().wait(clickWait);
     });
 });
 
@@ -423,7 +425,7 @@ const GroupAttributeEditorComponent = () => {
 
 describe('Group Attribute AttributeEditor', () => {
     beforeEach(() => {
-        cy.mount(<GroupAttributeEditorComponent />);
+        cy.mount(<GroupAttributeEditorComponent />).wait(componentLoadWait);
         cy.window()
             .its('store')
             .invoke(
@@ -432,14 +434,14 @@ describe('Group Attribute AttributeEditor', () => {
                     authorityList: groupAttributeAtributeEditorMockData.authorityInstanceDtoArray.map(transformAuthorityResponseDtoToModel),
                 }),
             )
-            .wait(100)
+            .wait(reduxActionWait)
             .window()
             .its('store')
             .invoke(
                 'dispatch',
                 raProfileActions.getRaProfileDetailSuccess({ raProfile: groupAttributeAtributeEditorMockData.raProfileResponseModel }),
             )
-            .wait(100)
+            .wait(reduxActionWait)
             .window()
             .its('store')
             .invoke(
@@ -448,7 +450,7 @@ describe('Group Attribute AttributeEditor', () => {
                     groupAttributeAtributeEditorMockData.customAttributeDtoArray.map(transformCustomAttributeDtoToModel),
                 ),
             )
-            .wait(100)
+            .wait(reduxActionWait)
             .window()
             .its('store')
             .invoke(
@@ -460,7 +462,7 @@ describe('Group Attribute AttributeEditor', () => {
                     ),
                 }),
             )
-            .wait(100)
+            .wait(reduxActionWait)
             .window()
             .its('store')
             .invoke(
@@ -469,7 +471,8 @@ describe('Group Attribute AttributeEditor', () => {
                     callbackId: '__attributes__ra-profile__.raprofile_ca_select_group',
                     data: groupAttributeAtributeEditorMockData.callbackSuccessObjectArray,
                 }),
-            );
+            )
+            .wait(callbackWait);
     });
 
     it(`🟢 Label should be "Select CA Method"
@@ -504,19 +507,19 @@ describe('Group Attribute AttributeEditor', () => {
         cy.window()
             .its('store')
             .invoke('dispatch', connectorActions.resetState())
-            .wait(100)
+            .wait(reduxActionWait)
             .window()
             .its('store')
             .invoke('dispatch', authoritiesActions.resetState())
-            .wait(100)
+            .wait(reduxActionWait)
             .window()
             .its('store')
             .invoke('dispatch', customAttributesActions.resetState())
-            .wait(100)
+            .wait(reduxActionWait)
             .window()
             .its('store')
             .invoke('dispatch', raProfileActions.resetState())
-            .wait(100)
+            .wait(reduxActionWait)
             .window()
             .its('store');
     });
@@ -569,7 +572,7 @@ const ConstraintCheckAttributeEditorComponent = () => {
 
 describe('Contstraint Check AttributeEditor', () => {
     beforeEach(() => {
-        cy.mount(<ConstraintCheckAttributeEditorComponent />);
+        cy.mount(<ConstraintCheckAttributeEditorComponent />).wait(componentLoadWait);
         cy.window()
             .its('store')
             .invoke(
@@ -578,11 +581,11 @@ describe('Contstraint Check AttributeEditor', () => {
                     connectors: constraintCheckAttributeEditorMockData.connectorResponseDtoArray.map(transformConnectorResponseDtoToModel),
                 }),
             )
-            .wait(100)
+            .wait(reduxActionWait)
             .window()
             .its('store')
             .invoke('dispatch', customAttributesActions.listResourceCustomAttributesSuccess([]))
-            .wait(100)
+            .wait(reduxActionWait)
             .window()
             .its('store')
             .invoke(
@@ -598,8 +601,8 @@ describe('Contstraint Check AttributeEditor', () => {
     it(`🟢 Select first option of the dropdown
         🟢 Select first option of the next dropdown
         🟢 Type incorrect input and verify the validation check`, () => {
-        cy.get('#react-select-32-input').should('exist').click();
-        cy.get('#react-select-32-option-0').should('exist').should('contain.text', 'Basic').click();
+        cy.get('#react-select-32-input').should('exist').click().wait(clickWait);
+        cy.get('#react-select-32-option-0').should('exist').should('contain.text', 'Basic').click().wait(clickWait);
 
         cy.window()
             .its('store')
@@ -610,13 +613,13 @@ describe('Contstraint Check AttributeEditor', () => {
                     data: constraintCheckAttributeEditorMockData.callbackSuccessObjectArray,
                 }),
             )
-            .wait(100);
+            .wait(callbackWait);
 
-        cy.get('#react-select-33-input').should('exist').click();
-        cy.get('#react-select-33-option-0').should('exist').should('contain.text', 'lab01-testssh').click();
+        cy.get('#react-select-33-input').should('exist').click().wait(clickWait);
+        cy.get('#react-select-33-option-0').should('exist').should('contain.text', 'lab01-testssh').click().wait(clickWait);
 
         cy.get('input[name="__attributes__authority__.authority_server_address"]').should('exist').type('test.');
-        cy.get('body').click(100, 100);
+        cy.get('body').click(200, 200);
         cy.get('.invalid-feedback').should('exist').should('contain.text', 'Enter Valid Address');
 
         it('should reset the redux state that was used', () => {
@@ -692,7 +695,7 @@ const TabAttributeEditor = () => {
 
 describe('Tabbed AttributeEditor component', () => {
     beforeEach(() => {
-        cy.mount(<TabAttributeEditor />);
+        cy.mount(<TabAttributeEditor />).wait(componentLoadWait);
         cy.window()
             .its('store')
             .invoke(
@@ -701,7 +704,7 @@ describe('Tabbed AttributeEditor component', () => {
                     tokenProfiles: tabAttributeEditorMockData.tokenProfileDtoArray.map(transformTokenProfileResponseDtoToModel),
                 }),
             )
-            .wait(100)
+            .wait(reduxActionWait)
             .window()
             .its('store')
             .invoke(
@@ -710,7 +713,7 @@ describe('Tabbed AttributeEditor component', () => {
                     groups: tabAttributeEditorMockData.certificateGroupSelectArray.map(transformCertificateGroupResponseDtoToModel),
                 }),
             )
-            .wait(100)
+            .wait(reduxActionWait)
             .window()
             .its('store')
             .invoke(
@@ -719,7 +722,7 @@ describe('Tabbed AttributeEditor component', () => {
                     tabAttributeEditorMockData.customAttributeDtoArray.map(transformCustomAttributeDtoToModel),
                 ),
             )
-            .wait(100)
+            .wait(reduxActionWait)
             .window()
             .its('store')
             .invoke(
@@ -743,17 +746,17 @@ describe('Tabbed AttributeEditor component', () => {
         cy.get('input').eq(0).should('have.attr', 'type', 'text');
         cy.get('input').eq(0).should('have.attr', 'placeholder', 'Enter Cryptographic Key Alias').type('test-key');
 
-        cy.get('.nav-link').eq(1).should('contain.text', 'Custom Attributes').click();
+        cy.get('.nav-link').eq(1).should('contain.text', 'Custom Attributes').click().wait(clickWait);
 
-        cy.get('#react-select-35-input').should('exist').click();
-        cy.get('#react-select-35-option-0').should('exist').click();
+        cy.get('#react-select-35-input').should('exist').click().wait(clickWait);
+        cy.get('#react-select-35-option-0').should('exist').click().wait(clickWait);
 
-        cy.get('.nav-link').eq(0).should('contain.text', 'Connector Attributes').click();
+        cy.get('.nav-link').eq(0).should('contain.text', 'Connector Attributes').click().wait(clickWait);
 
-        cy.get('#react-select-36-input').should('exist').click();
-        cy.get('#react-select-36-option-0').should('exist').click();
+        cy.get('#react-select-36-input').should('exist').click().wait(clickWait);
+        cy.get('#react-select-36-option-0').should('exist').click().wait(clickWait);
 
-        cy.wait(100)
+        cy.wait(reduxActionWait)
             .window()
             .its('store')
             .invoke(
@@ -762,25 +765,26 @@ describe('Tabbed AttributeEditor component', () => {
                     callbackId: '__attributes__cryptographicKey__.group_keySpec',
                     data: tabAttributeEditorMockData.callbackSuccessObjectArray,
                 }),
-            );
+            )
+            .wait(callbackWait);
 
-        cy.get('#react-select-37-input').should('exist').click();
-        cy.get('#react-select-37-option-0').should('exist').click();
+        cy.get('#react-select-37-input').should('exist').click().wait(clickWait);
+        cy.get('#react-select-37-option-0').should('exist').click().wait(clickWait);
     });
 
     it(`🟢 Reset the redux state that was used`, () => {
         cy.window()
             .its('store')
             .invoke('dispatch', cryptographicKeyActions.resetState())
-            .wait(100)
+            .wait(reduxActionWait)
             .window()
             .its('store')
             .invoke('dispatch', certificateGroupActions.resetState())
-            .wait(100)
+            .wait(reduxActionWait)
             .window()
             .its('store')
             .invoke('dispatch', tokenProfileActions.resetState())
-            .wait(100)
+            .wait(reduxActionWait)
             .window()
             .its('store')
             .invoke('dispatch', customAttributesActions.resetState());
@@ -846,7 +850,7 @@ const GlobalModalAttributeEditor = () => {
 
 describe('Global Modal AttributeEditor component', () => {
     before(() => {
-        cy.mount(<GlobalModalAttributeEditor />);
+        cy.mount(<GlobalModalAttributeEditor />).wait(componentLoadWait);
         cy.window()
             .its('store')
             .invoke(
@@ -855,11 +859,11 @@ describe('Global Modal AttributeEditor component', () => {
                     providers: globalModalAttributeEditorMockData.connectorDtoArrayOne.map(transformConnectorResponseDtoToModel),
                 }),
             )
-            .wait(100)
+            .wait(reduxActionWait)
             .window()
             .its('store')
             .invoke('dispatch', customAttributesActions.listResourceCustomAttributesSuccess([]))
-            .wait(100)
+            .wait(reduxActionWait)
             .window()
             .its('store')
             .invoke(
@@ -883,8 +887,8 @@ describe('Global Modal AttributeEditor component', () => {
         🟢 The value must be auto filled in the next dropdown
         `, () => {
         cy.get('input[name="__attributes__entity__.host"]').should('exist').type('test');
-        cy.get('#react-select-40-input').should('exist').click();
-        cy.get('#react-select-40-option-0').should('exist').click();
+        cy.get('#react-select-40-input').should('exist').click().wait(clickWait);
+        cy.get('#react-select-40-option-0').should('exist').click().wait(clickWait);
         cy.window()
             .its('store')
             .invoke(
@@ -893,19 +897,20 @@ describe('Global Modal AttributeEditor component', () => {
                     callbackId: '__attributes__entity__.credential',
                     data: globalModalAttributeEditorMockData.callbackSuccessObjectArrayOne,
                 }),
-            );
-        cy.get('#react-select-41-input').should('exist').click();
-        cy.get('.fa-add').should('exist').click();
+            )
+            .wait(callbackWait);
+        cy.get('#react-select-41-input').should('exist').click().wait(clickWait);
+        cy.get('.fa-add').should('exist').click().wait(clickWait);
 
-        cy.wait(100)
+        cy.wait(reduxActionWait)
             .window()
             .its('store')
             .invoke('dispatch', userInterfaceActions.showGlobalModal({ ...globalModalAttributeEditorMockData.globalModalModelObject }))
-            .wait(100)
+            .wait(reduxActionWait)
             .window()
             .its('store')
             .invoke('dispatch', customAttributesActions.listCustomAttributesSuccess([]))
-            .wait(100)
+            .wait(reduxActionWait)
             .window()
             .its('store')
             .invoke(
@@ -914,20 +919,20 @@ describe('Global Modal AttributeEditor component', () => {
                     connectors: globalModalAttributeEditorMockData.connectorDtoArrayTwo.map(transformConnectorResponseDtoToModel),
                 }),
             )
-            .wait(100)
+            .wait(reduxActionWait)
             .window()
             .its('store')
             .invoke('dispatch', customAttributesActions.listResourceCustomAttributesSuccess([]))
-            .wait(100);
+            .wait(reduxActionWait);
 
         cy.get('input[name="name"]').should('exist').type('test-credential');
-        cy.get('#react-select-42-input').should('exist').click();
-        cy.get('#react-select-42-option-0').should('exist').click();
+        cy.get('#react-select-42-input').should('exist').click().wait(clickWait);
+        cy.get('#react-select-42-option-0').should('exist').click().wait(clickWait);
 
-        cy.get('#react-select-43-input').should('exist').click();
-        cy.get('#react-select-43-option-1').should('exist').click();
+        cy.get('#react-select-43-input').should('exist').click().wait(clickWait);
+        cy.get('#react-select-43-option-1').should('exist').click().wait(clickWait);
 
-        cy.wait(100)
+        cy.wait(reduxActionWait)
             .window()
             .its('store')
             .invoke(
@@ -938,23 +943,23 @@ describe('Global Modal AttributeEditor component', () => {
                     ),
                 }),
             )
-            .wait(100)
+            .wait(reduxActionWait)
             .window()
             .its('store')
             .invoke('dispatch', credentialActions.createCredentialSuccess({ uuid: '2b2c6e64-9081-4750-a062-c84be728202d' }))
-            .wait(100)
+            .wait(reduxActionWait)
             .window()
             .its('store')
             .invoke('dispatch', userInterfaceActions.hideGlobalModal())
-            .wait(100)
+            .wait(reduxActionWait)
             .window()
             .its('store')
             .invoke('dispatch', userInterfaceActions.setInitiateAttributeCallback(true))
-            .wait(100)
+            .wait(reduxActionWait)
             .window()
             .its('store')
             .invoke('dispatch', userInterfaceActions.setAttributeCallbackValue('testabc123'))
-            .wait(100)
+            .wait(reduxActionWait)
             .window()
             .its('store')
             .invoke(
@@ -964,6 +969,6 @@ describe('Global Modal AttributeEditor component', () => {
                     data: globalModalAttributeEditorMockData.callbackSuccessObjectArrayTwo,
                 }),
             )
-            .wait(100);
+            .wait(callbackWait);
     });
 });

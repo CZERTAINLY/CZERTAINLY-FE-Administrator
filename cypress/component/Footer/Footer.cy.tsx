@@ -1,9 +1,10 @@
 import Footer from 'components/Layout/Footer';
 import '../../../src/resources/styles/theme.scss';
+import { componentLoadWait } from '../../utils/constants';
 
 describe('Footer component', () => {
     it('should render footer', () => {
-        cy.mount(<Footer />);
+        cy.mount(<Footer />).wait(componentLoadWait);
         cy.get('footer').should('exist');
         cy.get('footer').should('contain', '© 2018-');
         cy.get('footer').should('contain', new Date().getFullYear());

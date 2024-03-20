@@ -1,6 +1,7 @@
 import Dialog from 'components/Dialog/index';
 import { useState } from 'react';
 import '../../../src/resources/styles/theme.scss';
+import { clickWait, componentLoadWait } from '../../utils/constants';
 
 const TestDialog = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -32,14 +33,11 @@ const TestDialog = () => {
 
 describe('Dialog component', () => {
     it('should open and close the test dialog', () => {
-        cy.mount(<TestDialog />);
-        cy.contains('Open Dialog').click();
-        cy.wait(250);
+        cy.mount(<TestDialog />).wait(componentLoadWait);
+        cy.contains('Open Dialog').click().wait(clickWait);
         cy.contains('Test Dialog');
-        cy.wait(250);
-        cy.contains('Cancel').click();
-        cy.contains('Open Dialog').click();
-        cy.wait(250);
-        cy.contains('Yes').click();
+        cy.contains('Cancel').click().wait(clickWait);
+        cy.contains('Open Dialog').click().wait(clickWait);
+        cy.contains('Yes').click().wait(clickWait);
     });
 });
