@@ -141,7 +141,7 @@ export default function AdministratorDetail() {
                       },
                       {
                           id: 'status',
-                          columns: ['Username', <StatusBadge enabled={acmeProfile.enabled} />],
+                          columns: ['Status', <StatusBadge enabled={acmeProfile.enabled} />],
                       },
                       {
                           id: 'websiteUrl',
