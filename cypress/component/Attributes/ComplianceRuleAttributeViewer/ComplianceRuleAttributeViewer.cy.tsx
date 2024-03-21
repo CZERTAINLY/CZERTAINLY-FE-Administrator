@@ -1,10 +1,11 @@
 import ComplianceRuleAttributeViewer from 'components/Attributes/ComplianceRuleAttributeViewer';
 import '../../../../src/resources/styles/theme.scss';
+import { componentLoadWait } from '../../../utils/constants';
 import { complianceRuleAttributeViewerProps } from './mock-data';
 
 describe('Compliance Attribute Viewer', () => {
     beforeEach(() => {
-        cy.mount(<ComplianceRuleAttributeViewer attributes={complianceRuleAttributeViewerProps.attributes} />);
+        cy.mount(<ComplianceRuleAttributeViewer attributes={complianceRuleAttributeViewerProps.attributes} />).wait(componentLoadWait);
     });
     it('should render correct number of rows,columns and data elements', () => {
         cy.get('th').should('have.length', 2);
@@ -32,7 +33,7 @@ describe('Compliance Attribute Viewer with descriptors', () => {
                 attributes={complianceRuleAttributeViewerProps.attributes}
                 descriptorAttributes={complianceRuleAttributeViewerProps.descriptorAttributes}
             />,
-        );
+        ).wait(componentLoadWait);
     });
 
     it('should render correct number of rows,columns and data elements', () => {

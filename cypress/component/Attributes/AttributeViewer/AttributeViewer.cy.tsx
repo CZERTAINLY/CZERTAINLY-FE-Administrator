@@ -1,10 +1,11 @@
 import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from 'components/Attributes/AttributeViewer';
 import '../../../../src/resources/styles/theme.scss';
+import { clickWait, componentLoadWait } from '../../../utils/constants';
 import { attributeViewerProps } from './mock-data';
 
 describe('AttributeViewer without Metadata', () => {
     beforeEach(() => {
-        cy.mount(<AttributeViewer attributes={attributeViewerProps.attributes} />);
+        cy.mount(<AttributeViewer attributes={attributeViewerProps.attributes} />).wait(componentLoadWait);
     });
     it('should render correct number of rows,columns and data elements', () => {
         cy.get('th').should('have.length', 3);
@@ -33,29 +34,31 @@ describe('AttributeViewer without Metadata', () => {
     it(`🟢 check for clickable info icon for codeblock
         🟢 should open a modal on clicking the code block icon
         🟢 close the code block modal`, () => {
-        cy.get('.fa-info').eq(0).click().wait(200);
+        cy.get('.fa-info').eq(0).click().wait(clickWait);
         cy.get('.modal-content').should('be.visible');
-        cy.get('button').filter(':contains("Cancel")').click().wait(200);
+        cy.get('button').filter(':contains("Cancel")').click().wait(clickWait);
     });
 
     it(`should allow sorting of data
         🟢 check ascending and descending sorting for first column
         🟢 check ascending and descending sorting for second colum
         🟢 check ascending and descending sorting for third column`, () => {
-        cy.get('.fa-arrow-up').eq(0).click().wait(200);
-        cy.get('.fa-arrow-down').eq(0).click().wait(200);
+        cy.get('.fa-arrow-up').eq(0).click().wait(clickWait);
+        cy.get('.fa-arrow-down').eq(0).click().wait(clickWait);
 
-        cy.get('.fa-arrow-up').eq(1).click().wait(200);
-        cy.get('.fa-arrow-down').eq(1).click().wait(200);
+        cy.get('.fa-arrow-up').eq(1).click().wait(clickWait);
+        cy.get('.fa-arrow-down').eq(1).click().wait(clickWait);
 
-        cy.get('.fa-arrow-up').eq(2).click().wait(200);
-        cy.get('.fa-arrow-down').eq(2).click().wait(200);
+        cy.get('.fa-arrow-up').eq(2).click().wait(clickWait);
+        cy.get('.fa-arrow-down').eq(2).click().wait(clickWait);
     });
 });
 
 describe('AttributeViewer with Metadata', () => {
     beforeEach(() => {
-        cy.mount(<AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={attributeViewerProps.metadata} />);
+        cy.mount(<AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={attributeViewerProps.metadata} />).wait(
+            componentLoadWait,
+        );
     });
 
     it('should render correct number of rows,columns and data elements', () => {
@@ -71,7 +74,7 @@ describe('AttributeViewer with Metadata', () => {
         🟢 check ascending and descending sorting for first column
         🟢 check ascending and descending sorting for second colum
         🟢 check ascending and descending sorting for third column`, () => {
-        cy.get('.fa-caret-down').eq(0).click().wait(200);
+        cy.get('.fa-caret-down').eq(0).click().wait(clickWait);
         cy.get('th').eq(2).should('contain.text', 'Name');
         cy.get('th').eq(3).should('contain.text', 'Content Type');
         cy.get('th').eq(4).should('contain.text', 'Content');
@@ -84,16 +87,16 @@ describe('AttributeViewer with Metadata', () => {
         cy.get('td').eq(7).should('contain.text', 'string');
         cy.get('td').eq(8).should('contain.text', 'WebServer');
 
-        cy.get('.fa-arrow-up').eq(1).click().wait(200);
-        cy.get('.fa-arrow-down').eq(1).click().wait(200);
+        cy.get('.fa-arrow-up').eq(1).click().wait(clickWait);
+        cy.get('.fa-arrow-down').eq(1).click().wait(clickWait);
 
-        cy.get('.fa-arrow-up').eq(2).click().wait(200);
-        cy.get('.fa-arrow-down').eq(2).click().wait(200);
+        cy.get('.fa-arrow-up').eq(2).click().wait(clickWait);
+        cy.get('.fa-arrow-down').eq(2).click().wait(clickWait);
 
-        cy.get('.fa-arrow-up').eq(3).click().wait(200);
-        cy.get('.fa-arrow-down').eq(3).click().wait(200);
+        cy.get('.fa-arrow-up').eq(3).click().wait(clickWait);
+        cy.get('.fa-arrow-down').eq(3).click().wait(clickWait);
 
-        cy.get('.fa-caret-up').eq(0).click().wait(200);
+        cy.get('.fa-caret-up').eq(0).click().wait(clickWait);
     });
 
     it(`should open second connector details
@@ -103,7 +106,7 @@ describe('AttributeViewer with Metadata', () => {
     🟢 check ascending and descending sorting for first column
     🟢 check ascending and descending sorting for second colum
     🟢 check ascending and descending sorting for third column`, () => {
-        cy.get('.fa-caret-down').eq(1).click().wait(200);
+        cy.get('.fa-caret-down').eq(1).click().wait(clickWait);
         cy.get('th').eq(2).should('contain.text', 'Name');
         cy.get('th').eq(3).should('contain.text', 'Content Type');
         cy.get('th').eq(4).should('contain.text', 'Content');
@@ -116,16 +119,16 @@ describe('AttributeViewer with Metadata', () => {
         cy.get('td').eq(9).should('contain.text', 'string');
         cy.get('td').eq(10).should('contain.text', 'WebServer');
 
-        cy.get('.fa-arrow-up').eq(1).click().wait(200);
-        cy.get('.fa-arrow-down').eq(1).click().wait(200);
+        cy.get('.fa-arrow-up').eq(1).click().wait(clickWait);
+        cy.get('.fa-arrow-down').eq(1).click().wait(clickWait);
 
-        cy.get('.fa-arrow-up').eq(2).click().wait(200);
-        cy.get('.fa-arrow-down').eq(2).click().wait(200);
+        cy.get('.fa-arrow-up').eq(2).click().wait(clickWait);
+        cy.get('.fa-arrow-down').eq(2).click().wait(clickWait);
 
-        cy.get('.fa-arrow-up').eq(3).click().wait(200);
-        cy.get('.fa-arrow-down').eq(3).click().wait(200);
+        cy.get('.fa-arrow-up').eq(3).click().wait(clickWait);
+        cy.get('.fa-arrow-down').eq(3).click().wait(clickWait);
 
-        cy.get('.fa-caret-up').eq(0).click().wait(200);
+        cy.get('.fa-caret-up').eq(0).click().wait(clickWait);
     });
 });
 
@@ -137,7 +140,7 @@ describe('AttributeViewer with Metadata and Attributes', () => {
                 descriptors={attributeViewerProps.descriptors}
                 attributes={attributeViewerProps.attributes}
             />,
-        );
+        ).wait(componentLoadWait);
     });
 
     it('should render correct number of rows,columns and data elements', () => {
@@ -162,13 +165,13 @@ describe('AttributeViewer with Metadata and Attributes', () => {
     });
 
     it('should allow sorting of data', () => {
-        cy.get('.fa-arrow-up').eq(0).click().wait(200);
-        cy.get('.fa-arrow-down').eq(0).click().wait(200);
+        cy.get('.fa-arrow-up').eq(0).click().wait(clickWait);
+        cy.get('.fa-arrow-down').eq(0).click().wait(clickWait);
 
-        cy.get('.fa-arrow-up').eq(1).click().wait(200);
-        cy.get('.fa-arrow-down').eq(1).click().wait(200);
+        cy.get('.fa-arrow-up').eq(1).click().wait(clickWait);
+        cy.get('.fa-arrow-down').eq(1).click().wait(clickWait);
 
-        cy.get('.fa-arrow-up').eq(2).click().wait(200);
-        cy.get('.fa-arrow-down').eq(2).click().wait(200);
+        cy.get('.fa-arrow-up').eq(2).click().wait(clickWait);
+        cy.get('.fa-arrow-down').eq(2).click().wait(clickWait);
     });
 });

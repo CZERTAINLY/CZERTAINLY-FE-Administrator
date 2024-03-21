@@ -6,6 +6,7 @@ import { transformAttributeResponseDtoToModel, transformCustomAttributeDtoToMode
 import { useSelector } from 'react-redux';
 import { Resource } from 'types/openapi';
 import '../../../../src/resources/styles/theme.scss';
+import { clickWait, componentLoadWait, reduxActionWait } from '../../../utils/constants';
 import { certificateDetailSuccess, customAttributeObj, customAttributeWidgetProps, successData, updateSuccessObj } from './mock-data';
 
 describe('CustomAttributeWidget', () => {
@@ -17,13 +18,14 @@ describe('CustomAttributeWidget', () => {
                 attributes={customAttributeWidgetProps.attributes}
             />,
         )
-            .wait(1000)
+            .wait(componentLoadWait)
             .window()
             .its('store')
             .invoke(
                 'dispatch',
                 customAttributesActions.listResourceCustomAttributesSuccess(successData.map(transformCustomAttributeDtoToModel)),
-            );
+            )
+            .wait(reduxActionWait);
     });
 
     it('should render correct number of rows,columns and data elements', () => {
@@ -95,18 +97,20 @@ const CustomAttributeCertificateComponent = () => {
 
 describe('CustomAttributeCertificateComponent with certificate custom attributes', () => {
     beforeEach(() => {
-        cy.mount(<CustomAttributeCertificateComponent />);
-        cy.window()
-            .wait(100)
+        cy.mount(<CustomAttributeCertificateComponent />).wait(componentLoadWait);
+        cy.wait(reduxActionWait)
+            .window()
+            .wait(componentLoadWait)
             .its('store')
             .invoke('dispatch', certificateActions.getCertificateDetailSuccess({ certificate: certificateDetailSuccess }))
-            .wait(1000)
+            .wait(reduxActionWait)
             .window()
             .its('store')
             .invoke(
                 'dispatch',
                 customAttributesActions.listResourceCustomAttributesSuccess(customAttributeObj.map(transformCustomAttributeDtoToModel)),
-            );
+            )
+            .wait(reduxActionWait);
     });
 
     it(`should render correct number of rows,columns and data elements
@@ -120,10 +124,10 @@ describe('CustomAttributeCertificateComponent with certificate custom attributes
         cy.get('tr').should('have.length', 5);
         cy.get('td').should('have.length', 16);
 
-        cy.get('.fa-pencil-square-o').eq(0).click().wait(200);
-        cy.get('input').eq(0).clear().type('666').wait(200);
-        cy.get('.fa-plus').eq(0).click().wait(200);
-        cy.wait(300)
+        cy.get('.fa-pencil-square-o').eq(0).click().wait(clickWait);
+        cy.get('input').eq(0).clear().type('666').wait(clickWait);
+        cy.get('.fa-plus').eq(0).click().wait(clickWait);
+        cy.wait(reduxActionWait)
             .window()
             .its('store')
             .invoke(
@@ -133,11 +137,12 @@ describe('CustomAttributeCertificateComponent with certificate custom attributes
                     customAttributes: updateSuccessObj.map(transformAttributeResponseDtoToModel),
                     resourceUuid: '1c82f2ed-404e-4898-a15b-de429aa9461e',
                 }),
-            );
+            )
+            .wait(reduxActionWait);
 
-        cy.get('.fa-trash').eq(0).click().wait(200);
+        cy.get('.fa-trash').eq(0).click().wait(clickWait);
 
-        cy.wait(300)
+        cy.wait(reduxActionWait)
             .window()
             .its('store')
             .invoke(
@@ -147,7 +152,8 @@ describe('CustomAttributeCertificateComponent with certificate custom attributes
                     customAttributes: updateSuccessObj.slice(1).map(transformAttributeResponseDtoToModel),
                     resourceUuid: '1c82f2ed-404e-4898-a15b-de429aa9461e',
                 }),
-            );
+            )
+            .wait(reduxActionWait);
         cy.get('button').eq(0).should('be.disabled');
         cy.get('button').eq(3).should('be.disabled');
     });
