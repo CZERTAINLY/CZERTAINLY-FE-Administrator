@@ -112,9 +112,9 @@ const markAsReadNotification: AppEpic = (action$, state$, deps) => {
         filter(slice.actions.markAsReadNotification.match),
         mergeMap((action) =>
             deps.apiClients.internalNotificationApi.markNotificationAsRead({ uuid: action.payload.uuid }).pipe(
-                mergeMap((res) =>
+                mergeMap(() =>
                     of(
-                        slice.actions.markAsReadNotificationSuccess(transformNotificationDtoToModel(res)),
+                        slice.actions.markAsReadNotificationSuccess({ uuid: action.payload.uuid }),
                         slice.actions.listOverviewNotifications(),
                     ),
                 ),

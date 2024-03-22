@@ -12,20 +12,13 @@
  */
 
 /**
+ * Field group of search filter
  * @export
- * @interface ObjectAttributeContent
+ * @enum {string}
  */
-export interface ObjectAttributeContent {
-    /**
-     * Content Reference
-     * @type {string}
-     * @memberof ObjectAttributeContent
-     */
-    reference?: string;
-    /**
-     * Object attribute content data
-     * @type {object}
-     * @memberof ObjectAttributeContent
-     */
-    data: object;
+export enum FilterFieldSource {
+    Meta = 'meta',
+    Custom = 'custom',
+    Property = 'property'
 }
+

@@ -12,20 +12,16 @@
  */
 
 /**
+ * Type of the field
  * @export
- * @interface ObjectAttributeContent
+ * @enum {string}
  */
-export interface ObjectAttributeContent {
-    /**
-     * Content Reference
-     * @type {string}
-     * @memberof ObjectAttributeContent
-     */
-    reference?: string;
-    /**
-     * Object attribute content data
-     * @type {object}
-     * @memberof ObjectAttributeContent
-     */
-    data: object;
+export enum FilterFieldType {
+    String = 'string',
+    Number = 'number',
+    List = 'list',
+    Date = 'date',
+    Datetime = 'datetime',
+    Boolean = 'boolean'
 }
+

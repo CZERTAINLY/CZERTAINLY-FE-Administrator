@@ -195,6 +195,9 @@ models/EnumItemDto.ts
 models/ErrorMessageDto.ts
 models/FileAttributeContent.ts
 models/FileAttributeContentData.ts
+models/FilterConditionOperator.ts
+models/FilterFieldSource.ts
+models/FilterFieldType.ts
 models/FloatAttributeContent.ts
 models/FunctionGroupCode.ts
 models/FunctionGroupDto.ts
@@ -281,13 +284,10 @@ models/ScheduledJobHistoryDto.ts
 models/ScheduledJobHistoryResponseDto.ts
 models/ScheduledJobsResponseDto.ts
 models/SchedulerJobExecutionStatus.ts
-models/SearchCondition.ts
 models/SearchFieldDataByGroupDto.ts
 models/SearchFieldDataDto.ts
 models/SearchFilterRequestDto.ts
-models/SearchGroup.ts
 models/SearchRequestDto.ts
-models/SearchableFieldType.ts
 models/SecretAttributeContent.ts
 models/SecretAttributeContentData.ts
 models/SignDataRequestDto.ts

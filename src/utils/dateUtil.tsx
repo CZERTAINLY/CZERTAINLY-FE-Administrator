@@ -118,3 +118,9 @@ export const formatTimeAgo = (input: any) => {
         }
     }
 };
+
+export const getDateInString = (daysOffset: number) => {
+    const date = new Date();
+    date.setDate(date.getDate() + daysOffset);
+    return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+};
