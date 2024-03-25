@@ -12,7 +12,7 @@
  */
 
 /**
- * Type of the resource
+ * Source Object Type
  * @export
  * @enum {string}
  */
@@ -34,6 +34,7 @@ export enum Resource {
     Authorities = 'authorities',
     RaProfiles = 'raProfiles',
     Certificates = 'certificates',
+    CertificateRequests = 'certificateRequests',
     Groups = 'groups',
     ComplianceProfiles = 'complianceProfiles',
     Discoveries = 'discoveries',

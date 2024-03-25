@@ -12,13 +12,14 @@
  */
 
 /**
- * Field group of search filter
+ * Source of the field in the Condition
  * @export
  * @enum {string}
  */
 export enum FilterFieldSource {
     Meta = 'meta',
     Custom = 'custom',
+    Data = 'data',
     Property = 'property'
 }
 

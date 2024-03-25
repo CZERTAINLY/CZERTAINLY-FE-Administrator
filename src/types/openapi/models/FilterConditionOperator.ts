@@ -12,7 +12,7 @@
  */
 
 /**
- * Condition for the search filter
+ * Operator of the Rule Condition
  * @export
  * @enum {string}
  */
