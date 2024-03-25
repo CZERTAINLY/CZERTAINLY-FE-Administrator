@@ -27,6 +27,7 @@ export * from './LocalOperationsApi';
 export * from './LocationManagementApi';
 export * from './RAProfileManagementApi';
 export * from './RoleManagementApi';
+export * from './RulesManagementApi';
 export * from './SCEPProfileManagementApi';
 export * from './ScheduledJobsManagementApi';
 export * from './SettingsApi';

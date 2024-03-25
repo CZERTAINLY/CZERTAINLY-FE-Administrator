@@ -93,11 +93,11 @@ export const slice = createSlice({
             state.isMarking = true;
         },
 
-        markAsReadNotificationSuccess: (state, action: PayloadAction<NotificationModel>) => {
+        markAsReadNotificationSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isMarking = false;
 
             const index = state.notifications.findIndex((a) => a.uuid === action.payload.uuid);
-            if (index !== -1) state.notifications[index].readAt = action.payload.readAt;
+            if (index !== -1) state.notifications[index].readAt = Date.now().toString();
         },
 
         markAsReadNotificationFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
