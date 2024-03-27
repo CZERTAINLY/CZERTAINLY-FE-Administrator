@@ -306,4 +306,3 @@ export * from './UuidDto';
 export * from './VerificationResponseData';
 export * from './VerifyDataRequestDto';
 export * from './VerifyDataResponseDto';
-

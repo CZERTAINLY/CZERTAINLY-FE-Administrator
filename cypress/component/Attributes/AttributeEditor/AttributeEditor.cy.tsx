@@ -950,7 +950,7 @@ describe('Global Modal AttributeEditor component', () => {
             .wait(reduxActionWait)
             .window()
             .its('store')
-            .invoke('dispatch', userInterfaceActions.hideGlobalModal())
+            .invoke('dispatch', userInterfaceActions.resetState())
             .wait(reduxActionWait)
             .window()
             .its('store')

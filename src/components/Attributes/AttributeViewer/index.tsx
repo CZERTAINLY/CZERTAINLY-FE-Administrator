@@ -2,8 +2,9 @@ import CustomTable, { TableDataRow } from 'components/CustomTable';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { useCallback, useMemo, useState } from 'react';
 import { Form } from 'react-final-form';
-import { useSelector } from 'react-redux';
-import { Form as BootstrapForm } from 'reactstrap';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { Form as BootstrapForm, Button } from 'reactstrap';
 import {
     AttributeDescriptorModel,
     AttributeResponseModel,
@@ -13,8 +14,9 @@ import {
     isDataAttributeModel,
 } from 'types/attributes';
 import { MetadataItemModel, MetadataModel } from 'types/locations';
-import { PlatformEnum } from 'types/openapi';
+import { NameAndUuidDto, PlatformEnum, Resource } from 'types/openapi';
 import { getAttributeContent } from 'utils/attributes/attributes';
+import { actions as userInterfaceActions } from '../../../ducks/user-interface';
 import ContentValueField from '../../Input/DynamicContent/ContentValueField';
 import WidgetButtons, { IconName } from '../../WidgetButtons';
 
@@ -48,14 +50,23 @@ export default function AttributeViewer({
     const getContent = useCallback(getAttributeContent, []);
     const [editingAttributesNames, setEditingAttributesNames] = useState<string[]>([]);
     const contentTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AttributeContentType));
+    const dispatch = useDispatch();
+
     const tableHeaders = (viewerType: ATTRIBUTE_VIEWER_TYPE) => {
         const result = [];
         if (viewerType === ATTRIBUTE_VIEWER_TYPE.METADATA || viewerType === ATTRIBUTE_VIEWER_TYPE.METADATA_FLAT) {
-            result.push({
-                id: 'connector',
-                content: 'Connector',
-                sortable: true,
-            });
+            result.push(
+                {
+                    id: 'connector',
+                    content: 'Connector',
+                    sortable: true,
+                },
+                {
+                    id: 'sourceObject',
+                    content: 'Source Object',
+                    sortable: true,
+                },
+            );
         }
         if (
             viewerType === ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE ||
@@ -96,20 +107,67 @@ export default function AttributeViewer({
         return result;
     };
 
+    const renderSourceObjectsButton = useCallback(
+        (attribute: AttributeResponseModel | MetadataItemModel, resource: Resource) => {
+            const headers = [
+                { id: 'sourceObject', content: 'Name', sortable: true },
+                { id: 'uuid', content: 'UUID', sortable: true },
+            ];
+
+            const createData = (so: NameAndUuidDto) => ({
+                id: so.uuid,
+                columns: [
+                    so.name,
+                    <Link onClick={() => dispatch(userInterfaceActions.resetState())} to={`/${resource}/detail/${so.uuid}`}>
+                        {so.uuid}
+                    </Link>,
+                ],
+            });
+
+            if ('sourceObjects' in attribute && attribute.sourceObjects.length > 0 && resource) {
+                return (
+                    <Button
+                        className="btn btn-link p-0 ms-2"
+                        color="white"
+                        title="Source objects"
+                        onClick={() => {
+                            dispatch(
+                                userInterfaceActions.showGlobalModal({
+                                    content: <CustomTable headers={headers} data={attribute.sourceObjects.map(createData)} />,
+                                    isOpen: true,
+                                    showCloseButton: true,
+                                    title: 'Source objects',
+                                    size: 'lg',
+                                }),
+                            );
+                        }}
+                    >
+                        <i className="fa fa-info" style={{ color: 'auto' }} />
+                    </Button>
+                );
+            }
+            return null;
+        },
+        [dispatch],
+    );
+
     const getAttributesTableData = useCallback(
-        (attribute: AttributeResponseModel | MetadataItemModel) => ({
+        (attribute: AttributeResponseModel | MetadataItemModel, resource?: Resource): TableDataRow => ({
             id: attribute.uuid || attribute.name,
             columns: [
                 attribute.label || attribute.name || '',
                 getEnumLabel(contentTypeEnum, attribute.contentType),
-                getContent(attribute.contentType, attribute.content),
+                <>
+                    {getContent(attribute.contentType, attribute.content)}
+                    {resource && renderSourceObjectsButton(attribute, resource)}
+                </>,
             ],
         }),
-        [getContent, contentTypeEnum],
+        [getContent, contentTypeEnum, renderSourceObjectsButton],
     );
 
     const getDescriptorsTableData = useCallback(
-        (descriptor: AttributeDescriptorModel) => {
+        (descriptor: AttributeDescriptorModel): TableDataRow => {
             const attribute = attributes?.find((a) => a.name === descriptor.name);
             return {
                 id: descriptor.uuid || '',
@@ -128,13 +186,13 @@ export default function AttributeViewer({
     );
 
     const getMetadataTableData = useCallback(
-        (attribute: MetadataModel) => ({
+        (attribute: MetadataModel): TableDataRow => ({
             id: attribute.connectorUuid || '',
-            columns: [attribute.connectorName],
+            columns: [attribute.connectorName || 'No connector', attribute.sourceObjectType || ''],
             detailColumns: [
                 <CustomTable
                     headers={tableHeaders(ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE)}
-                    data={attribute.items.map(getAttributesTableData)}
+                    data={attribute.items.map((attributeItem) => getAttributesTableData(attributeItem, attribute.sourceObjectType))}
                     hasHeader={true}
                 />,
             ],
@@ -177,7 +235,7 @@ export default function AttributeViewer({
     );
 
     const getAttributesEditTableData = useCallback(
-        (attributes: AttributeResponseModel[], descriptors: CustomAttributeModel[]) => {
+        (attributes: AttributeResponseModel[], descriptors: CustomAttributeModel[]): TableDataRow[] => {
             if (!attributes || !descriptors) {
                 return [];
             }
@@ -219,7 +277,7 @@ export default function AttributeViewer({
     const tableData: TableDataRow[] = useMemo(() => {
         switch (viewerType) {
             case ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE:
-                return attributes?.map(getAttributesTableData);
+                return attributes?.map((attribute) => getAttributesTableData(attribute));
             case ATTRIBUTE_VIEWER_TYPE.ATTRIBUTES_WITH_DESCRIPTORS:
                 return descriptors?.map(getDescriptorsTableData);
             case ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE_EDIT:
@@ -231,7 +289,7 @@ export default function AttributeViewer({
                     ?.map((m) =>
                         m.items.map((i) => ({
                             ...getAttributesTableData(i),
-                            columns: [m.connectorName, ...getAttributesTableData(i).columns],
+                            columns: [m.connectorName ?? 'No connector', ...getAttributesTableData(i).columns],
                         })),
                     )
                     .flat();

@@ -59,17 +59,11 @@ export interface ResponseMetadataDto {
      */
     content?: Array<BaseAttributeContentDto>;
     /**
-     * Source Object Type
-     * @type {string}
-     * @memberof ResponseMetadataDto
-     */
-    sourceObjectType?: string;
-    /**
      * Source Objects
      * @type {Array<NameAndUuidDto>}
      * @memberof ResponseMetadataDto
      */
-    sourceObjects?: Array<NameAndUuidDto>;
+    sourceObjects: Array<NameAndUuidDto>;
 }
 
 

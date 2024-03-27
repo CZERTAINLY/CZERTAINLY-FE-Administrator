@@ -206,6 +206,8 @@ export function collectFormAttributes(
                 const attr: AttributeRequestModel = {
                     name: attributeName,
                     content: Array.isArray(content) ? content : [content],
+                    contentType: descriptor.contentType,
+                    uuid: '',
                 };
 
                 if (attributeUuid) attr.uuid = attributeUuid;

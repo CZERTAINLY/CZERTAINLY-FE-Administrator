@@ -106,6 +106,8 @@ export interface GlobalModalModel {
     isOpen: boolean;
     showCancelButton?: boolean;
     showOkButton?: boolean;
+    showCloseButton?: boolean;
+    showSubmitButton?: boolean;
     okButtonCallback?: () => void;
     cancelButtonCallback?: () => void;
 }

@@ -211,6 +211,8 @@ const NotificationInstanceForm = () => {
                 attributes: notificationDetails.attributes.map((attribute) => ({
                     name: attribute.name,
                     content: attribute.content ?? [],
+                    uuid: attribute.uuid ?? '',
+                    contentType: attribute.contentType,
                 })),
                 selectedNotificationInstanceProvider: { value: notificationDetails.connectorUuid },
             };
