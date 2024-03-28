@@ -63,8 +63,8 @@ export default function ConnectorForm() {
     // const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
 
     const isFetching = useSelector(connectorSelectors.isFetchingDetail);
-    // const isCreating = useSelector(connectorSelectors.isCreating);
-    // const isUpdating = useSelector(connectorSelectors.isUpdating);
+    const isCreating = useSelector(connectorSelectors.isCreating);
+    const isUpdating = useSelector(connectorSelectors.isUpdating);
     const isConnecting = useSelector(connectorSelectors.isConnecting);
     const isReconnecting = useSelector(connectorSelectors.isReconnecting);
 
@@ -447,7 +447,7 @@ export default function ConnectorForm() {
                                                     <ProgressButton
                                                         title={submitTitle}
                                                         inProgressTitle={inProgressTitle}
-                                                        inProgress={submitting}
+                                                        inProgress={isUpdating || isCreating}
                                                         disabled={pristine}
                                                     />
                                                 </ButtonGroup>
