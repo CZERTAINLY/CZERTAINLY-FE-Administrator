@@ -97,8 +97,6 @@ export function collectFormAttributes(
         const info = attribute.split(':');
 
         const attributeName = info[0];
-        // const attributeType = info[1];
-        const attributeUuid = info.length === 3 ? info[2] : undefined;
 
         const descriptor = descriptors?.find((d) => d.name === attributeName);
 
@@ -207,10 +205,8 @@ export function collectFormAttributes(
                     name: attributeName,
                     content: Array.isArray(content) ? content : [content],
                     contentType: descriptor.contentType,
-                    uuid: '',
+                    uuid: descriptor.uuid,
                 };
-
-                if (attributeUuid) attr.uuid = attributeUuid;
 
                 attrs.push(attr);
             }

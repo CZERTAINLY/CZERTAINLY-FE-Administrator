@@ -50,6 +50,7 @@ export default function AttributeViewer({
     const getContent = useCallback(getAttributeContent, []);
     const [editingAttributesNames, setEditingAttributesNames] = useState<string[]>([]);
     const contentTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AttributeContentType));
+    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const dispatch = useDispatch();
 
     const tableHeaders = (viewerType: ATTRIBUTE_VIEWER_TYPE) => {
@@ -117,10 +118,10 @@ export default function AttributeViewer({
             const createData = (so: NameAndUuidDto) => ({
                 id: so.uuid,
                 columns: [
-                    so.name,
                     <Link onClick={() => dispatch(userInterfaceActions.resetState())} to={`/${resource}/detail/${so.uuid}`}>
-                        {so.uuid}
+                        {so.name}
                     </Link>,
+                    so.uuid,
                 ],
             });
 
@@ -188,7 +189,10 @@ export default function AttributeViewer({
     const getMetadataTableData = useCallback(
         (attribute: MetadataModel): TableDataRow => ({
             id: attribute.connectorUuid || '',
-            columns: [attribute.connectorName || 'No connector', attribute.sourceObjectType || ''],
+            columns: [
+                attribute.connectorName || 'No connector',
+                attribute.sourceObjectType ? getEnumLabel(resourceEnum, attribute.sourceObjectType) : '',
+            ],
             detailColumns: [
                 <CustomTable
                     headers={tableHeaders(ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE)}
