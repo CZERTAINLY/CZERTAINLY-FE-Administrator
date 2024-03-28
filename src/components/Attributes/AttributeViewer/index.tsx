@@ -201,7 +201,7 @@ export default function AttributeViewer({
                 />,
             ],
         }),
-        [getAttributesTableData],
+        [getAttributesTableData, resourceEnum],
     );
 
     const getButtons = useCallback(
