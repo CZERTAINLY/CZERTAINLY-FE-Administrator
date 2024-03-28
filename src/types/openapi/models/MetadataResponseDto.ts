@@ -12,6 +12,7 @@
  */
 
 import type {
+    Resource,
     ResponseMetadataDto,
 } from './';
 
@@ -26,13 +27,18 @@ export interface MetadataResponseDto {
      * @type {string}
      * @memberof MetadataResponseDto
      */
-    connectorUuid: string;
+    connectorUuid?: string;
     /**
      * Name of the Connector
      * @type {string}
      * @memberof MetadataResponseDto
      */
-    connectorName: string;
+    connectorName?: string;
+    /**
+     * @type {Resource}
+     * @memberof MetadataResponseDto
+     */
+    sourceObjectType?: Resource;
     /**
      * List of Metadata
      * @type {Array<ResponseMetadataDto>}
@@ -40,3 +46,5 @@ export interface MetadataResponseDto {
      */
     items: Array<ResponseMetadataDto>;
 }
+
+

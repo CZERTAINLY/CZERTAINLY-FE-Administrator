@@ -1,7 +1,7 @@
 import { Props as AttributeViewerProps } from 'components/Attributes/AttributeViewer';
 import { AttributeResponseModel, DataAttributeModel } from 'types/attributes';
 import { MetadataModel } from 'types/locations';
-import { AttributeContentType, AttributeType } from 'types/openapi';
+import { AttributeContentType, AttributeType, Resource } from 'types/openapi';
 
 export const attributeViewerProps: AttributeViewerProps = {
     attributes: [
@@ -52,6 +52,7 @@ export const attributeViewerProps: AttributeViewerProps = {
         {
             connectorUuid: '0647b608-00b3-4d3b-a83b-24e3b6718c42',
             connectorName: 'PyADCS-Connector',
+            sourceObjectType: 'discoveries',
             items: [
                 {
                     uuid: '8dbc74f1-32e7-427a-9764-046b6400c054',
@@ -65,7 +66,6 @@ export const attributeViewerProps: AttributeViewerProps = {
                             data: 'Demo MS Sub CA',
                         },
                     ],
-                    sourceObjectType: 'discoveries',
                     sourceObjects: [
                         {
                             uuid: '1edec51f-5a15-4aab-80ef-b3c0f4dc83b0',
@@ -114,7 +114,7 @@ export const attributeViewerProps: AttributeViewerProps = {
                             data: 'WebServer',
                         },
                     ],
-                    sourceObjectType: 'discoveries',
+                    sourceObjectType: Resource.Discoveries,
                     sourceObjects: [
                         {
                             uuid: '1edec51f-5a15-4aab-80ef-b3c0f4dc83b0',
@@ -169,7 +169,7 @@ export const attributeViewerProps: AttributeViewerProps = {
                             data: 'ADCS-through-proxy',
                         },
                     ],
-                    sourceObjectType: 'discoveries',
+                    sourceObjectType: Resource.Discoveries,
                     sourceObjects: [
                         {
                             uuid: '783c8a99-03e4-4e77-a8e9-dcac4b5da78f',
@@ -190,7 +190,7 @@ export const attributeViewerProps: AttributeViewerProps = {
                             data: 'WebServer',
                         },
                     ],
-                    sourceObjectType: 'discoveries',
+                    sourceObjectType: Resource.Discoveries,
                     sourceObjects: [
                         {
                             uuid: '783c8a99-03e4-4e77-a8e9-dcac4b5da78f',

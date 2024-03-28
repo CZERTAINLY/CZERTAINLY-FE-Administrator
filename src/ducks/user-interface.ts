@@ -20,8 +20,13 @@ export const initialState: State = {
         title: undefined,
         size: 'sm',
         content: undefined,
-        type: undefined,
         isOpen: false,
+        showCancelButton: false,
+        showOkButton: false,
+        showCloseButton: false,
+        showSubmitButton: false,
+        okButtonCallback: undefined,
+        cancelButtonCallback: undefined,
     },
 };
 

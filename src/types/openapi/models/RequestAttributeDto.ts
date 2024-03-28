@@ -12,6 +12,7 @@
  */
 
 import type {
+    AttributeContentType,
     BaseAttributeContentDto,
 } from './';
 
@@ -26,7 +27,7 @@ export interface RequestAttributeDto {
      * @type {string}
      * @memberof RequestAttributeDto
      */
-    uuid?: string;
+    uuid: string;
     /**
      * Name of the Attribute
      * @type {string}
@@ -34,9 +35,16 @@ export interface RequestAttributeDto {
      */
     name: string;
     /**
+     * @type {AttributeContentType}
+     * @memberof RequestAttributeDto
+     */
+    contentType: AttributeContentType;
+    /**
      * Content of the Attribute
      * @type {Array<BaseAttributeContentDto>}
      * @memberof RequestAttributeDto
      */
     content: Array<BaseAttributeContentDto>;
 }
+
+
