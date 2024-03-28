@@ -134,21 +134,19 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }:
                                                         if (typeof property.propertyValue === 'string') {
                                                             navigator.clipboard
                                                                 .writeText(property.propertyValue)
-                                                                .then(
-                                                                    () =>
-                                                                        dispatch?.(
-                                                                            alertActions.success?.(
-                                                                                `${property.propertyName} copied to clipboard`,
-                                                                            ),
+                                                                .then(() =>
+                                                                    dispatch?.(
+                                                                        alertActions.success?.(
+                                                                            `${property.propertyName} copied to clipboard`,
                                                                         ),
+                                                                    ),
                                                                 )
-                                                                .catch(
-                                                                    () =>
-                                                                        dispatch?.(
-                                                                            alertActions.error?.(
-                                                                                `Failed to copy ${property.propertyName} to clipboard`,
-                                                                            ),
+                                                                .catch(() =>
+                                                                    dispatch?.(
+                                                                        alertActions.error?.(
+                                                                            `Failed to copy ${property.propertyName} to clipboard`,
                                                                         ),
+                                                                    ),
                                                                 );
                                                         }
                                                     }}

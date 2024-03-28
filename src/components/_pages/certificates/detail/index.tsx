@@ -652,8 +652,8 @@ export default function CertificateDetail() {
                                 navigator.clipboard
                                     .writeText(formatPEM(certificate?.certificateRequest?.content ?? '', true))
                                     .then(() => dispatch?.(alertActions.success?.('Certificate request content was copied to clipboard')))
-                                    .catch(
-                                        () => dispatch?.(alertActions.error?.('Failed to copy certificate request content to clipboard')),
+                                    .catch(() =>
+                                        dispatch?.(alertActions.error?.('Failed to copy certificate request content to clipboard')),
                                     );
                             }}
                         />
