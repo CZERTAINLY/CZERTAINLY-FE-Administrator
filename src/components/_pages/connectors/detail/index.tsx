@@ -127,7 +127,7 @@ export default function ConnectorDetail() {
     const onForceDeleteConnector = useCallback(() => {
         if (!connector) return;
         dispatch(actions.clearDeleteErrorMessages());
-        dispatch(actions.bulkForceDeleteConnectors({ uuids: [connector.uuid], successRedirect: `../` }));
+        dispatch(actions.bulkForceDeleteConnectors({ uuids: [connector.uuid], successRedirect: `../../` }));
     }, [connector, dispatch]);
 
     const onFunctionGroupChange = useCallback(
