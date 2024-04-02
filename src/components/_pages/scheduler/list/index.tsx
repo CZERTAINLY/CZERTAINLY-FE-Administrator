@@ -29,15 +29,11 @@ function SchedulerJobsList() {
     const checkedRows = useSelector(pagingSelectors.checkedRows(EntityType.SCHEDULER));
 
     const onEnableClick = useCallback(() => {
-        for (const uuid of checkedRows) {
-            dispatch(actions.enableSchedulerJob({ uuid }));
-        }
+        dispatch(actions.bulkEnableSchedulerJobs({ uuids: checkedRows }));
     }, [checkedRows, dispatch]);
 
     const onDisableClick = useCallback(() => {
-        for (const uuid of checkedRows) {
-            dispatch(actions.disableSchedulerJob({ uuid }));
-        }
+        dispatch(actions.bulkDisableSchedulerJobs({ uuids: checkedRows }));
     }, [checkedRows, dispatch]);
 
     const buttons: WidgetButtonProps[] = useMemo(

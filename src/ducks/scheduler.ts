@@ -93,6 +93,22 @@ export const slice = createSlice({
             state.isDeleting = false;
         },
 
+        bulkEnableSchedulerJobs: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.isEnabling = true;
+        },
+
+        bulkEnableSchedulerJobsSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.isEnabling = false;
+
+            state.schedulerJobs.forEach((schedulerJob) => {
+                if (action.payload.uuids.includes(schedulerJob.uuid)) schedulerJob.enabled = true;
+            });
+        },
+
+        bulkEnableSchedulerJobsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isEnabling = false;
+        },
+
         enableSchedulerJob: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isEnabling = true;
         },
@@ -108,6 +124,22 @@ export const slice = createSlice({
         },
 
         enableSchedulerJobFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isEnabling = false;
+        },
+
+        bulkDisableSchedulerJobs: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.isEnabling = true;
+        },
+
+        bulkDisableSchedulerJobsSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.isEnabling = false;
+
+            state.schedulerJobs.forEach((schedulerJob) => {
+                if (action.payload.uuids.includes(schedulerJob.uuid)) schedulerJob.enabled = false;
+            });
+        },
+
+        bulkDisableSchedulerJobsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isEnabling = false;
         },
 
