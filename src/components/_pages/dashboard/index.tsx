@@ -155,7 +155,7 @@ function Dashboard() {
                                     },
                                 ];
                             }
-                            if (labels[index] === 'expired') {
+                            if (labels[index] === 'Expired') {
                                 return [
                                     {
                                         fieldSource: FilterFieldSource.Property,
