@@ -32,6 +32,7 @@ import notificationsEpics from './notifications-epics';
 import raProfilesEpics from './ra-profiles-epics';
 import { reducers } from './reducers';
 import rolesEpics from './roles-epics';
+import rulesEpics from './rules-epics';
 import schedulerEpics from './scheduler-epics';
 import settingsEpics from './settings-epics';
 import startupEpics from './startup-epics';
@@ -62,6 +63,7 @@ export const epics = combineEpics(
     ...discoveriesEpics,
     ...usersEpics,
     ...rolesEpics,
+    ...rulesEpics,
     ...certificatesEpics,
     ...authoritiesEpics,
     ...raProfilesEpics,
