@@ -337,11 +337,60 @@ const listMappingAttributes: AppEpic = (action$, state$, deps) => {
     );
 };
 
+const bulkDeleteNotification: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.bulkDeleteNotification.match),
+        mergeMap((action) =>
+            deps.apiClients.internalNotificationApi.bulkDeleteNotification({ requestBody: action.payload.uuids }).pipe(
+                mergeMap(() =>
+                    of(
+                        slice.actions.bulkDeleteNotificationSuccess({ deletedNotificationUuids: action.payload.uuids }),
+                        slice.actions.listOverviewNotifications(),
+                    ),
+                ),
+
+                catchError((err) =>
+                    of(
+                        slice.actions.bulkDeleteNotificationFailure({ error: extractError(err, 'Failed to bulk delete notification') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to bulk delete notification' }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+const bulkMarkNotificationAsRead: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.bulkMarkNotificationAsRead.match),
+        mergeMap((action) =>
+            deps.apiClients.internalNotificationApi.bulkMarkNotificationAsRead({ requestBody: action.payload.uuids }).pipe(
+                mergeMap(() =>
+                    of(
+                        slice.actions.bulkMarkNotificationAsReadSuccess({ markedNotificationUuids: action.payload.uuids }),
+                        slice.actions.listOverviewNotifications(),
+                    ),
+                ),
+
+                catchError((err) =>
+                    of(
+                        slice.actions.bulkMarkNotificationAsReadFailure({
+                            error: extractError(err, 'Failed to bulk mark notification as read'),
+                        }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to bulk mark notification as read' }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
 const epics = [
     listOverviewNotifications,
     listNotifications,
     deleteNotification,
     markAsReadNotification,
+    bulkMarkNotificationAsRead,
     listNotificationInstances,
     getNotificationInstance,
     createNotificationInstance,
@@ -349,6 +398,7 @@ const epics = [
     getNotificationAttributesDescriptors,
     editNotificationInstance,
     deleteNotificationInstance,
+    bulkDeleteNotification,
     listMappingAttributes,
 ];
 
