@@ -88,6 +88,12 @@ function PagedList({
         [setPageSize, setPageNumber],
     );
 
+    useEffect(() => {
+        if (data.length !== pageSize) {
+            getFreshData();
+        }
+    }, [data.length, getFreshData, pageSize]);
+
     const onDeleteConfirmed = useCallback(() => {
         setConfirmDelete(false);
         onDeleteCallback!(checkedRows, currentFilters);
