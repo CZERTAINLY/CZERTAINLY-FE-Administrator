@@ -87,7 +87,6 @@ const getAttributeFormValue = (contentType: AttributeContentType, item: any) => 
     }
 
     if (contentType === AttributeContentType.Secret) {
-        console.log('item Secret', item);
         return {
             data: {
                 secret: item,

@@ -26,6 +26,7 @@ import {
     LocationManagementApi,
     RAProfileManagementApi,
     RoleManagementApi,
+    RulesManagementApi,
     SCEPProfileManagementApi,
     ScheduledJobsManagementApi,
     SettingsApi,
@@ -49,6 +50,7 @@ export interface ApiClients {
     auth: AuthenticationManagementApi;
     users: UserManagementApi;
     roles: RoleManagementApi;
+    rules: RulesManagementApi;
     auditLogs: AuditLogApi;
     raProfiles: RAProfileManagementApi;
     credentials: CredentialManagementApi;
@@ -89,6 +91,7 @@ export const backendClient: ApiClients = {
     auth: new AuthenticationManagementApi(configuration),
     users: new UserManagementApi(configuration),
     roles: new RoleManagementApi(configuration),
+    rules: new RulesManagementApi(configuration),
     certificates: new CertificateInventoryApi(configuration),
     auditLogs: new AuditLogApi(configuration),
     raProfiles: new RAProfileManagementApi(configuration),
