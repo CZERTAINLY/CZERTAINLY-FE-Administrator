@@ -81,6 +81,11 @@ export default function Sidebar() {
                     />
 
                     <LinksGroup _key="/auditlogs" header="Audit Logs" headerLink="/auditlogs" />
+                    <LinksGroup
+                        _key="workflows"
+                        header="Workflows"
+                        childrenLinks={[{ _key: '/conditiongroups', name: 'Condition Groups', link: '/conditiongroups' }]}
+                    />
                 </ul>
             </div>
         </nav>

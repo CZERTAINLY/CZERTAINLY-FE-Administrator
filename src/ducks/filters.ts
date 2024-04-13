@@ -15,6 +15,7 @@ export const enum EntityType {
     SCHEDULER,
     SCHEDULER_HISTORY,
     APPROVAL_PROFILES,
+    RESOURCE,
 }
 
 export type Filter = {
