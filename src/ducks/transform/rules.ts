@@ -18,12 +18,12 @@ import {
     ConditionRuleGroupRequestModel,
     ConditionRuleModel,
     ConditionRuleRequestDto,
-    ConditionRuleRequestModel,
     DetailRuleDto,
     DetailRuleModel,
     DtoRule,
     RequestRuleDto,
     RequestRuleModel,
+    RuleConditiontModel,
     RuleModel,
     RuleTriggerUpdateRequestDto,
     RuleTriggerUpdateRequestModel,
@@ -39,6 +39,16 @@ import {
     UpdateGroupRuleConditionRequestModel,
 } from 'types/rules';
 import { transformAttributeResponseDtoToModel } from './attributes';
+
+// export function transformSearchFilterModelRuleConditionDto(searchFilterModel: SearchFilterModel): RuleConditionGroupRequestDto {
+//     return {
+//         ...searchFilterModel,
+//         condition: searchFilterModel.condition,
+//         fieldIdentifier: searchFilterModel.fieldIdentifier,
+//         fieldSource: searchFilterModel.fieldSource,
+//         value: searchFilterModel.value,
+//     };
+// }
 
 export function transformRuleActionRequestDtoToModel(ruleActionRequestDto: ActionRuleRequestDto): ActionRuleRequestModel {
     return { ...ruleActionRequestDto };
@@ -108,7 +118,7 @@ export function transformDetailRuleDtoToModel(rule: DetailRuleDto): DetailRuleMo
     };
 }
 
-export function transformConditionRuleRequestModelToModelDto(conditionGroup: ConditionRuleRequestModel): ConditionRuleRequestDto {
+export function transformRuleConditiontModelToModelDto(conditionGroup: RuleConditiontModel): ConditionRuleRequestDto {
     return {
         ...conditionGroup,
     };
@@ -117,14 +127,14 @@ export function transformConditionRuleRequestModelToModelDto(conditionGroup: Con
 export function transformConditionRuleGroupRequestModelToDto(conditionGroup: ConditionRuleGroupRequestModel): ConditionRuleGroupRequestDto {
     return {
         ...conditionGroup,
-        conditions: conditionGroup.conditions.map(transformConditionRuleRequestModelToModelDto),
+        conditions: conditionGroup.conditions.map(transformRuleConditiontModelToModelDto),
     };
 }
 
 export function transformRuleRequestModelToDto(ruleRequest: RequestRuleModel): RequestRuleDto {
     return {
         ...ruleRequest,
-        conditions: ruleRequest.conditions?.length ? ruleRequest.conditions.map(transformConditionRuleRequestModelToModelDto) : [],
+        conditions: ruleRequest.conditions?.length ? ruleRequest.conditions.map(transformRuleConditiontModelToModelDto) : [],
         conditionGroups: ruleRequest.conditionGroups?.length
             ? ruleRequest.conditionGroups.map(transformConditionRuleGroupRequestModelToDto)
             : [],
@@ -156,14 +166,14 @@ export function transformUpdateGroupRuleConditionRequestModelToDto(
 ): UpdateGroupRuleConditionRequestDto {
     return {
         ...conditionGroup,
-        conditions: conditionGroup.conditions.map(transformConditionRuleRequestModelToModelDto),
+        conditions: conditionGroup.conditions.map(transformRuleConditiontModelToModelDto),
     };
 }
 
 export function transformRuleUpdateRequestModelToDto(ruleUpdateRequest: RuleUpdateRequestModel): RuleUpdateRequestDto {
     return {
         ...ruleUpdateRequest,
-        conditions: ruleUpdateRequest.conditions.map(transformConditionRuleRequestModelToModelDto),
+        conditions: ruleUpdateRequest.conditions.map(transformRuleConditiontModelToModelDto),
         conditionGroups: ruleUpdateRequest.conditionGroups.map(transformConditionRuleGroupRequestModelToDto),
     };
 }

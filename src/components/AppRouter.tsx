@@ -108,6 +108,7 @@ import NotificationInstanceDetail from './_pages/notifications/notification-inst
 import NotificationInstanceForm from './_pages/notifications/notification-instance-form';
 import NotificationsSetting from './_pages/notifications/notifications-setting';
 
+import ConditionGroupDetails from './_pages/condition-groups/details';
 import ConditionGroupForm from './_pages/condition-groups/form';
 import ConditionGroups from './_pages/condition-groups/list';
 import SchedulerJobDetail from './_pages/scheduler/detail';
@@ -322,6 +323,7 @@ export default function AppRouter() {
                     <Route path={`/conditiongroups`} element={<ConditionGroups />} />
                     <Route path={`/conditiongroups/add`} element={<ConditionGroupForm />} />
                     <Route path={`/conditiongroups/edit/:id`} element={<ConditionGroupForm />} />
+                    <Route path={`/conditiongroups/detail/:id`} element={<ConditionGroupDetails />} />
                 </Route>
 
                 {/*

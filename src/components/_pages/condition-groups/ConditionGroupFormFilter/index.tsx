@@ -1,84 +1,56 @@
 import { ApiClients } from 'api';
 import FilterWidget from 'components/FilterWidget';
-import { EntityType, selectors as filterSelectors } from 'ducks/filters';
-import { useCallback, useEffect, useMemo } from 'react';
+import { EntityType, actions as filterActions } from 'ducks/filters';
+import { selectors as rulesSelectors } from 'ducks/rules';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-final-form';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import { Resource } from 'types/openapi';
-import { ConditionRuleRequestModel } from 'types/rules';
+import { conditionGroupToFilter, filterToConditionGroup } from 'utils/rules';
+import { ConditionGroupFormValues } from '../form';
 
 interface ConditionGroupFormFilterProps {
     resource: Resource;
 }
 
 const ConditionGroupFormFilter = ({ resource }: ConditionGroupFormFilterProps) => {
-    // const renderFilterWidget =
-    const form = useForm();
-    const currentFilters = useSelector(filterSelectors.currentFilters(EntityType.RESOURCE));
+    const { id } = useParams();
+    const editMode = useMemo(() => !!id, [id]);
+    const form = useForm<ConditionGroupFormValues>();
+    const conditionGroupsDetails = useSelector(rulesSelectors.conditionGroupDetails);
+    const [hasEffectRun, setHasEffectRun] = useState(false);
 
-    //RuleConditionRequestDto
-    // const setConditions = (conditions: RuleConditionRequestDto[]) => {
-    //     console.log('conditions', conditions);
-    //     form.change('conditions', conditions);
-    // };
+    const dispatch = useDispatch();
 
     useEffect(() => {
-        const currentConditionGroups: ConditionRuleRequestModel[] = currentFilters.map((filter) => ({
-            fieldIdentifier: filter.fieldIdentifier,
-            operator: filter.condition,
-            values: filter.value,
-            fieldSource: filter.fieldSource,
-        }));
-        form.change('conditions', currentConditionGroups);
-    }, [currentFilters]);
-
-    const setConditions = useCallback(
-        (conditions: ConditionRuleRequestModel[]) => {
-            console.log('conditions', conditions);
-            form.change('conditions', conditions);
-        },
-        [form],
-    );
+        if (!hasEffectRun && editMode && conditionGroupsDetails) {
+            const currentConditions = conditionGroupsDetails.conditions;
+            const currentFilters = conditionGroupToFilter(currentConditions);
+            setHasEffectRun(true);
+            dispatch(filterActions.setCurrentFilters({ currentFilters: currentFilters, entity: EntityType.CONDITION_GROUP }));
+        }
+    }, [editMode, conditionGroupsDetails, hasEffectRun, dispatch]);
 
     const renderFilterWidget = useMemo(() => {
         return (
             <FilterWidget
-                entity={EntityType.RESOURCE}
+                entity={EntityType.CONDITION_GROUP}
                 title={'Condition Group'}
                 getAvailableFiltersApi={(apiClients: ApiClients) =>
                     apiClients.resources.listResourceRuleFilterFields({
                         resource,
                     })
                 }
-
-                // setConditionGroupFormValue={(value) => {
-                //     console.log('passed value', value);
-                //     setConditions(value);
-                // }}
+                onFilterUpdate={(currentFilters) => {
+                    const currentConditionGroups = filterToConditionGroup(currentFilters);
+                    form.change('conditions', currentConditionGroups);
+                }}
             />
         );
-    }, [resource, setConditions]);
+    }, [resource, form]);
 
-    return (
-        <div>
-            {/* <FilterWidget
-                entity={EntityType.RESOURCE}
-                title={'Condition Group'}
-                getAvailableFiltersApi={(apiClients: ApiClients) =>
-                    apiClients.resources.listResourceRuleFilterFields({
-                        resource,
-                    })
-                }
-                setFormValue={(value) => {
-                    // setConditions(conditions);
-                    // form.change('conditions', conditions);
-                    console.log('passed value', value);
-                    setConditions(value);
-                }}
-            /> */}
-            {renderFilterWidget}
-        </div>
-    );
+    return <div>{renderFilterWidget}</div>;
 };
 
 export default ConditionGroupFormFilter;

@@ -16,11 +16,15 @@ import type {
     RuleTriggerDetailDto,
     RuleTriggerDto,
     RuleTriggerRequestDto,
+    SearchFieldDataByGroupDto,
     UpdateRuleActionGroupRequestDto,
     UpdateRuleConditionGroupRequestDto,
     UpdateRuleRequestDto,
     UpdateRuleTriggerRequestDto,
 } from './openapi';
+
+export type FieldSearchDataByGroupDto = SearchFieldDataByGroupDto;
+export type FieldSearchDataByGroupModel = FieldSearchDataByGroupDto;
 
 export type ActionRuleDto = RuleActionDto;
 export type ActionRuleModel = ActionRuleDto;
@@ -53,11 +57,11 @@ export type ConditionRuleGroupDto = RuleConditionGroupDto;
 export type ConditionRuleGroupModel = ConditionRuleGroupDto;
 
 export type ConditionRuleRequestDto = RuleConditionRequestDto;
-export type ConditionRuleRequestModel = ConditionRuleRequestDto;
+export type RuleConditiontModel = ConditionRuleRequestDto;
 
 export type ConditionRuleGroupRequestDto = RuleConditionGroupRequestDto;
 export type ConditionRuleGroupRequestModel = Omit<ConditionRuleGroupRequestDto, 'conditions'> & {
-    conditions: Array<ConditionRuleRequestModel>;
+    conditions: Array<RuleConditiontModel>;
 };
 
 export type DetailRuleDto = RuleDetailDto;
@@ -74,7 +78,7 @@ export type RuleModel = Omit<DtoRule, 'attributes'> & {
 
 export type RequestRuleDto = RuleRequestDto;
 export type RequestRuleModel = Omit<RequestRuleDto, 'conditions | conditionGroups'> & {
-    conditions: Array<ConditionRuleRequestModel>;
+    conditions: Array<RuleConditiontModel>;
     conditionGroups: Array<ConditionRuleGroupRequestModel>;
 };
 
@@ -102,12 +106,12 @@ export type UpdateGroupRuleActionRequestModel = Omit<UpdateGroupRuleActionReques
 
 export type UpdateGroupRuleConditionRequestDto = UpdateRuleConditionGroupRequestDto;
 export type UpdateGroupRuleConditionRequestModel = Omit<UpdateGroupRuleConditionRequestDto, 'conditions'> & {
-    conditions: Array<ConditionRuleRequestModel>;
+    conditions: Array<RuleConditiontModel>;
 };
 
 export type RuleUpdateRequestDto = UpdateRuleRequestDto;
 export type RuleUpdateRequestModel = Omit<RuleUpdateRequestDto, 'conditions | conditionGroups'> & {
-    conditions: Array<ConditionRuleRequestModel>;
+    conditions: Array<RuleConditiontModel>;
     conditionGroups: Array<ConditionRuleGroupRequestModel>;
 };
 

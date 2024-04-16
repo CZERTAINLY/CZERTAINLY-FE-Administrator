@@ -113,7 +113,7 @@ export const slice = createSlice({
             state.isFetchingActionGroups = false;
         },
 
-        listConditionGroups: (state, action: PayloadAction<{ resource: Resource }>) => {
+        listConditionGroups: (state, action: PayloadAction<{ resource?: Resource }>) => {
             state.isFetchingConditionGroups = true;
         },
 
@@ -339,11 +339,26 @@ export const slice = createSlice({
 const state = createFeatureSelector<State>(slice.name);
 
 const rules = createSelector(state, (state) => state.rules);
+const conditionGroupDetails = createSelector(state, (state) => state.conditionGroupDetails);
+
+const isCreatingConditionGroup = createSelector(state, (state) => state.isCreatingConditionGroup);
+const isUpdatingConditionGroup = createSelector(state, (state) => state.isUpdatingConditionGroup);
 const isFetchingRulesList = createSelector(state, (state) => state.isFetchingRulesList);
+const conditionRuleGroups = createSelector(state, (state) => state.conditionRuleGroups);
+const isFetchingConditionGroups = createSelector(state, (state) => state.isFetchingConditionGroups);
+const isDeletingConditionGroup = createSelector(state, (state) => state.isDeletingConditionGroup);
+const isFetchingConditionGroup = createSelector(state, (state) => state.isFetchingConditionGroup);
 
 export const selectors = {
     rules,
     isFetchingRulesList,
+    conditionRuleGroups,
+    isFetchingConditionGroups,
+    isDeletingConditionGroup,
+    conditionGroupDetails,
+    isCreatingConditionGroup,
+    isUpdatingConditionGroup,
+    isFetchingConditionGroup,
 };
 
 export const actions = slice.actions;
