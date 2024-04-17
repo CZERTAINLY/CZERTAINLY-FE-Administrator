@@ -88,17 +88,12 @@ function PagedList({
         [setPageSize, setPageNumber],
     );
 
-    useEffect(() => {
-        if (data.length !== pageSize) {
-            getFreshData();
-        }
-    }, [data.length, getFreshData, pageSize]);
-
     const onDeleteConfirmed = useCallback(() => {
         setConfirmDelete(false);
         onDeleteCallback!(checkedRows, currentFilters);
         onCheckedRowsChanged([]);
-    }, [checkedRows, onDeleteCallback, currentFilters, onCheckedRowsChanged]);
+        getFreshData();
+    }, [checkedRows, onDeleteCallback, currentFilters, onCheckedRowsChanged, getFreshData]);
 
     useEffect(() => {
         setPageNumber(1);
