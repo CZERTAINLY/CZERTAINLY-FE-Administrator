@@ -14,7 +14,10 @@ import { PlatformEnum, Resource } from 'types/openapi';
 
 const ConditionGroups = () => {
     const conditionGroups = useSelector(rulesSelectors.conditionRuleGroups);
+
     const dispatch = useDispatch();
+    const navigate = useNavigate();
+
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [selectedResource, setSelectedResource] = useState<Resource>();
     const isFetchingList = useSelector(rulesSelectors.isFetchingConditionGroups);
@@ -22,8 +25,23 @@ const ConditionGroups = () => {
 
     const [checkedRows, setCheckedRows] = useState<string[]>([]);
     const [confirmDelete, setConfirmDelete] = useState(false);
-    const navigate = useNavigate();
+
     const isBusy = useMemo(() => isFetchingList || isDeleting, [isFetchingList, isDeleting]);
+
+    const onDeleteConfirmed = useCallback(() => {
+        dispatch(rulesActions.deleteConditionGroup({ conditionGroupUuid: checkedRows[0] }));
+        setConfirmDelete(false);
+        setCheckedRows([]);
+    }, [dispatch, checkedRows]);
+
+    const getFreshListConditionGroups = useCallback(() => {
+        dispatch(rulesActions.listConditionGroups({ resource: selectedResource }));
+    }, [dispatch, selectedResource]);
+
+    useEffect(() => {
+        getFreshListConditionGroups();
+    }, [getFreshListConditionGroups]);
+
     const resourceOptions = useMemo(() => {
         if (resourceTypeEnum === undefined) return [];
         const resourceTypeArray = Object.entries(resourceTypeEnum)
@@ -36,35 +54,27 @@ const ConditionGroups = () => {
         return resourceTypeArray;
     }, [resourceTypeEnum]);
 
-    const getFreshListConditionGroups = useCallback(() => {
-        dispatch(rulesActions.listConditionGroups({ resource: selectedResource }));
-    }, [dispatch, selectedResource]);
-
-    useEffect(() => {
-        getFreshListConditionGroups();
-    }, [getFreshListConditionGroups]);
-
     const conditionGroupsRowHeaders: TableHeader[] = useMemo(
         () => [
             {
                 content: 'Name',
-                align: 'center',
+                align: 'left',
                 id: 'name',
-                width: '5%',
+                width: '10%',
                 sortable: true,
             },
             {
                 content: 'Resource',
-                align: 'center',
+                align: 'left',
                 id: 'resource',
-                width: '5%',
+                width: '10%',
                 sortable: true,
             },
             {
                 content: 'Description',
-                align: 'center',
+                align: 'left',
                 id: 'description',
-                width: '5%',
+                width: '10%',
             },
         ],
         [],
@@ -122,12 +132,6 @@ const ConditionGroups = () => {
         [checkedRows, resourceOptions, navigate],
     );
 
-    const onDeleteConfirmed = useCallback(() => {
-        dispatch(rulesActions.deleteConditionGroup({ conditionGroupUuid: checkedRows[0] }));
-        setConfirmDelete(false);
-        setCheckedRows([]);
-    }, [dispatch, checkedRows]);
-
     return (
         <Container className="themed-container" fluid>
             <Widget
@@ -136,7 +140,6 @@ const ConditionGroups = () => {
                 refreshAction={getFreshListConditionGroups}
                 busy={isBusy}
                 widgetButtons={buttons}
-                // widgetLockName={LockWidgetNameEnum.NotificationStore}
             >
                 <br />
                 <CustomTable

@@ -10,17 +10,24 @@ import { Col, Container, Row } from 'reactstrap';
 
 const ConditionGroupDetails = () => {
     const { id } = useParams();
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const conditionGroupsDetails = useSelector(rulesSelectors.conditionGroupDetails);
+    const isFetchingConditionGroup = useSelector(rulesSelectors.isFetchingConditionGroup);
 
     const [confirmDelete, setConfirmDelete] = useState(false);
-    const navigate = useNavigate();
-    const conditionGroupsDetails = useSelector(rulesSelectors.conditionGroupDetails);
-    const dispatch = useDispatch();
-    const isFetchingConditionGroup = useSelector(rulesSelectors.isFetchingConditionGroup);
 
     useEffect(() => {
         if (!id) return;
         dispatch(rulesActions.getConditionGroup({ conditionGroupUuid: id }));
     }, [id, dispatch]);
+
+    const onDeleteConfirmed = useCallback(() => {
+        if (!id) return;
+        dispatch(rulesActions.deleteConditionGroup({ conditionGroupUuid: id }));
+        setConfirmDelete(false);
+    }, [dispatch, id]);
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
@@ -84,10 +91,6 @@ const ConditionGroupDetails = () => {
                 content: 'UUID',
             },
             {
-                id: 'fieldIdentifier',
-                content: 'Field Identifier',
-            },
-            {
                 id: 'fieldSource',
                 content: 'Field Source',
             },
@@ -112,7 +115,6 @@ const ConditionGroupDetails = () => {
                           id: condition.uuid,
                           columns: [
                               condition.uuid,
-                              condition.fieldIdentifier || '',
                               condition.fieldSource || '',
                               condition.operator || '',
                               typeof condition.value === 'string' ? (
@@ -137,12 +139,6 @@ const ConditionGroupDetails = () => {
                   }),
         [conditionGroupsDetails],
     );
-
-    const onDeleteConfirmed = useCallback(() => {
-        if (!id) return;
-        dispatch(rulesActions.deleteConditionGroup({ conditionGroupUuid: id }));
-        setConfirmDelete(false);
-    }, [dispatch, id]);
 
     return (
         <Container className="themed-container" fluid>
