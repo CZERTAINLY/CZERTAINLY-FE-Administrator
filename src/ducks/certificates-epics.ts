@@ -119,7 +119,7 @@ const issueCertificate: AppEpic = (action$, state, deps) => {
                     mergeMap((operation) =>
                         of(
                             slice.actions.issueCertificateSuccess({ uuid: operation.uuid, certificateData: operation.certificateData }),
-                            appRedirectActions.redirect({ url: `../detail/${operation.uuid}` }),
+                            appRedirectActions.redirect({ url: `../certificates/detail/${operation.uuid}` }),
                         ),
                     ),
 
@@ -148,7 +148,7 @@ const issueCertificateNew: AppEpic = (action$, state, deps) => {
                     mergeMap((operation) =>
                         of(
                             slice.actions.issueCertificateSuccess({ uuid: operation.uuid, certificateData: operation.certificateData }),
-                            appRedirectActions.redirect({ url: `../${operation.uuid}` }),
+                            appRedirectActions.redirect({ url: `../certificates/detail/${operation.uuid}` }),
                             alertActions.success('Issue new certificate operation successfully initiated'),
                         ),
                     ),
@@ -210,7 +210,7 @@ const renewCertificate: AppEpic = (action$, state, deps) => {
                     mergeMap((operation) =>
                         of(
                             slice.actions.renewCertificateSuccess({ uuid: operation.uuid }),
-                            appRedirectActions.redirect({ url: `../${operation.uuid}` }),
+                            appRedirectActions.redirect({ url: `../certificates/detail/${operation.uuid}` }),
                         ),
                     ),
 
@@ -240,7 +240,7 @@ const rekeyCertificate: AppEpic = (action$, state, deps) => {
                     mergeMap((operation) =>
                         of(
                             slice.actions.rekeyCertificateSuccess({ uuid: operation.uuid }),
-                            appRedirectActions.redirect({ url: `../${operation.uuid}` }),
+                            appRedirectActions.redirect({ url: `../certificates/detail/${operation.uuid}` }),
                         ),
                     ),
 
@@ -313,7 +313,7 @@ const deleteCertificate: AppEpic = (action$, state, deps) => {
                 mergeMap(() =>
                     of(
                         slice.actions.deleteCertificateSuccess({ uuid: action.payload.uuid }),
-                        appRedirectActions.redirect({ url: '../../' }),
+                        appRedirectActions.redirect({ url: '../../certificates' }),
                     ),
                 ),
 

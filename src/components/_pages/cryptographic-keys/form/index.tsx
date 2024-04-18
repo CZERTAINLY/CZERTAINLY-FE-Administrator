@@ -147,7 +147,7 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                     cryptographicKeysActions.updateCryptographicKey({
                         profileUuid: id!,
                         tokenInstanceUuid: values.tokenProfile!.value.tokenInstanceUuid,
-                        redirect: `../../../detail/${values.tokenProfile!.value.tokenInstanceUuid}/${id}`,
+                        redirect: `../../../keys/detail/${values.tokenProfile!.value.tokenInstanceUuid}/${id}`,
                         cryptographicKeyEditRequest: {
                             description: values.description,
                             tokenProfileUuid: values.tokenProfile!.value.uuid,

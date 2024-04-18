@@ -87,7 +87,9 @@ const addLocation: AppEpic = (action$, state, deps) => {
                                         location: transformLocationResponseDtoToModel(location),
                                         entityUuid: action.payload.entityUuid,
                                     }),
-                                    appRedirectActions.redirect({ url: `../detail/${action.payload.entityUuid}/${location.uuid}` }),
+                                    appRedirectActions.redirect({
+                                        url: `../locations/detail/${action.payload.entityUuid}/${location.uuid}`,
+                                    }),
                                 ),
                             ),
                         ),
@@ -118,7 +120,7 @@ const editLocation: AppEpic = (action$, state, deps) => {
                     mergeMap((location) =>
                         of(
                             slice.actions.editLocationSuccess({ location: transformLocationResponseDtoToModel(location) }),
-                            appRedirectActions.redirect({ url: `../../../detail/${action.payload.entityUuid}/${location.uuid}` }),
+                            appRedirectActions.redirect({ url: `../../../locations/detail/${action.payload.entityUuid}/${location.uuid}` }),
                         ),
                     ),
 

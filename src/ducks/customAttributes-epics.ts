@@ -104,7 +104,7 @@ const createCustomAttribute: AppEpic = (action$, state$, deps) => {
                     mergeMap((obj) =>
                         of(
                             slice.actions.createCustomAttributeSuccess({ uuid: obj.uuid }),
-                            appRedirectActions.redirect({ url: `../detail/${obj.uuid}` }),
+                            appRedirectActions.redirect({ url: `../customattributes/detail/${obj.uuid}` }),
                         ),
                     ),
                     catchError((err) =>
@@ -135,7 +135,7 @@ const updateCustomAttribute: AppEpic = (action$, state$, deps) => {
                             slice.actions.updateCustomAttributeSuccess(
                                 transformCustomAttributeDetailResponseDtoToModel(customAttributeDetail),
                             ),
-                            appRedirectActions.redirect({ url: `../../detail/${customAttributeDetail.uuid}` }),
+                            appRedirectActions.redirect({ url: `../../customattributes/detail/${customAttributeDetail.uuid}` }),
                         ),
                     ),
                     catchError((err) =>
@@ -244,7 +244,10 @@ const deleteCustomAttribute: AppEpic = (action$, state$, deps) => {
         switchMap((action) =>
             deps.apiClients.customAttributes.deleteCustomAttribute({ uuid: action.payload }).pipe(
                 mergeMap(() =>
-                    of(slice.actions.deleteCustomAttributeSuccess(action.payload), appRedirectActions.redirect({ url: '../../' })),
+                    of(
+                        slice.actions.deleteCustomAttributeSuccess(action.payload),
+                        appRedirectActions.redirect({ url: '../../customattributes' }),
+                    ),
                 ),
                 catchError((err) =>
                     of(

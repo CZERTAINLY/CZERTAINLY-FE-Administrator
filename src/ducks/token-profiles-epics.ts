@@ -94,7 +94,7 @@ const createTokenProfile: AppEpic = (action$, state$, deps) => {
                                     uuid: obj.uuid,
                                     tokenInstanceUuid: action.payload.tokenInstanceUuid,
                                 }),
-                                appRedirectActions.redirect({ url: `../detail/${action.payload.tokenInstanceUuid}/${obj.uuid}` }),
+                                appRedirectActions.redirect({ url: `../tokens/detail/${action.payload.tokenInstanceUuid}/${obj.uuid}` }),
                             ),
                         ),
                     ),

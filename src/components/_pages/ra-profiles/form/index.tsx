@@ -100,7 +100,7 @@ export default function RaProfileForm() {
                     raProfilesActions.updateRaProfile({
                         profileUuid: id!,
                         authorityInstanceUuid: values.authority!.value,
-                        redirect: `../../../detail/${values.authority!.value}/${id}`,
+                        redirect: `../../../raprofiles/detail/${values.authority!.value}/${id}`,
                         raProfileEditRequest: {
                             enabled: raProfile!.enabled,
                             description: values.description,

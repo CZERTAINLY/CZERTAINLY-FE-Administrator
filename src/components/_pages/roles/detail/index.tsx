@@ -66,7 +66,7 @@ export default function UserDetail() {
     const onDeleteConfirmed = useCallback(() => {
         if (!role) return;
 
-        dispatch(actions.delete({ uuid: role.uuid, redirect: `../../` }));
+        dispatch(actions.delete({ uuid: role.uuid, redirect: `../../roles` }));
         setConfirmDelete(false);
     }, [role, dispatch]);
 
