@@ -27,6 +27,7 @@ apis/InternalNotificationApi.ts
 apis/LocalOperationsApi.ts
 apis/LocationManagementApi.ts
 apis/RAProfileManagementApi.ts
+apis/ResourceManagementApi.ts
 apis/RoleManagementApi.ts
 apis/RulesManagementApi.ts
 apis/SCEPProfileManagementApi.ts

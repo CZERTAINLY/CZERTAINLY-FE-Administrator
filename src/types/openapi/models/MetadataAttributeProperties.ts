@@ -41,4 +41,10 @@ export interface MetadataAttributeProperties {
      * @memberof MetadataAttributeProperties
      */
     global?: boolean;
+    /**
+     * Boolean determining if the new metadata content should overwrite (replace) existing content instead of appending.
+     * @type {boolean}
+     * @memberof MetadataAttributeProperties
+     */
+    overwrite?: boolean;
 }

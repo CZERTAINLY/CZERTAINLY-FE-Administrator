@@ -36,9 +36,10 @@ interface Props {
     title: string;
     entity: EntityType;
     getAvailableFiltersApi: (apiClients: ApiClients) => Observable<Array<SearchFieldListModel>>;
+    onFilterUpdate?: (currentFilters: SearchFilterModel[]) => void;
 }
 
-export default function FilterWidget({ title, entity, getAvailableFiltersApi }: Props) {
+export default function FilterWidget({ onFilterUpdate, title, entity, getAvailableFiltersApi }: Props) {
     const dispatch = useDispatch();
 
     const searchGroupEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.FilterFieldSource));
@@ -168,14 +169,16 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
                 : [...currentFilters.slice(0, selectedFilter), updatedFilterItem, ...currentFilters.slice(selectedFilter + 1)];
 
         dispatch(actions.setCurrentFilters({ entity, currentFilters: newFilters }));
-    }, [filterGroup, filterField, filterCondition, selectedFilter, currentFilters, filterValue, dispatch, entity]);
+        if (onFilterUpdate) onFilterUpdate(newFilters);
+    }, [filterGroup, filterField, filterCondition, selectedFilter, currentFilters, filterValue, dispatch, entity, onFilterUpdate]);
 
     const onRemoveFilterClick = useCallback(
         (index: number) => {
             const newFilters = currentFilters.filter((_, i) => i !== index);
             dispatch(actions.setCurrentFilters({ entity, currentFilters: newFilters }));
+            if (onFilterUpdate) onFilterUpdate(newFilters);
         },
-        [currentFilters, dispatch, entity],
+        [currentFilters, dispatch, entity, onFilterUpdate],
     );
 
     const toggleFilter = useCallback(

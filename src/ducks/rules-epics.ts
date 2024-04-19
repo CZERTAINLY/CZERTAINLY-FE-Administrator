@@ -3,6 +3,7 @@ import { catchError, filter, switchMap } from 'rxjs/operators';
 
 import { AppEpic } from 'ducks';
 import { extractError } from 'utils/net';
+import { actions as appRedirectActions } from './app-redirect';
 
 import * as slice from './rules';
 import {
@@ -124,6 +125,7 @@ const createConditionGroup: AppEpic = (action$, state, deps) => {
                             slice.actions.createConditionGroupSuccess({
                                 conditionGroup: transformRuleConditionGroupDetailDtoToModel(conditionGroup),
                             }),
+                            appRedirectActions.redirect({ url: `../detail/${conditionGroup.uuid}` }),
                         ),
                     ),
                     catchError((err) =>
@@ -178,7 +180,12 @@ const deleteConditionGroup: AppEpic = (action$, state, deps) => {
         filter(slice.actions.deleteConditionGroup.match),
         switchMap((action) =>
             deps.apiClients.rules.deleteConditionGroup({ conditionGroupUuid: action.payload.conditionGroupUuid }).pipe(
-                switchMap(() => of(slice.actions.deleteConditionGroupSuccess({ conditionGroupUuid: action.payload.conditionGroupUuid }))),
+                switchMap(() =>
+                    of(
+                        slice.actions.deleteConditionGroupSuccess({ conditionGroupUuid: action.payload.conditionGroupUuid }),
+                        appRedirectActions.redirect({ url: `../../` }),
+                    ),
+                ),
                 catchError((err) =>
                     of(slice.actions.deleteConditionGroupFailure({ error: extractError(err, 'Failed to delete condition group') })),
                 ),
@@ -284,6 +291,7 @@ const updateConditionGroup: AppEpic = (action$, state, deps) => {
                             slice.actions.updateConditionGroupSuccess({
                                 conditionGroup: transformRuleConditionGroupDetailDtoToModel(conditionRuleGroupDetail),
                             }),
+                            appRedirectActions.redirect({ url: `../../detail/${conditionRuleGroupDetail.uuid}` }),
                         ),
                     ),
                     catchError((err) =>
