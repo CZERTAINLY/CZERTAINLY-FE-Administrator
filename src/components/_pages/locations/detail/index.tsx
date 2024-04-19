@@ -237,7 +237,7 @@ export default function LocationDetail() {
     const onDeleteConfirmed = useCallback(() => {
         if (!location) return;
 
-        dispatch(actions.deleteLocation({ entityUuid: location.entityInstanceUuid, uuid: location.uuid, redirect: '../../../' }));
+        dispatch(actions.deleteLocation({ entityUuid: location.entityInstanceUuid, uuid: location.uuid, redirect: '../../../locations' }));
         setConfirmDelete(false);
     }, [location, dispatch]);
 

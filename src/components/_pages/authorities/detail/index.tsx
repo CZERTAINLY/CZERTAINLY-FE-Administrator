@@ -56,7 +56,7 @@ export default function AuthorityDetail() {
     const onForceDeleteAuthority = useCallback(() => {
         if (!authority) return;
         dispatch(actions.clearDeleteErrorMessages());
-        dispatch(actions.bulkForceDeleteAuthority({ uuids: [authority.uuid], redirect: `../` }));
+        dispatch(actions.bulkForceDeleteAuthority({ uuids: [authority.uuid], redirect: `../authorities` }));
     }, [authority, dispatch]);
 
     const buttons: WidgetButtonProps[] = useMemo(

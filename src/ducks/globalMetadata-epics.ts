@@ -51,7 +51,7 @@ const createGlobalMetadata: AppEpic = (action$, state$, deps) => {
                     mergeMap((obj) =>
                         of(
                             slice.actions.createGlobalMetadataSuccess({ uuid: obj.uuid }),
-                            appRedirectActions.redirect({ url: `../detail/${obj.uuid}` }),
+                            appRedirectActions.redirect({ url: `../globalmetadata/detail/${obj.uuid}` }),
                         ),
                     ),
                     catchError((err) =>
@@ -82,7 +82,7 @@ const updateGlobalMetadata: AppEpic = (action$, state$, deps) => {
                             slice.actions.updateGlobalMetadataSuccess(
                                 transformGlobalMetadataDetailResponseDtoToModel(globalMetadataDetail),
                             ),
-                            appRedirectActions.redirect({ url: `../../detail/${globalMetadataDetail.uuid}` }),
+                            appRedirectActions.redirect({ url: `../../globalmetadata/detail/${globalMetadataDetail.uuid}` }),
                         ),
                     ),
                     catchError((err) =>
@@ -189,7 +189,10 @@ const deleteGlobalMetadata: AppEpic = (action$, state$, deps) => {
         switchMap((action) =>
             deps.apiClients.globalMetadata.deleteGlobalMetadata({ uuid: action.payload }).pipe(
                 mergeMap(() =>
-                    of(slice.actions.deleteGlobalMetadataSuccess(action.payload), appRedirectActions.redirect({ url: '../../' })),
+                    of(
+                        slice.actions.deleteGlobalMetadataSuccess(action.payload),
+                        appRedirectActions.redirect({ url: '../../globalmetadata' }),
+                    ),
                 ),
                 catchError((err) =>
                     of(

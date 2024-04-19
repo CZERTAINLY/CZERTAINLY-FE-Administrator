@@ -77,7 +77,7 @@ const create: AppEpic = (action$, state, deps) => {
                             mergeMap((userDetailDto) =>
                                 of(
                                     slice.actions.createSuccess({ user: transformUserDetailDtoToModel(userDetailDto) }),
-                                    appRedirectActions.redirect({ url: `../detail/${userDetailDto.uuid}` }),
+                                    appRedirectActions.redirect({ url: `../users/detail/${userDetailDto.uuid}` }),
                                 ),
                             ),
 
@@ -116,7 +116,7 @@ const update: AppEpic = (action$, state, deps) => {
                             mergeMap(() =>
                                 of(
                                     slice.actions.updateSuccess({ user: transformUserDetailDtoToModel(userDetailDto) }),
-                                    appRedirectActions.redirect({ url: `../../detail/${userDetailDto.uuid}` }),
+                                    appRedirectActions.redirect({ url: `../../users/detail/${userDetailDto.uuid}` }),
                                 ),
                             ),
 

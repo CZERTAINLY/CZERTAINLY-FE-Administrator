@@ -67,7 +67,7 @@ export default function AdministratorDetail() {
     const onForceDeleteAcmeProfile = useCallback(() => {
         if (!acmeProfile) return;
 
-        dispatch(actions.bulkForceDeleteAcmeProfiles({ uuids: [acmeProfile.uuid], redirect: `../` }));
+        dispatch(actions.bulkForceDeleteAcmeProfiles({ uuids: [acmeProfile.uuid], redirect: `../acmeprofiles` }));
     }, [acmeProfile, dispatch]);
 
     const buttons: WidgetButtonProps[] = useMemo(

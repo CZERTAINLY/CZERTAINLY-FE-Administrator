@@ -110,7 +110,7 @@ export default function TokenProfileForm({ usesGlobalModal = false }: TokenProfi
                     tokenProfilesActions.updateTokenProfile({
                         profileUuid: id!,
                         tokenInstanceUuid: values.token!.value,
-                        redirect: `../../../detail/${values.token!.value}/${id}`,
+                        redirect: `../../../tokens/detail/${values.token!.value}/${id}`,
                         tokenProfileEditRequest: {
                             enabled: tokenProfile!.enabled,
                             description: values.description,

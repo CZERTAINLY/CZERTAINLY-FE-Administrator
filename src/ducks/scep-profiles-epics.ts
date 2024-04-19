@@ -100,7 +100,7 @@ const createScepProfile: AppEpic = (action$, state$, deps) => {
                     mergeMap((scepProfile) =>
                         of(
                             slice.actions.createScepProfileSuccess({ uuid: scepProfile.uuid }),
-                            appRedirectActions.redirect({ url: `../detail/${scepProfile.uuid}` }),
+                            appRedirectActions.redirect({ url: `../scepprofiles/detail/${scepProfile.uuid}` }),
                         ),
                     ),
 
@@ -129,7 +129,7 @@ const updateScepProfile: AppEpic = (action$, state$, deps) => {
                     mergeMap((scepProfile) =>
                         of(
                             slice.actions.updateScepProfileSuccess({ scepProfile: transformScepProfileResponseDtoToModel(scepProfile) }),
-                            appRedirectActions.redirect({ url: `../../detail/${scepProfile.uuid}` }),
+                            appRedirectActions.redirect({ url: `../../scepprofiles/detail/${scepProfile.uuid}` }),
                         ),
                     ),
 
@@ -152,7 +152,7 @@ const deleteScepProfile: AppEpic = (action$, state$, deps) => {
                 mergeMap(() =>
                     of(
                         slice.actions.deleteScepProfileSuccess({ uuid: action.payload.uuid }),
-                        appRedirectActions.redirect({ url: '../../' }),
+                        appRedirectActions.redirect({ url: '../../scepprofiles' }),
                     ),
                 ),
 

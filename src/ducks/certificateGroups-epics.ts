@@ -72,7 +72,7 @@ const createGroup: AppEpic = (action$, state$, deps) => {
                     mergeMap((obj) =>
                         of(
                             slice.actions.createGroupSuccess({ uuid: obj.uuid }),
-                            appRedirectActions.redirect({ url: `../detail/${obj.uuid}` }),
+                            appRedirectActions.redirect({ url: `../groups/detail/${obj.uuid}` }),
                         ),
                     ),
 
@@ -100,7 +100,7 @@ const updateGroup: AppEpic = (action$, state$, deps) => {
                     mergeMap((groupDTO) =>
                         of(
                             slice.actions.updateGroupSuccess({ group: transformCertificateGroupResponseDtoToModel(groupDTO) }),
-                            appRedirectActions.redirect({ url: `../../detail/${groupDTO.uuid}` }),
+                            appRedirectActions.redirect({ url: `../../groups/detail/${groupDTO.uuid}` }),
                         ),
                     ),
 
@@ -121,7 +121,10 @@ const deleteGroup: AppEpic = (action$, state$, deps) => {
         switchMap((action) =>
             deps.apiClients.certificateGroups.deleteGroup({ uuid: action.payload.uuid }).pipe(
                 mergeMap(() =>
-                    of(slice.actions.deleteGroupSuccess({ uuid: action.payload.uuid }), appRedirectActions.redirect({ url: '../../' })),
+                    of(
+                        slice.actions.deleteGroupSuccess({ uuid: action.payload.uuid }),
+                        appRedirectActions.redirect({ url: '../../groups' }),
+                    ),
                 ),
 
                 catchError((err) =>

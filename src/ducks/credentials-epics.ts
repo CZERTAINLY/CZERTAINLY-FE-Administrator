@@ -141,7 +141,7 @@ const createCredential: AppEpic = (action$, state, deps) => {
                             ),
                             of(
                                 slice.actions.createCredentialSuccess({ uuid: obj.uuid }),
-                                appRedirectActions.redirect({ url: `../detail/${obj.uuid}` }),
+                                appRedirectActions.redirect({ url: `../credentials/detail/${obj.uuid}` }),
                             ),
                         ),
                     ),

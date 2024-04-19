@@ -76,7 +76,7 @@ export default function UserDetail() {
     const onDeleteConfirmed = useCallback(() => {
         if (!user) return;
 
-        dispatch(actions.deleteUser({ uuid: user.uuid, redirect: `../../` }));
+        dispatch(actions.deleteUser({ uuid: user.uuid, redirect: `../../users` }));
         setConfirmDelete(false);
     }, [user, dispatch]);
 

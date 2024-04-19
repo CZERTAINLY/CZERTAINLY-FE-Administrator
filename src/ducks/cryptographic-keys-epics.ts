@@ -167,7 +167,7 @@ const createCryptographicKey: AppEpic = (action$, state$, deps) => {
                                     uuid: obj.uuid,
                                     tokenInstanceUuid: action.payload.tokenInstanceUuid,
                                 }),
-                                appRedirectActions.redirect({ url: `../detail/${action.payload.tokenInstanceUuid}/${obj.uuid}` }),
+                                appRedirectActions.redirect({ url: `../keys/detail/${action.payload.tokenInstanceUuid}/${obj.uuid}` }),
                             ),
                         ),
                     ),
