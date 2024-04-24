@@ -125,7 +125,7 @@ const createConditionGroup: AppEpic = (action$, state, deps) => {
                             slice.actions.createConditionGroupSuccess({
                                 conditionGroup: transformRuleConditionGroupDetailDtoToModel(conditionGroup),
                             }),
-                            appRedirectActions.redirect({ url: `../detail/${conditionGroup.uuid}` }),
+                            appRedirectActions.redirect({ url: `../conditiongroups/detail/${conditionGroup.uuid}` }),
                         ),
                     ),
                     catchError((err) =>
@@ -140,7 +140,12 @@ const createRule: AppEpic = (action$, state, deps) => {
         filter(slice.actions.createRule.match),
         switchMap((action) =>
             deps.apiClients.rules.createRule({ ruleRequestDto: transformRuleRequestModelToDto(action.payload.rule) }).pipe(
-                switchMap((rule) => of(slice.actions.createRuleSuccess({ rule: transformDetailRuleDtoToModel(rule) }))),
+                switchMap((rule) =>
+                    of(
+                        slice.actions.createRuleSuccess({ rule: transformDetailRuleDtoToModel(rule) }),
+                        appRedirectActions.redirect({ url: `../rules/detail/${rule.uuid}` }),
+                    ),
+                ),
                 catchError((err) => of(slice.actions.createRuleFailure({ error: extractError(err, 'Failed to create rule') }))),
             ),
         ),
@@ -183,7 +188,7 @@ const deleteConditionGroup: AppEpic = (action$, state, deps) => {
                 switchMap(() =>
                     of(
                         slice.actions.deleteConditionGroupSuccess({ conditionGroupUuid: action.payload.conditionGroupUuid }),
-                        appRedirectActions.redirect({ url: `../../` }),
+                        appRedirectActions.redirect({ url: `../../conditiongroups` }),
                     ),
                 ),
                 catchError((err) =>
@@ -291,7 +296,7 @@ const updateConditionGroup: AppEpic = (action$, state, deps) => {
                             slice.actions.updateConditionGroupSuccess({
                                 conditionGroup: transformRuleConditionGroupDetailDtoToModel(conditionRuleGroupDetail),
                             }),
-                            appRedirectActions.redirect({ url: `../../detail/${conditionRuleGroupDetail.uuid}` }),
+                            appRedirectActions.redirect({ url: `../../conditiongroups/detail/${conditionRuleGroupDetail.uuid}` }),
                         ),
                     ),
                     catchError((err) =>
@@ -312,7 +317,12 @@ const updateRule: AppEpic = (action$, state, deps) => {
                     updateRuleRequestDto: transformRuleUpdateRequestModelToDto(action.payload.rule),
                 })
                 .pipe(
-                    switchMap((rule) => of(slice.actions.updateRuleSuccess({ rule: transformDetailRuleDtoToModel(rule) }))),
+                    switchMap((rule) =>
+                        of(
+                            slice.actions.updateRuleSuccess({ rule: transformDetailRuleDtoToModel(rule) }),
+                            appRedirectActions.redirect({ url: `../rules/detail/${rule.uuid}` }),
+                        ),
+                    ),
                     catchError((err) => of(slice.actions.updateRuleFailure({ error: extractError(err, 'Failed to update rule') }))),
                 ),
         ),

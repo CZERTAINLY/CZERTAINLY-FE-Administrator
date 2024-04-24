@@ -173,8 +173,10 @@ export function transformUpdateGroupRuleConditionRequestModelToDto(
 export function transformRuleUpdateRequestModelToDto(ruleUpdateRequest: RuleUpdateRequestModel): RuleUpdateRequestDto {
     return {
         ...ruleUpdateRequest,
-        conditions: ruleUpdateRequest.conditions.map(transformRuleConditiontModelToModelDto),
-        conditionGroups: ruleUpdateRequest.conditionGroups.map(transformConditionRuleGroupRequestModelToDto),
+        conditions: ruleUpdateRequest.conditions?.length ? ruleUpdateRequest.conditions.map(transformRuleConditiontModelToModelDto) : [],
+        conditionGroups: ruleUpdateRequest.conditionGroups?.length
+            ? ruleUpdateRequest.conditionGroups.map(transformConditionRuleGroupRequestModelToDto)
+            : [],
     };
 }
 

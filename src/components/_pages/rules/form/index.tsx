@@ -12,13 +12,14 @@ import { Field, Form } from 'react-final-form';
 import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 
+import ConditionFormFilter from 'components/ConditionFormFilter';
 import ProgressButton from 'components/ProgressButton';
 import Select from 'react-select';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { RuleConditiontModel } from 'types/rules';
 import { isObjectSame } from 'utils/common-utils';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
-import ConditionFormFilter from '../../../ConditionFormFilter';
+// import ConditionFormFilter from '../ConditionFormFilter';
 
 interface SelectChangeValue {
     value: string;
@@ -31,22 +32,23 @@ export interface ConditionGroupFormValues {
     resource: Resource;
     description: string;
     conditions: RuleConditiontModel[];
+    conditionGroupsUuids: SelectChangeValue[];
 }
 
 const ConditionGroupForm = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const title = id ? 'Edit' : 'Create Condition Group';
-    const isCreatingConditionGroup = useSelector(rulesSelectors.isCreatingConditionGroup);
-    const isUpdatingConditionGroup = useSelector(rulesSelectors.isUpdatingConditionGroup);
-    const conditionGroupsDetails = useSelector(rulesSelectors.conditionGroupDetails);
+    const title = id ? 'Edit' : 'Create Rule';
+
+    const conditionGroups = useSelector(rulesSelectors.conditionRuleGroups);
+    const isCreatingRule = useSelector(rulesSelectors.isCreatingRule);
+    const isUpdatingRule = useSelector(rulesSelectors.isUpdatingRule);
+
+    const ruleDetails = useSelector(rulesSelectors.ruleDetails);
     const editMode = useMemo(() => !!id, [id]);
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
-    const isBusy = useMemo(
-        () => isCreatingConditionGroup || isUpdatingConditionGroup,
-        [isCreatingConditionGroup, isUpdatingConditionGroup],
-    );
+    const isBusy = useMemo(() => isCreatingRule || isUpdatingRule, [isCreatingRule, isUpdatingRule]);
     const resourceOptions = useMemo(() => {
         if (resourceTypeEnum === undefined) return [];
         const resourceTypeArray = Object.entries(resourceTypeEnum)
@@ -59,9 +61,20 @@ const ConditionGroupForm = () => {
         return resourceTypeArray;
     }, [resourceTypeEnum]);
 
+    const conditionGroupsOptions = useMemo(() => {
+        if (conditionGroups === undefined) return [];
+        return conditionGroups.map((conditionGroup) => {
+            return { value: conditionGroup.uuid, label: conditionGroup.name };
+        });
+    }, [conditionGroups]);
+
+    useEffect(() => {
+        dispatch(rulesActions.listConditionGroups({}));
+    }, [dispatch]);
+
     useEffect(() => {
         if (!id) return;
-        dispatch(rulesActions.getConditionGroup({ conditionGroupUuid: id }));
+        dispatch(rulesActions.getRule({ ruleUuid: id }));
     }, [id, dispatch]);
 
     useEffect(() => {
@@ -73,16 +86,19 @@ const ConditionGroupForm = () => {
     const defaultValues: ConditionGroupFormValues = useMemo(() => {
         let selectedResource;
         if (editMode) {
-            selectedResource = resourceOptions.find((resource) => resource.value === conditionGroupsDetails?.resource);
+            selectedResource = resourceOptions.find((resource) => resource.value === ruleDetails?.resource);
         }
         return {
-            name: editMode ? conditionGroupsDetails?.name || '' : '',
-            resource: editMode ? conditionGroupsDetails?.resource || Resource.None : Resource.None,
+            name: editMode ? ruleDetails?.name || '' : '',
+            resource: editMode ? ruleDetails?.resource || Resource.None : Resource.None,
             selectedResource: editMode ? selectedResource || { value: '', label: '' } : { value: '', label: '' },
-            description: editMode ? conditionGroupsDetails?.description || '' : '',
-            conditions: editMode ? conditionGroupsDetails?.conditions || [] : [],
+            description: editMode ? ruleDetails?.description || '' : '',
+            conditions: editMode ? ruleDetails?.conditions || [] : [],
+            conditionGroupsUuids: editMode
+                ? ruleDetails?.conditionGroups?.map((conditionGroup) => ({ value: conditionGroup.uuid, label: conditionGroup.name })) || []
+                : [],
         };
-    }, [editMode, conditionGroupsDetails, resourceOptions]);
+    }, [editMode, ruleDetails, resourceOptions]);
 
     const submitTitle = useMemo(() => (editMode ? 'Save' : 'Create'), [editMode]);
     const inProgressTitle = useMemo(() => (editMode ? 'Saving...' : 'Creating...'), [editMode]);
@@ -98,9 +114,10 @@ const ConditionGroupForm = () => {
 
             if (editMode && id) {
                 dispatch(
-                    rulesActions.updateConditionGroup({
-                        conditionGroupUuid: id,
-                        conditionGroup: {
+                    rulesActions.updateRule({
+                        ruleUuid: id,
+                        rule: {
+                            conditionGroupsUuids: values.conditionGroupsUuids.map((uuid) => uuid.value),
                             conditions: values.conditions,
                             description: values.description,
                         },
@@ -108,12 +125,13 @@ const ConditionGroupForm = () => {
                 );
             } else {
                 dispatch(
-                    rulesActions.createConditionGroup({
-                        ruleConditionGroupRequest: {
+                    rulesActions.createRule({
+                        rule: {
+                            conditionGroupsUuids: values.conditionGroupsUuids.map((uuid) => uuid.value),
                             conditions: values.conditions,
+                            description: values.description,
                             name: values.name,
                             resource: values.resource,
-                            description: values.description,
                         },
                     }),
                 );
@@ -133,8 +151,6 @@ const ConditionGroupForm = () => {
         [defaultValues],
     );
 
-    if (id) return null;
-
     return (
         <Widget title={title} busy={isBusy}>
             <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<ConditionGroupFormValues>() }}>
@@ -143,7 +159,7 @@ const ConditionGroupForm = () => {
                         <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}>
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="name">Condition Group Name</Label>
+                                    <Label for="name">Rule Name</Label>
 
                                     <Input
                                         {...input}
@@ -178,17 +194,35 @@ const ConditionGroupForm = () => {
                             )}
                         </Field>
 
+                        <Field name="conditionGroupsUuids" validate={validateRequired()}>
+                            {({ input, meta }) => (
+                                <FormGroup>
+                                    <Label for="description">Condition Groups</Label>
+
+                                    <Select
+                                        {...input}
+                                        options={conditionGroupsOptions}
+                                        isMulti
+                                        placeholder="Select Condition Group"
+                                        isClearable
+                                    />
+                                </FormGroup>
+                            )}
+                        </Field>
+
                         <Field name="selectedResource" validate={validateRequired()}>
                             {({ input, meta }) => (
                                 <FormGroup>
                                     <Label for="resource">Resource</Label>
 
                                     <Select
+                                        isDisabled={editMode}
                                         {...input}
                                         maxMenuHeight={140}
                                         menuPlacement="auto"
                                         options={resourceOptions || []}
                                         placeholder="Select Resource"
+                                        isClearable
                                         onChange={(event) => {
                                             input.onChange(event);
                                             form.change('resource', event.value);
@@ -203,7 +237,6 @@ const ConditionGroupForm = () => {
                                                     ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
                                                     : { ...provided },
                                         }}
-                                        isClearable
                                     />
 
                                     <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
@@ -213,7 +246,7 @@ const ConditionGroupForm = () => {
                             )}
                         </Field>
 
-                        {values?.resource && <ConditionFormFilter formType="conditionGroup" resource={values.resource} />}
+                        {values?.resource && <ConditionFormFilter formType="rules" resource={values.resource} />}
 
                         <div className="d-flex justify-content-end">
                             <ButtonGroup>

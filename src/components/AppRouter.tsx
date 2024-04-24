@@ -110,7 +110,12 @@ import NotificationsSetting from './_pages/notifications/notifications-setting';
 
 import ConditionGroupDetails from './_pages/condition-groups/details';
 import ConditionGroupForm from './_pages/condition-groups/form';
-import ConditionGroups from './_pages/condition-groups/list';
+import ConditionGroupsList from './_pages/condition-groups/list';
+
+import RulesForm from './_pages/rules/form';
+import RulesList from './_pages/rules/list';
+
+import RuleDetails from './_pages/rules/detail';
 import SchedulerJobDetail from './_pages/scheduler/detail';
 import SchedulerJobsList from './_pages/scheduler/list';
 import Layout from './Layout';
@@ -320,10 +325,15 @@ export default function AppRouter() {
                     <Route path={`/notificationinstances/add`} element={<NotificationInstanceForm />} />
                     <Route path={`/notificationinstances/edit/:id`} element={<NotificationInstanceForm />} />
 
-                    <Route path={`/conditiongroups`} element={<ConditionGroups />} />
+                    <Route path={`/conditiongroups`} element={<ConditionGroupsList />} />
                     <Route path={`/conditiongroups/add`} element={<ConditionGroupForm />} />
-                    <Route path={`/conditiongroups/edit/:id`} element={<ConditionGroupForm />} />
+                    {/* <Route path={`/conditiongroups/edit/:id`} element={<ConditionGroupForm />} /> */}
                     <Route path={`/conditiongroups/detail/:id`} element={<ConditionGroupDetails />} />
+
+                    <Route path={`/rules/add`} element={<RulesForm />} />
+                    <Route path={`/rules/edit/:id`} element={<RulesForm />} />
+                    <Route path={`/rules`} element={<RulesList />} />
+                    <Route path={`/rules/detail/:id`} element={<RuleDetails />} />
                 </Route>
 
                 {/*

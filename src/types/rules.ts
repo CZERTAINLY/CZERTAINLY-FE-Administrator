@@ -77,9 +77,10 @@ export type RuleModel = Omit<DtoRule, 'attributes'> & {
 };
 
 export type RequestRuleDto = RuleRequestDto;
-export type RequestRuleModel = Omit<RequestRuleDto, 'conditions | conditionGroups'> & {
-    conditions: Array<RuleConditiontModel>;
-    conditionGroups: Array<ConditionRuleGroupRequestModel>;
+export type RequestRuleModel = Omit<RequestRuleDto, 'conditions | conditionGroups | conditionGroupsUuids'> & {
+    conditions?: Array<RuleConditiontModel>;
+    conditionGroups?: Array<ConditionRuleGroupRequestModel>;
+    conditionGroupsUuids?: Array<string>;
 };
 
 export type TriggerRuleDetailDto = RuleTriggerDetailDto;
@@ -110,9 +111,10 @@ export type UpdateGroupRuleConditionRequestModel = Omit<UpdateGroupRuleCondition
 };
 
 export type RuleUpdateRequestDto = UpdateRuleRequestDto;
-export type RuleUpdateRequestModel = Omit<RuleUpdateRequestDto, 'conditions | conditionGroups'> & {
-    conditions: Array<RuleConditiontModel>;
-    conditionGroups: Array<ConditionRuleGroupRequestModel>;
+export type RuleUpdateRequestModel = Omit<RuleUpdateRequestDto, 'conditions | conditionGroups | conditionGroupsUuids'> & {
+    conditions?: Array<RuleConditiontModel>;
+    conditionGroups?: Array<ConditionRuleGroupRequestModel>;
+    conditionGroupsUuids?: Array<string>;
 };
 
 export type RuleTriggerUpdateRequestDto = UpdateRuleTriggerRequestDto;
