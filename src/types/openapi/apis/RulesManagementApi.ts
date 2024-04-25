@@ -18,10 +18,8 @@ import type { OperationOpts, HttpHeaders, HttpQuery } from '../runtime';
 import type {
     AuthenticationServiceExceptionDto,
     Resource,
-    RuleActionGroupDetailDto,
     RuleActionGroupDto,
     RuleActionGroupRequestDto,
-    RuleConditionGroupDetailDto,
     RuleConditionGroupDto,
     RuleConditionGroupRequestDto,
     RuleDetailDto,
@@ -129,16 +127,16 @@ export class RulesManagementApi extends BaseAPI {
     /**
      * Create Action Group
      */
-    createActionGroup({ ruleActionGroupRequestDto }: CreateActionGroupRequest): Observable<RuleActionGroupDetailDto>
-    createActionGroup({ ruleActionGroupRequestDto }: CreateActionGroupRequest, opts?: OperationOpts): Observable<AjaxResponse<RuleActionGroupDetailDto>>
-    createActionGroup({ ruleActionGroupRequestDto }: CreateActionGroupRequest, opts?: OperationOpts): Observable<RuleActionGroupDetailDto | AjaxResponse<RuleActionGroupDetailDto>> {
+    createActionGroup({ ruleActionGroupRequestDto }: CreateActionGroupRequest): Observable<RuleActionGroupDto>
+    createActionGroup({ ruleActionGroupRequestDto }: CreateActionGroupRequest, opts?: OperationOpts): Observable<AjaxResponse<RuleActionGroupDto>>
+    createActionGroup({ ruleActionGroupRequestDto }: CreateActionGroupRequest, opts?: OperationOpts): Observable<RuleActionGroupDto | AjaxResponse<RuleActionGroupDto>> {
         throwIfNullOrUndefined(ruleActionGroupRequestDto, 'ruleActionGroupRequestDto', 'createActionGroup');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<RuleActionGroupDetailDto>({
+        return this.request<RuleActionGroupDto>({
             url: '/v1/rules/actionGroups',
             method: 'POST',
             headers,
@@ -149,16 +147,16 @@ export class RulesManagementApi extends BaseAPI {
     /**
      * Create Condition Group
      */
-    createConditionGroup({ ruleConditionGroupRequestDto }: CreateConditionGroupRequest): Observable<RuleConditionGroupDetailDto>
-    createConditionGroup({ ruleConditionGroupRequestDto }: CreateConditionGroupRequest, opts?: OperationOpts): Observable<AjaxResponse<RuleConditionGroupDetailDto>>
-    createConditionGroup({ ruleConditionGroupRequestDto }: CreateConditionGroupRequest, opts?: OperationOpts): Observable<RuleConditionGroupDetailDto | AjaxResponse<RuleConditionGroupDetailDto>> {
+    createConditionGroup({ ruleConditionGroupRequestDto }: CreateConditionGroupRequest): Observable<RuleConditionGroupDto>
+    createConditionGroup({ ruleConditionGroupRequestDto }: CreateConditionGroupRequest, opts?: OperationOpts): Observable<AjaxResponse<RuleConditionGroupDto>>
+    createConditionGroup({ ruleConditionGroupRequestDto }: CreateConditionGroupRequest, opts?: OperationOpts): Observable<RuleConditionGroupDto | AjaxResponse<RuleConditionGroupDto>> {
         throwIfNullOrUndefined(ruleConditionGroupRequestDto, 'ruleConditionGroupRequestDto', 'createConditionGroup');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<RuleConditionGroupDetailDto>({
+        return this.request<RuleConditionGroupDto>({
             url: '/v1/rules/conditionGroups',
             method: 'POST',
             headers,
@@ -265,12 +263,12 @@ export class RulesManagementApi extends BaseAPI {
     /**
      * Get Action Group Details
      */
-    getActionGroup({ actionGroupUuid }: GetActionGroupRequest): Observable<RuleActionGroupDetailDto>
-    getActionGroup({ actionGroupUuid }: GetActionGroupRequest, opts?: OperationOpts): Observable<AjaxResponse<RuleActionGroupDetailDto>>
-    getActionGroup({ actionGroupUuid }: GetActionGroupRequest, opts?: OperationOpts): Observable<RuleActionGroupDetailDto | AjaxResponse<RuleActionGroupDetailDto>> {
+    getActionGroup({ actionGroupUuid }: GetActionGroupRequest): Observable<RuleActionGroupDto>
+    getActionGroup({ actionGroupUuid }: GetActionGroupRequest, opts?: OperationOpts): Observable<AjaxResponse<RuleActionGroupDto>>
+    getActionGroup({ actionGroupUuid }: GetActionGroupRequest, opts?: OperationOpts): Observable<RuleActionGroupDto | AjaxResponse<RuleActionGroupDto>> {
         throwIfNullOrUndefined(actionGroupUuid, 'actionGroupUuid', 'getActionGroup');
 
-        return this.request<RuleActionGroupDetailDto>({
+        return this.request<RuleActionGroupDto>({
             url: '/v1/rules/actionGroups/{actionGroupUuid}'.replace('{actionGroupUuid}', encodeURI(actionGroupUuid)),
             method: 'GET',
         }, opts?.responseOpts);
@@ -279,12 +277,12 @@ export class RulesManagementApi extends BaseAPI {
     /**
      * Get Condition Group details
      */
-    getConditionGroup({ conditionGroupUuid }: GetConditionGroupRequest): Observable<RuleConditionGroupDetailDto>
-    getConditionGroup({ conditionGroupUuid }: GetConditionGroupRequest, opts?: OperationOpts): Observable<AjaxResponse<RuleConditionGroupDetailDto>>
-    getConditionGroup({ conditionGroupUuid }: GetConditionGroupRequest, opts?: OperationOpts): Observable<RuleConditionGroupDetailDto | AjaxResponse<RuleConditionGroupDetailDto>> {
+    getConditionGroup({ conditionGroupUuid }: GetConditionGroupRequest): Observable<RuleConditionGroupDto>
+    getConditionGroup({ conditionGroupUuid }: GetConditionGroupRequest, opts?: OperationOpts): Observable<AjaxResponse<RuleConditionGroupDto>>
+    getConditionGroup({ conditionGroupUuid }: GetConditionGroupRequest, opts?: OperationOpts): Observable<RuleConditionGroupDto | AjaxResponse<RuleConditionGroupDto>> {
         throwIfNullOrUndefined(conditionGroupUuid, 'conditionGroupUuid', 'getConditionGroup');
 
-        return this.request<RuleConditionGroupDetailDto>({
+        return this.request<RuleConditionGroupDto>({
             url: '/v1/rules/conditionGroups/{conditionGroupUuid}'.replace('{conditionGroupUuid}', encodeURI(conditionGroupUuid)),
             method: 'GET',
         }, opts?.responseOpts);
@@ -394,9 +392,9 @@ export class RulesManagementApi extends BaseAPI {
     /**
      * Update Action Group
      */
-    updateActionGroup({ actionGroupUuid, updateRuleActionGroupRequestDto }: UpdateActionGroupRequest): Observable<RuleActionGroupDetailDto>
-    updateActionGroup({ actionGroupUuid, updateRuleActionGroupRequestDto }: UpdateActionGroupRequest, opts?: OperationOpts): Observable<AjaxResponse<RuleActionGroupDetailDto>>
-    updateActionGroup({ actionGroupUuid, updateRuleActionGroupRequestDto }: UpdateActionGroupRequest, opts?: OperationOpts): Observable<RuleActionGroupDetailDto | AjaxResponse<RuleActionGroupDetailDto>> {
+    updateActionGroup({ actionGroupUuid, updateRuleActionGroupRequestDto }: UpdateActionGroupRequest): Observable<RuleActionGroupDto>
+    updateActionGroup({ actionGroupUuid, updateRuleActionGroupRequestDto }: UpdateActionGroupRequest, opts?: OperationOpts): Observable<AjaxResponse<RuleActionGroupDto>>
+    updateActionGroup({ actionGroupUuid, updateRuleActionGroupRequestDto }: UpdateActionGroupRequest, opts?: OperationOpts): Observable<RuleActionGroupDto | AjaxResponse<RuleActionGroupDto>> {
         throwIfNullOrUndefined(actionGroupUuid, 'actionGroupUuid', 'updateActionGroup');
         throwIfNullOrUndefined(updateRuleActionGroupRequestDto, 'updateRuleActionGroupRequestDto', 'updateActionGroup');
 
@@ -404,7 +402,7 @@ export class RulesManagementApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<RuleActionGroupDetailDto>({
+        return this.request<RuleActionGroupDto>({
             url: '/v1/rules/actionGroups/{actionGroupUuid}'.replace('{actionGroupUuid}', encodeURI(actionGroupUuid)),
             method: 'PUT',
             headers,
@@ -415,9 +413,9 @@ export class RulesManagementApi extends BaseAPI {
     /**
      * Update Condition Group
      */
-    updateConditionGroup({ conditionGroupUuid, updateRuleConditionGroupRequestDto }: UpdateConditionGroupRequest): Observable<RuleConditionGroupDetailDto>
-    updateConditionGroup({ conditionGroupUuid, updateRuleConditionGroupRequestDto }: UpdateConditionGroupRequest, opts?: OperationOpts): Observable<AjaxResponse<RuleConditionGroupDetailDto>>
-    updateConditionGroup({ conditionGroupUuid, updateRuleConditionGroupRequestDto }: UpdateConditionGroupRequest, opts?: OperationOpts): Observable<RuleConditionGroupDetailDto | AjaxResponse<RuleConditionGroupDetailDto>> {
+    updateConditionGroup({ conditionGroupUuid, updateRuleConditionGroupRequestDto }: UpdateConditionGroupRequest): Observable<RuleConditionGroupDto>
+    updateConditionGroup({ conditionGroupUuid, updateRuleConditionGroupRequestDto }: UpdateConditionGroupRequest, opts?: OperationOpts): Observable<AjaxResponse<RuleConditionGroupDto>>
+    updateConditionGroup({ conditionGroupUuid, updateRuleConditionGroupRequestDto }: UpdateConditionGroupRequest, opts?: OperationOpts): Observable<RuleConditionGroupDto | AjaxResponse<RuleConditionGroupDto>> {
         throwIfNullOrUndefined(conditionGroupUuid, 'conditionGroupUuid', 'updateConditionGroup');
         throwIfNullOrUndefined(updateRuleConditionGroupRequestDto, 'updateRuleConditionGroupRequestDto', 'updateConditionGroup');
 
@@ -425,7 +423,7 @@ export class RulesManagementApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<RuleConditionGroupDetailDto>({
+        return this.request<RuleConditionGroupDto>({
             url: '/v1/rules/conditionGroups/{conditionGroupUuid}'.replace('{conditionGroupUuid}', encodeURI(conditionGroupUuid)),
             method: 'PUT',
             headers,

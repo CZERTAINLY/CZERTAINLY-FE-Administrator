@@ -1,4 +1,5 @@
 import { ApiClients } from 'api';
+import ConditionsGroupsList from 'components/ConditionGroupsList';
 import FilterWidget from 'components/FilterWidget';
 import { EntityType, actions as filterActions } from 'ducks/filters';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
@@ -25,6 +26,11 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
     const dispatch = useDispatch();
 
     useEffect(() => {
+        dispatch(filterActions.setCurrentFilters({ currentFilters: [], entity: EntityType.CONDITIONS }));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
         if (!id) return;
         if (formType === 'rules') {
             dispatch(rulesActions.getRule({ ruleUuid: id }));
@@ -34,14 +40,14 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
     }, [id, dispatch, formType]);
 
     useEffect(() => {
-        if (!hasEffectRun && editMode) {
+        if (!hasEffectRun && editMode && id) {
             let currentConditions = [];
 
             if (formType === 'rules') {
-                if (!ruleDetails) return;
+                if (ruleDetails?.uuid !== id) return;
                 currentConditions = ruleDetails?.conditions || [];
             } else {
-                if (!conditionGroupsDetails) return;
+                if (conditionGroupsDetails?.uuid !== id) return;
                 currentConditions = conditionGroupsDetails?.conditions || [];
             }
 
@@ -49,43 +55,51 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
             setHasEffectRun(true);
             dispatch(filterActions.setCurrentFilters({ currentFilters: currentFilters, entity: EntityType.CONDITIONS }));
         }
-    }, [editMode, ruleDetails, conditionGroupsDetails, hasEffectRun, dispatch, formType]);
+    }, [editMode, ruleDetails, conditionGroupsDetails, hasEffectRun, dispatch, formType, id]);
 
     useEffect(() => {
         return () => {
             dispatch(filterActions.setCurrentFilters({ currentFilters: [], entity: EntityType.CONDITIONS }));
         };
-    }, [dispatch]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const renderAppendContent = useMemo(() => {
+        if (formType === 'rules' && ruleDetails?.conditionGroups && ruleDetails?.conditionGroups?.length > 0) {
+            return <ConditionsGroupsList ruleConditions={ruleDetails?.conditionGroups} />;
+        } else {
+            return null;
+        }
+    }, [ruleDetails, formType]);
 
     const renderFilterWidgetForRules = useMemo(() => {
         if (formType !== 'rules' || !id || !ruleDetails) return null;
 
         return (
-            <div>
-                <FilterWidget
-                    entity={EntityType.CONDITIONS}
-                    title={'Conditions'}
-                    getAvailableFiltersApi={(apiClients: ApiClients) =>
-                        apiClients.resources.listResourceRuleFilterFields({
-                            resource,
-                        })
-                    }
-                    onFilterUpdate={(currentFilters) => {
-                        const currentCondition = filterToConditionGroup(currentFilters);
-                        dispatch(
-                            rulesActions.updateRule({
-                                ruleUuid: id,
-                                rule: {
-                                    conditions: currentCondition,
-                                    conditionGroupsUuids: ruleDetails.conditionGroups.map((cg) => cg.uuid),
-                                },
-                            }),
-                        );
-                    }}
-                />
-            </div>
+            <FilterWidget
+                appendInWidgetContent={renderAppendContent}
+                entity={EntityType.CONDITIONS}
+                title={'Conditions'}
+                getAvailableFiltersApi={(apiClients: ApiClients) =>
+                    apiClients.resources.listResourceRuleFilterFields({
+                        resource,
+                    })
+                }
+                onFilterUpdate={(currentFilters) => {
+                    const currentCondition = filterToConditionGroup(currentFilters);
+                    dispatch(
+                        rulesActions.updateRule({
+                            ruleUuid: id,
+                            rule: {
+                                conditions: currentCondition,
+                                conditionGroupsUuids: ruleDetails.conditionGroups.map((cg) => cg.uuid),
+                            },
+                        }),
+                    );
+                }}
+            />
         );
-    }, [resource, dispatch, formType, id, ruleDetails]);
+    }, [resource, dispatch, formType, id, ruleDetails, renderAppendContent]);
 
     const renderFilterWidgetForConditionGroups = useMemo(() => {
         if (formType !== 'conditionGroup' || !id || !conditionGroupsDetails) return null;

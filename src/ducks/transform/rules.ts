@@ -1,7 +1,7 @@
 import {
     ActionRuleDto,
-    ActionRuleGroupDetailDto,
-    ActionRuleGroupDetailModel,
+    // ActionRuleGroupDetailDto,
+    // ActionRuleGroupDetailModel,
     ActionRuleGroupDto,
     ActionRuleGroupModel,
     ActionRuleGroupRequestDto,
@@ -10,8 +10,8 @@ import {
     ActionRuleRequestDto,
     ActionRuleRequestModel,
     ConditionRuleDto,
-    ConditionRuleGroupDetailDto,
-    ConditionRuleGroupDetailModel,
+    // ConditionRuleGroupDetailDto,
+    // ConditionRuleGroupDetailModel,
     ConditionRuleGroupDto,
     ConditionRuleGroupModel,
     ConditionRuleGroupRequestDto,
@@ -92,18 +92,18 @@ export function transformRuleActionDtoToModel(actionRule: ActionRuleDto): Action
     return { ...actionRule };
 }
 
-export function transformRuleActionGroupDetailDtoToModel(actionGroupDetail: ActionRuleGroupDetailDto): ActionRuleGroupDetailModel {
-    return {
-        ...actionGroupDetail,
-        actions: actionGroupDetail.actions.map(transformRuleActionDtoToModel),
-    };
-}
+// export function transformRuleActionGroupDetailDtoToModel(actionGroupDetail: ActionRuleGroupDetailDto): ActionRuleGroupDetailModel {
+//     return {
+//         ...actionGroupDetail,
+//         actions: actionGroupDetail.actions.map(transformRuleActionDtoToModel),
+//     };
+// }
 
-export function transformRuleConditionGroupDetailDtoToModel(conditionGroup: ConditionRuleGroupDetailDto): ConditionRuleGroupDetailModel {
-    return {
-        ...conditionGroup,
-    };
-}
+// export function transformRuleConditionGroupDetailDtoToModel(conditionGroup: ConditionRuleGroupDetailDto): ConditionRuleGroupDetailModel {
+//     return {
+//         ...conditionGroup,
+//     };
+// }
 
 export function transformConditionRuleDtoToModel(condition: ConditionRuleDto): ConditionRuleModel {
     return { ...condition };
@@ -131,23 +131,35 @@ export function transformConditionRuleGroupRequestModelToDto(conditionGroup: Con
     };
 }
 
+export function transformRuleConditionGroupDetailDtoToModel(conditionGroup: ConditionRuleGroupDto): ConditionRuleGroupModel {
+    return {
+        ...conditionGroup,
+    };
+}
+
+export function transformRuleConditionGroupDtoToModel(conditionGroup: ConditionRuleGroupDto): ConditionRuleGroupModel {
+    return {
+        ...conditionGroup,
+    };
+}
+
 export function transformRuleRequestModelToDto(ruleRequest: RequestRuleModel): RequestRuleDto {
     return {
         ...ruleRequest,
         conditions: ruleRequest.conditions?.length ? ruleRequest.conditions.map(transformRuleConditiontModelToModelDto) : [],
-        conditionGroups: ruleRequest.conditionGroups?.length
-            ? ruleRequest.conditionGroups.map(transformConditionRuleGroupRequestModelToDto)
-            : [],
+        // conditionGroups: ruleRequest.conditionGroups?.length
+        //     ? ruleRequest.conditionGroups.map(transformConditionRuleGroupRequestModelToDto)
+        //     : [],
     };
 }
 
 export function transformTriggerRuleRequestModelToDto(ruleTriggerRequest: TriggerRuleRequestModel): TriggerRuleRequestDto {
     return {
         ...ruleTriggerRequest,
-        rules: ruleTriggerRequest.rules?.length ? ruleTriggerRequest.rules.map(transformRuleRequestModelToDto) : [],
-        actionGroups: ruleTriggerRequest.actionGroups?.length
-            ? ruleTriggerRequest.actionGroups.map(tranformRuleActionGroupRequestModelToDto)
-            : [],
+        // rules: ruleTriggerRequest.rules?.length ? ruleTriggerRequest.rules.map(transformRuleRequestModelToDto) : [],
+        // actionGroups: ruleTriggerRequest.actionGroups?.length
+        //     ? ruleTriggerRequest.actionGroups.map(tranformRuleActionGroupRequestModelToDto)
+        //     : [],
         actions: ruleTriggerRequest.actions?.length ? ruleTriggerRequest.actions.map(transformRuleActionRequestModelToDto) : [],
     };
 }
@@ -174,9 +186,9 @@ export function transformRuleUpdateRequestModelToDto(ruleUpdateRequest: RuleUpda
     return {
         ...ruleUpdateRequest,
         conditions: ruleUpdateRequest.conditions?.length ? ruleUpdateRequest.conditions.map(transformRuleConditiontModelToModelDto) : [],
-        conditionGroups: ruleUpdateRequest.conditionGroups?.length
-            ? ruleUpdateRequest.conditionGroups.map(transformConditionRuleGroupRequestModelToDto)
-            : [],
+        // conditionGroups: ruleUpdateRequest.conditionGroups?.length
+        //     ? ruleUpdateRequest.conditionGroups.map(transformConditionRuleGroupRequestModelToDto)
+        //     : [],
     };
 }
 
@@ -185,8 +197,8 @@ export function transformRuleTriggerUpdateRequestModelToDto(
 ): RuleTriggerUpdateRequestDto {
     return {
         ...ruleTriggerUpdateRequest,
-        rules: ruleTriggerUpdateRequest.rules.map(transformRuleRequestModelToDto),
-        actionGroups: ruleTriggerUpdateRequest.actionGroups.map(tranformRuleActionGroupRequestModelToDto),
+        // rules: ruleTriggerUpdateRequest.rules.map(transformRuleRequestModelToDto),
+        // actionGroups: ruleTriggerUpdateRequest.actionGroups.map(tranformRuleActionGroupRequestModelToDto),
         actions: ruleTriggerUpdateRequest.actions.map(transformRuleActionRequestModelToDto),
     };
 }

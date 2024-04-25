@@ -1,4 +1,4 @@
-import { selectors as enumSelectors } from 'ducks/enums';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { useDispatch, useSelector } from 'react-redux';
 
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
@@ -87,10 +87,14 @@ const ConditionGroups = () => {
             rules.map((rule) => {
                 return {
                     id: rule.uuid,
-                    columns: [<Link to={`./detail/${rule.uuid}`}>{rule.name}</Link>, rule.resource, rule.description || ''],
+                    columns: [
+                        <Link to={`./detail/${rule.uuid}`}>{rule.name}</Link>,
+                        getEnumLabel(resourceTypeEnum, rule.resource),
+                        rule.description || '',
+                    ],
                 };
             }),
-        [rules],
+        [rules, resourceTypeEnum],
     );
 
     const buttons: WidgetButtonProps[] = useMemo(

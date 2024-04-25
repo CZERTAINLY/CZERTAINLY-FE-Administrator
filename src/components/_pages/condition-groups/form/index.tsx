@@ -27,7 +27,7 @@ interface SelectChangeValue {
 
 export interface ConditionGroupFormValues {
     name: string;
-    selectedResource: SelectChangeValue;
+    selectedResource?: SelectChangeValue;
     resource: Resource;
     description: string;
     conditions: RuleConditiontModel[];
@@ -37,7 +37,7 @@ const ConditionGroupForm = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const title = id ? 'Edit' : 'Create Condition Group';
+    const title = id ? 'Edit Condition Group' : 'Create Condition Group';
     const isCreatingConditionGroup = useSelector(rulesSelectors.isCreatingConditionGroup);
     const isUpdatingConditionGroup = useSelector(rulesSelectors.isUpdatingConditionGroup);
     const conditionGroupsDetails = useSelector(rulesSelectors.conditionGroupDetails);
@@ -78,7 +78,7 @@ const ConditionGroupForm = () => {
         return {
             name: editMode ? conditionGroupsDetails?.name || '' : '',
             resource: editMode ? conditionGroupsDetails?.resource || Resource.None : Resource.None,
-            selectedResource: editMode ? selectedResource || { value: '', label: '' } : { value: '', label: '' },
+            selectedResource: editMode ? selectedResource : undefined,
             description: editMode ? conditionGroupsDetails?.description || '' : '',
             conditions: editMode ? conditionGroupsDetails?.conditions || [] : [],
         };
@@ -93,7 +93,7 @@ const ConditionGroupForm = () => {
 
     const onSubmit = useCallback(
         (values: ConditionGroupFormValues) => {
-            // if (values.resource === '') return;
+            // if (values.resource === ('' as string)) return;
             if (values.resource === Resource.None) return;
 
             if (editMode && id) {
@@ -191,7 +191,9 @@ const ConditionGroupForm = () => {
                                         placeholder="Select Resource"
                                         onChange={(event) => {
                                             input.onChange(event);
-                                            form.change('resource', event.value);
+                                            if (event?.value) {
+                                                form.change('resource', event.value);
+                                            }
                                             form.change('conditions', []);
                                             dispatch(
                                                 filterActions.setCurrentFilters({ currentFilters: [], entity: EntityType.CONDITIONS }),
@@ -222,7 +224,12 @@ const ConditionGroupForm = () => {
                                     inProgressTitle={inProgressTitle}
                                     inProgress={submitting}
                                     disabled={
-                                        areDefaultValuesSame(values) || values.resource === Resource.None || submitting || !valid || isBusy
+                                        areDefaultValuesSame(values) ||
+                                        values.resource === Resource.None ||
+                                        submitting ||
+                                        !valid ||
+                                        isBusy ||
+                                        !values.conditions.length
                                     }
                                 />
 

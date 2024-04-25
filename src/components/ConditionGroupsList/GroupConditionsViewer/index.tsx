@@ -1,25 +1,26 @@
+import cx from 'classnames';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { EntityType, selectors } from 'ducks/filters';
-import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
-import { useEffect, useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { selectors as rulesSelectors } from 'ducks/rules';
+import { useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import { Badge, Spinner } from 'reactstrap';
-import { FilterFieldType, PlatformEnum } from 'types/openapi';
-type FormType = 'rules' | 'conditionGroup';
+import { FilterFieldType, PlatformEnum, RuleConditionDto } from 'types/openapi';
+import styles from './groupConditionsViewer.module.scss';
 
 interface ConditionsTableViewerProps {
-    conditionGroupId: string;
+    groupConditions: RuleConditionDto[];
+    conditionGroupName: string;
+    conditionGroupUuid: string;
 }
 
-const ConditionsTableViewer = ({ conditionGroupId }: ConditionsTableViewerProps) => {
+const GroupConditionsViewer = ({ groupConditions = [], conditionGroupName, conditionGroupUuid }: ConditionsTableViewerProps) => {
     const searchGroupEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.FilterFieldSource));
     const FilterConditionOperatorEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.FilterConditionOperator));
     const availableFilters = useSelector(selectors.availableFilters(EntityType.CONDITIONS));
     const platformEnums = useSelector(enumSelectors.platformEnums);
     const isFetchingConditionGroup = useSelector(rulesSelectors.isFetchingConditionGroup);
-    const conditionGroupsDetails = useSelector(rulesSelectors.conditionGroupDetails);
 
-    const dispatch = useDispatch();
     const booleanOptions = useMemo(
         () => [
             { label: 'True', value: true },
@@ -27,14 +28,9 @@ const ConditionsTableViewer = ({ conditionGroupId }: ConditionsTableViewerProps)
         ],
         [],
     );
-    useEffect(() => {
-        if (!conditionGroupId) return;
-        dispatch(rulesActions.getConditionGroup({ conditionGroupUuid: conditionGroupId }));
-    }, [conditionGroupId, dispatch]);
 
     const renderConditionsBadges = () => {
-        if (!conditionGroupsDetails) return null;
-        return conditionGroupsDetails.conditions.map((condition) => {
+        return groupConditions.map((condition) => {
             const field = availableFilters
                 .find((a) => a.filterFieldSource === condition.fieldSource)
                 ?.searchFieldData?.find((s) => s.fieldIdentifier === condition.fieldIdentifier);
@@ -55,26 +51,30 @@ const ConditionsTableViewer = ({ conditionGroupId }: ConditionsTableViewerProps)
                           }'`
                         : '';
             return (
-                <div>
-                    <Badge
-                        title={`${getEnumLabel(searchGroupEnum, condition.fieldSource)} ${label} ${getEnumLabel(
-                            FilterConditionOperatorEnum,
-                            condition.operator,
-                        )} ${value}`}
-                        className="my-1"
-                    >
-                        <b>{getEnumLabel(searchGroupEnum, condition.fieldSource)}&nbsp;</b>'{label}'&nbsp;
-                        {getEnumLabel(FilterConditionOperatorEnum, condition.operator)}&nbsp;
-                        {value}
-                    </Badge>
-                </div>
+                <Badge
+                    key={condition.uuid}
+                    title={`${getEnumLabel(searchGroupEnum, condition.fieldSource)} ${label} ${getEnumLabel(
+                        FilterConditionOperatorEnum,
+                        condition.operator,
+                    )} ${value}`}
+                    className={styles.groupConditionBadge}
+                >
+                    <b>{getEnumLabel(searchGroupEnum, condition.fieldSource)}&nbsp;</b>'{label}'&nbsp;
+                    {getEnumLabel(FilterConditionOperatorEnum, condition.operator)}&nbsp;
+                    {value}
+                </Badge>
             );
         });
     };
 
     if (isFetchingConditionGroup) return <Spinner active={isFetchingConditionGroup} />;
 
-    return <div>{renderConditionsBadges()}</div>;
+    return (
+        <div className="d-flex" key={conditionGroupUuid}>
+            <h6 className={cx('text-muted', styles.groupConditionTitle)}>{`${conditionGroupName}`}</h6>
+            <div className="ms-3">{renderConditionsBadges()}</div>
+        </div>
+    );
 };
 
-export default ConditionsTableViewer;
+export default GroupConditionsViewer;

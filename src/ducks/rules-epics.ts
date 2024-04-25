@@ -12,9 +12,11 @@ import {
     transformConditionRuleGroupRequestModelToDto,
     transformDetailRuleDtoToModel,
     transformDtoRuleToModel,
-    transformRuleActionGroupDetailDtoToModel,
+    // transformRuleActionGroupDetailDtoToModel,
     transformRuleActionGroupDtoToModel,
     transformRuleConditionGroupDetailDtoToModel,
+    transformRuleConditionGroupDtoToModel,
+    // transformRuleConditionGroupDetailDtoToModel,
     transformRuleRequestModelToDto,
     transformRuleTriggerUpdateRequestModelToDto,
     transformRuleUpdateRequestModelToDto,
@@ -101,7 +103,7 @@ const createActionGroup: AppEpic = (action$, state, deps) => {
                 })
                 .pipe(
                     switchMap((actionGroup) =>
-                        of(slice.actions.createActionGroupSuccess({ actionGroup: transformRuleActionGroupDetailDtoToModel(actionGroup) })),
+                        of(slice.actions.createActionGroupSuccess({ actionGroup: transformRuleActionGroupDtoToModel(actionGroup) })),
                     ),
                     catchError((err) =>
                         of(slice.actions.createActionGroupFailure({ error: extractError(err, 'Failed to create action group') })),
@@ -204,7 +206,12 @@ const deleteRule: AppEpic = (action$, state, deps) => {
         filter(slice.actions.deleteRule.match),
         switchMap((action) =>
             deps.apiClients.rules.deleteRule({ ruleUuid: action.payload.ruleUuid }).pipe(
-                switchMap(() => of(slice.actions.deleteRuleSuccess({ ruleUuid: action.payload.ruleUuid }))),
+                switchMap(() =>
+                    of(
+                        slice.actions.deleteRuleSuccess({ ruleUuid: action.payload.ruleUuid }),
+                        appRedirectActions.redirect({ url: `../rules` }),
+                    ),
+                ),
                 catchError((err) => of(slice.actions.deleteRuleFailure({ error: extractError(err, 'Failed to delete rule') }))),
             ),
         ),
@@ -229,7 +236,7 @@ const getActionGroup: AppEpic = (action$, state, deps) => {
         switchMap((action) =>
             deps.apiClients.rules.getActionGroup({ actionGroupUuid: action.payload.actionGroupUuid }).pipe(
                 switchMap((actionGroup) =>
-                    of(slice.actions.getActionGroupSuccess({ actionGroup: transformRuleActionGroupDetailDtoToModel(actionGroup) })),
+                    of(slice.actions.getActionGroupSuccess({ actionGroup: transformRuleActionGroupDtoToModel(actionGroup) })),
                 ),
                 catchError((err) => of(slice.actions.getActionGroupFailure({ error: extractError(err, 'Failed to get action group') }))),
             ),
@@ -294,7 +301,7 @@ const updateConditionGroup: AppEpic = (action$, state, deps) => {
                     switchMap((conditionRuleGroupDetail) =>
                         of(
                             slice.actions.updateConditionGroupSuccess({
-                                conditionGroup: transformRuleConditionGroupDetailDtoToModel(conditionRuleGroupDetail),
+                                conditionGroup: transformRuleConditionGroupDtoToModel(conditionRuleGroupDetail),
                             }),
                             appRedirectActions.redirect({ url: `../../conditiongroups/detail/${conditionRuleGroupDetail.uuid}` }),
                         ),

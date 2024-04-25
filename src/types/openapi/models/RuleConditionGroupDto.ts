@@ -13,6 +13,7 @@
 
 import type {
     Resource,
+    RuleConditionDto,
 } from './';
 
 /**
@@ -44,6 +45,12 @@ export interface RuleConditionGroupDto {
      * @memberof RuleConditionGroupDto
      */
     resource: Resource;
+    /**
+     * List of the Rule Conditions in the Rule Condition Group
+     * @type {Array<RuleConditionDto>}
+     * @memberof RuleConditionGroupDto
+     */
+    conditions: Array<RuleConditionDto>;
 }
 
 

@@ -17,7 +17,6 @@ import type {
 } from './';
 
 /**
- * List of new Action Groups to add in the Rule Trigger
  * @export
  * @interface RuleActionGroupRequestDto
  */

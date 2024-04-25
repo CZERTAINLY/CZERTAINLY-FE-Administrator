@@ -1,5 +1,5 @@
 import Widget from 'components/Widget';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 // import { EntityType, actions as filterActions } from 'ducks/filters';
@@ -28,7 +28,7 @@ interface SelectChangeValue {
 
 export interface ConditionGroupFormValues {
     name: string;
-    selectedResource: SelectChangeValue;
+    selectedResource?: SelectChangeValue;
     resource: Resource;
     description: string;
     conditions: RuleConditiontModel[];
@@ -44,7 +44,7 @@ const ConditionGroupForm = () => {
     const conditionGroups = useSelector(rulesSelectors.conditionRuleGroups);
     const isCreatingRule = useSelector(rulesSelectors.isCreatingRule);
     const isUpdatingRule = useSelector(rulesSelectors.isUpdatingRule);
-
+    const [selectedResourceState, setSelectedResourceState] = useState<SelectChangeValue>();
     const ruleDetails = useSelector(rulesSelectors.ruleDetails);
     const editMode = useMemo(() => !!id, [id]);
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
@@ -69,8 +69,9 @@ const ConditionGroupForm = () => {
     }, [conditionGroups]);
 
     useEffect(() => {
-        dispatch(rulesActions.listConditionGroups({}));
-    }, [dispatch]);
+        if (!selectedResourceState) return;
+        dispatch(rulesActions.listConditionGroups({ resource: selectedResourceState.value as Resource }));
+    }, [dispatch, selectedResourceState]);
 
     useEffect(() => {
         if (!id) return;
@@ -91,7 +92,7 @@ const ConditionGroupForm = () => {
         return {
             name: editMode ? ruleDetails?.name || '' : '',
             resource: editMode ? ruleDetails?.resource || Resource.None : Resource.None,
-            selectedResource: editMode ? selectedResource || { value: '', label: '' } : { value: '', label: '' },
+            selectedResource: editMode ? selectedResource : undefined,
             description: editMode ? ruleDetails?.description || '' : '',
             conditions: editMode ? ruleDetails?.conditions || [] : [],
             conditionGroupsUuids: editMode
@@ -194,22 +195,6 @@ const ConditionGroupForm = () => {
                             )}
                         </Field>
 
-                        <Field name="conditionGroupsUuids" validate={validateRequired()}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="description">Condition Groups</Label>
-
-                                    <Select
-                                        {...input}
-                                        options={conditionGroupsOptions}
-                                        isMulti
-                                        placeholder="Select Condition Group"
-                                        isClearable
-                                    />
-                                </FormGroup>
-                            )}
-                        </Field>
-
                         <Field name="selectedResource" validate={validateRequired()}>
                             {({ input, meta }) => (
                                 <FormGroup>
@@ -225,7 +210,13 @@ const ConditionGroupForm = () => {
                                         isClearable
                                         onChange={(event) => {
                                             input.onChange(event);
-                                            form.change('resource', event.value);
+                                            if (event?.value) {
+                                                form.change('resource', event.value);
+                                                setSelectedResourceState(event);
+                                            } else {
+                                                form.change('resource', undefined);
+                                            }
+
                                             form.change('conditions', []);
                                             dispatch(
                                                 filterActions.setCurrentFilters({ currentFilters: [], entity: EntityType.CONDITIONS }),
@@ -246,6 +237,22 @@ const ConditionGroupForm = () => {
                             )}
                         </Field>
 
+                        <Field name="conditionGroupsUuids">
+                            {({ input, meta }) => (
+                                <FormGroup>
+                                    <Label for="description">Condition Groups</Label>
+
+                                    <Select
+                                        isDisabled={values.resource === Resource.None || !values.resource}
+                                        {...input}
+                                        options={conditionGroupsOptions}
+                                        isMulti
+                                        placeholder="Select Condition Group"
+                                        isClearable
+                                    />
+                                </FormGroup>
+                            )}
+                        </Field>
                         {values?.resource && <ConditionFormFilter formType="rules" resource={values.resource} />}
 
                         <div className="d-flex justify-content-end">
@@ -255,7 +262,12 @@ const ConditionGroupForm = () => {
                                     inProgressTitle={inProgressTitle}
                                     inProgress={submitting}
                                     disabled={
-                                        areDefaultValuesSame(values) || values.resource === Resource.None || submitting || !valid || isBusy
+                                        areDefaultValuesSame(values) ||
+                                        values.resource === Resource.None ||
+                                        submitting ||
+                                        !valid ||
+                                        isBusy ||
+                                        (values.conditions.length === 0 && values.conditionGroupsUuids.length === 0)
                                     }
                                 />
 

@@ -21,6 +21,10 @@ import type {
     SearchFieldDataByGroupDto,
 } from '../models';
 
+export interface ListResourceEventsRequest {
+    resource: Resource;
+}
+
 export interface ListResourceRuleFilterFieldsRequest {
     resource: Resource;
     settable?: boolean;
@@ -30,6 +34,20 @@ export interface ListResourceRuleFilterFieldsRequest {
  * no description
  */
 export class ResourceManagementApi extends BaseAPI {
+
+    /**
+     * Retrieve a list of all events that can be triggered by a resource
+     */
+    listResourceEvents({ resource }: ListResourceEventsRequest): Observable<Array<string>>
+    listResourceEvents({ resource }: ListResourceEventsRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<string>>>
+    listResourceEvents({ resource }: ListResourceEventsRequest, opts?: OperationOpts): Observable<Array<string> | AjaxResponse<Array<string>>> {
+        throwIfNullOrUndefined(resource, 'resource', 'listResourceEvents');
+
+        return this.request<Array<string>>({
+            url: '/v1/resources/{resource}/events'.replace('{resource}', encodeURI(resource)),
+            method: 'GET',
+        }, opts?.responseOpts);
+    };
 
     /**
      * Retrieve filter fields that can be used for creating rule conditions and actions

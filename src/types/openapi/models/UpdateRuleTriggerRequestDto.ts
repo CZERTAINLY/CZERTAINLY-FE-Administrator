@@ -13,9 +13,7 @@
 
 import type {
     Resource,
-    RuleActionGroupRequestDto,
     RuleActionRequestDto,
-    RuleRequestDto,
     RuleTriggerType,
 } from './';
 
@@ -47,29 +45,11 @@ export interface UpdateRuleTriggerRequestDto {
      */
     triggerResource?: Resource;
     /**
-     * UUID of the the Rule Trigger event source object
-     * @type {string}
-     * @memberof UpdateRuleTriggerRequestDto
-     */
-    triggerResourceUuid?: string;
-    /**
-     * List of new Rules to add in the Rule Trigger
-     * @type {Array<RuleRequestDto>}
-     * @memberof UpdateRuleTriggerRequestDto
-     */
-    rules?: Array<RuleRequestDto>;
-    /**
      * List of UUIDs of existing Rules to add in the Rule Trigger
      * @type {Array<string>}
      * @memberof UpdateRuleTriggerRequestDto
      */
     rulesUuids?: Array<string>;
-    /**
-     * List of new Action Groups to add in the Rule Trigger
-     * @type {Array<RuleActionGroupRequestDto>}
-     * @memberof UpdateRuleTriggerRequestDto
-     */
-    actionGroups?: Array<RuleActionGroupRequestDto>;
     /**
      * List of UUIDs of existing Action Groups to add in the Rule Trigger
      * @type {Array<string>}

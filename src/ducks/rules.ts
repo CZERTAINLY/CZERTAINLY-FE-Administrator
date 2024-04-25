@@ -1,10 +1,10 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Resource } from 'types/openapi';
 import {
-    ActionRuleGroupDetailModel,
+    // ActionRuleGroupDetailModel,
     ActionRuleGroupModel,
     ActionRuleGroupRequestModel,
-    ConditionRuleGroupDetailModel,
+    // ConditionRuleGroupDetailModel,
     ConditionRuleGroupModel,
     ConditionRuleGroupRequestModel,
     DetailRuleModel,
@@ -23,9 +23,9 @@ export type State = {
     rules: RuleModel[];
     ruleDetails?: DetailRuleModel;
     actionRuleGroups: ActionRuleGroupModel[];
-    actionGroupDetails?: ActionRuleGroupDetailModel;
+    actionGroupDetails?: ActionRuleGroupModel;
     conditionRuleGroups: ConditionRuleGroupModel[];
-    conditionGroupDetails?: ConditionRuleGroupDetailModel;
+    conditionGroupDetails?: ConditionRuleGroupModel;
     ruleTriggers: TriggerRuleModel[];
     ruleTriggerDetail?: TriggerRuleDetailModel;
 
@@ -237,7 +237,7 @@ export const slice = createSlice({
         getActionGroup: (state, action: PayloadAction<{ actionGroupUuid: string }>) => {
             state.isFetchingActionGroup = true;
         },
-        getActionGroupSuccess: (state, action: PayloadAction<{ actionGroup: ActionRuleGroupDetailModel }>) => {
+        getActionGroupSuccess: (state, action: PayloadAction<{ actionGroup: ActionRuleGroupModel }>) => {
             state.actionGroupDetails = action.payload.actionGroup;
             state.isFetchingActionGroup = false;
         },
@@ -248,7 +248,7 @@ export const slice = createSlice({
         getConditionGroup: (state, action: PayloadAction<{ conditionGroupUuid: string }>) => {
             state.isFetchingConditionGroup = true;
         },
-        getConditionGroupSuccess: (state, action: PayloadAction<{ conditionGroup: ConditionRuleGroupDetailModel }>) => {
+        getConditionGroupSuccess: (state, action: PayloadAction<{ conditionGroup: ConditionRuleGroupModel }>) => {
             state.conditionGroupDetails = action.payload.conditionGroup;
             state.isFetchingConditionGroup = false;
         },
@@ -284,7 +284,7 @@ export const slice = createSlice({
             state.isUpdatingConditionGroup = true;
         },
 
-        updateConditionGroupSuccess: (state, action: PayloadAction<{ conditionGroup: ConditionRuleGroupDetailModel }>) => {
+        updateConditionGroupSuccess: (state, action: PayloadAction<{ conditionGroup: ConditionRuleGroupModel }>) => {
             state.conditionRuleGroups = state.conditionRuleGroups.map((group) =>
                 group.uuid === action.payload.conditionGroup.uuid ? action.payload.conditionGroup : group,
             );
