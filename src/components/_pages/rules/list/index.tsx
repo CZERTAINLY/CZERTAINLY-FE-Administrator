@@ -119,6 +119,7 @@ const ConditionGroups = () => {
                 custom: (
                     <div className={styles.listSelectContainer}>
                         <Select
+                            isClearable
                             maxMenuHeight={140}
                             menuPlacement="auto"
                             options={resourceOptions}

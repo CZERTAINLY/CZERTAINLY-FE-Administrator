@@ -3,7 +3,7 @@ import ConditionsGroupsList from 'components/ConditionGroupsList';
 import FilterWidget from 'components/FilterWidget';
 import { EntityType, actions as filterActions } from 'ducks/filters';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { Resource } from 'types/openapi';
@@ -18,10 +18,11 @@ interface ConditionGroupFormFilterProps {
 const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps) => {
     const { id } = useParams();
     const editMode = useMemo(() => !!id, [id]);
-    const [hasEffectRun, setHasEffectRun] = useState(false);
 
     const conditionGroupsDetails = useSelector(rulesSelectors.conditionGroupDetails);
     const ruleDetails = useSelector(rulesSelectors.ruleDetails);
+
+    const [hasEffectRun, setHasEffectRun] = useState(false);
 
     const dispatch = useDispatch();
 
@@ -32,12 +33,13 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
 
     useEffect(() => {
         if (!id) return;
-        if (formType === 'rules') {
+        if (formType === 'rules' && id !== ruleDetails?.uuid) {
             dispatch(rulesActions.getRule({ ruleUuid: id }));
-        } else {
+        }
+        if (formType === 'conditionGroup' && id !== conditionGroupsDetails?.uuid) {
             dispatch(rulesActions.getConditionGroup({ conditionGroupUuid: id }));
         }
-    }, [id, dispatch, formType]);
+    }, [id, dispatch, formType, ruleDetails, conditionGroupsDetails]);
 
     useEffect(() => {
         if (!hasEffectRun && editMode && id) {
@@ -130,7 +132,7 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
         );
     }, [resource, dispatch, formType, id, conditionGroupsDetails]);
 
-    const renderWidgetConditionViewer = useCallback(() => {
+    const renderWidgetConditionViewer = useMemo(() => {
         switch (formType) {
             case 'conditionGroup':
                 return renderFilterWidgetForConditionGroups;
@@ -141,7 +143,7 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
         }
     }, [formType, renderFilterWidgetForConditionGroups, renderFilterWidgetForRules]);
 
-    return <div>{renderWidgetConditionViewer()}</div>;
+    return <div>{renderWidgetConditionViewer}</div>;
 };
 
 export default ConditionsViewer;

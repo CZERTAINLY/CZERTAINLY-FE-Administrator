@@ -3,6 +3,7 @@ import { catchError, filter, switchMap } from 'rxjs/operators';
 
 import { AppEpic } from 'ducks';
 import { extractError } from 'utils/net';
+import { actions as alertActions } from './alerts';
 import { actions as appRedirectActions } from './app-redirect';
 
 import * as slice from './rules';
@@ -307,7 +308,10 @@ const updateConditionGroup: AppEpic = (action$, state, deps) => {
                         ),
                     ),
                     catchError((err) =>
-                        of(slice.actions.updateConditionGroupFailure({ error: extractError(err, 'Failed to update condition group') })),
+                        of(
+                            slice.actions.updateConditionGroupFailure({ error: extractError(err, 'Failed to update condition group') }),
+                            alertActions.error('Failed to update Condition Group'),
+                        ),
                     ),
                 ),
         ),
@@ -330,7 +334,12 @@ const updateRule: AppEpic = (action$, state, deps) => {
                             appRedirectActions.redirect({ url: `../rules/detail/${rule.uuid}` }),
                         ),
                     ),
-                    catchError((err) => of(slice.actions.updateRuleFailure({ error: extractError(err, 'Failed to update rule') }))),
+                    catchError((err) =>
+                        of(
+                            slice.actions.updateRuleFailure({ error: extractError(err, 'Failed to update rule') }),
+                            alertActions.error('Failed to update rule'),
+                        ),
+                    ),
                 ),
         ),
     );
