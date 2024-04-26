@@ -276,13 +276,11 @@ models/RoleDto.ts
 models/RolePermissionsRequestDto.ts
 models/RoleRequestDto.ts
 models/RuleActionDto.ts
-models/RuleActionGroupDetailDto.ts
 models/RuleActionGroupDto.ts
 models/RuleActionGroupRequestDto.ts
 models/RuleActionRequestDto.ts
 models/RuleActionType.ts
 models/RuleConditionDto.ts
-models/RuleConditionGroupDetailDto.ts
 models/RuleConditionGroupDto.ts
 models/RuleConditionGroupRequestDto.ts
 models/RuleConditionRequestDto.ts

@@ -84,7 +84,14 @@ export default function Sidebar() {
                     <LinksGroup
                         _key="workflows"
                         header="Workflows"
-                        childrenLinks={[{ _key: '/conditiongroups', name: 'Condition Groups', link: '/conditiongroups' }]}
+                        childrenLinks={[
+                            { _key: '/conditiongroups', name: 'Condition Groups', link: '/conditiongroups' },
+                            {
+                                _key: 'rules',
+                                name: 'Rules',
+                                link: '/rules',
+                            },
+                        ]}
                     />
                 </ul>
             </div>

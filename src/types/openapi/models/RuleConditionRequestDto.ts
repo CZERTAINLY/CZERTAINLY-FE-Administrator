@@ -17,7 +17,7 @@ import type {
 } from './';
 
 /**
- * List of the Rule Conditions to add in the Rule Condition Group
+ * List of conditions to add in the Rule
  * @export
  * @interface RuleConditionRequestDto
  */

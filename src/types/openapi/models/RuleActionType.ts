@@ -17,6 +17,7 @@
  * @enum {string}
  */
 export enum RuleActionType {
+    Ignore = 'ignore',
     SetField = 'setField'
 }
 

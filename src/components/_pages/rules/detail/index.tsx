@@ -7,44 +7,52 @@ import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Col, Container, Row } from 'reactstrap';
 import { PlatformEnum } from 'types/openapi';
 
-const ConditionGroupDetails = () => {
+const RuleDetails = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
-    const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
+    const navigate = useNavigate();
 
-    const conditionGroupsDetails = useSelector(rulesSelectors.conditionGroupDetails);
-    const isFetchingConditionGroup = useSelector(rulesSelectors.isFetchingConditionGroup);
-
+    const ruleDetails = useSelector(rulesSelectors.ruleDetails);
+    const isUpdatingRule = useSelector(rulesSelectors.isUpdatingRule);
+    const isFetchingRuleDetail = useSelector(rulesSelectors.isFetchingRuleDetail);
     const [confirmDelete, setConfirmDelete] = useState(false);
+    const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
 
     const getFreshDetails = useCallback(() => {
         if (!id) return;
-        dispatch(rulesActions.getConditionGroup({ conditionGroupUuid: id }));
-    }, [id, dispatch]);
+        dispatch(rulesActions.getRule({ ruleUuid: id }));
+    }, [dispatch, id]);
 
     useEffect(() => {
         getFreshDetails();
     }, [getFreshDetails]);
 
+    const isBusy = useMemo(() => isFetchingRuleDetail || isUpdatingRule, [isFetchingRuleDetail, isUpdatingRule]);
+
     const onDeleteConfirmed = useCallback(() => {
         if (!id) return;
-        dispatch(rulesActions.deleteConditionGroup({ conditionGroupUuid: id }));
+        dispatch(rulesActions.deleteRule({ ruleUuid: id }));
         setConfirmDelete(false);
     }, [dispatch, id]);
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
+                icon: 'pencil',
+                disabled: false,
+                onClick: () => navigate(`../rules/edit/${id}`),
+            },
+            {
                 icon: 'trash',
                 disabled: false,
                 onClick: () => setConfirmDelete(true),
             },
         ],
-        [],
+        [navigate, id],
     );
 
     const tableHeader: TableHeader[] = useMemo(
@@ -63,49 +71,76 @@ const ConditionGroupDetails = () => {
 
     const conditionGroupsDetailData: TableDataRow[] = useMemo(
         () =>
-            !conditionGroupsDetails
+            !ruleDetails
                 ? []
                 : [
                       {
                           id: 'uuid',
-                          columns: ['UUID', conditionGroupsDetails.uuid],
+                          columns: ['UUID', ruleDetails.uuid],
                       },
                       {
                           id: 'name',
-                          columns: ['Name', conditionGroupsDetails.name],
+                          columns: ['Name', ruleDetails.name],
                       },
                       {
                           id: 'resource',
-                          columns: ['Resource', getEnumLabel(resourceTypeEnum, conditionGroupsDetails.resource)],
+                          columns: ['Resource', getEnumLabel(resourceTypeEnum, ruleDetails.resource)],
                       },
                       {
                           id: 'description',
-                          columns: ['Description', conditionGroupsDetails.description || ''],
+                          columns: ['Description', ruleDetails.description || ''],
                       },
                   ],
-        [conditionGroupsDetails, resourceTypeEnum],
+        [ruleDetails, resourceTypeEnum],
+    );
+
+    const conditionGroupFieldsDataHeader = useMemo(
+        () => [
+            {
+                id: 'name',
+                content: 'Name',
+            },
+            {
+                id: 'description',
+                content: 'Description',
+            },
+        ],
+        [],
+    );
+
+    const conditionGroupFieldsData: TableDataRow[] = useMemo(
+        () =>
+            !ruleDetails?.conditions.length
+                ? []
+                : ruleDetails?.conditionGroups.map((conditionGroup) => {
+                      return {
+                          id: conditionGroup.uuid,
+                          columns: [
+                              <Link to={`../../conditiongroups/detail/${conditionGroup.uuid}`}>{conditionGroup.name}</Link> || '',
+                              conditionGroup.description || 'N/A',
+                          ],
+                      };
+                  }),
+        [ruleDetails],
     );
 
     return (
         <Container className="themed-container" fluid>
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
                 <Col>
-                    <Widget
-                        refreshAction={getFreshDetails}
-                        busy={isFetchingConditionGroup}
-                        title="Condition Group Details"
-                        titleSize="large"
-                        widgetButtons={buttons}
-                    >
+                    <Widget refreshAction={getFreshDetails} busy={isBusy} title="Rule Details" titleSize="large" widgetButtons={buttons}>
                         <CustomTable data={conditionGroupsDetailData} headers={tableHeader} />
                     </Widget>
                 </Col>
+                <Col>
+                    <Widget busy={isBusy} title="Condition Groups" titleSize="large">
+                        <CustomTable data={conditionGroupFieldsData} headers={conditionGroupFieldsDataHeader} hasDetails />
+                    </Widget>
+                </Col>
             </Row>
-            <Row>
-                {conditionGroupsDetails?.resource && (
-                    <ConditionsViewer resource={conditionGroupsDetails.resource} formType="conditionGroup" />
-                )}
-            </Row>
+
+            <Row>{ruleDetails?.resource && <ConditionsViewer resource={ruleDetails.resource} formType="rules" />}</Row>
+
             <Dialog
                 isOpen={confirmDelete}
                 caption={`Delete a Condition Group`}
@@ -120,4 +155,4 @@ const ConditionGroupDetails = () => {
     );
 };
 
-export default ConditionGroupDetails;
+export default RuleDetails;

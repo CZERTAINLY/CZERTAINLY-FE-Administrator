@@ -13,6 +13,7 @@
 
 import type {
     Resource,
+    RuleActionDto,
 } from './';
 
 /**
@@ -44,6 +45,12 @@ export interface RuleActionGroupDto {
      * @memberof RuleActionGroupDto
      */
     resource: Resource;
+    /**
+     * List of Rule Actions in the Rule Actions Group
+     * @type {Array<RuleActionDto>}
+     * @memberof RuleActionGroupDto
+     */
+    actions: Array<RuleActionDto>;
 }
 
 

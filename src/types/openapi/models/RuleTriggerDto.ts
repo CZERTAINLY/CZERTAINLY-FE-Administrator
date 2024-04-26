@@ -60,12 +60,6 @@ export interface RuleTriggerDto {
      * @memberof RuleTriggerDto
      */
     triggerResource?: Resource;
-    /**
-     * UUID of the the Rule Trigger event source object
-     * @type {string}
-     * @memberof RuleTriggerDto
-     */
-    triggerResourceUuid?: string;
 }
 
 

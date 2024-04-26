@@ -1,12 +1,12 @@
 import { AttributeResponseModel } from './attributes';
 import type {
     RuleActionDto,
-    RuleActionGroupDetailDto,
+    // RuleActionGroupDto,
     RuleActionGroupDto,
     RuleActionGroupRequestDto,
     RuleActionRequestDto,
     RuleConditionDto,
-    RuleConditionGroupDetailDto,
+    // RuleConditionGroupDetailDto,
     RuleConditionGroupDto,
     RuleConditionGroupRequestDto,
     RuleConditionRequestDto,
@@ -29,10 +29,10 @@ export type FieldSearchDataByGroupModel = FieldSearchDataByGroupDto;
 export type ActionRuleDto = RuleActionDto;
 export type ActionRuleModel = ActionRuleDto;
 
-export type ActionRuleGroupDetailDto = RuleActionGroupDetailDto;
-export type ActionRuleGroupDetailModel = Omit<ActionRuleGroupDetailDto, 'actions'> & {
-    actions: Array<ActionRuleModel>;
-};
+// export type ActionRuleGroupDetailDto = RuleActionGroupDetailDto;
+// export type ActionRuleGroupDetailModel = Omit<ActionRuleGroupDetailDto, 'actions'> & {
+//     actions: Array<ActionRuleModel>;
+// };
 
 export type ActionRuleGroupDto = RuleActionGroupDto;
 export type ActionRuleGroupModel = ActionRuleGroupDto;
@@ -48,10 +48,10 @@ export type ActionRuleGroupRequestModel = Omit<ActionRuleGroupRequestDto, 'actio
 export type ConditionRuleDto = RuleConditionDto;
 export type ConditionRuleModel = ConditionRuleDto;
 
-export type ConditionRuleGroupDetailDto = RuleConditionGroupDetailDto;
-export type ConditionRuleGroupDetailModel = Omit<ConditionRuleGroupDetailDto, 'conditions'> & {
-    conditions: Array<ConditionRuleModel>;
-};
+// export type ConditionRuleGroupDetailDto = RuleConditionGroupDetailDto;
+// export type ConditionRuleGroupDetailModel = Omit<ConditionRuleGroupDetailDto, 'conditions'> & {
+//     conditions: Array<ConditionRuleModel>;
+// };
 
 export type ConditionRuleGroupDto = RuleConditionGroupDto;
 export type ConditionRuleGroupModel = ConditionRuleGroupDto;
@@ -77,9 +77,10 @@ export type RuleModel = Omit<DtoRule, 'attributes'> & {
 };
 
 export type RequestRuleDto = RuleRequestDto;
-export type RequestRuleModel = Omit<RequestRuleDto, 'conditions | conditionGroups'> & {
-    conditions: Array<RuleConditiontModel>;
-    conditionGroups: Array<ConditionRuleGroupRequestModel>;
+export type RequestRuleModel = Omit<RequestRuleDto, 'conditions | conditionGroups | conditionGroupsUuids'> & {
+    conditions?: Array<RuleConditiontModel>;
+    conditionGroups?: Array<ConditionRuleGroupRequestModel>;
+    conditionGroupsUuids?: Array<string>;
 };
 
 export type TriggerRuleDetailDto = RuleTriggerDetailDto;
@@ -110,9 +111,10 @@ export type UpdateGroupRuleConditionRequestModel = Omit<UpdateGroupRuleCondition
 };
 
 export type RuleUpdateRequestDto = UpdateRuleRequestDto;
-export type RuleUpdateRequestModel = Omit<RuleUpdateRequestDto, 'conditions | conditionGroups'> & {
-    conditions: Array<RuleConditiontModel>;
-    conditionGroups: Array<ConditionRuleGroupRequestModel>;
+export type RuleUpdateRequestModel = Omit<RuleUpdateRequestDto, 'conditions | conditionGroups | conditionGroupsUuids'> & {
+    conditions?: Array<RuleConditiontModel>;
+    conditionGroups?: Array<ConditionRuleGroupRequestModel>;
+    conditionGroupsUuids?: Array<string>;
 };
 
 export type RuleTriggerUpdateRequestDto = UpdateRuleTriggerRequestDto;

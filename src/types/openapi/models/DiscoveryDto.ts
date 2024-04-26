@@ -50,4 +50,10 @@ export interface DiscoveryDto {
      * @memberof DiscoveryDto
      */
     kind: string;
+    /**
+     * List of triggers to be triggered after the discovery is finished, triggers will be evaluated in given order
+     * @type {Array<string>}
+     * @memberof DiscoveryDto
+     */
+    triggers?: Array<string>;
 }

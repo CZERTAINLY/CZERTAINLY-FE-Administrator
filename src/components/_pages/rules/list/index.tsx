@@ -11,17 +11,18 @@ import { Link, useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import { Container } from 'reactstrap';
 import { PlatformEnum, Resource } from 'types/openapi';
-import styles from './conditionGroupsList.module.scss';
+
+import styles from './ruleList.module.scss';
 
 const ConditionGroups = () => {
-    const conditionGroups = useSelector(rulesSelectors.conditionRuleGroups);
+    const rules = useSelector(rulesSelectors.rules);
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [selectedResource, setSelectedResource] = useState<Resource>();
-    const isFetchingList = useSelector(rulesSelectors.isFetchingConditionGroups);
+    const isFetchingList = useSelector(rulesSelectors.isFetchingRulesList);
     const isDeleting = useSelector(rulesSelectors.isDeletingConditionGroup);
 
     const [checkedRows, setCheckedRows] = useState<string[]>([]);
@@ -30,13 +31,13 @@ const ConditionGroups = () => {
     const isBusy = useMemo(() => isFetchingList || isDeleting, [isFetchingList, isDeleting]);
 
     const onDeleteConfirmed = useCallback(() => {
-        dispatch(rulesActions.deleteConditionGroup({ conditionGroupUuid: checkedRows[0] }));
+        dispatch(rulesActions.deleteRule({ ruleUuid: checkedRows[0] }));
         setConfirmDelete(false);
         setCheckedRows([]);
     }, [dispatch, checkedRows]);
 
     const getFreshListConditionGroups = useCallback(() => {
-        dispatch(rulesActions.listConditionGroups({ resource: selectedResource }));
+        dispatch(rulesActions.listRules({ resource: selectedResource }));
     }, [dispatch, selectedResource]);
 
     useEffect(() => {
@@ -83,17 +84,17 @@ const ConditionGroups = () => {
 
     const conditionGroupList: TableDataRow[] = useMemo(
         () =>
-            conditionGroups.map((conditionGroup) => {
+            rules.map((rule) => {
                 return {
-                    id: conditionGroup.uuid,
+                    id: rule.uuid,
                     columns: [
-                        <Link to={`./detail/${conditionGroup.uuid}`}>{conditionGroup.name}</Link>,
-                        getEnumLabel(resourceTypeEnum, conditionGroup.resource),
-                        conditionGroup.description || '',
+                        <Link to={`./detail/${rule.uuid}`}>{rule.name}</Link>,
+                        getEnumLabel(resourceTypeEnum, rule.resource),
+                        rule.description || '',
                     ],
                 };
             }),
-        [conditionGroups, resourceTypeEnum],
+        [rules, resourceTypeEnum],
     );
 
     const buttons: WidgetButtonProps[] = useMemo(
@@ -135,13 +136,7 @@ const ConditionGroups = () => {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget
-                titleSize="larger"
-                title="Condition Groups"
-                refreshAction={getFreshListConditionGroups}
-                busy={isBusy}
-                widgetButtons={buttons}
-            >
+            <Widget titleSize="larger" title="Rules" refreshAction={getFreshListConditionGroups} busy={isBusy} widgetButtons={buttons}>
                 <br />
                 <CustomTable
                     checkedRows={checkedRows}

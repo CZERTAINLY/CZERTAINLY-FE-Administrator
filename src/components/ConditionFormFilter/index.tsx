@@ -2,45 +2,71 @@ import { ApiClients } from 'api';
 import cx from 'classnames';
 import FilterWidget from 'components/FilterWidget';
 import { EntityType, actions as filterActions } from 'ducks/filters';
-import { selectors as rulesSelectors } from 'ducks/rules';
+import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { Resource } from 'types/openapi';
 import { conditionGroupToFilter, filterToConditionGroup } from 'utils/rules';
-import { ConditionGroupFormValues } from '../form';
+import { ConditionGroupFormValues } from '../_pages/condition-groups/form';
 import styles from './conditionGroupForm.module.scss';
+type FormType = 'rules' | 'conditionGroup';
 
 interface ConditionGroupFormFilterProps {
     resource: Resource;
+    formType: FormType;
 }
 
-const ConditionGroupFormFilter = ({ resource }: ConditionGroupFormFilterProps) => {
+const ConditionFormFilter = ({ resource, formType }: ConditionGroupFormFilterProps) => {
     const { id } = useParams();
     const editMode = useMemo(() => !!id, [id]);
     const [hasEffectRun, setHasEffectRun] = useState(false);
 
     const form = useForm<ConditionGroupFormValues>();
     const conditionGroupsDetails = useSelector(rulesSelectors.conditionGroupDetails);
+    const ruleDetails = useSelector(rulesSelectors.ruleDetails);
 
     const dispatch = useDispatch();
 
     useEffect(() => {
-        if (!hasEffectRun && editMode && conditionGroupsDetails) {
-            const currentConditions = conditionGroupsDetails.conditions;
+        if (!id) return;
+        if (formType === 'rules') {
+            dispatch(rulesActions.getRule({ ruleUuid: id }));
+        } else {
+            dispatch(rulesActions.getConditionGroup({ conditionGroupUuid: id }));
+        }
+    }, [id, dispatch, formType]);
+
+    useEffect(() => {
+        if (!hasEffectRun && editMode) {
+            let currentConditions = [];
+
+            if (formType === 'rules') {
+                if (!ruleDetails) return;
+                currentConditions = ruleDetails?.conditions || [];
+            } else {
+                if (!conditionGroupsDetails) return;
+                currentConditions = conditionGroupsDetails?.conditions || [];
+            }
+
             const currentFilters = conditionGroupToFilter(currentConditions);
             setHasEffectRun(true);
-            dispatch(filterActions.setCurrentFilters({ currentFilters: currentFilters, entity: EntityType.CONDITION_GROUP }));
+            dispatch(filterActions.setCurrentFilters({ currentFilters: currentFilters, entity: EntityType.CONDITIONS }));
         }
-    }, [editMode, conditionGroupsDetails, hasEffectRun, dispatch]);
+    }, [editMode, formType, ruleDetails, conditionGroupsDetails, hasEffectRun, dispatch]);
 
+    useEffect(() => {
+        return () => {
+            dispatch(filterActions.setCurrentFilters({ currentFilters: [], entity: EntityType.CONDITIONS }));
+        };
+    }, [dispatch]);
     const renderFilterWidget = useMemo(() => {
         return (
             <div className={cx({ [styles.disabled]: resource === Resource.None })}>
                 <FilterWidget
-                    entity={EntityType.CONDITION_GROUP}
-                    title={'Condition Group'}
+                    entity={EntityType.CONDITIONS}
+                    title={'Conditions'}
                     getAvailableFiltersApi={(apiClients: ApiClients) =>
                         apiClients.resources.listResourceRuleFilterFields({
                             resource,
@@ -55,7 +81,11 @@ const ConditionGroupFormFilter = ({ resource }: ConditionGroupFormFilterProps) =
         );
     }, [resource, form]);
 
-    return <div>{renderFilterWidget}</div>;
+    return (
+        <>
+            <div>{renderFilterWidget}</div>
+        </>
+    );
 };
 
-export default ConditionGroupFormFilter;
+export default ConditionFormFilter;

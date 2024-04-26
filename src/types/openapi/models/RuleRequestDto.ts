@@ -13,12 +13,10 @@
 
 import type {
     Resource,
-    RuleConditionGroupRequestDto,
     RuleConditionRequestDto,
 } from './';
 
 /**
- * List of new Rules to add in the Rule Trigger
  * @export
  * @interface RuleRequestDto
  */
@@ -58,12 +56,6 @@ export interface RuleRequestDto {
      * @memberof RuleRequestDto
      */
     conditions?: Array<RuleConditionRequestDto>;
-    /**
-     * List of new condition groups to add in the Rule
-     * @type {Array<RuleConditionGroupRequestDto>}
-     * @memberof RuleRequestDto
-     */
-    conditionGroups?: Array<RuleConditionGroupRequestDto>;
     /**
      * List of UUIDs of existing condition groups to add in the Rule
      * @type {Array<string>}

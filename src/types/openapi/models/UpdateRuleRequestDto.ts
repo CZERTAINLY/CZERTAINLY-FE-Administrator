@@ -12,7 +12,6 @@
  */
 
 import type {
-    RuleConditionGroupRequestDto,
     RuleConditionRequestDto,
 } from './';
 
@@ -45,12 +44,6 @@ export interface UpdateRuleRequestDto {
      * @memberof UpdateRuleRequestDto
      */
     conditions?: Array<RuleConditionRequestDto>;
-    /**
-     * List of new condition groups to add in the Rule
-     * @type {Array<RuleConditionGroupRequestDto>}
-     * @memberof UpdateRuleRequestDto
-     */
-    conditionGroups?: Array<RuleConditionGroupRequestDto>;
     /**
      * List of UUIDs of existing condition groups to add in the Rule
      * @type {Array<string>}
