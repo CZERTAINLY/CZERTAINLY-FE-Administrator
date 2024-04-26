@@ -20,8 +20,6 @@ const GroupConditionsViewer = ({ groupConditions = [], conditionGroupName, condi
     const availableFilters = useSelector(selectors.availableFilters(EntityType.CONDITIONS));
     const platformEnums = useSelector(enumSelectors.platformEnums);
     const isFetchingConditionGroup = useSelector(rulesSelectors.isFetchingConditionGroup);
-    console.log('platformEnums', platformEnums);
-    console.log('availableFilters', availableFilters);
     const booleanOptions = useMemo(
         () => [
             { label: 'True', value: true },
@@ -38,11 +36,6 @@ const GroupConditionsViewer = ({ groupConditions = [], conditionGroupName, condi
                 .find((a) => a.filterFieldSource === condition.fieldSource)
                 ?.searchFieldData?.find((s) => s.fieldIdentifier === condition.fieldIdentifier);
             const label = field ? field.fieldLabel : condition.fieldIdentifier;
-            console.log('condition.fieldIdentifier', condition.fieldIdentifier);
-            console.log('filterConditionSource', filterConditionSource);
-            console.log('foundField', foundField);
-            console.log('label', label);
-            console.log('field', field);
             const value =
                 field && field.type === FilterFieldType.Boolean
                     ? `'${booleanOptions.find((b) => !!condition.value === b.value)?.label}'`
