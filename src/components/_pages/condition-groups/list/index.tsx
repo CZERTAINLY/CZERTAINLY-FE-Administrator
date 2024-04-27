@@ -1,6 +1,7 @@
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { useDispatch, useSelector } from 'react-redux';
 
+import cx from 'classnames';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
@@ -99,18 +100,6 @@ const ConditionGroups = () => {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: 'plus',
-                disabled: false,
-                tooltip: 'Create',
-                onClick: () => navigate(`./add`),
-            },
-            {
-                icon: 'trash',
-                disabled: checkedRows.length === 0,
-                tooltip: 'Delete',
-                onClick: () => setConfirmDelete(true),
-            },
-            {
                 icon: 'search',
                 disabled: false,
                 tooltip: 'Select Resource',
@@ -128,6 +117,30 @@ const ConditionGroups = () => {
                             }}
                         />
                     </div>
+                ),
+            },
+            {
+                icon: 'plus',
+                disabled: false,
+                tooltip: 'Create',
+                onClick: () => navigate(`./add`),
+            },
+            {
+                icon: 'trash',
+                disabled: checkedRows.length === 0,
+                tooltip: 'Delete',
+                onClick: () => setConfirmDelete(true),
+            },
+
+            {
+                icon: 'info',
+                disabled: false,
+                onClick: () => {},
+                custom: (
+                    <i
+                        className={cx('fa fa-info', styles.infoIcon)}
+                        title="Condition Group is a set of conditions that are applicable to a rule"
+                    />
                 ),
             },
         ],

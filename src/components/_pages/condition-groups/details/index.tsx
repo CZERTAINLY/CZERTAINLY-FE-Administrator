@@ -21,9 +21,14 @@ const ConditionGroupDetails = () => {
 
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [updateDescriptionEditEnable, setUpdateDescription] = useState<boolean>(false);
-    const [updatedDescription, setUpdatedDescription] = useState<string>('');
+    const [updatedDescription, setUpdatedDescription] = useState<string>(conditionGroupsDetails?.description || '');
 
     const isBusy = useMemo(() => isFetchingConditionGroup || isUpdatingGroupDetails, [isFetchingConditionGroup, isUpdatingGroupDetails]);
+
+    useEffect(() => {
+        if (!conditionGroupsDetails?.description) return;
+        setUpdatedDescription(conditionGroupsDetails.description);
+    }, [conditionGroupsDetails?.description]);
 
     const getFreshDetails = useCallback(() => {
         if (!id) return;
@@ -105,7 +110,11 @@ const ConditionGroupDetails = () => {
                           columns: [
                               'Description',
                               updateDescriptionEditEnable ? (
-                                  <Input onChange={(e) => setUpdatedDescription(e.target.value)} placeholder="Enter Description" />
+                                  <Input
+                                      onChange={(e) => setUpdatedDescription(e.target.value)}
+                                      value={updatedDescription}
+                                      placeholder="Enter Description"
+                                  />
                               ) : (
                                   conditionGroupsDetails.description || ''
                               ),
@@ -159,6 +168,7 @@ const ConditionGroupDetails = () => {
             updateDescriptionEditEnable,
             onUpdateDescriptionConfirmed,
             isUpdatingGroupDetails,
+            updatedDescription,
         ],
     );
 

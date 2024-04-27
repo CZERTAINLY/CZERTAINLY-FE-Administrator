@@ -1,3 +1,4 @@
+import cx from 'classnames';
 import ConditionsViewer from 'components/ConditionsViewer';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
@@ -11,7 +12,7 @@ import { Link, useParams } from 'react-router-dom';
 import Select from 'react-select';
 import { Button, ButtonGroup, Col, Container, Input, Row } from 'reactstrap';
 import { PlatformEnum } from 'types/openapi';
-
+import styles from './rulesDetail.module.scss';
 interface SelectChangeValue {
     value: string;
     label: string;
@@ -27,8 +28,13 @@ const RuleDetails = () => {
 
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [updateDescriptionEditEnable, setUpdateDescription] = useState<boolean>(false);
-    const [updatedDescription, setUpdatedDescription] = useState<string>('');
+    const [updatedDescription, setUpdatedDescription] = useState<string>(ruleDetails?.description || '');
     const [newConditionGroups, setNewConditionGroups] = useState<SelectChangeValue[]>([]);
+
+    useEffect(() => {
+        if (!ruleDetails?.description) return;
+        setUpdatedDescription(ruleDetails.description);
+    }, [ruleDetails?.description]);
 
     const getFreshDetails = useCallback(() => {
         if (!id) return;
@@ -140,7 +146,12 @@ const RuleDetails = () => {
                 icon: 'info',
                 disabled: false,
                 onClick: () => {},
-                tooltip: 'Condition Group is a group of conditions that are applicable to a rule',
+                custom: (
+                    <i
+                        className={cx('fa fa-info', styles.infoIcon)}
+                        title="Condition Group is a set of conditions that are applicable to a rule"
+                    />
+                ),
             },
         ],
         [],
@@ -187,7 +198,11 @@ const RuleDetails = () => {
                           columns: [
                               'Description',
                               updateDescriptionEditEnable ? (
-                                  <Input onChange={(e) => setUpdatedDescription(e.target.value)} placeholder="Enter Description" />
+                                  <Input
+                                      value={updatedDescription}
+                                      onChange={(e) => setUpdatedDescription(e.target.value)}
+                                      placeholder="Enter Description"
+                                  />
                               ) : (
                                   ruleDetails.description || ''
                               ),
@@ -233,7 +248,7 @@ const RuleDetails = () => {
                           ],
                       },
                   ],
-        [ruleDetails, resourceTypeEnum, onUpdateDescriptionConfirmed, updateDescriptionEditEnable, isUpdatingRule],
+        [ruleDetails, resourceTypeEnum, onUpdateDescriptionConfirmed, updateDescriptionEditEnable, isUpdatingRule, updatedDescription],
     );
 
     const conditionGroupFieldsDataHeader = useMemo(
