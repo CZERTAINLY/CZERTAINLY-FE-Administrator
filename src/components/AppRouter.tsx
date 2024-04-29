@@ -327,11 +327,9 @@ export default function AppRouter() {
 
                     <Route path={`/conditiongroups`} element={<ConditionGroupsList />} />
                     <Route path={`/conditiongroups/add`} element={<ConditionGroupForm />} />
-                    {/* <Route path={`/conditiongroups/edit/:id`} element={<ConditionGroupForm />} /> */}
                     <Route path={`/conditiongroups/detail/:id`} element={<ConditionGroupDetails />} />
 
                     <Route path={`/rules/add`} element={<RulesForm />} />
-                    <Route path={`/rules/edit/:id`} element={<RulesForm />} />
                     <Route path={`/rules`} element={<RulesList />} />
                     <Route path={`/rules/detail/:id`} element={<RuleDetails />} />
                 </Route>

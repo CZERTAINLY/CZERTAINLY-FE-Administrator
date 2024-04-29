@@ -187,7 +187,6 @@ const ConditionGroupForm = () => {
                                         invalid={!!meta.error && meta.touched}
                                         type="text"
                                         placeholder="Enter the Description"
-                                        disabled={editMode}
                                     />
 
                                     <FormFeedback>{meta.error}</FormFeedback>

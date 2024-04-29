@@ -11,7 +11,7 @@ const ConditionsGroupsList = ({ ruleConditions }: ConditionsTableViewerProps) =>
         () =>
             ruleConditions.map((conditionGroup, i) => (
                 <React.Fragment key={conditionGroup.uuid}>
-                    {i !== 0 && <hr className="hr" />}
+                    <hr className={styles.conditionListHr} />
                     <GroupConditionsViewer
                         conditionGroupName={conditionGroup.name}
                         conditionGroupUuid={conditionGroup.uuid}

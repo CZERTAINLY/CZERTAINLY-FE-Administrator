@@ -3,7 +3,7 @@
     font-weight: 500;
     margin-right: 5px;
     margin-bottom: 5px;
-    padding: 5.75px 5.75px;
+    padding: 6.25px !important;
 }
 
 .groupConditionBadge:hover {
@@ -12,4 +12,11 @@
 
 .groupConditionTitle {
     min-width: 80px;
+    margin-top: 2px;
+}
+
+.groupConditionContainerDiv {
+    margin-top: 12px;
+    margin-bottom: 10px;
+    display: flex;
 }

@@ -8,18 +8,27 @@ import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rule
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { Col, Container, Row } from 'reactstrap';
+import { Button, ButtonGroup, Col, Container, Input, Row } from 'reactstrap';
 import { PlatformEnum } from 'types/openapi';
 
 const ConditionGroupDetails = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
-
     const conditionGroupsDetails = useSelector(rulesSelectors.conditionGroupDetails);
     const isFetchingConditionGroup = useSelector(rulesSelectors.isFetchingConditionGroup);
+    const isUpdatingGroupDetails = useSelector(rulesSelectors.isUpdatingConditionGroup);
 
     const [confirmDelete, setConfirmDelete] = useState(false);
+    const [updateDescriptionEditEnable, setUpdateDescription] = useState<boolean>(false);
+    const [updatedDescription, setUpdatedDescription] = useState<string>(conditionGroupsDetails?.description || '');
+
+    const isBusy = useMemo(() => isFetchingConditionGroup || isUpdatingGroupDetails, [isFetchingConditionGroup, isUpdatingGroupDetails]);
+
+    useEffect(() => {
+        if (!conditionGroupsDetails?.description) return;
+        setUpdatedDescription(conditionGroupsDetails.description);
+    }, [conditionGroupsDetails?.description]);
 
     const getFreshDetails = useCallback(() => {
         if (!id) return;
@@ -35,6 +44,20 @@ const ConditionGroupDetails = () => {
         dispatch(rulesActions.deleteConditionGroup({ conditionGroupUuid: id }));
         setConfirmDelete(false);
     }, [dispatch, id]);
+
+    const onUpdateDescriptionConfirmed = useCallback(() => {
+        if (!id) return;
+        dispatch(
+            rulesActions.updateConditionGroup({
+                conditionGroupUuid: id,
+                conditionGroup: {
+                    description: updatedDescription,
+                    conditions: conditionGroupsDetails?.conditions || [],
+                },
+            }),
+        );
+        setUpdateDescription(false);
+    }, [dispatch, id, conditionGroupsDetails, updatedDescription]);
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
@@ -57,6 +80,10 @@ const ConditionGroupDetails = () => {
                 id: 'value',
                 content: 'Value',
             },
+            {
+                id: 'actions',
+                content: 'Actions',
+            },
         ],
         [],
     );
@@ -68,22 +95,81 @@ const ConditionGroupDetails = () => {
                 : [
                       {
                           id: 'uuid',
-                          columns: ['UUID', conditionGroupsDetails.uuid],
+                          columns: ['UUID', conditionGroupsDetails.uuid, ''],
                       },
                       {
                           id: 'name',
-                          columns: ['Name', conditionGroupsDetails.name],
+                          columns: ['Name', conditionGroupsDetails.name, ''],
                       },
                       {
                           id: 'resource',
-                          columns: ['Resource', getEnumLabel(resourceTypeEnum, conditionGroupsDetails.resource)],
+                          columns: ['Resource', getEnumLabel(resourceTypeEnum, conditionGroupsDetails.resource), ''],
                       },
                       {
                           id: 'description',
-                          columns: ['Description', conditionGroupsDetails.description || ''],
+                          columns: [
+                              'Description',
+                              updateDescriptionEditEnable ? (
+                                  <Input
+                                      onChange={(e) => setUpdatedDescription(e.target.value)}
+                                      value={updatedDescription}
+                                      placeholder="Enter Description"
+                                  />
+                              ) : (
+                                  conditionGroupsDetails.description || ''
+                              ),
+                              <div>
+                                  {updateDescriptionEditEnable ? (
+                                      <ButtonGroup>
+                                          <Button
+                                              className="btn btn-link mx-auto"
+                                              size="sm"
+                                              color="secondary"
+                                              title="Update Description"
+                                              onClick={onUpdateDescriptionConfirmed}
+                                              disabled={isUpdatingGroupDetails}
+                                          >
+                                              <i className="fa fa-check" />
+                                          </Button>
+                                          <Button
+                                              className="btn btn-link mx-auto danger"
+                                              size="sm"
+                                              title="Cancel"
+                                              onClick={() => {
+                                                  setUpdateDescription(false);
+                                              }}
+                                              disabled={isUpdatingGroupDetails}
+                                          >
+                                              <i className="fa fa-close text-danger" />
+                                          </Button>
+                                      </ButtonGroup>
+                                  ) : (
+                                      <Button
+                                          className="btn btn-link mx-auto"
+                                          size="sm"
+                                          color="secondary"
+                                          title="Update Description"
+                                          onClick={() => {
+                                              setUpdateDescription(true);
+                                          }}
+                                          disabled={isUpdatingGroupDetails}
+                                      >
+                                          <i className="fa fa-pencil-square-o" />
+                                      </Button>
+                                  )}
+                              </div>,
+                          ],
                       },
                   ],
-        [conditionGroupsDetails, resourceTypeEnum],
+        [
+            conditionGroupsDetails,
+            resourceTypeEnum,
+            setUpdateDescription,
+            updateDescriptionEditEnable,
+            onUpdateDescriptionConfirmed,
+            isUpdatingGroupDetails,
+            updatedDescription,
+        ],
     );
 
     return (
@@ -92,7 +178,7 @@ const ConditionGroupDetails = () => {
                 <Col>
                     <Widget
                         refreshAction={getFreshDetails}
-                        busy={isFetchingConditionGroup}
+                        busy={isBusy}
                         title="Condition Group Details"
                         titleSize="large"
                         widgetButtons={buttons}

@@ -99,18 +99,6 @@ const ConditionGroups = () => {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: 'plus',
-                disabled: false,
-                tooltip: 'Create',
-                onClick: () => navigate(`./add`),
-            },
-            {
-                icon: 'trash',
-                disabled: checkedRows.length === 0,
-                tooltip: 'Delete',
-                onClick: () => setConfirmDelete(true),
-            },
-            {
                 icon: 'search',
                 disabled: false,
                 tooltip: 'Select Resource',
@@ -118,6 +106,7 @@ const ConditionGroups = () => {
                 custom: (
                     <div className={styles.listSelectContainer}>
                         <Select
+                            isClearable
                             maxMenuHeight={140}
                             menuPlacement="auto"
                             options={resourceOptions}
@@ -128,6 +117,18 @@ const ConditionGroups = () => {
                         />
                     </div>
                 ),
+            },
+            {
+                icon: 'plus',
+                disabled: false,
+                tooltip: 'Create',
+                onClick: () => navigate(`./add`),
+            },
+            {
+                icon: 'trash',
+                disabled: checkedRows.length === 0,
+                tooltip: 'Delete',
+                onClick: () => setConfirmDelete(true),
             },
         ],
         [checkedRows, resourceOptions, navigate],
@@ -142,7 +143,9 @@ const ConditionGroups = () => {
                 busy={isBusy}
                 widgetButtons={buttons}
             >
-                <br />
+                <p className="mb-2">
+                    Condition group is named set of conditions for selected resource that can be reused in rules of same resource
+                </p>
                 <CustomTable
                     checkedRows={checkedRows}
                     hasCheckboxes

@@ -56,7 +56,7 @@ const ConditionGroups = () => {
         return resourceTypeArray;
     }, [resourceTypeEnum]);
 
-    const conditionGroupsRowHeaders: TableHeader[] = useMemo(
+    const rulesTableHeader: TableHeader[] = useMemo(
         () => [
             {
                 content: 'Name',
@@ -82,7 +82,7 @@ const ConditionGroups = () => {
         [],
     );
 
-    const conditionGroupList: TableDataRow[] = useMemo(
+    const rulesList: TableDataRow[] = useMemo(
         () =>
             rules.map((rule) => {
                 return {
@@ -119,6 +119,7 @@ const ConditionGroups = () => {
                 custom: (
                     <div className={styles.listSelectContainer}>
                         <Select
+                            isClearable
                             maxMenuHeight={140}
                             menuPlacement="auto"
                             options={resourceOptions}
@@ -143,8 +144,8 @@ const ConditionGroups = () => {
                     hasCheckboxes
                     hasAllCheckBox={false}
                     multiSelect={false}
-                    data={conditionGroupList}
-                    headers={conditionGroupsRowHeaders}
+                    data={rulesList}
+                    headers={rulesTableHeader}
                     onCheckedRowsChanged={(checkedRows) => {
                         setCheckedRows(checkedRows as string[]);
                     }}
