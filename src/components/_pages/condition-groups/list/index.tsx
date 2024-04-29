@@ -1,7 +1,6 @@
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { useDispatch, useSelector } from 'react-redux';
 
-import cx from 'classnames';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
@@ -131,18 +130,6 @@ const ConditionGroups = () => {
                 tooltip: 'Delete',
                 onClick: () => setConfirmDelete(true),
             },
-
-            {
-                icon: 'info',
-                disabled: false,
-                onClick: () => {},
-                custom: (
-                    <i
-                        className={cx('fa fa-info', styles.infoIcon)}
-                        title="Condition Group is a set of conditions that are applicable to a rule"
-                    />
-                ),
-            },
         ],
         [checkedRows, resourceOptions, navigate],
     );
@@ -156,7 +143,9 @@ const ConditionGroups = () => {
                 busy={isBusy}
                 widgetButtons={buttons}
             >
-                <br />
+                <p className="mb-2">
+                    Condition group is named set of conditions for selected resource that can be reused in rules of same resource
+                </p>
                 <CustomTable
                     checkedRows={checkedRows}
                     hasCheckboxes

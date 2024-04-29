@@ -149,7 +149,7 @@ const RuleDetails = () => {
                 custom: (
                     <i
                         className={cx('fa fa-info', styles.infoIcon)}
-                        title="Condition Group is a set of conditions that are applicable to a rule"
+                        title="Condition group is named set of conditions for selected resource that can be reused in rules of same resource"
                     />
                 ),
             },
