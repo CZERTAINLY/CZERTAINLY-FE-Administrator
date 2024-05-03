@@ -993,6 +993,7 @@ export default function CertificateDetail() {
                           ) : (
                               ''
                           ),
+                          '',
                       ],
                   },
                   {
