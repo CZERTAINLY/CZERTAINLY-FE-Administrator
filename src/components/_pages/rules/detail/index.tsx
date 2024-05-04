@@ -226,6 +226,7 @@ const RuleDetails = () => {
                                               disabled={isUpdatingRule}
                                               onClick={() => {
                                                   setUpdateDescription(false);
+                                                  setUpdatedDescription(ruleDetails.description || '');
                                               }}
                                           >
                                               <i className="fa fa-close text-danger" />

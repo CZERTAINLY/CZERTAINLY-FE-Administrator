@@ -11,28 +11,28 @@ import { useParams } from 'react-router-dom';
 import { Button, ButtonGroup, Col, Container, Input, Row } from 'reactstrap';
 import { PlatformEnum } from 'types/openapi';
 
-const ConditionGroupDetails = () => {
+const ActionGroupDetails = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
-    const conditionGroupsDetails = useSelector(rulesSelectors.conditionGroupDetails);
-    const isFetchingConditionGroup = useSelector(rulesSelectors.isFetchingConditionGroup);
-    const isUpdatingGroupDetails = useSelector(rulesSelectors.isUpdatingConditionGroup);
+    const actionGroupDetails = useSelector(rulesSelectors.actionGroupDetails);
+    const isFetchingDetails = useSelector(rulesSelectors.isFetchingActionGroup);
+    const isUpdatingDetails = useSelector(rulesSelectors.isupdatingActionGroup);
 
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [updateDescriptionEditEnable, setUpdateDescription] = useState<boolean>(false);
-    const [updatedDescription, setUpdatedDescription] = useState<string>(conditionGroupsDetails?.description || '');
+    const [updatedDescription, setUpdatedDescription] = useState<string>(actionGroupDetails?.description || '');
 
-    const isBusy = useMemo(() => isFetchingConditionGroup || isUpdatingGroupDetails, [isFetchingConditionGroup, isUpdatingGroupDetails]);
+    const isBusy = useMemo(() => isFetchingDetails || isUpdatingDetails, [isFetchingDetails, isUpdatingDetails]);
 
     useEffect(() => {
-        if (!conditionGroupsDetails?.description) return;
-        setUpdatedDescription(conditionGroupsDetails.description);
-    }, [conditionGroupsDetails?.description]);
+        if (!actionGroupDetails?.description) return;
+        setUpdatedDescription(actionGroupDetails.description);
+    }, [actionGroupDetails?.description]);
 
     const getFreshDetails = useCallback(() => {
         if (!id) return;
-        dispatch(rulesActions.getConditionGroup({ conditionGroupUuid: id }));
+        dispatch(rulesActions.getActionGroup({ actionGroupUuid: id }));
     }, [id, dispatch]);
 
     useEffect(() => {
@@ -41,23 +41,24 @@ const ConditionGroupDetails = () => {
 
     const onDeleteConfirmed = useCallback(() => {
         if (!id) return;
-        dispatch(rulesActions.deleteConditionGroup({ conditionGroupUuid: id }));
+        dispatch(rulesActions.deleteActionGroup({ actionGroupUuid: id }));
         setConfirmDelete(false);
     }, [dispatch, id]);
 
     const onUpdateDescriptionConfirmed = useCallback(() => {
         if (!id) return;
         dispatch(
-            rulesActions.updateConditionGroup({
-                conditionGroupUuid: id,
-                conditionGroup: {
+            rulesActions.updateActionGroup({
+                actionGroupUuid: id,
+                actionGroup: {
                     description: updatedDescription,
-                    conditions: conditionGroupsDetails?.conditions || [],
+                    actions: actionGroupDetails?.actions || [],
+                    // conditions: actionGroupDetails?.conditions || [],
                 },
             }),
         );
         setUpdateDescription(false);
-    }, [dispatch, id, conditionGroupsDetails, updatedDescription]);
+    }, [dispatch, id, actionGroupDetails, updatedDescription]);
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
@@ -88,22 +89,22 @@ const ConditionGroupDetails = () => {
         [],
     );
 
-    const conditionGroupsDetailData: TableDataRow[] = useMemo(
+    const actionGroupsDetailData: TableDataRow[] = useMemo(
         () =>
-            !conditionGroupsDetails
+            !actionGroupDetails
                 ? []
                 : [
                       {
                           id: 'uuid',
-                          columns: ['UUID', conditionGroupsDetails.uuid, ''],
+                          columns: ['UUID', actionGroupDetails.uuid, ''],
                       },
                       {
                           id: 'name',
-                          columns: ['Name', conditionGroupsDetails.name, ''],
+                          columns: ['Name', actionGroupDetails.name, ''],
                       },
                       {
                           id: 'resource',
-                          columns: ['Resource', getEnumLabel(resourceTypeEnum, conditionGroupsDetails.resource), ''],
+                          columns: ['Resource', getEnumLabel(resourceTypeEnum, actionGroupDetails.resource), ''],
                       },
                       {
                           id: 'description',
@@ -116,7 +117,7 @@ const ConditionGroupDetails = () => {
                                       placeholder="Enter Description"
                                   />
                               ) : (
-                                  conditionGroupsDetails.description || ''
+                                  actionGroupDetails.description || ''
                               ),
                               <div>
                                   {updateDescriptionEditEnable ? (
@@ -127,7 +128,7 @@ const ConditionGroupDetails = () => {
                                               color="secondary"
                                               title="Update Description"
                                               onClick={onUpdateDescriptionConfirmed}
-                                              disabled={isUpdatingGroupDetails}
+                                              disabled={isUpdatingDetails}
                                           >
                                               <i className="fa fa-check" />
                                           </Button>
@@ -137,9 +138,9 @@ const ConditionGroupDetails = () => {
                                               title="Cancel"
                                               onClick={() => {
                                                   setUpdateDescription(false);
-                                                  setUpdatedDescription(conditionGroupsDetails.description || '');
+                                                  setUpdatedDescription(actionGroupDetails.description || '');
                                               }}
-                                              disabled={isUpdatingGroupDetails}
+                                              disabled={isUpdatingDetails}
                                           >
                                               <i className="fa fa-close text-danger" />
                                           </Button>
@@ -153,7 +154,7 @@ const ConditionGroupDetails = () => {
                                           onClick={() => {
                                               setUpdateDescription(true);
                                           }}
-                                          disabled={isUpdatingGroupDetails}
+                                          disabled={isUpdatingDetails}
                                       >
                                           <i className="fa fa-pencil-square-o" />
                                       </Button>
@@ -163,12 +164,12 @@ const ConditionGroupDetails = () => {
                       },
                   ],
         [
-            conditionGroupsDetails,
+            actionGroupDetails,
             resourceTypeEnum,
             setUpdateDescription,
             updateDescriptionEditEnable,
             onUpdateDescriptionConfirmed,
-            isUpdatingGroupDetails,
+            isUpdatingDetails,
             updatedDescription,
         ],
     );
@@ -180,23 +181,19 @@ const ConditionGroupDetails = () => {
                     <Widget
                         refreshAction={getFreshDetails}
                         busy={isBusy}
-                        title="Condition Group Details"
+                        title="Action Group Details"
                         titleSize="large"
                         widgetButtons={buttons}
                     >
-                        <CustomTable data={conditionGroupsDetailData} headers={tableHeader} />
+                        <CustomTable data={actionGroupsDetailData} headers={tableHeader} />
                     </Widget>
                 </Col>
             </Row>
-            <Row>
-                {conditionGroupsDetails?.resource && (
-                    <ConditionsViewer resource={conditionGroupsDetails.resource} formType="conditionGroup" />
-                )}
-            </Row>
+            <Row>{actionGroupDetails?.resource && <ConditionsViewer resource={actionGroupDetails.resource} formType="actionGroup" />}</Row>
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete a Condition Group`}
-                body={`You are about to delete a Condition Group. Is this what you want to do?`}
+                caption={`Delete a Action Group`}
+                body={`You are about to delete a Action Group. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
@@ -207,4 +204,4 @@ const ConditionGroupDetails = () => {
     );
 };
 
-export default ConditionGroupDetails;
+export default ActionGroupDetails;

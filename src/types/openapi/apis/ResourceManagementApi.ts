@@ -13,13 +13,12 @@
 
 import type { Observable } from 'rxjs';
 import type { AjaxResponse } from 'rxjs/ajax';
-import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
-import type { OperationOpts, HttpQuery } from '../runtime';
 import type {
-    AuthenticationServiceExceptionDto,
     Resource,
-    SearchFieldDataByGroupDto,
+    SearchFieldDataByGroupDto
 } from '../models';
+import type { HttpQuery, OperationOpts } from '../runtime';
+import { BaseAPI, encodeURI, throwIfNullOrUndefined } from '../runtime';
 
 export interface ListResourceEventsRequest {
     resource: Resource;
@@ -58,7 +57,6 @@ export class ResourceManagementApi extends BaseAPI {
         throwIfNullOrUndefined(resource, 'resource', 'listResourceRuleFilterFields');
 
         const query: HttpQuery = {};
-
         if (settable != null) { query['settable'] = settable; }
 
         return this.request<Array<SearchFieldDataByGroupDto>>({

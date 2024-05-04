@@ -1,6 +1,7 @@
 import { ApiClients } from 'api';
 import ConditionsGroupsList from 'components/ConditionGroupsList';
 import FilterWidget from 'components/FilterWidget';
+import FilterWidgetRuleAction from 'components/FilterWidgetRuleAction';
 import { EntityType, actions as filterActions } from 'ducks/filters';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useEffect, useMemo, useState } from 'react';
@@ -8,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { Resource } from 'types/openapi';
 import { conditionGroupToFilter, filterToConditionGroup } from 'utils/rules';
-type FormType = 'rules' | 'conditionGroup';
+type FormType = 'rules' | 'conditionGroup' | 'actionGroup';
 
 interface ConditionGroupFormFilterProps {
     resource: Resource;
@@ -21,6 +22,7 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
 
     const conditionGroupsDetails = useSelector(rulesSelectors.conditionGroupDetails);
     const ruleDetails = useSelector(rulesSelectors.ruleDetails);
+    const actionGroupDetails = useSelector(rulesSelectors.actionGroupDetails);
 
     const [hasEffectRun, setHasEffectRun] = useState(false);
 
@@ -39,7 +41,11 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
         if (formType === 'conditionGroup' && id !== conditionGroupsDetails?.uuid) {
             dispatch(rulesActions.getConditionGroup({ conditionGroupUuid: id }));
         }
-    }, [id, dispatch, formType, ruleDetails, conditionGroupsDetails]);
+
+        if (formType === 'actionGroup' && id !== actionGroupDetails?.uuid) {
+            dispatch(rulesActions.getActionGroup({ actionGroupUuid: id }));
+        }
+    }, [id, dispatch, formType, ruleDetails?.uuid, conditionGroupsDetails?.uuid, actionGroupDetails?.uuid]);
 
     useEffect(() => {
         if (!hasEffectRun && editMode && id) {
@@ -132,16 +138,49 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
         );
     }, [resource, dispatch, formType, id, conditionGroupsDetails]);
 
+    const renderFilterWidgetForActionGroup = useMemo(() => {
+        if (formType !== 'actionGroup' || !id || !actionGroupDetails) return null;
+
+        return (
+            <div>
+                <FilterWidgetRuleAction
+                    entity={EntityType.ACTIONS}
+                    title={'Actions'}
+                    getAvailableFiltersApi={(apiClients: ApiClients) =>
+                        apiClients.resources.listResourceRuleFilterFields({
+                            resource,
+                            settable: true,
+                        })
+                    }
+                    actionsList={actionGroupDetails.actions}
+                    onActionsUpdate={(currentActions) => {
+                        dispatch(
+                            rulesActions.updateActionGroup({
+                                actionGroupUuid: id,
+                                actionGroup: {
+                                    actions: currentActions,
+                                },
+                            }),
+                        );
+                    }}
+                />
+            </div>
+        );
+    }, [resource, dispatch, formType, id, actionGroupDetails]);
+
     const renderWidgetConditionViewer = useMemo(() => {
         switch (formType) {
             case 'conditionGroup':
                 return renderFilterWidgetForConditionGroups;
             case 'rules':
                 return renderFilterWidgetForRules;
+
+            case 'actionGroup':
+                return renderFilterWidgetForActionGroup;
             default:
                 return null;
         }
-    }, [formType, renderFilterWidgetForConditionGroups, renderFilterWidgetForRules]);
+    }, [formType, renderFilterWidgetForConditionGroups, renderFilterWidgetForRules, renderFilterWidgetForActionGroup]);
 
     return <div>{renderWidgetConditionViewer}</div>;
 };

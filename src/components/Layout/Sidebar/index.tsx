@@ -91,6 +91,11 @@ export default function Sidebar() {
                                 name: 'Rules',
                                 link: '/rules',
                             },
+                            {
+                                _key: 'actiongroups',
+                                name: 'Action Groups',
+                                link: '/actiongroups',
+                            },
                         ]}
                     />
                 </ul>

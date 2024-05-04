@@ -2,7 +2,7 @@ import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Resource } from 'types/openapi';
 import {
     // ActionRuleGroupDetailModel,
-    ActionRuleGroupModel,
+    ActionGroupModel,
     ActionRuleGroupRequestModel,
     // ConditionRuleGroupDetailModel,
     ConditionRuleGroupModel,
@@ -15,6 +15,7 @@ import {
     TriggerRuleDetailModel,
     TriggerRuleModel,
     TriggerRuleRequestModel,
+    UpdateActionGroupRequestModel,
     UpdateGroupRuleConditionRequestModel,
 } from 'types/rules';
 import { createFeatureSelector } from 'utils/ducks';
@@ -22,13 +23,14 @@ import { createFeatureSelector } from 'utils/ducks';
 export type State = {
     rules: RuleModel[];
     ruleDetails?: DetailRuleModel;
-    actionRuleGroups: ActionRuleGroupModel[];
-    actionGroupDetails?: ActionRuleGroupModel;
+    actionGroups: ActionGroupModel[];
+    actionGroupDetails?: ActionGroupModel;
     conditionRuleGroups: ConditionRuleGroupModel[];
     conditionGroupDetails?: ConditionRuleGroupModel;
     ruleTriggers: TriggerRuleModel[];
     ruleTriggerDetail?: TriggerRuleDetailModel;
 
+    isupdatingActionGroup: boolean;
     isFetchingRulesList: boolean;
     isFetchingActionGroups: boolean;
     isFetchingConditionGroups: boolean;
@@ -51,7 +53,7 @@ export type State = {
 
 export const initialState: State = {
     rules: [],
-    actionRuleGroups: [],
+    actionGroups: [],
     conditionRuleGroups: [],
     ruleTriggers: [],
     isFetchingRulesList: false,
@@ -65,6 +67,7 @@ export const initialState: State = {
     isCreatingRule: false,
     isFetchingRuleDetail: false,
 
+    isupdatingActionGroup: false,
     isCreatingActionGroup: false,
     isDeletingActionGroup: false,
     isCreatingConditionGroup: false,
@@ -102,11 +105,11 @@ export const slice = createSlice({
             state.isFetchingRulesList = false;
         },
 
-        listActionGroups: (state, action: PayloadAction<{ resource: Resource }>) => {
+        listActionGroups: (state, action: PayloadAction<{ resource?: Resource }>) => {
             state.isFetchingActionGroups = true;
         },
-        listActionGroupsSuccess: (state, action: PayloadAction<{ actionGroups: ActionRuleGroupModel[] }>) => {
-            state.actionRuleGroups = action.payload.actionGroups;
+        listActionGroupsSuccess: (state, action: PayloadAction<{ actionGroups: ActionGroupModel[] }>) => {
+            state.actionGroups = action.payload.actionGroups;
             state.isFetchingActionGroups = false;
         },
 
@@ -142,8 +145,8 @@ export const slice = createSlice({
         createActionGroup: (state, action: PayloadAction<{ ruleActionGroupRequest: ActionRuleGroupRequestModel }>) => {
             state.isCreatingActionGroup = true;
         },
-        createActionGroupSuccess: (state, action: PayloadAction<{ actionGroup: ActionRuleGroupModel }>) => {
-            state.actionRuleGroups.push(action.payload.actionGroup);
+        createActionGroupSuccess: (state, action: PayloadAction<{ actionGroup: ActionGroupModel }>) => {
+            state.actionGroups.push(action.payload.actionGroup);
             state.isCreatingActionGroup = false;
         },
 
@@ -192,10 +195,12 @@ export const slice = createSlice({
         deleteActionGroup: (state, action: PayloadAction<{ actionGroupUuid: string }>) => {
             state.isDeletingActionGroup = true;
         },
+
         deleteActionGroupSuccess: (state, action: PayloadAction<{ actionGroupUuid: string }>) => {
-            state.actionRuleGroups = state.actionRuleGroups.filter((group) => group.uuid !== action.payload.actionGroupUuid);
+            state.actionGroups = state.actionGroups.filter((group) => group.uuid !== action.payload.actionGroupUuid);
             state.isDeletingActionGroup = false;
         },
+
         deleteActionGroupFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isDeletingActionGroup = false;
         },
@@ -237,7 +242,7 @@ export const slice = createSlice({
         getActionGroup: (state, action: PayloadAction<{ actionGroupUuid: string }>) => {
             state.isFetchingActionGroup = true;
         },
-        getActionGroupSuccess: (state, action: PayloadAction<{ actionGroup: ActionRuleGroupModel }>) => {
+        getActionGroupSuccess: (state, action: PayloadAction<{ actionGroup: ActionGroupModel }>) => {
             state.actionGroupDetails = action.payload.actionGroup;
             state.isFetchingActionGroup = false;
         },
@@ -275,6 +280,26 @@ export const slice = createSlice({
         },
         getTriggerFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingTriggerDetail = false;
+        },
+
+        updateActionGroup: (state, action: PayloadAction<{ actionGroupUuid: string; actionGroup: UpdateActionGroupRequestModel }>) => {
+            state.isupdatingActionGroup = true;
+        },
+
+        updateActionGroupSuccess: (state, action: PayloadAction<{ actionGroup: ActionGroupModel }>) => {
+            state.actionGroups = state.actionGroups.map((group) =>
+                group.uuid === action.payload.actionGroup.uuid ? action.payload.actionGroup : group,
+            );
+
+            if (state.actionGroupDetails?.uuid === action.payload.actionGroup.uuid) {
+                state.actionGroupDetails = action.payload.actionGroup;
+            }
+
+            state.isupdatingActionGroup = false;
+        },
+
+        updateActionGroupFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isupdatingActionGroup = false;
         },
 
         updateConditionGroup: (
@@ -343,6 +368,9 @@ const rules = createSelector(state, (state) => state.rules);
 const conditionGroupDetails = createSelector(state, (state) => state.conditionGroupDetails);
 const ruleDetails = createSelector(state, (state) => state.ruleDetails);
 
+const actionGroups = createSelector(state, (state) => state.actionGroups);
+const actionGroupDetails = createSelector(state, (state) => state.actionGroupDetails);
+
 const isCreatingConditionGroup = createSelector(state, (state) => state.isCreatingConditionGroup);
 const isUpdatingConditionGroup = createSelector(state, (state) => state.isUpdatingConditionGroup);
 
@@ -355,11 +383,17 @@ const isFetchingConditionGroups = createSelector(state, (state) => state.isFetch
 const isDeletingConditionGroup = createSelector(state, (state) => state.isDeletingConditionGroup);
 const isFetchingConditionGroup = createSelector(state, (state) => state.isFetchingConditionGroup);
 const isFetchingRuleDetail = createSelector(state, (state) => state.isFetchingRuleDetail);
-
+const isCreatingActionGroup = createSelector(state, (state) => state.isCreatingActionGroup);
+const isFetchingActionGroups = createSelector(state, (state) => state.isFetchingActionGroups);
+const isDeletingActionGroup = createSelector(state, (state) => state.isDeletingActionGroup);
+const isFetchingActionGroup = createSelector(state, (state) => state.isFetchingActionGroup);
+const isupdatingActionGroup = createSelector(state, (state) => state.isupdatingActionGroup);
 export const selectors = {
     rules,
     conditionRuleGroups,
     conditionGroupDetails,
+    actionGroups,
+    actionGroupDetails,
     ruleDetails,
     isDeletingRule,
     isFetchingConditionGroups,
@@ -371,6 +405,11 @@ export const selectors = {
     isFetchingConditionGroup,
     isUpdatingRule,
     isFetchingRuleDetail,
+    isCreatingActionGroup,
+    isFetchingActionGroups,
+    isDeletingActionGroup,
+    isFetchingActionGroup,
+    isupdatingActionGroup,
 };
 
 export const actions = slice.actions;
