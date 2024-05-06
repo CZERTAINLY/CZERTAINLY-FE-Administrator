@@ -24,6 +24,7 @@ import {
     transformTriggerRuleDetailDtoToModel,
     transformTriggerRuleDtoToModel,
     transformTriggerRuleRequestModelToDto,
+    transformUpdateActionGroupRequestModelToDto,
     transformUpdateGroupRuleConditionRequestModelToDto,
 } from './transform/rules';
 
@@ -104,7 +105,10 @@ const createActionGroup: AppEpic = (action$, state, deps) => {
                 })
                 .pipe(
                     switchMap((actionGroup) =>
-                        of(slice.actions.createActionGroupSuccess({ actionGroup: transformRuleActionGroupDtoToModel(actionGroup) })),
+                        of(
+                            slice.actions.createActionGroupSuccess({ actionGroup: transformRuleActionGroupDtoToModel(actionGroup) }),
+                            appRedirectActions.redirect({ url: `../actiongroups/detail/${actionGroup.uuid}` }),
+                        ),
                     ),
                     catchError((err) =>
                         of(slice.actions.createActionGroupFailure({ error: extractError(err, 'Failed to create action group') })),
@@ -174,7 +178,12 @@ const deleteActionGroup: AppEpic = (action$, state, deps) => {
         filter(slice.actions.deleteActionGroup.match),
         switchMap((action) =>
             deps.apiClients.rules.deleteActionGroup({ actionGroupUuid: action.payload.actionGroupUuid }).pipe(
-                switchMap(() => of(slice.actions.deleteActionGroupSuccess({ actionGroupUuid: action.payload.actionGroupUuid }))),
+                switchMap(() =>
+                    of(
+                        slice.actions.deleteActionGroupSuccess({ actionGroupUuid: action.payload.actionGroupUuid }),
+                        appRedirectActions.redirect({ url: `../../actiongroups` }),
+                    ),
+                ),
                 catchError((err) =>
                     of(slice.actions.deleteActionGroupFailure({ error: extractError(err, 'Failed to delete action group') })),
                 ),
@@ -289,6 +298,34 @@ const getTrigger: AppEpic = (action$, state, deps) => {
     );
 };
 
+const updateActionGroup: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.updateActionGroup.match),
+        switchMap((action) =>
+            deps.apiClients.rules
+                .updateActionGroup({
+                    actionGroupUuid: action.payload.actionGroupUuid,
+                    updateRuleActionGroupRequestDto: transformUpdateActionGroupRequestModelToDto(action.payload.actionGroup),
+                })
+                .pipe(
+                    switchMap((actionGroup) =>
+                        of(
+                            slice.actions.updateActionGroupSuccess({
+                                actionGroup: transformRuleActionGroupDtoToModel(actionGroup),
+                            }),
+                        ),
+                    ),
+                    catchError((err) =>
+                        of(
+                            slice.actions.updateActionGroupFailure({ error: extractError(err, 'Failed to update action group') }),
+                            alertActions.error('Failed to update Action Group'),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
 const updateConditionGroup: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.updateConditionGroup.match),
@@ -381,6 +418,7 @@ const epics = [
     getConditionGroup,
     getRule,
     getTrigger,
+    updateActionGroup,
     updateConditionGroup,
     updateRule,
     updateTrigger,

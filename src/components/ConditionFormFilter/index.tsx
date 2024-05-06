@@ -1,6 +1,8 @@
 import { ApiClients } from 'api';
 import cx from 'classnames';
 import FilterWidget from 'components/FilterWidget';
+import FilterWidgetRuleAction from 'components/FilterWidgetRuleAction';
+import { ActionGroupFormValues } from 'components/_pages/action-groups/form';
 import { EntityType, actions as filterActions } from 'ducks/filters';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useEffect, useMemo, useState } from 'react';
@@ -11,8 +13,7 @@ import { Resource } from 'types/openapi';
 import { conditionGroupToFilter, filterToConditionGroup } from 'utils/rules';
 import { ConditionGroupFormValues } from '../_pages/condition-groups/form';
 import styles from './conditionGroupForm.module.scss';
-type FormType = 'rules' | 'conditionGroup';
-
+type FormType = 'rules' | 'conditionGroup' | 'actionGroup';
 interface ConditionGroupFormFilterProps {
     resource: Resource;
     formType: FormType;
@@ -24,6 +25,7 @@ const ConditionFormFilter = ({ resource, formType }: ConditionGroupFormFilterPro
     const [hasEffectRun, setHasEffectRun] = useState(false);
 
     const form = useForm<ConditionGroupFormValues>();
+    const actionGroupForm = useForm<ActionGroupFormValues>();
     const conditionGroupsDetails = useSelector(rulesSelectors.conditionGroupDetails);
     const ruleDetails = useSelector(rulesSelectors.ruleDetails);
 
@@ -33,8 +35,14 @@ const ConditionFormFilter = ({ resource, formType }: ConditionGroupFormFilterPro
         if (!id) return;
         if (formType === 'rules') {
             dispatch(rulesActions.getRule({ ruleUuid: id }));
-        } else {
+        }
+
+        if (formType === 'conditionGroup') {
             dispatch(rulesActions.getConditionGroup({ conditionGroupUuid: id }));
+        }
+
+        if (formType === 'actionGroup') {
+            dispatch(rulesActions.getActionGroup({ actionGroupUuid: id }));
         }
     }, [id, dispatch, formType]);
 
@@ -62,7 +70,23 @@ const ConditionFormFilter = ({ resource, formType }: ConditionGroupFormFilterPro
         };
     }, [dispatch]);
     const renderFilterWidget = useMemo(() => {
-        return (
+        return formType === 'actionGroup' ? (
+            <div className={cx({ [styles.disabled]: resource === Resource.None })}>
+                <FilterWidgetRuleAction
+                    entity={EntityType.ACTIONS}
+                    title={'Actions'}
+                    getAvailableFiltersApi={(apiClients: ApiClients) =>
+                        apiClients.resources.listResourceRuleFilterFields({
+                            resource,
+                            settable: true,
+                        })
+                    }
+                    onActionsUpdate={(currentActions) => {
+                        actionGroupForm.change('actions', currentActions);
+                    }}
+                />
+            </div>
+        ) : (
             <div className={cx({ [styles.disabled]: resource === Resource.None })}>
                 <FilterWidget
                     entity={EntityType.CONDITIONS}
@@ -79,7 +103,7 @@ const ConditionFormFilter = ({ resource, formType }: ConditionGroupFormFilterPro
                 />
             </div>
         );
-    }, [resource, form]);
+    }, [resource, form, formType, actionGroupForm]);
 
     return (
         <>

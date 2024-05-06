@@ -34,8 +34,8 @@ export type ActionRuleModel = ActionRuleDto;
 //     actions: Array<ActionRuleModel>;
 // };
 
-export type ActionRuleGroupDto = RuleActionGroupDto;
-export type ActionRuleGroupModel = ActionRuleGroupDto;
+export type ActionGroupDto = RuleActionGroupDto;
+export type ActionGroupModel = ActionGroupDto;
 
 export type ActionRuleRequestDto = RuleActionRequestDto;
 export type ActionRuleRequestModel = ActionRuleRequestDto;
@@ -86,7 +86,7 @@ export type RequestRuleModel = Omit<RequestRuleDto, 'conditions | conditionGroup
 export type TriggerRuleDetailDto = RuleTriggerDetailDto;
 export type TriggerRuleDetailModel = Omit<TriggerRuleDetailDto, 'rules | actionGroups | actions'> & {
     rules: Array<RuleModel>;
-    actionGroups: Array<ActionRuleGroupModel>;
+    actionGroups: Array<ActionGroupModel>;
     actions: Array<ActionRuleModel>;
 };
 
@@ -100,8 +100,8 @@ export type TriggerRuleRequestModel = Omit<TriggerRuleRequestDto, 'rules | actio
     actions: Array<ActionRuleRequestModel>;
 };
 
-export type UpdateGroupRuleActionRequestDto = UpdateRuleActionGroupRequestDto;
-export type UpdateGroupRuleActionRequestModel = Omit<UpdateGroupRuleActionRequestDto, 'actions'> & {
+export type UpdateActionGroupRequestDto = UpdateRuleActionGroupRequestDto;
+export type UpdateActionGroupRequestModel = Omit<UpdateActionGroupRequestDto, 'actions'> & {
     actions: Array<ActionRuleRequestModel>;
 };
 

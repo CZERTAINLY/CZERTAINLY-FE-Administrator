@@ -1,0 +1,27 @@
+.filterBadge {
+    border: 1px solid rgb(78, 78, 78) !important;
+    font-weight: 500;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    padding: 5px 5px;
+    cursor: pointer;
+}
+
+.filterBadge:hover {
+    box-shadow: 0 0 5px #b5bdc5;
+}
+
+.filterBadgeSpan {
+    cursor: pointer;
+    font-size: medium;
+    color: #b5bdc5;
+    padding-left: 5px;
+    padding-right: 2px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.filterBadgeSpan:hover {
+    color: red;
+    font-weight: 700;
+}

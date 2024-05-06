@@ -112,10 +112,14 @@ import ConditionGroupDetails from './_pages/condition-groups/details';
 import ConditionGroupForm from './_pages/condition-groups/form';
 import ConditionGroupsList from './_pages/condition-groups/list';
 
+import ActionGroupForm from './_pages/action-groups/form';
+import ActionGroupsList from './_pages/action-groups/list';
+
+import RuleDetails from './_pages/rules/detail';
 import RulesForm from './_pages/rules/form';
 import RulesList from './_pages/rules/list';
 
-import RuleDetails from './_pages/rules/detail';
+import ActionGroupsDetails from './_pages/action-groups/details';
 import SchedulerJobDetail from './_pages/scheduler/detail';
 import SchedulerJobsList from './_pages/scheduler/list';
 import Layout from './Layout';
@@ -332,6 +336,12 @@ export default function AppRouter() {
                     <Route path={`/rules/add`} element={<RulesForm />} />
                     <Route path={`/rules`} element={<RulesList />} />
                     <Route path={`/rules/detail/:id`} element={<RuleDetails />} />
+
+                    <Route path={`/actionGroups/add`} element={<ActionGroupForm />} />
+                    <Route path={`/actionGroups`} element={<ActionGroupsList />} />
+                    <Route path={`/actionGroups/detail/:id`} element={<ActionGroupsDetails />} />
+
+                    <Route path={`/approvals`} element={<ApprovalsList />} />
                 </Route>
 
                 {/*

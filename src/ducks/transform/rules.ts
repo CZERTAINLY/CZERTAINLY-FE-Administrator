@@ -1,9 +1,9 @@
 import {
-    ActionRuleDto,
     // ActionRuleGroupDetailDto,
     // ActionRuleGroupDetailModel,
-    ActionRuleGroupDto,
-    ActionRuleGroupModel,
+    ActionGroupDto,
+    ActionGroupModel,
+    ActionRuleDto,
     ActionRuleGroupRequestDto,
     ActionRuleGroupRequestModel,
     ActionRuleModel,
@@ -35,6 +35,8 @@ import {
     TriggerRuleModel,
     TriggerRuleRequestDto,
     TriggerRuleRequestModel,
+    UpdateActionGroupRequestDto,
+    UpdateActionGroupRequestModel,
     UpdateGroupRuleConditionRequestDto,
     UpdateGroupRuleConditionRequestModel,
 } from 'types/rules';
@@ -49,6 +51,13 @@ import { transformAttributeResponseDtoToModel } from './attributes';
 //         value: searchFilterModel.value,
 //     };
 // }
+
+export function transformUpdateActionGroupRequestModelToDto(actionGroup: UpdateActionGroupRequestModel): UpdateActionGroupRequestDto {
+    return {
+        ...actionGroup,
+        actions: actionGroup.actions.map(transformRuleActionRequestModelToDto),
+    };
+}
 
 export function transformRuleActionRequestDtoToModel(ruleActionRequestDto: ActionRuleRequestDto): ActionRuleRequestModel {
     return { ...ruleActionRequestDto };
@@ -72,7 +81,7 @@ export function transformDtoRuleToModel(rule: DtoRule): RuleModel {
     };
 }
 
-export function transformRuleActionGroupDtoToModel(actionGroup: ActionRuleGroupDto): ActionRuleGroupModel {
+export function transformRuleActionGroupDtoToModel(actionGroup: ActionGroupDto): ActionGroupModel {
     return {
         ...actionGroup,
     };
