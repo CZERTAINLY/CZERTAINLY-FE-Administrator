@@ -472,8 +472,8 @@ export default function FilterWidgetRuleAction({
                                 onClick={() => toggleFilter(i)}
                                 color={selectedFilter === i ? 'primary' : 'secondary'}
                             >
-                                <b>{f?.fieldSource && getEnumLabel(searchGroupEnum, f?.fieldSource)}&nbsp;</b>'{label}'&nbsp;
                                 {getEnumLabel(RuleActionTypeEnum, f.actionType)}&nbsp;
+                                <b>{f?.fieldSource && getEnumLabel(searchGroupEnum, f?.fieldSource)}&nbsp;</b>'{label}'&nbsp;to&nbsp;
                                 {value}
                                 <span className={styles.filterBadgeSpan} onClick={() => onRemoveFilterClick(i)}>
                                     &times;
