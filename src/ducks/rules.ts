@@ -1,10 +1,8 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Resource } from 'types/openapi';
 import {
-    // ActionRuleGroupDetailModel,
     ActionGroupModel,
     ActionRuleGroupRequestModel,
-    // ConditionRuleGroupDetailModel,
     ConditionRuleGroupModel,
     ConditionRuleGroupRequestModel,
     DetailRuleModel,
@@ -27,9 +25,11 @@ export type State = {
     actionGroupDetails?: ActionGroupModel;
     conditionRuleGroups: ConditionRuleGroupModel[];
     conditionGroupDetails?: ConditionRuleGroupModel;
-    ruleTriggers: TriggerRuleModel[];
-    ruleTriggerDetail?: TriggerRuleDetailModel;
+    triggers: TriggerRuleModel[];
+    triggerDetails?: TriggerRuleDetailModel;
+    resourceEvents: string[];
 
+    isFetchingResourceEvents: boolean;
     isupdatingActionGroup: boolean;
     isFetchingRulesList: boolean;
     isFetchingActionGroups: boolean;
@@ -55,17 +55,19 @@ export const initialState: State = {
     rules: [],
     actionGroups: [],
     conditionRuleGroups: [],
-    ruleTriggers: [],
+    triggers: [],
     isFetchingRulesList: false,
     isFetchingActionGroups: false,
     isFetchingActionGroup: false,
     isFetchingConditionGroup: false,
     isFetchingTriggerDetail: false,
+    resourceEvents: [],
 
     isFetchingConditionGroups: false,
     isFetchingTriggers: false,
     isCreatingRule: false,
     isFetchingRuleDetail: false,
+    isFetchingResourceEvents: false,
 
     isupdatingActionGroup: false,
     isCreatingActionGroup: false,
@@ -130,11 +132,11 @@ export const slice = createSlice({
             state.isFetchingConditionGroups = false;
         },
 
-        listTriggers: (state, action: PayloadAction<{ resource: Resource }>) => {
+        listTriggers: (state, action: PayloadAction<{ resource?: Resource }>) => {
             state.isFetchingTriggers = true;
         },
         listTriggersSuccess: (state, action: PayloadAction<{ triggers: TriggerRuleModel[] }>) => {
-            state.ruleTriggers = action.payload.triggers;
+            state.triggers = action.payload.triggers;
             state.isFetchingTriggers = false;
         },
 
@@ -184,7 +186,7 @@ export const slice = createSlice({
         },
 
         createTriggerSuccess: (state, action: PayloadAction<{ trigger: TriggerRuleModel }>) => {
-            state.ruleTriggers.push(action.payload.trigger);
+            state.triggers.push(action.payload.trigger);
             state.isCreatingTrigger = false;
         },
 
@@ -231,7 +233,7 @@ export const slice = createSlice({
             state.isCreatingTrigger = true;
         },
         deleteTriggerSuccess: (state, action: PayloadAction<{ triggerUuid: string }>) => {
-            state.ruleTriggers = state.ruleTriggers.filter((trigger) => trigger.uuid !== action.payload.triggerUuid);
+            state.triggers = state.triggers.filter((trigger) => trigger.uuid !== action.payload.triggerUuid);
             state.isCreatingTrigger = false;
         },
 
@@ -275,7 +277,7 @@ export const slice = createSlice({
             state.isFetchingTriggerDetail = true;
         },
         getTriggerSuccess: (state, action: PayloadAction<{ trigger: TriggerRuleDetailModel }>) => {
-            state.ruleTriggerDetail = action.payload.trigger;
+            state.triggerDetails = action.payload.trigger;
             state.isFetchingTriggerDetail = false;
         },
         getTriggerFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -345,12 +347,12 @@ export const slice = createSlice({
         },
 
         updateTriggerSuccess: (state, action: PayloadAction<{ trigger: TriggerRuleDetailModel }>) => {
-            state.ruleTriggers = state.ruleTriggers.map((trigger) =>
+            state.triggers = state.triggers.map((trigger) =>
                 trigger.uuid === action.payload.trigger.uuid ? action.payload.trigger : trigger,
             );
 
-            if (state.ruleTriggerDetail?.uuid === action.payload.trigger.uuid) {
-                state.ruleTriggerDetail = action.payload.trigger;
+            if (state.triggerDetails?.uuid === action.payload.trigger.uuid) {
+                state.triggerDetails = action.payload.trigger;
             }
 
             state.isUpdatingTrigger = false;
@@ -358,6 +360,20 @@ export const slice = createSlice({
 
         updateTriggerFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdatingTrigger = false;
+        },
+
+        listResourceEvents: (state, action: PayloadAction<{ resource: Resource }>) => {
+            state.resourceEvents = [];
+            state.isFetchingResourceEvents = true;
+        },
+
+        listResourceEventsSuccess: (state, action: PayloadAction<{ events: string[] }>) => {
+            state.resourceEvents = action.payload.events;
+            state.isFetchingResourceEvents = false;
+        },
+
+        listResourceEventsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingResourceEvents = false;
         },
     },
 });
@@ -367,6 +383,9 @@ const state = createFeatureSelector<State>(slice.name);
 const rules = createSelector(state, (state) => state.rules);
 const conditionGroupDetails = createSelector(state, (state) => state.conditionGroupDetails);
 const ruleDetails = createSelector(state, (state) => state.ruleDetails);
+const triggerDetails = createSelector(state, (state) => state.triggerDetails);
+const resourceEvents = createSelector(state, (state) => state.resourceEvents);
+const triggers = createSelector(state, (state) => state.triggers);
 
 const actionGroups = createSelector(state, (state) => state.actionGroups);
 const actionGroupDetails = createSelector(state, (state) => state.actionGroupDetails);
@@ -390,6 +409,9 @@ const isFetchingActionGroup = createSelector(state, (state) => state.isFetchingA
 const isupdatingActionGroup = createSelector(state, (state) => state.isupdatingActionGroup);
 export const selectors = {
     rules,
+    triggers,
+    triggerDetails,
+    resourceEvents,
     conditionRuleGroups,
     conditionGroupDetails,
     actionGroups,

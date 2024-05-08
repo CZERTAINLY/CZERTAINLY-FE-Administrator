@@ -115,6 +115,10 @@ import ConditionGroupsList from './_pages/condition-groups/list';
 import ActionGroupForm from './_pages/action-groups/form';
 import ActionGroupsList from './_pages/action-groups/list';
 
+import TriggerDetails from './_pages/triggers/details';
+import TriggerForm from './_pages/triggers/form';
+import TriggerList from './_pages/triggers/list';
+
 import RuleDetails from './_pages/rules/detail';
 import RulesForm from './_pages/rules/form';
 import RulesList from './_pages/rules/list';
@@ -340,6 +344,10 @@ export default function AppRouter() {
                     <Route path={`/actionGroups/add`} element={<ActionGroupForm />} />
                     <Route path={`/actionGroups`} element={<ActionGroupsList />} />
                     <Route path={`/actionGroups/detail/:id`} element={<ActionGroupsDetails />} />
+
+                    <Route path={`/triggers/add`} element={<TriggerForm />} />
+                    <Route path={`/triggers`} element={<TriggerList />} />
+                    <Route path={`/triggers/detail/:id`} element={<TriggerDetails />} />
 
                     <Route path={`/approvals`} element={<ApprovalsList />} />
                 </Route>

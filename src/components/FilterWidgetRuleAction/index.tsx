@@ -47,7 +47,10 @@ export default function FilterWidgetRuleAction({
     const availableFilters = useSelector(selectors.availableFilters(entity));
     const isFetchingAvailableFilters = useSelector(selectors.isFetchingFilters(entity));
 
-    const [selectedFilter, setSelectedFilter] = useState<number>(-1);
+    const [selectedFilter, setSelectedFilter] = useState<{ filterNumber: number; isEditEnabled: boolean }>({
+        filterNumber: -1,
+        isEditEnabled: false,
+    });
 
     const [ruleActionType, setRuleActionType] = useState<SingleValue<{ label: string; value: RuleActionType }> | undefined>(undefined);
 
@@ -85,7 +88,7 @@ export default function FilterWidgetRuleAction({
     const onUnselectFiltersClick = useCallback(
         (e: React.MouseEvent<HTMLDivElement>) => {
             if ((e.target as HTMLDivElement).id === 'unselectFilters') {
-                setSelectedFilter(-1);
+                setSelectedFilter({ filterNumber: -1, isEditEnabled: false });
             }
         },
         [setSelectedFilter],
@@ -110,7 +113,7 @@ export default function FilterWidgetRuleAction({
         setFilterField(undefined);
         setFilterValue(undefined);
 
-        if (selectedFilter === -1) {
+        if (selectedFilter.filterNumber === -1) {
             const updatedActions = [...actions, newAction];
             setActions(updatedActions);
             const updatedActionDataActions = updatedActions.map((a) => {
@@ -131,7 +134,7 @@ export default function FilterWidgetRuleAction({
 
             onActionsUpdate && onActionsUpdate(updatedActionDataActions);
         } else {
-            const updatedActions = actions.map((a, i) => (i === selectedFilter ? newAction : a));
+            const updatedActions = actions.map((a, i) => (i === selectedFilter.filterNumber ? newAction : a));
             setActions(updatedActions);
             const updatedActionDataActions = updatedActions.map((a) => {
                 return {
@@ -167,7 +170,7 @@ export default function FilterWidgetRuleAction({
     ]);
 
     useEffect(() => {
-        if (selectedFilter === -1) {
+        if (selectedFilter.filterNumber === -1) {
             setRuleActionType(undefined);
             setFieldSource(undefined);
             setFilterField(undefined);
@@ -186,7 +189,10 @@ export default function FilterWidgetRuleAction({
 
     const toggleFilter = useCallback(
         (index: number) => {
-            setSelectedFilter(selectedFilter === index ? -1 : index);
+            setSelectedFilter({
+                filterNumber: selectedFilter.filterNumber === index ? -1 : index,
+                isEditEnabled: false,
+            });
         },
         [selectedFilter],
     );
@@ -198,7 +204,7 @@ export default function FilterWidgetRuleAction({
 
     const currentField = useMemo(() => currentFields?.find((f) => f.fieldIdentifier === filterField?.value), [filterField, currentFields]);
 
-    const currentValueOptions: CurrentActionOptions[] = useMemo(() => {
+    const objectValueOptions: CurrentActionOptions[] = useMemo(() => {
         if (!currentField) return [];
 
         if (Array.isArray(currentField?.value)) {
@@ -209,40 +215,45 @@ export default function FilterWidgetRuleAction({
                     label = v;
                     value = v;
                 } else {
-                    const keys = Object.keys(v);
-                    if (keys.length === 2) {
-                        label = v[keys[1]];
-                        value = v;
-                    }
+                    label = v?.name || JSON.stringify(v);
+                    value = v;
                 }
 
                 return { label, value };
             });
         }
+
         return [];
     }, [currentField]);
 
     useEffect(() => {
         // this effect is for updating dropdowns when a filter is selected
-        if (selectedFilter >= actions.length) {
-            setSelectedFilter(-1);
+
+        if (selectedFilter.filterNumber >= actions.length) {
+            setSelectedFilter({ filterNumber: -1, isEditEnabled: false });
             return;
         }
 
-        if (selectedFilter === -1) {
+        if (selectedFilter.filterNumber === -1) {
             return;
         }
 
-        const selectedActionType = actions[selectedFilter].actionType;
+        // if edit is enabled that means the values are already set
+        if (selectedFilter.isEditEnabled) {
+            return;
+        }
+
+        const selectedActionType = actions[selectedFilter.filterNumber].actionType;
         setRuleActionType({ label: getEnumLabel(RuleActionTypeEnum, selectedActionType), value: selectedActionType });
 
-        const field = actions[selectedFilter].fieldSource;
+        const field = actions[selectedFilter.filterNumber].fieldSource;
         if (!field) return;
         setFieldSource({ label: getEnumLabel(searchGroupEnum, field), value: field });
 
-        const fieldIdentifier = actions[selectedFilter].fieldIdentifier;
+        const fieldIdentifier = actions[selectedFilter.filterNumber].fieldIdentifier;
         const fieldIdentifierSelected = currentFields?.find((cf) => cf.fieldIdentifier === fieldIdentifier);
         if (!fieldIdentifier) return;
+
         if (fieldIdentifierSelected) {
             setFilterField({
                 label: fieldIdentifierSelected.fieldLabel,
@@ -255,18 +266,24 @@ export default function FilterWidgetRuleAction({
             });
         }
 
-        const currentActionData = actions[selectedFilter].actionData;
-        if (!currentActionData) return;
+        const currentActionData = actions[selectedFilter.filterNumber].actionData;
+        if (currentActionData === undefined) return;
+
         if (
             currentField?.type === FilterFieldType.String ||
             currentField?.type === FilterFieldType.Number ||
             currentField?.type === FilterFieldType.Date
         ) {
             setFilterValue(currentActionData);
+            setSelectedFilter({ filterNumber: selectedFilter.filterNumber, isEditEnabled: true });
+
             return;
         }
+
         if (currentField?.type === FilterFieldType.Boolean) {
             setFilterValue(booleanOptions.find((f) => !!currentActionData === f.value));
+            setSelectedFilter({ filterNumber: selectedFilter.filterNumber, isEditEnabled: true });
+
             return;
         }
 
@@ -274,6 +291,8 @@ export default function FilterWidgetRuleAction({
             const value = currentActionData;
             const label = currentField.platformEnum ? platformEnums[currentField.platformEnum][value as unknown as string].label : value;
             setFilterValue({ label, value });
+            setSelectedFilter({ filterNumber: selectedFilter.filterNumber, isEditEnabled: true });
+
             return;
         }
 
@@ -285,15 +304,15 @@ export default function FilterWidgetRuleAction({
                     label = v;
                     value = v;
                 } else {
-                    const keys = Object.keys(v);
-                    if (keys.length === 2) {
-                        label = v[keys[1]];
-                        value = v;
-                    }
+                    label = v?.name || JSON.stringify(v);
+                    value = v;
                 }
+
                 return { label, value };
             });
+
             setFilterValue(newFilterValue);
+            setSelectedFilter({ filterNumber: selectedFilter.filterNumber, isEditEnabled: true });
         }
     }, [selectedFilter, actions, currentFields, RuleActionTypeEnum, booleanOptions, currentField, platformEnums, searchGroupEnum]);
 
@@ -333,6 +352,22 @@ export default function FilterWidgetRuleAction({
 
         setActions(updatedActions);
     }, [actionsList, availableFilters]);
+
+    const renderObjectValueSelector = useMemo(
+        () => (
+            <Select
+                id="value"
+                options={objectValueOptions}
+                value={filterValue}
+                onChange={(e) => {
+                    setFilterValue(e);
+                }}
+                isMulti={currentField?.multiValue}
+                placeholder="Select filter value from options"
+            />
+        ),
+        [objectValueOptions, filterValue, currentField],
+    );
 
     return (
         <>
@@ -417,25 +452,14 @@ export default function FilterWidgetRuleAction({
                                             }}
                                         />
                                     ) : (
-                                        <>
-                                            <Select
-                                                id="value"
-                                                options={currentValueOptions}
-                                                value={filterValue || null}
-                                                onChange={(e) => {
-                                                    setFilterValue(e);
-                                                }}
-                                                isMulti={currentField?.multiValue}
-                                                placeholder="Select filter value from options"
-                                            />
-                                        </>
+                                        renderObjectValueSelector
                                     )}
                                 </FormGroup>
                             </Col>
 
                             <Col md="auto">
                                 <Button style={{ width: '7em', marginTop: '2em' }} color="primary" onClick={onUpdateClick}>
-                                    {selectedFilter === -1 ? 'Add' : 'Update'}
+                                    {selectedFilter.filterNumber === -1 ? 'Add' : 'Update'}
                                 </Button>
                             </Col>
                         </Row>
@@ -470,7 +494,7 @@ export default function FilterWidgetRuleAction({
                                 className={styles.filterBadge}
                                 key={i}
                                 onClick={() => toggleFilter(i)}
-                                color={selectedFilter === i ? 'primary' : 'secondary'}
+                                color={selectedFilter.filterNumber === i ? 'primary' : 'secondary'}
                             >
                                 {getEnumLabel(RuleActionTypeEnum, f.actionType)}&nbsp;
                                 <b>{f?.fieldSource && getEnumLabel(searchGroupEnum, f?.fieldSource)}&nbsp;</b>'{label}'&nbsp;to&nbsp;

@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { Resource } from 'types/openapi';
 import { conditionGroupToFilter, filterToConditionGroup } from 'utils/rules';
-type FormType = 'rules' | 'conditionGroup' | 'actionGroup';
+type FormType = 'rules' | 'conditionGroup' | 'actionGroup' | 'trigger';
 
 interface ConditionGroupFormFilterProps {
     resource: Resource;
@@ -23,7 +23,8 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
     const conditionGroupsDetails = useSelector(rulesSelectors.conditionGroupDetails);
     const ruleDetails = useSelector(rulesSelectors.ruleDetails);
     const actionGroupDetails = useSelector(rulesSelectors.actionGroupDetails);
-
+    const trigerDetails = useSelector(rulesSelectors.triggerDetails);
+    console.log('trigerDetails', trigerDetails);
     const [hasEffectRun, setHasEffectRun] = useState(false);
 
     const dispatch = useDispatch();
@@ -45,7 +46,11 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
         if (formType === 'actionGroup' && id !== actionGroupDetails?.uuid) {
             dispatch(rulesActions.getActionGroup({ actionGroupUuid: id }));
         }
-    }, [id, dispatch, formType, ruleDetails?.uuid, conditionGroupsDetails?.uuid, actionGroupDetails?.uuid]);
+
+        if (formType === 'trigger' && id !== trigerDetails?.uuid) {
+            dispatch(rulesActions.getTrigger({ triggerUuid: id }));
+        }
+    }, [id, dispatch, formType, ruleDetails?.uuid, conditionGroupsDetails?.uuid, actionGroupDetails?.uuid, trigerDetails?.uuid]);
 
     useEffect(() => {
         if (!hasEffectRun && editMode && id) {
@@ -168,6 +173,39 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
         );
     }, [resource, dispatch, formType, id, actionGroupDetails]);
 
+    const renderFilterWidgetForTrigger = useMemo(() => {
+        if (formType !== 'trigger' || !id || !trigerDetails) return null;
+        console.log('trigerDetails', trigerDetails);
+        return (
+            <div>
+                <FilterWidgetRuleAction
+                    entity={EntityType.ACTIONS}
+                    title={'Actions'}
+                    getAvailableFiltersApi={(apiClients: ApiClients) =>
+                        apiClients.resources.listResourceRuleFilterFields({
+                            resource,
+                            settable: true,
+                        })
+                    }
+                    actionsList={trigerDetails.actions}
+                    onActionsUpdate={(currentActions) => {
+                        // const currentCondition = filterToConditionGroup(currentFilters);
+                        dispatch(
+                            rulesActions.updateTrigger({
+                                triggerUuid: id,
+                                trigger: {
+                                    actions: currentActions,
+                                    triggerType: trigerDetails.triggerType,
+                                    actionGroupsUuids: trigerDetails.actionGroups.map((ag) => ag.uuid),
+                                },
+                            }),
+                        );
+                    }}
+                />
+            </div>
+        );
+    }, [resource, dispatch, formType, id, trigerDetails]);
+
     const renderWidgetConditionViewer = useMemo(() => {
         switch (formType) {
             case 'conditionGroup':
@@ -177,10 +215,19 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
 
             case 'actionGroup':
                 return renderFilterWidgetForActionGroup;
+
+            case 'trigger':
+                return renderFilterWidgetForTrigger;
             default:
                 return null;
         }
-    }, [formType, renderFilterWidgetForConditionGroups, renderFilterWidgetForRules, renderFilterWidgetForActionGroup]);
+    }, [
+        formType,
+        renderFilterWidgetForConditionGroups,
+        renderFilterWidgetForRules,
+        renderFilterWidgetForActionGroup,
+        renderFilterWidgetForTrigger,
+    ]);
 
     return <div>{renderWidgetConditionViewer}</div>;
 };

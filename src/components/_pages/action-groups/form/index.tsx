@@ -1,12 +1,11 @@
 import Widget from 'components/Widget';
-import { useCallback, useEffect, useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-// import { EntityType, actions as filterActions } from 'ducks/filters';
 import { selectors as enumSelectors } from 'ducks/enums';
 import { EntityType, actions as filterActions } from 'ducks/filters';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
+import { useCallback, useMemo } from 'react';
 import { Field, Form } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
@@ -50,12 +49,6 @@ const ActionGroupForm = () => {
 
         return resourceTypeArray;
     }, [resourceTypeEnum]);
-
-    useEffect(() => {
-        return () => {
-            dispatch(filterActions.setCurrentFilters({ currentFilters: [], entity: EntityType.CONDITIONS }));
-        };
-    }, [dispatch]);
 
     const defaultValues: ActionGroupFormValues = useMemo(() => {
         return {

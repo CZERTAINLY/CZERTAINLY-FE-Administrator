@@ -12,15 +12,18 @@ import Select from 'react-select';
 import { Container } from 'reactstrap';
 import { PlatformEnum, Resource } from 'types/openapi';
 
-import styles from './ruleList.module.scss';
+import styles from './triggerList.module.scss';
 
 const ConditionGroups = () => {
-    const rules = useSelector(rulesSelectors.rules);
-
+    const triggers = useSelector(rulesSelectors.triggers);
+    console.log('triggers', triggers);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
+    const eventNameEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ResourceEvent));
+    const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.RuleTriggerType));
+
     const [selectedResource, setSelectedResource] = useState<Resource>();
     const isFetchingList = useSelector(rulesSelectors.isFetchingRulesList);
     const isDeleting = useSelector(rulesSelectors.isDeletingConditionGroup);
@@ -37,7 +40,7 @@ const ConditionGroups = () => {
     }, [dispatch, checkedRows]);
 
     const getFreshList = useCallback(() => {
-        dispatch(rulesActions.listRules({ resource: selectedResource }));
+        dispatch(rulesActions.listTriggers({ resource: selectedResource }));
     }, [dispatch, selectedResource]);
 
     useEffect(() => {
@@ -65,10 +68,25 @@ const ConditionGroups = () => {
                 width: '10%',
                 sortable: true,
             },
+
             {
-                content: 'Resource',
+                content: 'Trigger Source',
                 align: 'left',
-                id: 'resource',
+                id: 'triggerSource',
+                width: '10%',
+                sortable: true,
+            },
+            {
+                content: 'triggerType',
+                align: 'left',
+                id: 'triggerType',
+                width: '10%',
+                sortable: true,
+            },
+            {
+                content: 'eventName',
+                align: 'left',
+                id: 'eventName',
                 width: '10%',
                 sortable: true,
             },
@@ -81,20 +99,23 @@ const ConditionGroups = () => {
         ],
         [],
     );
-
+    console.log('triggers', triggers);
     const rulesList: TableDataRow[] = useMemo(
         () =>
-            rules.map((rule) => {
+            triggers.map((trigger) => {
                 return {
-                    id: rule.uuid,
+                    id: trigger.uuid,
                     columns: [
-                        <Link to={`./detail/${rule.uuid}`}>{rule.name}</Link>,
-                        getEnumLabel(resourceTypeEnum, rule.resource),
-                        rule.description || '',
+                        <Link to={`./detail/${trigger.uuid}`}>{trigger.name}</Link>,
+
+                        getEnumLabel(resourceTypeEnum, trigger.triggerResource || ''),
+                        getEnumLabel(triggerTypeEnum, trigger.triggerType),
+                        getEnumLabel(eventNameEnum, trigger.eventName || ''),
+                        trigger.description || '',
                     ],
                 };
             }),
-        [rules, resourceTypeEnum],
+        [triggers, resourceTypeEnum],
     );
 
     const buttons: WidgetButtonProps[] = useMemo(
@@ -137,7 +158,7 @@ const ConditionGroups = () => {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget titleSize="larger" title="Rules" refreshAction={getFreshList} busy={isBusy} widgetButtons={buttons}>
+            <Widget titleSize="larger" title="Triggers" refreshAction={getFreshList} busy={isBusy} widgetButtons={buttons}>
                 <br />
                 <CustomTable
                     checkedRows={checkedRows}

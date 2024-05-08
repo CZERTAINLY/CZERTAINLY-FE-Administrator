@@ -96,6 +96,11 @@ export default function Sidebar() {
                                 name: 'Action Groups',
                                 link: '/actiongroups',
                             },
+                            {
+                                _key: 'triggers',
+                                name: 'Triggers',
+                                link: '/triggers',
+                            },
                         ]}
                     />
                 </ul>
