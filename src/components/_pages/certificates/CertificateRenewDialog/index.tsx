@@ -21,7 +21,7 @@ interface Props {
 export default function CertificateRenewDialog({ onCancel, allowWithoutFile, onRenew }: Props) {
     const dispatch = useDispatch();
 
-    const [fileContent, setFileContent] = useState('');
+    const [fileContent, setFileContent] = useState<string | undefined>();
     const [uploadCsr, setUploadCsr] = useState(false);
     const [certificate, setCertificate] = useState<CertificateDetailResponseModel | undefined>();
 
