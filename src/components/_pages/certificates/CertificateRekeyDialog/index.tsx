@@ -18,7 +18,7 @@ import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, La
 import { AttributeDescriptorModel } from 'types/attributes';
 import { CertificateDetailResponseModel } from 'types/certificate';
 import { CryptographicKeyPairResponseModel } from 'types/cryptographic-keys';
-import { KeyType } from 'types/openapi';
+import { CertificateRequestFormat, KeyType } from 'types/openapi';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 
@@ -103,7 +103,8 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
                     raProfileUuid: certificate.raProfile.uuid,
                     authorityUuid: certificate.raProfile.authorityInstanceUuid,
                     rekey: {
-                        pkcs10: fileContent ? fileContent : undefined,
+                        request: fileContent ? fileContent : undefined,
+                        format: CertificateRequestFormat.Pkcs10,
                         signatureAttributes: collectFormAttributes('signatureAttributes', signatureAttributeDescriptors, values),
                         keyUuid: values.key?.value.uuid || '',
                         tokenProfileUuid: values.tokenProfile?.value || '',
