@@ -37,7 +37,7 @@ import {
     selectors as utilsCertificateRequestSelectors,
 } from '../../../../ducks/utilsCertificateRequest';
 import { CertificateDetailResponseModel } from '../../../../types/certificate';
-import { Resource } from '../../../../types/openapi';
+import { CertificateRequestFormat, Resource } from '../../../../types/openapi';
 import CertificateAttributes from '../../../CertificateAttributes';
 import FileUpload from '../../../Input/FileUpload/FileUpload';
 import TabLayout from '../../../Layout/TabLayout';
@@ -45,7 +45,7 @@ import RenderRequestKey from './RenderRequestKey';
 
 export interface FormValues {
     raProfile: SingleValue<{ label: string; value: RaProfileResponseModel }> | null;
-    pkcs10: File | null;
+    format?: CertificateRequestFormat;
     uploadCsr?: SingleValue<{ label: string; value: boolean }> | null;
     tokenProfile?: SingleValue<{ label: string; value: TokenProfileResponseModel }> | null;
     key?: SingleValue<{ label: string; value: CryptographicKeyPairResponseModel }> | null;
@@ -109,7 +109,8 @@ export default function CertificateForm() {
                     raProfileUuid: values.raProfile.value.uuid,
                     authorityUuid: values.raProfile.value.authorityInstanceUuid,
                     signRequest: {
-                        pkcs10: fileContent,
+                        format: CertificateRequestFormat.Pkcs10,
+                        request: fileContent,
                         attributes,
                         csrAttributes: collectFormAttributes('csrAttributes', csrAttributeDescriptors, values),
                         signatureAttributes: collectFormAttributes('signatureAttributes', signatureAttributeDescriptors, values),
@@ -183,7 +184,6 @@ export default function CertificateForm() {
     const defaultValues: FormValues = useMemo(
         () => ({
             raProfile: null,
-            pkcs10: null,
             fileName: '',
             contentType: '',
             file: '',

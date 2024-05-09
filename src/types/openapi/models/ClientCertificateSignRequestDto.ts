@@ -12,6 +12,7 @@
  */
 
 import type {
+    CertificateRequestFormat,
     RequestAttributeDto,
 } from './';
 
@@ -33,11 +34,16 @@ export interface ClientCertificateSignRequestDto {
      */
     signatureAttributes?: Array<RequestAttributeDto>;
     /**
-     * Certificate sign request (PKCS#10) encoded as Base64 string
+     * Certificate signing request encoded as Base64 string
      * @type {string}
      * @memberof ClientCertificateSignRequestDto
      */
-    pkcs10: string;
+    request: string;
+    /**
+     * @type {CertificateRequestFormat}
+     * @memberof ClientCertificateSignRequestDto
+     */
+    format?: CertificateRequestFormat;
     /**
      * Token Profile UUID. Required if CSR is not uploaded
      * @type {string}
@@ -63,3 +69,5 @@ export interface ClientCertificateSignRequestDto {
      */
     customAttributes?: Array<RequestAttributeDto>;
 }
+
+

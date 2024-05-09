@@ -25,6 +25,7 @@ import { selectors as settingSelectors } from 'ducks/settings';
 import {
     CertificateState as CertStatus,
     CertificateFormatEncoding,
+    CertificateRequestFormat,
     CertificateRevocationReason,
     CertificateValidationStatus,
 } from '../../../../types/openapi';
@@ -478,7 +479,10 @@ export default function CertificateDetail() {
             dispatch(
                 actions.renewCertificate({
                     uuid: certificate?.uuid || '',
-                    renewRequest: { pkcs10: data.fileContent ? data.fileContent : undefined },
+                    renewRequest: {
+                        format: CertificateRequestFormat.Pkcs10,
+                        request: data.fileContent,
+                    },
                     raProfileUuid: certificate?.raProfile?.uuid || '',
                     authorityUuid: certificate?.raProfile?.authorityInstanceUuid || '',
                 }),

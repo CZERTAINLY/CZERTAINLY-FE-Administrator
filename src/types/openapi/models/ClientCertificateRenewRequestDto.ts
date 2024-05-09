@@ -11,6 +11,10 @@
  * Do not edit the class manually.
  */
 
+import type {
+    CertificateRequestFormat,
+} from './';
+
 /**
  * @export
  * @interface ClientCertificateRenewRequestDto
@@ -23,9 +27,16 @@ export interface ClientCertificateRenewRequestDto {
      */
     replaceInLocations?: boolean;
     /**
-     * Certificate sign request (PKCS#10) encoded as Base64 string. If not provided, Existing CSR will be used
+     * Certificate signing request encoded as Base64 string. If not provided, Existing CSR will be used
      * @type {string}
      * @memberof ClientCertificateRenewRequestDto
      */
-    pkcs10?: string;
+    request?: string;
+    /**
+     * @type {CertificateRequestFormat}
+     * @memberof ClientCertificateRenewRequestDto
+     */
+    format?: CertificateRequestFormat;
 }
+
+
