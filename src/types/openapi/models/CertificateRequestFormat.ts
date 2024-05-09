@@ -12,7 +12,7 @@
  */
 
 /**
- * Certificate request format
+ * Certificate signing request format
  * @export
  * @enum {string}
  */
