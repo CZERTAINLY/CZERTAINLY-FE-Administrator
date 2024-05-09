@@ -24,7 +24,6 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
     const ruleDetails = useSelector(rulesSelectors.ruleDetails);
     const actionGroupDetails = useSelector(rulesSelectors.actionGroupDetails);
     const trigerDetails = useSelector(rulesSelectors.triggerDetails);
-    console.log('trigerDetails', trigerDetails);
     const [hasEffectRun, setHasEffectRun] = useState(false);
 
     const dispatch = useDispatch();
@@ -175,7 +174,6 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
 
     const renderFilterWidgetForTrigger = useMemo(() => {
         if (formType !== 'trigger' || !id || !trigerDetails) return null;
-        console.log('trigerDetails', trigerDetails);
         return (
             <div>
                 <FilterWidgetRuleAction

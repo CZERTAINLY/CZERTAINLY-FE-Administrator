@@ -110,7 +110,6 @@ const ConditionGroupForm = () => {
 
     const onSubmit = useCallback(
         (values: ConditionGroupFormValues) => {
-            // if (values.resource === '') return;
             if (values.resource === Resource.None) return;
 
             if (editMode && id) {

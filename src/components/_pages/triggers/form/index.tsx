@@ -49,13 +49,11 @@ const ConditionGroupForm = () => {
     const actionGroups = useSelector(rulesSelectors.actionGroups);
     const resourceEvents = useSelector(rulesSelectors.resourceEvents);
     const rules = useSelector(rulesSelectors.rules);
-    const isCreatingRule = useSelector(rulesSelectors.isCreatingRule);
-    const isUpdatingRule = useSelector(rulesSelectors.isUpdatingRule);
+    const isCreatingTrigger = useSelector(rulesSelectors.isCreatingTrigger);
     const [selectedResourceState, setSelectedResourceState] = useState<SelectChangeValue>();
-    const ruleDetails = useSelector(rulesSelectors.ruleDetails);
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const resourceEventEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ResourceEvent));
-    const isBusy = useMemo(() => isCreatingRule || isUpdatingRule, [isCreatingRule, isUpdatingRule]);
+    const isBusy = useMemo(() => isCreatingTrigger, [isCreatingTrigger]);
 
     const resourceOptions = useMemo(() => {
         if (resourceTypeEnum === undefined) return [];
@@ -69,14 +67,12 @@ const ConditionGroupForm = () => {
         return resourceTypeArray;
     }, [resourceTypeEnum]);
 
-    console.log('resourceEventEnum', resourceEventEnum);
-
     const resourceEventNameOptions = useMemo(() => {
         if (resourceEvents === undefined) return [];
         return resourceEvents.map((event) => {
             return { value: event, label: getEnumLabel(resourceEventEnum, event) };
         });
-    }, [resourceEvents]);
+    }, [resourceEvents, resourceEventEnum]);
 
     const actionGroupsOptions = useMemo(() => {
         if (actionGroups === undefined) return [];
@@ -125,7 +121,7 @@ const ConditionGroupForm = () => {
             triggerType: undefined,
             triggerResource: Resource.None,
         };
-    }, [ruleDetails, resourceOptions]);
+    }, []);
 
     const submitTitle = 'Create';
     const inProgressTitle = 'Creating...';

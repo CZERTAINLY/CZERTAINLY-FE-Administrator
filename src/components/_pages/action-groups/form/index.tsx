@@ -1,6 +1,5 @@
 import Widget from 'components/Widget';
 import { selectors as enumSelectors } from 'ducks/enums';
-import { EntityType, actions as filterActions } from 'ducks/filters';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useCallback, useMemo } from 'react';
 import { Field, Form } from 'react-final-form';
@@ -153,9 +152,6 @@ const ActionGroupForm = () => {
                                                 form.change('resource', event.value);
                                             }
                                             form.change('actions', []);
-                                            dispatch(
-                                                filterActions.setCurrentFilters({ currentFilters: [], entity: EntityType.CONDITIONS }),
-                                            );
                                         }}
                                         styles={{
                                             control: (provided) =>

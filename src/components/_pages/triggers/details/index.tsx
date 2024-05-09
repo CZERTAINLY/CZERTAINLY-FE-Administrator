@@ -17,14 +17,14 @@ interface SelectChangeValue {
     value: string;
     label: string;
 }
-const RuleDetails = () => {
+const TriggerDetails = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
     const triggerDetails = useSelector(rulesSelectors.triggerDetails);
-    const isUpdatingRule = useSelector(rulesSelectors.isUpdatingRule);
-    const isFetchingRuleDetail = useSelector(rulesSelectors.isFetchingRuleDetail);
+    const isUpdatingTrigger = useSelector(rulesSelectors.isUpdatingTrigger);
+
+    const isFetchingTriggerDetail = useSelector(rulesSelectors.isFetchingTriggerDetail);
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
-    // const conditionGroups = useSelector(rulesSelectors.conditionRuleGroups);
     const actionGroups = useSelector(rulesSelectors.actionGroups);
 
     const [confirmDelete, setConfirmDelete] = useState(false);
@@ -50,7 +50,7 @@ const RuleDetails = () => {
         dispatch(rulesActions.listActionGroups({ resource: triggerDetails?.resource }));
     }, [triggerDetails, dispatch]);
 
-    const isBusy = useMemo(() => isFetchingRuleDetail || isUpdatingRule, [isFetchingRuleDetail, isUpdatingRule]);
+    const isBusy = useMemo(() => isFetchingTriggerDetail || isUpdatingTrigger, [isFetchingTriggerDetail, isUpdatingTrigger]);
 
     const actionGroupOptions = useMemo(() => {
         if (actionGroups === undefined) return [];
@@ -83,22 +83,22 @@ const RuleDetails = () => {
             }),
         );
         setUpdateDescription(false);
-    }, [dispatch, id, triggerDetails, updatedDescription, updateDescriptionEditEnable]);
+    }, [dispatch, id, triggerDetails, updatedDescription]);
 
     const onUpdateActionGroupsConfirmed = useCallback(() => {
         if (!id || !triggerDetails) return;
 
-        const newConditionGroupsUuids = newActionGroups.map((newActionGroup) => newActionGroup.value);
+        const newActionGroupsUuids = newActionGroups.map((newActionGroup) => newActionGroup.value);
 
         const previousAndNewActionGroupsUuid = triggerDetails?.actionGroups.map((actionGroup) => actionGroup.uuid);
-        const allConditionGroups = [...(previousAndNewActionGroupsUuid || []), ...newConditionGroupsUuids];
+        const allActionGroups = [...(previousAndNewActionGroupsUuid || []), ...newActionGroupsUuids];
 
         dispatch(
             rulesActions.updateTrigger({
                 triggerUuid: id,
                 trigger: {
                     actions: triggerDetails?.actions || [],
-                    actionGroupsUuids: allConditionGroups,
+                    actionGroupsUuids: allActionGroups,
                     triggerType: triggerDetails.triggerType,
                 },
             }),
@@ -106,7 +106,7 @@ const RuleDetails = () => {
         setNewActionGroups([]);
     }, [dispatch, id, triggerDetails, newActionGroups]);
 
-    const onDeleteConditionGroup = useCallback(
+    const onDeleteActionGroup = useCallback(
         (actionGroupsUuid: string) => {
             if (!id || !triggerDetails) return;
 
@@ -125,7 +125,7 @@ const RuleDetails = () => {
                 }),
             );
         },
-        [dispatch, id, triggerDetails?.actionGroups, triggerDetails?.actions, triggerDetails?.description, triggerDetails?.triggerType],
+        [dispatch, id, triggerDetails],
     );
 
     const buttons: WidgetButtonProps[] = useMemo(
@@ -139,24 +139,21 @@ const RuleDetails = () => {
         [],
     );
 
-    const conditionGroupsButtons: WidgetButtonProps[] = useMemo(
+    const actionGroupsButtons: WidgetButtonProps[] = useMemo(
         () => [
             {
                 icon: 'info',
                 disabled: false,
                 onClick: () => {},
                 custom: (
-                    <i
-                        className={cx('fa fa-info', styles.infoIcon)}
-                        title="Condition group is named set of conditions for selected resource that can be reused in rules of same resource"
-                    />
+                    <i className={cx('fa fa-info', styles.infoIcon)} title="Action group is named set of actions for selected trigger" />
                 ),
             },
         ],
         [],
     );
 
-    const tableHeader: TableHeader[] = useMemo(
+    const triggerDetailHeader: TableHeader[] = useMemo(
         () => [
             {
                 id: 'property',
@@ -174,7 +171,7 @@ const RuleDetails = () => {
         [],
     );
 
-    const conditionGroupsDetailData: TableDataRow[] = useMemo(
+    const triggerDetailsData: TableDataRow[] = useMemo(
         () =>
             !triggerDetails
                 ? []
@@ -214,7 +211,7 @@ const RuleDetails = () => {
                                               color="secondary"
                                               title="Update Description"
                                               onClick={onUpdateDescriptionConfirmed}
-                                              disabled={isUpdatingRule}
+                                              disabled={isUpdatingTrigger}
                                           >
                                               <i className="fa fa-check" />
                                           </Button>
@@ -222,7 +219,7 @@ const RuleDetails = () => {
                                               className="btn btn-link mx-auto danger"
                                               size="sm"
                                               title="Cancel"
-                                              disabled={isUpdatingRule}
+                                              disabled={isUpdatingTrigger}
                                               onClick={() => {
                                                   setUpdateDescription(false);
                                                   setUpdatedDescription(triggerDetails.description || '');
@@ -248,10 +245,17 @@ const RuleDetails = () => {
                           ],
                       },
                   ],
-        [triggerDetails, resourceTypeEnum, onUpdateDescriptionConfirmed, updateDescriptionEditEnable, isUpdatingRule, updatedDescription],
+        [
+            triggerDetails,
+            resourceTypeEnum,
+            onUpdateDescriptionConfirmed,
+            updateDescriptionEditEnable,
+            isUpdatingTrigger,
+            updatedDescription,
+        ],
     );
 
-    const conditionGroupFieldsDataHeader = useMemo(
+    const actionGroupFieldsDataHeader = useMemo(
         () => [
             {
                 id: 'name',
@@ -269,45 +273,45 @@ const RuleDetails = () => {
         [],
     );
 
-    const conditionGroupFieldsData: TableDataRow[] = useMemo(
+    const actionGroupsFieldsData: TableDataRow[] = useMemo(
         () =>
             !triggerDetails?.actionGroups.length
                 ? []
-                : triggerDetails?.actionGroups.map((conditionGroup) => {
+                : triggerDetails?.actionGroups.map((actionGroup) => {
                       return {
-                          id: conditionGroup.uuid,
+                          id: actionGroup.uuid,
                           columns: [
-                              <Link to={`../../actiongroups/detail/${conditionGroup.uuid}`}>{conditionGroup.name}</Link> || '',
-                              conditionGroup.description || '',
+                              <Link to={`../../actiongroups/detail/${actionGroup.uuid}`}>{actionGroup.name}</Link> || '',
+                              actionGroup.description || '',
                               <Button
                                   className="btn btn-link text-danger"
                                   size="sm"
                                   color="danger"
-                                  title="Delete Condition Group"
+                                  title="Delete Action Group"
                                   onClick={() => {
-                                      onDeleteConditionGroup(conditionGroup.uuid);
+                                      onDeleteActionGroup(actionGroup.uuid);
                                   }}
-                                  disabled={isUpdatingRule}
+                                  disabled={isUpdatingTrigger}
                               >
                                   <i className="fa fa-trash" />
                               </Button>,
                           ],
                       };
                   }),
-        [triggerDetails, isUpdatingRule, onDeleteConditionGroup],
+        [triggerDetails, isUpdatingTrigger, onDeleteActionGroup],
     );
 
     return (
         <Container className="themed-container" fluid>
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
                 <Col>
-                    <Widget refreshAction={getFreshDetails} busy={isBusy} title="Triggers" titleSize="large" widgetButtons={buttons}>
-                        <CustomTable data={conditionGroupsDetailData} headers={tableHeader} />
+                    <Widget refreshAction={getFreshDetails} busy={isBusy} title="Trigger Details" titleSize="large" widgetButtons={buttons}>
+                        <CustomTable data={triggerDetailsData} headers={triggerDetailHeader} />
                     </Widget>
                 </Col>
                 <Col>
-                    <Widget widgetButtons={conditionGroupsButtons} busy={isBusy} title="Action Groups" titleSize="large">
-                        <CustomTable data={conditionGroupFieldsData} headers={conditionGroupFieldsDataHeader} hasDetails />
+                    <Widget widgetButtons={actionGroupsButtons} busy={isBusy} title="Action Groups" titleSize="large">
+                        <CustomTable data={actionGroupsFieldsData} headers={actionGroupFieldsDataHeader} hasDetails />
                         <div className="d-flex">
                             <div className="w-100">
                                 <Select
@@ -323,7 +327,7 @@ const RuleDetails = () => {
                                 {newActionGroups?.length ? (
                                     <ButtonGroup>
                                         <Button
-                                            disabled={isUpdatingRule}
+                                            disabled={isUpdatingTrigger}
                                             className="btn btn-link ms-2 mt-2 p-1"
                                             size="sm"
                                             color="secondary"
@@ -344,8 +348,8 @@ const RuleDetails = () => {
 
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete a Condition Group`}
-                body={`You are about to delete a Condition Group. Is this what you want to do?`}
+                caption={`Delete a Trigger`}
+                body={`You are about to delete a Trigger. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
@@ -356,4 +360,4 @@ const RuleDetails = () => {
     );
 };
 
-export default RuleDetails;
+export default TriggerDetails;

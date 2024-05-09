@@ -46,6 +46,7 @@ export type State = {
     isCreatingConditionGroup: boolean;
     isDeletingConditionGroup: boolean;
     isCreatingTrigger: boolean;
+    isDeletingTrigger: boolean;
     isUpdatingConditionGroup: boolean;
     isUpdatingRule: boolean;
     isUpdatingTrigger: boolean;
@@ -75,6 +76,7 @@ export const initialState: State = {
     isCreatingConditionGroup: false,
     isDeletingConditionGroup: false,
     isCreatingTrigger: false,
+    isDeletingTrigger: false,
     isUpdatingConditionGroup: false,
     isUpdatingRule: false,
     isUpdatingTrigger: false,
@@ -230,15 +232,15 @@ export const slice = createSlice({
         },
 
         deleteTrigger: (state, action: PayloadAction<{ triggerUuid: string }>) => {
-            state.isCreatingTrigger = true;
+            state.isDeletingTrigger = true;
         },
         deleteTriggerSuccess: (state, action: PayloadAction<{ triggerUuid: string }>) => {
             state.triggers = state.triggers.filter((trigger) => trigger.uuid !== action.payload.triggerUuid);
-            state.isCreatingTrigger = false;
+            state.isDeletingTrigger = false;
         },
 
         deleteTriggerFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isCreatingTrigger = false;
+            state.isDeletingTrigger = false;
         },
 
         getActionGroup: (state, action: PayloadAction<{ actionGroupUuid: string }>) => {
@@ -407,6 +409,12 @@ const isFetchingActionGroups = createSelector(state, (state) => state.isFetching
 const isDeletingActionGroup = createSelector(state, (state) => state.isDeletingActionGroup);
 const isFetchingActionGroup = createSelector(state, (state) => state.isFetchingActionGroup);
 const isupdatingActionGroup = createSelector(state, (state) => state.isupdatingActionGroup);
+const isUpdatingTrigger = createSelector(state, (state) => state.isUpdatingTrigger);
+const isFetchingTriggerDetail = createSelector(state, (state) => state.isFetchingTriggerDetail);
+const isDeletingTrigger = createSelector(state, (state) => state.isDeletingTrigger);
+const isFetchingTriggers = createSelector(state, (state) => state.isFetchingTriggers);
+const isCreatingTrigger = createSelector(state, (state) => state.isCreatingTrigger);
+
 export const selectors = {
     rules,
     triggers,
@@ -432,6 +440,11 @@ export const selectors = {
     isDeletingActionGroup,
     isFetchingActionGroup,
     isupdatingActionGroup,
+    isUpdatingTrigger,
+    isFetchingTriggerDetail,
+    isDeletingTrigger,
+    isFetchingTriggers,
+    isCreatingTrigger,
 };
 
 export const actions = slice.actions;

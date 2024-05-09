@@ -14,9 +14,8 @@ import { PlatformEnum, Resource } from 'types/openapi';
 
 import styles from './triggerList.module.scss';
 
-const ConditionGroups = () => {
+const TriggerList = () => {
     const triggers = useSelector(rulesSelectors.triggers);
-    console.log('triggers', triggers);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -25,8 +24,8 @@ const ConditionGroups = () => {
     const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.RuleTriggerType));
 
     const [selectedResource, setSelectedResource] = useState<Resource>();
-    const isFetchingList = useSelector(rulesSelectors.isFetchingRulesList);
-    const isDeleting = useSelector(rulesSelectors.isDeletingConditionGroup);
+    const isFetchingList = useSelector(rulesSelectors.isFetchingTriggers);
+    const isDeleting = useSelector(rulesSelectors.isDeletingTrigger);
 
     const [checkedRows, setCheckedRows] = useState<string[]>([]);
     const [confirmDelete, setConfirmDelete] = useState(false);
@@ -59,7 +58,7 @@ const ConditionGroups = () => {
         return resourceTypeArray;
     }, [resourceTypeEnum]);
 
-    const rulesTableHeader: TableHeader[] = useMemo(
+    const triggerTableHeader: TableHeader[] = useMemo(
         () => [
             {
                 content: 'Name',
@@ -99,8 +98,8 @@ const ConditionGroups = () => {
         ],
         [],
     );
-    console.log('triggers', triggers);
-    const rulesList: TableDataRow[] = useMemo(
+
+    const triggerListData: TableDataRow[] = useMemo(
         () =>
             triggers.map((trigger) => {
                 return {
@@ -115,7 +114,7 @@ const ConditionGroups = () => {
                     ],
                 };
             }),
-        [triggers, resourceTypeEnum],
+        [triggers, resourceTypeEnum, eventNameEnum, triggerTypeEnum],
     );
 
     const buttons: WidgetButtonProps[] = useMemo(
@@ -165,8 +164,8 @@ const ConditionGroups = () => {
                     hasCheckboxes
                     hasAllCheckBox={false}
                     multiSelect={false}
-                    data={rulesList}
-                    headers={rulesTableHeader}
+                    data={triggerListData}
+                    headers={triggerTableHeader}
                     onCheckedRowsChanged={(checkedRows) => {
                         setCheckedRows(checkedRows as string[]);
                     }}
@@ -176,8 +175,8 @@ const ConditionGroups = () => {
 
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete a Condition Group`}
-                body={`You are about to delete a Condition Group. Is this what you want to do?`}
+                caption={`Delete a Trigger`}
+                body={`You are about to delete a Trigger Group. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
@@ -188,4 +187,4 @@ const ConditionGroups = () => {
     );
 };
 
-export default ConditionGroups;
+export default TriggerList;

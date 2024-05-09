@@ -40,7 +40,6 @@ const ConditionGroupForm = () => {
     const title = 'Create Condition Group';
     const isCreatingConditionGroup = useSelector(rulesSelectors.isCreatingConditionGroup);
     const isUpdatingConditionGroup = useSelector(rulesSelectors.isUpdatingConditionGroup);
-    const conditionGroupsDetails = useSelector(rulesSelectors.conditionGroupDetails);
 
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const isBusy = useMemo(
@@ -78,7 +77,7 @@ const ConditionGroupForm = () => {
             description: '',
             conditions: [],
         };
-    }, [conditionGroupsDetails, resourceOptions]);
+    }, []);
 
     const submitTitle = 'Create';
     const inProgressTitle = 'Creating...';
@@ -102,7 +101,7 @@ const ConditionGroupForm = () => {
                 }),
             );
         },
-        [dispatch, id],
+        [dispatch],
     );
 
     const areDefaultValuesSame = useCallback(

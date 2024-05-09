@@ -155,8 +155,8 @@ const ConditionGroups = () => {
 
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete a Condition Group`}
-                body={`You are about to delete a Condition Group. Is this what you want to do?`}
+                caption={`Delete a Rule`}
+                body={`You are about to delete a Rule. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
