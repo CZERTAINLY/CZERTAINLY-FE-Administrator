@@ -3,7 +3,6 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 // import { EntityType, actions as filterActions } from 'ducks/filters';
-import { selectors as enumSelectors } from 'ducks/enums';
 import { EntityType, actions as filterActions } from 'ducks/filters';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 
@@ -14,9 +13,10 @@ import { mutators } from 'utils/attributes/attributeEditorMutators';
 
 import ProgressButton from 'components/ProgressButton';
 import Select from 'react-select';
-import { PlatformEnum, Resource } from 'types/openapi';
+import { Resource } from 'types/openapi';
 import { RuleConditiontModel } from 'types/rules';
 import { isObjectSame } from 'utils/common-utils';
+import { useResourceOptions } from 'utils/rules';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
 import ConditionFormFilter from '../../../ConditionFormFilter';
 
@@ -41,22 +41,11 @@ const ConditionGroupForm = () => {
     const isCreatingConditionGroup = useSelector(rulesSelectors.isCreatingConditionGroup);
     const isUpdatingConditionGroup = useSelector(rulesSelectors.isUpdatingConditionGroup);
 
-    const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const isBusy = useMemo(
         () => isCreatingConditionGroup || isUpdatingConditionGroup,
         [isCreatingConditionGroup, isUpdatingConditionGroup],
     );
-    const resourceOptions = useMemo(() => {
-        if (resourceTypeEnum === undefined) return [];
-        const resourceTypeArray = Object.entries(resourceTypeEnum)
-            .map(([key, value]) => {
-                return { value: value.code, label: value.label };
-            })
-            .filter((resource) => resource.value !== Resource.None)
-            .sort((a, b) => a.label.localeCompare(b.label));
-
-        return resourceTypeArray;
-    }, [resourceTypeEnum]);
+    const resourceOptions = useResourceOptions();
 
     useEffect(() => {
         if (!id) return;

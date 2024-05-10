@@ -31,6 +31,7 @@ import locationsEpics from './locations-epics';
 import notificationsEpics from './notifications-epics';
 import raProfilesEpics from './ra-profiles-epics';
 import { reducers } from './reducers';
+import resourcesEpics from './resource-epics';
 import rolesEpics from './roles-epics';
 import rulesEpics from './rules-epics';
 import schedulerEpics from './scheduler-epics';
@@ -63,6 +64,7 @@ export const epics = combineEpics(
     ...discoveriesEpics,
     ...usersEpics,
     ...rolesEpics,
+    ...resourcesEpics,
     ...rulesEpics,
     ...certificatesEpics,
     ...authoritiesEpics,

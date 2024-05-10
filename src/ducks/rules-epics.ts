@@ -406,20 +406,6 @@ const updateTrigger: AppEpic = (action$, state, deps) => {
     );
 };
 
-const listResourceEvents: AppEpic = (action$, state, deps) => {
-    return action$.pipe(
-        filter(slice.actions.listResourceEvents.match),
-        switchMap((action) =>
-            deps.apiClients.resources.listResourceEvents({ resource: action.payload.resource }).pipe(
-                switchMap((events) => of(slice.actions.listResourceEventsSuccess({ events }))),
-                catchError((err) =>
-                    of(slice.actions.listResourceEventsFailure({ error: extractError(err, 'Failed to get resource events') })),
-                ),
-            ),
-        ),
-    );
-};
-
 const epics = [
     listRules,
     listActionGroups,
@@ -441,7 +427,6 @@ const epics = [
     updateConditionGroup,
     updateRule,
     updateTrigger,
-    listResourceEvents,
 ];
 
 export default epics;

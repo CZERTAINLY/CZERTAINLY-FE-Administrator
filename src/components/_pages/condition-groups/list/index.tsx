@@ -11,6 +11,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import { Container } from 'reactstrap';
 import { PlatformEnum, Resource } from 'types/openapi';
+import { useResourceOptions } from 'utils/rules';
 import styles from './conditionGroupsList.module.scss';
 
 const ConditionGroups = () => {
@@ -43,17 +44,7 @@ const ConditionGroups = () => {
         getFreshListConditionGroups();
     }, [getFreshListConditionGroups]);
 
-    const resourceOptions = useMemo(() => {
-        if (resourceTypeEnum === undefined) return [];
-        const resourceTypeArray = Object.entries(resourceTypeEnum)
-            .map(([key, value]) => {
-                return { value: value.code, label: value.label };
-            })
-            .filter((resource) => resource.value !== Resource.None)
-            .sort((a, b) => a.label.localeCompare(b.label));
-
-        return resourceTypeArray;
-    }, [resourceTypeEnum]);
+    const resourceOptions = useResourceOptions();
 
     const conditionGroupsRowHeaders: TableHeader[] = useMemo(
         () => [

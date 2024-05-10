@@ -27,9 +27,7 @@ export type State = {
     conditionGroupDetails?: ConditionRuleGroupModel;
     triggers: TriggerRuleModel[];
     triggerDetails?: TriggerRuleDetailModel;
-    resourceEvents: string[];
 
-    isFetchingResourceEvents: boolean;
     isupdatingActionGroup: boolean;
     isFetchingRulesList: boolean;
     isFetchingActionGroups: boolean;
@@ -62,13 +60,11 @@ export const initialState: State = {
     isFetchingActionGroup: false,
     isFetchingConditionGroup: false,
     isFetchingTriggerDetail: false,
-    resourceEvents: [],
 
     isFetchingConditionGroups: false,
     isFetchingTriggers: false,
     isCreatingRule: false,
     isFetchingRuleDetail: false,
-    isFetchingResourceEvents: false,
 
     isupdatingActionGroup: false,
     isCreatingActionGroup: false,
@@ -363,20 +359,6 @@ export const slice = createSlice({
         updateTriggerFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdatingTrigger = false;
         },
-
-        listResourceEvents: (state, action: PayloadAction<{ resource: Resource }>) => {
-            state.resourceEvents = [];
-            state.isFetchingResourceEvents = true;
-        },
-
-        listResourceEventsSuccess: (state, action: PayloadAction<{ events: string[] }>) => {
-            state.resourceEvents = action.payload.events;
-            state.isFetchingResourceEvents = false;
-        },
-
-        listResourceEventsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isFetchingResourceEvents = false;
-        },
     },
 });
 
@@ -386,7 +368,6 @@ const rules = createSelector(state, (state) => state.rules);
 const conditionGroupDetails = createSelector(state, (state) => state.conditionGroupDetails);
 const ruleDetails = createSelector(state, (state) => state.ruleDetails);
 const triggerDetails = createSelector(state, (state) => state.triggerDetails);
-const resourceEvents = createSelector(state, (state) => state.resourceEvents);
 const triggers = createSelector(state, (state) => state.triggers);
 
 const actionGroups = createSelector(state, (state) => state.actionGroups);
@@ -419,7 +400,6 @@ export const selectors = {
     rules,
     triggers,
     triggerDetails,
-    resourceEvents,
     conditionRuleGroups,
     conditionGroupDetails,
     actionGroups,

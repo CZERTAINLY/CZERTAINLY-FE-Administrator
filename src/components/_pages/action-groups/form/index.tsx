@@ -1,5 +1,4 @@
 import Widget from 'components/Widget';
-import { selectors as enumSelectors } from 'ducks/enums';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useCallback, useMemo } from 'react';
 import { Field, Form } from 'react-final-form';
@@ -12,9 +11,10 @@ import { mutators } from 'utils/attributes/attributeEditorMutators';
 import ConditionFormFilter from 'components/ConditionFormFilter';
 import ProgressButton from 'components/ProgressButton';
 import Select from 'react-select';
-import { PlatformEnum, Resource } from 'types/openapi';
+import { Resource } from 'types/openapi';
 import { ActionRuleRequestModel } from 'types/rules';
 import { isObjectSame } from 'utils/common-utils';
+import { useResourceOptions } from 'utils/rules';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
 
 interface SelectChangeValue {
@@ -35,19 +35,8 @@ const ActionGroupForm = () => {
     const navigate = useNavigate();
     const title = 'Create Action Group';
     const isCreatingActionGroup = useSelector(rulesSelectors.isCreatingActionGroup);
-    const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const isBusy = useMemo(() => isCreatingActionGroup, [isCreatingActionGroup]);
-    const resourceOptions = useMemo(() => {
-        if (resourceTypeEnum === undefined) return [];
-        const resourceTypeArray = Object.entries(resourceTypeEnum)
-            .map(([key, value]) => {
-                return { value: value.code, label: value.label };
-            })
-            .filter((resource) => resource.value !== Resource.None)
-            .sort((a, b) => a.label.localeCompare(b.label));
-
-        return resourceTypeArray;
-    }, [resourceTypeEnum]);
+    const resourceOptions = useResourceOptions();
 
     const defaultValues: ActionGroupFormValues = useMemo(() => {
         return {

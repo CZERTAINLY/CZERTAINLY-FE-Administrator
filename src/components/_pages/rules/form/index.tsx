@@ -18,6 +18,7 @@ import Select from 'react-select';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { RuleConditiontModel } from 'types/rules';
 import { isObjectSame } from 'utils/common-utils';
+import { useResourceOptions } from 'utils/rules';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
 // import ConditionFormFilter from '../ConditionFormFilter';
 
@@ -49,17 +50,7 @@ const ConditionGroupForm = () => {
     const editMode = useMemo(() => !!id, [id]);
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const isBusy = useMemo(() => isCreatingRule || isUpdatingRule, [isCreatingRule, isUpdatingRule]);
-    const resourceOptions = useMemo(() => {
-        if (resourceTypeEnum === undefined) return [];
-        const resourceTypeArray = Object.entries(resourceTypeEnum)
-            .map(([key, value]) => {
-                return { value: value.code, label: value.label };
-            })
-            .filter((resource) => resource.value !== Resource.None)
-            .sort((a, b) => a.label.localeCompare(b.label));
-
-        return resourceTypeArray;
-    }, [resourceTypeEnum]);
+    const resourceOptions = useResourceOptions();
 
     const conditionGroupsOptions = useMemo(() => {
         if (conditionGroups === undefined) return [];

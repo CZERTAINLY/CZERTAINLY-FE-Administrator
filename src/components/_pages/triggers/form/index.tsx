@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 
+import { actions as resourceActions, selectors as resourceSelectors } from 'ducks/resource';
+
 import { Field, Form } from 'react-final-form';
 
 import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
@@ -17,6 +19,7 @@ import Select from 'react-select';
 import { PlatformEnum, Resource, RuleTriggerType } from 'types/openapi';
 import { ActionRuleRequestModel } from 'types/rules';
 import { isObjectSame } from 'utils/common-utils';
+import { useResourceOptions } from 'utils/rules';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
 
 interface SelectChangeValue {
@@ -29,7 +32,6 @@ export interface ConditionGroupFormValues {
     description: string;
     selectedResource?: SelectChangeValue;
     resource: Resource;
-    selecetedResource?: SelectChangeValue;
     triggerResource: Resource;
     selectedTriggerResource?: SelectChangeValue;
     triggerType?: RuleTriggerType;
@@ -47,32 +49,25 @@ const ConditionGroupForm = () => {
     const title = 'Create Trigger';
 
     const actionGroups = useSelector(rulesSelectors.actionGroups);
-    const resourceEvents = useSelector(rulesSelectors.resourceEvents);
+    const resourceEvents = useSelector(resourceSelectors.resourceEvents);
     const rules = useSelector(rulesSelectors.rules);
     const isCreatingTrigger = useSelector(rulesSelectors.isCreatingTrigger);
     const [selectedResourceState, setSelectedResourceState] = useState<SelectChangeValue>();
-    const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const resourceEventEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ResourceEvent));
     const isBusy = useMemo(() => isCreatingTrigger, [isCreatingTrigger]);
 
-    const resourceOptions = useMemo(() => {
-        if (resourceTypeEnum === undefined) return [];
-        const resourceTypeArray = Object.entries(resourceTypeEnum)
-            .map(([key, value]) => {
-                return { value: value.code, label: value.label };
-            })
-            .filter((resource) => resource.value !== Resource.None)
-            .sort((a, b) => a.label.localeCompare(b.label));
-
-        return resourceTypeArray;
-    }, [resourceTypeEnum]);
+    const resourceOptions = useResourceOptions();
 
     const resourceEventNameOptions = useMemo(() => {
         if (resourceEvents === undefined) return [];
         return resourceEvents.map((event) => {
-            return { value: event, label: getEnumLabel(resourceEventEnum, event) };
+            return { value: event, label: getEnumLabel(resourceEventEnum, event.event) };
         });
     }, [resourceEvents, resourceEventEnum]);
+
+    useEffect(() => {
+        dispatch(resourceActions.listResources());
+    }, [dispatch]);
 
     const actionGroupsOptions = useMemo(() => {
         if (actionGroups === undefined) return [];
@@ -97,7 +92,7 @@ const ConditionGroupForm = () => {
 
     const fetchResourceEvents = useCallback(
         (resource: Resource) => {
-            dispatch(rulesActions.listResourceEvents({ resource: resource }));
+            dispatch(resourceActions.listResourceEvents({ resource: resource }));
         },
         [dispatch],
     );
@@ -225,6 +220,10 @@ const ConditionGroupForm = () => {
                                                 form.change('selectedTriggerType', undefined);
                                                 form.change('eventName', undefined);
                                                 form.change('selectedEventName', undefined);
+                                                form.change('resource', Resource.None);
+                                                form.change('selectedResource', undefined);
+                                                form.change('actions', []);
+                                                form.change('actionGroupsUuids', []);
                                             } else {
                                                 form.change('triggerResource', undefined);
                                             }
