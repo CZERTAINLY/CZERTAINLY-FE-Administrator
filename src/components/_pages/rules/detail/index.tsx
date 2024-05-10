@@ -9,7 +9,6 @@ import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rule
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
-import Select from 'react-select';
 import { Button, ButtonGroup, Col, Container, Input, Row } from 'reactstrap';
 import { PlatformEnum } from 'types/openapi';
 import styles from './rulesDetail.module.scss';
@@ -29,7 +28,6 @@ const RuleDetails = () => {
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [updateDescriptionEditEnable, setUpdateDescription] = useState<boolean>(false);
     const [updatedDescription, setUpdatedDescription] = useState<string>(ruleDetails?.description || '');
-    const [newConditionGroups, setNewConditionGroups] = useState<SelectChangeValue[]>([]);
 
     useEffect(() => {
         if (!ruleDetails?.description) return;
@@ -86,26 +84,28 @@ const RuleDetails = () => {
         setUpdateDescription(false);
     }, [dispatch, id, ruleDetails, updatedDescription, updateDescriptionEditEnable]);
 
-    const onUpdateConditionGroupsConfirmed = useCallback(() => {
-        if (!id) return;
+    const onUpdateConditionGroupsConfirmed = useCallback(
+        (newValues: SelectChangeValue[]) => {
+            if (!id) return;
 
-        const newConditionGroupsUuids = newConditionGroups.map((conditionGroup) => conditionGroup.value);
+            const newConditionGroupsUuids = newValues.map((conditionGroup) => conditionGroup.value);
 
-        const previousAndNewConditionGroupsUuid = ruleDetails?.conditionGroups.map((conditionGroup) => conditionGroup.uuid);
-        const allConditionGroups = [...(previousAndNewConditionGroupsUuid || []), ...newConditionGroupsUuids];
+            const previousAndNewConditionGroupsUuid = ruleDetails?.conditionGroups.map((conditionGroup) => conditionGroup.uuid);
+            const allConditionGroups = [...(previousAndNewConditionGroupsUuid || []), ...newConditionGroupsUuids];
 
-        dispatch(
-            rulesActions.updateRule({
-                ruleUuid: id,
-                rule: {
-                    description: ruleDetails?.description || '',
-                    conditions: ruleDetails?.conditions || [],
-                    conditionGroupsUuids: allConditionGroups,
-                },
-            }),
-        );
-        setNewConditionGroups([]);
-    }, [dispatch, id, ruleDetails, newConditionGroups]);
+            dispatch(
+                rulesActions.updateRule({
+                    ruleUuid: id,
+                    rule: {
+                        description: ruleDetails?.description || '',
+                        conditions: ruleDetails?.conditions || [],
+                        conditionGroupsUuids: allConditionGroups,
+                    },
+                }),
+            );
+        },
+        [dispatch, id, ruleDetails],
+    );
 
     const onDeleteConditionGroup = useCallback(
         (conditionGroupUuid: string) => {
@@ -307,8 +307,16 @@ const RuleDetails = () => {
                 </Col>
                 <Col>
                     <Widget widgetButtons={conditionGroupsButtons} busy={isBusy} title="Condition Groups" titleSize="large">
-                        <CustomTable data={conditionGroupFieldsData} headers={conditionGroupFieldsDataHeader} hasDetails />
-                        <div className="d-flex">
+                        <CustomTable
+                            data={conditionGroupFieldsData}
+                            headers={conditionGroupFieldsDataHeader}
+                            newRowWidgetProps={{
+                                isBusy: isUpdatingRule,
+                                newItemsList: conditionGroupsOptions,
+                                onAddClick: onUpdateConditionGroupsConfirmed,
+                            }}
+                        />
+                        {/* <div className="d-flex">
                             <div className="w-100">
                                 <Select
                                     onChange={(event) => {
@@ -335,7 +343,7 @@ const RuleDetails = () => {
                                     </ButtonGroup>
                                 ) : null}
                             </div>
-                        </div>
+                        </div> */}
                     </Widget>
                 </Col>
             </Row>

@@ -177,6 +177,7 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
         return (
             <div>
                 <FilterWidgetRuleAction
+                    includeIgnoreAction
                     entity={EntityType.ACTIONS}
                     title={'Actions'}
                     getAvailableFiltersApi={(apiClients: ApiClients) =>
@@ -187,7 +188,6 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
                     }
                     actionsList={trigerDetails.actions}
                     onActionsUpdate={(currentActions) => {
-                        // const currentCondition = filterToConditionGroup(currentFilters);
                         dispatch(
                             rulesActions.updateTrigger({
                                 triggerUuid: id,

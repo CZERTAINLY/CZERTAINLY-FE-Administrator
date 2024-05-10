@@ -303,7 +303,6 @@ const ConditionGroupForm = () => {
                             </Field>
                         )}
 
-                        <hr />
                         <Field name="selectedResource" validate={validateRequired()}>
                             {({ input, meta }) => (
                                 <FormGroup>
@@ -376,7 +375,7 @@ const ConditionGroupForm = () => {
                                 </FormGroup>
                             )}
                         </Field>
-                        {values?.resource && <ConditionFormFilter formType="actionGroup" resource={values.resource} />}
+                        {values?.resource && <ConditionFormFilter formType="actionGroup" resource={values.resource} includeIgnoreAction />}
 
                         <div className="d-flex justify-content-end">
                             <ButtonGroup>

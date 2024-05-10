@@ -9,7 +9,6 @@ import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rule
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
-import Select from 'react-select';
 import { Button, ButtonGroup, Col, Container, Input, Row } from 'reactstrap';
 import { PlatformEnum } from 'types/openapi';
 import styles from './triggerDetails.module.scss';
@@ -30,7 +29,7 @@ const TriggerDetails = () => {
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [updateDescriptionEditEnable, setUpdateDescription] = useState<boolean>(false);
     const [updatedDescription, setUpdatedDescription] = useState<string>(triggerDetails?.description || '');
-    const [newActionGroups, setNewActionGroups] = useState<SelectChangeValue[]>([]);
+    // const [newActionGroups, setNewActionGroups] = useState<SelectChangeValue[]>([]);
 
     useEffect(() => {
         if (!triggerDetails?.description) return;
@@ -85,26 +84,29 @@ const TriggerDetails = () => {
         setUpdateDescription(false);
     }, [dispatch, id, triggerDetails, updatedDescription]);
 
-    const onUpdateActionGroupsConfirmed = useCallback(() => {
-        if (!id || !triggerDetails) return;
+    const onUpdateActionGroupsConfirmed = useCallback(
+        (newValues: SelectChangeValue[]) => {
+            if (!id || !triggerDetails) return;
 
-        const newActionGroupsUuids = newActionGroups.map((newActionGroup) => newActionGroup.value);
+            const newActionGroupsUuids = newValues.map((newActionGroup) => newActionGroup.value);
 
-        const previousAndNewActionGroupsUuid = triggerDetails?.actionGroups.map((actionGroup) => actionGroup.uuid);
-        const allActionGroups = [...(previousAndNewActionGroupsUuid || []), ...newActionGroupsUuids];
+            const previousAndNewActionGroupsUuid = triggerDetails?.actionGroups.map((actionGroup) => actionGroup.uuid);
+            const allActionGroups = [...(previousAndNewActionGroupsUuid || []), ...newActionGroupsUuids];
 
-        dispatch(
-            rulesActions.updateTrigger({
-                triggerUuid: id,
-                trigger: {
-                    actions: triggerDetails?.actions || [],
-                    actionGroupsUuids: allActionGroups,
-                    triggerType: triggerDetails.triggerType,
-                },
-            }),
-        );
-        setNewActionGroups([]);
-    }, [dispatch, id, triggerDetails, newActionGroups]);
+            dispatch(
+                rulesActions.updateTrigger({
+                    triggerUuid: id,
+                    trigger: {
+                        actions: triggerDetails?.actions || [],
+                        actionGroupsUuids: allActionGroups,
+                        triggerType: triggerDetails.triggerType,
+                    },
+                }),
+            );
+            // setNewActionGroups([]);
+        },
+        [dispatch, id, triggerDetails],
+    );
 
     const onDeleteActionGroup = useCallback(
         (actionGroupsUuid: string) => {
@@ -311,35 +313,15 @@ const TriggerDetails = () => {
                 </Col>
                 <Col>
                     <Widget widgetButtons={actionGroupsButtons} busy={isBusy} title="Action Groups" titleSize="large">
-                        <CustomTable data={actionGroupsFieldsData} headers={actionGroupFieldsDataHeader} hasDetails />
-                        <div className="d-flex">
-                            <div className="w-100">
-                                <Select
-                                    onChange={(event) => {
-                                        setNewActionGroups(event.map((e) => e));
-                                    }}
-                                    isMulti
-                                    value={newActionGroups}
-                                    options={actionGroupOptions}
-                                />
-                            </div>
-                            <div>
-                                {newActionGroups?.length ? (
-                                    <ButtonGroup>
-                                        <Button
-                                            disabled={isUpdatingTrigger}
-                                            className="btn btn-link ms-2 mt-2 p-1"
-                                            size="sm"
-                                            color="secondary"
-                                            title="Update Description"
-                                            onClick={onUpdateActionGroupsConfirmed}
-                                        >
-                                            <i className="fa fa-check" />
-                                        </Button>
-                                    </ButtonGroup>
-                                ) : null}
-                            </div>
-                        </div>
+                        <CustomTable
+                            data={actionGroupsFieldsData}
+                            headers={actionGroupFieldsDataHeader}
+                            newRowWidgetProps={{
+                                isBusy: isUpdatingTrigger,
+                                newItemsList: actionGroupOptions,
+                                onAddClick: onUpdateActionGroupsConfirmed,
+                            }}
+                        />
                     </Widget>
                 </Col>
             </Row>

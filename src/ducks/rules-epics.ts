@@ -172,7 +172,13 @@ const createTrigger: AppEpic = (action$, state, deps) => {
                             appRedirectActions.redirect({ url: `../../triggers` }),
                         ),
                     ),
-                    catchError((err) => of(slice.actions.createTriggerFailure({ error: extractError(err, 'Failed to create trigger') }))),
+                    catchError((err) =>
+                        of(
+                            slice.actions.createTriggerFailure({ error: extractError(err, 'Failed to create trigger') }),
+
+                            alertActions.error(extractError(err, 'Failed to create trigger')),
+                        ),
+                    ),
                 ),
         ),
     );
@@ -323,7 +329,8 @@ const updateActionGroup: AppEpic = (action$, state, deps) => {
                     catchError((err) =>
                         of(
                             slice.actions.updateActionGroupFailure({ error: extractError(err, 'Failed to update action group') }),
-                            alertActions.error('Failed to update Action Group'),
+                            alertActions.error(extractError(err, 'Failed to update action group')),
+                            slice.actions.getActionGroup({ actionGroupUuid: action.payload.actionGroupUuid }),
                         ),
                     ),
                 ),
@@ -400,7 +407,13 @@ const updateTrigger: AppEpic = (action$, state, deps) => {
                     switchMap((trigger) =>
                         of(slice.actions.updateTriggerSuccess({ trigger: transformTriggerRuleDetailDtoToModel(trigger) })),
                     ),
-                    catchError((err) => of(slice.actions.updateTriggerFailure({ error: extractError(err, 'Failed to update trigger') }))),
+                    catchError((err) =>
+                        of(
+                            slice.actions.updateTriggerFailure({ error: extractError(err, 'Failed to update trigger') }),
+                            alertActions.error(extractError(err, 'Failed to create trigger')),
+                            slice.actions.getTrigger({ triggerUuid: action.payload.triggerUuid }),
+                        ),
+                    ),
                 ),
         ),
     );
