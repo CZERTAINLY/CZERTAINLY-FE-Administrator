@@ -25,7 +25,7 @@ const TriggerDetails = () => {
     const isFetchingTriggerDetail = useSelector(rulesSelectors.isFetchingTriggerDetail);
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const actionGroups = useSelector(rulesSelectors.actionGroups);
-
+    const rules = useSelector(rulesSelectors.rules);
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [updateDescriptionEditEnable, setUpdateDescription] = useState<boolean>(false);
     const [updatedDescription, setUpdatedDescription] = useState<string>(triggerDetails?.description || '');
@@ -47,6 +47,7 @@ const TriggerDetails = () => {
 
     useEffect(() => {
         dispatch(rulesActions.listActionGroups({ resource: triggerDetails?.resource }));
+        dispatch(rulesActions.listRules({ resource: triggerDetails?.resource }));
     }, [triggerDetails, dispatch]);
 
     const isBusy = useMemo(() => isFetchingTriggerDetail || isUpdatingTrigger, [isFetchingTriggerDetail, isUpdatingTrigger]);
@@ -59,6 +60,15 @@ const TriggerDetails = () => {
             })
             .filter((actionGroup) => !triggerDetails?.actionGroups?.map((actionGroup) => actionGroup.uuid).includes(actionGroup.value));
     }, [actionGroups, triggerDetails]);
+
+    const rulesOptions = useMemo(() => {
+        if (triggerDetails === undefined) return [];
+        return rules
+            .map((rule) => {
+                return { value: rule.uuid, label: rule.name };
+            })
+            .filter((rule) => !triggerDetails?.rules.map((rule) => rule.uuid).includes(rule.value));
+    }, [triggerDetails, rules]);
 
     const onDeleteConfirmed = useCallback(() => {
         if (!id) return;
@@ -100,10 +110,34 @@ const TriggerDetails = () => {
                         actions: triggerDetails?.actions || [],
                         actionGroupsUuids: allActionGroups,
                         triggerType: triggerDetails.triggerType,
+                        rulesUuids: triggerDetails?.rules.map((rule) => rule.uuid) || [],
                     },
                 }),
             );
-            // setNewActionGroups([]);
+        },
+        [dispatch, id, triggerDetails],
+    );
+
+    const onUpdateRulesConfirmed = useCallback(
+        (newValues: SelectChangeValue[]) => {
+            if (!id || !triggerDetails) return;
+
+            const newRulesUuids = newValues.map((newRule) => newRule.value);
+
+            const previousAndNewRulesUuid = triggerDetails?.rules.map((rule) => rule.uuid);
+            const allRules = [...(previousAndNewRulesUuid || []), ...newRulesUuids];
+
+            dispatch(
+                rulesActions.updateTrigger({
+                    triggerUuid: id,
+                    trigger: {
+                        actions: triggerDetails?.actions || [],
+                        rulesUuids: allRules,
+                        actionGroupsUuids: triggerDetails?.actionGroups?.map((actionGroup) => actionGroup.uuid) || [],
+                        triggerType: triggerDetails.triggerType,
+                    },
+                }),
+            );
         },
         [dispatch, id, triggerDetails],
     );
@@ -122,6 +156,27 @@ const TriggerDetails = () => {
                         actions: triggerDetails?.actions || [],
                         description: triggerDetails?.description || '',
                         actionGroupsUuids: updatedActionGroupsUuid,
+                        triggerType: triggerDetails.triggerType,
+                    },
+                }),
+            );
+        },
+        [dispatch, id, triggerDetails],
+    );
+
+    const onDeleteRule = useCallback(
+        (ruleUuid: string) => {
+            if (!id || !triggerDetails) return;
+
+            const updatedRules = triggerDetails?.rules.filter((rule) => rule.uuid !== ruleUuid).map((rule) => rule.uuid);
+
+            dispatch(
+                rulesActions.updateTrigger({
+                    triggerUuid: id,
+                    trigger: {
+                        actions: triggerDetails?.actions || [],
+                        rulesUuids: updatedRules,
+                        actionGroupsUuids: triggerDetails?.actionGroups?.map((actionGroup) => actionGroup.uuid) || [],
                         triggerType: triggerDetails.triggerType,
                     },
                 }),
@@ -303,6 +358,52 @@ const TriggerDetails = () => {
         [triggerDetails, isUpdatingTrigger, onDeleteActionGroup],
     );
 
+    const rulesHeader: TableHeader[] = useMemo(
+        () => [
+            {
+                id: 'name',
+                content: 'Name',
+            },
+            {
+                id: 'description',
+                content: 'Description',
+            },
+            {
+                id: 'actions',
+                content: 'Actions',
+            },
+        ],
+        [],
+    );
+
+    const rulesData: TableDataRow[] = useMemo(
+        () =>
+            !triggerDetails?.rules.length
+                ? []
+                : triggerDetails?.rules.map((rule, i) => {
+                      return {
+                          id: rule.uuid,
+                          columns: [
+                              <Link to={`../../rules/detail/${rule.uuid}`}>{rule.name}</Link> || '',
+                              rule.description || '',
+                              <Button
+                                  className="btn btn-link text-danger"
+                                  size="sm"
+                                  color="danger"
+                                  title="Delete Rule"
+                                  onClick={() => {
+                                      onDeleteRule(rule.uuid);
+                                  }}
+                                  disabled={isUpdatingTrigger}
+                              >
+                                  <i className="fa fa-trash" />
+                              </Button>,
+                          ],
+                      };
+                  }),
+        [triggerDetails, isUpdatingTrigger, onDeleteRule],
+    );
+
     return (
         <Container className="themed-container" fluid>
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
@@ -320,6 +421,21 @@ const TriggerDetails = () => {
                                 isBusy: isUpdatingTrigger,
                                 newItemsList: actionGroupOptions,
                                 onAddClick: onUpdateActionGroupsConfirmed,
+                            }}
+                        />
+                    </Widget>
+                </Col>
+            </Row>
+            <Row xs="1" sm="1" md="2" lg="2" xl="2">
+                <Col>
+                    <Widget refreshAction={getFreshDetails} busy={isBusy} title="Rules" titleSize="large">
+                        <CustomTable
+                            data={rulesData}
+                            headers={rulesHeader}
+                            newRowWidgetProps={{
+                                isBusy: isUpdatingTrigger,
+                                newItemsList: rulesOptions,
+                                onAddClick: onUpdateRulesConfirmed,
                             }}
                         />
                     </Widget>

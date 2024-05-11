@@ -1,0 +1,22 @@
+.groupConditionBadge {
+    border: 1px solid rgb(78, 78, 78) !important;
+    font-weight: 500;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    padding: 6.25px !important;
+}
+
+.groupConditionBadge:hover {
+    box-shadow: 0 0 5px #b5bdc5;
+}
+
+.groupConditionTitle {
+    min-width: 80px;
+    margin-top: 2px;
+}
+
+.groupConditionContainerDiv {
+    margin-top: 12px;
+    margin-bottom: 10px;
+    display: flex;
+}

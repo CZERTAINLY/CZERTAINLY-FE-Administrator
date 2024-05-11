@@ -316,34 +316,6 @@ const RuleDetails = () => {
                                 onAddClick: onUpdateConditionGroupsConfirmed,
                             }}
                         />
-                        {/* <div className="d-flex">
-                            <div className="w-100">
-                                <Select
-                                    onChange={(event) => {
-                                        setNewConditionGroups(event.map((e) => e));
-                                    }}
-                                    isMulti
-                                    value={newConditionGroups}
-                                    options={conditionGroupsOptions}
-                                />
-                            </div>
-                            <div>
-                                {newConditionGroups?.length ? (
-                                    <ButtonGroup>
-                                        <Button
-                                            disabled={isUpdatingRule}
-                                            className="btn btn-link ms-2 mt-2 p-1"
-                                            size="sm"
-                                            color="secondary"
-                                            title="Update Description"
-                                            onClick={onUpdateConditionGroupsConfirmed}
-                                        >
-                                            <i className="fa fa-check" />
-                                        </Button>
-                                    </ButtonGroup>
-                                ) : null}
-                            </div>
-                        </div> */}
                     </Widget>
                 </Col>
             </Row>

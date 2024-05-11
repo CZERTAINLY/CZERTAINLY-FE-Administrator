@@ -16,7 +16,7 @@ import { mutators } from 'utils/attributes/attributeEditorMutators';
 import ConditionFormFilter from 'components/ConditionFormFilter';
 import ProgressButton from 'components/ProgressButton';
 import Select from 'react-select';
-import { PlatformEnum, Resource, RuleTriggerType } from 'types/openapi';
+import { PlatformEnum, Resource, ResourceEventDtoEventEnum, RuleTriggerType } from 'types/openapi';
 import { ActionRuleRequestModel } from 'types/rules';
 import { isObjectSame } from 'utils/common-utils';
 import { useResourceOptionsFromListWithFilters } from 'utils/rules';
@@ -42,7 +42,7 @@ export interface ConditionGroupFormValues {
     triggerType?: RuleTriggerType;
     selectedTriggerType?: SelectChangeValue;
     actions: ActionRuleRequestModel[];
-    eventName?: string;
+    eventName?: ResourceEventDtoEventEnum;
     selectedEventName?: SelectedEventValue;
     actionGroupsUuids: SelectChangeValue[];
     rulesUuids: SelectChangeValue[];
@@ -125,7 +125,6 @@ const ConditionGroupForm = () => {
             description: '',
             actionGroupsUuids: [],
             actions: [],
-            eventName: '',
             rulesUuids: [],
             triggerType: undefined,
             triggerResource: Resource.None,
@@ -188,7 +187,7 @@ const ConditionGroupForm = () => {
                                         valid={!meta.error && meta.touched}
                                         invalid={!!meta.error && meta.touched}
                                         type="text"
-                                        placeholder="Enter the Condition Group Name"
+                                        placeholder="Enter Trigger name"
                                     />
 
                                     <FormFeedback>{meta.error}</FormFeedback>
@@ -323,7 +322,7 @@ const ConditionGroupForm = () => {
                                                 if (!event?.value) return;
 
                                                 input.onChange(event);
-                                                form.change('eventName', event?.value?.event);
+                                                form.change('eventName', event?.value?.event as ResourceEventDtoEventEnum);
 
                                                 if (event?.value?.producedResource) {
                                                     const selectResource = resourceOptions.find(

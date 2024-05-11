@@ -79,10 +79,14 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
     const renderAppendContent = useMemo(() => {
         if (formType === 'rules' && ruleDetails?.conditionGroups && ruleDetails?.conditionGroups?.length > 0) {
             return <ConditionsGroupsList ruleConditions={ruleDetails?.conditionGroups} />;
-        } else {
-            return null;
         }
-    }, [ruleDetails, formType]);
+
+        if (formType === 'trigger' && trigerDetails?.actionGroups && trigerDetails?.actionGroups?.length > 0) {
+            return <ConditionsGroupsList actionGroups={trigerDetails.actionGroups} />;
+        } else {
+            return <></>;
+        }
+    }, [ruleDetails, formType, trigerDetails]);
 
     const renderFilterWidgetForRules = useMemo(() => {
         if (formType !== 'rules' || !id || !ruleDetails) return null;
@@ -180,6 +184,7 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
                     includeIgnoreAction
                     entity={EntityType.ACTIONS}
                     title={'Actions'}
+                    appendInWidgetContent={renderAppendContent}
                     getAvailableFiltersApi={(apiClients: ApiClients) =>
                         apiClients.resources.listResourceRuleFilterFields({
                             resource,
@@ -202,7 +207,7 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
                 />
             </div>
         );
-    }, [resource, dispatch, formType, id, trigerDetails]);
+    }, [resource, dispatch, formType, id, trigerDetails, renderAppendContent]);
 
     const renderWidgetConditionViewer = useMemo(() => {
         switch (formType) {
