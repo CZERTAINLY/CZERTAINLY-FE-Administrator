@@ -63,10 +63,12 @@ const state = createFeatureSelector<State>(slice.name);
 
 const resourceslist = createSelector(state, (state) => state.resourceslist);
 const resourceEvents = createSelector(state, (state) => state.resourceEvents);
+const isFetchingResourcesList = createSelector(state, (state) => state.isFetchingResourcesList);
 
 export const selectors = {
     resourceslist,
     resourceEvents,
+    isFetchingResourcesList,
 };
 
 export const actions = slice.actions;

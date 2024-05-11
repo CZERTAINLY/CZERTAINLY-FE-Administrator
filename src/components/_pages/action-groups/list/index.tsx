@@ -11,7 +11,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import { Container } from 'reactstrap';
 import { PlatformEnum, Resource } from 'types/openapi';
-import { useResourceOptions } from 'utils/rules';
+import { useRuleEvaluatorResourceOptions } from 'utils/rules';
 import styles from './actionGroupsList.module.scss';
 
 const ActionGroupsList = () => {
@@ -43,7 +43,7 @@ const ActionGroupsList = () => {
         getFreshListActionGroups();
     }, [getFreshListActionGroups]);
 
-    const resourceOptions = useResourceOptions();
+    const { resourceOptions, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
 
     const conditionGroupsRowHeaders: TableHeader[] = useMemo(
         () => [

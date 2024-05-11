@@ -1,5 +1,5 @@
 import Widget from 'components/Widget';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 // import { EntityType, actions as filterActions } from 'ducks/filters';
@@ -19,12 +19,17 @@ import Select from 'react-select';
 import { PlatformEnum, Resource, RuleTriggerType } from 'types/openapi';
 import { ActionRuleRequestModel } from 'types/rules';
 import { isObjectSame } from 'utils/common-utils';
-import { useResourceOptions } from 'utils/rules';
+import { useResourceOptionsFromListWithFilters } from 'utils/rules';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
 
 interface SelectChangeValue {
     value: string;
     label: string;
+}
+
+interface SelectedEventValue {
+    label: string;
+    value: { event: string; producedResource?: string };
 }
 
 export interface ConditionGroupFormValues {
@@ -38,7 +43,7 @@ export interface ConditionGroupFormValues {
     selectedTriggerType?: SelectChangeValue;
     actions: ActionRuleRequestModel[];
     eventName?: string;
-    selectedEventName?: SelectChangeValue;
+    selectedEventName?: SelectedEventValue;
     actionGroupsUuids: SelectChangeValue[];
     rulesUuids: SelectChangeValue[];
 }
@@ -52,11 +57,13 @@ const ConditionGroupForm = () => {
     const resourceEvents = useSelector(resourceSelectors.resourceEvents);
     const rules = useSelector(rulesSelectors.rules);
     const isCreatingTrigger = useSelector(rulesSelectors.isCreatingTrigger);
-    const [selectedResourceState, setSelectedResourceState] = useState<SelectChangeValue>();
     const resourceEventEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ResourceEvent));
     const isBusy = useMemo(() => isCreatingTrigger, [isCreatingTrigger]);
+    const resourceslist = useSelector(resourceSelectors.resourceslist);
 
-    const resourceOptions = useResourceOptions();
+    const resourceOptions = useResourceOptionsFromListWithFilters(resourceslist);
+    const resourceEventsOptions = useResourceOptionsFromListWithFilters(resourceslist, 'hasEvents');
+    const resourceRuleEvaluatorOptions = useResourceOptionsFromListWithFilters(resourceslist, 'hasRuleEvaluator');
 
     const resourceEventNameOptions = useMemo(() => {
         if (resourceEvents === undefined) return [];
@@ -97,17 +104,24 @@ const ConditionGroupForm = () => {
         [dispatch],
     );
 
-    useEffect(() => {
-        if (!selectedResourceState) return;
-        dispatch(rulesActions.listActionGroups({ resource: selectedResourceState.value as Resource }));
-        dispatch(rulesActions.listRules({ resource: selectedResourceState.value as Resource }));
-    }, [dispatch, selectedResourceState]);
+    const fetchActionGroups = useCallback(
+        (resource: Resource) => {
+            dispatch(rulesActions.listActionGroups({ resource: resource }));
+        },
+        [dispatch],
+    );
+
+    const fetchRules = useCallback(
+        (resource: Resource) => {
+            dispatch(rulesActions.listRules({ resource: resource }));
+        },
+        [dispatch],
+    );
 
     const defaultValues: ConditionGroupFormValues = useMemo(() => {
         return {
             name: '',
             resource: Resource.None,
-            selectedResource: undefined,
             description: '',
             actionGroupsUuids: [],
             actions: [],
@@ -167,7 +181,7 @@ const ConditionGroupForm = () => {
                         <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}>
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="name">Trgger Name</Label>
+                                    <Label for="name">Trigger Name</Label>
 
                                     <Input
                                         {...input}
@@ -199,6 +213,45 @@ const ConditionGroupForm = () => {
                                 </FormGroup>
                             )}
                         </Field>
+                        <Field name="selectedTriggerType" validate={validateRequired()}>
+                            {({ input, meta }) => (
+                                <FormGroup>
+                                    <Label for="triggerType">Rule Trigger Type</Label>
+
+                                    <Select
+                                        {...input}
+                                        maxMenuHeight={140}
+                                        menuPlacement="auto"
+                                        options={ruleTriggerTypeOptions}
+                                        placeholder="Select Rule Trigger Type"
+                                        isClearable
+                                        onChange={(event) => {
+                                            if (!event?.value) return;
+
+                                            input.onChange(event);
+
+                                            form.change('triggerType', event?.value);
+
+                                            // set all other values to default
+
+                                            form.change('triggerResource', Resource.None);
+                                            form.change('selectedTriggerResource', undefined);
+                                            form.change('eventName', undefined);
+                                            form.change('selectedEventName', undefined);
+                                            form.change('resource', Resource.None);
+                                            form.change('selectedResource', undefined);
+                                            form.change('actions', []);
+                                            form.change('actionGroupsUuids', []);
+                                            form.change('rulesUuids', []);
+                                        }}
+                                    />
+
+                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
+                                        {meta.error}
+                                    </div>
+                                </FormGroup>
+                            )}
+                        </Field>
 
                         <Field name="selectedTriggerResource" validate={validateRequired()}>
                             {({ input, meta }) => (
@@ -209,24 +262,34 @@ const ConditionGroupForm = () => {
                                         {...input}
                                         maxMenuHeight={140}
                                         menuPlacement="auto"
-                                        options={resourceOptions || []}
-                                        placeholder="Select Resource"
+                                        options={
+                                            values.triggerType === RuleTriggerType.Event
+                                                ? resourceEventsOptions
+                                                : resourceRuleEvaluatorOptions
+                                        }
+                                        placeholder="Select Trigger Resource"
                                         isClearable
                                         onChange={(event) => {
-                                            if (event?.value) {
-                                                form.change('triggerResource', event.value);
-                                                form.change('selectedTriggerResource', event);
-                                                form.change('triggerType', undefined);
-                                                form.change('selectedTriggerType', undefined);
-                                                form.change('eventName', undefined);
-                                                form.change('selectedEventName', undefined);
-                                                form.change('resource', Resource.None);
+                                            if (!event?.value) return;
+
+                                            input.onChange(event);
+                                            form.change('triggerResource', event.value as Resource);
+
+                                            if (values.triggerType === RuleTriggerType.Event) {
+                                                fetchResourceEvents(event.value as Resource);
                                                 form.change('selectedResource', undefined);
-                                                form.change('actions', []);
-                                                form.change('actionGroupsUuids', []);
+                                                form.change('resource', Resource.None);
                                             } else {
-                                                form.change('triggerResource', undefined);
+                                                form.change('selectedResource', event);
+                                                form.change('resource', event.value as Resource);
+                                                fetchActionGroups(event.value as Resource);
+                                                fetchRules(event.value as Resource);
                                             }
+                                            form.change('eventName', undefined);
+                                            form.change('selectedEventName', undefined);
+                                            form.change('actions', []);
+                                            form.change('actionGroupsUuids', []);
+                                            form.change('rulesUuids', []);
                                         }}
                                         styles={{
                                             control: (provided) =>
@@ -243,43 +306,11 @@ const ConditionGroupForm = () => {
                             )}
                         </Field>
 
-                        <Field name="selectedTriggerType" validate={validateRequired()}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="triggerType">Rule Trigger Type</Label>
-
-                                    <Select
-                                        {...input}
-                                        maxMenuHeight={140}
-                                        menuPlacement="auto"
-                                        options={ruleTriggerTypeOptions}
-                                        placeholder="Select Rule Trigger Type"
-                                        isClearable
-                                        onChange={(event) => {
-                                            input.onChange(event);
-                                            form.change('triggerType', event?.value);
-
-                                            if (event.value === RuleTriggerType.Event) {
-                                                fetchResourceEvents(values.triggerResource);
-                                            }
-
-                                            form.change('eventName', undefined);
-                                            form.change('selectedEventName', undefined);
-                                        }}
-                                    />
-
-                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
-                                        {meta.error}
-                                    </div>
-                                </FormGroup>
-                            )}
-                        </Field>
-
                         {values?.triggerType === RuleTriggerType.Event && (
                             <Field name="selectedEventName" validate={validateRequired()}>
                                 {({ input, meta }) => (
                                     <FormGroup>
-                                        <Label for="eventName">Event Name</Label>
+                                        <Label for="selectedEventName">Event Name</Label>
 
                                         <Select
                                             {...input}
@@ -289,9 +320,20 @@ const ConditionGroupForm = () => {
                                             placeholder="Select Event Name"
                                             isClearable
                                             onChange={(event) => {
+                                                if (!event?.value) return;
+
                                                 input.onChange(event);
-                                                form.change('eventName', event?.value);
-                                                form.change('selectedEventName', event);
+                                                form.change('eventName', event?.value?.event);
+
+                                                if (event?.value?.producedResource) {
+                                                    const selectResource = resourceOptions.find(
+                                                        (resource) => resource.value === event?.value?.producedResource,
+                                                    );
+                                                    form.change('selectedResource', selectResource);
+                                                    form.change('resource', event?.value?.producedResource);
+                                                    fetchActionGroups(event?.value?.producedResource);
+                                                    fetchRules(event?.value?.producedResource);
+                                                }
                                             }}
                                         />
 
@@ -303,10 +345,10 @@ const ConditionGroupForm = () => {
                             </Field>
                         )}
 
-                        <Field name="selectedResource" validate={validateRequired()}>
+                        <Field name="selectedResource">
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="resource">Resource</Label>
+                                    <Label for="selectedResource">Resource</Label>
 
                                     <Select
                                         {...input}
@@ -314,19 +356,7 @@ const ConditionGroupForm = () => {
                                         menuPlacement="auto"
                                         options={resourceOptions || []}
                                         placeholder="Select Resource"
-                                        isClearable
-                                        onChange={(event) => {
-                                            input.onChange(event);
-                                            if (event?.value) {
-                                                form.change('resource', event.value);
-                                                setSelectedResourceState(event);
-                                            } else {
-                                                form.change('resource', undefined);
-                                            }
-
-                                            form.change('actions', []);
-                                            // dispatch(filterActions.setCurrentFilters({ currentFilters: [], entity: EntityType.ACTIONS }));
-                                        }}
+                                        isDisabled={true}
                                         styles={{
                                             control: (provided) =>
                                                 meta.touched && meta.invalid

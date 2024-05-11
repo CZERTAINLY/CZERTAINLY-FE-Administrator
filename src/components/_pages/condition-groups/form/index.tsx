@@ -16,7 +16,7 @@ import Select from 'react-select';
 import { Resource } from 'types/openapi';
 import { RuleConditiontModel } from 'types/rules';
 import { isObjectSame } from 'utils/common-utils';
-import { useResourceOptions } from 'utils/rules';
+import { useRuleEvaluatorResourceOptions } from 'utils/rules';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
 import ConditionFormFilter from '../../../ConditionFormFilter';
 
@@ -40,12 +40,12 @@ const ConditionGroupForm = () => {
     const title = 'Create Condition Group';
     const isCreatingConditionGroup = useSelector(rulesSelectors.isCreatingConditionGroup);
     const isUpdatingConditionGroup = useSelector(rulesSelectors.isUpdatingConditionGroup);
+    const { resourceOptions, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
 
     const isBusy = useMemo(
-        () => isCreatingConditionGroup || isUpdatingConditionGroup,
-        [isCreatingConditionGroup, isUpdatingConditionGroup],
+        () => isCreatingConditionGroup || isFetchingResourcesList || isUpdatingConditionGroup,
+        [isCreatingConditionGroup, isUpdatingConditionGroup, isFetchingResourcesList],
     );
-    const resourceOptions = useResourceOptions();
 
     useEffect(() => {
         if (!id) return;

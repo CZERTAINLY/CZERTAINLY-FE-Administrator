@@ -12,7 +12,7 @@ import Select from 'react-select';
 import { Container } from 'reactstrap';
 import { PlatformEnum, Resource } from 'types/openapi';
 
-import { useResourceOptions } from 'utils/rules';
+import { useRuleEvaluatorResourceOptions } from 'utils/rules';
 import styles from './triggerList.module.scss';
 
 const TriggerList = () => {
@@ -30,11 +30,15 @@ const TriggerList = () => {
 
     const [checkedRows, setCheckedRows] = useState<string[]>([]);
     const [confirmDelete, setConfirmDelete] = useState(false);
+    const { resourceOptions, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
 
-    const isBusy = useMemo(() => isFetchingList || isDeleting, [isFetchingList, isDeleting]);
+    const isBusy = useMemo(
+        () => isFetchingList || isFetchingResourcesList || isDeleting,
+        [isFetchingList, isDeleting, isFetchingResourcesList],
+    );
 
     const onDeleteConfirmed = useCallback(() => {
-        dispatch(rulesActions.deleteRule({ ruleUuid: checkedRows[0] }));
+        dispatch(rulesActions.deleteTrigger({ triggerUuid: checkedRows[0] }));
         setConfirmDelete(false);
         setCheckedRows([]);
     }, [dispatch, checkedRows]);
@@ -46,8 +50,6 @@ const TriggerList = () => {
     useEffect(() => {
         getFreshList();
     }, [getFreshList]);
-
-    const resourceOptions = useResourceOptions();
 
     const triggerTableHeader: TableHeader[] = useMemo(
         () => [
@@ -67,14 +69,14 @@ const TriggerList = () => {
                 sortable: true,
             },
             {
-                content: 'triggerType',
+                content: 'Trigger Type',
                 align: 'left',
                 id: 'triggerType',
                 width: '10%',
                 sortable: true,
             },
             {
-                content: 'eventName',
+                content: 'Event Name',
                 align: 'left',
                 id: 'eventName',
                 width: '10%',

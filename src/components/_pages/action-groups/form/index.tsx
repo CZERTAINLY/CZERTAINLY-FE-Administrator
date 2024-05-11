@@ -14,7 +14,7 @@ import Select from 'react-select';
 import { Resource } from 'types/openapi';
 import { ActionRuleRequestModel } from 'types/rules';
 import { isObjectSame } from 'utils/common-utils';
-import { useResourceOptions } from 'utils/rules';
+import { useRuleEvaluatorResourceOptions } from 'utils/rules';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
 
 interface SelectChangeValue {
@@ -35,8 +35,8 @@ const ActionGroupForm = () => {
     const navigate = useNavigate();
     const title = 'Create Action Group';
     const isCreatingActionGroup = useSelector(rulesSelectors.isCreatingActionGroup);
-    const isBusy = useMemo(() => isCreatingActionGroup, [isCreatingActionGroup]);
-    const resourceOptions = useResourceOptions();
+    const { resourceOptions, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
+    const isBusy = useMemo(() => isCreatingActionGroup || isFetchingResourcesList, [isCreatingActionGroup, isFetchingResourcesList]);
 
     const defaultValues: ActionGroupFormValues = useMemo(() => {
         return {

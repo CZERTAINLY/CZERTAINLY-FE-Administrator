@@ -11,7 +11,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import { Container } from 'reactstrap';
 import { PlatformEnum, Resource } from 'types/openapi';
-import { useResourceOptions } from 'utils/rules';
+import { useRuleEvaluatorResourceOptions } from 'utils/rules';
 import styles from './conditionGroupsList.module.scss';
 
 const ConditionGroups = () => {
@@ -27,8 +27,12 @@ const ConditionGroups = () => {
 
     const [checkedRows, setCheckedRows] = useState<string[]>([]);
     const [confirmDelete, setConfirmDelete] = useState(false);
+    const { resourceOptions, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
 
-    const isBusy = useMemo(() => isFetchingList || isDeleting, [isFetchingList, isDeleting]);
+    const isBusy = useMemo(
+        () => isFetchingList || isDeleting || isFetchingResourcesList,
+        [isFetchingList, isDeleting, isFetchingResourcesList],
+    );
 
     const onDeleteConfirmed = useCallback(() => {
         dispatch(rulesActions.deleteConditionGroup({ conditionGroupUuid: checkedRows[0] }));
@@ -43,8 +47,6 @@ const ConditionGroups = () => {
     useEffect(() => {
         getFreshListConditionGroups();
     }, [getFreshListConditionGroups]);
-
-    const resourceOptions = useResourceOptions();
 
     const conditionGroupsRowHeaders: TableHeader[] = useMemo(
         () => [

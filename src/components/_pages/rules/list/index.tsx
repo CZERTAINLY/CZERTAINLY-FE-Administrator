@@ -12,7 +12,7 @@ import Select from 'react-select';
 import { Container } from 'reactstrap';
 import { PlatformEnum, Resource } from 'types/openapi';
 
-import { useResourceOptions } from 'utils/rules';
+import { useRuleEvaluatorResourceOptions } from 'utils/rules';
 import styles from './ruleList.module.scss';
 
 const ConditionGroups = () => {
@@ -28,8 +28,12 @@ const ConditionGroups = () => {
 
     const [checkedRows, setCheckedRows] = useState<string[]>([]);
     const [confirmDelete, setConfirmDelete] = useState(false);
+    const { resourceOptions, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
 
-    const isBusy = useMemo(() => isFetchingList || isDeleting, [isFetchingList, isDeleting]);
+    const isBusy = useMemo(
+        () => isFetchingList || isDeleting || isFetchingResourcesList,
+        [isFetchingList, isDeleting, isFetchingResourcesList],
+    );
 
     const onDeleteConfirmed = useCallback(() => {
         dispatch(rulesActions.deleteRule({ ruleUuid: checkedRows[0] }));
@@ -44,8 +48,6 @@ const ConditionGroups = () => {
     useEffect(() => {
         getFreshList();
     }, [getFreshList]);
-
-    const resourceOptions = useResourceOptions();
 
     const rulesTableHeader: TableHeader[] = useMemo(
         () => [
