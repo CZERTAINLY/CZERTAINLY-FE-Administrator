@@ -8,6 +8,7 @@ import { actions as connectorActions } from 'ducks/connectors';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
 
 import { actions as discoveryActions, selectors as discoverySelectors } from 'ducks/discoveries';
+import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { actions as userInterfaceActions } from '../../../../ducks/user-interface';
 
@@ -44,6 +45,7 @@ export default function DiscoveryForm() {
     const discoveryProviders = useSelector(discoverySelectors.discoveryProviders);
     const discoveryProviderAttributeDescriptors = useSelector(discoverySelectors.discoveryProviderAttributeDescriptors);
     const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
+    const triggers = useSelector(rulesSelectors.triggers);
     const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
     const isFetchingDiscoveryDetail = useSelector(discoverySelectors.isFetchingDetail);
     const isFetchingDiscoveryProviders = useSelector(discoverySelectors.isFetchingDiscoveryProviders);
@@ -52,6 +54,8 @@ export default function DiscoveryForm() {
     const [init, setInit] = useState(true);
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
     const [discoveryProvider, setDiscoveryProvider] = useState<ConnectorResponseModel>();
+
+    console.log('triggers', triggers);
 
     const isBusy = useMemo(
         () =>
@@ -76,6 +80,7 @@ export default function DiscoveryForm() {
             dispatch(connectorActions.clearCallbackData());
             dispatch(discoveryActions.listDiscoveryProviders());
             dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Discoveries));
+            dispatch(rulesActions.listTriggers({ triggerResouce: Resource.Discoveries }));
         }
     }, [dispatch, init]);
 
