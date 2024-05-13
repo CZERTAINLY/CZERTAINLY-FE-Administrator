@@ -88,6 +88,7 @@ const TriggerDetails = () => {
                         ? triggerDetails?.actionGroups.map((actionGroup) => actionGroup.uuid)
                         : [],
                     triggerType: triggerDetails.triggerType,
+                    rulesUuids: triggerDetails?.rules.map((rule) => rule.uuid) || [],
                 },
             }),
         );
@@ -111,6 +112,7 @@ const TriggerDetails = () => {
                         actionGroupsUuids: allActionGroups,
                         triggerType: triggerDetails.triggerType,
                         rulesUuids: triggerDetails?.rules.map((rule) => rule.uuid) || [],
+                        description: triggerDetails.description || '',
                     },
                 }),
             );
@@ -135,6 +137,7 @@ const TriggerDetails = () => {
                         rulesUuids: allRules,
                         actionGroupsUuids: triggerDetails?.actionGroups?.map((actionGroup) => actionGroup.uuid) || [],
                         triggerType: triggerDetails.triggerType,
+                        description: triggerDetails.description || '',
                     },
                 }),
             );
@@ -157,6 +160,7 @@ const TriggerDetails = () => {
                         description: triggerDetails?.description || '',
                         actionGroupsUuids: updatedActionGroupsUuid,
                         triggerType: triggerDetails.triggerType,
+                        rulesUuids: triggerDetails?.rules.map((rule) => rule.uuid) || [],
                     },
                 }),
             );
@@ -178,6 +182,7 @@ const TriggerDetails = () => {
                         rulesUuids: updatedRules,
                         actionGroupsUuids: triggerDetails?.actionGroups?.map((actionGroup) => actionGroup.uuid) || [],
                         triggerType: triggerDetails.triggerType,
+                        description: triggerDetails.description || '',
                     },
                 }),
             );
