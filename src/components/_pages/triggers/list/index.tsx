@@ -76,16 +76,16 @@ const TriggerList = () => {
                 sortable: true,
             },
             {
-                content: 'Resource',
+                content: 'Event Name',
                 align: 'left',
-                id: 'resource',
+                id: 'eventName',
                 width: '10%',
                 sortable: true,
             },
             {
-                content: 'Event Name',
+                content: 'Resource',
                 align: 'left',
-                id: 'eventName',
+                id: 'resource',
                 width: '10%',
                 sortable: true,
             },
@@ -109,8 +109,8 @@ const TriggerList = () => {
 
                         getEnumLabel(resourceTypeEnum, trigger.triggerResource || ''),
                         getEnumLabel(triggerTypeEnum, trigger.triggerType),
-                        getEnumLabel(resourceTypeEnum, trigger.resource),
                         getEnumLabel(eventNameEnum, trigger.eventName || ''),
+                        getEnumLabel(resourceTypeEnum, trigger.resource),
                         trigger.description || '',
                     ],
                 };

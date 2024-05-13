@@ -37,6 +37,13 @@ const GroupActionsViewer = ({ groupActions = [], conditionGroupName, conditionGr
                     const coincideValue = field?.value.find((v) => v.uuid === actionDataValue);
                     value = coincideValue.name || '';
                 }
+            } else {
+                if (typeof f.actionData === 'string') {
+                    value = f.actionData;
+                }
+                if (typeof f.actionData === 'object') {
+                    value = JSON.stringify(f.actionData);
+                }
             }
 
             return (
