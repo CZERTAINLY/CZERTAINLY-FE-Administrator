@@ -8,13 +8,11 @@ import {
     ApprovalStepRecipientDto,
     ApprovalStepRecipientDtoStatusEnum,
     ApprovalUserDto,
-    Resource,
+    Resource as ResourceEnum,
     UserApprovalDto,
 } from './openapi';
 
 export type ApprovalDtoStatusModel = ApprovalDtoStatusEnum;
-
-export type ResourceModel = Resource;
 
 export type ApprovalDetailDtoStatusModel = ApprovalDetailDtoStatusEnum;
 
@@ -23,7 +21,7 @@ export type ApprovalDetailStepDtoStatusModel = ApprovalStepRecipientDtoStatusEnu
 export type ApprovalDtoType = ApprovalDto;
 export type ApprovalModel = Omit<ApprovalDtoType, 'status' | 'resource'> & {
     status: ApprovalDtoStatusModel;
-    resource: ResourceModel;
+    resource: ResourceEnum;
 };
 
 export type RecipientApprovalStepDto = ApprovalStepRecipientDto;
@@ -41,7 +39,7 @@ export type DetailApprovalStepModel = Omit<DetailApprovalStepDto, 'approvalSteps
 export type DetailApprovalDto = ApprovalDetailDto;
 export type DetailApprovalModel = Omit<DetailApprovalDto, 'status' | 'resource' | 'approvalSteps'> & {
     status: ApprovalDetailDtoStatusModel;
-    resource: ResourceModel;
+    resource: ResourceEnum;
     approvalSteps: Array<DetailApprovalStepModel>;
 };
 

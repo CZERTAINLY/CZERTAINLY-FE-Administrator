@@ -8,13 +8,13 @@ import { actions as authActions, selectors as authSelectors } from 'ducks/auth';
 import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Input } from 'reactstrap';
-import { ResourceModel } from 'types/auth';
+import { AuthResourceModel } from 'types/auth';
 import { SubjectPermissionsModel } from 'types/roles';
 
 import style from './style.module.scss';
 
 interface Props {
-    resources?: ResourceModel[];
+    resources?: AuthResourceModel[];
     permissions?: SubjectPermissionsModel;
     disabled?: boolean;
     onPermissionsChanged?: (permissions: SubjectPermissionsModel) => void;
@@ -31,7 +31,7 @@ function RolePermissionsEditor({
     const objects = useSelector(authSelectors.objects);
     const isFetchingObjects = useSelector(authSelectors.isFetchingObjects);
 
-    const [currentResource, setCurrentResource] = useState<ResourceModel>();
+    const [currentResource, setCurrentResource] = useState<AuthResourceModel>();
 
     const [selectedObjects, setSelectedObjects] = useState<string[]>([]);
     const [objectsToAdd, setObjectsToAdd] = useState<string[]>([]);
@@ -41,7 +41,7 @@ function RolePermissionsEditor({
     const isBusy = isFetchingObjects;
 
     const getPermissions = useCallback(
-        (resource: ResourceModel) => {
+        (resource: AuthResourceModel) => {
             if (permissions.allowAllResources) return 'All actions allowed';
 
             const perms = permissions?.resources.find((r) => r.name === resource.name);
@@ -58,7 +58,7 @@ function RolePermissionsEditor({
     const clonePerms = useCallback(() => JSON.parse(JSON.stringify(permissions)) as SubjectPermissionsModel, [permissions]);
 
     const onResourceSelected = useCallback(
-        (resource: ResourceModel) => {
+        (resource: AuthResourceModel) => {
             setObjectsToAdd([]);
             if (resource.listObjectsEndpoint) dispatch(authActions.getObjectsForResource({ resource: resource.name }));
             setCurrentResource(resource);
@@ -67,7 +67,7 @@ function RolePermissionsEditor({
     );
 
     const allowAllActions = useCallback(
-        (resource: ResourceModel, enable: boolean) => {
+        (resource: AuthResourceModel, enable: boolean) => {
             const newPermissions: SubjectPermissionsModel = clonePerms();
 
             const resourcePermissions = newPermissions.resources.find((r) => r.name === resource.name);
@@ -90,7 +90,7 @@ function RolePermissionsEditor({
     );
 
     const allowAction = useCallback(
-        (resource: ResourceModel, action: string, enable: boolean) => {
+        (resource: AuthResourceModel, action: string, enable: boolean) => {
             const newPermissions: SubjectPermissionsModel = clonePerms();
 
             const resourcePermissions = newPermissions.resources.find((r) => r.name === resource.name);

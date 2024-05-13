@@ -3,7 +3,6 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 // import { EntityType, actions as filterActions } from 'ducks/filters';
-import { selectors as enumSelectors } from 'ducks/enums';
 import { EntityType, actions as filterActions } from 'ducks/filters';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 
@@ -14,9 +13,10 @@ import { mutators } from 'utils/attributes/attributeEditorMutators';
 
 import ProgressButton from 'components/ProgressButton';
 import Select from 'react-select';
-import { PlatformEnum, Resource } from 'types/openapi';
+import { Resource } from 'types/openapi';
 import { RuleConditiontModel } from 'types/rules';
 import { isObjectSame } from 'utils/common-utils';
+import { useRuleEvaluatorResourceOptions } from 'utils/rules';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
 import ConditionFormFilter from '../../../ConditionFormFilter';
 
@@ -37,27 +37,15 @@ const ConditionGroupForm = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const title = id ? 'Edit Condition Group' : 'Create Condition Group';
+    const title = 'Create Condition Group';
     const isCreatingConditionGroup = useSelector(rulesSelectors.isCreatingConditionGroup);
     const isUpdatingConditionGroup = useSelector(rulesSelectors.isUpdatingConditionGroup);
-    const conditionGroupsDetails = useSelector(rulesSelectors.conditionGroupDetails);
-    const editMode = useMemo(() => !!id, [id]);
-    const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
-    const isBusy = useMemo(
-        () => isCreatingConditionGroup || isUpdatingConditionGroup,
-        [isCreatingConditionGroup, isUpdatingConditionGroup],
-    );
-    const resourceOptions = useMemo(() => {
-        if (resourceTypeEnum === undefined) return [];
-        const resourceTypeArray = Object.entries(resourceTypeEnum)
-            .map(([key, value]) => {
-                return { value: value.code, label: value.label };
-            })
-            .filter((resource) => resource.value !== Resource.None)
-            .sort((a, b) => a.label.localeCompare(b.label));
+    const { resourceOptions, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
 
-        return resourceTypeArray;
-    }, [resourceTypeEnum]);
+    const isBusy = useMemo(
+        () => isCreatingConditionGroup || isFetchingResourcesList || isUpdatingConditionGroup,
+        [isCreatingConditionGroup, isUpdatingConditionGroup, isFetchingResourcesList],
+    );
 
     useEffect(() => {
         if (!id) return;
@@ -71,21 +59,17 @@ const ConditionGroupForm = () => {
     }, [dispatch]);
 
     const defaultValues: ConditionGroupFormValues = useMemo(() => {
-        let selectedResource;
-        if (editMode) {
-            selectedResource = resourceOptions.find((resource) => resource.value === conditionGroupsDetails?.resource);
-        }
         return {
-            name: editMode ? conditionGroupsDetails?.name || '' : '',
-            resource: editMode ? conditionGroupsDetails?.resource || Resource.None : Resource.None,
-            selectedResource: editMode ? selectedResource : undefined,
-            description: editMode ? conditionGroupsDetails?.description || '' : '',
-            conditions: editMode ? conditionGroupsDetails?.conditions || [] : [],
+            name: '',
+            resource: Resource.None,
+            selectedResource: undefined,
+            description: '',
+            conditions: [],
         };
-    }, [editMode, conditionGroupsDetails, resourceOptions]);
+    }, []);
 
-    const submitTitle = useMemo(() => (editMode ? 'Save' : 'Create'), [editMode]);
-    const inProgressTitle = useMemo(() => (editMode ? 'Saving...' : 'Creating...'), [editMode]);
+    const submitTitle = 'Create';
+    const inProgressTitle = 'Creating...';
 
     const onCancel = useCallback(() => {
         navigate(-1);
@@ -93,33 +77,20 @@ const ConditionGroupForm = () => {
 
     const onSubmit = useCallback(
         (values: ConditionGroupFormValues) => {
-            // if (values.resource === ('' as string)) return;
             if (values.resource === Resource.None) return;
 
-            if (editMode && id) {
-                dispatch(
-                    rulesActions.updateConditionGroup({
-                        conditionGroupUuid: id,
-                        conditionGroup: {
-                            conditions: values.conditions,
-                            description: values.description,
-                        },
-                    }),
-                );
-            } else {
-                dispatch(
-                    rulesActions.createConditionGroup({
-                        ruleConditionGroupRequest: {
-                            conditions: values.conditions,
-                            name: values.name,
-                            resource: values.resource,
-                            description: values.description,
-                        },
-                    }),
-                );
-            }
+            dispatch(
+                rulesActions.createConditionGroup({
+                    ruleConditionGroupRequest: {
+                        conditions: values.conditions,
+                        name: values.name,
+                        resource: values.resource,
+                        description: values.description,
+                    },
+                }),
+            );
         },
-        [dispatch, editMode, id],
+        [dispatch],
     );
 
     const areDefaultValuesSame = useCallback(
@@ -151,7 +122,6 @@ const ConditionGroupForm = () => {
                                         invalid={!!meta.error && meta.touched}
                                         type="text"
                                         placeholder="Enter the Condition Group Name"
-                                        disabled={editMode}
                                     />
 
                                     <FormFeedback>{meta.error}</FormFeedback>
@@ -170,7 +140,6 @@ const ConditionGroupForm = () => {
                                         invalid={!!meta.error && meta.touched}
                                         type="text"
                                         placeholder="Enter the Description"
-                                        disabled={editMode}
                                     />
 
                                     <FormFeedback>{meta.error}</FormFeedback>

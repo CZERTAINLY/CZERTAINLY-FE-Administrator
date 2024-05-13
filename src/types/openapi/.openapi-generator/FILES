@@ -78,6 +78,7 @@ models/AttributeValueTarget.ts
 models/AuditLogDto.ts
 models/AuditLogFilter.ts
 models/AuditLogResponseDto.ts
+models/AuthResourceDto.ts
 models/AuthType.ts
 models/AuthenticationServiceExceptionDto.ts
 models/AuthorityInstanceDto.ts
@@ -266,7 +267,8 @@ models/RemoveCertificateDto.ts
 models/RequestAttributeCallback.ts
 models/RequestAttributeDto.ts
 models/Resource.ts
-models/ResourceDetailDto.ts
+models/ResourceDto.ts
+models/ResourceEventDto.ts
 models/ResourcePermissionsDto.ts
 models/ResourcePermissionsRequestDto.ts
 models/ResponseAttributeDto.ts

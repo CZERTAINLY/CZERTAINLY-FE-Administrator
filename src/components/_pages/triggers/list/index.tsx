@@ -5,47 +5,53 @@ import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
-import { actions as actionGroupsActions, selectors as rulesSelectors } from 'ducks/rules';
+import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import { Container } from 'reactstrap';
 import { PlatformEnum, Resource } from 'types/openapi';
-import { useRuleEvaluatorResourceOptions } from 'utils/rules';
-import styles from './actionGroupsList.module.scss';
 
-const ActionGroupsList = () => {
-    const actionGroups = useSelector(rulesSelectors.actionGroups);
+import { useRuleEvaluatorResourceOptions } from 'utils/rules';
+import styles from './triggerList.module.scss';
+
+const TriggerList = () => {
+    const triggers = useSelector(rulesSelectors.triggers);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
+    const eventNameEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ResourceEvent));
+    const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.RuleTriggerType));
+
     const [selectedResource, setSelectedResource] = useState<Resource>();
-    const isFetchingList = useSelector(rulesSelectors.isFetchingActionGroups);
-    const isDeleting = useSelector(rulesSelectors.isDeletingActionGroup);
+    const isFetchingList = useSelector(rulesSelectors.isFetchingTriggers);
+    const isDeleting = useSelector(rulesSelectors.isDeletingTrigger);
 
     const [checkedRows, setCheckedRows] = useState<string[]>([]);
     const [confirmDelete, setConfirmDelete] = useState(false);
+    const { resourceOptions, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
 
-    const isBusy = useMemo(() => isFetchingList || isDeleting, [isFetchingList, isDeleting]);
+    const isBusy = useMemo(
+        () => isFetchingList || isFetchingResourcesList || isDeleting,
+        [isFetchingList, isDeleting, isFetchingResourcesList],
+    );
 
     const onDeleteConfirmed = useCallback(() => {
-        dispatch(actionGroupsActions.deleteActionGroup({ actionGroupUuid: checkedRows[0] }));
+        dispatch(rulesActions.deleteTrigger({ triggerUuid: checkedRows[0] }));
         setConfirmDelete(false);
         setCheckedRows([]);
     }, [dispatch, checkedRows]);
 
-    const getFreshListActionGroups = useCallback(() => {
-        dispatch(actionGroupsActions.listActionGroups({ resource: selectedResource }));
+    const getFreshList = useCallback(() => {
+        dispatch(rulesActions.listTriggers({ resource: selectedResource }));
     }, [dispatch, selectedResource]);
 
     useEffect(() => {
-        getFreshListActionGroups();
-    }, [getFreshListActionGroups]);
+        getFreshList();
+    }, [getFreshList]);
 
-    const { resourceOptions, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
-
-    const conditionGroupsRowHeaders: TableHeader[] = useMemo(
+    const triggerTableHeader: TableHeader[] = useMemo(
         () => [
             {
                 content: 'Name',
@@ -54,10 +60,32 @@ const ActionGroupsList = () => {
                 width: '10%',
                 sortable: true,
             },
+
+            {
+                content: 'Trigger Source',
+                align: 'left',
+                id: 'triggerSource',
+                width: '10%',
+                sortable: true,
+            },
+            {
+                content: 'Trigger Type',
+                align: 'left',
+                id: 'triggerType',
+                width: '10%',
+                sortable: true,
+            },
             {
                 content: 'Resource',
                 align: 'left',
                 id: 'resource',
+                width: '10%',
+                sortable: true,
+            },
+            {
+                content: 'Event Name',
+                align: 'left',
+                id: 'eventName',
                 width: '10%',
                 sortable: true,
             },
@@ -71,23 +99,39 @@ const ActionGroupsList = () => {
         [],
     );
 
-    const actionGroupList: TableDataRow[] = useMemo(
+    const triggerListData: TableDataRow[] = useMemo(
         () =>
-            actionGroups.map((actionGroup) => {
+            triggers.map((trigger) => {
                 return {
-                    id: actionGroup.uuid,
+                    id: trigger.uuid,
                     columns: [
-                        <Link to={`./detail/${actionGroup.uuid}`}>{actionGroup.name}</Link>,
-                        getEnumLabel(resourceTypeEnum, actionGroup.resource),
-                        actionGroup.description || '',
+                        <Link to={`./detail/${trigger.uuid}`}>{trigger.name}</Link>,
+
+                        getEnumLabel(resourceTypeEnum, trigger.triggerResource || ''),
+                        getEnumLabel(triggerTypeEnum, trigger.triggerType),
+                        getEnumLabel(resourceTypeEnum, trigger.resource),
+                        getEnumLabel(eventNameEnum, trigger.eventName || ''),
+                        trigger.description || '',
                     ],
                 };
             }),
-        [actionGroups, resourceTypeEnum],
+        [triggers, resourceTypeEnum, eventNameEnum, triggerTypeEnum],
     );
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
+            {
+                icon: 'plus',
+                disabled: false,
+                tooltip: 'Create',
+                onClick: () => navigate(`./add`),
+            },
+            {
+                icon: 'trash',
+                disabled: checkedRows.length === 0,
+                tooltip: 'Delete',
+                onClick: () => setConfirmDelete(true),
+            },
             {
                 icon: 'search',
                 disabled: false,
@@ -108,33 +152,21 @@ const ActionGroupsList = () => {
                     </div>
                 ),
             },
-            {
-                icon: 'plus',
-                disabled: false,
-                tooltip: 'Create',
-                onClick: () => navigate(`./add`),
-            },
-            {
-                icon: 'trash',
-                disabled: checkedRows.length === 0,
-                tooltip: 'Delete',
-                onClick: () => setConfirmDelete(true),
-            },
         ],
         [checkedRows, resourceOptions, navigate],
     );
 
     return (
         <Container className="themed-container" fluid>
-            <Widget titleSize="larger" title="Action Groups" refreshAction={getFreshListActionGroups} busy={isBusy} widgetButtons={buttons}>
-                <p className="mb-2">Action group is named set of action for selected resource</p>
+            <Widget titleSize="larger" title="Triggers" refreshAction={getFreshList} busy={isBusy} widgetButtons={buttons}>
+                <br />
                 <CustomTable
                     checkedRows={checkedRows}
                     hasCheckboxes
                     hasAllCheckBox={false}
                     multiSelect={false}
-                    data={actionGroupList}
-                    headers={conditionGroupsRowHeaders}
+                    data={triggerListData}
+                    headers={triggerTableHeader}
                     onCheckedRowsChanged={(checkedRows) => {
                         setCheckedRows(checkedRows as string[]);
                     }}
@@ -144,8 +176,8 @@ const ActionGroupsList = () => {
 
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete a Action Group`}
-                body={`You are about to delete a Action Group. Is this what you want to do?`}
+                caption={`Delete a Trigger`}
+                body={`You are about to delete a Trigger Group. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
@@ -156,4 +188,4 @@ const ActionGroupsList = () => {
     );
 };
 
-export default ActionGroupsList;
+export default TriggerList;

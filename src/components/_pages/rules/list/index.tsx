@@ -12,6 +12,7 @@ import Select from 'react-select';
 import { Container } from 'reactstrap';
 import { PlatformEnum, Resource } from 'types/openapi';
 
+import { useRuleEvaluatorResourceOptions } from 'utils/rules';
 import styles from './ruleList.module.scss';
 
 const ConditionGroups = () => {
@@ -27,8 +28,12 @@ const ConditionGroups = () => {
 
     const [checkedRows, setCheckedRows] = useState<string[]>([]);
     const [confirmDelete, setConfirmDelete] = useState(false);
+    const { resourceOptions, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
 
-    const isBusy = useMemo(() => isFetchingList || isDeleting, [isFetchingList, isDeleting]);
+    const isBusy = useMemo(
+        () => isFetchingList || isDeleting || isFetchingResourcesList,
+        [isFetchingList, isDeleting, isFetchingResourcesList],
+    );
 
     const onDeleteConfirmed = useCallback(() => {
         dispatch(rulesActions.deleteRule({ ruleUuid: checkedRows[0] }));
@@ -36,25 +41,13 @@ const ConditionGroups = () => {
         setCheckedRows([]);
     }, [dispatch, checkedRows]);
 
-    const getFreshListConditionGroups = useCallback(() => {
+    const getFreshList = useCallback(() => {
         dispatch(rulesActions.listRules({ resource: selectedResource }));
     }, [dispatch, selectedResource]);
 
     useEffect(() => {
-        getFreshListConditionGroups();
-    }, [getFreshListConditionGroups]);
-
-    const resourceOptions = useMemo(() => {
-        if (resourceTypeEnum === undefined) return [];
-        const resourceTypeArray = Object.entries(resourceTypeEnum)
-            .map(([key, value]) => {
-                return { value: value.code, label: value.label };
-            })
-            .filter((resource) => resource.value !== Resource.None)
-            .sort((a, b) => a.label.localeCompare(b.label));
-
-        return resourceTypeArray;
-    }, [resourceTypeEnum]);
+        getFreshList();
+    }, [getFreshList]);
 
     const rulesTableHeader: TableHeader[] = useMemo(
         () => [
@@ -137,7 +130,7 @@ const ConditionGroups = () => {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget titleSize="larger" title="Rules" refreshAction={getFreshListConditionGroups} busy={isBusy} widgetButtons={buttons}>
+            <Widget titleSize="larger" title="Rules" refreshAction={getFreshList} busy={isBusy} widgetButtons={buttons}>
                 <br />
                 <CustomTable
                     checkedRows={checkedRows}
@@ -155,8 +148,8 @@ const ConditionGroups = () => {
 
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete a Condition Group`}
-                body={`You are about to delete a Condition Group. Is this what you want to do?`}
+                caption={`Delete a Rule`}
+                body={`You are about to delete a Rule. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },

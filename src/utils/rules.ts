@@ -1,5 +1,13 @@
+import { getEnumLabel } from 'ducks/enums';
+import { useEffect, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { SearchFilterModel } from 'types/certificate';
 import { RuleConditiontModel } from 'types/rules';
+// import { EntityType, actions as filterActions } from 'ducks/filters';
+import { selectors as enumSelectors } from 'ducks/enums';
+import { actions as resourceActions, selectors as resourceSelectors } from 'ducks/resource';
+import { PlatformEnum } from 'types/openapi';
+import { ResourceModel } from 'types/resource';
 
 export const filterToConditionGroup = (filter: SearchFilterModel[]): RuleConditiontModel[] => {
     return filter.map((filter) => ({
@@ -17,4 +25,75 @@ export const conditionGroupToFilter = (conditionGroup: RuleConditiontModel[]): S
         value: condition.value,
         fieldSource: condition.fieldSource,
     }));
+};
+
+export const useResourceOptions = () => {
+    const resourceList = useSelector(resourceSelectors.resourceslist);
+    const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
+    const isFetchingResourcesList = useSelector(resourceSelectors.isFetchingResourcesList);
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(resourceActions.listResources());
+    }, [dispatch]);
+
+    const resourceOptions = useMemo(() => {
+        if (!resourceList.length) return [];
+        return resourceList.map((resource) => {
+            return { value: resource.resource, label: getEnumLabel(resourceTypeEnum, resource.resource) };
+        });
+    }, [resourceList, resourceTypeEnum]);
+
+    return { resourceOptions, isFetchingResourcesList };
+};
+
+export const useRuleEvaluatorResourceOptions = () => {
+    const resourceList = useSelector(resourceSelectors.resourceslist);
+    const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
+    const isFetchingResourcesList = useSelector(resourceSelectors.isFetchingResourcesList);
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(resourceActions.listResources());
+    }, [dispatch]);
+
+    const resourceOptions = useMemo(() => {
+        if (!resourceList.length) return [];
+        const resourceListWithRuleEvaluator = resourceList.filter((resource) => resource.hasRuleEvaluator);
+        return resourceListWithRuleEvaluator.map((resource) => {
+            return { value: resource.resource, label: getEnumLabel(resourceTypeEnum, resource.resource) };
+        });
+    }, [resourceList, resourceTypeEnum]);
+
+    return { resourceOptions, isFetchingResourcesList };
+};
+
+type ResourceFilter = 'hasEvents' | 'hasRuleEvaluator';
+
+export const useResourceOptionsFromListWithFilters = (resourceList: ResourceModel[], resourceFilter?: ResourceFilter) => {
+    const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
+
+    const resourceOptions = useMemo(() => {
+        if (!resourceList.length) return [];
+
+        if (resourceFilter === 'hasEvents') {
+            const resourceListWithEvents = resourceList.filter((resource) => resource.hasEvents);
+            return resourceListWithEvents.map((resource) => {
+                return { value: resource.resource, label: getEnumLabel(resourceTypeEnum, resource.resource) };
+            });
+        }
+
+        if (resourceFilter === 'hasRuleEvaluator') {
+            const resourceListWithRuleEvaluator = resourceList.filter((resource) => resource.hasRuleEvaluator);
+            return resourceListWithRuleEvaluator.map((resource) => {
+                return { value: resource.resource, label: getEnumLabel(resourceTypeEnum, resource.resource) };
+            });
+        }
+
+        return resourceList.map((resource) => {
+            return { value: resource.resource, label: getEnumLabel(resourceTypeEnum, resource.resource) };
+        });
+    }, [resourceList, resourceTypeEnum, resourceFilter]);
+
+    return resourceOptions;
 };

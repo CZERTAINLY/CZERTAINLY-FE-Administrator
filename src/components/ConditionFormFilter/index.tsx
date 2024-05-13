@@ -17,9 +17,10 @@ type FormType = 'rules' | 'conditionGroup' | 'actionGroup';
 interface ConditionGroupFormFilterProps {
     resource: Resource;
     formType: FormType;
+    includeIgnoreAction?: boolean;
 }
 
-const ConditionFormFilter = ({ resource, formType }: ConditionGroupFormFilterProps) => {
+const ConditionFormFilter = ({ resource, formType, includeIgnoreAction }: ConditionGroupFormFilterProps) => {
     const { id } = useParams();
     const editMode = useMemo(() => !!id, [id]);
     const [hasEffectRun, setHasEffectRun] = useState(false);
@@ -81,6 +82,7 @@ const ConditionFormFilter = ({ resource, formType }: ConditionGroupFormFilterPro
                             settable: true,
                         })
                     }
+                    includeIgnoreAction={includeIgnoreAction}
                     onActionsUpdate={(currentActions) => {
                         actionGroupForm.change('actions', currentActions);
                     }}
@@ -103,7 +105,7 @@ const ConditionFormFilter = ({ resource, formType }: ConditionGroupFormFilterPro
                 />
             </div>
         );
-    }, [resource, form, formType, actionGroupForm]);
+    }, [resource, form, formType, actionGroupForm, includeIgnoreAction]);
 
     return (
         <>

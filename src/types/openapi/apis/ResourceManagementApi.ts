@@ -13,12 +13,15 @@
 
 import type { Observable } from 'rxjs';
 import type { AjaxResponse } from 'rxjs/ajax';
+import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
+import type { OperationOpts, HttpQuery } from '../runtime';
 import type {
+    AuthenticationServiceExceptionDto,
     Resource,
-    SearchFieldDataByGroupDto
+    ResourceDto,
+    ResourceEventDto,
+    SearchFieldDataByGroupDto,
 } from '../models';
-import type { HttpQuery, OperationOpts } from '../runtime';
-import { BaseAPI, encodeURI, throwIfNullOrUndefined } from '../runtime';
 
 export interface ListResourceEventsRequest {
     resource: Resource;
@@ -37,12 +40,12 @@ export class ResourceManagementApi extends BaseAPI {
     /**
      * Retrieve a list of all events that can be triggered by a resource
      */
-    listResourceEvents({ resource }: ListResourceEventsRequest): Observable<Array<string>>
-    listResourceEvents({ resource }: ListResourceEventsRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<string>>>
-    listResourceEvents({ resource }: ListResourceEventsRequest, opts?: OperationOpts): Observable<Array<string> | AjaxResponse<Array<string>>> {
+    listResourceEvents({ resource }: ListResourceEventsRequest): Observable<Array<ResourceEventDto>>
+    listResourceEvents({ resource }: ListResourceEventsRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<ResourceEventDto>>>
+    listResourceEvents({ resource }: ListResourceEventsRequest, opts?: OperationOpts): Observable<Array<ResourceEventDto> | AjaxResponse<Array<ResourceEventDto>>> {
         throwIfNullOrUndefined(resource, 'resource', 'listResourceEvents');
 
-        return this.request<Array<string>>({
+        return this.request<Array<ResourceEventDto>>({
             url: '/v1/resources/{resource}/events'.replace('{resource}', encodeURI(resource)),
             method: 'GET',
         }, opts?.responseOpts);
@@ -57,12 +60,25 @@ export class ResourceManagementApi extends BaseAPI {
         throwIfNullOrUndefined(resource, 'resource', 'listResourceRuleFilterFields');
 
         const query: HttpQuery = {};
+
         if (settable != null) { query['settable'] = settable; }
 
         return this.request<Array<SearchFieldDataByGroupDto>>({
             url: '/v1/resources/{resource}/filters/rules'.replace('{resource}', encodeURI(resource)),
             method: 'GET',
             query,
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * Retrieve list of resources with information and settings
+     */
+    listResources(): Observable<Array<ResourceDto>>
+    listResources(opts?: OperationOpts): Observable<AjaxResponse<Array<ResourceDto>>>
+    listResources(opts?: OperationOpts): Observable<Array<ResourceDto> | AjaxResponse<Array<ResourceDto>>> {
+        return this.request<Array<ResourceDto>>({
+            url: '/v1/resources',
+            method: 'GET',
         }, opts?.responseOpts);
     };
 

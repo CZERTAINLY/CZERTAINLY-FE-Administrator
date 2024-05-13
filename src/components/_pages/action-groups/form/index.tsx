@@ -1,12 +1,9 @@
 import Widget from 'components/Widget';
-import { useCallback, useEffect, useMemo } from 'react';
+import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
+import { useCallback, useMemo } from 'react';
+import { Field, Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-// import { EntityType, actions as filterActions } from 'ducks/filters';
-import { selectors as enumSelectors } from 'ducks/enums';
-import { EntityType, actions as filterActions } from 'ducks/filters';
-import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
-import { Field, Form } from 'react-final-form';
 
 import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
@@ -14,9 +11,10 @@ import { mutators } from 'utils/attributes/attributeEditorMutators';
 import ConditionFormFilter from 'components/ConditionFormFilter';
 import ProgressButton from 'components/ProgressButton';
 import Select from 'react-select';
-import { PlatformEnum, Resource } from 'types/openapi';
+import { Resource } from 'types/openapi';
 import { ActionRuleRequestModel } from 'types/rules';
 import { isObjectSame } from 'utils/common-utils';
+import { useRuleEvaluatorResourceOptions } from 'utils/rules';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
 
 interface SelectChangeValue {
@@ -37,25 +35,8 @@ const ActionGroupForm = () => {
     const navigate = useNavigate();
     const title = 'Create Action Group';
     const isCreatingActionGroup = useSelector(rulesSelectors.isCreatingActionGroup);
-    const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
-    const isBusy = useMemo(() => isCreatingActionGroup, [isCreatingActionGroup]);
-    const resourceOptions = useMemo(() => {
-        if (resourceTypeEnum === undefined) return [];
-        const resourceTypeArray = Object.entries(resourceTypeEnum)
-            .map(([key, value]) => {
-                return { value: value.code, label: value.label };
-            })
-            .filter((resource) => resource.value !== Resource.None)
-            .sort((a, b) => a.label.localeCompare(b.label));
-
-        return resourceTypeArray;
-    }, [resourceTypeEnum]);
-
-    useEffect(() => {
-        return () => {
-            dispatch(filterActions.setCurrentFilters({ currentFilters: [], entity: EntityType.CONDITIONS }));
-        };
-    }, [dispatch]);
+    const { resourceOptions, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
+    const isBusy = useMemo(() => isCreatingActionGroup || isFetchingResourcesList, [isCreatingActionGroup, isFetchingResourcesList]);
 
     const defaultValues: ActionGroupFormValues = useMemo(() => {
         return {
@@ -160,9 +141,6 @@ const ActionGroupForm = () => {
                                                 form.change('resource', event.value);
                                             }
                                             form.change('actions', []);
-                                            dispatch(
-                                                filterActions.setCurrentFilters({ currentFilters: [], entity: EntityType.CONDITIONS }),
-                                            );
                                         }}
                                         styles={{
                                             control: (provided) =>

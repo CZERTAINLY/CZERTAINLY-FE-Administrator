@@ -48,13 +48,10 @@ export type ActionRuleGroupRequestModel = Omit<ActionRuleGroupRequestDto, 'actio
 export type ConditionRuleDto = RuleConditionDto;
 export type ConditionRuleModel = ConditionRuleDto;
 
-// export type ConditionRuleGroupDetailDto = RuleConditionGroupDetailDto;
-// export type ConditionRuleGroupDetailModel = Omit<ConditionRuleGroupDetailDto, 'conditions'> & {
-//     conditions: Array<ConditionRuleModel>;
-// };
-
 export type ConditionRuleGroupDto = RuleConditionGroupDto;
-export type ConditionRuleGroupModel = ConditionRuleGroupDto;
+export type ConditionRuleGroupModel = Omit<ConditionRuleGroupDto, 'conditions'> & {
+    conditions: Array<ConditionRuleModel>;
+};
 
 export type ConditionRuleRequestDto = RuleConditionRequestDto;
 export type RuleConditiontModel = ConditionRuleRequestDto;
@@ -79,7 +76,6 @@ export type RuleModel = Omit<DtoRule, 'attributes'> & {
 export type RequestRuleDto = RuleRequestDto;
 export type RequestRuleModel = Omit<RequestRuleDto, 'conditions | conditionGroups | conditionGroupsUuids'> & {
     conditions?: Array<RuleConditiontModel>;
-    conditionGroups?: Array<ConditionRuleGroupRequestModel>;
     conditionGroupsUuids?: Array<string>;
 };
 
@@ -95,9 +91,9 @@ export type TriggerRuleModel = TriggerRuleDto;
 
 export type TriggerRuleRequestDto = RuleTriggerRequestDto;
 export type TriggerRuleRequestModel = Omit<TriggerRuleRequestDto, 'rules | actionGroups | actions'> & {
-    rules: Array<RequestRuleModel>;
-    actionGroups: Array<ActionRuleGroupRequestModel>;
-    actions: Array<ActionRuleRequestModel>;
+    actions?: Array<ActionRuleRequestModel>;
+    actionGroupsUuids?: Array<string>;
+    rulesUuids?: Array<string>;
 };
 
 export type UpdateActionGroupRequestDto = UpdateRuleActionGroupRequestDto;
@@ -113,13 +109,12 @@ export type UpdateGroupRuleConditionRequestModel = Omit<UpdateGroupRuleCondition
 export type RuleUpdateRequestDto = UpdateRuleRequestDto;
 export type RuleUpdateRequestModel = Omit<RuleUpdateRequestDto, 'conditions | conditionGroups | conditionGroupsUuids'> & {
     conditions?: Array<RuleConditiontModel>;
-    conditionGroups?: Array<ConditionRuleGroupRequestModel>;
     conditionGroupsUuids?: Array<string>;
 };
 
 export type RuleTriggerUpdateRequestDto = UpdateRuleTriggerRequestDto;
 export type RuleTriggerUpdateRequestModel = Omit<RuleTriggerUpdateRequestDto, 'rules | actionGroups | actions'> & {
-    rules: Array<RequestRuleModel>;
-    actionGroups: Array<ActionRuleGroupRequestModel>;
     actions: Array<ActionRuleRequestModel>;
+    rulesUuids?: Array<string>;
+    actionGroupsUuids?: Array<string>;
 };

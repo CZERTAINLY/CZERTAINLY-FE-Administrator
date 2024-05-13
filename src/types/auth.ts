@@ -1,7 +1,7 @@
 import { AttributeRequestModel, AttributeResponseModel } from './attributes';
 import {
     ActionDto as ActionDtoOpenApi,
-    ResourceDetailDto,
+    AuthResourceDto as AuthResourceDtoApi,
     RoleDto,
     UpdateUserRequestDto,
     UserCertificateDto as UserCertificateDtoOpenApi,
@@ -11,8 +11,8 @@ import {
 export type ActionDto = ActionDtoOpenApi;
 export type ActionModel = ActionDto;
 
-export type ResourceDto = ResourceDetailDto;
-export type ResourceModel = Omit<ResourceDto, 'actions'> & { actions: Array<ActionModel> };
+export type AuthResourceDto = AuthResourceDtoApi;
+export type AuthResourceModel = Omit<AuthResourceDto, 'actions'> & { actions: Array<ActionModel> };
 
 export type UserCertificateDto = UserCertificateDtoOpenApi;
 export type UserCertificateModel = UserCertificateDto;

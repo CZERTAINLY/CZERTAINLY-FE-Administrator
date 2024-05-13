@@ -1,15 +1,17 @@
 import React, { useMemo } from 'react';
-import { ConditionRuleGroupModel } from 'types/rules';
+import { ActionGroupModel, ConditionRuleGroupModel } from 'types/rules';
+import GroupActionsViewer from './GroupActionsViewer';
 import GroupConditionsViewer from './GroupConditionsViewer';
 import styles from './conditionGroupsList.module.scss';
 interface ConditionsTableViewerProps {
-    ruleConditions: ConditionRuleGroupModel[];
+    ruleConditions?: ConditionRuleGroupModel[];
+    actionGroups?: ActionGroupModel[];
 }
 
-const ConditionsGroupsList = ({ ruleConditions }: ConditionsTableViewerProps) => {
-    const renderRuleConditions = useMemo(
-        () =>
-            ruleConditions.map((conditionGroup, i) => (
+const ConditionsGroupsList = ({ ruleConditions, actionGroups }: ConditionsTableViewerProps) => {
+    const renderListData = useMemo(() => {
+        if (ruleConditions?.length) {
+            return ruleConditions.map((conditionGroup, i) => (
                 <React.Fragment key={conditionGroup.uuid}>
                     <hr className={styles.conditionListHr} />
                     <GroupConditionsViewer
@@ -19,11 +21,23 @@ const ConditionsGroupsList = ({ ruleConditions }: ConditionsTableViewerProps) =>
                         key={conditionGroup.uuid}
                     />
                 </React.Fragment>
-            )),
-        [ruleConditions],
-    );
+            ));
+        } else if (actionGroups?.length) {
+            return actionGroups.map((actionGroup, i) => (
+                <React.Fragment key={actionGroup.uuid}>
+                    <hr className={styles.conditionListHr} />
+                    <GroupActionsViewer
+                        conditionGroupName={actionGroup.name}
+                        conditionGroupUuid={actionGroup.uuid}
+                        groupActions={actionGroup.actions}
+                        key={actionGroup.uuid}
+                    />
+                </React.Fragment>
+            ));
+        } else return <></>;
+    }, [ruleConditions, actionGroups]);
 
-    return ruleConditions?.length ? <div className={styles.conditionGroupList}>{renderRuleConditions}</div> : null;
+    return <>{renderListData}</>;
 };
 
 export default ConditionsGroupsList;

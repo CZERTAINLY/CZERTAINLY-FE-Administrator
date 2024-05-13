@@ -16,11 +16,11 @@ import type { AjaxResponse } from 'rxjs/ajax';
 import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
 import type { OperationOpts, HttpHeaders } from '../runtime';
 import type {
+    AuthResourceDto,
     AuthenticationServiceExceptionDto,
     ErrorMessageDto,
     NameAndUuidDto,
     Resource,
-    ResourceDetailDto,
     UpdateUserRequestDto,
     UserDetailDto,
 } from '../models';
@@ -39,12 +39,12 @@ export interface UpdateUserProfileRequest {
 export class AuthenticationManagementApi extends BaseAPI {
 
     /**
-     * Get all Resources
+     * Get Auth Resources
      */
-    getAllResources(): Observable<Array<ResourceDetailDto>>
-    getAllResources(opts?: OperationOpts): Observable<AjaxResponse<Array<ResourceDetailDto>>>
-    getAllResources(opts?: OperationOpts): Observable<Array<ResourceDetailDto> | AjaxResponse<Array<ResourceDetailDto>>> {
-        return this.request<Array<ResourceDetailDto>>({
+    getAuthResources(): Observable<Array<AuthResourceDto>>
+    getAuthResources(opts?: OperationOpts): Observable<AjaxResponse<Array<AuthResourceDto>>>
+    getAuthResources(opts?: OperationOpts): Observable<Array<AuthResourceDto> | AjaxResponse<Array<AuthResourceDto>>> {
+        return this.request<Array<AuthResourceDto>>({
             url: '/v1/auth/resources',
             method: 'GET',
         }, opts?.responseOpts);

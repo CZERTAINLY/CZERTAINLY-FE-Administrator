@@ -34,6 +34,7 @@ import { slice as initialLocationsSlice, initialState as initialLocationsState }
 import { initialState as initialNotificationsState, slice as notificationsSlice } from './notifications';
 import { initialState as initialPagingState, slice as pagingSlice } from './paging';
 import { initialState as initialRaProfilesState, slice as raProfilesSlice } from './ra-profiles';
+import { initialState as initialResouceState, slice as resourceSlice } from './resource';
 import { initialState as initialRolesState, slice as rolesSlice } from './roles';
 import { initialState as initialRulesState, slice as rulesSlice } from './rules';
 import { initialState as initialSchedulerState, slice as schedulerSlice } from './scheduler';
@@ -60,6 +61,7 @@ export const initialState = {
     [usersSlice.name]: initialUsersState,
     [rolesSlice.name]: initialRolesState,
     [rulesSlice.name]: initialRulesState,
+    [resourceSlice.name]: initialResouceState,
     [certificatesSlice.name]: initialCertificatesState,
     [authoritiesSlice.name]: initialAuthoritiesState,
     [raProfilesSlice.name]: initialRaProfilesState,

@@ -3,7 +3,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 // import { EntityType, actions as filterActions } from 'ducks/filters';
-import { selectors as enumSelectors } from 'ducks/enums';
 import { EntityType, actions as filterActions } from 'ducks/filters';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 
@@ -15,9 +14,10 @@ import { mutators } from 'utils/attributes/attributeEditorMutators';
 import ConditionFormFilter from 'components/ConditionFormFilter';
 import ProgressButton from 'components/ProgressButton';
 import Select from 'react-select';
-import { PlatformEnum, Resource } from 'types/openapi';
+import { Resource } from 'types/openapi';
 import { RuleConditiontModel } from 'types/rules';
 import { isObjectSame } from 'utils/common-utils';
+import { useRuleEvaluatorResourceOptions } from 'utils/rules';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
 // import ConditionFormFilter from '../ConditionFormFilter';
 
@@ -47,19 +47,12 @@ const ConditionGroupForm = () => {
     const [selectedResourceState, setSelectedResourceState] = useState<SelectChangeValue>();
     const ruleDetails = useSelector(rulesSelectors.ruleDetails);
     const editMode = useMemo(() => !!id, [id]);
-    const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
-    const isBusy = useMemo(() => isCreatingRule || isUpdatingRule, [isCreatingRule, isUpdatingRule]);
-    const resourceOptions = useMemo(() => {
-        if (resourceTypeEnum === undefined) return [];
-        const resourceTypeArray = Object.entries(resourceTypeEnum)
-            .map(([key, value]) => {
-                return { value: value.code, label: value.label };
-            })
-            .filter((resource) => resource.value !== Resource.None)
-            .sort((a, b) => a.label.localeCompare(b.label));
+    const { resourceOptions, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
 
-        return resourceTypeArray;
-    }, [resourceTypeEnum]);
+    const isBusy = useMemo(
+        () => isCreatingRule || isUpdatingRule || isFetchingResourcesList,
+        [isCreatingRule, isUpdatingRule, isFetchingResourcesList],
+    );
 
     const conditionGroupsOptions = useMemo(() => {
         if (conditionGroups === undefined) return [];
@@ -110,7 +103,6 @@ const ConditionGroupForm = () => {
 
     const onSubmit = useCallback(
         (values: ConditionGroupFormValues) => {
-            // if (values.resource === '') return;
             if (values.resource === Resource.None) return;
 
             if (editMode && id) {
