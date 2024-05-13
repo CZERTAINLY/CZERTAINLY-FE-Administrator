@@ -247,7 +247,7 @@ const deleteTrigger: AppEpic = (action$, state, deps) => {
                 switchMap(() =>
                     of(
                         slice.actions.deleteTriggerSuccess({ triggerUuid: action.payload.triggerUuid }),
-                        appRedirectActions.redirect({ url: `../../rules` }),
+                        appRedirectActions.redirect({ url: `../../triggers` }),
                     ),
                 ),
                 catchError((err) => of(slice.actions.deleteTriggerFailure({ error: extractError(err, 'Failed to delete trigger') }))),
