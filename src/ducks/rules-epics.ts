@@ -244,7 +244,12 @@ const deleteTrigger: AppEpic = (action$, state, deps) => {
         filter(slice.actions.deleteTrigger.match),
         switchMap((action) =>
             deps.apiClients.rules.deleteTrigger({ triggerUuid: action.payload.triggerUuid }).pipe(
-                switchMap(() => of(slice.actions.deleteTriggerSuccess({ triggerUuid: action.payload.triggerUuid }))),
+                switchMap(() =>
+                    of(
+                        slice.actions.deleteTriggerSuccess({ triggerUuid: action.payload.triggerUuid }),
+                        appRedirectActions.redirect({ url: `../../triggers` }),
+                    ),
+                ),
                 catchError((err) => of(slice.actions.deleteTriggerFailure({ error: extractError(err, 'Failed to delete trigger') }))),
             ),
         ),

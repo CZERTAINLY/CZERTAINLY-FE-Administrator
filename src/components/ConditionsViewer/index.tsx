@@ -109,6 +109,7 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
                             rule: {
                                 conditions: currentCondition,
                                 conditionGroupsUuids: ruleDetails.conditionGroups.map((cg) => cg.uuid),
+                                description: ruleDetails.description || '',
                             },
                         }),
                     );
@@ -198,7 +199,9 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
                                 triggerUuid: id,
                                 trigger: {
                                     actions: currentActions,
+                                    description: trigerDetails.description,
                                     triggerType: trigerDetails.triggerType,
+                                    rulesUuids: trigerDetails.rules.map((r) => r.uuid),
                                     actionGroupsUuids: trigerDetails.actionGroups.map((ag) => ag.uuid),
                                 },
                             }),
