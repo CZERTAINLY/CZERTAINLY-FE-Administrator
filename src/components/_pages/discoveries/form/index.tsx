@@ -294,6 +294,7 @@ export default function DiscoveryForm() {
                                             onDiscoveryProviderChange(event);
                                             form.mutators.clearAttributes('discovery');
                                             form.mutators.setAttribute('storeKind', undefined);
+                                            form.mutators.setAttribute('triggers', undefined);
                                             input.onChange(event);
                                         }}
                                         styles={{
@@ -307,25 +308,6 @@ export default function DiscoveryForm() {
                                     <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
                                         {meta.error}
                                     </div>
-                                </FormGroup>
-                            )}
-                        </Field>
-
-                        <Field name="triggers">
-                            {({ input }) => (
-                                <FormGroup>
-                                    <Label for="triggers">Triggers</Label>
-                                    <Select
-                                        {...input}
-                                        isMulti
-                                        maxMenuHeight={140}
-                                        menuPlacement="auto"
-                                        options={triggerOptions}
-                                        placeholder="Select Triggers"
-                                    />
-                                    <p className="text-muted mt-1 ">
-                                        Note: Triggers will be executed on newly discovered certificate in displayed order
-                                    </p>
                                 </FormGroup>
                             )}
                         </Field>
@@ -362,6 +344,26 @@ export default function DiscoveryForm() {
                             </Field>
                         ) : undefined}
 
+                        {values?.storeKind && (
+                            <Field name="triggers">
+                                {({ input }) => (
+                                    <FormGroup>
+                                        <Label for="triggers">Triggers</Label>
+                                        <Select
+                                            {...input}
+                                            isMulti
+                                            maxMenuHeight={140}
+                                            menuPlacement="auto"
+                                            options={triggerOptions}
+                                            placeholder="Select Triggers"
+                                        />
+                                        <p className="text-muted mt-1 ">
+                                            Note: Triggers will be executed on newly discovered certificate in displayed order
+                                        </p>
+                                    </FormGroup>
+                                )}
+                            </Field>
+                        )}
                         <>
                             <br />
                             <TabLayout
