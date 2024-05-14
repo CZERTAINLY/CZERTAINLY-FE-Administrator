@@ -28,8 +28,15 @@ import { collectFormAttributes } from 'utils/attributes/attributes';
 
 import { getStrongFromCronExpression } from 'utils/dateUtil';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateQuartzCronExpression, validateRequired } from 'utils/validators';
+
+interface SelectChangeValue {
+    value: string;
+    label: string;
+}
+
 interface FormValues {
     name: string | undefined;
+    triggers: SelectChangeValue[] | undefined;
     discoveryProvider: { value: string; label: string } | undefined;
     storeKind: { value: string; label: string } | undefined;
     jobName: string | undefined;
@@ -55,7 +62,14 @@ export default function DiscoveryForm() {
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
     const [discoveryProvider, setDiscoveryProvider] = useState<ConnectorResponseModel>();
 
-    console.log('triggers', triggers);
+    const triggerOptions = useMemo(
+        () =>
+            triggers.map((trigger) => ({
+                label: trigger.name,
+                value: trigger.uuid,
+            })),
+        [triggers],
+    );
 
     const isBusy = useMemo(
         () =>
@@ -111,10 +125,29 @@ export default function DiscoveryForm() {
 
     const onSubmit = useCallback(
         (values: FormValues, form: any) => {
+            console.log('values', {
+                request: {
+                    name: values.name!,
+                    triggers: values.triggers?.map((trigger) => trigger.value) ?? [],
+                    connectorUuid: values.discoveryProvider!.value,
+                    kind: values.storeKind?.value!,
+                    attributes: collectFormAttributes(
+                        'discovery',
+                        [...(discoveryProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
+                        values,
+                    ),
+                    customAttributes: collectFormAttributes('customDiscovery', resourceCustomAttributes, values),
+                },
+                scheduled: values.scheduled,
+                jobName: values.jobName,
+                cronExpression: values.cronExpression,
+                oneTime: values.oneTime,
+            });
             dispatch(
                 discoveryActions.createDiscovery({
                     request: {
                         name: values.name!,
+                        triggers: values.triggers?.map((trigger) => trigger.value) ?? [],
                         connectorUuid: values.discoveryProvider!.value,
                         kind: values.storeKind?.value!,
                         attributes: collectFormAttributes(
@@ -274,6 +307,25 @@ export default function DiscoveryForm() {
                                     <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
                                         {meta.error}
                                     </div>
+                                </FormGroup>
+                            )}
+                        </Field>
+
+                        <Field name="triggers">
+                            {({ input }) => (
+                                <FormGroup>
+                                    <Label for="triggers">Triggers</Label>
+                                    <Select
+                                        {...input}
+                                        isMulti
+                                        maxMenuHeight={140}
+                                        menuPlacement="auto"
+                                        options={triggerOptions}
+                                        placeholder="Select Triggers"
+                                    />
+                                    <p className="text-muted mt-1 ">
+                                        Note: Triggers will be executed on newly discovered certificate in displayed order
+                                    </p>
                                 </FormGroup>
                             )}
                         </Field>
