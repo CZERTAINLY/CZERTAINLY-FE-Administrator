@@ -29,7 +29,7 @@ const TriggerDetails = () => {
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [updateDescriptionEditEnable, setUpdateDescription] = useState<boolean>(false);
     const [updatedDescription, setUpdatedDescription] = useState<string>(triggerDetails?.description || '');
-    // const [newActionGroups, setNewActionGroups] = useState<SelectChangeValue[]>([]);
+    const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.RuleTriggerType));
 
     useEffect(() => {
         if (!triggerDetails?.description) return;
@@ -247,10 +247,21 @@ const TriggerDetails = () => {
                           columns: ['Name', triggerDetails.name, ''],
                       },
                       {
+                          id: 'triggerResource',
+                          columns: ['Trigger Resource', triggerDetails.triggerResource || ''],
+                      },
+                      {
+                          id: 'triggerType',
+                          columns: ['Trigger Type', getEnumLabel(triggerTypeEnum, triggerDetails.triggerType), ''],
+                      },
+                      {
+                          id: 'eventName',
+                          columns: ['Event Name', triggerDetails.eventName || '', ''],
+                      },
+                      {
                           id: 'resource',
                           columns: ['Resource', getEnumLabel(resourceTypeEnum, triggerDetails.resource), ''],
                       },
-
                       {
                           id: 'description',
                           columns: [
