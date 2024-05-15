@@ -47,7 +47,7 @@ const GroupActionsViewer = ({ groupActions = [], conditionGroupName, conditionGr
             }
 
             return (
-                <Badge className={styles.groupConditionBadge} key={i}>
+                <Badge className={styles.groupConditionBadge} key={f.uuid}>
                     {getEnumLabel(RuleActionTypeEnum, f.actionType)}&nbsp;
                     <>
                         <b>{f?.fieldSource && getEnumLabel(searchGroupEnum, f?.fieldSource)}&nbsp;</b>'{label}

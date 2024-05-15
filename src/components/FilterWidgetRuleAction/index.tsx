@@ -393,7 +393,7 @@ export default function FilterWidgetRuleAction({
         (itemNumber: number, actionType: string, value: string, label?: string, fieldSource?: string) => {
             if (isFetchingAvailableFilters) return <></>;
             return (
-                <>
+                <React.Fragment key={itemNumber}>
                     {getEnumLabel(RuleActionTypeEnum, actionType)}&nbsp;
                     <b>{fieldSource && getEnumLabel(searchGroupEnum, fieldSource)}&nbsp;</b>'{label}
                     '&nbsp;to&nbsp;
@@ -401,7 +401,7 @@ export default function FilterWidgetRuleAction({
                     <span className={styles.filterBadgeSpan} onClick={() => onRemoveFilterClick(itemNumber)}>
                         &times;
                     </span>
-                </>
+                </React.Fragment>
             );
         },
         [isFetchingAvailableFilters, RuleActionTypeEnum, onRemoveFilterClick, searchGroupEnum],
@@ -540,18 +540,11 @@ export default function FilterWidgetRuleAction({
                         return (
                             <Badge
                                 className={styles.filterBadge}
-                                key={i}
+                                key={f.actionType + i}
                                 onClick={() => toggleFilter(i)}
                                 color={selectedFilter.filterNumber === i ? 'primary' : 'secondary'}
                             >
-                                {!isActionTypeIgnore && (
-                                    <>
-                                        {/* <b>{f?.fieldSource && getEnumLabel(searchGroupEnum, f?.fieldSource)}&nbsp;</b>'{label}
-                                        '&nbsp;to&nbsp;
-                                        {value} */}
-                                        {renderBadgeContent(i, f.actionType, value, label, f.fieldSource)}
-                                    </>
-                                )}
+                                {!isActionTypeIgnore && <>{renderBadgeContent(i, f.actionType, value, label, f.fieldSource)}</>}
                             </Badge>
                         );
                     })}

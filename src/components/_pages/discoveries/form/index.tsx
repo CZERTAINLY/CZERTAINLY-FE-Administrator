@@ -6,6 +6,7 @@ import ProgressButton from 'components/ProgressButton';
 import Widget from 'components/Widget';
 import { actions as connectorActions } from 'ducks/connectors';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 
 import { actions as discoveryActions, selectors as discoverySelectors } from 'ducks/discoveries';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
@@ -14,7 +15,7 @@ import { actions as userInterfaceActions } from '../../../../ducks/user-interfac
 
 import { Field, Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import Select from 'react-select';
 import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
@@ -23,9 +24,11 @@ import { ConnectorResponseModel } from 'types/connectors';
 import { FunctionGroupCode, Resource } from 'types/openapi';
 
 import Cron from 'react-cron-generator';
+import { PlatformEnum } from 'types/openapi';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import { getStrongFromCronExpression } from 'utils/dateUtil';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateQuartzCronExpression, validateRequired } from 'utils/validators';
 
@@ -36,7 +39,7 @@ interface SelectChangeValue {
 
 interface FormValues {
     name: string | undefined;
-    triggers: SelectChangeValue[] | undefined;
+    triggers: string[] | undefined;
     discoveryProvider: { value: string; label: string } | undefined;
     storeKind: { value: string; label: string } | undefined;
     jobName: string | undefined;
@@ -53,6 +56,10 @@ export default function DiscoveryForm() {
     const discoveryProviderAttributeDescriptors = useSelector(discoverySelectors.discoveryProviderAttributeDescriptors);
     const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
     const triggers = useSelector(rulesSelectors.triggers);
+    const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
+    const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.RuleTriggerType));
+    const eventNameEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ResourceEvent));
+    const [selectedTriggers, setSelectedTriggers] = useState<SelectChangeValue[]>([]);
     const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
     const isFetchingDiscoveryDetail = useSelector(discoverySelectors.isFetchingDetail);
     const isFetchingDiscoveryProviders = useSelector(discoverySelectors.isFetchingDiscoveryProviders);
@@ -64,11 +71,13 @@ export default function DiscoveryForm() {
 
     const triggerOptions = useMemo(
         () =>
-            triggers.map((trigger) => ({
-                label: trigger.name,
-                value: trigger.uuid,
-            })),
-        [triggers],
+            triggers
+                .map((trigger) => ({
+                    label: trigger.name,
+                    value: trigger.uuid,
+                }))
+                .filter((trigger) => !selectedTriggers.find((selectedTrigger) => selectedTrigger.value === trigger.value)),
+        [triggers, selectedTriggers],
     );
 
     const isBusy = useMemo(
@@ -129,7 +138,7 @@ export default function DiscoveryForm() {
                 discoveryActions.createDiscovery({
                     request: {
                         name: values.name!,
-                        triggers: values.triggers?.map((trigger) => trigger.value) ?? [],
+                        triggers: selectedTriggers.length ? selectedTriggers.map((trigger) => trigger.value) : undefined,
                         connectorUuid: values.discoveryProvider!.value,
                         kind: values.storeKind?.value!,
                         attributes: collectFormAttributes(
@@ -146,7 +155,7 @@ export default function DiscoveryForm() {
                 }),
             );
         },
-        [dispatch, discoveryProviderAttributeDescriptors, groupAttributesCallbackAttributes, resourceCustomAttributes],
+        [dispatch, discoveryProviderAttributeDescriptors, groupAttributesCallbackAttributes, resourceCustomAttributes, selectedTriggers],
     );
 
     const onCancel = useCallback(() => {
@@ -172,6 +181,72 @@ export default function DiscoveryForm() {
                 })) ?? [],
         [discoveryProvider],
     );
+
+    const onUpdateTriggersConfirmed = useCallback(
+        (newValues: SelectChangeValue[]) => {
+            const previousTriggers = selectedTriggers;
+            const allTriggers = [
+                ...previousTriggers,
+                ...newValues.filter((newValue) => !previousTriggers.find((trigger) => trigger.value === newValue.value)),
+            ];
+            setSelectedTriggers(allTriggers);
+        },
+        [selectedTriggers],
+    );
+
+    const triggerHeaders: TableHeader[] = [
+        {
+            id: 'name',
+            content: 'Name',
+        },
+        {
+            id: 'triggerSource',
+            content: 'Trigger Source',
+        },
+        {
+            id: 'triggerType',
+            content: 'Trigger Type',
+        },
+        {
+            id: 'eventName',
+            content: 'Event Name',
+        },
+        {
+            id: 'actions',
+            content: 'Actions',
+        },
+    ];
+
+    const triggerTableData: TableDataRow[] = useMemo(() => {
+        const triggerDataListOrderedAsPerSelectedTriggers = triggers
+            .filter((trigger) => selectedTriggers.find((selectedTrigger) => selectedTrigger.value === trigger.uuid))
+            .sort(
+                (a, b) =>
+                    selectedTriggers.findIndex((selectedTrigger) => selectedTrigger.value === a.uuid) -
+                    selectedTriggers.findIndex((selectedTrigger) => selectedTrigger.value === b.uuid),
+            );
+
+        return triggerDataListOrderedAsPerSelectedTriggers.map((trigger) => ({
+            id: trigger.uuid,
+            columns: [
+                <Link to={`../../triggers/detail/${trigger.uuid}`}>{trigger.name}</Link>,
+                getEnumLabel(resourceTypeEnum, trigger.triggerResource || ''),
+                getEnumLabel(triggerTypeEnum, trigger.triggerType),
+                getEnumLabel(eventNameEnum, trigger.eventName || ''),
+                <Button
+                    className="btn btn-link text-danger"
+                    size="sm"
+                    color="danger"
+                    title="Delete Condition Group"
+                    onClick={() => {
+                        setSelectedTriggers(selectedTriggers.filter((selectedTrigger) => selectedTrigger.value !== trigger.uuid));
+                    }}
+                >
+                    <i className="fa fa-trash" />
+                </Button>,
+            ],
+        }));
+    }, [selectedTriggers, triggers, eventNameEnum, resourceTypeEnum, triggerTypeEnum]);
 
     return (
         <Form onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
@@ -240,6 +315,22 @@ export default function DiscoveryForm() {
                                 <SwitchField id="oneTime" label="One Time Only" />
                             </>
                         )}
+                    </Widget>
+
+                    <Widget title="Triggers">
+                        <p className="text-muted mt-1 ">
+                            Note: Triggers will be executed on newly discovered certificate in displayed order
+                        </p>
+                        <CustomTable
+                            hasHeader={!!triggerTableData.length}
+                            data={triggerTableData}
+                            headers={triggerHeaders}
+                            newRowWidgetProps={{
+                                newItemsList: triggerOptions,
+                                isBusy,
+                                onAddClick: onUpdateTriggersConfirmed,
+                            }}
+                        />
                     </Widget>
 
                     <Widget title="Add discovery" busy={isBusy}>
@@ -326,26 +417,6 @@ export default function DiscoveryForm() {
                             </Field>
                         ) : undefined}
 
-                        {values?.storeKind && (
-                            <Field name="triggers">
-                                {({ input }) => (
-                                    <FormGroup>
-                                        <Label for="triggers">Triggers</Label>
-                                        <Select
-                                            {...input}
-                                            isMulti
-                                            maxMenuHeight={140}
-                                            menuPlacement="auto"
-                                            options={triggerOptions}
-                                            placeholder="Select Triggers"
-                                        />
-                                        <p className="text-muted mt-1 ">
-                                            Note: Triggers will be executed on newly discovered certificate in displayed order
-                                        </p>
-                                    </FormGroup>
-                                )}
-                            </Field>
-                        )}
                         <>
                             <br />
                             <TabLayout

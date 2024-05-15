@@ -19,7 +19,7 @@ const TriggerDetails = () => {
     const dispatch = useDispatch();
     const triggerDetails = useSelector(rulesSelectors.triggerDetails);
     const isUpdatingTrigger = useSelector(rulesSelectors.isUpdatingTrigger);
-
+    const eventNameEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ResourceEvent));
     const isFetchingTriggerDetail = useSelector(rulesSelectors.isFetchingTriggerDetail);
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const actionGroups = useSelector(rulesSelectors.actionGroups);
@@ -246,7 +246,7 @@ const TriggerDetails = () => {
                       },
                       {
                           id: 'eventName',
-                          columns: ['Event Name', triggerDetails.eventName || '', ''],
+                          columns: ['Event Name', getEnumLabel(eventNameEnum, triggerDetails.eventName || ''), ''],
                       },
                       {
                           id: 'resource',
@@ -316,6 +316,7 @@ const TriggerDetails = () => {
             updateDescriptionEditEnable,
             isUpdatingTrigger,
             updatedDescription,
+            eventNameEnum,
         ],
     );
 

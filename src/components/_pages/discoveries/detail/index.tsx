@@ -31,6 +31,7 @@ export default function DiscoveryDetail() {
     const isDeleting = useSelector(selectors.isDeleting);
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const eventNameEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ResourceEvent));
 
     const isBusy = useMemo(() => isFetching || isDeleting, [isFetching, isDeleting]);
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
@@ -154,8 +155,8 @@ export default function DiscoveryDetail() {
             content: 'Trigger Type',
         },
         {
-            id: 'description',
-            content: 'Description',
+            id: 'eventName',
+            content: 'Event Name',
         },
     ];
 
@@ -166,7 +167,7 @@ export default function DiscoveryDetail() {
                   <Link to={`../../triggers/detail/${trigger.uuid}`}>{trigger.name}</Link>,
                   trigger?.triggerResource ? getEnumLabel(resourceTypeEnum, trigger.triggerResource) : '',
                   getEnumLabel(triggerTypeEnum, trigger.triggerType),
-                  trigger?.description || '',
+                  getEnumLabel(eventNameEnum, trigger.eventName || ''),
               ],
           }))
         : [];
@@ -188,9 +189,11 @@ export default function DiscoveryDetail() {
                         <CustomTable headers={detailHeaders} data={detailData} />
                     </Widget>
                 </Col>
-                <Widget title="Assigned Triggers" busy={isBusy} titleSize="large" widgetLockName={LockWidgetNameEnum.DiscoveryDetails}>
-                    <CustomTable headers={triggerHeaders} data={triggerTableData} />
-                </Widget>
+                <Col>
+                    <Widget title="Assigned Triggers" busy={isBusy} titleSize="large" widgetLockName={LockWidgetNameEnum.DiscoveryDetails}>
+                        <CustomTable headers={triggerHeaders} data={triggerTableData} />
+                    </Widget>
+                </Col>
             </Row>
 
             <Row xs="1" sm="1" md="2" lg="2" xl="2">

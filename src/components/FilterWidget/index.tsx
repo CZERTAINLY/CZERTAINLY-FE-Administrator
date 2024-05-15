@@ -247,7 +247,7 @@ export default function FilterWidget({
             if (isFetchingAvailableFilters) return <></>;
 
             return (
-                <>
+                <React.Fragment key={itemNumber}>
                     <b>{getEnumLabel(searchGroupEnum, fieldSource)}&nbsp;</b>'{label}'&nbsp;
                     {getEnumLabel(FilterConditionOperatorEnum, fieldCondition)}&nbsp;
                     {value}
@@ -256,7 +256,7 @@ export default function FilterWidget({
                             &times;
                         </span>
                     )}
-                </>
+                </React.Fragment>
             );
         },
         [isFetchingAvailableFilters, FilterConditionOperatorEnum, disableBadgeRemove, onRemoveFilterClick, searchGroupEnum],
@@ -416,9 +416,6 @@ export default function FilterWidget({
                                 onClick={() => toggleFilter(i)}
                                 color={selectedFilter === i ? 'primary' : 'secondary'}
                             >
-                                {/* <b>{getEnumLabel(searchGroupEnum, f.fieldSource)}&nbsp;</b>'{label}'&nbsp;
-                                {getEnumLabel(FilterConditionOperatorEnum, f.condition)}&nbsp;
-                                {value} */}
                                 {getBadgeContent(i, f.fieldSource, f.condition, label, value)}
                             </Badge>
                         );
