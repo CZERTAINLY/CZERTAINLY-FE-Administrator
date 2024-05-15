@@ -132,15 +132,8 @@ const ActionGroupsList = () => {
                 refreshAction={getFreshListActionGroups}
                 busy={isBusy}
                 widgetButtons={buttons}
-                // widgetInfoCard={{
-                //     title: 'Overview',
-                //     heading: 'What is a Action Group?',
-                //     description: 'Action group is named set of actions for selected trigger',
-                // }}
-
                 widgetInfoCard={{
-                    title: 'Action Group information',
-                    heading: 'Overview',
+                    title: 'Information',
                     description: 'Action group is named set of actions for selected trigger',
                 }}
             >

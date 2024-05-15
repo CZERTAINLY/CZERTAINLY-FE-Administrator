@@ -18,10 +18,9 @@ const ActionGroupDetails = () => {
     const actionGroupDetails = useSelector(rulesSelectors.actionGroupDetails);
     const isFetchingDetails = useSelector(rulesSelectors.isFetchingActionGroup);
     const isUpdatingDetails = useSelector(rulesSelectors.isupdatingActionGroup);
-
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [updateDescriptionEditEnable, setUpdateDescription] = useState<boolean>(false);
-    const [updatedDescription, setUpdatedDescription] = useState<string>(actionGroupDetails?.description || '');
+    const [updatedDescription, setUpdatedDescription] = useState(actionGroupDetails?.description);
 
     const isBusy = useMemo(() => isFetchingDetails || isUpdatingDetails, [isFetchingDetails, isUpdatingDetails]);
 
@@ -129,7 +128,7 @@ const ActionGroupDetails = () => {
                                               color="secondary"
                                               title="Update Description"
                                               onClick={onUpdateDescriptionConfirmed}
-                                              disabled={isUpdatingDetails}
+                                              disabled={isUpdatingDetails || updatedDescription === actionGroupDetails.description}
                                           >
                                               <i className="fa fa-check" />
                                           </Button>

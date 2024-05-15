@@ -136,8 +136,7 @@ const ConditionGroups = () => {
                 busy={isBusy}
                 widgetButtons={buttons}
                 widgetInfoCard={{
-                    title: 'Condition Group information',
-                    heading: 'Overview',
+                    title: 'Information',
                     description:
                         'Condition group is named set of conditions for selected resource that can be reused in rules of same resource',
                 }}

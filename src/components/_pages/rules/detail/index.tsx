@@ -25,7 +25,7 @@ const RuleDetails = () => {
 
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [updateDescriptionEditEnable, setUpdateDescription] = useState<boolean>(false);
-    const [updatedDescription, setUpdatedDescription] = useState<string>(ruleDetails?.description || '');
+    const [updatedDescription, setUpdatedDescription] = useState(ruleDetails?.description);
 
     useEffect(() => {
         if (!ruleDetails?.description) return;
@@ -197,7 +197,7 @@ const RuleDetails = () => {
                                               color="secondary"
                                               title="Update Description"
                                               onClick={onUpdateDescriptionConfirmed}
-                                              disabled={isUpdatingRule}
+                                              disabled={isUpdatingRule || updatedDescription === ruleDetails.description}
                                           >
                                               <i className="fa fa-check" />
                                           </Button>
@@ -294,8 +294,7 @@ const RuleDetails = () => {
                         title="Condition Groups"
                         titleSize="large"
                         widgetInfoCard={{
-                            title: 'Condition Group information',
-                            heading: 'Overview',
+                            title: 'Information',
                             description:
                                 'Condition group is named set of conditions for selected resource that can be reused in rules of same resource',
                         }}

@@ -21,7 +21,7 @@ const ConditionGroupDetails = () => {
 
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [updateDescriptionEditEnable, setUpdateDescription] = useState<boolean>(false);
-    const [updatedDescription, setUpdatedDescription] = useState<string>(conditionGroupsDetails?.description || '');
+    const [updatedDescription, setUpdatedDescription] = useState(conditionGroupsDetails?.description);
 
     const isBusy = useMemo(() => isFetchingConditionGroup || isUpdatingGroupDetails, [isFetchingConditionGroup, isUpdatingGroupDetails]);
 
@@ -129,7 +129,7 @@ const ConditionGroupDetails = () => {
                                               color="secondary"
                                               title="Update Description"
                                               onClick={onUpdateDescriptionConfirmed}
-                                              disabled={isUpdatingGroupDetails}
+                                              disabled={isUpdatingGroupDetails || updatedDescription === conditionGroupsDetails.description}
                                           >
                                               <i className="fa fa-check" />
                                           </Button>

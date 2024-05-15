@@ -13,7 +13,7 @@ import style from './Widget.module.scss';
 
 interface WidgetInfoCard {
     title: string;
-    heading: string;
+    heading?: string;
     description: string;
     notesList?: string[];
 }
@@ -114,7 +114,7 @@ function Widget({
                 <Collapse isOpen={showWidgetInfo}>
                     <Card color="default">
                         <CardHeader>{widgetInfoCard.title}</CardHeader>
-                        <h2 className="ms-3 mb-0 mt-3">{widgetInfoCard.heading}</h2>
+                        {widgetInfoCard.heading && <h2 className="ms-3 mb-0 mt-3">{widgetInfoCard.heading}</h2>}
                         <CardBody>
                             {widgetInfoCard.description && <p>{widgetInfoCard.description}</p>}
 

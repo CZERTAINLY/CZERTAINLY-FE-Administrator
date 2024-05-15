@@ -26,7 +26,7 @@ const TriggerDetails = () => {
     const rules = useSelector(rulesSelectors.rules);
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [updateDescriptionEditEnable, setUpdateDescription] = useState<boolean>(false);
-    const [updatedDescription, setUpdatedDescription] = useState<string>(triggerDetails?.description || '');
+    const [updatedDescription, setUpdatedDescription] = useState(triggerDetails?.description);
     const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.RuleTriggerType));
 
     useEffect(() => {
@@ -274,7 +274,7 @@ const TriggerDetails = () => {
                                               color="secondary"
                                               title="Update Description"
                                               onClick={onUpdateDescriptionConfirmed}
-                                              disabled={isUpdatingTrigger}
+                                              disabled={isUpdatingTrigger || updatedDescription === triggerDetails.description}
                                           >
                                               <i className="fa fa-check" />
                                           </Button>
@@ -426,8 +426,7 @@ const TriggerDetails = () => {
                         title="Action Groups"
                         titleSize="large"
                         widgetInfoCard={{
-                            title: 'Action Group information',
-                            heading: 'Overview',
+                            title: 'Information',
                             description: 'Action group is named set of actions for selected trigger',
                         }}
                     >
