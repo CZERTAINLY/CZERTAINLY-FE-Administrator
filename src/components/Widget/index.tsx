@@ -1,5 +1,5 @@
 import cx from 'classnames';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import Spinner from 'components/Spinner';
 import WidgetButtons, { WidgetButtonProps } from 'components/WidgetButtons';
@@ -7,8 +7,16 @@ import WidgetLock from 'components/WidgetLock';
 import { selectors } from 'ducks/user-interface';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { Card, CardBody, CardHeader, Collapse } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import style from './Widget.module.scss';
+
+interface WidgetInfoCard {
+    title: string;
+    heading: string;
+    description: string;
+    notesList?: string[];
+}
 
 interface Props {
     title?: string;
@@ -24,6 +32,7 @@ interface Props {
     widgetExtraTopNode?: React.ReactNode;
     hideWidgetButtons?: boolean;
     lockSize?: 'small' | 'normal' | 'large';
+    widgetInfoCard?: WidgetInfoCard;
 }
 
 function Widget({
@@ -40,8 +49,10 @@ function Widget({
     widgetExtraTopNode,
     hideWidgetButtons = false,
     lockSize = 'normal',
+    widgetInfoCard,
 }: Props) {
     const widgetLock = useSelector(selectors.selectWidgetLocks).find((lock) => lock.widgetName === widgetLockName);
+    const [showWidgetInfo, setShowWidgetInfo] = useState(false);
 
     const getTitleText = () =>
         title ? (
@@ -72,8 +83,14 @@ function Widget({
 
     const renderWidgetButtons = useCallback(() => {
         const updatedWidgetButtons = widgetButtons?.map((button) => ({ ...button, disabled: widgetLock ? true : button.disabled })) || [];
+        if (widgetInfoCard)
+            updatedWidgetButtons.push({
+                icon: 'info',
+                onClick: () => setShowWidgetInfo(!showWidgetInfo),
+                disabled: false,
+            });
 
-        if (!widgetButtons) return null;
+        if (!updatedWidgetButtons.length) return null;
         if (hideWidgetButtons) return null;
         else {
             return (
@@ -82,16 +99,36 @@ function Widget({
                 </div>
             );
         }
-    }, [widgetButtons, hideWidgetButtons, widgetLock]);
+    }, [widgetButtons, hideWidgetButtons, widgetLock, widgetInfoCard, showWidgetInfo]);
 
     return (
         <section className={cx(style.widget, className)}>
             <div className="d-flex align-items-center">
-                {renderTitle()}
+                <div>{renderTitle()}</div>
                 {renderRefreshButton()}
                 {renderWidgetButtons()}
                 {widgetExtraTopNode}
             </div>
+
+            {widgetInfoCard && (
+                <Collapse isOpen={showWidgetInfo}>
+                    <Card color="default">
+                        <CardHeader>{widgetInfoCard.title}</CardHeader>
+                        <h2 className="ms-3 mb-0 mt-3">{widgetInfoCard.heading}</h2>
+                        <CardBody>
+                            {widgetInfoCard.description && <p>{widgetInfoCard.description}</p>}
+
+                            {widgetInfoCard.notesList && (
+                                <ul>
+                                    {widgetInfoCard.notesList.map((note, index) => (
+                                        <li key={index}>{note}</li>
+                                    ))}
+                                </ul>
+                            )}
+                        </CardBody>
+                    </Card>
+                </Collapse>
+            )}
             {widgetLock ? (
                 <WidgetLock
                     lockTitle={widgetLock.lockTitle}

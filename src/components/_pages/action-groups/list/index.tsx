@@ -126,8 +126,24 @@ const ActionGroupsList = () => {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget titleSize="larger" title="Action Groups" refreshAction={getFreshListActionGroups} busy={isBusy} widgetButtons={buttons}>
-                <p className="mb-2">Action group is named set of action for selected resource</p>
+            <Widget
+                titleSize="larger"
+                title="Action Groups"
+                refreshAction={getFreshListActionGroups}
+                busy={isBusy}
+                widgetButtons={buttons}
+                // widgetInfoCard={{
+                //     title: 'Overview',
+                //     heading: 'What is a Action Group?',
+                //     description: 'Action group is named set of actions for selected trigger',
+                // }}
+
+                widgetInfoCard={{
+                    title: 'Action Group information',
+                    heading: 'Overview',
+                    description: 'Action group is named set of actions for selected trigger',
+                }}
+            >
                 <CustomTable
                     checkedRows={checkedRows}
                     hasCheckboxes

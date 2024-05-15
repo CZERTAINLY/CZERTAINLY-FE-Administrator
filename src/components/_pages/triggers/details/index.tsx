@@ -1,4 +1,3 @@
-import cx from 'classnames';
 import ConditionsViewer from 'components/ConditionsViewer';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
@@ -11,7 +10,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
 import { Button, ButtonGroup, Col, Container, Input, Row } from 'reactstrap';
 import { PlatformEnum } from 'types/openapi';
-import styles from './triggerDetails.module.scss';
 interface SelectChangeValue {
     value: string;
     label: string;
@@ -96,7 +94,7 @@ const TriggerDetails = () => {
             );
         }
         setUpdateDescription(false);
-    }, [dispatch, id, triggerDetails, updatedDescription]);
+    }, [dispatch, id, triggerDetails, updatedDescription, updateDescriptionEditEnable]);
 
     const onUpdateActionGroupsConfirmed = useCallback(
         (newValues: SelectChangeValue[]) => {
@@ -204,20 +202,6 @@ const TriggerDetails = () => {
         [],
     );
 
-    const actionGroupsButtons: WidgetButtonProps[] = useMemo(
-        () => [
-            {
-                icon: 'info',
-                disabled: false,
-                onClick: () => {},
-                custom: (
-                    <i className={cx('fa fa-info', styles.infoIcon)} title="Action group is named set of actions for selected trigger" />
-                ),
-            },
-        ],
-        [],
-    );
-
     const triggerDetailHeader: TableHeader[] = useMemo(
         () => [
             {
@@ -251,7 +235,10 @@ const TriggerDetails = () => {
                       },
                       {
                           id: 'triggerResource',
-                          columns: ['Trigger Resource', triggerDetails.triggerResource || ''],
+                          columns: [
+                              'Trigger Resource',
+                              triggerDetails?.triggerResource ? getEnumLabel(resourceTypeEnum, triggerDetails.triggerResource) : '',
+                          ],
                       },
                       {
                           id: 'triggerType',
@@ -322,6 +309,7 @@ const TriggerDetails = () => {
                       },
                   ],
         [
+            triggerTypeEnum,
             triggerDetails,
             resourceTypeEnum,
             onUpdateDescriptionConfirmed,
@@ -432,7 +420,16 @@ const TriggerDetails = () => {
                     </Widget>
                 </Col>
                 <Col>
-                    <Widget widgetButtons={actionGroupsButtons} busy={isBusy} title="Action Groups" titleSize="large">
+                    <Widget
+                        busy={isBusy}
+                        title="Action Groups"
+                        titleSize="large"
+                        widgetInfoCard={{
+                            title: 'Action Group information',
+                            heading: 'Overview',
+                            description: 'Action group is named set of actions for selected trigger',
+                        }}
+                    >
                         <CustomTable
                             data={actionGroupsFieldsData}
                             headers={actionGroupFieldsDataHeader}

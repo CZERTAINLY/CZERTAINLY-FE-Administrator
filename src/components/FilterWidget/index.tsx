@@ -259,7 +259,7 @@ export default function FilterWidget({
                 </>
             );
         },
-        [isFetchingAvailableFilters],
+        [isFetchingAvailableFilters, FilterConditionOperatorEnum, disableBadgeRemove, onRemoveFilterClick, searchGroupEnum],
     );
 
     return (

@@ -389,22 +389,6 @@ export default function FilterWidgetRuleAction({
 
     const isActionTypeIgnore = actions.some((a) => a.actionType === RuleActionType.Ignore);
 
-    // const areValuesSameForFilter = useMemo(() => {
-    //     const isSelectedActionTypeSame = ruleActionType?.value === actions[selectedFilter.filterNumber]?.actionType;
-    //     const isSelectedFieldSourceSame = fieldSource?.value === actions[selectedFilter.filterNumber]?.fieldSource;
-    //     const isSelectedFieldSame = filterField?.value === actions[selectedFilter.filterNumber]?.fieldIdentifier;
-    //     const isSelectedValueSame = JSON.stringify(filterValue) === JSON.stringify(actions[selectedFilter.filterNumber]?.actionData);
-
-    //     console.log({
-    //         isSelectedActionTypeSame,
-    //         isSelectedFieldSourceSame,
-    //         isSelectedFieldSame,
-    //         isSelectedValueSame,
-    //     });
-
-    //     return isSelectedActionTypeSame && isSelectedFieldSourceSame && isSelectedFieldSame && isSelectedValueSame;
-    // }, [selectedFilter, actionsList]);
-
     const renderBadgeContent = useCallback(
         (itemNumber: number, actionType: string, value: string, label?: string, fieldSource?: string) => {
             if (isFetchingAvailableFilters) return <></>;
@@ -420,7 +404,7 @@ export default function FilterWidgetRuleAction({
                 </>
             );
         },
-        [isFetchingAvailableFilters],
+        [isFetchingAvailableFilters, RuleActionTypeEnum, onRemoveFilterClick, searchGroupEnum],
     );
 
     return (

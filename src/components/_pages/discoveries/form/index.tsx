@@ -125,24 +125,6 @@ export default function DiscoveryForm() {
 
     const onSubmit = useCallback(
         (values: FormValues, form: any) => {
-            console.log('values', {
-                request: {
-                    name: values.name!,
-                    triggers: values.triggers?.map((trigger) => trigger.value) ?? [],
-                    connectorUuid: values.discoveryProvider!.value,
-                    kind: values.storeKind?.value!,
-                    attributes: collectFormAttributes(
-                        'discovery',
-                        [...(discoveryProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
-                        values,
-                    ),
-                    customAttributes: collectFormAttributes('customDiscovery', resourceCustomAttributes, values),
-                },
-                scheduled: values.scheduled,
-                jobName: values.jobName,
-                cronExpression: values.cronExpression,
-                oneTime: values.oneTime,
-            });
             dispatch(
                 discoveryActions.createDiscovery({
                     request: {

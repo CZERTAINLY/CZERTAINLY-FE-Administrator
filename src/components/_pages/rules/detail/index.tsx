@@ -1,4 +1,3 @@
-import cx from 'classnames';
 import ConditionsViewer from 'components/ConditionsViewer';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
@@ -11,7 +10,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
 import { Button, ButtonGroup, Col, Container, Input, Row } from 'reactstrap';
 import { PlatformEnum } from 'types/openapi';
-import styles from './rulesDetail.module.scss';
 interface SelectChangeValue {
     value: string;
     label: string;
@@ -136,23 +134,6 @@ const RuleDetails = () => {
                 icon: 'trash',
                 disabled: false,
                 onClick: () => setConfirmDelete(true),
-            },
-        ],
-        [],
-    );
-
-    const conditionGroupsButtons: WidgetButtonProps[] = useMemo(
-        () => [
-            {
-                icon: 'info',
-                disabled: false,
-                onClick: () => {},
-                custom: (
-                    <i
-                        className={cx('fa fa-info', styles.infoIcon)}
-                        title="Condition group is named set of conditions for selected resource that can be reused in rules of same resource"
-                    />
-                ),
             },
         ],
         [],
@@ -308,7 +289,17 @@ const RuleDetails = () => {
                     </Widget>
                 </Col>
                 <Col>
-                    <Widget widgetButtons={conditionGroupsButtons} busy={isBusy} title="Condition Groups" titleSize="large">
+                    <Widget
+                        busy={isBusy}
+                        title="Condition Groups"
+                        titleSize="large"
+                        widgetInfoCard={{
+                            title: 'Condition Group information',
+                            heading: 'Overview',
+                            description:
+                                'Condition group is named set of conditions for selected resource that can be reused in rules of same resource',
+                        }}
+                    >
                         <CustomTable
                             data={conditionGroupFieldsData}
                             headers={conditionGroupFieldsDataHeader}

@@ -6,6 +6,7 @@ import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions, selectors } from 'ducks/discoveries';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
@@ -14,7 +15,7 @@ import { Col, Container, Label, Row } from 'reactstrap';
 
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { dateFormatter } from 'utils/dateUtil';
-import { Resource } from '../../../../types/openapi';
+import { PlatformEnum, Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import DiscoveryStatus from '../DiscoveryStatus';
 import DiscoveryCertificates from './DiscoveryCertificates';
@@ -32,6 +33,8 @@ export default function DiscoveryDetail() {
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
     const isBusy = useMemo(() => isFetching || isDeleting, [isFetching, isDeleting]);
+    const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
+    const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.RuleTriggerType));
 
     const getFreshDiscoveryDetails = useCallback(() => {
         if (!id) return;
@@ -139,19 +142,32 @@ export default function DiscoveryDetail() {
 
     const triggerHeaders: TableHeader[] = [
         {
-            id: 'uuid',
-            content: 'Uuiod',
+            id: 'name',
+            content: 'Name',
         },
         {
-            id: 'name',
-            content: 'name',
+            id: 'triggerSource',
+            content: 'Trigger Source',
+        },
+        {
+            id: 'triggerType',
+            content: 'Trigger Type',
+        },
+        {
+            id: 'description',
+            content: 'Description',
         },
     ];
 
     const triggerTableData: TableDataRow[] = discovery?.triggers.length
         ? discovery.triggers.map((trigger) => ({
               id: trigger.uuid,
-              columns: [trigger.uuid, trigger.name],
+              columns: [
+                  <Link to={`../../triggers/detail/${trigger.uuid}`}>{trigger.name}</Link>,
+                  trigger?.triggerResource ? getEnumLabel(resourceTypeEnum, trigger.triggerResource) : '',
+                  getEnumLabel(triggerTypeEnum, trigger.triggerType),
+                  trigger?.description || '',
+              ],
           }))
         : [];
 

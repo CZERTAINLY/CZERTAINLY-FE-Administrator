@@ -81,10 +81,7 @@ const ConditionGroupForm = () => {
             dispatch(
                 rulesActions.createConditionGroup({
                     ruleConditionGroupRequest: {
-                        conditions: values.conditions.map((condition) => ({
-                            ...condition,
-                            value: Array.isArray(condition.value) ? condition.value.map((v) => v?.uuid || v) : condition.value,
-                        })),
+                        conditions: values.conditions,
                         name: values.name,
                         resource: values.resource,
                         description: values.description,
