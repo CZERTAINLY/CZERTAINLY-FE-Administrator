@@ -212,6 +212,14 @@ export default function DiscoveryForm() {
             content: 'Event Name',
         },
         {
+            id: 'resource',
+            content: 'Resource',
+        },
+        {
+            id: 'description',
+            content: 'Description',
+        },
+        {
             id: 'actions',
             content: 'Actions',
         },
@@ -233,6 +241,8 @@ export default function DiscoveryForm() {
                 getEnumLabel(resourceTypeEnum, trigger.triggerResource || ''),
                 getEnumLabel(triggerTypeEnum, trigger.triggerType),
                 getEnumLabel(eventNameEnum, trigger.eventName || ''),
+                getEnumLabel(resourceTypeEnum, trigger.resource || ''),
+                trigger.description || '',
                 <Button
                     className="btn btn-link text-danger"
                     size="sm"

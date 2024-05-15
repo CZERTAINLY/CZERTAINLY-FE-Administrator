@@ -158,6 +158,14 @@ export default function DiscoveryDetail() {
             id: 'eventName',
             content: 'Event Name',
         },
+        {
+            id: 'resource',
+            content: 'Resource',
+        },
+        {
+            id: 'description',
+            content: 'Description',
+        },
     ];
 
     const triggerTableData: TableDataRow[] = discovery?.triggers.length
@@ -168,6 +176,8 @@ export default function DiscoveryDetail() {
                   trigger?.triggerResource ? getEnumLabel(resourceTypeEnum, trigger.triggerResource) : '',
                   getEnumLabel(triggerTypeEnum, trigger.triggerType),
                   getEnumLabel(eventNameEnum, trigger.eventName || ''),
+                  getEnumLabel(resourceTypeEnum, trigger.resource || ''),
+                  trigger.description || '',
               ],
           }))
         : [];

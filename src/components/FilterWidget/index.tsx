@@ -252,7 +252,7 @@ export default function FilterWidget({
         }
 
         return [];
-    }, [currentField]);
+    }, [currentField, currentFilters, selectedFilter]);
 
     const getBadgeContent = useCallback(
         (itemNumber: number, fieldSource: string, fieldCondition: string, label: string, value: string) => {
