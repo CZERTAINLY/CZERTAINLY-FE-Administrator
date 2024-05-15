@@ -33,16 +33,15 @@ const NewRowWidget = ({ newItemsList, isBusy, onAddClick }: NewRowWidgetProps) =
                     <ButtonGroup>
                         <Button
                             disabled={isBusy}
-                            className="btn btn-link ms-2 mt-2 p-1"
+                            className="btn btn-link ms-2 mt-0 p-3"
                             size="sm"
                             color="secondary"
-                            title="Update Description"
                             onClick={() => {
                                 onAddClick(selectedItems);
                                 setSelectedItems([]);
                             }}
                         >
-                            <i className="fa fa-check" />
+                            <i className="fa fa-add" />
                         </Button>
                     </ButtonGroup>
                 ) : null}

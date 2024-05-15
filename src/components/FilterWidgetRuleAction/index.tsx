@@ -419,6 +419,13 @@ export default function FilterWidgetRuleAction({
         [isFetchingAvailableFilters, RuleActionTypeEnum, onRemoveFilterClick, searchGroupEnum],
     );
 
+    const isUpdateButtonDisabled = useMemo(() => {
+        {
+            if (ruleActionType?.value === RuleActionType.Ignore) return false;
+            return !filterField || !fieldSource || !ruleActionType || !filterValue;
+        }
+    }, [filterField, fieldSource, ruleActionType, filterValue]);
+
     return (
         <>
             <Widget title={title} busy={isFetchingAvailableFilters} titleSize="larger">
@@ -517,7 +524,8 @@ export default function FilterWidgetRuleAction({
                                     style={{ width: '7em', marginTop: '2em' }}
                                     color="primary"
                                     onClick={onUpdateClick}
-                                    disabled={!filterField || !fieldSource || !ruleActionType || !filterValue}
+                                    // disabled={!filterField || !fieldSource || !ruleActionType || !filterValue}
+                                    disabled={isUpdateButtonDisabled}
                                 >
                                     {selectedFilter.filterNumber === -1 ? 'Add' : 'Update'}
                                 </Button>
@@ -556,7 +564,9 @@ export default function FilterWidgetRuleAction({
                                 onClick={() => toggleFilter(i)}
                                 color={selectedFilter.filterNumber === i ? 'primary' : 'secondary'}
                             >
-                                {!isActionTypeIgnore && <>{renderBadgeContent(i, f.actionType, value, label, f.fieldSource)}</>}
+                                {!isActionTypeIgnore && !isFetchingAvailableFilters && (
+                                    <>{renderBadgeContent(i, f.actionType, value, label, f.fieldSource)}</>
+                                )}
                             </Badge>
                         );
                     })}

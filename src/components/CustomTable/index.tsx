@@ -45,11 +45,6 @@ interface Props {
     onPageSizeChanged?: (pageSize: number) => void;
     onPageChanged?: (page: number) => void;
     newRowWidgetProps?: NewRowWidgetProps;
-    // interface NewRowWidgetProps {
-    //     newItemsList: SelectChangeValue[];
-    //     isBusy: boolean;
-    //     onAddClick: (newValues: SelectChangeValue[]) => void;
-    // }
 }
 
 const emptyCheckedRows: (string | number)[] = [];

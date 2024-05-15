@@ -428,7 +428,7 @@ export default function FilterWidget({
                                 onClick={() => toggleFilter(i)}
                                 color={selectedFilter === i ? 'primary' : 'secondary'}
                             >
-                                {getBadgeContent(i, f.fieldSource, f.condition, label, value)}
+                                {!isFetchingAvailableFilters && getBadgeContent(i, f.fieldSource, f.condition, label, value)}
                             </Badge>
                         );
                     })}

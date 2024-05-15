@@ -234,7 +234,7 @@ export default function DiscoveryForm() {
                     selectedTriggers.findIndex((selectedTrigger) => selectedTrigger.value === b.uuid),
             );
 
-        return triggerDataListOrderedAsPerSelectedTriggers.map((trigger) => ({
+        return triggerDataListOrderedAsPerSelectedTriggers.map((trigger, i) => ({
             id: trigger.uuid,
             columns: [
                 <Link to={`../../triggers/detail/${trigger.uuid}`}>{trigger.name}</Link>,
@@ -243,17 +243,54 @@ export default function DiscoveryForm() {
                 getEnumLabel(eventNameEnum, trigger.eventName || ''),
                 getEnumLabel(resourceTypeEnum, trigger.resource || ''),
                 trigger.description || '',
-                <Button
-                    className="btn btn-link text-danger"
-                    size="sm"
-                    color="danger"
-                    title="Delete Condition Group"
-                    onClick={() => {
-                        setSelectedTriggers(selectedTriggers.filter((selectedTrigger) => selectedTrigger.value !== trigger.uuid));
-                    }}
-                >
-                    <i className="fa fa-trash" />
-                </Button>,
+                <div className="d-flex">
+                    <Button
+                        className="btn btn-link text-danger"
+                        size="sm"
+                        color="danger"
+                        title="Delete Condition Group"
+                        onClick={() => {
+                            setSelectedTriggers(selectedTriggers.filter((selectedTrigger) => selectedTrigger.value !== trigger.uuid));
+                        }}
+                    >
+                        <i className="fa fa-trash" />
+                    </Button>
+                    <Button
+                        className="btn btn-link"
+                        size="sm"
+                        title="Move Trigger Up"
+                        disabled={i === 0}
+                        onClick={() => {
+                            const index = selectedTriggers.findIndex((selectedTrigger) => selectedTrigger.value === trigger.uuid);
+                            if (index === 0) return;
+                            const newSelectedTriggers = [...selectedTriggers];
+                            const temp = newSelectedTriggers[index];
+                            newSelectedTriggers[index] = newSelectedTriggers[index - 1];
+                            newSelectedTriggers[index - 1] = temp;
+                            setSelectedTriggers(newSelectedTriggers);
+                        }}
+                    >
+                        <i className="fa fa-arrow-up" />
+                    </Button>
+
+                    <Button
+                        className="btn btn-link"
+                        size="sm"
+                        title="Move Trigger Down"
+                        disabled={i === selectedTriggers.length - 1}
+                        onClick={() => {
+                            const index = selectedTriggers.findIndex((selectedTrigger) => selectedTrigger.value === trigger.uuid);
+                            if (index === selectedTriggers.length - 1) return;
+                            const newSelectedTriggers = [...selectedTriggers];
+                            const temp = newSelectedTriggers[index];
+                            newSelectedTriggers[index] = newSelectedTriggers[index + 1];
+                            newSelectedTriggers[index + 1] = temp;
+                            setSelectedTriggers(newSelectedTriggers);
+                        }}
+                    >
+                        <i className="fa fa-arrow-down" />
+                    </Button>
+                </div>,
             ],
         }));
     }, [selectedTriggers, triggers, eventNameEnum, resourceTypeEnum, triggerTypeEnum]);

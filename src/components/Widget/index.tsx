@@ -112,7 +112,7 @@ function Widget({
 
             {widgetInfoCard && (
                 <Collapse isOpen={showWidgetInfo}>
-                    <Card color="default">
+                    <Card color="default" className="my-2">
                         <CardHeader>{widgetInfoCard.title}</CardHeader>
                         {widgetInfoCard.heading && <h2 className="ms-3 mb-0 mt-3">{widgetInfoCard.heading}</h2>}
                         <CardBody>
