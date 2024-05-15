@@ -219,7 +219,7 @@ export default function FilterWidgetRuleAction({
         if (!currentField) return [];
 
         if (Array.isArray(currentField?.value)) {
-            return currentField?.value?.map((v, i) => {
+            const objectOptions = currentField?.value?.map((v, i) => {
                 let label = '';
                 let value = '';
                 if (typeof v === 'string') {
@@ -232,10 +232,22 @@ export default function FilterWidgetRuleAction({
 
                 return { label, value };
             });
+
+            if (selectedFilter.filterNumber === -1) return objectOptions;
+
+            const currentActionData = actions[selectedFilter.filterNumber]?.actionData;
+
+            const filteredOptions = objectOptions.filter((o) => {
+                if (Array.isArray(currentActionData)) {
+                    return !currentActionData.some((a) => a?.name === o?.label);
+                }
+            });
+
+            return filteredOptions;
         }
 
         return [];
-    }, [currentField]);
+    }, [currentField, actions, selectedFilter]);
 
     useEffect(() => {
         // this effect is for updating dropdowns when a filter is selected
@@ -529,7 +541,7 @@ export default function FilterWidgetRuleAction({
                                                     field?.platformEnum ? platformEnums[field.platformEnum][v]?.label : v?.name ? v.name : v
                                                 }'`,
                                         )
-                                        .join(' OR ')}`
+                                        .join(', ')}`
                                   : f.actionData
                                     ? `'${
                                           field?.platformEnum

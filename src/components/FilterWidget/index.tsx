@@ -224,7 +224,7 @@ export default function FilterWidget({
         if (!currentField) return [];
 
         if (Array.isArray(currentField?.value)) {
-            return currentField?.value?.map((v, i) => {
+            const objectOptions = currentField?.value?.map((v, i) => {
                 let label = '';
                 let value = '';
                 if (typeof v === 'string') {
@@ -237,6 +237,18 @@ export default function FilterWidget({
 
                 return { label, value };
             });
+
+            if (selectedFilter === -1) return objectOptions;
+
+            const currentValue = currentFilters[selectedFilter].value;
+
+            const filteredOptions = objectOptions.filter((o) => {
+                if (Array.isArray(currentValue)) {
+                    return !currentValue.some((a) => a?.name === o?.label);
+                }
+            });
+
+            return filteredOptions;
         }
 
         return [];
