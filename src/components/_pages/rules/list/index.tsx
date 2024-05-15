@@ -130,7 +130,17 @@ const ConditionGroups = () => {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget titleSize="larger" title="Rules" refreshAction={getFreshList} busy={isBusy} widgetButtons={buttons}>
+            <Widget
+                titleSize="larger"
+                title="Rules"
+                refreshAction={getFreshList}
+                busy={isBusy}
+                widgetButtons={buttons}
+                widgetInfoCard={{
+                    title: 'Information',
+                    description: 'Rules are combination of conditions and condition groups',
+                }}
+            >
                 <br />
                 <CustomTable
                     checkedRows={checkedRows}

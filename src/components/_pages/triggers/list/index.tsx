@@ -158,7 +158,17 @@ const TriggerList = () => {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget titleSize="larger" title="Triggers" refreshAction={getFreshList} busy={isBusy} widgetButtons={buttons}>
+            <Widget
+                titleSize="larger"
+                title="Triggers"
+                refreshAction={getFreshList}
+                busy={isBusy}
+                widgetButtons={buttons}
+                widgetInfoCard={{
+                    title: 'Information',
+                    description: 'Triggers are defined to trigger actions based on certain conditions of a resource',
+                }}
+            >
                 <br />
                 <CustomTable
                     checkedRows={checkedRows}
