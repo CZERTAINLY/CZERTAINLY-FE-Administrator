@@ -168,7 +168,7 @@ const createTrigger: AppEpic = (action$, state, deps) => {
                 .pipe(
                     switchMap((trigger) =>
                         of(
-                            slice.actions.createTriggerSuccess({ trigger: transformTriggerRuleDtoToModel(trigger) }),
+                            slice.actions.createTriggerSuccess({ trigger: transformTriggerRuleDetailDtoToModel(trigger) }),
                             appRedirectActions.redirect({ url: `../../triggers` }),
                         ),
                     ),
@@ -364,7 +364,8 @@ const updateConditionGroup: AppEpic = (action$, state, deps) => {
                     catchError((err) =>
                         of(
                             slice.actions.updateConditionGroupFailure({ error: extractError(err, 'Failed to update condition group') }),
-                            alertActions.error('Failed to update Condition Group'),
+                            alertActions.error(extractError(err, 'Failed to update Condition Group')),
+                            slice.actions.getConditionGroup({ conditionGroupUuid: action.payload.conditionGroupUuid }),
                         ),
                     ),
                 ),
@@ -391,7 +392,8 @@ const updateRule: AppEpic = (action$, state, deps) => {
                     catchError((err) =>
                         of(
                             slice.actions.updateRuleFailure({ error: extractError(err, 'Failed to update rule') }),
-                            alertActions.error('Failed to update rule'),
+                            alertActions.error(extractError(err, 'Failed to update rule')),
+                            slice.actions.getRule({ ruleUuid: action.payload.ruleUuid }),
                         ),
                     ),
                 ),

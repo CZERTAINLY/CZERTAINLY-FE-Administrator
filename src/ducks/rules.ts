@@ -183,8 +183,7 @@ export const slice = createSlice({
             state.isCreatingTrigger = true;
         },
 
-        createTriggerSuccess: (state, action: PayloadAction<{ trigger: TriggerRuleModel }>) => {
-            state.triggers.push(action.payload.trigger);
+        createTriggerSuccess: (state, action: PayloadAction<{ trigger: TriggerRuleDetailModel }>) => {
             state.isCreatingTrigger = false;
         },
 
@@ -345,10 +344,6 @@ export const slice = createSlice({
         },
 
         updateTriggerSuccess: (state, action: PayloadAction<{ trigger: TriggerRuleDetailModel }>) => {
-            state.triggers = state.triggers.map((trigger) =>
-                trigger.uuid === action.payload.trigger.uuid ? action.payload.trigger : trigger,
-            );
-
             if (state.triggerDetails?.uuid === action.payload.trigger.uuid) {
                 state.triggerDetails = action.payload.trigger;
             }

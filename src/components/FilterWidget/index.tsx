@@ -32,15 +32,28 @@ const noValue: { [condition in FilterConditionOperator]: boolean } = {
     [FilterConditionOperator.NotChecked]: true,
 };
 
+interface ObjectValueOptions {
+    label: string;
+    value: string | any;
+}
+
 interface Props {
     title: string;
     entity: EntityType;
     getAvailableFiltersApi: (apiClients: ApiClients) => Observable<Array<SearchFieldListModel>>;
     onFilterUpdate?: (currentFilters: SearchFilterModel[]) => void;
     appendInWidgetContent?: React.ReactNode;
+    disableBadgeRemove?: boolean;
 }
 
-export default function FilterWidget({ appendInWidgetContent, onFilterUpdate, title, entity, getAvailableFiltersApi }: Props) {
+export default function FilterWidget({
+    appendInWidgetContent,
+    onFilterUpdate,
+    title,
+    entity,
+    getAvailableFiltersApi,
+    disableBadgeRemove,
+}: Props) {
     const dispatch = useDispatch();
 
     const searchGroupEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.FilterFieldSource));
@@ -124,12 +137,22 @@ export default function FilterWidget({ appendInWidgetContent, onFilterUpdate, ti
         }
 
         if (Array.isArray(currentFilters[selectedFilter].value)) {
-            setFilterValue(
-                (currentFilters[selectedFilter].value as Array<object>).map((v: object) => {
-                    const label = field.platformEnum ? platformEnums[field.platformEnum][v as unknown as string].label : v;
-                    return { label, value: v };
-                }),
-            );
+            const currentValue = currentFilters[selectedFilter].value as Array<object>;
+            const newFilterValue = currentValue.map((v: any) => {
+                let label = '';
+                let value = '';
+                if (typeof v === 'string') {
+                    label = v;
+                    value = v;
+                } else {
+                    label = v?.name || JSON.stringify(v);
+                    value = v;
+                }
+
+                return { label, value };
+            });
+
+            setFilterValue(newFilterValue);
         }
     }, [availableFilters, currentFilters, selectedFilter, booleanOptions, platformEnums, FilterConditionOperatorEnum, searchGroupEnum]);
 
@@ -162,8 +185,9 @@ export default function FilterWidget({ appendInWidgetContent, onFilterUpdate, ti
                     : Array.isArray(filterValue)
                       ? filterValue.map((v) => (v as any).value)
                       : (filterValue as any).value
-                : '',
+                : undefined,
         };
+
         const newFilters =
             selectedFilter === -1
                 ? [...currentFilters, updatedFilterItem]
@@ -195,6 +219,48 @@ export default function FilterWidget({ appendInWidgetContent, onFilterUpdate, ti
     );
 
     const currentField = useMemo(() => currentFields?.find((f) => f.fieldIdentifier === filterField?.value), [filterField, currentFields]);
+
+    const objectValueOptions: ObjectValueOptions[] = useMemo(() => {
+        if (!currentField) return [];
+
+        if (Array.isArray(currentField?.value)) {
+            return currentField?.value?.map((v, i) => {
+                let label = '';
+                let value = '';
+                if (typeof v === 'string') {
+                    label = v;
+                    value = v;
+                } else {
+                    label = v?.name || JSON.stringify(v);
+                    value = v;
+                }
+
+                return { label, value };
+            });
+        }
+
+        return [];
+    }, [currentField]);
+
+    const getBadgeContent = useCallback(
+        (itemNumber: number, fieldSource: string, fieldCondition: string, label: string, value: string) => {
+            if (isFetchingAvailableFilters) return <></>;
+
+            return (
+                <>
+                    <b>{getEnumLabel(searchGroupEnum, fieldSource)}&nbsp;</b>'{label}'&nbsp;
+                    {getEnumLabel(FilterConditionOperatorEnum, fieldCondition)}&nbsp;
+                    {value}
+                    {!disableBadgeRemove && (
+                        <span className={styles.filterBadgeSpan} onClick={() => onRemoveFilterClick(itemNumber)}>
+                            &times;
+                        </span>
+                    )}
+                </>
+            );
+        },
+        [isFetchingAvailableFilters],
+    );
 
     return (
         <>
@@ -294,16 +360,7 @@ export default function FilterWidget({ appendInWidgetContent, onFilterUpdate, ti
                                     ) : (
                                         <Select
                                             id="value"
-                                            options={
-                                                filterField
-                                                    ? (currentField?.value as string[])?.map((v) => {
-                                                          const label = currentField.platformEnum
-                                                              ? platformEnums[currentField.platformEnum][(v ?? '') as string].label
-                                                              : v;
-                                                          return { label, value: v };
-                                                      })
-                                                    : undefined
-                                            }
+                                            options={objectValueOptions}
                                             value={filterValue || null}
                                             onChange={(e) => {
                                                 setFilterValue(e);
@@ -336,10 +393,15 @@ export default function FilterWidget({ appendInWidgetContent, onFilterUpdate, ti
                         const value =
                             field && field.type === FilterFieldType.Boolean
                                 ? `'${booleanOptions.find((b) => !!f.value === b.value)?.label}'`
-                                : Array.isArray(f.value) && f.value.length > 1
-                                  ? `(${f.value
-                                        .map((v) => `'${field?.platformEnum ? platformEnums[field.platformEnum][v]?.label : v}'`)
-                                        .join(' OR ')})`
+                                : Array.isArray(f.value)
+                                  ? `${f.value
+                                        .map(
+                                            (v) =>
+                                                `'${
+                                                    field?.platformEnum ? platformEnums[field.platformEnum][v]?.label : v?.name ? v.name : v
+                                                }'`,
+                                        )
+                                        .join(' OR ')}`
                                   : f.value
                                     ? `'${
                                           field?.platformEnum
@@ -354,12 +416,10 @@ export default function FilterWidget({ appendInWidgetContent, onFilterUpdate, ti
                                 onClick={() => toggleFilter(i)}
                                 color={selectedFilter === i ? 'primary' : 'secondary'}
                             >
-                                <b>{getEnumLabel(searchGroupEnum, f.fieldSource)}&nbsp;</b>'{label}'&nbsp;
+                                {/* <b>{getEnumLabel(searchGroupEnum, f.fieldSource)}&nbsp;</b>'{label}'&nbsp;
                                 {getEnumLabel(FilterConditionOperatorEnum, f.condition)}&nbsp;
-                                {value}
-                                <span className={styles.filterBadgeSpan} onClick={() => onRemoveFilterClick(i)}>
-                                    &times;
-                                </span>
+                                {value} */}
+                                {getBadgeContent(i, f.fieldSource, f.condition, label, value)}
                             </Badge>
                         );
                     })}

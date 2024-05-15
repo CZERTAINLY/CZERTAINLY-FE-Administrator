@@ -46,19 +46,20 @@ const ActionGroupDetails = () => {
     }, [dispatch, id]);
 
     const onUpdateDescriptionConfirmed = useCallback(() => {
-        if (!id) return;
-        dispatch(
-            rulesActions.updateActionGroup({
-                actionGroupUuid: id,
-                actionGroup: {
-                    description: updatedDescription,
-                    actions: actionGroupDetails?.actions || [],
-                    // conditions: actionGroupDetails?.conditions || [],
-                },
-            }),
-        );
+        if (!id || !updateDescriptionEditEnable) return;
+        if (updatedDescription !== actionGroupDetails?.description) {
+            dispatch(
+                rulesActions.updateActionGroup({
+                    actionGroupUuid: id,
+                    actionGroup: {
+                        description: updatedDescription,
+                        actions: actionGroupDetails?.actions || [],
+                    },
+                }),
+            );
+        }
         setUpdateDescription(false);
-    }, [dispatch, id, actionGroupDetails, updatedDescription]);
+    }, [dispatch, id, actionGroupDetails, updatedDescription, updateDescriptionEditEnable]);
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [

@@ -69,18 +69,20 @@ const RuleDetails = () => {
 
     const onUpdateDescriptionConfirmed = useCallback(() => {
         if (!id || !updateDescriptionEditEnable) return;
-        dispatch(
-            rulesActions.updateRule({
-                ruleUuid: id,
-                rule: {
-                    description: updatedDescription,
-                    conditions: ruleDetails?.conditions || [],
-                    conditionGroupsUuids: ruleDetails?.conditionGroups?.length
-                        ? ruleDetails?.conditionGroups.map((conditionGroup) => conditionGroup.uuid)
-                        : [],
-                },
-            }),
-        );
+        if (updatedDescription !== ruleDetails?.description) {
+            dispatch(
+                rulesActions.updateRule({
+                    ruleUuid: id,
+                    rule: {
+                        description: updatedDescription,
+                        conditions: ruleDetails?.conditions || [],
+                        conditionGroupsUuids: ruleDetails?.conditionGroups?.length
+                            ? ruleDetails?.conditionGroups.map((conditionGroup) => conditionGroup.uuid)
+                            : [],
+                    },
+                }),
+            );
+        }
         setUpdateDescription(false);
     }, [dispatch, id, ruleDetails, updatedDescription, updateDescriptionEditEnable]);
 
@@ -271,7 +273,7 @@ const RuleDetails = () => {
 
     const conditionGroupFieldsData: TableDataRow[] = useMemo(
         () =>
-            !ruleDetails?.conditions.length
+            !ruleDetails?.conditionGroups.length
                 ? []
                 : ruleDetails?.conditionGroups.map((conditionGroup) => {
                       return {

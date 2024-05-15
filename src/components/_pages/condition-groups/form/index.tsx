@@ -78,11 +78,13 @@ const ConditionGroupForm = () => {
     const onSubmit = useCallback(
         (values: ConditionGroupFormValues) => {
             if (values.resource === Resource.None) return;
-
             dispatch(
                 rulesActions.createConditionGroup({
                     ruleConditionGroupRequest: {
-                        conditions: values.conditions,
+                        conditions: values.conditions.map((condition) => ({
+                            ...condition,
+                            value: Array.isArray(condition.value) ? condition.value.map((v) => v?.uuid || v) : condition.value,
+                        })),
                         name: values.name,
                         resource: values.resource,
                         description: values.description,

@@ -15,6 +15,7 @@ import type {
     DiscoveryStatus,
     MetadataResponseDto,
     ResponseAttributeDto,
+    RuleTriggerDto,
 } from './';
 
 /**
@@ -99,6 +100,12 @@ export interface DiscoveryHistoryDetailDto {
      * @memberof DiscoveryHistoryDetailDto
      */
     metadata?: Array<MetadataResponseDto>;
+    /**
+     * List of associated triggers
+     * @type {Array<RuleTriggerDto>}
+     * @memberof DiscoveryHistoryDetailDto
+     */
+    triggers: Array<RuleTriggerDto>;
 }
 
 

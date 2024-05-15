@@ -30,11 +30,10 @@ const GroupConditionsViewer = ({ groupConditions = [], conditionGroupName, condi
 
     const renderConditionsBadges = () => {
         return groupConditions.map((condition) => {
-            const filterConditionSource = availableFilters.find((a) => a.filterFieldSource === condition.fieldSource);
-            const foundField = filterConditionSource?.searchFieldData?.find((s) => s.fieldIdentifier === condition.fieldIdentifier);
             const field = availableFilters
                 .find((a) => a.filterFieldSource === condition.fieldSource)
                 ?.searchFieldData?.find((s) => s.fieldIdentifier === condition.fieldIdentifier);
+
             const label = field ? field.fieldLabel : condition.fieldIdentifier;
             const value =
                 field && field.type === FilterFieldType.Boolean
@@ -50,6 +49,7 @@ const GroupConditionsViewer = ({ groupConditions = [], conditionGroupName, condi
                                   : condition.value
                           }'`
                         : '';
+
             return (
                 <Badge
                     key={condition.uuid}

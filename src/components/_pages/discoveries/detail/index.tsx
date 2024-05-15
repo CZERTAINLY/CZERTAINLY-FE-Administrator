@@ -137,20 +137,45 @@ export default function DiscoveryDetail() {
         [discovery],
     );
 
+    const triggerHeaders: TableHeader[] = [
+        {
+            id: 'uuid',
+            content: 'Uuiod',
+        },
+        {
+            id: 'name',
+            content: 'name',
+        },
+    ];
+
+    const triggerTableData: TableDataRow[] = discovery?.triggers.length
+        ? discovery.triggers.map((trigger) => ({
+              id: trigger.uuid,
+              columns: [trigger.uuid, trigger.name],
+          }))
+        : [];
+
     return (
         <Container className="themed-container" fluid>
-            <Widget
-                title="Certificate Discovery Details"
-                busy={isBusy}
-                widgetButtons={buttons}
-                titleSize="large"
-                refreshAction={getFreshDiscoveryDetails}
-                widgetLockName={LockWidgetNameEnum.DiscoveryDetails}
-            >
-                <br />
+            <Row xs="1" sm="1" md="2" lg="2" xl="2">
+                <Col>
+                    <Widget
+                        title="Certificate Discovery Details"
+                        busy={isBusy}
+                        widgetButtons={buttons}
+                        titleSize="large"
+                        refreshAction={getFreshDiscoveryDetails}
+                        widgetLockName={LockWidgetNameEnum.DiscoveryDetails}
+                    >
+                        <br />
 
-                <CustomTable headers={detailHeaders} data={detailData} />
-            </Widget>
+                        <CustomTable headers={detailHeaders} data={detailData} />
+                    </Widget>
+                </Col>
+                <Widget title="Assigned Triggers" busy={isBusy} titleSize="large" widgetLockName={LockWidgetNameEnum.DiscoveryDetails}>
+                    <CustomTable headers={triggerHeaders} data={triggerTableData} />
+                </Widget>
+            </Row>
 
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
                 <Col>

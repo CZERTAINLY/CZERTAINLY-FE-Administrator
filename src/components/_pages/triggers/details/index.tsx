@@ -77,21 +77,24 @@ const TriggerDetails = () => {
     }, [dispatch, id]);
 
     const onUpdateDescriptionConfirmed = useCallback(() => {
-        if (!id || !triggerDetails) return;
-        dispatch(
-            rulesActions.updateTrigger({
-                triggerUuid: id,
-                trigger: {
-                    description: updatedDescription,
-                    actions: triggerDetails?.actions || [],
-                    actionGroupsUuids: triggerDetails?.actionGroups?.length
-                        ? triggerDetails?.actionGroups.map((actionGroup) => actionGroup.uuid)
-                        : [],
-                    triggerType: triggerDetails.triggerType,
-                    rulesUuids: triggerDetails?.rules.map((rule) => rule.uuid) || [],
-                },
-            }),
-        );
+        if (!id || !triggerDetails || !updateDescriptionEditEnable) return;
+
+        if (updatedDescription !== triggerDetails.description) {
+            dispatch(
+                rulesActions.updateTrigger({
+                    triggerUuid: id,
+                    trigger: {
+                        description: updatedDescription,
+                        actions: triggerDetails?.actions || [],
+                        actionGroupsUuids: triggerDetails?.actionGroups?.length
+                            ? triggerDetails?.actionGroups.map((actionGroup) => actionGroup.uuid)
+                            : [],
+                        triggerType: triggerDetails.triggerType,
+                        rulesUuids: triggerDetails?.rules.map((rule) => rule.uuid) || [],
+                    },
+                }),
+            );
+        }
         setUpdateDescription(false);
     }, [dispatch, id, triggerDetails, updatedDescription]);
 
