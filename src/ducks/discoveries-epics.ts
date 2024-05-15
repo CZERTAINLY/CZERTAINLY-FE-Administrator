@@ -147,7 +147,7 @@ const createDiscovery: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.createDiscovery.match),
         switchMap((action) => {
-            const url = action.payload.scheduled ? '../../jobs/detail/' : '../detail/';
+            const url = action.payload.scheduled ? '../../jobs/detail/' : '../discoveries/detail/';
             return iif(
                 () => action.payload.scheduled,
                 deps.apiClients.discoveries.scheduleDiscovery({
@@ -181,7 +181,10 @@ const deleteDiscovery: AppEpic = (action$, state$, deps) => {
         switchMap((action) =>
             deps.apiClients.discoveries.deleteDiscovery({ uuid: action.payload.uuid }).pipe(
                 mergeMap(() =>
-                    of(slice.actions.deleteDiscoverySuccess({ uuid: action.payload.uuid }), appRedirectActions.redirect({ url: '../../' })),
+                    of(
+                        slice.actions.deleteDiscoverySuccess({ uuid: action.payload.uuid }),
+                        appRedirectActions.redirect({ url: '../../discoveries' }),
+                    ),
                 ),
 
                 catchError((err) =>

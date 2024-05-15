@@ -130,7 +130,7 @@ export const slice = createSlice({
             state.isFetchingConditionGroups = false;
         },
 
-        listTriggers: (state, action: PayloadAction<{ resource?: Resource }>) => {
+        listTriggers: (state, action: PayloadAction<{ resource?: Resource; triggerResouce?: Resource }>) => {
             state.isFetchingTriggers = true;
         },
         listTriggersSuccess: (state, action: PayloadAction<{ triggers: TriggerRuleModel[] }>) => {

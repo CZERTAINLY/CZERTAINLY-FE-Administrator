@@ -8,6 +8,7 @@ import { actions as connectorActions } from 'ducks/connectors';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
 
 import { actions as discoveryActions, selectors as discoverySelectors } from 'ducks/discoveries';
+import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { actions as userInterfaceActions } from '../../../../ducks/user-interface';
 
@@ -27,8 +28,15 @@ import { collectFormAttributes } from 'utils/attributes/attributes';
 
 import { getStrongFromCronExpression } from 'utils/dateUtil';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateQuartzCronExpression, validateRequired } from 'utils/validators';
+
+interface SelectChangeValue {
+    value: string;
+    label: string;
+}
+
 interface FormValues {
     name: string | undefined;
+    triggers: SelectChangeValue[] | undefined;
     discoveryProvider: { value: string; label: string } | undefined;
     storeKind: { value: string; label: string } | undefined;
     jobName: string | undefined;
@@ -44,6 +52,7 @@ export default function DiscoveryForm() {
     const discoveryProviders = useSelector(discoverySelectors.discoveryProviders);
     const discoveryProviderAttributeDescriptors = useSelector(discoverySelectors.discoveryProviderAttributeDescriptors);
     const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
+    const triggers = useSelector(rulesSelectors.triggers);
     const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
     const isFetchingDiscoveryDetail = useSelector(discoverySelectors.isFetchingDetail);
     const isFetchingDiscoveryProviders = useSelector(discoverySelectors.isFetchingDiscoveryProviders);
@@ -52,6 +61,15 @@ export default function DiscoveryForm() {
     const [init, setInit] = useState(true);
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
     const [discoveryProvider, setDiscoveryProvider] = useState<ConnectorResponseModel>();
+
+    const triggerOptions = useMemo(
+        () =>
+            triggers.map((trigger) => ({
+                label: trigger.name,
+                value: trigger.uuid,
+            })),
+        [triggers],
+    );
 
     const isBusy = useMemo(
         () =>
@@ -76,6 +94,7 @@ export default function DiscoveryForm() {
             dispatch(connectorActions.clearCallbackData());
             dispatch(discoveryActions.listDiscoveryProviders());
             dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Discoveries));
+            dispatch(rulesActions.listTriggers({ triggerResouce: Resource.Discoveries }));
         }
     }, [dispatch, init]);
 
@@ -106,10 +125,29 @@ export default function DiscoveryForm() {
 
     const onSubmit = useCallback(
         (values: FormValues, form: any) => {
+            console.log('values', {
+                request: {
+                    name: values.name!,
+                    triggers: values.triggers?.map((trigger) => trigger.value) ?? [],
+                    connectorUuid: values.discoveryProvider!.value,
+                    kind: values.storeKind?.value!,
+                    attributes: collectFormAttributes(
+                        'discovery',
+                        [...(discoveryProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
+                        values,
+                    ),
+                    customAttributes: collectFormAttributes('customDiscovery', resourceCustomAttributes, values),
+                },
+                scheduled: values.scheduled,
+                jobName: values.jobName,
+                cronExpression: values.cronExpression,
+                oneTime: values.oneTime,
+            });
             dispatch(
                 discoveryActions.createDiscovery({
                     request: {
                         name: values.name!,
+                        triggers: values.triggers?.map((trigger) => trigger.value) ?? [],
                         connectorUuid: values.discoveryProvider!.value,
                         kind: values.storeKind?.value!,
                         attributes: collectFormAttributes(
@@ -256,6 +294,7 @@ export default function DiscoveryForm() {
                                             onDiscoveryProviderChange(event);
                                             form.mutators.clearAttributes('discovery');
                                             form.mutators.setAttribute('storeKind', undefined);
+                                            form.mutators.setAttribute('triggers', undefined);
                                             input.onChange(event);
                                         }}
                                         styles={{
@@ -305,6 +344,26 @@ export default function DiscoveryForm() {
                             </Field>
                         ) : undefined}
 
+                        {values?.storeKind && (
+                            <Field name="triggers">
+                                {({ input }) => (
+                                    <FormGroup>
+                                        <Label for="triggers">Triggers</Label>
+                                        <Select
+                                            {...input}
+                                            isMulti
+                                            maxMenuHeight={140}
+                                            menuPlacement="auto"
+                                            options={triggerOptions}
+                                            placeholder="Select Triggers"
+                                        />
+                                        <p className="text-muted mt-1 ">
+                                            Note: Triggers will be executed on newly discovered certificate in displayed order
+                                        </p>
+                                    </FormGroup>
+                                )}
+                            </Field>
+                        )}
                         <>
                             <br />
                             <TabLayout
