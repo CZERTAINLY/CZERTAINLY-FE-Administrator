@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { Badge, Container } from 'reactstrap';
@@ -188,9 +188,16 @@ export default function UsersList() {
                         <Link to={`./detail/${user.uuid}`}>{user.username}</Link>
                     </span>,
 
-                    <span style={{ whiteSpace: 'nowrap' }}>
-                        {user.groupUuid ? <Link to={`../groups/detail/${user.groupUuid}`}>{user.groupName}</Link> : user.groupName}
-                    </span>,
+                    <Fragment>
+                        {user?.groups?.length
+                            ? user?.groups.map((group, i) => (
+                                  <Fragment key={group.uuid}>
+                                      <Link to={`../../groups/detail/${group.uuid}`}>{group.name}</Link>
+                                      {user?.groups?.length && i !== user.groups.length - 1 ? `, ` : ``}
+                                  </Fragment>
+                              ))
+                            : ''}
+                    </Fragment>,
 
                     <span style={{ whiteSpace: 'nowrap' }}>{user.description || ''}</span>,
 

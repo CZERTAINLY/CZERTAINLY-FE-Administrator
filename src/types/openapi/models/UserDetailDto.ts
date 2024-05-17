@@ -12,6 +12,7 @@
  */
 
 import type {
+    NameAndUuidDto,
     ResponseAttributeDto,
     RoleDto,
     UserCertificateDto,
@@ -59,17 +60,11 @@ export interface UserDetailDto {
      */
     description?: string;
     /**
-     * Group name of the user
-     * @type {string}
+     * Groups of the user
+     * @type {Array<NameAndUuidDto>}
      * @memberof UserDetailDto
      */
-    groupName?: string;
-    /**
-     * Group UUID of the user
-     * @type {string}
-     * @memberof UserDetailDto
-     */
-    groupUuid?: string;
+    groups: Array<NameAndUuidDto>;
     /**
      * Status of the user. True = Enabled, False = Disabled
      * @type {boolean}

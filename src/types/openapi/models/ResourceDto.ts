@@ -38,6 +38,18 @@ export interface ResourceDto {
      */
     hasCustomAttributes: boolean;
     /**
+     * Support assigning groups to resource objects
+     * @type {boolean}
+     * @memberof ResourceDto
+     */
+    hasGroups: boolean;
+    /**
+     * Support assigning owner to resource objects
+     * @type {boolean}
+     * @memberof ResourceDto
+     */
+    hasOwner: boolean;
+    /**
      * Has events that can be used in triggers
      * @type {boolean}
      * @memberof ResourceDto

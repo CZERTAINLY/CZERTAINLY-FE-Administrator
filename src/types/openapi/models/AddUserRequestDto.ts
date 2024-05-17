@@ -51,11 +51,11 @@ export interface AddUserRequestDto {
      */
     email?: string;
     /**
-     * Group UUID of the user
-     * @type {string}
+     * Groups UUIDs of the user
+     * @type {Array<string>}
      * @memberof AddUserRequestDto
      */
-    groupUuid?: string;
+    groupUuids?: Array<string>;
     /**
      * Status of the user. True = Enabled, False = Disabled
      * @type {boolean}

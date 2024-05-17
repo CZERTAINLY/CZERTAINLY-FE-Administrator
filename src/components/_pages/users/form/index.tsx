@@ -38,9 +38,15 @@ import { collectFormAttributes } from '../../../../utils/attributes/attributes';
 import AttributeEditor from '../../../Attributes/AttributeEditor';
 import TabLayout from '../../../Layout/TabLayout';
 
+interface SelectChangeValue {
+    value: string;
+    label: string;
+}
+
 interface FormValues {
     username: string;
-    group: { label: string; value: string };
+    // group: { label: string; value: string };
+    selectedGroups: SelectChangeValue[];
     description: string;
     firstName: string;
     lastName: string;
@@ -186,6 +192,7 @@ function UserForm() {
                     enabled: false,
                     roles: [],
                     systemUser: false,
+                    groups: [],
                 });
 
             setUserRoles([]);
@@ -257,7 +264,8 @@ function UserForm() {
                             firstName: values.firstName || undefined,
                             lastName: values.lastName || undefined,
                             email: values.email,
-                            groupUuid: values.group?.value ?? undefined,
+                            // groupUuid: values.group?.value ?? undefined,
+                            groupUuids: values.selectedGroups.map((g) => g.value),
                             certificateUuid:
                                 values.inputType.value === 'select'
                                     ? values.certificate
@@ -279,7 +287,8 @@ function UserForm() {
                             firstName: values.firstName || undefined,
                             lastName: values.lastName || undefined,
                             email: values.email || undefined,
-                            groupUuid: values.group?.value ?? undefined,
+                            // groupUuid: values.group?.value ?? undefined,
+                            groupUuids: values.selectedGroups.map((g) => g.value),
                             enabled: values.enabled,
                             certificateData: values.inputType?.value === 'upload' && certToUpload ? certFileContent : undefined,
                             certificateUuid:
@@ -322,7 +331,8 @@ function UserForm() {
         () => ({
             username: editMode ? user?.username : '',
             description: editMode ? user?.description : '',
-            group: editMode && user?.groupName && user?.groupUuid ? { label: user.groupName, value: user.groupUuid } : undefined,
+            // group: undefined,
+            selectedGroups: editMode ? user?.groups.map((g) => ({ label: g.name, value: g.uuid })) : [],
             firstName: editMode ? user?.firstName || '' : '',
             lastName: editMode ? user?.lastName : '',
             email: editMode ? user?.email : '',
@@ -453,10 +463,10 @@ function UserForm() {
                                 )}
                             </Field>
 
-                            <Field name="group">
+                            <Field name="selectedGroups">
                                 {({ input }) => (
                                     <FormGroup>
-                                        <Label for="group">Group</Label>
+                                        <Label for="selectedGroups">Group</Label>
 
                                         <Select
                                             {...input}
@@ -465,6 +475,7 @@ function UserForm() {
                                             options={optionsForGroup}
                                             placeholder="Select Group"
                                             isClearable
+                                            isMulti
                                         />
                                     </FormGroup>
                                 )}

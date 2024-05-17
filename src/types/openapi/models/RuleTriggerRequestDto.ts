@@ -44,12 +44,12 @@ export interface RuleTriggerRequestDto {
      * @type {string}
      * @memberof RuleTriggerRequestDto
      */
-    eventName?: string;
+    eventName?: RuleTriggerRequestDtoEventNameEnum;
     /**
      * @type {Resource}
      * @memberof RuleTriggerRequestDto
      */
-    resource?: Resource;
+    resource: Resource;
     /**
      * @type {Resource}
      * @memberof RuleTriggerRequestDto
@@ -75,4 +75,11 @@ export interface RuleTriggerRequestDto {
     actions?: Array<RuleActionRequestDto>;
 }
 
+/**
+ * @export
+ * @enum {string}
+ */
+export enum RuleTriggerRequestDtoEventNameEnum {
+    DiscoveryFinished = 'discoveryFinished'
+}
 

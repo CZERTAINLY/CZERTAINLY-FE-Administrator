@@ -45,11 +45,11 @@ export interface EditKeyRequestDto {
      */
     ownerUuid?: string;
     /**
-     * UUID of the group
-     * @type {string}
+     * UUIDs of the groups to associate with key
+     * @type {Array<string>}
      * @memberof EditKeyRequestDto
      */
-    groupUuid?: string;
+    groupUuids?: Array<string>;
     /**
      * List of Custom Attributes
      * @type {Array<RequestAttributeDto>}

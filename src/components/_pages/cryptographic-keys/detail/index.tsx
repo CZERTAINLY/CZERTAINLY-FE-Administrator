@@ -8,7 +8,7 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions, selectors } from 'ducks/cryptographic-keys';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { Link, useParams } from 'react-router-dom';
@@ -325,16 +325,17 @@ export default function CryptographicKeyDetail() {
                           ],
                       },
                       {
-                          id: 'groupName',
+                          id: 'groupNames',
                           columns: [
-                              'Group Name',
-                              cryptographicKey.group ? (
-                                  <Link to={`${relativePath}/groups/detail/${cryptographicKey.group.uuid}`}>
-                                      {cryptographicKey.group.name}
-                                  </Link>
-                              ) : (
-                                  ''
-                              ),
+                              'Group Names',
+                              cryptographicKey.groups?.length
+                                  ? cryptographicKey.groups.map((group, i) => (
+                                        <Fragment key={group.uuid}>
+                                            <Link to={`${relativePath}/groups/detail/${group.uuid}`}>{group.name}</Link>
+                                            {cryptographicKey?.groups?.length && i !== cryptographicKey.groups.length - 1 ? `, ` : ``}
+                                        </Fragment>
+                                    ))
+                                  : '',
                           ],
                       },
                   ],
