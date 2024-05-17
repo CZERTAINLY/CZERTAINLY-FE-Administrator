@@ -70,13 +70,13 @@ export default function FilterWidgetRuleAction({
     const ruleActionsOptions = useMemo(() => {
         if (includeIgnoreAction) {
             return [
-                { label: 'Ignore', value: RuleActionType.Ignore },
-                { label: 'Set Field', value: RuleActionType.SetField },
+                { label: getEnumLabel(RuleActionTypeEnum, RuleActionType.Ignore), value: RuleActionType.Ignore },
+                { label: getEnumLabel(RuleActionTypeEnum, RuleActionType.SetField), value: RuleActionType.SetField },
             ];
         } else {
-            return [{ label: 'Set Field', value: RuleActionType.SetField }];
+            return [{ label: getEnumLabel(RuleActionTypeEnum, RuleActionType.SetField), value: RuleActionType.SetField }];
         }
-    }, [includeIgnoreAction]);
+    }, [includeIgnoreAction, RuleActionTypeEnum]);
 
     const booleanOptions = useMemo(
         () => [
@@ -214,7 +214,6 @@ export default function FilterWidgetRuleAction({
     );
 
     const currentField = useMemo(() => currentFields?.find((f) => f.fieldIdentifier === filterField?.value), [filterField, currentFields]);
-
     const objectValueOptions: CurrentActionOptions[] = useMemo(() => {
         if (!currentField) return [];
 
@@ -236,7 +235,7 @@ export default function FilterWidgetRuleAction({
             if (selectedFilter.filterNumber === -1) return objectOptions;
 
             const currentActionData = actions[selectedFilter.filterNumber]?.actionData;
-
+            if (currentActionData === undefined) return objectOptions;
             const filteredOptions = objectOptions.filter((o) => {
                 if (Array.isArray(currentActionData)) {
                     return !currentActionData.some((a) => a?.name === o?.label);
@@ -382,7 +381,6 @@ export default function FilterWidgetRuleAction({
 
         setActions(updatedActions);
     }, [actionsList, availableFilters]);
-
     const renderObjectValueSelector = useMemo(
         () => (
             <Select
@@ -524,7 +522,6 @@ export default function FilterWidgetRuleAction({
                                     style={{ width: '7em', marginTop: '2em' }}
                                     color="primary"
                                     onClick={onUpdateClick}
-                                    // disabled={!filterField || !fieldSource || !ruleActionType || !filterValue}
                                     disabled={isUpdateButtonDisabled}
                                 >
                                     {selectedFilter.filterNumber === -1 ? 'Add' : 'Update'}
@@ -567,6 +564,7 @@ export default function FilterWidgetRuleAction({
                                 {!isActionTypeIgnore && !isFetchingAvailableFilters && (
                                     <>{renderBadgeContent(i, f.actionType, value, label, f.fieldSource)}</>
                                 )}
+                                {isActionTypeIgnore && getEnumLabel(RuleActionTypeEnum, RuleActionType.Ignore)}
                             </Badge>
                         );
                     })}

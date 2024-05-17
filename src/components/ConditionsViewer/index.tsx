@@ -90,7 +90,7 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
 
     const renderFilterWidgetForRules = useMemo(() => {
         if (formType !== 'rules' || !id || !ruleDetails) return null;
-
+        const disableBadgeRemove = ruleDetails.conditions.length === 1 && ruleDetails.conditionGroups.length === 0;
         return (
             <FilterWidget
                 appendInWidgetContent={renderAppendContent}
@@ -101,6 +101,7 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
                         resource,
                     })
                 }
+                disableBadgeRemove={disableBadgeRemove}
                 onFilterUpdate={(currentFilters) => {
                     const currentCondition = filterToConditionGroup(currentFilters);
                     dispatch(

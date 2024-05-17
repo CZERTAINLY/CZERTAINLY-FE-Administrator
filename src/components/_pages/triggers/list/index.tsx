@@ -121,18 +121,6 @@ const TriggerList = () => {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: 'plus',
-                disabled: false,
-                tooltip: 'Create',
-                onClick: () => navigate(`./add`),
-            },
-            {
-                icon: 'trash',
-                disabled: checkedRows.length === 0,
-                tooltip: 'Delete',
-                onClick: () => setConfirmDelete(true),
-            },
-            {
                 icon: 'search',
                 disabled: false,
                 tooltip: 'Select Resource',
@@ -151,6 +139,18 @@ const TriggerList = () => {
                         />
                     </div>
                 ),
+            },
+            {
+                icon: 'plus',
+                disabled: false,
+                tooltip: 'Create',
+                onClick: () => navigate(`./add`),
+            },
+            {
+                icon: 'trash',
+                disabled: checkedRows.length === 0,
+                tooltip: 'Delete',
+                onClick: () => setConfirmDelete(true),
             },
         ],
         [checkedRows, resourceOptions, navigate],

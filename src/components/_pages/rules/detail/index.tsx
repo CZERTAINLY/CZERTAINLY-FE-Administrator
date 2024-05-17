@@ -25,12 +25,12 @@ const RuleDetails = () => {
 
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [updateDescriptionEditEnable, setUpdateDescription] = useState<boolean>(false);
-    const [updatedDescription, setUpdatedDescription] = useState(ruleDetails?.description);
+    const [updatedDescription, setUpdatedDescription] = useState('');
 
     useEffect(() => {
-        if (!ruleDetails?.description) return;
+        if (!ruleDetails?.description || ruleDetails.uuid !== id) return;
         setUpdatedDescription(ruleDetails.description);
-    }, [ruleDetails?.description]);
+    }, [ruleDetails, id]);
 
     const getFreshDetails = useCallback(() => {
         if (!id) return;
@@ -159,7 +159,7 @@ const RuleDetails = () => {
 
     const conditionGroupsDetailData: TableDataRow[] = useMemo(
         () =>
-            !ruleDetails
+            !ruleDetails || isFetchingRuleDetail
                 ? []
                 : [
                       {
@@ -197,7 +197,11 @@ const RuleDetails = () => {
                                               color="secondary"
                                               title="Update Description"
                                               onClick={onUpdateDescriptionConfirmed}
-                                              disabled={isUpdatingRule || updatedDescription === ruleDetails.description}
+                                              disabled={
+                                                  isUpdatingRule ||
+                                                  updatedDescription === ruleDetails.description ||
+                                                  updatedDescription === ''
+                                              }
                                           >
                                               <i className="fa fa-check" />
                                           </Button>
@@ -208,7 +212,7 @@ const RuleDetails = () => {
                                               disabled={isUpdatingRule}
                                               onClick={() => {
                                                   setUpdateDescription(false);
-                                                  setUpdatedDescription(ruleDetails.description || '');
+                                                  setUpdatedDescription(ruleDetails?.description || '');
                                               }}
                                           >
                                               <i className="fa fa-close text-danger" />
@@ -231,7 +235,15 @@ const RuleDetails = () => {
                           ],
                       },
                   ],
-        [ruleDetails, resourceTypeEnum, onUpdateDescriptionConfirmed, updateDescriptionEditEnable, isUpdatingRule, updatedDescription],
+        [
+            ruleDetails,
+            resourceTypeEnum,
+            onUpdateDescriptionConfirmed,
+            updateDescriptionEditEnable,
+            isUpdatingRule,
+            updatedDescription,
+            isFetchingRuleDetail,
+        ],
     );
 
     const conditionGroupFieldsDataHeader = useMemo(

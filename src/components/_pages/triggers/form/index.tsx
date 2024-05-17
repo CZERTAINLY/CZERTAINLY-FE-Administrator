@@ -34,7 +34,7 @@ interface SelectedEventValue {
 
 export interface ConditionGroupFormValues {
     name: string;
-    description: string;
+    description?: string;
     selectedResource?: SelectChangeValue;
     resource: Resource;
     triggerResource: Resource;
@@ -53,6 +53,7 @@ const ConditionGroupForm = () => {
     const navigate = useNavigate();
     const title = 'Create Trigger';
 
+    const ruleTriggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.RuleTriggerType));
     const actionGroups = useSelector(rulesSelectors.actionGroups);
     const resourceEvents = useSelector(resourceSelectors.resourceEvents);
     const rules = useSelector(rulesSelectors.rules);
@@ -92,10 +93,10 @@ const ConditionGroupForm = () => {
 
     const ruleTriggerTypeOptions = useMemo(() => {
         return [
-            { value: RuleTriggerType.Event, label: 'Event' },
-            { value: RuleTriggerType.Manual, label: 'Manual' },
+            { value: RuleTriggerType.Event, label: getEnumLabel(ruleTriggerTypeEnum, RuleTriggerType.Event) },
+            // { value: RuleTriggerType.Manual, label: getEnumLabel(ruleTriggerTypeEnum, RuleTriggerType.Manual) },
         ];
-    }, []);
+    }, [ruleTriggerTypeEnum]);
 
     const fetchResourceEvents = useCallback(
         (resource: Resource) => {
@@ -122,7 +123,7 @@ const ConditionGroupForm = () => {
         return {
             name: '',
             resource: Resource.None,
-            description: '',
+            description: undefined,
             actionGroupsUuids: [],
             actions: [],
             rulesUuids: [],
@@ -141,7 +142,6 @@ const ConditionGroupForm = () => {
     const onSubmit = useCallback(
         (values: ConditionGroupFormValues) => {
             if (values.resource === Resource.None || values.triggerResource === Resource.None || !values.triggerType) return;
-
             dispatch(
                 rulesActions.createTrigger({
                     trigger: {
@@ -195,7 +195,7 @@ const ConditionGroupForm = () => {
                             )}
                         </Field>
 
-                        <Field name="description" validate={composeValidators(validateAlphaNumericWithSpecialChars())}>
+                        <Field name="description">
                             {({ input, meta }) => (
                                 <FormGroup>
                                     <Label for="description">Description</Label>
@@ -215,14 +215,14 @@ const ConditionGroupForm = () => {
                         <Field name="selectedTriggerType" validate={validateRequired()}>
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="triggerType">Rule Trigger Type</Label>
+                                    <Label for="triggerType">Type</Label>
 
                                     <Select
                                         {...input}
                                         maxMenuHeight={140}
                                         menuPlacement="auto"
                                         options={ruleTriggerTypeOptions}
-                                        placeholder="Select Rule Trigger Type"
+                                        placeholder="Select Trigger Type"
                                         isClearable
                                         onChange={(event) => {
                                             if (!event?.value) return;
@@ -230,9 +230,6 @@ const ConditionGroupForm = () => {
                                             input.onChange(event);
 
                                             form.change('triggerType', event?.value);
-
-                                            // set all other values to default
-
                                             form.change('triggerResource', Resource.None);
                                             form.change('selectedTriggerResource', undefined);
                                             form.change('eventName', undefined);
@@ -404,7 +401,7 @@ const ConditionGroupForm = () => {
                                 </FormGroup>
                             )}
                         </Field>
-                        {values?.resource && <ConditionFormFilter formType="actionGroup" resource={values.resource} includeIgnoreAction />}
+                        {values?.resource && <ConditionFormFilter formType="actions" resource={values.resource} includeIgnoreAction />}
 
                         <div className="d-flex justify-content-end">
                             <ButtonGroup>

@@ -26,13 +26,13 @@ const TriggerDetails = () => {
     const rules = useSelector(rulesSelectors.rules);
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [updateDescriptionEditEnable, setUpdateDescription] = useState<boolean>(false);
-    const [updatedDescription, setUpdatedDescription] = useState(triggerDetails?.description);
+    const [updatedDescription, setUpdatedDescription] = useState('');
     const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.RuleTriggerType));
 
     useEffect(() => {
-        if (!triggerDetails?.description) return;
+        if (!triggerDetails?.description || triggerDetails.uuid !== id) return;
         setUpdatedDescription(triggerDetails.description);
-    }, [triggerDetails?.description]);
+    }, [triggerDetails, id]);
 
     const getFreshDetails = useCallback(() => {
         if (!id) return;
@@ -222,7 +222,7 @@ const TriggerDetails = () => {
 
     const triggerDetailsData: TableDataRow[] = useMemo(
         () =>
-            !triggerDetails
+            !triggerDetails || isFetchingTriggerDetail
                 ? []
                 : [
                       {
@@ -274,7 +274,11 @@ const TriggerDetails = () => {
                                               color="secondary"
                                               title="Update Description"
                                               onClick={onUpdateDescriptionConfirmed}
-                                              disabled={isUpdatingTrigger || updatedDescription === triggerDetails.description}
+                                              disabled={
+                                                  isUpdatingTrigger ||
+                                                  updatedDescription === triggerDetails.description ||
+                                                  updatedDescription === ''
+                                              }
                                           >
                                               <i className="fa fa-check" />
                                           </Button>
@@ -285,7 +289,7 @@ const TriggerDetails = () => {
                                               disabled={isUpdatingTrigger}
                                               onClick={() => {
                                                   setUpdateDescription(false);
-                                                  setUpdatedDescription(triggerDetails.description || '');
+                                                  setUpdatedDescription(triggerDetails?.description || '');
                                               }}
                                           >
                                               <i className="fa fa-close text-danger" />
@@ -317,6 +321,7 @@ const TriggerDetails = () => {
             isUpdatingTrigger,
             updatedDescription,
             eventNameEnum,
+            isFetchingTriggerDetail,
         ],
     );
 

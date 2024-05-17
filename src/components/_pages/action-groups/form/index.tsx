@@ -26,7 +26,7 @@ export interface ActionGroupFormValues {
     name: string;
     selectedResource?: SelectChangeValue;
     resource: Resource;
-    description: string;
+    description?: string;
     actions: Array<ActionRuleRequestModel>;
 }
 
@@ -43,7 +43,7 @@ const ActionGroupForm = () => {
             name: '',
             resource: Resource.None,
             selectedResource: undefined,
-            description: '',
+            description: undefined,
             actions: [],
         };
     }, []);
@@ -106,7 +106,7 @@ const ActionGroupForm = () => {
                             )}
                         </Field>
 
-                        <Field name="description" validate={composeValidators(validateAlphaNumericWithSpecialChars())}>
+                        <Field name="description">
                             {({ input, meta }) => (
                                 <FormGroup>
                                     <Label for="description">Description</Label>
@@ -158,7 +158,7 @@ const ActionGroupForm = () => {
                             )}
                         </Field>
 
-                        {values?.resource && <ConditionFormFilter formType="actionGroup" resource={values.resource} />}
+                        {values?.resource && <ConditionFormFilter formType="actions" resource={values.resource} />}
 
                         <div className="d-flex justify-content-end">
                             <ButtonGroup>

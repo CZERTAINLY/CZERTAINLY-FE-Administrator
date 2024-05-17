@@ -29,7 +29,7 @@ export interface ConditionGroupFormValues {
     name: string;
     selectedResource?: SelectChangeValue;
     resource: Resource;
-    description: string;
+    description?: string;
     conditions: RuleConditiontModel[];
 }
 
@@ -63,7 +63,7 @@ const ConditionGroupForm = () => {
             name: '',
             resource: Resource.None,
             selectedResource: undefined,
-            description: '',
+            description: undefined,
             conditions: [],
         };
     }, []);
@@ -128,7 +128,7 @@ const ConditionGroupForm = () => {
                             )}
                         </Field>
 
-                        <Field name="description" validate={composeValidators(validateAlphaNumericWithSpecialChars())}>
+                        <Field name="description">
                             {({ input, meta }) => (
                                 <FormGroup>
                                     <Label for="description">Description</Label>
@@ -183,7 +183,7 @@ const ConditionGroupForm = () => {
                             )}
                         </Field>
 
-                        {values?.resource && <ConditionFormFilter formType="conditionGroup" resource={values.resource} />}
+                        {values?.resource && <ConditionFormFilter formType="conditions" resource={values.resource} />}
 
                         <div className="d-flex justify-content-end">
                             <ButtonGroup>

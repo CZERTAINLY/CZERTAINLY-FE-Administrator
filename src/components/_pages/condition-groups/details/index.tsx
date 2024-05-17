@@ -21,14 +21,14 @@ const ConditionGroupDetails = () => {
 
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [updateDescriptionEditEnable, setUpdateDescription] = useState<boolean>(false);
-    const [updatedDescription, setUpdatedDescription] = useState(conditionGroupsDetails?.description);
+    const [updatedDescription, setUpdatedDescription] = useState('');
 
     const isBusy = useMemo(() => isFetchingConditionGroup || isUpdatingGroupDetails, [isFetchingConditionGroup, isUpdatingGroupDetails]);
 
     useEffect(() => {
-        if (!conditionGroupsDetails?.description) return;
+        if (!conditionGroupsDetails?.description || conditionGroupsDetails.uuid !== id) return;
         setUpdatedDescription(conditionGroupsDetails.description);
-    }, [conditionGroupsDetails?.description]);
+    }, [conditionGroupsDetails, id]);
 
     const getFreshDetails = useCallback(() => {
         if (!id) return;
@@ -92,7 +92,7 @@ const ConditionGroupDetails = () => {
 
     const conditionGroupsDetailData: TableDataRow[] = useMemo(
         () =>
-            !conditionGroupsDetails
+            !conditionGroupsDetails || isFetchingConditionGroup
                 ? []
                 : [
                       {
@@ -129,7 +129,11 @@ const ConditionGroupDetails = () => {
                                               color="secondary"
                                               title="Update Description"
                                               onClick={onUpdateDescriptionConfirmed}
-                                              disabled={isUpdatingGroupDetails || updatedDescription === conditionGroupsDetails.description}
+                                              disabled={
+                                                  isUpdatingGroupDetails ||
+                                                  updatedDescription === conditionGroupsDetails.description ||
+                                                  updatedDescription === ''
+                                              }
                                           >
                                               <i className="fa fa-check" />
                                           </Button>
@@ -139,7 +143,7 @@ const ConditionGroupDetails = () => {
                                               title="Cancel"
                                               onClick={() => {
                                                   setUpdateDescription(false);
-                                                  setUpdatedDescription(conditionGroupsDetails.description || '');
+                                                  setUpdatedDescription(conditionGroupsDetails?.description || '');
                                               }}
                                               disabled={isUpdatingGroupDetails}
                                           >
@@ -172,6 +176,7 @@ const ConditionGroupDetails = () => {
             onUpdateDescriptionConfirmed,
             isUpdatingGroupDetails,
             updatedDescription,
+            isFetchingConditionGroup,
         ],
     );
 

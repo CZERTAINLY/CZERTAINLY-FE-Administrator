@@ -30,7 +30,7 @@ export interface ConditionGroupFormValues {
     name: string;
     selectedResource?: SelectChangeValue;
     resource: Resource;
-    description: string;
+    description?: string;
     conditions: RuleConditiontModel[];
     conditionGroupsUuids: SelectChangeValue[];
 }
@@ -39,14 +39,13 @@ const ConditionGroupForm = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const title = id ? 'Edit' : 'Create Rule';
+    const title = 'Create Rule';
 
     const conditionGroups = useSelector(rulesSelectors.conditionRuleGroups);
     const isCreatingRule = useSelector(rulesSelectors.isCreatingRule);
     const isUpdatingRule = useSelector(rulesSelectors.isUpdatingRule);
     const [selectedResourceState, setSelectedResourceState] = useState<SelectChangeValue>();
     const ruleDetails = useSelector(rulesSelectors.ruleDetails);
-    const editMode = useMemo(() => !!id, [id]);
     const { resourceOptions, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
 
     const isBusy = useMemo(
@@ -78,24 +77,18 @@ const ConditionGroupForm = () => {
     }, [dispatch]);
 
     const defaultValues: ConditionGroupFormValues = useMemo(() => {
-        let selectedResource;
-        if (editMode) {
-            selectedResource = resourceOptions.find((resource) => resource.value === ruleDetails?.resource);
-        }
         return {
-            name: editMode ? ruleDetails?.name || '' : '',
-            resource: editMode ? ruleDetails?.resource || Resource.None : Resource.None,
-            selectedResource: editMode ? selectedResource : undefined,
-            description: editMode ? ruleDetails?.description || '' : '',
-            conditions: editMode ? ruleDetails?.conditions || [] : [],
-            conditionGroupsUuids: editMode
-                ? ruleDetails?.conditionGroups?.map((conditionGroup) => ({ value: conditionGroup.uuid, label: conditionGroup.name })) || []
-                : [],
+            name: '',
+            resource: Resource.None,
+            selectedResource: undefined,
+            description: undefined,
+            conditions: [],
+            conditionGroupsUuids: [],
         };
-    }, [editMode, ruleDetails, resourceOptions]);
+    }, []);
 
-    const submitTitle = useMemo(() => (editMode ? 'Save' : 'Create'), [editMode]);
-    const inProgressTitle = useMemo(() => (editMode ? 'Saving...' : 'Creating...'), [editMode]);
+    const submitTitle = 'Create';
+    const inProgressTitle = 'Creating...';
 
     const onCancel = useCallback(() => {
         navigate(-1);
@@ -104,33 +97,19 @@ const ConditionGroupForm = () => {
     const onSubmit = useCallback(
         (values: ConditionGroupFormValues) => {
             if (values.resource === Resource.None) return;
-
-            if (editMode && id) {
-                dispatch(
-                    rulesActions.updateRule({
-                        ruleUuid: id,
-                        rule: {
-                            conditionGroupsUuids: values.conditionGroupsUuids.map((uuid) => uuid.value),
-                            conditions: values.conditions,
-                            description: values.description,
-                        },
-                    }),
-                );
-            } else {
-                dispatch(
-                    rulesActions.createRule({
-                        rule: {
-                            conditionGroupsUuids: values.conditionGroupsUuids.map((uuid) => uuid.value),
-                            conditions: values.conditions,
-                            description: values.description,
-                            name: values.name,
-                            resource: values.resource,
-                        },
-                    }),
-                );
-            }
+            dispatch(
+                rulesActions.createRule({
+                    rule: {
+                        conditionGroupsUuids: values.conditionGroupsUuids.map((uuid) => uuid.value),
+                        conditions: values.conditions,
+                        description: values.description,
+                        name: values.name,
+                        resource: values.resource,
+                    },
+                }),
+            );
         },
-        [dispatch, editMode, id],
+        [dispatch],
     );
 
     const areDefaultValuesSame = useCallback(
@@ -160,7 +139,6 @@ const ConditionGroupForm = () => {
                                         invalid={!!meta.error && meta.touched}
                                         type="text"
                                         placeholder="Enter the Condition Group Name"
-                                        disabled={editMode}
                                     />
 
                                     <FormFeedback>{meta.error}</FormFeedback>
@@ -168,7 +146,7 @@ const ConditionGroupForm = () => {
                             )}
                         </Field>
 
-                        <Field name="description" validate={composeValidators(validateAlphaNumericWithSpecialChars())}>
+                        <Field name="description">
                             {({ input, meta }) => (
                                 <FormGroup>
                                     <Label for="description">Description</Label>
@@ -192,7 +170,6 @@ const ConditionGroupForm = () => {
                                     <Label for="resource">Resource</Label>
 
                                     <Select
-                                        isDisabled={editMode}
                                         {...input}
                                         maxMenuHeight={140}
                                         menuPlacement="auto"
@@ -244,7 +221,7 @@ const ConditionGroupForm = () => {
                                 </FormGroup>
                             )}
                         </Field>
-                        {values?.resource && <ConditionFormFilter formType="rules" resource={values.resource} />}
+                        {values?.resource && <ConditionFormFilter formType="conditions" resource={values.resource} />}
 
                         <div className="d-flex justify-content-end">
                             <ButtonGroup>
