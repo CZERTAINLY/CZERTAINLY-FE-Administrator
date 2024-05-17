@@ -357,12 +357,6 @@ export const slice = createSlice({
 
         updateGroupSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isUpdatingGroup = false;
-
-            // const certificateIndex = state.certificates.findIndex((certificate) => certificate.uuid === action.payload.uuid);
-
-            // if (certificateIndex >= 0) state.certificates[certificateIndex].group = action.payload.group;
-
-            // if (state.certificateDetail?.uuid === action.payload.uuid) state.certificateDetail.group = action.payload.group;
         },
 
         updateGroupFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -375,12 +369,6 @@ export const slice = createSlice({
 
         deleteGroupsSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isUpdatingGroup = false;
-
-            // const certificateIndex = state.certificates.findIndex((certificate) => certificate.uuid === action.payload.uuid);
-
-            // if (certificateIndex >= 0) state.certificates[certificateIndex].group = undefined;
-
-            // if (state.certificateDetail?.uuid === action.payload.uuid) state.certificateDetail.group = undefined;
         },
 
         deleteGroupsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -505,14 +493,6 @@ export const slice = createSlice({
 
         bulkUpdateGroupSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
             state.isBulkUpdatingGroup = false;
-
-            // action.payload.uuids.forEach((uuid) => {
-            //     const certificateIndex = state.certificates.findIndex((certificate) => certificate.uuid === uuid);
-
-            //     if (certificateIndex >= 0) state.certificates[certificateIndex].group = action.payload.group;
-
-            //     if (state.certificateDetail?.uuid === uuid) state.certificateDetail.group = action.payload.group;
-            // });
         },
 
         bulkDeleteGroup: (state, action: PayloadAction<{ certificateUuids: string[] }>) => {
@@ -521,14 +501,6 @@ export const slice = createSlice({
 
         bulkDeleteGroupSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
             state.isBulkUpdatingGroup = false;
-
-            // action.payload.uuids.forEach((uuid) => {
-            // const certificateIndex = state.certificates.findIndex((certificate) => certificate.uuid === uuid);
-
-            // if (certificateIndex >= 0) state.certificates[certificateIndex].group = undefined;
-
-            //     if (state.certificateDetail?.uuid === uuid) state.certificateDetail.group = undefined;
-            // });
         },
 
         bulkUpdateGroupFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {

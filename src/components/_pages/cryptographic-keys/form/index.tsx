@@ -43,7 +43,6 @@ interface FormValues {
     description: string;
     tokenProfile: { value: TokenProfileResponseModel; label: string } | undefined;
     type?: { value: KeyRequestType; label: string } | undefined;
-    // groups?: string[] | undefined;
     selectedGroups?: SelectChangeValue[] | undefined;
     owner?: { value: string; label: string } | undefined;
 }

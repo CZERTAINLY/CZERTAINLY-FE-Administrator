@@ -45,7 +45,6 @@ interface SelectChangeValue {
 
 interface FormValues {
     username: string;
-    // group: { label: string; value: string };
     selectedGroups: SelectChangeValue[];
     description: string;
     firstName: string;
@@ -264,7 +263,6 @@ function UserForm() {
                             firstName: values.firstName || undefined,
                             lastName: values.lastName || undefined,
                             email: values.email,
-                            // groupUuid: values.group?.value ?? undefined,
                             groupUuids: values.selectedGroups.map((g) => g.value),
                             certificateUuid:
                                 values.inputType.value === 'select'
@@ -287,7 +285,6 @@ function UserForm() {
                             firstName: values.firstName || undefined,
                             lastName: values.lastName || undefined,
                             email: values.email || undefined,
-                            // groupUuid: values.group?.value ?? undefined,
                             groupUuids: values.selectedGroups.map((g) => g.value),
                             enabled: values.enabled,
                             certificateData: values.inputType?.value === 'upload' && certToUpload ? certFileContent : undefined,
@@ -331,8 +328,7 @@ function UserForm() {
         () => ({
             username: editMode ? user?.username : '',
             description: editMode ? user?.description : '',
-            // group: undefined,
-            selectedGroups: editMode ? user?.groups.map((g) => ({ label: g.name, value: g.uuid })) : [],
+            selectedGroups: editMode ? user?.groups.map((group) => ({ label: group.name, value: group.uuid })) : [],
             firstName: editMode ? user?.firstName || '' : '',
             lastName: editMode ? user?.lastName : '',
             email: editMode ? user?.email : '',

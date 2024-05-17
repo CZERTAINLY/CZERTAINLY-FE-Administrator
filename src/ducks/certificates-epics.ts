@@ -595,7 +595,6 @@ const bulkUpdateGroup: AppEpic = (action$, state, deps) => {
                         of(
                             slice.actions.bulkUpdateGroupSuccess({
                                 uuids: action.payload.certificateUuids!,
-                                // group: action.payload.group,
                             }),
                             alertActions.success('Update operation for selected certificates groups completed.'),
                             slice.actions.listCertificates({}),
