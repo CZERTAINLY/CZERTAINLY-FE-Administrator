@@ -196,7 +196,7 @@ export default function UsersList() {
                                       {user?.groups?.length && i !== user.groups.length - 1 ? `, ` : ``}
                                   </Fragment>
                               ))
-                            : ''}
+                            : 'Unassigned'}
                     </Fragment>,
 
                     <span style={{ whiteSpace: 'nowrap' }}>{user.description || ''}</span>,
