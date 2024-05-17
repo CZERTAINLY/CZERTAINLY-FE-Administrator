@@ -19,49 +19,10 @@ interface ConditionGroupFormFilterProps {
 }
 
 const ConditionFormFilter = ({ resource, formType, includeIgnoreAction }: ConditionGroupFormFilterProps) => {
-    // const { id } = useParams();
-    // const editMode = useMemo(() => !!id, [id]);
-    // const [hasEffectRun, setHasEffectRun] = useState(false);
-
     const form = useForm<ConditionGroupFormValues>();
     const actionGroupForm = useForm<ActionGroupFormValues>();
-    // const conditionGroupsDetails = useSelector(rulesSelectors.conditionGroupDetails);
-    // const ruleDetails = useSelector(rulesSelectors.ruleDetails);
 
     const dispatch = useDispatch();
-
-    // useEffect(() => {
-    //     if (!id) return;
-    //     if (formType === 'rules') {
-    //         dispatch(rulesActions.getRule({ ruleUuid: id }));
-    //     }
-
-    //     if (formType === 'conditionGroup') {
-    //         dispatch(rulesActions.getConditionGroup({ conditionGroupUuid: id }));
-    //     }
-
-    //     if (formType === 'actionGroup') {
-    //         dispatch(rulesActions.getActionGroup({ actionGroupUuid: id }));
-    //     }
-    // }, [id, dispatch, formType]);
-
-    // useEffect(() => {
-    //     if (!hasEffectRun && editMode) {
-    //         let currentConditions = [];
-
-    //         if (formType === 'rules') {
-    //             if (!ruleDetails) return;
-    //             currentConditions = ruleDetails?.conditions || [];
-    //         } else {
-    //             if (!conditionGroupsDetails) return;
-    //             currentConditions = conditionGroupsDetails?.conditions || [];
-    //         }
-
-    //         const currentFilters = conditionGroupToFilter(currentConditions);
-    //         setHasEffectRun(true);
-    //         dispatch(filterActions.setCurrentFilters({ currentFilters: currentFilters, entity: EntityType.CONDITIONS }));
-    //     }
-    // }, [editMode, formType, ruleDetails, conditionGroupsDetails, hasEffectRun, dispatch]);
 
     useEffect(() => {
         return () => {

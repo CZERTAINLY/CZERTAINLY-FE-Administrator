@@ -443,6 +443,7 @@ export default function FilterWidgetRuleAction({
                                             setFilterField(undefined);
                                         }}
                                         value={ruleActionType || null}
+                                        isDisabled={isActionTypeIgnore && !selectedFilter.isEditEnabled}
                                     />
                                 </FormGroup>
                             </Col>
