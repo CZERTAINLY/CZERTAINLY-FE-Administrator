@@ -6,7 +6,7 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions, selectors } from 'ducks/certificates';
 import { EntityType } from 'ducks/filters';
 import { selectors as pagingSelectors } from 'ducks/paging';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
@@ -204,83 +204,68 @@ export default function CertificateList({
             },
             {
                 content: 'Compliance',
-                //sortable: true,
                 align: 'center',
                 id: 'compliance',
                 width: '5%',
             },
             {
                 content: '',
-                //sortable: true,
                 align: 'center',
                 id: 'keyAvailability',
                 width: '1%',
             },
             {
                 content: 'Common Name',
-                //sortable: true,
                 id: 'commonName',
                 width: '10%',
             },
             {
                 content: 'Valid From',
-                //sortable: true,
-                //sortType: "date",
                 id: 'validFrom',
                 width: '15%',
             },
             {
                 content: 'Expires At',
-                //sortable: true,
-                //sortType: "date",
                 id: 'expiresAt',
                 width: '15%',
             },
             {
-                content: 'Group',
-                //sortable: true,
+                content: 'Groups',
                 id: 'group',
                 width: '15%',
             },
             {
                 content: 'RA Profile',
-                //sortable: true,
                 id: 'raProfile',
                 width: '15%',
             },
             {
                 content: 'Owner',
-                //sortable: true,
                 id: 'owner',
                 width: '15%',
             },
             {
                 content: 'Serial number',
-                //sortable: true,
                 id: 'serialNumber',
                 width: '15%',
             },
             {
                 content: 'Signature Algorithm',
-                //sortable: true,
                 id: 'signatureAlgorithm',
                 width: '15%',
             },
             {
                 content: 'Public Key Algorithm',
-                //sortable: true,
                 id: 'publicKeyAlgorithm',
                 width: '15%',
             },
             {
                 content: 'Issuer Common Name',
-                //sortable: true,
                 id: 'issuerCommonName',
                 width: '15%',
             },
             {
                 content: 'Certificate Type',
-                //sortable: true,
                 id: 'certificateType',
                 width: '15%',
             },
@@ -306,11 +291,14 @@ export default function CertificateList({
                         ),
                         certificate.notBefore ? <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(certificate.notBefore)}</span> : '',
                         certificate.notAfter ? <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(certificate.notAfter)}</span> : '',
-                        certificate.group ? (
-                            <Link to={`../groups/detail/${certificate?.group.uuid}`}>{certificate.group.name ?? 'Unassigned'}</Link>
-                        ) : (
-                            certificate.group ?? 'Unassigned'
-                        ),
+                        certificate?.groups?.length
+                            ? certificate?.groups.map((group, i) => (
+                                  <React.Fragment key={group.uuid}>
+                                      <Link to={`../../groups/detail/${group.uuid}`}>{group.name}</Link>
+                                      {certificate?.groups?.length && i !== certificate.groups.length - 1 ? `, ` : ``}
+                                  </React.Fragment>
+                              ))
+                            : 'Unassigned',
                         <span style={{ whiteSpace: 'nowrap' }}>
                             {certificate.raProfile ? (
                                 <Link
@@ -383,7 +371,7 @@ export default function CertificateList({
 
             <Dialog
                 isOpen={updateGroup}
-                caption={`Update Group`}
+                caption={`Update Groups`}
                 body={
                     <CertificateGroupDialog
                         uuids={checkedRows}

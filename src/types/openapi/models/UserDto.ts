@@ -11,6 +11,10 @@
  * Do not edit the class manually.
  */
 
+import type {
+    NameAndUuidDto,
+} from './';
+
 /**
  * List of Users with the role
  * @export
@@ -54,17 +58,11 @@ export interface UserDto {
      */
     description?: string;
     /**
-     * Group name of the user
-     * @type {string}
+     * Groups of the user
+     * @type {Array<NameAndUuidDto>}
      * @memberof UserDto
      */
-    groupName?: string;
-    /**
-     * Group UUID of the user
-     * @type {string}
-     * @memberof UserDto
-     */
-    groupUuid?: string;
+    groups: Array<NameAndUuidDto>;
     /**
      * Status of the user. True = Enabled, False = Disabled
      * @type {boolean}

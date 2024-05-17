@@ -45,11 +45,11 @@ export interface UpdateUserRequestDto {
      */
     email: string;
     /**
-     * Group UUID of the user
-     * @type {string}
+     * Groups UUIDs of the user (set to empty list to remove certificate from all groups)
+     * @type {Array<string>}
      * @memberof UpdateUserRequestDto
      */
-    groupUuid?: string;
+    groupUuids?: Array<string>;
     /**
      * Base64 Content of the admin certificate
      * @type {string}

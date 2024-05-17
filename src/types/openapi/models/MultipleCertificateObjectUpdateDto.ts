@@ -21,11 +21,11 @@ import type {
  */
 export interface MultipleCertificateObjectUpdateDto {
     /**
-     * Certificate Group UUID (set to empty string to remove certificate from group)
-     * @type {string}
+     * Certificate Groups UUIDs (set to empty list to remove certificate from all groups)
+     * @type {Array<string>}
      * @memberof MultipleCertificateObjectUpdateDto
      */
-    groupUuid?: string;
+    groupUuids?: Array<string>;
     /**
      * Certificate owner user UUID (set to empty string to remove owner of certificate)
      * @type {string}

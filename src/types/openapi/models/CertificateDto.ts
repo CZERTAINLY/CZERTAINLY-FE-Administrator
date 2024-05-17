@@ -114,10 +114,11 @@ export interface CertificateDto {
      */
     fingerprint?: string;
     /**
-     * @type {GroupDto}
+     * Groups associated to the Certificate
+     * @type {Array<GroupDto>}
      * @memberof CertificateDto
      */
-    group?: GroupDto;
+    groups?: Array<GroupDto>;
     /**
      * Certificate Owner
      * @type {string}

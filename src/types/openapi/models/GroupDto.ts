@@ -16,7 +16,7 @@ import type {
 } from './';
 
 /**
- * Key Group
+ * Groups associated to the key
  * @export
  * @interface GroupDto
  */

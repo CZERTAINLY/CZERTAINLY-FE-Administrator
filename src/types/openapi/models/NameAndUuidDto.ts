@@ -12,7 +12,7 @@
  */
 
 /**
- * Source Objects
+ * Groups of the user
  * @export
  * @interface NameAndUuidDto
  */

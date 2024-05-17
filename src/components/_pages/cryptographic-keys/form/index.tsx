@@ -19,7 +19,6 @@ import Select, { SingleValue } from 'react-select';
 
 import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
 import { AttributeDescriptorModel } from 'types/attributes';
-import { CertificateGroupResponseModel } from 'types/certificateGroups';
 import { TokenProfileResponseModel } from 'types/token-profiles';
 import { actions as userInterfaceActions } from '../../../../ducks/user-interface';
 
@@ -35,12 +34,16 @@ interface CryptographicKeyFormProps {
     usesGlobalModal?: boolean;
 }
 
+interface SelectChangeValue {
+    value: string;
+    label: string;
+}
 interface FormValues {
     name: string;
     description: string;
     tokenProfile: { value: TokenProfileResponseModel; label: string } | undefined;
     type?: { value: KeyRequestType; label: string } | undefined;
-    group?: { value: CertificateGroupResponseModel; label: string } | undefined;
+    selectedGroups: SelectChangeValue[];
     owner?: { value: string; label: string } | undefined;
 }
 
@@ -152,7 +155,7 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                             description: values.description,
                             tokenProfileUuid: values.tokenProfile!.value.uuid,
                             ownerUuid: values.owner ? values.owner.value : undefined,
-                            groupUuid: values.group ? values.group.value.uuid : undefined,
+                            groupUuids: values?.selectedGroups?.length ? values?.selectedGroups?.map((group) => group.value) : [],
                             name: values.name,
                         },
                     }),
@@ -164,7 +167,7 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                         tokenProfileUuid: values.tokenProfile!.value.uuid,
                         type: values.type!.value,
                         cryptographicKeyAddRequest: {
-                            groupUuid: values.group?.value.uuid,
+                            groupUuids: values?.selectedGroups?.length ? values?.selectedGroups?.map((group) => group.value) : [],
                             name: values.name,
                             description: values.description,
                             attributes: collectFormAttributes(
@@ -212,7 +215,7 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
     const optionsForGroups = useMemo(
         () =>
             groups.map((group) => ({
-                value: group,
+                value: group.uuid,
                 label: group.name,
             })),
         [groups],
@@ -283,11 +286,11 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                     ? optionsForKeys.find((option) => option.value.uuid === (keyDetail.tokenProfileUuid || ''))
                     : undefined
                 : undefined,
-            group: editMode
-                ? keyDetail && keyDetail.group
-                    ? { value: keyDetail.group, label: keyDetail.group?.name }
-                    : undefined
-                : undefined,
+            selectedGroups: editMode
+                ? keyDetail && keyDetail.groups?.length
+                    ? keyDetail.groups?.map((group) => ({ value: group.uuid, label: group.name }))
+                    : []
+                : [],
             owner: editMode
                 ? keyDetail && keyDetail.ownerUuid && keyDetail.owner
                     ? { value: keyDetail.ownerUuid, label: keyDetail.owner }
@@ -395,20 +398,21 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                             </Field>
                         )}
 
-                        <Field name="group">
+                        <Field name="selectedGroups">
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="group">Group</Label>
+                                    <Label for="selectedGroups">Groups</Label>
 
                                     <Select
                                         {...input}
                                         maxMenuHeight={140}
                                         menuPlacement="auto"
                                         options={optionsForGroups}
-                                        placeholder="Select Group"
+                                        placeholder="Select Groups"
                                         onChange={(event) => {
                                             input.onChange(event);
                                         }}
+                                        isMulti
                                         styles={{
                                             control: (provided) =>
                                                 meta.touched && meta.invalid
