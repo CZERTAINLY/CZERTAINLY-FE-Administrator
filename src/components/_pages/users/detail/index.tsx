@@ -9,7 +9,7 @@ import { actions as certActions, selectors as certSelectors } from 'ducks/certif
 
 import { selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { actions, selectors } from 'ducks/users';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Badge, Container } from 'reactstrap';
@@ -147,14 +147,17 @@ export default function UserDetail() {
                           columns: ['Username', user.username],
                       },
                       {
-                          id: 'group',
+                          id: 'groups',
                           columns: [
-                              'Group',
-                              user.groupUuid ? (
-                                  <Link to={`../../groups/detail/${user.groupUuid}`}>{user.groupName}</Link>
-                              ) : (
-                                  user.groupName ?? ''
-                              ),
+                              'Groups',
+                              user?.groups?.length
+                                  ? user?.groups.map((group, i) => (
+                                        <Fragment key={group.uuid}>
+                                            <Link to={`../../groups/detail/${group.uuid}`}>{group.name}</Link>
+                                            {user?.groups?.length && i !== user.groups.length - 1 ? `, ` : ``}
+                                        </Fragment>
+                                    ))
+                                  : '',
                           ],
                       },
                       {

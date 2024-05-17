@@ -81,7 +81,7 @@ export function transformCertificateDetailResponseDtoToModel(certificate: Certif
         metadata: certificate.metadata?.map(transformMetadataDtoToModel),
         raProfile: certificate.raProfile ? transformRaProfileSimplifiedDtoToModel(certificate.raProfile) : undefined,
         locations: certificate.locations?.map(transformLocationResponseDtoToModel),
-        group: certificate.group ? transformCertificateGroupResponseDtoToModel(certificate.group) : undefined,
+        groups: certificate.groups?.length ? certificate.groups.map(transformCertificateGroupResponseDtoToModel) : undefined,
         nonCompliantRules: certificate.nonCompliantRules?.map(transformCertificateComplianceResponseDtoToModel),
         customAttributes: certificate.customAttributes?.map(transformAttributeResponseDtoToModel),
     };
@@ -91,7 +91,7 @@ export function transformCertificateResponseDtoToModel(certificate: CertificateL
     return {
         ...certificate,
         raProfile: certificate.raProfile ? transformRaProfileSimplifiedDtoToModel(certificate.raProfile) : undefined,
-        group: certificate.group ? transformCertificateGroupResponseDtoToModel(certificate.group) : undefined,
+        groups: certificate.groups?.length ? certificate.groups.map(transformCertificateGroupResponseDtoToModel) : undefined,
     };
 }
 
@@ -438,27 +438,29 @@ export function transformCertifacetObjectToNodesAndEdges(
         });
     }
 
-    if (certificate?.group) {
-        nodes.push({
-            id: '3',
-            type: 'customFlowNode',
-            position: { x: 0, y: 0 },
-            width: nodeWidth,
-            height: nodeHeight,
-            data: {
-                customNodeCardTitle: 'Group',
-                description: certificate?.group?.description || '',
-                icon: 'fa fa fa-users',
-                entityLabel: certificate?.group?.name || '',
-                redirectUrl: certificate?.group?.uuid ? `/groups/detail/${certificate?.group?.uuid}` : undefined,
-            },
-        });
-        edges.push({
-            id: 'e1-3',
-            source: '3',
-            target: '1',
-            type: 'floating',
-            markerEnd: { type: MarkerType.Arrow },
+    if (certificate?.groups?.length) {
+        certificate?.groups.forEach((group) => {
+            nodes.push({
+                id: '3',
+                type: 'customFlowNode',
+                position: { x: 0, y: 0 },
+                width: nodeWidth,
+                height: nodeHeight,
+                data: {
+                    customNodeCardTitle: 'Group',
+                    description: group?.description || '',
+                    icon: 'fa fa fa-users',
+                    entityLabel: group?.name || '',
+                    redirectUrl: group?.uuid ? `/groups/detail/${group?.uuid}` : undefined,
+                },
+            });
+            edges.push({
+                id: 'e1-3',
+                source: '3',
+                target: '1',
+                type: 'floating',
+                markerEnd: { type: MarkerType.Arrow },
+            });
         });
     }
 

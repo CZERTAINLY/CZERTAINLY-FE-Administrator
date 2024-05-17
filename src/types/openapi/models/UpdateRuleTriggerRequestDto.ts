@@ -34,16 +34,21 @@ export interface UpdateRuleTriggerRequestDto {
      */
     triggerType: RuleTriggerType;
     /**
-     * Name of the event of the Rule Trigger
+     * Event of the Rule Trigger
      * @type {string}
      * @memberof UpdateRuleTriggerRequestDto
      */
-    eventName?: string;
+    eventName?: UpdateRuleTriggerRequestDtoEventNameEnum;
     /**
      * @type {Resource}
      * @memberof UpdateRuleTriggerRequestDto
      */
     triggerResource?: Resource;
+    /**
+     * @type {Resource}
+     * @memberof UpdateRuleTriggerRequestDto
+     */
+    resource?: Resource;
     /**
      * List of UUIDs of existing Rules to add in the Rule Trigger
      * @type {Array<string>}
@@ -64,4 +69,11 @@ export interface UpdateRuleTriggerRequestDto {
     actions?: Array<RuleActionRequestDto>;
 }
 
+/**
+ * @export
+ * @enum {string}
+ */
+export enum UpdateRuleTriggerRequestDtoEventNameEnum {
+    DiscoveryFinished = 'discoveryFinished'
+}
 

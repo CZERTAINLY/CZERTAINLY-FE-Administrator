@@ -9,7 +9,7 @@ import { actions, selectors } from 'ducks/cryptographic-keys';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { EntityType } from 'ducks/filters';
 import { selectors as pagingSelectors } from 'ducks/paging';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import Select from 'react-select';
@@ -256,13 +256,14 @@ function CryptographicKeyList() {
                         cryptographicKey.length?.toString() || 'unknown',
                         cryptographicKey.format || 'unknown',
                         <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(cryptographicKey.creationTime) || ''}</span>,
-                        cryptographicKey.group ? (
-                            <Link to={`../groups/detail/${cryptographicKey.group?.uuid}`}>
-                                {cryptographicKey.group.name ?? 'Unassigned'}
-                            </Link>
-                        ) : (
-                            cryptographicKey.group ?? 'Unassigned'
-                        ),
+                        cryptographicKey?.groups?.length
+                            ? cryptographicKey?.groups.map((group, i) => (
+                                  <Fragment key={group.uuid}>
+                                      <Link to={`../../groups/detail/${group.uuid}`}>{group.name}</Link>
+                                      {cryptographicKey?.groups?.length && i !== cryptographicKey.groups.length - 1 ? `, ` : ``}
+                                  </Fragment>
+                              ))
+                            : 'Unassigned',
                         cryptographicKey.ownerUuid ? (
                             <Link to={`../users/detail/${cryptographicKey.ownerUuid}`}>{cryptographicKey.owner ?? 'Unassigned'}</Link>
                         ) : (

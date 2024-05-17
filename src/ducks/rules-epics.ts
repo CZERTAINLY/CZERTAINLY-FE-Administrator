@@ -168,7 +168,7 @@ const createTrigger: AppEpic = (action$, state, deps) => {
                 .pipe(
                     switchMap((trigger) =>
                         of(
-                            slice.actions.createTriggerSuccess({ trigger: transformTriggerRuleDtoToModel(trigger) }),
+                            slice.actions.createTriggerSuccess({ trigger: transformTriggerRuleDetailDtoToModel(trigger) }),
                             appRedirectActions.redirect({ url: `../../triggers` }),
                         ),
                     ),

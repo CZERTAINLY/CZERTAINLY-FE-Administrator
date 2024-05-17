@@ -96,10 +96,11 @@ export interface KeyDetailDto {
      */
     ownerUuid?: string;
     /**
-     * @type {GroupDto}
+     * Groups associated to the key
+     * @type {Array<GroupDto>}
      * @memberof KeyDetailDto
      */
-    group?: GroupDto;
+    groups?: Array<GroupDto>;
     /**
      * Key Objects
      * @type {Array<KeyItemDetailDto>}

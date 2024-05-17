@@ -33,11 +33,11 @@ export interface KeyRequestDto {
      */
     description: string;
     /**
-     * UUID of the group
-     * @type {string}
+     * UUIDs of the groups to associate with key
+     * @type {Array<string>}
      * @memberof KeyRequestDto
      */
-    groupUuid?: string;
+    groupUuids?: Array<string>;
     /**
      * List of Attributes to create a Key
      * @type {Array<RequestAttributeDto>}

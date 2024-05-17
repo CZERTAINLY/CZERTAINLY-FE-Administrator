@@ -151,7 +151,7 @@ const ConditionGroupForm = () => {
                         triggerType: values.triggerType,
                         actionGroupsUuids: values.actionGroupsUuids.map((actionGroup) => actionGroup.value),
                         actions: values.actions,
-                        eventName: values.eventName,
+                        // eventName: values.eventName,
                         rulesUuids: values.rulesUuids.map((rule) => rule.value),
                         triggerResource: values.triggerResource,
                     },

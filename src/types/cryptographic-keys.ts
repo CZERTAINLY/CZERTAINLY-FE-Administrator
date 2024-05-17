@@ -38,7 +38,7 @@ export type CryptographicKeyDetailResponseDto = KeyDetailDto;
 export type CryptographicKeyDetailResponseModel = Omit<CryptographicKeyDetailResponseDto, 'attributes | customAttributes | group'> & {
     attributes: Array<AttributeResponseModel>;
     customAttributes?: Array<AttributeResponseModel>;
-    group?: CertificateGroupResponseModel;
+    groups?: Array<CertificateGroupResponseModel>;
 };
 
 export type CryptographicKeyItemDetailResponseDto = KeyItemDetailDto;

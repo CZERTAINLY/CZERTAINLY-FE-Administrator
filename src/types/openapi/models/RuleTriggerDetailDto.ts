@@ -52,7 +52,7 @@ export interface RuleTriggerDetailDto {
      * @type {string}
      * @memberof RuleTriggerDetailDto
      */
-    eventName?: string;
+    eventName?: RuleTriggerDetailDtoEventNameEnum;
     /**
      * @type {Resource}
      * @memberof RuleTriggerDetailDto
@@ -83,4 +83,11 @@ export interface RuleTriggerDetailDto {
     actions: Array<RuleActionDto>;
 }
 
+/**
+ * @export
+ * @enum {string}
+ */
+export enum RuleTriggerDetailDtoEventNameEnum {
+    DiscoveryFinished = 'discoveryFinished'
+}
 
