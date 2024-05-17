@@ -763,7 +763,7 @@ export default function CertificateDetail() {
                     maxMenuHeight={140}
                     menuPlacement="auto"
                     options={groupOptions}
-                    placeholder={`Select Group`}
+                    placeholder={`Select Groups`}
                     value={groups}
                     onChange={(event) => {
                         const newGroupsList = event.length ? [...event] : [];
@@ -1949,7 +1949,7 @@ export default function CertificateDetail() {
 
             <Dialog
                 isOpen={updateGroup}
-                caption={`Update Group`}
+                caption={`Update Groups`}
                 body={updateGroupBody}
                 toggle={() => onCancelGroupUpdate()}
                 buttons={[

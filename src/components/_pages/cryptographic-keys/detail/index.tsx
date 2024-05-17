@@ -327,7 +327,7 @@ export default function CryptographicKeyDetail() {
                       {
                           id: 'groupNames',
                           columns: [
-                              'Group Names',
+                              'Groups',
                               cryptographicKey.groups?.length
                                   ? cryptographicKey.groups.map((group, i) => (
                                         <Fragment key={group.uuid}>

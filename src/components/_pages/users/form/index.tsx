@@ -328,7 +328,11 @@ function UserForm() {
         () => ({
             username: editMode ? user?.username : '',
             description: editMode ? user?.description : '',
-            selectedGroups: editMode ? user?.groups.map((group) => ({ label: group.name, value: group.uuid })) : [],
+            selectedGroups: editMode
+                ? user?.groups?.length
+                    ? user?.groups.map((group) => ({ label: group.name, value: group.uuid }))
+                    : []
+                : [],
             firstName: editMode ? user?.firstName || '' : '',
             lastName: editMode ? user?.lastName : '',
             email: editMode ? user?.email : '',
@@ -462,14 +466,14 @@ function UserForm() {
                             <Field name="selectedGroups">
                                 {({ input }) => (
                                     <FormGroup>
-                                        <Label for="selectedGroups">Group</Label>
+                                        <Label for="selectedGroups">Groups</Label>
 
                                         <Select
                                             {...input}
                                             maxMenuHeight={140}
                                             menuPlacement="auto"
                                             options={optionsForGroup}
-                                            placeholder="Select Group"
+                                            placeholder="Select Groups"
                                             isClearable
                                             isMulti
                                         />

@@ -51,12 +51,13 @@ export default function CertificateGroupDialog({ uuids, onCancel, onUpdate }: Pr
     return (
         <>
             <FormGroup>
-                <Label for="group">Group</Label>
+                <Label for="group">Groups</Label>
 
                 <Select
                     id="group"
                     options={groupOptions}
                     value={selectedGroups}
+                    placeholder="Select groups"
                     isMulti
                     onChange={(event) => {
                         const newGroups = event.length ? [...event] : [];

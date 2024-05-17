@@ -43,7 +43,7 @@ interface FormValues {
     description: string;
     tokenProfile: { value: TokenProfileResponseModel; label: string } | undefined;
     type?: { value: KeyRequestType; label: string } | undefined;
-    selectedGroups?: SelectChangeValue[] | undefined;
+    selectedGroups: SelectChangeValue[];
     owner?: { value: string; label: string } | undefined;
 }
 
@@ -155,7 +155,7 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                             description: values.description,
                             tokenProfileUuid: values.tokenProfile!.value.uuid,
                             ownerUuid: values.owner ? values.owner.value : undefined,
-                            groupUuids: values?.selectedGroups?.length ? values?.selectedGroups?.map((group) => group.value) : undefined,
+                            groupUuids: values?.selectedGroups?.length ? values?.selectedGroups?.map((group) => group.value) : [],
                             name: values.name,
                         },
                     }),
@@ -167,7 +167,7 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                         tokenProfileUuid: values.tokenProfile!.value.uuid,
                         type: values.type!.value,
                         cryptographicKeyAddRequest: {
-                            groupUuids: values?.selectedGroups?.length ? values?.selectedGroups?.map((group) => group.value) : undefined,
+                            groupUuids: values?.selectedGroups?.length ? values?.selectedGroups?.map((group) => group.value) : [],
                             name: values.name,
                             description: values.description,
                             attributes: collectFormAttributes(
@@ -289,8 +289,8 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
             selectedGroups: editMode
                 ? keyDetail && keyDetail.groups?.length
                     ? keyDetail.groups?.map((group) => ({ value: group.uuid, label: group.name }))
-                    : undefined
-                : undefined,
+                    : []
+                : [],
             owner: editMode
                 ? keyDetail && keyDetail.ownerUuid && keyDetail.owner
                     ? { value: keyDetail.ownerUuid, label: keyDetail.owner }
@@ -401,14 +401,14 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                         <Field name="selectedGroups">
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="selectedGroups">Group</Label>
+                                    <Label for="selectedGroups">Groups</Label>
 
                                     <Select
                                         {...input}
                                         maxMenuHeight={140}
                                         menuPlacement="auto"
                                         options={optionsForGroups}
-                                        placeholder="Select Group"
+                                        placeholder="Select Groups"
                                         onChange={(event) => {
                                             input.onChange(event);
                                         }}
