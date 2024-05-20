@@ -44,6 +44,7 @@ interface Props {
     onFilterUpdate?: (currentFilters: SearchFilterModel[]) => void;
     appendInWidgetContent?: React.ReactNode;
     disableBadgeRemove?: boolean;
+    busyBadges?: boolean;
 }
 
 export default function FilterWidget({
@@ -53,6 +54,7 @@ export default function FilterWidget({
     entity,
     getAvailableFiltersApi,
     disableBadgeRemove,
+    busyBadges,
 }: Props) {
     const dispatch = useDispatch();
 
@@ -194,14 +196,20 @@ export default function FilterWidget({
                 : [...currentFilters.slice(0, selectedFilter), updatedFilterItem, ...currentFilters.slice(selectedFilter + 1)];
 
         dispatch(actions.setCurrentFilters({ entity, currentFilters: newFilters }));
-        if (onFilterUpdate) onFilterUpdate(newFilters);
+        if (onFilterUpdate) {
+            onFilterUpdate(newFilters);
+            setSelectedFilter(-1);
+        }
     }, [filterGroup, filterField, filterCondition, selectedFilter, currentFilters, filterValue, dispatch, entity, onFilterUpdate]);
 
     const onRemoveFilterClick = useCallback(
         (index: number) => {
             const newFilters = currentFilters.filter((_, i) => i !== index);
             dispatch(actions.setCurrentFilters({ entity, currentFilters: newFilters }));
-            if (onFilterUpdate) onFilterUpdate(newFilters);
+            if (onFilterUpdate) {
+                onFilterUpdate(newFilters);
+                setSelectedFilter(-1);
+            }
         },
         [currentFilters, dispatch, entity, onFilterUpdate],
     );
@@ -256,7 +264,7 @@ export default function FilterWidget({
 
     const getBadgeContent = useCallback(
         (itemNumber: number, fieldSource: string, fieldCondition: string, label: string, value: string) => {
-            if (isFetchingAvailableFilters) return <></>;
+            if (isFetchingAvailableFilters || busyBadges) return <></>;
 
             return (
                 <React.Fragment key={itemNumber}>
@@ -271,7 +279,7 @@ export default function FilterWidget({
                 </React.Fragment>
             );
         },
-        [isFetchingAvailableFilters, FilterConditionOperatorEnum, disableBadgeRemove, onRemoveFilterClick, searchGroupEnum],
+        [isFetchingAvailableFilters, FilterConditionOperatorEnum, disableBadgeRemove, onRemoveFilterClick, searchGroupEnum, busyBadges],
     );
 
     return (
@@ -428,7 +436,7 @@ export default function FilterWidget({
                                 onClick={() => toggleFilter(i)}
                                 color={selectedFilter === i ? 'primary' : 'secondary'}
                             >
-                                {!isFetchingAvailableFilters && getBadgeContent(i, f.fieldSource, f.condition, label, value)}
+                                {!isFetchingAvailableFilters && !busyBadges && getBadgeContent(i, f.fieldSource, f.condition, label, value)}
                             </Badge>
                         );
                     })}

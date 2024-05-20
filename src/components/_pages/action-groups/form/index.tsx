@@ -35,7 +35,7 @@ const ActionGroupForm = () => {
     const navigate = useNavigate();
     const title = 'Create Action Group';
     const isCreatingActionGroup = useSelector(rulesSelectors.isCreatingActionGroup);
-    const { resourceOptions, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
+    const { resourceOptionsWithRuleEvaluator, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
     const isBusy = useMemo(() => isCreatingActionGroup || isFetchingResourcesList, [isCreatingActionGroup, isFetchingResourcesList]);
 
     const defaultValues: ActionGroupFormValues = useMemo(() => {
@@ -133,7 +133,7 @@ const ActionGroupForm = () => {
                                         {...input}
                                         maxMenuHeight={140}
                                         menuPlacement="auto"
-                                        options={resourceOptions || []}
+                                        options={resourceOptionsWithRuleEvaluator || []}
                                         placeholder="Select Resource"
                                         onChange={(event) => {
                                             input.onChange(event);

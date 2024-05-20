@@ -264,33 +264,39 @@ const RuleDetails = () => {
         [],
     );
 
-    const conditionGroupFieldsData: TableDataRow[] = useMemo(
-        () =>
-            !ruleDetails?.conditionGroups.length
-                ? []
-                : ruleDetails?.conditionGroups.map((conditionGroup) => {
-                      return {
-                          id: conditionGroup.uuid,
-                          columns: [
-                              <Link to={`../../conditiongroups/detail/${conditionGroup.uuid}`}>{conditionGroup.name}</Link> || '',
-                              conditionGroup.description || '',
-                              <Button
-                                  className="btn btn-link text-danger"
-                                  size="sm"
-                                  color="danger"
-                                  title="Delete Condition Group"
-                                  onClick={() => {
-                                      onDeleteConditionGroup(conditionGroup.uuid);
-                                  }}
-                                  disabled={isUpdatingRule}
-                              >
-                                  <i className="fa fa-trash" />
-                              </Button>,
-                          ],
-                      };
-                  }),
-        [ruleDetails, isUpdatingRule, onDeleteConditionGroup],
-    );
+    const conditionGroupFieldsData: TableDataRow[] = useMemo(() => {
+        const isDeleteDisabled =
+            (ruleDetails?.conditions.length === 0 && ruleDetails?.conditionGroups.length === 1) || isFetchingRuleDetail || isUpdatingRule;
+        const conditionGroupData = !ruleDetails?.conditionGroups.length
+            ? []
+            : ruleDetails?.conditionGroups.map((conditionGroup) => {
+                  return {
+                      id: conditionGroup.uuid,
+                      columns: [
+                          <Link to={`../../conditiongroups/detail/${conditionGroup.uuid}`}>{conditionGroup.name}</Link> || '',
+                          conditionGroup.description || '',
+                          <Button
+                              className="btn btn-link text-danger"
+                              size="sm"
+                              color="danger"
+                              title={
+                                  isDeleteDisabled
+                                      ? 'Cannot delete this condition group as there are no other conditions in the rule'
+                                      : 'Delete Condition Group'
+                              }
+                              onClick={() => {
+                                  onDeleteConditionGroup(conditionGroup.uuid);
+                              }}
+                              disabled={isDeleteDisabled}
+                          >
+                              <i className="fa fa-trash" />
+                          </Button>,
+                      ],
+                  };
+              });
+
+        return conditionGroupData;
+    }, [ruleDetails, isUpdatingRule, onDeleteConditionGroup, isFetchingRuleDetail]);
 
     return (
         <Container className="themed-container" fluid>

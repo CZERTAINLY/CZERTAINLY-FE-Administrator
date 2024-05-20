@@ -43,7 +43,7 @@ const ActionGroupsList = () => {
         getFreshListActionGroups();
     }, [getFreshListActionGroups]);
 
-    const { resourceOptions, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
+    const { resourceOptionsWithRuleEvaluator, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
 
     const conditionGroupsRowHeaders: TableHeader[] = useMemo(
         () => [
@@ -99,7 +99,7 @@ const ActionGroupsList = () => {
                             isClearable
                             maxMenuHeight={140}
                             menuPlacement="auto"
-                            options={resourceOptions}
+                            options={resourceOptionsWithRuleEvaluator}
                             placeholder="Select Resource"
                             onChange={(event) => {
                                 setSelectedResource(event?.value as Resource);
@@ -121,7 +121,7 @@ const ActionGroupsList = () => {
                 onClick: () => setConfirmDelete(true),
             },
         ],
-        [checkedRows, resourceOptions, navigate],
+        [checkedRows, resourceOptionsWithRuleEvaluator, navigate],
     );
 
     return (

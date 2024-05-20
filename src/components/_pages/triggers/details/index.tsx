@@ -343,33 +343,42 @@ const TriggerDetails = () => {
         [],
     );
 
-    const actionGroupsFieldsData: TableDataRow[] = useMemo(
-        () =>
-            !triggerDetails?.actionGroups.length
-                ? []
-                : triggerDetails?.actionGroups.map((actionGroup) => {
-                      return {
-                          id: actionGroup.uuid,
-                          columns: [
-                              <Link to={`../../actiongroups/detail/${actionGroup.uuid}`}>{actionGroup.name}</Link> || '',
-                              actionGroup.description || '',
-                              <Button
-                                  className="btn btn-link text-danger"
-                                  size="sm"
-                                  color="danger"
-                                  title="Delete Action Group"
-                                  onClick={() => {
-                                      onDeleteActionGroup(actionGroup.uuid);
-                                  }}
-                                  disabled={isUpdatingTrigger}
-                              >
-                                  <i className="fa fa-trash" />
-                              </Button>,
-                          ],
-                      };
-                  }),
-        [triggerDetails, isUpdatingTrigger, onDeleteActionGroup],
-    );
+    const actionGroupsFieldsData: TableDataRow[] = useMemo(() => {
+        const isDeleteDisabled =
+            (triggerDetails?.actions?.length === 0 && triggerDetails?.actionGroups?.length == 1) ||
+            isUpdatingTrigger ||
+            isFetchingTriggerDetail;
+
+        const actionGroupData = !triggerDetails?.actionGroups.length
+            ? []
+            : triggerDetails?.actionGroups.map((actionGroup) => {
+                  return {
+                      id: actionGroup.uuid,
+                      columns: [
+                          <Link to={`../../actiongroups/detail/${actionGroup.uuid}`}>{actionGroup.name}</Link> || '',
+                          actionGroup.description || '',
+                          <Button
+                              className="btn btn-link text-danger"
+                              size="sm"
+                              color="danger"
+                              title={
+                                  isDeleteDisabled
+                                      ? 'Cannot delete this action group as there are no other actions in the trigger'
+                                      : 'Delete Action Group'
+                              }
+                              onClick={() => {
+                                  onDeleteActionGroup(actionGroup.uuid);
+                              }}
+                              disabled={isDeleteDisabled}
+                          >
+                              <i className="fa fa-trash" />
+                          </Button>,
+                      ],
+                  };
+              });
+
+        return actionGroupData;
+    }, [triggerDetails, onDeleteActionGroup, isUpdatingTrigger, isFetchingTriggerDetail]);
 
     const rulesHeader: TableHeader[] = useMemo(
         () => [

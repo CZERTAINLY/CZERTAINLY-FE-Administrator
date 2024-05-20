@@ -27,6 +27,8 @@ interface Props {
     appendInWidgetContent?: React.ReactNode;
     actionsList?: ActionRuleRequestModel[];
     includeIgnoreAction?: boolean;
+    disableBadgeRemove?: boolean;
+    busyBadges?: boolean;
 }
 
 export default function FilterWidgetRuleAction({
@@ -37,6 +39,8 @@ export default function FilterWidgetRuleAction({
     entity,
     getAvailableFiltersApi,
     includeIgnoreAction,
+    disableBadgeRemove,
+    busyBadges,
 }: Props) {
     const dispatch = useDispatch();
 
@@ -144,6 +148,7 @@ export default function FilterWidgetRuleAction({
             });
 
             onActionsUpdate && onActionsUpdate(updatedActionDataActions);
+            setSelectedFilter({ filterNumber: -1, isEditEnabled: false });
         } else {
             const updatedActions = actions.map((a, i) => (i === selectedFilter.filterNumber ? newAction : a));
             setActions(updatedActions);
@@ -164,6 +169,7 @@ export default function FilterWidgetRuleAction({
             });
 
             onActionsUpdate && onActionsUpdate(updatedActionDataActions);
+            setSelectedFilter({ filterNumber: -1, isEditEnabled: false });
         }
     }, [
         ruleActionType,
@@ -193,7 +199,10 @@ export default function FilterWidgetRuleAction({
         (index: number) => {
             const newActions = actions.filter((_, i) => i !== index);
             setActions(newActions);
-            onActionsUpdate && onActionsUpdate(newActions);
+            if (onActionsUpdate) {
+                onActionsUpdate(newActions);
+                setSelectedFilter({ filterNumber: -1, isEditEnabled: false });
+            }
         },
         [actions, onActionsUpdate],
     );
@@ -401,20 +410,22 @@ export default function FilterWidgetRuleAction({
 
     const renderBadgeContent = useCallback(
         (itemNumber: number, actionType: string, value: string, label?: string, fieldSource?: string) => {
-            if (isFetchingAvailableFilters) return <></>;
+            if (isFetchingAvailableFilters || busyBadges) return <></>;
             return (
                 <React.Fragment key={itemNumber}>
                     {getEnumLabel(RuleActionTypeEnum, actionType)}&nbsp;
                     <b>{fieldSource && getEnumLabel(searchGroupEnum, fieldSource)}&nbsp;</b>'{label}
                     '&nbsp;to&nbsp;
                     {value}
-                    <span className={styles.filterBadgeSpan} onClick={() => onRemoveFilterClick(itemNumber)}>
-                        &times;
-                    </span>
+                    {!disableBadgeRemove && (
+                        <span className={styles.filterBadgeSpan} onClick={() => onRemoveFilterClick(itemNumber)}>
+                            &times;
+                        </span>
+                    )}
                 </React.Fragment>
             );
         },
-        [isFetchingAvailableFilters, RuleActionTypeEnum, onRemoveFilterClick, searchGroupEnum],
+        [isFetchingAvailableFilters, RuleActionTypeEnum, onRemoveFilterClick, searchGroupEnum, disableBadgeRemove, busyBadges],
     );
 
     const isUpdateButtonDisabled = useMemo(() => {
@@ -562,10 +573,12 @@ export default function FilterWidgetRuleAction({
                                 onClick={() => toggleFilter(i)}
                                 color={selectedFilter.filterNumber === i ? 'primary' : 'secondary'}
                             >
-                                {!isActionTypeIgnore && !isFetchingAvailableFilters && (
+                                {!isActionTypeIgnore && !isFetchingAvailableFilters && !busyBadges && (
                                     <>{renderBadgeContent(i, f.actionType, value, label, f.fieldSource)}</>
                                 )}
-                                {isActionTypeIgnore && getEnumLabel(RuleActionTypeEnum, RuleActionType.Ignore)}
+                                {isActionTypeIgnore && !isFetchingAvailableFilters && !busyBadges && (
+                                    <b>{getEnumLabel(RuleActionTypeEnum, RuleActionType.Ignore)} </b>
+                                )}
                             </Badge>
                         );
                     })}

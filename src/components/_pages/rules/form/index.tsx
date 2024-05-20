@@ -46,7 +46,7 @@ const ConditionGroupForm = () => {
     const isUpdatingRule = useSelector(rulesSelectors.isUpdatingRule);
     const [selectedResourceState, setSelectedResourceState] = useState<SelectChangeValue>();
     const ruleDetails = useSelector(rulesSelectors.ruleDetails);
-    const { resourceOptions, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
+    const { resourceOptionsWithRuleEvaluator, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
 
     const isBusy = useMemo(
         () => isCreatingRule || isUpdatingRule || isFetchingResourcesList,
@@ -173,7 +173,7 @@ const ConditionGroupForm = () => {
                                         {...input}
                                         maxMenuHeight={140}
                                         menuPlacement="auto"
-                                        options={resourceOptions || []}
+                                        options={resourceOptionsWithRuleEvaluator || []}
                                         placeholder="Select Resource"
                                         isClearable
                                         onChange={(event) => {

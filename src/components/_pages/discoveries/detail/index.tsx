@@ -147,8 +147,8 @@ export default function DiscoveryDetail() {
             content: 'Name',
         },
         {
-            id: 'triggerSource',
-            content: 'Trigger Source',
+            id: 'triggerResource',
+            content: 'Trigger Resource',
         },
         {
             id: 'triggerType',

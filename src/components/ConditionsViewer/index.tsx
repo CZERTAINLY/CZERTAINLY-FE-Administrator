@@ -21,9 +21,21 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
     const editMode = useMemo(() => !!id, [id]);
 
     const conditionGroupsDetails = useSelector(rulesSelectors.conditionGroupDetails);
+    const isFetchingConditionGroup = useSelector(rulesSelectors.isFetchingConditionGroup);
+    const isUpdatingConditionGroup = useSelector(rulesSelectors.isUpdatingConditionGroup);
+
     const ruleDetails = useSelector(rulesSelectors.ruleDetails);
+    const isFetchingRuleDetail = useSelector(rulesSelectors.isFetchingRuleDetail);
+    const isUpdatingRule = useSelector(rulesSelectors.isUpdatingRule);
+
     const actionGroupDetails = useSelector(rulesSelectors.actionGroupDetails);
+    const isFetchingActionGroup = useSelector(rulesSelectors.isFetchingActionGroup);
+    const isUpdatingActionGroup = useSelector(rulesSelectors.isUpdatingActionGroup);
+
     const trigerDetails = useSelector(rulesSelectors.triggerDetails);
+    const isFetchingTriggerDetail = useSelector(rulesSelectors.isFetchingTriggerDetail);
+    const isUpdatingTrigger = useSelector(rulesSelectors.isUpdatingTrigger);
+
     const [hasEffectRun, setHasEffectRun] = useState(false);
 
     const dispatch = useDispatch();
@@ -78,24 +90,31 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
 
     const renderAppendContent = useMemo(() => {
         if (formType === 'rules' && ruleDetails?.conditionGroups && ruleDetails?.conditionGroups?.length > 0) {
+            if (isFetchingRuleDetail || isUpdatingRule) return <></>;
             return <ConditionsGroupsList ruleConditions={ruleDetails?.conditionGroups} />;
         }
 
         if (formType === 'trigger' && trigerDetails?.actionGroups && trigerDetails?.actionGroups?.length > 0) {
+            if (isFetchingTriggerDetail || isUpdatingTrigger) return <></>;
             return <ConditionsGroupsList actionGroups={trigerDetails.actionGroups} />;
         } else {
             return <></>;
         }
-    }, [ruleDetails, formType, trigerDetails]);
+    }, [ruleDetails, formType, trigerDetails, isFetchingRuleDetail, isFetchingTriggerDetail, isUpdatingRule, isUpdatingTrigger]);
 
     const renderFilterWidgetForRules = useMemo(() => {
         if (formType !== 'rules' || !id || !ruleDetails) return null;
-        const disableBadgeRemove = ruleDetails.conditions.length === 1 && ruleDetails.conditionGroups.length === 0;
+        const disableBadgeRemove =
+            (ruleDetails.conditions.length === 1 && ruleDetails.conditionGroups.length === 0) || isFetchingRuleDetail || isUpdatingRule;
+
+        const isBusy = isFetchingRuleDetail || isUpdatingRule;
+
         return (
             <FilterWidget
                 appendInWidgetContent={renderAppendContent}
                 entity={EntityType.CONDITIONS}
                 title={'Conditions'}
+                busyBadges={isBusy}
                 getAvailableFiltersApi={(apiClients: ApiClients) =>
                     apiClients.resources.listResourceRuleFilterFields({
                         resource,
@@ -117,14 +136,16 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
                 }}
             />
         );
-    }, [resource, dispatch, formType, id, ruleDetails, renderAppendContent]);
+    }, [resource, dispatch, formType, id, ruleDetails, renderAppendContent, isFetchingRuleDetail, isUpdatingRule]);
 
     const renderFilterWidgetForConditionGroups = useMemo(() => {
         if (formType !== 'conditionGroup' || !id || !conditionGroupsDetails) return null;
-        const disableBadgeRemove = conditionGroupsDetails.conditions.length === 1;
+        const disableBadgeRemove = conditionGroupsDetails.conditions.length === 1 || isFetchingConditionGroup || isUpdatingConditionGroup;
+        const isBusy = isFetchingConditionGroup || isUpdatingConditionGroup;
         return (
             <div>
                 <FilterWidget
+                    busyBadges={isBusy}
                     entity={EntityType.CONDITIONS}
                     title={'Conditions'}
                     getAvailableFiltersApi={(apiClients: ApiClients) =>
@@ -147,16 +168,20 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
                 />
             </div>
         );
-    }, [resource, dispatch, formType, id, conditionGroupsDetails]);
+    }, [resource, dispatch, formType, id, conditionGroupsDetails, isFetchingConditionGroup, isUpdatingConditionGroup]);
 
     const renderFilterWidgetForActionGroup = useMemo(() => {
         if (formType !== 'actionGroup' || !id || !actionGroupDetails) return null;
+        const disableBadgeRemove = actionGroupDetails.actions.length === 1 || isFetchingActionGroup || isUpdatingActionGroup;
 
+        const isBusy = isFetchingActionGroup || isUpdatingActionGroup;
         return (
             <div>
                 <FilterWidgetRuleAction
                     entity={EntityType.ACTIONS}
                     title={'Actions'}
+                    busyBadges={isBusy}
+                    disableBadgeRemove={disableBadgeRemove}
                     getAvailableFiltersApi={(apiClients: ApiClients) =>
                         apiClients.resources.listResourceRuleFilterFields({
                             resource,
@@ -177,16 +202,24 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
                 />
             </div>
         );
-    }, [resource, dispatch, formType, id, actionGroupDetails]);
+    }, [resource, dispatch, formType, id, actionGroupDetails, isFetchingActionGroup, isUpdatingActionGroup]);
 
     const renderFilterWidgetForTrigger = useMemo(() => {
         if (formType !== 'trigger' || !id || !trigerDetails) return null;
+        const isActionOnlyOne = trigerDetails.actions.length === 1;
+        const isActionGroupEmpty = trigerDetails.actionGroups.length === 0;
+
+        const disableBadgeRemove = isActionOnlyOne && isActionGroupEmpty;
+        const isBusy = isFetchingTriggerDetail || isUpdatingTrigger;
+
         return (
             <div>
                 <FilterWidgetRuleAction
                     includeIgnoreAction
                     entity={EntityType.ACTIONS}
                     title={'Actions'}
+                    busyBadges={isBusy}
+                    disableBadgeRemove={disableBadgeRemove}
                     appendInWidgetContent={renderAppendContent}
                     getAvailableFiltersApi={(apiClients: ApiClients) =>
                         apiClients.resources.listResourceRuleFilterFields({
@@ -212,7 +245,7 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
                 />
             </div>
         );
-    }, [resource, dispatch, formType, id, trigerDetails, renderAppendContent]);
+    }, [resource, dispatch, formType, id, trigerDetails, renderAppendContent, isFetchingTriggerDetail, isUpdatingTrigger]);
 
     const renderWidgetConditionViewer = useMemo(() => {
         switch (formType) {

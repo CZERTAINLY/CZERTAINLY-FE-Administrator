@@ -40,7 +40,7 @@ const ConditionGroupForm = () => {
     const title = 'Create Condition Group';
     const isCreatingConditionGroup = useSelector(rulesSelectors.isCreatingConditionGroup);
     const isUpdatingConditionGroup = useSelector(rulesSelectors.isUpdatingConditionGroup);
-    const { resourceOptions, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
+    const { resourceOptionsWithRuleEvaluator, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
 
     const isBusy = useMemo(
         () => isCreatingConditionGroup || isFetchingResourcesList || isUpdatingConditionGroup,
@@ -155,7 +155,7 @@ const ConditionGroupForm = () => {
                                         {...input}
                                         maxMenuHeight={140}
                                         menuPlacement="auto"
-                                        options={resourceOptions || []}
+                                        options={resourceOptionsWithRuleEvaluator || []}
                                         placeholder="Select Resource"
                                         onChange={(event) => {
                                             input.onChange(event);

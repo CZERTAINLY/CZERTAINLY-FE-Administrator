@@ -17,7 +17,7 @@ const ActionGroupDetails = () => {
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const actionGroupDetails = useSelector(rulesSelectors.actionGroupDetails);
     const isFetchingDetails = useSelector(rulesSelectors.isFetchingActionGroup);
-    const isUpdatingDetails = useSelector(rulesSelectors.isupdatingActionGroup);
+    const isUpdatingDetails = useSelector(rulesSelectors.isUpdatingActionGroup);
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [updateDescriptionEditEnable, setUpdateDescription] = useState<boolean>(false);
     const [updatedDescription, setUpdatedDescription] = useState('');
