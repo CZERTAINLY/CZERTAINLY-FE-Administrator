@@ -139,8 +139,6 @@ function UserForm() {
         [groups],
     );
 
-    const [selectedCertificate, setSelectedCertificate] = useState<{ label: string; value: string }>();
-
     const [certUploadDialog, setCertUploadDialog] = useState(false);
     const [certToUpload, setCertToUpload] = useState<CertificateDetailResponseModel>();
     const [certFileContent, setCertFileContent] = useState<string>();
@@ -203,14 +201,6 @@ function UserForm() {
     useEffect(() => {
         if (user && user.certificate && user.certificate.uuid && certificateDetail && certificateDetail.uuid === user.certificate.uuid) {
             const certs = [...loadedCerts];
-
-            setSelectedCertificate({
-                label:
-                    certificateDetail.commonName && certificateDetail.fingerprint
-                        ? `${certificateDetail.commonName} (${certificateDetail.fingerprint})`
-                        : `( empty ) ( ${certificateDetail.commonName} )`,
-                value: certificateDetail.uuid,
-            });
 
             const idx = certs.findIndex((c) => c.uuid === certificateDetail.uuid);
             if (idx > 0) certs.splice(idx, 1);
@@ -324,8 +314,9 @@ function UserForm() {
 
     const inProgressTitle = useMemo(() => (editMode ? 'Saving...' : 'Creating...'), [editMode]);
 
-    const defaultValues = useMemo(
-        () => ({
+    const defaultValues = useMemo(() => {
+        const userCertificateValue = optionsForCertificate.find((cert) => cert.value === user?.certificate?.uuid);
+        const defaultValues = {
             username: editMode ? user?.username : '',
             description: editMode ? user?.description : '',
             selectedGroups: editMode
@@ -339,10 +330,15 @@ function UserForm() {
             enabled: editMode ? user?.enabled : true,
             systemUser: editMode ? user?.systemUser : false,
             inputType: optionsForInput[1],
-            certificate: selectedCertificate,
-        }),
-        [user, editMode, selectedCertificate, optionsForInput],
-    );
+            certificate: editMode
+                ? userCertificateValue
+                    ? { label: userCertificateValue?.label, value: userCertificateValue?.value }
+                    : undefined
+                : undefined,
+        };
+
+        return defaultValues;
+    }, [user, editMode, optionsForInput, optionsForCertificate]);
 
     const rolesTableHeader: TableHeader[] = useMemo(
         () => [
