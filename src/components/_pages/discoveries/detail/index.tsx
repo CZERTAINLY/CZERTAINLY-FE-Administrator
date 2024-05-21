@@ -6,6 +6,7 @@ import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions, selectors } from 'ducks/discoveries';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
@@ -14,7 +15,7 @@ import { Col, Container, Label, Row } from 'reactstrap';
 
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { dateFormatter } from 'utils/dateUtil';
-import { Resource } from '../../../../types/openapi';
+import { PlatformEnum, Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import DiscoveryStatus from '../DiscoveryStatus';
 import DiscoveryCertificates from './DiscoveryCertificates';
@@ -30,8 +31,11 @@ export default function DiscoveryDetail() {
     const isDeleting = useSelector(selectors.isDeleting);
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const eventNameEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ResourceEvent));
 
     const isBusy = useMemo(() => isFetching || isDeleting, [isFetching, isDeleting]);
+    const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
+    const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.RuleTriggerType));
 
     const getFreshDiscoveryDetails = useCallback(() => {
         if (!id) return;
@@ -137,20 +141,70 @@ export default function DiscoveryDetail() {
         [discovery],
     );
 
+    const triggerHeaders: TableHeader[] = [
+        {
+            id: 'name',
+            content: 'Name',
+        },
+        {
+            id: 'triggerResource',
+            content: 'Trigger Resource',
+        },
+        {
+            id: 'triggerType',
+            content: 'Trigger Type',
+        },
+        {
+            id: 'eventName',
+            content: 'Event Name',
+        },
+        {
+            id: 'resource',
+            content: 'Resource',
+        },
+        {
+            id: 'description',
+            content: 'Description',
+        },
+    ];
+
+    const triggerTableData: TableDataRow[] = discovery?.triggers.length
+        ? discovery.triggers.map((trigger) => ({
+              id: trigger.uuid,
+              columns: [
+                  <Link to={`../../triggers/detail/${trigger.uuid}`}>{trigger.name}</Link>,
+                  trigger?.triggerResource ? getEnumLabel(resourceTypeEnum, trigger.triggerResource) : '',
+                  getEnumLabel(triggerTypeEnum, trigger.triggerType),
+                  getEnumLabel(eventNameEnum, trigger.eventName || ''),
+                  getEnumLabel(resourceTypeEnum, trigger.resource || ''),
+                  trigger.description || '',
+              ],
+          }))
+        : [];
+
     return (
         <Container className="themed-container" fluid>
-            <Widget
-                title="Certificate Discovery Details"
-                busy={isBusy}
-                widgetButtons={buttons}
-                titleSize="large"
-                refreshAction={getFreshDiscoveryDetails}
-                widgetLockName={LockWidgetNameEnum.DiscoveryDetails}
-            >
-                <br />
+            <Row xs="1" sm="1" md="2" lg="2" xl="2">
+                <Col>
+                    <Widget
+                        title="Certificate Discovery Details"
+                        busy={isBusy}
+                        widgetButtons={buttons}
+                        titleSize="large"
+                        refreshAction={getFreshDiscoveryDetails}
+                        widgetLockName={LockWidgetNameEnum.DiscoveryDetails}
+                    >
+                        <br />
 
-                <CustomTable headers={detailHeaders} data={detailData} />
-            </Widget>
+                        <CustomTable headers={detailHeaders} data={detailData} />
+                    </Widget>
+                </Col>
+                <Col>
+                    <Widget title="Assigned Triggers" busy={isBusy} titleSize="large" widgetLockName={LockWidgetNameEnum.DiscoveryDetails}>
+                        <CustomTable headers={triggerHeaders} data={triggerTableData} />
+                    </Widget>
+                </Col>
+            </Row>
 
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
                 <Col>

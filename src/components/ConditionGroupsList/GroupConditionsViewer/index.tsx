@@ -5,7 +5,7 @@ import { selectors as rulesSelectors } from 'ducks/rules';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { Badge, Spinner } from 'reactstrap';
-import { FilterFieldType, PlatformEnum, RuleConditionDto } from 'types/openapi';
+import { PlatformEnum, RuleConditionDto } from 'types/openapi';
 import styles from './groupConditionsViewer.module.scss';
 
 interface ConditionsTableViewerProps {
@@ -29,27 +29,29 @@ const GroupConditionsViewer = ({ groupConditions = [], conditionGroupName, condi
     );
 
     const renderConditionsBadges = () => {
-        return groupConditions.map((condition) => {
-            const filterConditionSource = availableFilters.find((a) => a.filterFieldSource === condition.fieldSource);
-            const foundField = filterConditionSource?.searchFieldData?.find((s) => s.fieldIdentifier === condition.fieldIdentifier);
+        return groupConditions.map((condition, i) => {
             const field = availableFilters
                 .find((a) => a.filterFieldSource === condition.fieldSource)
                 ?.searchFieldData?.find((s) => s.fieldIdentifier === condition.fieldIdentifier);
+
             const label = field ? field.fieldLabel : condition.fieldIdentifier;
-            const value =
-                field && field.type === FilterFieldType.Boolean
-                    ? `'${booleanOptions.find((b) => !!condition.value === b.value)?.label}'`
-                    : Array.isArray(condition.value) && condition.value.length > 1
-                      ? `(${condition.value
-                            .map((v) => `'${field?.platformEnum ? platformEnums[field.platformEnum][v]?.label : v}'`)
-                            .join(' OR ')})`
-                      : condition.value
-                        ? `'${
-                              field?.platformEnum
-                                  ? platformEnums[field.platformEnum][condition.value as unknown as string]?.label
-                                  : condition.value
-                          }'`
-                        : '';
+            let value = '';
+
+            if (Array.isArray(field?.value)) {
+                if (Array.isArray(condition.value)) {
+                    const conditionValue = condition.value[0];
+                    const coincideValue = field?.value.find((v) => v.uuid === conditionValue.uuid);
+                    value = coincideValue?.name || '';
+                }
+            } else {
+                if (typeof condition.value === 'string') {
+                    value = condition.value;
+                }
+                if (typeof condition.value === 'object') {
+                    value = JSON.stringify(condition.value);
+                }
+            }
+
             return (
                 <Badge
                     key={condition.uuid}

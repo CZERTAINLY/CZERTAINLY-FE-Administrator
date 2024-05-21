@@ -17,18 +17,17 @@ const ActionGroupDetails = () => {
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const actionGroupDetails = useSelector(rulesSelectors.actionGroupDetails);
     const isFetchingDetails = useSelector(rulesSelectors.isFetchingActionGroup);
-    const isUpdatingDetails = useSelector(rulesSelectors.isupdatingActionGroup);
-
+    const isUpdatingDetails = useSelector(rulesSelectors.isUpdatingActionGroup);
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [updateDescriptionEditEnable, setUpdateDescription] = useState<boolean>(false);
-    const [updatedDescription, setUpdatedDescription] = useState<string>(actionGroupDetails?.description || '');
+    const [updatedDescription, setUpdatedDescription] = useState('');
 
     const isBusy = useMemo(() => isFetchingDetails || isUpdatingDetails, [isFetchingDetails, isUpdatingDetails]);
 
     useEffect(() => {
-        if (!actionGroupDetails?.description) return;
+        if (!actionGroupDetails?.description || actionGroupDetails.uuid !== id) return;
         setUpdatedDescription(actionGroupDetails.description);
-    }, [actionGroupDetails?.description]);
+    }, [actionGroupDetails, id]);
 
     const getFreshDetails = useCallback(() => {
         if (!id) return;
@@ -46,19 +45,20 @@ const ActionGroupDetails = () => {
     }, [dispatch, id]);
 
     const onUpdateDescriptionConfirmed = useCallback(() => {
-        if (!id) return;
-        dispatch(
-            rulesActions.updateActionGroup({
-                actionGroupUuid: id,
-                actionGroup: {
-                    description: updatedDescription,
-                    actions: actionGroupDetails?.actions || [],
-                    // conditions: actionGroupDetails?.conditions || [],
-                },
-            }),
-        );
+        if (!id || !updateDescriptionEditEnable) return;
+        if (updatedDescription !== actionGroupDetails?.description) {
+            dispatch(
+                rulesActions.updateActionGroup({
+                    actionGroupUuid: id,
+                    actionGroup: {
+                        description: updatedDescription,
+                        actions: actionGroupDetails?.actions || [],
+                    },
+                }),
+            );
+        }
         setUpdateDescription(false);
-    }, [dispatch, id, actionGroupDetails, updatedDescription]);
+    }, [dispatch, id, actionGroupDetails, updatedDescription, updateDescriptionEditEnable]);
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
@@ -91,7 +91,7 @@ const ActionGroupDetails = () => {
 
     const actionGroupsDetailData: TableDataRow[] = useMemo(
         () =>
-            !actionGroupDetails
+            !actionGroupDetails || isFetchingDetails
                 ? []
                 : [
                       {
@@ -128,7 +128,11 @@ const ActionGroupDetails = () => {
                                               color="secondary"
                                               title="Update Description"
                                               onClick={onUpdateDescriptionConfirmed}
-                                              disabled={isUpdatingDetails}
+                                              disabled={
+                                                  isUpdatingDetails ||
+                                                  updatedDescription === actionGroupDetails.description ||
+                                                  updatedDescription === ''
+                                              }
                                           >
                                               <i className="fa fa-check" />
                                           </Button>
@@ -138,7 +142,7 @@ const ActionGroupDetails = () => {
                                               title="Cancel"
                                               onClick={() => {
                                                   setUpdateDescription(false);
-                                                  setUpdatedDescription(actionGroupDetails.description || '');
+                                                  setUpdatedDescription(actionGroupDetails?.description || '');
                                               }}
                                               disabled={isUpdatingDetails}
                                           >
@@ -171,6 +175,7 @@ const ActionGroupDetails = () => {
             onUpdateDescriptionConfirmed,
             isUpdatingDetails,
             updatedDescription,
+            isFetchingDetails,
         ],
     );
 

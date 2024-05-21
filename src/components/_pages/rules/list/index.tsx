@@ -28,7 +28,7 @@ const ConditionGroups = () => {
 
     const [checkedRows, setCheckedRows] = useState<string[]>([]);
     const [confirmDelete, setConfirmDelete] = useState(false);
-    const { resourceOptions, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
+    const { resourceOptionsWithRuleEvaluator, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
 
     const isBusy = useMemo(
         () => isFetchingList || isDeleting || isFetchingResourcesList,
@@ -93,6 +93,26 @@ const ConditionGroups = () => {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
+                icon: 'search',
+                disabled: false,
+                tooltip: 'Select Resource',
+                onClick: () => {},
+                custom: (
+                    <div className={styles.listSelectContainer}>
+                        <Select
+                            isClearable
+                            maxMenuHeight={140}
+                            menuPlacement="auto"
+                            options={resourceOptionsWithRuleEvaluator}
+                            placeholder="Select Resource"
+                            onChange={(event) => {
+                                setSelectedResource(event?.value as Resource);
+                            }}
+                        />
+                    </div>
+                ),
+            },
+            {
                 icon: 'plus',
                 disabled: false,
                 tooltip: 'Create',
@@ -104,33 +124,23 @@ const ConditionGroups = () => {
                 tooltip: 'Delete',
                 onClick: () => setConfirmDelete(true),
             },
-            {
-                icon: 'search',
-                disabled: false,
-                tooltip: 'Select Resource',
-                onClick: () => {},
-                custom: (
-                    <div className={styles.listSelectContainer}>
-                        <Select
-                            isClearable
-                            maxMenuHeight={140}
-                            menuPlacement="auto"
-                            options={resourceOptions}
-                            placeholder="Select Resource"
-                            onChange={(event) => {
-                                setSelectedResource(event?.value as Resource);
-                            }}
-                        />
-                    </div>
-                ),
-            },
         ],
-        [checkedRows, resourceOptions, navigate],
+        [checkedRows, resourceOptionsWithRuleEvaluator, navigate],
     );
 
     return (
         <Container className="themed-container" fluid>
-            <Widget titleSize="larger" title="Rules" refreshAction={getFreshList} busy={isBusy} widgetButtons={buttons}>
+            <Widget
+                titleSize="larger"
+                title="Rules"
+                refreshAction={getFreshList}
+                busy={isBusy}
+                widgetButtons={buttons}
+                widgetInfoCard={{
+                    title: 'Information',
+                    description: 'Rules are combination of conditions and condition groups',
+                }}
+            >
                 <br />
                 <CustomTable
                     checkedRows={checkedRows}

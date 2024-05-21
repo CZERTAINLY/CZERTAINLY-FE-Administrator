@@ -43,7 +43,7 @@ const ActionGroupsList = () => {
         getFreshListActionGroups();
     }, [getFreshListActionGroups]);
 
-    const { resourceOptions, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
+    const { resourceOptionsWithRuleEvaluator, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
 
     const conditionGroupsRowHeaders: TableHeader[] = useMemo(
         () => [
@@ -99,7 +99,7 @@ const ActionGroupsList = () => {
                             isClearable
                             maxMenuHeight={140}
                             menuPlacement="auto"
-                            options={resourceOptions}
+                            options={resourceOptionsWithRuleEvaluator}
                             placeholder="Select Resource"
                             onChange={(event) => {
                                 setSelectedResource(event?.value as Resource);
@@ -121,13 +121,22 @@ const ActionGroupsList = () => {
                 onClick: () => setConfirmDelete(true),
             },
         ],
-        [checkedRows, resourceOptions, navigate],
+        [checkedRows, resourceOptionsWithRuleEvaluator, navigate],
     );
 
     return (
         <Container className="themed-container" fluid>
-            <Widget titleSize="larger" title="Action Groups" refreshAction={getFreshListActionGroups} busy={isBusy} widgetButtons={buttons}>
-                <p className="mb-2">Action group is named set of action for selected resource</p>
+            <Widget
+                titleSize="larger"
+                title="Action Groups"
+                refreshAction={getFreshListActionGroups}
+                busy={isBusy}
+                widgetButtons={buttons}
+                widgetInfoCard={{
+                    title: 'Information',
+                    description: 'Action group is named set of actions for selected trigger',
+                }}
+            >
                 <CustomTable
                     checkedRows={checkedRows}
                     hasCheckboxes

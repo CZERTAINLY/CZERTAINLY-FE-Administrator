@@ -29,7 +29,7 @@ export interface ConditionGroupFormValues {
     name: string;
     selectedResource?: SelectChangeValue;
     resource: Resource;
-    description: string;
+    description?: string;
     conditions: RuleConditiontModel[];
 }
 
@@ -40,7 +40,7 @@ const ConditionGroupForm = () => {
     const title = 'Create Condition Group';
     const isCreatingConditionGroup = useSelector(rulesSelectors.isCreatingConditionGroup);
     const isUpdatingConditionGroup = useSelector(rulesSelectors.isUpdatingConditionGroup);
-    const { resourceOptions, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
+    const { resourceOptionsWithRuleEvaluator, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
 
     const isBusy = useMemo(
         () => isCreatingConditionGroup || isFetchingResourcesList || isUpdatingConditionGroup,
@@ -63,7 +63,7 @@ const ConditionGroupForm = () => {
             name: '',
             resource: Resource.None,
             selectedResource: undefined,
-            description: '',
+            description: undefined,
             conditions: [],
         };
     }, []);
@@ -78,7 +78,6 @@ const ConditionGroupForm = () => {
     const onSubmit = useCallback(
         (values: ConditionGroupFormValues) => {
             if (values.resource === Resource.None) return;
-
             dispatch(
                 rulesActions.createConditionGroup({
                     ruleConditionGroupRequest: {
@@ -129,7 +128,7 @@ const ConditionGroupForm = () => {
                             )}
                         </Field>
 
-                        <Field name="description" validate={composeValidators(validateAlphaNumericWithSpecialChars())}>
+                        <Field name="description">
                             {({ input, meta }) => (
                                 <FormGroup>
                                     <Label for="description">Description</Label>
@@ -156,7 +155,7 @@ const ConditionGroupForm = () => {
                                         {...input}
                                         maxMenuHeight={140}
                                         menuPlacement="auto"
-                                        options={resourceOptions || []}
+                                        options={resourceOptionsWithRuleEvaluator || []}
                                         placeholder="Select Resource"
                                         onChange={(event) => {
                                             input.onChange(event);
@@ -184,7 +183,7 @@ const ConditionGroupForm = () => {
                             )}
                         </Field>
 
-                        {values?.resource && <ConditionFormFilter formType="conditionGroup" resource={values.resource} />}
+                        {values?.resource && <ConditionFormFilter formType="conditions" resource={values.resource} />}
 
                         <div className="d-flex justify-content-end">
                             <ButtonGroup>
