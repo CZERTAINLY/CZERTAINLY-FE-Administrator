@@ -57,7 +57,7 @@ export const useRuleEvaluatorResourceOptions = () => {
         dispatch(resourceActions.listResources());
     }, [dispatch]);
 
-    const resourceOptions = useMemo(() => {
+    const resourceOptionsWithRuleEvaluator = useMemo(() => {
         if (!resourceList.length) return [];
         const resourceListWithRuleEvaluator = resourceList.filter((resource) => resource.hasRuleEvaluator);
         return resourceListWithRuleEvaluator.map((resource) => {
@@ -65,7 +65,28 @@ export const useRuleEvaluatorResourceOptions = () => {
         });
     }, [resourceList, resourceTypeEnum]);
 
-    return { resourceOptions, isFetchingResourcesList };
+    return { resourceOptionsWithRuleEvaluator, isFetchingResourcesList };
+};
+
+export const useHasEventsResourceOptions = () => {
+    const resourceList = useSelector(resourceSelectors.resourceslist);
+    const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
+    const isFetchingResourcesList = useSelector(resourceSelectors.isFetchingResourcesList);
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(resourceActions.listResources());
+    }, [dispatch]);
+
+    const resourceOptionsWithEvents = useMemo(() => {
+        if (!resourceList.length) return [];
+        const resourceListWithEvents = resourceList.filter((resource) => resource.hasEvents);
+        return resourceListWithEvents.map((resource) => {
+            return { value: resource.resource, label: getEnumLabel(resourceTypeEnum, resource.resource) };
+        });
+    }, [resourceList, resourceTypeEnum]);
+
+    return { resourceOptionsWithEvents, isFetchingResourcesList };
 };
 
 type ResourceFilter = 'hasEvents' | 'hasRuleEvaluator';

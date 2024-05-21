@@ -27,6 +27,8 @@ interface Props {
     appendInWidgetContent?: React.ReactNode;
     actionsList?: ActionRuleRequestModel[];
     includeIgnoreAction?: boolean;
+    disableBadgeRemove?: boolean;
+    busyBadges?: boolean;
 }
 
 export default function FilterWidgetRuleAction({
@@ -37,6 +39,8 @@ export default function FilterWidgetRuleAction({
     entity,
     getAvailableFiltersApi,
     includeIgnoreAction,
+    disableBadgeRemove,
+    busyBadges,
 }: Props) {
     const dispatch = useDispatch();
 
@@ -70,13 +74,13 @@ export default function FilterWidgetRuleAction({
     const ruleActionsOptions = useMemo(() => {
         if (includeIgnoreAction) {
             return [
-                { label: 'Ignore', value: RuleActionType.Ignore },
-                { label: 'Set Field', value: RuleActionType.SetField },
+                { label: getEnumLabel(RuleActionTypeEnum, RuleActionType.Ignore), value: RuleActionType.Ignore },
+                { label: getEnumLabel(RuleActionTypeEnum, RuleActionType.SetField), value: RuleActionType.SetField },
             ];
         } else {
-            return [{ label: 'Set Field', value: RuleActionType.SetField }];
+            return [{ label: getEnumLabel(RuleActionTypeEnum, RuleActionType.SetField), value: RuleActionType.SetField }];
         }
-    }, [includeIgnoreAction]);
+    }, [includeIgnoreAction, RuleActionTypeEnum]);
 
     const booleanOptions = useMemo(
         () => [
@@ -144,6 +148,7 @@ export default function FilterWidgetRuleAction({
             });
 
             onActionsUpdate && onActionsUpdate(updatedActionDataActions);
+            setSelectedFilter({ filterNumber: -1, isEditEnabled: false });
         } else {
             const updatedActions = actions.map((a, i) => (i === selectedFilter.filterNumber ? newAction : a));
             setActions(updatedActions);
@@ -164,6 +169,7 @@ export default function FilterWidgetRuleAction({
             });
 
             onActionsUpdate && onActionsUpdate(updatedActionDataActions);
+            setSelectedFilter({ filterNumber: -1, isEditEnabled: false });
         }
     }, [
         ruleActionType,
@@ -193,7 +199,10 @@ export default function FilterWidgetRuleAction({
         (index: number) => {
             const newActions = actions.filter((_, i) => i !== index);
             setActions(newActions);
-            onActionsUpdate && onActionsUpdate(newActions);
+            if (onActionsUpdate) {
+                onActionsUpdate(newActions);
+                setSelectedFilter({ filterNumber: -1, isEditEnabled: false });
+            }
         },
         [actions, onActionsUpdate],
     );
@@ -214,12 +223,11 @@ export default function FilterWidgetRuleAction({
     );
 
     const currentField = useMemo(() => currentFields?.find((f) => f.fieldIdentifier === filterField?.value), [filterField, currentFields]);
-
     const objectValueOptions: CurrentActionOptions[] = useMemo(() => {
         if (!currentField) return [];
 
         if (Array.isArray(currentField?.value)) {
-            return currentField?.value?.map((v, i) => {
+            const objectOptions = currentField?.value?.map((v, i) => {
                 let label = '';
                 let value = '';
                 if (typeof v === 'string') {
@@ -232,10 +240,22 @@ export default function FilterWidgetRuleAction({
 
                 return { label, value };
             });
+
+            if (selectedFilter.filterNumber === -1) return objectOptions;
+
+            const currentActionData = actions[selectedFilter.filterNumber]?.actionData;
+            if (currentActionData === undefined) return objectOptions;
+            const filteredOptions = objectOptions.filter((o) => {
+                if (Array.isArray(currentActionData)) {
+                    return !currentActionData.some((a) => a?.name === o?.label);
+                }
+            });
+
+            return filteredOptions;
         }
 
         return [];
-    }, [currentField]);
+    }, [currentField, actions, selectedFilter]);
 
     useEffect(() => {
         // this effect is for updating dropdowns when a filter is selected
@@ -370,7 +390,6 @@ export default function FilterWidgetRuleAction({
 
         setActions(updatedActions);
     }, [actionsList, availableFilters]);
-
     const renderObjectValueSelector = useMemo(
         () => (
             <Select
@@ -388,6 +407,33 @@ export default function FilterWidgetRuleAction({
     );
 
     const isActionTypeIgnore = actions.some((a) => a.actionType === RuleActionType.Ignore);
+
+    const renderBadgeContent = useCallback(
+        (itemNumber: number, actionType: string, value: string, label?: string, fieldSource?: string) => {
+            if (isFetchingAvailableFilters || busyBadges) return <></>;
+            return (
+                <React.Fragment key={itemNumber}>
+                    {getEnumLabel(RuleActionTypeEnum, actionType)}&nbsp;
+                    <b>{fieldSource && getEnumLabel(searchGroupEnum, fieldSource)}&nbsp;</b>'{label}
+                    '&nbsp;to&nbsp;
+                    {value}
+                    {!disableBadgeRemove && (
+                        <span className={styles.filterBadgeSpan} onClick={() => onRemoveFilterClick(itemNumber)}>
+                            &times;
+                        </span>
+                    )}
+                </React.Fragment>
+            );
+        },
+        [isFetchingAvailableFilters, RuleActionTypeEnum, onRemoveFilterClick, searchGroupEnum, disableBadgeRemove, busyBadges],
+    );
+
+    const isUpdateButtonDisabled = useMemo(() => {
+        {
+            if (ruleActionType?.value === RuleActionType.Ignore) return false;
+            return !filterField || !fieldSource || !ruleActionType || !filterValue;
+        }
+    }, [filterField, fieldSource, ruleActionType, filterValue]);
 
     return (
         <>
@@ -408,6 +454,7 @@ export default function FilterWidgetRuleAction({
                                             setFilterField(undefined);
                                         }}
                                         value={ruleActionType || null}
+                                        isDisabled={isActionTypeIgnore && !selectedFilter.isEditEnabled}
                                     />
                                 </FormGroup>
                             </Col>
@@ -487,7 +534,7 @@ export default function FilterWidgetRuleAction({
                                     style={{ width: '7em', marginTop: '2em' }}
                                     color="primary"
                                     onClick={onUpdateClick}
-                                    // disabled={isActionTypeIgnore}
+                                    disabled={isUpdateButtonDisabled}
                                 >
                                     {selectedFilter.filterNumber === -1 ? 'Add' : 'Update'}
                                 </Button>
@@ -511,7 +558,7 @@ export default function FilterWidgetRuleAction({
                                                     field?.platformEnum ? platformEnums[field.platformEnum][v]?.label : v?.name ? v.name : v
                                                 }'`,
                                         )
-                                        .join(' OR ')}`
+                                        .join(', ')}`
                                   : f.actionData
                                     ? `'${
                                           field?.platformEnum
@@ -522,21 +569,16 @@ export default function FilterWidgetRuleAction({
                         return (
                             <Badge
                                 className={styles.filterBadge}
-                                key={i}
+                                key={f.actionType + i}
                                 onClick={() => toggleFilter(i)}
                                 color={selectedFilter.filterNumber === i ? 'primary' : 'secondary'}
                             >
-                                {getEnumLabel(RuleActionTypeEnum, f.actionType)}&nbsp;
-                                {!isActionTypeIgnore && (
-                                    <>
-                                        <b>{f?.fieldSource && getEnumLabel(searchGroupEnum, f?.fieldSource)}&nbsp;</b>'{label}
-                                        '&nbsp;to&nbsp;
-                                        {value}
-                                    </>
+                                {!isActionTypeIgnore && !isFetchingAvailableFilters && !busyBadges && (
+                                    <>{renderBadgeContent(i, f.actionType, value, label, f.fieldSource)}</>
                                 )}
-                                <span className={styles.filterBadgeSpan} onClick={() => onRemoveFilterClick(i)}>
-                                    &times;
-                                </span>
+                                {isActionTypeIgnore && !isFetchingAvailableFilters && !busyBadges && (
+                                    <b>{getEnumLabel(RuleActionTypeEnum, RuleActionType.Ignore)} </b>
+                                )}
                             </Badge>
                         );
                     })}

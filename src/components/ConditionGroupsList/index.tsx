@@ -1,15 +1,23 @@
+import { EntityType, selectors } from 'ducks/filters';
 import React, { useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import { ActionGroupModel, ConditionRuleGroupModel } from 'types/rules';
 import GroupActionsViewer from './GroupActionsViewer';
 import GroupConditionsViewer from './GroupConditionsViewer';
 import styles from './conditionGroupsList.module.scss';
+
 interface ConditionsTableViewerProps {
     ruleConditions?: ConditionRuleGroupModel[];
     actionGroups?: ActionGroupModel[];
 }
 
 const ConditionsGroupsList = ({ ruleConditions, actionGroups }: ConditionsTableViewerProps) => {
+    const isFetchingAvailableFiltersConditions = useSelector(selectors.isFetchingFilters(EntityType.CONDITIONS));
+    const isFetchingAvailableFiltersActions = useSelector(selectors.isFetchingFilters(EntityType.ACTIONS));
+
     const renderListData = useMemo(() => {
+        if (isFetchingAvailableFiltersConditions || isFetchingAvailableFiltersActions) return <></>;
+
         if (ruleConditions?.length) {
             return ruleConditions.map((conditionGroup, i) => (
                 <React.Fragment key={conditionGroup.uuid}>
@@ -35,7 +43,7 @@ const ConditionsGroupsList = ({ ruleConditions, actionGroups }: ConditionsTableV
                 </React.Fragment>
             ));
         } else return <></>;
-    }, [ruleConditions, actionGroups]);
+    }, [ruleConditions, actionGroups, isFetchingAvailableFiltersConditions, isFetchingAvailableFiltersActions]);
 
     return <>{renderListData}</>;
 };

@@ -26,7 +26,7 @@ export interface ActionGroupFormValues {
     name: string;
     selectedResource?: SelectChangeValue;
     resource: Resource;
-    description: string;
+    description?: string;
     actions: Array<ActionRuleRequestModel>;
 }
 
@@ -35,7 +35,7 @@ const ActionGroupForm = () => {
     const navigate = useNavigate();
     const title = 'Create Action Group';
     const isCreatingActionGroup = useSelector(rulesSelectors.isCreatingActionGroup);
-    const { resourceOptions, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
+    const { resourceOptionsWithRuleEvaluator, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
     const isBusy = useMemo(() => isCreatingActionGroup || isFetchingResourcesList, [isCreatingActionGroup, isFetchingResourcesList]);
 
     const defaultValues: ActionGroupFormValues = useMemo(() => {
@@ -43,7 +43,7 @@ const ActionGroupForm = () => {
             name: '',
             resource: Resource.None,
             selectedResource: undefined,
-            description: '',
+            description: undefined,
             actions: [],
         };
     }, []);
@@ -106,7 +106,7 @@ const ActionGroupForm = () => {
                             )}
                         </Field>
 
-                        <Field name="description" validate={composeValidators(validateAlphaNumericWithSpecialChars())}>
+                        <Field name="description">
                             {({ input, meta }) => (
                                 <FormGroup>
                                     <Label for="description">Description</Label>
@@ -133,7 +133,7 @@ const ActionGroupForm = () => {
                                         {...input}
                                         maxMenuHeight={140}
                                         menuPlacement="auto"
-                                        options={resourceOptions || []}
+                                        options={resourceOptionsWithRuleEvaluator || []}
                                         placeholder="Select Resource"
                                         onChange={(event) => {
                                             input.onChange(event);
@@ -158,7 +158,7 @@ const ActionGroupForm = () => {
                             )}
                         </Field>
 
-                        {values?.resource && <ConditionFormFilter formType="actionGroup" resource={values.resource} />}
+                        {values?.resource && <ConditionFormFilter formType="actions" resource={values.resource} />}
 
                         <div className="d-flex justify-content-end">
                             <ButtonGroup>

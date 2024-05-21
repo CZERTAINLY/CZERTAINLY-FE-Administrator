@@ -28,7 +28,7 @@ export type State = {
     triggers: TriggerRuleModel[];
     triggerDetails?: TriggerRuleDetailModel;
 
-    isupdatingActionGroup: boolean;
+    isUpdatingActionGroup: boolean;
     isFetchingRulesList: boolean;
     isFetchingActionGroups: boolean;
     isFetchingConditionGroups: boolean;
@@ -66,7 +66,7 @@ export const initialState: State = {
     isCreatingRule: false,
     isFetchingRuleDetail: false,
 
-    isupdatingActionGroup: false,
+    isUpdatingActionGroup: false,
     isCreatingActionGroup: false,
     isDeletingActionGroup: false,
     isCreatingConditionGroup: false,
@@ -184,7 +184,6 @@ export const slice = createSlice({
         },
 
         createTriggerSuccess: (state, action: PayloadAction<{ trigger: TriggerRuleDetailModel }>) => {
-            // state.triggers.push(action.payload.trigger);
             state.isCreatingTrigger = false;
         },
 
@@ -283,7 +282,7 @@ export const slice = createSlice({
         },
 
         updateActionGroup: (state, action: PayloadAction<{ actionGroupUuid: string; actionGroup: UpdateActionGroupRequestModel }>) => {
-            state.isupdatingActionGroup = true;
+            state.isUpdatingActionGroup = true;
         },
 
         updateActionGroupSuccess: (state, action: PayloadAction<{ actionGroup: ActionGroupModel }>) => {
@@ -295,11 +294,11 @@ export const slice = createSlice({
                 state.actionGroupDetails = action.payload.actionGroup;
             }
 
-            state.isupdatingActionGroup = false;
+            state.isUpdatingActionGroup = false;
         },
 
         updateActionGroupFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isupdatingActionGroup = false;
+            state.isUpdatingActionGroup = false;
         },
 
         updateConditionGroup: (
@@ -345,10 +344,6 @@ export const slice = createSlice({
         },
 
         updateTriggerSuccess: (state, action: PayloadAction<{ trigger: TriggerRuleDetailModel }>) => {
-            // state.triggers = state.triggers.map((trigger) =>
-            //     trigger.uuid === action.payload.trigger.uuid ? action.payload.trigger : trigger,
-            // );
-
             if (state.triggerDetails?.uuid === action.payload.trigger.uuid) {
                 state.triggerDetails = action.payload.trigger;
             }
@@ -389,7 +384,7 @@ const isCreatingActionGroup = createSelector(state, (state) => state.isCreatingA
 const isFetchingActionGroups = createSelector(state, (state) => state.isFetchingActionGroups);
 const isDeletingActionGroup = createSelector(state, (state) => state.isDeletingActionGroup);
 const isFetchingActionGroup = createSelector(state, (state) => state.isFetchingActionGroup);
-const isupdatingActionGroup = createSelector(state, (state) => state.isupdatingActionGroup);
+const isUpdatingActionGroup = createSelector(state, (state) => state.isUpdatingActionGroup);
 const isUpdatingTrigger = createSelector(state, (state) => state.isUpdatingTrigger);
 const isFetchingTriggerDetail = createSelector(state, (state) => state.isFetchingTriggerDetail);
 const isDeletingTrigger = createSelector(state, (state) => state.isDeletingTrigger);
@@ -419,7 +414,7 @@ export const selectors = {
     isFetchingActionGroups,
     isDeletingActionGroup,
     isFetchingActionGroup,
-    isupdatingActionGroup,
+    isUpdatingActionGroup,
     isUpdatingTrigger,
     isFetchingTriggerDetail,
     isDeletingTrigger,

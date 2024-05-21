@@ -12,7 +12,7 @@ import Select from 'react-select';
 import { Container } from 'reactstrap';
 import { PlatformEnum, Resource } from 'types/openapi';
 
-import { useRuleEvaluatorResourceOptions } from 'utils/rules';
+import { useHasEventsResourceOptions, useRuleEvaluatorResourceOptions } from 'utils/rules';
 import styles from './triggerList.module.scss';
 
 const TriggerList = () => {
@@ -23,14 +23,16 @@ const TriggerList = () => {
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const eventNameEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ResourceEvent));
     const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.RuleTriggerType));
-
     const [selectedResource, setSelectedResource] = useState<Resource>();
+    const [selectedTriggerSource, setSelectedTriggerSource] = useState<Resource>();
     const isFetchingList = useSelector(rulesSelectors.isFetchingTriggers);
     const isDeleting = useSelector(rulesSelectors.isDeletingTrigger);
 
     const [checkedRows, setCheckedRows] = useState<string[]>([]);
     const [confirmDelete, setConfirmDelete] = useState(false);
-    const { resourceOptions, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
+    const { resourceOptionsWithRuleEvaluator, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
+
+    const { resourceOptionsWithEvents } = useHasEventsResourceOptions();
 
     const isBusy = useMemo(
         () => isFetchingList || isFetchingResourcesList || isDeleting,
@@ -44,8 +46,8 @@ const TriggerList = () => {
     }, [dispatch, checkedRows]);
 
     const getFreshList = useCallback(() => {
-        dispatch(rulesActions.listTriggers({ resource: selectedResource }));
-    }, [dispatch, selectedResource]);
+        dispatch(rulesActions.listTriggers({ resource: selectedResource, triggerResouce: selectedTriggerSource }));
+    }, [dispatch, selectedResource, selectedTriggerSource]);
 
     useEffect(() => {
         getFreshList();
@@ -62,9 +64,9 @@ const TriggerList = () => {
             },
 
             {
-                content: 'Trigger Source',
+                content: 'Trigger Resource',
                 align: 'left',
-                id: 'triggerSource',
+                id: 'triggerResource',
                 width: '10%',
                 sortable: true,
             },
@@ -121,16 +123,24 @@ const TriggerList = () => {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: 'plus',
+                icon: 'search',
                 disabled: false,
-                tooltip: 'Create',
-                onClick: () => navigate(`./add`),
-            },
-            {
-                icon: 'trash',
-                disabled: checkedRows.length === 0,
-                tooltip: 'Delete',
-                onClick: () => setConfirmDelete(true),
+                tooltip: 'Select Trigger Source',
+                onClick: () => {},
+                custom: (
+                    <div className={styles.listSelectContainer}>
+                        <Select
+                            isClearable
+                            maxMenuHeight={140}
+                            menuPlacement="auto"
+                            options={resourceOptionsWithEvents}
+                            placeholder="Select Trigger Source"
+                            onChange={(event) => {
+                                setSelectedTriggerSource(event?.value as Resource);
+                            }}
+                        />
+                    </div>
+                ),
             },
             {
                 icon: 'search',
@@ -143,7 +153,7 @@ const TriggerList = () => {
                             isClearable
                             maxMenuHeight={140}
                             menuPlacement="auto"
-                            options={resourceOptions}
+                            options={resourceOptionsWithRuleEvaluator}
                             placeholder="Select Resource"
                             onChange={(event) => {
                                 setSelectedResource(event?.value as Resource);
@@ -152,13 +162,35 @@ const TriggerList = () => {
                     </div>
                 ),
             },
+            {
+                icon: 'plus',
+                disabled: false,
+                tooltip: 'Create',
+                onClick: () => navigate(`./add`),
+            },
+            {
+                icon: 'trash',
+                disabled: checkedRows.length === 0,
+                tooltip: 'Delete',
+                onClick: () => setConfirmDelete(true),
+            },
         ],
-        [checkedRows, resourceOptions, navigate],
+        [checkedRows, resourceOptionsWithRuleEvaluator, navigate, resourceOptionsWithEvents],
     );
 
     return (
         <Container className="themed-container" fluid>
-            <Widget titleSize="larger" title="Triggers" refreshAction={getFreshList} busy={isBusy} widgetButtons={buttons}>
+            <Widget
+                titleSize="larger"
+                title="Triggers"
+                refreshAction={getFreshList}
+                busy={isBusy}
+                widgetButtons={buttons}
+                widgetInfoCard={{
+                    title: 'Information',
+                    description: 'Triggers are defined to trigger actions based on certain conditions of a resource',
+                }}
+            >
                 <br />
                 <CustomTable
                     checkedRows={checkedRows}

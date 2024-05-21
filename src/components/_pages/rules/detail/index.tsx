@@ -1,4 +1,3 @@
-import cx from 'classnames';
 import ConditionsViewer from 'components/ConditionsViewer';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
@@ -11,7 +10,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
 import { Button, ButtonGroup, Col, Container, Input, Row } from 'reactstrap';
 import { PlatformEnum } from 'types/openapi';
-import styles from './rulesDetail.module.scss';
 interface SelectChangeValue {
     value: string;
     label: string;
@@ -27,12 +25,12 @@ const RuleDetails = () => {
 
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [updateDescriptionEditEnable, setUpdateDescription] = useState<boolean>(false);
-    const [updatedDescription, setUpdatedDescription] = useState<string>(ruleDetails?.description || '');
+    const [updatedDescription, setUpdatedDescription] = useState('');
 
     useEffect(() => {
-        if (!ruleDetails?.description) return;
+        if (!ruleDetails?.description || ruleDetails.uuid !== id) return;
         setUpdatedDescription(ruleDetails.description);
-    }, [ruleDetails?.description]);
+    }, [ruleDetails, id]);
 
     const getFreshDetails = useCallback(() => {
         if (!id) return;
@@ -69,18 +67,20 @@ const RuleDetails = () => {
 
     const onUpdateDescriptionConfirmed = useCallback(() => {
         if (!id || !updateDescriptionEditEnable) return;
-        dispatch(
-            rulesActions.updateRule({
-                ruleUuid: id,
-                rule: {
-                    description: updatedDescription,
-                    conditions: ruleDetails?.conditions || [],
-                    conditionGroupsUuids: ruleDetails?.conditionGroups?.length
-                        ? ruleDetails?.conditionGroups.map((conditionGroup) => conditionGroup.uuid)
-                        : [],
-                },
-            }),
-        );
+        if (updatedDescription !== ruleDetails?.description) {
+            dispatch(
+                rulesActions.updateRule({
+                    ruleUuid: id,
+                    rule: {
+                        description: updatedDescription,
+                        conditions: ruleDetails?.conditions || [],
+                        conditionGroupsUuids: ruleDetails?.conditionGroups?.length
+                            ? ruleDetails?.conditionGroups.map((conditionGroup) => conditionGroup.uuid)
+                            : [],
+                    },
+                }),
+            );
+        }
         setUpdateDescription(false);
     }, [dispatch, id, ruleDetails, updatedDescription, updateDescriptionEditEnable]);
 
@@ -139,23 +139,6 @@ const RuleDetails = () => {
         [],
     );
 
-    const conditionGroupsButtons: WidgetButtonProps[] = useMemo(
-        () => [
-            {
-                icon: 'info',
-                disabled: false,
-                onClick: () => {},
-                custom: (
-                    <i
-                        className={cx('fa fa-info', styles.infoIcon)}
-                        title="Condition group is named set of conditions for selected resource that can be reused in rules of same resource"
-                    />
-                ),
-            },
-        ],
-        [],
-    );
-
     const tableHeader: TableHeader[] = useMemo(
         () => [
             {
@@ -176,7 +159,7 @@ const RuleDetails = () => {
 
     const conditionGroupsDetailData: TableDataRow[] = useMemo(
         () =>
-            !ruleDetails
+            !ruleDetails || isFetchingRuleDetail
                 ? []
                 : [
                       {
@@ -214,7 +197,11 @@ const RuleDetails = () => {
                                               color="secondary"
                                               title="Update Description"
                                               onClick={onUpdateDescriptionConfirmed}
-                                              disabled={isUpdatingRule}
+                                              disabled={
+                                                  isUpdatingRule ||
+                                                  updatedDescription === ruleDetails.description ||
+                                                  updatedDescription === ''
+                                              }
                                           >
                                               <i className="fa fa-check" />
                                           </Button>
@@ -225,7 +212,7 @@ const RuleDetails = () => {
                                               disabled={isUpdatingRule}
                                               onClick={() => {
                                                   setUpdateDescription(false);
-                                                  setUpdatedDescription(ruleDetails.description || '');
+                                                  setUpdatedDescription(ruleDetails?.description || '');
                                               }}
                                           >
                                               <i className="fa fa-close text-danger" />
@@ -248,7 +235,15 @@ const RuleDetails = () => {
                           ],
                       },
                   ],
-        [ruleDetails, resourceTypeEnum, onUpdateDescriptionConfirmed, updateDescriptionEditEnable, isUpdatingRule, updatedDescription],
+        [
+            ruleDetails,
+            resourceTypeEnum,
+            onUpdateDescriptionConfirmed,
+            updateDescriptionEditEnable,
+            isUpdatingRule,
+            updatedDescription,
+            isFetchingRuleDetail,
+        ],
     );
 
     const conditionGroupFieldsDataHeader = useMemo(
@@ -269,33 +264,39 @@ const RuleDetails = () => {
         [],
     );
 
-    const conditionGroupFieldsData: TableDataRow[] = useMemo(
-        () =>
-            !ruleDetails?.conditions.length
-                ? []
-                : ruleDetails?.conditionGroups.map((conditionGroup) => {
-                      return {
-                          id: conditionGroup.uuid,
-                          columns: [
-                              <Link to={`../../conditiongroups/detail/${conditionGroup.uuid}`}>{conditionGroup.name}</Link> || '',
-                              conditionGroup.description || '',
-                              <Button
-                                  className="btn btn-link text-danger"
-                                  size="sm"
-                                  color="danger"
-                                  title="Delete Condition Group"
-                                  onClick={() => {
-                                      onDeleteConditionGroup(conditionGroup.uuid);
-                                  }}
-                                  disabled={isUpdatingRule}
-                              >
-                                  <i className="fa fa-trash" />
-                              </Button>,
-                          ],
-                      };
-                  }),
-        [ruleDetails, isUpdatingRule, onDeleteConditionGroup],
-    );
+    const conditionGroupFieldsData: TableDataRow[] = useMemo(() => {
+        const isDeleteDisabled =
+            (ruleDetails?.conditions.length === 0 && ruleDetails?.conditionGroups.length === 1) || isFetchingRuleDetail || isUpdatingRule;
+        const conditionGroupData = !ruleDetails?.conditionGroups.length
+            ? []
+            : ruleDetails?.conditionGroups.map((conditionGroup) => {
+                  return {
+                      id: conditionGroup.uuid,
+                      columns: [
+                          <Link to={`../../conditiongroups/detail/${conditionGroup.uuid}`}>{conditionGroup.name}</Link> || '',
+                          conditionGroup.description || '',
+                          <Button
+                              className="btn btn-link text-danger"
+                              size="sm"
+                              color="danger"
+                              title={
+                                  isDeleteDisabled
+                                      ? 'Cannot delete this condition group as there are no other conditions in the rule'
+                                      : 'Delete Condition Group'
+                              }
+                              onClick={() => {
+                                  onDeleteConditionGroup(conditionGroup.uuid);
+                              }}
+                              disabled={isDeleteDisabled}
+                          >
+                              <i className="fa fa-trash" />
+                          </Button>,
+                      ],
+                  };
+              });
+
+        return conditionGroupData;
+    }, [ruleDetails, isUpdatingRule, onDeleteConditionGroup, isFetchingRuleDetail]);
 
     return (
         <Container className="themed-container" fluid>
@@ -306,7 +307,16 @@ const RuleDetails = () => {
                     </Widget>
                 </Col>
                 <Col>
-                    <Widget widgetButtons={conditionGroupsButtons} busy={isBusy} title="Condition Groups" titleSize="large">
+                    <Widget
+                        busy={isBusy}
+                        title="Condition Groups"
+                        titleSize="large"
+                        widgetInfoCard={{
+                            title: 'Information',
+                            description:
+                                'Condition group is named set of conditions for selected resource that can be reused in rules of same resource',
+                        }}
+                    >
                         <CustomTable
                             data={conditionGroupFieldsData}
                             headers={conditionGroupFieldsDataHeader}

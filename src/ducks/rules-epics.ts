@@ -85,7 +85,7 @@ const listTriggers: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.listTriggers.match),
         switchMap((action) =>
-            deps.apiClients.rules.listTriggers({ resource: action.payload.resource }).pipe(
+            deps.apiClients.rules.listTriggers({ resource: action.payload.resource, triggerResource: action.payload.triggerResouce }).pipe(
                 switchMap((triggers) =>
                     of(slice.actions.listTriggersSuccess({ triggers: triggers.map((trigger) => transformTriggerRuleDtoToModel(trigger)) })),
                 ),
@@ -169,7 +169,7 @@ const createTrigger: AppEpic = (action$, state, deps) => {
                     switchMap((trigger) =>
                         of(
                             slice.actions.createTriggerSuccess({ trigger: transformTriggerRuleDetailDtoToModel(trigger) }),
-                            appRedirectActions.redirect({ url: `../../triggers` }),
+                            appRedirectActions.redirect({ url: `../../triggers/detail/${trigger.uuid}` }),
                         ),
                     ),
                     catchError((err) =>
@@ -364,7 +364,8 @@ const updateConditionGroup: AppEpic = (action$, state, deps) => {
                     catchError((err) =>
                         of(
                             slice.actions.updateConditionGroupFailure({ error: extractError(err, 'Failed to update condition group') }),
-                            alertActions.error('Failed to update Condition Group'),
+                            alertActions.error(extractError(err, 'Failed to update Condition Group')),
+                            slice.actions.getConditionGroup({ conditionGroupUuid: action.payload.conditionGroupUuid }),
                         ),
                     ),
                 ),
@@ -391,7 +392,8 @@ const updateRule: AppEpic = (action$, state, deps) => {
                     catchError((err) =>
                         of(
                             slice.actions.updateRuleFailure({ error: extractError(err, 'Failed to update rule') }),
-                            alertActions.error('Failed to update rule'),
+                            alertActions.error(extractError(err, 'Failed to update rule')),
+                            slice.actions.getRule({ ruleUuid: action.payload.ruleUuid }),
                         ),
                     ),
                 ),
