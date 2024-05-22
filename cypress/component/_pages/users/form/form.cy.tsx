@@ -1,7 +1,21 @@
 import { actions as groupActions } from 'ducks/certificateGroups';
 import { actions as certificateActions } from 'ducks/certificates';
 import { actions as customAttributesActions } from 'ducks/customAttributes';
+import { actions as pagingActions } from 'ducks/paging';
 import { actions as rolesActions } from 'ducks/roles';
+import { actions as userActions } from 'ducks/users';
+import { Route, Routes } from 'react-router-dom';
+import {
+    AttributeContentType,
+    AttributeType,
+    CertificateRequestFormat,
+    CertificateState,
+    CertificateType,
+    CertificateValidationStatus,
+    ComplianceStatus,
+    Resource,
+} from 'types/openapi';
+
 import UserEdit from '../../../../../src/components/_pages/users/form';
 import '../../../../../src/resources/styles/theme.scss';
 import { reduxActionWait } from '../../../../utils/constants';
@@ -71,31 +85,51 @@ describe('UserForm component - Add User', () => {
         cy.get('th').eq(2).should('contain.text', 'Role description');
         cy.get('th').eq(3).should('contain.text', 'System role');
     });
+
+    it(`🟢 Enter all form values`, () => {
+        cy.get('input').eq(1).type('testUser');
+        cy.get('#react-select-5-input').should('exist').click();
+        cy.get('#react-select-5-option-0').should('exist').click();
+        cy.get('input').eq(4).type('Test description');
+        cy.get('input').eq(5).type('Test First Name');
+        cy.get('input').eq(6).type('Test Last Name');
+        cy.get('input').eq(7).type('test@email.com');
+        cy.get('#react-select-7-input').should('exist').click();
+        cy.get('#react-select-7-option-1').should('exist').click();
+        cy.get('td').eq(1).should('exist').click();
+    });
 });
+describe('UserForm component - Edit User', () => {
+    it('should render UserEdit with the correct id', () => {
+        cy.mount(
+            <Routes>
+                <Route path="/users/edit/:id" element={<UserEdit />} />
+            </Routes>,
+            {},
+            `/users/edit/${userFormMockData.userDetailsPayload.user.uuid}`,
+        );
 
-// describe('UserForm component - Edit User', () => {
-//     it('should render UserEdit with the correct id', () => {
-//         cy.mount(
-//             <MemoryRouter initialEntries={['/users/edit/5a8b457d-b068-4db2-89bf-d37c46bfb2f8']}>
-//                 <Routes>
-//                     <Route path="/users/edit/:id" element={<UserEdit />} />
-//                 </Routes>
-//             </MemoryRouter>,
-//         );
-//         cy.wait(reduxActionWait)
-//             .window()
-//             .its('store')
-//             .invoke('dispatch', customAttributesActions.listResourceCustomAttributesSuccess(userFormMockData.resourceCustomAttributes));
-//         cy.wait(reduxActionWait).window().its('store').invoke('dispatch', rolesActions.listSuccess(userFormMockData.rolesListPayload));
+        cy.wait(reduxActionWait)
+            .window()
+            .its('store')
+            .invoke('dispatch', userActions.getDetailSuccess({ ...userFormMockData.userDetailsPayload }));
+        cy.wait(reduxActionWait)
+            .window()
+            .its('store')
+            .invoke('dispatch', customAttributesActions.listResourceCustomAttributesSuccess(userFormMockData.resourceCustomAttributes));
+        cy.wait(reduxActionWait).window().its('store').invoke('dispatch', rolesActions.listSuccess(userFormMockData.rolesListPayload));
+        cy.wait(reduxActionWait)
+            .window()
+            .its('store')
+            .invoke('dispatch', certificateActions.getCertificateDetailSuccess(userFormMockData.certificateDetailsPayload));
+        cy.wait(reduxActionWait)
+            .window()
+            .its('store')
+            .invoke('dispatch', groupActions.listGroupsSuccess(userFormMockData.groupListPayload));
 
-//         cy.wait(reduxActionWait)
-//             .window()
-//             .its('store')
-//             .invoke('dispatch', groupActions.listGroupsSuccess(userFormMockData.groupListPayload));
-
-//         cy.wait(reduxActionWait)
-//             .window()
-//             .its('store')
-//             .invoke('dispatch', certificateActions.listCertificatesSuccess(userFormMockData.certificateListPayload));
-//     });
-// });
+        cy.wait(reduxActionWait)
+            .window()
+            .its('store')
+            .invoke('dispatch', certificateActions.listCertificatesSuccess(userFormMockData.certificateListPayload));
+    });
+});

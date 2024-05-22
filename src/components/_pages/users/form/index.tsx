@@ -37,6 +37,7 @@ import { mutators } from '../../../../utils/attributes/attributeEditorMutators';
 import { collectFormAttributes } from '../../../../utils/attributes/attributes';
 import AttributeEditor from '../../../Attributes/AttributeEditor';
 import TabLayout from '../../../Layout/TabLayout';
+import cert from '../../../../../cypress/component/CertificateAttributes/mock-data';
 
 interface SelectChangeValue {
     value: string;
@@ -52,7 +53,7 @@ interface FormValues {
     email: string;
     inputType: { value: 'upload' | 'select' };
     certFile: FileList | undefined;
-    certificate: any;
+    certificateUuid?: string;
     enabled: boolean;
 }
 
@@ -139,6 +140,8 @@ function UserForm() {
         [groups],
     );
 
+    const [selectedCertificate, setSelectedCertificate] = useState<{ label: string; value: string }>();
+
     const [certUploadDialog, setCertUploadDialog] = useState(false);
     const [certToUpload, setCertToUpload] = useState<CertificateDetailResponseModel>();
     const [certFileContent, setCertFileContent] = useState<string>();
@@ -202,6 +205,14 @@ function UserForm() {
         if (user && user.certificate && user.certificate.uuid && certificateDetail && certificateDetail.uuid === user.certificate.uuid) {
             const certs = [...loadedCerts];
 
+            setSelectedCertificate({
+                label:
+                    certificateDetail.commonName && certificateDetail.fingerprint
+                        ? `${certificateDetail.commonName} (${certificateDetail.fingerprint})`
+                        : `( empty ) ( ${certificateDetail.commonName} )`,
+                value: certificateDetail.uuid,
+            });
+
             const idx = certs.findIndex((c) => c.uuid === certificateDetail.uuid);
             if (idx > 0) certs.splice(idx, 1);
             else return;
@@ -256,8 +267,8 @@ function UserForm() {
                             groupUuids: values.selectedGroups.map((g) => g.value),
                             certificateUuid:
                                 values.inputType.value === 'select'
-                                    ? values.certificate
-                                        ? values.certificate.value
+                                    ? values.certificateUuid
+                                        ? values.certificateUuid
                                         : undefined
                                     : undefined,
                             certificateData: values.inputType?.value === 'upload' && certToUpload ? certFileContent : undefined,
@@ -280,8 +291,8 @@ function UserForm() {
                             certificateData: values.inputType?.value === 'upload' && certToUpload ? certFileContent : undefined,
                             certificateUuid:
                                 values.inputType?.value === 'select'
-                                    ? values.certificate
-                                        ? values.certificate?.value
+                                    ? values.certificateUuid
+                                        ? values.certificateUuid
                                         : undefined
                                     : undefined,
                             customAttributes: collectFormAttributes('customUser', resourceCustomAttributes, values),
@@ -314,9 +325,8 @@ function UserForm() {
 
     const inProgressTitle = useMemo(() => (editMode ? 'Saving...' : 'Creating...'), [editMode]);
 
-    const defaultValues = useMemo(() => {
-        const userCertificateValue = optionsForCertificate.find((cert) => cert.value === user?.certificate?.uuid);
-        const defaultValues = {
+    const defaultValues = useMemo(
+        () => ({
             username: editMode ? user?.username : '',
             description: editMode ? user?.description : '',
             selectedGroups: editMode
@@ -330,15 +340,10 @@ function UserForm() {
             enabled: editMode ? user?.enabled : true,
             systemUser: editMode ? user?.systemUser : false,
             inputType: optionsForInput[1],
-            certificate: editMode
-                ? userCertificateValue
-                    ? { label: userCertificateValue?.label, value: userCertificateValue?.value }
-                    : undefined
-                : undefined,
-        };
-
-        return defaultValues;
-    }, [user, editMode, optionsForInput, optionsForCertificate]);
+            certificateUuid: editMode && user?.certificate ? user.certificate.uuid : undefined,
+        }),
+        [user, editMode, optionsForInput],
+    );
 
     const rolesTableHeader: TableHeader[] = useMemo(
         () => [
@@ -437,7 +442,7 @@ function UserForm() {
     return (
         <>
             <Form onSubmit={onSubmit} initialValues={defaultValues} mutators={{ ...mutators<FormValues>() }}>
-                {({ handleSubmit, pristine, submitting, values, valid }) => (
+                {({ handleSubmit, pristine, submitting, values, valid, form }) => (
                     <BootstrapForm onSubmit={handleSubmit}>
                         <Widget title={title} busy={isBusy} widgetExtraTopNode={enableCheckButton}>
                             <Field name="username" validate={composeValidators(validateRequired(), validateUrlSafe())}>
@@ -593,16 +598,30 @@ function UserForm() {
                                     </FormText>
                                 </FormGroup>
                             ) : (
-                                <Field name="certificate">
+                                <Field name="certificateUuid">
                                     {({ input, meta }) => (
                                         <FormGroup>
-                                            <Label for="certificate">Certificate</Label>
+                                            <Label for="certificateUuid">Certificate</Label>
 
                                             <Select
                                                 {...input}
                                                 //ref={certSelectRef}
                                                 maxMenuHeight={140}
                                                 menuPlacement="auto"
+                                                value={selectedCertificate}
+                                                onChange={(value) => {
+                                                    if (!value) {
+                                                        setSelectedCertificate(undefined);
+                                                        form.change('certificateUuid', undefined);
+                                                        return;
+                                                    }
+                                                    input.onChange(value);
+                                                    setSelectedCertificate({
+                                                        label: value.label,
+                                                        value: value.value,
+                                                    });
+                                                    form.change('certificateUuid', value?.value);
+                                                }}
                                                 options={optionsForCertificate}
                                                 placeholder="Select Certificate"
                                                 onMenuScrollToBottom={loadNextCertificates}

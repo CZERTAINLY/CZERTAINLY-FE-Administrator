@@ -1,6 +1,7 @@
 import {
     AttributeContentType,
     AttributeType,
+    CertificateRequestFormat,
     CertificateState,
     CertificateType,
     CertificateValidationStatus,
@@ -10,7 +11,7 @@ import {
 const userFormMockData = {
     resourceCustomAttributes: [
         {
-            uuid: '35617cc3-4b77-4bd3-ad62-d6051b92f5e9',
+            uuid: 'uuid-1234-department-custom-attribute',
             name: 'DepartmentAssociation',
             description: '',
             content: [
@@ -37,7 +38,7 @@ const userFormMockData = {
             },
         },
         {
-            uuid: '38164377-9c87-4c7a-8594-1f4eb83b4e93',
+            uuid: 'uuid-1234-text-custom-attribute',
             name: 'Text Me',
             description: '',
             type: AttributeType.Custom,
@@ -53,7 +54,7 @@ const userFormMockData = {
             },
         },
         {
-            uuid: '57feb749-4150-415f-8cd7-44ce27b03de4',
+            uuid: 'uuid-1234-some-custom-attribute',
             name: 'SomeCustom',
             description: 'SomeCustom',
             content: [
@@ -77,14 +78,14 @@ const userFormMockData = {
     rolesListPayload: {
         roles: [
             {
-                uuid: '44013f84-ef99-4d82-bbb0-340e767d0111',
+                uuid: 'uuid-1234-role',
                 name: 'RB_web_admin_team1',
                 description: '',
-                email: 'katerina.bzatkova@3key.company',
+                email: 'tempkat@email.com',
                 systemRole: false,
             },
             {
-                uuid: '463b03ee-43da-4978-ac62-c14db4d81609',
+                uuid: 'uuid-4321-role',
                 name: 'test-role',
                 description: 'Test role',
                 systemRole: false,
@@ -94,28 +95,28 @@ const userFormMockData = {
     groupListPayload: {
         groups: [
             {
-                uuid: '080714e4-fd31-47f6-87f5-fafb6e1ae510',
-                name: 'RB team 1',
+                uuid: 'uuid-1234-group',
+                name: 'Test Group 1',
                 description: '',
-                email: 'katerina.bzatkova@3key.company',
+                email: 'tempkat@email.com',
             },
             {
-                uuid: '2a495644-27e3-4ecb-a8bb-f1e50ac630cb',
-                name: 'RB Division1',
+                uuid: 'uuid-4321-group',
+                name: 'Test Group 2',
                 description: '',
-                email: 'katerina.bzatkova@3key.company',
+                email: 'tempkat@email.com',
             },
         ],
     },
 
     certificateListPayload: [
         {
-            uuid: 'c1d5c601-4343-4ed6-800b-9a4f742c60a5',
-            commonName: 'keitaro.io',
-            serialNumber: '47ca2bafd4c818f2532eb53f59ee50bebdb',
+            uuid: 'uuid-4321-certificate-keit',
+            commonName: 'test-cert-00',
+            serialNumber: '1234-certificate-serial',
             issuerCommonName: 'R3',
             issuerDn: "CN=R3, O=Let's Encrypt, C=US",
-            subjectDn: 'CN=keitaro.io',
+            subjectDn: 'CN=test-cert-00',
             notBefore: '2024-03-31T10:05:38.000+00:00',
             notAfter: '2024-06-29T10:05:37.000+00:00',
             publicKeyAlgorithm: 'RSA',
@@ -123,7 +124,7 @@ const userFormMockData = {
             keySize: 2048,
             state: CertificateState.Issued,
             validationStatus: CertificateValidationStatus.Valid,
-            fingerprint: '1630ef6e2d8f412931fbafa9e8c6e5d4be3f20ce6fc2841cf40f19f84e18ae14',
+            fingerprint: '12345678fingerprint',
             groups: [],
             certificateType: CertificateType.X509,
             issuerSerialNumber: '912b084acf0c18a753f6d62e25a75f5a',
@@ -132,7 +133,232 @@ const userFormMockData = {
             privateKeyAvailability: false,
             trustedCa: true,
         },
+        {
+            trustedCa: true,
+            uuid: 'uuid-0011-certificate-test',
+            commonName: 'test-cert-01',
+            serialNumber: 'uuid-0011-serial-1234',
+            issuerCommonName: 'Demo MS Sub CA',
+            issuerDn: 'O=3Key Company s.r.o., CN=Demo MS Sub CA',
+            subjectDn: 'CN=test-cert-01',
+            notBefore: '2024-05-20T15:56:46.000+00:00',
+            notAfter: '2026-05-20T15:56:46.000+00:00',
+            publicKeyAlgorithm: 'RSA',
+            signatureAlgorithm: 'SHA512withRSA',
+            keySize: 2048,
+            state: CertificateState.Issued,
+            validationStatus: CertificateValidationStatus.Valid,
+            raProfile: {
+                uuid: 'uuid-0011-ra-profile-1234',
+                name: 'ADCS-py-webserver',
+                enabled: true,
+                authorityInstanceUuid: 'uuid-1234-authority-instance-1234',
+            },
+            fingerprint: '12348765fingerprint',
+            groups: [],
+            certificateType: CertificateType.X509,
+            issuerSerialNumber: '1234-serial-issuer',
+            complianceStatus: ComplianceStatus.NotChecked,
+            issuerCertificateUuid: 'uuid-1234-issuer-certificate',
+            privateKeyAvailability: false,
+        },
     ],
+
+    userDetailsPayload: {
+        user: {
+            uuid: '12345useruuid',
+            username: 'test user 001',
+            firstName: 'test user 001',
+            lastName: 'ns',
+            description: 'test user 001',
+            groups: [
+                {
+                    uuid: 'uuid-1234-group',
+                    name: 'Test Group 1',
+                },
+            ],
+            enabled: true,
+            systemUser: false,
+            certificate: {
+                uuid: 'uuid-0011-certificate-test',
+                fingerprint: '12348765fingerprint',
+            },
+            roles: [
+                {
+                    uuid: 'uuid-role-2134',
+                    name: 'acme',
+                    description: 'System role with all ACME permissions',
+                    systemRole: true,
+                },
+            ],
+            customAttributes: [
+                {
+                    uuid: 'uuid-1234-text-custom-attribute',
+                    name: 'Text Me',
+                    label: 'Text Me',
+                    // type: 'custom',
+                    type: AttributeType.Custom,
+                    // contentType: 'text',
+                    contentType: AttributeContentType.Text,
+                    content: [
+                        {
+                            data: 'test',
+                        },
+                    ],
+                },
+                {
+                    uuid: 'uuid-1234-some-custom-attribute',
+                    name: 'SomeCustom',
+                    label: 'SomeCustom',
+                    type: AttributeType.Custom,
+                    // contentType: 'integer',
+                    contentType: AttributeContentType.Integer,
+
+                    content: [
+                        {
+                            data: '1',
+                        },
+                    ],
+                },
+                {
+                    uuid: 'uuid-1234-department-custom-attribute',
+                    name: 'DepartmentAssociation',
+                    label: 'Department',
+                    type: AttributeType.Custom,
+                    // contentType: 'string',
+                    contentType: AttributeContentType.String,
+                    content: [
+                        {
+                            data: 'IT',
+                        },
+                    ],
+                },
+            ],
+        },
+    },
+
+    certificateDetailsPayload: {
+        certificate: {
+            trustedCa: true,
+            uuid: 'uuid-0011-certificate-test',
+            commonName: 'test-cert-01',
+            serialNumber: 'uuid-0011-serial-1234',
+            issuerCommonName: 'Demo MS Sub CA',
+            issuerDn: 'O=3Key Company s.r.o., CN=Demo MS Sub CA',
+            subjectDn: 'CN=test-cert-01',
+            notBefore: '2024-05-20T15:56:46.000+00:00',
+            notAfter: '2026-05-20T15:56:46.000+00:00',
+            publicKeyAlgorithm: 'RSA',
+            signatureAlgorithm: 'SHA512withRSA',
+            keySize: 2048,
+            state: CertificateState.Issued,
+            validationStatus: CertificateValidationStatus.Valid,
+            raProfile: {
+                uuid: 'uuid-0011-ra-profile-1234',
+                name: 'ADCS-py-webserver',
+                enabled: true,
+                authorityInstanceUuid: 'uuid-1234-authority-instance-1234',
+            },
+            fingerprint: '12348765fingerprint',
+            certificateType: CertificateType.X509,
+            issuerSerialNumber: '1234-serial-issuer',
+            complianceStatus: ComplianceStatus.NotChecked,
+            issuerCertificateUuid: 'uuid-1234-issuer-certificate',
+            privateKeyAvailability: false,
+            extendedKeyUsage: ['1.3.6.1.5.5.7.3.1'],
+            keyUsage: ['digitalSignature', 'keyEncipherment'],
+            basicConstraints: 'Subject Type=End Entity',
+            metadata: [],
+            certificateContent: '',
+            subjectAlternativeNames: {
+                registeredID: [],
+                ediPartyName: [],
+                iPAddress: [],
+                x400Address: [],
+                rfc822Name: [],
+                otherName: [],
+                dNSName: [],
+                uniformResourceIdentifier: [],
+                directoryName: [],
+            },
+            customAttributes: [
+                {
+                    uuid: 'uuid-tempreadonly-1234',
+                    name: 'tempreadonly',
+                    label: 'tempreadonly',
+                    type: AttributeType.Custom,
+                    contentType: AttributeContentType.Text,
+                    content: [
+                        {
+                            data: 'tempreadonly',
+                        },
+                    ],
+                },
+                {
+                    uuid: 'uuid-tempreadonly-4321',
+                    name: 'Test Date',
+                    label: 'Test Date',
+                    type: AttributeType.Custom,
+                    // contentType: 'date',
+                    contentType: AttributeContentType.Date,
+                    content: [
+                        {
+                            data: '2024-01-03',
+                        },
+                    ],
+                },
+                {
+                    uuid: 'uuid-tempreadonly-1122',
+                    name: 'Test',
+                    label: 'Testsdw',
+                    type: AttributeType.Custom,
+                    contentType: AttributeContentType.String,
+                    content: [
+                        {
+                            data: 'Default content',
+                        },
+                    ],
+                },
+                {
+                    uuid: 'uuid-1234-some-custom-attribute',
+                    name: 'SomeCustom',
+                    label: 'SomeCustom',
+                    type: AttributeType.Custom,
+                    contentType: AttributeContentType.Integer,
+                    content: [
+                        {
+                            data: '0',
+                        },
+                    ],
+                },
+            ],
+            certificateRequest: {
+                certificateType: CertificateType.X509,
+                certificateRequestFormat: CertificateRequestFormat.Pkcs10,
+                publicKeyAlgorithm: 'RSA',
+                signatureAlgorithm: 'SHA512withRSA',
+                content: '',
+                commonName: 'test-cert-01',
+                subjectDn: 'CN=test-cert-01',
+                subjectAlternativeNames: {
+                    registeredID: [],
+                    ediPartyName: [],
+                    iPAddress: [],
+                    x400Address: [],
+                    rfc822Name: [],
+                    otherName: [],
+                    dNSName: [],
+                    uniformResourceIdentifier: [],
+                    directoryName: [],
+                },
+                attributes: [],
+                signatureAttributes: [],
+            },
+            issueAttributes: [],
+            revokeAttributes: [],
+            relatedCertificates: [],
+        },
+    },
 };
 
 export { userFormMockData };
