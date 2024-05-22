@@ -166,7 +166,7 @@ function WidgetButtons({ buttons }: Props) {
         renderedButtons.push(renderButton(button));
     });
 
-    return <div className="d-flex">{renderedButtons}</div>;
+    return <div className="d-flex ms-1">{renderedButtons}</div>;
 }
 
 export default WidgetButtons;

@@ -1,7 +1,8 @@
+import cx from 'classnames';
 import { useState } from 'react';
 import Select from 'react-select';
 import { Button, ButtonGroup } from 'reactstrap';
-
+import styles from './NewRowWidget.module.scss';
 interface SelectChangeValue {
     value: string;
     label: string;
@@ -33,7 +34,7 @@ const NewRowWidget = ({ newItemsList, isBusy, onAddClick }: NewRowWidgetProps) =
                     <ButtonGroup>
                         <Button
                             disabled={isBusy}
-                            className="btn btn-link ms-2 mt-0 p-3"
+                            className={cx('btn btn-link ms-1', styles.addButton)}
                             size="sm"
                             color="secondary"
                             onClick={() => {
@@ -41,7 +42,7 @@ const NewRowWidget = ({ newItemsList, isBusy, onAddClick }: NewRowWidgetProps) =
                                 setSelectedItems([]);
                             }}
                         >
-                            <i className="fa fa-add" />
+                            <i className="fa fa-plus" />
                         </Button>
                     </ButtonGroup>
                 ) : null}
