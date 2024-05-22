@@ -12,9 +12,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { Badge, Container } from 'reactstrap';
-import { PlatformEnum } from 'types/openapi';
+import { AttributeContentType, PlatformEnum } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { getAttributeContent } from 'utils/attributes/attributes';
+import cx from 'classnames';
+import { actions as alertActions } from 'ducks/alerts';
+import styles from './customAttribute.module.scss';
+import { BaseAttributeContentModel } from 'types/attributes';
 
 export default function CustomAttributeDetail() {
     const dispatch = useDispatch();
@@ -108,6 +112,21 @@ export default function CustomAttributeDetail() {
             <></>
         );
 
+    const onContentCopyClick = useCallback(() => {
+        if (!customAttribute) return;
+        let textToCopy = '';
+
+        console.log('customAttribute.content', customAttribute.content);
+        if (!customAttribute?.content?.length) return;
+        if (customAttribute.content.length > 1) textToCopy = customAttribute.content?.map((content) => content.data).join(', ');
+        if (customAttribute.content.length === 1) textToCopy = customAttribute.content[0].data.toString();
+
+        navigator.clipboard
+            .writeText(textToCopy)
+            .then(() => dispatch?.(alertActions.success?.('Custom Attribute content was copied to clipboard')))
+            .catch(() => dispatch?.(alertActions.error?.('Failed to Custom Attribute content to clipboard')));
+    }, [customAttribute, dispatch]);
+
     const detailData: TableDataRow[] = useMemo(
         () =>
             !customAttribute
@@ -150,7 +169,17 @@ export default function CustomAttributeDetail() {
                       },
                       {
                           id: 'content',
-                          columns: ['Content', getAttributeContent(customAttribute.contentType, customAttribute.content)],
+                          columns: [
+                              'Content',
+                              <>
+                                  {getAttributeContent(customAttribute.contentType, customAttribute.content)}
+                                  {customAttribute?.content?.length ? (
+                                      <i className={cx('fa fa-copy', styles.copyCustomContentButton)} onClick={onContentCopyClick} />
+                                  ) : (
+                                      <> </>
+                                  )}
+                              </>,
+                          ],
                       },
                       {
                           id: 'properties',
@@ -167,7 +196,7 @@ export default function CustomAttributeDetail() {
                           ],
                       },
                   ],
-        [customAttribute, attributeContentTypeEnum, resourceEnum],
+        [customAttribute, attributeContentTypeEnum, resourceEnum, onContentCopyClick],
     );
 
     return (
