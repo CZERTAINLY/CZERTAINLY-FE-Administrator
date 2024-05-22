@@ -615,12 +615,11 @@ function UserForm() {
                                                         form.change('certificateUuid', undefined);
                                                         return;
                                                     }
-                                                    input.onChange(value);
                                                     setSelectedCertificate({
                                                         label: value.label,
                                                         value: value.value,
                                                     });
-                                                    form.change('certificateUuid', value?.value);
+                                                    input.onChange(value.value);
                                                 }}
                                                 options={optionsForCertificate}
                                                 placeholder="Select Certificate"
