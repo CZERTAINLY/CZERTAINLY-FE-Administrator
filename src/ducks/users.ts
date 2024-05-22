@@ -152,7 +152,9 @@ export const slice = createSlice({
                 state.users.push(action.payload.user);
             }
 
-            if (state.user?.uuid === action.payload.user.uuid) state.user = action.payload.user;
+            if (state.user?.uuid === action.payload.user.uuid) {
+                state.user = JSON.parse(JSON.stringify(action.payload.user));
+            }
             state.isUpdating = false;
         },
 
