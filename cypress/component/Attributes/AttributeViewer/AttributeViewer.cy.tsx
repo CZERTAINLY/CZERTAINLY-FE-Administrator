@@ -9,27 +9,31 @@ describe('AttributeViewer without Metadata', () => {
         cy.mount(<AttributeViewer attributes={attributeViewerProps.attributes} />).wait(componentLoadWait);
     });
     it('should render correct number of rows,columns and data elements', () => {
-        cy.get('th').should('have.length', 3);
+        cy.get('th').should('have.length', 4);
         cy.get('tr').should('have.length', 4);
-        cy.get('td').should('have.length', 9);
+        cy.get('td').should('have.length', 12);
     });
 
     it('should render correct heading', () => {
         cy.get('th').eq(0).should('contain.text', 'Name');
         cy.get('th').eq(1).should('contain.text', 'Content Type');
         cy.get('th').eq(2).should('contain.text', 'Content');
+        cy.get('th').eq(3).should('contain.text', 'Actions');
     });
 
     it('should render correct data', () => {
         cy.get('td').eq(0).should('contain.text', 'Test Label 1');
         cy.get('td').eq(1).should('contain.text', 'string');
         cy.get('td').eq(2).should('contain.text', 'test-attribute-data-1');
-        cy.get('td').eq(3).should('contain.text', 'Test Label 2');
-        cy.get('td').eq(4).should('contain.text', 'boolean');
-        cy.get('td').eq(5).should('contain.text', 'true');
-        cy.get('td').eq(6).should('contain.text', 'Test Label 3');
-        cy.get('td').eq(7).should('contain.text', 'codeblock');
-        cy.get('td').eq(8).should('contain.text', 'html');
+        cy.get('td').eq(3).find('i.fa.fa-copy').should('exist');
+        cy.get('td').eq(4).should('contain.text', 'Test Label 2');
+        cy.get('td').eq(5).should('contain.text', 'boolean');
+        cy.get('td').eq(6).should('contain.text', 'true');
+        cy.get('td').eq(7).find('i.fa.fa-copy').should('exist');
+        cy.get('td').eq(8).should('contain.text', 'Test Label 3');
+        cy.get('td').eq(9).should('contain.text', 'codeblock');
+        cy.get('td').eq(10).should('contain.text', 'html');
+        cy.get('td').eq(11).find('i.fa.fa-copy').should('exist');
     });
 
     it(`🟢 check for clickable info icon for codeblock
@@ -44,50 +48,6 @@ describe('AttributeViewer without Metadata', () => {
         🟢 check ascending and descending sorting for first column
         🟢 check ascending and descending sorting for second colum
         🟢 check ascending and descending sorting for third column`, () => {
-        cy.get('.fa-arrow-up').eq(0).click().wait(clickWait);
-        cy.get('.fa-arrow-down').eq(0).click().wait(clickWait);
-
-        cy.get('.fa-arrow-up').eq(1).click().wait(clickWait);
-        cy.get('.fa-arrow-down').eq(1).click().wait(clickWait);
-
-        cy.get('.fa-arrow-up').eq(2).click().wait(clickWait);
-        cy.get('.fa-arrow-down').eq(2).click().wait(clickWait);
-    });
-});
-
-describe('AttributeViewer with Metadata and Attributes', () => {
-    beforeEach(() => {
-        cy.mount(
-            <AttributeViewer
-                viewerType={ATTRIBUTE_VIEWER_TYPE.ATTRIBUTES_WITH_DESCRIPTORS}
-                descriptors={attributeViewerProps.descriptors}
-                attributes={attributeViewerProps.attributes}
-            />,
-        ).wait(componentLoadWait);
-    });
-
-    it('should render correct number of rows,columns and data elements', () => {
-        cy.get('th').should('have.length', 3);
-        cy.get('tr').should('have.length', 3);
-        cy.get('td').should('have.length', 6);
-    });
-
-    it('should render correct heading', () => {
-        cy.get('th').eq(0).should('contain.text', 'Name');
-        cy.get('th').eq(1).should('contain.text', 'Content Type');
-        cy.get('th').eq(2).should('contain.text', 'Content');
-    });
-
-    it('should render correct data', () => {
-        cy.get('td').eq(0).should('contain.text', 'Test Label 1');
-        cy.get('td').eq(1).should('contain.text', 'string');
-        cy.get('td').eq(2).should('contain.text', 'test-attribute-data-1');
-        cy.get('td').eq(3).should('contain.text', 'Test Label 2');
-        cy.get('td').eq(4).should('contain.text', 'string');
-        cy.get('td').eq(5).should('contain.text', 'test-descriptor-data-2');
-    });
-
-    it('should allow sorting of data', () => {
         cy.get('.fa-arrow-up').eq(0).click().wait(clickWait);
         cy.get('.fa-arrow-down').eq(0).click().wait(clickWait);
 
@@ -132,9 +92,10 @@ describe('AttributeViewer with Metadata', () => {
         cy.get('td').eq(5).should('contain.text', 'string');
         cy.get('td').eq(6).should('contain.text', 'Demo MS Sub CA');
 
-        cy.get('td').eq(7).should('contain.text', 'Certificate Template Name');
-        cy.get('td').eq(8).should('contain.text', 'string');
-        cy.get('td').eq(9).should('contain.text', 'WebServer');
+        cy.get('td').eq(7).find('i.fa.fa-copy').should('exist');
+        cy.get('td').eq(8).should('contain.text', 'Certificate Template Name');
+        cy.get('td').eq(9).should('contain.text', 'string');
+        cy.get('td').eq(10).should('contain.text', 'WebServer');
 
         cy.get('.fa-arrow-up').eq(1).click().wait(clickWait);
         cy.get('.fa-arrow-down').eq(1).click().wait(clickWait);
@@ -167,7 +128,8 @@ describe('AttributeViewer with Metadata', () => {
 
         cy.get('td').eq(8).should('contain.text', 'string');
         cy.get('td').eq(9).should('contain.text', 'ADCS-through-proxy');
-        cy.get('td').eq(10).should('contain.text', 'Discovery Source');
+        cy.get('td').eq(10).find('i.fa.fa-copy').should('exist');
+        cy.get('td').eq(11).should('contain.text', 'Discovery Source');
 
         cy.get('.fa-arrow-up').eq(1).click().wait(clickWait);
         cy.get('.fa-arrow-down').eq(1).click().wait(clickWait);

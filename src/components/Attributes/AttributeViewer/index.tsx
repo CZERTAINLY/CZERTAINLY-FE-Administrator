@@ -1,4 +1,5 @@
-import CustomTable, { TableDataRow } from 'components/CustomTable';
+import cx from 'classnames';
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { useCallback, useMemo, useState } from 'react';
 import { Form } from 'react-final-form';
@@ -11,18 +12,18 @@ import {
     BaseAttributeContentModel,
     CustomAttributeModel,
     isCustomAttributeModelArray,
-    isDataAttributeModel,
 } from 'types/attributes';
 import { MetadataItemModel, MetadataModel } from 'types/locations';
 import { NameAndUuidDto, PlatformEnum, Resource } from 'types/openapi';
 import { getAttributeContent } from 'utils/attributes/attributes';
+import { useCopyToClipboard } from 'utils/common-hooks';
 import { actions as userInterfaceActions } from '../../../ducks/user-interface';
 import ContentValueField from '../../Input/DynamicContent/ContentValueField';
-import WidgetButtons, { IconName } from '../../WidgetButtons';
+import WidgetButtons, { WidgetButtonProps } from '../../WidgetButtons';
+import styles from './attributeViewer.module.scss';
 
 export enum ATTRIBUTE_VIEWER_TYPE {
     ATTRIBUTE,
-    ATTRIBUTES_WITH_DESCRIPTORS,
     METADATA,
     METADATA_FLAT,
     ATTRIBUTE_EDIT,
@@ -52,9 +53,43 @@ export default function AttributeViewer({
     const contentTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AttributeContentType));
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const dispatch = useDispatch();
+    const copyToClipboard = useCopyToClipboard();
+
+    const onCopyContentClick = useCallback(
+        (attribute: AttributeResponseModel) => {
+            let textToCopy = '';
+            if (!attribute?.content?.length) return;
+            // if (attribute.content.length > 1) textToCopy = attribute?.content?.map((content) => content.data).join(', ');
+            // if (attribute.content.length === 1) textToCopy = attribute.content[0]?.reference.toString();
+
+            // check if reference is there or if no reference then use .data to copy
+
+            if (attribute.content.length > 1) {
+                textToCopy = attribute.content
+                    .map((content) => {
+                        if (content.reference) {
+                            return content.reference;
+                        }
+                        return content.data;
+                    })
+                    .join(', ');
+            }
+            if (attribute.content.length === 1) {
+                textToCopy = attribute.content[0]?.reference?.toString() || attribute.content[0]?.data.toString();
+            }
+
+            console.log('attribute.content', attribute.content);
+            console.log('textToCopy', textToCopy);
+            console.log('typeof', typeof textToCopy);
+            if (attribute) {
+                copyToClipboard(textToCopy, 'Custom Attribute content was copied to clipboard', 'Failed to copy to clipboard');
+            }
+        },
+        [copyToClipboard],
+    );
 
     const tableHeaders = (viewerType: ATTRIBUTE_VIEWER_TYPE) => {
-        const result = [];
+        const result: TableHeader[] = [];
         if (viewerType === ATTRIBUTE_VIEWER_TYPE.METADATA || viewerType === ATTRIBUTE_VIEWER_TYPE.METADATA_FLAT) {
             result.push(
                 {
@@ -71,7 +106,6 @@ export default function AttributeViewer({
         }
         if (
             viewerType === ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE ||
-            viewerType === ATTRIBUTE_VIEWER_TYPE.ATTRIBUTES_WITH_DESCRIPTORS ||
             viewerType === ATTRIBUTE_VIEWER_TYPE.METADATA_FLAT ||
             viewerType === ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE_EDIT
         ) {
@@ -102,7 +136,24 @@ export default function AttributeViewer({
                 content: 'Actions',
                 sortable: false,
                 width: '15%',
+                align: 'center',
             });
+        }
+        // We add this action if it doesn't exist to add copy to clipboard button
+        if (
+            viewerType === ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE ||
+            viewerType === ATTRIBUTE_VIEWER_TYPE.METADATA_FLAT ||
+            viewerType === ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE_EDIT
+        ) {
+            if (!result.find((r) => r.id === 'actions')) {
+                result.push({
+                    id: 'actions',
+                    content: 'Actions',
+                    sortable: false,
+                    align: 'center',
+                    width: '15%',
+                });
+            }
         }
 
         return result;
@@ -160,30 +211,22 @@ export default function AttributeViewer({
                 getEnumLabel(contentTypeEnum, attribute.contentType),
                 <>
                     {getContent(attribute.contentType, attribute.content)}
-                    {resource && renderSourceObjectsButton(attribute, resource)}
+                    {resource && (
+                        <>
+                            {getEnumLabel(resourceEnum, resource)}
+                            {renderSourceObjectsButton(attribute, resource)}
+                        </>
+                    )}
                 </>,
+                <i
+                    className={cx('fa fa-copy', styles.copyContentButton)}
+                    onClick={() => {
+                        onCopyContentClick(attribute);
+                    }}
+                />,
             ],
         }),
-        [getContent, contentTypeEnum, renderSourceObjectsButton],
-    );
-
-    const getDescriptorsTableData = useCallback(
-        (descriptor: AttributeDescriptorModel): TableDataRow => {
-            const attribute = attributes?.find((a) => a.name === descriptor.name);
-            return {
-                id: descriptor.uuid || '',
-                columns: [
-                    isDataAttributeModel(descriptor) ? descriptor.properties.label : descriptor.name,
-                    isDataAttributeModel(descriptor) ? getEnumLabel(contentTypeEnum, descriptor.contentType) : 'n/a',
-                    isDataAttributeModel(descriptor)
-                        ? attribute
-                            ? getContent(attribute.contentType, attribute.content)
-                            : getContent(descriptor.contentType, descriptor.content)
-                        : '',
-                ],
-            };
-        },
-        [getContent, attributes, contentTypeEnum],
+        [getContent, contentTypeEnum, resourceEnum, renderSourceObjectsButton, onCopyContentClick],
     );
 
     const getMetadataTableData = useCallback(
@@ -205,11 +248,11 @@ export default function AttributeViewer({
     );
 
     const getButtons = useCallback(
-        (descriptor: CustomAttributeModel, attributeName: string) => {
-            const buttons = [];
+        (attribute: AttributeResponseModel, descriptor: CustomAttributeModel, attributeName: string) => {
+            const buttons: WidgetButtonProps[] = [];
             if (editingAttributesNames.find((a) => a === attributeName)) {
                 buttons.push({
-                    icon: 'times' as IconName,
+                    icon: 'times',
                     disabled: false,
                     tooltip: 'Cancel',
                     onClick: () => {
@@ -218,7 +261,15 @@ export default function AttributeViewer({
                 });
             } else {
                 buttons.push({
-                    icon: 'pencil' as IconName,
+                    icon: 'copy',
+                    disabled: false,
+                    tooltip: 'Copy to clipboard',
+                    onClick: () => {
+                        onCopyContentClick(attribute);
+                    },
+                });
+                buttons.push({
+                    icon: 'pencil',
                     disabled: descriptor.properties.readOnly,
                     tooltip: descriptor.properties.readOnly ? 'Attribute is read only, edit is disabled' : 'Edit',
                     onClick: () => {
@@ -228,14 +279,14 @@ export default function AttributeViewer({
             }
             onRemove &&
                 buttons.push({
-                    icon: 'trash' as IconName,
+                    icon: 'trash',
                     disabled: descriptor.properties.required,
                     tooltip: descriptor.properties.required ? "Attribute is required, can't be removed" : 'Remove',
                     onClick: () => onRemove(descriptor.uuid),
                 });
             return buttons;
         },
-        [editingAttributesNames, onRemove],
+        [editingAttributesNames, onRemove, onCopyContentClick],
     );
 
     const getAttributesEditTableData = useCallback(
@@ -270,7 +321,7 @@ export default function AttributeViewer({
                             ) : (
                                 getContent(a.contentType, a.content)
                             ),
-                            <WidgetButtons buttons={getButtons(descriptor!, a.name)} />,
+                            <WidgetButtons buttons={getButtons(a, descriptor!, a.name)} />,
                         ],
                     };
                 });
@@ -282,8 +333,6 @@ export default function AttributeViewer({
         switch (viewerType) {
             case ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE:
                 return attributes?.map((attribute) => getAttributesTableData(attribute));
-            case ATTRIBUTE_VIEWER_TYPE.ATTRIBUTES_WITH_DESCRIPTORS:
-                return descriptors?.map(getDescriptorsTableData);
             case ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE_EDIT:
                 return isCustomAttributeModelArray(descriptors) ? getAttributesEditTableData(attributes, descriptors) : [];
             case ATTRIBUTE_VIEWER_TYPE.METADATA:
@@ -293,7 +342,19 @@ export default function AttributeViewer({
                     ?.map((m) =>
                         m.items.map((i) => ({
                             ...getAttributesTableData(i),
-                            columns: [m.connectorName ?? 'No connector', ...getAttributesTableData(i).columns],
+                            columns: [
+                                m.connectorName ?? 'No connector',
+                                m.sourceObjectType ? (
+                                    <>
+                                        {getEnumLabel(resourceEnum, m.sourceObjectType)}
+                                        {renderSourceObjectsButton(i, m.sourceObjectType)}
+                                    </>
+                                ) : (
+                                    'No Source Object'
+                                ),
+
+                                ...getAttributesTableData(i).columns,
+                            ],
                         })),
                     )
                     .flat();
@@ -304,12 +365,13 @@ export default function AttributeViewer({
     }, [
         attributes,
         metadata,
+        resourceEnum,
         getAttributesTableData,
         getAttributesEditTableData,
         getMetadataTableData,
         viewerType,
         descriptors,
-        getDescriptorsTableData,
+        renderSourceObjectsButton,
     ]);
 
     return tableData ? (

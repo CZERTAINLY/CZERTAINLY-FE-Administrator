@@ -1,24 +1,20 @@
+import cx from 'classnames';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
-
 import Dialog from 'components/Dialog';
 import StatusBadge from 'components/StatusBadge';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
-
 import { actions, selectors } from 'ducks/customAttributes';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-
 import { Badge, Container } from 'reactstrap';
-import { AttributeContentType, PlatformEnum } from 'types/openapi';
+import { PlatformEnum } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { getAttributeContent } from 'utils/attributes/attributes';
-import cx from 'classnames';
-import { actions as alertActions } from 'ducks/alerts';
+import { useCopyToClipboard } from 'utils/common-hooks';
 import styles from './customAttribute.module.scss';
-import { BaseAttributeContentModel } from 'types/attributes';
 
 export default function CustomAttributeDetail() {
     const dispatch = useDispatch();
@@ -112,20 +108,18 @@ export default function CustomAttributeDetail() {
             <></>
         );
 
+    const copyToClipboard = useCopyToClipboard();
+
     const onContentCopyClick = useCallback(() => {
         if (!customAttribute) return;
         let textToCopy = '';
 
-        console.log('customAttribute.content', customAttribute.content);
         if (!customAttribute?.content?.length) return;
         if (customAttribute.content.length > 1) textToCopy = customAttribute.content?.map((content) => content.data).join(', ');
         if (customAttribute.content.length === 1) textToCopy = customAttribute.content[0].data.toString();
 
-        navigator.clipboard
-            .writeText(textToCopy)
-            .then(() => dispatch?.(alertActions.success?.('Custom Attribute content was copied to clipboard')))
-            .catch(() => dispatch?.(alertActions.error?.('Failed to Custom Attribute content to clipboard')));
-    }, [customAttribute, dispatch]);
+        copyToClipboard(textToCopy, 'Custom Attribute content was copied to clipboard', 'Failed to Custom Attribute content to clipboard');
+    }, [customAttribute, copyToClipboard]);
 
     const detailData: TableDataRow[] = useMemo(
         () =>

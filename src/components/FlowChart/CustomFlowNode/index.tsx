@@ -1,5 +1,4 @@
 import cx from 'classnames';
-import { actions as alertActions } from 'ducks/alerts';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -7,7 +6,9 @@ import { Handle, Position } from 'reactflow';
 import { Button, Collapse } from 'reactstrap';
 import { EntityNodeProps } from 'types/flowchart';
 import { CertificateValidationStatus } from 'types/openapi';
+import { useCopyToClipboard } from 'utils/common-hooks';
 import style from './customFlowNode.module.scss';
+
 export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }: EntityNodeProps) {
     const [collapse, setCollapse] = useState(false);
 
@@ -19,6 +20,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }:
     const onEntered = () => setStatus('-');
     const onExited = () => setStatus('+');
     const toggle = () => setCollapse(!collapse);
+    const copyToClipboard = useCopyToClipboard();
 
     const getStatusClasses = () => {
         switch (data.certificateNodeValidationStatus) {
@@ -132,24 +134,11 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }:
                                                 <i
                                                     onClick={() => {
                                                         if (typeof property.propertyValue === 'string') {
-                                                            navigator.clipboard
-                                                                .writeText(property.propertyValue)
-                                                                .then(
-                                                                    () =>
-                                                                        dispatch?.(
-                                                                            alertActions.success?.(
-                                                                                `${property.propertyName} copied to clipboard`,
-                                                                            ),
-                                                                        ),
-                                                                )
-                                                                .catch(
-                                                                    () =>
-                                                                        dispatch?.(
-                                                                            alertActions.error?.(
-                                                                                `Failed to copy ${property.propertyName} to clipboard`,
-                                                                            ),
-                                                                        ),
-                                                                );
+                                                            copyToClipboard(
+                                                                property.propertyValue,
+                                                                `${property.propertyName} copied to clipboard`,
+                                                                `Failed to copy ${property.propertyName} to clipboard`,
+                                                            );
                                                         }
                                                     }}
                                                     className="fa fa-copy ms-2"

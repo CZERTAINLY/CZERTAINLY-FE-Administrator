@@ -7,7 +7,6 @@ import Dialog from 'components/Dialog';
 import ProgressButton from 'components/ProgressButton';
 import Spinner from 'components/Spinner';
 import StatusBadge from 'components/StatusBadge';
-import { actions as alertActions } from 'ducks/alerts';
 import { actions as utilsActuatorActions } from 'ducks/utilsActuator';
 import { actions as userInterfaceActions } from '../../../../ducks/user-interface';
 
@@ -72,7 +71,7 @@ import SwitchWidget from 'components/SwitchWidget';
 import { transformCertifacetObjectToNodesAndEdges } from 'ducks/transform/certificates';
 import { Edge } from 'reactflow';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { DeviceType, useDeviceType } from 'utils/common-hooks';
+import { DeviceType, useCopyToClipboard, useDeviceType } from 'utils/common-hooks';
 import CertificateStatus from '../CertificateStatus';
 import CertificateDownloadForm from './CertificateDownloadForm';
 import styles from './certificateDetail.module.scss';
@@ -94,6 +93,7 @@ export default function CertificateDetail() {
     const dispatch = useDispatch();
     const { id } = useParams();
 
+    const copyToClipboard = useCopyToClipboard();
     const certificate = useSelector(selectors.certificateDetail);
     const certificateChain = useSelector(selectors.certificateChain);
     const certificateChainDownloadContent = useSelector(selectors.certificateChainDownloadContent);
@@ -340,12 +340,6 @@ export default function CertificateDetail() {
     useEffect(() => {
         setRaProfileOptions(raProfiles.map((group) => ({ value: group.uuid + ':#' + group.authorityInstanceUuid, label: group.name })));
     }, [dispatch, raProfiles]);
-
-    // useEffect(() => {
-    //     if (!certificate?.ownerUuid) {
-    //         setOwnerUuid(undefined);
-    //     }
-    // }, [certificate?.ownerUuid]);
 
     useEffect(() => {
         if (!certificateRevocationReason) return;
@@ -644,14 +638,15 @@ export default function CertificateDetail() {
                 disabled: !certificate?.certificateContent,
                 tooltip: 'Copy certificate content',
                 onClick: () => {
-                    navigator.clipboard
-                        .writeText(formatPEM(certificate?.certificateContent ?? ''))
-                        .then(() => dispatch?.(alertActions.success?.('Certificate content was copied to clipboard')))
-                        .catch(() => dispatch?.(alertActions.error?.('Failed to copy certificate content to clipboard')));
+                    copyToClipboard(
+                        formatPEM(certificate?.certificateContent ?? ''),
+                        'Certificate content was copied to clipboard',
+                        'Failed to copy certificate content to clipboard',
+                    );
                 },
             },
         ],
-        [certificate, onComplianceCheck, dispatch, onDownloadClick],
+        [certificate, onComplianceCheck, dispatch, onDownloadClick, copyToClipboard],
     );
 
     const downloadCSRDropDown = useMemo(
@@ -678,12 +673,11 @@ export default function CertificateDetail() {
                             className={cx('fa fa-copy', styles.copyButton)}
                             onClick={() => {
                                 if (!certificate?.certificateRequest?.content) return;
-                                navigator.clipboard
-                                    .writeText(formatPEM(certificate?.certificateRequest?.content ?? '', true))
-                                    .then(() => dispatch?.(alertActions.success?.('Certificate request content was copied to clipboard')))
-                                    .catch(
-                                        () => dispatch?.(alertActions.error?.('Failed to copy certificate request content to clipboard')),
-                                    );
+                                copyToClipboard(
+                                    formatPEM(certificate?.certificateRequest?.content ?? '', true),
+                                    'Certificate request content was copied to clipboard',
+                                    'Failed to copy certificate request content to clipboard',
+                                );
                             }}
                         />
                     </div>
@@ -702,7 +696,7 @@ export default function CertificateDetail() {
                 </DropdownMenu>
             </UncontrolledButtonDropdown>
         ),
-        [certificate, fileNameToDownload, dispatch],
+        [certificate, fileNameToDownload, copyToClipboard],
     );
 
     const buttonsCSR: WidgetButtonProps[] = useMemo(
