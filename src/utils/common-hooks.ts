@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { actions as alertActions } from 'ducks/alerts';
 
 interface WindowSizes {
     width: number;
@@ -54,3 +56,23 @@ export function useDeviceType(): DeviceType {
 
     return deviceType;
 }
+
+export const useCopyToClipboard = () => {
+    const dispatch = useDispatch();
+
+    const copyToClipboard = useCallback(
+        (
+            text: string,
+            successMessage: string = 'Content was copied to clipboard',
+            errorMessage: string = 'Failed to copy content to clipboard',
+        ) => {
+            navigator.clipboard
+                .writeText(text)
+                .then(() => dispatch(alertActions.success(successMessage)))
+                .catch(() => dispatch(alertActions.error(errorMessage)));
+        },
+        [dispatch],
+    );
+
+    return copyToClipboard;
+};

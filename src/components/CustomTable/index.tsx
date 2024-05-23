@@ -430,7 +430,7 @@ function CustomTable({
                                 <td
                                     key={index}
                                     className={styles.dataCell}
-                                    style={tblHeaders && tblHeaders[index].align ? { textAlign: tblHeaders[index].align } : {}}
+                                    style={tblHeaders && tblHeaders[index]?.align ? { textAlign: tblHeaders[index]?.align } : {}}
                                 >
                                     <div>{column ? column : <></>}</div>
                                 </td>
