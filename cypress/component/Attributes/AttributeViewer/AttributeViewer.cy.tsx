@@ -129,6 +129,10 @@ describe('AttributeViewer with Metadata', () => {
         cy.get('td').eq(8).should('contain.text', 'string');
         cy.get('td').eq(9).should('contain.text', 'ADCS-through-proxy');
         cy.get('td').eq(10).find('i.fa.fa-copy').should('exist');
+
+        if (!Cypress.isBrowser('firefox')) {
+            cy.get('td').eq(10).find('i.fa.fa-copy').should('exist').click().wait(clickWait);
+        }
         cy.get('td').eq(11).should('contain.text', 'Discovery Source');
 
         cy.get('.fa-arrow-up').eq(1).click().wait(clickWait);

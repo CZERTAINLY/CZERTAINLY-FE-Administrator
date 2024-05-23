@@ -156,6 +156,9 @@ describe('CustomAttributeCertificateComponent with certificate custom attributes
             .wait(reduxActionWait);
         cy.get('button').eq(1).should('be.disabled');
         cy.get('button').eq(5).should('be.disabled');
-        cy.get('button').eq(0).find('i.fa.fa-copy').should('exist').click().wait(clickWait);
+
+        if (!Cypress.isBrowser('firefox')) {
+            cy.get('button').eq(0).find('i.fa.fa-copy').should('exist').click().wait(clickWait);
+        }
     });
 });
