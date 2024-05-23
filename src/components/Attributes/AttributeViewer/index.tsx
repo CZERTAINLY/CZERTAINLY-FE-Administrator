@@ -78,9 +78,6 @@ export default function AttributeViewer({
                 textToCopy = attribute.content[0]?.reference?.toString() || attribute.content[0]?.data.toString();
             }
 
-            console.log('attribute.content', attribute.content);
-            console.log('textToCopy', textToCopy);
-            console.log('typeof', typeof textToCopy);
             if (attribute) {
                 copyToClipboard(textToCopy, 'Custom Attribute content was copied to clipboard', 'Failed to copy to clipboard');
             }
