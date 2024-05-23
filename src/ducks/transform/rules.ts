@@ -25,6 +25,10 @@ import {
     RequestRuleModel,
     RuleConditiontModel,
     RuleModel,
+    RuleTriggerHistoryDto,
+    RuleTriggerHistoryModel,
+    RuleTriggerHistoryRecordDto,
+    RuleTriggerHistoryRecordModel,
     RuleTriggerUpdateRequestDto,
     RuleTriggerUpdateRequestModel,
     RuleUpdateRequestDto,
@@ -51,6 +55,19 @@ import { transformAttributeResponseDtoToModel } from './attributes';
 //         value: searchFilterModel.value,
 //     };
 // }
+
+export function transformTriggerRuleHistoryDtoToModel(ruleTriggerHistory: RuleTriggerHistoryRecordDto): RuleTriggerHistoryRecordModel {
+    return {
+        ...ruleTriggerHistory,
+    };
+}
+
+export function transformRuleTriggerHistoryDtoToModel(ruleTriggerHistory: RuleTriggerHistoryDto): RuleTriggerHistoryModel {
+    return {
+        ...ruleTriggerHistory,
+        records: ruleTriggerHistory?.records?.length ? ruleTriggerHistory.records.map(transformTriggerRuleHistoryDtoToModel) : [],
+    };
+}
 
 export function transformUpdateActionGroupRequestModelToDto(actionGroup: UpdateActionGroupRequestModel): UpdateActionGroupRequestDto {
     return {

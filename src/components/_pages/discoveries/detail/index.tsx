@@ -13,6 +13,7 @@ import { Link, useParams } from 'react-router-dom';
 
 import { Col, Container, Label, Row } from 'reactstrap';
 
+import { actions as rulesActions, selectors as ruleSelectors } from 'ducks/rules';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { dateFormatter } from 'utils/dateUtil';
 import { PlatformEnum, Resource } from '../../../../types/openapi';
@@ -32,10 +33,25 @@ export default function DiscoveryDetail() {
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const eventNameEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ResourceEvent));
+    const triggerHistories = useSelector(ruleSelectors.triggerHistories);
+    console.log('triggerHistories', triggerHistories);
 
-    const isBusy = useMemo(() => isFetching || isDeleting, [isFetching, isDeleting]);
+    const isFetchingRuleTriggerHistories = useSelector(ruleSelectors.isFetchingTriggerHistories);
+
+    const isBusy = useMemo(
+        () => isFetching || isDeleting || isFetchingRuleTriggerHistories,
+        [isFetching, isDeleting, isFetchingRuleTriggerHistories],
+    );
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.RuleTriggerType));
+
+    const getRuleTriggerHistories = useCallback(
+        (triggerUuid: string) => {
+            if (!id) return;
+            dispatch(rulesActions.getTriggerHistory({ triggerUuid: triggerUuid, triggerObjectUuid: id }));
+        },
+        [id, dispatch],
+    );
 
     const getFreshDiscoveryDetails = useCallback(() => {
         if (!id) return;
@@ -166,6 +182,10 @@ export default function DiscoveryDetail() {
             id: 'description',
             content: 'Description',
         },
+        {
+            id: 'actions',
+            content: 'Actions',
+        },
     ];
 
     const triggerTableData: TableDataRow[] = discovery?.triggers.length
@@ -178,6 +198,13 @@ export default function DiscoveryDetail() {
                   getEnumLabel(eventNameEnum, trigger.eventName || ''),
                   getEnumLabel(resourceTypeEnum, trigger.resource || ''),
                   trigger.description || '',
+                  <button
+                      onClick={() => {
+                          getRuleTriggerHistories(trigger.uuid);
+                      }}
+                  >
+                      get history
+                  </button>,
               ],
           }))
         : [];

@@ -27,6 +27,7 @@ import type {
     RuleRequestDto,
     RuleTriggerDetailDto,
     RuleTriggerDto,
+    RuleTriggerHistoryDto,
     RuleTriggerRequestDto,
     UpdateRuleActionGroupRequestDto,
     UpdateRuleConditionGroupRequestDto,
@@ -80,6 +81,11 @@ export interface GetRuleRequest {
 
 export interface GetTriggerRequest {
     triggerUuid: string;
+}
+
+export interface GetTriggerHistoryRequest {
+    triggerUuid: string;
+    triggerObjectUuid: string;
 }
 
 export interface ListActionGroupsRequest {
@@ -312,6 +318,21 @@ export class RulesManagementApi extends BaseAPI {
 
         return this.request<RuleTriggerDetailDto>({
             url: '/v1/rules/triggers/{triggerUuid}'.replace('{triggerUuid}', encodeURI(triggerUuid)),
+            method: 'GET',
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * Get Trigger History
+     */
+    getTriggerHistory({ triggerUuid, triggerObjectUuid }: GetTriggerHistoryRequest): Observable<Array<RuleTriggerHistoryDto>>
+    getTriggerHistory({ triggerUuid, triggerObjectUuid }: GetTriggerHistoryRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<RuleTriggerHistoryDto>>>
+    getTriggerHistory({ triggerUuid, triggerObjectUuid }: GetTriggerHistoryRequest, opts?: OperationOpts): Observable<Array<RuleTriggerHistoryDto> | AjaxResponse<Array<RuleTriggerHistoryDto>>> {
+        throwIfNullOrUndefined(triggerUuid, 'triggerUuid', 'getTriggerHistory');
+        throwIfNullOrUndefined(triggerObjectUuid, 'triggerObjectUuid', 'getTriggerHistory');
+
+        return this.request<Array<RuleTriggerHistoryDto>>({
+            url: '/v1/rules/triggers/{triggerUuid}/history/{triggerObjectUuid}'.replace('{triggerUuid}', encodeURI(triggerUuid)).replace('{triggerObjectUuid}', encodeURI(triggerObjectUuid)),
             method: 'GET',
         }, opts?.responseOpts);
     };

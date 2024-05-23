@@ -1,12 +1,10 @@
 import { AttributeResponseModel } from './attributes';
 import type {
     RuleActionDto,
-    // RuleActionGroupDto,
     RuleActionGroupDto,
     RuleActionGroupRequestDto,
     RuleActionRequestDto,
     RuleConditionDto,
-    // RuleConditionGroupDetailDto,
     RuleConditionGroupDto,
     RuleConditionGroupRequestDto,
     RuleConditionRequestDto,
@@ -15,6 +13,8 @@ import type {
     RuleRequestDto,
     RuleTriggerDetailDto,
     RuleTriggerDto,
+    RuleTriggerHistoryDto as RuleTriggerHistoryDtoApi,
+    RuleTriggerHistoryRecordDto as RuleTriggerHistoryRecordDtoApi,
     RuleTriggerRequestDto,
     SearchFieldDataByGroupDto,
     UpdateRuleActionGroupRequestDto,
@@ -23,16 +23,19 @@ import type {
     UpdateRuleTriggerRequestDto,
 } from './openapi';
 
+export type RuleTriggerHistoryRecordDto = RuleTriggerHistoryRecordDtoApi;
+export type RuleTriggerHistoryRecordModel = RuleTriggerHistoryRecordDto;
+
+export type RuleTriggerHistoryDto = RuleTriggerHistoryDtoApi;
+export type RuleTriggerHistoryModel = Omit<RuleTriggerHistoryDto, 'records'> & {
+    records: Array<RuleTriggerHistoryRecordModel>;
+};
+
 export type FieldSearchDataByGroupDto = SearchFieldDataByGroupDto;
 export type FieldSearchDataByGroupModel = FieldSearchDataByGroupDto;
 
 export type ActionRuleDto = RuleActionDto;
 export type ActionRuleModel = ActionRuleDto;
-
-// export type ActionRuleGroupDetailDto = RuleActionGroupDetailDto;
-// export type ActionRuleGroupDetailModel = Omit<ActionRuleGroupDetailDto, 'actions'> & {
-//     actions: Array<ActionRuleModel>;
-// };
 
 export type ActionGroupDto = RuleActionGroupDto;
 export type ActionGroupModel = ActionGroupDto;

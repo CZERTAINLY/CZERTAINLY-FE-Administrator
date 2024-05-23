@@ -250,6 +250,8 @@ export * from './RuleDto';
 export * from './RuleRequestDto';
 export * from './RuleTriggerDetailDto';
 export * from './RuleTriggerDto';
+export * from './RuleTriggerHistoryDto';
+export * from './RuleTriggerHistoryRecordDto';
 export * from './RuleTriggerRequestDto';
 export * from './RuleTriggerType';
 export * from './ScepProfileDetailDto';

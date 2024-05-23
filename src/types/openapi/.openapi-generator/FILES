@@ -291,6 +291,8 @@ models/RuleDto.ts
 models/RuleRequestDto.ts
 models/RuleTriggerDetailDto.ts
 models/RuleTriggerDto.ts
+models/RuleTriggerHistoryDto.ts
+models/RuleTriggerHistoryRecordDto.ts
 models/RuleTriggerRequestDto.ts
 models/RuleTriggerType.ts
 models/ScepProfileDetailDto.ts

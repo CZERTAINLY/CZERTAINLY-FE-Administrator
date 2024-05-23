@@ -8,6 +8,7 @@ import {
     DetailRuleModel,
     RequestRuleModel,
     RuleModel,
+    RuleTriggerHistoryModel,
     RuleTriggerUpdateRequestModel,
     RuleUpdateRequestModel,
     TriggerRuleDetailModel,
@@ -27,6 +28,7 @@ export type State = {
     conditionGroupDetails?: ConditionRuleGroupModel;
     triggers: TriggerRuleModel[];
     triggerDetails?: TriggerRuleDetailModel;
+    triggerHistories: RuleTriggerHistoryModel[];
 
     isUpdatingActionGroup: boolean;
     isFetchingRulesList: boolean;
@@ -48,6 +50,7 @@ export type State = {
     isUpdatingConditionGroup: boolean;
     isUpdatingRule: boolean;
     isUpdatingTrigger: boolean;
+    isFetchingTriggerHistories: boolean;
 };
 
 export const initialState: State = {
@@ -55,6 +58,8 @@ export const initialState: State = {
     actionGroups: [],
     conditionRuleGroups: [],
     triggers: [],
+    triggerHistories: [],
+
     isFetchingRulesList: false,
     isFetchingActionGroups: false,
     isFetchingActionGroup: false,
@@ -77,6 +82,7 @@ export const initialState: State = {
     isUpdatingRule: false,
     isUpdatingTrigger: false,
     isDeletingRule: false,
+    isFetchingTriggerHistories: false,
 };
 
 export const slice = createSlice({
@@ -354,6 +360,19 @@ export const slice = createSlice({
         updateTriggerFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdatingTrigger = false;
         },
+
+        getTriggerHistory: (state, action: PayloadAction<{ triggerUuid: string; triggerObjectUuid: string }>) => {
+            state.isFetchingTriggerHistories = true;
+        },
+
+        getTriggerHistorySuccess: (state, action: PayloadAction<{ triggerHistories: RuleTriggerHistoryModel[] }>) => {
+            state.triggerHistories = action.payload.triggerHistories;
+            state.isFetchingTriggerHistories = false;
+        },
+
+        getTriggerHistoryFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingTriggerHistories = false;
+        },
     },
 });
 
@@ -364,6 +383,7 @@ const conditionGroupDetails = createSelector(state, (state) => state.conditionGr
 const ruleDetails = createSelector(state, (state) => state.ruleDetails);
 const triggerDetails = createSelector(state, (state) => state.triggerDetails);
 const triggers = createSelector(state, (state) => state.triggers);
+const triggerHistories = createSelector(state, (state) => state.triggerHistories);
 
 const actionGroups = createSelector(state, (state) => state.actionGroups);
 const actionGroupDetails = createSelector(state, (state) => state.actionGroupDetails);
@@ -371,6 +391,7 @@ const actionGroupDetails = createSelector(state, (state) => state.actionGroupDet
 const isCreatingConditionGroup = createSelector(state, (state) => state.isCreatingConditionGroup);
 const isUpdatingConditionGroup = createSelector(state, (state) => state.isUpdatingConditionGroup);
 
+const isFetchingTriggerHistories = createSelector(state, (state) => state.isFetchingTriggerHistories);
 const isCreatingRule = createSelector(state, (state) => state.isCreatingRule);
 const isUpdatingRule = createSelector(state, (state) => state.isUpdatingRule);
 const isDeletingRule = createSelector(state, (state) => state.isDeletingRule);
@@ -400,6 +421,7 @@ export const selectors = {
     actionGroups,
     actionGroupDetails,
     ruleDetails,
+    triggerHistories,
     isDeletingRule,
     isFetchingConditionGroups,
     isDeletingConditionGroup,
@@ -420,6 +442,7 @@ export const selectors = {
     isDeletingTrigger,
     isFetchingTriggers,
     isCreatingTrigger,
+    isFetchingTriggerHistories,
 };
 
 export const actions = slice.actions;

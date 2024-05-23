@@ -19,6 +19,7 @@ import {
     transformRuleConditionGroupDtoToModel,
     // transformRuleConditionGroupDetailDtoToModel,
     transformRuleRequestModelToDto,
+    transformRuleTriggerHistoryDtoToModel,
     transformRuleTriggerUpdateRequestModelToDto,
     transformRuleUpdateRequestModelToDto,
     transformTriggerRuleDetailDtoToModel,
@@ -426,6 +427,28 @@ const updateTrigger: AppEpic = (action$, state, deps) => {
     );
 };
 
+const getTriggerHistory: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.getTriggerHistory.match),
+        switchMap((action) =>
+            deps.apiClients.rules
+                .getTriggerHistory({ triggerUuid: action.payload.triggerUuid, triggerObjectUuid: action.payload.triggerObjectUuid })
+                .pipe(
+                    switchMap((triggerHistory) =>
+                        of(
+                            slice.actions.getTriggerHistorySuccess({
+                                triggerHistories: triggerHistory.map(transformRuleTriggerHistoryDtoToModel),
+                            }),
+                        ),
+                    ),
+                    catchError((err) =>
+                        of(slice.actions.getTriggerHistoryFailure({ error: extractError(err, 'Failed to get trigger history') })),
+                    ),
+                ),
+        ),
+    );
+};
+
 const epics = [
     listRules,
     listActionGroups,
@@ -447,6 +470,7 @@ const epics = [
     updateConditionGroup,
     updateRule,
     updateTrigger,
+    getTriggerHistory,
 ];
 
 export default epics;
