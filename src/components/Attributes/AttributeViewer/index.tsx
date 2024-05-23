@@ -255,7 +255,7 @@ export default function AttributeViewer({
                             onSubmit && descriptor && editingAttributesNames.find((n) => n === a.name) ? (
                                 <Form onSubmit={() => {}}>
                                     {({ values }) => (
-                                        <BootstrapForm>
+                                        <BootstrapForm className="mt-3">
                                             <ContentValueField
                                                 descriptor={descriptor}
                                                 initialContent={a.content}
