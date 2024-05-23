@@ -208,12 +208,7 @@ export default function AttributeViewer({
                 getEnumLabel(contentTypeEnum, attribute.contentType),
                 <>
                     {getContent(attribute.contentType, attribute.content)}
-                    {resource && (
-                        <>
-                            {getEnumLabel(resourceEnum, resource)}
-                            {renderSourceObjectsButton(attribute, resource)}
-                        </>
-                    )}
+                    {resource && renderSourceObjectsButton(attribute, resource)}
                 </>,
                 <i
                     className={cx('fa fa-copy', styles.copyContentButton)}
@@ -223,7 +218,7 @@ export default function AttributeViewer({
                 />,
             ],
         }),
-        [getContent, contentTypeEnum, resourceEnum, renderSourceObjectsButton, onCopyContentClick],
+        [getContent, contentTypeEnum, renderSourceObjectsButton, onCopyContentClick],
     );
 
     const getMetadataTableData = useCallback(
@@ -341,14 +336,7 @@ export default function AttributeViewer({
                             ...getAttributesTableData(i),
                             columns: [
                                 m.connectorName ?? 'No connector',
-                                m.sourceObjectType ? (
-                                    <>
-                                        {getEnumLabel(resourceEnum, m.sourceObjectType)}
-                                        {renderSourceObjectsButton(i, m.sourceObjectType)}
-                                    </>
-                                ) : (
-                                    'No Source Object'
-                                ),
+                                m.sourceObjectType ? getEnumLabel(resourceEnum, m.sourceObjectType) : 'No Source Object',
 
                                 ...getAttributesTableData(i).columns,
                             ],
@@ -368,7 +356,6 @@ export default function AttributeViewer({
         getMetadataTableData,
         viewerType,
         descriptors,
-        renderSourceObjectsButton,
     ]);
 
     return tableData ? (
