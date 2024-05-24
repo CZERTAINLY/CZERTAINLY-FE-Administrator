@@ -12,7 +12,7 @@
  */
 
 /**
- * Source Object Type
+ * Type of the the trigger event source object
  * @export
  * @enum {string}
  */

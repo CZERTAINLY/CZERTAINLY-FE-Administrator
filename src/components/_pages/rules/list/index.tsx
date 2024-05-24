@@ -24,7 +24,7 @@ const ConditionGroups = () => {
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [selectedResource, setSelectedResource] = useState<Resource>();
     const isFetchingList = useSelector(rulesSelectors.isFetchingRulesList);
-    const isDeleting = useSelector(rulesSelectors.isDeletingConditionGroup);
+    const isDeleting = useSelector(rulesSelectors.isDeletingRule);
 
     const [checkedRows, setCheckedRows] = useState<string[]>([]);
     const [confirmDelete, setConfirmDelete] = useState(false);
@@ -134,7 +134,7 @@ const ConditionGroups = () => {
                 titleSize="larger"
                 title="Rules"
                 refreshAction={getFreshList}
-                busy={isBusy}
+                // busy={isBusy}
                 widgetButtons={buttons}
                 widgetInfoCard={{
                     title: 'Information',

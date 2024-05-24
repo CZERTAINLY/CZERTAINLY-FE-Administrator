@@ -2,14 +2,14 @@ import { getEnumLabel } from 'ducks/enums';
 import { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { SearchFilterModel } from 'types/certificate';
-import { RuleConditiontModel } from 'types/rules';
+import { ConditionItemModel } from 'types/rules';
 // import { EntityType, actions as filterActions } from 'ducks/filters';
 import { selectors as enumSelectors } from 'ducks/enums';
 import { actions as resourceActions, selectors as resourceSelectors } from 'ducks/resource';
 import { PlatformEnum } from 'types/openapi';
 import { ResourceModel } from 'types/resource';
 
-export const filterToConditionGroup = (filter: SearchFilterModel[]): RuleConditiontModel[] => {
+export const filterToConditionGroup = (filter: SearchFilterModel[]): ConditionItemModel[] => {
     return filter.map((filter) => ({
         fieldIdentifier: filter.fieldIdentifier,
         operator: filter.condition,
@@ -18,7 +18,7 @@ export const filterToConditionGroup = (filter: SearchFilterModel[]): RuleConditi
     }));
 };
 
-export const conditionGroupToFilter = (conditionGroup: RuleConditiontModel[]): SearchFilterModel[] => {
+export const conditionGroupToFilter = (conditionGroup: ConditionItemModel[]): SearchFilterModel[] => {
     return conditionGroup.map((condition) => ({
         fieldIdentifier: condition.fieldIdentifier,
         condition: condition.operator,

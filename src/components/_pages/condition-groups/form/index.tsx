@@ -13,8 +13,8 @@ import { mutators } from 'utils/attributes/attributeEditorMutators';
 
 import ProgressButton from 'components/ProgressButton';
 import Select from 'react-select';
-import { Resource } from 'types/openapi';
-import { RuleConditiontModel } from 'types/rules';
+import { ConditionType, Resource } from 'types/openapi';
+import { ConditionItemModel } from 'types/rules';
 import { isObjectSame } from 'utils/common-utils';
 import { useRuleEvaluatorResourceOptions } from 'utils/rules';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
@@ -30,26 +30,26 @@ export interface ConditionGroupFormValues {
     selectedResource?: SelectChangeValue;
     resource: Resource;
     description?: string;
-    conditions: RuleConditiontModel[];
+    conditions: ConditionItemModel[];
 }
 
 const ConditionGroupForm = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const title = 'Create Condition Group';
-    const isCreatingConditionGroup = useSelector(rulesSelectors.isCreatingConditionGroup);
-    const isUpdatingConditionGroup = useSelector(rulesSelectors.isUpdatingConditionGroup);
+    const title = 'Create Condition';
+    const isCreatingCondition = useSelector(rulesSelectors.isCreatingCondition);
+    const isUpdatingCondition = useSelector(rulesSelectors.isUpdatingCondition);
     const { resourceOptionsWithRuleEvaluator, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
 
     const isBusy = useMemo(
-        () => isCreatingConditionGroup || isFetchingResourcesList || isUpdatingConditionGroup,
-        [isCreatingConditionGroup, isUpdatingConditionGroup, isFetchingResourcesList],
+        () => isCreatingCondition || isFetchingResourcesList || isUpdatingCondition,
+        [isCreatingCondition, isUpdatingCondition, isFetchingResourcesList],
     );
 
     useEffect(() => {
         if (!id) return;
-        dispatch(rulesActions.getConditionGroup({ conditionGroupUuid: id }));
+        dispatch(rulesActions.getCondition({ conditionUuid: id }));
     }, [id, dispatch]);
 
     useEffect(() => {
@@ -79,9 +79,11 @@ const ConditionGroupForm = () => {
         (values: ConditionGroupFormValues) => {
             if (values.resource === Resource.None) return;
             dispatch(
-                rulesActions.createConditionGroup({
-                    ruleConditionGroupRequest: {
-                        conditions: values.conditions,
+                rulesActions.createCondition({
+                    conditionRequestModel: {
+                        // conditions: values.conditions,
+                        items: values.conditions,
+                        type: ConditionType.CheckField,
                         name: values.name,
                         resource: values.resource,
                         description: values.description,
@@ -113,7 +115,7 @@ const ConditionGroupForm = () => {
                         <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}>
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="name">Condition Group Name</Label>
+                                    <Label for="name">Condition Name</Label>
 
                                     <Input
                                         {...input}
@@ -191,14 +193,14 @@ const ConditionGroupForm = () => {
                                     title={submitTitle}
                                     inProgressTitle={inProgressTitle}
                                     inProgress={submitting}
-                                    disabled={
-                                        areDefaultValuesSame(values) ||
-                                        values.resource === Resource.None ||
-                                        submitting ||
-                                        !valid ||
-                                        isBusy ||
-                                        !values.conditions.length
-                                    }
+                                    // disabled={
+                                    //     areDefaultValuesSame(values) ||
+                                    //     values.resource === Resource.None ||
+                                    //     submitting ||
+                                    //     !valid ||
+                                    //     isBusy ||
+                                    //     !values.conditions.length
+                                    // }
                                 />
 
                                 <Button color="default" onClick={onCancel} disabled={submitting}>

@@ -12,10 +12,8 @@
  */
 
 import type {
+    ConditionDto,
     Resource,
-    ResponseAttributeDto,
-    RuleConditionDto,
-    RuleConditionGroupDto,
 } from './';
 
 /**
@@ -36,12 +34,6 @@ export interface RuleDetailDto {
      */
     name: string;
     /**
-     * UUID of the Compliance Connector
-     * @type {string}
-     * @memberof RuleDetailDto
-     */
-    connector_uuid?: string;
-    /**
      * Description of the Rule
      * @type {string}
      * @memberof RuleDetailDto
@@ -53,35 +45,11 @@ export interface RuleDetailDto {
      */
     resource: Resource;
     /**
-     * Type of the Resource associated with the Rule
-     * @type {string}
-     * @memberof RuleDetailDto
-     */
-    resourceType?: string;
-    /**
-     * Format of the Resource associated with the Rule
-     * @type {string}
-     * @memberof RuleDetailDto
-     */
-    resourceFormat?: string;
-    /**
-     * Attributes of the Rule
-     * @type {Array<ResponseAttributeDto>}
-     * @memberof RuleDetailDto
-     */
-    attributes: Array<ResponseAttributeDto>;
-    /**
      * List of conditions in the Rule
-     * @type {Array<RuleConditionDto>}
+     * @type {Array<ConditionDto>}
      * @memberof RuleDetailDto
      */
-    conditions: Array<RuleConditionDto>;
-    /**
-     * List of condition groups in the Rule
-     * @type {Array<RuleConditionGroupDto>}
-     * @memberof RuleDetailDto
-     */
-    conditionGroups: Array<RuleConditionGroupDto>;
+    conditions: Array<ConditionDto>;
 }
 
 

@@ -12,38 +12,44 @@
  */
 
 import type {
+    ExecutionItemRequestDto,
+    ExecutionType,
     Resource,
-    RuleActionRequestDto,
 } from './';
 
 /**
  * @export
- * @interface RuleActionGroupRequestDto
+ * @interface ExecutionRequestDto
  */
-export interface RuleActionGroupRequestDto {
+export interface ExecutionRequestDto {
     /**
-     * Name of the Rule Action Group
+     * Name of the execution
      * @type {string}
-     * @memberof RuleActionGroupRequestDto
+     * @memberof ExecutionRequestDto
      */
     name: string;
     /**
-     * Description of the Rule Action Group
+     * Description of the execution
      * @type {string}
-     * @memberof RuleActionGroupRequestDto
+     * @memberof ExecutionRequestDto
      */
     description?: string;
     /**
+     * @type {ExecutionType}
+     * @memberof ExecutionRequestDto
+     */
+    type: ExecutionType;
+    /**
      * @type {Resource}
-     * @memberof RuleActionGroupRequestDto
+     * @memberof ExecutionRequestDto
      */
     resource: Resource;
     /**
-     * List of new Rule Actions to add in the Rule Actions Group
-     * @type {Array<RuleActionRequestDto>}
-     * @memberof RuleActionGroupRequestDto
+     * List of the execution items to add to execution
+     * @type {Array<ExecutionItemRequestDto>}
+     * @memberof ExecutionRequestDto
      */
-    actions: Array<RuleActionRequestDto>;
+    items: Array<ExecutionItemRequestDto>;
 }
 
 

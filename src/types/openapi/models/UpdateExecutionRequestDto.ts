@@ -12,24 +12,24 @@
  */
 
 import type {
-    RuleConditionRequestDto,
+    ExecutionItemRequestDto,
 } from './';
 
 /**
  * @export
- * @interface UpdateRuleConditionGroupRequestDto
+ * @interface UpdateExecutionRequestDto
  */
-export interface UpdateRuleConditionGroupRequestDto {
+export interface UpdateExecutionRequestDto {
     /**
-     * Description of the Rule Condition Group
+     * Description of the execution
      * @type {string}
-     * @memberof UpdateRuleConditionGroupRequestDto
+     * @memberof UpdateExecutionRequestDto
      */
     description?: string;
     /**
-     * List of the Rule Conditions to add in the Rule Condition Group
-     * @type {Array<RuleConditionRequestDto>}
-     * @memberof UpdateRuleConditionGroupRequestDto
+     * List of the execution items to add to execution
+     * @type {Array<ExecutionItemRequestDto>}
+     * @memberof UpdateExecutionRequestDto
      */
-    conditions: Array<RuleConditionRequestDto>;
+    items: Array<ExecutionItemRequestDto>;
 }

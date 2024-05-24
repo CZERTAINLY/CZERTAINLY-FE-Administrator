@@ -12,14 +12,12 @@
  */
 
 /**
- * Source of the field in the condition item
+ * Type of the trigger
  * @export
  * @enum {string}
  */
-export enum FilterFieldSource {
-    Meta = 'meta',
-    Custom = 'custom',
-    Data = 'data',
-    Property = 'property'
+export enum TriggerType {
+    Event = 'event',
+    Manual = 'manual'
 }
 

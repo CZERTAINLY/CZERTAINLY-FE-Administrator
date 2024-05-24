@@ -22,7 +22,7 @@ const TriggerList = () => {
 
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const eventNameEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ResourceEvent));
-    const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.RuleTriggerType));
+    const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.TriggerType));
     const [selectedResource, setSelectedResource] = useState<Resource>();
     const [selectedTriggerSource, setSelectedTriggerSource] = useState<Resource>();
     const isFetchingList = useSelector(rulesSelectors.isFetchingTriggers);
@@ -46,7 +46,7 @@ const TriggerList = () => {
     }, [dispatch, checkedRows]);
 
     const getFreshList = useCallback(() => {
-        dispatch(rulesActions.listTriggers({ resource: selectedResource, triggerResouce: selectedTriggerSource }));
+        dispatch(rulesActions.listTriggers({ resource: selectedResource, eventResource: selectedTriggerSource }));
     }, [dispatch, selectedResource, selectedTriggerSource]);
 
     useEffect(() => {
@@ -109,9 +109,9 @@ const TriggerList = () => {
                     columns: [
                         <Link to={`./detail/${trigger.uuid}`}>{trigger.name}</Link>,
 
-                        getEnumLabel(resourceTypeEnum, trigger.triggerResource || ''),
-                        getEnumLabel(triggerTypeEnum, trigger.triggerType),
-                        getEnumLabel(eventNameEnum, trigger.eventName || ''),
+                        getEnumLabel(resourceTypeEnum, trigger.eventResource || ''),
+                        getEnumLabel(triggerTypeEnum, trigger.type),
+                        getEnumLabel(eventNameEnum, trigger.event || ''),
                         getEnumLabel(resourceTypeEnum, trigger.resource),
                         trigger.description || '',
                     ],

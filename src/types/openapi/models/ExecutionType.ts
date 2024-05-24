@@ -12,14 +12,11 @@
  */
 
 /**
- * Source of the field in the condition item
+ * Type of the execution
  * @export
  * @enum {string}
  */
-export enum FilterFieldSource {
-    Meta = 'meta',
-    Custom = 'custom',
-    Data = 'data',
-    Property = 'property'
+export enum ExecutionType {
+    SetField = 'setField'
 }
 

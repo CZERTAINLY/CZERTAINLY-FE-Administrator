@@ -1,14 +1,9 @@
-import { ApiClients } from 'api';
-import ConditionsGroupsList from 'components/ConditionGroupsList';
-import FilterWidget from 'components/FilterWidget';
-import FilterWidgetRuleAction from 'components/FilterWidgetRuleAction';
 import { EntityType, actions as filterActions } from 'ducks/filters';
-import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
+import { selectors as rulesSelectors } from 'ducks/rules';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { Resource } from 'types/openapi';
-import { conditionGroupToFilter, filterToConditionGroup } from 'utils/rules';
 type FormType = 'rules' | 'conditionGroup' | 'actionGroup' | 'trigger';
 
 interface ConditionGroupFormFilterProps {
@@ -20,17 +15,17 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
     const { id } = useParams();
     const editMode = useMemo(() => !!id, [id]);
 
-    const conditionGroupsDetails = useSelector(rulesSelectors.conditionGroupDetails);
-    const isFetchingConditionGroup = useSelector(rulesSelectors.isFetchingConditionGroup);
-    const isUpdatingConditionGroup = useSelector(rulesSelectors.isUpdatingConditionGroup);
+    // const conditionGroupsDetails = useSelector(rulesSelectors.conditionGroupDetails);
+    // const isFetchingConditionGroup = useSelector(rulesSelectors.isFetchingConditionGroup);
+    // const isUpdatingConditionGroup = useSelector(rulesSelectors.isUpdatingConditionGroup);
 
-    const ruleDetails = useSelector(rulesSelectors.ruleDetails);
-    const isFetchingRuleDetail = useSelector(rulesSelectors.isFetchingRuleDetail);
-    const isUpdatingRule = useSelector(rulesSelectors.isUpdatingRule);
+    // const ruleDetails = useSelector(rulesSelectors.ruleDetails);
+    // const isFetchingRuleDetail = useSelector(rulesSelectors.isFetchingRuleDetail);
+    // const isUpdatingRule = useSelector(rulesSelectors.isUpdatingRule);
 
-    const actionGroupDetails = useSelector(rulesSelectors.actionGroupDetails);
-    const isFetchingActionGroup = useSelector(rulesSelectors.isFetchingActionGroup);
-    const isUpdatingActionGroup = useSelector(rulesSelectors.isUpdatingActionGroup);
+    // const actionGroupDetails = useSelector(rulesSelectors.actionGroupDetails);
+    // const isFetchingActionGroup = useSelector(rulesSelectors.isFetchingActionGroup);
+    // const isUpdatingActionGroup = useSelector(rulesSelectors.isUpdatingActionGroup);
 
     const trigerDetails = useSelector(rulesSelectors.triggerDetails);
     const isFetchingTriggerDetail = useSelector(rulesSelectors.isFetchingTriggerDetail);
@@ -45,41 +40,41 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    useEffect(() => {
-        if (!id) return;
-        if (formType === 'rules' && id !== ruleDetails?.uuid) {
-            dispatch(rulesActions.getRule({ ruleUuid: id }));
-        }
-        if (formType === 'conditionGroup' && id !== conditionGroupsDetails?.uuid) {
-            dispatch(rulesActions.getConditionGroup({ conditionGroupUuid: id }));
-        }
+    // useEffect(() => {
+    //     if (!id) return;
+    //     if (formType === 'rules' && id !== ruleDetails?.uuid) {
+    //         dispatch(rulesActions.getRule({ ruleUuid: id }));
+    //     }
+    //     if (formType === 'conditionGroup' && id !== conditionGroupsDetails?.uuid) {
+    //         dispatch(rulesActions.getConditionGroup({ conditionGroupUuid: id }));
+    //     }
 
-        if (formType === 'actionGroup' && id !== actionGroupDetails?.uuid) {
-            dispatch(rulesActions.getActionGroup({ actionGroupUuid: id }));
-        }
+    //     if (formType === 'actionGroup' && id !== actionGroupDetails?.uuid) {
+    //         dispatch(rulesActions.getActionGroup({ actionGroupUuid: id }));
+    //     }
 
-        if (formType === 'trigger' && id !== trigerDetails?.uuid) {
-            dispatch(rulesActions.getTrigger({ triggerUuid: id }));
-        }
-    }, [id, dispatch, formType, ruleDetails?.uuid, conditionGroupsDetails?.uuid, actionGroupDetails?.uuid, trigerDetails?.uuid]);
+    //     if (formType === 'trigger' && id !== trigerDetails?.uuid) {
+    //         dispatch(rulesActions.getTrigger({ triggerUuid: id }));
+    //     }
+    // }, [id, dispatch, formType, ruleDetails?.uuid, conditionGroupsDetails?.uuid, actionGroupDetails?.uuid, trigerDetails?.uuid]);
 
-    useEffect(() => {
-        if (!hasEffectRun && editMode && id) {
-            let currentConditions = [];
+    // useEffect(() => {
+    //     if (!hasEffectRun && editMode && id) {
+    //         let currentConditions = [];
 
-            if (formType === 'rules') {
-                if (ruleDetails?.uuid !== id) return;
-                currentConditions = ruleDetails?.conditions || [];
-            } else {
-                if (conditionGroupsDetails?.uuid !== id) return;
-                currentConditions = conditionGroupsDetails?.conditions || [];
-            }
+    //         if (formType === 'rules') {
+    //             if (ruleDetails?.uuid !== id) return;
+    //             currentConditions = ruleDetails?.conditions || [];
+    //         } else {
+    //             if (conditionGroupsDetails?.uuid !== id) return;
+    //             currentConditions = conditionGroupsDetails?.conditions || [];
+    //         }
 
-            const currentFilters = conditionGroupToFilter(currentConditions);
-            setHasEffectRun(true);
-            dispatch(filterActions.setCurrentFilters({ currentFilters: currentFilters, entity: EntityType.CONDITIONS }));
-        }
-    }, [editMode, ruleDetails, conditionGroupsDetails, hasEffectRun, dispatch, formType, id]);
+    //         const currentFilters = conditionGroupToFilter(currentConditions);
+    //         setHasEffectRun(true);
+    //         dispatch(filterActions.setCurrentFilters({ currentFilters: currentFilters, entity: EntityType.CONDITIONS }));
+    //     }
+    // }, [editMode, ruleDetails, conditionGroupsDetails, hasEffectRun, dispatch, formType, id]);
 
     useEffect(() => {
         return () => {
@@ -88,96 +83,97 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const renderAppendContent = useMemo(() => {
-        if (formType === 'rules' && ruleDetails?.conditionGroups && ruleDetails?.conditionGroups?.length > 0) {
-            if (isFetchingRuleDetail || isUpdatingRule) return <></>;
-            return <ConditionsGroupsList ruleConditions={ruleDetails?.conditionGroups} />;
-        }
+    // const renderAppendContent = useMemo(() => {
+    //     if (formType === 'rules' && ruleDetails?.conditionGroups && ruleDetails?.conditionGroups?.length > 0) {
+    //         if (isFetchingRuleDetail || isUpdatingRule) return <></>;
+    //         return <ConditionsGroupsList ruleConditions={ruleDetails?.conditionGroups} />;
+    //     }
 
-        if (formType === 'trigger' && trigerDetails?.actionGroups && trigerDetails?.actionGroups?.length > 0) {
-            if (isFetchingTriggerDetail || isUpdatingTrigger) return <></>;
-            return <ConditionsGroupsList actionGroups={trigerDetails.actionGroups} />;
-        } else {
-            return <></>;
-        }
-    }, [ruleDetails, formType, trigerDetails, isFetchingRuleDetail, isFetchingTriggerDetail, isUpdatingRule, isUpdatingTrigger]);
+    //     if (formType === 'trigger' && trigerDetails?.actionGroups && trigerDetails?.actionGroups?.length > 0) {
+    //         if (isFetchingTriggerDetail || isUpdatingTrigger) return <></>;
+    //         return <ConditionsGroupsList actionGroups={trigerDetails.actionGroups} />;
+    //     } else {
+    //         return <></>;
+    //     }
+    // }, [ruleDetails, formType, trigerDetails, isFetchingRuleDetail, isFetchingTriggerDetail, isUpdatingRule, isUpdatingTrigger]);
 
-    const renderFilterWidgetForRules = useMemo(() => {
-        if (formType !== 'rules' || !id || !ruleDetails) return null;
-        const disableBadgeRemove =
-            (ruleDetails.conditions.length === 1 && ruleDetails.conditionGroups.length === 0) || isFetchingRuleDetail || isUpdatingRule;
+    // const renderFilterWidgetForRules = useMemo(() => {
+    //     if (formType !== 'rules' || !id || !ruleDetails) return null;
+    //     const disableBadgeRemove =
+    //         (ruleDetails.conditions.length === 1 && ruleDetails.conditionGroups.length === 0) || isFetchingRuleDetail || isUpdatingRule;
 
-        const isBusy = isFetchingRuleDetail || isUpdatingRule;
+    //     const isBusy = isFetchingRuleDetail || isUpdatingRule;
 
-        return (
-            <FilterWidget
-                appendInWidgetContent={renderAppendContent}
-                entity={EntityType.CONDITIONS}
-                title={'Conditions'}
-                busyBadges={isBusy}
-                getAvailableFiltersApi={(apiClients: ApiClients) =>
-                    apiClients.resources.listResourceRuleFilterFields({
-                        resource,
-                    })
-                }
-                disableBadgeRemove={disableBadgeRemove}
-                onFilterUpdate={(currentFilters) => {
-                    const currentCondition = filterToConditionGroup(currentFilters);
-                    dispatch(
-                        rulesActions.updateRule({
-                            ruleUuid: id,
-                            rule: {
-                                conditions: currentCondition,
-                                conditionGroupsUuids: ruleDetails.conditionGroups.map((cg) => cg.uuid),
-                                description: ruleDetails.description || '',
-                            },
-                        }),
-                    );
-                }}
-            />
-        );
-    }, [resource, dispatch, formType, id, ruleDetails, renderAppendContent, isFetchingRuleDetail, isUpdatingRule]);
+    //     return (
+    //         <FilterWidget
+    //             appendInWidgetContent={renderAppendContent}
+    //             entity={EntityType.CONDITIONS}
+    //             title={'Conditions'}
+    //             busyBadges={isBusy}
+    //             getAvailableFiltersApi={(apiClients: ApiClients) =>
+    //                 apiClients.resources.listResourceRuleFilterFields({
+    //                     resource,
+    //                 })
+    //             }
+    //             disableBadgeRemove={disableBadgeRemove}
+    //             onFilterUpdate={(currentFilters) => {
+    //                 const currentCondition = filterToConditionGroup(currentFilters);
+    //                 dispatch(
+    //                     rulesActions.updateRule({
+    //                         ruleUuid: id,
+    //                         rule: {
+    //                             conditions: currentCondition,
+    //                             conditionGroupsUuids: ruleDetails.conditionGroups.map((cg) => cg.uuid),
+    //                             description: ruleDetails.description || '',
+    //                         },
+    //                     }),
+    //                 );
+    //             }}
+    //         />
+    //     );
+    // }, [resource, dispatch, formType, id, ruleDetails, renderAppendContent, isFetchingRuleDetail, isUpdatingRule]);
 
-    const renderFilterWidgetForConditionGroups = useMemo(() => {
-        if (formType !== 'conditionGroup' || !id || !conditionGroupsDetails) return null;
-        const disableBadgeRemove = conditionGroupsDetails.conditions.length === 1 || isFetchingConditionGroup || isUpdatingConditionGroup;
-        const isBusy = isFetchingConditionGroup || isUpdatingConditionGroup;
-        return (
-            <div>
-                <FilterWidget
-                    busyBadges={isBusy}
-                    entity={EntityType.CONDITIONS}
-                    title={'Conditions'}
-                    getAvailableFiltersApi={(apiClients: ApiClients) =>
-                        apiClients.resources.listResourceRuleFilterFields({
-                            resource,
-                        })
-                    }
-                    disableBadgeRemove={disableBadgeRemove}
-                    onFilterUpdate={(currentFilters) => {
-                        const currentCondition = filterToConditionGroup(currentFilters);
-                        dispatch(
-                            rulesActions.updateConditionGroup({
-                                conditionGroupUuid: id,
-                                conditionGroup: {
-                                    conditions: currentCondition,
-                                },
-                            }),
-                        );
-                    }}
-                />
-            </div>
-        );
-    }, [resource, dispatch, formType, id, conditionGroupsDetails, isFetchingConditionGroup, isUpdatingConditionGroup]);
+    // const renderFilterWidgetForConditionGroups = useMemo(() => {
+    //     if (formType !== 'conditionGroup' || !id || !conditionGroupsDetails) return null;
+    //     const disableBadgeRemove = conditionGroupsDetails.conditions.length === 1 || isFetchingConditionGroup || isUpdatingConditionGroup;
+    //     const isBusy = isFetchingConditionGroup || isUpdatingConditionGroup;
+    //     return (
+    //         <div>
+    //             <FilterWidget
+    //                 busyBadges={isBusy}
+    //                 entity={EntityType.CONDITIONS}
+    //                 title={'Conditions'}
+    //                 getAvailableFiltersApi={(apiClients: ApiClients) =>
+    //                     apiClients.resources.listResourceRuleFilterFields({
+    //                         resource,
+    //                     })
+    //                 }
+    //                 disableBadgeRemove={disableBadgeRemove}
+    //                 onFilterUpdate={(currentFilters) => {
+    //                     const currentCondition = filterToConditionGroup(currentFilters);
+    //                     dispatch(
+    //                         rulesActions.updateConditionGroup({
+    //                             conditionGroupUuid: id,
+    //                             conditionGroup: {
+    //                                 conditions: currentCondition,
+    //                             },
+    //                         }),
+    //                     );
+    //                 }}
+    //             />
+    //         </div>
+    //     );
+    // }, [resource, dispatch, formType, id, conditionGroupsDetails, isFetchingConditionGroup, isUpdatingConditionGroup]);
 
-    const renderFilterWidgetForActionGroup = useMemo(() => {
-        if (formType !== 'actionGroup' || !id || !actionGroupDetails) return null;
-        const disableBadgeRemove = actionGroupDetails.actions.length === 1 || isFetchingActionGroup || isUpdatingActionGroup;
+    // const renderFilterWidgetForActionGroup = useMemo(() => {
+    //     if (formType !== 'actionGroup' || !id || !actionGroupDetails) return null;
+    // const disableBadgeRemove = actionGroupDetails.actions.length === 1 || isFetchingActionGroup || isUpdatingActionGroup;
 
-        const isBusy = isFetchingActionGroup || isUpdatingActionGroup;
-        return (
-            <div>
-                <FilterWidgetRuleAction
+    // const isBusy = isFetchingActionGroup || isUpdatingActionGroup;
+    // return (
+    // <div>
+    // {
+    /* <FilterWidgetRuleAction
                     entity={EntityType.ACTIONS}
                     title={'Actions'}
                     busyBadges={isBusy}
@@ -199,22 +195,23 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
                             }),
                         );
                     }}
-                />
-            </div>
-        );
-    }, [resource, dispatch, formType, id, actionGroupDetails, isFetchingActionGroup, isUpdatingActionGroup]);
+                /> */
+    // }
+    // </div>
+    //     );
+    // }, [resource, dispatch, formType, id, actionGroupDetails, isFetchingActionGroup, isUpdatingActionGroup]);
 
     const renderFilterWidgetForTrigger = useMemo(() => {
         if (formType !== 'trigger' || !id || !trigerDetails) return null;
         const isActionOnlyOne = trigerDetails.actions.length === 1;
-        const isActionGroupEmpty = trigerDetails.actionGroups.length === 0;
+        // const isActionGroupEmpty = trigerDetails.actionGroups.length === 0;
 
-        const disableBadgeRemove = isActionOnlyOne && isActionGroupEmpty;
+        // const disableBadgeRemove = isActionOnlyOne && isActionGroupEmpty;
         const isBusy = isFetchingTriggerDetail || isUpdatingTrigger;
 
         return (
             <div>
-                <FilterWidgetRuleAction
+                {/* <FilterWidgetRuleAction
                     includeIgnoreAction
                     entity={EntityType.ACTIONS}
                     title={'Actions'}
@@ -227,7 +224,7 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
                             settable: true,
                         })
                     }
-                    actionsList={trigerDetails.actions}
+                    ExecutionsList={trigerDetails.actions}
                     onActionsUpdate={(currentActions) => {
                         dispatch(
                             rulesActions.updateTrigger({
@@ -242,31 +239,42 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
                             }),
                         );
                     }}
-                />
+                /> */}
             </div>
         );
-    }, [resource, dispatch, formType, id, trigerDetails, renderAppendContent, isFetchingTriggerDetail, isUpdatingTrigger]);
+    }, [
+        resource,
+        dispatch,
+        formType,
+        id,
+        trigerDetails,
+
+        // renderAppendContent,
+
+        isFetchingTriggerDetail,
+        isUpdatingTrigger,
+    ]);
 
     const renderWidgetConditionViewer = useMemo(() => {
         switch (formType) {
-            case 'conditionGroup':
-                return renderFilterWidgetForConditionGroups;
-            case 'rules':
-                return renderFilterWidgetForRules;
+            // case 'conditionGroup':
+            //     return renderFilterWidgetForConditionGroups;
+            // case 'rules':
+            //     return renderFilterWidgetForRules;
 
-            case 'actionGroup':
-                return renderFilterWidgetForActionGroup;
+            // case 'actionGroup':
+            //     return renderFilterWidgetForActionGroup;
 
-            case 'trigger':
-                return renderFilterWidgetForTrigger;
+            // case 'trigger':
+            //     return renderFilterWidgetForTrigger;
             default:
                 return null;
         }
     }, [
         formType,
-        renderFilterWidgetForConditionGroups,
-        renderFilterWidgetForRules,
-        renderFilterWidgetForActionGroup,
+        // renderFilterWidgetForConditionGroups,
+        // renderFilterWidgetForRules,
+        // renderFilterWidgetForActionGroup,
         renderFilterWidgetForTrigger,
     ]);
 

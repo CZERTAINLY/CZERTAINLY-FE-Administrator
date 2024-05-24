@@ -6,7 +6,7 @@ import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions, selectors } from 'ducks/discoveries';
-import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { selectors as enumSelectors } from 'ducks/enums';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
@@ -35,7 +35,7 @@ export default function DiscoveryDetail() {
 
     const isBusy = useMemo(() => isFetching || isDeleting, [isFetching, isDeleting]);
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
-    const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.RuleTriggerType));
+    const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.TriggerType));
 
     const getFreshDiscoveryDetails = useCallback(() => {
         if (!id) return;
@@ -168,19 +168,19 @@ export default function DiscoveryDetail() {
         },
     ];
 
-    const triggerTableData: TableDataRow[] = discovery?.triggers.length
-        ? discovery.triggers.map((trigger) => ({
-              id: trigger.uuid,
-              columns: [
-                  <Link to={`../../triggers/detail/${trigger.uuid}`}>{trigger.name}</Link>,
-                  trigger?.triggerResource ? getEnumLabel(resourceTypeEnum, trigger.triggerResource) : '',
-                  getEnumLabel(triggerTypeEnum, trigger.triggerType),
-                  getEnumLabel(eventNameEnum, trigger.eventName || ''),
-                  getEnumLabel(resourceTypeEnum, trigger.resource || ''),
-                  trigger.description || '',
-              ],
-          }))
-        : [];
+    // const triggerTableData: TableDataRow[] = discovery?.triggers.length
+    //     ? discovery.triggers.map((trigger) => ({
+    //           id: trigger.uuid,
+    //           columns: [
+    //               <Link to={`../../triggers/detail/${trigger.uuid}`}>{trigger.name}</Link>,
+    //               trigger?.triggerResource ? getEnumLabel(resourceTypeEnum, trigger.triggerResource) : '',
+    //               getEnumLabel(triggerTypeEnum, trigger.triggerType),
+    //               getEnumLabel(eventNameEnum, trigger.eventName || ''),
+    //               getEnumLabel(resourceTypeEnum, trigger.resource || ''),
+    //               trigger.description || '',
+    //           ],
+    //       }))
+    //     : [];
 
     return (
         <Container className="themed-container" fluid>
@@ -200,9 +200,9 @@ export default function DiscoveryDetail() {
                     </Widget>
                 </Col>
                 <Col>
-                    <Widget title="Assigned Triggers" busy={isBusy} titleSize="large" widgetLockName={LockWidgetNameEnum.DiscoveryDetails}>
+                    {/* <Widget title="Assigned Triggers" busy={isBusy} titleSize="large" widgetLockName={LockWidgetNameEnum.DiscoveryDetails}>
                         <CustomTable headers={triggerHeaders} data={triggerTableData} />
-                    </Widget>
+                    </Widget> */}
                 </Col>
             </Row>
 

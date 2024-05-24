@@ -27,13 +27,15 @@ import {
     RAProfileManagementApi,
     ResourceManagementApi,
     RoleManagementApi,
-    RulesManagementApi,
     SCEPProfileManagementApi,
     ScheduledJobsManagementApi,
     SettingsApi,
     StatisticsDashboardApi,
     TokenProfileManagementApi,
     UserManagementApi,
+    WorkflowActionsManagementApi,
+    WorkflowRulesManagementApi,
+    WorkflowTriggersManagementApi,
 } from 'types/openapi';
 import { TokenInstanceControllerApi } from 'types/openapi/apis/TokenInstanceControllerApi';
 import {
@@ -51,7 +53,10 @@ export interface ApiClients {
     auth: AuthenticationManagementApi;
     users: UserManagementApi;
     roles: RoleManagementApi;
-    rules: RulesManagementApi;
+    // rules: RulesManagementApi;
+    actions: WorkflowActionsManagementApi;
+    rules: WorkflowRulesManagementApi;
+    triggers: WorkflowTriggersManagementApi;
     auditLogs: AuditLogApi;
     raProfiles: RAProfileManagementApi;
     credentials: CredentialManagementApi;
@@ -93,7 +98,10 @@ export const backendClient: ApiClients = {
     auth: new AuthenticationManagementApi(configuration),
     users: new UserManagementApi(configuration),
     roles: new RoleManagementApi(configuration),
-    rules: new RulesManagementApi(configuration),
+    // rules: new RulesManagementApi(configuration),
+    actions: new WorkflowActionsManagementApi(configuration),
+    rules: new WorkflowRulesManagementApi(configuration),
+    triggers: new WorkflowTriggersManagementApi(configuration),
     certificates: new CertificateInventoryApi(configuration),
     auditLogs: new AuditLogApi(configuration),
     raProfiles: new RAProfileManagementApi(configuration),

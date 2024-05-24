@@ -5,11 +5,11 @@ import { selectors as rulesSelectors } from 'ducks/rules';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { Badge, Spinner } from 'reactstrap';
-import { PlatformEnum, RuleConditionDto } from 'types/openapi';
+import { ConditionItemDto, PlatformEnum } from 'types/openapi';
 import styles from './groupConditionsViewer.module.scss';
 
 interface ConditionsTableViewerProps {
-    groupConditions: RuleConditionDto[];
+    groupConditions: ConditionItemDto[];
     conditionGroupName: string;
     conditionGroupUuid: string;
 }
@@ -19,7 +19,7 @@ const GroupConditionsViewer = ({ groupConditions = [], conditionGroupName, condi
     const FilterConditionOperatorEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.FilterConditionOperator));
     const availableFilters = useSelector(selectors.availableFilters(EntityType.CONDITIONS));
     const platformEnums = useSelector(enumSelectors.platformEnums);
-    const isFetchingConditionGroup = useSelector(rulesSelectors.isFetchingConditionGroup);
+    const isFetchingCondition = useSelector(rulesSelectors.isFetchingCondition);
     const booleanOptions = useMemo(
         () => [
             { label: 'True', value: true },
@@ -54,7 +54,7 @@ const GroupConditionsViewer = ({ groupConditions = [], conditionGroupName, condi
 
             return (
                 <Badge
-                    key={condition.uuid}
+                    key={i}
                     title={`${getEnumLabel(searchGroupEnum, condition.fieldSource)} ${label} ${getEnumLabel(
                         FilterConditionOperatorEnum,
                         condition.operator,
@@ -69,7 +69,7 @@ const GroupConditionsViewer = ({ groupConditions = [], conditionGroupName, condi
         });
     };
 
-    if (isFetchingConditionGroup) return <Spinner active={isFetchingConditionGroup} />;
+    if (isFetchingCondition) return <Spinner active={isFetchingCondition} />;
 
     return (
         <div className={styles.groupConditionContainerDiv} key={conditionGroupUuid}>

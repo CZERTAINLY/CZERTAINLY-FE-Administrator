@@ -12,38 +12,32 @@
  */
 
 import type {
-    FilterConditionOperator,
     FilterFieldSource,
 } from './';
 
 /**
- * List of conditions to add in the Rule
+ * List of the execution items
  * @export
- * @interface RuleConditionRequestDto
+ * @interface ExecutionItemDto
  */
-export interface RuleConditionRequestDto {
+export interface ExecutionItemDto {
     /**
      * @type {FilterFieldSource}
-     * @memberof RuleConditionRequestDto
+     * @memberof ExecutionItemDto
      */
     fieldSource: FilterFieldSource;
     /**
-     * Field identifier of the Rule Condition
+     * Field identifier of the execution item
      * @type {string}
-     * @memberof RuleConditionRequestDto
+     * @memberof ExecutionItemDto
      */
     fieldIdentifier: string;
     /**
-     * @type {FilterConditionOperator}
-     * @memberof RuleConditionRequestDto
-     */
-    operator: FilterConditionOperator;
-    /**
-     * Value of the Rule Condition
+     * Data of the execution item
      * @type {object}
-     * @memberof RuleConditionRequestDto
+     * @memberof ExecutionItemDto
      */
-    value?: object;
+    data?: object;
 }
 
 

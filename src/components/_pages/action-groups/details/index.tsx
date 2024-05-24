@@ -15,9 +15,9 @@ const ActionGroupDetails = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
-    const actionGroupDetails = useSelector(rulesSelectors.actionGroupDetails);
-    const isFetchingDetails = useSelector(rulesSelectors.isFetchingActionGroup);
-    const isUpdatingDetails = useSelector(rulesSelectors.isUpdatingActionGroup);
+    const ExecutionDetails = useSelector(rulesSelectors.ExecutionDetails);
+    const isFetchingDetails = useSelector(rulesSelectors.isFetchingExecutionDetails);
+    const isUpdatingDetails = useSelector(rulesSelectors.isUpdatingExecution);
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [updateDescriptionEditEnable, setUpdateDescription] = useState<boolean>(false);
     const [updatedDescription, setUpdatedDescription] = useState('');
@@ -25,13 +25,13 @@ const ActionGroupDetails = () => {
     const isBusy = useMemo(() => isFetchingDetails || isUpdatingDetails, [isFetchingDetails, isUpdatingDetails]);
 
     useEffect(() => {
-        if (!actionGroupDetails?.description || actionGroupDetails.uuid !== id) return;
-        setUpdatedDescription(actionGroupDetails.description);
-    }, [actionGroupDetails, id]);
+        if (!ExecutionDetails?.description || ExecutionDetails.uuid !== id) return;
+        setUpdatedDescription(ExecutionDetails.description);
+    }, [ExecutionDetails, id]);
 
     const getFreshDetails = useCallback(() => {
         if (!id) return;
-        dispatch(rulesActions.getActionGroup({ actionGroupUuid: id }));
+        dispatch(rulesActions.getExecution({ executionUuid: id }));
     }, [id, dispatch]);
 
     useEffect(() => {
@@ -40,25 +40,26 @@ const ActionGroupDetails = () => {
 
     const onDeleteConfirmed = useCallback(() => {
         if (!id) return;
-        dispatch(rulesActions.deleteActionGroup({ actionGroupUuid: id }));
+        dispatch(rulesActions.deleteExecution({ executionUuid: id }));
         setConfirmDelete(false);
     }, [dispatch, id]);
 
     const onUpdateDescriptionConfirmed = useCallback(() => {
         if (!id || !updateDescriptionEditEnable) return;
-        if (updatedDescription !== actionGroupDetails?.description) {
+        if (updatedDescription !== ExecutionDetails?.description) {
             dispatch(
-                rulesActions.updateActionGroup({
-                    actionGroupUuid: id,
-                    actionGroup: {
+                rulesActions.updateExecution({
+                    executionUuid: id,
+                    execution: {
                         description: updatedDescription,
-                        actions: actionGroupDetails?.actions || [],
+                        // actions: ExecutionDetails?.actions || [],
+                        items: ExecutionDetails?.items || [],
                     },
                 }),
             );
         }
         setUpdateDescription(false);
-    }, [dispatch, id, actionGroupDetails, updatedDescription, updateDescriptionEditEnable]);
+    }, [dispatch, id, ExecutionDetails, updatedDescription, updateDescriptionEditEnable]);
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
@@ -91,20 +92,20 @@ const ActionGroupDetails = () => {
 
     const actionGroupsDetailData: TableDataRow[] = useMemo(
         () =>
-            !actionGroupDetails || isFetchingDetails
+            !ExecutionDetails || isFetchingDetails
                 ? []
                 : [
                       {
                           id: 'uuid',
-                          columns: ['UUID', actionGroupDetails.uuid, ''],
+                          columns: ['UUID', ExecutionDetails.uuid, ''],
                       },
                       {
                           id: 'name',
-                          columns: ['Name', actionGroupDetails.name, ''],
+                          columns: ['Name', ExecutionDetails.name, ''],
                       },
                       {
                           id: 'resource',
-                          columns: ['Resource', getEnumLabel(resourceTypeEnum, actionGroupDetails.resource), ''],
+                          columns: ['Resource', getEnumLabel(resourceTypeEnum, ExecutionDetails.resource), ''],
                       },
                       {
                           id: 'description',
@@ -117,7 +118,7 @@ const ActionGroupDetails = () => {
                                       placeholder="Enter Description"
                                   />
                               ) : (
-                                  actionGroupDetails.description || ''
+                                  ExecutionDetails.description || ''
                               ),
                               <div>
                                   {updateDescriptionEditEnable ? (
@@ -130,7 +131,7 @@ const ActionGroupDetails = () => {
                                               onClick={onUpdateDescriptionConfirmed}
                                               disabled={
                                                   isUpdatingDetails ||
-                                                  updatedDescription === actionGroupDetails.description ||
+                                                  updatedDescription === ExecutionDetails.description ||
                                                   updatedDescription === ''
                                               }
                                           >
@@ -142,7 +143,7 @@ const ActionGroupDetails = () => {
                                               title="Cancel"
                                               onClick={() => {
                                                   setUpdateDescription(false);
-                                                  setUpdatedDescription(actionGroupDetails?.description || '');
+                                                  setUpdatedDescription(ExecutionDetails?.description || '');
                                               }}
                                               disabled={isUpdatingDetails}
                                           >
@@ -168,7 +169,7 @@ const ActionGroupDetails = () => {
                       },
                   ],
         [
-            actionGroupDetails,
+            ExecutionDetails,
             resourceTypeEnum,
             setUpdateDescription,
             updateDescriptionEditEnable,
@@ -194,7 +195,7 @@ const ActionGroupDetails = () => {
                     </Widget>
                 </Col>
             </Row>
-            <Row>{actionGroupDetails?.resource && <ConditionsViewer resource={actionGroupDetails.resource} formType="actionGroup" />}</Row>
+            <Row>{ExecutionDetails?.resource && <ConditionsViewer resource={ExecutionDetails.resource} formType="actionGroup" />}</Row>
             <Dialog
                 isOpen={confirmDelete}
                 caption={`Delete a Action Group`}

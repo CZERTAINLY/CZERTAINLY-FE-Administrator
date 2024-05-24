@@ -15,7 +15,7 @@ import ConditionFormFilter from 'components/ConditionFormFilter';
 import ProgressButton from 'components/ProgressButton';
 import Select from 'react-select';
 import { Resource } from 'types/openapi';
-import { RuleConditiontModel } from 'types/rules';
+import { ConditionItemModel } from 'types/rules';
 import { isObjectSame } from 'utils/common-utils';
 import { useRuleEvaluatorResourceOptions } from 'utils/rules';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
@@ -31,7 +31,7 @@ export interface ConditionGroupFormValues {
     selectedResource?: SelectChangeValue;
     resource: Resource;
     description?: string;
-    conditions: RuleConditiontModel[];
+    conditions: ConditionItemModel[];
     conditionGroupsUuids: SelectChangeValue[];
 }
 
@@ -41,7 +41,7 @@ const ConditionGroupForm = () => {
     const navigate = useNavigate();
     const title = 'Create Rule';
 
-    const conditionGroups = useSelector(rulesSelectors.conditionRuleGroups);
+    const conditions = useSelector(rulesSelectors.conditions);
     const isCreatingRule = useSelector(rulesSelectors.isCreatingRule);
     const isUpdatingRule = useSelector(rulesSelectors.isUpdatingRule);
     const [selectedResourceState, setSelectedResourceState] = useState<SelectChangeValue>();
@@ -54,15 +54,15 @@ const ConditionGroupForm = () => {
     );
 
     const conditionGroupsOptions = useMemo(() => {
-        if (conditionGroups === undefined) return [];
-        return conditionGroups.map((conditionGroup) => {
+        if (conditions === undefined) return [];
+        return conditions.map((conditionGroup) => {
             return { value: conditionGroup.uuid, label: conditionGroup.name };
         });
-    }, [conditionGroups]);
+    }, [conditions]);
 
     useEffect(() => {
         if (!selectedResourceState) return;
-        dispatch(rulesActions.listConditionGroups({ resource: selectedResourceState.value as Resource }));
+        dispatch(rulesActions.listConditions({ resource: selectedResourceState.value as Resource }));
     }, [dispatch, selectedResourceState]);
 
     useEffect(() => {
@@ -97,17 +97,17 @@ const ConditionGroupForm = () => {
     const onSubmit = useCallback(
         (values: ConditionGroupFormValues) => {
             if (values.resource === Resource.None) return;
-            dispatch(
-                rulesActions.createRule({
-                    rule: {
-                        conditionGroupsUuids: values.conditionGroupsUuids.map((uuid) => uuid.value),
-                        conditions: values.conditions,
-                        description: values.description,
-                        name: values.name,
-                        resource: values.resource,
-                    },
-                }),
-            );
+            // dispatch(
+            //     rulesActions.createRule({
+            //         rule: {
+            //             conditionGroupsUuids: values.conditionGroupsUuids.map((uuid) => uuid.value),
+            //             conditions: values.conditions,
+            //             description: values.description,
+            //             name: values.name,
+            //             resource: values.resource,
+            //         },
+            //     }),
+            // );
         },
         [dispatch],
     );

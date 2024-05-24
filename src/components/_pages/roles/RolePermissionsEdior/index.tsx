@@ -221,7 +221,7 @@ function RolePermissionsEditor({
                                             }
                                             onChange={(e) => allowAction(currentResource, action.name, e.target.checked)}
                                         />
-                                        &nbsp;&nbsp;&nbsp;{action.displayName}
+                                        &nbsp;&nbsp;&nbsp;{action.name}
                                     </label>
                                 ))}
                             </div>
@@ -246,7 +246,7 @@ function RolePermissionsEditor({
                 (action) =>
                     ({
                         id: action.name,
-                        content: action.displayName,
+                        content: action.name,
                         sortable: false,
                         align: 'center',
                         width: '5em',

@@ -15,14 +15,14 @@ import { useRuleEvaluatorResourceOptions } from 'utils/rules';
 import styles from './actionGroupsList.module.scss';
 
 const ActionGroupsList = () => {
-    const actionGroups = useSelector(rulesSelectors.actionGroups);
+    const executions = useSelector(rulesSelectors.executions);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [selectedResource, setSelectedResource] = useState<Resource>();
-    const isFetchingList = useSelector(rulesSelectors.isFetchingActionGroups);
-    const isDeleting = useSelector(rulesSelectors.isDeletingActionGroup);
+    const isFetchingList = useSelector(rulesSelectors.isFetchingExecutions);
+    const isDeleting = useSelector(rulesSelectors.isDeletingExecution);
 
     const [checkedRows, setCheckedRows] = useState<string[]>([]);
     const [confirmDelete, setConfirmDelete] = useState(false);
@@ -30,13 +30,13 @@ const ActionGroupsList = () => {
     const isBusy = useMemo(() => isFetchingList || isDeleting, [isFetchingList, isDeleting]);
 
     const onDeleteConfirmed = useCallback(() => {
-        dispatch(actionGroupsActions.deleteActionGroup({ actionGroupUuid: checkedRows[0] }));
+        dispatch(actionGroupsActions.deleteExecution({ executionUuid: checkedRows[0] }));
         setConfirmDelete(false);
         setCheckedRows([]);
     }, [dispatch, checkedRows]);
 
     const getFreshListActionGroups = useCallback(() => {
-        dispatch(actionGroupsActions.listActionGroups({ resource: selectedResource }));
+        dispatch(actionGroupsActions.listExecutions({ resource: selectedResource }));
     }, [dispatch, selectedResource]);
 
     useEffect(() => {
@@ -73,7 +73,7 @@ const ActionGroupsList = () => {
 
     const actionGroupList: TableDataRow[] = useMemo(
         () =>
-            actionGroups.map((actionGroup) => {
+            executions.map((actionGroup) => {
                 return {
                     id: actionGroup.uuid,
                     columns: [
@@ -83,7 +83,7 @@ const ActionGroupsList = () => {
                     ],
                 };
             }),
-        [actionGroups, resourceTypeEnum],
+        [executions, resourceTypeEnum],
     );
 
     const buttons: WidgetButtonProps[] = useMemo(

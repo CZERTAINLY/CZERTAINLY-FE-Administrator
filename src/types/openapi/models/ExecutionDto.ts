@@ -12,61 +12,50 @@
  */
 
 import type {
+    ExecutionItemDto,
+    ExecutionType,
     Resource,
-    RuleTriggerType,
 } from './';
 
 /**
  * @export
- * @interface RuleTriggerDto
+ * @interface ExecutionDto
  */
-export interface RuleTriggerDto {
+export interface ExecutionDto {
     /**
      * Object identifier
      * @type {string}
-     * @memberof RuleTriggerDto
+     * @memberof ExecutionDto
      */
     uuid: string;
     /**
      * Object Name
      * @type {string}
-     * @memberof RuleTriggerDto
+     * @memberof ExecutionDto
      */
     name: string;
     /**
-     * Description of the Rule Trigger
+     * Description of the execution
      * @type {string}
-     * @memberof RuleTriggerDto
+     * @memberof ExecutionDto
      */
     description?: string;
     /**
-     * @type {RuleTriggerType}
-     * @memberof RuleTriggerDto
+     * @type {ExecutionType}
+     * @memberof ExecutionDto
      */
-    triggerType: RuleTriggerType;
-    /**
-     * Name of the event of the Rule Trigger
-     * @type {string}
-     * @memberof RuleTriggerDto
-     */
-    eventName?: RuleTriggerDtoEventNameEnum;
+    type: ExecutionType;
     /**
      * @type {Resource}
-     * @memberof RuleTriggerDto
+     * @memberof ExecutionDto
      */
     resource: Resource;
     /**
-     * @type {Resource}
-     * @memberof RuleTriggerDto
+     * List of the execution items
+     * @type {Array<ExecutionItemDto>}
+     * @memberof ExecutionDto
      */
-    triggerResource?: Resource;
+    items: Array<ExecutionItemDto>;
 }
 
-/**
- * @export
- * @enum {string}
- */
-export enum RuleTriggerDtoEventNameEnum {
-    DiscoveryFinished = 'discoveryFinished'
-}
 

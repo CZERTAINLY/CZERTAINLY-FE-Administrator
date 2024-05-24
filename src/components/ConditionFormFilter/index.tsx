@@ -43,7 +43,7 @@ const ConditionFormFilter = ({ resource, formType, includeIgnoreAction }: Condit
                     }
                     includeIgnoreAction={includeIgnoreAction}
                     onActionsUpdate={(currentActions) => {
-                        actionGroupForm.change('actions', currentActions);
+                        // actionGroupForm.change('actions', currentActions);
                     }}
                 />
             </div>

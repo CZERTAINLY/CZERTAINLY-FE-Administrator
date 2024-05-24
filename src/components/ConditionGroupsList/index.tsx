@@ -1,14 +1,12 @@
 import { EntityType, selectors } from 'ducks/filters';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { ActionGroupModel, ConditionRuleGroupModel } from 'types/rules';
-import GroupActionsViewer from './GroupActionsViewer';
-import GroupConditionsViewer from './GroupConditionsViewer';
+import { ConditionModel, ExecutionModel } from 'types/rules';
 import styles from './conditionGroupsList.module.scss';
 
 interface ConditionsTableViewerProps {
-    ruleConditions?: ConditionRuleGroupModel[];
-    actionGroups?: ActionGroupModel[];
+    ruleConditions?: ConditionModel[];
+    actionGroups?: ExecutionModel[];
 }
 
 const ConditionsGroupsList = ({ ruleConditions, actionGroups }: ConditionsTableViewerProps) => {
@@ -22,24 +20,24 @@ const ConditionsGroupsList = ({ ruleConditions, actionGroups }: ConditionsTableV
             return ruleConditions.map((conditionGroup, i) => (
                 <React.Fragment key={conditionGroup.uuid}>
                     <hr className={styles.conditionListHr} />
-                    <GroupConditionsViewer
+                    {/* <GroupConditionsViewer
                         conditionGroupName={conditionGroup.name}
                         conditionGroupUuid={conditionGroup.uuid}
-                        groupConditions={conditionGroup.conditions}
+                        groupConditions={conditionGroup.items}
                         key={conditionGroup.uuid}
-                    />
+                    /> */}
                 </React.Fragment>
             ));
         } else if (actionGroups?.length) {
             return actionGroups.map((actionGroup, i) => (
                 <React.Fragment key={actionGroup.uuid}>
                     <hr className={styles.conditionListHr} />
-                    <GroupActionsViewer
+                    {/* <GroupActionsViewer
                         conditionGroupName={actionGroup.name}
                         conditionGroupUuid={actionGroup.uuid}
                         groupActions={actionGroup.actions}
                         key={actionGroup.uuid}
-                    />
+                    /> */}
                 </React.Fragment>
             ));
         } else return <></>;

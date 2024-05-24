@@ -13,19 +13,19 @@
 
 /**
  * @export
- * @interface UpdateRuleRequestDto
+ * @interface UpdateActionRequestDto
  */
-export interface UpdateRuleRequestDto {
+export interface UpdateActionRequestDto {
     /**
-     * Description of the Rule
+     * Description of the action
      * @type {string}
-     * @memberof UpdateRuleRequestDto
+     * @memberof UpdateActionRequestDto
      */
     description?: string;
     /**
-     * List of UUIDs of existing conditions to add to the rule
+     * List of UUIDs of existing executions to add to the action
      * @type {Array<string>}
-     * @memberof UpdateRuleRequestDto
+     * @memberof UpdateActionRequestDto
      */
-    conditionsUuids: Array<string>;
+    executionsUuids: Array<string>;
 }

@@ -12,24 +12,24 @@
  */
 
 import type {
-    RuleActionRequestDto,
+    ConditionItemRequestDto,
 } from './';
 
 /**
  * @export
- * @interface UpdateRuleActionGroupRequestDto
+ * @interface UpdateConditionRequestDto
  */
-export interface UpdateRuleActionGroupRequestDto {
+export interface UpdateConditionRequestDto {
     /**
-     * Description of the Rule Action Group
+     * Description of the condition
      * @type {string}
-     * @memberof UpdateRuleActionGroupRequestDto
+     * @memberof UpdateConditionRequestDto
      */
     description?: string;
     /**
-     * List of new Rule Actions to add in the Rule Actions Group
-     * @type {Array<RuleActionRequestDto>}
-     * @memberof UpdateRuleActionGroupRequestDto
+     * List of the condition items to add to condition
+     * @type {Array<ConditionItemRequestDto>}
+     * @memberof UpdateConditionRequestDto
      */
-    actions: Array<RuleActionRequestDto>;
+    items: Array<ConditionItemRequestDto>;
 }

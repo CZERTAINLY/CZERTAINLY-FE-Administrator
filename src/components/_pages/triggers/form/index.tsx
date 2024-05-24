@@ -16,8 +16,8 @@ import { mutators } from 'utils/attributes/attributeEditorMutators';
 import ConditionFormFilter from 'components/ConditionFormFilter';
 import ProgressButton from 'components/ProgressButton';
 import Select from 'react-select';
-import { PlatformEnum, Resource, RuleTriggerRequestDtoEventNameEnum, RuleTriggerType } from 'types/openapi';
-import { ActionRuleRequestModel } from 'types/rules';
+import { PlatformEnum, Resource, TriggerRequestDtoEventEnum, TriggerType } from 'types/openapi';
+import { ExecutionItemModel } from 'types/rules';
 import { isObjectSame } from 'utils/common-utils';
 import { useResourceOptionsFromListWithFilters } from 'utils/rules';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
@@ -39,10 +39,10 @@ export interface ConditionGroupFormValues {
     resource: Resource;
     triggerResource: Resource;
     selectedTriggerResource?: SelectChangeValue;
-    triggerType?: RuleTriggerType;
+    triggerType?: TriggerType;
     selectedTriggerType?: SelectChangeValue;
-    actions: ActionRuleRequestModel[];
-    eventName?: RuleTriggerRequestDtoEventNameEnum;
+    actions: ExecutionItemModel[];
+    eventName?: TriggerRequestDtoEventEnum;
     selectedEventName?: SelectedEventValue;
     actionGroupsUuids: SelectChangeValue[];
     rulesUuids: SelectChangeValue[];
@@ -53,8 +53,8 @@ const ConditionGroupForm = () => {
     const navigate = useNavigate();
     const title = 'Create Trigger';
 
-    const ruleTriggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.RuleTriggerType));
-    const actionGroups = useSelector(rulesSelectors.actionGroups);
+    const ruleTriggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.TriggerType));
+    const executions = useSelector(rulesSelectors.executions);
     const resourceEvents = useSelector(resourceSelectors.resourceEvents);
     const rules = useSelector(rulesSelectors.rules);
     const isCreatingTrigger = useSelector(rulesSelectors.isCreatingTrigger);
@@ -78,11 +78,11 @@ const ConditionGroupForm = () => {
     }, [dispatch]);
 
     const actionGroupsOptions = useMemo(() => {
-        if (actionGroups === undefined) return [];
-        return actionGroups.map((conditionGroup) => {
+        if (executions === undefined) return [];
+        return executions.map((conditionGroup) => {
             return { value: conditionGroup.uuid, label: conditionGroup.name };
         });
-    }, [actionGroups]);
+    }, [executions]);
 
     const rulesOptions = useMemo(() => {
         if (rules === undefined) return [];
@@ -93,8 +93,8 @@ const ConditionGroupForm = () => {
 
     const ruleTriggerTypeOptions = useMemo(() => {
         return [
-            { value: RuleTriggerType.Event, label: getEnumLabel(ruleTriggerTypeEnum, RuleTriggerType.Event) },
-            // { value: RuleTriggerType.Manual, label: getEnumLabel(ruleTriggerTypeEnum, RuleTriggerType.Manual) },
+            { value: TriggerType.Event, label: getEnumLabel(ruleTriggerTypeEnum, TriggerType.Event) },
+            // { value: TriggerType.Manual, label: getEnumLabel(ruleTriggerTypeEnum, TriggerType.Manual) },
         ];
     }, [ruleTriggerTypeEnum]);
 
@@ -107,7 +107,7 @@ const ConditionGroupForm = () => {
 
     const fetchActionGroups = useCallback(
         (resource: Resource) => {
-            dispatch(rulesActions.listActionGroups({ resource: resource }));
+            dispatch(rulesActions.listExecutions({ resource: resource }));
         },
         [dispatch],
     );
@@ -142,21 +142,22 @@ const ConditionGroupForm = () => {
     const onSubmit = useCallback(
         (values: ConditionGroupFormValues) => {
             if (values.resource === Resource.None || values.triggerResource === Resource.None || !values.triggerType) return;
-            dispatch(
-                rulesActions.createTrigger({
-                    trigger: {
-                        name: values.name,
-                        description: values.description,
-                        resource: values.resource,
-                        triggerType: values.triggerType,
-                        actionGroupsUuids: values.actionGroupsUuids.map((actionGroup) => actionGroup.value),
-                        actions: values.actions,
-                        eventName: values?.eventName,
-                        rulesUuids: values.rulesUuids.map((rule) => rule.value),
-                        triggerResource: values.triggerResource,
-                    },
-                }),
-            );
+            // dispatch(
+            //     rulesActions.createTrigger({
+            //         trigger: {
+            //             name: values.name,
+            //             description: values.description,
+            //             resource: values.resource,
+            //             // triggerType: values.triggerType,
+            //             ignoreTrigger: false,
+            //             actionGroupsUuids: values.actionGroupsUuids.map((actionGroup) => actionGroup.value),
+            //             actions: values.actions,
+            //             eventName: values?.eventName,
+            //             rulesUuids: values.rulesUuids.map((rule) => rule.value),
+            //             triggerResource: values.triggerResource,
+            //         },
+            //     }),
+            // );
         },
         [dispatch],
     );
@@ -259,9 +260,7 @@ const ConditionGroupForm = () => {
                                         maxMenuHeight={140}
                                         menuPlacement="auto"
                                         options={
-                                            values.triggerType === RuleTriggerType.Event
-                                                ? resourceEventsOptions
-                                                : resourceRuleEvaluatorOptions
+                                            values.triggerType === TriggerType.Event ? resourceEventsOptions : resourceRuleEvaluatorOptions
                                         }
                                         placeholder="Select Trigger Resource"
                                         isClearable
@@ -271,7 +270,7 @@ const ConditionGroupForm = () => {
                                             input.onChange(event);
                                             form.change('triggerResource', event.value as Resource);
 
-                                            if (values.triggerType === RuleTriggerType.Event) {
+                                            if (values.triggerType === TriggerType.Event) {
                                                 fetchResourceEvents(event.value as Resource);
                                                 form.change('selectedResource', undefined);
                                                 form.change('resource', Resource.None);
@@ -302,7 +301,7 @@ const ConditionGroupForm = () => {
                             )}
                         </Field>
 
-                        {values?.triggerType === RuleTriggerType.Event && (
+                        {values?.triggerType === TriggerType.Event && (
                             <Field name="selectedEventName" validate={validateRequired()}>
                                 {({ input, meta }) => (
                                     <FormGroup>
@@ -319,7 +318,7 @@ const ConditionGroupForm = () => {
                                                 if (!event?.value) return;
 
                                                 input.onChange(event);
-                                                form.change('eventName', event?.value?.event as RuleTriggerRequestDtoEventNameEnum);
+                                                form.change('eventName', event?.value?.event as TriggerRequestDtoEventEnum);
 
                                                 if (event?.value?.producedResource) {
                                                     const selectResource = resourceOptions.find(

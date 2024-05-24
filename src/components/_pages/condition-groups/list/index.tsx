@@ -15,15 +15,15 @@ import { useRuleEvaluatorResourceOptions } from 'utils/rules';
 import styles from './conditionGroupsList.module.scss';
 
 const ConditionGroups = () => {
-    const conditionGroups = useSelector(rulesSelectors.conditionRuleGroups);
+    const conditions = useSelector(rulesSelectors.conditions);
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [selectedResource, setSelectedResource] = useState<Resource>();
-    const isFetchingList = useSelector(rulesSelectors.isFetchingConditionGroups);
-    const isDeleting = useSelector(rulesSelectors.isDeletingConditionGroup);
+    const isFetchingList = useSelector(rulesSelectors.isFetchingConditions);
+    const isDeleting = useSelector(rulesSelectors.isDeletingCondition);
 
     const [checkedRows, setCheckedRows] = useState<string[]>([]);
     const [confirmDelete, setConfirmDelete] = useState(false);
@@ -35,13 +35,13 @@ const ConditionGroups = () => {
     );
 
     const onDeleteConfirmed = useCallback(() => {
-        dispatch(rulesActions.deleteConditionGroup({ conditionGroupUuid: checkedRows[0] }));
+        dispatch(rulesActions.deleteCondition({ conditionUuid: checkedRows[0] }));
         setConfirmDelete(false);
         setCheckedRows([]);
     }, [dispatch, checkedRows]);
 
     const getFreshListConditionGroups = useCallback(() => {
-        dispatch(rulesActions.listConditionGroups({ resource: selectedResource }));
+        dispatch(rulesActions.listConditions({ resource: selectedResource }));
     }, [dispatch, selectedResource]);
 
     useEffect(() => {
@@ -76,7 +76,7 @@ const ConditionGroups = () => {
 
     const conditionGroupList: TableDataRow[] = useMemo(
         () =>
-            conditionGroups.map((conditionGroup) => {
+            conditions.map((conditionGroup) => {
                 return {
                     id: conditionGroup.uuid,
                     columns: [
@@ -86,7 +86,7 @@ const ConditionGroups = () => {
                     ],
                 };
             }),
-        [conditionGroups, resourceTypeEnum],
+        [conditions, resourceTypeEnum],
     );
 
     const buttons: WidgetButtonProps[] = useMemo(
@@ -133,7 +133,7 @@ const ConditionGroups = () => {
                 titleSize="larger"
                 title="Condition Groups"
                 refreshAction={getFreshListConditionGroups}
-                busy={isBusy}
+                // busy={isBusy}
                 widgetButtons={buttons}
                 widgetInfoCard={{
                     title: 'Information',

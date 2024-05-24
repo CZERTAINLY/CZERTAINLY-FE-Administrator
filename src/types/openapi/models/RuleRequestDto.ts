@@ -13,7 +13,6 @@
 
 import type {
     Resource,
-    RuleConditionRequestDto,
 } from './';
 
 /**
@@ -22,13 +21,13 @@ import type {
  */
 export interface RuleRequestDto {
     /**
-     * Name of the Rule
+     * Name of the rule
      * @type {string}
      * @memberof RuleRequestDto
      */
     name: string;
     /**
-     * Description of the Rule
+     * Description of the rule
      * @type {string}
      * @memberof RuleRequestDto
      */
@@ -39,29 +38,11 @@ export interface RuleRequestDto {
      */
     resource: Resource;
     /**
-     * Type of the Resource associated with the Rule
-     * @type {string}
-     * @memberof RuleRequestDto
-     */
-    resourceType?: string;
-    /**
-     * Format of the Resource associated with the Rule
-     * @type {string}
-     * @memberof RuleRequestDto
-     */
-    resourceFormat?: string;
-    /**
-     * List of conditions to add in the Rule
-     * @type {Array<RuleConditionRequestDto>}
-     * @memberof RuleRequestDto
-     */
-    conditions?: Array<RuleConditionRequestDto>;
-    /**
-     * List of UUIDs of existing condition groups to add in the Rule
+     * List of UUIDs of existing conditions to add to the rule
      * @type {Array<string>}
      * @memberof RuleRequestDto
      */
-    conditionGroupsUuids?: Array<string>;
+    conditionsUuids: Array<string>;
 }
 
 

@@ -17,37 +17,31 @@ import type {
 } from './';
 
 /**
- * List of the Rule Conditions in the Rule Condition Group
+ * List of the condition items to add to condition
  * @export
- * @interface RuleConditionDto
+ * @interface ConditionItemRequestDto
  */
-export interface RuleConditionDto {
-    /**
-     * UUID of the Rule Condition
-     * @type {string}
-     * @memberof RuleConditionDto
-     */
-    uuid: string;
+export interface ConditionItemRequestDto {
     /**
      * @type {FilterFieldSource}
-     * @memberof RuleConditionDto
+     * @memberof ConditionItemRequestDto
      */
     fieldSource: FilterFieldSource;
     /**
-     * Field identifier of the Rule Condition
+     * Field identifier of the condition item
      * @type {string}
-     * @memberof RuleConditionDto
+     * @memberof ConditionItemRequestDto
      */
     fieldIdentifier: string;
     /**
      * @type {FilterConditionOperator}
-     * @memberof RuleConditionDto
+     * @memberof ConditionItemRequestDto
      */
     operator: FilterConditionOperator;
     /**
-     * Value of the Rule Condition
+     * Value of the condition item
      * @type {object}
-     * @memberof RuleConditionDto
+     * @memberof ConditionItemRequestDto
      */
     value?: object;
 }

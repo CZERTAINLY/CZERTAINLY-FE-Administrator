@@ -12,44 +12,44 @@
  */
 
 import type {
+    ExecutionDto,
     Resource,
-    RuleActionDto,
 } from './';
 
 /**
  * @export
- * @interface RuleActionGroupDetailDto
+ * @interface ActionDetailDto
  */
-export interface RuleActionGroupDetailDto {
+export interface ActionDetailDto {
     /**
      * Object identifier
      * @type {string}
-     * @memberof RuleActionGroupDetailDto
+     * @memberof ActionDetailDto
      */
     uuid: string;
     /**
      * Object Name
      * @type {string}
-     * @memberof RuleActionGroupDetailDto
+     * @memberof ActionDetailDto
      */
     name: string;
     /**
-     * Description of the Rule Action Group
+     * Description of the action
      * @type {string}
-     * @memberof RuleActionGroupDetailDto
+     * @memberof ActionDetailDto
      */
     description?: string;
     /**
      * @type {Resource}
-     * @memberof RuleActionGroupDetailDto
+     * @memberof ActionDetailDto
      */
     resource: Resource;
     /**
-     * List of Rule Actions in the Rule Actions Group
-     * @type {Array<RuleActionDto>}
-     * @memberof RuleActionGroupDetailDto
+     * List of executions
+     * @type {Array<ExecutionDto>}
+     * @memberof ActionDetailDto
      */
-    actions: Array<RuleActionDto>;
+    executions: Array<ExecutionDto>;
 }
 
 

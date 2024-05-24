@@ -1,5 +1,5 @@
 import Widget from 'components/Widget';
-import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
+import { selectors as rulesSelectors } from 'ducks/rules';
 import { useCallback, useMemo } from 'react';
 import { Field, Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -12,7 +12,7 @@ import ConditionFormFilter from 'components/ConditionFormFilter';
 import ProgressButton from 'components/ProgressButton';
 import Select from 'react-select';
 import { Resource } from 'types/openapi';
-import { ActionRuleRequestModel } from 'types/rules';
+import { RuleRequestModel } from 'types/rules';
 import { isObjectSame } from 'utils/common-utils';
 import { useRuleEvaluatorResourceOptions } from 'utils/rules';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
@@ -27,16 +27,16 @@ export interface ActionGroupFormValues {
     selectedResource?: SelectChangeValue;
     resource: Resource;
     description?: string;
-    actions: Array<ActionRuleRequestModel>;
+    actions: Array<RuleRequestModel>;
 }
 
 const ActionGroupForm = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const title = 'Create Action Group';
-    const isCreatingActionGroup = useSelector(rulesSelectors.isCreatingActionGroup);
+    const isCreatingExecution = useSelector(rulesSelectors.isCreatingExecution);
     const { resourceOptionsWithRuleEvaluator, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
-    const isBusy = useMemo(() => isCreatingActionGroup || isFetchingResourcesList, [isCreatingActionGroup, isFetchingResourcesList]);
+    const isBusy = useMemo(() => isCreatingExecution || isFetchingResourcesList, [isCreatingExecution, isFetchingResourcesList]);
 
     const defaultValues: ActionGroupFormValues = useMemo(() => {
         return {
@@ -58,16 +58,17 @@ const ActionGroupForm = () => {
     const onSubmit = useCallback(
         (values: ActionGroupFormValues) => {
             if (values.resource === Resource.None) return;
-            dispatch(
-                rulesActions.createActionGroup({
-                    ruleActionGroupRequest: {
-                        actions: values.actions,
-                        name: values.name,
-                        description: values.description,
-                        resource: values.resource,
-                    },
-                }),
-            );
+            // dispatch(
+            //     rulesActions.createExecution({
+            //         executionRequestModel: {
+            //             // actions: values.actions,
+            //             items: values.actions,
+            //             name: values.name,
+            //             description: values.description,
+            //             resource: values.resource,
+            //         },
+            //     }),
+            // );
         },
         [dispatch],
     );
@@ -166,14 +167,14 @@ const ActionGroupForm = () => {
                                     title={submitTitle}
                                     inProgressTitle={inProgressTitle}
                                     inProgress={submitting}
-                                    disabled={
-                                        areDefaultValuesSame(values) ||
-                                        values.resource === Resource.None ||
-                                        submitting ||
-                                        !valid ||
-                                        isBusy ||
-                                        !values.actions.length
-                                    }
+                                    // disabled={
+                                    //     areDefaultValuesSame(values) ||
+                                    //     values.resource === Resource.None ||
+                                    //     submitting ||
+                                    //     !valid ||
+                                    //     isBusy ||
+                                    //     !values.actions.length
+                                    // }
                                 />
 
                                 <Button color="default" onClick={onCancel} disabled={submitting}>

@@ -12,44 +12,51 @@
  */
 
 import type {
+    ConditionItemDto,
+    ConditionType,
     Resource,
-    RuleConditionDto,
 } from './';
 
 /**
+ * List of conditions in the Rule
  * @export
- * @interface RuleConditionGroupDetailDto
+ * @interface ConditionDto
  */
-export interface RuleConditionGroupDetailDto {
+export interface ConditionDto {
     /**
      * Object identifier
      * @type {string}
-     * @memberof RuleConditionGroupDetailDto
+     * @memberof ConditionDto
      */
     uuid: string;
     /**
      * Object Name
      * @type {string}
-     * @memberof RuleConditionGroupDetailDto
+     * @memberof ConditionDto
      */
     name: string;
     /**
-     * Description of the Rule Condition Group
+     * Description of the condition
      * @type {string}
-     * @memberof RuleConditionGroupDetailDto
+     * @memberof ConditionDto
      */
     description?: string;
     /**
+     * @type {ConditionType}
+     * @memberof ConditionDto
+     */
+    type: ConditionType;
+    /**
      * @type {Resource}
-     * @memberof RuleConditionGroupDetailDto
+     * @memberof ConditionDto
      */
     resource: Resource;
     /**
-     * List of the Rule Conditions in the Rule Condition Group
-     * @type {Array<RuleConditionDto>}
-     * @memberof RuleConditionGroupDetailDto
+     * List of the condition items
+     * @type {Array<ConditionItemDto>}
+     * @memberof ConditionDto
      */
-    conditions: Array<RuleConditionDto>;
+    items: Array<ConditionItemDto>;
 }
 
 

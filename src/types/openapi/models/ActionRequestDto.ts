@@ -13,44 +13,36 @@
 
 import type {
     Resource,
-    RuleActionDto,
 } from './';
 
 /**
- * List of Action Groups in the Rule Trigger
  * @export
- * @interface RuleActionGroupDto
+ * @interface ActionRequestDto
  */
-export interface RuleActionGroupDto {
+export interface ActionRequestDto {
     /**
-     * Object identifier
+     * Name of the action
      * @type {string}
-     * @memberof RuleActionGroupDto
-     */
-    uuid: string;
-    /**
-     * Object Name
-     * @type {string}
-     * @memberof RuleActionGroupDto
+     * @memberof ActionRequestDto
      */
     name: string;
     /**
-     * Description of the Rule Action Group
+     * Description of the action
      * @type {string}
-     * @memberof RuleActionGroupDto
+     * @memberof ActionRequestDto
      */
     description?: string;
     /**
      * @type {Resource}
-     * @memberof RuleActionGroupDto
+     * @memberof ActionRequestDto
      */
     resource: Resource;
     /**
-     * List of Rule Actions in the Rule Actions Group
-     * @type {Array<RuleActionDto>}
-     * @memberof RuleActionGroupDto
+     * List of UUIDs of existing executions to add to the action
+     * @type {Array<string>}
+     * @memberof ActionRequestDto
      */
-    actions: Array<RuleActionDto>;
+    executionsUuids: Array<string>;
 }
 
 

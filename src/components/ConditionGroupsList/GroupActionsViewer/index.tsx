@@ -5,11 +5,11 @@ import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { Badge } from 'reactstrap';
 import { PlatformEnum } from 'types/openapi';
-import { ActionRuleModel } from 'types/rules';
+import { ExecutionItemModel } from 'types/rules';
 import styles from './groupActionsViewer.module.scss';
 
 interface ConditionsTableViewerProps {
-    groupActions: ActionRuleModel[];
+    groupActions: ExecutionItemModel[];
     conditionGroupName: string;
     conditionGroupUuid: string;
 }
@@ -17,7 +17,7 @@ interface ConditionsTableViewerProps {
 const GroupActionsViewer = ({ groupActions = [], conditionGroupName, conditionGroupUuid }: ConditionsTableViewerProps) => {
     const searchGroupEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.FilterFieldSource));
     const availableFilters = useSelector(selectors.availableFilters(EntityType.ACTIONS));
-    const RuleActionTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.RuleActionType));
+    const executionTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ExecutionType));
 
     const renderActionBadges = useMemo(() => {
         if (!groupActions) return null;
@@ -32,23 +32,23 @@ const GroupActionsViewer = ({ groupActions = [], conditionGroupName, conditionGr
             let value = '';
 
             if (Array.isArray(field?.value)) {
-                if (Array.isArray(f.actionData)) {
-                    const actionDataValue = f.actionData[0];
+                if (Array.isArray(f.data)) {
+                    const actionDataValue = f.data[0];
                     const coincideValue = field?.value.find((v) => v.uuid === actionDataValue);
                     value = coincideValue?.name || '';
                 }
             } else {
-                if (typeof f.actionData === 'string') {
-                    value = f.actionData;
+                if (typeof f.data === 'string') {
+                    value = f.data;
                 }
-                if (typeof f.actionData === 'object') {
-                    value = JSON.stringify(f.actionData);
+                if (typeof f.data === 'object') {
+                    value = JSON.stringify(f.data);
                 }
             }
 
             return (
-                <Badge className={styles.groupConditionBadge} key={f.uuid}>
-                    {getEnumLabel(RuleActionTypeEnum, f.actionType)}&nbsp;
+                <Badge className={styles.groupConditionBadge} key={i}>
+                    {/* {getEnumLabel(executionTypeEnum, f.actionType)}&nbsp; */}
                     <>
                         <b>{f?.fieldSource && getEnumLabel(searchGroupEnum, f?.fieldSource)}&nbsp;</b>'{label}
                         '&nbsp;to&nbsp;
@@ -57,7 +57,7 @@ const GroupActionsViewer = ({ groupActions = [], conditionGroupName, conditionGr
                 </Badge>
             );
         });
-    }, [groupActions, availableFilters, RuleActionTypeEnum, searchGroupEnum]);
+    }, [groupActions, availableFilters, executionTypeEnum, searchGroupEnum]);
 
     return (
         <div className={styles.groupConditionContainerDiv} key={conditionGroupUuid}>

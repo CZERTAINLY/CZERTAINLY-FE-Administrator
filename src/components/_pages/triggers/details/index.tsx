@@ -22,12 +22,12 @@ const TriggerDetails = () => {
     const eventNameEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ResourceEvent));
     const isFetchingTriggerDetail = useSelector(rulesSelectors.isFetchingTriggerDetail);
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
-    const actionGroups = useSelector(rulesSelectors.actionGroups);
+    const executions = useSelector(rulesSelectors.executions);
     const rules = useSelector(rulesSelectors.rules);
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [updateDescriptionEditEnable, setUpdateDescription] = useState<boolean>(false);
     const [updatedDescription, setUpdatedDescription] = useState('');
-    const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.RuleTriggerType));
+    const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.TriggerType));
 
     useEffect(() => {
         if (!triggerDetails?.description || triggerDetails.uuid !== id) return;
@@ -44,20 +44,20 @@ const TriggerDetails = () => {
     }, [getFreshDetails]);
 
     useEffect(() => {
-        dispatch(rulesActions.listActionGroups({ resource: triggerDetails?.resource }));
+        dispatch(rulesActions.listExecutions({ resource: triggerDetails?.resource }));
         dispatch(rulesActions.listRules({ resource: triggerDetails?.resource }));
     }, [triggerDetails, dispatch]);
 
     const isBusy = useMemo(() => isFetchingTriggerDetail || isUpdatingTrigger, [isFetchingTriggerDetail, isUpdatingTrigger]);
 
     const actionGroupOptions = useMemo(() => {
-        if (actionGroups === undefined) return [];
-        return actionGroups
-            .map((actionGroup) => {
-                return { value: actionGroup.uuid, label: actionGroup.name };
+        if (executions === undefined) return [];
+        return executions
+            .map((execution) => {
+                return { value: execution.uuid, label: execution.name };
             })
-            .filter((actionGroup) => !triggerDetails?.actionGroups?.map((actionGroup) => actionGroup.uuid).includes(actionGroup.value));
-    }, [actionGroups, triggerDetails]);
+            .filter((execution) => !triggerDetails?.actions?.map((action) => action.uuid).includes(execution.value));
+    }, [executions, triggerDetails]);
 
     const rulesOptions = useMemo(() => {
         if (triggerDetails === undefined) return [];
@@ -83,12 +83,18 @@ const TriggerDetails = () => {
                     triggerUuid: id,
                     trigger: {
                         description: updatedDescription,
-                        actions: triggerDetails?.actions || [],
-                        actionGroupsUuids: triggerDetails?.actionGroups?.length
-                            ? triggerDetails?.actionGroups.map((actionGroup) => actionGroup.uuid)
-                            : [],
-                        triggerType: triggerDetails.triggerType,
+                        // actions: triggerDetails?.actions || [],
+                        // actionGroupsUuids: triggerDetails?.actionGroups?.length
+                        //     ? triggerDetails?.actionGroups.map((actionGroup) => actionGroup.uuid)
+                        //     : [],
+                        // triggerType: triggerDetails.triggerType,
+                        ignoreTrigger: triggerDetails.ignoreTrigger,
+                        resource: triggerDetails.resource,
+                        type: triggerDetails.type,
+                        actionsUuids: triggerDetails?.actions.map((action) => action.uuid) || [],
                         rulesUuids: triggerDetails?.rules.map((rule) => rule.uuid) || [],
+                        // event: triggerDetails.event,
+                        // eventResource: triggerDetails.eventResource,
                     },
                 }),
             );
@@ -102,16 +108,16 @@ const TriggerDetails = () => {
 
             const newActionGroupsUuids = newValues.map((newActionGroup) => newActionGroup.value);
 
-            const previousAndNewActionGroupsUuid = triggerDetails?.actionGroups.map((actionGroup) => actionGroup.uuid);
+            const previousAndNewActionGroupsUuid = triggerDetails?.actions.map((action) => action.uuid);
             const allActionGroups = [...(previousAndNewActionGroupsUuid || []), ...newActionGroupsUuids];
-
             dispatch(
                 rulesActions.updateTrigger({
                     triggerUuid: id,
                     trigger: {
-                        actions: triggerDetails?.actions || [],
-                        actionGroupsUuids: allActionGroups,
-                        triggerType: triggerDetails.triggerType,
+                        actionsUuids: allActionGroups,
+                        ignoreTrigger: triggerDetails.ignoreTrigger,
+                        resource: triggerDetails.resource,
+                        type: triggerDetails.type,
                         rulesUuids: triggerDetails?.rules.map((rule) => rule.uuid) || [],
                         description: triggerDetails.description || '',
                     },
@@ -134,10 +140,14 @@ const TriggerDetails = () => {
                 rulesActions.updateTrigger({
                     triggerUuid: id,
                     trigger: {
-                        actions: triggerDetails?.actions || [],
+                        // actionsUuids: triggerDetails?.actionsUuids || [],
                         rulesUuids: allRules,
-                        actionGroupsUuids: triggerDetails?.actionGroups?.map((actionGroup) => actionGroup.uuid) || [],
-                        triggerType: triggerDetails.triggerType,
+                        ignoreTrigger: triggerDetails.ignoreTrigger,
+                        resource: triggerDetails.resource,
+                        type: triggerDetails.type,
+
+                        // actionGroupsUuids: triggerDetails?.actionGroups?.map((actionGroup) => actionGroup.uuid) || [],
+                        // triggerType: triggerDetails.triggerType,
                         description: triggerDetails.description || '',
                     },
                 }),
@@ -150,18 +160,22 @@ const TriggerDetails = () => {
         (actionGroupsUuid: string) => {
             if (!id || !triggerDetails) return;
 
-            const updatedActionGroupsUuid = triggerDetails?.actionGroups
+            const updatedActionGroupsUuid = triggerDetails?.actions
                 .filter((actionGroup) => actionGroup.uuid !== actionGroupsUuid)
                 .map((actionGroup) => actionGroup.uuid);
             dispatch(
                 rulesActions.updateTrigger({
                     triggerUuid: id,
                     trigger: {
-                        actions: triggerDetails?.actions || [],
+                        // actions: triggerDetails?.actions || [],
                         description: triggerDetails?.description || '',
-                        actionGroupsUuids: updatedActionGroupsUuid,
-                        triggerType: triggerDetails.triggerType,
+                        // actionUuids: updatedActionGroupsUuid,
+                        // triggerType: triggerDetails.triggerType,
                         rulesUuids: triggerDetails?.rules.map((rule) => rule.uuid) || [],
+                        ignoreTrigger: triggerDetails.ignoreTrigger,
+                        resource: triggerDetails.resource,
+                        type: triggerDetails.type,
+                        actionsUuids: updatedActionGroupsUuid,
                     },
                 }),
             );
@@ -179,11 +193,14 @@ const TriggerDetails = () => {
                 rulesActions.updateTrigger({
                     triggerUuid: id,
                     trigger: {
-                        actions: triggerDetails?.actions || [],
+                        // actions: triggerDetails?.actions || [],
                         rulesUuids: updatedRules,
-                        actionGroupsUuids: triggerDetails?.actionGroups?.map((actionGroup) => actionGroup.uuid) || [],
-                        triggerType: triggerDetails.triggerType,
+                        // actionGroupsUuids: triggerDetails?.actionGroups?.map((actionGroup) => actionGroup.uuid) || [],
+                        // triggerType: triggerDetails.triggerType,
                         description: triggerDetails.description || '',
+                        ignoreTrigger: triggerDetails.ignoreTrigger,
+                        resource: triggerDetails.resource,
+                        type: triggerDetails.type,
                     },
                 }),
             );
@@ -237,16 +254,16 @@ const TriggerDetails = () => {
                           id: 'triggerResource',
                           columns: [
                               'Trigger Resource',
-                              triggerDetails?.triggerResource ? getEnumLabel(resourceTypeEnum, triggerDetails.triggerResource) : '',
+                              triggerDetails?.eventResource ? getEnumLabel(resourceTypeEnum, triggerDetails.eventResource) : '',
                           ],
                       },
                       {
                           id: 'triggerType',
-                          columns: ['Trigger Type', getEnumLabel(triggerTypeEnum, triggerDetails.triggerType), ''],
+                          columns: ['Trigger Type', getEnumLabel(triggerTypeEnum, triggerDetails.type), ''],
                       },
                       {
                           id: 'eventName',
-                          columns: ['Event Name', getEnumLabel(eventNameEnum, triggerDetails.eventName || ''), ''],
+                          columns: ['Event Name', getEnumLabel(eventNameEnum, triggerDetails.event || ''), ''],
                       },
                       {
                           id: 'resource',
@@ -344,19 +361,16 @@ const TriggerDetails = () => {
     );
 
     const actionGroupsFieldsData: TableDataRow[] = useMemo(() => {
-        const isDeleteDisabled =
-            (triggerDetails?.actions?.length === 0 && triggerDetails?.actionGroups?.length == 1) ||
-            isUpdatingTrigger ||
-            isFetchingTriggerDetail;
+        const isDeleteDisabled = triggerDetails?.actions?.length === 0 || isUpdatingTrigger || isFetchingTriggerDetail;
 
-        const actionGroupData = !triggerDetails?.actionGroups.length
+        const actionGroupData = !triggerDetails?.actions.length
             ? []
-            : triggerDetails?.actionGroups.map((actionGroup) => {
+            : triggerDetails?.actions.map((action) => {
                   return {
-                      id: actionGroup.uuid,
+                      id: action.uuid,
                       columns: [
-                          <Link to={`../../actiongroups/detail/${actionGroup.uuid}`}>{actionGroup.name}</Link> || '',
-                          actionGroup.description || '',
+                          <Link to={`../../actiongroups/detail/${action.uuid}`}>{action.name}</Link> || '',
+                          action.description || '',
                           <Button
                               className="btn btn-link text-danger"
                               size="sm"
@@ -367,7 +381,7 @@ const TriggerDetails = () => {
                                       : 'Delete Action Group'
                               }
                               onClick={() => {
-                                  onDeleteActionGroup(actionGroup.uuid);
+                                  onDeleteActionGroup(action.uuid);
                               }}
                               disabled={isDeleteDisabled}
                           >
