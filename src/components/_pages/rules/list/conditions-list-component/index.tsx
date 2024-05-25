@@ -9,12 +9,11 @@ import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rule
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Select from 'react-select';
-import { Container } from 'reactstrap';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { useRuleEvaluatorResourceOptions } from 'utils/rules';
 import styles from './conditionGroupsList.module.scss';
 
-const ConditionGroups = () => {
+const ConditionsList = () => {
     const conditions = useSelector(rulesSelectors.conditions);
 
     const dispatch = useDispatch();
@@ -80,7 +79,7 @@ const ConditionGroups = () => {
                 return {
                     id: conditionGroup.uuid,
                     columns: [
-                        <Link to={`./detail/${conditionGroup.uuid}`}>{conditionGroup.name}</Link>,
+                        <Link to={`../conditions/detail/${conditionGroup.uuid}`}>{conditionGroup.name}</Link>,
                         getEnumLabel(resourceTypeEnum, conditionGroup.resource),
                         conditionGroup.description || '',
                     ],
@@ -115,7 +114,7 @@ const ConditionGroups = () => {
                 icon: 'plus',
                 disabled: false,
                 tooltip: 'Create',
-                onClick: () => navigate(`./add`),
+                onClick: () => navigate(`../conditions/add`),
             },
             {
                 icon: 'trash',
@@ -128,7 +127,7 @@ const ConditionGroups = () => {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <>
             <Widget
                 titleSize="larger"
                 title="Conditions"
@@ -164,8 +163,8 @@ const ConditionGroups = () => {
                     { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
-        </Container>
+        </>
     );
 };
 
-export default ConditionGroups;
+export default ConditionsList;

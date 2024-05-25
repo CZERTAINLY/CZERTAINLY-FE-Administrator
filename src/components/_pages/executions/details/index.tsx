@@ -11,7 +11,7 @@ import { useParams } from 'react-router-dom';
 import { Button, ButtonGroup, Col, Container, Input, Row } from 'reactstrap';
 import { PlatformEnum } from 'types/openapi';
 
-const ActionGroupDetails = () => {
+const ExecutionDetails = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
@@ -187,7 +187,7 @@ const ActionGroupDetails = () => {
                     <Widget
                         refreshAction={getFreshDetails}
                         busy={isBusy}
-                        title="Action Group Details"
+                        title="Execution Details"
                         titleSize="large"
                         widgetButtons={buttons}
                     >
@@ -210,4 +210,4 @@ const ActionGroupDetails = () => {
     );
 };
 
-export default ActionGroupDetails;
+export default ExecutionDetails;

@@ -108,12 +108,15 @@ import NotificationInstanceDetail from './_pages/notifications/notification-inst
 import NotificationInstanceForm from './_pages/notifications/notification-instance-form';
 import NotificationsSetting from './_pages/notifications/notifications-setting';
 
-import ConditionGroupDetails from './_pages/condition-groups/details';
-import ConditionGroupForm from './_pages/condition-groups/form';
-import ConditionGroupsList from './_pages/condition-groups/list';
+import ConditionDetails from './_pages/conditions/details';
+import ConditionForm from './_pages/conditions/form';
 
-import ActionGroupForm from './_pages/action-groups/form';
-import ActionGroupsList from './_pages/action-groups/list';
+import ExecutionDetails from './_pages/executions/details';
+import ExecutionForm from './_pages/executions/form';
+
+import ActionDetails from './_pages/actions/detail';
+import ActionForm from './_pages/actions/form';
+import ActionsList from './_pages/actions/list';
 
 import TriggerDetails from './_pages/triggers/details';
 import TriggerForm from './_pages/triggers/form';
@@ -123,7 +126,6 @@ import RuleDetails from './_pages/rules/detail';
 import RulesForm from './_pages/rules/form';
 import RulesList from './_pages/rules/list';
 
-import ActionGroupsDetails from './_pages/action-groups/details';
 import SchedulerJobDetail from './_pages/scheduler/detail';
 import SchedulerJobsList from './_pages/scheduler/list';
 import Layout from './Layout';
@@ -333,17 +335,19 @@ export default function AppRouter() {
                     <Route path={`/notificationinstances/add`} element={<NotificationInstanceForm />} />
                     <Route path={`/notificationinstances/edit/:id`} element={<NotificationInstanceForm />} />
 
-                    <Route path={`/conditions`} element={<ConditionGroupsList />} />
-                    <Route path={`/conditions/add`} element={<ConditionGroupForm />} />
-                    <Route path={`/conditions/detail/:id`} element={<ConditionGroupDetails />} />
+                    <Route path={`/conditions/add`} element={<ConditionForm />} />
+                    <Route path={`/conditions/detail/:id`} element={<ConditionDetails />} />
 
                     <Route path={`/rules/add`} element={<RulesForm />} />
-                    <Route path={`/rules`} element={<RulesList />} />
+                    <Route path={`/rules/:tabIndex?`} element={<RulesList />} />
                     <Route path={`/rules/detail/:id`} element={<RuleDetails />} />
 
-                    <Route path={`/executions/add`} element={<ActionGroupForm />} />
-                    <Route path={`/executions`} element={<ActionGroupsList />} />
-                    <Route path={`/executions/detail/:id`} element={<ActionGroupsDetails />} />
+                    <Route path={`/executions/add`} element={<ExecutionForm />} />
+                    <Route path={`/executions/detail/:id`} element={<ExecutionDetails />} />
+
+                    <Route path={`/actions/add`} element={<ActionForm />} />
+                    <Route path={`/actions/:tabIndex?`} element={<ActionsList />} />
+                    <Route path={`/actions/detail/:id`} element={<ActionDetails />} />
 
                     <Route path={`/triggers/add`} element={<TriggerForm />} />
                     <Route path={`/triggers`} element={<TriggerList />} />

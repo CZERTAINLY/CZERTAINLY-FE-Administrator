@@ -1,62 +1,84 @@
 import Widget from 'components/Widget';
-import { selectors as rulesSelectors } from 'ducks/rules';
-import { useCallback, useMemo } from 'react';
-import { Field, Form } from 'react-final-form';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+// import { EntityType, actions as filterActions } from 'ducks/filters';
+import { EntityType, actions as filterActions } from 'ducks/filters';
+import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
+
+import { Field, Form } from 'react-final-form';
 
 import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 
-import ConditionFormFilter from 'components/ConditionFormFilter';
 import ProgressButton from 'components/ProgressButton';
-import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import { actions as rulesActions } from 'ducks/rules';
 import Select from 'react-select';
-import { ExecutionType, PlatformEnum, Resource } from 'types/openapi';
-import { ExecutionItemRequestModel } from 'types/rules';
+import { Resource } from 'types/openapi';
 import { isObjectSame } from 'utils/common-utils';
 import { useRuleEvaluatorResourceOptions } from 'utils/rules';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
+// import ConditionFormFilter from '../ConditionFormFilter';
 
 interface SelectChangeValue {
     value: string;
     label: string;
 }
 
-export interface ActionGroupFormValues {
+export interface actionFormValues {
     name: string;
     selectedResource?: SelectChangeValue;
     resource: Resource;
     description?: string;
-    items: ExecutionItemRequestModel[];
-    selectedType?: SelectChangeValue;
-    type?: ExecutionType;
+    executionsUuids: SelectChangeValue[];
 }
 
-const ExecutionForm = () => {
+const ActionsForm = () => {
+    // const { id } = useParams();
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const title = 'Create Execution';
-    const isCreatingExecution = useSelector(rulesSelectors.isCreatingExecution);
+    const title = 'Create Action';
+
+    const executions = useSelector(rulesSelectors.executions);
+    const isCreatingRule = useSelector(rulesSelectors.isCreatingRule);
+    const isUpdatingRule = useSelector(rulesSelectors.isUpdatingRule);
+    const [selectedResourceState, setSelectedResourceState] = useState<SelectChangeValue>();
     const { resourceOptionsWithRuleEvaluator, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
-    const isBusy = useMemo(() => isCreatingExecution || isFetchingResourcesList, [isCreatingExecution, isFetchingResourcesList]);
-    const executionTyeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ExecutionType));
 
-    const executionTypeOptions = useMemo(() => {
-        return [{ value: ExecutionType.SetField, label: getEnumLabel(executionTyeEnum, ExecutionType.SetField) }];
-    }, [executionTyeEnum]);
+    const isBusy = useMemo(
+        () => isCreatingRule || isUpdatingRule || isFetchingResourcesList,
+        [isCreatingRule, isUpdatingRule, isFetchingResourcesList],
+    );
 
-    const defaultValues: ActionGroupFormValues = useMemo(() => {
+    const conditionsOptions = useMemo(() => {
+        if (executions === undefined) return [];
+        return executions.map((execution) => {
+            return { value: execution.uuid, label: execution.name };
+        });
+    }, [executions]);
+
+    useEffect(() => {
+        if (!selectedResourceState) return;
+        dispatch(rulesActions.listExecutions({ resource: selectedResourceState.value as Resource }));
+    }, [dispatch, selectedResourceState]);
+
+    // useEffect(() => {
+    //     if (!id) return;
+    //     dispatch(rulesActions.getAction({ actionUuid: id }));
+    // }, [id, dispatch]);
+
+    useEffect(() => {
+        return () => {
+            dispatch(filterActions.setCurrentFilters({ currentFilters: [], entity: EntityType.CONDITIONS }));
+        };
+    }, [dispatch]);
+
+    const defaultValues: actionFormValues = useMemo(() => {
         return {
             name: '',
             resource: Resource.None,
             selectedResource: undefined,
             description: undefined,
-            actions: [],
-            items: [],
-            selectedType: undefined,
-            type: undefined,
+            executionsUuids: [],
         };
     }, []);
 
@@ -68,17 +90,16 @@ const ExecutionForm = () => {
     }, [navigate]);
 
     const onSubmit = useCallback(
-        (values: ActionGroupFormValues) => {
-            if (values.resource === Resource.None || !values.type) return;
+        (values: actionFormValues) => {
+            if (values.resource === Resource.None) return;
             console.log('values', values);
             dispatch(
-                rulesActions.createExecution({
-                    executionRequestModel: {
-                        items: values.items,
-                        type: values.type,
-                        name: values.name,
+                rulesActions.createAction({
+                    action: {
                         description: values.description,
+                        name: values.name,
                         resource: values.resource,
+                        executionsUuids: values.executionsUuids.map((execution) => execution.value),
                     },
                 }),
             );
@@ -87,7 +108,7 @@ const ExecutionForm = () => {
     );
 
     const areDefaultValuesSame = useCallback(
-        (values: ActionGroupFormValues) => {
+        (values: actionFormValues) => {
             const areValuesSame = isObjectSame(
                 values as unknown as Record<string, unknown>,
                 defaultValues as unknown as Record<string, unknown>,
@@ -99,20 +120,20 @@ const ExecutionForm = () => {
 
     return (
         <Widget title={title} busy={isBusy}>
-            <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<ActionGroupFormValues>() }}>
+            <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<actionFormValues>() }}>
                 {({ handleSubmit, pristine, submitting, values, valid, form }) => (
                     <BootstrapForm onSubmit={handleSubmit}>
                         <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}>
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="name">Execution Name</Label>
+                                    <Label for="name">Action Name</Label>
 
                                     <Input
                                         {...input}
                                         valid={!meta.error && meta.touched}
                                         invalid={!!meta.error && meta.touched}
                                         type="text"
-                                        placeholder="Enter the Execution Name"
+                                        placeholder="Enter the Action Name"
                                     />
 
                                     <FormFeedback>{meta.error}</FormFeedback>
@@ -138,37 +159,6 @@ const ExecutionForm = () => {
                             )}
                         </Field>
 
-                        <Field name="selectedType" validate={validateRequired()}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="type">Execution Type</Label>
-
-                                    <Select
-                                        {...input}
-                                        options={executionTypeOptions}
-                                        placeholder="Select Execution Type"
-                                        onChange={(event) => {
-                                            input.onChange(event);
-                                            if (event?.value) {
-                                                form.change('type', event.value);
-                                            }
-                                        }}
-                                        styles={{
-                                            control: (provided) =>
-                                                meta.touched && meta.invalid
-                                                    ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
-                                                    : { ...provided },
-                                        }}
-                                        isClearable
-                                    />
-
-                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
-                                        {meta.error}
-                                    </div>
-                                </FormGroup>
-                            )}
-                        </Field>
-
                         <Field name="selectedResource" validate={validateRequired()}>
                             {({ input, meta }) => (
                                 <FormGroup>
@@ -180,12 +170,20 @@ const ExecutionForm = () => {
                                         menuPlacement="auto"
                                         options={resourceOptionsWithRuleEvaluator || []}
                                         placeholder="Select Resource"
+                                        isClearable
                                         onChange={(event) => {
                                             input.onChange(event);
                                             if (event?.value) {
                                                 form.change('resource', event.value);
+                                                setSelectedResourceState(event);
+                                            } else {
+                                                form.change('resource', undefined);
                                             }
-                                            form.change('items', []);
+
+                                            form.change('executionsUuids', []);
+                                            dispatch(
+                                                filterActions.setCurrentFilters({ currentFilters: [], entity: EntityType.CONDITIONS }),
+                                            );
                                         }}
                                         styles={{
                                             control: (provided) =>
@@ -193,7 +191,6 @@ const ExecutionForm = () => {
                                                     ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
                                                     : { ...provided },
                                         }}
-                                        isClearable
                                     />
 
                                     <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
@@ -203,7 +200,23 @@ const ExecutionForm = () => {
                             )}
                         </Field>
 
-                        {values?.resource && <ConditionFormFilter formType="cxecutionItem" resource={values.resource} />}
+                        <Field name="executionsUuids" validate={validateRequired()}>
+                            {({ input, meta }) => (
+                                <FormGroup>
+                                    <Label for="description">Executions</Label>
+
+                                    <Select
+                                        isDisabled={values.resource === Resource.None || !values.resource}
+                                        {...input}
+                                        options={conditionsOptions}
+                                        isMulti
+                                        placeholder="Select Executions"
+                                        isClearable
+                                    />
+                                </FormGroup>
+                            )}
+                        </Field>
+                        {/* {values?.resource && <ConditionFormFilter formType="conditionItem" resource={values.resource} />} */}
 
                         <div className="d-flex justify-content-end">
                             <ButtonGroup>
@@ -217,7 +230,7 @@ const ExecutionForm = () => {
                                         submitting ||
                                         !valid ||
                                         isBusy ||
-                                        !values.items.length
+                                        values.executionsUuids.length === 0
                                     }
                                 />
 
@@ -233,4 +246,4 @@ const ExecutionForm = () => {
     );
 };
 
-export default ExecutionForm;
+export default ActionsForm;

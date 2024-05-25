@@ -1,7 +1,7 @@
 import Widget from 'components/Widget';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 // import { EntityType, actions as filterActions } from 'ducks/filters';
 import { EntityType, actions as filterActions } from 'ducks/filters';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
@@ -26,7 +26,7 @@ interface SelectChangeValue {
     label: string;
 }
 
-export interface ConditionGroupFormValues {
+export interface ConditionFormValues {
     name: string;
     selectedResource?: SelectChangeValue;
     resource: Resource;
@@ -36,8 +36,8 @@ export interface ConditionGroupFormValues {
     items: ConditionItemModel[];
 }
 
-const ConditionGroupForm = () => {
-    const { id } = useParams();
+const ConditionForm = () => {
+    // const { id } = useParams();
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const title = 'Create Condition';
@@ -51,10 +51,10 @@ const ConditionGroupForm = () => {
         [isCreatingCondition, isUpdatingCondition, isFetchingResourcesList],
     );
 
-    useEffect(() => {
-        if (!id) return;
-        dispatch(rulesActions.getCondition({ conditionUuid: id }));
-    }, [id, dispatch]);
+    // useEffect(() => {
+    //     if (!id) return;
+    //     dispatch(rulesActions.getCondition({ conditionUuid: id }));
+    // }, [id, dispatch]);
 
     useEffect(() => {
         return () => {
@@ -62,7 +62,7 @@ const ConditionGroupForm = () => {
         };
     }, [dispatch]);
 
-    const defaultValues: ConditionGroupFormValues = useMemo(() => {
+    const defaultValues: ConditionFormValues = useMemo(() => {
         return {
             name: '',
             resource: Resource.None,
@@ -84,7 +84,7 @@ const ConditionGroupForm = () => {
     }, [navigate]);
 
     const onSubmit = useCallback(
-        (values: ConditionGroupFormValues) => {
+        (values: ConditionFormValues) => {
             if (values.resource === Resource.None || !values.type) return;
             dispatch(
                 rulesActions.createCondition({
@@ -103,7 +103,7 @@ const ConditionGroupForm = () => {
     );
 
     const areDefaultValuesSame = useCallback(
-        (values: ConditionGroupFormValues) => {
+        (values: ConditionFormValues) => {
             const areValuesSame = isObjectSame(
                 values as unknown as Record<string, unknown>,
                 defaultValues as unknown as Record<string, unknown>,
@@ -113,11 +113,11 @@ const ConditionGroupForm = () => {
         [defaultValues],
     );
 
-    if (id) return null;
+    // if (id) return null;
 
     return (
         <Widget title={title} busy={isBusy}>
-            <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<ConditionGroupFormValues>() }}>
+            <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<ConditionFormValues>() }}>
                 {({ handleSubmit, pristine, submitting, values, valid, form }) => (
                     <BootstrapForm onSubmit={handleSubmit}>
                         <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}>
@@ -247,4 +247,4 @@ const ConditionGroupForm = () => {
     );
 };
 
-export default ConditionGroupForm;
+export default ConditionForm;

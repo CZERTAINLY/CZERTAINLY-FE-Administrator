@@ -1,6 +1,10 @@
 import {
+    ActionDetailDto,
+    ActionDetailModel,
     ActionDto,
     ActionModel,
+    ActionRequestDto,
+    ActionRequestModel,
     ConditionDto,
     ConditionItemDto,
     ConditionItemModel,
@@ -29,6 +33,8 @@ import {
     TriggerModel,
     TriggerRequestDto,
     TriggerRequestModel,
+    UpdateActionRequestDto,
+    UpdateActionRequestModel,
     UpdateConditionRequestDto,
     UpdateConditionRequestModel,
     UpdateExecutionRequestDto,
@@ -170,5 +176,23 @@ export function transformUpdateTriggerRequestModelToDto(updateTriggerRequestMode
 export function transformUpdateRuleRequestModelToDto(updateRuleRequestModel: UpdateRuleRequestModel): UpdateRuleRequestDto {
     return {
         ...updateRuleRequestModel,
+    };
+}
+
+export function transformActionRequestModelToDto(actionRequestModel: ActionRequestModel): ActionRequestDto {
+    return {
+        ...actionRequestModel,
+    };
+}
+
+export function transformActionDetailDtoToModel(actionDetailDto: ActionDetailDto): ActionDetailModel {
+    return {
+        ...actionDetailDto,
+    };
+}
+
+export function transformUpdateActionRequestModelToDto(updateActionRequestModel: UpdateActionRequestModel): UpdateActionRequestDto {
+    return {
+        ...updateActionRequestModel,
     };
 }

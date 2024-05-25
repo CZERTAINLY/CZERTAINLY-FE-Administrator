@@ -9,12 +9,11 @@ import { actions as actionGroupsActions, selectors as rulesSelectors } from 'duc
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Select from 'react-select';
-import { Container } from 'reactstrap';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { useRuleEvaluatorResourceOptions } from 'utils/rules';
 import styles from './actionGroupsList.module.scss';
 
-const ActionGroupsList = () => {
+const ExecutionsList = () => {
     const executions = useSelector(rulesSelectors.executions);
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -77,7 +76,7 @@ const ActionGroupsList = () => {
                 return {
                     id: actionGroup.uuid,
                     columns: [
-                        <Link to={`./detail/${actionGroup.uuid}`}>{actionGroup.name}</Link>,
+                        <Link to={`../executions/detail/${actionGroup.uuid}`}>{actionGroup.name}</Link>,
                         getEnumLabel(resourceTypeEnum, actionGroup.resource),
                         actionGroup.description || '',
                     ],
@@ -112,7 +111,7 @@ const ActionGroupsList = () => {
                 icon: 'plus',
                 disabled: false,
                 tooltip: 'Create',
-                onClick: () => navigate(`./add`),
+                onClick: () => navigate(`../executions/add`),
             },
             {
                 icon: 'trash',
@@ -125,7 +124,7 @@ const ActionGroupsList = () => {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <>
             <Widget
                 titleSize="larger"
                 title="Executions"
@@ -161,8 +160,8 @@ const ActionGroupsList = () => {
                     { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
-        </Container>
+        </>
     );
 };
 
-export default ActionGroupsList;
+export default ExecutionsList;

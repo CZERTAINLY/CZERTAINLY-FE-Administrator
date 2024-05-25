@@ -140,7 +140,7 @@ export default function FilterWidgetRuleAction({
                     // actionType: a.actionType,
                     fieldSource: a.fieldSource,
                     fieldIdentifier: a.fieldIdentifier,
-                    actionData: Array.isArray(a.data)
+                    data: Array.isArray(a.data)
                         ? a.data.map((v) => {
                               if (typeof v === 'object' && v.hasOwnProperty('uuid')) {
                                   return v.uuid;
@@ -161,7 +161,7 @@ export default function FilterWidgetRuleAction({
                     // actionType: a.actionType,
                     fieldSource: a.fieldSource,
                     fieldIdentifier: a.fieldIdentifier,
-                    actionData: Array.isArray(a.data)
+                    data: Array.isArray(a.data)
                         ? a.data.map((v) => {
                               if (typeof v === 'object' && v.hasOwnProperty('uuid')) {
                                   return v.uuid;
@@ -387,7 +387,7 @@ export default function FilterWidgetRuleAction({
 
                 return {
                     ...action,
-                    actionData: updatedActionData,
+                    data: updatedActionData,
                 };
             } else return action;
         });

@@ -11,7 +11,7 @@ import { useParams } from 'react-router-dom';
 import { Button, ButtonGroup, Col, Container, Input, Row } from 'reactstrap';
 import { PlatformEnum } from 'types/openapi';
 
-const ConditionGroupDetails = () => {
+const ConditionDetails = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
@@ -184,7 +184,7 @@ const ConditionGroupDetails = () => {
         <Container className="themed-container" fluid>
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
                 <Col>
-                    <Widget refreshAction={getFreshDetails} busy={isBusy} title="Condition Group" titleSize="large" widgetButtons={buttons}>
+                    <Widget refreshAction={getFreshDetails} busy={isBusy} title="Condition" titleSize="large" widgetButtons={buttons}>
                         <CustomTable data={conditionGroupsDetailData} headers={tableHeader} />
                     </Widget>
                 </Col>
@@ -192,8 +192,8 @@ const ConditionGroupDetails = () => {
             <Row>{conditionDetails?.resource && <ConditionsViewer resource={conditionDetails.resource} formType="conditionGroup" />}</Row>
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete a Condition Group`}
-                body={`You are about to delete a Condition Group. Is this what you want to do?`}
+                caption={`Delete a Condition`}
+                body={`You are about to delete a Condition. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
@@ -204,4 +204,4 @@ const ConditionGroupDetails = () => {
     );
 };
 
-export default ConditionGroupDetails;
+export default ConditionDetails;

@@ -2,14 +2,14 @@ import { ApiClients } from 'api';
 import cx from 'classnames';
 import FilterWidget from 'components/FilterWidget';
 import FilterWidgetRuleAction from 'components/FilterWidgetRuleAction';
-import { ActionGroupFormValues } from 'components/_pages/action-groups/form';
+import { ExecutionFormValues } from 'components/_pages/executions/form';
 import { EntityType, actions as filterActions } from 'ducks/filters';
 import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-final-form';
 import { useDispatch } from 'react-redux';
 import { Resource } from 'types/openapi';
 import { filterToConditionItems } from 'utils/rules';
-import { ConditionGroupFormValues } from '../_pages/condition-groups/form';
+import { ConditionFormValues } from '../_pages/conditions/form';
 import styles from './conditionGroupForm.module.scss';
 type FormType = 'conditionItem' | 'cxecutionItem';
 interface ConditionGroupFormFilterProps {
@@ -19,8 +19,8 @@ interface ConditionGroupFormFilterProps {
 }
 
 const ConditionFormFilter = ({ resource, formType, includeIgnoreAction }: ConditionGroupFormFilterProps) => {
-    const form = useForm<ConditionGroupFormValues>();
-    const actionGroupForm = useForm<ActionGroupFormValues>();
+    const form = useForm<ConditionFormValues>();
+    const actionGroupForm = useForm<ExecutionFormValues>();
 
     const dispatch = useDispatch();
 

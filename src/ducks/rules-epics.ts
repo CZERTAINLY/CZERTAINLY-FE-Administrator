@@ -7,8 +7,11 @@ import { actions as alertActions } from './alerts';
 import { actions as appRedirectActions } from './app-redirect';
 
 import * as slice from './rules';
+import { transformActionDtoToModel } from './transform/auth';
 import {
     tranformExecutionRequestModelToDto,
+    transformActionDetailDtoToModel,
+    transformActionRequestModelToDto,
     transformConditionDtoToModel,
     transformConditionRequestModelToDto,
     transformExecutionDtoToModel,
@@ -18,6 +21,7 @@ import {
     transformTriggerDetailDtoToModel,
     transformTriggerDtoToModel,
     transformTriggerRequestModelToDto,
+    transformUpdateActionRequestModelToDto,
     transformUpdateConditionRequestModelToDto,
     transformUpdateExecutionRequestModelToDto,
     transformUpdateRuleRequestModelToDto,
@@ -31,7 +35,12 @@ const listRules: AppEpic = (action$, state, deps) => {
             deps.apiClients.rules.listRules({ resource: action.payload.resource }).pipe(
                 switchMap((rules) => of(slice.actions.listRulesSuccess({ rules: rules.map((rule) => transformRuleDtoToModel(rule)) }))),
 
-                catchError((err) => of(slice.actions.listRulesFailure({ error: extractError(err, 'Failed to get rules list') }))),
+                catchError((err) =>
+                    of(
+                        slice.actions.listRulesFailure({ error: extractError(err, 'Failed to get rules list') }),
+                        alertActions.error(extractError(err, 'Failed to get rules list')),
+                    ),
+                ),
             ),
         ),
     );
@@ -49,7 +58,30 @@ const listExecutions: AppEpic = (action$, state, deps) => {
                         }),
                     ),
                 ),
-                catchError((err) => of(slice.actions.listExecutionsFailure({ error: extractError(err, 'Failed to get Executions list') }))),
+                catchError((err) =>
+                    of(
+                        slice.actions.listExecutionsFailure({ error: extractError(err, 'Failed to get Executions list') }),
+                        alertActions.error(extractError(err, 'Failed to get Executions list')),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+const listActions: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.listActions.match),
+        switchMap((action) =>
+            deps.apiClients.actions.listActions({ resource: action.payload.resource }).pipe(
+                switchMap((actions) =>
+                    of(
+                        slice.actions.listActionsSuccess({
+                            actionsList: actions.map((action) => transformActionDtoToModel(action)),
+                        }),
+                    ),
+                ),
+                catchError((err) => of(slice.actions.listActionsFailure({ error: extractError(err, 'Failed to get actions list') }))),
             ),
         ),
     );
@@ -67,7 +99,12 @@ const listConditions: AppEpic = (action$, state, deps) => {
                         }),
                     ),
                 ),
-                catchError((err) => of(slice.actions.listConditionsFailure({ error: extractError(err, 'Failed to get conditions list') }))),
+                catchError((err) =>
+                    of(
+                        slice.actions.listConditionsFailure({ error: extractError(err, 'Failed to get conditions list') }),
+                        alertActions.error(extractError(err, 'Failed to get conditions list')),
+                    ),
+                ),
             ),
         ),
     );
@@ -85,7 +122,12 @@ const listTriggers: AppEpic = (action$, state, deps) => {
                         }),
                     ),
                 ),
-                catchError((err) => of(slice.actions.listTriggersFailure({ error: extractError(err, 'Failed to get triggers list') }))),
+                catchError((err) =>
+                    of(
+                        slice.actions.listTriggersFailure({ error: extractError(err, 'Failed to get triggers list') }),
+                        alertActions.error(extractError(err, 'Failed to get triggers list')),
+                    ),
+                ),
             ),
         ),
     );
@@ -107,9 +149,34 @@ const createExecution: AppEpic = (action$, state, deps) => {
                         ),
                     ),
                     catchError((err) =>
-                        of(slice.actions.createExecutionFailure({ error: extractError(err, 'Failed to create Execution') })),
+                        of(
+                            slice.actions.createExecutionFailure({ error: extractError(err, 'Failed to create Execution') }),
+                            alertActions.error(extractError(err, 'Failed to create Execution')),
+                        ),
                     ),
                 ),
+        ),
+    );
+};
+
+const createAction: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.createAction.match),
+        switchMap((action) =>
+            deps.apiClients.actions.createAction({ actionRequestDto: transformActionRequestModelToDto(action.payload.action) }).pipe(
+                switchMap((action) =>
+                    of(
+                        slice.actions.createActionSuccess({ action: transformActionDetailDtoToModel(action) }),
+                        appRedirectActions.redirect({ url: `../actions/detail/${action.uuid}` }),
+                    ),
+                ),
+                catchError((err) =>
+                    of(
+                        slice.actions.createActionFailure({ error: extractError(err, 'Failed to create action') }),
+                        alertActions.error(extractError(err, 'Failed to create action')),
+                    ),
+                ),
+            ),
         ),
     );
 };
@@ -132,7 +199,10 @@ const createCondition: AppEpic = (action$, state, deps) => {
                         ),
                     ),
                     catchError((err) =>
-                        of(slice.actions.createConditionFailure({ error: extractError(err, 'Failed to create condition') })),
+                        of(
+                            slice.actions.createConditionFailure({ error: extractError(err, 'Failed to create condition') }),
+                            alertActions.error(extractError(err, 'Failed to create condition')),
+                        ),
                     ),
                 ),
         ),
@@ -149,7 +219,12 @@ const createRule: AppEpic = (action$, state, deps) => {
                         appRedirectActions.redirect({ url: `../rules/detail/${rule.uuid}` }),
                     ),
                 ),
-                catchError((err) => of(slice.actions.createRuleFailure({ error: extractError(err, 'Failed to create rule') }))),
+                catchError((err) =>
+                    of(
+                        slice.actions.createRuleFailure({ error: extractError(err, 'Failed to create rule') }),
+                        alertActions.error(extractError(err, 'Failed to create rule')),
+                    ),
+                ),
             ),
         ),
     );
@@ -169,7 +244,6 @@ const createTrigger: AppEpic = (action$, state, deps) => {
                 catchError((err) =>
                     of(
                         slice.actions.createTriggerFailure({ error: extractError(err, 'Failed to create trigger') }),
-
                         alertActions.error(extractError(err, 'Failed to create trigger')),
                     ),
                 ),
@@ -186,10 +260,15 @@ const deleteExecution: AppEpic = (action$, state, deps) => {
                 switchMap(() =>
                     of(
                         slice.actions.deleteExecutionSuccess({ executionUuid: action.payload.executionUuid }),
-                        appRedirectActions.redirect({ url: `../../executions` }),
+                        appRedirectActions.redirect({ url: `../../actions` }),
                     ),
                 ),
-                catchError((err) => of(slice.actions.deleteExecutionFailure({ error: extractError(err, 'Failed to delete Execution') }))),
+                catchError((err) =>
+                    of(
+                        slice.actions.deleteExecutionFailure({ error: extractError(err, 'Failed to delete Execution') }),
+                        alertActions.error(extractError(err, 'Failed to delete Execution')),
+                    ),
+                ),
             ),
         ),
     );
@@ -203,10 +282,15 @@ const deleteCondition: AppEpic = (action$, state, deps) => {
                 switchMap(() =>
                     of(
                         slice.actions.deleteConditionSuccess({ conditionUuid: action.payload.conditionUuid }),
-                        appRedirectActions.redirect({ url: `../../conditions` }),
+                        appRedirectActions.redirect({ url: `../../rules` }),
                     ),
                 ),
-                catchError((err) => of(slice.actions.deleteConditionFailure({ error: extractError(err, 'Failed to delete condition') }))),
+                catchError((err) =>
+                    of(
+                        slice.actions.deleteConditionFailure({ error: extractError(err, 'Failed to delete condition') }),
+                        alertActions.error(extractError(err, 'Failed to delete condition')),
+                    ),
+                ),
             ),
         ),
     );
@@ -223,7 +307,12 @@ const deleteRule: AppEpic = (action$, state, deps) => {
                         appRedirectActions.redirect({ url: `../rules` }),
                     ),
                 ),
-                catchError((err) => of(slice.actions.deleteRuleFailure({ error: extractError(err, 'Failed to delete rule') }))),
+                catchError((err) =>
+                    of(
+                        slice.actions.deleteRuleFailure({ error: extractError(err, 'Failed to delete rule') }),
+                        alertActions.error(extractError(err, 'Failed to delete rule')),
+                    ),
+                ),
             ),
         ),
     );
@@ -240,7 +329,12 @@ const deleteTrigger: AppEpic = (action$, state, deps) => {
                         appRedirectActions.redirect({ url: `../../triggers` }),
                     ),
                 ),
-                catchError((err) => of(slice.actions.deleteTriggerFailure({ error: extractError(err, 'Failed to delete trigger') }))),
+                catchError((err) =>
+                    of(
+                        slice.actions.deleteTriggerFailure({ error: extractError(err, 'Failed to delete trigger') }),
+                        alertActions.error(extractError(err, 'Failed to delete trigger')),
+                    ),
+                ),
             ),
         ),
     );
@@ -252,7 +346,29 @@ const getExecution: AppEpic = (action$, state, deps) => {
         switchMap((action) =>
             deps.apiClients.actions.getExecution({ executionUuid: action.payload.executionUuid }).pipe(
                 switchMap((actionGroup) => of(slice.actions.getExecutionSuccess({ execution: transformExecutionDtoToModel(actionGroup) }))),
-                catchError((err) => of(slice.actions.getExecutionFailure({ error: extractError(err, 'Failed to get Execution') }))),
+                catchError((err) =>
+                    of(
+                        (slice.actions.getExecutionFailure({ error: extractError(err, 'Failed to get Execution') }),
+                        alertActions.error(extractError(err, 'Failed to get Execution'))),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+const getAction: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.getAction.match),
+        switchMap((action) =>
+            deps.apiClients.actions.getAction({ actionUuid: action.payload.actionUuid }).pipe(
+                switchMap((actionGroup) => of(slice.actions.getActionSuccess({ action: transformActionDetailDtoToModel(actionGroup) }))),
+                catchError((err) =>
+                    of(
+                        slice.actions.getActionFailure({ error: extractError(err, 'Failed to get Action') }),
+                        alertActions.error(extractError(err, 'Failed to get Action')),
+                    ),
+                ),
             ),
         ),
     );
@@ -270,7 +386,12 @@ const getCondition: AppEpic = (action$, state, deps) => {
                         }),
                     ),
                 ),
-                catchError((err) => of(slice.actions.getConditionFailure({ error: extractError(err, 'Failed to get Condition') }))),
+                catchError((err) =>
+                    of(
+                        slice.actions.getConditionFailure({ error: extractError(err, 'Failed to get Condition') }),
+                        alertActions.error(extractError(err, 'Failed to get Condition')),
+                    ),
+                ),
             ),
         ),
     );
@@ -282,7 +403,12 @@ const getRule: AppEpic = (action$, state, deps) => {
         switchMap((action) =>
             deps.apiClients.rules.getRule({ ruleUuid: action.payload.ruleUuid }).pipe(
                 switchMap((rule) => of(slice.actions.getRuleSuccess({ rule: transformRuleDetailDtoToModel(rule) }))),
-                catchError((err) => of(slice.actions.getRuleFailure({ error: extractError(err, 'Failed to get rule') }))),
+                catchError((err) =>
+                    of(
+                        slice.actions.getRuleFailure({ error: extractError(err, 'Failed to get rule') }),
+                        alertActions.error(extractError(err, 'Failed to get rule')),
+                    ),
+                ),
             ),
         ),
     );
@@ -294,7 +420,12 @@ const getTrigger: AppEpic = (action$, state, deps) => {
         switchMap((action) =>
             deps.apiClients.triggers.getTrigger({ triggerUuid: action.payload.triggerUuid }).pipe(
                 switchMap((trigger) => of(slice.actions.getTriggerSuccess({ trigger: transformTriggerDetailDtoToModel(trigger) }))),
-                catchError((err) => of(slice.actions.getTriggerFailure({ error: extractError(err, 'Failed to get trigger') }))),
+                catchError((err) =>
+                    of(
+                        slice.actions.getTriggerFailure({ error: extractError(err, 'Failed to get trigger') }),
+                        alertActions.error(extractError(err, 'Failed to get trigger')),
+                    ),
+                ),
             ),
         ),
     );
@@ -322,6 +453,36 @@ const updateExecution: AppEpic = (action$, state, deps) => {
                             slice.actions.updateExecutionFailure({ error: extractError(err, 'Failed to update action group') }),
                             alertActions.error(extractError(err, 'Failed to update action group')),
                             slice.actions.getExecution({ executionUuid: action.payload.executionUuid }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
+const updateAction: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.updateAction.match),
+        switchMap((action) =>
+            deps.apiClients.actions
+                .updateAction({
+                    actionUuid: action.payload.actionUuid,
+                    updateActionRequestDto: transformUpdateActionRequestModelToDto(action.payload.action),
+                })
+                .pipe(
+                    switchMap((action) =>
+                        of(
+                            slice.actions.updateActionSuccess({
+                                action: transformActionDetailDtoToModel(action),
+                            }),
+                            appRedirectActions.redirect({ url: `../actions/detail/${action.uuid}` }),
+                        ),
+                    ),
+                    catchError((err) =>
+                        of(
+                            slice.actions.updateActionFailure({ error: extractError(err, 'Failed to update action group') }),
+                            alertActions.error(extractError(err, 'Failed to update action group')),
+                            slice.actions.getAction({ actionUuid: action.payload.actionUuid }),
                         ),
                     ),
                 ),
@@ -415,18 +576,22 @@ const epics = [
     listExecutions,
     listConditions,
     listTriggers,
+    listActions,
     createExecution,
     createCondition,
     createRule,
+    createAction,
     createTrigger,
     deleteExecution,
     deleteCondition,
     deleteRule,
     deleteTrigger,
     getExecution,
+    getAction,
     getCondition,
     getRule,
     getTrigger,
+    updateAction,
     updateExecution,
     updateCondition,
     updateRule,

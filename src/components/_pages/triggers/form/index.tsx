@@ -31,16 +31,6 @@ interface SelectedEventValue {
 }
 
 export interface TriggerFormValues {
-    // name: values.name,
-    // description: values.description,
-    // resource: values.resource,
-    // ignoreTrigger: values.ignoreTrigger || false,
-    // actionsUuids: values.actionsUuids.map((action) => action.value),
-    // event: values?.eventName,
-    // rulesUuids: values.rulesUuids.map((rule) => rule.value),
-    // eventResource: values.eventResource,
-    // type: values.triggerType,
-
     name: string;
     description?: string;
     selectedResource?: SelectChangeValue;
@@ -63,7 +53,7 @@ const TriggerForm = () => {
     const title = 'Create Trigger';
 
     const ruleTriggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.TriggerType));
-    const executions = useSelector(rulesSelectors.executions);
+    const actionsList = useSelector(rulesSelectors.actionsList);
     const resourceEvents = useSelector(resourceSelectors.resourceEvents);
     const rules = useSelector(rulesSelectors.rules);
     const isCreatingTrigger = useSelector(rulesSelectors.isCreatingTrigger);
@@ -87,11 +77,11 @@ const TriggerForm = () => {
     }, [dispatch]);
 
     const actionsOptions = useMemo(() => {
-        if (executions === undefined) return [];
-        return executions.map((conditionGroup) => {
+        if (actionsList === undefined) return [];
+        return actionsList.map((conditionGroup) => {
             return { value: conditionGroup.uuid, label: conditionGroup.name };
         });
-    }, [executions]);
+    }, [actionsList]);
 
     const rulesOptions = useMemo(() => {
         if (rules === undefined) return [];
@@ -113,7 +103,7 @@ const TriggerForm = () => {
 
     const fetchActions = useCallback(
         (resource: Resource) => {
-            dispatch(rulesActions.listExecutions({ resource: resource }));
+            dispatch(rulesActions.listActions({ resource: resource }));
         },
         [dispatch],
     );
@@ -255,31 +245,6 @@ const TriggerForm = () => {
                             )}
                         </Field>
 
-                        <Field name="ignoreTrigger" type="checkbox">
-                            {({ input }) => (
-                                <FormGroup className="pt-2 ps-0 mb-3" check>
-                                    <div className="d-flex">
-                                        <Label check>Ignore Trigger</Label>
-                                        <Input
-                                            className="ms-2 mt-1"
-                                            {...input}
-                                            type="checkbox"
-                                            checked={values.ignoreTrigger}
-                                            onClick={(event) => {
-                                                if (event.target) {
-                                                    const isChecked = (event.target as HTMLInputElement).checked;
-                                                    if (isChecked) {
-                                                        form.change('actionsUuids', []);
-                                                        // form.change('rulesUuids', []);
-                                                    }
-                                                }
-                                            }}
-                                        />
-                                    </div>
-                                </FormGroup>
-                            )}
-                        </Field>
-
                         <Field name="selectedTriggerResource" validate={validateRequired()}>
                             {({ input, meta }) => (
                                 <FormGroup>
@@ -335,14 +300,14 @@ const TriggerForm = () => {
                             <Field name="selectedEvent" validate={validateRequired()}>
                                 {({ input, meta }) => (
                                     <FormGroup>
-                                        <Label for="selectedEvent">Event Name</Label>
+                                        <Label for="selectedEvent">Event</Label>
 
                                         <Select
                                             {...input}
                                             maxMenuHeight={140}
                                             menuPlacement="auto"
                                             options={resourceEventNameOptions || []}
-                                            placeholder="Select Event Name"
+                                            placeholder="Select Event"
                                             isClearable
                                             onChange={(event) => {
                                                 if (!event?.value) return;
@@ -369,6 +334,30 @@ const TriggerForm = () => {
                                 )}
                             </Field>
                         )}
+
+                        <Field name="ignoreTrigger" type="checkbox">
+                            {({ input }) => (
+                                <FormGroup className="pt-2 ps-0 mb-3" check>
+                                    <div className="d-flex">
+                                        <Label check>Ignore Trigger</Label>
+                                        <Input
+                                            className="ms-2 mt-1"
+                                            {...input}
+                                            type="checkbox"
+                                            checked={values.ignoreTrigger}
+                                            onClick={(event) => {
+                                                if (event.target) {
+                                                    const isChecked = (event.target as HTMLInputElement).checked;
+                                                    if (isChecked) {
+                                                        form.change('actionsUuids', []);
+                                                    }
+                                                }
+                                            }}
+                                        />
+                                    </div>
+                                </FormGroup>
+                            )}
+                        </Field>
 
                         <Field name="selectedResource">
                             {({ input, meta }) => (

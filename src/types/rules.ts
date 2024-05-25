@@ -17,6 +17,7 @@ import type {
     TriggerDetailDto as TriggerDetailDtoApi,
     TriggerDto as TriggerDtoApi,
     TriggerRequestDto as TriggerRequestDtoApi,
+    UpdateActionRequestDto as UpdateActionRequestDtoApi,
     UpdateConditionRequestDto as UpdateConditionRequestDtoApi,
     UpdateExecutionRequestDto as UpdateExecutionRequestDtoApi,
     UpdateRuleRequestDto as UpdateRuleRequestDtoApi,
@@ -107,3 +108,6 @@ export type ActionDetailDto = ActionDetailDtoApi;
 export type ActionDetailModel = Omit<ActionDetailDto, 'executions'> & {
     executions: Array<ExecutionModel>;
 };
+
+export type UpdateActionRequestDto = UpdateActionRequestDtoApi;
+export type UpdateActionRequestModel = UpdateActionRequestDto;
