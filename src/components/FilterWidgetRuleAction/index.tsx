@@ -445,7 +445,7 @@ export default function FilterWidgetRuleAction({
                 <div id="unselectFilters" onClick={onUnselectFiltersClick}>
                     <div style={{ width: '99%', borderBottom: 'solid 1px silver', marginBottom: '1rem' }}>
                         <Row>
-                            <Col>
+                            {/* <Col>
                                 <FormGroup>
                                     <Label for="actions">Action Type</Label>
                                     <Select
@@ -461,7 +461,7 @@ export default function FilterWidgetRuleAction({
                                         isDisabled={!selectedFilter.isEditEnabled}
                                     />
                                 </FormGroup>
-                            </Col>
+                            </Col> */}
                             <Col>
                                 <FormGroup>
                                     <Label for="group">Field Source</Label>

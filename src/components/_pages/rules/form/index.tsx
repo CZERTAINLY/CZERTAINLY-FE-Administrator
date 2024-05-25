@@ -11,11 +11,9 @@ import { Field, Form } from 'react-final-form';
 import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 
-import ConditionFormFilter from 'components/ConditionFormFilter';
 import ProgressButton from 'components/ProgressButton';
 import Select from 'react-select';
 import { Resource } from 'types/openapi';
-import { ConditionItemModel } from 'types/rules';
 import { isObjectSame } from 'utils/common-utils';
 import { useRuleEvaluatorResourceOptions } from 'utils/rules';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
@@ -26,16 +24,15 @@ interface SelectChangeValue {
     label: string;
 }
 
-export interface ConditionGroupFormValues {
+export interface ruleFormValues {
     name: string;
     selectedResource?: SelectChangeValue;
     resource: Resource;
     description?: string;
-    conditions: ConditionItemModel[];
-    conditionGroupsUuids: SelectChangeValue[];
+    conditionsUuids: SelectChangeValue[];
 }
 
-const ConditionGroupForm = () => {
+const RulesForm = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -53,10 +50,10 @@ const ConditionGroupForm = () => {
         [isCreatingRule, isUpdatingRule, isFetchingResourcesList],
     );
 
-    const conditionGroupsOptions = useMemo(() => {
+    const conditionsOptions = useMemo(() => {
         if (conditions === undefined) return [];
-        return conditions.map((conditionGroup) => {
-            return { value: conditionGroup.uuid, label: conditionGroup.name };
+        return conditions.map((condition) => {
+            return { value: condition.uuid, label: condition.name };
         });
     }, [conditions]);
 
@@ -76,14 +73,15 @@ const ConditionGroupForm = () => {
         };
     }, [dispatch]);
 
-    const defaultValues: ConditionGroupFormValues = useMemo(() => {
+    const defaultValues: ruleFormValues = useMemo(() => {
         return {
             name: '',
             resource: Resource.None,
             selectedResource: undefined,
             description: undefined,
-            conditions: [],
-            conditionGroupsUuids: [],
+            // conditions: [],
+            // conditionGroupsUuids: [],
+            conditionsUuids: [],
         };
     }, []);
 
@@ -95,25 +93,25 @@ const ConditionGroupForm = () => {
     }, [navigate]);
 
     const onSubmit = useCallback(
-        (values: ConditionGroupFormValues) => {
+        (values: ruleFormValues) => {
             if (values.resource === Resource.None) return;
-            // dispatch(
-            //     rulesActions.createRule({
-            //         rule: {
-            //             conditionGroupsUuids: values.conditionGroupsUuids.map((uuid) => uuid.value),
-            //             conditions: values.conditions,
-            //             description: values.description,
-            //             name: values.name,
-            //             resource: values.resource,
-            //         },
-            //     }),
-            // );
+            console.log('values', values);
+            dispatch(
+                rulesActions.createRule({
+                    rule: {
+                        description: values.description,
+                        name: values.name,
+                        resource: values.resource,
+                        conditionsUuids: values.conditionsUuids.map((condition) => condition.value),
+                    },
+                }),
+            );
         },
         [dispatch],
     );
 
     const areDefaultValuesSame = useCallback(
-        (values: ConditionGroupFormValues) => {
+        (values: ruleFormValues) => {
             const areValuesSame = isObjectSame(
                 values as unknown as Record<string, unknown>,
                 defaultValues as unknown as Record<string, unknown>,
@@ -125,7 +123,7 @@ const ConditionGroupForm = () => {
 
     return (
         <Widget title={title} busy={isBusy}>
-            <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<ConditionGroupFormValues>() }}>
+            <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<ruleFormValues>() }}>
                 {({ handleSubmit, pristine, submitting, values, valid, form }) => (
                     <BootstrapForm onSubmit={handleSubmit}>
                         <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}>
@@ -185,7 +183,7 @@ const ConditionGroupForm = () => {
                                                 form.change('resource', undefined);
                                             }
 
-                                            form.change('conditions', []);
+                                            form.change('conditionsUuids', []);
                                             dispatch(
                                                 filterActions.setCurrentFilters({ currentFilters: [], entity: EntityType.CONDITIONS }),
                                             );
@@ -205,23 +203,23 @@ const ConditionGroupForm = () => {
                             )}
                         </Field>
 
-                        <Field name="conditionGroupsUuids">
+                        <Field name="conditionsUuids" validate={validateRequired()}>
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="description">Condition Groups</Label>
+                                    <Label for="description">Condition</Label>
 
                                     <Select
                                         isDisabled={values.resource === Resource.None || !values.resource}
                                         {...input}
-                                        options={conditionGroupsOptions}
+                                        options={conditionsOptions}
                                         isMulti
-                                        placeholder="Select Condition Group"
+                                        placeholder="Select Conditions"
                                         isClearable
                                     />
                                 </FormGroup>
                             )}
                         </Field>
-                        {values?.resource && <ConditionFormFilter formType="conditions" resource={values.resource} />}
+                        {/* {values?.resource && <ConditionFormFilter formType="conditionItem" resource={values.resource} />} */}
 
                         <div className="d-flex justify-content-end">
                             <ButtonGroup>
@@ -235,7 +233,7 @@ const ConditionGroupForm = () => {
                                         submitting ||
                                         !valid ||
                                         isBusy ||
-                                        (values.conditions.length === 0 && values.conditionGroupsUuids.length === 0)
+                                        values.conditionsUuids.length === 0
                                     }
                                 />
 
@@ -251,4 +249,4 @@ const ConditionGroupForm = () => {
     );
 };
 
-export default ConditionGroupForm;
+export default RulesForm;

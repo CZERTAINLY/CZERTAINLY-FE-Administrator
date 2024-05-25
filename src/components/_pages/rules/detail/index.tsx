@@ -318,7 +318,7 @@ const RuleDetails = () => {
                         widgetInfoCard={{
                             title: 'Information',
                             description:
-                                'Condition group is named set of conditions for selected resource that can be reused in rules of same resource',
+                                'Condition is named set of conditions for selected resource that can be reused in rules of same resource',
                         }}
                     >
                         <CustomTable

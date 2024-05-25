@@ -10,9 +10,11 @@ import { mutators } from 'utils/attributes/attributeEditorMutators';
 
 import ConditionFormFilter from 'components/ConditionFormFilter';
 import ProgressButton from 'components/ProgressButton';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { actions as rulesActions } from 'ducks/rules';
 import Select from 'react-select';
-import { Resource } from 'types/openapi';
-import { RuleRequestModel } from 'types/rules';
+import { ExecutionType, PlatformEnum, Resource } from 'types/openapi';
+import { ExecutionItemRequestModel } from 'types/rules';
 import { isObjectSame } from 'utils/common-utils';
 import { useRuleEvaluatorResourceOptions } from 'utils/rules';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
@@ -27,16 +29,23 @@ export interface ActionGroupFormValues {
     selectedResource?: SelectChangeValue;
     resource: Resource;
     description?: string;
-    actions: Array<RuleRequestModel>;
+    items: ExecutionItemRequestModel[];
+    selectedType?: SelectChangeValue;
+    type?: ExecutionType;
 }
 
-const ActionGroupForm = () => {
+const ExecutionForm = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const title = 'Create Action Group';
+    const title = 'Create Execution';
     const isCreatingExecution = useSelector(rulesSelectors.isCreatingExecution);
     const { resourceOptionsWithRuleEvaluator, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
     const isBusy = useMemo(() => isCreatingExecution || isFetchingResourcesList, [isCreatingExecution, isFetchingResourcesList]);
+    const executionTyeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ExecutionType));
+
+    const executionTypeOptions = useMemo(() => {
+        return [{ value: ExecutionType.SetField, label: getEnumLabel(executionTyeEnum, ExecutionType.SetField) }];
+    }, [executionTyeEnum]);
 
     const defaultValues: ActionGroupFormValues = useMemo(() => {
         return {
@@ -45,6 +54,9 @@ const ActionGroupForm = () => {
             selectedResource: undefined,
             description: undefined,
             actions: [],
+            items: [],
+            selectedType: undefined,
+            type: undefined,
         };
     }, []);
 
@@ -57,18 +69,19 @@ const ActionGroupForm = () => {
 
     const onSubmit = useCallback(
         (values: ActionGroupFormValues) => {
-            if (values.resource === Resource.None) return;
-            // dispatch(
-            //     rulesActions.createExecution({
-            //         executionRequestModel: {
-            //             // actions: values.actions,
-            //             items: values.actions,
-            //             name: values.name,
-            //             description: values.description,
-            //             resource: values.resource,
-            //         },
-            //     }),
-            // );
+            if (values.resource === Resource.None || !values.type) return;
+            console.log('values', values);
+            dispatch(
+                rulesActions.createExecution({
+                    executionRequestModel: {
+                        items: values.items,
+                        type: values.type,
+                        name: values.name,
+                        description: values.description,
+                        resource: values.resource,
+                    },
+                }),
+            );
         },
         [dispatch],
     );
@@ -92,14 +105,14 @@ const ActionGroupForm = () => {
                         <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}>
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="name">Action Group Name</Label>
+                                    <Label for="name">Execution Name</Label>
 
                                     <Input
                                         {...input}
                                         valid={!meta.error && meta.touched}
                                         invalid={!!meta.error && meta.touched}
                                         type="text"
-                                        placeholder="Enter the Action Group Name"
+                                        placeholder="Enter the Execution Name"
                                     />
 
                                     <FormFeedback>{meta.error}</FormFeedback>
@@ -125,23 +138,20 @@ const ActionGroupForm = () => {
                             )}
                         </Field>
 
-                        <Field name="selectedResource" validate={validateRequired()}>
+                        <Field name="selectedType" validate={validateRequired()}>
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="resource">Resource</Label>
+                                    <Label for="type">Execution Type</Label>
 
                                     <Select
                                         {...input}
-                                        maxMenuHeight={140}
-                                        menuPlacement="auto"
-                                        options={resourceOptionsWithRuleEvaluator || []}
-                                        placeholder="Select Resource"
+                                        options={executionTypeOptions}
+                                        placeholder="Select Execution Type"
                                         onChange={(event) => {
                                             input.onChange(event);
                                             if (event?.value) {
-                                                form.change('resource', event.value);
+                                                form.change('type', event.value);
                                             }
-                                            form.change('actions', []);
                                         }}
                                         styles={{
                                             control: (provided) =>
@@ -159,7 +169,41 @@ const ActionGroupForm = () => {
                             )}
                         </Field>
 
-                        {values?.resource && <ConditionFormFilter formType="actions" resource={values.resource} />}
+                        <Field name="selectedResource" validate={validateRequired()}>
+                            {({ input, meta }) => (
+                                <FormGroup>
+                                    <Label for="resource">Resource</Label>
+
+                                    <Select
+                                        {...input}
+                                        maxMenuHeight={140}
+                                        menuPlacement="auto"
+                                        options={resourceOptionsWithRuleEvaluator || []}
+                                        placeholder="Select Resource"
+                                        onChange={(event) => {
+                                            input.onChange(event);
+                                            if (event?.value) {
+                                                form.change('resource', event.value);
+                                            }
+                                            form.change('items', []);
+                                        }}
+                                        styles={{
+                                            control: (provided) =>
+                                                meta.touched && meta.invalid
+                                                    ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
+                                                    : { ...provided },
+                                        }}
+                                        isClearable
+                                    />
+
+                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
+                                        {meta.error}
+                                    </div>
+                                </FormGroup>
+                            )}
+                        </Field>
+
+                        {values?.resource && <ConditionFormFilter formType="cxecutionItem" resource={values.resource} />}
 
                         <div className="d-flex justify-content-end">
                             <ButtonGroup>
@@ -167,14 +211,14 @@ const ActionGroupForm = () => {
                                     title={submitTitle}
                                     inProgressTitle={inProgressTitle}
                                     inProgress={submitting}
-                                    // disabled={
-                                    //     areDefaultValuesSame(values) ||
-                                    //     values.resource === Resource.None ||
-                                    //     submitting ||
-                                    //     !valid ||
-                                    //     isBusy ||
-                                    //     !values.actions.length
-                                    // }
+                                    disabled={
+                                        areDefaultValuesSame(values) ||
+                                        values.resource === Resource.None ||
+                                        submitting ||
+                                        !valid ||
+                                        isBusy ||
+                                        !values.items.length
+                                    }
                                 />
 
                                 <Button color="default" onClick={onCancel} disabled={submitting}>
@@ -189,4 +233,4 @@ const ActionGroupForm = () => {
     );
 };
 
-export default ActionGroupForm;
+export default ExecutionForm;

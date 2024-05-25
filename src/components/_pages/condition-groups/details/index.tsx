@@ -184,13 +184,7 @@ const ConditionGroupDetails = () => {
         <Container className="themed-container" fluid>
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
                 <Col>
-                    <Widget
-                        refreshAction={getFreshDetails}
-                        busy={isBusy}
-                        title="Condition Group Details"
-                        titleSize="large"
-                        widgetButtons={buttons}
-                    >
+                    <Widget refreshAction={getFreshDetails} busy={isBusy} title="Condition Group" titleSize="large" widgetButtons={buttons}>
                         <CustomTable data={conditionGroupsDetailData} headers={tableHeader} />
                     </Widget>
                 </Col>

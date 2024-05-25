@@ -103,7 +103,7 @@ const createExecution: AppEpic = (action$, state, deps) => {
                     switchMap((execution) =>
                         of(
                             slice.actions.createExecutionSuccess({ execution: transformExecutionDtoToModel(execution) }),
-                            appRedirectActions.redirect({ url: `../actiongroups/detail/${execution.uuid}` }),
+                            appRedirectActions.redirect({ url: `../executions/detail/${execution.uuid}` }),
                         ),
                     ),
                     catchError((err) =>
@@ -128,7 +128,7 @@ const createCondition: AppEpic = (action$, state, deps) => {
                             slice.actions.createConditionSuccess({
                                 condition: transformConditionDtoToModel(condition),
                             }),
-                            appRedirectActions.redirect({ url: `../conditiongroups/detail/${condition.uuid}` }),
+                            appRedirectActions.redirect({ url: `../conditions/detail/${condition.uuid}` }),
                         ),
                     ),
                     catchError((err) =>
@@ -186,7 +186,7 @@ const deleteExecution: AppEpic = (action$, state, deps) => {
                 switchMap(() =>
                     of(
                         slice.actions.deleteExecutionSuccess({ executionUuid: action.payload.executionUuid }),
-                        appRedirectActions.redirect({ url: `../../actiongroups` }),
+                        appRedirectActions.redirect({ url: `../../executions` }),
                     ),
                 ),
                 catchError((err) => of(slice.actions.deleteExecutionFailure({ error: extractError(err, 'Failed to delete Execution') }))),
@@ -203,7 +203,7 @@ const deleteCondition: AppEpic = (action$, state, deps) => {
                 switchMap(() =>
                     of(
                         slice.actions.deleteConditionSuccess({ conditionUuid: action.payload.conditionUuid }),
-                        appRedirectActions.redirect({ url: `../../conditiongroups` }),
+                        appRedirectActions.redirect({ url: `../../conditions` }),
                     ),
                 ),
                 catchError((err) => of(slice.actions.deleteConditionFailure({ error: extractError(err, 'Failed to delete condition') }))),
@@ -344,7 +344,7 @@ const updateCondition: AppEpic = (action$, state, deps) => {
                             slice.actions.updateConditionSuccess({
                                 condition: transformConditionDtoToModel(condition),
                             }),
-                            appRedirectActions.redirect({ url: `../../conditiongroups/detail/${condition.uuid}` }),
+                            appRedirectActions.redirect({ url: `../../conditions/detail/${condition.uuid}` }),
                         ),
                     ),
                     catchError((err) =>

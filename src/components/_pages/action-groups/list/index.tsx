@@ -128,13 +128,13 @@ const ActionGroupsList = () => {
         <Container className="themed-container" fluid>
             <Widget
                 titleSize="larger"
-                title="Action Groups"
+                title="Executions"
                 refreshAction={getFreshListActionGroups}
                 busy={isBusy}
                 widgetButtons={buttons}
                 widgetInfoCard={{
                     title: 'Information',
-                    description: 'Action group is named set of actions for selected trigger',
+                    description: 'Executions is named set of execution items for selected trigger',
                 }}
             >
                 <CustomTable

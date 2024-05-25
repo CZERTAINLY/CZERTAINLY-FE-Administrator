@@ -12,8 +12,9 @@ import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, In
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 
 import ProgressButton from 'components/ProgressButton';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import Select from 'react-select';
-import { ConditionType, Resource } from 'types/openapi';
+import { ConditionType, PlatformEnum, Resource } from 'types/openapi';
 import { ConditionItemModel } from 'types/rules';
 import { isObjectSame } from 'utils/common-utils';
 import { useRuleEvaluatorResourceOptions } from 'utils/rules';
@@ -30,7 +31,9 @@ export interface ConditionGroupFormValues {
     selectedResource?: SelectChangeValue;
     resource: Resource;
     description?: string;
-    conditions: ConditionItemModel[];
+    type?: ConditionType;
+    selectedType?: SelectChangeValue;
+    items: ConditionItemModel[];
 }
 
 const ConditionGroupForm = () => {
@@ -40,6 +43,7 @@ const ConditionGroupForm = () => {
     const title = 'Create Condition';
     const isCreatingCondition = useSelector(rulesSelectors.isCreatingCondition);
     const isUpdatingCondition = useSelector(rulesSelectors.isUpdatingCondition);
+    const conditionTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ConditionType));
     const { resourceOptionsWithRuleEvaluator, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
 
     const isBusy = useMemo(
@@ -64,12 +68,16 @@ const ConditionGroupForm = () => {
             resource: Resource.None,
             selectedResource: undefined,
             description: undefined,
-            conditions: [],
+            items: [],
         };
     }, []);
 
     const submitTitle = 'Create';
     const inProgressTitle = 'Creating...';
+
+    const typeOptions = useMemo(() => {
+        return [{ value: ConditionType.CheckField, label: getEnumLabel(conditionTypeEnum, ConditionType.CheckField) }];
+    }, [conditionTypeEnum]);
 
     const onCancel = useCallback(() => {
         navigate(-1);
@@ -77,19 +85,19 @@ const ConditionGroupForm = () => {
 
     const onSubmit = useCallback(
         (values: ConditionGroupFormValues) => {
-            if (values.resource === Resource.None) return;
+            if (values.resource === Resource.None || !values.type) return;
             dispatch(
                 rulesActions.createCondition({
                     conditionRequestModel: {
-                        // conditions: values.conditions,
-                        items: values.conditions,
-                        type: ConditionType.CheckField,
+                        items: values.items,
+                        type: values.type,
                         name: values.name,
                         resource: values.resource,
                         description: values.description,
                     },
                 }),
             );
+            console.log('values', values);
         },
         [dispatch],
     );
@@ -148,6 +156,30 @@ const ConditionGroupForm = () => {
                             )}
                         </Field>
 
+                        <Field name="selectedType" validate={validateRequired()}>
+                            {({ input, meta }) => (
+                                <FormGroup>
+                                    <Label for="type">Condition Type</Label>
+
+                                    <Select
+                                        {...input}
+                                        options={typeOptions}
+                                        placeholder="Select Condition Type"
+                                        onChange={(event) => {
+                                            input.onChange(event);
+                                            if (event?.value) {
+                                                form.change('type', event.value);
+                                            }
+                                        }}
+                                    />
+
+                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
+                                        {meta.error}
+                                    </div>
+                                </FormGroup>
+                            )}
+                        </Field>
+
                         <Field name="selectedResource" validate={validateRequired()}>
                             {({ input, meta }) => (
                                 <FormGroup>
@@ -164,7 +196,7 @@ const ConditionGroupForm = () => {
                                             if (event?.value) {
                                                 form.change('resource', event.value);
                                             }
-                                            form.change('conditions', []);
+                                            form.change('items', []);
                                             dispatch(
                                                 filterActions.setCurrentFilters({ currentFilters: [], entity: EntityType.CONDITIONS }),
                                             );
@@ -185,7 +217,7 @@ const ConditionGroupForm = () => {
                             )}
                         </Field>
 
-                        {values?.resource && <ConditionFormFilter formType="conditions" resource={values.resource} />}
+                        {values?.resource && <ConditionFormFilter formType="conditionItem" resource={values.resource} />}
 
                         <div className="d-flex justify-content-end">
                             <ButtonGroup>
@@ -193,14 +225,14 @@ const ConditionGroupForm = () => {
                                     title={submitTitle}
                                     inProgressTitle={inProgressTitle}
                                     inProgress={submitting}
-                                    // disabled={
-                                    //     areDefaultValuesSame(values) ||
-                                    //     values.resource === Resource.None ||
-                                    //     submitting ||
-                                    //     !valid ||
-                                    //     isBusy ||
-                                    //     !values.conditions.length
-                                    // }
+                                    disabled={
+                                        areDefaultValuesSame(values) ||
+                                        values.resource === Resource.None ||
+                                        submitting ||
+                                        !valid ||
+                                        isBusy ||
+                                        !values.items.length
+                                    }
                                 />
 
                                 <Button color="default" onClick={onCancel} disabled={submitting}>

@@ -8,10 +8,10 @@ import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-final-form';
 import { useDispatch } from 'react-redux';
 import { Resource } from 'types/openapi';
-import { filterToConditionGroup } from 'utils/rules';
+import { filterToConditionItems } from 'utils/rules';
 import { ConditionGroupFormValues } from '../_pages/condition-groups/form';
 import styles from './conditionGroupForm.module.scss';
-type FormType = 'conditions' | 'actions';
+type FormType = 'conditionItem' | 'cxecutionItem';
 interface ConditionGroupFormFilterProps {
     resource: Resource;
     formType: FormType;
@@ -30,11 +30,11 @@ const ConditionFormFilter = ({ resource, formType, includeIgnoreAction }: Condit
         };
     }, [dispatch]);
     const renderFilterWidget = useMemo(() => {
-        return formType === 'actions' ? (
+        return formType === 'cxecutionItem' ? (
             <div className={cx({ [styles.disabled]: resource === Resource.None })}>
                 <FilterWidgetRuleAction
                     entity={EntityType.ACTIONS}
-                    title={'Actions'}
+                    title={'Execution Items'}
                     getAvailableFiltersApi={(apiClients: ApiClients) =>
                         apiClients.resources.listResourceRuleFilterFields({
                             resource,
@@ -43,7 +43,7 @@ const ConditionFormFilter = ({ resource, formType, includeIgnoreAction }: Condit
                     }
                     includeIgnoreAction={includeIgnoreAction}
                     onActionsUpdate={(currentActions) => {
-                        // actionGroupForm.change('actions', currentActions);
+                        actionGroupForm.change('items', currentActions);
                     }}
                 />
             </div>
@@ -51,15 +51,15 @@ const ConditionFormFilter = ({ resource, formType, includeIgnoreAction }: Condit
             <div className={cx({ [styles.disabled]: resource === Resource.None })}>
                 <FilterWidget
                     entity={EntityType.CONDITIONS}
-                    title={'Conditions'}
+                    title={'Condition Items'}
                     getAvailableFiltersApi={(apiClients: ApiClients) =>
                         apiClients.resources.listResourceRuleFilterFields({
                             resource,
                         })
                     }
                     onFilterUpdate={(currentFilters) => {
-                        const currentConditionGroups = filterToConditionGroup(currentFilters);
-                        form.change('conditions', currentConditionGroups);
+                        const currentConditionItems = filterToConditionItems(currentFilters);
+                        form.change('items', currentConditionItems);
                     }}
                 />
             </div>

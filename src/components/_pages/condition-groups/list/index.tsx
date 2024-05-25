@@ -131,14 +131,13 @@ const ConditionGroups = () => {
         <Container className="themed-container" fluid>
             <Widget
                 titleSize="larger"
-                title="Condition Groups"
+                title="Conditions"
                 refreshAction={getFreshListConditionGroups}
                 // busy={isBusy}
                 widgetButtons={buttons}
                 widgetInfoCard={{
                     title: 'Information',
-                    description:
-                        'Condition group is named set of conditions for selected resource that can be reused in rules of same resource',
+                    description: 'Condition is named set of conditions for selected resource that can be reused in rules of same resource',
                 }}
             >
                 <CustomTable

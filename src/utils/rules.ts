@@ -9,7 +9,7 @@ import { actions as resourceActions, selectors as resourceSelectors } from 'duck
 import { PlatformEnum } from 'types/openapi';
 import { ResourceModel } from 'types/resource';
 
-export const filterToConditionGroup = (filter: SearchFilterModel[]): ConditionItemModel[] => {
+export const filterToConditionItems = (filter: SearchFilterModel[]): ConditionItemModel[] => {
     return filter.map((filter) => ({
         fieldIdentifier: filter.fieldIdentifier,
         operator: filter.condition,

@@ -117,7 +117,7 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
     //             }
     //             disableBadgeRemove={disableBadgeRemove}
     //             onFilterUpdate={(currentFilters) => {
-    //                 const currentCondition = filterToConditionGroup(currentFilters);
+    //                 const currentCondition = filterToConditionItems(currentFilters);
     //                 dispatch(
     //                     rulesActions.updateRule({
     //                         ruleUuid: id,
@@ -150,7 +150,7 @@ const ConditionsViewer = ({ resource, formType }: ConditionGroupFormFilterProps)
     //                 }
     //                 disableBadgeRemove={disableBadgeRemove}
     //                 onFilterUpdate={(currentFilters) => {
-    //                     const currentCondition = filterToConditionGroup(currentFilters);
+    //                     const currentCondition = filterToConditionItems(currentFilters);
     //                     dispatch(
     //                         rulesActions.updateConditionGroup({
     //                             conditionGroupUuid: id,

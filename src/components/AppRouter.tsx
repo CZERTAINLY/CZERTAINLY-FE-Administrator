@@ -333,17 +333,17 @@ export default function AppRouter() {
                     <Route path={`/notificationinstances/add`} element={<NotificationInstanceForm />} />
                     <Route path={`/notificationinstances/edit/:id`} element={<NotificationInstanceForm />} />
 
-                    <Route path={`/conditiongroups`} element={<ConditionGroupsList />} />
-                    <Route path={`/conditiongroups/add`} element={<ConditionGroupForm />} />
-                    <Route path={`/conditiongroups/detail/:id`} element={<ConditionGroupDetails />} />
+                    <Route path={`/conditions`} element={<ConditionGroupsList />} />
+                    <Route path={`/conditions/add`} element={<ConditionGroupForm />} />
+                    <Route path={`/conditions/detail/:id`} element={<ConditionGroupDetails />} />
 
                     <Route path={`/rules/add`} element={<RulesForm />} />
                     <Route path={`/rules`} element={<RulesList />} />
                     <Route path={`/rules/detail/:id`} element={<RuleDetails />} />
 
-                    <Route path={`/actionGroups/add`} element={<ActionGroupForm />} />
-                    <Route path={`/actionGroups`} element={<ActionGroupsList />} />
-                    <Route path={`/actionGroups/detail/:id`} element={<ActionGroupsDetails />} />
+                    <Route path={`/executions/add`} element={<ActionGroupForm />} />
+                    <Route path={`/executions`} element={<ActionGroupsList />} />
+                    <Route path={`/executions/detail/:id`} element={<ActionGroupsDetails />} />
 
                     <Route path={`/triggers/add`} element={<TriggerForm />} />
                     <Route path={`/triggers`} element={<TriggerList />} />
