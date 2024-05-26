@@ -232,6 +232,7 @@ const TriggerDetails = () => {
             {
                 id: 'actions',
                 content: 'Actions',
+                align: 'center',
             },
         ],
         [],

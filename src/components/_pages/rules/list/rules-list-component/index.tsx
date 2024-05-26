@@ -14,7 +14,7 @@ import { PlatformEnum, Resource } from 'types/openapi';
 import { useRuleEvaluatorResourceOptions } from 'utils/rules';
 import styles from './ruleList.module.scss';
 
-const ConditionGroups = () => {
+const RulesList = () => {
     const rules = useSelector(rulesSelectors.rules);
 
     const dispatch = useDispatch();
@@ -48,7 +48,7 @@ const ConditionGroups = () => {
         getFreshList();
     }, [getFreshList]);
 
-    const rulesTableHeader: TableHeader[] = useMemo(
+    const rulesHeader: TableHeader[] = useMemo(
         () => [
             {
                 content: 'Name',
@@ -74,7 +74,7 @@ const ConditionGroups = () => {
         [],
     );
 
-    const rulesList: TableDataRow[] = useMemo(
+    const rulesData: TableDataRow[] = useMemo(
         () =>
             rules.map((rule) => {
                 return {
@@ -115,7 +115,7 @@ const ConditionGroups = () => {
                 icon: 'plus',
                 disabled: false,
                 tooltip: 'Create',
-                onClick: () => navigate(`./add`),
+                onClick: () => navigate(`../rules/add`),
             },
             {
                 icon: 'trash',
@@ -133,11 +133,11 @@ const ConditionGroups = () => {
                 titleSize="larger"
                 title="Rules"
                 refreshAction={getFreshList}
-                // busy={isBusy}
+                busy={isBusy}
                 widgetButtons={buttons}
                 widgetInfoCard={{
                     title: 'Information',
-                    description: 'Rules are combination of conditions and condition groups',
+                    description: 'Rules contain set of conditions',
                 }}
             >
                 <br />
@@ -146,8 +146,8 @@ const ConditionGroups = () => {
                     hasCheckboxes
                     hasAllCheckBox={false}
                     multiSelect={false}
-                    data={rulesList}
-                    headers={rulesTableHeader}
+                    data={rulesData}
+                    headers={rulesHeader}
                     onCheckedRowsChanged={(checkedRows) => {
                         setCheckedRows(checkedRows as string[]);
                     }}
@@ -169,4 +169,4 @@ const ConditionGroups = () => {
     );
 };
 
-export default ConditionGroups;
+export default RulesList;

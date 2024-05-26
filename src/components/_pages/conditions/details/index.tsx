@@ -85,6 +85,7 @@ const ConditionDetails = () => {
             {
                 id: 'actions',
                 content: 'Actions',
+                align: 'center',
             },
         ],
         [],

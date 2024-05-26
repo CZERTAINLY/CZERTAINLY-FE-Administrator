@@ -59,6 +59,7 @@ export type State = {
     isUpdatingAction: boolean;
     isUpdatingTrigger: boolean;
     isFetchingActions: boolean;
+    isDeletingAction: boolean;
 };
 
 export const initialState: State = {
@@ -94,6 +95,7 @@ export const initialState: State = {
     isDeletingRule: false,
     isFetchingActions: false,
     isFetchingActionDetail: false,
+    isDeletingAction: false,
 };
 
 export const slice = createSlice({
@@ -245,6 +247,18 @@ export const slice = createSlice({
 
         deleteExecutionFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isDeletingExecution = false;
+        },
+        deleteAction: (state, action: PayloadAction<{ actionUuid: string }>) => {
+            state.isDeletingAction = true;
+        },
+
+        deleteActionSuccess: (state, action: PayloadAction<{ actionUuid: string }>) => {
+            state.actionsList = state.actionsList.filter((group) => group.uuid !== action.payload.actionUuid);
+            state.isDeletingAction = false;
+        },
+
+        deleteActionFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isDeletingAction = false;
         },
 
         deleteCondition: (state, action: PayloadAction<{ conditionUuid: string }>) => {
@@ -468,6 +482,8 @@ const isFetchingTriggerDetail = createSelector(state, (state) => state.isFetchin
 const isDeletingTrigger = createSelector(state, (state) => state.isDeletingTrigger);
 const isFetchingTriggers = createSelector(state, (state) => state.isFetchingTriggers);
 const isCreatingTrigger = createSelector(state, (state) => state.isCreatingTrigger);
+const isFetchingActions = createSelector(state, (state) => state.isFetchingActions);
+const isDeletingAction = createSelector(state, (state) => state.isDeletingAction);
 
 export const selectors = {
     rules,
@@ -501,6 +517,8 @@ export const selectors = {
     isDeletingTrigger,
     isFetchingTriggers,
     isCreatingTrigger,
+    isFetchingActions,
+    isDeletingAction,
 };
 
 export const actions = slice.actions;

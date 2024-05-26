@@ -58,7 +58,7 @@ const RuleDetails = () => {
 
     const onDeleteConfirmed = useCallback(() => {
         if (!id) return;
-        dispatch(rulesActions.deleteRule({ ruleUuid: id }));
+        dispatch(rulesActions.deleteAction({ actionUuid: id }));
         setConfirmDelete(false);
     }, [dispatch, id]);
 
@@ -157,6 +157,7 @@ const RuleDetails = () => {
             {
                 id: 'actions',
                 content: 'Actions',
+                align: 'center',
             },
         ],
         [],
@@ -338,8 +339,8 @@ const RuleDetails = () => {
 
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete a Rule`}
-                body={`You are about to delete a Rule. Is this what you want to do?`}
+                caption={`Delete an Action`}
+                body={`You are about to delete an action. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },

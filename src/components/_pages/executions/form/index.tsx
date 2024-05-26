@@ -64,7 +64,7 @@ const ExecutionForm = () => {
     const inProgressTitle = 'Creating...';
 
     const onCancel = useCallback(() => {
-        navigate(-1);
+        navigate('../actions/1');
     }, [navigate]);
 
     const onSubmit = useCallback(

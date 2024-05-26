@@ -72,7 +72,7 @@ const ExecutionDetails = () => {
         [],
     );
 
-    const tableHeader: TableHeader[] = useMemo(
+    const executionTableHeaders: TableHeader[] = useMemo(
         () => [
             {
                 id: 'property',
@@ -85,12 +85,13 @@ const ExecutionDetails = () => {
             {
                 id: 'actions',
                 content: 'Actions',
+                align: 'center',
             },
         ],
         [],
     );
 
-    const actionGroupsDetailData: TableDataRow[] = useMemo(
+    const executionDetailsData: TableDataRow[] = useMemo(
         () =>
             !ExecutionDetails || isFetchingDetails
                 ? []
@@ -191,15 +192,15 @@ const ExecutionDetails = () => {
                         titleSize="large"
                         widgetButtons={buttons}
                     >
-                        <CustomTable data={actionGroupsDetailData} headers={tableHeader} />
+                        <CustomTable data={executionDetailsData} headers={executionTableHeaders} />
                     </Widget>
                 </Col>
             </Row>
             <Row>{ExecutionDetails?.resource && <ConditionsViewer resource={ExecutionDetails.resource} formType="actionGroup" />}</Row>
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete a Action Group`}
-                body={`You are about to delete a Action Group. Is this what you want to do?`}
+                caption={`Delete an Execution`}
+                body={`You are about to delete an Execution. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },

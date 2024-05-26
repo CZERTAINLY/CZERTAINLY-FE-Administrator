@@ -260,13 +260,35 @@ const deleteExecution: AppEpic = (action$, state, deps) => {
                 switchMap(() =>
                     of(
                         slice.actions.deleteExecutionSuccess({ executionUuid: action.payload.executionUuid }),
-                        appRedirectActions.redirect({ url: `../../actions` }),
+                        appRedirectActions.redirect({ url: `../../actions/1` }),
                     ),
                 ),
                 catchError((err) =>
                     of(
                         slice.actions.deleteExecutionFailure({ error: extractError(err, 'Failed to delete Execution') }),
                         alertActions.error(extractError(err, 'Failed to delete Execution')),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+const deleteAction: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.deleteAction.match),
+        switchMap((action) =>
+            deps.apiClients.actions.deleteAction({ actionUuid: action.payload.actionUuid }).pipe(
+                switchMap(() =>
+                    of(
+                        slice.actions.deleteActionSuccess({ actionUuid: action.payload.actionUuid }),
+                        appRedirectActions.redirect({ url: `../actions/0` }),
+                    ),
+                ),
+                catchError((err) =>
+                    of(
+                        slice.actions.deleteActionFailure({ error: extractError(err, 'Failed to delete action') }),
+                        alertActions.error(extractError(err, 'Failed to delete action')),
                     ),
                 ),
             ),
@@ -282,7 +304,7 @@ const deleteCondition: AppEpic = (action$, state, deps) => {
                 switchMap(() =>
                     of(
                         slice.actions.deleteConditionSuccess({ conditionUuid: action.payload.conditionUuid }),
-                        appRedirectActions.redirect({ url: `../../rules` }),
+                        appRedirectActions.redirect({ url: `../../rules/1` }),
                     ),
                 ),
                 catchError((err) =>
@@ -304,7 +326,7 @@ const deleteRule: AppEpic = (action$, state, deps) => {
                 switchMap(() =>
                     of(
                         slice.actions.deleteRuleSuccess({ ruleUuid: action.payload.ruleUuid }),
-                        appRedirectActions.redirect({ url: `../rules` }),
+                        appRedirectActions.redirect({ url: `../rules/0` }),
                     ),
                 ),
                 catchError((err) =>
@@ -583,6 +605,7 @@ const epics = [
     createAction,
     createTrigger,
     deleteExecution,
+    deleteAction,
     deleteCondition,
     deleteRule,
     deleteTrigger,

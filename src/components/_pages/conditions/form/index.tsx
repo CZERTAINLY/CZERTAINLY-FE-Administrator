@@ -37,24 +37,14 @@ export interface ConditionFormValues {
 }
 
 const ConditionForm = () => {
-    // const { id } = useParams();
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const title = 'Create Condition';
     const isCreatingCondition = useSelector(rulesSelectors.isCreatingCondition);
-    const isUpdatingCondition = useSelector(rulesSelectors.isUpdatingCondition);
     const conditionTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ConditionType));
     const { resourceOptionsWithRuleEvaluator, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
 
-    const isBusy = useMemo(
-        () => isCreatingCondition || isFetchingResourcesList || isUpdatingCondition,
-        [isCreatingCondition, isUpdatingCondition, isFetchingResourcesList],
-    );
-
-    // useEffect(() => {
-    //     if (!id) return;
-    //     dispatch(rulesActions.getCondition({ conditionUuid: id }));
-    // }, [id, dispatch]);
+    const isBusy = useMemo(() => isCreatingCondition || isFetchingResourcesList, [isCreatingCondition, isFetchingResourcesList]);
 
     useEffect(() => {
         return () => {
@@ -80,7 +70,7 @@ const ConditionForm = () => {
     }, [conditionTypeEnum]);
 
     const onCancel = useCallback(() => {
-        navigate(-1);
+        navigate('../rules/1');
     }, [navigate]);
 
     const onSubmit = useCallback(
@@ -112,8 +102,6 @@ const ConditionForm = () => {
         },
         [defaultValues],
     );
-
-    // if (id) return null;
 
     return (
         <Widget title={title} busy={isBusy}>

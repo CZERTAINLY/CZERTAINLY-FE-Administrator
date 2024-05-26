@@ -33,22 +33,16 @@ export interface ruleFormValues {
 }
 
 const RulesForm = () => {
-    // const { id } = useParams();
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const title = 'Create Rule';
 
     const conditions = useSelector(rulesSelectors.conditions);
     const isCreatingRule = useSelector(rulesSelectors.isCreatingRule);
-    const isUpdatingRule = useSelector(rulesSelectors.isUpdatingRule);
     const [selectedResourceState, setSelectedResourceState] = useState<SelectChangeValue>();
-    const ruleDetails = useSelector(rulesSelectors.ruleDetails);
     const { resourceOptionsWithRuleEvaluator, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
 
-    const isBusy = useMemo(
-        () => isCreatingRule || isUpdatingRule || isFetchingResourcesList,
-        [isCreatingRule, isUpdatingRule, isFetchingResourcesList],
-    );
+    const isBusy = useMemo(() => isCreatingRule || isFetchingResourcesList, [isCreatingRule, isFetchingResourcesList]);
 
     const conditionsOptions = useMemo(() => {
         if (conditions === undefined) return [];
@@ -61,11 +55,6 @@ const RulesForm = () => {
         if (!selectedResourceState) return;
         dispatch(rulesActions.listConditions({ resource: selectedResourceState.value as Resource }));
     }, [dispatch, selectedResourceState]);
-
-    // useEffect(() => {
-    //     if (!id) return;
-    //     dispatch(rulesActions.getRule({ ruleUuid: id }));
-    // }, [id, dispatch]);
 
     useEffect(() => {
         return () => {
@@ -89,7 +78,7 @@ const RulesForm = () => {
     const inProgressTitle = 'Creating...';
 
     const onCancel = useCallback(() => {
-        navigate(-1);
+        navigate('../rules');
     }, [navigate]);
 
     const onSubmit = useCallback(
@@ -206,7 +195,7 @@ const RulesForm = () => {
                         <Field name="conditionsUuids" validate={validateRequired()}>
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="description">Condition</Label>
+                                    <Label for="description">Conditions</Label>
 
                                     <Select
                                         isDisabled={values.resource === Resource.None || !values.resource}

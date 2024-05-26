@@ -11,7 +11,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { useRuleEvaluatorResourceOptions } from 'utils/rules';
-import styles from './conditionGroupsList.module.scss';
+import styles from './conditionList.module.scss';
 
 const ConditionsList = () => {
     const conditions = useSelector(rulesSelectors.conditions);
@@ -20,6 +20,7 @@ const ConditionsList = () => {
     const navigate = useNavigate();
 
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
+    const conditionTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ConditionType));
     const [selectedResource, setSelectedResource] = useState<Resource>();
     const isFetchingList = useSelector(rulesSelectors.isFetchingConditions);
     const isDeleting = useSelector(rulesSelectors.isDeletingCondition);
@@ -47,7 +48,7 @@ const ConditionsList = () => {
         getFreshListConditionGroups();
     }, [getFreshListConditionGroups]);
 
-    const conditionGroupsRowHeaders: TableHeader[] = useMemo(
+    const conditionDataHeaders: TableHeader[] = useMemo(
         () => [
             {
                 content: 'Name',
@@ -55,6 +56,12 @@ const ConditionsList = () => {
                 id: 'name',
                 width: '10%',
                 sortable: true,
+            },
+            {
+                content: 'Type',
+                align: 'left',
+                id: 'type',
+                width: '10%',
             },
             {
                 content: 'Resource',
@@ -73,15 +80,16 @@ const ConditionsList = () => {
         [],
     );
 
-    const conditionGroupList: TableDataRow[] = useMemo(
+    const conditionsData: TableDataRow[] = useMemo(
         () =>
-            conditions.map((conditionGroup) => {
+            conditions.map((condition) => {
                 return {
-                    id: conditionGroup.uuid,
+                    id: condition.uuid,
                     columns: [
-                        <Link to={`../conditions/detail/${conditionGroup.uuid}`}>{conditionGroup.name}</Link>,
-                        getEnumLabel(resourceTypeEnum, conditionGroup.resource),
-                        conditionGroup.description || '',
+                        <Link to={`../conditions/detail/${condition.uuid}`}>{condition.name}</Link>,
+                        getEnumLabel(conditionTypeEnum, condition.type),
+                        getEnumLabel(resourceTypeEnum, condition.resource),
+                        condition.description || '',
                     ],
                 };
             }),
@@ -132,20 +140,21 @@ const ConditionsList = () => {
                 titleSize="larger"
                 title="Conditions"
                 refreshAction={getFreshListConditionGroups}
-                // busy={isBusy}
+                busy={isBusy}
                 widgetButtons={buttons}
                 widgetInfoCard={{
                     title: 'Information',
-                    description: 'Condition is named set of conditions for selected resource that can be reused in rules of same resource',
+                    description: 'Condition is named set of conditions items',
                 }}
             >
+                <br />
                 <CustomTable
                     checkedRows={checkedRows}
                     hasCheckboxes
                     hasAllCheckBox={false}
                     multiSelect={false}
-                    data={conditionGroupList}
-                    headers={conditionGroupsRowHeaders}
+                    data={conditionsData}
+                    headers={conditionDataHeaders}
                     onCheckedRowsChanged={(checkedRows) => {
                         setCheckedRows(checkedRows as string[]);
                     }}
@@ -155,8 +164,8 @@ const ConditionsList = () => {
 
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete a Condition Group`}
-                body={`You are about to delete a Condition Group. Is this what you want to do?`}
+                caption={`Delete a Condition`}
+                body={`You are about to delete a Condition. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },

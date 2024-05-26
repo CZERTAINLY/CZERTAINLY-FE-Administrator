@@ -19,6 +19,7 @@ const ExecutionsList = () => {
     const navigate = useNavigate();
 
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
+    const executionTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ExecutionType));
     const [selectedResource, setSelectedResource] = useState<Resource>();
     const isFetchingList = useSelector(rulesSelectors.isFetchingExecutions);
     const isDeleting = useSelector(rulesSelectors.isDeletingExecution);
@@ -44,41 +45,49 @@ const ExecutionsList = () => {
 
     const { resourceOptionsWithRuleEvaluator, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
 
-    const conditionGroupsRowHeaders: TableHeader[] = useMemo(
+    const executionsDataHeaders: TableHeader[] = useMemo(
         () => [
             {
                 content: 'Name',
                 align: 'left',
                 id: 'name',
-                width: '10%',
+                width: '25%',
+                sortable: true,
+            },
+            {
+                content: 'Type',
+                align: 'left',
+                id: 'type',
+                width: '25%',
                 sortable: true,
             },
             {
                 content: 'Resource',
                 align: 'left',
                 id: 'resource',
-                width: '10%',
+                width: '25%',
                 sortable: true,
             },
             {
                 content: 'Description',
                 align: 'left',
                 id: 'description',
-                width: '10%',
+                width: '25%',
             },
         ],
         [],
     );
 
-    const actionGroupList: TableDataRow[] = useMemo(
+    const executionsData: TableDataRow[] = useMemo(
         () =>
-            executions.map((actionGroup) => {
+            executions.map((execution) => {
                 return {
-                    id: actionGroup.uuid,
+                    id: execution.uuid,
                     columns: [
-                        <Link to={`../executions/detail/${actionGroup.uuid}`}>{actionGroup.name}</Link>,
-                        getEnumLabel(resourceTypeEnum, actionGroup.resource),
-                        actionGroup.description || '',
+                        <Link to={`../executions/detail/${execution.uuid}`}>{execution.name}</Link>,
+                        getEnumLabel(executionTypeEnum, execution.type),
+                        getEnumLabel(resourceTypeEnum, execution.resource),
+                        execution.description || '',
                     ],
                 };
             }),
@@ -133,16 +142,17 @@ const ExecutionsList = () => {
                 widgetButtons={buttons}
                 widgetInfoCard={{
                     title: 'Information',
-                    description: 'Executions is named set of execution items for selected trigger',
+                    description: 'Executions is named set of execution items',
                 }}
             >
+                <br />
                 <CustomTable
                     checkedRows={checkedRows}
                     hasCheckboxes
                     hasAllCheckBox={false}
                     multiSelect={false}
-                    data={actionGroupList}
-                    headers={conditionGroupsRowHeaders}
+                    data={executionsData}
+                    headers={executionsDataHeaders}
                     onCheckedRowsChanged={(checkedRows) => {
                         setCheckedRows(checkedRows as string[]);
                     }}
@@ -152,8 +162,8 @@ const ExecutionsList = () => {
 
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete a Action Group`}
-                body={`You are about to delete a Action Group. Is this what you want to do?`}
+                caption={`Delete an Execution`}
+                body={`You are about to delete a Execution. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },

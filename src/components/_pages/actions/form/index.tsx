@@ -40,16 +40,12 @@ const ActionsForm = () => {
 
     const executions = useSelector(rulesSelectors.executions);
     const isCreatingRule = useSelector(rulesSelectors.isCreatingRule);
-    const isUpdatingRule = useSelector(rulesSelectors.isUpdatingRule);
     const [selectedResourceState, setSelectedResourceState] = useState<SelectChangeValue>();
     const { resourceOptionsWithRuleEvaluator, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
 
-    const isBusy = useMemo(
-        () => isCreatingRule || isUpdatingRule || isFetchingResourcesList,
-        [isCreatingRule, isUpdatingRule, isFetchingResourcesList],
-    );
+    const isBusy = useMemo(() => isCreatingRule || isFetchingResourcesList, [isCreatingRule, isFetchingResourcesList]);
 
-    const conditionsOptions = useMemo(() => {
+    const executionsOptions = useMemo(() => {
         if (executions === undefined) return [];
         return executions.map((execution) => {
             return { value: execution.uuid, label: execution.name };
@@ -60,11 +56,6 @@ const ActionsForm = () => {
         if (!selectedResourceState) return;
         dispatch(rulesActions.listExecutions({ resource: selectedResourceState.value as Resource }));
     }, [dispatch, selectedResourceState]);
-
-    // useEffect(() => {
-    //     if (!id) return;
-    //     dispatch(rulesActions.getAction({ actionUuid: id }));
-    // }, [id, dispatch]);
 
     useEffect(() => {
         return () => {
@@ -86,7 +77,7 @@ const ActionsForm = () => {
     const inProgressTitle = 'Creating...';
 
     const onCancel = useCallback(() => {
-        navigate(-1);
+        navigate('../actions');
     }, [navigate]);
 
     const onSubmit = useCallback(
@@ -208,7 +199,7 @@ const ActionsForm = () => {
                                     <Select
                                         isDisabled={values.resource === Resource.None || !values.resource}
                                         {...input}
-                                        options={conditionsOptions}
+                                        options={executionsOptions}
                                         isMulti
                                         placeholder="Select Executions"
                                         isClearable

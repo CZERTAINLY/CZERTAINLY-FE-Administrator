@@ -22,8 +22,8 @@ const ActionsList = () => {
 
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [selectedResource, setSelectedResource] = useState<Resource>();
-    const isFetchingList = useSelector(rulesSelectors.isFetchingRulesList);
-    const isDeleting = useSelector(rulesSelectors.isDeletingRule);
+    const isFetchingList = useSelector(rulesSelectors.isFetchingActions);
+    const isDeleting = useSelector(rulesSelectors.isDeletingAction);
 
     const [checkedRows, setCheckedRows] = useState<string[]>([]);
     const [confirmDelete, setConfirmDelete] = useState(false);
@@ -35,7 +35,7 @@ const ActionsList = () => {
     );
 
     const onDeleteConfirmed = useCallback(() => {
-        dispatch(rulesActions.deleteRule({ ruleUuid: checkedRows[0] }));
+        dispatch(rulesActions.deleteAction({ actionUuid: checkedRows[0] }));
         setConfirmDelete(false);
         setCheckedRows([]);
     }, [dispatch, checkedRows]);
@@ -115,7 +115,7 @@ const ActionsList = () => {
                 icon: 'plus',
                 disabled: false,
                 tooltip: 'Create',
-                onClick: () => navigate(`./add`),
+                onClick: () => navigate(`../actions/add`),
             },
             {
                 icon: 'trash',
@@ -132,6 +132,7 @@ const ActionsList = () => {
             <Widget
                 titleSize="larger"
                 title="Actions"
+                busy={isBusy}
                 refreshAction={getFreshList}
                 widgetButtons={buttons}
                 widgetInfoCard={{
@@ -156,8 +157,8 @@ const ActionsList = () => {
 
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete a Rule`}
-                body={`You are about to delete a Rule. Is this what you want to do?`}
+                caption={`Delete an Action`}
+                body={`You are about to delete an Action. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },

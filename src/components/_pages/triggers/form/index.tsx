@@ -78,8 +78,8 @@ const TriggerForm = () => {
 
     const actionsOptions = useMemo(() => {
         if (actionsList === undefined) return [];
-        return actionsList.map((conditionGroup) => {
-            return { value: conditionGroup.uuid, label: conditionGroup.name };
+        return actionsList.map((action) => {
+            return { value: action.uuid, label: action.name };
         });
     }, [actionsList]);
 

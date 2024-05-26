@@ -144,7 +144,7 @@ const RuleDetails = () => {
         [],
     );
 
-    const tableHeader: TableHeader[] = useMemo(
+    const ruleTableHeaders: TableHeader[] = useMemo(
         () => [
             {
                 id: 'property',
@@ -157,12 +157,13 @@ const RuleDetails = () => {
             {
                 id: 'actions',
                 content: 'Actions',
+                align: 'center',
             },
         ],
         [],
     );
 
-    const conditionGroupsDetailData: TableDataRow[] = useMemo(
+    const ruleDetailsData: TableDataRow[] = useMemo(
         () =>
             !ruleDetails || isFetchingRuleDetail
                 ? []
@@ -307,7 +308,7 @@ const RuleDetails = () => {
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
                 <Col>
                     <Widget refreshAction={getFreshDetails} busy={isBusy} title="Rule Details" titleSize="large" widgetButtons={buttons}>
-                        <CustomTable data={conditionGroupsDetailData} headers={tableHeader} />
+                        <CustomTable data={ruleDetailsData} headers={ruleTableHeaders} />
                     </Widget>
                 </Col>
                 {/* <Col>
