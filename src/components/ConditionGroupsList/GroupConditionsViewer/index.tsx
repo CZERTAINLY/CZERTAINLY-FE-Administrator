@@ -19,7 +19,7 @@ const GroupConditionsViewer = ({ groupConditions = [], conditionGroupName, condi
     const FilterConditionOperatorEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.FilterConditionOperator));
     const availableFilters = useSelector(selectors.availableFilters(EntityType.CONDITIONS));
     const platformEnums = useSelector(enumSelectors.platformEnums);
-    const isFetchingCondition = useSelector(rulesSelectors.isFetchingCondition);
+    const isFetchingConditionDetails = useSelector(rulesSelectors.isFetchingConditionDetails);
     const booleanOptions = useMemo(
         () => [
             { label: 'True', value: true },
@@ -69,7 +69,7 @@ const GroupConditionsViewer = ({ groupConditions = [], conditionGroupName, condi
         });
     };
 
-    if (isFetchingCondition) return <Spinner active={isFetchingCondition} />;
+    if (isFetchingConditionDetails) return <Spinner active={isFetchingConditionDetails} />;
 
     return (
         <div className={styles.groupConditionContainerDiv} key={conditionGroupUuid}>

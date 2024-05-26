@@ -26,7 +26,7 @@ export type State = {
     rules: RuleModel[];
     ruleDetails?: RuleDetailModel;
     executions: ExecutionModel[];
-    ExecutionDetails?: ExecutionModel;
+    executionDetails?: ExecutionModel;
     actionsList: ActionModel[];
     actionDetails?: ActionDetailModel;
 
@@ -41,10 +41,10 @@ export type State = {
     isFetchingConditions: boolean;
     isFetchingTriggers: boolean;
     isCreatingAction: boolean;
-    isFetchingActionDetail: boolean;
+    isFetchingActionDetails: boolean;
     isFetchingRuleDetail: boolean;
     isFetchingExecutionDetails: boolean;
-    isFetchingCondition: boolean;
+    isFetchingConditionDetails: boolean;
     isFetchingTriggerDetail: boolean;
     isDeletingRule: boolean;
     isCreatingRule: boolean;
@@ -72,7 +72,7 @@ export const initialState: State = {
     isFetchingRulesList: false,
     isFetchingExecutions: false,
     isFetchingExecutionDetails: false,
-    isFetchingCondition: false,
+    isFetchingConditionDetails: false,
     isFetchingTriggerDetail: false,
 
     isFetchingConditions: false,
@@ -94,7 +94,7 @@ export const initialState: State = {
     isUpdatingAction: false,
     isDeletingRule: false,
     isFetchingActions: false,
-    isFetchingActionDetail: false,
+    isFetchingActionDetails: false,
     isDeletingAction: false,
 };
 
@@ -299,7 +299,7 @@ export const slice = createSlice({
             state.isFetchingExecutionDetails = true;
         },
         getExecutionSuccess: (state, action: PayloadAction<{ execution: ExecutionModel }>) => {
-            state.ExecutionDetails = action.payload.execution;
+            state.executionDetails = action.payload.execution;
             state.isFetchingExecutionDetails = false;
         },
         getExecutionFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -307,27 +307,27 @@ export const slice = createSlice({
         },
 
         getAction: (state, action: PayloadAction<{ actionUuid: string }>) => {
-            state.isFetchingActionDetail = true;
+            state.isFetchingActionDetails = true;
         },
 
         getActionSuccess: (state, action: PayloadAction<{ action: ActionDetailModel }>) => {
             state.actionDetails = action.payload.action;
-            state.isFetchingActionDetail = false;
+            state.isFetchingActionDetails = false;
         },
 
         getActionFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isFetchingActionDetail = false;
+            state.isFetchingActionDetails = false;
         },
 
         getCondition: (state, action: PayloadAction<{ conditionUuid: string }>) => {
-            state.isFetchingCondition = true;
+            state.isFetchingConditionDetails = true;
         },
         getConditionSuccess: (state, action: PayloadAction<{ condition: ConditionModel }>) => {
             state.conditionDetails = action.payload.condition;
-            state.isFetchingCondition = false;
+            state.isFetchingConditionDetails = false;
         },
         getConditionFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isFetchingCondition = false;
+            state.isFetchingConditionDetails = false;
         },
         getRule: (state, action: PayloadAction<{ ruleUuid: string }>) => {
             state.isFetchingRuleDetail = true;
@@ -360,8 +360,8 @@ export const slice = createSlice({
                 group.uuid === action.payload.execution.uuid ? action.payload.execution : group,
             );
 
-            if (state.ExecutionDetails?.uuid === action.payload.execution.uuid) {
-                state.ExecutionDetails = action.payload.execution;
+            if (state.executionDetails?.uuid === action.payload.execution.uuid) {
+                state.executionDetails = action.payload.execution;
             }
 
             state.isUpdatingExecution = false;
@@ -459,7 +459,7 @@ const actionsList = createSelector(state, (state) => state.actionsList);
 const actionDetails = createSelector(state, (state) => state.actionDetails);
 
 const executions = createSelector(state, (state) => state.executions);
-const ExecutionDetails = createSelector(state, (state) => state.ExecutionDetails);
+const executionDetails = createSelector(state, (state) => state.executionDetails);
 
 const isCreatingCondition = createSelector(state, (state) => state.isCreatingCondition);
 const isUpdatingCondition = createSelector(state, (state) => state.isUpdatingCondition);
@@ -470,11 +470,14 @@ const isDeletingRule = createSelector(state, (state) => state.isDeletingRule);
 const isFetchingRulesList = createSelector(state, (state) => state.isFetchingRulesList);
 const isFetchingConditions = createSelector(state, (state) => state.isFetchingConditions);
 const isDeletingCondition = createSelector(state, (state) => state.isDeletingCondition);
-const isFetchingCondition = createSelector(state, (state) => state.isFetchingCondition);
+const isFetchingConditionDetails = createSelector(state, (state) => state.isFetchingConditionDetails);
 const isFetchingRuleDetail = createSelector(state, (state) => state.isFetchingRuleDetail);
 const isCreatingExecution = createSelector(state, (state) => state.isCreatingExecution);
 const isFetchingExecutions = createSelector(state, (state) => state.isFetchingExecutions);
 const isDeletingExecution = createSelector(state, (state) => state.isDeletingExecution);
+const isFetchingActionDetails = createSelector(state, (state) => state.isFetchingActionDetails);
+const isUpdatingAction = createSelector(state, (state) => state.isUpdatingAction);
+const isCreatingAction = createSelector(state, (state) => state.isCreatingAction);
 const isFetchingExecutionDetails = createSelector(state, (state) => state.isFetchingExecutionDetails);
 const isUpdatingExecution = createSelector(state, (state) => state.isUpdatingExecution);
 const isUpdatingTrigger = createSelector(state, (state) => state.isUpdatingTrigger);
@@ -495,7 +498,10 @@ export const selectors = {
     actionDetails,
     actionsList,
 
-    ExecutionDetails,
+    isCreatingAction,
+    isFetchingActionDetails,
+    isUpdatingAction,
+    executionDetails,
     ruleDetails,
     isDeletingRule,
     isFetchingConditions,
@@ -504,7 +510,7 @@ export const selectors = {
     isCreatingCondition,
     isCreatingRule,
     isUpdatingCondition,
-    isFetchingCondition,
+    isFetchingConditionDetails,
     isUpdatingRule,
     isFetchingRuleDetail,
     isCreatingExecution,

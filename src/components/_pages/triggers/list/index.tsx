@@ -62,14 +62,21 @@ const TriggerList = () => {
                 width: '10%',
                 sortable: true,
             },
+            {
+                content: 'Ignore Trigger',
+                align: 'left',
+                id: 'ignoreTrigger',
+                width: '10%',
+            },
 
             {
-                content: 'Trigger Resource',
+                content: 'Event Resource',
                 align: 'left',
                 id: 'triggerResource',
                 width: '10%',
                 sortable: true,
             },
+
             {
                 content: 'Trigger Type',
                 align: 'left',
@@ -108,7 +115,7 @@ const TriggerList = () => {
                     id: trigger.uuid,
                     columns: [
                         <Link to={`./detail/${trigger.uuid}`}>{trigger.name}</Link>,
-
+                        trigger.ignoreTrigger ? 'Yes' : 'No',
                         getEnumLabel(resourceTypeEnum, trigger.eventResource || ''),
                         getEnumLabel(triggerTypeEnum, trigger.type),
                         getEnumLabel(eventNameEnum, trigger.event || ''),
@@ -125,7 +132,7 @@ const TriggerList = () => {
             {
                 icon: 'search',
                 disabled: false,
-                tooltip: 'Select Event Source',
+                tooltip: 'Select Event Resource',
                 onClick: () => {},
                 custom: (
                     <div className={styles.listSelectContainer}>
@@ -134,7 +141,7 @@ const TriggerList = () => {
                             maxMenuHeight={140}
                             menuPlacement="auto"
                             options={resourceOptionsWithEvents}
-                            placeholder="Select Event Source"
+                            placeholder="Select Event Resource"
                             onChange={(event) => {
                                 setSelectedEventSource(event?.value as Resource);
                             }}

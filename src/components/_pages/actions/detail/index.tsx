@@ -1,4 +1,3 @@
-import ConditionsViewer from 'components/ConditionsViewer';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
@@ -7,7 +6,7 @@ import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { Button, ButtonGroup, Col, Container, Input, Row } from 'reactstrap';
 import { PlatformEnum } from 'types/openapi';
 interface SelectChangeValue {
@@ -18,10 +17,11 @@ const RuleDetails = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
     const actionDetails = useSelector(rulesSelectors.actionDetails);
-    const isUpdatingRule = useSelector(rulesSelectors.isUpdatingRule);
-    const isFetchingRuleDetail = useSelector(rulesSelectors.isFetchingRuleDetail);
+    const isUpdatingAction = useSelector(rulesSelectors.isUpdatingAction);
+    const isFetchingActionDetails = useSelector(rulesSelectors.isFetchingActionDetails);
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
-    const conditionGroups = useSelector(rulesSelectors.conditions);
+    const executionTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ExecutionType));
+    const executions = useSelector(rulesSelectors.executions);
 
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [updateDescriptionEditEnable, setUpdateDescription] = useState<boolean>(false);
@@ -42,19 +42,19 @@ const RuleDetails = () => {
     }, [getFreshDetails]);
 
     useEffect(() => {
-        dispatch(rulesActions.listConditions({ resource: actionDetails?.resource }));
+        dispatch(rulesActions.listExecutions({ resource: actionDetails?.resource }));
     }, [actionDetails, dispatch]);
 
-    const isBusy = useMemo(() => isFetchingRuleDetail || isUpdatingRule, [isFetchingRuleDetail, isUpdatingRule]);
+    const isBusy = useMemo(() => isFetchingActionDetails || isUpdatingAction, [isFetchingActionDetails, isUpdatingAction]);
 
     const executionsOptions = useMemo(() => {
-        if (conditionGroups === undefined) return [];
-        return conditionGroups
+        if (executions === undefined) return [];
+        return executions
             .map((conditions) => {
                 return { value: conditions.uuid, label: conditions.name };
             })
             .filter((conditions) => !actionDetails?.executions?.map((condition) => condition.uuid).includes(conditions.value));
-    }, [conditionGroups, actionDetails]);
+    }, [executions, actionDetails]);
 
     const onDeleteConfirmed = useCallback(() => {
         if (!id) return;
@@ -65,72 +65,62 @@ const RuleDetails = () => {
     const onUpdateDescriptionConfirmed = useCallback(() => {
         if (!id || !updateDescriptionEditEnable) return;
         if (updatedDescription !== actionDetails?.description) {
-            // dispatch(
-            //     rulesActions.updateRule({
-            //         ruleUuid: id,
-            //         rule: {
-            //             description: updatedDescription,
-            //             // conditionsUuids: actionDetails?.conditions
-            //             conditionUuids: actionDetails?.conditionGroups?.length
-            //                 ? actionDetails?.conditionGroups.map((conditionGroup) => conditionGroup.uuid)
-            //                 : [],
-            //         },
-            //     }),
-            // );
+            dispatch(
+                rulesActions.updateAction({
+                    actionUuid: id,
+                    action: {
+                        description: updatedDescription,
+                        executionsUuids: actionDetails?.executions?.length
+                            ? actionDetails?.executions.map((execution) => execution.uuid)
+                            : [],
+                    },
+                }),
+            );
         }
         setUpdateDescription(false);
     }, [dispatch, id, actionDetails, updatedDescription, updateDescriptionEditEnable]);
 
-    const onUpdateConditionGroupsConfirmed = useCallback(
+    const onUpdateExecutionsConfirmed = useCallback(
         (newValues: SelectChangeValue[]) => {
             if (!id) return;
 
-            const newConditionGroupsUuids = newValues.map((conditionGroup) => conditionGroup.value);
+            const newExecutionsUuids = newValues.map((execution) => execution.value);
 
-            const previousAndNewConditionGroupsUuid = actionDetails?.executions.map((execution) => execution.uuid);
-            const allConditionGroups = [...(previousAndNewConditionGroupsUuid || []), ...newConditionGroupsUuids];
+            const previousAndNewExecutionsUuid = actionDetails?.executions.map((execution) => execution.uuid);
+            const allConditionGroups = [...(previousAndNewExecutionsUuid || []), ...newExecutionsUuids];
 
-            // dispatch(
-            //     rulesActions.updateRule({
-            //         ruleUuid: id,
-            //         rule: {
-            //             description: actionDetails?.description || '',
-            //             conditions: actionDetails?.conditions || [],
-            //             conditionGroupsUuids: allConditionGroups,
-            //         },
-            //     }),
-            // );
+            dispatch(
+                rulesActions.updateAction({
+                    actionUuid: id,
+                    action: {
+                        description: actionDetails?.description || '',
+                        executionsUuids: allConditionGroups,
+                        // conditionGroupsUuids: allConditionGroups,
+                    },
+                }),
+            );
         },
         [dispatch, id, actionDetails],
     );
 
-    const onDeleteConditionGroup = useCallback(
-        (conditionGroupUuid: string) => {
+    const onDeleteExecution = useCallback(
+        (executionUuid: string) => {
             if (!id) return;
 
-            // const updatedConditionGroupsUuid = actionDetails?.conditionGroups
-            //     .filter((conditionGroup) => conditionGroup.uuid !== conditionGroupUuid)
-            //     .map((conditionGroup) => conditionGroup.uuid);
-            // dispatch(
-            //     rulesActions.updateRule({
-            //         ruleUuid: id,
-            //         rule: {
-            //             conditions: actionDetails?.conditions || [],
-            //             description: actionDetails?.description || '',
-            //             conditionGroupsUuids: updatedConditionGroupsUuid,
-            //         },
-            //     }),
-            // );
+            const updatedExecutionsUuid = actionDetails?.executions
+                .filter((execution) => execution.uuid !== executionUuid)
+                .map((execution) => execution.uuid);
+            dispatch(
+                rulesActions.updateAction({
+                    actionUuid: id,
+                    action: {
+                        description: actionDetails?.description || '',
+                        executionsUuids: updatedExecutionsUuid?.length ? updatedExecutionsUuid : [],
+                    },
+                }),
+            );
         },
-        [
-            dispatch,
-            id,
-
-            // actionDetails?.conditionGroups,
-
-            actionDetails?.executions,
-            actionDetails?.description,
-        ],
+        [dispatch, id, actionDetails?.executions, actionDetails?.description],
     );
 
     const buttons: WidgetButtonProps[] = useMemo(
@@ -165,7 +155,7 @@ const RuleDetails = () => {
 
     const conditionGroupsDetailData: TableDataRow[] = useMemo(
         () =>
-            !actionDetails || isFetchingRuleDetail
+            !actionDetails || isFetchingActionDetails
                 ? []
                 : [
                       {
@@ -204,7 +194,7 @@ const RuleDetails = () => {
                                               title="Update Description"
                                               onClick={onUpdateDescriptionConfirmed}
                                               disabled={
-                                                  isUpdatingRule ||
+                                                  isUpdatingAction ||
                                                   updatedDescription === actionDetails.description ||
                                                   updatedDescription === ''
                                               }
@@ -215,7 +205,7 @@ const RuleDetails = () => {
                                               className="btn btn-link mx-auto danger"
                                               size="sm"
                                               title="Cancel"
-                                              disabled={isUpdatingRule}
+                                              disabled={isUpdatingAction}
                                               onClick={() => {
                                                   setUpdateDescription(false);
                                                   setUpdatedDescription(actionDetails?.description || '');
@@ -246,62 +236,67 @@ const RuleDetails = () => {
             resourceTypeEnum,
             onUpdateDescriptionConfirmed,
             updateDescriptionEditEnable,
-            isUpdatingRule,
+            isUpdatingAction,
             updatedDescription,
-            isFetchingRuleDetail,
+            isFetchingActionDetails,
         ],
     );
 
-    // const conditionGroupFieldsDataHeader = useMemo(
-    //     () => [
-    //         {
-    //             id: 'name',
-    //             content: 'Name',
-    //         },
-    //         {
-    //             id: 'description',
-    //             content: 'Description',
-    //         },
-    //         {
-    //             id: 'actions',
-    //             content: 'Actions',
-    //         },
-    //     ],
-    //     [],
-    // );
+    const executionDataHeaders = useMemo(
+        () => [
+            {
+                id: 'name',
+                content: 'Name',
+            },
+            {
+                id: 'type',
+                content: 'Type',
+            },
+            {
+                id: 'description',
+                content: 'Description',
+            },
+            {
+                id: 'actions',
+                content: 'Actions',
+            },
+        ],
+        [],
+    );
 
-    // const conditionGroupFieldsData: TableDataRow[] = useMemo(() => {
-    //     const isDeleteDisabled = actionDetails?.conditions.length === 0 || isFetchingRuleDetail || isUpdatingRule;
-    //     const conditionGroupData = !actionDetails?.conditionGroups.length
-    //         ? []
-    //         : actionDetails?.conditionGroups.map((conditionGroup) => {
-    //               return {
-    //                   id: conditionGroup.uuid,
-    //                   columns: [
-    //                       <Link to={`../../conditiongroups/detail/${conditionGroup.uuid}`}>{conditionGroup.name}</Link> || '',
-    //                       conditionGroup.description || '',
-    //                       <Button
-    //                           className="btn btn-link text-danger"
-    //                           size="sm"
-    //                           color="danger"
-    //                           title={
-    //                               isDeleteDisabled
-    //                                   ? 'Cannot delete this condition group as there are no other conditions in the rule'
-    //                                   : 'Delete Condition Group'
-    //                           }
-    //                           onClick={() => {
-    //                               onDeleteConditionGroup(conditionGroup.uuid);
-    //                           }}
-    //                           disabled={isDeleteDisabled}
-    //                       >
-    //                           <i className="fa fa-trash" />
-    //                       </Button>,
-    //                   ],
-    //               };
-    //           });
+    const executionsData: TableDataRow[] = useMemo(() => {
+        const isDeleteDisabled = actionDetails?.executions.length === 1 || isFetchingActionDetails || isUpdatingAction;
+        const conditionGroupData = !actionDetails?.executions.length
+            ? []
+            : actionDetails?.executions.map((conditionGroup) => {
+                  return {
+                      id: conditionGroup.uuid,
+                      columns: [
+                          <Link to={`../../executions/detail/${conditionGroup.uuid}`}>{conditionGroup.name}</Link> || '',
+                          getEnumLabel(executionTypeEnum, conditionGroup.type) || '',
+                          conditionGroup.description || '',
+                          <Button
+                              className="btn btn-link text-danger"
+                              size="sm"
+                              color="danger"
+                              title={
+                                  isDeleteDisabled
+                                      ? 'Cannot delete this execution as there are no other executions in the action'
+                                      : 'Delete Condition Group'
+                              }
+                              onClick={() => {
+                                  onDeleteExecution(conditionGroup.uuid);
+                              }}
+                              disabled={isDeleteDisabled}
+                          >
+                              <i className="fa fa-trash" />
+                          </Button>,
+                      ],
+                  };
+              });
 
-    //     return conditionGroupData;
-    // }, [actionDetails, isUpdatingRule, onDeleteConditionGroup, isFetchingRuleDetail]);
+        return conditionGroupData;
+    }, [actionDetails, isUpdatingAction, onDeleteExecution, isFetchingActionDetails, executionTypeEnum]);
 
     return (
         <Container className="themed-container" fluid>
@@ -311,31 +306,30 @@ const RuleDetails = () => {
                         <CustomTable data={conditionGroupsDetailData} headers={tableHeader} />
                     </Widget>
                 </Col>
-                {/* <Col>
+                <Col>
                     <Widget
                         busy={isBusy}
-                        title="Condition Groups"
+                        title="Executions"
                         titleSize="large"
                         widgetInfoCard={{
                             title: 'Information',
-                            description:
-                                'Condition is named set of conditions for selected resource that can be reused in rules of same resource',
+                            description: 'Execution is named set of execution items',
                         }}
                     >
                         <CustomTable
-                            data={conditionGroupFieldsData}
-                            headers={conditionGroupFieldsDataHeader}
+                            data={executionsData}
+                            headers={executionDataHeaders}
                             newRowWidgetProps={{
-                                isBusy: isUpdatingRule,
+                                isBusy: isUpdatingAction,
                                 newItemsList: executionsOptions,
-                                onAddClick: onUpdateConditionGroupsConfirmed,
+                                onAddClick: onUpdateExecutionsConfirmed,
                             }}
                         />
                     </Widget>
-                </Col> */}
+                </Col>
             </Row>
 
-            <Row>{actionDetails?.resource && <ConditionsViewer resource={actionDetails.resource} formType="rules" />}</Row>
+            {/* <Row>{actionDetails?.resource && <ConditionAndExecutionItemsViewer resource={actionDetails.resource} formType="rules" />}</Row> */}
 
             <Dialog
                 isOpen={confirmDelete}

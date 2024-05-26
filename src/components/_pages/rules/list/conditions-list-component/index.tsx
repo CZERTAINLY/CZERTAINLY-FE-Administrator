@@ -93,7 +93,7 @@ const ConditionsList = () => {
                     ],
                 };
             }),
-        [conditions, resourceTypeEnum],
+        [conditions, resourceTypeEnum, conditionTypeEnum],
     );
 
     const buttons: WidgetButtonProps[] = useMemo(

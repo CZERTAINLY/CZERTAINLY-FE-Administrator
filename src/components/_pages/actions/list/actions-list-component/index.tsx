@@ -80,7 +80,7 @@ const ActionsList = () => {
                 return {
                     id: rule.uuid,
                     columns: [
-                        <Link to={`./detail/${rule.uuid}`}>{rule.name}</Link>,
+                        <Link to={`../actions/detail/${rule.uuid}`}>{rule.name}</Link>,
                         getEnumLabel(resourceTypeEnum, rule.resource),
                         rule.description || '',
                     ],

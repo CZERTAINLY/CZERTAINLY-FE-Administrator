@@ -1,4 +1,4 @@
-import ConditionsViewer from 'components/ConditionsViewer';
+import ConditionAndExecutionItemsViewer from 'components/ConditionAndExecutionItemsViewer';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
@@ -15,7 +15,8 @@ const ExecutionDetails = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
-    const ExecutionDetails = useSelector(rulesSelectors.ExecutionDetails);
+    const executionTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ExecutionType));
+    const executionDetails = useSelector(rulesSelectors.executionDetails);
     const isFetchingDetails = useSelector(rulesSelectors.isFetchingExecutionDetails);
     const isUpdatingDetails = useSelector(rulesSelectors.isUpdatingExecution);
     const [confirmDelete, setConfirmDelete] = useState(false);
@@ -25,9 +26,9 @@ const ExecutionDetails = () => {
     const isBusy = useMemo(() => isFetchingDetails || isUpdatingDetails, [isFetchingDetails, isUpdatingDetails]);
 
     useEffect(() => {
-        if (!ExecutionDetails?.description || ExecutionDetails.uuid !== id) return;
-        setUpdatedDescription(ExecutionDetails.description);
-    }, [ExecutionDetails, id]);
+        if (!executionDetails?.description || executionDetails.uuid !== id) return;
+        setUpdatedDescription(executionDetails.description);
+    }, [executionDetails, id]);
 
     const getFreshDetails = useCallback(() => {
         if (!id) return;
@@ -46,20 +47,20 @@ const ExecutionDetails = () => {
 
     const onUpdateDescriptionConfirmed = useCallback(() => {
         if (!id || !updateDescriptionEditEnable) return;
-        if (updatedDescription !== ExecutionDetails?.description) {
+        if (updatedDescription !== executionDetails?.description) {
             dispatch(
                 rulesActions.updateExecution({
                     executionUuid: id,
                     execution: {
                         description: updatedDescription,
-                        // actions: ExecutionDetails?.actions || [],
-                        items: ExecutionDetails?.items || [],
+                        // actions: executionDetails?.actions || [],
+                        items: executionDetails?.items || [],
                     },
                 }),
             );
         }
         setUpdateDescription(false);
-    }, [dispatch, id, ExecutionDetails, updatedDescription, updateDescriptionEditEnable]);
+    }, [dispatch, id, executionDetails, updatedDescription, updateDescriptionEditEnable]);
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
@@ -93,20 +94,24 @@ const ExecutionDetails = () => {
 
     const executionDetailsData: TableDataRow[] = useMemo(
         () =>
-            !ExecutionDetails || isFetchingDetails
+            !executionDetails || isFetchingDetails
                 ? []
                 : [
                       {
                           id: 'uuid',
-                          columns: ['UUID', ExecutionDetails.uuid, ''],
+                          columns: ['UUID', executionDetails.uuid, ''],
                       },
                       {
                           id: 'name',
-                          columns: ['Name', ExecutionDetails.name, ''],
+                          columns: ['Name', executionDetails.name, ''],
+                      },
+                      {
+                          id: 'type',
+                          columns: ['Type', getEnumLabel(executionTypeEnum, executionDetails.type), ''],
                       },
                       {
                           id: 'resource',
-                          columns: ['Resource', getEnumLabel(resourceTypeEnum, ExecutionDetails.resource), ''],
+                          columns: ['Resource', getEnumLabel(resourceTypeEnum, executionDetails.resource), ''],
                       },
                       {
                           id: 'description',
@@ -119,7 +124,7 @@ const ExecutionDetails = () => {
                                       placeholder="Enter Description"
                                   />
                               ) : (
-                                  ExecutionDetails.description || ''
+                                  executionDetails.description || ''
                               ),
                               <div>
                                   {updateDescriptionEditEnable ? (
@@ -132,7 +137,7 @@ const ExecutionDetails = () => {
                                               onClick={onUpdateDescriptionConfirmed}
                                               disabled={
                                                   isUpdatingDetails ||
-                                                  updatedDescription === ExecutionDetails.description ||
+                                                  updatedDescription === executionDetails.description ||
                                                   updatedDescription === ''
                                               }
                                           >
@@ -144,7 +149,7 @@ const ExecutionDetails = () => {
                                               title="Cancel"
                                               onClick={() => {
                                                   setUpdateDescription(false);
-                                                  setUpdatedDescription(ExecutionDetails?.description || '');
+                                                  setUpdatedDescription(executionDetails?.description || '');
                                               }}
                                               disabled={isUpdatingDetails}
                                           >
@@ -170,7 +175,8 @@ const ExecutionDetails = () => {
                       },
                   ],
         [
-            ExecutionDetails,
+            executionDetails,
+            executionTypeEnum,
             resourceTypeEnum,
             setUpdateDescription,
             updateDescriptionEditEnable,
@@ -196,7 +202,11 @@ const ExecutionDetails = () => {
                     </Widget>
                 </Col>
             </Row>
-            <Row>{ExecutionDetails?.resource && <ConditionsViewer resource={ExecutionDetails.resource} formType="actionGroup" />}</Row>
+            <Row>
+                {executionDetails?.resource && (
+                    <ConditionAndExecutionItemsViewer resource={executionDetails.resource} formType="executionItems" />
+                )}
+            </Row>
             <Dialog
                 isOpen={confirmDelete}
                 caption={`Delete an Execution`}

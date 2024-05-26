@@ -429,7 +429,7 @@ export default function FilterWidgetRuleAction({
                 </React.Fragment>
             );
         },
-        [isFetchingAvailableFilters, executionTypeEnum, onRemoveFilterClick, searchGroupEnum, disableBadgeRemove, busyBadges],
+        [isFetchingAvailableFilters, onRemoveFilterClick, searchGroupEnum, disableBadgeRemove, busyBadges],
     );
 
     const isUpdateButtonDisabled = useMemo(() => {

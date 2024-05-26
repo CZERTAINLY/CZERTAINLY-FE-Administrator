@@ -39,11 +39,11 @@ const ActionsForm = () => {
     const title = 'Create Action';
 
     const executions = useSelector(rulesSelectors.executions);
-    const isCreatingRule = useSelector(rulesSelectors.isCreatingRule);
+    const isCreatingAction = useSelector(rulesSelectors.isCreatingAction);
     const [selectedResourceState, setSelectedResourceState] = useState<SelectChangeValue>();
     const { resourceOptionsWithRuleEvaluator, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
 
-    const isBusy = useMemo(() => isCreatingRule || isFetchingResourcesList, [isCreatingRule, isFetchingResourcesList]);
+    const isBusy = useMemo(() => isCreatingAction || isFetchingResourcesList, [isCreatingAction, isFetchingResourcesList]);
 
     const executionsOptions = useMemo(() => {
         if (executions === undefined) return [];

@@ -91,7 +91,7 @@ const ExecutionsList = () => {
                     ],
                 };
             }),
-        [executions, resourceTypeEnum],
+        [executions, resourceTypeEnum, executionTypeEnum],
     );
 
     const buttons: WidgetButtonProps[] = useMemo(

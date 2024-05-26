@@ -1,4 +1,4 @@
-import ConditionsViewer from 'components/ConditionsViewer';
+import ConditionAndExecutionItemsViewer from 'components/ConditionAndExecutionItemsViewer';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
@@ -15,8 +15,9 @@ const ConditionDetails = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
+    const conditionTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ConditionType));
     const conditionDetails = useSelector(rulesSelectors.conditionDetails);
-    const isFetchingConditionGroup = useSelector(rulesSelectors.isFetchingCondition);
+    const isFetchingConditionGroup = useSelector(rulesSelectors.isFetchingConditionDetails);
     const isUpdatingGroupDetails = useSelector(rulesSelectors.isUpdatingCondition);
 
     const [confirmDelete, setConfirmDelete] = useState(false);
@@ -105,6 +106,10 @@ const ConditionDetails = () => {
                           columns: ['Name', conditionDetails.name, ''],
                       },
                       {
+                          id: 'type',
+                          columns: ['Type', getEnumLabel(conditionTypeEnum, conditionDetails.type), ''],
+                      },
+                      {
                           id: 'resource',
                           columns: ['Resource', getEnumLabel(resourceTypeEnum, conditionDetails.resource), ''],
                       },
@@ -171,6 +176,7 @@ const ConditionDetails = () => {
                   ],
         [
             conditionDetails,
+            conditionTypeEnum,
             resourceTypeEnum,
             setUpdateDescription,
             updateDescriptionEditEnable,
@@ -190,7 +196,11 @@ const ConditionDetails = () => {
                     </Widget>
                 </Col>
             </Row>
-            <Row>{conditionDetails?.resource && <ConditionsViewer resource={conditionDetails.resource} formType="conditionGroup" />}</Row>
+            <Row>
+                {conditionDetails?.resource && (
+                    <ConditionAndExecutionItemsViewer resource={conditionDetails.resource} formType="condtionItems" />
+                )}
+            </Row>
             <Dialog
                 isOpen={confirmDelete}
                 caption={`Delete a Condition`}
