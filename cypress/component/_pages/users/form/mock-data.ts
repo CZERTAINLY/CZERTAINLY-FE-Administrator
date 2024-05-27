@@ -196,9 +196,7 @@ const userFormMockData = {
                     uuid: 'uuid-1234-text-custom-attribute',
                     name: 'Text Me',
                     label: 'Text Me',
-                    // type: 'custom',
                     type: AttributeType.Custom,
-                    // contentType: 'text',
                     contentType: AttributeContentType.Text,
                     content: [
                         {
@@ -211,7 +209,6 @@ const userFormMockData = {
                     name: 'SomeCustom',
                     label: 'SomeCustom',
                     type: AttributeType.Custom,
-                    // contentType: 'integer',
                     contentType: AttributeContentType.Integer,
 
                     content: [
@@ -225,7 +222,6 @@ const userFormMockData = {
                     name: 'DepartmentAssociation',
                     label: 'Department',
                     type: AttributeType.Custom,
-                    // contentType: 'string',
                     contentType: AttributeContentType.String,
                     content: [
                         {
@@ -299,7 +295,6 @@ const userFormMockData = {
                     name: 'Test Date',
                     label: 'Test Date',
                     type: AttributeType.Custom,
-                    // contentType: 'date',
                     contentType: AttributeContentType.Date,
                     content: [
                         {

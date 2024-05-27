@@ -200,7 +200,7 @@ export default function TokenProfileForm({ usesGlobalModal = false }: TokenProfi
                         <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}>
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="name">RA Profile Name</Label>
+                                    <Label for="name">Token Profile Name</Label>
 
                                     <Input
                                         {...input}

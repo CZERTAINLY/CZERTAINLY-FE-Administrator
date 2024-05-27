@@ -22,9 +22,9 @@ const TriggerList = () => {
 
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const eventNameEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ResourceEvent));
-    const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.RuleTriggerType));
+    const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.TriggerType));
     const [selectedResource, setSelectedResource] = useState<Resource>();
-    const [selectedTriggerSource, setSelectedTriggerSource] = useState<Resource>();
+    const [selectedEventSource, setSelectedEventSource] = useState<Resource>();
     const isFetchingList = useSelector(rulesSelectors.isFetchingTriggers);
     const isDeleting = useSelector(rulesSelectors.isDeletingTrigger);
 
@@ -46,8 +46,8 @@ const TriggerList = () => {
     }, [dispatch, checkedRows]);
 
     const getFreshList = useCallback(() => {
-        dispatch(rulesActions.listTriggers({ resource: selectedResource, triggerResouce: selectedTriggerSource }));
-    }, [dispatch, selectedResource, selectedTriggerSource]);
+        dispatch(rulesActions.listTriggers({ resource: selectedResource, eventResource: selectedEventSource }));
+    }, [dispatch, selectedResource, selectedEventSource]);
 
     useEffect(() => {
         getFreshList();
@@ -62,14 +62,21 @@ const TriggerList = () => {
                 width: '10%',
                 sortable: true,
             },
+            {
+                content: 'Ignore Trigger',
+                align: 'left',
+                id: 'ignoreTrigger',
+                width: '10%',
+            },
 
             {
-                content: 'Trigger Resource',
+                content: 'Event Resource',
                 align: 'left',
                 id: 'triggerResource',
                 width: '10%',
                 sortable: true,
             },
+
             {
                 content: 'Trigger Type',
                 align: 'left',
@@ -108,10 +115,10 @@ const TriggerList = () => {
                     id: trigger.uuid,
                     columns: [
                         <Link to={`./detail/${trigger.uuid}`}>{trigger.name}</Link>,
-
-                        getEnumLabel(resourceTypeEnum, trigger.triggerResource || ''),
-                        getEnumLabel(triggerTypeEnum, trigger.triggerType),
-                        getEnumLabel(eventNameEnum, trigger.eventName || ''),
+                        trigger.ignoreTrigger ? 'Yes' : 'No',
+                        getEnumLabel(resourceTypeEnum, trigger.eventResource || ''),
+                        getEnumLabel(triggerTypeEnum, trigger.type),
+                        getEnumLabel(eventNameEnum, trigger.event || ''),
                         getEnumLabel(resourceTypeEnum, trigger.resource),
                         trigger.description || '',
                     ],
@@ -125,7 +132,7 @@ const TriggerList = () => {
             {
                 icon: 'search',
                 disabled: false,
-                tooltip: 'Select Trigger Source',
+                tooltip: 'Select Event Resource',
                 onClick: () => {},
                 custom: (
                     <div className={styles.listSelectContainer}>
@@ -134,9 +141,9 @@ const TriggerList = () => {
                             maxMenuHeight={140}
                             menuPlacement="auto"
                             options={resourceOptionsWithEvents}
-                            placeholder="Select Trigger Source"
+                            placeholder="Select Event Resource"
                             onChange={(event) => {
-                                setSelectedTriggerSource(event?.value as Resource);
+                                setSelectedEventSource(event?.value as Resource);
                             }}
                         />
                     </div>
@@ -209,7 +216,7 @@ const TriggerList = () => {
             <Dialog
                 isOpen={confirmDelete}
                 caption={`Delete a Trigger`}
-                body={`You are about to delete a Trigger Group. Is this what you want to do?`}
+                body={`You are about to delete a Trigger. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },

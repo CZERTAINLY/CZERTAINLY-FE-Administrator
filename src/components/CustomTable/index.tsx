@@ -580,6 +580,8 @@ function CustomTable({
             )}
             {newRowWidgetProps && (
                 <NewRowWidget
+                    selectHint={newRowWidgetProps.selectHint}
+                    immidiateAdd={newRowWidgetProps.immidiateAdd}
                     isBusy={newRowWidgetProps.isBusy}
                     newItemsList={newRowWidgetProps.newItemsList}
                     onAddClick={newRowWidgetProps.onAddClick}

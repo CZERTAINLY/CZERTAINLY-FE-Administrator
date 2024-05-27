@@ -12,7 +12,7 @@
  */
 
 import type {
-    RuleTriggerHistoryRecordDto,
+    TriggerHistoryRecordDto,
 } from './';
 
 /**
@@ -52,10 +52,10 @@ export interface RuleTriggerHistoryDto {
     actionsPerformed?: boolean;
     /**
      * List of records for each action that has not been performed and each condition that has not been evaluated.
-     * @type {Array<RuleTriggerHistoryRecordDto>}
+     * @type {Array<TriggerHistoryRecordDto>}
      * @memberof RuleTriggerHistoryDto
      */
-    records?: Array<RuleTriggerHistoryRecordDto>;
+    records?: Array<TriggerHistoryRecordDto>;
     /**
      * Time at which has the trigger been triggered
      * @type {string}

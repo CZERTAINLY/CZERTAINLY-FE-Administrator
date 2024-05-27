@@ -13,7 +13,6 @@
 
 import type {
     Resource,
-    ResponseAttributeDto,
 } from './';
 
 /**
@@ -35,12 +34,6 @@ export interface RuleDto {
      */
     name: string;
     /**
-     * UUID of the Compliance Connector
-     * @type {string}
-     * @memberof RuleDto
-     */
-    connector_uuid?: string;
-    /**
      * Description of the Rule
      * @type {string}
      * @memberof RuleDto
@@ -51,24 +44,6 @@ export interface RuleDto {
      * @memberof RuleDto
      */
     resource: Resource;
-    /**
-     * Type of the Resource associated with the Rule
-     * @type {string}
-     * @memberof RuleDto
-     */
-    resourceType?: string;
-    /**
-     * Format of the Resource associated with the Rule
-     * @type {string}
-     * @memberof RuleDto
-     */
-    resourceFormat?: string;
-    /**
-     * Attributes of the Rule
-     * @type {Array<ResponseAttributeDto>}
-     * @memberof RuleDto
-     */
-    attributes: Array<ResponseAttributeDto>;
 }
 
 

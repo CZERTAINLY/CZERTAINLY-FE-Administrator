@@ -7,26 +7,26 @@ import { actions as alertActions } from './alerts';
 import { actions as appRedirectActions } from './app-redirect';
 
 import * as slice from './rules';
+import { transformActionDtoToModel } from './transform/auth';
 import {
-    tranformRuleActionGroupRequestModelToDto,
-    transformConditionRuleGroupDtoToModel,
-    transformConditionRuleGroupRequestModelToDto,
-    transformDetailRuleDtoToModel,
-    transformDtoRuleToModel,
-    // transformRuleActionGroupDetailDtoToModel,
-    transformRuleActionGroupDtoToModel,
-    transformRuleConditionGroupDetailDtoToModel,
-    transformRuleConditionGroupDtoToModel,
-    // transformRuleConditionGroupDetailDtoToModel,
+    tranformExecutionRequestModelToDto,
+    transformActionDetailDtoToModel,
+    transformActionRequestModelToDto,
+    transformConditionDtoToModel,
+    transformConditionRequestModelToDto,
+    transformExecutionDtoToModel,
+    transformRuleDetailDtoToModel,
+    transformRuleDtoToModel,
     transformRuleRequestModelToDto,
-    transformRuleTriggerHistoryDtoToModel,
-    transformRuleTriggerUpdateRequestModelToDto,
-    transformRuleUpdateRequestModelToDto,
-    transformTriggerRuleDetailDtoToModel,
-    transformTriggerRuleDtoToModel,
-    transformTriggerRuleRequestModelToDto,
-    transformUpdateActionGroupRequestModelToDto,
-    transformUpdateGroupRuleConditionRequestModelToDto,
+    transformTriggerDetailDtoToModel,
+    transformTriggerDtoToModel,
+    transformTriggerHistoryDtoToModel,
+    transformTriggerRequestModelToDto,
+    transformUpdateActionRequestModelToDto,
+    transformUpdateConditionRequestModelToDto,
+    transformUpdateExecutionRequestModelToDto,
+    transformUpdateRuleRequestModelToDto,
+    transformUpdateTriggerRequestModelToDto,
 } from './transform/rules';
 
 const listRules: AppEpic = (action$, state, deps) => {
@@ -34,48 +34,77 @@ const listRules: AppEpic = (action$, state, deps) => {
         filter(slice.actions.listRules.match),
         switchMap((action) =>
             deps.apiClients.rules.listRules({ resource: action.payload.resource }).pipe(
-                switchMap((rules) => of(slice.actions.listRulesSuccess({ rules: rules.map((rule) => transformDtoRuleToModel(rule)) }))),
+                switchMap((rules) => of(slice.actions.listRulesSuccess({ rules: rules.map((rule) => transformRuleDtoToModel(rule)) }))),
 
-                catchError((err) => of(slice.actions.listRulesFailure({ error: extractError(err, 'Failed to get rules list') }))),
-            ),
-        ),
-    );
-};
-
-const listActionGroups: AppEpic = (action$, state, deps) => {
-    return action$.pipe(
-        filter(slice.actions.listActionGroups.match),
-        switchMap((action) =>
-            deps.apiClients.rules.listActionGroups({ resource: action.payload.resource }).pipe(
-                switchMap((actionGroups) =>
-                    of(
-                        slice.actions.listActionGroupsSuccess({
-                            actionGroups: actionGroups.map((actionGroup) => transformRuleActionGroupDtoToModel(actionGroup)),
-                        }),
-                    ),
-                ),
                 catchError((err) =>
-                    of(slice.actions.listActionGroupsFailure({ error: extractError(err, 'Failed to get action groups list') })),
+                    of(
+                        slice.actions.listRulesFailure({ error: extractError(err, 'Failed to get rules list') }),
+                        alertActions.error(extractError(err, 'Failed to get rules list')),
+                    ),
                 ),
             ),
         ),
     );
 };
 
-const listConditionGroups: AppEpic = (action$, state, deps) => {
+const listExecutions: AppEpic = (action$, state, deps) => {
     return action$.pipe(
-        filter(slice.actions.listConditionGroups.match),
+        filter(slice.actions.listExecutions.match),
         switchMap((action) =>
-            deps.apiClients.rules.listConditionGroups({ resource: action.payload.resource }).pipe(
-                switchMap((conditionGroups) =>
+            deps.apiClients.actions.listExecutions({ resource: action.payload.resource }).pipe(
+                switchMap((executions) =>
                     of(
-                        slice.actions.listConditionGroupsSuccess({
-                            conditionGroups: conditionGroups.map((conditionGroup) => transformConditionRuleGroupDtoToModel(conditionGroup)),
+                        slice.actions.listExecutionsSuccess({
+                            executions: executions.map((execution) => transformExecutionDtoToModel(execution)),
                         }),
                     ),
                 ),
                 catchError((err) =>
-                    of(slice.actions.listConditionGroupsFailure({ error: extractError(err, 'Failed to get condition groups list') })),
+                    of(
+                        slice.actions.listExecutionsFailure({ error: extractError(err, 'Failed to get Executions list') }),
+                        alertActions.error(extractError(err, 'Failed to get Executions list')),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+const listActions: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.listActions.match),
+        switchMap((action) =>
+            deps.apiClients.actions.listActions({ resource: action.payload.resource }).pipe(
+                switchMap((actions) =>
+                    of(
+                        slice.actions.listActionsSuccess({
+                            actionsList: actions.map((action) => transformActionDtoToModel(action)),
+                        }),
+                    ),
+                ),
+                catchError((err) => of(slice.actions.listActionsFailure({ error: extractError(err, 'Failed to get actions list') }))),
+            ),
+        ),
+    );
+};
+
+const listConditions: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.listConditions.match),
+        switchMap((action) =>
+            deps.apiClients.rules.listConditions({ resource: action.payload.resource }).pipe(
+                switchMap((conditions) =>
+                    of(
+                        slice.actions.listConditionsSuccess({
+                            conditions: conditions.map((condition) => transformConditionDtoToModel(condition)),
+                        }),
+                    ),
+                ),
+                catchError((err) =>
+                    of(
+                        slice.actions.listConditionsFailure({ error: extractError(err, 'Failed to get conditions list') }),
+                        alertActions.error(extractError(err, 'Failed to get conditions list')),
+                    ),
                 ),
             ),
         ),
@@ -86,58 +115,95 @@ const listTriggers: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.listTriggers.match),
         switchMap((action) =>
-            deps.apiClients.rules.listTriggers({ resource: action.payload.resource, triggerResource: action.payload.triggerResouce }).pipe(
+            deps.apiClients.triggers.listTriggers({ resource: action.payload.resource, eventResource: action.payload.eventResource }).pipe(
                 switchMap((triggers) =>
-                    of(slice.actions.listTriggersSuccess({ triggers: triggers.map((trigger) => transformTriggerRuleDtoToModel(trigger)) })),
+                    of(
+                        slice.actions.listTriggersSuccess({
+                            triggers: triggers.map((trigger) => transformTriggerDtoToModel(trigger)),
+                        }),
+                    ),
                 ),
-                catchError((err) => of(slice.actions.listTriggersFailure({ error: extractError(err, 'Failed to get triggers list') }))),
+                catchError((err) =>
+                    of(
+                        slice.actions.listTriggersFailure({ error: extractError(err, 'Failed to get triggers list') }),
+                        alertActions.error(extractError(err, 'Failed to get triggers list')),
+                    ),
+                ),
             ),
         ),
     );
 };
 
-const createActionGroup: AppEpic = (action$, state, deps) => {
+const createExecution: AppEpic = (action$, state, deps) => {
     return action$.pipe(
-        filter(slice.actions.createActionGroup.match),
+        filter(slice.actions.createExecution.match),
         switchMap((action) =>
-            deps.apiClients.rules
-                .createActionGroup({
-                    ruleActionGroupRequestDto: tranformRuleActionGroupRequestModelToDto(action.payload.ruleActionGroupRequest),
+            deps.apiClients.actions
+                .createExecution({
+                    executionRequestDto: tranformExecutionRequestModelToDto(action.payload.executionRequestModel),
                 })
                 .pipe(
-                    switchMap((actionGroup) =>
+                    switchMap((execution) =>
                         of(
-                            slice.actions.createActionGroupSuccess({ actionGroup: transformRuleActionGroupDtoToModel(actionGroup) }),
-                            appRedirectActions.redirect({ url: `../actiongroups/detail/${actionGroup.uuid}` }),
+                            slice.actions.createExecutionSuccess({ execution: transformExecutionDtoToModel(execution) }),
+                            appRedirectActions.redirect({ url: `../executions/detail/${execution.uuid}` }),
                         ),
                     ),
                     catchError((err) =>
-                        of(slice.actions.createActionGroupFailure({ error: extractError(err, 'Failed to create action group') })),
+                        of(
+                            slice.actions.createExecutionFailure({ error: extractError(err, 'Failed to create Execution') }),
+                            alertActions.error(extractError(err, 'Failed to create Execution')),
+                        ),
                     ),
                 ),
         ),
     );
 };
 
-const createConditionGroup: AppEpic = (action$, state, deps) => {
+const createAction: AppEpic = (action$, state, deps) => {
     return action$.pipe(
-        filter(slice.actions.createConditionGroup.match),
+        filter(slice.actions.createAction.match),
+        switchMap((action) =>
+            deps.apiClients.actions.createAction({ actionRequestDto: transformActionRequestModelToDto(action.payload.action) }).pipe(
+                switchMap((action) =>
+                    of(
+                        slice.actions.createActionSuccess({ action: transformActionDetailDtoToModel(action) }),
+                        appRedirectActions.redirect({ url: `../actions/detail/${action.uuid}` }),
+                    ),
+                ),
+                catchError((err) =>
+                    of(
+                        slice.actions.createActionFailure({ error: extractError(err, 'Failed to create action') }),
+                        alertActions.error(extractError(err, 'Failed to create action')),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+const createCondition: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.createCondition.match),
         switchMap((action) =>
             deps.apiClients.rules
-                .createConditionGroup({
-                    ruleConditionGroupRequestDto: transformConditionRuleGroupRequestModelToDto(action.payload.ruleConditionGroupRequest),
+                .createCondition({
+                    conditionRequestDto: transformConditionRequestModelToDto(action.payload.conditionRequestModel),
                 })
                 .pipe(
-                    switchMap((conditionGroup) =>
+                    switchMap((condition) =>
                         of(
-                            slice.actions.createConditionGroupSuccess({
-                                conditionGroup: transformRuleConditionGroupDetailDtoToModel(conditionGroup),
+                            slice.actions.createConditionSuccess({
+                                condition: transformConditionDtoToModel(condition),
                             }),
-                            appRedirectActions.redirect({ url: `../conditiongroups/detail/${conditionGroup.uuid}` }),
+                            appRedirectActions.redirect({ url: `../conditions/detail/${condition.uuid}` }),
                         ),
                     ),
                     catchError((err) =>
-                        of(slice.actions.createConditionGroupFailure({ error: extractError(err, 'Failed to create condition group') })),
+                        of(
+                            slice.actions.createConditionFailure({ error: extractError(err, 'Failed to create condition') }),
+                            alertActions.error(extractError(err, 'Failed to create condition')),
+                        ),
                     ),
                 ),
         ),
@@ -150,11 +216,16 @@ const createRule: AppEpic = (action$, state, deps) => {
             deps.apiClients.rules.createRule({ ruleRequestDto: transformRuleRequestModelToDto(action.payload.rule) }).pipe(
                 switchMap((rule) =>
                     of(
-                        slice.actions.createRuleSuccess({ rule: transformDetailRuleDtoToModel(rule) }),
+                        slice.actions.createRuleSuccess({ rule: transformRuleDetailDtoToModel(rule) }),
                         appRedirectActions.redirect({ url: `../rules/detail/${rule.uuid}` }),
                     ),
                 ),
-                catchError((err) => of(slice.actions.createRuleFailure({ error: extractError(err, 'Failed to create rule') }))),
+                catchError((err) =>
+                    of(
+                        slice.actions.createRuleFailure({ error: extractError(err, 'Failed to create rule') }),
+                        alertActions.error(extractError(err, 'Failed to create rule')),
+                    ),
+                ),
             ),
         ),
     );
@@ -164,59 +235,84 @@ const createTrigger: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.createTrigger.match),
         switchMap((action) =>
-            deps.apiClients.rules
-                .createTrigger({ ruleTriggerRequestDto: transformTriggerRuleRequestModelToDto(action.payload.trigger) })
-                .pipe(
-                    switchMap((trigger) =>
-                        of(
-                            slice.actions.createTriggerSuccess({ trigger: transformTriggerRuleDetailDtoToModel(trigger) }),
-                            appRedirectActions.redirect({ url: `../../triggers/detail/${trigger.uuid}` }),
-                        ),
-                    ),
-                    catchError((err) =>
-                        of(
-                            slice.actions.createTriggerFailure({ error: extractError(err, 'Failed to create trigger') }),
-
-                            alertActions.error(extractError(err, 'Failed to create trigger')),
-                        ),
-                    ),
-                ),
-        ),
-    );
-};
-
-const deleteActionGroup: AppEpic = (action$, state, deps) => {
-    return action$.pipe(
-        filter(slice.actions.deleteActionGroup.match),
-        switchMap((action) =>
-            deps.apiClients.rules.deleteActionGroup({ actionGroupUuid: action.payload.actionGroupUuid }).pipe(
-                switchMap(() =>
+            deps.apiClients.triggers.createTrigger({ triggerRequestDto: transformTriggerRequestModelToDto(action.payload.trigger) }).pipe(
+                switchMap((trigger) =>
                     of(
-                        slice.actions.deleteActionGroupSuccess({ actionGroupUuid: action.payload.actionGroupUuid }),
-                        appRedirectActions.redirect({ url: `../../actiongroups` }),
+                        slice.actions.createTriggerSuccess({ trigger: transformTriggerDetailDtoToModel(trigger) }),
+                        appRedirectActions.redirect({ url: `../../triggers/detail/${trigger.uuid}` }),
                     ),
                 ),
                 catchError((err) =>
-                    of(slice.actions.deleteActionGroupFailure({ error: extractError(err, 'Failed to delete action group') })),
+                    of(
+                        slice.actions.createTriggerFailure({ error: extractError(err, 'Failed to create trigger') }),
+                        alertActions.error(extractError(err, 'Failed to create trigger')),
+                    ),
                 ),
             ),
         ),
     );
 };
 
-const deleteConditionGroup: AppEpic = (action$, state, deps) => {
+const deleteExecution: AppEpic = (action$, state, deps) => {
     return action$.pipe(
-        filter(slice.actions.deleteConditionGroup.match),
+        filter(slice.actions.deleteExecution.match),
         switchMap((action) =>
-            deps.apiClients.rules.deleteConditionGroup({ conditionGroupUuid: action.payload.conditionGroupUuid }).pipe(
+            deps.apiClients.actions.deleteExecution({ executionUuid: action.payload.executionUuid }).pipe(
                 switchMap(() =>
                     of(
-                        slice.actions.deleteConditionGroupSuccess({ conditionGroupUuid: action.payload.conditionGroupUuid }),
-                        appRedirectActions.redirect({ url: `../../conditiongroups` }),
+                        slice.actions.deleteExecutionSuccess({ executionUuid: action.payload.executionUuid }),
+                        appRedirectActions.redirect({ url: `../../actions/1` }),
                     ),
                 ),
                 catchError((err) =>
-                    of(slice.actions.deleteConditionGroupFailure({ error: extractError(err, 'Failed to delete condition group') })),
+                    of(
+                        slice.actions.deleteExecutionFailure({ error: extractError(err, 'Failed to delete Execution') }),
+                        alertActions.error(extractError(err, 'Failed to delete Execution')),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+const deleteAction: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.deleteAction.match),
+        switchMap((action) =>
+            deps.apiClients.actions.deleteAction({ actionUuid: action.payload.actionUuid }).pipe(
+                switchMap(() =>
+                    of(
+                        slice.actions.deleteActionSuccess({ actionUuid: action.payload.actionUuid }),
+                        appRedirectActions.redirect({ url: `../actions/0` }),
+                    ),
+                ),
+                catchError((err) =>
+                    of(
+                        slice.actions.deleteActionFailure({ error: extractError(err, 'Failed to delete action') }),
+                        alertActions.error(extractError(err, 'Failed to delete action')),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+const deleteCondition: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.deleteCondition.match),
+        switchMap((action) =>
+            deps.apiClients.rules.deleteCondition({ conditionUuid: action.payload.conditionUuid }).pipe(
+                switchMap(() =>
+                    of(
+                        slice.actions.deleteConditionSuccess({ conditionUuid: action.payload.conditionUuid }),
+                        appRedirectActions.redirect({ url: `../../rules/1` }),
+                    ),
+                ),
+                catchError((err) =>
+                    of(
+                        slice.actions.deleteConditionFailure({ error: extractError(err, 'Failed to delete condition') }),
+                        alertActions.error(extractError(err, 'Failed to delete condition')),
+                    ),
                 ),
             ),
         ),
@@ -231,10 +327,15 @@ const deleteRule: AppEpic = (action$, state, deps) => {
                 switchMap(() =>
                     of(
                         slice.actions.deleteRuleSuccess({ ruleUuid: action.payload.ruleUuid }),
-                        appRedirectActions.redirect({ url: `../rules` }),
+                        appRedirectActions.redirect({ url: `../rules/0` }),
                     ),
                 ),
-                catchError((err) => of(slice.actions.deleteRuleFailure({ error: extractError(err, 'Failed to delete rule') }))),
+                catchError((err) =>
+                    of(
+                        slice.actions.deleteRuleFailure({ error: extractError(err, 'Failed to delete rule') }),
+                        alertActions.error(extractError(err, 'Failed to delete rule')),
+                    ),
+                ),
             ),
         ),
     );
@@ -244,47 +345,75 @@ const deleteTrigger: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.deleteTrigger.match),
         switchMap((action) =>
-            deps.apiClients.rules.deleteTrigger({ triggerUuid: action.payload.triggerUuid }).pipe(
+            deps.apiClients.triggers.deleteTrigger({ triggerUuid: action.payload.triggerUuid }).pipe(
                 switchMap(() =>
                     of(
                         slice.actions.deleteTriggerSuccess({ triggerUuid: action.payload.triggerUuid }),
                         appRedirectActions.redirect({ url: `../../triggers` }),
                     ),
                 ),
-                catchError((err) => of(slice.actions.deleteTriggerFailure({ error: extractError(err, 'Failed to delete trigger') }))),
-            ),
-        ),
-    );
-};
-
-const getActionGroup: AppEpic = (action$, state, deps) => {
-    return action$.pipe(
-        filter(slice.actions.getActionGroup.match),
-        switchMap((action) =>
-            deps.apiClients.rules.getActionGroup({ actionGroupUuid: action.payload.actionGroupUuid }).pipe(
-                switchMap((actionGroup) =>
-                    of(slice.actions.getActionGroupSuccess({ actionGroup: transformRuleActionGroupDtoToModel(actionGroup) })),
+                catchError((err) =>
+                    of(
+                        slice.actions.deleteTriggerFailure({ error: extractError(err, 'Failed to delete trigger') }),
+                        alertActions.error(extractError(err, 'Failed to delete trigger')),
+                    ),
                 ),
-                catchError((err) => of(slice.actions.getActionGroupFailure({ error: extractError(err, 'Failed to get action group') }))),
             ),
         ),
     );
 };
 
-const getConditionGroup: AppEpic = (action$, state, deps) => {
+const getExecution: AppEpic = (action$, state, deps) => {
     return action$.pipe(
-        filter(slice.actions.getConditionGroup.match),
+        filter(slice.actions.getExecution.match),
         switchMap((action) =>
-            deps.apiClients.rules.getConditionGroup({ conditionGroupUuid: action.payload.conditionGroupUuid }).pipe(
+            deps.apiClients.actions.getExecution({ executionUuid: action.payload.executionUuid }).pipe(
+                switchMap((actionGroup) => of(slice.actions.getExecutionSuccess({ execution: transformExecutionDtoToModel(actionGroup) }))),
+                catchError((err) =>
+                    of(
+                        (slice.actions.getExecutionFailure({ error: extractError(err, 'Failed to get Execution') }),
+                        alertActions.error(extractError(err, 'Failed to get Execution'))),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+const getAction: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.getAction.match),
+        switchMap((action) =>
+            deps.apiClients.actions.getAction({ actionUuid: action.payload.actionUuid }).pipe(
+                switchMap((actionGroup) => of(slice.actions.getActionSuccess({ action: transformActionDetailDtoToModel(actionGroup) }))),
+                catchError((err) =>
+                    of(
+                        slice.actions.getActionFailure({ error: extractError(err, 'Failed to get Action') }),
+                        alertActions.error(extractError(err, 'Failed to get Action')),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+const getCondition: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.getCondition.match),
+        switchMap((action) =>
+            deps.apiClients.rules.getCondition({ conditionUuid: action.payload.conditionUuid }).pipe(
                 switchMap((conditionGroup) =>
                     of(
-                        slice.actions.getConditionGroupSuccess({
-                            conditionGroup: transformRuleConditionGroupDetailDtoToModel(conditionGroup),
+                        slice.actions.getConditionSuccess({
+                            condition: transformConditionDtoToModel(conditionGroup),
                         }),
                     ),
                 ),
                 catchError((err) =>
-                    of(slice.actions.getConditionGroupFailure({ error: extractError(err, 'Failed to get condition group') })),
+                    of(
+                        slice.actions.getConditionFailure({ error: extractError(err, 'Failed to get Condition') }),
+                        alertActions.error(extractError(err, 'Failed to get Condition')),
+                    ),
                 ),
             ),
         ),
@@ -296,8 +425,13 @@ const getRule: AppEpic = (action$, state, deps) => {
         filter(slice.actions.getRule.match),
         switchMap((action) =>
             deps.apiClients.rules.getRule({ ruleUuid: action.payload.ruleUuid }).pipe(
-                switchMap((rule) => of(slice.actions.getRuleSuccess({ rule: transformDetailRuleDtoToModel(rule) }))),
-                catchError((err) => of(slice.actions.getRuleFailure({ error: extractError(err, 'Failed to get rule') }))),
+                switchMap((rule) => of(slice.actions.getRuleSuccess({ rule: transformRuleDetailDtoToModel(rule) }))),
+                catchError((err) =>
+                    of(
+                        slice.actions.getRuleFailure({ error: extractError(err, 'Failed to get rule') }),
+                        alertActions.error(extractError(err, 'Failed to get rule')),
+                    ),
+                ),
             ),
         ),
     );
@@ -307,36 +441,41 @@ const getTrigger: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.getTrigger.match),
         switchMap((action) =>
-            deps.apiClients.rules.getTrigger({ triggerUuid: action.payload.triggerUuid }).pipe(
-                switchMap((trigger) => of(slice.actions.getTriggerSuccess({ trigger: transformTriggerRuleDetailDtoToModel(trigger) }))),
-                catchError((err) => of(slice.actions.getTriggerFailure({ error: extractError(err, 'Failed to get trigger') }))),
+            deps.apiClients.triggers.getTrigger({ triggerUuid: action.payload.triggerUuid }).pipe(
+                switchMap((trigger) => of(slice.actions.getTriggerSuccess({ trigger: transformTriggerDetailDtoToModel(trigger) }))),
+                catchError((err) =>
+                    of(
+                        slice.actions.getTriggerFailure({ error: extractError(err, 'Failed to get trigger') }),
+                        alertActions.error(extractError(err, 'Failed to get trigger')),
+                    ),
+                ),
             ),
         ),
     );
 };
 
-const updateActionGroup: AppEpic = (action$, state, deps) => {
+const updateExecution: AppEpic = (action$, state, deps) => {
     return action$.pipe(
-        filter(slice.actions.updateActionGroup.match),
+        filter(slice.actions.updateExecution.match),
         switchMap((action) =>
-            deps.apiClients.rules
-                .updateActionGroup({
-                    actionGroupUuid: action.payload.actionGroupUuid,
-                    updateRuleActionGroupRequestDto: transformUpdateActionGroupRequestModelToDto(action.payload.actionGroup),
+            deps.apiClients.actions
+                .updateExecution({
+                    executionUuid: action.payload.executionUuid,
+                    updateExecutionRequestDto: transformUpdateExecutionRequestModelToDto(action.payload.execution),
                 })
                 .pipe(
-                    switchMap((actionGroup) =>
+                    switchMap((execution) =>
                         of(
-                            slice.actions.updateActionGroupSuccess({
-                                actionGroup: transformRuleActionGroupDtoToModel(actionGroup),
+                            slice.actions.updateExecutionSuccess({
+                                execution: transformExecutionDtoToModel(execution),
                             }),
                         ),
                     ),
                     catchError((err) =>
                         of(
-                            slice.actions.updateActionGroupFailure({ error: extractError(err, 'Failed to update action group') }),
+                            slice.actions.updateExecutionFailure({ error: extractError(err, 'Failed to update action group') }),
                             alertActions.error(extractError(err, 'Failed to update action group')),
-                            slice.actions.getActionGroup({ actionGroupUuid: action.payload.actionGroupUuid }),
+                            slice.actions.getExecution({ executionUuid: action.payload.executionUuid }),
                         ),
                     ),
                 ),
@@ -344,29 +483,59 @@ const updateActionGroup: AppEpic = (action$, state, deps) => {
     );
 };
 
-const updateConditionGroup: AppEpic = (action$, state, deps) => {
+const updateAction: AppEpic = (action$, state, deps) => {
     return action$.pipe(
-        filter(slice.actions.updateConditionGroup.match),
+        filter(slice.actions.updateAction.match),
         switchMap((action) =>
-            deps.apiClients.rules
-                .updateConditionGroup({
-                    conditionGroupUuid: action.payload.conditionGroupUuid,
-                    updateRuleConditionGroupRequestDto: transformUpdateGroupRuleConditionRequestModelToDto(action.payload.conditionGroup),
+            deps.apiClients.actions
+                .updateAction({
+                    actionUuid: action.payload.actionUuid,
+                    updateActionRequestDto: transformUpdateActionRequestModelToDto(action.payload.action),
                 })
                 .pipe(
-                    switchMap((conditionRuleGroupDetail) =>
+                    switchMap((action) =>
                         of(
-                            slice.actions.updateConditionGroupSuccess({
-                                conditionGroup: transformRuleConditionGroupDtoToModel(conditionRuleGroupDetail),
+                            slice.actions.updateActionSuccess({
+                                action: transformActionDetailDtoToModel(action),
                             }),
-                            appRedirectActions.redirect({ url: `../../conditiongroups/detail/${conditionRuleGroupDetail.uuid}` }),
+                            appRedirectActions.redirect({ url: `../actions/detail/${action.uuid}` }),
                         ),
                     ),
                     catchError((err) =>
                         of(
-                            slice.actions.updateConditionGroupFailure({ error: extractError(err, 'Failed to update condition group') }),
+                            slice.actions.updateActionFailure({ error: extractError(err, 'Failed to update action group') }),
+                            alertActions.error(extractError(err, 'Failed to update action group')),
+                            slice.actions.getAction({ actionUuid: action.payload.actionUuid }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
+const updateCondition: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.updateCondition.match),
+        switchMap((action) =>
+            deps.apiClients.rules
+                .updateCondition({
+                    conditionUuid: action.payload.conditionUuid,
+                    updateConditionRequestDto: transformUpdateConditionRequestModelToDto(action.payload.condition),
+                })
+                .pipe(
+                    switchMap((condition) =>
+                        of(
+                            slice.actions.updateConditionSuccess({
+                                condition: transformConditionDtoToModel(condition),
+                            }),
+                            appRedirectActions.redirect({ url: `../../conditions/detail/${condition.uuid}` }),
+                        ),
+                    ),
+                    catchError((err) =>
+                        of(
+                            slice.actions.updateConditionFailure({ error: extractError(err, 'Failed to update condition group') }),
                             alertActions.error(extractError(err, 'Failed to update Condition Group')),
-                            slice.actions.getConditionGroup({ conditionGroupUuid: action.payload.conditionGroupUuid }),
+                            slice.actions.getCondition({ conditionUuid: action.payload.conditionUuid }),
                         ),
                     ),
                 ),
@@ -381,12 +550,12 @@ const updateRule: AppEpic = (action$, state, deps) => {
             deps.apiClients.rules
                 .updateRule({
                     ruleUuid: action.payload.ruleUuid,
-                    updateRuleRequestDto: transformRuleUpdateRequestModelToDto(action.payload.rule),
+                    updateRuleRequestDto: transformUpdateRuleRequestModelToDto(action.payload.rule),
                 })
                 .pipe(
                     switchMap((rule) =>
                         of(
-                            slice.actions.updateRuleSuccess({ rule: transformDetailRuleDtoToModel(rule) }),
+                            slice.actions.updateRuleSuccess({ rule: transformRuleDetailDtoToModel(rule) }),
                             appRedirectActions.redirect({ url: `../rules/detail/${rule.uuid}` }),
                         ),
                     ),
@@ -406,19 +575,17 @@ const updateTrigger: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.updateTrigger.match),
         switchMap((action) =>
-            deps.apiClients.rules
+            deps.apiClients.triggers
                 .updateTrigger({
                     triggerUuid: action.payload.triggerUuid,
-                    updateRuleTriggerRequestDto: transformRuleTriggerUpdateRequestModelToDto(action.payload.trigger),
+                    updateTriggerRequestDto: transformUpdateTriggerRequestModelToDto(action.payload.trigger),
                 })
                 .pipe(
-                    switchMap((trigger) =>
-                        of(slice.actions.updateTriggerSuccess({ trigger: transformTriggerRuleDetailDtoToModel(trigger) })),
-                    ),
+                    switchMap((trigger) => of(slice.actions.updateTriggerSuccess({ trigger: transformTriggerDetailDtoToModel(trigger) }))),
                     catchError((err) =>
                         of(
                             slice.actions.updateTriggerFailure({ error: extractError(err, 'Failed to update trigger') }),
-                            alertActions.error(extractError(err, 'Failed to create trigger')),
+                            alertActions.error(extractError(err, 'Failed to update trigger')),
                             slice.actions.getTrigger({ triggerUuid: action.payload.triggerUuid }),
                         ),
                     ),
@@ -431,13 +598,13 @@ const getTriggerHistory: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.getTriggerHistory.match),
         switchMap((action) =>
-            deps.apiClients.rules
-                .getTriggerHistory({ triggerUuid: action.payload.triggerUuid, triggerObjectUuid: action.payload.triggerObjectUuid })
+            deps.apiClients.triggers
+                .getTriggerHistory({ triggerUuid: action.payload.triggerUuid, associationObjectUuid: action.payload.triggerObjectUuid })
                 .pipe(
                     switchMap((triggerHistory) =>
                         of(
                             slice.actions.getTriggerHistorySuccess({
-                                triggerHistories: triggerHistory.map(transformRuleTriggerHistoryDtoToModel),
+                                triggerHistories: triggerHistory.map(transformTriggerHistoryDtoToModel),
                             }),
                         ),
                     ),
@@ -451,23 +618,28 @@ const getTriggerHistory: AppEpic = (action$, state, deps) => {
 
 const epics = [
     listRules,
-    listActionGroups,
-    listConditionGroups,
+    listExecutions,
+    listConditions,
     listTriggers,
-    createActionGroup,
-    createConditionGroup,
+    listActions,
+    createExecution,
+    createCondition,
     createRule,
+    createAction,
     createTrigger,
-    deleteActionGroup,
-    deleteConditionGroup,
+    deleteExecution,
+    deleteAction,
+    deleteCondition,
     deleteRule,
     deleteTrigger,
-    getActionGroup,
-    getConditionGroup,
+    getExecution,
+    getAction,
+    getCondition,
     getRule,
     getTrigger,
-    updateActionGroup,
-    updateConditionGroup,
+    updateAction,
+    updateExecution,
+    updateCondition,
     updateRule,
     updateTrigger,
     getTriggerHistory,

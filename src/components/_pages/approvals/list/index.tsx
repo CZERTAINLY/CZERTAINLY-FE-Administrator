@@ -3,7 +3,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button, Container } from 'reactstrap';
-// import { selectors as profileApprovalSelector } from "ducks/approval-profiles";
 
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
@@ -37,10 +36,6 @@ export default function ApprovalsList() {
     const [showHistory, setShowHistory] = useState<boolean>(false);
 
     const isBusy = useMemo(() => isFetching, [isFetching]);
-
-    useEffect(() => {
-        // dispatch(rolesActions.getPermissions({ uuid:  }));
-    }, []);
 
     const listUserApprovals = useCallback(() => {
         dispatch(

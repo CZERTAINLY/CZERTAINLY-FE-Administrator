@@ -273,7 +273,9 @@ function TokenProfileList() {
             <Dialog
                 isOpen={confirmDelete}
                 caption={`Delete Token ${checkedRows.length > 1 ? 'Profiles' : 'Profile'}`}
-                body={`You are about to delete ${checkedRows.length > 1 ? 'a Token Profile' : 'RA profiles'}. Is this what you want to do?`}
+                body={`You are about to delete ${
+                    checkedRows.length > 1 ? 'a Token Profile' : 'Token Profiles'
+                }. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },

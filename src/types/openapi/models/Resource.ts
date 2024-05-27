@@ -12,7 +12,7 @@
  */
 
 /**
- * Source Object Type
+ * Type of the the trigger event source object
  * @export
  * @enum {string}
  */
@@ -44,6 +44,9 @@ export enum Resource {
     Tokens = 'tokens',
     Keys = 'keys',
     ApprovalProfiles = 'approvalProfiles',
-    Approvals = 'approvals'
+    Approvals = 'approvals',
+    Rules = 'rules',
+    Actions = 'actions',
+    Triggers = 'triggers'
 }
 

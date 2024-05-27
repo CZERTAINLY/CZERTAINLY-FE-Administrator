@@ -151,7 +151,6 @@ describe('AttributeViewer with Metadata', () => {
 
     it(`should check if source object table is opened in modal`, () => {
         cy.get('.fa-caret-down').eq(0).click().wait(clickWait);
-        // cy.get('.fa-arrow-up').eq(1).click().wait(clickWait);
         cy.get('.fa-info').eq(0).click().wait(clickWait);
 
         cy.get('.modal-content').should('be.visible');

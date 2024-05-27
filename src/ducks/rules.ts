@@ -1,88 +1,107 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Resource } from 'types/openapi';
 import {
-    ActionGroupModel,
-    ActionRuleGroupRequestModel,
-    ConditionRuleGroupModel,
-    ConditionRuleGroupRequestModel,
-    DetailRuleModel,
-    RequestRuleModel,
+    ActionDetailModel,
+    ActionModel,
+    ActionRequestModel,
+    ConditionModel,
+    ConditionRequestModel,
+    ExecutionModel,
+    ExecutionRequestModel,
+    RuleDetailModel,
     RuleModel,
-    RuleTriggerHistoryModel,
-    RuleTriggerUpdateRequestModel,
-    RuleUpdateRequestModel,
-    TriggerRuleDetailModel,
-    TriggerRuleModel,
-    TriggerRuleRequestModel,
-    UpdateActionGroupRequestModel,
-    UpdateGroupRuleConditionRequestModel,
+    RuleRequestModel,
+    TriggerDetailModel,
+    TriggerHistoryModel,
+    TriggerModel,
+    TriggerRequestDto,
+    UpdateActionRequestModel,
+    UpdateConditionRequestModel,
+    UpdateExecutionRequestModel,
+    UpdateRuleRequestModel,
+    UpdateTriggerRequestModel,
 } from 'types/rules';
 import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     rules: RuleModel[];
-    ruleDetails?: DetailRuleModel;
-    actionGroups: ActionGroupModel[];
-    actionGroupDetails?: ActionGroupModel;
-    conditionRuleGroups: ConditionRuleGroupModel[];
-    conditionGroupDetails?: ConditionRuleGroupModel;
-    triggers: TriggerRuleModel[];
-    triggerDetails?: TriggerRuleDetailModel;
-    triggerHistories: RuleTriggerHistoryModel[];
+    triggerHistories: TriggerHistoryModel[];
 
-    isUpdatingActionGroup: boolean;
+    ruleDetails?: RuleDetailModel;
+    executions: ExecutionModel[];
+    executionDetails?: ExecutionModel;
+    actionsList: ActionModel[];
+    actionDetails?: ActionDetailModel;
+
+    conditions: ConditionModel[];
+    conditionDetails?: ConditionModel;
+    triggers: TriggerModel[];
+    triggerDetails?: TriggerDetailModel;
+
+    isUpdatingExecution: boolean;
     isFetchingRulesList: boolean;
-    isFetchingActionGroups: boolean;
-    isFetchingConditionGroups: boolean;
+    isFetchingExecutions: boolean;
+    isFetchingConditions: boolean;
     isFetchingTriggers: boolean;
-    isFetchingRuleDetail: boolean;
-    isFetchingActionGroup: boolean;
-    isFetchingConditionGroup: boolean;
+    isCreatingAction: boolean;
+    isFetchingActionDetails: boolean;
+    isFetchingRuleDetails: boolean;
+    isFetchingExecutionDetails: boolean;
+    isFetchingConditionDetails: boolean;
     isFetchingTriggerDetail: boolean;
     isDeletingRule: boolean;
     isCreatingRule: boolean;
-    isCreatingActionGroup: boolean;
-    isDeletingActionGroup: boolean;
-    isCreatingConditionGroup: boolean;
-    isDeletingConditionGroup: boolean;
+    isCreatingExecution: boolean;
+    isDeletingExecution: boolean;
+    isCreatingCondition: boolean;
+    isDeletingCondition: boolean;
     isCreatingTrigger: boolean;
     isDeletingTrigger: boolean;
-    isUpdatingConditionGroup: boolean;
+    isUpdatingCondition: boolean;
     isUpdatingRule: boolean;
+    isUpdatingAction: boolean;
     isUpdatingTrigger: boolean;
     isFetchingTriggerHistories: boolean;
+    isFetchingActions: boolean;
+    isDeletingAction: boolean;
 };
 
 export const initialState: State = {
     rules: [],
-    actionGroups: [],
-    conditionRuleGroups: [],
+    executions: [],
+    conditions: [],
+    actionsList: [],
     triggers: [],
     triggerHistories: [],
 
     isFetchingRulesList: false,
-    isFetchingActionGroups: false,
-    isFetchingActionGroup: false,
-    isFetchingConditionGroup: false,
+    isFetchingExecutions: false,
+    isFetchingExecutionDetails: false,
+    isFetchingConditionDetails: false,
     isFetchingTriggerDetail: false,
 
-    isFetchingConditionGroups: false,
+    isFetchingConditions: false,
     isFetchingTriggers: false,
     isCreatingRule: false,
-    isFetchingRuleDetail: false,
+    isFetchingRuleDetails: false,
 
-    isUpdatingActionGroup: false,
-    isCreatingActionGroup: false,
-    isDeletingActionGroup: false,
-    isCreatingConditionGroup: false,
-    isDeletingConditionGroup: false,
+    isUpdatingExecution: false,
+    isCreatingExecution: false,
+    isCreatingAction: false,
+    isDeletingExecution: false,
+    isCreatingCondition: false,
+    isDeletingCondition: false,
     isCreatingTrigger: false,
     isDeletingTrigger: false,
-    isUpdatingConditionGroup: false,
+    isUpdatingCondition: false,
     isUpdatingRule: false,
     isUpdatingTrigger: false,
+    isUpdatingAction: false,
     isDeletingRule: false,
     isFetchingTriggerHistories: false,
+    isFetchingActions: false,
+    isFetchingActionDetails: false,
+    isDeletingAction: false,
 };
 
 export const slice = createSlice({
@@ -111,35 +130,48 @@ export const slice = createSlice({
             state.isFetchingRulesList = false;
         },
 
-        listActionGroups: (state, action: PayloadAction<{ resource?: Resource }>) => {
-            state.isFetchingActionGroups = true;
+        listExecutions: (state, action: PayloadAction<{ resource?: Resource }>) => {
+            state.isFetchingExecutions = true;
         },
-        listActionGroupsSuccess: (state, action: PayloadAction<{ actionGroups: ActionGroupModel[] }>) => {
-            state.actionGroups = action.payload.actionGroups;
-            state.isFetchingActionGroups = false;
-        },
-
-        listActionGroupsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isFetchingActionGroups = false;
+        listExecutionsSuccess: (state, action: PayloadAction<{ executions: ExecutionModel[] }>) => {
+            state.executions = action.payload.executions;
+            state.isFetchingExecutions = false;
         },
 
-        listConditionGroups: (state, action: PayloadAction<{ resource?: Resource }>) => {
-            state.isFetchingConditionGroups = true;
+        listExecutionsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingExecutions = false;
         },
 
-        listConditionGroupsSuccess: (state, action: PayloadAction<{ conditionGroups: ConditionRuleGroupModel[] }>) => {
-            state.conditionRuleGroups = action.payload.conditionGroups;
-            state.isFetchingConditionGroups = false;
+        listActions: (state, action: PayloadAction<{ resource?: Resource }>) => {
+            state.isFetchingActions = true;
         },
 
-        listConditionGroupsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isFetchingConditionGroups = false;
+        listActionsSuccess: (state, action: PayloadAction<{ actionsList: ActionModel[] }>) => {
+            state.actionsList = action.payload.actionsList;
+            state.isFetchingActions = false;
         },
 
-        listTriggers: (state, action: PayloadAction<{ resource?: Resource; triggerResouce?: Resource }>) => {
+        listActionsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingActions = false;
+        },
+
+        listConditions: (state, action: PayloadAction<{ resource?: Resource }>) => {
+            state.isFetchingConditions = true;
+        },
+
+        listConditionsSuccess: (state, action: PayloadAction<{ conditions: ConditionModel[] }>) => {
+            state.conditions = action.payload.conditions;
+            state.isFetchingConditions = false;
+        },
+
+        listConditionsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingConditions = false;
+        },
+
+        listTriggers: (state, action: PayloadAction<{ resource?: Resource; eventResource?: Resource }>) => {
             state.isFetchingTriggers = true;
         },
-        listTriggersSuccess: (state, action: PayloadAction<{ triggers: TriggerRuleModel[] }>) => {
+        listTriggersSuccess: (state, action: PayloadAction<{ triggers: TriggerModel[] }>) => {
             state.triggers = action.payload.triggers;
             state.isFetchingTriggers = false;
         },
@@ -148,32 +180,45 @@ export const slice = createSlice({
             state.isFetchingTriggers = false;
         },
 
-        createActionGroup: (state, action: PayloadAction<{ ruleActionGroupRequest: ActionRuleGroupRequestModel }>) => {
-            state.isCreatingActionGroup = true;
+        createExecution: (state, action: PayloadAction<{ executionRequestModel: ExecutionRequestModel }>) => {
+            state.isCreatingExecution = true;
         },
-        createActionGroupSuccess: (state, action: PayloadAction<{ actionGroup: ActionGroupModel }>) => {
-            state.actionGroups.push(action.payload.actionGroup);
-            state.isCreatingActionGroup = false;
-        },
-
-        createActionGroupFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isCreatingActionGroup = false;
+        createExecutionSuccess: (state, action: PayloadAction<{ execution: ExecutionModel }>) => {
+            state.executions.push(action.payload.execution);
+            state.isCreatingExecution = false;
         },
 
-        createConditionGroup: (state, action: PayloadAction<{ ruleConditionGroupRequest: ConditionRuleGroupRequestModel }>) => {
-            state.isCreatingConditionGroup = true;
+        createExecutionFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isCreatingExecution = false;
         },
 
-        createConditionGroupSuccess: (state, action: PayloadAction<{ conditionGroup: ConditionRuleGroupModel }>) => {
-            state.conditionRuleGroups.push(action.payload.conditionGroup);
-            state.isCreatingConditionGroup = false;
+        createAction: (state, action: PayloadAction<{ action: ActionRequestModel }>) => {
+            state.isCreatingAction = true;
         },
 
-        createConditionGroupFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isCreatingConditionGroup = false;
+        createActionSuccess: (state, action: PayloadAction<{ action: ActionModel }>) => {
+            state.actionsList.push(action.payload.action);
+            state.isCreatingAction = false;
         },
 
-        createRule: (state, action: PayloadAction<{ rule: RequestRuleModel }>) => {
+        createActionFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isCreatingAction = false;
+        },
+
+        createCondition: (state, action: PayloadAction<{ conditionRequestModel: ConditionRequestModel }>) => {
+            state.isCreatingCondition = true;
+        },
+
+        createConditionSuccess: (state, action: PayloadAction<{ condition: ConditionModel }>) => {
+            state.conditions.push(action.payload.condition);
+            state.isCreatingCondition = false;
+        },
+
+        createConditionFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isCreatingCondition = false;
+        },
+
+        createRule: (state, action: PayloadAction<{ rule: RuleRequestModel }>) => {
             state.isCreatingRule = true;
         },
         createRuleSuccess: (state, action: PayloadAction<{ rule: RuleModel }>) => {
@@ -185,11 +230,11 @@ export const slice = createSlice({
             state.isCreatingRule = false;
         },
 
-        createTrigger: (state, action: PayloadAction<{ trigger: TriggerRuleRequestModel }>) => {
+        createTrigger: (state, action: PayloadAction<{ trigger: TriggerRequestDto }>) => {
             state.isCreatingTrigger = true;
         },
 
-        createTriggerSuccess: (state, action: PayloadAction<{ trigger: TriggerRuleDetailModel }>) => {
+        createTriggerSuccess: (state, action: PayloadAction<{ trigger: TriggerDetailModel }>) => {
             state.isCreatingTrigger = false;
         },
 
@@ -197,28 +242,40 @@ export const slice = createSlice({
             state.isCreatingTrigger = false;
         },
 
-        deleteActionGroup: (state, action: PayloadAction<{ actionGroupUuid: string }>) => {
-            state.isDeletingActionGroup = true;
+        deleteExecution: (state, action: PayloadAction<{ executionUuid: string }>) => {
+            state.isDeletingExecution = true;
         },
 
-        deleteActionGroupSuccess: (state, action: PayloadAction<{ actionGroupUuid: string }>) => {
-            state.actionGroups = state.actionGroups.filter((group) => group.uuid !== action.payload.actionGroupUuid);
-            state.isDeletingActionGroup = false;
+        deleteExecutionSuccess: (state, action: PayloadAction<{ executionUuid: string }>) => {
+            state.executions = state.executions.filter((group) => group.uuid !== action.payload.executionUuid);
+            state.isDeletingExecution = false;
         },
 
-        deleteActionGroupFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isDeletingActionGroup = false;
+        deleteExecutionFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isDeletingExecution = false;
+        },
+        deleteAction: (state, action: PayloadAction<{ actionUuid: string }>) => {
+            state.isDeletingAction = true;
         },
 
-        deleteConditionGroup: (state, action: PayloadAction<{ conditionGroupUuid: string }>) => {
-            state.isDeletingConditionGroup = true;
+        deleteActionSuccess: (state, action: PayloadAction<{ actionUuid: string }>) => {
+            state.actionsList = state.actionsList.filter((group) => group.uuid !== action.payload.actionUuid);
+            state.isDeletingAction = false;
         },
-        deleteConditionGroupSuccess: (state, action: PayloadAction<{ conditionGroupUuid: string }>) => {
-            state.conditionRuleGroups = state.conditionRuleGroups.filter((group) => group.uuid !== action.payload.conditionGroupUuid);
-            state.isDeletingConditionGroup = false;
+
+        deleteActionFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isDeletingAction = false;
         },
-        deleteConditionGroupFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isDeletingConditionGroup = false;
+
+        deleteCondition: (state, action: PayloadAction<{ conditionUuid: string }>) => {
+            state.isDeletingCondition = true;
+        },
+        deleteConditionSuccess: (state, action: PayloadAction<{ conditionUuid: string }>) => {
+            state.conditions = state.conditions.filter((group) => group.uuid !== action.payload.conditionUuid);
+            state.isDeletingCondition = false;
+        },
+        deleteConditionFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isDeletingCondition = false;
         },
 
         deleteRule: (state, action: PayloadAction<{ ruleUuid: string }>) => {
@@ -244,42 +301,55 @@ export const slice = createSlice({
             state.isDeletingTrigger = false;
         },
 
-        getActionGroup: (state, action: PayloadAction<{ actionGroupUuid: string }>) => {
-            state.isFetchingActionGroup = true;
+        getExecution: (state, action: PayloadAction<{ executionUuid: string }>) => {
+            state.isFetchingExecutionDetails = true;
         },
-        getActionGroupSuccess: (state, action: PayloadAction<{ actionGroup: ActionGroupModel }>) => {
-            state.actionGroupDetails = action.payload.actionGroup;
-            state.isFetchingActionGroup = false;
+        getExecutionSuccess: (state, action: PayloadAction<{ execution: ExecutionModel }>) => {
+            state.executionDetails = action.payload.execution;
+            state.isFetchingExecutionDetails = false;
         },
-        getActionGroupFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isFetchingActionGroup = false;
+        getExecutionFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingExecutionDetails = false;
         },
 
-        getConditionGroup: (state, action: PayloadAction<{ conditionGroupUuid: string }>) => {
-            state.isFetchingConditionGroup = true;
+        getAction: (state, action: PayloadAction<{ actionUuid: string }>) => {
+            state.isFetchingActionDetails = true;
         },
-        getConditionGroupSuccess: (state, action: PayloadAction<{ conditionGroup: ConditionRuleGroupModel }>) => {
-            state.conditionGroupDetails = action.payload.conditionGroup;
-            state.isFetchingConditionGroup = false;
+
+        getActionSuccess: (state, action: PayloadAction<{ action: ActionDetailModel }>) => {
+            state.actionDetails = action.payload.action;
+            state.isFetchingActionDetails = false;
         },
-        getConditionGroupFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isFetchingConditionGroup = false;
+
+        getActionFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingActionDetails = false;
+        },
+
+        getCondition: (state, action: PayloadAction<{ conditionUuid: string }>) => {
+            state.isFetchingConditionDetails = true;
+        },
+        getConditionSuccess: (state, action: PayloadAction<{ condition: ConditionModel }>) => {
+            state.conditionDetails = action.payload.condition;
+            state.isFetchingConditionDetails = false;
+        },
+        getConditionFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingConditionDetails = false;
         },
         getRule: (state, action: PayloadAction<{ ruleUuid: string }>) => {
-            state.isFetchingRuleDetail = true;
+            state.isFetchingRuleDetails = true;
         },
-        getRuleSuccess: (state, action: PayloadAction<{ rule: DetailRuleModel }>) => {
+        getRuleSuccess: (state, action: PayloadAction<{ rule: RuleDetailModel }>) => {
             state.ruleDetails = action.payload.rule;
-            state.isFetchingRuleDetail = false;
+            state.isFetchingRuleDetails = false;
         },
         getRuleFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isFetchingRuleDetail = false;
+            state.isFetchingRuleDetails = false;
         },
 
         getTrigger: (state, action: PayloadAction<{ triggerUuid: string }>) => {
             state.isFetchingTriggerDetail = true;
         },
-        getTriggerSuccess: (state, action: PayloadAction<{ trigger: TriggerRuleDetailModel }>) => {
+        getTriggerSuccess: (state, action: PayloadAction<{ trigger: TriggerDetailModel }>) => {
             state.triggerDetails = action.payload.trigger;
             state.isFetchingTriggerDetail = false;
         },
@@ -287,53 +357,70 @@ export const slice = createSlice({
             state.isFetchingTriggerDetail = false;
         },
 
-        updateActionGroup: (state, action: PayloadAction<{ actionGroupUuid: string; actionGroup: UpdateActionGroupRequestModel }>) => {
-            state.isUpdatingActionGroup = true;
+        updateExecution: (state, action: PayloadAction<{ executionUuid: string; execution: UpdateExecutionRequestModel }>) => {
+            state.isUpdatingExecution = true;
         },
 
-        updateActionGroupSuccess: (state, action: PayloadAction<{ actionGroup: ActionGroupModel }>) => {
-            state.actionGroups = state.actionGroups.map((group) =>
-                group.uuid === action.payload.actionGroup.uuid ? action.payload.actionGroup : group,
+        updateExecutionSuccess: (state, action: PayloadAction<{ execution: ExecutionModel }>) => {
+            state.executions = state.executions.map((group) =>
+                group.uuid === action.payload.execution.uuid ? action.payload.execution : group,
             );
 
-            if (state.actionGroupDetails?.uuid === action.payload.actionGroup.uuid) {
-                state.actionGroupDetails = action.payload.actionGroup;
+            if (state.executionDetails?.uuid === action.payload.execution.uuid) {
+                state.executionDetails = action.payload.execution;
             }
 
-            state.isUpdatingActionGroup = false;
+            state.isUpdatingExecution = false;
         },
 
-        updateActionGroupFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isUpdatingActionGroup = false;
+        updateExecutionFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isUpdatingExecution = false;
         },
 
-        updateConditionGroup: (
-            state,
-            action: PayloadAction<{ conditionGroupUuid: string; conditionGroup: UpdateGroupRuleConditionRequestModel }>,
-        ) => {
-            state.isUpdatingConditionGroup = true;
+        updateAction: (state, action: PayloadAction<{ actionUuid: string; action: UpdateActionRequestModel }>) => {
+            state.isUpdatingAction = true;
         },
 
-        updateConditionGroupSuccess: (state, action: PayloadAction<{ conditionGroup: ConditionRuleGroupModel }>) => {
-            state.conditionRuleGroups = state.conditionRuleGroups.map((group) =>
-                group.uuid === action.payload.conditionGroup.uuid ? action.payload.conditionGroup : group,
+        updateActionSuccess: (state, action: PayloadAction<{ action: ActionDetailModel }>) => {
+            state.actionsList = state.actionsList.map((group) =>
+                group.uuid === action.payload.action.uuid ? action.payload.action : group,
             );
 
-            if (state.conditionGroupDetails?.uuid === action.payload.conditionGroup.uuid) {
-                state.conditionGroupDetails = action.payload.conditionGroup;
+            if (state.actionDetails?.uuid === action.payload.action.uuid) {
+                state.actionDetails = action.payload.action;
             }
 
-            state.isUpdatingConditionGroup = false;
+            state.isUpdatingAction = false;
         },
 
-        updateConditionGroupFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isUpdatingConditionGroup = false;
+        updateActionFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isUpdatingAction = false;
         },
 
-        updateRule: (state, action: PayloadAction<{ ruleUuid: string; rule: RuleUpdateRequestModel }>) => {
+        updateCondition: (state, action: PayloadAction<{ conditionUuid: string; condition: UpdateConditionRequestModel }>) => {
+            state.isUpdatingCondition = true;
+        },
+
+        updateConditionSuccess: (state, action: PayloadAction<{ condition: ConditionModel }>) => {
+            state.conditions = state.conditions.map((group) =>
+                group.uuid === action.payload.condition.uuid ? action.payload.condition : group,
+            );
+
+            if (state.conditionDetails?.uuid === action.payload.condition.uuid) {
+                state.conditionDetails = action.payload.condition;
+            }
+
+            state.isUpdatingCondition = false;
+        },
+
+        updateConditionFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isUpdatingCondition = false;
+        },
+
+        updateRule: (state, action: PayloadAction<{ ruleUuid: string; rule: UpdateRuleRequestModel }>) => {
             state.isUpdatingRule = true;
         },
-        updateRuleSuccess: (state, action: PayloadAction<{ rule: DetailRuleModel }>) => {
+        updateRuleSuccess: (state, action: PayloadAction<{ rule: RuleDetailModel }>) => {
             state.rules = state.rules.map((rule) => (rule.uuid === action.payload.rule.uuid ? action.payload.rule : rule));
             state.isUpdatingRule = false;
 
@@ -345,11 +432,11 @@ export const slice = createSlice({
             state.isUpdatingRule = false;
         },
 
-        updateTrigger: (state, action: PayloadAction<{ triggerUuid: string; trigger: RuleTriggerUpdateRequestModel }>) => {
+        updateTrigger: (state, action: PayloadAction<{ triggerUuid: string; trigger: UpdateTriggerRequestModel }>) => {
             state.isUpdatingTrigger = true;
         },
 
-        updateTriggerSuccess: (state, action: PayloadAction<{ trigger: TriggerRuleDetailModel }>) => {
+        updateTriggerSuccess: (state, action: PayloadAction<{ trigger: TriggerDetailModel }>) => {
             if (state.triggerDetails?.uuid === action.payload.trigger.uuid) {
                 state.triggerDetails = action.payload.trigger;
             }
@@ -365,7 +452,7 @@ export const slice = createSlice({
             state.isFetchingTriggerHistories = true;
         },
 
-        getTriggerHistorySuccess: (state, action: PayloadAction<{ triggerHistories: RuleTriggerHistoryModel[] }>) => {
+        getTriggerHistorySuccess: (state, action: PayloadAction<{ triggerHistories: TriggerHistoryModel[] }>) => {
             state.triggerHistories = action.payload.triggerHistories;
             state.isFetchingTriggerHistories = false;
         },
@@ -379,70 +466,88 @@ export const slice = createSlice({
 const state = createFeatureSelector<State>(slice.name);
 
 const rules = createSelector(state, (state) => state.rules);
-const conditionGroupDetails = createSelector(state, (state) => state.conditionGroupDetails);
 const ruleDetails = createSelector(state, (state) => state.ruleDetails);
+
+const conditions = createSelector(state, (state) => state.conditions);
+const conditionDetails = createSelector(state, (state) => state.conditionDetails);
+
 const triggerDetails = createSelector(state, (state) => state.triggerDetails);
 const triggers = createSelector(state, (state) => state.triggers);
 const triggerHistories = createSelector(state, (state) => state.triggerHistories);
 
-const actionGroups = createSelector(state, (state) => state.actionGroups);
-const actionGroupDetails = createSelector(state, (state) => state.actionGroupDetails);
+const actionsList = createSelector(state, (state) => state.actionsList);
+const actionDetails = createSelector(state, (state) => state.actionDetails);
 
-const isCreatingConditionGroup = createSelector(state, (state) => state.isCreatingConditionGroup);
-const isUpdatingConditionGroup = createSelector(state, (state) => state.isUpdatingConditionGroup);
+const executions = createSelector(state, (state) => state.executions);
+const executionDetails = createSelector(state, (state) => state.executionDetails);
+
+const isCreatingCondition = createSelector(state, (state) => state.isCreatingCondition);
+const isUpdatingCondition = createSelector(state, (state) => state.isUpdatingCondition);
 
 const isFetchingTriggerHistories = createSelector(state, (state) => state.isFetchingTriggerHistories);
 const isCreatingRule = createSelector(state, (state) => state.isCreatingRule);
 const isUpdatingRule = createSelector(state, (state) => state.isUpdatingRule);
 const isDeletingRule = createSelector(state, (state) => state.isDeletingRule);
 const isFetchingRulesList = createSelector(state, (state) => state.isFetchingRulesList);
-const conditionRuleGroups = createSelector(state, (state) => state.conditionRuleGroups);
-const isFetchingConditionGroups = createSelector(state, (state) => state.isFetchingConditionGroups);
-const isDeletingConditionGroup = createSelector(state, (state) => state.isDeletingConditionGroup);
-const isFetchingConditionGroup = createSelector(state, (state) => state.isFetchingConditionGroup);
-const isFetchingRuleDetail = createSelector(state, (state) => state.isFetchingRuleDetail);
-const isCreatingActionGroup = createSelector(state, (state) => state.isCreatingActionGroup);
-const isFetchingActionGroups = createSelector(state, (state) => state.isFetchingActionGroups);
-const isDeletingActionGroup = createSelector(state, (state) => state.isDeletingActionGroup);
-const isFetchingActionGroup = createSelector(state, (state) => state.isFetchingActionGroup);
-const isUpdatingActionGroup = createSelector(state, (state) => state.isUpdatingActionGroup);
+const isFetchingConditions = createSelector(state, (state) => state.isFetchingConditions);
+const isDeletingCondition = createSelector(state, (state) => state.isDeletingCondition);
+const isFetchingConditionDetails = createSelector(state, (state) => state.isFetchingConditionDetails);
+const isFetchingRuleDetails = createSelector(state, (state) => state.isFetchingRuleDetails);
+const isCreatingExecution = createSelector(state, (state) => state.isCreatingExecution);
+const isFetchingExecutions = createSelector(state, (state) => state.isFetchingExecutions);
+const isDeletingExecution = createSelector(state, (state) => state.isDeletingExecution);
+const isFetchingActionDetails = createSelector(state, (state) => state.isFetchingActionDetails);
+const isUpdatingAction = createSelector(state, (state) => state.isUpdatingAction);
+const isCreatingAction = createSelector(state, (state) => state.isCreatingAction);
+const isFetchingExecutionDetails = createSelector(state, (state) => state.isFetchingExecutionDetails);
+const isUpdatingExecution = createSelector(state, (state) => state.isUpdatingExecution);
 const isUpdatingTrigger = createSelector(state, (state) => state.isUpdatingTrigger);
 const isFetchingTriggerDetail = createSelector(state, (state) => state.isFetchingTriggerDetail);
 const isDeletingTrigger = createSelector(state, (state) => state.isDeletingTrigger);
 const isFetchingTriggers = createSelector(state, (state) => state.isFetchingTriggers);
 const isCreatingTrigger = createSelector(state, (state) => state.isCreatingTrigger);
+const isFetchingActions = createSelector(state, (state) => state.isFetchingActions);
+const isDeletingAction = createSelector(state, (state) => state.isDeletingAction);
 
 export const selectors = {
     rules,
     triggers,
     triggerDetails,
-    conditionRuleGroups,
-    conditionGroupDetails,
-    actionGroups,
-    actionGroupDetails,
+    conditions,
+    conditionDetails,
+    executions,
+    actionDetails,
+    actionsList,
+
+    isCreatingAction,
+    isFetchingActionDetails,
+    isUpdatingAction,
+    executionDetails,
     ruleDetails,
     triggerHistories,
     isDeletingRule,
-    isFetchingConditionGroups,
-    isDeletingConditionGroup,
+    isFetchingConditions,
+    isDeletingCondition,
     isFetchingRulesList,
-    isCreatingConditionGroup,
+    isCreatingCondition,
     isCreatingRule,
-    isUpdatingConditionGroup,
-    isFetchingConditionGroup,
+    isUpdatingCondition,
+    isFetchingConditionDetails,
     isUpdatingRule,
-    isFetchingRuleDetail,
-    isCreatingActionGroup,
-    isFetchingActionGroups,
-    isDeletingActionGroup,
-    isFetchingActionGroup,
-    isUpdatingActionGroup,
+    isFetchingRuleDetails,
+    isCreatingExecution,
+    isFetchingExecutions,
+    isDeletingExecution,
+    isFetchingExecutionDetails,
+    isUpdatingExecution,
     isUpdatingTrigger,
     isFetchingTriggerDetail,
     isDeletingTrigger,
     isFetchingTriggers,
     isCreatingTrigger,
     isFetchingTriggerHistories,
+    isFetchingActions,
+    isDeletingAction,
 };
 
 export const actions = slice.actions;

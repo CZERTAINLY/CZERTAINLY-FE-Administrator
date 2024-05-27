@@ -1,230 +1,215 @@
 import {
-    // ActionRuleGroupDetailDto,
-    // ActionRuleGroupDetailModel,
-    ActionGroupDto,
-    ActionGroupModel,
-    ActionRuleDto,
-    ActionRuleGroupRequestDto,
-    ActionRuleGroupRequestModel,
-    ActionRuleModel,
-    ActionRuleRequestDto,
-    ActionRuleRequestModel,
-    ConditionRuleDto,
-    // ConditionRuleGroupDetailDto,
-    // ConditionRuleGroupDetailModel,
-    ConditionRuleGroupDto,
-    ConditionRuleGroupModel,
-    ConditionRuleGroupRequestDto,
-    ConditionRuleGroupRequestModel,
-    ConditionRuleModel,
-    ConditionRuleRequestDto,
-    DetailRuleDto,
-    DetailRuleModel,
-    DtoRule,
-    RequestRuleDto,
-    RequestRuleModel,
-    RuleConditiontModel,
+    ActionDetailDto,
+    ActionDetailModel,
+    ActionDto,
+    ActionModel,
+    ActionRequestDto,
+    ActionRequestModel,
+    ConditionDto,
+    ConditionItemDto,
+    ConditionItemModel,
+    ConditionItemRequestDto,
+    ConditionItemRequestModel,
+    ConditionModel,
+    ConditionRequestDto,
+    ConditionRequestModel,
+    ExecutionDto,
+    ExecutionItemDto,
+    ExecutionItemModel,
+    ExecutionItemRequestDto,
+    ExecutionItemRequestModel,
+    ExecutionModel,
+    ExecutionRequestDto,
+    ExecutionRequestModel,
+    RuleDetailDto,
+    RuleDetailModel,
+    RuleDto,
     RuleModel,
-    RuleTriggerHistoryDto,
-    RuleTriggerHistoryModel,
-    RuleTriggerHistoryRecordDto,
-    RuleTriggerHistoryRecordModel,
-    RuleTriggerUpdateRequestDto,
-    RuleTriggerUpdateRequestModel,
-    RuleUpdateRequestDto,
-    RuleUpdateRequestModel,
-    TriggerRuleDetailDto,
-    TriggerRuleDetailModel,
-    TriggerRuleDto,
-    TriggerRuleModel,
-    TriggerRuleRequestDto,
-    TriggerRuleRequestModel,
-    UpdateActionGroupRequestDto,
-    UpdateActionGroupRequestModel,
-    UpdateGroupRuleConditionRequestDto,
-    UpdateGroupRuleConditionRequestModel,
+    RuleRequestDto,
+    RuleRequestModel,
+    TriggerDetailDto,
+    TriggerDetailModel,
+    TriggerDto,
+    TriggerHistoryDto,
+    TriggerHistoryModel,
+    TriggerHistoryRecordDto,
+    TriggerHistoryRecordModel,
+    TriggerModel,
+    TriggerRequestDto,
+    TriggerRequestModel,
+    UpdateActionRequestDto,
+    UpdateActionRequestModel,
+    UpdateConditionRequestDto,
+    UpdateConditionRequestModel,
+    UpdateExecutionRequestDto,
+    UpdateExecutionRequestModel,
+    UpdateRuleRequestDto,
+    UpdateRuleRequestModel,
+    UpdateTriggerRequestDto,
+    UpdateTriggerRequestModel,
 } from 'types/rules';
-import { transformAttributeResponseDtoToModel } from './attributes';
 
-// export function transformSearchFilterModelRuleConditionDto(searchFilterModel: SearchFilterModel): RuleConditionGroupRequestDto {
-//     return {
-//         ...searchFilterModel,
-//         condition: searchFilterModel.condition,
-//         fieldIdentifier: searchFilterModel.fieldIdentifier,
-//         fieldSource: searchFilterModel.fieldSource,
-//         value: searchFilterModel.value,
-//     };
-// }
-
-export function transformTriggerRuleHistoryDtoToModel(ruleTriggerHistory: RuleTriggerHistoryRecordDto): RuleTriggerHistoryRecordModel {
+export function transformTriggerHistoryRecordDtoToModel(ruleTriggerHistory: TriggerHistoryRecordDto): TriggerHistoryRecordModel {
     return {
         ...ruleTriggerHistory,
     };
 }
 
-export function transformRuleTriggerHistoryDtoToModel(ruleTriggerHistory: RuleTriggerHistoryDto): RuleTriggerHistoryModel {
+export function transformTriggerHistoryDtoToModel(ruleTriggerHistory: TriggerHistoryDto): TriggerHistoryModel {
     return {
         ...ruleTriggerHistory,
-        records: ruleTriggerHistory?.records?.length ? ruleTriggerHistory.records.map(transformTriggerRuleHistoryDtoToModel) : [],
+        records: ruleTriggerHistory?.records?.length ? ruleTriggerHistory.records.map(transformTriggerHistoryRecordDtoToModel) : [],
     };
 }
 
-export function transformUpdateActionGroupRequestModelToDto(actionGroup: UpdateActionGroupRequestModel): UpdateActionGroupRequestDto {
+export function transformExecutionItemRequestModelToDto(executionItemRequestModel: ExecutionItemRequestModel): ExecutionItemRequestDto {
     return {
-        ...actionGroup,
-        actions: actionGroup.actions.map(transformRuleActionRequestModelToDto),
+        ...executionItemRequestModel,
+    };
+}
+export function transformUpdateExecutionRequestModelToDto(
+    updateExecutionRequestModel: UpdateExecutionRequestModel,
+): UpdateExecutionRequestDto {
+    return {
+        ...updateExecutionRequestModel,
+        items: updateExecutionRequestModel.items.map(transformExecutionItemRequestModelToDto),
     };
 }
 
-export function transformRuleActionRequestDtoToModel(ruleActionRequestDto: ActionRuleRequestDto): ActionRuleRequestModel {
-    return { ...ruleActionRequestDto };
-}
-
-export function transformRuleActionRequestModelToDto(ruleActionRequestModel: ActionRuleRequestModel): ActionRuleRequestDto {
-    return { ...ruleActionRequestModel };
-}
-
-export function tranformRuleActionGroupRequestModelToDto(actionGroup: ActionRuleGroupRequestModel): ActionRuleGroupRequestDto {
+export function tranformExecutionRequestModelToDto(executionRequestModel: ExecutionRequestModel): ExecutionRequestDto {
     return {
-        ...actionGroup,
-        actions: actionGroup.actions.map(transformRuleActionRequestModelToDto),
+        ...executionRequestModel,
+        items: executionRequestModel.items.map(transformExecutionItemRequestModelToDto),
     };
 }
 
-export function transformDtoRuleToModel(rule: DtoRule): RuleModel {
+export function transformExecutionItemDtoToModel(executionItemDto: ExecutionItemDto): ExecutionItemModel {
     return {
-        ...rule,
-        attributes: rule.attributes.map(transformAttributeResponseDtoToModel),
+        ...executionItemDto,
     };
 }
 
-export function transformRuleActionGroupDtoToModel(actionGroup: ActionGroupDto): ActionGroupModel {
+export function transformExecutionDtoToModel(executionDto: ExecutionDto): ExecutionModel {
     return {
-        ...actionGroup,
+        ...executionDto,
+        items: executionDto.items.map(transformExecutionItemDtoToModel),
     };
 }
 
-export function transformConditionRuleGroupDtoToModel(conditionGroup: ConditionRuleGroupDto): ConditionRuleGroupModel {
+export function transformTriggerDtoToModel(triggerDto: TriggerDto): TriggerModel {
+    return { ...triggerDto };
+}
+
+export function transformRuleDtoToModel(ruleDto: RuleDto): RuleModel {
+    return { ...ruleDto };
+}
+
+export function transformConditionItemDtoToModel(conditionItemDto: ConditionItemDto): ConditionItemModel {
     return {
-        ...conditionGroup,
+        ...conditionItemDto,
     };
 }
 
-export function transformTriggerRuleDtoToModel(ruleTrigger: TriggerRuleDto): TriggerRuleModel {
-    return { ...ruleTrigger };
-}
-
-export function transformRuleActionDtoToModel(actionRule: ActionRuleDto): ActionRuleModel {
-    return { ...actionRule };
-}
-
-// export function transformRuleActionGroupDetailDtoToModel(actionGroupDetail: ActionRuleGroupDetailDto): ActionRuleGroupDetailModel {
-//     return {
-//         ...actionGroupDetail,
-//         actions: actionGroupDetail.actions.map(transformRuleActionDtoToModel),
-//     };
-// }
-
-// export function transformRuleConditionGroupDetailDtoToModel(conditionGroup: ConditionRuleGroupDetailDto): ConditionRuleGroupDetailModel {
-//     return {
-//         ...conditionGroup,
-//     };
-// }
-
-export function transformConditionRuleDtoToModel(condition: ConditionRuleDto): ConditionRuleModel {
-    return { ...condition };
-}
-
-export function transformDetailRuleDtoToModel(rule: DetailRuleDto): DetailRuleModel {
+export function transformConditionDtoToModel(conditionDto: ConditionDto): ConditionModel {
     return {
-        ...rule,
-        attributes: rule.attributes.map(transformAttributeResponseDtoToModel),
-        conditions: rule.conditions.map(transformConditionRuleDtoToModel),
-        conditionGroups: rule.conditionGroups.map(transformConditionRuleGroupDtoToModel),
+        ...conditionDto,
+        items: conditionDto.items.map(transformConditionItemDtoToModel),
     };
 }
 
-export function transformRuleConditiontModelToModelDto(conditionGroup: RuleConditiontModel): ConditionRuleRequestDto {
+export function transformRuleDetailDtoToModel(ruleDetailDto: RuleDetailDto): RuleDetailModel {
     return {
-        ...conditionGroup,
+        ...ruleDetailDto,
+        conditions: ruleDetailDto.conditions.map(transformConditionDtoToModel),
     };
 }
 
-export function transformConditionRuleGroupRequestModelToDto(conditionGroup: ConditionRuleGroupRequestModel): ConditionRuleGroupRequestDto {
+export function transformConditionItemModelDto(conditionItemModel: ConditionItemModel): ConditionItemDto {
     return {
-        ...conditionGroup,
-        conditions: conditionGroup.conditions.map(transformRuleConditiontModelToModelDto),
+        ...conditionItemModel,
     };
 }
 
-export function transformRuleConditionGroupDetailDtoToModel(conditionGroup: ConditionRuleGroupDto): ConditionRuleGroupModel {
+export function transformConditionItemRequestModelDto(conditionItemRequestModel: ConditionItemRequestModel): ConditionItemRequestDto {
     return {
-        ...conditionGroup,
+        ...conditionItemRequestModel,
     };
 }
 
-export function transformRuleConditionGroupDtoToModel(conditionGroup: ConditionRuleGroupDto): ConditionRuleGroupModel {
+export function transformConditionRequestModelToDto(conditionRequestModel: ConditionRequestModel): ConditionRequestDto {
     return {
-        ...conditionGroup,
+        ...conditionRequestModel,
+        items: conditionRequestModel.items.map(transformConditionItemRequestModelDto),
     };
 }
 
-export function transformRuleRequestModelToDto(ruleRequest: RequestRuleModel): RequestRuleDto {
+export function transformRuleRequestModelToDto(ruleRequestModel: RuleRequestModel): RuleRequestDto {
     return {
-        ...ruleRequest,
-        conditions: ruleRequest.conditions?.length ? ruleRequest.conditions.map(transformRuleConditiontModelToModelDto) : [],
-        // conditionGroups: ruleRequest.conditionGroups?.length
-        //     ? ruleRequest.conditionGroups.map(transformConditionRuleGroupRequestModelToDto)
-        //     : [],
+        ...ruleRequestModel,
     };
 }
 
-export function transformTriggerRuleRequestModelToDto(ruleTriggerRequest: TriggerRuleRequestModel): TriggerRuleRequestDto {
+export function transformTriggerRequestModelToDto(triggerRequestModel: TriggerRequestModel): TriggerRequestDto {
     return {
-        ...ruleTriggerRequest,
-        // rules: ruleTriggerRequest.rules?.length ? ruleTriggerRequest.rules.map(transformRuleRequestModelToDto) : [],
-        // actionGroups: ruleTriggerRequest.actionGroups?.length
-        //     ? ruleTriggerRequest.actionGroups.map(tranformRuleActionGroupRequestModelToDto)
-        //     : [],
-        actions: ruleTriggerRequest.actions?.length ? ruleTriggerRequest.actions.map(transformRuleActionRequestModelToDto) : [],
+        ...triggerRequestModel,
     };
 }
 
-export function transformTriggerRuleDetailDtoToModel(ruleTriggerDetail: TriggerRuleDetailDto): TriggerRuleDetailModel {
+export function transformActionDtoToModel(actionDto: ActionDto): ActionModel {
     return {
-        ...ruleTriggerDetail,
-        rules: ruleTriggerDetail.rules.map(transformDtoRuleToModel),
-        actionGroups: ruleTriggerDetail.actionGroups.map(transformRuleActionGroupDtoToModel),
-        actions: ruleTriggerDetail.actions.map(transformRuleActionDtoToModel),
+        ...actionDto,
     };
 }
 
-export function transformUpdateGroupRuleConditionRequestModelToDto(
-    conditionGroup: UpdateGroupRuleConditionRequestModel,
-): UpdateGroupRuleConditionRequestDto {
+export function transformTriggerDetailDtoToModel(triggerDetailDto: TriggerDetailDto): TriggerDetailModel {
     return {
-        ...conditionGroup,
-        conditions: conditionGroup.conditions.map(transformRuleConditiontModelToModelDto),
+        ...triggerDetailDto,
+        rules: triggerDetailDto.rules.map(transformRuleDtoToModel),
+        actions: triggerDetailDto.actions.map(transformActionDtoToModel),
     };
 }
 
-export function transformRuleUpdateRequestModelToDto(ruleUpdateRequest: RuleUpdateRequestModel): RuleUpdateRequestDto {
+export function transformConditionItemRequestModelToDto(conditionItemRequestModel: ConditionItemRequestModel): ConditionItemRequestDto {
     return {
-        ...ruleUpdateRequest,
-        conditions: ruleUpdateRequest.conditions?.length ? ruleUpdateRequest.conditions.map(transformRuleConditiontModelToModelDto) : [],
-        // conditionGroups: ruleUpdateRequest.conditionGroups?.length
-        //     ? ruleUpdateRequest.conditionGroups.map(transformConditionRuleGroupRequestModelToDto)
-        //     : [],
+        ...conditionItemRequestModel,
     };
 }
 
-export function transformRuleTriggerUpdateRequestModelToDto(
-    ruleTriggerUpdateRequest: RuleTriggerUpdateRequestModel,
-): RuleTriggerUpdateRequestDto {
+export function transformUpdateConditionRequestModelToDto(
+    updateConditionRequestModel: UpdateConditionRequestModel,
+): UpdateConditionRequestDto {
     return {
-        ...ruleTriggerUpdateRequest,
-        // rules: ruleTriggerUpdateRequest.rules.map(transformRuleRequestModelToDto),
-        // actionGroups: ruleTriggerUpdateRequest.actionGroups.map(tranformRuleActionGroupRequestModelToDto),
-        actions: ruleTriggerUpdateRequest.actions.map(transformRuleActionRequestModelToDto),
+        ...updateConditionRequestModel,
+        items: updateConditionRequestModel.items.map(transformConditionItemRequestModelToDto),
+    };
+}
+
+export function transformUpdateTriggerRequestModelToDto(updateTriggerRequestModel: UpdateTriggerRequestModel): UpdateTriggerRequestDto {
+    return {
+        ...updateTriggerRequestModel,
+    };
+}
+
+export function transformUpdateRuleRequestModelToDto(updateRuleRequestModel: UpdateRuleRequestModel): UpdateRuleRequestDto {
+    return {
+        ...updateRuleRequestModel,
+    };
+}
+
+export function transformActionRequestModelToDto(actionRequestModel: ActionRequestModel): ActionRequestDto {
+    return {
+        ...actionRequestModel,
+    };
+}
+
+export function transformActionDetailDtoToModel(actionDetailDto: ActionDetailDto): ActionDetailModel {
+    return {
+        ...actionDetailDto,
+    };
+}
+
+export function transformUpdateActionRequestModelToDto(updateActionRequestModel: UpdateActionRequestModel): UpdateActionRequestDto {
+    return {
+        ...updateActionRequestModel,
     };
 }

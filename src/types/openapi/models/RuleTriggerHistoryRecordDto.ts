@@ -12,7 +12,7 @@
  */
 
 import type {
-    RuleActionDto,
+    ActionDto,
 } from './';
 
 /**
@@ -27,8 +27,8 @@ export interface RuleTriggerHistoryRecordDto {
      */
     Message_with_cause_of_action_condition_failure_?: string;
     /**
-     * @type {RuleActionDto}
+     * @type {ActionDto}
      * @memberof RuleTriggerHistoryRecordDto
      */
-    Condition_that_is_referenced_by_history_record?: RuleActionDto;
+    Condition_that_is_referenced_by_history_record?: ActionDto;
 }
