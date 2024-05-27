@@ -83,7 +83,6 @@ const ActionsForm = () => {
     const onSubmit = useCallback(
         (values: actionFormValues) => {
             if (values.resource === Resource.None) return;
-            console.log('values', values);
             dispatch(
                 rulesActions.createAction({
                     action: {

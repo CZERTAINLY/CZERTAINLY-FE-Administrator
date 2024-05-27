@@ -24,7 +24,7 @@ interface Props {
     entity: EntityType;
     getAvailableFiltersApi: (apiClients: ApiClients) => Observable<Array<SearchFieldListModel>>;
     onActionsUpdate?: (actionRuleRequests: ExecutionItemModel[]) => void;
-    appendInWidgetContent?: React.ReactNode;
+    // appendInWidgetContent?: React.ReactNode;
     ExecutionsList?: ExecutionItemModel[];
     includeIgnoreAction?: boolean;
     disableBadgeRemove?: boolean;
@@ -34,7 +34,7 @@ interface Props {
 export default function FilterWidgetRuleAction({
     ExecutionsList,
     onActionsUpdate,
-    appendInWidgetContent,
+    // appendInWidgetContent,
     title,
     entity,
     getAvailableFiltersApi,
@@ -585,7 +585,7 @@ export default function FilterWidgetRuleAction({
                         );
                     })}
                 </div>
-                {appendInWidgetContent}
+                {/* {appendInWidgetContent} */}
             </Widget>
         </>
     );

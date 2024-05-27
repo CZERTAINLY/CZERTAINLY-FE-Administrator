@@ -87,7 +87,6 @@ const ConditionForm = () => {
                     },
                 }),
             );
-            console.log('values', values);
         },
         [dispatch],
     );

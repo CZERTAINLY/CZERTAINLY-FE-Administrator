@@ -6,23 +6,23 @@ import { useSelector } from 'react-redux';
 import { Badge } from 'reactstrap';
 import { PlatformEnum } from 'types/openapi';
 import { ExecutionItemModel } from 'types/rules';
-import styles from './groupActionsViewer.module.scss';
+import styles from './executionsItemsList.module.scss';
 
-interface ConditionsTableViewerProps {
-    groupActions: ExecutionItemModel[];
-    conditionGroupName: string;
-    conditionGroupUuid: string;
+interface ExecutionsItemsListProps {
+    executionItems: ExecutionItemModel[];
+    executionName: string;
+    executionUuid: string;
 }
 
-const GroupActionsViewer = ({ groupActions = [], conditionGroupName, conditionGroupUuid }: ConditionsTableViewerProps) => {
+const ExecutionsItemsList = ({ executionItems = [], executionName, executionUuid }: ExecutionsItemsListProps) => {
     const searchGroupEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.FilterFieldSource));
     const availableFilters = useSelector(selectors.availableFilters(EntityType.ACTIONS));
     const executionTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ExecutionType));
 
     const renderActionBadges = useMemo(() => {
-        if (!groupActions) return null;
+        if (!executionItems) return null;
 
-        return groupActions.map((f, i) => {
+        return executionItems.map((f, i) => {
             const field = availableFilters
                 .find((a) => a.filterFieldSource === f.fieldSource)
                 ?.searchFieldData?.find((s) => s.fieldIdentifier === f.fieldIdentifier);
@@ -48,7 +48,6 @@ const GroupActionsViewer = ({ groupActions = [], conditionGroupName, conditionGr
 
             return (
                 <Badge className={styles.groupConditionBadge} key={i}>
-                    {/* {getEnumLabel(executionTypeEnum, f.actionType)}&nbsp; */}
                     <>
                         <b>{f?.fieldSource && getEnumLabel(searchGroupEnum, f?.fieldSource)}&nbsp;</b>'{label}
                         '&nbsp;to&nbsp;
@@ -57,14 +56,14 @@ const GroupActionsViewer = ({ groupActions = [], conditionGroupName, conditionGr
                 </Badge>
             );
         });
-    }, [groupActions, availableFilters, executionTypeEnum, searchGroupEnum]);
+    }, [executionItems, availableFilters, searchGroupEnum]);
 
     return (
-        <div className={styles.groupConditionContainerDiv} key={conditionGroupUuid}>
-            <h6 className={cx('text-muted', styles.groupConditionTitle)}>{`${conditionGroupName}`}</h6>
+        <div className={styles.groupConditionContainerDiv} key={executionUuid}>
+            <h6 className={cx('text-muted', styles.groupConditionTitle)}>{`${executionName}`}</h6>
             <div className="ms-3">{renderActionBadges}</div>
         </div>
     );
 };
 
-export default GroupActionsViewer;
+export default ExecutionsItemsList;

@@ -24,7 +24,7 @@ const ConditionAndExecutionItemsViewer = ({ resource, formType }: ConditionGroup
     const isUpdatingCondition = useSelector(rulesSelectors.isUpdatingCondition);
 
     // const ruleDetails = useSelector(rulesSelectors.ruleDetails);
-    // const isFetchingRuleDetail = useSelector(rulesSelectors.isFetchingRuleDetail);
+    // const isFetchingRuleDetails = useSelector(rulesSelectors.isFetchingRuleDetails);
     // const isUpdatingRule = useSelector(rulesSelectors.isUpdatingRule);
 
     const executionDetails = useSelector(rulesSelectors.executionDetails);
@@ -124,7 +124,7 @@ const ConditionAndExecutionItemsViewer = ({ resource, formType }: ConditionGroup
 
     // const renderAppendContent = useMemo(() => {
     //     if (formType === 'rules' && ruleDetails?.conditionGroups && ruleDetails?.conditionGroups?.length > 0) {
-    //         if (isFetchingRuleDetail || isUpdatingRule) return <></>;
+    //         if (isFetchingRuleDetails || isUpdatingRule) return <></>;
     //         return <ConditionsGroupsList ruleConditions={ruleDetails?.conditionGroups} />;
     //     }
 
@@ -134,14 +134,14 @@ const ConditionAndExecutionItemsViewer = ({ resource, formType }: ConditionGroup
     //     } else {
     //         return <></>;
     //     }
-    // }, [ruleDetails, formType, trigerDetails, isFetchingRuleDetail, isFetchingTriggerDetail, isUpdatingRule, isUpdatingTrigger]);
+    // }, [ruleDetails, formType, trigerDetails, isFetchingRuleDetails, isFetchingTriggerDetail, isUpdatingRule, isUpdatingTrigger]);
 
     // const renderFilterWidgetForRules = useMemo(() => {
     //     if (formType !== 'rules' || !id || !ruleDetails) return null;
     //     const disableBadgeRemove =
-    //         (ruleDetails.conditions.length === 1 && ruleDetails.conditionGroups.length === 0) || isFetchingRuleDetail || isUpdatingRule;
+    //         (ruleDetails.conditions.length === 1 && ruleDetails.conditionGroups.length === 0) || isFetchingRuleDetails || isUpdatingRule;
 
-    //     const isBusy = isFetchingRuleDetail || isUpdatingRule;
+    //     const isBusy = isFetchingRuleDetails || isUpdatingRule;
 
     //     return (
     //         <FilterWidget
@@ -170,7 +170,7 @@ const ConditionAndExecutionItemsViewer = ({ resource, formType }: ConditionGroup
     //             }}
     //         />
     //     );
-    // }, [resource, dispatch, formType, id, ruleDetails, renderAppendContent, isFetchingRuleDetail, isUpdatingRule]);
+    // }, [resource, dispatch, formType, id, ruleDetails, renderAppendContent, isFetchingRuleDetails, isUpdatingRule]);
 
     const renderFilterWidgetForConditionItems = useMemo(() => {
         if (formType !== 'condtionItems' || !id || !conditionDetails) return null;

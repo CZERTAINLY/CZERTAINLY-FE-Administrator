@@ -1,5 +1,7 @@
+import { ApiClients } from 'api';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
+import ConditionsExecutionsList from 'components/ExecutionConditionItemsList';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
@@ -8,7 +10,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
 import { Button, ButtonGroup, Col, Container, Input, Row } from 'reactstrap';
-import { PlatformEnum } from 'types/openapi';
+import { PlatformEnum, Resource } from 'types/openapi';
 interface SelectChangeValue {
     value: string;
     label: string;
@@ -18,7 +20,7 @@ const RuleDetails = () => {
     const dispatch = useDispatch();
     const ruleDetails = useSelector(rulesSelectors.ruleDetails);
     const isUpdatingRule = useSelector(rulesSelectors.isUpdatingRule);
-    const isFetchingRuleDetail = useSelector(rulesSelectors.isFetchingRuleDetail);
+    const isFetchingRuleDetails = useSelector(rulesSelectors.isFetchingRuleDetails);
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const conditions = useSelector(rulesSelectors.conditions);
     const conditionTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ConditionType));
@@ -45,7 +47,7 @@ const RuleDetails = () => {
         dispatch(rulesActions.listConditions({ resource: ruleDetails?.resource }));
     }, [ruleDetails, dispatch]);
 
-    const isBusy = useMemo(() => isFetchingRuleDetail || isUpdatingRule, [isFetchingRuleDetail, isUpdatingRule]);
+    const isBusy = useMemo(() => isFetchingRuleDetails || isUpdatingRule, [isFetchingRuleDetails, isUpdatingRule]);
 
     const conditionsOptions = useMemo(() => {
         if (conditions === undefined) return [];
@@ -152,7 +154,7 @@ const RuleDetails = () => {
 
     const ruleDetailsData: TableDataRow[] = useMemo(
         () =>
-            !ruleDetails || isFetchingRuleDetail
+            !ruleDetails || isFetchingRuleDetails
                 ? []
                 : [
                       {
@@ -235,7 +237,7 @@ const RuleDetails = () => {
             updateDescriptionEditEnable,
             isUpdatingRule,
             updatedDescription,
-            isFetchingRuleDetail,
+            isFetchingRuleDetails,
         ],
     );
 
@@ -262,7 +264,7 @@ const RuleDetails = () => {
     );
 
     const conditionsData: TableDataRow[] = useMemo(() => {
-        const isDeleteDisabled = ruleDetails?.conditions.length === 1 || isFetchingRuleDetail || isUpdatingRule;
+        const isDeleteDisabled = ruleDetails?.conditions.length === 1 || isFetchingRuleDetails || isUpdatingRule;
         const conditionsData = !ruleDetails?.conditions.length
             ? []
             : ruleDetails?.conditions.map((condition) => {
@@ -293,7 +295,7 @@ const RuleDetails = () => {
               });
 
         return conditionsData;
-    }, [ruleDetails, isUpdatingRule, onDeleteCondition, isFetchingRuleDetail, conditionTypeEnum]);
+    }, [ruleDetails, isUpdatingRule, onDeleteCondition, isFetchingRuleDetails, conditionTypeEnum]);
 
     return (
         <Container className="themed-container" fluid>
@@ -325,7 +327,21 @@ const RuleDetails = () => {
                     </Widget>
                 </Col>
             </Row>
+            {/* <ConditionsItemsList  conditionGroupName=''/> */}
 
+            {ruleDetails?.conditions.length ? (
+                <ConditionsExecutionsList
+                    listType="conditionsItems"
+                    ruleConditions={ruleDetails?.conditions}
+                    getAvailableFiltersApi={(apiClients: ApiClients) =>
+                        apiClients.resources.listResourceRuleFilterFields({
+                            resource: ruleDetails?.resource || Resource.None,
+                        })
+                    }
+                />
+            ) : (
+                <></>
+            )}
             <Dialog
                 isOpen={confirmDelete}
                 caption={`Delete a Rule`}

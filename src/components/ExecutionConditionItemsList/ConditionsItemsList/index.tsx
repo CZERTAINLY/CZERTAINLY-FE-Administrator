@@ -6,20 +6,21 @@ import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { Badge, Spinner } from 'reactstrap';
 import { ConditionItemDto, PlatformEnum } from 'types/openapi';
-import styles from './groupConditionsViewer.module.scss';
+import styles from './conditionsItemsList.module.scss';
 
 interface ConditionsTableViewerProps {
-    groupConditions: ConditionItemDto[];
-    conditionGroupName: string;
-    conditionGroupUuid: string;
+    conditionItems: ConditionItemDto[];
+    conditionName: string;
+    conditionUuid: string;
 }
 
-const GroupConditionsViewer = ({ groupConditions = [], conditionGroupName, conditionGroupUuid }: ConditionsTableViewerProps) => {
+const ConditionsItemsList = ({ conditionItems = [], conditionName, conditionUuid }: ConditionsTableViewerProps) => {
     const searchGroupEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.FilterFieldSource));
     const FilterConditionOperatorEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.FilterConditionOperator));
     const availableFilters = useSelector(selectors.availableFilters(EntityType.CONDITIONS));
     const platformEnums = useSelector(enumSelectors.platformEnums);
     const isFetchingConditionDetails = useSelector(rulesSelectors.isFetchingConditionDetails);
+
     const booleanOptions = useMemo(
         () => [
             { label: 'True', value: true },
@@ -29,7 +30,7 @@ const GroupConditionsViewer = ({ groupConditions = [], conditionGroupName, condi
     );
 
     const renderConditionsBadges = () => {
-        return groupConditions.map((condition, i) => {
+        return conditionItems.map((condition, i) => {
             const field = availableFilters
                 .find((a) => a.filterFieldSource === condition.fieldSource)
                 ?.searchFieldData?.find((s) => s.fieldIdentifier === condition.fieldIdentifier);
@@ -72,11 +73,11 @@ const GroupConditionsViewer = ({ groupConditions = [], conditionGroupName, condi
     if (isFetchingConditionDetails) return <Spinner active={isFetchingConditionDetails} />;
 
     return (
-        <div className={styles.groupConditionContainerDiv} key={conditionGroupUuid}>
-            <h6 className={cx('text-muted', styles.groupConditionTitle)}>{`${conditionGroupName}`}</h6>
+        <div className={styles.groupConditionContainerDiv} key={conditionUuid}>
+            <h6 className={cx('text-muted', styles.groupConditionTitle)}>{`${conditionName}`}</h6>
             <div className="ms-3">{renderConditionsBadges()}</div>
         </div>
     );
 };
 
-export default GroupConditionsViewer;
+export default ConditionsItemsList;

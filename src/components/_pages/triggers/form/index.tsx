@@ -139,7 +139,6 @@ const TriggerForm = () => {
     const onSubmit = useCallback(
         (values: TriggerFormValues) => {
             if (values.resource === Resource.None || values.eventResource === Resource.None || !values.triggerType) return;
-            console.log('values: ', values);
             dispatch(
                 rulesActions.createTrigger({
                     trigger: {

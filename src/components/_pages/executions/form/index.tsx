@@ -70,7 +70,6 @@ const ExecutionForm = () => {
     const onSubmit = useCallback(
         (values: ExecutionFormValues) => {
             if (values.resource === Resource.None || !values.type) return;
-            console.log('values', values);
             dispatch(
                 rulesActions.createExecution({
                     executionRequestModel: {

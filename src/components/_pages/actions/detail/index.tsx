@@ -1,5 +1,7 @@
+import { ApiClients } from 'api';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
+import ConditionsExecutionsList from 'components/ExecutionConditionItemsList';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
@@ -330,7 +332,21 @@ const RuleDetails = () => {
             </Row>
 
             {/* <Row>{actionDetails?.resource && <ConditionAndExecutionItemsViewer resource={actionDetails.resource} formType="rules" />}</Row> */}
-
+            {actionDetails?.executions.length ? (
+                <ConditionsExecutionsList
+                    listType="executionItems"
+                    // ruleConditions={actionDetails?.executions}
+                    actionExecutions={actionDetails?.executions}
+                    getAvailableFiltersApi={(apiClients: ApiClients) =>
+                        apiClients.resources.listResourceRuleFilterFields({
+                            resource: actionDetails.resource,
+                            settable: true,
+                        })
+                    }
+                />
+            ) : (
+                <></>
+            )}
             <Dialog
                 isOpen={confirmDelete}
                 caption={`Delete an Action`}

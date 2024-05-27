@@ -42,13 +42,13 @@ interface Props {
     entity: EntityType;
     getAvailableFiltersApi: (apiClients: ApiClients) => Observable<Array<SearchFieldListModel>>;
     onFilterUpdate?: (currentFilters: SearchFilterModel[]) => void;
-    appendInWidgetContent?: React.ReactNode;
+    // appendInWidgetContent?: React.ReactNode;
     disableBadgeRemove?: boolean;
     busyBadges?: boolean;
 }
 
 export default function FilterWidget({
-    appendInWidgetContent,
+    // appendInWidgetContent,
     onFilterUpdate,
     title,
     entity,
@@ -441,7 +441,7 @@ export default function FilterWidget({
                         );
                     })}
                 </div>
-                {appendInWidgetContent}
+                {/* {appendInWidgetContent} */}
             </Widget>
         </>
     );
