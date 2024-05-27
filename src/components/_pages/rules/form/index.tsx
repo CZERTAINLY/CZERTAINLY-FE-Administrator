@@ -1,10 +1,9 @@
 import Widget from 'components/Widget';
+import { EntityType, actions as filterActions } from 'ducks/filters';
+import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-// import { EntityType, actions as filterActions } from 'ducks/filters';
-import { EntityType, actions as filterActions } from 'ducks/filters';
-import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 
 import { Field, Form } from 'react-final-form';
 
@@ -17,7 +16,6 @@ import { Resource } from 'types/openapi';
 import { isObjectSame } from 'utils/common-utils';
 import { useRuleEvaluatorResourceOptions } from 'utils/rules';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
-// import ConditionFormFilter from '../ConditionFormFilter';
 
 interface SelectChangeValue {
     value: string;
@@ -68,8 +66,6 @@ const RulesForm = () => {
             resource: Resource.None,
             selectedResource: undefined,
             description: undefined,
-            // conditions: [],
-            // conditionGroupsUuids: [],
             conditionsUuids: [],
         };
     }, []);

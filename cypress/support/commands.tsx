@@ -29,14 +29,3 @@ Cypress.Commands.add('mount', (component, options = {}, initialRoute = '/') => {
 
     return mount(wrapped, mountOptions);
 });
-
-// Cypress.Commands.add("mount", mount);
-
-// Cypress.Commands.add('mountWithRouter', (component, route) => {
-//     // Mount the component with the Router context
-//     cy.mount(component, {}, route);
-// });
-
-// Cypress.Commands.add('dataCy', (value) => {
-//     return cy.get(`[data-cy=${value}]`);
-// });

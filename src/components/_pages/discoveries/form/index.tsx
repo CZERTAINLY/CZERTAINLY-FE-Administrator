@@ -319,7 +319,6 @@ export default function DiscoveryForm() {
                                     id="cronExpression"
                                     label="Cron Expression"
                                     validators={[validateRequired(), validateQuartzCronExpression(values.cronExpression)]}
-                                    // description={getCronExpression(values.cronExpression)}
                                     description={getStrongFromCronExpression(values.cronExpression)}
                                     inputGroupIcon={{
                                         icon: 'fa fa-stopwatch',

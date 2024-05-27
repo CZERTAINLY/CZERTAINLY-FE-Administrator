@@ -53,7 +53,6 @@ const ExecutionDetails = () => {
                     executionUuid: id,
                     execution: {
                         description: updatedDescription,
-                        // actions: executionDetails?.actions || [],
                         items: executionDetails?.items || [],
                     },
                 }),

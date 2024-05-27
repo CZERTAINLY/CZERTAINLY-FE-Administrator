@@ -97,7 +97,6 @@ const RuleDetails = () => {
                     action: {
                         description: actionDetails?.description || '',
                         executionsUuids: allConditionGroups,
-                        // conditionGroupsUuids: allConditionGroups,
                     },
                 }),
             );
@@ -335,7 +334,6 @@ const RuleDetails = () => {
             {actionDetails?.executions.length ? (
                 <ConditionsExecutionsList
                     listType="executionItems"
-                    // ruleConditions={actionDetails?.executions}
                     actionExecutions={actionDetails?.executions}
                     getAvailableFiltersApi={(apiClients: ApiClients) =>
                         apiClients.resources.listResourceRuleFilterFields({

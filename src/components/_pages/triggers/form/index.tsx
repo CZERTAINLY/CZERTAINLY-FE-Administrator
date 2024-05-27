@@ -1,10 +1,9 @@
 import Widget from 'components/Widget';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-// import { EntityType, actions as filterActions } from 'ducks/filters';
-import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 
 import { actions as resourceActions, selectors as resourceSelectors } from 'ducks/resource';
 
@@ -276,7 +275,6 @@ const TriggerForm = () => {
                                             }
                                             form.change('event', undefined);
                                             form.change('selectedEvent', undefined);
-                                            // form.change('action', []);
                                             form.change('actionsUuids', []);
                                             form.change('rulesUuids', []);
                                         }}

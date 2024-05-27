@@ -42,20 +42,11 @@ interface Props {
     entity: EntityType;
     getAvailableFiltersApi: (apiClients: ApiClients) => Observable<Array<SearchFieldListModel>>;
     onFilterUpdate?: (currentFilters: SearchFilterModel[]) => void;
-    // appendInWidgetContent?: React.ReactNode;
     disableBadgeRemove?: boolean;
     busyBadges?: boolean;
 }
 
-export default function FilterWidget({
-    // appendInWidgetContent,
-    onFilterUpdate,
-    title,
-    entity,
-    getAvailableFiltersApi,
-    disableBadgeRemove,
-    busyBadges,
-}: Props) {
+export default function FilterWidget({ onFilterUpdate, title, entity, getAvailableFiltersApi, disableBadgeRemove, busyBadges }: Props) {
     const dispatch = useDispatch();
 
     const searchGroupEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.FilterFieldSource));
