@@ -11,8 +11,12 @@
  * Do not edit the class manually.
  */
 
+import type {
+    Resource,
+} from './';
+
 /**
- * List of Actions for the Resource
+ * List of Action Groups in the Rule Trigger
  * @export
  * @interface ActionDto
  */
@@ -30,9 +34,16 @@ export interface ActionDto {
      */
     name: string;
     /**
-     * Resource label
+     * Description of the action
      * @type {string}
      * @memberof ActionDto
      */
-    displayName: string;
+    description?: string;
+    /**
+     * @type {Resource}
+     * @memberof ActionDto
+     */
+    resource: Resource;
 }
+
+

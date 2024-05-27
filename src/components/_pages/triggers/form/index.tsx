@@ -1,10 +1,9 @@
 import Widget from 'components/Widget';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-// import { EntityType, actions as filterActions } from 'ducks/filters';
-import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 
 import { actions as resourceActions, selectors as resourceSelectors } from 'ducks/resource';
 
@@ -13,11 +12,9 @@ import { Field, Form } from 'react-final-form';
 import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 
-import ConditionFormFilter from 'components/ConditionFormFilter';
 import ProgressButton from 'components/ProgressButton';
 import Select from 'react-select';
-import { PlatformEnum, Resource, RuleTriggerRequestDtoEventNameEnum, RuleTriggerType } from 'types/openapi';
-import { ActionRuleRequestModel } from 'types/rules';
+import { PlatformEnum, Resource, TriggerRequestDtoEventEnum, TriggerType } from 'types/openapi';
 import { isObjectSame } from 'utils/common-utils';
 import { useResourceOptionsFromListWithFilters } from 'utils/rules';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
@@ -32,29 +29,30 @@ interface SelectedEventValue {
     value: { event: string; producedResource?: string };
 }
 
-export interface ConditionGroupFormValues {
+export interface TriggerFormValues {
     name: string;
     description?: string;
     selectedResource?: SelectChangeValue;
     resource: Resource;
-    triggerResource: Resource;
+    eventResource: Resource;
     selectedTriggerResource?: SelectChangeValue;
-    triggerType?: RuleTriggerType;
+    triggerType?: TriggerType;
     selectedTriggerType?: SelectChangeValue;
-    actions: ActionRuleRequestModel[];
-    eventName?: RuleTriggerRequestDtoEventNameEnum;
-    selectedEventName?: SelectedEventValue;
-    actionGroupsUuids: SelectChangeValue[];
+    event?: TriggerRequestDtoEventEnum;
+    selectedEvent?: SelectedEventValue;
+    actionsUuids: SelectChangeValue[];
     rulesUuids: SelectChangeValue[];
+    ignoreTrigger: boolean;
+    type?: TriggerType;
 }
 
-const ConditionGroupForm = () => {
+const TriggerForm = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const title = 'Create Trigger';
 
-    const ruleTriggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.RuleTriggerType));
-    const actionGroups = useSelector(rulesSelectors.actionGroups);
+    const ruleTriggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.TriggerType));
+    const actionsList = useSelector(rulesSelectors.actionsList);
     const resourceEvents = useSelector(resourceSelectors.resourceEvents);
     const rules = useSelector(rulesSelectors.rules);
     const isCreatingTrigger = useSelector(rulesSelectors.isCreatingTrigger);
@@ -77,12 +75,12 @@ const ConditionGroupForm = () => {
         dispatch(resourceActions.listResources());
     }, [dispatch]);
 
-    const actionGroupsOptions = useMemo(() => {
-        if (actionGroups === undefined) return [];
-        return actionGroups.map((conditionGroup) => {
-            return { value: conditionGroup.uuid, label: conditionGroup.name };
+    const actionsOptions = useMemo(() => {
+        if (actionsList === undefined) return [];
+        return actionsList.map((action) => {
+            return { value: action.uuid, label: action.name };
         });
-    }, [actionGroups]);
+    }, [actionsList]);
 
     const rulesOptions = useMemo(() => {
         if (rules === undefined) return [];
@@ -92,10 +90,7 @@ const ConditionGroupForm = () => {
     }, [rules]);
 
     const ruleTriggerTypeOptions = useMemo(() => {
-        return [
-            { value: RuleTriggerType.Event, label: getEnumLabel(ruleTriggerTypeEnum, RuleTriggerType.Event) },
-            // { value: RuleTriggerType.Manual, label: getEnumLabel(ruleTriggerTypeEnum, RuleTriggerType.Manual) },
-        ];
+        return [{ value: TriggerType.Event, label: getEnumLabel(ruleTriggerTypeEnum, TriggerType.Event) }];
     }, [ruleTriggerTypeEnum]);
 
     const fetchResourceEvents = useCallback(
@@ -105,9 +100,9 @@ const ConditionGroupForm = () => {
         [dispatch],
     );
 
-    const fetchActionGroups = useCallback(
+    const fetchActions = useCallback(
         (resource: Resource) => {
-            dispatch(rulesActions.listActionGroups({ resource: resource }));
+            dispatch(rulesActions.listActions({ resource: resource }));
         },
         [dispatch],
     );
@@ -119,16 +114,17 @@ const ConditionGroupForm = () => {
         [dispatch],
     );
 
-    const defaultValues: ConditionGroupFormValues = useMemo(() => {
+    const defaultValues: TriggerFormValues = useMemo(() => {
         return {
             name: '',
             resource: Resource.None,
             description: undefined,
-            actionGroupsUuids: [],
-            actions: [],
+            actionsUuids: [],
             rulesUuids: [],
             triggerType: undefined,
-            triggerResource: Resource.None,
+            eventResource: Resource.None,
+            event: undefined,
+            ignoreTrigger: false,
         };
     }, []);
 
@@ -140,20 +136,20 @@ const ConditionGroupForm = () => {
     }, [navigate]);
 
     const onSubmit = useCallback(
-        (values: ConditionGroupFormValues) => {
-            if (values.resource === Resource.None || values.triggerResource === Resource.None || !values.triggerType) return;
+        (values: TriggerFormValues) => {
+            if (values.resource === Resource.None || values.eventResource === Resource.None || !values.triggerType) return;
             dispatch(
                 rulesActions.createTrigger({
                     trigger: {
                         name: values.name,
                         description: values.description,
                         resource: values.resource,
-                        triggerType: values.triggerType,
-                        actionGroupsUuids: values.actionGroupsUuids.map((actionGroup) => actionGroup.value),
-                        actions: values.actions,
-                        eventName: values?.eventName,
+                        ignoreTrigger: values.ignoreTrigger,
+                        actionsUuids: values.actionsUuids.map((action) => action.value),
+                        event: values?.event,
                         rulesUuids: values.rulesUuids.map((rule) => rule.value),
-                        triggerResource: values.triggerResource,
+                        eventResource: values.eventResource,
+                        type: values.triggerType,
                     },
                 }),
             );
@@ -162,7 +158,7 @@ const ConditionGroupForm = () => {
     );
 
     const areDefaultValuesSame = useCallback(
-        (values: ConditionGroupFormValues) => {
+        (values: TriggerFormValues) => {
             const areValuesSame = isObjectSame(
                 values as unknown as Record<string, unknown>,
                 defaultValues as unknown as Record<string, unknown>,
@@ -174,7 +170,7 @@ const ConditionGroupForm = () => {
 
     return (
         <Widget title={title} busy={isBusy}>
-            <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<ConditionGroupFormValues>() }}>
+            <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<TriggerFormValues>() }}>
                 {({ handleSubmit, pristine, submitting, values, valid, form }) => (
                     <BootstrapForm onSubmit={handleSubmit}>
                         <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}>
@@ -228,16 +224,14 @@ const ConditionGroupForm = () => {
                                             if (!event?.value) return;
 
                                             input.onChange(event);
-
                                             form.change('triggerType', event?.value);
-                                            form.change('triggerResource', Resource.None);
+                                            form.change('eventResource', Resource.None);
                                             form.change('selectedTriggerResource', undefined);
-                                            form.change('eventName', undefined);
-                                            form.change('selectedEventName', undefined);
+                                            form.change('event', undefined);
+                                            form.change('selectedEvent', undefined);
                                             form.change('resource', Resource.None);
                                             form.change('selectedResource', undefined);
-                                            form.change('actions', []);
-                                            form.change('actionGroupsUuids', []);
+                                            form.change('actionsUuids', []);
                                             form.change('rulesUuids', []);
                                         }}
                                     />
@@ -252,39 +246,36 @@ const ConditionGroupForm = () => {
                         <Field name="selectedTriggerResource" validate={validateRequired()}>
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="triggerResource">Trigger Resource</Label>
+                                    <Label for="eventResource">Event Resource</Label>
 
                                     <Select
                                         {...input}
                                         maxMenuHeight={140}
                                         menuPlacement="auto"
                                         options={
-                                            values.triggerType === RuleTriggerType.Event
-                                                ? resourceEventsOptions
-                                                : resourceRuleEvaluatorOptions
+                                            values.triggerType === TriggerType.Event ? resourceEventsOptions : resourceRuleEvaluatorOptions
                                         }
-                                        placeholder="Select Trigger Resource"
+                                        placeholder="Select Event Resource"
                                         isClearable
                                         onChange={(event) => {
                                             if (!event?.value) return;
 
                                             input.onChange(event);
-                                            form.change('triggerResource', event.value as Resource);
+                                            form.change('eventResource', event.value as Resource);
 
-                                            if (values.triggerType === RuleTriggerType.Event) {
+                                            if (values.triggerType === TriggerType.Event) {
                                                 fetchResourceEvents(event.value as Resource);
                                                 form.change('selectedResource', undefined);
                                                 form.change('resource', Resource.None);
                                             } else {
                                                 form.change('selectedResource', event);
                                                 form.change('resource', event.value as Resource);
-                                                fetchActionGroups(event.value as Resource);
+                                                fetchActions(event.value as Resource);
                                                 fetchRules(event.value as Resource);
                                             }
-                                            form.change('eventName', undefined);
-                                            form.change('selectedEventName', undefined);
-                                            form.change('actions', []);
-                                            form.change('actionGroupsUuids', []);
+                                            form.change('event', undefined);
+                                            form.change('selectedEvent', undefined);
+                                            form.change('actionsUuids', []);
                                             form.change('rulesUuids', []);
                                         }}
                                         styles={{
@@ -302,24 +293,24 @@ const ConditionGroupForm = () => {
                             )}
                         </Field>
 
-                        {values?.triggerType === RuleTriggerType.Event && (
-                            <Field name="selectedEventName" validate={validateRequired()}>
+                        {values?.triggerType === TriggerType.Event && (
+                            <Field name="selectedEvent" validate={validateRequired()}>
                                 {({ input, meta }) => (
                                     <FormGroup>
-                                        <Label for="selectedEventName">Event Name</Label>
+                                        <Label for="selectedEvent">Event</Label>
 
                                         <Select
                                             {...input}
                                             maxMenuHeight={140}
                                             menuPlacement="auto"
                                             options={resourceEventNameOptions || []}
-                                            placeholder="Select Event Name"
+                                            placeholder="Select Event"
                                             isClearable
                                             onChange={(event) => {
                                                 if (!event?.value) return;
 
                                                 input.onChange(event);
-                                                form.change('eventName', event?.value?.event as RuleTriggerRequestDtoEventNameEnum);
+                                                form.change('event', event?.value?.event as TriggerRequestDtoEventEnum);
 
                                                 if (event?.value?.producedResource) {
                                                     const selectResource = resourceOptions.find(
@@ -327,7 +318,7 @@ const ConditionGroupForm = () => {
                                                     );
                                                     form.change('selectedResource', selectResource);
                                                     form.change('resource', event?.value?.producedResource);
-                                                    fetchActionGroups(event?.value?.producedResource);
+                                                    fetchActions(event?.value?.producedResource);
                                                     fetchRules(event?.value?.producedResource);
                                                 }
                                             }}
@@ -340,6 +331,30 @@ const ConditionGroupForm = () => {
                                 )}
                             </Field>
                         )}
+
+                        <Field name="ignoreTrigger" type="checkbox">
+                            {({ input }) => (
+                                <FormGroup className="pt-2 ps-0 mb-3" check>
+                                    <div className="d-flex">
+                                        <Label check>Ignore Trigger</Label>
+                                        <Input
+                                            className="ms-2 mt-1"
+                                            {...input}
+                                            type="checkbox"
+                                            checked={values.ignoreTrigger}
+                                            onClick={(event) => {
+                                                if (event.target) {
+                                                    const isChecked = (event.target as HTMLInputElement).checked;
+                                                    if (isChecked) {
+                                                        form.change('actionsUuids', []);
+                                                    }
+                                                }
+                                            }}
+                                        />
+                                    </div>
+                                </FormGroup>
+                            )}
+                        </Field>
 
                         <Field name="selectedResource">
                             {({ input, meta }) => (
@@ -385,23 +400,22 @@ const ConditionGroupForm = () => {
                             )}
                         </Field>
 
-                        <Field name="actionGroupsUuids">
+                        <Field name="actionsUuids">
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="description">Action Groups</Label>
+                                    <Label for="description">Actions</Label>
 
                                     <Select
-                                        isDisabled={values.resource === Resource.None || !values.resource}
+                                        isDisabled={values.resource === Resource.None || !values.resource || values.ignoreTrigger}
                                         {...input}
-                                        options={actionGroupsOptions}
+                                        options={actionsOptions}
                                         isMulti
-                                        placeholder="Select Condition Group"
+                                        placeholder="Select Actions"
                                         isClearable
                                     />
                                 </FormGroup>
                             )}
                         </Field>
-                        {values?.resource && <ConditionFormFilter formType="actions" resource={values.resource} includeIgnoreAction />}
 
                         <div className="d-flex justify-content-end">
                             <ButtonGroup>
@@ -415,7 +429,7 @@ const ConditionGroupForm = () => {
                                         submitting ||
                                         !valid ||
                                         isBusy ||
-                                        (!values.actionGroupsUuids.length && !values.actions.length)
+                                        (!values.ignoreTrigger && !values.actionsUuids.length)
                                     }
                                 />
 
@@ -431,4 +445,4 @@ const ConditionGroupForm = () => {
     );
 };
 
-export default ConditionGroupForm;
+export default TriggerForm;

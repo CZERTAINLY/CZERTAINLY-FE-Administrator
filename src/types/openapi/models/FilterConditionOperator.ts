@@ -12,7 +12,7 @@
  */
 
 /**
- * Operator of the Rule Condition
+ * Operator of the condition item
  * @export
  * @enum {string}
  */

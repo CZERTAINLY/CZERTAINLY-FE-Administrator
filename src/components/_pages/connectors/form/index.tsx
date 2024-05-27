@@ -60,7 +60,6 @@ export default function ConnectorForm() {
     );
 
     const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
-    // const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
 
     const isFetching = useSelector(connectorSelectors.isFetchingDetail);
     const isCreating = useSelector(connectorSelectors.isCreating);
@@ -122,7 +121,6 @@ export default function ConnectorForm() {
                             url: values.url,
                             authType: selectedAuthType.value,
                             customAttributes: collectFormAttributes('customConnector', resourceCustomAttributes, values),
-                            // authAttributes: []
                         },
                     }),
                 );
@@ -133,7 +131,6 @@ export default function ConnectorForm() {
                         url: values.url,
                         authType: selectedAuthType.value,
                         customAttributes: collectFormAttributes('customConnector', resourceCustomAttributes, values),
-                        // authAttributes: []
                     }),
                 );
             }
@@ -265,7 +262,6 @@ export default function ConnectorForm() {
                                                         invalid={!!meta.error && meta.touched}
                                                         type="text"
                                                         placeholder="Username"
-                                                        //disabled={editMode}
                                                     />
                                                     <FormFeedback>{meta.error}</FormFeedback>
                                                 </FormGroup>
@@ -283,7 +279,6 @@ export default function ConnectorForm() {
                                                         invalid={!!meta.error && meta.touched}
                                                         type="password"
                                                         placeholder="Password"
-                                                        // disabled={editMode}
                                                     />
 
                                                     <FormFeedback>{meta.error}</FormFeedback>
@@ -305,7 +300,6 @@ export default function ConnectorForm() {
                                                     invalid={!!meta.error && meta.touched}
                                                     type="file"
                                                     placeholder="clientCert"
-                                                    // disabled={editMode}
                                                 />
 
                                                 <FormFeedback>{meta.error}</FormFeedback>

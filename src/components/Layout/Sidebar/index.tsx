@@ -85,16 +85,16 @@ export default function Sidebar() {
                         _key="workflows"
                         header="Workflows"
                         childrenLinks={[
-                            { _key: '/conditiongroups', name: 'Condition Groups', link: '/conditiongroups' },
+                            // { _key: '/conditions', name: 'Conditions', link: '/conditions' },
                             {
                                 _key: 'rules',
                                 name: 'Rules',
                                 link: '/rules',
                             },
                             {
-                                _key: 'actiongroups',
-                                name: 'Action Groups',
-                                link: '/actiongroups',
+                                _key: 'actions',
+                                name: 'Actions',
+                                link: '/actions',
                             },
                             {
                                 _key: 'triggers',

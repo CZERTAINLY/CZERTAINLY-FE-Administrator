@@ -11,10 +11,6 @@
  * Do not edit the class manually.
  */
 
-import type {
-    RuleConditionRequestDto,
-} from './';
-
 /**
  * @export
  * @interface UpdateRuleRequestDto
@@ -27,27 +23,9 @@ export interface UpdateRuleRequestDto {
      */
     description?: string;
     /**
-     * Type of the Resource associated with the Rule
-     * @type {string}
-     * @memberof UpdateRuleRequestDto
-     */
-    resourceType?: string;
-    /**
-     * Format of the Resource associated with the Rule
-     * @type {string}
-     * @memberof UpdateRuleRequestDto
-     */
-    resourceFormat?: string;
-    /**
-     * List of conditions to add in the Rule
-     * @type {Array<RuleConditionRequestDto>}
-     * @memberof UpdateRuleRequestDto
-     */
-    conditions?: Array<RuleConditionRequestDto>;
-    /**
-     * List of UUIDs of existing condition groups to add in the Rule
+     * List of UUIDs of existing conditions to add to the rule
      * @type {Array<string>}
      * @memberof UpdateRuleRequestDto
      */
-    conditionGroupsUuids?: Array<string>;
+    conditionsUuids: Array<string>;
 }

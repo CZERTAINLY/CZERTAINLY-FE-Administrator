@@ -1,120 +1,113 @@
-import { AttributeResponseModel } from './attributes';
 import type {
-    RuleActionDto,
-    // RuleActionGroupDto,
-    RuleActionGroupDto,
-    RuleActionGroupRequestDto,
-    RuleActionRequestDto,
-    RuleConditionDto,
-    // RuleConditionGroupDetailDto,
-    RuleConditionGroupDto,
-    RuleConditionGroupRequestDto,
-    RuleConditionRequestDto,
-    RuleDetailDto,
-    RuleDto,
-    RuleRequestDto,
-    RuleTriggerDetailDto,
-    RuleTriggerDto,
-    RuleTriggerRequestDto,
+    ActionDetailDto as ActionDetailDtoApi,
+    ActionDto as ActionDtoApi,
+    ActionRequestDto as ActionRequestDtoApi,
+    ConditionDto as ConditionDtoApi,
+    ConditionItemDto as ConditionItemDtoApi,
+    ConditionItemRequestDto as ConditionItemRequestDtoApi,
+    ConditionRequestDto as ConditionRequestDtoApi,
+    ExecutionDto as ExecutionDtoApi,
+    ExecutionItemDto as ExecutionItemDtoApi,
+    ExecutionItemRequestDto as ExecutionItemRequestDtoApi,
+    ExecutionRequestDto as ExecutionRequestDtoApi,
+    RuleDetailDto as RuleDetailDtoApi,
+    RuleDto as RuleDtoApi,
+    RuleRequestDto as RuleRequestDtoApi,
     SearchFieldDataByGroupDto,
-    UpdateRuleActionGroupRequestDto,
-    UpdateRuleConditionGroupRequestDto,
-    UpdateRuleRequestDto,
-    UpdateRuleTriggerRequestDto,
+    TriggerDetailDto as TriggerDetailDtoApi,
+    TriggerDto as TriggerDtoApi,
+    TriggerRequestDto as TriggerRequestDtoApi,
+    UpdateActionRequestDto as UpdateActionRequestDtoApi,
+    UpdateConditionRequestDto as UpdateConditionRequestDtoApi,
+    UpdateExecutionRequestDto as UpdateExecutionRequestDtoApi,
+    UpdateRuleRequestDto as UpdateRuleRequestDtoApi,
+    UpdateTriggerRequestDto as UpdateTriggerRequestDtoApi,
 } from './openapi';
 
 export type FieldSearchDataByGroupDto = SearchFieldDataByGroupDto;
 export type FieldSearchDataByGroupModel = FieldSearchDataByGroupDto;
 
-export type ActionRuleDto = RuleActionDto;
-export type ActionRuleModel = ActionRuleDto;
+export type ExecutionItemDto = ExecutionItemDtoApi;
+export type ExecutionItemModel = ExecutionItemDto;
 
-// export type ActionRuleGroupDetailDto = RuleActionGroupDetailDto;
-// export type ActionRuleGroupDetailModel = Omit<ActionRuleGroupDetailDto, 'actions'> & {
-//     actions: Array<ActionRuleModel>;
-// };
-
-export type ActionGroupDto = RuleActionGroupDto;
-export type ActionGroupModel = ActionGroupDto;
-
-export type ActionRuleRequestDto = RuleActionRequestDto;
-export type ActionRuleRequestModel = ActionRuleRequestDto;
-
-export type ActionRuleGroupRequestDto = RuleActionGroupRequestDto;
-export type ActionRuleGroupRequestModel = Omit<ActionRuleGroupRequestDto, 'actions'> & {
-    actions: Array<ActionRuleRequestModel>;
+export type ExecutionDto = ExecutionDtoApi;
+export type ExecutionModel = Omit<ExecutionDto, 'items'> & {
+    items: Array<ExecutionItemModel>;
 };
 
-export type ConditionRuleDto = RuleConditionDto;
-export type ConditionRuleModel = ConditionRuleDto;
+export type ExecutionItemRequestDto = ExecutionItemRequestDtoApi;
+export type ExecutionItemRequestModel = ExecutionItemRequestDto;
 
-export type ConditionRuleGroupDto = RuleConditionGroupDto;
-export type ConditionRuleGroupModel = Omit<ConditionRuleGroupDto, 'conditions'> & {
-    conditions: Array<ConditionRuleModel>;
+export type ExecutionRequestDto = ExecutionRequestDtoApi;
+export type ExecutionRequestModel = Omit<ExecutionRequestDto, 'items'> & {
+    items: Array<ExecutionItemRequestModel>;
 };
 
-export type ConditionRuleRequestDto = RuleConditionRequestDto;
-export type RuleConditiontModel = ConditionRuleRequestDto;
+export type ActionDto = ActionDtoApi;
+export type ActionModel = ActionDto;
 
-export type ConditionRuleGroupRequestDto = RuleConditionGroupRequestDto;
-export type ConditionRuleGroupRequestModel = Omit<ConditionRuleGroupRequestDto, 'conditions'> & {
-    conditions: Array<RuleConditiontModel>;
+export type ConditionItemDto = ConditionItemDtoApi;
+export type ConditionItemModel = ConditionItemDto;
+
+export type ConditionDto = ConditionDtoApi;
+export type ConditionModel = Omit<ConditionDto, 'items'> & {
+    items: Array<ConditionItemModel>;
 };
 
-export type DetailRuleDto = RuleDetailDto;
-export type DetailRuleModel = Omit<DetailRuleDto, 'attributes | conditions | conditionGroups'> & {
-    attributes: Array<AttributeResponseModel>;
-    conditions: Array<ConditionRuleModel>;
-    conditionGroups: Array<ConditionRuleGroupModel>;
+export type ConditionItemRequestDto = ConditionItemRequestDtoApi;
+export type ConditionItemRequestModel = ConditionItemRequestDto;
+
+export type ConditionRequestDto = ConditionRequestDtoApi;
+export type ConditionRequestModel = Omit<ConditionRequestDto, 'items'> & {
+    items: Array<ConditionItemRequestModel>;
 };
 
-export type DtoRule = RuleDto;
-export type RuleModel = Omit<DtoRule, 'attributes'> & {
-    attributes: Array<AttributeResponseModel>;
+export type RuleDetailDto = RuleDetailDtoApi;
+export type RuleDetailModel = Omit<RuleDetailDto, 'conditions'> & {
+    conditions: Array<ConditionModel>;
 };
 
-export type RequestRuleDto = RuleRequestDto;
-export type RequestRuleModel = Omit<RequestRuleDto, 'conditions | conditionGroups | conditionGroupsUuids'> & {
-    conditions?: Array<RuleConditiontModel>;
-    conditionGroupsUuids?: Array<string>;
-};
+export type RuleDto = RuleDtoApi;
+export type RuleModel = RuleDto;
 
-export type TriggerRuleDetailDto = RuleTriggerDetailDto;
-export type TriggerRuleDetailModel = Omit<TriggerRuleDetailDto, 'rules | actionGroups | actions'> & {
+export type RuleRequestDto = RuleRequestDtoApi;
+export type RuleRequestModel = RuleRequestDto;
+
+export type TriggerDetailDto = TriggerDetailDtoApi;
+export type TriggerDetailModel = Omit<TriggerDetailDto, 'rules | actions'> & {
     rules: Array<RuleModel>;
-    actionGroups: Array<ActionGroupModel>;
-    actions: Array<ActionRuleModel>;
+    actions: Array<ActionModel>;
 };
 
-export type TriggerRuleDto = RuleTriggerDto;
-export type TriggerRuleModel = TriggerRuleDto;
+export type TriggerDto = TriggerDtoApi;
+export type TriggerModel = TriggerDto;
 
-export type TriggerRuleRequestDto = RuleTriggerRequestDto;
-export type TriggerRuleRequestModel = Omit<TriggerRuleRequestDto, 'rules | actionGroups | actions'> & {
-    actions?: Array<ActionRuleRequestModel>;
-    actionGroupsUuids?: Array<string>;
-    rulesUuids?: Array<string>;
+export type TriggerRequestDto = TriggerRequestDtoApi;
+export type TriggerRequestModel = TriggerRequestDto;
+
+export type UpdateExecutionRequestDto = UpdateExecutionRequestDtoApi;
+export type UpdateExecutionRequestModel = Omit<UpdateExecutionRequestDto, 'items'> & {
+    items: Array<ExecutionItemRequestModel>;
 };
 
-export type UpdateActionGroupRequestDto = UpdateRuleActionGroupRequestDto;
-export type UpdateActionGroupRequestModel = Omit<UpdateActionGroupRequestDto, 'actions'> & {
-    actions: Array<ActionRuleRequestModel>;
+export type UpdateConditionRequestDto = UpdateConditionRequestDtoApi;
+export type UpdateConditionRequestModel = Omit<UpdateConditionRequestDto, 'items'> & {
+    items: Array<ConditionItemRequestModel>;
 };
 
-export type UpdateGroupRuleConditionRequestDto = UpdateRuleConditionGroupRequestDto;
-export type UpdateGroupRuleConditionRequestModel = Omit<UpdateGroupRuleConditionRequestDto, 'conditions'> & {
-    conditions: Array<RuleConditiontModel>;
+export type UpdateRuleRequestDto = UpdateRuleRequestDtoApi;
+export type UpdateRuleRequestModel = UpdateRuleRequestDto;
+
+export type UpdateTriggerRequestDto = UpdateTriggerRequestDtoApi;
+export type UpdateTriggerRequestModel = UpdateTriggerRequestDto;
+
+export type ActionRequestDto = ActionRequestDtoApi;
+export type ActionRequestModel = ActionRequestDto;
+
+export type ActionDetailDto = ActionDetailDtoApi;
+export type ActionDetailModel = Omit<ActionDetailDto, 'executions'> & {
+    executions: Array<ExecutionModel>;
 };
 
-export type RuleUpdateRequestDto = UpdateRuleRequestDto;
-export type RuleUpdateRequestModel = Omit<RuleUpdateRequestDto, 'conditions | conditionGroups | conditionGroupsUuids'> & {
-    conditions?: Array<RuleConditiontModel>;
-    conditionGroupsUuids?: Array<string>;
-};
-
-export type RuleTriggerUpdateRequestDto = UpdateRuleTriggerRequestDto;
-export type RuleTriggerUpdateRequestModel = Omit<RuleTriggerUpdateRequestDto, 'rules | actionGroups | actions'> & {
-    actions: Array<ActionRuleRequestModel>;
-    rulesUuids?: Array<string>;
-    actionGroupsUuids?: Array<string>;
-};
+export type UpdateActionRequestDto = UpdateActionRequestDtoApi;
+export type UpdateActionRequestModel = UpdateActionRequestDto;

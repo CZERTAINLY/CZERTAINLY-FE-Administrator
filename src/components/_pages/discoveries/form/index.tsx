@@ -26,9 +26,9 @@ import { FunctionGroupCode, Resource } from 'types/openapi';
 import Cron from 'react-cron-generator';
 import { PlatformEnum } from 'types/openapi';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
-import { collectFormAttributes } from 'utils/attributes/attributes';
 
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import { collectFormAttributes } from 'utils/attributes/attributes';
 import { getStrongFromCronExpression } from 'utils/dateUtil';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateQuartzCronExpression, validateRequired } from 'utils/validators';
 
@@ -57,7 +57,7 @@ export default function DiscoveryForm() {
     const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
     const triggers = useSelector(rulesSelectors.triggers);
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
-    const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.RuleTriggerType));
+    const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.TriggerType));
     const eventNameEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ResourceEvent));
     const [selectedTriggers, setSelectedTriggers] = useState<SelectChangeValue[]>([]);
     const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
@@ -103,7 +103,7 @@ export default function DiscoveryForm() {
             dispatch(connectorActions.clearCallbackData());
             dispatch(discoveryActions.listDiscoveryProviders());
             dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Discoveries));
-            dispatch(rulesActions.listTriggers({ triggerResouce: Resource.Discoveries }));
+            dispatch(rulesActions.listTriggers({ eventResource: Resource.Discoveries }));
         }
     }, [dispatch, init]);
 
@@ -238,9 +238,9 @@ export default function DiscoveryForm() {
             id: trigger.uuid,
             columns: [
                 <Link to={`../../triggers/detail/${trigger.uuid}`}>{trigger.name}</Link>,
-                getEnumLabel(resourceTypeEnum, trigger.triggerResource || ''),
-                getEnumLabel(triggerTypeEnum, trigger.triggerType),
-                getEnumLabel(eventNameEnum, trigger.eventName || ''),
+                getEnumLabel(resourceTypeEnum, trigger.eventResource || ''),
+                getEnumLabel(triggerTypeEnum, trigger.type),
+                getEnumLabel(eventNameEnum, trigger.event || ''),
                 getEnumLabel(resourceTypeEnum, trigger.resource || ''),
                 trigger.description || '',
                 <div className="d-flex">
@@ -319,7 +319,6 @@ export default function DiscoveryForm() {
                                     id="cronExpression"
                                     label="Cron Expression"
                                     validators={[validateRequired(), validateQuartzCronExpression(values.cronExpression)]}
-                                    // description={getCronExpression(values.cronExpression)}
                                     description={getStrongFromCronExpression(values.cronExpression)}
                                     inputGroupIcon={{
                                         icon: 'fa fa-stopwatch',
@@ -373,6 +372,8 @@ export default function DiscoveryForm() {
                             data={triggerTableData}
                             headers={triggerHeaders}
                             newRowWidgetProps={{
+                                selectHint: 'Select Triggers',
+                                immidiateAdd: true,
                                 newItemsList: triggerOptions,
                                 isBusy,
                                 onAddClick: onUpdateTriggersConfirmed,

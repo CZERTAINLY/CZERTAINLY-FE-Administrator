@@ -35,7 +35,7 @@ export default function DiscoveryDetail() {
 
     const isBusy = useMemo(() => isFetching || isDeleting, [isFetching, isDeleting]);
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
-    const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.RuleTriggerType));
+    const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.TriggerType));
 
     const getFreshDiscoveryDetails = useCallback(() => {
         if (!id) return;
@@ -147,12 +147,16 @@ export default function DiscoveryDetail() {
             content: 'Name',
         },
         {
-            id: 'triggerResource',
-            content: 'Trigger Resource',
+            id: 'eventResource',
+            content: 'Event Resource',
         },
         {
             id: 'triggerType',
             content: 'Trigger Type',
+        },
+        {
+            id: 'ignoreTrigger',
+            content: 'Ignore Trigger',
         },
         {
             id: 'eventName',
@@ -173,9 +177,10 @@ export default function DiscoveryDetail() {
               id: trigger.uuid,
               columns: [
                   <Link to={`../../triggers/detail/${trigger.uuid}`}>{trigger.name}</Link>,
-                  trigger?.triggerResource ? getEnumLabel(resourceTypeEnum, trigger.triggerResource) : '',
-                  getEnumLabel(triggerTypeEnum, trigger.triggerType),
-                  getEnumLabel(eventNameEnum, trigger.eventName || ''),
+                  trigger?.eventResource ? getEnumLabel(resourceTypeEnum, trigger.eventResource) : '',
+                  getEnumLabel(triggerTypeEnum, trigger.type),
+                  trigger.ignoreTrigger ? 'Yes' : 'No',
+                  getEnumLabel(eventNameEnum, trigger.event || ''),
                   getEnumLabel(resourceTypeEnum, trigger.resource || ''),
                   trigger.description || '',
               ],
