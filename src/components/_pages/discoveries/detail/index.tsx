@@ -270,12 +270,13 @@ export default function DiscoveryDetail() {
             </Row>
 
             <Row>
-                <Col md="8">
+                <Col md={triggerHistorySummary?.associationObjectUuid !== id ? '12' : '8'}>
                     <Widget title="Assigned Triggers" busy={isBusy} titleSize="large" widgetLockName={LockWidgetNameEnum.DiscoveryDetails}>
                         <CustomTable headers={triggerHeaders} data={triggerTableData} />
                     </Widget>
                 </Col>
-                {triggerHistorySummary && (
+
+                {triggerHistorySummary?.associationObjectUuid === id && (
                     <Col md="4">
                         <Widget title="Triggers summary" titleSize="large" busy={isFetchingTriggerSummary}>
                             <CustomTable headers={detailHeaders} data={triggersSummary} />

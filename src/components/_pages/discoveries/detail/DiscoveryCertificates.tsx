@@ -66,10 +66,6 @@ export default function DiscoveryCertificates({ id, triggerHistorySummary }: Pro
                 id: 'fingerprint',
                 content: 'Fingerprint',
             },
-            // {
-            //     id: 'triggers',
-            //     content: 'Triggers',
-            // },
         ];
 
         if (newlyDiscovered === true) {

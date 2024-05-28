@@ -8,6 +8,7 @@ interface TriggerHistorySummaryProps {
 
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import TabLayout from 'components/Layout/TabLayout';
+import Widget from 'components/Widget';
 import { actions as userInterfaceActions } from 'ducks/user-interface';
 import { useDispatch } from 'react-redux';
 import { Button } from 'reactstrap';
@@ -20,14 +21,17 @@ const TriggerHistorySummaryViewer = ({ triggerHistoryObjectSummary }: TriggerHis
             {
                 id: 'failSource',
                 content: 'Fail Source',
+                width: '30%',
             },
             {
                 id: 'name',
                 content: 'Name',
+                width: '30%',
             },
             {
                 id: 'message',
                 content: 'Message',
+                width: '40%',
             },
         ],
         [],
@@ -45,19 +49,21 @@ const TriggerHistorySummaryViewer = ({ triggerHistoryObjectSummary }: TriggerHis
                       ],
                   }))
                 : [];
-            return <CustomTable headers={triggerHistoryHeaders} data={recordData} />;
+            return (
+                <Widget>
+                    <CustomTable headers={triggerHistoryHeaders} data={recordData} />
+                </Widget>
+            );
         },
         [triggerHistoryHeaders],
     );
 
     const onIconClick = useCallback(() => {
         const triggers = triggerHistoryObjectSummary.triggers;
-        // if (!triggers.length) return;
-
         dispatch(
             userInterfaceActions.showGlobalModal({
                 isOpen: true,
-                size: 'lg',
+                size: 'xl',
                 content: (
                     <div>
                         <TabLayout
@@ -73,27 +79,35 @@ const TriggerHistorySummaryViewer = ({ triggerHistoryObjectSummary }: TriggerHis
                         />
                     </div>
                 ),
-                title: 'Trigger History Details',
+                title: 'Trigger History Summary Details',
                 showCloseButton: true,
             }),
         );
     }, [triggerHistoryObjectSummary, dispatch, getTriggerHistoryTable]);
 
+    // check if there are some records are present atleast in one trigger object of trigger array
+
+    const hasRecords = useMemo(() => {
+        return triggerHistoryObjectSummary.triggers.some((trigger) => trigger.records.length);
+    }, [triggerHistoryObjectSummary.triggers]);
+
     const getIcon = useMemo(() => {
         if (!triggerHistoryObjectSummary.matched) {
-            return <i className={cx('fa', 'fa-close', styles.closeIcon)} />;
+            return <i className={cx('fa', 'fa-close', styles.closeIcon)} title="Not Matched" />;
         } else if (triggerHistoryObjectSummary.matched && !triggerHistoryObjectSummary.ignored) {
-            return <i className={cx('fa', 'fa-check', styles.checkIcon)} />;
+            return <i className={cx('fa', 'fa-check', styles.checkIcon)} title="Matched" />;
         } else {
-            return <i className={cx('fa', 'fa-ban', styles.banIcon)} />;
+            return <i className={cx('fa', 'fa-ban', styles.banIcon)} title="Ignored" />;
         }
     }, [triggerHistoryObjectSummary.matched, triggerHistoryObjectSummary.ignored]);
     return (
         <div className="d-flex justify-content-center">
             <div className="p-2">{getIcon}</div>
-            <Button className="btn btn-link" onClick={onIconClick}>
-                <i className={cx('fa', 'fa-info', styles.infoIcon)} />
-            </Button>
+            {hasRecords && (
+                <Button className="btn btn-link" onClick={onIconClick}>
+                    <i className={cx('fa', 'fa-info', styles.infoIcon)} />
+                </Button>
+            )}
         </div>
     );
 };

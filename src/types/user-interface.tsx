@@ -100,7 +100,7 @@ export interface WidgetLockErrorModel {
 
 export interface GlobalModalModel {
     title?: string;
-    size?: 'sm' | 'lg';
+    size?: 'sm' | 'lg' | 'xl';
     content: string | JSX.Element | undefined;
     type?: 'success' | 'error' | 'warning' | 'info' | 'confirm' | 'question';
     isOpen: boolean;
