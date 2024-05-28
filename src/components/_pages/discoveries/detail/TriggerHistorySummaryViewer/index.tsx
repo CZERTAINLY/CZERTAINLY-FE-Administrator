@@ -21,17 +21,17 @@ const TriggerHistorySummaryViewer = ({ triggerHistoryObjectSummary }: TriggerHis
             {
                 id: 'failSource',
                 content: 'Fail Source',
-                width: '30%',
+                width: '15%',
             },
             {
                 id: 'name',
                 content: 'Name',
-                width: '30%',
+                width: '15%',
             },
             {
                 id: 'message',
                 content: 'Message',
-                width: '40%',
+                width: '70%',
             },
         ],
         [],
@@ -45,7 +45,7 @@ const TriggerHistorySummaryViewer = ({ triggerHistoryObjectSummary }: TriggerHis
                       columns: [
                           r?.condition ? 'Condition' : r?.execution ? 'Execution' : '',
                           r.condition?.name || r.execution?.name || '',
-                          <div className={styles.messageDataCell}>{r.message}</div> || '',
+                          r.message || '',
                       ],
                   }))
                 : [];
