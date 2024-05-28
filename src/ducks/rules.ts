@@ -13,6 +13,7 @@ import {
     RuleRequestModel,
     TriggerDetailModel,
     TriggerHistoryModel,
+    TriggerHistorySummaryModel,
     TriggerModel,
     TriggerRequestDto,
     UpdateActionRequestModel,
@@ -26,6 +27,7 @@ import { createFeatureSelector } from 'utils/ducks';
 export type State = {
     rules: RuleModel[];
     triggerHistories: TriggerHistoryModel[];
+    triggerHistorySummary?: TriggerHistorySummaryModel;
 
     ruleDetails?: RuleDetailModel;
     executions: ExecutionModel[];
@@ -62,6 +64,7 @@ export type State = {
     isUpdatingAction: boolean;
     isUpdatingTrigger: boolean;
     isFetchingTriggerHistories: boolean;
+    isFetchingTriggerHistorySummary: boolean;
     isFetchingActions: boolean;
     isDeletingAction: boolean;
 };
@@ -99,6 +102,7 @@ export const initialState: State = {
     isUpdatingAction: false,
     isDeletingRule: false,
     isFetchingTriggerHistories: false,
+    isFetchingTriggerHistorySummary: false,
     isFetchingActions: false,
     isFetchingActionDetails: false,
     isDeletingAction: false,
@@ -460,6 +464,17 @@ export const slice = createSlice({
         getTriggerHistoryFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingTriggerHistories = false;
         },
+
+        getTriggerHistorySummary: (state, action: PayloadAction<{ triggerObjectUuid: string }>) => {
+            state.isFetchingTriggerHistorySummary = true;
+        },
+        getTriggerHistorySummarySuccess: (state, action: PayloadAction<{ triggerHistorySummary: TriggerHistorySummaryModel }>) => {
+            state.triggerHistorySummary = action.payload.triggerHistorySummary;
+            state.isFetchingTriggerHistorySummary = false;
+        },
+        getTriggerHistorySummaryFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingTriggerHistorySummary = false;
+        },
     },
 });
 
@@ -474,6 +489,7 @@ const conditionDetails = createSelector(state, (state) => state.conditionDetails
 const triggerDetails = createSelector(state, (state) => state.triggerDetails);
 const triggers = createSelector(state, (state) => state.triggers);
 const triggerHistories = createSelector(state, (state) => state.triggerHistories);
+const triggerHistorySummary = createSelector(state, (state) => state.triggerHistorySummary);
 
 const actionsList = createSelector(state, (state) => state.actionsList);
 const actionDetails = createSelector(state, (state) => state.actionDetails);
@@ -484,6 +500,7 @@ const executionDetails = createSelector(state, (state) => state.executionDetails
 const isCreatingCondition = createSelector(state, (state) => state.isCreatingCondition);
 const isUpdatingCondition = createSelector(state, (state) => state.isUpdatingCondition);
 
+const isFetchingTriggerHistorySummary = createSelector(state, (state) => state.isFetchingTriggerHistorySummary);
 const isFetchingTriggerHistories = createSelector(state, (state) => state.isFetchingTriggerHistories);
 const isCreatingRule = createSelector(state, (state) => state.isCreatingRule);
 const isUpdatingRule = createSelector(state, (state) => state.isUpdatingRule);
@@ -518,6 +535,7 @@ export const selectors = {
     executions,
     actionDetails,
     actionsList,
+    triggerHistorySummary,
 
     isCreatingAction,
     isFetchingActionDetails,
@@ -546,6 +564,7 @@ export const selectors = {
     isFetchingTriggers,
     isCreatingTrigger,
     isFetchingTriggerHistories,
+    isFetchingTriggerHistorySummary,
     isFetchingActions,
     isDeletingAction,
 };

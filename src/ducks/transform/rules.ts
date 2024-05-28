@@ -32,8 +32,13 @@ import {
     TriggerDto,
     TriggerHistoryDto,
     TriggerHistoryModel,
+    TriggerHistoryObjectSummaryDto,
+    TriggerHistoryObjectSummaryModel,
+    TriggerHistoryObjectTriggerSummaryDto,
+    TriggerHistoryObjectTriggerSummaryModel,
     TriggerHistoryRecordDto,
     TriggerHistoryRecordModel,
+    TriggerHistorySummaryDto,
     TriggerModel,
     TriggerRequestDto,
     TriggerRequestModel,
@@ -211,5 +216,29 @@ export function transformActionDetailDtoToModel(actionDetailDto: ActionDetailDto
 export function transformUpdateActionRequestModelToDto(updateActionRequestModel: UpdateActionRequestModel): UpdateActionRequestDto {
     return {
         ...updateActionRequestModel,
+    };
+}
+
+export function transformTriggerHistoryObjectTriggerSummaryDtoToModel(
+    triggerHistoryObjectTriggerSummaryDto: TriggerHistoryObjectTriggerSummaryDto,
+): TriggerHistoryObjectTriggerSummaryModel {
+    return {
+        ...triggerHistoryObjectTriggerSummaryDto,
+    };
+}
+
+export function transformTriggerHistoryObjectSummaryDtoToModel(
+    triggerHistoryObjectSummaryDto: TriggerHistoryObjectSummaryDto,
+): TriggerHistoryObjectSummaryModel {
+    return {
+        ...triggerHistoryObjectSummaryDto,
+        triggers: triggerHistoryObjectSummaryDto.triggers.map(transformTriggerHistoryObjectTriggerSummaryDtoToModel),
+    };
+}
+
+export function transformTriggerHistorySummaryDtoToModel(triggerHistorySummaryDto: TriggerHistorySummaryDto): TriggerHistorySummaryDto {
+    return {
+        ...triggerHistorySummaryDto,
+        objects: triggerHistorySummaryDto.objects.map(transformTriggerHistoryObjectSummaryDtoToModel),
     };
 }

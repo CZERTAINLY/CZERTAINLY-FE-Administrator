@@ -21,6 +21,7 @@ import {
     transformTriggerDetailDtoToModel,
     transformTriggerDtoToModel,
     transformTriggerHistoryDtoToModel,
+    transformTriggerHistorySummaryDtoToModel,
     transformTriggerRequestModelToDto,
     transformUpdateActionRequestModelToDto,
     transformUpdateConditionRequestModelToDto,
@@ -616,6 +617,30 @@ const getTriggerHistory: AppEpic = (action$, state, deps) => {
     );
 };
 
+const getTriggerHistorySummary: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.getTriggerHistorySummary.match),
+        switchMap((action) =>
+            deps.apiClients.triggers.getTriggerHistorySummary({ associationObjectUuid: action.payload.triggerObjectUuid }).pipe(
+                switchMap((triggerHistorySummary) =>
+                    of(
+                        slice.actions.getTriggerHistorySummarySuccess({
+                            triggerHistorySummary: transformTriggerHistorySummaryDtoToModel(triggerHistorySummary),
+                        }),
+                    ),
+                ),
+                catchError((err) =>
+                    of(
+                        slice.actions.getTriggerHistorySummaryFailure({
+                            error: extractError(err, 'Failed to get trigger history summary'),
+                        }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
 const epics = [
     listRules,
     listExecutions,
@@ -643,6 +668,7 @@ const epics = [
     updateRule,
     updateTrigger,
     getTriggerHistory,
+    getTriggerHistorySummary,
 ];
 
 export default epics;
