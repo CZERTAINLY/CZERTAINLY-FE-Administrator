@@ -39,6 +39,7 @@ import {
     TriggerHistoryRecordDto,
     TriggerHistoryRecordModel,
     TriggerHistorySummaryDto,
+    TriggerHistorySummaryModel,
     TriggerModel,
     TriggerRequestDto,
     TriggerRequestModel,
@@ -224,6 +225,7 @@ export function transformTriggerHistoryObjectTriggerSummaryDtoToModel(
 ): TriggerHistoryObjectTriggerSummaryModel {
     return {
         ...triggerHistoryObjectTriggerSummaryDto,
+        records: triggerHistoryObjectTriggerSummaryDto.records.map(transformTriggerHistoryRecordDtoToModel),
     };
 }
 
@@ -236,7 +238,7 @@ export function transformTriggerHistoryObjectSummaryDtoToModel(
     };
 }
 
-export function transformTriggerHistorySummaryDtoToModel(triggerHistorySummaryDto: TriggerHistorySummaryDto): TriggerHistorySummaryDto {
+export function transformTriggerHistorySummaryDtoToModel(triggerHistorySummaryDto: TriggerHistorySummaryDto): TriggerHistorySummaryModel {
     return {
         ...triggerHistorySummaryDto,
         objects: triggerHistorySummaryDto.objects.map(transformTriggerHistoryObjectSummaryDtoToModel),

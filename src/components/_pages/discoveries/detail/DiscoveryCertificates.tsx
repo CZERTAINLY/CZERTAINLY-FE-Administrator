@@ -7,7 +7,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-import { TriggerHistoryObjectSummaryModel, TriggerHistorySummaryModel } from 'types/rules';
+import { TriggerHistorySummaryModel } from 'types/rules';
 import { dateFormatter } from 'utils/dateUtil';
 import PagedCustomTable from '../../../CustomTable/PagedCustomTable';
 import TabLayout from '../../../Layout/TabLayout';
@@ -85,32 +85,6 @@ export default function DiscoveryCertificates({ id, triggerHistorySummary }: Pro
     const discoveryCertificatesData: TableDataRow[] = useMemo(
         () =>
             discoveryCertificates?.certificates.map((r) => {
-                console.log('r', r.uuid);
-
-                const certificateTriggerHistory = triggerHistorySummary?.objects?.filter(
-                    (summary) => summary.referenceObjectUuid === r.uuid,
-                );
-
-                console.log('certificateTriggerHistory', certificateTriggerHistory);
-                let triggerHistoryObjectSummary: TriggerHistoryObjectSummaryModel | undefined = undefined;
-
-                if (certificateTriggerHistory?.length) {
-                    triggerHistoryObjectSummary = certificateTriggerHistory.reduce((acc, curr) => {
-                        return {
-                            matched: acc.matched || curr.matched,
-                            ignored: acc.ignored || curr.ignored,
-                            triggers: [...acc.triggers, ...curr.triggers],
-                            objectUuid: curr.objectUuid,
-                            referenceObjectUuid: curr.referenceObjectUuid,
-                        };
-                    });
-                }
-                if (certificateTriggerHistory?.length === 1) {
-                    triggerHistoryObjectSummary = certificateTriggerHistory[0];
-                }
-
-                console.log('triggerColumnValueObject', triggerHistoryObjectSummary);
-
                 const certificateColumns = [
                     r.inventoryUuid ? <Link to={`../../certificates/detail/${r.inventoryUuid}`}>{r.commonName}</Link> : r.commonName,
                     r.serialNumber,
@@ -121,6 +95,9 @@ export default function DiscoveryCertificates({ id, triggerHistorySummary }: Pro
                 ];
 
                 if (newlyDiscovered === true) {
+                    const triggerHistoryObjectSummary = triggerHistorySummary?.objects?.find(
+                        (summary) => summary.referenceObjectUuid === r.uuid,
+                    );
                     certificateColumns.push(
                         triggerHistoryObjectSummary ? (
                             <TriggerHistorySummaryViewer triggerHistoryObjectSummary={triggerHistoryObjectSummary} />

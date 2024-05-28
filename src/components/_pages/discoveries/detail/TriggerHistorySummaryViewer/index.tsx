@@ -1,12 +1,12 @@
 import cx from 'classnames';
 import { useCallback, useMemo } from 'react';
-import { TriggerHistoryObjectSummaryModel } from 'types/rules';
+import { TriggerHistoryObjectSummaryModel, TriggerHistoryObjectTriggerSummaryModel } from 'types/rules';
 import styles from './triggerHistorySummaryViewer.module.scss';
 interface TriggerHistorySummaryProps {
     triggerHistoryObjectSummary: TriggerHistoryObjectSummaryModel;
 }
 
-import CustomTable, { TableHeader } from 'components/CustomTable';
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import TabLayout from 'components/Layout/TabLayout';
 import { actions as userInterfaceActions } from 'ducks/user-interface';
 import { useDispatch } from 'react-redux';
@@ -15,41 +15,45 @@ import { Button } from 'reactstrap';
 const TriggerHistorySummaryViewer = ({ triggerHistoryObjectSummary }: TriggerHistorySummaryProps) => {
     const dispatch = useDispatch();
 
-    const detailHeaders: TableHeader[] = useMemo(
+    const triggerHistoryHeaders: TableHeader[] = useMemo(
         () => [
             {
-                id: 'property',
-                content: 'Property',
-                width: '50%',
+                id: 'failSource',
+                content: 'Fail Source',
             },
             {
-                id: 'value',
-                content: 'Value',
-                width: '50%',
+                id: 'name',
+                content: 'Name',
+            },
+            {
+                id: 'message',
+                content: 'Message',
             },
         ],
         [],
     );
 
+    const getTriggerHistoryTable = useCallback(
+        (trigger: TriggerHistoryObjectTriggerSummaryModel) => {
+            const recordData: TableDataRow[] = trigger?.records?.length
+                ? trigger.records.map((r, i) => ({
+                      id: i,
+                      columns: [
+                          r?.condition ? 'Condition' : r?.execution ? 'Execution' : '',
+                          r.condition?.name || r.execution?.name || '',
+                          <div className={styles.messageDataCell}>{r.message}</div> || '',
+                      ],
+                  }))
+                : [];
+            return <CustomTable headers={triggerHistoryHeaders} data={recordData} />;
+        },
+        [triggerHistoryHeaders],
+    );
+
     const onIconClick = useCallback(() => {
-        console.log('triggerHistoryObjectSummary', triggerHistoryObjectSummary);
-
-        //         each trigger results should be on own tab in a table with 3 columns
-        // Fail source - Condition if condition is not null or Execution otherwise
-        // Name - name from object above that is present in DTO
-        // Message
-
         const triggers = triggerHistoryObjectSummary.triggers;
-        console.log('triggerResults', triggers);
+        // if (!triggers.length) return;
 
-        // <TabLayout
-        //     tabs={[
-        //         { title: 'All', onClick: () => setNewlyDiscovered(undefined), content: pagedTable },
-        //         { title: 'New', onClick: () => setNewlyDiscovered(true), content: pagedTable },
-        //         { title: 'Existing', onClick: () => setNewlyDiscovered(false), content: pagedTable },
-        //     ]}
-        //     onlyActiveTabContent={true}
-        // />;
         dispatch(
             userInterfaceActions.showGlobalModal({
                 isOpen: true,
@@ -60,24 +64,8 @@ const TriggerHistorySummaryViewer = ({ triggerHistoryObjectSummary }: TriggerHis
                             tabs={
                                 triggers.length
                                     ? triggers.map((trigger, i) => ({
-                                          content: (
-                                              <CustomTable
-                                                  headers={detailHeaders}
-                                                  data={[
-                                                      {
-                                                          id: 'objectName',
-                                                          columns: ['Object Name', trigger.triggerName],
-                                                      },
-                                                      {
-                                                          id: 'message',
-                                                          columns: ['Message', ''],
-                                                      },
-
-                                                      //   {},
-                                                  ]}
-                                              />
-                                          ),
-                                          title: `Trigger ${i + 1}`,
+                                          content: getTriggerHistoryTable(trigger),
+                                          title: trigger.triggerName,
                                           onClick: () => {},
                                       }))
                                     : []
@@ -86,11 +74,11 @@ const TriggerHistorySummaryViewer = ({ triggerHistoryObjectSummary }: TriggerHis
                     </div>
                 ),
                 title: 'Trigger History Details',
+                showCloseButton: true,
             }),
         );
-    }, [triggerHistoryObjectSummary, dispatch]);
+    }, [triggerHistoryObjectSummary, dispatch, getTriggerHistoryTable]);
 
-    console.log('triggerHistoryObjectSummary', triggerHistoryObjectSummary);
     const getIcon = useMemo(() => {
         if (!triggerHistoryObjectSummary.matched) {
             return <i className={cx('fa', 'fa-close', styles.closeIcon)} />;

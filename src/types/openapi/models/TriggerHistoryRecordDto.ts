@@ -26,15 +26,15 @@ export interface TriggerHistoryRecordDto {
      * @type {string}
      * @memberof TriggerHistoryRecordDto
      */
-    Message_with_cause_of_action_condition_failure_: string;
+    message: string;
     /**
      * @type {ConditionDto}
      * @memberof TriggerHistoryRecordDto
      */
-    Condition_that_is_referenced_by_history_record?: ConditionDto;
+    condition?: ConditionDto;
     /**
      * @type {ExecutionDto}
      * @memberof TriggerHistoryRecordDto
      */
-    Execution_that_is_referenced_by_history_record?: ExecutionDto;
+    execution?: ExecutionDto;
 }

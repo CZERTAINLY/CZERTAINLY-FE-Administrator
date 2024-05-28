@@ -36,8 +36,6 @@ export default function DiscoveryDetail() {
     const triggerHistories = useSelector(ruleSelectors.triggerHistories);
     const triggerHistorySummary = useSelector(ruleSelectors.triggerHistorySummary);
     const isFetchingTriggerSummary = useSelector(ruleSelectors.isFetchingTriggerHistorySummary);
-    console.log('triggerHistories', triggerHistories);
-    console.log('triggerHistorySummary', triggerHistorySummary);
     const isFetchingRuleTriggerHistories = useSelector(ruleSelectors.isFetchingTriggerHistories);
 
     const isBusy = useMemo(
@@ -57,7 +55,6 @@ export default function DiscoveryDetail() {
 
     useEffect(() => {
         if (!id) return;
-        console.log('getTriggerHistorySummary');
         dispatch(rulesActions.getTriggerHistorySummary({ triggerObjectUuid: id }));
     }, [id, dispatch]);
 
@@ -227,8 +224,6 @@ export default function DiscoveryDetail() {
                   columns: ['Number of Objects Ignored', triggerHistorySummary?.objectsIgnored.toString() || '0'],
               },
           ];
-
-    console.log('triggersSummary', triggersSummary);
 
     return (
         <Container className="themed-container" fluid>
