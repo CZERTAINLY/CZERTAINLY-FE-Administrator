@@ -221,6 +221,21 @@ export const slice = createSlice({
             state.isUpdatingContent = false;
         },
 
+        loadCustomAttributeContent: (state, action: PayloadAction<ResourceCustomAttributesContents>) => {
+            console.log('inside reducer', action.payload);
+            const index = state.resourceCustomAttributesContents.findIndex(
+                (r) => r.resource === action.payload.resource && r.resourceUuid === action.payload.resourceUuid,
+            );
+
+            if (index === -1) {
+                state.resourceCustomAttributesContents.push(action.payload);
+            } else {
+                state.resourceCustomAttributesContents[index].customAttributes = action.payload.customAttributes;
+            }
+
+            return state;
+        },
+
         getCustomAttribute: (state, action: PayloadAction<string>) => {
             state.customAttribute = undefined;
             state.isFetchingDetail = true;

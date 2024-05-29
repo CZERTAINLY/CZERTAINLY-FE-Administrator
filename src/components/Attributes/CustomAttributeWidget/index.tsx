@@ -14,10 +14,12 @@ export type Props = {
     resource: Resource;
     resourceUuid: string;
     attributes: AttributeResponseModel[] | undefined;
+    onRemove?: (attributeUuid: string) => void;
 };
 
-export default function CustomAttributeWidget({ resource, resourceUuid, attributes }: Props) {
+export default function CustomAttributeWidget({ resource, resourceUuid, attributes, onRemove }: Props) {
     const dispatch = useDispatch();
+    const [isAttributeContentLoaded, setIsAttributeContentLoaded] = useState<boolean>(false);
 
     const resourceCustomAttributesContents = useSelector(
         customAttributesSelectors.resourceCustomAttributesContents(resource, resourceUuid),
@@ -29,6 +31,21 @@ export default function CustomAttributeWidget({ resource, resourceUuid, attribut
 
     const [attribute, setAttribute] = useState<CustomAttributeModel>();
 
+    useEffect(() => {
+        if (attributes?.length && !isAttributeContentLoaded) {
+            dispatch(
+                customAttributesActions.loadCustomAttributeContent({
+                    resource: resource,
+                    resourceUuid: resourceUuid,
+                    customAttributes: attributes,
+                }),
+            );
+
+            setIsAttributeContentLoaded(true);
+            console.log('dispatch called');
+        }
+    }, [attributes, resource, resourceUuid, isAttributeContentLoaded, dispatch]);
+    console.log('isAttributeContentLoaded', isAttributeContentLoaded);
     const addCustomAttribute = (attributeUuid: string, content: BaseAttributeContentModel[] | undefined) => {
         if (content) {
             dispatch(

@@ -196,7 +196,7 @@ const updateCredential: AppEpic = (action$, state, deps) => {
                                 credential: transformCredentialResponseDtoToModel(credential),
                             }),
 
-                            appRedirectActions.redirect({ url: '../../detail/' + credential.uuid }),
+                            appRedirectActions.redirect({ url: '../../credentials/detail/' + credential.uuid }),
                         ),
                     ),
 
