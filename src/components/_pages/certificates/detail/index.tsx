@@ -1782,14 +1782,11 @@ export default function CertificateDetail() {
                                 ) : null}
 
                                 {certificate && (
-                                    <>
-                                        asd
-                                        <CustomAttributeWidget
-                                            resource={Resource.Certificates}
-                                            resourceUuid={certificate.uuid}
-                                            attributes={certificate.customAttributes}
-                                        />
-                                    </>
+                                    <CustomAttributeWidget
+                                        resource={Resource.Certificates}
+                                        resourceUuid={certificate.uuid}
+                                        attributes={certificate.customAttributes}
+                                    />
                                 )}
                             </Widget>
                         ),

@@ -334,7 +334,10 @@ models/TokenProfileKeyUsageRequestDto.ts
 models/TriggerDetailDto.ts
 models/TriggerDto.ts
 models/TriggerHistoryDto.ts
+models/TriggerHistoryObjectSummaryDto.ts
+models/TriggerHistoryObjectTriggerSummaryDto.ts
 models/TriggerHistoryRecordDto.ts
+models/TriggerHistorySummaryDto.ts
 models/TriggerRequestDto.ts
 models/TriggerType.ts
 models/UpdateActionRequestDto.ts

@@ -16,62 +16,39 @@ import type {
 } from './';
 
 /**
+ * List of records for each trigger that has been evaluated.
  * @export
- * @interface TriggerHistoryDto
+ * @interface TriggerHistoryObjectTriggerSummaryDto
  */
-export interface TriggerHistoryDto {
-    /**
-     * Object identifier
-     * @type {string}
-     * @memberof TriggerHistoryDto
-     */
-    uuid: string;
-    /**
-     * UUID of the trigger.
-     * @type {string}
-     * @memberof TriggerHistoryDto
-     */
-    triggerUuid: string;
+export interface TriggerHistoryObjectTriggerSummaryDto {
     /**
      * UUID of the object that the trigger has been evaluated on.
      * @type {string}
-     * @memberof TriggerHistoryDto
+     * @memberof TriggerHistoryObjectTriggerSummaryDto
      */
-    objectUuid?: string;
+    triggerUuid: string;
     /**
      * Reference UUID of the object that the trigger has been evaluated on.
      * @type {string}
-     * @memberof TriggerHistoryDto
+     * @memberof TriggerHistoryObjectTriggerSummaryDto
      */
-    referenceObjectUuid?: string;
-    /**
-     * All conditions in the trigger have been matched.
-     * @type {boolean}
-     * @memberof TriggerHistoryDto
-     */
-    conditionsMatched: boolean;
-    /**
-     * All actions in the trigger have been performed.
-     * @type {boolean}
-     * @memberof TriggerHistoryDto
-     */
-    actionsPerformed: boolean;
+    triggerName: string;
     /**
      * Time at which has the trigger been triggered
      * @type {string}
-     * @memberof TriggerHistoryDto
+     * @memberof TriggerHistoryObjectTriggerSummaryDto
      */
     triggeredAt: string;
     /**
      * Additional message. 
      * @type {string}
-     * @memberof TriggerHistoryDto
+     * @memberof TriggerHistoryObjectTriggerSummaryDto
      */
     message?: string;
     /**
      * List of records for each action that has not been performed and each condition that has not been evaluated.
      * @type {Array<TriggerHistoryRecordDto>}
-     * @memberof TriggerHistoryDto
+     * @memberof TriggerHistoryObjectTriggerSummaryDto
      */
     records: Array<TriggerHistoryRecordDto>;
 }

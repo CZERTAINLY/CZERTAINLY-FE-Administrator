@@ -16,6 +16,11 @@ import type {
     SearchFieldDataByGroupDto,
     TriggerDetailDto as TriggerDetailDtoApi,
     TriggerDto as TriggerDtoApi,
+    TriggerHistoryDto as TriggerHistoryDtoApi,
+    TriggerHistoryObjectSummaryDto as TriggerHistoryObjectSummaryDtoApi,
+    TriggerHistoryObjectTriggerSummaryDto as TriggerHistoryObjectTriggerSummaryDtoApi,
+    TriggerHistoryRecordDto as TriggerHistoryRecordDtoApi,
+    TriggerHistorySummaryDto as TriggerHistorySummaryDtoApi,
     TriggerRequestDto as TriggerRequestDtoApi,
     UpdateActionRequestDto as UpdateActionRequestDtoApi,
     UpdateConditionRequestDto as UpdateConditionRequestDtoApi,
@@ -111,3 +116,25 @@ export type ActionDetailModel = Omit<ActionDetailDto, 'executions'> & {
 
 export type UpdateActionRequestDto = UpdateActionRequestDtoApi;
 export type UpdateActionRequestModel = UpdateActionRequestDto;
+
+export type TriggerHistoryRecordDto = TriggerHistoryRecordDtoApi;
+export type TriggerHistoryRecordModel = TriggerHistoryRecordDto;
+
+export type TriggerHistoryDto = TriggerHistoryDtoApi;
+export type TriggerHistoryModel = Omit<TriggerHistoryDto, 'records'> & {
+    records: Array<TriggerHistoryRecordModel>;
+};
+export type TriggerHistoryObjectTriggerSummaryDto = TriggerHistoryObjectTriggerSummaryDtoApi;
+export type TriggerHistoryObjectTriggerSummaryModel = Omit<TriggerHistoryObjectTriggerSummaryDto, 'records'> & {
+    records: Array<TriggerHistoryRecordModel>;
+};
+export type TriggerHistoryObjectSummaryDto = TriggerHistoryObjectSummaryDtoApi;
+// export type TriggerHistoryObjectSummaryModel = TriggerHistoryObjectSummaryDto;
+export type TriggerHistoryObjectSummaryModel = Omit<TriggerHistoryObjectSummaryDto, 'triggers'> & {
+    triggers: Array<TriggerHistoryObjectTriggerSummaryModel>;
+};
+
+export type TriggerHistorySummaryDto = TriggerHistorySummaryDtoApi;
+export type TriggerHistorySummaryModel = Omit<TriggerHistorySummaryDto, 'objects'> & {
+    objects: Array<TriggerHistoryObjectSummaryModel>;
+};

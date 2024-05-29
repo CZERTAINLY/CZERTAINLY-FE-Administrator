@@ -30,6 +30,16 @@ import {
     TriggerDetailDto,
     TriggerDetailModel,
     TriggerDto,
+    TriggerHistoryDto,
+    TriggerHistoryModel,
+    TriggerHistoryObjectSummaryDto,
+    TriggerHistoryObjectSummaryModel,
+    TriggerHistoryObjectTriggerSummaryDto,
+    TriggerHistoryObjectTriggerSummaryModel,
+    TriggerHistoryRecordDto,
+    TriggerHistoryRecordModel,
+    TriggerHistorySummaryDto,
+    TriggerHistorySummaryModel,
     TriggerModel,
     TriggerRequestDto,
     TriggerRequestModel,
@@ -44,6 +54,19 @@ import {
     UpdateTriggerRequestDto,
     UpdateTriggerRequestModel,
 } from 'types/rules';
+
+export function transformTriggerHistoryRecordDtoToModel(ruleTriggerHistory: TriggerHistoryRecordDto): TriggerHistoryRecordModel {
+    return {
+        ...ruleTriggerHistory,
+    };
+}
+
+export function transformTriggerHistoryDtoToModel(ruleTriggerHistory: TriggerHistoryDto): TriggerHistoryModel {
+    return {
+        ...ruleTriggerHistory,
+        records: ruleTriggerHistory?.records?.length ? ruleTriggerHistory.records.map(transformTriggerHistoryRecordDtoToModel) : [],
+    };
+}
 
 export function transformExecutionItemRequestModelToDto(executionItemRequestModel: ExecutionItemRequestModel): ExecutionItemRequestDto {
     return {
@@ -194,5 +217,30 @@ export function transformActionDetailDtoToModel(actionDetailDto: ActionDetailDto
 export function transformUpdateActionRequestModelToDto(updateActionRequestModel: UpdateActionRequestModel): UpdateActionRequestDto {
     return {
         ...updateActionRequestModel,
+    };
+}
+
+export function transformTriggerHistoryObjectTriggerSummaryDtoToModel(
+    triggerHistoryObjectTriggerSummaryDto: TriggerHistoryObjectTriggerSummaryDto,
+): TriggerHistoryObjectTriggerSummaryModel {
+    return {
+        ...triggerHistoryObjectTriggerSummaryDto,
+        records: triggerHistoryObjectTriggerSummaryDto.records.map(transformTriggerHistoryRecordDtoToModel),
+    };
+}
+
+export function transformTriggerHistoryObjectSummaryDtoToModel(
+    triggerHistoryObjectSummaryDto: TriggerHistoryObjectSummaryDto,
+): TriggerHistoryObjectSummaryModel {
+    return {
+        ...triggerHistoryObjectSummaryDto,
+        triggers: triggerHistoryObjectSummaryDto.triggers.map(transformTriggerHistoryObjectTriggerSummaryDtoToModel),
+    };
+}
+
+export function transformTriggerHistorySummaryDtoToModel(triggerHistorySummaryDto: TriggerHistorySummaryDto): TriggerHistorySummaryModel {
+    return {
+        ...triggerHistorySummaryDto,
+        objects: triggerHistorySummaryDto.objects.map(transformTriggerHistoryObjectSummaryDtoToModel),
     };
 }

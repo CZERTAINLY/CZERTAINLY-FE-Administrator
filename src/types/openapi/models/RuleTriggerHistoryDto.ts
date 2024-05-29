@@ -17,61 +17,55 @@ import type {
 
 /**
  * @export
- * @interface TriggerHistoryDto
+ * @interface RuleTriggerHistoryDto
  */
-export interface TriggerHistoryDto {
+export interface RuleTriggerHistoryDto {
     /**
      * Object identifier
      * @type {string}
-     * @memberof TriggerHistoryDto
+     * @memberof RuleTriggerHistoryDto
      */
     uuid: string;
     /**
-     * UUID of the trigger.
-     * @type {string}
-     * @memberof TriggerHistoryDto
-     */
-    triggerUuid: string;
-    /**
      * UUID of the object that the trigger has been evaluated on.
      * @type {string}
-     * @memberof TriggerHistoryDto
+     * @memberof RuleTriggerHistoryDto
      */
     objectUuid?: string;
     /**
-     * Reference UUID of the object that the trigger has been evaluated on.
+     * UUID of the object that the trigger has been evaluated on.
      * @type {string}
-     * @memberof TriggerHistoryDto
+     * @memberof RuleTriggerHistoryDto
      */
     referenceObjectUuid?: string;
     /**
      * All conditions in the trigger have been matched.
      * @type {boolean}
-     * @memberof TriggerHistoryDto
+     * @memberof RuleTriggerHistoryDto
      */
-    conditionsMatched: boolean;
+    conditionsMatched?: boolean;
     /**
      * All actions in the trigger have been performed.
      * @type {boolean}
-     * @memberof TriggerHistoryDto
+     * @memberof RuleTriggerHistoryDto
      */
-    actionsPerformed: boolean;
-    /**
-     * Time at which has the trigger been triggered
-     * @type {string}
-     * @memberof TriggerHistoryDto
-     */
-    triggeredAt: string;
-    /**
-     * Additional message. 
-     * @type {string}
-     * @memberof TriggerHistoryDto
-     */
-    message?: string;
+    actionsPerformed?: boolean;
     /**
      * List of records for each action that has not been performed and each condition that has not been evaluated.
      * @type {Array<TriggerHistoryRecordDto>}
-     * @memberof TriggerHistoryDto
+     * @memberof RuleTriggerHistoryDto
      */
-    records: Array<TriggerHistoryRecordDto>;
+    records?: Array<TriggerHistoryRecordDto>;
+    /**
+     * Time at which has the trigger been triggered
+     * @type {string}
+     * @memberof RuleTriggerHistoryDto
+     */
+    triggeredAt?: string;
+    /**
+     * Additional message. 
+     * @type {string}
+     * @memberof RuleTriggerHistoryDto
+     */
+    message?: string;
 }

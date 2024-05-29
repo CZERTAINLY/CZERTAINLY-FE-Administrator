@@ -62,7 +62,6 @@ const TriggerForm = () => {
 
     const resourceOptions = useResourceOptionsFromListWithFilters(resourceslist);
     const resourceEventsOptions = useResourceOptionsFromListWithFilters(resourceslist, 'hasEvents');
-    const resourceRuleEvaluatorOptions = useResourceOptionsFromListWithFilters(resourceslist, 'hasRuleEvaluator');
 
     const resourceEventNameOptions = useMemo(() => {
         if (resourceEvents === undefined) return [];
@@ -252,11 +251,10 @@ const TriggerForm = () => {
                                         {...input}
                                         maxMenuHeight={140}
                                         menuPlacement="auto"
-                                        options={
-                                            values.triggerType === TriggerType.Event ? resourceEventsOptions : resourceRuleEvaluatorOptions
-                                        }
+                                        options={resourceEventsOptions}
                                         placeholder="Select Event Resource"
                                         isClearable
+                                        isDisabled={!values.triggerType}
                                         onChange={(event) => {
                                             if (!event?.value) return;
 

@@ -20,6 +20,8 @@ import {
     transformRuleRequestModelToDto,
     transformTriggerDetailDtoToModel,
     transformTriggerDtoToModel,
+    transformTriggerHistoryDtoToModel,
+    transformTriggerHistorySummaryDtoToModel,
     transformTriggerRequestModelToDto,
     transformUpdateActionRequestModelToDto,
     transformUpdateConditionRequestModelToDto,
@@ -593,6 +595,52 @@ const updateTrigger: AppEpic = (action$, state, deps) => {
     );
 };
 
+const getTriggerHistory: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.getTriggerHistory.match),
+        switchMap((action) =>
+            deps.apiClients.triggers
+                .getTriggerHistory({ triggerUuid: action.payload.triggerUuid, associationObjectUuid: action.payload.triggerObjectUuid })
+                .pipe(
+                    switchMap((triggerHistory) =>
+                        of(
+                            slice.actions.getTriggerHistorySuccess({
+                                triggerHistories: triggerHistory.map(transformTriggerHistoryDtoToModel),
+                            }),
+                        ),
+                    ),
+                    catchError((err) =>
+                        of(slice.actions.getTriggerHistoryFailure({ error: extractError(err, 'Failed to get trigger history') })),
+                    ),
+                ),
+        ),
+    );
+};
+
+const getTriggerHistorySummary: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.getTriggerHistorySummary.match),
+        switchMap((action) =>
+            deps.apiClients.triggers.getTriggerHistorySummary({ associationObjectUuid: action.payload.triggerObjectUuid }).pipe(
+                switchMap((triggerHistorySummary) =>
+                    of(
+                        slice.actions.getTriggerHistorySummarySuccess({
+                            triggerHistorySummary: transformTriggerHistorySummaryDtoToModel(triggerHistorySummary),
+                        }),
+                    ),
+                ),
+                catchError((err) =>
+                    of(
+                        slice.actions.getTriggerHistorySummaryFailure({
+                            error: extractError(err, 'Failed to get trigger history summary'),
+                        }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
 const epics = [
     listRules,
     listExecutions,
@@ -619,6 +667,8 @@ const epics = [
     updateCondition,
     updateRule,
     updateTrigger,
+    getTriggerHistory,
+    getTriggerHistorySummary,
 ];
 
 export default epics;

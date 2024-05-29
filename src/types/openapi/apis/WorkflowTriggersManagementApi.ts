@@ -21,6 +21,7 @@ import type {
     TriggerDetailDto,
     TriggerDto,
     TriggerHistoryDto,
+    TriggerHistorySummaryDto,
     TriggerRequestDto,
     UpdateTriggerRequestDto,
 } from '../models';
@@ -39,7 +40,11 @@ export interface GetTriggerRequest {
 
 export interface GetTriggerHistoryRequest {
     triggerUuid: string;
-    triggerObjectUuid: string;
+    associationObjectUuid: string;
+}
+
+export interface GetTriggerHistorySummaryRequest {
+    associationObjectUuid: string;
 }
 
 export interface ListTriggersRequest {
@@ -108,14 +113,28 @@ export class WorkflowTriggersManagementApi extends BaseAPI {
     /**
      * Get Trigger History
      */
-    getTriggerHistory({ triggerUuid, triggerObjectUuid }: GetTriggerHistoryRequest): Observable<Array<TriggerHistoryDto>>
-    getTriggerHistory({ triggerUuid, triggerObjectUuid }: GetTriggerHistoryRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<TriggerHistoryDto>>>
-    getTriggerHistory({ triggerUuid, triggerObjectUuid }: GetTriggerHistoryRequest, opts?: OperationOpts): Observable<Array<TriggerHistoryDto> | AjaxResponse<Array<TriggerHistoryDto>>> {
+    getTriggerHistory({ triggerUuid, associationObjectUuid }: GetTriggerHistoryRequest): Observable<Array<TriggerHistoryDto>>
+    getTriggerHistory({ triggerUuid, associationObjectUuid }: GetTriggerHistoryRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<TriggerHistoryDto>>>
+    getTriggerHistory({ triggerUuid, associationObjectUuid }: GetTriggerHistoryRequest, opts?: OperationOpts): Observable<Array<TriggerHistoryDto> | AjaxResponse<Array<TriggerHistoryDto>>> {
         throwIfNullOrUndefined(triggerUuid, 'triggerUuid', 'getTriggerHistory');
-        throwIfNullOrUndefined(triggerObjectUuid, 'triggerObjectUuid', 'getTriggerHistory');
+        throwIfNullOrUndefined(associationObjectUuid, 'associationObjectUuid', 'getTriggerHistory');
 
         return this.request<Array<TriggerHistoryDto>>({
-            url: '/v1/workflows/triggers/{triggerUuid}/history/{triggerObjectUuid}'.replace('{triggerUuid}', encodeURI(triggerUuid)).replace('{triggerObjectUuid}', encodeURI(triggerObjectUuid)),
+            url: '/v1/workflows/triggers/{triggerUuid}/history/{associationObjectUuid}'.replace('{triggerUuid}', encodeURI(triggerUuid)).replace('{associationObjectUuid}', encodeURI(associationObjectUuid)),
+            method: 'GET',
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * Get Trigger History Summary
+     */
+    getTriggerHistorySummary({ associationObjectUuid }: GetTriggerHistorySummaryRequest): Observable<TriggerHistorySummaryDto>
+    getTriggerHistorySummary({ associationObjectUuid }: GetTriggerHistorySummaryRequest, opts?: OperationOpts): Observable<AjaxResponse<TriggerHistorySummaryDto>>
+    getTriggerHistorySummary({ associationObjectUuid }: GetTriggerHistorySummaryRequest, opts?: OperationOpts): Observable<TriggerHistorySummaryDto | AjaxResponse<TriggerHistorySummaryDto>> {
+        throwIfNullOrUndefined(associationObjectUuid, 'associationObjectUuid', 'getTriggerHistorySummary');
+
+        return this.request<TriggerHistorySummaryDto>({
+            url: '/v1/workflows/triggers/history/{associationObjectUuid}'.replace('{associationObjectUuid}', encodeURI(associationObjectUuid)),
             method: 'GET',
         }, opts?.responseOpts);
     };
