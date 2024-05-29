@@ -220,6 +220,26 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
 
     const title = useMemo(() => (editMode ? 'Edit Credential' : 'Create Credential'), [editMode]);
 
+    const renderCustomAttributesEditor = useCallback(() => {
+        if (isBusy) return <></>;
+        return (
+            <TabLayout
+                tabs={[
+                    {
+                        title: 'Custom attributes',
+                        content: (
+                            <AttributeEditor
+                                id="customCredential"
+                                attributeDescriptors={resourceCustomAttributes}
+                                attributes={credential?.customAttributes}
+                            />
+                        ),
+                    },
+                ]}
+            />
+        );
+    }, [resourceCustomAttributes, credential, isBusy]);
+
     return (
         <Widget title={title} busy={isBusy}>
             <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
@@ -368,13 +388,7 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
                                     },
                                     {
                                         title: 'Custom Attributes',
-                                        content: (
-                                            <AttributeEditor
-                                                id="customCredential"
-                                                attributeDescriptors={resourceCustomAttributes}
-                                                attributes={credential?.customAttributes}
-                                            />
-                                        ),
+                                        content: renderCustomAttributesEditor(),
                                     },
                                 ]}
                             />
