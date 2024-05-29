@@ -18,8 +18,8 @@
  */
 export enum DiscoveryStatus {
     InProgress = 'inProgress',
+    Processing = 'processing',
     Failed = 'failed',
     Completed = 'completed',
-    Warning = 'warning'
+    Warning = 'warning',
 }
-
