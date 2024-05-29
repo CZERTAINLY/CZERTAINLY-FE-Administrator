@@ -223,19 +223,10 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
     const renderCustomAttributesEditor = useCallback(() => {
         if (isBusy) return <></>;
         return (
-            <TabLayout
-                tabs={[
-                    {
-                        title: 'Custom attributes',
-                        content: (
-                            <AttributeEditor
-                                id="customCredential"
-                                attributeDescriptors={resourceCustomAttributes}
-                                attributes={credential?.customAttributes}
-                            />
-                        ),
-                    },
-                ]}
+            <AttributeEditor
+                id="customCredential"
+                attributeDescriptors={resourceCustomAttributes}
+                attributes={credential?.customAttributes}
             />
         );
     }, [resourceCustomAttributes, credential, isBusy]);
