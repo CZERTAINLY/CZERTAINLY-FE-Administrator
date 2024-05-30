@@ -222,7 +222,6 @@ export const slice = createSlice({
         },
 
         loadCustomAttributeContent: (state, action: PayloadAction<ResourceCustomAttributesContents>) => {
-            console.log('inside reducer', action.payload);
             const index = state.resourceCustomAttributesContents.findIndex(
                 (r) => r.resource === action.payload.resource && r.resourceUuid === action.payload.resourceUuid,
             );
