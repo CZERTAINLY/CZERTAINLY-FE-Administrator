@@ -234,6 +234,11 @@ export default function TokenForm() {
 
     const title = useMemo(() => (editMode ? `Edit token ${token?.name}` : 'Create new token'), [editMode, token]);
 
+    const renderCustomAttributeEditor = useMemo(() => {
+        if (isBusy) return <></>;
+        return <AttributeEditor id="customToken" attributeDescriptors={resourceCustomAttributes} attributes={token?.customAttributes} />;
+    }, [resourceCustomAttributes, token?.customAttributes, isBusy]);
+
     return (
         <Widget title={title} busy={isBusy}>
             <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
@@ -388,13 +393,7 @@ export default function TokenForm() {
                                     },
                                     {
                                         title: 'Custom Attributes',
-                                        content: (
-                                            <AttributeEditor
-                                                id="customToken"
-                                                attributeDescriptors={resourceCustomAttributes}
-                                                attributes={tokenDetail?.customAttributes}
-                                            />
-                                        ),
+                                        content: renderCustomAttributeEditor,
                                     },
                                 ]}
                             />

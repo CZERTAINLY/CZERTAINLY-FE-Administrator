@@ -82,10 +82,10 @@ export default function AuthorityForm() {
     }, [dispatch]);
 
     useEffect(() => {
-        if (editMode && (!authoritySelector || authoritySelector.uuid !== id)) {
-            dispatch(authorityActions.getAuthorityDetail({ uuid: id! }));
+        if (editMode && id) {
+            dispatch(authorityActions.getAuthorityDetail({ uuid: id }));
         }
-    }, [dispatch, editMode, authoritySelector, authorityProviders, isFetchingAuthorityProviders, id]);
+    }, [dispatch, editMode, id]);
 
     useEffect(() => {
         if (editMode && authoritySelector?.uuid === id) {
@@ -245,6 +245,17 @@ export default function AuthorityForm() {
 
     const title = useMemo(() => (editMode ? `Edit authority ${authority?.name}` : 'Create new authority'), [editMode, authority]);
 
+    const renderCustomAttributeEditor = useMemo(() => {
+        if (isBusy) return <></>;
+        return (
+            <AttributeEditor
+                id="customAuthority"
+                attributeDescriptors={resourceCustomAttributes}
+                attributes={authority?.customAttributes}
+            />
+        );
+    }, [resourceCustomAttributes, authority, isBusy]);
+
     return (
         <Widget title={title} busy={isBusy}>
             <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
@@ -399,13 +410,7 @@ export default function AuthorityForm() {
                                     },
                                     {
                                         title: 'Custom Attributes',
-                                        content: (
-                                            <AttributeEditor
-                                                id="customAuthority"
-                                                attributeDescriptors={resourceCustomAttributes}
-                                                attributes={authority?.customAttributes}
-                                            />
-                                        ),
+                                        content: renderCustomAttributeEditor,
                                     },
                                 ]}
                             />

@@ -81,11 +81,11 @@ export default function TokenProfileForm({ usesGlobalModal = false }: TokenProfi
     }, [dispatch]);
 
     useEffect(() => {
-        if (editMode && tokenProfileSelector && tokenProfileSelector.uuid !== tokenProfile?.uuid) {
+        if (editMode && tokenProfileSelector && tokenProfileSelector.uuid === id) {
             setTokenProfile(tokenProfileSelector);
             dispatch(tokensActions.getTokenProfileAttributesDescriptors({ tokenUuid: tokenProfileSelector.tokenInstanceUuid }));
         }
-    }, [tokens, dispatch, editMode, tokenProfile?.uuid, tokenProfileSelector]);
+    }, [tokens, dispatch, editMode, tokenProfile?.uuid, tokenProfileSelector, id]);
 
     const onTokenChange = useCallback(
         (tokenUuid: string, form: FormApi<FormValues>) => {
@@ -191,6 +191,17 @@ export default function TokenProfileForm({ usesGlobalModal = false }: TokenProfi
         }
         return options;
     };
+
+    const renderCustomAttributesEditor = useMemo(() => {
+        if (isBusy) return <></>;
+        return (
+            <AttributeEditor
+                id="customTokenProfile"
+                attributeDescriptors={resourceCustomAttributes}
+                attributes={tokenProfile?.customAttributes}
+            />
+        );
+    }, [isBusy, resourceCustomAttributes, tokenProfile]);
 
     return (
         <Widget title={title} busy={isBusy}>
@@ -322,13 +333,7 @@ export default function TokenProfileForm({ usesGlobalModal = false }: TokenProfi
                                 },
                                 {
                                     title: 'Custom Attributes',
-                                    content: (
-                                        <AttributeEditor
-                                            id="customTokenProfile"
-                                            attributeDescriptors={resourceCustomAttributes}
-                                            attributes={tokenProfile?.customAttributes}
-                                        />
-                                    ),
+                                    content: renderCustomAttributesEditor,
                                 },
                             ]}
                         />

@@ -1,20 +1,9 @@
 import { actions as groupActions } from 'ducks/certificateGroups';
 import { actions as certificateActions } from 'ducks/certificates';
 import { actions as customAttributesActions } from 'ducks/customAttributes';
-import { actions as pagingActions } from 'ducks/paging';
 import { actions as rolesActions } from 'ducks/roles';
 import { actions as userActions } from 'ducks/users';
 import { Route, Routes } from 'react-router-dom';
-import {
-    AttributeContentType,
-    AttributeType,
-    CertificateRequestFormat,
-    CertificateState,
-    CertificateType,
-    CertificateValidationStatus,
-    ComplianceStatus,
-    Resource,
-} from 'types/openapi';
 
 import UserEdit from '../../../../../src/components/_pages/users/form';
 import '../../../../../src/resources/styles/theme.scss';
@@ -88,8 +77,8 @@ describe('UserForm component - Add User', () => {
 
     it(`🟢 Enter all form values`, () => {
         cy.get('input').eq(1).type('testUser');
-        cy.get('#react-select-5-input').should('exist').click();
-        cy.get('#react-select-5-option-0').should('exist').click();
+        cy.get('#react-select-6-input').should('exist').click();
+        cy.get('#react-select-6-option-0').should('exist').click();
         cy.get('input').eq(4).type('Test description');
         cy.get('input').eq(5).type('Test First Name');
         cy.get('input').eq(6).type('Test Last Name');

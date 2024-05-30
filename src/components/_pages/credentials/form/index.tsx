@@ -79,18 +79,22 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
     );
 
     useEffect(() => {
+        if (editMode && id) {
+            dispatch(actions.getCredentialDetail({ uuid: id }));
+        }
+    }, [dispatch, id, editMode]);
+
+    useEffect(() => {
         dispatch(actions.listCredentialProviders());
         dispatch(connectorsActions.clearCallbackData());
         dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Credentials));
-
-        if (editMode) dispatch(actions.getCredentialDetail({ uuid: id! }));
-    }, [dispatch, editMode, id]);
+    }, [dispatch]);
 
     useEffect(() => {
-        if (editMode && credentialSelector && credential?.uuid !== credentialSelector.uuid) {
+        if (editMode && id === credentialSelector?.uuid) {
             setCredential(credentialSelector);
         }
-    }, [editMode, credential, credentialSelector]);
+    }, [editMode, id, credentialSelector]);
 
     useEffect(() => {
         if (editMode && credentialProviders && credentialProviders.length > 0 && credential?.uuid === id) {

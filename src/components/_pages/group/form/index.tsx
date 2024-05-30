@@ -76,10 +76,18 @@ export default function GroupForm() {
     const onCancelClick = useCallback(() => {
         navigate(-1);
     }, [navigate]);
-
     useEffect(() => {
         dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Groups));
-        if (editMode && groupSelector && groupSelector.uuid !== group?.uuid) {
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (editMode && id) {
+            dispatch(actions.getGroupDetail({ uuid: id }));
+        }
+    }, [dispatch, editMode, id]);
+
+    useEffect(() => {
+        if (editMode && groupSelector?.uuid === id) {
             setGroup(groupSelector);
         }
     }, [dispatch, editMode, group?.uuid, groupSelector, id]);
@@ -94,7 +102,25 @@ export default function GroupForm() {
     );
 
     const title = useMemo(() => (editMode ? 'Edit Group' : 'Add Group'), [editMode]);
-
+    const renderCustomAttributesEditor = useMemo(() => {
+        if (isBusy) return <></>;
+        return (
+            <TabLayout
+                tabs={[
+                    {
+                        title: 'Custom Attributes',
+                        content: (
+                            <AttributeEditor
+                                id="customGroup"
+                                attributeDescriptors={resourceCustomAttributes}
+                                attributes={group?.customAttributes}
+                            />
+                        ),
+                    },
+                ]}
+            />
+        );
+    }, [resourceCustomAttributes, group, isBusy]);
     return (
         <Widget title={title} busy={isBusy}>
             <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
@@ -158,24 +184,8 @@ export default function GroupForm() {
                             )}
                         </Field>
 
-                        <>
-                            <br />
-
-                            <TabLayout
-                                tabs={[
-                                    {
-                                        title: 'Custom Attributes',
-                                        content: (
-                                            <AttributeEditor
-                                                id="customGroup"
-                                                attributeDescriptors={resourceCustomAttributes}
-                                                attributes={group?.customAttributes}
-                                            />
-                                        ),
-                                    },
-                                ]}
-                            />
-                        </>
+                        <br />
+                        {renderCustomAttributesEditor}
 
                         <div className="d-flex justify-content-end">
                             <ButtonGroup>

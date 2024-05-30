@@ -165,7 +165,7 @@ export default function RaProfileDetail() {
             raProfilesActions.deleteRaProfile({
                 authorityUuid: raProfile.authorityInstanceUuid || 'unknown',
                 uuid: raProfile.uuid,
-                redirect: '../../../',
+                redirect: '../../../raprofiles',
             }),
         );
         setConfirmDelete(false);

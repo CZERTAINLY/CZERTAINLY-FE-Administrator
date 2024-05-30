@@ -65,17 +65,26 @@ export default function RaProfileForm() {
         dispatch(authoritiesActions.listAuthorities());
         dispatch(authoritiesActions.clearRAProfilesAttributesDescriptors());
         dispatch(connectorActions.clearCallbackData());
+        dispatch(customAttributesActions.listResourceCustomAttributes(Resource.RaProfiles));
+    }, [dispatch]);
 
-        if (editMode) dispatch(raProfilesActions.getRaProfileDetail({ authorityUuid: authorityId!, uuid: id! }));
+    useEffect(() => {
+        if (authorityId) {
+            dispatch(authoritiesActions.getRAProfilesAttributesDescriptors({ authorityUuid: authorityId }));
+        }
+    }, [dispatch, authorityId]);
+
+    useEffect(() => {
+        if (editMode && id && authorityId) {
+            dispatch(raProfilesActions.getRaProfileDetail({ authorityUuid: authorityId, uuid: id }));
+        }
     }, [dispatch, editMode, id, authorityId]);
 
     useEffect(() => {
-        dispatch(customAttributesActions.listResourceCustomAttributes(Resource.RaProfiles));
-        if (editMode && raProfileSelector && raProfileSelector.uuid !== raProfile?.uuid) {
+        if (editMode && raProfileSelector?.uuid === id) {
             setRaProfile(raProfileSelector);
-            dispatch(authoritiesActions.getRAProfilesAttributesDescriptors({ authorityUuid: raProfileSelector.authorityInstanceUuid }));
         }
-    }, [authorities, dispatch, editMode, raProfile?.uuid, raProfileSelector]);
+    }, [dispatch, editMode, id, raProfileSelector]);
 
     const onAuthorityChange = useCallback(
         (authorityUuid: string, form: FormApi<FormValues>) => {
@@ -157,6 +166,17 @@ export default function RaProfileForm() {
     );
 
     const title = useMemo(() => (editMode ? 'Edit RA Profile' : 'Create RA Profile'), [editMode]);
+
+    const renderCustomAttributesEditor = useMemo(() => {
+        if (isBusy) return <></>;
+        return (
+            <AttributeEditor
+                id="customRaProfile"
+                attributeDescriptors={resourceCustomAttributes}
+                attributes={raProfile?.customAttributes}
+            />
+        );
+    }, [isBusy, raProfile, resourceCustomAttributes]);
 
     return (
         <Widget title={title} busy={isBusy}>
@@ -257,13 +277,7 @@ export default function RaProfileForm() {
                                 },
                                 {
                                     title: 'Custom Attributes',
-                                    content: (
-                                        <AttributeEditor
-                                            id="customRaProfile"
-                                            attributeDescriptors={resourceCustomAttributes}
-                                            attributes={raProfile?.customAttributes}
-                                        />
-                                    ),
+                                    content: renderCustomAttributesEditor,
                                 },
                             ]}
                         />

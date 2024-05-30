@@ -138,7 +138,7 @@ export default function ComplianceProfileDetail() {
     const onForceDeleteComplianceProfile = useCallback(() => {
         if (!profile) return;
 
-        dispatch(actions.bulkForceDeleteComplianceProfiles({ uuids: [profile.uuid], redirect: `../` }));
+        dispatch(actions.bulkForceDeleteComplianceProfiles({ uuids: [profile.uuid], redirect: `../complianceprofiles` }));
     }, [profile, dispatch]);
 
     const onAddRule = useCallback(

@@ -220,6 +220,17 @@ export default function AcmeProfileForm() {
 
     const title = useMemo(() => (editMode ? 'Edit ACME Profile' : 'Create ACME Profile'), [editMode]);
 
+    const renderCustomAttributeEditor = useMemo(() => {
+        if (isBusy) return <></>;
+        return (
+            <AttributeEditor
+                id="customAcmeProfile"
+                attributeDescriptors={resourceCustomAttributes}
+                attributes={acmeProfile?.customAttributes}
+            />
+        );
+    }, [isBusy, resourceCustomAttributes, acmeProfile?.customAttributes]);
+
     return (
         <Widget title={title} busy={isBusy}>
             <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
@@ -537,13 +548,7 @@ export default function AcmeProfileForm() {
                                     },
                                     {
                                         title: 'Custom Attributes',
-                                        content: (
-                                            <AttributeEditor
-                                                id="customAcmeProfile"
-                                                attributeDescriptors={resourceCustomAttributes}
-                                                attributes={acmeProfile?.customAttributes}
-                                            />
-                                        ),
+                                        content: renderCustomAttributeEditor,
                                     },
                                 ]}
                             />
