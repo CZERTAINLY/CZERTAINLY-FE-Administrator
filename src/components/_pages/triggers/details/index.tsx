@@ -252,6 +252,7 @@ const TriggerDetails = () => {
                           columns: [
                               'Event Resource',
                               triggerDetails?.eventResource ? getEnumLabel(resourceTypeEnum, triggerDetails.eventResource) : '',
+                              '',
                           ],
                       },
                       {

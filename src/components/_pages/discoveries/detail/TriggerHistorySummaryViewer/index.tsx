@@ -101,7 +101,7 @@ const TriggerHistorySummaryViewer = ({ triggerHistoryObjectSummary }: TriggerHis
         }
     }, [triggerHistoryObjectSummary.matched, triggerHistoryObjectSummary.ignored]);
     return (
-        <div className="d-flex justify-content-center">
+        <div className="d-flex justify-content-start" style={{ marginBottom: '4px' }}>
             <div className="p-2">{getIcon}</div>
             {hasRecords && (
                 <Button className="btn btn-link" onClick={onIconClick}>

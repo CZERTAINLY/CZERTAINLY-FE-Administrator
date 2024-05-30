@@ -12,7 +12,7 @@ import { dateFormatter } from 'utils/dateUtil';
 import PagedCustomTable from '../../../CustomTable/PagedCustomTable';
 import TabLayout from '../../../Layout/TabLayout';
 import TriggerHistorySummaryViewer from './TriggerHistorySummaryViewer';
-
+import styles from './discoveryCertificates.module.scss';
 interface Props {
     id: string;
     triggerHistorySummary?: TriggerHistorySummaryModel;
@@ -83,11 +83,11 @@ export default function DiscoveryCertificates({ id, triggerHistorySummary }: Pro
             discoveryCertificates?.certificates.map((r) => {
                 const certificateColumns = [
                     r.inventoryUuid ? <Link to={`../../certificates/detail/${r.inventoryUuid}`}>{r.commonName}</Link> : r.commonName,
-                    r.serialNumber,
+                    <span className={styles.wordWrap}>{r.serialNumber}</span>,
                     <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(r.notAfter)}</span>,
                     <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(r.notBefore)}</span>,
                     r.issuerCommonName,
-                    r.fingerprint,
+                    <span className={styles.wordWrap}>{r.fingerprint}</span>,
                 ];
 
                 if (newlyDiscovered === true) {
