@@ -87,15 +87,19 @@ export default function LocationForm() {
             dispatch(entityActions.listEntities({}));
             setInit(false);
         }
+    }, [dispatch, init]);
 
-        if (editMode && (!locationSelector || locationSelector.uuid !== id)) {
-            dispatch(locationActions.getLocationDetail({ entityUuid: entityId!, uuid: id! }));
+    useEffect(() => {
+        if (editMode && id && entityId) {
+            dispatch(locationActions.getLocationDetail({ entityUuid: entityId, uuid: id }));
         }
+    }, [dispatch, editMode, entityId, id]);
 
+    useEffect(() => {
         if (editMode && locationSelector?.uuid === id) {
             setLocation(locationSelector);
         }
-    }, [dispatch, editMode, locationSelector, id, init, entityId]);
+    }, [locationSelector, editMode, id]);
 
     useEffect(() => {
         if (editMode && location?.uuid === id && entities && entities.length > 0) {
@@ -185,6 +189,13 @@ export default function LocationForm() {
     );
 
     const title = useMemo(() => (editMode ? `Edit Location: ${location?.name}` : 'Add Location'), [editMode, location]);
+
+    const renderCustomAttributesEditor = useMemo(() => {
+        if (isBusy) return <></>;
+        return (
+            <AttributeEditor id="customLocation" attributeDescriptors={resourceCustomAttributes} attributes={location?.customAttributes} />
+        );
+    }, [isBusy, location, resourceCustomAttributes]);
 
     return (
         <Widget title={title} busy={isBusy}>
@@ -286,13 +297,7 @@ export default function LocationForm() {
                                     },
                                     {
                                         title: 'Custom Attributes',
-                                        content: (
-                                            <AttributeEditor
-                                                id="customLocation"
-                                                attributeDescriptors={resourceCustomAttributes}
-                                                attributes={location?.customAttributes}
-                                            />
-                                        ),
+                                        content: renderCustomAttributesEditor,
                                     },
                                 ]}
                             />

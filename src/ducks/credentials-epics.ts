@@ -165,7 +165,7 @@ const deleteCredential: AppEpic = (action$, state, deps) => {
                 mergeMap(() =>
                     of(
                         slice.actions.deleteCredentialSuccess({ uuid: action.payload.uuid }),
-                        appRedirectActions.redirect({ url: '../../' }),
+                        appRedirectActions.redirect({ url: '../../credentials' }),
                     ),
                 ),
 
@@ -196,7 +196,7 @@ const updateCredential: AppEpic = (action$, state, deps) => {
                                 credential: transformCredentialResponseDtoToModel(credential),
                             }),
 
-                            appRedirectActions.redirect({ url: '../../detail/' + credential.uuid }),
+                            appRedirectActions.redirect({ url: '../../credentials/detail/' + credential.uuid }),
                         ),
                     ),
 

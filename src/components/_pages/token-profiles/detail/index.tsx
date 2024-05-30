@@ -77,7 +77,7 @@ export default function TokenProfileDetail() {
             tokenProfilesActions.deleteTokenProfile({
                 tokenInstanceUuid: tokenProfile.tokenInstanceUuid || 'unknown',
                 uuid: tokenProfile.uuid,
-                redirect: '../../../',
+                redirect: '../../../tokenprofiles',
             }),
         );
         setConfirmDelete(false);

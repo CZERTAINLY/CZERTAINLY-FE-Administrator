@@ -135,6 +135,7 @@ const updateCustomAttribute: AppEpic = (action$, state$, deps) => {
                             slice.actions.updateCustomAttributeSuccess(
                                 transformCustomAttributeDetailResponseDtoToModel(customAttributeDetail),
                             ),
+                            slice.actions.getCustomAttribute(customAttributeDetail.uuid),
                             appRedirectActions.redirect({ url: `../../customattributes/detail/${customAttributeDetail.uuid}` }),
                         ),
                     ),

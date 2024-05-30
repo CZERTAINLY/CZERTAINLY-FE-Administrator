@@ -157,7 +157,7 @@ export const slice = createSlice({
 
         updateCustomAttributeSuccess: (state, action: PayloadAction<CustomAttributeDetailResponseModel>) => {
             state.isUpdating = false;
-            state.customAttribute = action.payload;
+            // state.customAttribute = action.payload;
         },
 
         updateCustomAttributeFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -219,6 +219,20 @@ export const slice = createSlice({
             action: PayloadAction<{ resource: Resource; resourceUuid: string; error: string | undefined }>,
         ) => {
             state.isUpdatingContent = false;
+        },
+
+        loadCustomAttributeContent: (state, action: PayloadAction<ResourceCustomAttributesContents>) => {
+            const index = state.resourceCustomAttributesContents.findIndex(
+                (r) => r.resource === action.payload.resource && r.resourceUuid === action.payload.resourceUuid,
+            );
+
+            if (index === -1) {
+                state.resourceCustomAttributesContents.push(action.payload);
+            } else {
+                state.resourceCustomAttributesContents[index].customAttributes = action.payload.customAttributes;
+            }
+
+            return state;
         },
 
         getCustomAttribute: (state, action: PayloadAction<string>) => {

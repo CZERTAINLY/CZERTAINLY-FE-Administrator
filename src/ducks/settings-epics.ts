@@ -42,7 +42,10 @@ const updatePlatformSettings: AppEpic = (action$, state$, deps) => {
             deps.apiClients.settings.updatePlatformSettings({ platformSettingsDto: action.payload }).pipe(
                 mergeMap(() => {
                     updateBackendUtilsClients(action.payload.utils.utilsServiceUrl);
-                    return of(slice.actions.updatePlatformSettingsSuccess(action.payload), appRedirectActions.redirect({ url: `../` }));
+                    return of(
+                        slice.actions.updatePlatformSettingsSuccess(action.payload),
+                        appRedirectActions.redirect({ url: `../settings` }),
+                    );
                 }),
                 catchError((err) =>
                     of(

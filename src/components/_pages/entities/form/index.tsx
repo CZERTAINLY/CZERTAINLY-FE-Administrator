@@ -79,9 +79,11 @@ export default function EntityForm() {
         dispatch(connectorActions.clearCallbackData());
         dispatch(entityActions.listEntityProviders());
         dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Entities));
+    }, [dispatch]);
 
-        if (editMode) {
-            dispatch(entityActions.getEntityDetail({ uuid: id! }));
+    useEffect(() => {
+        if (editMode && id) {
+            dispatch(entityActions.getEntityDetail({ uuid: id }));
         }
     }, [dispatch, editMode, id]);
 
@@ -210,6 +212,11 @@ export default function EntityForm() {
     );
 
     const title = useMemo(() => (editMode ? 'Edit Entity' : 'Create Entity'), [editMode]);
+
+    const renderCustomAttributesEditor = useMemo(() => {
+        if (isBusy) return <></>;
+        return <AttributeEditor id="customEntity" attributeDescriptors={resourceCustomAttributes} attributes={entity?.customAttributes} />;
+    }, [isBusy, entity, resourceCustomAttributes]);
 
     return (
         <Widget title={title} busy={isBusy}>
@@ -364,13 +371,7 @@ export default function EntityForm() {
                                     },
                                     {
                                         title: 'Custom Attributes',
-                                        content: (
-                                            <AttributeEditor
-                                                id="customEntity"
-                                                attributeDescriptors={resourceCustomAttributes}
-                                                attributes={entity?.customAttributes}
-                                            />
-                                        ),
+                                        content: renderCustomAttributesEditor,
                                     },
                                 ]}
                             />

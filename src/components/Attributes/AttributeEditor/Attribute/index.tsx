@@ -162,6 +162,20 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
         return composed;
     };
 
+    const getUpdatedOptionsForEditSelect = (
+        valuesRecieved: { label: string; value: any }[],
+        options?: { label: string; value: any }[],
+    ): { label: string; value: any }[] | undefined => {
+        if (valuesRecieved?.length > 0) {
+            const updatedOptions = options?.filter((option) => {
+                return !valuesRecieved.some((value) => JSON.stringify(value.value) == JSON.stringify(option.value));
+            });
+            return updatedOptions;
+        }
+
+        return options;
+    };
+
     const createSelect = (descriptor: DataAttributeModel | CustomAttributeModel): JSX.Element => {
         return (
             <Field name={name} validate={buildValidators()} type={getFormType(descriptor.contentType)}>
@@ -181,7 +195,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                                 {...input}
                                 maxMenuHeight={140}
                                 menuPlacement="auto"
-                                options={options}
+                                options={getUpdatedOptionsForEditSelect(input.value, options)}
                                 placeholder={`Select ${descriptor.properties.label}`}
                                 styles={{
                                     control: (provided) =>

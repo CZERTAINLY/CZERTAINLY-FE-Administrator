@@ -37,7 +37,6 @@ import { mutators } from '../../../../utils/attributes/attributeEditorMutators';
 import { collectFormAttributes } from '../../../../utils/attributes/attributes';
 import AttributeEditor from '../../../Attributes/AttributeEditor';
 import TabLayout from '../../../Layout/TabLayout';
-import cert from '../../../../../cypress/component/CertificateAttributes/mock-data';
 
 interface SelectChangeValue {
     value: string;
@@ -420,7 +419,7 @@ function UserForm() {
     const title = useMemo(() => (editMode ? 'Edit user' : 'Create user'), [editMode]);
 
     const renderCustomAttributesEditor = useCallback(() => {
-        if (isBusy || !user?.customAttributes) return <></>;
+        if (isBusy) return <></>;
         return (
             <TabLayout
                 tabs={[

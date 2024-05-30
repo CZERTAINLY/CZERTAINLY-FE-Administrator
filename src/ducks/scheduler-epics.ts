@@ -109,7 +109,7 @@ const deleteSchedulerJob: AppEpic = (action$, state$, deps) => {
                         () => action.payload.redirect,
                         of(
                             slice.actions.deleteSchedulerJobSuccess({ uuid: action.payload.uuid }),
-                            appRedirectActions.redirect({ url: '../../' }),
+                            appRedirectActions.redirect({ url: '../../jobs' }),
                         ),
                         of(slice.actions.deleteSchedulerJobSuccess({ uuid: action.payload.uuid })),
                     ),

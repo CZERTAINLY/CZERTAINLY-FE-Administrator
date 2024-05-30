@@ -36,10 +36,19 @@ function RoleForm() {
     const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
     const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
 
+    const isBusy = useMemo(
+        () => isFetchingRoleDetail || isFetchingResourceCustomAttributes,
+        [isFetchingRoleDetail, isFetchingResourceCustomAttributes],
+    );
+
     useEffect(() => {
         dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Roles));
+    }, [dispatch]);
 
-        if (editMode) dispatch(rolesActions.getDetail({ uuid: id! }));
+    useEffect(() => {
+        if (editMode && id) {
+            dispatch(rolesActions.getDetail({ uuid: id }));
+        }
     }, [dispatch, editMode, id]);
 
     const onSubmit = useCallback(
@@ -90,9 +99,16 @@ function RoleForm() {
 
     const title = useMemo(() => (editMode ? 'Edit Role' : 'Add Role'), [editMode]);
 
+    const renderCustomAttributesEditor = useMemo(() => {
+        if (isBusy) return <></>;
+        return (
+            <AttributeEditor id="customRole" attributeDescriptors={resourceCustomAttributes} attributes={roleSelector?.customAttributes} />
+        );
+    }, [roleSelector, resourceCustomAttributes, isBusy]);
+
     return (
         <>
-            <Widget title={title} busy={isFetchingRoleDetail || isFetchingResourceCustomAttributes}>
+            <Widget title={title} busy={isBusy}>
                 <Form onSubmit={onSubmit} initialValues={defaultValues} mutators={{ ...mutators<FormValues>() }}>
                     {({ handleSubmit, pristine, submitting, values, valid }) => (
                         <BootstrapForm onSubmit={handleSubmit}>
@@ -159,13 +175,7 @@ function RoleForm() {
                                 tabs={[
                                     {
                                         title: 'Custom Attributes',
-                                        content: (
-                                            <AttributeEditor
-                                                id="customRole"
-                                                attributeDescriptors={resourceCustomAttributes}
-                                                attributes={roleSelector?.customAttributes}
-                                            />
-                                        ),
+                                        content: renderCustomAttributesEditor,
                                     },
                                 ]}
                             />
