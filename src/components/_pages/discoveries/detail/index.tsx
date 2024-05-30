@@ -33,7 +33,6 @@ export default function DiscoveryDetail() {
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const eventNameEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ResourceEvent));
-    const triggerHistories = useSelector(ruleSelectors.triggerHistories);
     const triggerHistorySummary = useSelector(ruleSelectors.triggerHistorySummary);
     const isFetchingTriggerSummary = useSelector(ruleSelectors.isFetchingTriggerHistorySummary);
     const isFetchingRuleTriggerHistories = useSelector(ruleSelectors.isFetchingTriggerHistories);
@@ -45,15 +44,12 @@ export default function DiscoveryDetail() {
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.TriggerType));
 
-    const getRuleTriggerHistories = useCallback(
-        (triggerUuid: string) => {
-            if (!id) return;
-            dispatch(rulesActions.getTriggerHistory({ triggerUuid: triggerUuid, triggerObjectUuid: id }));
-        },
-        [id, dispatch],
-    );
+    // useEffect(() => {
+    //     if (!id) return;
+    //     dispatch(rulesActions.getTriggerHistorySummary({ triggerObjectUuid: id }));
+    // }, [id, dispatch]);
 
-    useEffect(() => {
+    const getFreshTriggerHistorySummary = useCallback(() => {
         if (!id) return;
         dispatch(rulesActions.getTriggerHistorySummary({ triggerObjectUuid: id }));
     }, [id, dispatch]);
@@ -62,6 +58,7 @@ export default function DiscoveryDetail() {
         if (!id) return;
         dispatch(actions.resetState());
         dispatch(actions.getDiscoveryDetail({ uuid: id }));
+        dispatch(rulesActions.getTriggerHistorySummary({ triggerObjectUuid: id }));
     }, [id, dispatch]);
 
     useEffect(() => {
@@ -278,7 +275,12 @@ export default function DiscoveryDetail() {
 
                 {triggerHistorySummary?.associationObjectUuid === id && (
                     <Col md="4">
-                        <Widget title="Triggers summary" titleSize="large" busy={isFetchingTriggerSummary}>
+                        <Widget
+                            title="Triggers summary"
+                            titleSize="large"
+                            busy={isFetchingTriggerSummary}
+                            refreshAction={getFreshTriggerHistorySummary}
+                        >
                             <CustomTable headers={detailHeaders} data={triggersSummary} />
                         </Widget>
                     </Col>
