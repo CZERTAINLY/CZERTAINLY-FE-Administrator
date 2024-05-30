@@ -177,7 +177,21 @@ export default function FilterWidgetRuleAction({
             const newActions = actions.filter((_, i) => i !== index);
             setActions(newActions);
             if (onActionsUpdate) {
-                onActionsUpdate(newActions);
+                const actionsWithItemsUuids = newActions.map((a) => {
+                    return {
+                        fieldSource: a.fieldSource,
+                        fieldIdentifier: a.fieldIdentifier,
+                        data: Array.isArray(a.data)
+                            ? a.data.map((v) => {
+                                  if (typeof v === 'object' && v.hasOwnProperty('uuid')) {
+                                      return v.uuid;
+                                  }
+                                  return v;
+                              })
+                            : a.data,
+                    };
+                });
+                onActionsUpdate(actionsWithItemsUuids);
                 setSelectedFilter({ filterNumber: -1, isEditEnabled: false });
             }
         },
