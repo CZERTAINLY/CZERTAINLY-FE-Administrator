@@ -45,8 +45,14 @@ export const getAttributeContent = (contentType: AttributeContentType, content: 
             case AttributeContentType.File:
                 return content.reference;
             case AttributeContentType.Time:
+                const time = new Date();
+                return time.toISOString().split('.')[0].split('T')[1];
             case AttributeContentType.Date:
+                const date = new Date();
+                return date.toISOString().split('T')[0];
             case AttributeContentType.Datetime:
+                const dateTime = new Date();
+                return dateTime.toISOString().split('.')[0].replace('T', ' ');
             case AttributeContentType.Float:
             case AttributeContentType.Integer:
             case AttributeContentType.String:

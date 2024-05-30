@@ -138,7 +138,12 @@ const updateRaProfile: AppEpic = (action$, state$, deps) => {
                         ),
                     ),
 
-                    catchError((err) => of(slice.actions.updateRaProfileFailure({ error: extractError(err, 'Failed to update profile') }))),
+                    catchError((err) =>
+                        of(
+                            (slice.actions.updateRaProfileFailure({ error: extractError(err, 'Failed to update profile') }),
+                            alertActions.error(extractError(err, 'Failed to update profile'))),
+                        ),
+                    ),
                 ),
         ),
     );

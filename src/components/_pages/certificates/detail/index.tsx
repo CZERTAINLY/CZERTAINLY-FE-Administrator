@@ -1437,7 +1437,7 @@ export default function CertificateDetail() {
             certDetail.unshift({
                 id: 'trustedCa',
                 columns: [
-                    'Trusted CA',
+                    certificate?.basicConstraints?.includes('End Entity') ? 'Trusted Self-Signed' : 'Trusted CA',
                     <SwitchWidget disabled={isUpdatingTrustedStatus} checked={certificate.trustedCa ?? false} onClick={switchCallback} />,
                 ],
             });
