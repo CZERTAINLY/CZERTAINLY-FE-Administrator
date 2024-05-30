@@ -297,6 +297,22 @@ const RuleDetails = () => {
         return conditionsData;
     }, [ruleDetails, isUpdatingRule, onDeleteCondition, isFetchingRuleDetails, conditionTypeEnum]);
 
+    const renderRuleConditions = useMemo(() => {
+        return ruleDetails?.conditions.length ? (
+            <ConditionsExecutionsList
+                listType="conditionsItems"
+                ruleConditions={ruleDetails?.conditions}
+                getAvailableFiltersApi={(apiClients: ApiClients) =>
+                    apiClients.resources.listResourceRuleFilterFields({
+                        resource: ruleDetails?.resource || Resource.None,
+                    })
+                }
+            />
+        ) : (
+            <></>
+        );
+    }, [ruleDetails]);
+
     return (
         <Container className="themed-container" fluid>
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
@@ -327,21 +343,7 @@ const RuleDetails = () => {
                     </Widget>
                 </Col>
             </Row>
-            {/* <ConditionsItemsList  conditionGroupName=''/> */}
-
-            {ruleDetails?.conditions.length ? (
-                <ConditionsExecutionsList
-                    listType="conditionsItems"
-                    ruleConditions={ruleDetails?.conditions}
-                    getAvailableFiltersApi={(apiClients: ApiClients) =>
-                        apiClients.resources.listResourceRuleFilterFields({
-                            resource: ruleDetails?.resource || Resource.None,
-                        })
-                    }
-                />
-            ) : (
-                <></>
-            )}
+            {renderRuleConditions}
             <Dialog
                 isOpen={confirmDelete}
                 caption={`Delete a Rule`}
