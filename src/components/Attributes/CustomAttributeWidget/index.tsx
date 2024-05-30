@@ -42,8 +42,10 @@ export default function CustomAttributeWidget({ resource, resourceUuid, attribut
             );
 
             setIsAttributeContentLoaded(true);
+            console.log('dispatch called');
         }
     }, [attributes, resource, resourceUuid, isAttributeContentLoaded, dispatch]);
+    console.log('isAttributeContentLoaded', isAttributeContentLoaded);
     const addCustomAttribute = (attributeUuid: string, content: BaseAttributeContentModel[] | undefined) => {
         if (content) {
             dispatch(

@@ -10,7 +10,7 @@ import Select, { MultiValue, SingleValue } from 'react-select';
 import { Badge, Button, Col, FormGroup, Input, Label, Row } from 'reactstrap';
 import { Observable } from 'rxjs';
 import { SearchFieldListModel, SearchFilterModel } from 'types/certificate';
-import { FilterConditionOperator, FilterFieldSource, FilterFieldType, PlatformEnum, SearchFilterRequestDto } from 'types/openapi';
+import { FilterConditionOperator, FilterFieldSource, FilterFieldType, PlatformEnum } from 'types/openapi';
 import styles from './FilterWidget.module.scss';
 
 const noValue: { [condition in FilterConditionOperator]: boolean } = {
@@ -188,22 +188,7 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
 
         dispatch(actions.setCurrentFilters({ entity, currentFilters: newFilters }));
         if (onFilterUpdate) {
-            const filtersWithItemNames: SearchFilterRequestDto[] = newFilters.map((f) => {
-                return {
-                    fieldSource: f.fieldSource,
-                    fieldIdentifier: f.fieldIdentifier,
-                    condition: f.condition,
-                    value: Array.isArray(f.value)
-                        ? f.value.map((v) => {
-                              if (typeof v === 'object' && v.hasOwnProperty('name')) {
-                                  return v.name;
-                              }
-                              return v;
-                          })
-                        : f.value,
-                };
-            });
-            onFilterUpdate(filtersWithItemNames);
+            onFilterUpdate(newFilters);
             setSelectedFilter(-1);
         }
     }, [filterGroup, filterField, filterCondition, selectedFilter, currentFilters, filterValue, dispatch, entity, onFilterUpdate]);
@@ -213,22 +198,7 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
             const newFilters = currentFilters.filter((_, i) => i !== index);
             dispatch(actions.setCurrentFilters({ entity, currentFilters: newFilters }));
             if (onFilterUpdate) {
-                const filtersWithItemNames: SearchFilterRequestDto[] = newFilters.map((f) => {
-                    return {
-                        fieldSource: f.fieldSource,
-                        fieldIdentifier: f.fieldIdentifier,
-                        condition: f.condition,
-                        value: Array.isArray(f.value)
-                            ? f.value.map((v) => {
-                                  if (typeof v === 'object' && v.hasOwnProperty('name')) {
-                                      return v.name;
-                                  }
-                                  return v;
-                              })
-                            : f.value,
-                    };
-                });
-                onFilterUpdate(filtersWithItemNames);
+                onFilterUpdate(newFilters);
                 setSelectedFilter(-1);
             }
         },
