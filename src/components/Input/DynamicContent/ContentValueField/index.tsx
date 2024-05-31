@@ -86,7 +86,11 @@ export default function ContentValueField({ descriptor, initialContent, onSubmit
             if (descriptor.properties.multiSelect) {
                 return input.value.map((v: any) => transformObjectContent(descriptor.contentType, v.value));
             } else {
-                return [transformObjectContent(descriptor.contentType, input.value.value)];
+                if (Array.isArray(input.value)) {
+                    return input.value.map((v: any) => transformObjectContent(descriptor.contentType, v.value));
+                } else {
+                    return [transformObjectContent(descriptor.contentType, input.value.value)];
+                }
             }
         }
         return [transformObjectContent(descriptor.contentType, { data: input.value })];

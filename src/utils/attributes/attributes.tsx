@@ -6,14 +6,7 @@ import {
     isCustomAttributeModel,
     isDataAttributeModel,
 } from 'types/attributes';
-import {
-    AttributeContentType,
-    CodeBlockAttributeContent,
-    DateAttributeContent,
-    DateTimeAttributeContent,
-    FileAttributeContentData,
-    SecretAttributeContent,
-} from 'types/openapi';
+import { AttributeContentType, CodeBlockAttributeContent, FileAttributeContentData, SecretAttributeContent } from 'types/openapi';
 import { utf8ToBase64 } from 'utils/common-utils';
 import { getFormattedDateTime } from 'utils/dateUtil';
 import CodeBlock from '../../components/Attributes/CodeBlock';
@@ -79,12 +72,15 @@ export const getAttributeContent = (contentType: AttributeContentType, content: 
 
 const getAttributeFormValue = (contentType: AttributeContentType, item: any) => {
     if (contentType === AttributeContentType.Datetime) {
-        return item.value ? new Date(item.value).toISOString() : ({ data: new Date(item).toISOString() } as DateTimeAttributeContent);
+        const returnVal = item?.value?.data ? { data: new Date(item.value.data).toISOString() } : new Date(item).toISOString();
+        return returnVal;
     }
     if (contentType === AttributeContentType.Date) {
-        return item.value
-            ? new Date(item.value).toISOString().slice(0, 10)
-            : ({ data: new Date(item).toISOString().slice(0, 10) } as DateAttributeContent);
+        const returnVal = item?.value?.data
+            ? { data: new Date(item.value.data).toISOString().slice(0, 10) }
+            : new Date(item).toISOString().slice(0, 10);
+
+        return returnVal;
     }
     if (contentType === AttributeContentType.Codeblock) {
         return { data: { code: utf8ToBase64(item.code), language: item.language } } as CodeBlockAttributeContent;
