@@ -15,6 +15,7 @@ import {
     SecretAttributeContent,
 } from 'types/openapi';
 import { utf8ToBase64 } from 'utils/common-utils';
+import { getFormattedDateTime } from 'utils/dateUtil';
 import CodeBlock from '../../components/Attributes/CodeBlock';
 
 export const attributeFieldNameTransform: { [name: string]: string } = {
@@ -45,14 +46,11 @@ export const getAttributeContent = (contentType: AttributeContentType, content: 
             case AttributeContentType.File:
                 return content.reference;
             case AttributeContentType.Time:
-                const time = new Date();
-                return time.toISOString().split('.')[0].split('T')[1];
+                return content.data.toString();
             case AttributeContentType.Date:
-                const date = new Date();
-                return date.toISOString().split('T')[0];
+                return content.data.toString();
             case AttributeContentType.Datetime:
-                const dateTime = new Date();
-                return dateTime.toISOString().split('.')[0].replace('T', ' ');
+                return getFormattedDateTime(content.data.toString());
             case AttributeContentType.Float:
             case AttributeContentType.Integer:
             case AttributeContentType.String:

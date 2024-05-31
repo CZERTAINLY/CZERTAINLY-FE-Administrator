@@ -3,6 +3,7 @@ import { Field, useForm } from 'react-final-form';
 import Select from 'react-select';
 import { Col, FormFeedback, FormGroup, Input, InputGroup } from 'reactstrap';
 import { getStepValue } from 'utils/common-utils';
+import { getFormattedDateTime } from 'utils/dateUtil';
 import { BaseAttributeContentModel, CustomAttributeModel } from '../../../../types/attributes';
 import { AttributeContentType } from '../../../../types/openapi';
 import { composeValidators, validateRequired } from '../../../../utils/validators';
@@ -141,6 +142,7 @@ export default function ContentValueField({ descriptor, initialContent, onSubmit
                         type={ContentFieldConfiguration[descriptor.contentType].type}
                         id={descriptor.name}
                         step={fieldStepValue}
+                        value={descriptor.contentType === AttributeContentType.Datetime ? getFormattedDateTime(input.value) : input.value}
                     />
                 );
                 const feedbackComponent = <FormFeedback>{meta.error}</FormFeedback>;
