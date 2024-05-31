@@ -15,7 +15,8 @@ function Alerts() {
                 <Alert
                     className={style.alert}
                     key={alert.id}
-                    color={alert.color}
+                    style={{ background: alert.color === 'info' ? '#d0e3f0' : '' }}
+                    color={alert.color === 'info' ? 'secondary' : alert.color}
                     toggle={() => dispatch(actions.dismiss(alert.id))}
                     isOpen
                     data-hiding={alert.isHiding}

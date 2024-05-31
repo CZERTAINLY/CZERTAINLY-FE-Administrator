@@ -134,6 +134,7 @@ export default function ContentValueField({ descriptor, initialContent, onSubmit
                     </Col>
                 ) : (
                     <Input
+                        disabled={descriptor.properties.readOnly}
                         {...input}
                         valid={!meta.error && meta.touched}
                         invalid={!!meta.error && meta.touched}
