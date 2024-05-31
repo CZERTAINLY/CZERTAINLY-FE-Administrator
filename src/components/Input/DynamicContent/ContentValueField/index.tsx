@@ -19,13 +19,32 @@ type Props = {
 export default function ContentValueField({ descriptor, initialContent, onSubmit }: Props) {
     const form = useForm();
 
-    const options = useMemo(() => descriptor.content?.map((a) => ({ label: a.reference ?? a.data.toString(), value: a })), [descriptor]);
+    const options = useMemo(
+        () =>
+            descriptor.content?.map((a) => ({
+                label: a.reference
+                    ? a.reference
+                    : descriptor.contentType === AttributeContentType.Datetime
+                      ? getFormattedDateTime(a.data.toString())
+                      : a.data.toString(),
+                value: a,
+            })),
+        [descriptor],
+    );
 
     useEffect(() => {
         const initialValue =
             initialContent && initialContent.length > 0
                 ? descriptor.properties.list
-                    ? options?.filter((o) => initialContent.find((i) => i.data === o.value.data))
+                    ? options?.filter((o) =>
+                          initialContent.find((i) => {
+                              if (descriptor.contentType === AttributeContentType.Datetime) {
+                                  return getFormattedDateTime(i.data.toString()) === getFormattedDateTime(o.value.data.toString());
+                              } else {
+                                  return i.data === o.value.data;
+                              }
+                          }),
+                      )
                     : initialContent[0].data
                 : undefined;
 
