@@ -191,7 +191,7 @@ export default function AttributeViewer({
                             );
                         }}
                     >
-                        <i className="fa fa-info" style={{ color: 'auto' }} />
+                        <i className="fa fa-info" style={{ color: 'auto', marginBottom: '9.5px', marginLeft: '4px', fontSize: '14px' }} />
                     </Button>
                 );
             }
