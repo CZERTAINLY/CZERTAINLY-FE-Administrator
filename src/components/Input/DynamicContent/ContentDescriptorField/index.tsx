@@ -72,6 +72,7 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
                                 const labelComponent = <Label for={name}>Default Content</Label>;
                                 const buttonComponent = (
                                     <WidgetButtons
+                                        justify="start"
                                         buttons={[
                                             {
                                                 icon: 'trash',

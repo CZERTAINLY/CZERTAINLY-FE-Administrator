@@ -1,0 +1,7 @@
+.wordWrap {
+    display: inline-block;
+    max-width: 200px;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
+}
