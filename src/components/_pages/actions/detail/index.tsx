@@ -299,6 +299,23 @@ const RuleDetails = () => {
         return conditionGroupData;
     }, [actionDetails, isUpdatingAction, onDeleteExecution, isFetchingActionDetails, executionTypeEnum]);
 
+    const renderActionExecutions = useMemo(() => {
+        return actionDetails?.executions.length ? (
+            <ConditionsExecutionsList
+                listType="executionItems"
+                actionExecutions={actionDetails?.executions}
+                getAvailableFiltersApi={(apiClients: ApiClients) =>
+                    apiClients.resources.listResourceRuleFilterFields({
+                        resource: actionDetails.resource,
+                        settable: true,
+                    })
+                }
+            />
+        ) : (
+            <></>
+        );
+    }, [actionDetails]);
+
     return (
         <Container className="themed-container" fluid>
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
@@ -330,21 +347,7 @@ const RuleDetails = () => {
                 </Col>
             </Row>
 
-            {/* <Row>{actionDetails?.resource && <ConditionAndExecutionItemsViewer resource={actionDetails.resource} formType="rules" />}</Row> */}
-            {actionDetails?.executions.length ? (
-                <ConditionsExecutionsList
-                    listType="executionItems"
-                    actionExecutions={actionDetails?.executions}
-                    getAvailableFiltersApi={(apiClients: ApiClients) =>
-                        apiClients.resources.listResourceRuleFilterFields({
-                            resource: actionDetails.resource,
-                            settable: true,
-                        })
-                    }
-                />
-            ) : (
-                <></>
-            )}
+            {renderActionExecutions}
             <Dialog
                 isOpen={confirmDelete}
                 caption={`Delete an Action`}
