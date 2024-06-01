@@ -23,6 +23,7 @@ import CustomSelectComponent from 'components/CustomSelectComponent';
 import { useDispatch, useSelector } from 'react-redux';
 import { AddNewAttributeList, AddNewAttributeType } from 'types/user-interface';
 import { getStepValue } from 'utils/common-utils';
+import { getFormattedDateTime } from 'utils/dateUtil';
 import { composeValidators, validateFloat, validateInteger, validatePattern, validateRequired } from 'utils/validators';
 import { actions as userInterfaceActions, selectors as userInterfaceSelectors } from '../../../../ducks/user-interface';
 import { getAttributeContent } from '../../../../utils/attributes/attributes';
@@ -423,6 +424,9 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                             placeholder={`Enter ${descriptor.properties.label}`}
                             disabled={descriptor.properties.readOnly || busy}
                             step={getStepValue(descriptor.contentType)}
+                            value={
+                                descriptor.contentType === AttributeContentType.Datetime ? getFormattedDateTime(input.value) : input.value
+                            }
                         />
 
                         {descriptor.properties.visible && descriptor.contentType === AttributeContentType.Boolean ? (

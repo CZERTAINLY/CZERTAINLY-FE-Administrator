@@ -124,3 +124,16 @@ export const getDateInString = (daysOffset: number) => {
     date.setDate(date.getDate() + daysOffset);
     return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
 };
+
+export function getFormattedDateTime(dateString: string): string {
+    if (isNaN(Date.parse(dateString))) {
+        return dateString;
+    }
+
+    let date = new Date(dateString);
+    let formattedDateTime = `${date.getFullYear()}-${('0' + (date.getMonth() + 1)).slice(-2)}-${('0' + date.getDate()).slice(-2)} ${(
+        '0' + date.getHours()
+    ).slice(-2)}:${('0' + date.getMinutes()).slice(-2)}:${('0' + date.getSeconds()).slice(-2)}`;
+
+    return formattedDateTime;
+}

@@ -13,6 +13,7 @@ import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, In
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 
 import ProgressButton from 'components/ProgressButton';
+import SwitchWidget from 'components/SwitchWidget';
 import Select from 'react-select';
 import { PlatformEnum, Resource, TriggerRequestDtoEventEnum, TriggerType } from 'types/openapi';
 import { isObjectSame } from 'utils/common-utils';
@@ -330,29 +331,18 @@ const TriggerForm = () => {
                             </Field>
                         )}
 
-                        <Field name="ignoreTrigger" type="checkbox">
-                            {({ input }) => (
-                                <FormGroup className="pt-2 ps-0 mb-3" check>
-                                    <div className="d-flex">
-                                        <Label check>Ignore Trigger</Label>
-                                        <Input
-                                            className="ms-2 mt-1"
-                                            {...input}
-                                            type="checkbox"
-                                            checked={values.ignoreTrigger}
-                                            onClick={(event) => {
-                                                if (event.target) {
-                                                    const isChecked = (event.target as HTMLInputElement).checked;
-                                                    if (isChecked) {
-                                                        form.change('actionsUuids', []);
-                                                    }
-                                                }
-                                            }}
-                                        />
-                                    </div>
-                                </FormGroup>
-                            )}
-                        </Field>
+                        <div className="d-flex my-2">
+                            <Label style={{ marginTop: '2.5px', marginRight: '1rem' }}>Ignore Trigger</Label>
+                            <SwitchWidget
+                                checked={values.ignoreTrigger}
+                                onClick={() => {
+                                    form.change('ignoreTrigger', !values.ignoreTrigger);
+                                    if (!values.ignoreTrigger) {
+                                        form.change('actionsUuids', []);
+                                    }
+                                }}
+                            />
+                        </div>
 
                         <Field name="selectedResource">
                             {({ input, meta }) => (

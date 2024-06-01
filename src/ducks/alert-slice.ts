@@ -45,6 +45,20 @@ export const alertsSlice = createSlice({
             },
         },
 
+        info: {
+            prepare: (message: string) => ({ payload: message }),
+
+            reducer: (state, action: PayloadAction<string>) => {
+                state.messages.push({
+                    id: state.msgId,
+                    time: Date.now(),
+                    message: action.payload,
+                    color: 'info',
+                });
+                state.msgId++;
+            },
+        },
+
         hide: {
             prepare: (id: number) => ({ payload: id }),
 

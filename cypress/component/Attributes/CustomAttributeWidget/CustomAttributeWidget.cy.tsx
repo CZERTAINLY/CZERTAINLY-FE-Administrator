@@ -74,7 +74,7 @@ describe('CustomAttributeWidget', () => {
 
         cy.get('td').eq(24).should('contain.text', 'Test');
         cy.get('td').eq(25).should('contain.text', 'datetime');
-        cy.get('td').eq(26).should('contain.text', '2022-02-02T12:00:00');
+        cy.get('td').eq(26).should('contain.text', '2022-02-02 12:00:00');
         cy.get('td').eq(27).should('contain.html', 'fa-pencil-square-o', 'fa-trash');
 
         cy.get('td').eq(28).should('contain.text', 'Test');

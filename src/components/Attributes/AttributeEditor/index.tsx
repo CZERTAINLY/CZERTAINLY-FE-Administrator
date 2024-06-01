@@ -24,6 +24,7 @@ import {
 import { CallbackAttributeModel } from 'types/connectors';
 import { AttributeContentType, AttributeValueTarget, FunctionGroupCode, Resource } from 'types/openapi';
 import { base64ToUtf8 } from 'utils/common-utils';
+import { getFormattedDateTime } from 'utils/dateUtil';
 import { Attribute } from './Attribute';
 
 // same empty array is used to prevent re-rendering of the component
@@ -377,7 +378,11 @@ export default function AttributeEditor({
                     if (descriptor.properties.list && descriptor.properties.multiSelect) {
                         if (Array.isArray(attribute?.content)) {
                             formAttributeValue = attribute!.content.map((content) => ({
-                                label: content.reference ?? content.data.toString(),
+                                label: content.reference
+                                    ? content.reference
+                                    : descriptor.contentType === AttributeContentType.Datetime
+                                      ? getFormattedDateTime(content.data.toString())
+                                      : content.data.toString(),
                                 value: content,
                             }));
                         } else {
@@ -386,7 +391,11 @@ export default function AttributeEditor({
                     } else if (descriptor.properties.list) {
                         if (attribute?.content) {
                             formAttributeValue = {
-                                label: attribute.content[0].reference ?? attribute.content[0].data.toString(),
+                                label: attribute.content[0].reference
+                                    ? attribute.content[0].reference
+                                    : descriptor.contentType === AttributeContentType.Datetime
+                                      ? getFormattedDateTime(attribute.content[0].data.toString())
+                                      : attribute.content[0].data.toString(),
                                 value: attribute.content[0],
                             };
                         } else {

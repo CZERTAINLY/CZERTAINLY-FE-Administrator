@@ -1,7 +1,10 @@
+import cx from 'classnames';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
+import SwitchWidget from 'components/SwitchWidget';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
+import { actions as alertActions } from 'ducks/alerts';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -9,6 +12,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
 import { Button, ButtonGroup, Col, Container, Input, Row } from 'reactstrap';
 import { PlatformEnum, UpdateTriggerRequestDtoEventEnum } from 'types/openapi';
+import styles from './triggerDetails.module.scss';
 interface SelectChangeValue {
     value: string;
     label: string;
@@ -27,11 +31,20 @@ const TriggerDetails = () => {
     const [updateDescriptionEditEnable, setUpdateDescription] = useState<boolean>(false);
     const [updatedDescription, setUpdatedDescription] = useState('');
     const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.TriggerType));
+    const [highlight, setHighlight] = useState(false);
 
     useEffect(() => {
         if (!triggerDetails?.description || triggerDetails.uuid !== id) return;
         setUpdatedDescription(triggerDetails.description);
     }, [triggerDetails, id]);
+
+    const triggerHighlight = useCallback(() => {
+        setHighlight(true);
+        const timer = setTimeout(() => {
+            setHighlight(false);
+        }, 2000);
+        return () => clearTimeout(timer);
+    }, []);
 
     const getFreshDetails = useCallback(() => {
         if (!id) return;
@@ -43,7 +56,7 @@ const TriggerDetails = () => {
     }, [getFreshDetails]);
 
     useEffect(() => {
-        dispatch(rulesActions.listExecutions({ resource: triggerDetails?.resource }));
+        dispatch(rulesActions.listActions({ resource: triggerDetails?.resource }));
         dispatch(rulesActions.listRules({ resource: triggerDetails?.resource }));
     }, [triggerDetails, dispatch]);
 
@@ -109,7 +122,7 @@ const TriggerDetails = () => {
                     triggerUuid: id,
                     trigger: {
                         actionsUuids: allActionsUuids,
-                        ignoreTrigger: triggerDetails.ignoreTrigger,
+                        ignoreTrigger: false,
                         resource: triggerDetails.resource,
                         type: triggerDetails.type,
                         rulesUuids: triggerDetails?.rules.map((rule) => rule.uuid) || [],
@@ -245,7 +258,37 @@ const TriggerDetails = () => {
                       },
                       {
                           id: 'ignoreTrigger',
-                          columns: ['Ignore Trigger', triggerDetails.ignoreTrigger ? 'Yes' : 'No', ''],
+                          columns: [
+                              'Ignore Trigger',
+                              <SwitchWidget
+                                  checked={triggerDetails.ignoreTrigger}
+                                  onClick={() => {
+                                      if (triggerDetails?.ignoreTrigger) {
+                                          dispatch(alertActions.info('Please add actions from the actions table'));
+                                          triggerHighlight();
+                                      } else {
+                                          dispatch(
+                                              rulesActions.updateTrigger({
+                                                  triggerUuid: triggerDetails.uuid,
+                                                  trigger: {
+                                                      ignoreTrigger: true,
+                                                      description: triggerDetails.description || '',
+                                                      rulesUuids: triggerDetails?.rules.map((rule) => rule.uuid) || [],
+                                                      resource: triggerDetails.resource,
+                                                      type: triggerDetails.type,
+                                                      actionsUuids: [],
+                                                      eventResource: triggerDetails.eventResource,
+                                                      event:
+                                                          (triggerDetails.event as unknown as UpdateTriggerRequestDtoEventEnum) ||
+                                                          undefined,
+                                                  },
+                                              }),
+                                          );
+                                      }
+                                  }}
+                              />,
+                              '',
+                          ],
                       },
                       {
                           id: 'eventResource',
@@ -336,7 +379,9 @@ const TriggerDetails = () => {
             isUpdatingTrigger,
             updatedDescription,
             eventNameEnum,
+            dispatch,
             isFetchingTriggerDetail,
+            triggerHighlight,
         ],
     );
 
@@ -455,7 +500,11 @@ const TriggerDetails = () => {
                             title: 'Information',
                             description: 'Actions is named set of actions for selected trigger',
                         }}
+                        // className={styles.highLightWidget}
+                        className={cx({ [styles.highLightWidget]: highlight === true })}
+                        // className="p
                     >
+                        {/* <div className={styles.highLightBorder}> */}
                         <CustomTable
                             data={actionsData}
                             headers={actionsDataHeader}
@@ -465,6 +514,7 @@ const TriggerDetails = () => {
                                 onAddClick: onUpdateActionsConfirmed,
                             }}
                         />
+                        {/* </div> */}
                     </Widget>
                 </Col>
             </Row>
