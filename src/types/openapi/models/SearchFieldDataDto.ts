@@ -12,6 +12,7 @@
  */
 
 import type {
+    AttributeContentType,
     FilterConditionOperator,
     FilterFieldType,
     PlatformEnum,
@@ -51,6 +52,11 @@ export interface SearchFieldDataDto {
      * @memberof SearchFieldDataDto
      */
     platformEnum?: PlatformEnum;
+    /**
+     * @type {AttributeContentType}
+     * @memberof SearchFieldDataDto
+     */
+    attributeContentType?: AttributeContentType;
     /**
      * Available values for the field
      * @type {object}

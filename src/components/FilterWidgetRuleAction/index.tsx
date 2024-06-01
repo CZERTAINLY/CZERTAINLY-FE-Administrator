@@ -10,8 +10,9 @@ import Select, { MultiValue, SingleValue } from 'react-select';
 import { Badge, Button, Col, FormGroup, Input, Label, Row } from 'reactstrap';
 import { Observable } from 'rxjs';
 import { SearchFieldListModel } from 'types/certificate';
-import { FilterFieldSource, FilterFieldType, PlatformEnum } from 'types/openapi';
+import { AttributeContentType, FilterFieldSource, FilterFieldType, PlatformEnum } from 'types/openapi';
 import { ExecutionItemModel, ExecutionItemRequestModel } from 'types/rules';
+import { getFormattedDateTime } from 'utils/dateUtil';
 import styles from './FilterWidgetRuleAction.module.scss';
 
 interface CurrentActionOptions {
@@ -222,7 +223,7 @@ export default function FilterWidgetRuleAction({
                 let label = '';
                 let value = '';
                 if (typeof v === 'string') {
-                    label = v;
+                    label = currentField.attributeContentType === AttributeContentType.Datetime ? getFormattedDateTime(v) : v;
                     value = v;
                 } else {
                     label = v?.name || JSON.stringify(v);
@@ -315,7 +316,11 @@ export default function FilterWidgetRuleAction({
 
         if (currentField && !currentField?.multiValue) {
             const value = currentActionData;
-            const label = currentField.platformEnum ? platformEnums[currentField.platformEnum][value as unknown as string].label : value;
+            const label = currentField.platformEnum
+                ? platformEnums[currentField.platformEnum][value as unknown as string].label
+                : currentField.attributeContentType === AttributeContentType.Datetime
+                  ? getFormattedDateTime(value as unknown as string)
+                  : value;
             setFilterValue({ label, value });
             setSelectedFilter({ filterNumber: selectedFilter.filterNumber, isEditEnabled: true });
 
@@ -518,17 +523,44 @@ export default function FilterWidgetRuleAction({
                                         .map(
                                             (v) =>
                                                 `'${
-                                                    field?.platformEnum ? platformEnums[field.platformEnum][v]?.label : v?.name ? v.name : v
+                                                    field?.platformEnum
+                                                        ? platformEnums[field.platformEnum][v]?.label
+                                                        : v?.name
+                                                          ? v.name
+                                                          : field?.attributeContentType === AttributeContentType.Datetime
+                                                            ? getFormattedDateTime(v as unknown as string)
+                                                            : v
                                                 }'`,
                                         )
-                                        .join(', ')}`
+                                        .join(' OR ')}`
                                   : f.data
                                     ? `'${
                                           field?.platformEnum
                                               ? platformEnums[field.platformEnum][f.data as unknown as string]?.label
-                                              : f.data
+                                              : field?.attributeContentType === AttributeContentType.Datetime
+                                                ? getFormattedDateTime(f.data as unknown as string)
+                                                : f.data
                                       }'`
                                     : '';
+                        // const value =
+                        //     field && field.type === FilterFieldType.Boolean
+                        //         ? `'${booleanOptions.find((b) => !!f.data === b.value)?.label}'`
+                        //         : Array.isArray(f.data)
+                        //           ? `${f.data
+                        //                 .map(
+                        //                     (v) =>
+                        //                         `'${
+                        //                             field?.platformEnum ? platformEnums[field.platformEnum][v]?.label : v?.name ? v.name : v
+                        //                         }'`,
+                        //                 )
+                        //                 .join(', ')}`
+                        //           : f.data
+                        //             ? `'${
+                        //                   field?.platformEnum
+                        //                       ? platformEnums[field.platformEnum][f.data as unknown as string]?.label
+                        //                       : f.data
+                        //               }'`
+                        //             : '';
                         return (
                             <Badge
                                 className={styles.filterBadge}
