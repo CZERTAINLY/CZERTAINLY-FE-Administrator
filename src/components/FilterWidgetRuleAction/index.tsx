@@ -13,7 +13,7 @@ import { SearchFieldListModel } from 'types/certificate';
 import { AttributeContentType, FilterFieldSource, FilterFieldType, PlatformEnum, SearchFieldDataDto } from 'types/openapi';
 import { ExecutionItemModel, ExecutionItemRequestModel } from 'types/rules';
 import { getFormType, getStepValue } from 'utils/common-utils';
-import { getFormattedUtc } from 'utils/dateUtil';
+import { getFormattedDateByType, getFormattedDateTime, getFormattedUtc } from 'utils/dateUtil';
 import styles from './FilterWidgetRuleAction.module.scss';
 
 interface CurrentActionOptions {
@@ -63,6 +63,7 @@ export default function FilterWidgetRuleAction({
     const [filterField, setFilterField] = useState<SingleValue<{ label: string; value: string }> | undefined>(undefined);
 
     const [filterValue, setFilterValue] = useState<
+        | string
         | object
         | SingleValue<object | object[] | { label: string; value: object }>
         | MultiValue<object | object[] | { label: string; value: object }>
@@ -77,6 +78,18 @@ export default function FilterWidgetRuleAction({
         [],
     );
 
+    const checkIfFieldIsDate = useCallback((field: SearchFieldDataDto) => {
+        if (
+            field.attributeContentType === AttributeContentType.Date ||
+            field.attributeContentType === AttributeContentType.Time ||
+            field.attributeContentType === AttributeContentType.Datetime
+        ) {
+            return true;
+        } else {
+            return false;
+        }
+    }, []);
+
     useEffect(() => {
         dispatch(filterActions.getAvailableFilters({ entity, getAvailableFiltersApi }));
     }, [dispatch, entity, getAvailableFiltersApi]);
@@ -89,6 +102,13 @@ export default function FilterWidgetRuleAction({
         },
         [setSelectedFilter],
     );
+
+    const currentFields = useMemo(
+        () => availableFilters.find((f) => f.filterFieldSource === fieldSource?.value)?.searchFieldData,
+        [availableFilters, fieldSource],
+    );
+
+    const currentField = useMemo(() => currentFields?.find((f) => f.fieldIdentifier === filterField?.value), [filterField, currentFields]);
 
     const onUpdateClick = useCallback(() => {
         if (!fieldSource?.value) return;
@@ -116,6 +136,9 @@ export default function FilterWidgetRuleAction({
             updatedActions = [...actions, newExecution];
             setActions(updatedActions);
             const updatedActionDataActions = updatedActions.map((a) => {
+                const fieldOfAction = availableFilters
+                    .find((f) => f.filterFieldSource === a.fieldSource)
+                    ?.searchFieldData?.find((s) => s.fieldIdentifier === a.fieldIdentifier);
                 return {
                     fieldSource: a.fieldSource,
                     fieldIdentifier: a.fieldIdentifier,
@@ -124,14 +147,14 @@ export default function FilterWidgetRuleAction({
                               if (typeof v === 'object' && v.hasOwnProperty('uuid')) {
                                   return v.uuid;
                               }
-                              if (currentField?.attributeContentType && currentField && checkIfFieldIsDate(currentField)) {
+                              if (fieldOfAction?.attributeContentType && fieldOfAction && checkIfFieldIsDate(fieldOfAction)) {
                                   console.log('v', v);
-                                  return getFormattedUtc(currentField.attributeContentType, v);
+                                  return getFormattedUtc(fieldOfAction.attributeContentType, v);
                               }
                               return v;
                           })
-                        : currentField?.attributeContentType && currentField
-                          ? [getFormattedUtc(currentField.attributeContentType, a.data as unknown as string) as Object]
+                        : fieldOfAction?.attributeContentType && fieldOfAction && checkIfFieldIsDate(fieldOfAction)
+                          ? [getFormattedUtc(fieldOfAction.attributeContentType, a.data as unknown as string) as Object]
                           : a.data,
                 };
             });
@@ -142,6 +165,9 @@ export default function FilterWidgetRuleAction({
             const updatedActions = actions.map((a, i) => (i === selectedFilter.filterNumber ? newExecution : a));
             setActions(updatedActions);
             const updatedActionDataActions = updatedActions.map((a) => {
+                const fieldOfAction = availableFilters
+                    .find((f) => f.filterFieldSource === a.fieldSource)
+                    ?.searchFieldData?.find((s) => s.fieldIdentifier === a.fieldIdentifier);
                 return {
                     fieldSource: a.fieldSource,
                     fieldIdentifier: a.fieldIdentifier,
@@ -150,14 +176,14 @@ export default function FilterWidgetRuleAction({
                               if (typeof v === 'object' && v.hasOwnProperty('uuid')) {
                                   return v.uuid;
                               }
-                              if (currentField?.attributeContentType && currentField && checkIfFieldIsDate(currentField)) {
+                              if (fieldOfAction?.attributeContentType && fieldOfAction && checkIfFieldIsDate(fieldOfAction)) {
                                   console.log('v', v);
-                                  return getFormattedUtc(currentField.attributeContentType, v);
+                                  return getFormattedUtc(fieldOfAction.attributeContentType, v);
                               }
                               return v;
                           })
-                        : currentField?.attributeContentType && currentField
-                          ? [getFormattedUtc(currentField.attributeContentType, a.data as unknown as string) as Object]
+                        : fieldOfAction?.attributeContentType && fieldOfAction && checkIfFieldIsDate(fieldOfAction)
+                          ? [getFormattedUtc(fieldOfAction.attributeContentType, a.data as unknown as string) as Object]
                           : a.data,
                 };
             });
@@ -166,6 +192,7 @@ export default function FilterWidgetRuleAction({
             setSelectedFilter({ filterNumber: -1, isEditEnabled: false });
         }
     }, [
+        checkIfFieldIsDate,
         fieldSource,
         filterField,
         filterValue,
@@ -176,6 +203,7 @@ export default function FilterWidgetRuleAction({
         setActions,
         onActionsUpdate,
         selectedFilter,
+        availableFilters,
     ]);
 
     useEffect(() => {
@@ -192,6 +220,9 @@ export default function FilterWidgetRuleAction({
             setActions(newActions);
             if (onActionsUpdate) {
                 const actionsWithItemsUuids = newActions.map((a) => {
+                    const fieldOfAction = availableFilters
+                        .find((f) => f.filterFieldSource === a.fieldSource)
+                        ?.searchFieldData?.find((s) => s.fieldIdentifier === a.fieldIdentifier);
                     return {
                         fieldSource: a.fieldSource,
                         fieldIdentifier: a.fieldIdentifier,
@@ -200,14 +231,14 @@ export default function FilterWidgetRuleAction({
                                   if (typeof v === 'object' && v.hasOwnProperty('uuid')) {
                                       return v.uuid;
                                   }
-                                  if (currentField?.attributeContentType && currentField && checkIfFieldIsDate(currentField)) {
+                                  if (fieldOfAction?.attributeContentType && fieldOfAction && checkIfFieldIsDate(fieldOfAction)) {
                                       console.log('v', v);
-                                      return getFormattedUtc(currentField.attributeContentType, v);
+                                      return getFormattedUtc(fieldOfAction.attributeContentType, v);
                                   }
                                   return v;
                               })
-                            : currentField?.attributeContentType && currentField
-                              ? [getFormattedUtc(currentField.attributeContentType, a.data as unknown as string) as Object]
+                            : fieldOfAction?.attributeContentType && fieldOfAction && checkIfFieldIsDate(fieldOfAction)
+                              ? [getFormattedUtc(fieldOfAction.attributeContentType, a.data as unknown as string) as Object]
                               : a.data,
                     };
                 });
@@ -215,7 +246,7 @@ export default function FilterWidgetRuleAction({
                 setSelectedFilter({ filterNumber: -1, isEditEnabled: false });
             }
         },
-        [actions, onActionsUpdate],
+        [actions, onActionsUpdate, checkIfFieldIsDate, availableFilters],
     );
 
     const toggleFilter = useCallback(
@@ -228,25 +259,6 @@ export default function FilterWidgetRuleAction({
         [selectedFilter],
     );
 
-    const currentFields = useMemo(
-        () => availableFilters.find((f) => f.filterFieldSource === fieldSource?.value)?.searchFieldData,
-        [availableFilters, fieldSource],
-    );
-
-    const currentField = useMemo(() => currentFields?.find((f) => f.fieldIdentifier === filterField?.value), [filterField, currentFields]);
-
-    const checkIfFieldIsDate = useCallback((field: SearchFieldDataDto) => {
-        if (
-            field.attributeContentType === AttributeContentType.Date ||
-            field.attributeContentType === AttributeContentType.Time ||
-            field.attributeContentType === AttributeContentType.Datetime
-        ) {
-            return true;
-        } else {
-            return false;
-        }
-    }, []);
-
     const objectValueOptions: CurrentActionOptions[] = useMemo(() => {
         if (!currentField) return [];
 
@@ -255,7 +267,11 @@ export default function FilterWidgetRuleAction({
                 let label = '';
                 let value = '';
                 if (typeof v === 'string') {
-                    label = v;
+                    if (checkIfFieldIsDate(currentField)) {
+                        label = getFormattedDateTime(v);
+                    } else {
+                        label = v;
+                    }
                     value = v;
                 } else {
                     label = v?.name || JSON.stringify(v);
@@ -265,9 +281,12 @@ export default function FilterWidgetRuleAction({
                 return { label, value };
             });
 
-            if (selectedFilter.filterNumber === -1) return objectOptions;
+            console.log('objectOptions', objectOptions);
 
+            if (selectedFilter.filterNumber === -1) return objectOptions;
             const currentActionData = actions[selectedFilter.filterNumber]?.data;
+            console.log('currentActionData', currentActionData);
+
             if (currentActionData === undefined) return objectOptions;
             const filteredOptions = objectOptions.filter((o) => {
                 if (Array.isArray(currentActionData)) {
@@ -275,11 +294,34 @@ export default function FilterWidgetRuleAction({
                 }
             });
 
-            return filteredOptions;
+            if (checkIfFieldIsDate(currentField)) {
+                const currentActionLabel = getFormattedDateTime(currentActionData as unknown as string);
+
+                console.log('currentActionLabel', currentActionLabel);
+
+                if (Array.isArray(currentActionData)) {
+                    // return filteredOptions;
+                    const dateFilteredOptions = objectOptions.filter((o) => {
+                        return !currentActionData.some((a) => currentActionLabel === o?.label);
+                    });
+                    console.log('dateFilteredOptions', dateFilteredOptions);
+
+                    return dateFilteredOptions;
+                } else {
+                    const dateFilteredOptions = objectOptions.filter((o) => {
+                        return currentActionLabel !== o?.label;
+                    });
+
+                    console.log('dateFilteredOptions', dateFilteredOptions);
+                    return dateFilteredOptions;
+                }
+            } else {
+                return filteredOptions;
+            }
         }
 
         return [];
-    }, [currentField, actions, selectedFilter]);
+    }, [currentField, actions, selectedFilter, checkIfFieldIsDate]);
 
     useEffect(() => {
         // this effect is for updating dropdowns when a filter is selected
@@ -328,14 +370,9 @@ export default function FilterWidgetRuleAction({
         const currentActionData = actions[selectedFilter.filterNumber].data;
         if (currentActionData === undefined) return;
 
-        if (
-            currentField?.type === FilterFieldType.String ||
-            currentField?.type === FilterFieldType.Number ||
-            currentField?.type === FilterFieldType.Date
-        ) {
+        if (currentField?.type === FilterFieldType.String || currentField?.type === FilterFieldType.Number) {
             setFilterValue(currentActionData);
             setSelectedFilter({ filterNumber: selectedFilter.filterNumber, isEditEnabled: true });
-
             return;
         }
 
@@ -344,6 +381,48 @@ export default function FilterWidgetRuleAction({
             setSelectedFilter({ filterNumber: selectedFilter.filterNumber, isEditEnabled: true });
 
             return;
+        }
+
+        // console.log('eod');
+        if (currentField && currentField.attributeContentType && checkIfFieldIsDate(currentField)) {
+            if (currentField.type === 'list') {
+                if (Array.isArray(currentActionData)) {
+                    const newFilterValue = currentActionData.map((v: any) => {
+                        console.log('array pick val', v);
+                        let label = '';
+                        let value = '';
+                        if (typeof v === 'string') {
+                            label = getFormattedDateTime(v);
+                            value = v;
+                        } else {
+                            label = v?.name || JSON.stringify(v);
+                            value = v;
+                        }
+
+                        return { label, value };
+                    });
+                    console.log('filtv multi', newFilterValue);
+                    setFilterValue(newFilterValue);
+                    setSelectedFilter({ filterNumber: selectedFilter.filterNumber, isEditEnabled: true });
+                    return;
+                } else {
+                    const value = currentActionData;
+                    const label = getFormattedDateTime(value as unknown as string);
+                    console.log('filtv sing', value);
+
+                    setFilterValue({ label, value });
+                    setSelectedFilter({ filterNumber: selectedFilter.filterNumber, isEditEnabled: true });
+                    return;
+                }
+            } else {
+                const value = currentActionData;
+                const label = getFormattedDateTime(value as unknown as string);
+                console.log('filtv sing', value);
+
+                setFilterValue(getFormattedDateByType(value as unknown as string, currentField.attributeContentType));
+                setSelectedFilter({ filterNumber: selectedFilter.filterNumber, isEditEnabled: true });
+                return;
+            }
         }
 
         if (currentField && !currentField?.multiValue) {
@@ -355,8 +434,11 @@ export default function FilterWidgetRuleAction({
             return;
         }
 
+        console.log('currentActionData', currentActionData);
+        console.log('!checkIfFieldIsDate(currentField)', currentField && !checkIfFieldIsDate(currentField));
         if (currentField && Array.isArray(currentActionData)) {
             const newFilterValue = currentActionData.map((v: any) => {
+                console.log('array pick val', v);
                 let label = '';
                 let value = '';
                 if (typeof v === 'string') {
@@ -373,7 +455,17 @@ export default function FilterWidgetRuleAction({
             setFilterValue(newFilterValue);
             setSelectedFilter({ filterNumber: selectedFilter.filterNumber, isEditEnabled: true });
         }
-    }, [selectedFilter, actions, currentFields, executionTypeEnum, booleanOptions, currentField, platformEnums, searchGroupEnum]);
+    }, [
+        selectedFilter,
+        actions,
+        currentFields,
+        executionTypeEnum,
+        booleanOptions,
+        currentField,
+        platformEnums,
+        searchGroupEnum,
+        checkIfFieldIsDate,
+    ]);
 
     useEffect(() => {
         // this effect is for updating the actions when the ExecutionsList is passed
@@ -448,6 +540,8 @@ export default function FilterWidgetRuleAction({
     );
 
     const isUpdateButtonDisabled = useMemo(() => !filterField || !fieldSource || !filterValue, [filterField, fieldSource, filterValue]);
+
+    console.log('filterValue', filterValue);
 
     return (
         <>

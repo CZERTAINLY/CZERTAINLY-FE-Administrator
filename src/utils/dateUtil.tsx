@@ -163,3 +163,34 @@ export function getFormattedUtc(type: AttributeContentType, dateString: string):
 
     return dateString;
 }
+
+export const getFormattedDateByType = (dateString: string, type: AttributeContentType): string => {
+    console.log('dateString', dateString);
+
+    if (type === 'time') {
+        // If the type is 'time', format the time string directly
+        const [hours, minutes, seconds] = dateString.split(':');
+        const formattedTime = `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}:${seconds.padStart(2, '0')}`;
+        return formattedTime; // Outputs: 22:22:02
+    }
+
+    const date = new Date(dateString);
+
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Months are 0-based in JavaScript
+    const year = date.getUTCFullYear();
+
+    const hours = String(date.getUTCHours()).padStart(2, '0');
+    const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+    const seconds = String(date.getUTCSeconds()).padStart(2, '0');
+
+    if (type === 'datetime') {
+        const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+        return formattedDate; // Outputs: 2024-12-12T07:43:13
+    } else if (type === 'date') {
+        const formattedDate = `${year}-${month}-${day}`;
+        return formattedDate; // Outputs: 2024-12-12
+    }
+
+    return dateString;
+};
