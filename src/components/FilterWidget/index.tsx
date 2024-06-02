@@ -89,6 +89,18 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
         [],
     );
 
+    const checkIfFieldIsDate = useCallback((field: SearchFieldDataDto) => {
+        if (
+            field.attributeContentType === AttributeContentType.Date ||
+            field.attributeContentType === AttributeContentType.Time ||
+            field.attributeContentType === AttributeContentType.Datetime
+        ) {
+            return true;
+        } else {
+            return false;
+        }
+    }, []);
+
     useEffect(() => {
         dispatch(actions.getAvailableFilters({ entity, getAvailableFiltersApi }));
     }, [dispatch, entity, getAvailableFiltersApi]);
@@ -165,7 +177,16 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
 
             setFilterValue(newFilterValue);
         }
-    }, [availableFilters, currentFilters, selectedFilter, booleanOptions, platformEnums, FilterConditionOperatorEnum, searchGroupEnum]);
+    }, [
+        availableFilters,
+        currentFilters,
+        selectedFilter,
+        booleanOptions,
+        platformEnums,
+        FilterConditionOperatorEnum,
+        searchGroupEnum,
+        checkIfFieldIsDate,
+    ]);
 
     const onUnselectFiltersClick = useCallback(
         (e: React.MouseEvent<HTMLDivElement>) => {
@@ -267,18 +288,6 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
 
     const currentField = useMemo(() => currentFields?.find((f) => f.fieldIdentifier === filterField?.value), [filterField, currentFields]);
 
-    const checkIfFieldIsDate = useCallback((field: SearchFieldDataDto) => {
-        if (
-            field.attributeContentType === AttributeContentType.Date ||
-            field.attributeContentType === AttributeContentType.Time ||
-            field.attributeContentType === AttributeContentType.Datetime
-        ) {
-            return true;
-        } else {
-            return false;
-        }
-    }, []);
-
     const objectValueOptions: ObjectValueOptions[] = useMemo(() => {
         if (!currentField) return [];
 
@@ -322,7 +331,7 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
         }
 
         return [];
-    }, [currentField, currentFilters, selectedFilter]);
+    }, [currentField, currentFilters, selectedFilter, checkIfFieldIsDate]);
 
     const getBadgeContent = useCallback(
         (itemNumber: number, fieldSource: string, fieldCondition: string, label: string, value: string) => {
