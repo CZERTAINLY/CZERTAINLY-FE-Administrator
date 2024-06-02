@@ -141,32 +141,25 @@ export function getFormattedDateTime(dateString: string): string {
 
 // type formatType = 'datetime' | 'date' | 'time';
 export function getFormattedUtc(type: AttributeContentType, dateString: string): string {
-    if (isNaN(Date.parse(dateString))) {
+    console.log('dateString', dateString);
+    if (type === 'datetime') {
+        const date = new Date(dateString);
+        return date.toISOString();
+    } else if (type === 'date') {
+        const date = new Date(dateString);
+        return date.toISOString().split('T')[0]; // returns YYYY-MM-DD
+    } else if (type === 'time') {
+        const timeParts = dateString.split(':');
+        if (timeParts.length === 2) {
+            // If the time string is in HH:mm format, add ':00' to make it HH:mm:ss
+            dateString += ':00';
+        } else if (timeParts.length === 1) {
+            // If the time string is in HH format, add ':00:00' to make it HH:mm:ss
+            dateString += ':00:00';
+        }
+        console.log('dateString', dateString);
         return dateString;
     }
 
-    let date = new Date(dateString);
-    let formattedDateTime = '';
-
-    switch (type) {
-        case 'datetime':
-            formattedDateTime = `${date.getUTCFullYear()}-${('0' + (date.getUTCMonth() + 1)).slice(-2)}-${('0' + date.getUTCDate()).slice(
-                -2,
-            )}T${('0' + date.getUTCHours()).slice(-2)}:${('0' + date.getUTCMinutes()).slice(-2)}:${('0' + date.getUTCSeconds()).slice(
-                -2,
-            )}Z`;
-            break;
-        case 'date':
-            formattedDateTime = `${date.getUTCFullYear()}-${('0' + (date.getUTCMonth() + 1)).slice(-2)}-${('0' + date.getUTCDate()).slice(
-                -2,
-            )}`;
-            break;
-        case 'time':
-            formattedDateTime = `${('0' + date.getUTCHours()).slice(-2)}:${('0' + date.getUTCMinutes()).slice(-2)}:${(
-                '0' + date.getUTCSeconds()
-            ).slice(-2)}`;
-            break;
-    }
-
-    return formattedDateTime;
+    return dateString;
 }

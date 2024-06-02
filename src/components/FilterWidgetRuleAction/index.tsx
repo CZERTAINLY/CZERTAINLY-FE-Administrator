@@ -13,6 +13,7 @@ import { SearchFieldListModel } from 'types/certificate';
 import { AttributeContentType, FilterFieldSource, FilterFieldType, PlatformEnum, SearchFieldDataDto } from 'types/openapi';
 import { ExecutionItemModel, ExecutionItemRequestModel } from 'types/rules';
 import { getFormType, getStepValue } from 'utils/common-utils';
+import { getFormattedUtc } from 'utils/dateUtil';
 import styles from './FilterWidgetRuleAction.module.scss';
 
 interface CurrentActionOptions {
@@ -123,9 +124,15 @@ export default function FilterWidgetRuleAction({
                               if (typeof v === 'object' && v.hasOwnProperty('uuid')) {
                                   return v.uuid;
                               }
+                              if (currentField?.attributeContentType && currentField && checkIfFieldIsDate(currentField)) {
+                                  console.log('v', v);
+                                  return getFormattedUtc(currentField.attributeContentType, v);
+                              }
                               return v;
                           })
-                        : a.data,
+                        : currentField?.attributeContentType && currentField
+                          ? [getFormattedUtc(currentField.attributeContentType, a.data as unknown as string) as Object]
+                          : a.data,
                 };
             });
 
@@ -143,12 +150,18 @@ export default function FilterWidgetRuleAction({
                               if (typeof v === 'object' && v.hasOwnProperty('uuid')) {
                                   return v.uuid;
                               }
+                              if (currentField?.attributeContentType && currentField && checkIfFieldIsDate(currentField)) {
+                                  console.log('v', v);
+                                  return getFormattedUtc(currentField.attributeContentType, v);
+                              }
                               return v;
                           })
-                        : a.data,
+                        : currentField?.attributeContentType && currentField
+                          ? [getFormattedUtc(currentField.attributeContentType, a.data as unknown as string) as Object]
+                          : a.data,
                 };
             });
-
+            console.log('updatedActionDataActions', updatedActionDataActions);
             onActionsUpdate && onActionsUpdate(updatedActionDataActions);
             setSelectedFilter({ filterNumber: -1, isEditEnabled: false });
         }
@@ -187,9 +200,15 @@ export default function FilterWidgetRuleAction({
                                   if (typeof v === 'object' && v.hasOwnProperty('uuid')) {
                                       return v.uuid;
                                   }
+                                  if (currentField?.attributeContentType && currentField && checkIfFieldIsDate(currentField)) {
+                                      console.log('v', v);
+                                      return getFormattedUtc(currentField.attributeContentType, v);
+                                  }
                                   return v;
                               })
-                            : a.data,
+                            : currentField?.attributeContentType && currentField
+                              ? [getFormattedUtc(currentField.attributeContentType, a.data as unknown as string) as Object]
+                              : a.data,
                     };
                 });
                 onActionsUpdate(actionsWithItemsUuids);
