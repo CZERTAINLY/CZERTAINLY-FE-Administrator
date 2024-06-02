@@ -16,9 +16,11 @@ import {
     FilterFieldSource,
     FilterFieldType,
     PlatformEnum,
+    SearchFieldDataDto,
     SearchFilterRequestDto,
 } from 'types/openapi';
 import { getFormType, getStepValue } from 'utils/common-utils';
+import { getFormattedDateTime } from 'utils/dateUtil';
 import styles from './FilterWidget.module.scss';
 
 const noValue: { [condition in FilterConditionOperator]: boolean } = {
@@ -132,7 +134,11 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
 
         if (!field.multiValue) {
             const value = currentFilters[selectedFilter].value;
-            const label = field.platformEnum ? platformEnums[field.platformEnum][(value ?? '') as string].label : value;
+            const label = field.platformEnum
+                ? platformEnums[field.platformEnum][(value ?? '') as string].label
+                : checkIfFieldIsDate(field)
+                  ? getFormattedDateTime(value as unknown as string)
+                  : value;
             setFilterValue({ label, value });
             return;
         }
@@ -143,7 +149,11 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
                 let label = '';
                 let value = '';
                 if (typeof v === 'string') {
-                    label = v;
+                    if (checkIfFieldIsDate(field)) {
+                        label = getFormattedDateTime(v);
+                    } else {
+                        label = v;
+                    }
                     value = v;
                 } else {
                     label = v?.name || JSON.stringify(v);
@@ -257,6 +267,18 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
 
     const currentField = useMemo(() => currentFields?.find((f) => f.fieldIdentifier === filterField?.value), [filterField, currentFields]);
 
+    const checkIfFieldIsDate = useCallback((field: SearchFieldDataDto) => {
+        if (
+            field.attributeContentType === AttributeContentType.Date ||
+            field.attributeContentType === AttributeContentType.Time ||
+            field.attributeContentType === AttributeContentType.Datetime
+        ) {
+            return true;
+        } else {
+            return false;
+        }
+    }, []);
+
     const objectValueOptions: ObjectValueOptions[] = useMemo(() => {
         if (!currentField) return [];
 
@@ -267,7 +289,11 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
                 let label = '';
                 let value = '';
                 if (typeof v === 'string') {
-                    label = v;
+                    if (checkIfFieldIsDate(currentField)) {
+                        label = getFormattedDateTime(v);
+                    } else {
+                        label = v;
+                    }
                     value = v;
                 } else {
                     label = v?.name || JSON.stringify(v);
@@ -465,7 +491,13 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
                                         .map(
                                             (v) =>
                                                 `'${
-                                                    field?.platformEnum ? platformEnums[field.platformEnum][v]?.label : v?.name ? v.name : v
+                                                    field?.platformEnum
+                                                        ? platformEnums[field.platformEnum][v]?.label
+                                                        : v?.name
+                                                          ? v.name
+                                                          : field && checkIfFieldIsDate(field)
+                                                            ? getFormattedDateTime(v)
+                                                            : v
                                                 }'`,
                                         )
                                         .join(' OR ')}`
@@ -473,7 +505,9 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
                                     ? `'${
                                           field?.platformEnum
                                               ? platformEnums[field.platformEnum][f.value as unknown as string]?.label
-                                              : f.value
+                                              : field && checkIfFieldIsDate(field)
+                                                ? getFormattedDateTime(f.value as unknown as string)
+                                                : f.value
                                       }'`
                                     : '';
                         return (
