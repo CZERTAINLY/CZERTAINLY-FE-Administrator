@@ -10,9 +10,9 @@ import Select, { MultiValue, SingleValue } from 'react-select';
 import { Badge, Button, Col, FormGroup, Input, Label, Row } from 'reactstrap';
 import { Observable } from 'rxjs';
 import { SearchFieldListModel } from 'types/certificate';
-import { AttributeContentType, FilterFieldSource, FilterFieldType, PlatformEnum } from 'types/openapi';
+import { AttributeContentType, FilterFieldSource, FilterFieldType, PlatformEnum, SearchFieldDataDto } from 'types/openapi';
 import { ExecutionItemModel, ExecutionItemRequestModel } from 'types/rules';
-import { getFormattedDateTime } from 'utils/dateUtil';
+import { getFormType, getStepValue } from 'utils/common-utils';
 import styles from './FilterWidgetRuleAction.module.scss';
 
 interface CurrentActionOptions {
@@ -215,6 +215,19 @@ export default function FilterWidgetRuleAction({
     );
 
     const currentField = useMemo(() => currentFields?.find((f) => f.fieldIdentifier === filterField?.value), [filterField, currentFields]);
+
+    const checkIfFieldIsDate = useCallback((field: SearchFieldDataDto) => {
+        if (
+            field.attributeContentType === AttributeContentType.Date ||
+            field.attributeContentType === AttributeContentType.Time ||
+            field.attributeContentType === AttributeContentType.Datetime
+        ) {
+            return true;
+        } else {
+            return false;
+        }
+    }, []);
+
     const objectValueOptions: CurrentActionOptions[] = useMemo(() => {
         if (!currentField) return [];
 
@@ -223,7 +236,7 @@ export default function FilterWidgetRuleAction({
                 let label = '';
                 let value = '';
                 if (typeof v === 'string') {
-                    label = currentField.attributeContentType === AttributeContentType.Datetime ? getFormattedDateTime(v) : v;
+                    label = v;
                     value = v;
                 } else {
                     label = v?.name || JSON.stringify(v);
@@ -316,11 +329,7 @@ export default function FilterWidgetRuleAction({
 
         if (currentField && !currentField?.multiValue) {
             const value = currentActionData;
-            const label = currentField.platformEnum
-                ? platformEnums[currentField.platformEnum][value as unknown as string].label
-                : currentField.attributeContentType === AttributeContentType.Datetime
-                  ? getFormattedDateTime(value as unknown as string)
-                  : value;
+            const label = currentField.platformEnum ? platformEnums[currentField.platformEnum][value as unknown as string].label : value;
             setFilterValue({ label, value });
             setSelectedFilter({ filterNumber: selectedFilter.filterNumber, isEditEnabled: true });
 
@@ -473,7 +482,16 @@ export default function FilterWidgetRuleAction({
                                     currentField?.type === FilterFieldType.Number ? (
                                         <Input
                                             id="value"
-                                            type={currentField?.type === FilterFieldType.Date ? 'date' : 'text'}
+                                            type={
+                                                currentField?.attributeContentType && checkIfFieldIsDate(currentField)
+                                                    ? getFormType(currentField?.attributeContentType)
+                                                    : 'text'
+                                            }
+                                            step={
+                                                currentField?.attributeContentType
+                                                    ? getStepValue(currentField?.attributeContentType)
+                                                    : undefined
+                                            }
                                             value={filterValue?.toString() || ''}
                                             onChange={(e) => {
                                                 setFilterValue(JSON.parse(JSON.stringify(e.target.value)));
@@ -523,44 +541,17 @@ export default function FilterWidgetRuleAction({
                                         .map(
                                             (v) =>
                                                 `'${
-                                                    field?.platformEnum
-                                                        ? platformEnums[field.platformEnum][v]?.label
-                                                        : v?.name
-                                                          ? v.name
-                                                          : field?.attributeContentType === AttributeContentType.Datetime
-                                                            ? getFormattedDateTime(v as unknown as string)
-                                                            : v
+                                                    field?.platformEnum ? platformEnums[field.platformEnum][v]?.label : v?.name ? v.name : v
                                                 }'`,
                                         )
-                                        .join(' OR ')}`
+                                        .join(', ')}`
                                   : f.data
                                     ? `'${
                                           field?.platformEnum
                                               ? platformEnums[field.platformEnum][f.data as unknown as string]?.label
-                                              : field?.attributeContentType === AttributeContentType.Datetime
-                                                ? getFormattedDateTime(f.data as unknown as string)
-                                                : f.data
+                                              : f.data
                                       }'`
                                     : '';
-                        // const value =
-                        //     field && field.type === FilterFieldType.Boolean
-                        //         ? `'${booleanOptions.find((b) => !!f.data === b.value)?.label}'`
-                        //         : Array.isArray(f.data)
-                        //           ? `${f.data
-                        //                 .map(
-                        //                     (v) =>
-                        //                         `'${
-                        //                             field?.platformEnum ? platformEnums[field.platformEnum][v]?.label : v?.name ? v.name : v
-                        //                         }'`,
-                        //                 )
-                        //                 .join(', ')}`
-                        //           : f.data
-                        //             ? `'${
-                        //                   field?.platformEnum
-                        //                       ? platformEnums[field.platformEnum][f.data as unknown as string]?.label
-                        //                       : f.data
-                        //               }'`
-                        //             : '';
                         return (
                             <Badge
                                 className={styles.filterBadge}

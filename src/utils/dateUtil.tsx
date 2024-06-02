@@ -1,5 +1,6 @@
 import { parseExpression } from 'cron-parser';
 import cronstrue from 'cronstrue';
+import { AttributeContentType } from 'types/openapi';
 
 function leading0(s: string, count: number) {
     while (s.length < count) {
@@ -134,6 +135,38 @@ export function getFormattedDateTime(dateString: string): string {
     let formattedDateTime = `${date.getFullYear()}-${('0' + (date.getMonth() + 1)).slice(-2)}-${('0' + date.getDate()).slice(-2)} ${(
         '0' + date.getHours()
     ).slice(-2)}:${('0' + date.getMinutes()).slice(-2)}:${('0' + date.getSeconds()).slice(-2)}`;
+
+    return formattedDateTime;
+}
+
+// type formatType = 'datetime' | 'date' | 'time';
+export function getFormattedUtc(type: AttributeContentType, dateString: string): string {
+    if (isNaN(Date.parse(dateString))) {
+        return dateString;
+    }
+
+    let date = new Date(dateString);
+    let formattedDateTime = '';
+
+    switch (type) {
+        case 'datetime':
+            formattedDateTime = `${date.getUTCFullYear()}-${('0' + (date.getUTCMonth() + 1)).slice(-2)}-${('0' + date.getUTCDate()).slice(
+                -2,
+            )}T${('0' + date.getUTCHours()).slice(-2)}:${('0' + date.getUTCMinutes()).slice(-2)}:${('0' + date.getUTCSeconds()).slice(
+                -2,
+            )}Z`;
+            break;
+        case 'date':
+            formattedDateTime = `${date.getUTCFullYear()}-${('0' + (date.getUTCMonth() + 1)).slice(-2)}-${('0' + date.getUTCDate()).slice(
+                -2,
+            )}`;
+            break;
+        case 'time':
+            formattedDateTime = `${('0' + date.getUTCHours()).slice(-2)}:${('0' + date.getUTCMinutes()).slice(-2)}:${(
+                '0' + date.getUTCSeconds()
+            ).slice(-2)}`;
+            break;
+    }
 
     return formattedDateTime;
 }

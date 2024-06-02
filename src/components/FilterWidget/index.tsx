@@ -422,9 +422,7 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
                                         <Input
                                             id="value"
                                             type={
-                                                currentField?.attributeContentType == AttributeContentType.Date ||
-                                                currentField?.attributeContentType == AttributeContentType.Time ||
-                                                currentField?.attributeContentType == AttributeContentType.Datetime
+                                                currentField?.attributeContentType && checkIfFieldIsDate(currentField)
                                                     ? getFormType(currentField?.attributeContentType)
                                                     : 'text'
                                             }
