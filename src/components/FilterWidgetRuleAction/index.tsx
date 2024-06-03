@@ -148,7 +148,11 @@ export default function FilterWidgetRuleAction({
                                   return v.uuid;
                               }
                               if (fieldOfAction?.attributeContentType && fieldOfAction && checkIfFieldIsDate(fieldOfAction)) {
-                                  console.log('v', v);
+                                  console.log('v1', v);
+                                  if (v.hasOwnProperty('value')) {
+                                      return getFormattedUtc(fieldOfAction.attributeContentType, v.value);
+                                  }
+
                                   return getFormattedUtc(fieldOfAction.attributeContentType, v);
                               }
                               return v;
@@ -177,7 +181,10 @@ export default function FilterWidgetRuleAction({
                                   return v.uuid;
                               }
                               if (fieldOfAction?.attributeContentType && fieldOfAction && checkIfFieldIsDate(fieldOfAction)) {
-                                  console.log('v', v);
+                                  console.log('v2', v);
+                                  if (v.hasOwnProperty('value')) {
+                                      return getFormattedUtc(fieldOfAction.attributeContentType, v.value);
+                                  }
                                   return getFormattedUtc(fieldOfAction.attributeContentType, v);
                               }
                               return v;
@@ -232,7 +239,7 @@ export default function FilterWidgetRuleAction({
                                       return v.uuid;
                                   }
                                   if (fieldOfAction?.attributeContentType && fieldOfAction && checkIfFieldIsDate(fieldOfAction)) {
-                                      console.log('v', v);
+                                      console.log('v3', v);
                                       return getFormattedUtc(fieldOfAction.attributeContentType, v);
                                   }
                                   return v;
@@ -483,8 +490,10 @@ export default function FilterWidgetRuleAction({
             if (Array.isArray(action.data) && action.data.every((v) => typeof v === 'string')) {
                 const thisCurrentFields = availableFilters.find((f) => f.filterFieldSource === action.fieldSource)?.searchFieldData;
                 if (!thisCurrentFields) return action;
-
                 const thisCurrentField = thisCurrentFields.find((f) => f.fieldIdentifier === action.fieldIdentifier);
+                if (thisCurrentField && checkIfFieldIsDate(thisCurrentField)) {
+                    console.log('action.data', action.data);
+                }
 
                 if (!thisCurrentField || !Array.isArray(thisCurrentField.value)) return action;
 
