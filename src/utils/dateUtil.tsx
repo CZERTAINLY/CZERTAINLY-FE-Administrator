@@ -1,5 +1,6 @@
 import { parseExpression } from 'cron-parser';
 import cronstrue from 'cronstrue';
+import { AttributeContentType } from 'types/openapi';
 
 function leading0(s: string, count: number) {
     while (s.length < count) {
@@ -137,3 +138,66 @@ export function getFormattedDateTime(dateString: string): string {
 
     return formattedDateTime;
 }
+
+export function getFormattedDate(dateString: string): string {
+    if (isNaN(Date.parse(dateString))) {
+        return dateString;
+    }
+
+    let date = new Date(dateString);
+    let formattedDate = `${date.getFullYear()}-${('0' + (date.getMonth() + 1)).slice(-2)}-${('0' + date.getDate()).slice(-2)}`;
+
+    return formattedDate;
+}
+
+// type formatType = 'datetime' | 'date' | 'time';
+export function getFormattedUtc(type: AttributeContentType, dateString: string): string {
+    if (type === 'datetime') {
+        const date = new Date(dateString);
+        return date.toISOString();
+    } else if (type === 'date') {
+        const date = new Date(dateString);
+        return date.toISOString().split('T')[0]; // returns YYYY-MM-DD
+    } else if (type === 'time') {
+        const timeParts = dateString.split(':');
+        if (timeParts.length === 2) {
+            // If the time string is in HH:mm format, add ':00' to make it HH:mm:ss
+            dateString += ':00';
+        } else if (timeParts.length === 1) {
+            // If the time string is in HH format, add ':00:00' to make it HH:mm:ss
+            dateString += ':00:00';
+        }
+        return dateString;
+    }
+
+    return dateString;
+}
+
+export const getFormattedDateByType = (dateString: string, type: AttributeContentType): string => {
+    if (type === 'time') {
+        // If the type is 'time', format the time string directly
+        const [hours, minutes, seconds] = dateString.split(':');
+        const formattedTime = `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}:${seconds.padStart(2, '0')}`;
+        return formattedTime; // Outputs: 22:22:02
+    }
+
+    const date = new Date(dateString);
+
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Months are 0-based in JavaScript
+    const year = date.getUTCFullYear();
+
+    const hours = String(date.getUTCHours()).padStart(2, '0');
+    const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+    const seconds = String(date.getUTCSeconds()).padStart(2, '0');
+
+    if (type === 'datetime') {
+        const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+        return formattedDate; // Outputs: 2024-12-12T07:43:13
+    } else if (type === 'date') {
+        const formattedDate = `${year}-${month}-${day}`;
+        return formattedDate; // Outputs: 2024-12-12
+    }
+
+    return dateString;
+};

@@ -10,7 +10,17 @@ import Select, { MultiValue, SingleValue } from 'react-select';
 import { Badge, Button, Col, FormGroup, Input, Label, Row } from 'reactstrap';
 import { Observable } from 'rxjs';
 import { SearchFieldListModel, SearchFilterModel } from 'types/certificate';
-import { FilterConditionOperator, FilterFieldSource, FilterFieldType, PlatformEnum, SearchFilterRequestDto } from 'types/openapi';
+import {
+    AttributeContentType,
+    FilterConditionOperator,
+    FilterFieldSource,
+    FilterFieldType,
+    PlatformEnum,
+    SearchFieldDataDto,
+    SearchFilterRequestDto,
+} from 'types/openapi';
+import { getFormType, getStepValue } from 'utils/common-utils';
+import { getFormattedDate, getFormattedDateTime } from 'utils/dateUtil';
 import styles from './FilterWidget.module.scss';
 
 const noValue: { [condition in FilterConditionOperator]: boolean } = {
@@ -79,6 +89,18 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
         [],
     );
 
+    const checkIfFieldIsDate = useCallback((field: SearchFieldDataDto) => {
+        if (
+            field.attributeContentType === AttributeContentType.Date ||
+            field.attributeContentType === AttributeContentType.Time ||
+            field.attributeContentType === AttributeContentType.Datetime
+        ) {
+            return true;
+        } else {
+            return false;
+        }
+    }, []);
+
     useEffect(() => {
         dispatch(actions.getAvailableFilters({ entity, getAvailableFiltersApi }));
     }, [dispatch, entity, getAvailableFiltersApi]);
@@ -124,7 +146,11 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
 
         if (!field.multiValue) {
             const value = currentFilters[selectedFilter].value;
-            const label = field.platformEnum ? platformEnums[field.platformEnum][(value ?? '') as string].label : value;
+            const label = field.platformEnum
+                ? platformEnums[field.platformEnum][(value ?? '') as string].label
+                : checkIfFieldIsDate(field)
+                  ? getFormattedDateTime(value as unknown as string)
+                  : value;
             setFilterValue({ label, value });
             return;
         }
@@ -135,7 +161,11 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
                 let label = '';
                 let value = '';
                 if (typeof v === 'string') {
-                    label = v;
+                    if (checkIfFieldIsDate(field)) {
+                        label = getFormattedDateTime(v);
+                    } else {
+                        label = v;
+                    }
                     value = v;
                 } else {
                     label = v?.name || JSON.stringify(v);
@@ -147,7 +177,16 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
 
             setFilterValue(newFilterValue);
         }
-    }, [availableFilters, currentFilters, selectedFilter, booleanOptions, platformEnums, FilterConditionOperatorEnum, searchGroupEnum]);
+    }, [
+        availableFilters,
+        currentFilters,
+        selectedFilter,
+        booleanOptions,
+        platformEnums,
+        FilterConditionOperatorEnum,
+        searchGroupEnum,
+        checkIfFieldIsDate,
+    ]);
 
     const onUnselectFiltersClick = useCallback(
         (e: React.MouseEvent<HTMLDivElement>) => {
@@ -257,7 +296,11 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
                 let label = '';
                 let value = '';
                 if (typeof v === 'string') {
-                    label = v;
+                    if (checkIfFieldIsDate(currentField)) {
+                        label = getFormattedDateTime(v);
+                    } else {
+                        label = v;
+                    }
                     value = v;
                 } else {
                     label = v?.name || JSON.stringify(v);
@@ -270,18 +313,18 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
             if (selectedFilter === -1) return objectOptions;
 
             const currentValue = currentFilters[selectedFilter].value;
-
             const filteredOptions = objectOptions.filter((o) => {
                 if (Array.isArray(currentValue)) {
                     return !currentValue.some((a) => a?.name === o?.label);
+                } else {
+                    return JSON.stringify(currentValue) !== o?.value;
                 }
             });
-
             return filteredOptions;
         }
 
         return [];
-    }, [currentField, currentFilters, selectedFilter]);
+    }, [currentField, currentFilters, selectedFilter, checkIfFieldIsDate]);
 
     const getBadgeContent = useCallback(
         (itemNumber: number, fieldSource: string, fieldCondition: string, label: string, value: string) => {
@@ -380,7 +423,16 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
                                     currentField?.type === FilterFieldType.Number ? (
                                         <Input
                                             id="value"
-                                            type={currentField?.type === FilterFieldType.Date ? 'date' : 'text'}
+                                            type={
+                                                currentField?.attributeContentType && checkIfFieldIsDate(currentField)
+                                                    ? getFormType(currentField?.attributeContentType)
+                                                    : 'text'
+                                            }
+                                            step={
+                                                currentField?.attributeContentType
+                                                    ? getStepValue(currentField?.attributeContentType)
+                                                    : undefined
+                                            }
                                             value={filterValue?.toString() || ''}
                                             onChange={(e) => {
                                                 setFilterValue(JSON.parse(JSON.stringify(e.target.value)));
@@ -439,7 +491,15 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
                                         .map(
                                             (v) =>
                                                 `'${
-                                                    field?.platformEnum ? platformEnums[field.platformEnum][v]?.label : v?.name ? v.name : v
+                                                    field?.platformEnum
+                                                        ? platformEnums[field.platformEnum][v]?.label
+                                                        : v?.name
+                                                          ? v.name
+                                                          : field && field?.attributeContentType === AttributeContentType.Date
+                                                            ? getFormattedDate(v)
+                                                            : field && field?.attributeContentType === AttributeContentType.Datetime
+                                                              ? getFormattedDateTime(v)
+                                                              : v
                                                 }'`,
                                         )
                                         .join(' OR ')}`
@@ -447,7 +507,11 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
                                     ? `'${
                                           field?.platformEnum
                                               ? platformEnums[field.platformEnum][f.value as unknown as string]?.label
-                                              : f.value
+                                              : field && field?.attributeContentType === AttributeContentType.Date
+                                                ? getFormattedDate(f.value as unknown as string)
+                                                : field && field?.attributeContentType === AttributeContentType.Datetime
+                                                  ? getFormattedDateTime(f.value as unknown as string)
+                                                  : f.value
                                       }'`
                                     : '';
                         return (

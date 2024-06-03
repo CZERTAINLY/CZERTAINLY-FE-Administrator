@@ -23,6 +23,7 @@ import type {
  */
 export interface TriggerHistoryRecordDto {
     /**
+     * Message with cause of action/condition failure.
      * @type {string}
      * @memberof TriggerHistoryRecordDto
      */
