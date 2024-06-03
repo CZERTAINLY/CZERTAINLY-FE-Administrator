@@ -18,7 +18,6 @@ interface ExecutionsItemsListProps {
 const ExecutionsItemsList = ({ executionItems = [], executionName, executionUuid }: ExecutionsItemsListProps) => {
     const searchGroupEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.FilterFieldSource));
     const availableFilters = useSelector(selectors.availableFilters(EntityType.ACTIONS));
-    const executionTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ExecutionType));
     const platformEnums = useSelector(enumSelectors.platformEnums);
 
     const booleanOptions = useMemo(
@@ -52,18 +51,14 @@ const ExecutionsItemsList = ({ executionItems = [], executionName, executionUuid
             let coincideValueToShow = '';
             if (Array.isArray(field?.value)) {
                 if (Array.isArray(f.data)) {
-                    const actionDataValue = f.data[0];
-                    const coincideValue = field?.value.find((v) => v.uuid === actionDataValue);
-                    coincideValueToShow = coincideValue?.name
-                        ? coincideValue.name
-                        : field && field.attributeContentType === AttributeContentType.Date
-                          ? getFormattedDate(actionDataValue)
-                          : field && field.attributeContentType === AttributeContentType.Datetime
-                            ? getFormattedDateTime(actionDataValue)
-                            : f.data.toString();
+                    const actionDataValues = f.data as string[];
+                    const coincideValues = field?.value.filter((v) => actionDataValues.includes(v.uuid));
+
+                    if (coincideValues?.length) coincideValueToShow = coincideValues?.map((v) => v.name).join(', ');
                 }
             }
-            value = coincideValueToShow.length
+
+            value = coincideValueToShow?.length
                 ? coincideValueToShow
                 : field && field.type === FilterFieldType.Boolean
                   ? `'${booleanOptions.find((b) => !!f.data === b.value)?.label}'`

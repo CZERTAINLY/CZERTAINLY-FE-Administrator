@@ -50,44 +50,34 @@ const ConditionsItemsList = ({ conditionItems = [], conditionName, conditionUuid
             const label = field ? field.fieldLabel : condition.fieldIdentifier;
 
             let value = '';
-            let coincideValueToShow = '';
 
-            if (Array.isArray(field?.value)) {
-                if (Array.isArray(condition.value)) {
-                    const conditionValue = condition.value[0];
-                    const coincideValue = field?.value.find((v) => v.uuid === conditionValue.uuid);
-                    coincideValueToShow = coincideValue?.name || '';
-                }
-            }
-
-            value = coincideValueToShow.length
-                ? coincideValueToShow
-                : field && field.type === FilterFieldType.Boolean
-                  ? `'${booleanOptions.find((b) => !!condition.value === b.value)?.label}'`
-                  : Array.isArray(condition.value)
-                    ? `${condition.value
-                          .map(
-                              (v) =>
-                                  `'${
-                                      field?.platformEnum
-                                          ? platformEnums[field.platformEnum][v]?.label
-                                          : v?.name
-                                            ? v.name
-                                            : field && checkIfFieldIsDate(field)
-                                              ? getFormattedDateTime(v)
-                                              : v
-                                  }'`,
-                          )
-                          .join(' OR ')}`
-                    : condition.value
-                      ? `'${
-                            field?.platformEnum
-                                ? platformEnums[field.platformEnum][condition.value as unknown as string]?.label
-                                : field && checkIfFieldIsDate(field)
-                                  ? getFormattedDateTime(condition.value as unknown as string)
-                                  : condition.value
-                        }'`
-                      : '';
+            value =
+                field && field.type === FilterFieldType.Boolean
+                    ? `'${booleanOptions.find((b) => !!condition.value === b.value)?.label}'`
+                    : Array.isArray(condition.value)
+                      ? `${condition.value
+                            .map(
+                                (v) =>
+                                    `'${
+                                        field?.platformEnum
+                                            ? platformEnums[field.platformEnum][v]?.label
+                                            : v?.name
+                                              ? v.name
+                                              : field && checkIfFieldIsDate(field)
+                                                ? getFormattedDateTime(v)
+                                                : v
+                                    }'`,
+                            )
+                            .join(' OR ')}`
+                      : condition.value
+                        ? `'${
+                              field?.platformEnum
+                                  ? platformEnums[field.platformEnum][condition.value as unknown as string]?.label
+                                  : field && checkIfFieldIsDate(field)
+                                    ? getFormattedDateTime(condition.value as unknown as string)
+                                    : condition.value
+                          }'`
+                        : '';
 
             return (
                 <Badge
