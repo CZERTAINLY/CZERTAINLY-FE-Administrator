@@ -111,7 +111,7 @@ const ConditionAndExecutionItemsViewer = ({ resource, formType }: ConditionGroup
                 {
                     <FilterWidgetRuleAction
                         entity={EntityType.ACTIONS}
-                        title={'Actions Items'}
+                        title={'Execution Items'}
                         busyBadges={isBusy}
                         disableBadgeRemove={disableBadgeRemove}
                         getAvailableFiltersApi={(apiClients: ApiClients) =>

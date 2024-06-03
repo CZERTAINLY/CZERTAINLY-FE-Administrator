@@ -20,7 +20,7 @@ import {
     SearchFilterRequestDto,
 } from 'types/openapi';
 import { getFormType, getStepValue } from 'utils/common-utils';
-import { getFormattedDateTime } from 'utils/dateUtil';
+import { getFormattedDate, getFormattedDateTime } from 'utils/dateUtil';
 import styles from './FilterWidget.module.scss';
 
 const noValue: { [condition in FilterConditionOperator]: boolean } = {
@@ -495,9 +495,11 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
                                                         ? platformEnums[field.platformEnum][v]?.label
                                                         : v?.name
                                                           ? v.name
-                                                          : field && checkIfFieldIsDate(field)
-                                                            ? getFormattedDateTime(v)
-                                                            : v
+                                                          : field && field?.attributeContentType === AttributeContentType.Date
+                                                            ? getFormattedDate(v)
+                                                            : field && field?.attributeContentType === AttributeContentType.Datetime
+                                                              ? getFormattedDateTime(v)
+                                                              : v
                                                 }'`,
                                         )
                                         .join(' OR ')}`

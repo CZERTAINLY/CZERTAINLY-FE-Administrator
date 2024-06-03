@@ -6,7 +6,7 @@ import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { Badge, Spinner } from 'reactstrap';
 import { AttributeContentType, ConditionItemDto, FilterFieldType, PlatformEnum, SearchFieldDataDto } from 'types/openapi';
-import { getFormattedDateTime } from 'utils/dateUtil';
+import { getFormattedDate, getFormattedDateTime } from 'utils/dateUtil';
 import styles from './conditionsItemsList.module.scss';
 
 interface ConditionsTableViewerProps {
@@ -63,9 +63,11 @@ const ConditionsItemsList = ({ conditionItems = [], conditionName, conditionUuid
                                             ? platformEnums[field.platformEnum][v]?.label
                                             : v?.name
                                               ? v.name
-                                              : field && checkIfFieldIsDate(field)
-                                                ? getFormattedDateTime(v)
-                                                : v
+                                              : field && field.attributeContentType === AttributeContentType.Date
+                                                ? getFormattedDate(v as unknown as string)
+                                                : field && field.attributeContentType === AttributeContentType.Datetime
+                                                  ? getFormattedDateTime(v as unknown as string)
+                                                  : v
                                     }'`,
                             )
                             .join(' OR ')}`
