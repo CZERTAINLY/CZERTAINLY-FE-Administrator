@@ -139,6 +139,17 @@ export function getFormattedDateTime(dateString: string): string {
     return formattedDateTime;
 }
 
+export function getFormattedDate(dateString: string): string {
+    if (isNaN(Date.parse(dateString))) {
+        return dateString;
+    }
+
+    let date = new Date(dateString);
+    let formattedDate = `${date.getFullYear()}-${('0' + (date.getMonth() + 1)).slice(-2)}-${('0' + date.getDate()).slice(-2)}`;
+
+    return formattedDate;
+}
+
 // type formatType = 'datetime' | 'date' | 'time';
 export function getFormattedUtc(type: AttributeContentType, dateString: string): string {
     if (type === 'datetime') {

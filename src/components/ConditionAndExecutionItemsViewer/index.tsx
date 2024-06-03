@@ -77,7 +77,7 @@ const ConditionAndExecutionItemsViewer = ({ resource, formType }: ConditionGroup
                 <FilterWidget
                     busyBadges={isBusy}
                     entity={EntityType.CONDITIONS}
-                    title={'Conditions'}
+                    title={'Condition Items'}
                     getAvailableFiltersApi={(apiClients: ApiClients) =>
                         apiClients.resources.listResourceRuleFilterFields({
                             resource,
@@ -111,7 +111,7 @@ const ConditionAndExecutionItemsViewer = ({ resource, formType }: ConditionGroup
                 {
                     <FilterWidgetRuleAction
                         entity={EntityType.ACTIONS}
-                        title={'Actions'}
+                        title={'Actions Items'}
                         busyBadges={isBusy}
                         disableBadgeRemove={disableBadgeRemove}
                         getAvailableFiltersApi={(apiClients: ApiClients) =>
