@@ -141,7 +141,6 @@ export function getFormattedDateTime(dateString: string): string {
 
 // type formatType = 'datetime' | 'date' | 'time';
 export function getFormattedUtc(type: AttributeContentType, dateString: string): string {
-    console.log('dateString', dateString);
     if (type === 'datetime') {
         const date = new Date(dateString);
         return date.toISOString();
@@ -157,7 +156,6 @@ export function getFormattedUtc(type: AttributeContentType, dateString: string):
             // If the time string is in HH format, add ':00:00' to make it HH:mm:ss
             dateString += ':00:00';
         }
-        console.log('dateString', dateString);
         return dateString;
     }
 
@@ -165,8 +163,6 @@ export function getFormattedUtc(type: AttributeContentType, dateString: string):
 }
 
 export const getFormattedDateByType = (dateString: string, type: AttributeContentType): string => {
-    console.log('dateString', dateString);
-
     if (type === 'time') {
         // If the type is 'time', format the time string directly
         const [hours, minutes, seconds] = dateString.split(':');

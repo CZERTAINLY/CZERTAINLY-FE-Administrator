@@ -323,7 +323,56 @@ export default function FilterWidgetRuleAction({
 
         return [];
     }, [currentField, actions, selectedFilter, checkIfFieldIsDate]);
+    const updateFilterValueDateTime = useCallback(() => {
+        const currentActionData = actions[selectedFilter.filterNumber]?.data;
+        const currentFieldThis = currentFields?.find((f) => f.fieldIdentifier === actions[selectedFilter.filterNumber]?.fieldIdentifier);
+        if (currentFieldThis && currentFieldThis.attributeContentType && checkIfFieldIsDate(currentFieldThis)) {
+            if (currentFieldThis.type === 'list') {
+                if (Array.isArray(currentActionData)) {
+                    const newFilterValue = currentActionData.map((v: any) => {
+                        let label = '';
+                        let value = '';
+                        if (typeof v === 'string') {
+                            if (checkIfFieldIsDate(currentFieldThis)) {
+                                label = getFormattedDateTime(v);
+                            } else {
+                                label = v;
+                            }
+                            value = v;
+                        } else {
+                            if (checkIfFieldIsDate(currentFieldThis)) {
+                                label = v.label;
+                                value = v.value;
+                            } else {
+                                label = v?.name || JSON.stringify(v);
+                                value = v;
+                            }
+                        }
 
+                        return { label, value };
+                    });
+                    setFilterValue(newFilterValue);
+                    setSelectedFilter({ filterNumber: selectedFilter.filterNumber, isEditEnabled: true });
+                    return;
+                } else {
+                    const value = currentActionData;
+                    const label = getFormattedDateTime(value as unknown as string);
+
+                    setFilterValue({ label, value });
+                    setSelectedFilter({ filterNumber: selectedFilter.filterNumber, isEditEnabled: true });
+                    return;
+                }
+            } else {
+                const value = currentActionData;
+                const label = getFormattedDateTime(value as unknown as string);
+                const formattedDate = getFormattedDateByType(value as unknown as string, currentFieldThis.attributeContentType);
+                setFilterValue(formattedDate);
+
+                setSelectedFilter({ filterNumber: selectedFilter.filterNumber, isEditEnabled: true });
+                return;
+            }
+        }
+    }, [actions, checkIfFieldIsDate, selectedFilter, currentFields]);
     useEffect(() => {
         // this effect is for updating dropdowns when a filter is selected
 
@@ -384,63 +433,11 @@ export default function FilterWidgetRuleAction({
             return;
         }
 
-        // console.log('eod');
         if (currentField && currentField.attributeContentType && checkIfFieldIsDate(currentField)) {
-            if (currentField.type === 'list') {
-                if (Array.isArray(currentActionData)) {
-                    const newFilterValue = currentActionData.map((v: any) => {
-                        let label = '';
-                        let value = '';
-                        console.log('currentActionData', currentActionData);
-                        if (typeof v === 'string') {
-                            if (checkIfFieldIsDate(currentField)) {
-                                console.log('data v', v);
-                                label = getFormattedDateTime(v);
-                            } else {
-                                label = v;
-                            }
-                            value = v;
-                        } else {
-                            if (checkIfFieldIsDate(currentField)) {
-                                label = v.label;
-                                value = v.value;
-                            } else {
-                                label = v?.name || JSON.stringify(v);
-                                value = v;
-                            }
-                        }
-
-                        return { label, value };
-                    });
-                    setFilterValue(newFilterValue);
-                    setSelectedFilter({ filterNumber: selectedFilter.filterNumber, isEditEnabled: true });
-                    return;
-                } else {
-                    const value = currentActionData;
-                    const label = getFormattedDateTime(value as unknown as string);
-                    console.log('value single select', value);
-                    console.log(
-                        'getformd single select',
-                        getFormattedDateByType(value as unknown as string, currentField.attributeContentType),
-                    );
-                    setFilterValue({ label, value });
-                    setSelectedFilter({ filterNumber: selectedFilter.filterNumber, isEditEnabled: true });
-                    return;
-                }
-            } else {
-                const value = currentActionData;
-                const label = getFormattedDateTime(value as unknown as string);
-                console.log('value single', value);
-                console.log('getformd', getFormattedDateByType(value as unknown as string, currentField.attributeContentType));
-                const formattedDate = getFormattedDateByType(value as unknown as string, currentField.attributeContentType);
-                setFilterValue(formattedDate);
-
-                setSelectedFilter({ filterNumber: selectedFilter.filterNumber, isEditEnabled: true });
-                return;
-            }
+            updateFilterValueDateTime();
         }
 
-        if (currentField && !currentField?.multiValue) {
+        if (currentField && !currentField?.multiValue && !checkIfFieldIsDate(currentField)) {
             const value = currentActionData;
             const label = currentField.platformEnum ? platformEnums[currentField.platformEnum][value as unknown as string].label : value;
             setFilterValue({ label, value });
@@ -449,9 +446,8 @@ export default function FilterWidgetRuleAction({
             return;
         }
 
-        if (currentField && Array.isArray(currentActionData)) {
+        if (currentField && Array.isArray(currentActionData) && !checkIfFieldIsDate(currentField)) {
             const newFilterValue = currentActionData.map((v: any) => {
-                console.log('array pick val', v);
                 let label = '';
                 let value = '';
                 if (typeof v === 'string') {
@@ -472,14 +468,15 @@ export default function FilterWidgetRuleAction({
         selectedFilter,
         actions,
         currentFields,
-        executionTypeEnum,
+        // executionTypeEnum,
+        updateFilterValueDateTime,
         booleanOptions,
         currentField,
         platformEnums,
         searchGroupEnum,
         checkIfFieldIsDate,
     ]);
-    console.log('fv', filterValue);
+
     useEffect(() => {
         // this effect is for updating the actions when the ExecutionsList is passed
         if (!ExecutionsList) return;
@@ -657,6 +654,34 @@ export default function FilterWidgetRuleAction({
                             .find((a) => a.filterFieldSource === f.fieldSource)
                             ?.searchFieldData?.find((s) => s.fieldIdentifier === f.fieldIdentifier);
                         const label = field ? field.fieldLabel : f.fieldIdentifier;
+                        // const value =
+                        //     field && field.type === FilterFieldType.Boolean
+                        //         ? `'${booleanOptions.find((b) => !!f.data === b.value)?.label}'`
+                        //         : Array.isArray(f.data)
+                        //           ? `${f.data
+                        //                 .map(
+                        //                     (v) =>
+                        //                         `'${
+                        //                             field?.platformEnum
+                        //                                 ? platformEnums[field.platformEnum][v]?.label
+                        //                                 : v?.name
+                        //                                   ? v.name
+                        //                                   : field && checkIfFieldIsDate(field)
+                        //                                     ? v?.label
+                        //                                         ? getFormattedDateTime(v.label)
+                        //                                         : getFormattedDateTime(v)
+                        //                                     : v
+                        //                         }'`,
+                        //                 )
+                        //                 .join(', ')}`
+                        //           : f.data
+                        //             ? `'${
+                        //                   field?.platformEnum
+                        //                       ? platformEnums[field.platformEnum][f.data as unknown as string]?.label
+                        //                       : f.data
+                        //               }'`
+                        //             : '';
+
                         const value =
                             field && field.type === FilterFieldType.Boolean
                                 ? `'${booleanOptions.find((b) => !!f.data === b.value)?.label}'`
@@ -665,15 +690,25 @@ export default function FilterWidgetRuleAction({
                                         .map(
                                             (v) =>
                                                 `'${
-                                                    field?.platformEnum ? platformEnums[field.platformEnum][v]?.label : v?.name ? v.name : v
+                                                    field?.platformEnum
+                                                        ? platformEnums[field.platformEnum][v]?.label
+                                                        : v?.name
+                                                          ? v.name
+                                                          : field && checkIfFieldIsDate(field)
+                                                            ? v?.label
+                                                                ? getFormattedDateTime(v?.label)
+                                                                : getFormattedDateTime(v)
+                                                            : v
                                                 }'`,
                                         )
-                                        .join(', ')}`
+                                        .join(' OR ')}`
                                   : f.data
                                     ? `'${
                                           field?.platformEnum
                                               ? platformEnums[field.platformEnum][f.data as unknown as string]?.label
-                                              : f.data
+                                              : field && checkIfFieldIsDate(field)
+                                                ? getFormattedDateTime(f.data as unknown as string)
+                                                : f.data
                                       }'`
                                     : '';
                         return (

@@ -291,8 +291,6 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
     const objectValueOptions: ObjectValueOptions[] = useMemo(() => {
         if (!currentField) return [];
 
-        // console.log('currentField?.value', currentField?.value);
-
         if (Array.isArray(currentField?.value)) {
             const objectOptions = currentField?.value?.map((v, i) => {
                 let label = '';
@@ -314,19 +312,14 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
 
             if (selectedFilter === -1) return objectOptions;
 
-            console.log('objectOptions', objectOptions);
-
             const currentValue = currentFilters[selectedFilter].value;
-            console.log('currentValue', currentValue);
             const filteredOptions = objectOptions.filter((o) => {
                 if (Array.isArray(currentValue)) {
                     return !currentValue.some((a) => a?.name === o?.label);
                 } else {
-                    console.log('JSON.stringify(currentValue) !== o?.value', JSON.stringify(currentValue) !== o?.value);
                     return JSON.stringify(currentValue) !== o?.value;
                 }
             });
-            console.log('filteredOptions', filteredOptions);
             return filteredOptions;
         }
 
