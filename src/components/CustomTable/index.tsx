@@ -4,6 +4,7 @@ import { Input, Pagination, PaginationItem, PaginationLink, Table } from 'reacts
 import { jsxInnerText } from 'utils/jsxInnerText';
 
 import styles from './CustomTable.module.scss';
+import NewRowWidget, { NewRowWidgetProps } from './NewRowWidget';
 
 export interface TableHeader {
     id: string;
@@ -43,6 +44,7 @@ interface Props {
     onCheckedRowsChanged?: (checkedRows: (string | number)[]) => void;
     onPageSizeChanged?: (pageSize: number) => void;
     onPageChanged?: (page: number) => void;
+    newRowWidgetProps?: NewRowWidgetProps;
 }
 
 const emptyCheckedRows: (string | number)[] = [];
@@ -62,11 +64,11 @@ function CustomTable({
     onCheckedRowsChanged,
     onPageSizeChanged,
     onPageChanged,
+    newRowWidgetProps,
 }: Props) {
     const [tblHeaders, setTblHeaders] = useState<TableHeader[]>();
     const [tblData, setTblData] = useState<TableDataRow[]>(data);
     const [tblCheckedRows, setTblCheckedRows] = useState<(string | number)[]>(checkedRows || emptyCheckedRows);
-
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [totalPages, setTotalPages] = useState(1);
@@ -428,7 +430,7 @@ function CustomTable({
                                 <td
                                     key={index}
                                     className={styles.dataCell}
-                                    style={tblHeaders && tblHeaders[index].align ? { textAlign: tblHeaders[index].align } : {}}
+                                    style={tblHeaders && tblHeaders[index]?.align ? { textAlign: tblHeaders[index]?.align } : {}}
                                 >
                                     <div>{column ? column : <></>}</div>
                                 </td>
@@ -517,7 +519,6 @@ function CustomTable({
             ) : (
                 <></>
             )}
-
             <div className="table-responsive">
                 <Table className={cx('table-hover', styles.logsTable)} size="sm">
                     {!hasHeader ? (
@@ -530,7 +531,6 @@ function CustomTable({
                     <tbody>{body}</tbody>
                 </Table>
             </div>
-
             {!hasPagination ? (
                 <></>
             ) : (
@@ -577,6 +577,15 @@ function CustomTable({
                         )}
                     </div>
                 </div>
+            )}
+            {newRowWidgetProps && (
+                <NewRowWidget
+                    selectHint={newRowWidgetProps.selectHint}
+                    immidiateAdd={newRowWidgetProps.immidiateAdd}
+                    isBusy={newRowWidgetProps.isBusy}
+                    newItemsList={newRowWidgetProps.newItemsList}
+                    onAddClick={newRowWidgetProps.onAddClick}
+                />
             )}
         </div>
     );

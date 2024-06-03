@@ -36,12 +36,12 @@ export default function CertificateUploadDialog({ onCancel, onUpload, okButtonTi
     const [certificate, setCertificate] = useState<CertificateDetailResponseModel | undefined>();
     const [fileContent, setFileContent] = useState('');
 
-    const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
+    const secondaryResourceCustomAttributes = useSelector(customAttributesSelectors.secondaryResourceCustomAttributes);
     const parsedCertificate = useSelector(utilsCertificateSelectors.parsedCertificate);
     const health = useSelector(utilsActuatorSelectors.health);
 
     useEffect(() => {
-        dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Certificates));
+        dispatch(customAttributesActions.listSecondaryResourceCustomAttributes(Resource.Certificates));
         dispatch(utilsCertificateActions.reset());
         dispatch(utilsActuatorActions.health());
     }, [dispatch]);
@@ -57,7 +57,7 @@ export default function CertificateUploadDialog({ onCancel, onUpload, okButtonTi
             onSubmit={(values) =>
                 onUpload({
                     fileContent: fileContent,
-                    customAttributes: collectFormAttributes('customUploadCertificate', resourceCustomAttributes, values),
+                    customAttributes: collectFormAttributes('customUploadCertificate', secondaryResourceCustomAttributes, values),
                     certificate: certificate,
                 })
             }
@@ -96,7 +96,10 @@ export default function CertificateUploadDialog({ onCancel, onUpload, okButtonTi
                                 {
                                     title: 'Custom Attributes',
                                     content: (
-                                        <AttributeEditor id="customUploadCertificate" attributeDescriptors={resourceCustomAttributes} />
+                                        <AttributeEditor
+                                            id="customUploadCertificate"
+                                            attributeDescriptors={secondaryResourceCustomAttributes}
+                                        />
                                     ),
                                 },
                             ]}

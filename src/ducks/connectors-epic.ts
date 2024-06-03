@@ -151,7 +151,7 @@ const createConnector: AppEpic = (action$, state, deps) => {
                                 slice.actions.createConnectorSuccess({
                                     connector: transformConnectorResponseDtoToModel(connector),
                                 }),
-                                appRedirectActions.redirect({ url: `../detail/${connector.uuid}` }),
+                                appRedirectActions.redirect({ url: `../connectors/detail/${connector.uuid}` }),
                             ),
                         ),
 
@@ -188,7 +188,7 @@ const updateConnector: AppEpic = (action$, state, deps) => {
                     mergeMap((connector) =>
                         of(
                             slice.actions.updateConnectorSuccess({ connector: transformConnectorResponseDtoToModel(connector) }),
-                            appRedirectActions.redirect({ url: `../../detail/${connector.uuid}` }),
+                            appRedirectActions.redirect({ url: `../../connectors/detail/${connector.uuid}` }),
                         ),
                     ),
 
@@ -209,7 +209,10 @@ const deleteConnector: AppEpic = (action$, state, deps) => {
         switchMap((action) =>
             deps.apiClients.connectors.deleteConnector({ uuid: action.payload.uuid }).pipe(
                 mergeMap(() =>
-                    of(slice.actions.deleteConnectorSuccess({ uuid: action.payload.uuid }), appRedirectActions.redirect({ url: '../../' })),
+                    of(
+                        slice.actions.deleteConnectorSuccess({ uuid: action.payload.uuid }),
+                        appRedirectActions.redirect({ url: '../../connectors' }),
+                    ),
                 ),
 
                 catchError((error) =>

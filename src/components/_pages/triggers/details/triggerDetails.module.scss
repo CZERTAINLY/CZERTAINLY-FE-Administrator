@@ -1,0 +1,13 @@
+@import 'src/resources/styles/app';
+
+.infoIcon {
+    color: $czertainly-blue;
+    font-size: small;
+    font-size: 14px;
+}
+
+.highLightWidget {
+    outline: 2px solid $czertainly-blue;
+    border-radius: 5px;
+    box-sizing: border-box;
+}

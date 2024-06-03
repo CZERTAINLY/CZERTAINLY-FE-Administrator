@@ -1,8 +1,8 @@
 import {
     ActionDto,
     ActionModel,
-    ResourceDto,
-    ResourceModel,
+    AuthResourceDto,
+    AuthResourceModel,
     RoleResponseDto,
     RoleResponseModel,
     UserCertificateDto,
@@ -14,7 +14,7 @@ import {
 } from 'types/auth';
 import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from './attributes';
 
-export function transformResourceDtoToModel(resource: ResourceDto): ResourceModel {
+export function transformResourceDtoToModel(resource: AuthResourceDto): AuthResourceModel {
     return {
         ...resource,
         actions: resource.actions.map(transformActionDtoToModel),

@@ -29,6 +29,7 @@ export type State = {
     isFetchingDetail: boolean;
     isFetchingResources: boolean;
     isFetchingResourceCustomAttributes: boolean;
+    isFetchingResourceSecondaryCustomAttributes: boolean;
     isCreating: boolean;
     isDeleting: boolean;
     isBulkDeleting: boolean;
@@ -51,6 +52,7 @@ export const initialState: State = {
     isFetchingDetail: false,
     isFetchingResources: false,
     isFetchingResourceCustomAttributes: false,
+    isFetchingResourceSecondaryCustomAttributes: false,
     isCreating: false,
     isDeleting: false,
     isBulkDeleting: false,
@@ -66,6 +68,14 @@ export const slice = createSlice({
     name: 'customAttributes',
     initialState,
     reducers: {
+        resetState: (state, action: PayloadAction<void>) => {
+            Object.keys(state).forEach((key) => {
+                if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined;
+            });
+
+            Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));
+        },
+
         setCheckedRows: (state, action: PayloadAction<{ checkedRows: string[] }>) => {
             state.checkedRows = action.payload.checkedRows;
         },
@@ -114,16 +124,16 @@ export const slice = createSlice({
 
         listSecondaryResourceCustomAttributes: (state, action: PayloadAction<Resource>) => {
             state.secondaryResourceCustomAttributes = [];
-            state.isFetchingResourceCustomAttributes = true;
+            state.isFetchingResourceSecondaryCustomAttributes = true;
         },
 
         listSecondaryResourceCustomAttributesSuccess: (state, action: PayloadAction<CustomAttributeModel[]>) => {
             state.secondaryResourceCustomAttributes = action.payload;
-            state.isFetchingResourceCustomAttributes = false;
+            state.isFetchingResourceSecondaryCustomAttributes = false;
         },
 
         listSecondaryResourceCustomAttributesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isFetchingResourceCustomAttributes = false;
+            state.isFetchingResourceSecondaryCustomAttributes = false;
         },
 
         createCustomAttribute: (state, action: PayloadAction<CustomAttributeCreateRequestModel>) => {
@@ -147,7 +157,7 @@ export const slice = createSlice({
 
         updateCustomAttributeSuccess: (state, action: PayloadAction<CustomAttributeDetailResponseModel>) => {
             state.isUpdating = false;
-            state.customAttribute = action.payload;
+            // state.customAttribute = action.payload;
         },
 
         updateCustomAttributeFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -209,6 +219,20 @@ export const slice = createSlice({
             action: PayloadAction<{ resource: Resource; resourceUuid: string; error: string | undefined }>,
         ) => {
             state.isUpdatingContent = false;
+        },
+
+        loadCustomAttributeContent: (state, action: PayloadAction<ResourceCustomAttributesContents>) => {
+            const index = state.resourceCustomAttributesContents.findIndex(
+                (r) => r.resource === action.payload.resource && r.resourceUuid === action.payload.resourceUuid,
+            );
+
+            if (index === -1) {
+                state.resourceCustomAttributesContents.push(action.payload);
+            } else {
+                state.resourceCustomAttributesContents[index].customAttributes = action.payload.customAttributes;
+            }
+
+            return state;
         },
 
         getCustomAttribute: (state, action: PayloadAction<string>) => {
@@ -364,6 +388,10 @@ const isFetchingList = createSelector(state, (state: State) => state.isFetchingL
 const isFetchingDetail = createSelector(state, (state: State) => state.isFetchingDetail);
 const isFetchingResources = createSelector(state, (state: State) => state.isFetchingResources);
 const isFetchingResourceCustomAttributes = createSelector(state, (state: State) => state.isFetchingResourceCustomAttributes);
+const isFetchingResourceSecondaryCustomAttributes = createSelector(
+    state,
+    (state: State) => state.isFetchingResourceSecondaryCustomAttributes,
+);
 const isCreating = createSelector(state, (state: State) => state.isCreating);
 const isDeleting = createSelector(state, (state: State) => state.isDeleting);
 const isBulkDeleting = createSelector(state, (state: State) => state.isBulkDeleting);
@@ -391,6 +419,7 @@ export const selectors = {
     isFetchingDetail,
     isFetchingResources,
     isFetchingResourceCustomAttributes,
+    isFetchingResourceSecondaryCustomAttributes,
     isDeleting,
     isBulkDeleting,
     isBulkEnabling,

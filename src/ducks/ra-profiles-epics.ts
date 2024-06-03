@@ -90,7 +90,9 @@ const createRaProfile: AppEpic = (action$, state$, deps) => {
                                 uuid: obj.uuid,
                                 authorityInstanceUuid: action.payload.authorityInstanceUuid,
                             }),
-                            appRedirectActions.redirect({ url: `../detail/${action.payload.authorityInstanceUuid}/${obj.uuid}` }),
+                            appRedirectActions.redirect({
+                                url: `../raprofiles/detail/${action.payload.authorityInstanceUuid}/${obj.uuid}`,
+                            }),
                         ),
                     ),
 
@@ -136,7 +138,12 @@ const updateRaProfile: AppEpic = (action$, state$, deps) => {
                         ),
                     ),
 
-                    catchError((err) => of(slice.actions.updateRaProfileFailure({ error: extractError(err, 'Failed to update profile') }))),
+                    catchError((err) =>
+                        of(
+                            (slice.actions.updateRaProfileFailure({ error: extractError(err, 'Failed to update profile') }),
+                            alertActions.error(extractError(err, 'Failed to update profile'))),
+                        ),
+                    ),
                 ),
         ),
     );

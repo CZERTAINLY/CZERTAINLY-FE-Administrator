@@ -60,11 +60,10 @@ export default function ConnectorForm() {
     );
 
     const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
-    // const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
 
     const isFetching = useSelector(connectorSelectors.isFetchingDetail);
-    // const isCreating = useSelector(connectorSelectors.isCreating);
-    // const isUpdating = useSelector(connectorSelectors.isUpdating);
+    const isCreating = useSelector(connectorSelectors.isCreating);
+    const isUpdating = useSelector(connectorSelectors.isUpdating);
     const isConnecting = useSelector(connectorSelectors.isConnecting);
     const isReconnecting = useSelector(connectorSelectors.isReconnecting);
 
@@ -122,7 +121,6 @@ export default function ConnectorForm() {
                             url: values.url,
                             authType: selectedAuthType.value,
                             customAttributes: collectFormAttributes('customConnector', resourceCustomAttributes, values),
-                            // authAttributes: []
                         },
                     }),
                 );
@@ -133,7 +131,6 @@ export default function ConnectorForm() {
                         url: values.url,
                         authType: selectedAuthType.value,
                         customAttributes: collectFormAttributes('customConnector', resourceCustomAttributes, values),
-                        // authAttributes: []
                     }),
                 );
             }
@@ -265,7 +262,6 @@ export default function ConnectorForm() {
                                                         invalid={!!meta.error && meta.touched}
                                                         type="text"
                                                         placeholder="Username"
-                                                        //disabled={editMode}
                                                     />
                                                     <FormFeedback>{meta.error}</FormFeedback>
                                                 </FormGroup>
@@ -283,7 +279,6 @@ export default function ConnectorForm() {
                                                         invalid={!!meta.error && meta.touched}
                                                         type="password"
                                                         placeholder="Password"
-                                                        // disabled={editMode}
                                                     />
 
                                                     <FormFeedback>{meta.error}</FormFeedback>
@@ -305,7 +300,6 @@ export default function ConnectorForm() {
                                                     invalid={!!meta.error && meta.touched}
                                                     type="file"
                                                     placeholder="clientCert"
-                                                    // disabled={editMode}
                                                 />
 
                                                 <FormFeedback>{meta.error}</FormFeedback>
@@ -447,7 +441,7 @@ export default function ConnectorForm() {
                                                     <ProgressButton
                                                         title={submitTitle}
                                                         inProgressTitle={inProgressTitle}
-                                                        inProgress={submitting}
+                                                        inProgress={isUpdating || isCreating}
                                                         disabled={pristine}
                                                     />
                                                 </ButtonGroup>

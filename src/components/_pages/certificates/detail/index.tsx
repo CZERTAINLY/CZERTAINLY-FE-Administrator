@@ -7,7 +7,6 @@ import Dialog from 'components/Dialog';
 import ProgressButton from 'components/ProgressButton';
 import Spinner from 'components/Spinner';
 import StatusBadge from 'components/StatusBadge';
-import { actions as alertActions } from 'ducks/alerts';
 import { actions as utilsActuatorActions } from 'ducks/utilsActuator';
 import { actions as userInterfaceActions } from '../../../../ducks/user-interface';
 
@@ -25,12 +24,13 @@ import { selectors as settingSelectors } from 'ducks/settings';
 import {
     CertificateState as CertStatus,
     CertificateFormatEncoding,
+    CertificateRequestFormat,
     CertificateRevocationReason,
     CertificateValidationStatus,
 } from '../../../../types/openapi';
 
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
@@ -71,7 +71,7 @@ import SwitchWidget from 'components/SwitchWidget';
 import { transformCertifacetObjectToNodesAndEdges } from 'ducks/transform/certificates';
 import { Edge } from 'reactflow';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { DeviceType, useDeviceType } from 'utils/common-hooks';
+import { DeviceType, useCopyToClipboard, useDeviceType } from 'utils/common-hooks';
 import CertificateStatus from '../CertificateStatus';
 import CertificateDownloadForm from './CertificateDownloadForm';
 import styles from './certificateDetail.module.scss';
@@ -84,16 +84,22 @@ interface ChainDownloadSwitchState {
     isCopyTriggered?: boolean;
 }
 
+interface SelectChangeValue {
+    value: string;
+    label: string;
+}
+
 export default function CertificateDetail() {
     const dispatch = useDispatch();
     const { id } = useParams();
 
+    const copyToClipboard = useCopyToClipboard();
     const certificate = useSelector(selectors.certificateDetail);
     const certificateChain = useSelector(selectors.certificateChain);
     const certificateChainDownloadContent = useSelector(selectors.certificateChainDownloadContent);
     const certificateDownloadContent = useSelector(selectors.certificateDownloadContent);
 
-    const groups = useSelector(groupSelectors.certificateGroups);
+    const groupsList = useSelector(groupSelectors.certificateGroups);
     const raProfiles = useSelector(raProfileSelectors.raProfiles);
     const users = useSelector(userSelectors.users);
 
@@ -113,7 +119,6 @@ export default function CertificateDetail() {
     const [certificateDownloadSwitch, setCertificateDownload] = useState<ChainDownloadSwitchState>({ isDownloadTriggered: false });
 
     const [isFlowTabOpenend, setIsFlowTabOpenend] = useState<boolean>(false);
-    const [groupOptions, setGroupOptions] = useState<{ label: string; value: string }[]>([]);
     const [raProfileOptions, setRaProfileOptions] = useState<{ label: string; value: string }[]>([]);
     const [userOptions, setUserOptions] = useState<{ label: string; value: string }[]>([]);
     const [certificateRevokeReasonOptions, setCertificateRevokeReasonOptions] = useState<{ label: string; value: string }[]>([]);
@@ -148,7 +153,7 @@ export default function CertificateDetail() {
     const deviceType = useDeviceType();
     const [currentInfoId, setCurrentInfoId] = useState('');
 
-    const [group, setGroup] = useState<string>();
+    const [groups, setGroups] = useState<SelectChangeValue[]>([]);
     const [ownerUuid, setOwnerUuid] = useState<string>();
     const [raProfile, setRaProfile] = useState<string>();
     const [raProfileAuthorityUuid, setRaProfileAuthorityUuid] = useState<string>();
@@ -324,10 +329,6 @@ export default function CertificateDetail() {
     }, [certificate, locations]);
 
     useEffect(() => {
-        setGroupOptions(groups.map((group) => ({ value: group.uuid, label: group.name })));
-    }, [dispatch, groups]);
-
-    useEffect(() => {
         setUserOptions(
             users.map((user) => ({
                 value: user.uuid,
@@ -339,12 +340,6 @@ export default function CertificateDetail() {
     useEffect(() => {
         setRaProfileOptions(raProfiles.map((group) => ({ value: group.uuid + ':#' + group.authorityInstanceUuid, label: group.name })));
     }, [dispatch, raProfiles]);
-
-    // useEffect(() => {
-    //     if (!certificate?.ownerUuid) {
-    //         setOwnerUuid(undefined);
-    //     }
-    // }, [certificate?.ownerUuid]);
 
     useEffect(() => {
         if (!certificateRevocationReason) return;
@@ -407,8 +402,13 @@ export default function CertificateDetail() {
 
     const onCancelGroupUpdate = useCallback(() => {
         setUpdateGroup(false);
-        setGroup(undefined);
-    }, [setUpdateGroup, setGroup]);
+        const certificatePreselectedGroups = certificate?.groups?.map((group) => ({
+            value: group.uuid,
+            label: group.name,
+        }));
+
+        setGroups(certificatePreselectedGroups || []);
+    }, [setUpdateGroup, setGroups, certificate?.groups]);
 
     const onCancelOwnerUpdate = useCallback(() => {
         setUpdateOwner(false);
@@ -427,11 +427,11 @@ export default function CertificateDetail() {
     }, [dispatch, certificate?.uuid]);
 
     const onUpdateGroup = useCallback(() => {
-        if (!certificate || !group) return;
+        if (!certificate || !groups) return;
 
-        dispatch(actions.updateGroup({ uuid: certificate.uuid, updateGroupRequest: { groupUuid: group } }));
+        dispatch(actions.updateGroup({ uuid: certificate.uuid, updateGroupRequest: { groupUuids: groups.map((group) => group.value) } }));
         setUpdateGroup(false);
-    }, [certificate, dispatch, group]);
+    }, [certificate, dispatch, groups]);
 
     const onUpdateOwner = useCallback(() => {
         if (!certificate || !ownerUuid || !users) {
@@ -478,7 +478,10 @@ export default function CertificateDetail() {
             dispatch(
                 actions.renewCertificate({
                     uuid: certificate?.uuid || '',
-                    renewRequest: { pkcs10: data.fileContent ? data.fileContent : undefined },
+                    renewRequest: {
+                        format: CertificateRequestFormat.Pkcs10,
+                        request: data.fileContent,
+                    },
                     raProfileUuid: certificate?.raProfile?.uuid || '',
                     authorityUuid: certificate?.raProfile?.authorityInstanceUuid || '',
                 }),
@@ -546,6 +549,26 @@ export default function CertificateDetail() {
             }),
         );
     }, [dispatch]);
+
+    useEffect(() => {
+        const certificatePreselectedGroups = certificate?.groups?.length
+            ? certificate.groups.map((group) => ({
+                  value: group.uuid,
+                  label: group.name,
+              }))
+            : [];
+
+        setGroups(certificatePreselectedGroups);
+    }, [certificate?.groups]);
+
+    const groupOptions = useMemo(
+        () =>
+            groupsList.map((group) => ({
+                value: group.uuid,
+                label: group.name,
+            })),
+        [groupsList],
+    );
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
@@ -615,14 +638,15 @@ export default function CertificateDetail() {
                 disabled: !certificate?.certificateContent,
                 tooltip: 'Copy certificate content',
                 onClick: () => {
-                    navigator.clipboard
-                        .writeText(formatPEM(certificate?.certificateContent ?? ''))
-                        .then(() => dispatch?.(alertActions.success?.('Certificate content was copied to clipboard')))
-                        .catch(() => dispatch?.(alertActions.error?.('Failed to copy certificate content to clipboard')));
+                    copyToClipboard(
+                        formatPEM(certificate?.certificateContent ?? ''),
+                        'Certificate content was copied to clipboard',
+                        'Failed to copy certificate content to clipboard',
+                    );
                 },
             },
         ],
-        [certificate, onComplianceCheck, dispatch, onDownloadClick],
+        [certificate, onComplianceCheck, dispatch, onDownloadClick, copyToClipboard],
     );
 
     const downloadCSRDropDown = useMemo(
@@ -649,12 +673,11 @@ export default function CertificateDetail() {
                             className={cx('fa fa-copy', styles.copyButton)}
                             onClick={() => {
                                 if (!certificate?.certificateRequest?.content) return;
-                                navigator.clipboard
-                                    .writeText(formatPEM(certificate?.certificateRequest?.content ?? '', true))
-                                    .then(() => dispatch?.(alertActions.success?.('Certificate request content was copied to clipboard')))
-                                    .catch(
-                                        () => dispatch?.(alertActions.error?.('Failed to copy certificate request content to clipboard')),
-                                    );
+                                copyToClipboard(
+                                    formatPEM(certificate?.certificateRequest?.content ?? '', true),
+                                    'Certificate request content was copied to clipboard',
+                                    'Failed to copy certificate request content to clipboard',
+                                );
                             }}
                         />
                     </div>
@@ -673,7 +696,7 @@ export default function CertificateDetail() {
                 </DropdownMenu>
             </UncontrolledButtonDropdown>
         ),
-        [certificate, fileNameToDownload, dispatch],
+        [certificate, fileNameToDownload, copyToClipboard],
     );
 
     const buttonsCSR: WidgetButtonProps[] = useMemo(
@@ -734,12 +757,17 @@ export default function CertificateDetail() {
                     maxMenuHeight={140}
                     menuPlacement="auto"
                     options={groupOptions}
-                    placeholder={`Select Group`}
-                    onChange={(event) => setGroup(event?.value)}
+                    placeholder={`Select Groups`}
+                    value={groups}
+                    onChange={(event) => {
+                        const newGroupsList = event.length ? [...event] : [];
+                        setGroups(newGroupsList);
+                    }}
+                    isMulti
                 />
             </div>
         );
-    }, [setGroup, groupOptions]);
+    }, [setGroups, groupOptions, groups]);
 
     const updateRaAndAuthorityState = useCallback((value: string) => {
         setRaProfile(value.split(':#')[0]);
@@ -993,6 +1021,7 @@ export default function CertificateDetail() {
                           ) : (
                               ''
                           ),
+                          '',
                       ],
                   },
                   {
@@ -1039,14 +1068,17 @@ export default function CertificateDetail() {
                       ],
                   },
                   {
-                      id: 'group',
+                      id: 'groups',
                       columns: [
-                          'Group',
-                          certificate?.group?.name ? (
-                              <Link to={`../../groups/detail/${certificate?.group.uuid}`}>{certificate?.group.name}</Link>
-                          ) : (
-                              'Unassigned'
-                          ),
+                          'Groups',
+                          certificate?.groups?.length
+                              ? certificate?.groups.map((group, i) => (
+                                    <React.Fragment key={group.uuid}>
+                                        <Link to={`../../groups/detail/${group.uuid}`}>{group.name}</Link>
+                                        {certificate?.groups?.length && i !== certificate.groups.length - 1 ? `, ` : ``}
+                                    </React.Fragment>
+                                ))
+                              : 'Unassigned',
                           <div className="d-flex">
                               <Button
                                   className="btn btn-link"
@@ -1064,11 +1096,11 @@ export default function CertificateDetail() {
                                   className="btn btn-link"
                                   size="sm"
                                   color="secondary"
-                                  disabled={!certificate?.group?.uuid}
+                                  disabled={!certificate?.groups?.length}
                                   onClick={() => {
-                                      if (!certificate?.group?.uuid || !id) return;
+                                      if (!id) return;
                                       dispatch(
-                                          actions.deleteGroup({
+                                          actions.deleteGroups({
                                               uuid: id,
                                           }),
                                       );
@@ -1405,7 +1437,7 @@ export default function CertificateDetail() {
             certDetail.unshift({
                 id: 'trustedCa',
                 columns: [
-                    'Trusted CA',
+                    certificate?.basicConstraints?.includes('End Entity') ? 'Trusted Self-Signed' : 'Trusted CA',
                     <SwitchWidget disabled={isUpdatingTrustedStatus} checked={certificate.trustedCa ?? false} onClick={switchCallback} />,
                 ],
             });
@@ -1911,11 +1943,11 @@ export default function CertificateDetail() {
 
             <Dialog
                 isOpen={updateGroup}
-                caption={`Update Group`}
+                caption={`Update Groups`}
                 body={updateGroupBody}
                 toggle={() => onCancelGroupUpdate()}
                 buttons={[
-                    { color: 'primary', onClick: () => onUpdateGroup(), body: 'Update', disabled: true ? group === undefined : false },
+                    { color: 'primary', onClick: () => onUpdateGroup(), body: 'Update' },
                     { color: 'secondary', onClick: () => onCancelGroupUpdate(), body: 'Cancel' },
                 ]}
             />

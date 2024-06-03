@@ -181,7 +181,7 @@ const createToken: AppEpic = (action$, state$, deps) => {
                     mergeMap((obj) =>
                         of(
                             slice.actions.createTokenSuccess({ uuid: obj.uuid }),
-                            appRedirectActions.redirect({ url: `../detail/${obj.uuid}` }),
+                            appRedirectActions.redirect({ url: `../tokens/detail/${obj.uuid}` }),
                         ),
                     ),
 
@@ -210,7 +210,7 @@ const updateToken: AppEpic = (action$, state$, deps) => {
                     mergeMap((tokenDto) =>
                         of(
                             slice.actions.updateTokenSuccess({ token: transformTokenDetailResponseDtoToModel(tokenDto) }),
-                            appRedirectActions.redirect({ url: `../../detail/${tokenDto.uuid}` }),
+                            appRedirectActions.redirect({ url: `../../tokens/detail/${tokenDto.uuid}` }),
                         ),
                     ),
 
@@ -231,7 +231,10 @@ const deleteToken: AppEpic = (action$, state$, deps) => {
         switchMap((action) =>
             deps.apiClients.tokenInstances.deleteTokenInstance({ uuid: action.payload.uuid }).pipe(
                 mergeMap(() =>
-                    of(slice.actions.deleteTokenSuccess({ uuid: action.payload.uuid }), appRedirectActions.redirect({ url: '../../' })),
+                    of(
+                        slice.actions.deleteTokenSuccess({ uuid: action.payload.uuid }),
+                        appRedirectActions.redirect({ url: '../../tokens' }),
+                    ),
                 ),
 
                 catchError((err) =>

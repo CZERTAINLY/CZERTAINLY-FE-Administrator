@@ -28,8 +28,8 @@ export default function CodeBlock({ content }: Props) {
     return (
         <>
             {content.data.language}&nbsp;
-            <Button className="btn btn-link p-0" color="white" title={content.data.language} onClick={() => setShowDialog(true)}>
-                <i className="fa fa-info" style={{ color: 'auto' }} />
+            <Button className="btn btn-link p-0 ms-2" color="white" title={content.data.language} onClick={() => setShowDialog(true)}>
+                <i className="fa fa-info" style={{ color: 'auto', marginBottom: '9px', fontSize: '14px' }} />
             </Button>
             <Dialog
                 isOpen={showDialog}

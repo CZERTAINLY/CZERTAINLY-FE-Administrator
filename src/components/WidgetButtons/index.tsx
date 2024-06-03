@@ -1,3 +1,4 @@
+import cx from 'classnames';
 import React from 'react';
 import { Button, ButtonProps } from 'reactstrap';
 
@@ -51,6 +52,7 @@ export interface WidgetButtonProps {
 
 interface Props {
     buttons: WidgetButtonProps[];
+    justify?: 'start' | 'end' | 'center';
 }
 
 const colors = {
@@ -133,7 +135,7 @@ const classNames = {
 
 //TODO: Add refresh button put it on left which should be optional
 
-function WidgetButtons({ buttons }: Props) {
+function WidgetButtons({ buttons, justify = 'center' }: Props) {
     const renderButton = (button: WidgetButtonProps) => {
         let toolTip: JSX.Element | undefined;
         let style;
@@ -166,7 +168,17 @@ function WidgetButtons({ buttons }: Props) {
         renderedButtons.push(renderButton(button));
     });
 
-    return <>{renderedButtons}</>;
+    return (
+        <div
+            className={cx('d-flex ms-2', {
+                'justify-content-start': justify === 'start',
+                'justify-content-center': justify === 'center',
+                'justify-content-end': justify === 'end',
+            })}
+        >
+            {renderedButtons}
+        </div>
+    );
 }
 
 export default WidgetButtons;

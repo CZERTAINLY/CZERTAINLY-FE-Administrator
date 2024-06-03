@@ -34,7 +34,9 @@ import { slice as notificationsSlice } from './notifications';
 import { slice as pagingSlice } from './paging';
 import { slice as raProfilesSlice } from './ra-profiles';
 // import { reducers } from "./reducers";
+import { slice as resourceSlice } from './resource';
 import { slice as rolesSlice } from './roles';
+import { slice as rulesSlice } from './rules';
 import { slice as schedulerSlice } from './scheduler';
 import { slice as settingsSlice } from './settings';
 import { slice as dashboardSlice } from './statisticsDashboard';
@@ -57,6 +59,8 @@ export const reducers = combineReducers<typeof initialState, any>({
     [pagingSlice.name]: pagingSlice.reducer,
     [usersSlice.name]: usersSlice.reducer,
     [rolesSlice.name]: rolesSlice.reducer,
+    [resourceSlice.name]: resourceSlice.reducer,
+    [rulesSlice.name]: rulesSlice.reducer,
     [certificatesSlice.name]: certificatesSlice.reducer,
     [authoritiesSlice.name]: authoritiesSlice.reducer,
     [raProfilesSlice.name]: raProfilesSlice.reducer,

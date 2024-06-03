@@ -23,6 +23,7 @@ import CustomSelectComponent from 'components/CustomSelectComponent';
 import { useDispatch, useSelector } from 'react-redux';
 import { AddNewAttributeList, AddNewAttributeType } from 'types/user-interface';
 import { getStepValue } from 'utils/common-utils';
+import { getFormattedDateTime } from 'utils/dateUtil';
 import { composeValidators, validateFloat, validateInteger, validatePattern, validateRequired } from 'utils/validators';
 import { actions as userInterfaceActions, selectors as userInterfaceSelectors } from '../../../../ducks/user-interface';
 import { getAttributeContent } from '../../../../utils/attributes/attributes';
@@ -42,6 +43,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
     const attributeCallbackValue = useSelector(userInterfaceSelectors.selectAttributeCallbackValue);
     const initiateAttributeCallback = useSelector(userInterfaceSelectors.selectInitiateAttributeCallback);
     const dispatch = useDispatch();
+
     useEffect(() => {
         if (descriptor?.name) {
             const addNewAttributeValue = AddNewAttributeList.find((a) => a.name === descriptor.name);
@@ -161,6 +163,20 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
         return composed;
     };
 
+    const getUpdatedOptionsForEditSelect = (
+        valuesRecieved: { label: string; value: any }[],
+        options?: { label: string; value: any }[],
+    ): { label: string; value: any }[] | undefined => {
+        if (valuesRecieved?.length > 0) {
+            const updatedOptions = options?.filter((option) => {
+                return !valuesRecieved.some((value) => JSON.stringify(value.value) == JSON.stringify(option.value));
+            });
+            return updatedOptions;
+        }
+
+        return options;
+    };
+
     const createSelect = (descriptor: DataAttributeModel | CustomAttributeModel): JSX.Element => {
         return (
             <Field name={name} validate={buildValidators()} type={getFormType(descriptor.contentType)}>
@@ -180,7 +196,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                                 {...input}
                                 maxMenuHeight={140}
                                 menuPlacement="auto"
-                                options={options}
+                                options={getUpdatedOptionsForEditSelect(input.value, options)}
                                 placeholder={`Select ${descriptor.properties.label}`}
                                 styles={{
                                     control: (provided) =>
@@ -408,6 +424,9 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                             placeholder={`Enter ${descriptor.properties.label}`}
                             disabled={descriptor.properties.readOnly || busy}
                             step={getStepValue(descriptor.contentType)}
+                            value={
+                                descriptor.contentType === AttributeContentType.Datetime ? getFormattedDateTime(input.value) : input.value
+                            }
                         />
 
                         {descriptor.properties.visible && descriptor.contentType === AttributeContentType.Boolean ? (

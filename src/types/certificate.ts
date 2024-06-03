@@ -66,7 +66,7 @@ export type CertificateDetailResponseModel = Omit<
     metadata?: Array<MetadataModel>;
     raProfile?: RaProfileSimplifiedModel;
     locations?: Array<LocationResponseModel>;
-    group?: CertificateGroupResponseModel;
+    groups?: Array<CertificateGroupResponseModel>;
     nonCompliantRules?: Array<CertificateComplianceResponseModel>;
     customAttributes?: Array<AttributeResponseModel>;
 };

@@ -1,12 +1,12 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ResourceModel, UserDetailModel, UserUpdateRequestModel } from 'types/auth';
+import { AuthResourceModel, UserDetailModel, UserUpdateRequestModel } from 'types/auth';
 import { NameAndUuidModel } from 'types/locations';
 import { Resource } from 'types/openapi';
 import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     profile?: UserDetailModel;
-    resources?: ResourceModel[];
+    resources?: AuthResourceModel[];
     objects?: NameAndUuidModel[];
 
     isFetchingProfile: boolean;
@@ -57,6 +57,10 @@ export const slice = createSlice({
             state.isFetchingProfile = false;
         },
 
+        resetProfile(state, action: PayloadAction<void>) {
+            state.profile = undefined;
+        },
+
         updateProfile(state, action: PayloadAction<{ profile: UserUpdateRequestModel; redirect?: string }>) {
             state.isUpdatingProfile = true;
         },
@@ -70,17 +74,17 @@ export const slice = createSlice({
             state.isUpdatingProfile = false;
         },
 
-        getResources(state, action: PayloadAction<void>) {
+        getAuthResources(state, action: PayloadAction<void>) {
             state.isFetchingResources = true;
             state.resources = undefined;
         },
 
-        getResourcesSuccess(state, action: PayloadAction<{ resources: ResourceModel[] }>) {
+        getAuthResourcesSuccess(state, action: PayloadAction<{ resources: AuthResourceModel[] }>) {
             state.isFetchingResources = false;
             state.resources = action.payload.resources;
         },
 
-        getResourcesFailure(state, action: PayloadAction<void>) {
+        getAuthResourcesFailure(state, action: PayloadAction<void>) {
             state.isFetchingResources = false;
         },
 

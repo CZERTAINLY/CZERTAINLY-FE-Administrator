@@ -1,14 +1,22 @@
+import { configureStore } from '@reduxjs/toolkit';
 import { mount } from 'cypress/react18';
+import { reducers } from 'ducks/reducers';
 
-// Augment the Cypress namespace to include type definitions for
-// your custom command.
-// Alternatively, can be defined in cypress/support/component.d.ts
-// with a <reference path="./component" /> at the top of your spec.
+const reduxStore = configureStore({
+    reducer: reducers,
+    middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware({
+            serializableCheck: false,
+        }),
+});
 declare global {
     namespace Cypress {
         interface Chainable {
             mount: typeof mount;
             dataCy(value: string): Chainable<JQuery<HTMLElement>>;
         }
+    }
+    interface Window {
+        store: typeof reduxStore;
     }
 }

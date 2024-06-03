@@ -70,7 +70,7 @@ export default function ScepProfileDetail() {
     const onForceDeleteScepProfile = useCallback(() => {
         if (!scepProfile) return;
 
-        dispatch(actions.bulkForceDeleteScepProfiles({ uuids: [scepProfile.uuid], redirect: `../` }));
+        dispatch(actions.bulkForceDeleteScepProfiles({ uuids: [scepProfile.uuid], redirect: `../scepprofiles` }));
     }, [scepProfile, dispatch]);
 
     const buttons: WidgetButtonProps[] = useMemo(

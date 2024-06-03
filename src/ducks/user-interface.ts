@@ -1,13 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { createSelector } from 'reselect';
 import { AjaxError } from 'rxjs/ajax';
-import { GloablModalModel, LockWidgetNameEnum, WidgetLockErrorModel, WidgetLockModel } from 'types/user-interface';
+import { GlobalModalModel, LockWidgetNameEnum, WidgetLockErrorModel, WidgetLockModel } from 'types/user-interface';
 import { createFeatureSelector } from 'utils/ducks';
 import { getLockWidgetObject } from 'utils/net';
 
 export type State = {
     widgetLocks: WidgetLockModel[];
-    globalModal: GloablModalModel;
+    globalModal: GlobalModalModel;
     initiateAttributeCallback?: boolean;
     attributeCallbackValue?: string;
     initiateFormCallback?: boolean;
@@ -20,8 +20,13 @@ export const initialState: State = {
         title: undefined,
         size: 'sm',
         content: undefined,
-        type: undefined,
         isOpen: false,
+        showCancelButton: false,
+        showOkButton: false,
+        showCloseButton: false,
+        showSubmitButton: false,
+        okButtonCallback: undefined,
+        cancelButtonCallback: undefined,
     },
 };
 
@@ -31,6 +36,14 @@ export const slice = createSlice({
     initialState,
 
     reducers: {
+        resetState: (state, action: PayloadAction<void>) => {
+            Object.keys(state).forEach((key) => {
+                if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined;
+            });
+
+            Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));
+        },
+
         insertWidgetLock: {
             prepare: (error: AjaxError | WidgetLockErrorModel, lockWidgetName: LockWidgetNameEnum) => {
                 let payload;
@@ -57,7 +70,7 @@ export const slice = createSlice({
             state.widgetLocks = state.widgetLocks.filter((widgetLock) => widgetLock.widgetName !== action.payload);
         },
 
-        showGlobalModal: (state, action: PayloadAction<GloablModalModel>) => {
+        showGlobalModal: (state, action: PayloadAction<GlobalModalModel>) => {
             state.globalModal = action.payload;
         },
 

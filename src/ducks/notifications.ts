@@ -26,7 +26,9 @@ export type State = {
     isCreatingNotificationInstance: boolean;
     isEditingNotificationInstance: boolean;
     isDeleting: boolean;
+    isBulkDeleting: boolean;
     isMarking: boolean;
+    isBulkMarking: boolean;
 };
 
 export const initialState: State = {
@@ -44,7 +46,9 @@ export const initialState: State = {
     isFetchingOverview: false,
     isEditingNotificationInstance: false,
     isDeleting: false,
+    isBulkDeleting: false,
     isMarking: false,
+    isBulkMarking: false,
 };
 
 export const slice = createSlice({
@@ -93,11 +97,11 @@ export const slice = createSlice({
             state.isMarking = true;
         },
 
-        markAsReadNotificationSuccess: (state, action: PayloadAction<NotificationModel>) => {
+        markAsReadNotificationSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isMarking = false;
 
             const index = state.notifications.findIndex((a) => a.uuid === action.payload.uuid);
-            if (index !== -1) state.notifications[index].readAt = action.payload.readAt;
+            if (index !== -1) state.notifications[index].readAt = Date.now().toString();
         },
 
         markAsReadNotificationFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -222,6 +226,41 @@ export const slice = createSlice({
         listMappingAttributesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingMappingAttributes = false;
         },
+
+        bulkDeleteNotification: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.isBulkDeleting = true;
+        },
+
+        bulkDeleteNotificationSuccess: (state, action: PayloadAction<{ deletedNotificationUuids: string[] }>) => {
+            state.notifications = state.notifications.filter(
+                (notification) => action.payload.deletedNotificationUuids.indexOf(notification.uuid) === -1,
+            );
+            state.deleteErrorMessage = undefined;
+            state.isBulkDeleting = false;
+        },
+
+        bulkDeleteNotificationFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.deleteErrorMessage = action.payload.error;
+            state.isBulkDeleting = false;
+        },
+
+        bulkMarkNotificationAsRead: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.isBulkMarking = true;
+        },
+
+        bulkMarkNotificationAsReadSuccess: (state, action: PayloadAction<{ markedNotificationUuids: string[] }>) => {
+            state.notifications = state.notifications.map((notification) => {
+                if (action.payload.markedNotificationUuids.includes(notification.uuid)) {
+                    notification.readAt = Date.now().toString();
+                }
+                return notification;
+            });
+            state.isBulkMarking = false;
+        },
+
+        bulkMarkNotificationAsReadFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isBulkMarking = false;
+        },
     },
 });
 
@@ -244,7 +283,9 @@ const isFetchingNotificationInstanceDetail = createSelector(state, (state) => st
 const isFetchingNotificationInstances = createSelector(state, (state) => state.isFetchingNotificationInstances);
 const isFetchingOverview = createSelector(state, (state) => state.isFetchingOverview);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
+const isBulkDeleting = createSelector(state, (state) => state.isBulkDeleting);
 const isMarking = createSelector(state, (state) => state.isMarking);
+const isBulkMarking = createSelector(state, (state) => state.isBulkMarking);
 
 export const selectors = {
     state,
@@ -265,7 +306,9 @@ export const selectors = {
     isFetchingNotificationInstances,
     isFetchingOverview,
     isDeleting,
+    isBulkDeleting,
     isMarking,
+    isBulkMarking,
 };
 
 export const actions = slice.actions;

@@ -130,7 +130,7 @@ const addEntity: AppEpic = (action$, state$, deps) => {
                     mergeMap((obj) =>
                         of(
                             slice.actions.addEntitySuccess({ uuid: obj.uuid }),
-                            appRedirectActions.redirect({ url: `../detail/${obj.uuid}` }),
+                            appRedirectActions.redirect({ url: `../entities/detail/${obj.uuid}` }),
                         ),
                     ),
 
@@ -161,7 +161,7 @@ const updateEntity: AppEpic = (action$, state$, deps) => {
                     mergeMap((entity) =>
                         of(
                             slice.actions.updateEntitySuccess({ entity: transformEntityResponseDtoToModel(entity) }),
-                            appRedirectActions.redirect({ url: `../../detail/${entity.uuid}` }),
+                            appRedirectActions.redirect({ url: `../../entities/detail/${entity.uuid}` }),
                         ),
                     ),
 

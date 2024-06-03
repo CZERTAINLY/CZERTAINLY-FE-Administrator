@@ -6,16 +6,18 @@ import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions, selectors } from 'ducks/discoveries';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
 
 import { Col, Container, Label, Row } from 'reactstrap';
 
+import CustomAttributeWidget from 'components/Attributes/CustomAttributeWidget';
+import { actions as rulesActions, selectors as ruleSelectors } from 'ducks/rules';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { dateFormatter } from 'utils/dateUtil';
-import { Resource } from '../../../../types/openapi';
-import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
+import { PlatformEnum, Resource } from '../../../../types/openapi';
 import DiscoveryStatus from '../DiscoveryStatus';
 import DiscoveryCertificates from './DiscoveryCertificates';
 
@@ -30,13 +32,33 @@ export default function DiscoveryDetail() {
     const isDeleting = useSelector(selectors.isDeleting);
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const eventNameEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ResourceEvent));
+    const triggerHistorySummary = useSelector(ruleSelectors.triggerHistorySummary);
+    const isFetchingTriggerSummary = useSelector(ruleSelectors.isFetchingTriggerHistorySummary);
+    const isFetchingRuleTriggerHistories = useSelector(ruleSelectors.isFetchingTriggerHistories);
 
-    const isBusy = useMemo(() => isFetching || isDeleting, [isFetching, isDeleting]);
+    const isBusy = useMemo(
+        () => isFetching || isDeleting || isFetchingRuleTriggerHistories,
+        [isFetching, isDeleting, isFetchingRuleTriggerHistories],
+    );
+    const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
+    const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.TriggerType));
+
+    // useEffect(() => {
+    //     if (!id) return;
+    //     dispatch(rulesActions.getTriggerHistorySummary({ triggerObjectUuid: id }));
+    // }, [id, dispatch]);
+
+    const getFreshTriggerHistorySummary = useCallback(() => {
+        if (!id) return;
+        dispatch(rulesActions.getTriggerHistorySummary({ triggerObjectUuid: id }));
+    }, [id, dispatch]);
 
     const getFreshDiscoveryDetails = useCallback(() => {
         if (!id) return;
         dispatch(actions.resetState());
         dispatch(actions.getDiscoveryDetail({ uuid: id }));
+        dispatch(rulesActions.getTriggerHistorySummary({ triggerObjectUuid: id }));
     }, [id, dispatch]);
 
     useEffect(() => {
@@ -137,28 +159,97 @@ export default function DiscoveryDetail() {
         [discovery],
     );
 
+    const triggerHeaders: TableHeader[] = [
+        {
+            id: 'name',
+            content: 'Name',
+        },
+        {
+            id: 'eventResource',
+            content: 'Event Resource',
+        },
+        {
+            id: 'triggerType',
+            content: 'Trigger Type',
+        },
+        {
+            id: 'ignoreTrigger',
+            content: 'Ignore Trigger',
+        },
+        {
+            id: 'eventName',
+            content: 'Event Name',
+        },
+        {
+            id: 'resource',
+            content: 'Resource',
+        },
+        {
+            id: 'description',
+            content: 'Description',
+        },
+    ];
+
+    const triggerTableData: TableDataRow[] = discovery?.triggers.length
+        ? discovery.triggers.map((trigger) => ({
+              id: trigger.uuid,
+              columns: [
+                  <Link to={`../../triggers/detail/${trigger.uuid}`}>{trigger.name}</Link>,
+                  trigger?.eventResource ? getEnumLabel(resourceTypeEnum, trigger.eventResource) : '',
+                  getEnumLabel(triggerTypeEnum, trigger.type),
+                  trigger.ignoreTrigger ? 'Yes' : 'No',
+                  getEnumLabel(eventNameEnum, trigger.event || ''),
+                  getEnumLabel(resourceTypeEnum, trigger.resource || ''),
+                  trigger.description || '',
+              ],
+          }))
+        : [];
+
+    const triggersSummary: TableDataRow[] = !triggerHistorySummary
+        ? []
+        : [
+              {
+                  id: 'objectsEvaluated',
+                  columns: ['Number of Objects Evaluated', triggerHistorySummary?.objectsEvaluated.toString() || '0'],
+              },
+              {
+                  id: 'objectsMatched',
+                  columns: ['Number of Objects Matched', triggerHistorySummary?.objectsMatched.toString() || '0'],
+              },
+              {
+                  id: 'objectsIgnored',
+                  columns: ['Number of Objects Ignored', triggerHistorySummary?.objectsIgnored.toString() || '0'],
+              },
+          ];
+
     return (
         <Container className="themed-container" fluid>
-            <Widget
-                title="Certificate Discovery Details"
-                busy={isBusy}
-                widgetButtons={buttons}
-                titleSize="large"
-                refreshAction={getFreshDiscoveryDetails}
-                widgetLockName={LockWidgetNameEnum.DiscoveryDetails}
-            >
-                <br />
-
-                <CustomTable headers={detailHeaders} data={detailData} />
-            </Widget>
-
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
+                <Col>
+                    <Widget
+                        title="Certificate Discovery Details"
+                        busy={isBusy}
+                        widgetButtons={buttons}
+                        titleSize="large"
+                        refreshAction={getFreshDiscoveryDetails}
+                        widgetLockName={LockWidgetNameEnum.DiscoveryDetails}
+                    >
+                        <br />
+
+                        <CustomTable headers={detailHeaders} data={detailData} />
+                    </Widget>
+                </Col>
                 <Col>
                     <Widget title="Attributes" titleSize="large">
                         <br />
                         <Label>Discovery Attributes</Label>
                         <AttributeViewer attributes={discovery?.attributes} />
                     </Widget>
+                </Col>
+            </Row>
+
+            <Row xs="1" sm="1" md="2" lg="2" xl="2">
+                <Col>
                     {discovery && (
                         <CustomAttributeWidget
                             resource={Resource.Discoveries}
@@ -175,7 +266,27 @@ export default function DiscoveryDetail() {
                 </Col>
             </Row>
 
-            {discovery?.uuid && <DiscoveryCertificates id={discovery.uuid} />}
+            <Row>
+                <Col md={triggerHistorySummary?.associationObjectUuid !== id ? '12' : '8'}>
+                    <Widget title="Assigned Triggers" busy={isBusy} titleSize="large" widgetLockName={LockWidgetNameEnum.DiscoveryDetails}>
+                        <CustomTable headers={triggerHeaders} data={triggerTableData} />
+                    </Widget>
+                </Col>
+
+                {triggerHistorySummary?.associationObjectUuid === id && (
+                    <Col md="4">
+                        <Widget
+                            title="Triggers summary"
+                            titleSize="large"
+                            busy={isFetchingTriggerSummary}
+                            refreshAction={getFreshTriggerHistorySummary}
+                        >
+                            <CustomTable headers={detailHeaders} data={triggersSummary} />
+                        </Widget>
+                    </Col>
+                )}
+            </Row>
+            {discovery?.uuid && <DiscoveryCertificates id={discovery.uuid} triggerHistorySummary={triggerHistorySummary} />}
 
             <Dialog
                 isOpen={confirmDelete}

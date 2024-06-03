@@ -20,8 +20,10 @@ function NotificationsList() {
 
     const notifications = useSelector(selectors.notifications);
     const isDeleting = useSelector(selectors.isDeleting);
+    const isBulkDeleting = useSelector(selectors.isBulkDeleting);
     const isMarking = useSelector(selectors.isMarking);
-    const isBusy = isDeleting || isMarking;
+    const isBulkMarking = useSelector(selectors.isBulkMarking);
+    const isBusy = isDeleting || isMarking || isBulkDeleting || isBulkMarking;
 
     const checkedRows = useSelector(pagingSelectors.checkedRows(EntityType.NOTIFICATIONS));
 
@@ -31,11 +33,10 @@ function NotificationsList() {
                 icon: 'check',
                 disabled: checkedRows.length === 0,
                 tooltip: 'Mark as read',
-                onClick: () => {
-                    for (const uuid of checkedRows) {
-                        dispatch(actions.markAsReadNotification({ uuid }));
-                    }
-                },
+                onClick: () =>
+                    checkedRows.length > 1
+                        ? dispatch(actions.bulkMarkNotificationAsRead({ uuids: checkedRows }))
+                        : dispatch(actions.markAsReadNotification({ uuid: checkedRows[0] })),
             },
         ],
         [checkedRows, dispatch],
@@ -96,7 +97,6 @@ function NotificationsList() {
             })),
         [notifications, dispatch, navigate],
     );
-
     const onListCallback = useCallback(
         (pagination: SearchRequestModel) => dispatch(actions.listNotifications({ unread: false, pagination })),
         [dispatch],
@@ -107,7 +107,11 @@ function NotificationsList() {
             <PagedList
                 entity={EntityType.NOTIFICATIONS}
                 onListCallback={onListCallback}
-                onDeleteCallback={(uuids) => uuids.forEach((uuid) => dispatch(actions.deleteNotification({ uuid })))}
+                onDeleteCallback={(uuids) =>
+                    uuids.length > 1
+                        ? dispatch(actions.bulkDeleteNotification({ uuids }))
+                        : dispatch(actions.deleteNotification({ uuid: uuids[0] }))
+                }
                 headers={notificationsRowHeaders}
                 data={notificationsList}
                 isBusy={isBusy}

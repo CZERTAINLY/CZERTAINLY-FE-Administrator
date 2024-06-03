@@ -48,7 +48,7 @@ export default function EntityDetail() {
     const onDeleteConfirmed = useCallback(() => {
         if (!entity) return;
 
-        dispatch(actions.deleteEntity({ uuid: entity.uuid, redirect: '../../' }));
+        dispatch(actions.deleteEntity({ uuid: entity.uuid, redirect: '../../entities' }));
         setConfirmDelete(false);
     }, [entity, dispatch]);
 

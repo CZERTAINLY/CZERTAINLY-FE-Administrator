@@ -6,8 +6,9 @@ import {
     isCustomAttributeModel,
     isDataAttributeModel,
 } from 'types/attributes';
-import { AttributeContentType, FileAttributeContentData } from 'types/openapi';
+import { AttributeContentType, CodeBlockAttributeContent, FileAttributeContentData, SecretAttributeContent } from 'types/openapi';
 import { utf8ToBase64 } from 'utils/common-utils';
+import { getFormattedDateTime } from 'utils/dateUtil';
 import CodeBlock from '../../components/Attributes/CodeBlock';
 
 export const attributeFieldNameTransform: { [name: string]: string } = {
@@ -38,8 +39,11 @@ export const getAttributeContent = (contentType: AttributeContentType, content: 
             case AttributeContentType.File:
                 return content.reference;
             case AttributeContentType.Time:
+                return content.data.toString();
             case AttributeContentType.Date:
+                return content.data.toString();
             case AttributeContentType.Datetime:
+                return getFormattedDateTime(content.data.toString());
             case AttributeContentType.Float:
             case AttributeContentType.Integer:
             case AttributeContentType.String:
@@ -68,13 +72,26 @@ export const getAttributeContent = (contentType: AttributeContentType, content: 
 
 const getAttributeFormValue = (contentType: AttributeContentType, item: any) => {
     if (contentType === AttributeContentType.Datetime) {
-        return item.value ? new Date(item.value).toISOString() : { data: new Date(item).toISOString() };
+        const returnVal = item?.value?.data ? { data: new Date(item.value.data).toISOString() } : new Date(item).toISOString();
+        return returnVal;
     }
     if (contentType === AttributeContentType.Date) {
-        return item.value ? new Date(item.value).toISOString().slice(0, 10) : { data: new Date(item).toISOString().slice(0, 10) };
+        const returnVal = item?.value?.data
+            ? { data: new Date(item.value.data).toISOString().slice(0, 10) }
+            : new Date(item).toISOString().slice(0, 10);
+
+        return returnVal;
     }
     if (contentType === AttributeContentType.Codeblock) {
-        return { data: { code: utf8ToBase64(item.code), language: item.language } };
+        return { data: { code: utf8ToBase64(item.code), language: item.language } } as CodeBlockAttributeContent;
+    }
+
+    if (contentType === AttributeContentType.Secret) {
+        return {
+            data: {
+                secret: item,
+            },
+        } as SecretAttributeContent;
     }
 
     return item.value ?? { data: item };
@@ -97,8 +114,6 @@ export function collectFormAttributes(
         const info = attribute.split(':');
 
         const attributeName = info[0];
-        // const attributeType = info[1];
-        const attributeUuid = info.length === 3 ? info[2] : undefined;
 
         const descriptor = descriptors?.find((d) => d.name === attributeName);
 
@@ -113,107 +128,18 @@ export function collectFormAttributes(
             } else {
                 content = getAttributeFormValue(descriptor.contentType, attributes[attribute]);
             }
-            //
-            // switch (descriptor.contentType) {
-            //
-            //
-            //    case AttributeContentType.Boolean:
-            //    case AttributeContentType.Text:
-            //    case AttributeContentType.Time:
-            //    case AttributeContentType.Secret:
-            //
-            //       if (descriptor.properties.list || descriptor.properties.multiSelect) continue;
-            //       content = {data: !!attributes[attribute]};
-            //
-            //       break;
-            //
-            //
-            //    case AttributeContentType.Integer:
-            //
-            //       if (descriptor.properties.list) {
-            //          if (Array.isArray(attributes[attribute]))
-            //             content = attributes[attribute].map((lv: any) => parseInt(lv.value));
-            //          else
-            //             content = {value: parseInt(attributes[attribute].value.value)}
-            //       } else {
-            //          content = {value: parseInt(attributes[attribute])};
-            //       }
-            //
-            //       break;
-            //
-            //
-            //    case AttributeContentType.Float:
-            //       if (descriptor.properties.list) {
-            //          if (Array.isArray(attributes[attribute]))
-            //             content = attributes[attribute].map((lv: any) => parseFloat(lv.value));
-            //          else
-            //             content = {value: parseFloat(attributes[attribute].value.value)}
-            //       } else {
-            //          content = {value: parseFloat(attributes[attribute])};
-            //       }
-            //       break;
-            //
-            //
-            //    case AttributeContentType.String:
-            //
-            //       if (descriptor.properties.list) {
-            //          if (Array.isArray(attributes[attribute]))
-            //             content = attributes[attribute].map((lv: any) => lv.value);
-            //          else
-            //             content = {value: attributes[attribute].value.value};
-            //       } else {
-            //          content = {value: attributes[attribute]};
-            //       }
-            //
-            //       break;
-            //
-            //    case AttributeContentType.Date:
-            //    case AttributeContentType.Datetime:
-            //
-            //       if (descriptor.properties.list || descriptor.properties.multiSelect) continue;
-            //       content = {value: new Date(attributes[attribute]).toISOString()};
-            //
-            //       break;
-            //
-            //    case AttributeContentType.File:
-            //
-            //       if (descriptor.properties.list || descriptor.properties.multiSelect) continue;
-            //       content = attributes[attribute];
-            //
-            //       break;
-            //
-            //
-            //    case AttributeContentType.Credential:
-            //    case AttributeContentType.Object:
-            //
-            //       if (descriptor.properties.list) {
-            //          if (Array.isArray(attributes[attribute]))
-            //             content = attributes[attribute].map((lv: any) => lv.value);
-            //          else
-            //             content = attributes[attribute].value;
-            //       } else {
-            //          content = attributes[attribute];
-            //       }
-            //
-            //       break;
-            //
-            //    default:
-            //
-            //       continue;
-            //
-            // }
+
             if (typeof content.data !== 'undefined' || Array.isArray(content)) {
                 const attr: AttributeRequestModel = {
                     name: attributeName,
                     content: Array.isArray(content) ? content : [content],
+                    contentType: descriptor.contentType,
+                    uuid: descriptor.uuid,
                 };
-
-                if (attributeUuid) attr.uuid = attributeUuid;
 
                 attrs.push(attr);
             }
         }
     }
-
     return attrs;
 }

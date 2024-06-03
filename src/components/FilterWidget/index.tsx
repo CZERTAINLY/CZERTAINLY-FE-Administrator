@@ -10,39 +10,57 @@ import Select, { MultiValue, SingleValue } from 'react-select';
 import { Badge, Button, Col, FormGroup, Input, Label, Row } from 'reactstrap';
 import { Observable } from 'rxjs';
 import { SearchFieldListModel, SearchFilterModel } from 'types/certificate';
-import { PlatformEnum, SearchCondition, SearchGroup, SearchableFieldType } from 'types/openapi';
+import {
+    AttributeContentType,
+    FilterConditionOperator,
+    FilterFieldSource,
+    FilterFieldType,
+    PlatformEnum,
+    SearchFieldDataDto,
+    SearchFilterRequestDto,
+} from 'types/openapi';
+import { getFormType, getStepValue } from 'utils/common-utils';
+import { getFormattedDate, getFormattedDateTime } from 'utils/dateUtil';
 import styles from './FilterWidget.module.scss';
 
-const noValue: { [condition in SearchCondition]: boolean } = {
-    [SearchCondition.Equals]: false,
-    [SearchCondition.NotEquals]: false,
-    [SearchCondition.Greater]: false,
-    [SearchCondition.GreaterOrEqual]: false,
-    [SearchCondition.Lesser]: false,
-    [SearchCondition.LesserOrEqual]: false,
-    [SearchCondition.Contains]: false,
-    [SearchCondition.NotContains]: false,
-    [SearchCondition.StartsWith]: false,
-    [SearchCondition.EndsWith]: false,
-    [SearchCondition.Empty]: true,
-    [SearchCondition.NotEmpty]: true,
-    [SearchCondition.Success]: true,
-    [SearchCondition.Failed]: true,
-    [SearchCondition.Unknown]: true,
-    [SearchCondition.NotChecked]: true,
+const noValue: { [condition in FilterConditionOperator]: boolean } = {
+    [FilterConditionOperator.Equals]: false,
+    [FilterConditionOperator.NotEquals]: false,
+    [FilterConditionOperator.Greater]: false,
+    [FilterConditionOperator.GreaterOrEqual]: false,
+    [FilterConditionOperator.Lesser]: false,
+    [FilterConditionOperator.LesserOrEqual]: false,
+    [FilterConditionOperator.Contains]: false,
+    [FilterConditionOperator.NotContains]: false,
+    [FilterConditionOperator.StartsWith]: false,
+    [FilterConditionOperator.EndsWith]: false,
+    [FilterConditionOperator.Empty]: true,
+    [FilterConditionOperator.NotEmpty]: true,
+    [FilterConditionOperator.Success]: true,
+    [FilterConditionOperator.Failed]: true,
+    [FilterConditionOperator.Unknown]: true,
+    [FilterConditionOperator.NotChecked]: true,
 };
+
+interface ObjectValueOptions {
+    label: string;
+    value: string | any;
+}
 
 interface Props {
     title: string;
     entity: EntityType;
     getAvailableFiltersApi: (apiClients: ApiClients) => Observable<Array<SearchFieldListModel>>;
+    onFilterUpdate?: (currentFilters: SearchFilterModel[]) => void;
+    disableBadgeRemove?: boolean;
+    busyBadges?: boolean;
 }
 
-export default function FilterWidget({ title, entity, getAvailableFiltersApi }: Props) {
+export default function FilterWidget({ onFilterUpdate, title, entity, getAvailableFiltersApi, disableBadgeRemove, busyBadges }: Props) {
     const dispatch = useDispatch();
 
-    const searchGroupEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.SearchGroup));
-    const searchConditionEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.SearchCondition));
+    const searchGroupEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.FilterFieldSource));
+    const FilterConditionOperatorEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.FilterConditionOperator));
     const platformEnums = useSelector(enumSelectors.platformEnums);
 
     const availableFilters = useSelector(selectors.availableFilters(entity));
@@ -51,9 +69,11 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
 
     const [selectedFilter, setSelectedFilter] = useState<number>(-1);
 
-    const [filterGroup, setFilterGroup] = useState<SingleValue<{ label: string; value: SearchGroup }> | undefined>(undefined);
+    const [filterGroup, setFilterGroup] = useState<SingleValue<{ label: string; value: FilterFieldSource }> | undefined>(undefined);
     const [filterField, setFilterField] = useState<SingleValue<{ label: string; value: string }> | undefined>(undefined);
-    const [filterCondition, setFilterCondition] = useState<SingleValue<{ label: string; value: SearchCondition }> | undefined>(undefined);
+    const [filterCondition, setFilterCondition] = useState<SingleValue<{ label: string; value: FilterConditionOperator }> | undefined>(
+        undefined,
+    );
     const [filterValue, setFilterValue] = useState<
         | object
         | SingleValue<object | object[] | { label: string; value: object }>
@@ -68,6 +88,18 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
         ],
         [],
     );
+
+    const checkIfFieldIsDate = useCallback((field: SearchFieldDataDto) => {
+        if (
+            field.attributeContentType === AttributeContentType.Date ||
+            field.attributeContentType === AttributeContentType.Time ||
+            field.attributeContentType === AttributeContentType.Datetime
+        ) {
+            return true;
+        } else {
+            return false;
+        }
+    }, []);
 
     useEffect(() => {
         dispatch(actions.getAvailableFilters({ entity, getAvailableFiltersApi }));
@@ -88,50 +120,73 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
         }
 
         const field = availableFilters
-            .find((f) => f.searchGroup === currentFilters[selectedFilter].searchGroup)
+            .find((f) => f.filterFieldSource === currentFilters[selectedFilter].fieldSource)
             ?.searchFieldData?.find((f) => f.fieldIdentifier === currentFilters[selectedFilter].fieldIdentifier);
         if (!field) return;
 
         setFilterGroup({
-            label: getEnumLabel(searchGroupEnum, currentFilters[selectedFilter].searchGroup),
-            value: currentFilters[selectedFilter].searchGroup,
+            label: getEnumLabel(searchGroupEnum, currentFilters[selectedFilter].fieldSource),
+            value: currentFilters[selectedFilter].fieldSource,
         });
         setFilterField({ label: field.fieldLabel, value: field.fieldIdentifier });
         setFilterCondition({
-            label: getEnumLabel(searchConditionEnum, currentFilters[selectedFilter].condition),
+            label: getEnumLabel(FilterConditionOperatorEnum, currentFilters[selectedFilter].condition),
             value: currentFilters[selectedFilter].condition,
         });
 
-        if (
-            field.type === SearchableFieldType.String ||
-            field.type === SearchableFieldType.Number ||
-            field.type === SearchableFieldType.Date
-        ) {
+        if (field.type === FilterFieldType.String || field.type === FilterFieldType.Number || field.type === FilterFieldType.Date) {
             setFilterValue(currentFilters[selectedFilter].value);
             return;
         }
 
-        if (field.type === SearchableFieldType.Boolean) {
+        if (field.type === FilterFieldType.Boolean) {
             setFilterValue(booleanOptions.find((f) => !!currentFilters[selectedFilter].value === f.value));
             return;
         }
 
         if (!field.multiValue) {
             const value = currentFilters[selectedFilter].value;
-            const label = field.platformEnum ? platformEnums[field.platformEnum][(value ?? '') as string].label : value;
+            const label = field.platformEnum
+                ? platformEnums[field.platformEnum][(value ?? '') as string].label
+                : checkIfFieldIsDate(field)
+                  ? getFormattedDateTime(value as unknown as string)
+                  : value;
             setFilterValue({ label, value });
             return;
         }
 
         if (Array.isArray(currentFilters[selectedFilter].value)) {
-            setFilterValue(
-                (currentFilters[selectedFilter].value as Array<object>).map((v: object) => {
-                    const label = field.platformEnum ? platformEnums[field.platformEnum][v as unknown as string].label : v;
-                    return { label, value: v };
-                }),
-            );
+            const currentValue = currentFilters[selectedFilter].value as Array<object>;
+            const newFilterValue = currentValue.map((v: any) => {
+                let label = '';
+                let value = '';
+                if (typeof v === 'string') {
+                    if (checkIfFieldIsDate(field)) {
+                        label = getFormattedDateTime(v);
+                    } else {
+                        label = v;
+                    }
+                    value = v;
+                } else {
+                    label = v?.name || JSON.stringify(v);
+                    value = v;
+                }
+
+                return { label, value };
+            });
+
+            setFilterValue(newFilterValue);
         }
-    }, [availableFilters, currentFilters, selectedFilter, booleanOptions, platformEnums, searchConditionEnum, searchGroupEnum]);
+    }, [
+        availableFilters,
+        currentFilters,
+        selectedFilter,
+        booleanOptions,
+        platformEnums,
+        FilterConditionOperatorEnum,
+        searchGroupEnum,
+        checkIfFieldIsDate,
+    ]);
 
     const onUnselectFiltersClick = useCallback(
         (e: React.MouseEvent<HTMLDivElement>) => {
@@ -153,7 +208,7 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
         }
 
         const updatedFilterItem: SearchFilterModel = {
-            searchGroup: filterGroup.value,
+            fieldSource: filterGroup.value,
             fieldIdentifier: filterField.value,
             condition: filterCondition.value,
             value: filterValue
@@ -162,22 +217,61 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
                     : Array.isArray(filterValue)
                       ? filterValue.map((v) => (v as any).value)
                       : (filterValue as any).value
-                : '',
+                : undefined,
         };
+
         const newFilters =
             selectedFilter === -1
                 ? [...currentFilters, updatedFilterItem]
                 : [...currentFilters.slice(0, selectedFilter), updatedFilterItem, ...currentFilters.slice(selectedFilter + 1)];
 
         dispatch(actions.setCurrentFilters({ entity, currentFilters: newFilters }));
-    }, [filterGroup, filterField, filterCondition, selectedFilter, currentFilters, filterValue, dispatch, entity]);
+        if (onFilterUpdate) {
+            const filtersWithItemNames: SearchFilterRequestDto[] = newFilters.map((f) => {
+                return {
+                    fieldSource: f.fieldSource,
+                    fieldIdentifier: f.fieldIdentifier,
+                    condition: f.condition,
+                    value: Array.isArray(f.value)
+                        ? f.value.map((v) => {
+                              if (typeof v === 'object' && v.hasOwnProperty('name')) {
+                                  return v.name;
+                              }
+                              return v;
+                          })
+                        : f.value,
+                };
+            });
+            onFilterUpdate(filtersWithItemNames);
+            setSelectedFilter(-1);
+        }
+    }, [filterGroup, filterField, filterCondition, selectedFilter, currentFilters, filterValue, dispatch, entity, onFilterUpdate]);
 
     const onRemoveFilterClick = useCallback(
         (index: number) => {
             const newFilters = currentFilters.filter((_, i) => i !== index);
             dispatch(actions.setCurrentFilters({ entity, currentFilters: newFilters }));
+            if (onFilterUpdate) {
+                const filtersWithItemNames: SearchFilterRequestDto[] = newFilters.map((f) => {
+                    return {
+                        fieldSource: f.fieldSource,
+                        fieldIdentifier: f.fieldIdentifier,
+                        condition: f.condition,
+                        value: Array.isArray(f.value)
+                            ? f.value.map((v) => {
+                                  if (typeof v === 'object' && v.hasOwnProperty('name')) {
+                                      return v.name;
+                                  }
+                                  return v;
+                              })
+                            : f.value,
+                    };
+                });
+                onFilterUpdate(filtersWithItemNames);
+                setSelectedFilter(-1);
+            }
         },
-        [currentFilters, dispatch, entity],
+        [currentFilters, dispatch, entity, onFilterUpdate],
     );
 
     const toggleFilter = useCallback(
@@ -188,11 +282,69 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
     );
 
     const currentFields = useMemo(
-        () => availableFilters.find((f) => f.searchGroup === filterGroup?.value)?.searchFieldData,
+        () => availableFilters.find((f) => f.filterFieldSource === filterGroup?.value)?.searchFieldData,
         [availableFilters, filterGroup],
     );
 
     const currentField = useMemo(() => currentFields?.find((f) => f.fieldIdentifier === filterField?.value), [filterField, currentFields]);
+
+    const objectValueOptions: ObjectValueOptions[] = useMemo(() => {
+        if (!currentField) return [];
+
+        if (Array.isArray(currentField?.value)) {
+            const objectOptions = currentField?.value?.map((v, i) => {
+                let label = '';
+                let value = '';
+                if (typeof v === 'string') {
+                    if (checkIfFieldIsDate(currentField)) {
+                        label = getFormattedDateTime(v);
+                    } else {
+                        label = v;
+                    }
+                    value = v;
+                } else {
+                    label = v?.name || JSON.stringify(v);
+                    value = v;
+                }
+
+                return { label, value };
+            });
+
+            if (selectedFilter === -1) return objectOptions;
+
+            const currentValue = currentFilters[selectedFilter].value;
+            const filteredOptions = objectOptions.filter((o) => {
+                if (Array.isArray(currentValue)) {
+                    return !currentValue.some((a) => a?.name === o?.label);
+                } else {
+                    return JSON.stringify(currentValue) !== o?.value;
+                }
+            });
+            return filteredOptions;
+        }
+
+        return [];
+    }, [currentField, currentFilters, selectedFilter, checkIfFieldIsDate]);
+
+    const getBadgeContent = useCallback(
+        (itemNumber: number, fieldSource: string, fieldCondition: string, label: string, value: string) => {
+            if (isFetchingAvailableFilters || busyBadges) return <></>;
+
+            return (
+                <React.Fragment key={itemNumber}>
+                    <b>{getEnumLabel(searchGroupEnum, fieldSource)}&nbsp;</b>'{label}'&nbsp;
+                    {getEnumLabel(FilterConditionOperatorEnum, fieldCondition)}&nbsp;
+                    {value}
+                    {!disableBadgeRemove && (
+                        <span className={styles.filterBadgeSpan} onClick={() => onRemoveFilterClick(itemNumber)}>
+                            &times;
+                        </span>
+                    )}
+                </React.Fragment>
+            );
+        },
+        [isFetchingAvailableFilters, FilterConditionOperatorEnum, disableBadgeRemove, onRemoveFilterClick, searchGroupEnum, busyBadges],
+    );
 
     return (
         <>
@@ -206,8 +358,8 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
                                     <Select
                                         id="group"
                                         options={availableFilters.map((f) => ({
-                                            label: getEnumLabel(searchGroupEnum, f.searchGroup),
-                                            value: f.searchGroup,
+                                            label: getEnumLabel(searchGroupEnum, f.filterFieldSource),
+                                            value: f.filterFieldSource,
                                         }))}
                                         onChange={(e) => {
                                             setFilterGroup(e);
@@ -247,7 +399,7 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
                                         options={
                                             filterField
                                                 ? currentField?.conditions.map((c) => ({
-                                                      label: getEnumLabel(searchConditionEnum, c),
+                                                      label: getEnumLabel(FilterConditionOperatorEnum, c),
                                                       value: c,
                                                   }))
                                                 : undefined
@@ -266,12 +418,21 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
                                 <FormGroup>
                                     <Label for="value">Filter Value</Label>
                                     {currentField?.type === undefined ||
-                                    currentField?.type === SearchableFieldType.String ||
-                                    currentField?.type === SearchableFieldType.Date ||
-                                    currentField?.type === SearchableFieldType.Number ? (
+                                    currentField?.type === FilterFieldType.String ||
+                                    currentField?.type === FilterFieldType.Date ||
+                                    currentField?.type === FilterFieldType.Number ? (
                                         <Input
                                             id="value"
-                                            type={currentField?.type === SearchableFieldType.Date ? 'date' : 'text'}
+                                            type={
+                                                currentField?.attributeContentType && checkIfFieldIsDate(currentField)
+                                                    ? getFormType(currentField?.attributeContentType)
+                                                    : 'text'
+                                            }
+                                            step={
+                                                currentField?.attributeContentType
+                                                    ? getStepValue(currentField?.attributeContentType)
+                                                    : undefined
+                                            }
                                             value={filterValue?.toString() || ''}
                                             onChange={(e) => {
                                                 setFilterValue(JSON.parse(JSON.stringify(e.target.value)));
@@ -279,7 +440,7 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
                                             placeholder="Enter filter value"
                                             disabled={!filterField || !filterCondition || noValue[filterCondition.value]}
                                         />
-                                    ) : currentField?.type === SearchableFieldType.Boolean ? (
+                                    ) : currentField?.type === FilterFieldType.Boolean ? (
                                         <Select
                                             id="value"
                                             options={filterField ? booleanOptions : undefined}
@@ -292,16 +453,7 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
                                     ) : (
                                         <Select
                                             id="value"
-                                            options={
-                                                filterField
-                                                    ? (currentField?.value as string[])?.map((v) => {
-                                                          const label = currentField.platformEnum
-                                                              ? platformEnums[currentField.platformEnum][(v ?? '') as string].label
-                                                              : v;
-                                                          return { label, value: v };
-                                                      })
-                                                    : undefined
-                                            }
+                                            options={objectValueOptions}
                                             value={filterValue || null}
                                             onChange={(e) => {
                                                 setFilterValue(e);
@@ -328,21 +480,38 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
                     </div>
                     {currentFilters.map((f, i) => {
                         const field = availableFilters
-                            .find((a) => a.searchGroup === f.searchGroup)
+                            .find((a) => a.filterFieldSource === f.fieldSource)
                             ?.searchFieldData?.find((s) => s.fieldIdentifier === f.fieldIdentifier);
                         const label = field ? field.fieldLabel : f.fieldIdentifier;
                         const value =
-                            field && field.type === SearchableFieldType.Boolean
+                            field && field.type === FilterFieldType.Boolean
                                 ? `'${booleanOptions.find((b) => !!f.value === b.value)?.label}'`
-                                : Array.isArray(f.value) && f.value.length > 1
-                                  ? `(${f.value
-                                        .map((v) => `'${field?.platformEnum ? platformEnums[field.platformEnum][v]?.label : v}'`)
-                                        .join(' OR ')})`
+                                : Array.isArray(f.value)
+                                  ? `${f.value
+                                        .map(
+                                            (v) =>
+                                                `'${
+                                                    field?.platformEnum
+                                                        ? platformEnums[field.platformEnum][v]?.label
+                                                        : v?.name
+                                                          ? v.name
+                                                          : field && field?.attributeContentType === AttributeContentType.Date
+                                                            ? getFormattedDate(v)
+                                                            : field && field?.attributeContentType === AttributeContentType.Datetime
+                                                              ? getFormattedDateTime(v)
+                                                              : v
+                                                }'`,
+                                        )
+                                        .join(' OR ')}`
                                   : f.value
                                     ? `'${
                                           field?.platformEnum
                                               ? platformEnums[field.platformEnum][f.value as unknown as string]?.label
-                                              : f.value
+                                              : field && field?.attributeContentType === AttributeContentType.Date
+                                                ? getFormattedDate(f.value as unknown as string)
+                                                : field && field?.attributeContentType === AttributeContentType.Datetime
+                                                  ? getFormattedDateTime(f.value as unknown as string)
+                                                  : f.value
                                       }'`
                                     : '';
                         return (
@@ -352,16 +521,12 @@ export default function FilterWidget({ title, entity, getAvailableFiltersApi }: 
                                 onClick={() => toggleFilter(i)}
                                 color={selectedFilter === i ? 'primary' : 'secondary'}
                             >
-                                <b>{getEnumLabel(searchGroupEnum, f.searchGroup)}&nbsp;</b>'{label}'&nbsp;
-                                {getEnumLabel(searchConditionEnum, f.condition)}&nbsp;
-                                {value}
-                                <span className={styles.filterBadgeSpan} onClick={() => onRemoveFilterClick(i)}>
-                                    &times;
-                                </span>
+                                {!isFetchingAvailableFilters && !busyBadges && getBadgeContent(i, f.fieldSource, f.condition, label, value)}
                             </Badge>
                         );
                     })}
                 </div>
+                {/* {appendInWidgetContent} */}
             </Widget>
         </>
     );

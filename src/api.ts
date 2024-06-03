@@ -25,6 +25,7 @@ import {
     InternalNotificationApi,
     LocationManagementApi,
     RAProfileManagementApi,
+    ResourceManagementApi,
     RoleManagementApi,
     SCEPProfileManagementApi,
     ScheduledJobsManagementApi,
@@ -32,6 +33,9 @@ import {
     StatisticsDashboardApi,
     TokenProfileManagementApi,
     UserManagementApi,
+    WorkflowActionsManagementApi,
+    WorkflowRulesManagementApi,
+    WorkflowTriggersManagementApi,
 } from 'types/openapi';
 import { TokenInstanceControllerApi } from 'types/openapi/apis/TokenInstanceControllerApi';
 import {
@@ -49,6 +53,10 @@ export interface ApiClients {
     auth: AuthenticationManagementApi;
     users: UserManagementApi;
     roles: RoleManagementApi;
+    // rules: RulesManagementApi;
+    actions: WorkflowActionsManagementApi;
+    rules: WorkflowRulesManagementApi;
+    triggers: WorkflowTriggersManagementApi;
     auditLogs: AuditLogApi;
     raProfiles: RAProfileManagementApi;
     credentials: CredentialManagementApi;
@@ -57,6 +65,7 @@ export interface ApiClients {
     statisticsDashboard: StatisticsDashboardApi;
     authorities: AuthorityManagementApi;
     entities: EntityManagementApi;
+    resources: ResourceManagementApi;
     locations: LocationManagementApi;
     certificates: CertificateInventoryApi;
     acmeAccounts: ACMEAccountManagementApi;
@@ -89,12 +98,17 @@ export const backendClient: ApiClients = {
     auth: new AuthenticationManagementApi(configuration),
     users: new UserManagementApi(configuration),
     roles: new RoleManagementApi(configuration),
+    // rules: new RulesManagementApi(configuration),
+    actions: new WorkflowActionsManagementApi(configuration),
+    rules: new WorkflowRulesManagementApi(configuration),
+    triggers: new WorkflowTriggersManagementApi(configuration),
     certificates: new CertificateInventoryApi(configuration),
     auditLogs: new AuditLogApi(configuration),
     raProfiles: new RAProfileManagementApi(configuration),
     credentials: new CredentialManagementApi(configuration),
     authorities: new AuthorityManagementApi(configuration),
     entities: new EntityManagementApi(configuration),
+    resources: new ResourceManagementApi(configuration),
     locations: new LocationManagementApi(configuration),
     connectors: new ConnectorManagementApi(configuration),
     callback: new CallbackApi(configuration),

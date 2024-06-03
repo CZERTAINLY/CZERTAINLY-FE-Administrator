@@ -38,16 +38,21 @@ import { collectFormAttributes } from '../../../../utils/attributes/attributes';
 import AttributeEditor from '../../../Attributes/AttributeEditor';
 import TabLayout from '../../../Layout/TabLayout';
 
+interface SelectChangeValue {
+    value: string;
+    label: string;
+}
+
 interface FormValues {
     username: string;
-    group: { label: string; value: string };
+    selectedGroups: SelectChangeValue[];
     description: string;
     firstName: string;
     lastName: string;
     email: string;
     inputType: { value: 'upload' | 'select' };
     certFile: FileList | undefined;
-    certificate: any;
+    certificateUuid?: string;
     enabled: boolean;
 }
 
@@ -68,6 +73,7 @@ function UserForm() {
     const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
     const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
 
+    const isFetchingResourceSecondaryCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceSecondaryCustomAttributes);
     const isFetchingUserDetail = useSelector(userSelectors.isFetchingDetail);
     const isFetchingRoles = useSelector(rolesSelectors.isFetchingList);
 
@@ -77,6 +83,7 @@ function UserForm() {
     const isCreatingUser = useSelector(userSelectors.isCreating);
     const isUpdatingUser = useSelector(userSelectors.isUpdating);
 
+    const isUpdatingContent = useSelector(customAttributesSelectors.isUpdatingContent);
     const [loadedCerts, setLoadedCerts] = useState<CertificateListResponseModel[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [user, setUser] = useState<UserDetailModel>();
@@ -84,6 +91,30 @@ function UserForm() {
     const [userRoles, setUserRoles] = useState<string[]>([]);
 
     const [optionsForCertificate, setOptionsForCertificate] = useState<{ label: string; value: string }[]>([]);
+
+    const isBusy = useMemo(
+        () =>
+            isFetchingUserDetail ||
+            isFetchingCertsList ||
+            isFetchingCertDetail ||
+            isFetchingRoles ||
+            isUpdatingUser ||
+            isCreatingUser ||
+            isFetchingResourceCustomAttributes ||
+            isFetchingResourceSecondaryCustomAttributes ||
+            isUpdatingContent,
+        [
+            isFetchingUserDetail,
+            isFetchingCertsList,
+            isFetchingCertDetail,
+            isFetchingRoles,
+            isUpdatingUser,
+            isCreatingUser,
+            isFetchingResourceCustomAttributes,
+            isFetchingResourceSecondaryCustomAttributes,
+            isUpdatingContent,
+        ],
+    );
 
     const optionsForInput: { label: string; value: 'upload' | 'select' }[] = useMemo(
         () => [
@@ -160,6 +191,7 @@ function UserForm() {
                     enabled: false,
                     roles: [],
                     systemUser: false,
+                    groups: [],
                 });
 
             setUserRoles([]);
@@ -231,11 +263,11 @@ function UserForm() {
                             firstName: values.firstName || undefined,
                             lastName: values.lastName || undefined,
                             email: values.email,
-                            groupUuid: values.group?.value ?? undefined,
+                            groupUuids: values.selectedGroups.map((g) => g.value),
                             certificateUuid:
                                 values.inputType.value === 'select'
-                                    ? values.certificate
-                                        ? values.certificate.value
+                                    ? values.certificateUuid
+                                        ? values.certificateUuid
                                         : undefined
                                     : undefined,
                             certificateData: values.inputType?.value === 'upload' && certToUpload ? certFileContent : undefined,
@@ -253,13 +285,13 @@ function UserForm() {
                             firstName: values.firstName || undefined,
                             lastName: values.lastName || undefined,
                             email: values.email || undefined,
-                            groupUuid: values.group?.value ?? undefined,
+                            groupUuids: values.selectedGroups.map((g) => g.value),
                             enabled: values.enabled,
                             certificateData: values.inputType?.value === 'upload' && certToUpload ? certFileContent : undefined,
                             certificateUuid:
                                 values.inputType?.value === 'select'
-                                    ? values.certificate
-                                        ? values.certificate?.value
+                                    ? values.certificateUuid
+                                        ? values.certificateUuid
                                         : undefined
                                     : undefined,
                             customAttributes: collectFormAttributes('customUser', resourceCustomAttributes, values),
@@ -296,16 +328,20 @@ function UserForm() {
         () => ({
             username: editMode ? user?.username : '',
             description: editMode ? user?.description : '',
-            group: editMode && user?.groupName && user?.groupUuid ? { label: user.groupName, value: user.groupUuid } : undefined,
+            selectedGroups: editMode
+                ? user?.groups?.length
+                    ? user?.groups.map((group) => ({ label: group.name, value: group.uuid }))
+                    : []
+                : [],
             firstName: editMode ? user?.firstName || '' : '',
             lastName: editMode ? user?.lastName : '',
             email: editMode ? user?.email : '',
             enabled: editMode ? user?.enabled : true,
             systemUser: editMode ? user?.systemUser : false,
             inputType: optionsForInput[1],
-            certificate: selectedCertificate,
+            certificateUuid: editMode && user?.certificate ? user.certificate.uuid : undefined,
         }),
-        [user, editMode, selectedCertificate, optionsForInput],
+        [user, editMode, optionsForInput],
     );
 
     const rolesTableHeader: TableHeader[] = useMemo(
@@ -382,24 +418,32 @@ function UserForm() {
     );
     const title = useMemo(() => (editMode ? 'Edit user' : 'Create user'), [editMode]);
 
+    const renderCustomAttributesEditor = useCallback(() => {
+        if (isBusy) return <></>;
+        return (
+            <TabLayout
+                tabs={[
+                    {
+                        title: 'Custom attributes',
+                        content: (
+                            <AttributeEditor
+                                id="customUser"
+                                attributeDescriptors={resourceCustomAttributes}
+                                attributes={user?.customAttributes}
+                            />
+                        ),
+                    },
+                ]}
+            />
+        );
+    }, [resourceCustomAttributes, user, isBusy]);
+
     return (
         <>
             <Form onSubmit={onSubmit} initialValues={defaultValues} mutators={{ ...mutators<FormValues>() }}>
-                {({ handleSubmit, pristine, submitting, values, valid }) => (
+                {({ handleSubmit, pristine, submitting, values, valid, form }) => (
                     <BootstrapForm onSubmit={handleSubmit}>
-                        <Widget
-                            title={title}
-                            busy={
-                                isFetchingUserDetail ||
-                                isFetchingCertsList ||
-                                isFetchingCertDetail ||
-                                isFetchingRoles ||
-                                isUpdatingUser ||
-                                isCreatingUser ||
-                                isFetchingResourceCustomAttributes
-                            }
-                            widgetExtraTopNode={enableCheckButton}
-                        >
+                        <Widget title={title} busy={isBusy} widgetExtraTopNode={enableCheckButton}>
                             <Field name="username" validate={composeValidators(validateRequired(), validateUrlSafe())}>
                                 {({ input, meta }) => (
                                     <FormGroup>
@@ -419,18 +463,19 @@ function UserForm() {
                                 )}
                             </Field>
 
-                            <Field name="group">
+                            <Field name="selectedGroups">
                                 {({ input }) => (
                                     <FormGroup>
-                                        <Label for="group">Group</Label>
+                                        <Label for="selectedGroups">Groups</Label>
 
                                         <Select
                                             {...input}
                                             maxMenuHeight={140}
                                             menuPlacement="auto"
                                             options={optionsForGroup}
-                                            placeholder="Select Group"
+                                            placeholder="Select Groups"
                                             isClearable
+                                            isMulti
                                         />
                                     </FormGroup>
                                 )}
@@ -552,16 +597,29 @@ function UserForm() {
                                     </FormText>
                                 </FormGroup>
                             ) : (
-                                <Field name="certificate">
+                                <Field name="certificateUuid">
                                     {({ input, meta }) => (
                                         <FormGroup>
-                                            <Label for="certificate">Certificate</Label>
+                                            <Label for="certificateUuid">Certificate</Label>
 
                                             <Select
                                                 {...input}
                                                 //ref={certSelectRef}
                                                 maxMenuHeight={140}
                                                 menuPlacement="auto"
+                                                value={selectedCertificate}
+                                                onChange={(value) => {
+                                                    if (!value) {
+                                                        setSelectedCertificate(undefined);
+                                                        form.change('certificateUuid', undefined);
+                                                        return;
+                                                    }
+                                                    setSelectedCertificate({
+                                                        label: value.label,
+                                                        value: value.value,
+                                                    });
+                                                    input.onChange(value.value);
+                                                }}
                                                 options={optionsForCertificate}
                                                 placeholder="Select Certificate"
                                                 onMenuScrollToBottom={loadNextCertificates}
@@ -591,21 +649,7 @@ function UserForm() {
                             )}
 
                             <br />
-                            <TabLayout
-                                tabs={[
-                                    {
-                                        title: 'Custom attributes',
-                                        content: (
-                                            <AttributeEditor
-                                                id="customUser"
-                                                attributeDescriptors={resourceCustomAttributes}
-                                                attributes={user?.customAttributes}
-                                            />
-                                        ),
-                                    },
-                                ]}
-                            />
-
+                            {renderCustomAttributesEditor()}
                             <br />
 
                             <p>Assigned User Roles</p>

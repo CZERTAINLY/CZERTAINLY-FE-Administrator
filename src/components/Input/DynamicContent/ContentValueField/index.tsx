@@ -3,6 +3,7 @@ import { Field, useForm } from 'react-final-form';
 import Select from 'react-select';
 import { Col, FormFeedback, FormGroup, Input, InputGroup } from 'reactstrap';
 import { getStepValue } from 'utils/common-utils';
+import { getFormattedDateTime } from 'utils/dateUtil';
 import { BaseAttributeContentModel, CustomAttributeModel } from '../../../../types/attributes';
 import { AttributeContentType } from '../../../../types/openapi';
 import { composeValidators, validateRequired } from '../../../../utils/validators';
@@ -18,13 +19,32 @@ type Props = {
 export default function ContentValueField({ descriptor, initialContent, onSubmit }: Props) {
     const form = useForm();
 
-    const options = useMemo(() => descriptor.content?.map((a) => ({ label: a.reference ?? a.data.toString(), value: a })), [descriptor]);
+    const options = useMemo(
+        () =>
+            descriptor.content?.map((a) => ({
+                label: a.reference
+                    ? a.reference
+                    : descriptor.contentType === AttributeContentType.Datetime
+                      ? getFormattedDateTime(a.data.toString())
+                      : a.data.toString(),
+                value: a,
+            })),
+        [descriptor],
+    );
 
     useEffect(() => {
         const initialValue =
             initialContent && initialContent.length > 0
                 ? descriptor.properties.list
-                    ? options?.filter((o) => initialContent.find((i) => i.data === o.value.data))
+                    ? options?.filter((o) =>
+                          initialContent.find((i) => {
+                              if (descriptor.contentType === AttributeContentType.Datetime) {
+                                  return getFormattedDateTime(i.data.toString()) === getFormattedDateTime(o.value.data.toString());
+                              } else {
+                                  return i.data === o.value.data;
+                              }
+                          }),
+                      )
                     : initialContent[0].data
                 : undefined;
 
@@ -85,7 +105,11 @@ export default function ContentValueField({ descriptor, initialContent, onSubmit
             if (descriptor.properties.multiSelect) {
                 return input.value.map((v: any) => transformObjectContent(descriptor.contentType, v.value));
             } else {
-                return [transformObjectContent(descriptor.contentType, input.value.value)];
+                if (Array.isArray(input.value)) {
+                    return input.value.map((v: any) => transformObjectContent(descriptor.contentType, v.value));
+                } else {
+                    return [transformObjectContent(descriptor.contentType, input.value.value)];
+                }
             }
         }
         return [transformObjectContent(descriptor.contentType, { data: input.value })];
@@ -134,12 +158,14 @@ export default function ContentValueField({ descriptor, initialContent, onSubmit
                     </Col>
                 ) : (
                     <Input
+                        disabled={descriptor.properties.readOnly}
                         {...input}
                         valid={!meta.error && meta.touched}
                         invalid={!!meta.error && meta.touched}
                         type={ContentFieldConfiguration[descriptor.contentType].type}
                         id={descriptor.name}
                         step={fieldStepValue}
+                        value={descriptor.contentType === AttributeContentType.Datetime ? getFormattedDateTime(input.value) : input.value}
                     />
                 );
                 const feedbackComponent = <FormFeedback>{meta.error}</FormFeedback>;

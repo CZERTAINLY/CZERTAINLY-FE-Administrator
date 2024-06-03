@@ -1,0 +1,11 @@
+@import 'src/resources/styles/app';
+
+.conditionGroupList {
+    max-height: 275px;
+    overflow-y: auto;
+    margin-top: 1rem;
+}
+
+.conditionListHr {
+    margin: 0;
+}

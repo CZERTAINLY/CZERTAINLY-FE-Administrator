@@ -98,11 +98,11 @@ const getAuthorityProviderAttributesDescriptors: AppEpic = (action$, state, deps
                     kind: action.payload.kind,
                 })
                 .pipe(
-                    map((attributeDescriptors) =>
-                        slice.actions.getAuthorityProviderAttributesDescriptorsSuccess({
+                    map((attributeDescriptors) => {
+                        return slice.actions.getAuthorityProviderAttributesDescriptorsSuccess({
                             attributeDescriptor: attributeDescriptors.map(transformAttributeDescriptorDtoToModel),
-                        }),
-                    ),
+                        });
+                    }),
 
                     catchError((err) =>
                         of(
@@ -155,7 +155,7 @@ const createAuthority: AppEpic = (action$, state$, deps) => {
                     mergeMap((obj) =>
                         of(
                             slice.actions.createAuthoritySuccess({ uuid: obj.uuid }),
-                            appRedirectActions.redirect({ url: `../detail/${obj.uuid}` }),
+                            appRedirectActions.redirect({ url: `../authorities/detail/${obj.uuid}` }),
                         ),
                     ),
 
@@ -184,7 +184,7 @@ const updateAuthority: AppEpic = (action$, state$, deps) => {
                     mergeMap((authorityDto) =>
                         of(
                             slice.actions.updateAuthoritySuccess({ authority: transformAuthorityResponseDtoToModel(authorityDto) }),
-                            appRedirectActions.redirect({ url: `../../detail/${authorityDto.uuid}` }),
+                            appRedirectActions.redirect({ url: `../../authorities/detail/${authorityDto.uuid}` }),
                         ),
                     ),
 
@@ -205,7 +205,10 @@ const deleteAuthority: AppEpic = (action$, state$, deps) => {
         switchMap((action) =>
             deps.apiClients.authorities.deleteAuthorityInstance({ uuid: action.payload.uuid }).pipe(
                 mergeMap(() =>
-                    of(slice.actions.deleteAuthoritySuccess({ uuid: action.payload.uuid }), appRedirectActions.redirect({ url: '../../' })),
+                    of(
+                        slice.actions.deleteAuthoritySuccess({ uuid: action.payload.uuid }),
+                        appRedirectActions.redirect({ url: '../../authorities' }),
+                    ),
                 ),
 
                 catchError((err) =>

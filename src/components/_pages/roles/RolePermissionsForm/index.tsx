@@ -39,7 +39,7 @@ function RoleForm() {
     useEffect(() => {
         dispatch(rolesActions.resetState());
         dispatch(authActions.clearResources());
-        dispatch(authActions.getResources());
+        dispatch(authActions.getAuthResources());
     }, [dispatch]);
 
     /* Load role && role permissions */

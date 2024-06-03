@@ -305,7 +305,7 @@ export default function ApprovalStepField({ approvalSteps }: Props) {
         () =>
             approvalSteps.map((approvalStep, index) => ({
                 title: (
-                    <div className="d-flex align-items-center align-content-center justify-content-center p-2">
+                    <div className="d-flex align-items-center align-content-center justify-content-center ">
                         <h6 className="m-0" onClick={() => setSelectedTab(index)}>
                             Approval Step {index + 1}
                         </h6>
@@ -331,7 +331,7 @@ export default function ApprovalStepField({ approvalSteps }: Props) {
                 tabs={[
                     ...tabs,
                     {
-                        title: <i className="fa fa-plus p-3" />,
+                        title: <i className="fa fa-plus" />,
                         content: <></>,
                         onClick: () => handleAddStepClick(),
                     },

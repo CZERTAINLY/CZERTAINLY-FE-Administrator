@@ -55,18 +55,20 @@ const updateProfileSuccess: AppEpic = (action$, state$, deps) => {
     );
 };
 
-const getResources: AppEpic = (action$, state$, deps) => {
+const getAuthResources: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
-        filter(slice.actions.getResources.match),
+        filter(slice.actions.getAuthResources.match),
         switchMap(() =>
-            deps.apiClients.auth.getAllResources().pipe(
+            deps.apiClients.auth.getAuthResources().pipe(
                 map((resources) =>
-                    slice.actions.getResourcesSuccess({ resources: resources.map((resource) => transformResourceDtoToModel(resource)) }),
+                    slice.actions.getAuthResourcesSuccess({
+                        resources: resources.map((resource) => transformResourceDtoToModel(resource)),
+                    }),
                 ),
 
                 catchError((err) =>
                     of(
-                        slice.actions.getResourcesFailure(),
+                        slice.actions.getAuthResourcesFailure(),
                         appRedirectActions.fetchError({ error: err.payload.error, message: 'Failed to get user resources' }),
                     ),
                 ),
@@ -93,6 +95,6 @@ const getObjectsForResource: AppEpic = (action$, state$, deps) => {
     );
 };
 
-export const epics = [getProfile, getResources, updateProfile, updateProfileSuccess, getObjectsForResource];
+export const epics = [getProfile, getAuthResources, updateProfile, updateProfileSuccess, getObjectsForResource];
 
 export default epics;

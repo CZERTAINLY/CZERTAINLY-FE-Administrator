@@ -6,15 +6,11 @@ import { EntityType } from 'ducks/filters';
 import { actions, selectors } from 'ducks/statisticsDashboard';
 import { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { SearchCondition, SearchGroup } from 'types/openapi';
+import { FilterConditionOperator, FilterFieldSource } from 'types/openapi';
 import { getCertificateDonutChartColors } from 'utils/dashboard';
+import { getDateInString } from 'utils/dateUtil';
 import CountBadge from './DashboardItem/CountBadge';
 import DonutChart from './DashboardItem/DonutChart';
-const getDateInString = (daysOffset: number) => {
-    const date = new Date();
-    date.setDate(date.getDate() + daysOffset);
-    return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
-};
 
 function Dashboard() {
     const dashboard = useSelector(selectors.statisticsDashboard);
@@ -72,8 +68,8 @@ function Dashboard() {
                             const selectedCertificateState = certificateStateList.find((status) => status.label === labels[index]);
                             return [
                                 {
-                                    searchGroup: SearchGroup.Property,
-                                    condition: SearchCondition.Equals,
+                                    fieldSource: FilterFieldSource.Property,
+                                    condition: FilterConditionOperator.Equals,
                                     fieldIdentifier: 'CERTIFICATE_STATE',
                                     value: selectedCertificateState?.code ? [selectedCertificateState?.code] : [''],
                                 },
@@ -99,8 +95,8 @@ function Dashboard() {
                             );
                             return [
                                 {
-                                    searchGroup: SearchGroup.Property,
-                                    condition: SearchCondition.Equals,
+                                    fieldSource: FilterFieldSource.Property,
+                                    condition: FilterConditionOperator.Equals,
                                     fieldIdentifier: 'CERTIFICATE_VALIDATION_STATUS',
                                     value: selectedCertificateValidationStatus?.code ? [selectedCertificateValidationStatus?.code] : [''],
                                 },
@@ -122,8 +118,8 @@ function Dashboard() {
                             const selectedComplianceStatus = complianceStatusList.find((status) => status.label === labels[index]);
                             return [
                                 {
-                                    searchGroup: SearchGroup.Property,
-                                    condition: SearchCondition.Equals,
+                                    fieldSource: FilterFieldSource.Property,
+                                    condition: FilterConditionOperator.Equals,
                                     fieldIdentifier: 'COMPLIANCE_STATUS',
                                     value: selectedComplianceStatus?.code ? [selectedComplianceStatus?.code] : [''],
                                 },
@@ -152,18 +148,18 @@ function Dashboard() {
                             if (labels[index] === 'More') {
                                 return [
                                     {
-                                        searchGroup: SearchGroup.Property,
-                                        condition: SearchCondition.Greater,
+                                        fieldSource: FilterFieldSource.Property,
+                                        condition: FilterConditionOperator.Greater,
                                         fieldIdentifier: 'NOT_AFTER',
                                         value: JSON.parse(JSON.stringify(getDateInString(90))),
                                     },
                                 ];
                             }
-                            if (labels[index] === 'expired') {
+                            if (labels[index] === 'Expired') {
                                 return [
                                     {
-                                        searchGroup: SearchGroup.Property,
-                                        condition: SearchCondition.Lesser,
+                                        fieldSource: FilterFieldSource.Property,
+                                        condition: FilterConditionOperator.Lesser,
                                         fieldIdentifier: 'NOT_AFTER',
                                         value: JSON.parse(JSON.stringify(getDateInString(0))),
                                     },
@@ -172,14 +168,14 @@ function Dashboard() {
                             if (labels[index] === '60' || labels[index] === '90') {
                                 return [
                                     {
-                                        searchGroup: SearchGroup.Property,
-                                        condition: SearchCondition.Greater,
+                                        fieldSource: FilterFieldSource.Property,
+                                        condition: FilterConditionOperator.Greater,
                                         fieldIdentifier: 'NOT_AFTER',
                                         value: JSON.parse(JSON.stringify(getDateInString(+labels[index] - 30))),
                                     },
                                     {
-                                        searchGroup: SearchGroup.Property,
-                                        condition: SearchCondition.Lesser,
+                                        fieldSource: FilterFieldSource.Property,
+                                        condition: FilterConditionOperator.Lesser,
                                         fieldIdentifier: 'NOT_AFTER',
                                         value: JSON.parse(JSON.stringify(getDateInString(+labels[index]))),
                                     },
@@ -187,14 +183,14 @@ function Dashboard() {
                             }
                             return [
                                 {
-                                    searchGroup: SearchGroup.Property,
-                                    condition: SearchCondition.Greater,
+                                    fieldSource: FilterFieldSource.Property,
+                                    condition: FilterConditionOperator.Greater,
                                     fieldIdentifier: 'NOT_AFTER',
                                     value: JSON.parse(JSON.stringify(getDateInString(+labels[index] - 10))),
                                 },
                                 {
-                                    searchGroup: SearchGroup.Property,
-                                    condition: SearchCondition.Lesser,
+                                    fieldSource: FilterFieldSource.Property,
+                                    condition: FilterConditionOperator.Lesser,
                                     fieldIdentifier: 'NOT_AFTER',
                                     value: JSON.parse(JSON.stringify(getDateInString(+labels[index]))),
                                 },
@@ -211,8 +207,8 @@ function Dashboard() {
                         entity={EntityType.CERTIFICATE}
                         onSetFilter={(index, labels) => [
                             {
-                                searchGroup: SearchGroup.Property,
-                                condition: SearchCondition.Equals,
+                                fieldSource: FilterFieldSource.Property,
+                                condition: FilterConditionOperator.Equals,
                                 fieldIdentifier: 'KEY_SIZE',
                                 value: JSON.parse(JSON.stringify(labels[index])),
                             },
@@ -230,16 +226,16 @@ function Dashboard() {
                             labels[index] === 'Unknown'
                                 ? [
                                       {
-                                          searchGroup: SearchGroup.Property,
-                                          condition: SearchCondition.Empty,
+                                          fieldSource: FilterFieldSource.Property,
+                                          condition: FilterConditionOperator.Empty,
                                           fieldIdentifier: 'RA_PROFILE_NAME',
                                           value: JSON.parse(JSON.stringify('')),
                                       },
                                   ]
                                 : [
                                       {
-                                          searchGroup: SearchGroup.Property,
-                                          condition: SearchCondition.Equals,
+                                          fieldSource: FilterFieldSource.Property,
+                                          condition: FilterConditionOperator.Equals,
                                           fieldIdentifier: 'RA_PROFILE_NAME',
                                           value: JSON.parse(JSON.stringify(labels[index])),
                                       },
@@ -258,16 +254,16 @@ function Dashboard() {
                             labels[index] === 'Unassigned'
                                 ? [
                                       {
-                                          searchGroup: SearchGroup.Property,
-                                          condition: SearchCondition.Empty,
+                                          fieldSource: FilterFieldSource.Property,
+                                          condition: FilterConditionOperator.Empty,
                                           fieldIdentifier: 'GROUP_NAME',
                                           value: JSON.parse(JSON.stringify('')),
                                       },
                                   ]
                                 : [
                                       {
-                                          searchGroup: SearchGroup.Property,
-                                          condition: SearchCondition.Equals,
+                                          fieldSource: FilterFieldSource.Property,
+                                          condition: FilterConditionOperator.Equals,
                                           fieldIdentifier: 'GROUP_NAME',
                                           value: JSON.parse(JSON.stringify(labels[index])),
                                       },

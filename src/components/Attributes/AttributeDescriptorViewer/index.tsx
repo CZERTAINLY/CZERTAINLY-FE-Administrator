@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 import { AttributeDescriptorModel, isDataAttributeModel, isInfoAttributeModel } from 'types/attributes';
 import { AttributeConstraintType, PlatformEnum } from 'types/openapi';
 
-interface Props {
+export interface Props {
     attributeDescriptors: AttributeDescriptorModel[];
 }
 

@@ -7,7 +7,6 @@ import { actions as appRedirectActions } from './app-redirect';
 
 import * as slice from './certificates';
 import { transformAttributeDescriptorDtoToModel, transformAttributeResponseDtoToModel } from './transform/attributes';
-import { transformCertificateGroupResponseDtoToModel } from './transform/certificateGroups';
 
 import { store } from 'index';
 import { LockWidgetNameEnum } from 'types/user-interface';
@@ -119,7 +118,7 @@ const issueCertificate: AppEpic = (action$, state, deps) => {
                     mergeMap((operation) =>
                         of(
                             slice.actions.issueCertificateSuccess({ uuid: operation.uuid, certificateData: operation.certificateData }),
-                            appRedirectActions.redirect({ url: `../detail/${operation.uuid}` }),
+                            appRedirectActions.redirect({ url: `../certificates/detail/${operation.uuid}` }),
                         ),
                     ),
 
@@ -148,7 +147,7 @@ const issueCertificateNew: AppEpic = (action$, state, deps) => {
                     mergeMap((operation) =>
                         of(
                             slice.actions.issueCertificateSuccess({ uuid: operation.uuid, certificateData: operation.certificateData }),
-                            appRedirectActions.redirect({ url: `../${operation.uuid}` }),
+                            appRedirectActions.redirect({ url: `../certificates/detail/${operation.uuid}` }),
                             alertActions.success('Issue new certificate operation successfully initiated'),
                         ),
                     ),
@@ -210,7 +209,7 @@ const renewCertificate: AppEpic = (action$, state, deps) => {
                     mergeMap((operation) =>
                         of(
                             slice.actions.renewCertificateSuccess({ uuid: operation.uuid }),
-                            appRedirectActions.redirect({ url: `../${operation.uuid}` }),
+                            appRedirectActions.redirect({ url: `../certificates/detail/${operation.uuid}` }),
                         ),
                     ),
 
@@ -240,7 +239,7 @@ const rekeyCertificate: AppEpic = (action$, state, deps) => {
                     mergeMap((operation) =>
                         of(
                             slice.actions.rekeyCertificateSuccess({ uuid: operation.uuid }),
-                            appRedirectActions.redirect({ url: `../${operation.uuid}` }),
+                            appRedirectActions.redirect({ url: `../certificates/detail/${operation.uuid}` }),
                         ),
                     ),
 
@@ -313,7 +312,7 @@ const deleteCertificate: AppEpic = (action$, state, deps) => {
                 mergeMap(() =>
                     of(
                         slice.actions.deleteCertificateSuccess({ uuid: action.payload.uuid }),
-                        appRedirectActions.redirect({ url: '../../' }),
+                        appRedirectActions.redirect({ url: '../../certificates' }),
                     ),
                 ),
 
@@ -338,25 +337,13 @@ const updateGroup: AppEpic = (action$, state, deps) => {
                     certificateUpdateObjectsDto: transformCertificateObjectModelToDto(action.payload.updateGroupRequest),
                 })
                 .pipe(
-                    switchMap(() =>
-                        deps.apiClients.certificateGroups.getGroup({ uuid: action.payload.updateGroupRequest.groupUuid! }).pipe(
-                            mergeMap((group) =>
-                                of(
-                                    slice.actions.updateGroupSuccess({
-                                        uuid: action.payload.uuid,
-                                        groupUuid: action.payload.updateGroupRequest.groupUuid!,
-                                        group: transformCertificateGroupResponseDtoToModel(group),
-                                    }),
-                                    slice.actions.getCertificateHistory({ uuid: action.payload.uuid }),
-                                ),
-                            ),
-
-                            catchError((err) =>
-                                of(
-                                    slice.actions.updateGroupFailure({ error: extractError(err, 'Failed to update group') }),
-                                    appRedirectActions.fetchError({ error: err, message: 'Failed to update group' }),
-                                ),
-                            ),
+                    mergeMap(() =>
+                        of(
+                            slice.actions.updateGroupSuccess({
+                                uuid: action.payload.uuid,
+                            }),
+                            slice.actions.getCertificateHistory({ uuid: action.payload.uuid }),
+                            slice.actions.getCertificateDetail({ uuid: action.payload.uuid }),
                         ),
                     ),
 
@@ -371,35 +358,36 @@ const updateGroup: AppEpic = (action$, state, deps) => {
     );
 };
 
-const deleteGroup: AppEpic = (action$, state, deps) => {
+const deleteGroups: AppEpic = (action$, state, deps) => {
     return action$.pipe(
-        filter(slice.actions.deleteGroup.match),
+        filter(slice.actions.deleteGroups.match),
         switchMap((action) =>
             deps.apiClients.certificates
                 .updateCertificateObjects({
                     uuid: action.payload.uuid,
-                    certificateUpdateObjectsDto: { groupUuid: '' },
+                    certificateUpdateObjectsDto: { groupUuids: [] },
                 })
                 .pipe(
                     mergeMap(() =>
                         of(
-                            slice.actions.deleteGroupSuccess({
+                            slice.actions.deleteGroupsSuccess({
                                 uuid: action.payload.uuid,
                             }),
                             slice.actions.getCertificateHistory({ uuid: action.payload.uuid }),
+                            slice.actions.getCertificateDetail({ uuid: action.payload.uuid }),
                         ),
                     ),
 
                     catchError((err) =>
                         of(
-                            slice.actions.deleteGroupFailure({ error: extractError(err, 'Failed to delete group') }),
+                            slice.actions.deleteGroupsFailure({ error: extractError(err, 'Failed to delete group') }),
                             appRedirectActions.fetchError({ error: err, message: 'Failed to delete group' }),
                         ),
                     ),
 
                     catchError((err) =>
                         of(
-                            slice.actions.deleteGroupFailure({ error: extractError(err, 'Failed to delete group') }),
+                            slice.actions.deleteGroupsFailure({ error: extractError(err, 'Failed to delete group') }),
                             appRedirectActions.fetchError({ error: err, message: 'Failed to delete group' }),
                         ),
                     ),
@@ -603,21 +591,13 @@ const bulkUpdateGroup: AppEpic = (action$, state, deps) => {
                     multipleCertificateObjectUpdateDto: transformCertificateBulkObjectModelToDto(action.payload),
                 })
                 .pipe(
-                    switchMap(() =>
-                        deps.apiClients.certificateGroups.getGroup({ uuid: action.payload.groupUuid! }).pipe(
-                            map((group) =>
-                                slice.actions.bulkUpdateGroupSuccess({
-                                    uuids: action.payload.certificateUuids!,
-                                    group: group,
-                                }),
-                            ),
-
-                            catchError((err) =>
-                                of(
-                                    slice.actions.updateOwnerFailure({ error: extractError(err, 'Failed to bulk update update group') }),
-                                    appRedirectActions.fetchError({ error: err, message: 'Failed to bulk update update group' }),
-                                ),
-                            ),
+                    mergeMap(() =>
+                        of(
+                            slice.actions.bulkUpdateGroupSuccess({
+                                uuids: action.payload.certificateUuids!,
+                            }),
+                            alertActions.success('Update operation for selected certificates groups completed.'),
+                            slice.actions.listCertificates({}),
                         ),
                     ),
 
@@ -640,7 +620,7 @@ const bulkDeleteGroup: AppEpic = (action$, state, deps) => {
                 .bulkUpdateCertificateObjects({
                     multipleCertificateObjectUpdateDto: transformCertificateBulkObjectModelToDto({
                         certificateUuids: action.payload.certificateUuids,
-                        groupUuid: '',
+                        groupUuids: [],
                     }),
                 })
                 .pipe(
@@ -650,6 +630,7 @@ const bulkDeleteGroup: AppEpic = (action$, state, deps) => {
                                 uuids: action.payload.certificateUuids!,
                             }),
                             alertActions.success('Delete operation for selected certificates groups completed.'),
+                            slice.actions.listCertificates({}),
                         ),
                     ),
 
@@ -1087,7 +1068,7 @@ const epics = [
     listCertificateLocations,
     deleteCertificate,
     updateGroup,
-    deleteGroup,
+    deleteGroups,
     bulkDeleteGroup,
     updateRaProfile,
     deleteRaProfile,

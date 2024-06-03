@@ -7,8 +7,9 @@ import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as certActions, selectors as certSelectors } from 'ducks/certificates';
 
+import { selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { actions, selectors } from 'ducks/users';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Badge, Container } from 'reactstrap';
@@ -27,6 +28,8 @@ export default function UserDetail() {
     const isFetchingRoles = useSelector(selectors.isFetchingRoles);
     const isDisabling = useSelector(selectors.isDisabling);
     const isEnabling = useSelector(selectors.isEnabling);
+    const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
+    const isUpdatingContent = useSelector(customAttributesSelectors.isUpdatingContent);
 
     const certificate = useSelector(certSelectors.certificateDetail);
     const isFetchingCertificateDetail = useSelector(certSelectors.isFetchingDetail);
@@ -73,15 +76,20 @@ export default function UserDetail() {
     const onDeleteConfirmed = useCallback(() => {
         if (!user) return;
 
-        dispatch(actions.deleteUser({ uuid: user.uuid, redirect: `../../` }));
+        dispatch(actions.deleteUser({ uuid: user.uuid, redirect: `../../users` }));
         setConfirmDelete(false);
     }, [user, dispatch]);
+
+    const isBusy = useMemo(
+        () => isFetchingDetail || isFetchingRoles || isFetchingResourceCustomAttributes || isUpdatingContent || isFetchingCertificateDetail,
+        [isFetchingDetail, isFetchingRoles, isFetchingResourceCustomAttributes, isUpdatingContent, isFetchingCertificateDetail],
+    );
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
                 icon: 'pencil',
-                disabled: user?.systemUser || false,
+                disabled: isBusy || user?.systemUser || false,
                 tooltip: 'Edit',
                 onClick: () => {
                     onEditClick();
@@ -112,7 +120,7 @@ export default function UserDetail() {
                 },
             },
         ],
-        [user, onEditClick, onDisableClick, onEnableClick],
+        [user, onEditClick, onDisableClick, onEnableClick, isBusy, setConfirmDelete],
     );
 
     const detailHeaders: TableHeader[] = useMemo(
@@ -139,14 +147,17 @@ export default function UserDetail() {
                           columns: ['Username', user.username],
                       },
                       {
-                          id: 'group',
+                          id: 'groups',
                           columns: [
-                              'Group',
-                              user.groupUuid ? (
-                                  <Link to={`../../groups/detail/${user.groupUuid}`}>{user.groupName}</Link>
-                              ) : (
-                                  user.groupName ?? ''
-                              ),
+                              'Groups',
+                              user?.groups?.length
+                                  ? user?.groups.map((group, i) => (
+                                        <Fragment key={group.uuid}>
+                                            <Link to={`../../groups/detail/${group.uuid}`}>{group.name}</Link>
+                                            {user?.groups?.length && i !== user.groups.length - 1 ? `, ` : ``}
+                                        </Fragment>
+                                    ))
+                                  : '',
                           ],
                       },
                       {

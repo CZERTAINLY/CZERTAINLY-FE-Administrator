@@ -41,7 +41,7 @@ export type NameAndUuidDto = NameAndUuidDtoOpenApi;
 export type NameAndUuidModel = NameAndUuidDto;
 
 export type MetadataItemDto = ResponseMetadataDto;
-export type MetadataItemModel = Omit<MetadataItemDto, 'sourceObjects'> & { sourceObjects?: Array<NameAndUuidModel> };
+export type MetadataItemModel = Omit<MetadataItemDto, 'sourceObjects'> & { sourceObjects: Array<NameAndUuidModel> };
 
 export type MetadataDto = MetadataResponseDto;
 export type MetadataModel = Omit<MetadataDto, 'items'> & { items: Array<MetadataItemModel> };

@@ -6,14 +6,16 @@ import ProgressButton from 'components/ProgressButton';
 import Widget from 'components/Widget';
 import { actions as connectorActions } from 'ducks/connectors';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 
 import { actions as discoveryActions, selectors as discoverySelectors } from 'ducks/discoveries';
+import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { actions as userInterfaceActions } from '../../../../ducks/user-interface';
 
 import { Field, Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import Select from 'react-select';
 import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
@@ -22,13 +24,22 @@ import { ConnectorResponseModel } from 'types/connectors';
 import { FunctionGroupCode, Resource } from 'types/openapi';
 
 import Cron from 'react-cron-generator';
+import { PlatformEnum } from 'types/openapi';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
-import { collectFormAttributes } from 'utils/attributes/attributes';
 
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import { collectFormAttributes } from 'utils/attributes/attributes';
 import { getStrongFromCronExpression } from 'utils/dateUtil';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateQuartzCronExpression, validateRequired } from 'utils/validators';
+
+interface SelectChangeValue {
+    value: string;
+    label: string;
+}
+
 interface FormValues {
     name: string | undefined;
+    triggers: string[] | undefined;
     discoveryProvider: { value: string; label: string } | undefined;
     storeKind: { value: string; label: string } | undefined;
     jobName: string | undefined;
@@ -44,6 +55,11 @@ export default function DiscoveryForm() {
     const discoveryProviders = useSelector(discoverySelectors.discoveryProviders);
     const discoveryProviderAttributeDescriptors = useSelector(discoverySelectors.discoveryProviderAttributeDescriptors);
     const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
+    const triggers = useSelector(rulesSelectors.triggers);
+    const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
+    const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.TriggerType));
+    const eventNameEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ResourceEvent));
+    const [selectedTriggers, setSelectedTriggers] = useState<SelectChangeValue[]>([]);
     const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
     const isFetchingDiscoveryDetail = useSelector(discoverySelectors.isFetchingDetail);
     const isFetchingDiscoveryProviders = useSelector(discoverySelectors.isFetchingDiscoveryProviders);
@@ -52,6 +68,17 @@ export default function DiscoveryForm() {
     const [init, setInit] = useState(true);
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
     const [discoveryProvider, setDiscoveryProvider] = useState<ConnectorResponseModel>();
+
+    const triggerOptions = useMemo(
+        () =>
+            triggers
+                .map((trigger) => ({
+                    label: trigger.name,
+                    value: trigger.uuid,
+                }))
+                .filter((trigger) => !selectedTriggers.find((selectedTrigger) => selectedTrigger.value === trigger.value)),
+        [triggers, selectedTriggers],
+    );
 
     const isBusy = useMemo(
         () =>
@@ -76,6 +103,7 @@ export default function DiscoveryForm() {
             dispatch(connectorActions.clearCallbackData());
             dispatch(discoveryActions.listDiscoveryProviders());
             dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Discoveries));
+            dispatch(rulesActions.listTriggers({ eventResource: Resource.Discoveries }));
         }
     }, [dispatch, init]);
 
@@ -110,6 +138,7 @@ export default function DiscoveryForm() {
                 discoveryActions.createDiscovery({
                     request: {
                         name: values.name!,
+                        triggers: selectedTriggers.length ? selectedTriggers.map((trigger) => trigger.value) : undefined,
                         connectorUuid: values.discoveryProvider!.value,
                         kind: values.storeKind?.value!,
                         attributes: collectFormAttributes(
@@ -126,7 +155,7 @@ export default function DiscoveryForm() {
                 }),
             );
         },
-        [dispatch, discoveryProviderAttributeDescriptors, groupAttributesCallbackAttributes, resourceCustomAttributes],
+        [dispatch, discoveryProviderAttributeDescriptors, groupAttributesCallbackAttributes, resourceCustomAttributes, selectedTriggers],
     );
 
     const onCancel = useCallback(() => {
@@ -153,6 +182,119 @@ export default function DiscoveryForm() {
         [discoveryProvider],
     );
 
+    const onUpdateTriggersConfirmed = useCallback(
+        (newValues: SelectChangeValue[]) => {
+            const previousTriggers = selectedTriggers;
+            const allTriggers = [
+                ...previousTriggers,
+                ...newValues.filter((newValue) => !previousTriggers.find((trigger) => trigger.value === newValue.value)),
+            ];
+            setSelectedTriggers(allTriggers);
+        },
+        [selectedTriggers],
+    );
+
+    const triggerHeaders: TableHeader[] = [
+        {
+            id: 'name',
+            content: 'Name',
+        },
+        {
+            id: 'triggerResource',
+            content: 'Trigger Resource',
+        },
+        {
+            id: 'triggerType',
+            content: 'Trigger Type',
+        },
+        {
+            id: 'eventName',
+            content: 'Event Name',
+        },
+        {
+            id: 'resource',
+            content: 'Resource',
+        },
+        {
+            id: 'description',
+            content: 'Description',
+        },
+        {
+            id: 'actions',
+            content: 'Actions',
+        },
+    ];
+
+    const triggerTableData: TableDataRow[] = useMemo(() => {
+        const triggerDataListOrderedAsPerSelectedTriggers = triggers
+            .filter((trigger) => selectedTriggers.find((selectedTrigger) => selectedTrigger.value === trigger.uuid))
+            .sort(
+                (a, b) =>
+                    selectedTriggers.findIndex((selectedTrigger) => selectedTrigger.value === a.uuid) -
+                    selectedTriggers.findIndex((selectedTrigger) => selectedTrigger.value === b.uuid),
+            );
+
+        return triggerDataListOrderedAsPerSelectedTriggers.map((trigger, i) => ({
+            id: trigger.uuid,
+            columns: [
+                <Link to={`../../triggers/detail/${trigger.uuid}`}>{trigger.name}</Link>,
+                getEnumLabel(resourceTypeEnum, trigger.eventResource || ''),
+                getEnumLabel(triggerTypeEnum, trigger.type),
+                getEnumLabel(eventNameEnum, trigger.event || ''),
+                getEnumLabel(resourceTypeEnum, trigger.resource || ''),
+                trigger.description || '',
+                <div className="d-flex">
+                    <Button
+                        className="btn btn-link text-danger"
+                        size="sm"
+                        color="danger"
+                        title="Delete Condition Group"
+                        onClick={() => {
+                            setSelectedTriggers(selectedTriggers.filter((selectedTrigger) => selectedTrigger.value !== trigger.uuid));
+                        }}
+                    >
+                        <i className="fa fa-trash" />
+                    </Button>
+                    <Button
+                        className="btn btn-link"
+                        size="sm"
+                        title="Move Trigger Up"
+                        disabled={i === 0}
+                        onClick={() => {
+                            const index = selectedTriggers.findIndex((selectedTrigger) => selectedTrigger.value === trigger.uuid);
+                            if (index === 0) return;
+                            const newSelectedTriggers = [...selectedTriggers];
+                            const temp = newSelectedTriggers[index];
+                            newSelectedTriggers[index] = newSelectedTriggers[index - 1];
+                            newSelectedTriggers[index - 1] = temp;
+                            setSelectedTriggers(newSelectedTriggers);
+                        }}
+                    >
+                        <i className="fa fa-arrow-up" />
+                    </Button>
+
+                    <Button
+                        className="btn btn-link"
+                        size="sm"
+                        title="Move Trigger Down"
+                        disabled={i === selectedTriggers.length - 1}
+                        onClick={() => {
+                            const index = selectedTriggers.findIndex((selectedTrigger) => selectedTrigger.value === trigger.uuid);
+                            if (index === selectedTriggers.length - 1) return;
+                            const newSelectedTriggers = [...selectedTriggers];
+                            const temp = newSelectedTriggers[index];
+                            newSelectedTriggers[index] = newSelectedTriggers[index + 1];
+                            newSelectedTriggers[index + 1] = temp;
+                            setSelectedTriggers(newSelectedTriggers);
+                        }}
+                    >
+                        <i className="fa fa-arrow-down" />
+                    </Button>
+                </div>,
+            ],
+        }));
+    }, [selectedTriggers, triggers, eventNameEnum, resourceTypeEnum, triggerTypeEnum]);
+
     return (
         <Form onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
             {({ handleSubmit, pristine, submitting, values, valid, form }) => (
@@ -177,7 +319,6 @@ export default function DiscoveryForm() {
                                     id="cronExpression"
                                     label="Cron Expression"
                                     validators={[validateRequired(), validateQuartzCronExpression(values.cronExpression)]}
-                                    // description={getCronExpression(values.cronExpression)}
                                     description={getStrongFromCronExpression(values.cronExpression)}
                                     inputGroupIcon={{
                                         icon: 'fa fa-stopwatch',
@@ -222,6 +363,24 @@ export default function DiscoveryForm() {
                         )}
                     </Widget>
 
+                    <Widget title="Triggers">
+                        <p className="text-muted mt-1 ">
+                            Note: Triggers will be executed on newly discovered certificate in displayed order
+                        </p>
+                        <CustomTable
+                            hasHeader={!!triggerTableData.length}
+                            data={triggerTableData}
+                            headers={triggerHeaders}
+                            newRowWidgetProps={{
+                                selectHint: 'Select Triggers',
+                                immidiateAdd: true,
+                                newItemsList: triggerOptions,
+                                isBusy,
+                                onAddClick: onUpdateTriggersConfirmed,
+                            }}
+                        />
+                    </Widget>
+
                     <Widget title="Add discovery" busy={isBusy}>
                         <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}>
                             {({ input, meta }) => (
@@ -256,6 +415,7 @@ export default function DiscoveryForm() {
                                             onDiscoveryProviderChange(event);
                                             form.mutators.clearAttributes('discovery');
                                             form.mutators.setAttribute('storeKind', undefined);
+                                            form.mutators.setAttribute('triggers', undefined);
                                             input.onChange(event);
                                         }}
                                         styles={{

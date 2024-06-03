@@ -1,0 +1,15 @@
+@import 'src/resources/styles/app';
+
+.copyContentButton {
+    margin: 0.5rem;
+    cursor: pointer;
+    color: $czertainly-blue;
+    font-size: small;
+    &:hover {
+        color: $brand-primary;
+    }
+
+    &:active {
+        color: $brand-primary;
+    }
+}

@@ -7,15 +7,18 @@ import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
+import { TriggerHistorySummaryModel } from 'types/rules';
 import { dateFormatter } from 'utils/dateUtil';
 import PagedCustomTable from '../../../CustomTable/PagedCustomTable';
 import TabLayout from '../../../Layout/TabLayout';
-
+import TriggerHistorySummaryViewer from './TriggerHistorySummaryViewer';
+import styles from './discoveryCertificates.module.scss';
 interface Props {
     id: string;
+    triggerHistorySummary?: TriggerHistorySummaryModel;
 }
 
-export default function DiscoveryCertificates({ id }: Props) {
+export default function DiscoveryCertificates({ id, triggerHistorySummary }: Props) {
     const dispatch = useDispatch();
 
     const discoveryCertificates = useSelector(selectors.discoveryCertificates);
@@ -37,8 +40,8 @@ export default function DiscoveryCertificates({ id }: Props) {
         [dispatch, id, newlyDiscovered],
     );
 
-    const discoveryCertificatesHeaders: TableHeader[] = useMemo(
-        () => [
+    const discoveryCertificatesHeaders: TableHeader[] = useMemo(() => {
+        const discoveryHeaders = [
             {
                 id: 'commonName',
                 content: 'Common Name',
@@ -63,24 +66,48 @@ export default function DiscoveryCertificates({ id }: Props) {
                 id: 'fingerprint',
                 content: 'Fingerprint',
             },
-        ],
-        [],
-    );
+        ];
+
+        if (newlyDiscovered === true) {
+            discoveryHeaders.push({
+                id: 'triggers',
+                content: 'Triggers',
+            });
+        }
+
+        return discoveryHeaders;
+    }, [newlyDiscovered]);
 
     const discoveryCertificatesData: TableDataRow[] = useMemo(
         () =>
-            discoveryCertificates?.certificates.map((r) => ({
-                id: r.serialNumber + r.fingerprint,
-                columns: [
+            discoveryCertificates?.certificates.map((r) => {
+                const certificateColumns = [
                     r.inventoryUuid ? <Link to={`../../certificates/detail/${r.inventoryUuid}`}>{r.commonName}</Link> : r.commonName,
-                    r.serialNumber,
+                    <span className={styles.wordWrap}>{r.serialNumber}</span>,
                     <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(r.notAfter)}</span>,
                     <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(r.notBefore)}</span>,
                     r.issuerCommonName,
-                    r.fingerprint,
-                ],
-            })) ?? [],
-        [discoveryCertificates],
+                    <span className={styles.wordWrap}>{r.fingerprint}</span>,
+                ];
+
+                if (newlyDiscovered === true) {
+                    const triggerHistoryObjectSummary = triggerHistorySummary?.objects?.find(
+                        (summary) => summary.referenceObjectUuid === r.uuid,
+                    );
+                    certificateColumns.push(
+                        triggerHistoryObjectSummary ? (
+                            <TriggerHistorySummaryViewer triggerHistoryObjectSummary={triggerHistoryObjectSummary} />
+                        ) : (
+                            ''
+                        ),
+                    );
+                }
+                return {
+                    id: r.serialNumber + r.fingerprint,
+                    columns: certificateColumns,
+                };
+            }) ?? [],
+        [discoveryCertificates, triggerHistorySummary?.objects, newlyDiscovered],
     );
 
     const pagedTable = (

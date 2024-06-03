@@ -1,7 +1,8 @@
 import { AppEpic } from 'ducks';
-import { iif, of } from 'rxjs';
-import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
+import { concat, from, iif, of } from 'rxjs';
+import { catchError, concatMap, filter, map, mergeMap, switchMap, toArray } from 'rxjs/operators';
 import { extractError } from 'utils/net';
+import { actions as alertActions } from './alerts';
 import { actions as appRedirectActions } from './app-redirect';
 import { actions as userInterfaceActions } from './user-interface';
 
@@ -108,7 +109,7 @@ const deleteSchedulerJob: AppEpic = (action$, state$, deps) => {
                         () => action.payload.redirect,
                         of(
                             slice.actions.deleteSchedulerJobSuccess({ uuid: action.payload.uuid }),
-                            appRedirectActions.redirect({ url: '../../' }),
+                            appRedirectActions.redirect({ url: '../../jobs' }),
                         ),
                         of(slice.actions.deleteSchedulerJobSuccess({ uuid: action.payload.uuid })),
                     ),
@@ -143,6 +144,38 @@ const enableSchedulerJob: AppEpic = (action$, state$, deps) => {
     );
 };
 
+const bulkEnableSchedulerJobs: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.bulkEnableSchedulerJobs.match),
+        switchMap((action) => {
+            return from(action.payload.uuids).pipe(
+                concatMap((uuid) =>
+                    deps.apiClients.scheduler.enableScheduledJob({ uuid }).pipe(
+                        map(() => slice.actions.enableSchedulerJobSuccess({ uuid })),
+                        catchError((err) =>
+                            of(
+                                slice.actions.enableSchedulerJobFailure({ error: extractError(err, 'Failed to enable Scheduled Job') }),
+                                appRedirectActions.fetchError({ error: err, message: 'Failed to enable Scheduled Job' }),
+                            ),
+                        ),
+                    ),
+                ),
+                toArray(),
+                map(() => {
+                    store.dispatch(slice.actions.bulkEnableSchedulerJobsSuccess({ uuids: action.payload.uuids }));
+                    return alertActions.success('Successfully enabled selected Scheduled jobs');
+                }),
+                catchError((err) => {
+                    return concat(
+                        of(slice.actions.bulkEnableSchedulerJobsFailure({ error: 'There was some problem' })),
+                        of(appRedirectActions.fetchError({ error: err, message: 'Failed to enable Scheduled Jobs' })),
+                    );
+                }),
+            );
+        }),
+    );
+};
+
 const disableSchedulerJob: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.disableSchedulerJob.match),
@@ -161,6 +194,49 @@ const disableSchedulerJob: AppEpic = (action$, state$, deps) => {
     );
 };
 
-const epics = [listSchedulerJobs, listSchedulerJobHistory, getSchedulerJob, deleteSchedulerJob, enableSchedulerJob, disableSchedulerJob];
+const bulkDisableSchedulerJobs: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.bulkDisableSchedulerJobs.match),
+        switchMap((action) => {
+            return from(action.payload.uuids).pipe(
+                concatMap((uuid) =>
+                    deps.apiClients.scheduler.disableScheduledJob({ uuid }).pipe(
+                        map(() => slice.actions.disableSchedulerJobSuccess({ uuid })),
+                        catchError((err) =>
+                            of(
+                                slice.actions.disableSchedulerJobFailure({
+                                    error: extractError(err, 'Failed to disable Scheduled Job'),
+                                }),
+                                appRedirectActions.fetchError({ error: err, message: 'Failed to disable Scheduled Job' }),
+                            ),
+                        ),
+                    ),
+                ),
+                toArray(),
+                map(() => {
+                    store.dispatch(slice.actions.bulkDisableSchedulerJobsSuccess({ uuids: action.payload.uuids }));
+                    return alertActions.success('Successfully disabled selected Scheduled jobs');
+                }),
+                catchError((err) => {
+                    return concat(
+                        of(slice.actions.bulkDisableSchedulerJobsFailure({ error: 'There was some problem' })),
+                        of(appRedirectActions.fetchError({ error: err, message: 'Failed to enable Scheduled Jobs' })),
+                    );
+                }),
+            );
+        }),
+    );
+};
+
+const epics = [
+    listSchedulerJobs,
+    listSchedulerJobHistory,
+    getSchedulerJob,
+    deleteSchedulerJob,
+    enableSchedulerJob,
+    disableSchedulerJob,
+    bulkEnableSchedulerJobs,
+    bulkDisableSchedulerJobs,
+];
 
 export default epics;
