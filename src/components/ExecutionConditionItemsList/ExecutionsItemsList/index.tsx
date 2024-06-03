@@ -71,12 +71,10 @@ const ExecutionsItemsList = ({ executionItems = [], executionName, executionUuid
                                           ? platformEnums[field.platformEnum][v]?.label
                                           : v?.name
                                             ? v.name
-                                            : field && checkIfFieldIsDate(field)
-                                              ? v?.label
-                                                  ? getFormattedDateTime(v?.label)
-                                                  : getFormattedDateTime(v)
-                                              : v?.label
-                                                ? v.label
+                                            : field && field.attributeContentType === AttributeContentType.Date
+                                              ? getFormattedDate(v as unknown as string)
+                                              : field && field.attributeContentType === AttributeContentType.Datetime
+                                                ? getFormattedDateTime(v as unknown as string)
                                                 : v
                                   }'`,
                           )
@@ -103,7 +101,7 @@ const ExecutionsItemsList = ({ executionItems = [], executionName, executionUuid
                 </Badge>
             );
         });
-    }, [executionItems, availableFilters, searchGroupEnum, booleanOptions, checkIfFieldIsDate, platformEnums]);
+    }, [executionItems, availableFilters, searchGroupEnum, booleanOptions, platformEnums]);
 
     return (
         <div className={styles.groupConditionContainerDiv} key={executionUuid}>

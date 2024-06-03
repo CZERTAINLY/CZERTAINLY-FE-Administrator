@@ -507,9 +507,11 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
                                     ? `'${
                                           field?.platformEnum
                                               ? platformEnums[field.platformEnum][f.value as unknown as string]?.label
-                                              : field && checkIfFieldIsDate(field)
-                                                ? getFormattedDateTime(f.value as unknown as string)
-                                                : f.value
+                                              : field && field?.attributeContentType === AttributeContentType.Date
+                                                ? getFormattedDate(f.value as unknown as string)
+                                                : field && field?.attributeContentType === AttributeContentType.Datetime
+                                                  ? getFormattedDateTime(f.value as unknown as string)
+                                                  : f.value
                                       }'`
                                     : '';
                         return (

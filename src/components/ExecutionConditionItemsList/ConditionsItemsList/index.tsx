@@ -75,9 +75,11 @@ const ConditionsItemsList = ({ conditionItems = [], conditionName, conditionUuid
                         ? `'${
                               field?.platformEnum
                                   ? platformEnums[field.platformEnum][condition.value as unknown as string]?.label
-                                  : field && checkIfFieldIsDate(field)
-                                    ? getFormattedDateTime(condition.value as unknown as string)
-                                    : condition.value
+                                  : field && field.attributeContentType === AttributeContentType.Date
+                                    ? getFormattedDate(condition.value as unknown as string)
+                                    : field && field.attributeContentType === AttributeContentType.Datetime
+                                      ? getFormattedDateTime(condition.value as unknown as string)
+                                      : condition.value
                           }'`
                         : '';
 
@@ -96,7 +98,7 @@ const ConditionsItemsList = ({ conditionItems = [], conditionName, conditionUuid
                 </Badge>
             );
         });
-    }, [FilterConditionOperatorEnum, availableFilters, booleanOptions, checkIfFieldIsDate, conditionItems, platformEnums, searchGroupEnum]);
+    }, [FilterConditionOperatorEnum, availableFilters, booleanOptions, conditionItems, platformEnums, searchGroupEnum]);
 
     if (isFetchingConditionDetails) return <Spinner active={isFetchingConditionDetails} />;
 
