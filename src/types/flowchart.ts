@@ -4,10 +4,15 @@ import { Edge, NodeProps } from 'reactflow';
 import { CertificateState, CertificateValidationStatus } from './openapi';
 
 export interface OtherProperties {
-    propertyName: string;
+    propertyName?: string;
     propertyValue?: string;
     copyable?: boolean;
     propertyContent?: ReactNode;
+}
+
+interface CertificateNodeData {
+    certificateNodeStatus?: CertificateState;
+    certificateNodeValidationStatus?: CertificateValidationStatus;
 }
 
 export interface CustomNodeData {
@@ -19,8 +24,10 @@ export interface CustomNodeData {
     handleHide?: 'source' | 'target';
     description?: string;
     otherProperties?: OtherProperties[];
-    certificateNodeStatus?: CertificateState;
-    certificateNodeValidationStatus?: CertificateValidationStatus;
+    expandedByDefault?: boolean;
+    // certificateNodeStatus?: CertificateState;
+    // certificateNodeValidationStatus?: CertificateValidationStatus;
+    certificateNodeData?: CertificateNodeData;
 }
 export interface EntityNodeProps extends NodeProps {
     data: CustomNodeData;

@@ -1,18 +1,24 @@
 import cx from 'classnames';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
+import FlowChart, { CustomNode } from 'components/FlowChart';
+import TabLayout from 'components/Layout/TabLayout';
 import SwitchWidget from 'components/SwitchWidget';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as alertActions } from 'ducks/alerts';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
+import { useTransformTriggerObjectToNodesAndEdges } from 'ducks/transform/rules';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
+import { Edge } from 'reactflow';
 import { Button, ButtonGroup, Col, Container, Input, Row } from 'reactstrap';
 import { PlatformEnum, UpdateTriggerRequestDtoEventEnum } from 'types/openapi';
+import { DeviceType, useDeviceType } from 'utils/common-hooks';
 import styles from './triggerDetails.module.scss';
+
 interface SelectChangeValue {
     value: string;
     label: string;
@@ -32,6 +38,27 @@ const TriggerDetails = () => {
     const [updatedDescription, setUpdatedDescription] = useState('');
     const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.TriggerType));
     const [highlight, setHighlight] = useState(false);
+    const deviceType = useDeviceType();
+
+    const [triggerNodes, setTriggerNodes] = useState<CustomNode[]>([]);
+    const [triggerEdges, setTriggerEdges] = useState<Edge[]>([]);
+
+    const defaultViewport = useMemo(
+        () => ({
+            zoom: 0.5,
+            x: deviceType === DeviceType.Tablet ? -50 : deviceType === DeviceType.Mobile ? -150 : 300,
+            y: 0,
+        }),
+        [deviceType],
+    );
+    const { nodes, edges } = useTransformTriggerObjectToNodesAndEdges(triggerDetails);
+
+    // useEffect(() => {
+    //     if (!triggerDetails) return;
+    //     const { nodes, edges } = useTransformTriggerObjectToNodesAndEdges(triggerDetails);
+    //     setTriggerNodes(nodes);
+    //     setTriggerEdges(edges);
+    // }, [triggerDetails]);
 
     useEffect(() => {
         if (!triggerDetails?.description || triggerDetails.uuid !== id) return;
@@ -485,56 +512,79 @@ const TriggerDetails = () => {
 
     return (
         <Container className="themed-container" fluid>
-            <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                <Col>
-                    <Widget refreshAction={getFreshDetails} busy={isBusy} title="Trigger Details" titleSize="large" widgetButtons={buttons}>
-                        <CustomTable data={triggerDetailsData} headers={triggerDetailHeader} />
-                    </Widget>
-                </Col>
-                <Col>
-                    <Widget
-                        busy={isBusy}
-                        title="Actions"
-                        titleSize="large"
-                        widgetInfoCard={{
-                            title: 'Information',
-                            description: 'Actions is named set of actions for selected trigger',
-                        }}
-                        // className={styles.highLightWidget}
-                        className={cx({ [styles.highLightWidget]: highlight === true })}
-                        // className="p
-                    >
-                        {/* <div className={styles.highLightBorder}> */}
-                        <CustomTable
-                            data={actionsData}
-                            headers={actionsDataHeader}
-                            newRowWidgetProps={{
-                                isBusy: isUpdatingTrigger,
-                                newItemsList: actionsOptions,
-                                onAddClick: onUpdateActionsConfirmed,
-                            }}
-                        />
-                        {/* </div> */}
-                    </Widget>
-                </Col>
-            </Row>
-            <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                <Col>
-                    <Widget busy={isBusy} title="Rules" titleSize="large">
-                        <CustomTable
-                            data={rulesData}
-                            headers={rulesHeader}
-                            newRowWidgetProps={{
-                                isBusy: isUpdatingTrigger,
-                                newItemsList: rulesOptions,
-                                onAddClick: onUpdateRulesConfirmed,
-                            }}
-                        />
-                    </Widget>
-                </Col>
-            </Row>
-
-            {/* <Row>{triggerDetails?.resource && <ConditionAndExecutionItemsViewer resource={triggerDetails.resource} formType="trigger" />}</Row> */}
+            <TabLayout
+                tabs={[
+                    {
+                        title: 'Trigger Details',
+                        content: (
+                            <Widget>
+                                <Row xs="1" sm="1" md="2" lg="2" xl="2">
+                                    <Col>
+                                        <Widget
+                                            refreshAction={getFreshDetails}
+                                            busy={isBusy}
+                                            title="Trigger Details"
+                                            titleSize="large"
+                                            widgetButtons={buttons}
+                                        >
+                                            <CustomTable data={triggerDetailsData} headers={triggerDetailHeader} />
+                                        </Widget>
+                                    </Col>
+                                    <Col>
+                                        <Widget
+                                            busy={isBusy}
+                                            title="Actions"
+                                            titleSize="large"
+                                            widgetInfoCard={{
+                                                title: 'Information',
+                                                description: 'Actions is named set of actions for selected trigger',
+                                            }}
+                                            className={cx({ [styles.highLightWidget]: highlight === true })}
+                                        >
+                                            <CustomTable
+                                                data={actionsData}
+                                                headers={actionsDataHeader}
+                                                newRowWidgetProps={{
+                                                    isBusy: isUpdatingTrigger,
+                                                    newItemsList: actionsOptions,
+                                                    onAddClick: onUpdateActionsConfirmed,
+                                                }}
+                                            />
+                                        </Widget>
+                                    </Col>
+                                </Row>
+                                <Row xs="1" sm="1" md="2" lg="2" xl="2">
+                                    <Col>
+                                        <Widget busy={isBusy} title="Rules" titleSize="large">
+                                            <CustomTable
+                                                data={rulesData}
+                                                headers={rulesHeader}
+                                                newRowWidgetProps={{
+                                                    isBusy: isUpdatingTrigger,
+                                                    newItemsList: rulesOptions,
+                                                    onAddClick: onUpdateRulesConfirmed,
+                                                }}
+                                            />
+                                        </Widget>
+                                    </Col>
+                                </Row>
+                            </Widget>
+                        ),
+                    },
+                    {
+                        title: 'Flow',
+                        content: (
+                            <FlowChart
+                                busy={isBusy}
+                                flowChartTitle="Trigger Flow"
+                                flowChartEdges={edges}
+                                flowChartNodes={nodes}
+                                defaultViewport={defaultViewport}
+                            />
+                        ),
+                    },
+                ]}
+            />
 
             <Dialog
                 isOpen={confirmDelete}

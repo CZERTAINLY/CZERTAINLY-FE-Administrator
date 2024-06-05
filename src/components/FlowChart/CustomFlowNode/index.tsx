@@ -10,20 +10,20 @@ import { useCopyToClipboard } from 'utils/common-hooks';
 import style from './customFlowNode.module.scss';
 
 export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }: EntityNodeProps) {
-    const [collapse, setCollapse] = useState(false);
+    const [collapse, setCollapse] = useState(data.expandedByDefault ?? false);
 
-    const [status, setStatus] = useState('+');
+    // const [status, setStatus] = useState('+');
     // TODO: Use this during dynamic flowchart updates
     // const onEntering = () => setStatus("Opening...");
     // const onExiting = () => setStatus("Closing...");
     const dispatch = useDispatch();
-    const onEntered = () => setStatus('-');
-    const onExited = () => setStatus('+');
+    // const onEntered = () => setStatus('-');
+    // const onExited = () => setStatus('+');
     const toggle = () => setCollapse(!collapse);
     const copyToClipboard = useCopyToClipboard();
 
     const getStatusClasses = () => {
-        switch (data.certificateNodeValidationStatus) {
+        switch (data?.certificateNodeData?.certificateNodeValidationStatus) {
             case CertificateValidationStatus.Valid:
                 return style.validStatus;
             case CertificateValidationStatus.Expired:
@@ -47,7 +47,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }:
     };
 
     const getExpandButtonStatusClasses = () => {
-        switch (data.certificateNodeValidationStatus) {
+        switch (data?.certificateNodeData?.certificateNodeValidationStatus) {
             case CertificateValidationStatus.Valid:
                 return style.expandButtonValid;
             case CertificateValidationStatus.Expired:
@@ -86,7 +86,8 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }:
                 {selected && data.otherProperties && (
                     <div className={style.expandButtonContainer}>
                         <Button color="primary" onClick={toggle} className={cx(style.expandButton, getExpandButtonStatusClasses())}>
-                            <span className="mx-auto">{status}</span>
+                            {/* <span className="mx-auto">{status}</span> */}
+                            <i className={cx('fa ', { 'fa-chevron-down': !collapse, 'fa-chevron-up': collapse })} />
                         </Button>
                     </div>
                 )}
@@ -121,12 +122,19 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }:
 
                 {data.otherProperties && (
                     <>
-                        <Collapse isOpen={collapse} onEntered={onEntered} onExited={onExited}>
+                        <Collapse
+                            isOpen={collapse}
+                            // onEntered={onEntered} onExited={onExited}
+
+                            className="w-100"
+                        >
                             <div className={cx(style.listContainer, { [style.listContainerDragging]: dragging })}>
-                                <ul className={cx('list-group ps-2', style.listStyle)}>
+                                <ul className={cx('list-group p-1', style.listStyle)}>
                                     {data.otherProperties.map((property, index) => (
-                                        <li key={index} className="list-group-item text-wrap p-0 ">
-                                            <span className={style.propertyName}>{property.propertyName} : </span>
+                                        <li key={index} className="list-group-item text-wrap p-0 ps-1">
+                                            {property?.propertyName && (
+                                                <span className={style.propertyName}>{property.propertyName} : </span>
+                                            )}
                                             {property?.propertyValue && (
                                                 <span className={style.propertyValue}>{property.propertyValue}</span>
                                             )}

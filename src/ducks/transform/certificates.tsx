@@ -256,8 +256,10 @@ export function transformCertifacetObjectToNodesAndEdges(
             entityLabel: certificate.commonName,
             icon: 'fa fa-certificate',
             isMainNode: true,
-            certificateNodeStatus: certificate.state,
-            certificateNodeValidationStatus: certificate.validationStatus,
+            certificateNodeData: {
+                certificateNodeStatus: certificate.state,
+                certificateNodeValidationStatus: certificate.validationStatus,
+            },
             otherProperties: otherPropertiesCurrentCertificate,
         },
     });
@@ -327,8 +329,10 @@ export function transformCertifacetObjectToNodesAndEdges(
                     entityLabel: chain.commonName,
                     icon: chainLength - 1 === index && certificateChain?.completeChain ? 'fa fa-medal' : 'fa fa-certificate',
                     isMainNode: true,
-                    certificateNodeStatus: chain.state,
-                    certificateNodeValidationStatus: chain.validationStatus,
+                    certificateNodeData: {
+                        certificateNodeStatus: chain.state,
+                        certificateNodeValidationStatus: chain.validationStatus,
+                    },
                     otherProperties: otherProperties,
                 },
             });
