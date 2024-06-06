@@ -51,6 +51,7 @@ export default function Sidebar() {
                             { _key: '/acmeaccounts', name: 'ACME Accounts', link: '/acmeaccounts' },
                             { _key: '/acmeprofiles', name: 'ACME Profiles', link: '/acmeprofiles' },
                             { _key: '/scepprofiles', name: 'SCEP Profiles', link: '/scepprofiles' },
+                            { _key: '/cmpprofiles', name: 'CMP Profiles', link: '/cmpprofiles' },
                         ]}
                     />
 
