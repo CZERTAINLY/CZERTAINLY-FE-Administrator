@@ -1,11 +1,14 @@
 import { AppEpic } from 'ducks';
 import { of } from 'rxjs';
-import { catchError, filter, switchMap } from 'rxjs/operators';
+import { catchError, filter, map, switchMap } from 'rxjs/operators';
 import { extractError } from 'utils/net';
 
 // import { slice } from './scep-profiles';
+import { actions as alertActions } from './alerts';
+import { actions as appRedirectActions } from './app-redirect';
 import { slice } from './cmp-profiles';
-import { transformCmpProfileDtoToModel } from './transform/cmp-profiles';
+import { transformCertificateListResponseDtoToModel } from './transform/certificates';
+import { transformCmpProfileDtoToModel, transformCmpProfileRequestModelToDto } from './transform/cmp-profiles';
 
 // const listScepProfiles: AppEpic = (action$, state$, deps) => {
 //     return action$.pipe(
@@ -81,6 +84,31 @@ const listCmpProfiles: AppEpic = (action$, state$, deps) => {
 //     );
 // };
 
+const listCmpSigningCertificates: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.listCmpSigningCertificates.match),
+        switchMap((action) =>
+            deps.apiClients.cmpProfiles.listCmpSigningCertificates().pipe(
+                map((cmpProfiles) =>
+                    slice.actions.listCmpSigningCertificatesSuccess({
+                        certificates: cmpProfiles.map(transformCertificateListResponseDtoToModel),
+                    }),
+                ),
+
+                catchError((error) =>
+                    of(
+                        slice.actions.listCmpSigningCertificatesFailure({
+                            error: extractError(error, 'Failed to get CMP Signing Certificates list'),
+                        }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to get CMP Signing Certificates list' }),
+                        alertActions.error(extractError(error, 'Failed to get CMP Signing Certificates list')),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
 // const getScepProfileDetail: AppEpic = (action$, state$, deps) => {
 //     return action$.pipe(
 //         filter(slice.actions.getScepProfile.match),
@@ -130,6 +158,27 @@ const listCmpProfiles: AppEpic = (action$, state$, deps) => {
 //         ),
 //     );
 // };
+
+const createCmpProfile: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.createCmpProfile.match),
+        switchMap((action) =>
+            deps.apiClients.cmpProfiles
+                .createCmpProfile({ cmpProfileRequestDto: transformCmpProfileRequestModelToDto(action.payload) })
+                .pipe(
+                    map((cmpProfile) => slice.actions.createCmpProfileSuccess()),
+
+                    catchError((error) =>
+                        of(
+                            slice.actions.createCmpProfileFailure({ error: extractError(error, 'Failed to create CMP Profile') }),
+                            appRedirectActions.fetchError({ error, message: 'Failed to create CMP Profile' }),
+                            alertActions.error(extractError(error, 'Failed to create CMP Profile')),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
 
 // const updateScepProfile: AppEpic = (action$, state$, deps) => {
 //     return action$.pipe(
@@ -317,6 +366,8 @@ const listCmpProfiles: AppEpic = (action$, state$, deps) => {
 
 const epics = [
     listCmpProfiles,
+    createCmpProfile,
+    listCmpSigningCertificates,
     // listScepProfiles,
     // listScepCaCertificates,
     // getScepProfileDetail,

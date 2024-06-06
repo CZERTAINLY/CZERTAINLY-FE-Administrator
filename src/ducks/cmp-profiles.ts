@@ -1,5 +1,5 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { CertificateListResponseDto, CertificateListResponseModel } from 'types/certificate';
+import { CertificateListResponseModel } from 'types/certificate';
 import { BulkActionModel } from 'types/connectors';
 
 import {
@@ -22,7 +22,7 @@ export type State = {
 
     cmpProfile?: CmpProfileDetailModel;
     cmpProfiles: CmpProfileModel[];
-    caCertificates?: CertificateListResponseModel[];
+    cmpSigningCertificates?: CertificateListResponseModel[];
 
     isFetchingList: boolean;
     isFetchingCertificates: boolean;
@@ -109,16 +109,29 @@ export const slice = createSlice({
             state.isFetchingList = false;
         },
 
-        listScepCaCertificates: (state, action: PayloadAction<boolean>) => {
+        // listScepCaCertificates: (state, action: PayloadAction<boolean>) => {
+        //     state.isFetchingCertificates = true;
+        // },
+
+        // listScepCaCertificatesSuccess: (state, action: PayloadAction<{ certificates: CertificateListResponseDto[] }>) => {
+        //     state.cmpSigningCertificates = action.payload.certificates;
+        //     state.isFetchingCertificates = false;
+        // },
+
+        // listScepCaCertificatesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+        //     state.isFetchingCertificates = false;
+        // },
+
+        listCmpSigningCertificates: (state, action: PayloadAction<void>) => {
             state.isFetchingCertificates = true;
         },
 
-        listScepCaCertificatesSuccess: (state, action: PayloadAction<{ certificates: CertificateListResponseDto[] }>) => {
-            state.caCertificates = action.payload.certificates;
+        listCmpSigningCertificatesSuccess: (state, action: PayloadAction<{ certificates: CertificateListResponseModel[] }>) => {
+            state.cmpSigningCertificates = action.payload.certificates;
             state.isFetchingCertificates = false;
         },
 
-        listScepCaCertificatesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+        listCmpSigningCertificatesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingCertificates = false;
         },
 
@@ -182,7 +195,7 @@ export const slice = createSlice({
             state.isCreating = true;
         },
 
-        createCmpProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+        createCmpProfileSuccess: (state, action: PayloadAction<void>) => {
             state.isCreating = false;
         },
 
@@ -530,7 +543,7 @@ const state = createFeatureSelector<State>(slice.name);
 // const scepProfiles = createSelector(state, (state) => state.scepProfiles);
 const cmpProfile = createSelector(state, (state) => state.cmpProfile);
 const cmpProfiles = createSelector(state, (state) => state.cmpProfiles);
-const caCertificates = createSelector(state, (state) => state.caCertificates);
+const cmpSigningCertificates = createSelector(state, (state) => state.cmpSigningCertificates);
 
 const deleteErrorMessage = createSelector(state, (state) => state.deleteErrorMessage);
 const bulkDeleteErrorMessages = createSelector(state, (state) => state.bulkDeleteErrorMessages);
@@ -562,7 +575,7 @@ export const selectors = {
     // scepProfiles,
     cmpProfile,
     cmpProfiles,
-    caCertificates,
+    cmpSigningCertificates,
 
     isFetchingList,
     isFetchingCertificates,
