@@ -79,6 +79,21 @@ export interface CmpProfileEditRequestDto {
      * @memberof CmpProfileEditRequestDto
      */
     name: string;
+    /**
+     * Variant of the CMP Profile
+     * @type {string}
+     * @memberof CmpProfileEditRequestDto
+     */
+    variant: CmpProfileEditRequestDtoVariantEnum;
 }
 
+/**
+ * @export
+ * @enum {string}
+ */
+export enum CmpProfileEditRequestDtoVariantEnum {
+    V2 = 'v2',
+    V23gpp = 'v2_3gpp',
+    V3 = 'v3'
+}
 

@@ -8,7 +8,12 @@ import { actions as alertActions } from './alerts';
 import { actions as appRedirectActions } from './app-redirect';
 import { slice } from './cmp-profiles';
 import { transformCertificateListResponseDtoToModel } from './transform/certificates';
-import { transformCmpProfileDtoToModel, transformCmpProfileRequestModelToDto } from './transform/cmp-profiles';
+import {
+    transformCmpProfileDetailDtoToModel,
+    transformCmpProfileDtoToModel,
+    transformCmpProfileEditRequestModelToDto,
+    transformCmpProfileRequestModelToDto,
+} from './transform/cmp-profiles';
 
 // const listScepProfiles: AppEpic = (action$, state$, deps) => {
 //     return action$.pipe(
@@ -133,6 +138,25 @@ const listCmpSigningCertificates: AppEpic = (action$, state$, deps) => {
 //     );
 // };
 
+const getCmpProfile: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.getCmpProfile.match),
+        switchMap((action) =>
+            deps.apiClients.cmpProfiles.getCmpProfile({ cmpProfileUuid: action.payload.uuid }).pipe(
+                map((cmpProfile) => slice.actions.getCmpProfileSuccess({ cmpProfile: transformCmpProfileDetailDtoToModel(cmpProfile) })),
+
+                catchError((error) =>
+                    of(
+                        slice.actions.getCmpProfileFailure({ error: extractError(error, 'Failed to get CMP Profile details') }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to get CMP Profile details' }),
+                        alertActions.error(extractError(error, 'Failed to get CMP Profile details')),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
 // const createScepProfile: AppEpic = (action$, state$, deps) => {
 //     return action$.pipe(
 //         filter(slice.actions.createScepProfile.match),
@@ -166,7 +190,12 @@ const createCmpProfile: AppEpic = (action$, state$, deps) => {
             deps.apiClients.cmpProfiles
                 .createCmpProfile({ cmpProfileRequestDto: transformCmpProfileRequestModelToDto(action.payload) })
                 .pipe(
-                    map((cmpProfile) => slice.actions.createCmpProfileSuccess()),
+                    switchMap((cmpProfile) =>
+                        of(
+                            slice.actions.createCmpProfileSuccess(),
+                            appRedirectActions.redirect({ url: `../cmpprofiles/detail/${cmpProfile.uuid}` }),
+                        ),
+                    ),
 
                     catchError((error) =>
                         of(
@@ -208,6 +237,34 @@ const createCmpProfile: AppEpic = (action$, state$, deps) => {
 //         ),
 //     );
 // };
+
+const updateCmpProfile: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.updateCmpProfile.match),
+        switchMap((action) =>
+            deps.apiClients.cmpProfiles
+                .editCmpProfile({
+                    cmpProfileUuid: action.payload.uuid,
+                    cmpProfileEditRequestDto: transformCmpProfileEditRequestModelToDto(action.payload.updateCmpRequest),
+                })
+                .pipe(
+                    switchMap((cmpProfile) =>
+                        of(
+                            (slice.actions.updateCmpProfileSuccess({ cmpProfile: transformCmpProfileDetailDtoToModel(cmpProfile) }),
+                            appRedirectActions.redirect({ url: `../../cmpprofiles/detail/${cmpProfile.uuid}` })),
+                        ),
+                    ),
+                    catchError((error) =>
+                        of(
+                            slice.actions.updateCmpProfileFailure({ error: extractError(error, 'Failed to update CMP Profile') }),
+                            appRedirectActions.fetchError({ error, message: 'Failed to update CMP Profile' }),
+                            alertActions.error(extractError(error, 'Failed to update CMP Profile')),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
 
 // const deleteScepProfile: AppEpic = (action$, state$, deps) => {
 //     return action$.pipe(
@@ -368,6 +425,8 @@ const epics = [
     listCmpProfiles,
     createCmpProfile,
     listCmpSigningCertificates,
+    getCmpProfile,
+    updateCmpProfile,
     // listScepProfiles,
     // listScepCaCertificates,
     // getScepProfileDetail,

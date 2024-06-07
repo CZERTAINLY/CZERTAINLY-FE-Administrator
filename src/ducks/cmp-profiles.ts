@@ -168,11 +168,11 @@ export const slice = createSlice({
 
             const cmpProfileIndex = state.cmpProfiles.findIndex((cmpProfile) => cmpProfile.uuid === action.payload.cmpProfile.uuid);
 
-            if (cmpProfileIndex >= 0) {
-                state.cmpProfiles[cmpProfileIndex] = action.payload.cmpProfile;
-            } else {
-                state.cmpProfiles.push(action.payload.cmpProfile);
-            }
+            // if (cmpProfileIndex >= 0) {
+            //     state.cmpProfiles[cmpProfileIndex] = action.payload.cmpProfile;
+            // } else {
+            //     state.cmpProfiles.push(action.payload.cmpProfile);
+            // }
         },
 
         getCmpProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -244,15 +244,17 @@ export const slice = createSlice({
         updateCmpProfileSuccess: (state, action: PayloadAction<{ cmpProfile: CmpProfileDetailModel }>) => {
             state.isUpdating = false;
 
-            const cmpProfileIndex = state.cmpProfiles.findIndex((cmpProfile) => cmpProfile.uuid === action.payload.cmpProfile.uuid);
+            // const cmpProfileIndex = state.cmpProfiles.findIndex((cmpProfile) => cmpProfile.uuid === action.payload.cmpProfile.uuid);
 
-            if (cmpProfileIndex >= 0) {
-                state.cmpProfiles[cmpProfileIndex] = action.payload.cmpProfile;
-            } else {
-                state.cmpProfiles.push(action.payload.cmpProfile);
+            // if (cmpProfileIndex >= 0) {
+            //     state.cmpProfiles[cmpProfileIndex] = action.payload.cmpProfile;
+            // } else {
+            //     state.cmpProfiles.push(action.payload.cmpProfile);
+            // }
+
+            if (state.cmpProfile?.uuid === action.payload.cmpProfile.uuid) {
+                state.cmpProfile = JSON.parse(JSON.stringify(action.payload.cmpProfile));
             }
-
-            if (state.cmpProfile?.uuid === action.payload.cmpProfile.uuid) state.cmpProfile = action.payload.cmpProfile;
         },
 
         updateCmpProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {

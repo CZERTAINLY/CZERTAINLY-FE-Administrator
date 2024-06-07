@@ -39,6 +39,12 @@ export interface CmpProfileDto {
      */
     enabled: boolean;
     /**
+     * Variant of the CMP Profile
+     * @type {string}
+     * @memberof CmpProfileDto
+     */
+    variant: CmpProfileDtoVariantEnum;
+    /**
      * CMP Profile description
      * @type {string}
      * @memberof CmpProfileDto
@@ -56,3 +62,14 @@ export interface CmpProfileDto {
      */
     cmpUrl?: string;
 }
+
+/**
+ * @export
+ * @enum {string}
+ */
+export enum CmpProfileDtoVariantEnum {
+    V2 = 'v2',
+    V23gpp = 'v2_3gpp',
+    V3 = 'v3'
+}
+

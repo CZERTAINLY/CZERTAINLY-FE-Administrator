@@ -32,6 +32,10 @@ export function transformCmpProfileDetailDtoToModel(cmp: CmpProfileDetailDto): C
         issueCertificateAttributes: cmp.issueCertificateAttributes?.map(transformAttributeResponseDtoToModel),
         revokeCertificateAttributes: cmp.revokeCertificateAttributes?.map(transformAttributeResponseDtoToModel),
         customAttributes: cmp.customAttributes?.map(transformAttributeResponseDtoToModel),
+
+        // issueCertificateAttributes: acme.issueCertificateAttributes?.map(transformAttributeResponseDtoToModel),
+        // revokeCertificateAttributes: acme.revokeCertificateAttributes?.map(transformAttributeResponseDtoToModel),
+        // customAttributes: acme.customAttributes?.map(transformAttributeResponseDtoToModel),
     };
 }
 // export function transformScepProfileResponseDtoToModel(scep: ScepProfileResponseDto): ScepProfileResponseModel {
