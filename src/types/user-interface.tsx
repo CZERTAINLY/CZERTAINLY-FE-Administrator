@@ -67,6 +67,7 @@ export enum LockWidgetNameEnum {
     ListOfACMEAccounts,
     ACMEAccountDetails,
     ListOfACMEProfiles,
+    ListOfCMPProfiles,
     ACMEProfileDetails,
     ListOfSCEPProfiles,
     SCEPProfileDetails,

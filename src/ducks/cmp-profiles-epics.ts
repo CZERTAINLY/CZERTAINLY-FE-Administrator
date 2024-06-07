@@ -1,9 +1,11 @@
 import { AppEpic } from 'ducks';
 import { of } from 'rxjs';
-import { catchError, filter, map, switchMap } from 'rxjs/operators';
+import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
 import { extractError } from 'utils/net';
+import { actions as userInterfaceActions } from './user-interface';
 
 // import { slice } from './scep-profiles';
+import { LockWidgetNameEnum } from 'types/user-interface';
 import { actions as alertActions } from './alerts';
 import { actions as appRedirectActions } from './app-redirect';
 import { slice } from './cmp-profiles';
@@ -50,14 +52,14 @@ const listCmpProfiles: AppEpic = (action$, state$, deps) => {
                         slice.actions.listCmpProfilesSuccess({
                             cmpProfileList: cmpProfiles.map(transformCmpProfileDtoToModel),
                         }),
-                        // userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfCMPProfiles),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfCMPProfiles),
                     ),
                 ),
 
                 catchError((error) =>
                     of(
                         slice.actions.listCmpProfilesFailure({ error: extractError(error, 'Failed to get CMP Profiles list') }),
-                        // userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfCMPProfiles),
+                        userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfCMPProfiles),
                     ),
                 ),
             ),
@@ -289,6 +291,30 @@ const updateCmpProfile: AppEpic = (action$, state$, deps) => {
 //     );
 // };
 
+const deleteCmpProfile: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.deleteCmpProfile.match),
+        switchMap((action) =>
+            deps.apiClients.cmpProfiles.deleteCmpProfile({ cmpProfileUuid: action.payload.uuid }).pipe(
+                switchMap(() =>
+                    of(
+                        slice.actions.deleteCmpProfileSuccess({ uuid: action.payload.uuid }),
+                        appRedirectActions.redirect({ url: '../../cmpprofiles' }),
+                    ),
+                ),
+
+                catchError((error) =>
+                    of(
+                        slice.actions.deleteCmpProfileFailure({ error: extractError(error, 'Failed to delete CMP Profile') }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to delete CMP Profile' }),
+                        alertActions.error(extractError(error, 'Failed to delete CMP Profile')),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
 // const enableScepProfile: AppEpic = (action$, state$, deps) => {
 //     return action$.pipe(
 //         filter(slice.actions.enableScepProfile.match),
@@ -307,6 +333,25 @@ const updateCmpProfile: AppEpic = (action$, state$, deps) => {
 //     );
 // };
 
+const enableCmpProfile: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.enableCmpProfile.match),
+        switchMap((action) =>
+            deps.apiClients.cmpProfiles.enableCmpProfile({ cmpProfileUuid: action.payload.uuid }).pipe(
+                map(() => slice.actions.enableCmpProfileSuccess({ uuid: action.payload.uuid })),
+
+                catchError((error) =>
+                    of(
+                        slice.actions.enableCmpProfileFailure({ error: extractError(error, 'Failed to enable CMP Profile') }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to enable CMP Profile' }),
+                        alertActions.error(extractError(error, 'Failed to enable CMP Profile')),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
 // const disableScepProfile: AppEpic = (action$, state$, deps) => {
 //     return action$.pipe(
 //         filter(slice.actions.disableScepProfile.match),
@@ -324,6 +369,25 @@ const updateCmpProfile: AppEpic = (action$, state$, deps) => {
 //         ),
 //     );
 // };
+
+const disableCmpProfile: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.disableCmpProfile.match),
+        switchMap((action) =>
+            deps.apiClients.cmpProfiles.disableCmpProfile({ cmpProfileUuid: action.payload.uuid }).pipe(
+                map(() => slice.actions.disableCmpProfileSuccess({ uuid: action.payload.uuid })),
+
+                catchError((error) =>
+                    of(
+                        slice.actions.disableCmpProfileFailure({ error: extractError(error, 'Failed to disable CMP Profile') }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to disable CMP Profile' }),
+                        alertActions.error(extractError(error, 'Failed to disable CMP Profile')),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
 
 // const bulkDeleteScepProfiles: AppEpic = (action$, state$, deps) => {
 //     return action$.pipe(
@@ -348,6 +412,30 @@ const updateCmpProfile: AppEpic = (action$, state$, deps) => {
 //         ),
 //     );
 // };
+
+const bulkDeleteCmpProfiles: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.bulkDeleteCmpProfiles.match),
+
+        switchMap((action) =>
+            deps.apiClients.scepProfiles.bulkDeleteScepProfile({ requestBody: action.payload.uuids }).pipe(
+                mergeMap((errors) =>
+                    of(
+                        slice.actions.bulkDeleteCmpProfilesSuccess({ uuids: action.payload.uuids, errors }),
+                        // alertActions.success('Selected SCEP profiles successfully deleted.'),
+                    ),
+                ),
+
+                catchError((err) =>
+                    of(
+                        slice.actions.bulkDeleteCmpProfilesFailure({ error: extractError(err, 'Failed to delete SCEP Accounts') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to delete SCEP Accounts' }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
 
 // const bulkForceDeleteScepProfiles: AppEpic = (action$, state$, deps) => {
 //     return action$.pipe(
@@ -385,6 +473,33 @@ const updateCmpProfile: AppEpic = (action$, state$, deps) => {
 //     );
 // };
 
+const bulkForceDeleteCmpProfiles: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.bulkForceDeleteCmpProfiles.match),
+        switchMap((action) =>
+            deps.apiClients.cmpProfiles.forceDeleteCmpProfiles({ requestBody: action.payload.uuids }).pipe(
+                mergeMap(() =>
+                    of(
+                        slice.actions.bulkForceDeleteCmpProfilesSuccess({
+                            uuids: action.payload.uuids,
+                            redirect: action.payload.redirect,
+                        }),
+                        appRedirectActions.redirect({ url: action.payload.redirect! }),
+                    ),
+                ),
+
+                catchError((error) =>
+                    of(
+                        slice.actions.bulkForceDeleteCmpProfilesFailure({ error: extractError(error, 'Failed to delete CMP Profiles') }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to delete CMP Profiles' }),
+                        alertActions.error(extractError(error, 'Failed to delete CMP Profiles')),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
 // const bulkEnableScepProfiles: AppEpic = (action$, state$, deps) => {
 //     return action$.pipe(
 //         filter(slice.actions.bulkEnableScepProfiles.match),
@@ -402,6 +517,25 @@ const updateCmpProfile: AppEpic = (action$, state$, deps) => {
 //         ),
 //     );
 // };
+
+const bulkEnableCmpProfiles: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.bulkEnableCmpProfiles.match),
+        switchMap((action) =>
+            deps.apiClients.cmpProfiles.bulkEnableCmpProfile({ requestBody: action.payload.uuids }).pipe(
+                map(() => slice.actions.bulkEnableCmpProfilesSuccess({ uuids: action.payload.uuids })),
+
+                catchError((error) =>
+                    of(
+                        slice.actions.bulkEnableCmpProfilesFailure({ error: extractError(error, 'Failed to enable CMP Accounts') }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to enable CMP Accounts' }),
+                        alertActions.error(extractError(error, 'Failed to enable CMP Accounts')),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
 
 // const bulkDisableScepProfiles: AppEpic = (action$, state$, deps) => {
 //     return action$.pipe(
@@ -421,24 +555,50 @@ const updateCmpProfile: AppEpic = (action$, state$, deps) => {
 //     );
 // };
 
+const bulkDisableCmpProfiles: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.bulkDisableCmpProfiles.match),
+        switchMap((action) =>
+            deps.apiClients.cmpProfiles.bulkDisableCmpProfile({ requestBody: action.payload.uuids }).pipe(
+                map(() => slice.actions.bulkDisableCmpProfilesSuccess({ uuids: action.payload.uuids })),
+
+                catchError((error) =>
+                    of(
+                        slice.actions.bulkDisableCmpProfilesFailure({ error: extractError(error, 'Failed to disable CMP Accounts') }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to disable CMP Accounts' }),
+                        alertActions.error(extractError(error, 'Failed to disable CMP Accounts')),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
 const epics = [
-    listCmpProfiles,
-    createCmpProfile,
-    listCmpSigningCertificates,
-    getCmpProfile,
-    updateCmpProfile,
     // listScepProfiles,
-    // listScepCaCertificates,
-    // getScepProfileDetail,
-    // updateScepProfile,
+    listCmpProfiles,
     // createScepProfile,
+    createCmpProfile,
+    // listScepCaCertificates,
+    listCmpSigningCertificates,
+    // getScepProfileDetail,
+    getCmpProfile,
+    // updateScepProfile,
+    updateCmpProfile,
     // deleteScepProfile,
+    deleteCmpProfile,
     // enableScepProfile,
+    enableCmpProfile,
     // disableScepProfile,
+    disableCmpProfile,
     // bulkDeleteScepProfiles,
+    bulkDeleteCmpProfiles,
     // bulkForceDeleteScepProfiles,
+    bulkForceDeleteCmpProfiles,
     // bulkEnableScepProfiles,
+    bulkEnableCmpProfiles,
     // bulkDisableScepProfiles,
+    bulkDisableCmpProfiles,
 ];
 
 export default epics;
