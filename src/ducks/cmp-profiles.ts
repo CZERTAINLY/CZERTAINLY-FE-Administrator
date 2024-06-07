@@ -83,6 +83,10 @@ export const slice = createSlice({
             state.bulkDeleteErrorMessages = [];
         },
 
+        resetCmpProfile: (state, action: PayloadAction<void>) => {
+            state.cmpProfile = undefined;
+        },
+
         // listScepProfiles: (state, action: PayloadAction<void>) => {
         //     state.isFetchingList = true;
         // },

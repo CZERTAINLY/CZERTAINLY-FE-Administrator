@@ -203,7 +203,6 @@ const createCmpProfile: AppEpic = (action$, state$, deps) => {
                         of(
                             slice.actions.createCmpProfileFailure({ error: extractError(error, 'Failed to create CMP Profile') }),
                             appRedirectActions.fetchError({ error, message: 'Failed to create CMP Profile' }),
-                            alertActions.error(extractError(error, 'Failed to create CMP Profile')),
                         ),
                     ),
                 ),
@@ -261,7 +260,7 @@ const updateCmpProfile: AppEpic = (action$, state$, deps) => {
                         of(
                             slice.actions.updateCmpProfileFailure({ error: extractError(error, 'Failed to update CMP Profile') }),
                             appRedirectActions.fetchError({ error, message: 'Failed to update CMP Profile' }),
-                            alertActions.error(extractError(error, 'Failed to update CMP Profile')),
+                            // alertActions.error(extractError(error, 'Failed to update CMP Profile')),
                         ),
                     ),
                 ),
@@ -308,7 +307,7 @@ const deleteCmpProfile: AppEpic = (action$, state$, deps) => {
                     of(
                         slice.actions.deleteCmpProfileFailure({ error: extractError(error, 'Failed to delete CMP Profile') }),
                         appRedirectActions.fetchError({ error, message: 'Failed to delete CMP Profile' }),
-                        alertActions.error(extractError(error, 'Failed to delete CMP Profile')),
+                        // alertActions.error(extractError(error, 'Failed to delete CMP Profile')),
                     ),
                 ),
             ),
@@ -345,7 +344,7 @@ const enableCmpProfile: AppEpic = (action$, state$, deps) => {
                     of(
                         slice.actions.enableCmpProfileFailure({ error: extractError(error, 'Failed to enable CMP Profile') }),
                         appRedirectActions.fetchError({ error, message: 'Failed to enable CMP Profile' }),
-                        alertActions.error(extractError(error, 'Failed to enable CMP Profile')),
+                        // alertActions.error(extractError(error, 'Failed to enable CMP Profile')),
                     ),
                 ),
             ),
@@ -382,7 +381,7 @@ const disableCmpProfile: AppEpic = (action$, state$, deps) => {
                     of(
                         slice.actions.disableCmpProfileFailure({ error: extractError(error, 'Failed to disable CMP Profile') }),
                         appRedirectActions.fetchError({ error, message: 'Failed to disable CMP Profile' }),
-                        alertActions.error(extractError(error, 'Failed to disable CMP Profile')),
+                        // alertActions.error(extractError(error, 'Failed to disable CMP Profile')),
                     ),
                 ),
             ),
@@ -493,7 +492,7 @@ const bulkForceDeleteCmpProfiles: AppEpic = (action$, state$, deps) => {
                     of(
                         slice.actions.bulkForceDeleteCmpProfilesFailure({ error: extractError(error, 'Failed to delete CMP Profiles') }),
                         appRedirectActions.fetchError({ error, message: 'Failed to delete CMP Profiles' }),
-                        alertActions.error(extractError(error, 'Failed to delete CMP Profiles')),
+                        // alertActions.error(extractError(error, 'Failed to delete CMP Profiles')),
                     ),
                 ),
             ),
@@ -530,7 +529,7 @@ const bulkEnableCmpProfiles: AppEpic = (action$, state$, deps) => {
                     of(
                         slice.actions.bulkEnableCmpProfilesFailure({ error: extractError(error, 'Failed to enable CMP Accounts') }),
                         appRedirectActions.fetchError({ error, message: 'Failed to enable CMP Accounts' }),
-                        alertActions.error(extractError(error, 'Failed to enable CMP Accounts')),
+                        // alertActions.error(extractError(error, 'Failed to enable CMP Accounts')),
                     ),
                 ),
             ),
@@ -567,7 +566,7 @@ const bulkDisableCmpProfiles: AppEpic = (action$, state$, deps) => {
                     of(
                         slice.actions.bulkDisableCmpProfilesFailure({ error: extractError(error, 'Failed to disable CMP Accounts') }),
                         appRedirectActions.fetchError({ error, message: 'Failed to disable CMP Accounts' }),
-                        alertActions.error(extractError(error, 'Failed to disable CMP Accounts')),
+                        // alertActions.error(extractError(error, 'Failed to disable CMP Accounts')),
                     ),
                 ),
             ),

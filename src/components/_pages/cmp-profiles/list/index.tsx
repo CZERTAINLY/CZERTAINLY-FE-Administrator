@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { Container, Table } from 'reactstrap';
+import { Badge, Container, Table } from 'reactstrap';
 
 import { actions, selectors } from 'ducks/cmp-profiles';
 
@@ -168,8 +168,14 @@ export default function AdministratorsList() {
                 align: 'center',
             },
             {
-                id: 'directoryUrl',
-                content: 'Directory URL',
+                id: 'cmpUrl',
+                content: 'CMP URL',
+                sortable: true,
+                width: 'auto',
+            },
+            {
+                id: 'variant',
+                content: 'Variant',
                 sortable: true,
                 width: 'auto',
             },
@@ -205,7 +211,7 @@ export default function AdministratorsList() {
                     ),
 
                     cmpProfile.cmpUrl || '',
-
+                    <Badge color="primary">{cmpProfile.variant}</Badge>,
                     <StatusBadge enabled={cmpProfile.enabled} />,
                 ],
             })),
@@ -236,8 +242,7 @@ export default function AdministratorsList() {
             <Dialog
                 isOpen={confirmDelete}
                 caption={`Delete ${checkedRows.length > 1 ? 'CMP Profiles' : 'an CMP Profile'}`}
-                body={`You are about to delete ${checkedRows.length > 1 ? 'CMP Profiles' : 'an CMP Profile'} which may have associated CMP
-                   Account(s). When deleted the CMP Account(s) will be revoked. Is this what you want to do?`}
+                body={`You are about to delete ${checkedRows.length > 1 ? 'CMP Profiles' : 'an CMP Profile'}. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },

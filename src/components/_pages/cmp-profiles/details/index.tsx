@@ -147,18 +147,6 @@ export default function AdministratorDetail() {
                           id: 'cmpUrl',
                           columns: ['CMP URL', cmpProfile.cmpUrl || 'N/A'],
                       },
-                      //   {
-                      //       id: 'retryInterval',
-                      //       columns: ['Retry Interval', `${cmpProfile.retryInterval || 'N/A'} (seconds)`],
-                      //   },
-                      //   {
-                      //       id: 'orderValidity',
-                      //       columns: ['Order Validity', `${cmpProfile.validity || 'N/A'} (seconds)`],
-                      //   },
-                      //   {
-                      //       id: 'directoryUrl',
-                      //       columns: ['Directory URL', cmpProfile.directoryUrl || 'N/A'],
-                      //   },
                   ],
         [cmpProfile],
     );
@@ -195,65 +183,6 @@ export default function AdministratorDetail() {
         [cmpProfile],
     );
 
-    // const dnsData: TableDataRow[] = useMemo(
-    //     () =>
-    //         !cmpProfile
-    //             ? []
-    //             : [
-    //                   {
-    //                       id: 'dnsResolverIpAddress',
-    //                       columns: ['DNS Resolver IP Address', cmpProfile.dnsResolverIp || 'N/A'],
-    //                   },
-    //                   {
-    //                       id: 'dnsResolverPort',
-    //                       columns: ['DNS Resolver Port', cmpProfile.dnsResolverPort || 'N/A'],
-    //                   },
-    //               ],
-    //     [cmpProfile],
-    // );
-
-    // const termsOfServiceData: TableDataRow[] = useMemo(
-    //     () =>
-    //         !cmpProfile
-    //             ? []
-    //             : [
-    //                   {
-    //                       id: 'termsOfServiceUrl',
-    //                       columns: ['Terms of Service URL', cmpProfile.termsOfServiceUrl || 'N/A'],
-    //                   },
-    //                   {
-    //                       id: 'changesToTermsOfServiceUrl',
-    //                       columns: ['Changes of Terms of Service URL', cmpProfile.termsOfServiceChangeUrl || 'N/A'],
-    //                   },
-    //                   {
-    //                       id: 'disableNewOrderPlacement',
-    //                       columns: [
-    //                           'Disable new Order placement? (due to change in Terms Of Service)',
-    //                           cmpProfile.termsOfServiceChangeDisable !== undefined
-    //                               ? cmpProfile.termsOfServiceChangeDisable
-    //                                   ? 'Yes'
-    //                                   : 'No'
-    //                               : 'N/A',
-    //                       ],
-    //                   },
-    //                   {
-    //                       id: 'requireContact',
-    //                       columns: [
-    //                           'Require Contact information for new Accounts?',
-    //                           cmpProfile.requireContact !== undefined ? (cmpProfile.requireContact ? 'Yes' : 'No') : 'N/A',
-    //                       ],
-    //                   },
-    //                   {
-    //                       id: 'requireAgreement',
-    //                       columns: [
-    //                           'Require Agreement for new Accounts?',
-    //                           cmpProfile.requireTermsOfService !== undefined ? (cmpProfile.requireTermsOfService ? 'Yes' : 'No') : 'N/A',
-    //                       ],
-    //                   },
-    //               ],
-    //     [cmpProfile],
-    // );
-
     const raProfileText = useMemo(
         () => (raProfileDetailData.length > 0 ? 'RA Profile Configuration' : 'Default RA Profile not selected'),
         [raProfileDetailData],
@@ -275,16 +204,6 @@ export default function AdministratorDetail() {
                         <CustomTable headers={tableHeader} data={cmpProfileDetailData} />
                     </Widget>
                 </Col>
-
-                {/* <Col>
-                    <Widget title="DNS" busy={isBusy} titleSize="large">
-                        <CustomTable headers={tableHeader} data={dnsData} />
-                    </Widget>
-
-                    <Widget title="Terms of Service" busy={isBusy} titleSize="large">
-                        <CustomTable headers={tableHeader} data={termsOfServiceData} />
-                    </Widget>
-                </Col> */}
             </Row>
 
             {cmpProfile && (
@@ -332,8 +251,7 @@ export default function AdministratorDetail() {
             <Dialog
                 isOpen={confirmDelete}
                 caption="Delete CMP Profile"
-                body="You are about to delete CMP Profile which may have associated CMP
-                  Account(s). When deleted the CMP Account(s) will be revoked."
+                body="You are about to delete CMP Profile. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },

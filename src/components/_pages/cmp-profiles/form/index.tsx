@@ -27,6 +27,7 @@ import { RaProfileSimplifiedModel } from 'types/ra-profiles';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 import { composeValidators, validateAlphaNumericWithoutAccents, validateLength, validateRequired } from 'utils/validators';
+import styles from './cmpForm.module.scss';
 
 interface SelectChangeValue {
     value: string;
@@ -62,6 +63,7 @@ export default function CmpProfileForm() {
     // const raProfile = useSelector(raProfileSelectors.raProfile);
     const raProfiles = useSelector(raProfileSelectors.raProfiles);
 
+    const isFetchingCmpCertificates = useSelector(cmpProfileSelectors.isFetchingCertificates);
     const isFetchingDetail = useSelector(cmpProfileSelectors.isFetchingDetail);
     const isCreating = useSelector(cmpProfileSelectors.isCreating);
     const isUpdating = useSelector(cmpProfileSelectors.isUpdating);
@@ -119,19 +121,21 @@ export default function CmpProfileForm() {
     );
 
     useEffect(() => {
-        if (editMode && id) {
-            dispatch(cmpProfileActions.getCmpProfile({ uuid: id }));
-        }
-    }, [dispatch, id, editMode]);
-
-    useEffect(() => {
         dispatch(customAttributesActions.listResourceCustomAttributes(Resource.CmpProfiles));
         dispatch(raProfileActions.listRaProfiles());
-        dispatch(cmpProfileActions.listCmpSigningCertificates());
+        // dispatch(cmpProfileActions.listCmpSigningCertificates());
     }, [dispatch]);
 
     const title = useMemo(() => (editMode ? 'Edit CMP Profile' : 'Create CMP Profile'), [editMode]);
-    const isBusy = useMemo(() => isFetchingDetail || isCreating || isUpdating, [isFetchingDetail, isCreating, isUpdating]);
+    const isBusy = useMemo(
+        () => isFetchingDetail || isCreating || isUpdating || isFetchingCmpCertificates,
+        [isFetchingDetail, isCreating, isUpdating, isFetchingCmpCertificates],
+    );
+
+    useEffect(() => {
+        if (id) dispatch(cmpProfileActions.getCmpProfile({ uuid: id }));
+        else dispatch(cmpProfileActions.resetCmpProfile());
+    }, [id, dispatch]);
 
     const onSubmit = useCallback(
         (values: FormValues) => {
@@ -361,7 +365,7 @@ export default function CmpProfileForm() {
 
     return (
         <Widget title={title} busy={isBusy}>
-            {!isBusy && (
+            {!isFetchingDetail && (
                 <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
                     {({ handleSubmit, pristine, submitting, valid, form, values }) => {
                         return (
@@ -374,7 +378,7 @@ export default function CmpProfileForm() {
                                                 {...input}
                                                 id="name"
                                                 type="text"
-                                                placeholder="Name"
+                                                placeholder="CMP Profile Name"
                                                 valid={!meta.error && meta.touched}
                                                 invalid={!!meta.error && meta.touched}
                                                 disabled={editMode}
@@ -388,110 +392,136 @@ export default function CmpProfileForm() {
                                     {({ input, meta }) => (
                                         <FormGroup>
                                             <Label for="description">Description</Label>
-                                            <Input {...input} id="description" type="text" placeholder="Description" />
+                                            <Input {...input} id="description" type="textarea" placeholder="Enter Description" />
                                         </FormGroup>
                                     )}
                                 </Field>
-
-                                <Field name="selectedVariant" validate={composeValidators(validateRequired())}>
-                                    {({ input, meta }) => (
-                                        <FormGroup>
-                                            <Label for="selectedVariant">Variant</Label>
-                                            <Select
-                                                {...input}
-                                                id="selectedVariant"
-                                                maxMenuHeight={140}
-                                                menuPlacement="auto"
-                                                options={cmpProfileVariantOptions}
-                                                placeholder="Select Variant"
-                                                isClearable={true}
-                                            />
-                                            <FormFeedback>{meta.error}</FormFeedback>
-                                        </FormGroup>
-                                    )}
-                                </Field>
-
-                                <Field name="selectedRequestProtectionMethod">
-                                    {({ input, meta }) => (
-                                        <FormGroup>
-                                            <Label for="selectedRequestProtectionMethod">Requested Protection Method</Label>
-                                            <Select
-                                                {...input}
-                                                id="selectedRequestProtectionMethod"
-                                                maxMenuHeight={140}
-                                                menuPlacement="auto"
-                                                options={protectionMethodOptions}
-                                                placeholder="Select Requested Protection Method"
-                                                isClearable={true}
-                                                onChange={(event) => {
-                                                    input.onChange(event);
-                                                    form.change('sharedSecret', undefined);
-                                                }}
-                                            />
-                                        </FormGroup>
-                                    )}
-                                </Field>
-                                {values?.selectedRequestProtectionMethod?.value === ProtectionMethod.SharedSecret && (
-                                    <Field name="sharedSecret" validate={composeValidators(validateRequired())}>
+                                <Widget title="CMP Variant Configuration">
+                                    <Field name="selectedVariant" validate={composeValidators(validateRequired())} type="radio">
                                         {({ input, meta }) => (
                                             <FormGroup>
-                                                <Label for="sharedSecret">Shared Secret</Label>
-                                                <Input
-                                                    {...input}
-                                                    id="sharedSecret"
-                                                    type="text"
-                                                    placeholder="Shared Secret"
-                                                    valid={!meta.error && meta.touched}
-                                                    invalid={!!meta.error && meta.touched}
-                                                />
-                                                <FormFeedback>{meta.error}</FormFeedback>
-                                            </FormGroup>
-                                        )}
-                                    </Field>
-                                )}
-
-                                <Field name="selectedResponseProtectionMethod">
-                                    {({ input, meta }) => (
-                                        <FormGroup>
-                                            <Label for="selectedResponseProtectionMethod">Response Protection Method</Label>
-                                            <Select
-                                                {...input}
-                                                id="selectedResponseProtectionMethod"
-                                                maxMenuHeight={140}
-                                                menuPlacement="auto"
-                                                options={protectionMethodOptions}
-                                                placeholder="Select Response Protection Method"
-                                                isClearable={true}
-                                                onChange={(event) => {
-                                                    input.onChange(event);
-                                                    form.change('selectedSigningCertificate', undefined);
-                                                }}
-                                            />
-                                        </FormGroup>
-                                    )}
-                                </Field>
-
-                                {values?.selectedResponseProtectionMethod?.value === ProtectionMethod.Signature && (
-                                    <Field name="selectedSigningCertificate" validate={composeValidators(validateRequired())}>
-                                        {({ input, meta }) => (
-                                            <FormGroup>
-                                                <Label for="selectedSigningCertificate">Signing Certificate</Label>
+                                                {/* <Label for="selectedVariant">Variant</Label>
                                                 <Select
                                                     {...input}
-                                                    id="selectedSigningCertificate"
+                                                    id="selectedVariant"
                                                     maxMenuHeight={140}
                                                     menuPlacement="auto"
-                                                    options={signingCertificateOptions}
-                                                    placeholder="Select Signing Certificate"
+                                                    options={cmpProfileVariantOptions}
+                                                    placeholder="Select Variant"
                                                     isClearable={true}
                                                 />
-
-                                                <FormFeedback>{meta.error}</FormFeedback>
+                                                <FormFeedback>{meta.error}</FormFeedback> */}
+                                                {cmpProfileVariantOptions.map((option, index) => {
+                                                    return (
+                                                        <FormGroup check inline key={index} className={styles.radioFormGroup}>
+                                                            <Label check>
+                                                                <Input
+                                                                    type="radio"
+                                                                    name="selectedVariant"
+                                                                    value={option.value}
+                                                                    onChange={(event) => {
+                                                                        input.onChange({ value: option.value, label: option.label });
+                                                                    }}
+                                                                    checked={values?.selectedVariant?.value === option.value}
+                                                                    className={styles.radioFormInput}
+                                                                />
+                                                                {option.label}
+                                                            </Label>
+                                                        </FormGroup>
+                                                    );
+                                                })}
                                             </FormGroup>
                                         )}
                                     </Field>
-                                )}
+                                </Widget>
+                                <Widget title="Request Configuration">
+                                    <Field name="selectedRequestProtectionMethod">
+                                        {({ input, meta }) => (
+                                            <FormGroup>
+                                                <Label for="selectedRequestProtectionMethod">Requested Protection Method</Label>
+                                                <Select
+                                                    {...input}
+                                                    id="selectedRequestProtectionMethod"
+                                                    maxMenuHeight={140}
+                                                    menuPlacement="auto"
+                                                    options={protectionMethodOptions}
+                                                    placeholder="Select Requested Protection Method"
+                                                    isClearable={true}
+                                                    onChange={(event) => {
+                                                        input.onChange(event);
+                                                        form.change('sharedSecret', undefined);
+                                                    }}
+                                                />
+                                            </FormGroup>
+                                        )}
+                                    </Field>
+                                    {values?.selectedRequestProtectionMethod?.value === ProtectionMethod.SharedSecret && (
+                                        <Field name="sharedSecret" validate={composeValidators(validateRequired())}>
+                                            {({ input, meta }) => (
+                                                <FormGroup>
+                                                    <Label for="sharedSecret">Shared Secret</Label>
+                                                    <Input
+                                                        {...input}
+                                                        id="sharedSecret"
+                                                        type="password"
+                                                        placeholder="Shared Secret"
+                                                        valid={!meta.error && meta.touched}
+                                                        invalid={!!meta.error && meta.touched}
+                                                    />
+                                                    <FormFeedback>{meta.error}</FormFeedback>
+                                                </FormGroup>
+                                            )}
+                                        </Field>
+                                    )}
+                                </Widget>
 
+                                <Widget title="Response Configuration">
+                                    <Field name="selectedResponseProtectionMethod">
+                                        {({ input, meta }) => (
+                                            <FormGroup>
+                                                <Label for="selectedResponseProtectionMethod">Response Protection Method</Label>
+                                                <Select
+                                                    {...input}
+                                                    id="selectedResponseProtectionMethod"
+                                                    maxMenuHeight={140}
+                                                    menuPlacement="auto"
+                                                    options={protectionMethodOptions}
+                                                    placeholder="Select Response Protection Method"
+                                                    isClearable={true}
+                                                    onChange={(event) => {
+                                                        input.onChange(event);
+                                                        form.change('selectedSigningCertificate', undefined);
+                                                        if (event?.value === ProtectionMethod.Signature) {
+                                                            if (!cmpSigningCertificates || cmpSigningCertificates.length === 0)
+                                                                dispatch(cmpProfileActions.listCmpSigningCertificates());
+                                                        }
+                                                    }}
+                                                />
+                                            </FormGroup>
+                                        )}
+                                    </Field>
+
+                                    {values?.selectedResponseProtectionMethod?.value === ProtectionMethod.Signature && (
+                                        <Field name="selectedSigningCertificate" validate={composeValidators(validateRequired())}>
+                                            {({ input, meta }) => (
+                                                <FormGroup>
+                                                    <Label for="selectedSigningCertificate">Signing Certificate</Label>
+                                                    <Select
+                                                        {...input}
+                                                        id="selectedSigningCertificate"
+                                                        maxMenuHeight={140}
+                                                        menuPlacement="auto"
+                                                        options={signingCertificateOptions}
+                                                        placeholder="Select Signing Certificate"
+                                                        isClearable={true}
+                                                    />
+
+                                                    <FormFeedback>{meta.error}</FormFeedback>
+                                                </FormGroup>
+                                            )}
+                                        </Field>
+                                    )}
+                                </Widget>
                                 <Widget
                                     title="RA Profile Configuration"
                                     busy={
@@ -515,9 +545,11 @@ export default function CmpProfileForm() {
                                                     placeholder="Select to change RA Profile if needed"
                                                     isClearable={true}
                                                     onChange={(event) => {
-                                                        if (event.value) {
+                                                        input.onChange(event);
+                                                        if (event?.value) {
                                                             onRaProfileChange(form, event.value.uuid);
-                                                            input.onChange(event);
+                                                        } else {
+                                                            onRaProfileChange(form, undefined);
                                                         }
                                                     }}
                                                 />
