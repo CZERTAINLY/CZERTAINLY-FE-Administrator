@@ -253,6 +253,7 @@ const updateCmpProfile: AppEpic = (action$, state$, deps) => {
                     switchMap((cmpProfile) =>
                         of(
                             (slice.actions.updateCmpProfileSuccess({ cmpProfile: transformCmpProfileDetailDtoToModel(cmpProfile) }),
+                            slice.actions.getCmpProfile({ uuid: cmpProfile.uuid }),
                             appRedirectActions.redirect({ url: `../../cmpprofiles/detail/${cmpProfile.uuid}` })),
                         ),
                     ),

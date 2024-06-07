@@ -130,7 +130,7 @@ export default function CmpProfileForm() {
         dispatch(cmpProfileActions.listCmpSigningCertificates());
     }, [dispatch]);
 
-    const title = useMemo(() => (editMode ? 'CMP Profile' : 'CMP Profile'), [editMode]);
+    const title = useMemo(() => (editMode ? 'Edit CMP Profile' : 'Create CMP Profile'), [editMode]);
     const isBusy = useMemo(() => isFetchingDetail || isCreating || isUpdating, [isFetchingDetail, isCreating, isUpdating]);
 
     const onSubmit = useCallback(
@@ -366,7 +366,7 @@ export default function CmpProfileForm() {
                     {({ handleSubmit, pristine, submitting, valid, form, values }) => {
                         return (
                             <BootstrapForm onSubmit={handleSubmit}>
-                                <Field name="name" validators={[validateRequired(), validateAlphaNumericWithoutAccents()]}>
+                                <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithoutAccents())}>
                                     {({ input, meta }) => (
                                         <FormGroup>
                                             <Label for="name">Name</Label>

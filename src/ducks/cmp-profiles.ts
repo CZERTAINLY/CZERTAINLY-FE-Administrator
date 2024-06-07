@@ -252,9 +252,9 @@ export const slice = createSlice({
             //     state.cmpProfiles.push(action.payload.cmpProfile);
             // }
 
-            if (state.cmpProfile?.uuid === action.payload.cmpProfile.uuid) {
-                state.cmpProfile = JSON.parse(JSON.stringify(action.payload.cmpProfile));
-            }
+            // if (state.cmpProfile?.uuid === action.payload.cmpProfile.uuid) {
+            //     state.cmpProfile = JSON.parse(JSON.stringify(action.payload.cmpProfile));
+            // }
         },
 
         updateCmpProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
