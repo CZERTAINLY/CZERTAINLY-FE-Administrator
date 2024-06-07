@@ -306,15 +306,6 @@ export default function CmpProfileForm() {
             }
             const selectedRaProfile = raProfilesOptions.find((raProfile) => raProfile.value.uuid === value);
 
-            // if (selectedRaProfile && selectedRaProfileDetails) {
-            //     dispatch(
-            //         raProfileActions.getRaProfileDetail({
-            //             uuid: selectedRaProfileDetails?.uuid,
-            //             authorityUuid: selectedRaProfileDetails?.authorityInstanceUuid,
-            //         }),
-            //     );
-            // }
-
             if (selectedRaProfile?.value?.authorityInstanceUuid) {
                 dispatch(
                     raProfileActions.listIssuanceAttributeDescriptors({
