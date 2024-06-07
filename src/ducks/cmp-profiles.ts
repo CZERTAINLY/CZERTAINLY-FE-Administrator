@@ -87,19 +87,6 @@ export const slice = createSlice({
             state.cmpProfile = undefined;
         },
 
-        // listScepProfiles: (state, action: PayloadAction<void>) => {
-        //     state.isFetchingList = true;
-        // },
-
-        // listScepProfilesSuccess: (state, action: PayloadAction<{ scepProfileList: ScepProfileListResponseModel[] }>) => {
-        //     state.scepProfiles = action.payload.scepProfileList;
-        //     state.isFetchingList = false;
-        // },
-
-        // listScepProfilesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-        //     state.isFetchingList = false;
-        // },
-
         listCmpProfiles: (state, action: PayloadAction<void>) => {
             state.isFetchingList = true;
         },
@@ -112,19 +99,6 @@ export const slice = createSlice({
         listCmpProfilesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingList = false;
         },
-
-        // listScepCaCertificates: (state, action: PayloadAction<boolean>) => {
-        //     state.isFetchingCertificates = true;
-        // },
-
-        // listScepCaCertificatesSuccess: (state, action: PayloadAction<{ certificates: CertificateListResponseDto[] }>) => {
-        //     state.cmpSigningCertificates = action.payload.certificates;
-        //     state.isFetchingCertificates = false;
-        // },
-
-        // listScepCaCertificatesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-        //     state.isFetchingCertificates = false;
-        // },
 
         listCmpSigningCertificates: (state, action: PayloadAction<void>) => {
             state.isFetchingCertificates = true;
@@ -139,28 +113,6 @@ export const slice = createSlice({
             state.isFetchingCertificates = false;
         },
 
-        // getScepProfile: (state, action: PayloadAction<{ uuid: string }>) => {
-        //     state.isFetchingDetail = true;
-        // },
-
-        // getScepProfileSuccess: (state, action: PayloadAction<{ scepProfile: ScepProfileResponseModel }>) => {
-        //     state.isFetchingDetail = false;
-
-        //     state.scepProfile = action.payload.scepProfile;
-
-        //     const scepProfileIndex = state.scepProfiles.findIndex((scepProfile) => scepProfile.uuid === action.payload.scepProfile.uuid);
-
-        //     if (scepProfileIndex >= 0) {
-        //         state.scepProfiles[scepProfileIndex] = action.payload.scepProfile;
-        //     } else {
-        //         state.scepProfiles.push(action.payload.scepProfile);
-        //     }
-        // },
-
-        // getScepProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-        //     state.isFetchingDetail = false;
-        // },
-
         getCmpProfile: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isFetchingDetail = true;
         },
@@ -171,29 +123,11 @@ export const slice = createSlice({
             state.cmpProfile = action.payload.cmpProfile;
 
             const cmpProfileIndex = state.cmpProfiles.findIndex((cmpProfile) => cmpProfile.uuid === action.payload.cmpProfile.uuid);
-
-            // if (cmpProfileIndex >= 0) {
-            //     state.cmpProfiles[cmpProfileIndex] = action.payload.cmpProfile;
-            // } else {
-            //     state.cmpProfiles.push(action.payload.cmpProfile);
-            // }
         },
 
         getCmpProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingDetail = false;
         },
-
-        // createScepProfile: (state, action: PayloadAction<ScepProfileAddRequestModel>) => {
-        //     state.isCreating = true;
-        // },
-
-        // createScepProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
-        //     state.isCreating = false;
-        // },
-
-        // createScepProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-        //     state.isCreating = false;
-        // },
 
         createCmpProfile: (state, action: PayloadAction<CmpProfileRequestModel>) => {
             state.isCreating = true;
@@ -207,34 +141,6 @@ export const slice = createSlice({
             state.isCreating = false;
         },
 
-        // updateScepProfile: (
-        //     state,
-        //     action: PayloadAction<{
-        //         uuid: string;
-        //         updateScepRequest: ScepProfileEditRequestModel;
-        //     }>,
-        // ) => {
-        //     state.isUpdating = true;
-        // },
-
-        // updateScepProfileSuccess: (state, action: PayloadAction<{ scepProfile: ScepProfileResponseModel }>) => {
-        //     state.isUpdating = false;
-
-        //     const scepProfileIndex = state.scepProfiles.findIndex((scepProfile) => scepProfile.uuid === action.payload.scepProfile.uuid);
-
-        //     if (scepProfileIndex >= 0) {
-        //         state.scepProfiles[scepProfileIndex] = action.payload.scepProfile;
-        //     } else {
-        //         state.scepProfiles.push(action.payload.scepProfile);
-        //     }
-
-        //     if (state.scepProfile?.uuid === action.payload.scepProfile.uuid) state.scepProfile = action.payload.scepProfile;
-        // },
-
-        // updateScepProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-        //     state.isUpdating = false;
-        // },
-
         updateCmpProfile: (
             state,
             action: PayloadAction<{
@@ -247,43 +153,11 @@ export const slice = createSlice({
 
         updateCmpProfileSuccess: (state, action: PayloadAction<{ cmpProfile: CmpProfileDetailModel }>) => {
             state.isUpdating = false;
-
-            // const cmpProfileIndex = state.cmpProfiles.findIndex((cmpProfile) => cmpProfile.uuid === action.payload.cmpProfile.uuid);
-
-            // if (cmpProfileIndex >= 0) {
-            //     state.cmpProfiles[cmpProfileIndex] = action.payload.cmpProfile;
-            // } else {
-            //     state.cmpProfiles.push(action.payload.cmpProfile);
-            // }
-
-            // if (state.cmpProfile?.uuid === action.payload.cmpProfile.uuid) {
-            //     state.cmpProfile = JSON.parse(JSON.stringify(action.payload.cmpProfile));
-            // }
         },
 
         updateCmpProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdating = false;
         },
-
-        // deleteScepProfile: (state, action: PayloadAction<{ uuid: string }>) => {
-        //     state.isDeleting = true;
-        //     state.deleteErrorMessage = '';
-        // },
-
-        // deleteScepProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
-        //     state.isDeleting = false;
-
-        //     const profileIndex = state.scepProfiles.findIndex((profile) => profile.uuid === action.payload.uuid);
-
-        //     if (profileIndex >= 0) state.scepProfiles.splice(profileIndex, 1);
-
-        //     if (state.scepProfile?.uuid === action.payload.uuid) state.scepProfile = undefined;
-        // },
-
-        // deleteScepProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-        //     state.isDeleting = false;
-        //     state.deleteErrorMessage = action.payload.error || 'Unknown error';
-        // },
 
         deleteCmpProfile: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isDeleting = true;
@@ -305,24 +179,6 @@ export const slice = createSlice({
             state.deleteErrorMessage = action.payload.error || 'Unknown error';
         },
 
-        // enableScepProfile: (state, action: PayloadAction<{ uuid: string }>) => {
-        //     state.isEnabling = true;
-        // },
-
-        // enableScepProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
-        //     state.isEnabling = false;
-
-        //     const profileIndex = state.scepProfiles.findIndex((profile) => profile.uuid === action.payload.uuid);
-
-        //     if (profileIndex >= 0) state.scepProfiles[profileIndex].enabled = true;
-
-        //     if (state.scepProfile?.uuid === action.payload.uuid) state.scepProfile.enabled = true;
-        // },
-
-        // enableScepProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-        //     state.isEnabling = false;
-        // },
-
         enableCmpProfile: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isEnabling = true;
         },
@@ -341,24 +197,6 @@ export const slice = createSlice({
             state.isEnabling = false;
         },
 
-        // disableScepProfile: (state, action: PayloadAction<{ uuid: string }>) => {
-        //     state.isDisabling = true;
-        // },
-
-        // disableScepProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
-        //     state.isDisabling = false;
-
-        //     const profileIndex = state.scepProfiles.findIndex((profile) => profile.uuid === action.payload.uuid);
-
-        //     if (profileIndex >= 0) state.scepProfiles[profileIndex].enabled = false;
-
-        //     if (state.scepProfile?.uuid === action.payload.uuid) state.scepProfile.enabled = false;
-        // },
-
-        // disableScepProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-        //     state.isDisabling = false;
-        // },
-
         disableCmpProfile: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isDisabling = true;
         },
@@ -376,31 +214,6 @@ export const slice = createSlice({
         disableCmpProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isDisabling = false;
         },
-
-        // bulkDeleteScepProfiles: (state, action: PayloadAction<{ uuids: string[] }>) => {
-        //     state.bulkDeleteErrorMessages = [];
-
-        //     state.isBulkDeleting = true;
-        // },
-
-        // bulkDeleteScepProfilesSuccess: (state, action: PayloadAction<{ uuids: string[]; errors: BulkActionModel[] }>) => {
-        //     state.isBulkDeleting = false;
-        //     if (action.payload.errors?.length > 0) {
-        //         state.bulkDeleteErrorMessages = action.payload.errors;
-        //         return;
-        //     }
-
-        //     action.payload.uuids.forEach((uuid) => {
-        //         const profileIndex = state.scepProfiles.findIndex((profile) => profile.uuid === uuid);
-        //         if (profileIndex >= 0) state.scepProfiles.splice(profileIndex, 1);
-        //     });
-
-        //     if (state.scepProfile && action.payload.uuids.includes(state.scepProfile.uuid)) state.scepProfile = undefined;
-        // },
-
-        // bulkDeleteScepProfilesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-        //     state.isBulkDeleting = false;
-        // },
 
         bulkDeleteCmpProfiles: (state, action: PayloadAction<{ uuids: string[] }>) => {
             state.bulkDeleteErrorMessages = [];
@@ -427,25 +240,6 @@ export const slice = createSlice({
             state.isBulkDeleting = false;
         },
 
-        // bulkForceDeleteScepProfiles: (state, action: PayloadAction<{ uuids: string[]; redirect?: string }>) => {
-        //     state.isBulkForceDeleting = true;
-        // },
-
-        // bulkForceDeleteScepProfilesSuccess: (state, action: PayloadAction<{ uuids: string[]; redirect?: string }>) => {
-        //     state.isBulkForceDeleting = false;
-
-        //     action.payload.uuids.forEach((uuid) => {
-        //         const profileIndex = state.scepProfiles.findIndex((profile) => profile.uuid === uuid);
-        //         if (profileIndex >= 0) state.scepProfiles.splice(profileIndex, 1);
-        //     });
-
-        //     if (state.scepProfile && action.payload.uuids.includes(state.scepProfile.uuid)) state.scepProfile = undefined;
-        // },
-
-        // bulkForceDeleteScepProfilesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-        //     state.isBulkForceDeleting = false;
-        // },
-
         bulkForceDeleteCmpProfiles: (state, action: PayloadAction<{ uuids: string[]; redirect?: string }>) => {
             state.isBulkForceDeleting = true;
         },
@@ -465,25 +259,6 @@ export const slice = createSlice({
             state.isBulkForceDeleting = false;
         },
 
-        // bulkEnableScepProfiles: (state, action: PayloadAction<{ uuids: string[] }>) => {
-        //     state.isBulkEnabling = true;
-        // },
-
-        // bulkEnableScepProfilesSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
-        //     state.isBulkEnabling = false;
-
-        //     action.payload.uuids.forEach((uuid) => {
-        //         const profileIndex = state.scepProfiles.findIndex((profile) => profile.uuid === uuid);
-        //         if (profileIndex >= 0) state.scepProfiles[profileIndex].enabled = true;
-        //     });
-
-        //     if (state.scepProfile && action.payload.uuids.includes(state.scepProfile.uuid)) state.scepProfile.enabled = true;
-        // },
-
-        // bulkEnableScepProfilesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-        //     state.isBulkEnabling = false;
-        // },
-
         bulkEnableCmpProfiles: (state, action: PayloadAction<{ uuids: string[] }>) => {
             state.isBulkEnabling = true;
         },
@@ -502,25 +277,6 @@ export const slice = createSlice({
         bulkEnableCmpProfilesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isBulkEnabling = false;
         },
-
-        // bulkDisableScepProfiles: (state, action: PayloadAction<{ uuids: string[] }>) => {
-        //     state.isBulkDisabling = true;
-        // },
-
-        // bulkDisableScepProfilesSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
-        //     state.isBulkDisabling = false;
-
-        //     action.payload.uuids.forEach((uuid) => {
-        //         const profileIndex = state.scepProfiles.findIndex((profile) => profile.uuid === uuid);
-        //         if (profileIndex >= 0) state.scepProfiles[profileIndex].enabled = false;
-        //     });
-
-        //     if (state.scepProfile && action.payload.uuids.includes(state.scepProfile.uuid)) state.scepProfile.enabled = false;
-        // },
-
-        // bulkDisableScepProfilesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-        //     state.isBulkDisabling = false;
-        // },
 
         bulkDisableCmpProfiles: (state, action: PayloadAction<{ uuids: string[] }>) => {
             state.isBulkDisabling = true;
@@ -545,8 +301,6 @@ export const slice = createSlice({
 
 const state = createFeatureSelector<State>(slice.name);
 
-// const scepProfile = createSelector(state, (state) => state.scepProfile);
-// const scepProfiles = createSelector(state, (state) => state.scepProfiles);
 const cmpProfile = createSelector(state, (state) => state.cmpProfile);
 const cmpProfiles = createSelector(state, (state) => state.cmpProfiles);
 const cmpSigningCertificates = createSelector(state, (state) => state.cmpSigningCertificates);
@@ -577,8 +331,6 @@ export const selectors = {
     deleteErrorMessage,
     bulkDeleteErrorMessages,
 
-    // scepProfile,
-    // scepProfiles,
     cmpProfile,
     cmpProfiles,
     cmpSigningCertificates,

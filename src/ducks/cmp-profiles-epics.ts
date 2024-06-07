@@ -120,18 +120,17 @@ const updateCmpProfile: AppEpic = (action$, state$, deps) => {
                     cmpProfileEditRequestDto: transformCmpProfileEditRequestModelToDto(action.payload.updateCmpRequest),
                 })
                 .pipe(
-                    switchMap((cmpProfile) =>
+                    mergeMap((cmpProfile) =>
                         of(
-                            (slice.actions.updateCmpProfileSuccess({ cmpProfile: transformCmpProfileDetailDtoToModel(cmpProfile) }),
-                            slice.actions.getCmpProfile({ uuid: cmpProfile.uuid }),
-                            appRedirectActions.redirect({ url: `../../cmpprofiles/detail/${cmpProfile.uuid}` })),
+                            slice.actions.updateCmpProfileSuccess({ cmpProfile: transformCmpProfileDetailDtoToModel(cmpProfile) }),
+                            appRedirectActions.redirect({ url: `../../cmpprofiles/detail/${cmpProfile.uuid}` }),
                         ),
                     ),
+
                     catchError((error) =>
                         of(
                             slice.actions.updateCmpProfileFailure({ error: extractError(error, 'Failed to update CMP Profile') }),
                             appRedirectActions.fetchError({ error, message: 'Failed to update CMP Profile' }),
-                            // alertActions.error(extractError(error, 'Failed to update CMP Profile')),
                         ),
                     ),
                 ),

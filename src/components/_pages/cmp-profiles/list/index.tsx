@@ -44,7 +44,6 @@ export default function AdministratorsList() {
     }, [getFreshData]);
 
     useEffect(() => {
-        console.log('bulk dl err', bulkDeleteErrorMessages);
         setConfirmForceDelete(bulkDeleteErrorMessages.length > 0);
     }, [bulkDeleteErrorMessages]);
 

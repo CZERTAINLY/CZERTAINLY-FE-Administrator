@@ -86,12 +86,12 @@ export interface CmpProfileDetailDto {
      * @type {ProtectionMethod}
      * @memberof CmpProfileDetailDto
      */
-    requestProtectionMethod?: ProtectionMethod;
+    requestProtectionMethod: ProtectionMethod;
     /**
      * @type {ProtectionMethod}
      * @memberof CmpProfileDetailDto
      */
-    responseProtectionMethod?: ProtectionMethod;
+    responseProtectionMethod: ProtectionMethod;
     /**
      * @type {CertificateDto}
      * @memberof CmpProfileDetailDto
