@@ -329,7 +329,7 @@ export default function CmpProfileForm() {
     );
 
     const renderCustomAttributeEditor = useMemo(() => {
-        if (isBusy) return <></>;
+        // if (isBusy) return <></>;
         return (
             <AttributeEditor
                 id="customCmpProfile"
@@ -337,10 +337,11 @@ export default function CmpProfileForm() {
                 attributes={cmpProfile?.customAttributes}
             />
         );
-    }, [isBusy, resourceCustomAttributes, cmpProfile?.customAttributes]);
+    }, [resourceCustomAttributes, cmpProfile?.customAttributes]);
 
     const renderIssuanceAttributes = useMemo(() => {
-        if (isBusy || !raProfileIssuanceAttrDescs) return <></>;
+        // if (isBusy || !raProfileIssuanceAttrDescs) return <></>;
+        if (!raProfileIssuanceAttrDescs) return <></>;
         return (
             <FormGroup>
                 <AttributeEditor
@@ -352,7 +353,7 @@ export default function CmpProfileForm() {
                 />
             </FormGroup>
         );
-    }, [isBusy, raProfileIssuanceAttrDescs, cmpProfile?.issueCertificateAttributes, issueGroupAttributesCallbackAttributes]);
+    }, [raProfileIssuanceAttrDescs, cmpProfile?.issueCertificateAttributes, issueGroupAttributesCallbackAttributes]);
 
     return (
         <Widget title={title} busy={isBusy}>
@@ -595,7 +596,7 @@ export default function CmpProfileForm() {
                                                 title={editMode ? 'Update' : 'Create'}
                                                 inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
                                                 inProgress={submitting}
-                                                disabled={pristine || submitting || !valid}
+                                                disabled={pristine || submitting || !valid || isBusy}
                                             />
 
                                             <Button color="default" onClick={onCancelClick} disabled={submitting}>
