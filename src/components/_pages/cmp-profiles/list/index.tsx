@@ -10,6 +10,8 @@ import Dialog from 'components/Dialog';
 import StatusBadge from 'components/StatusBadge';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { PlatformEnum } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 
 export default function AdministratorsList() {
@@ -28,6 +30,7 @@ export default function AdministratorsList() {
     const isBulkEnabling = useSelector(selectors.isBulkEnabling);
     const isBulkDisabling = useSelector(selectors.isBulkDisabling);
     const isBulkForceDeleting = useSelector(selectors.isBulkForceDeleting);
+    const cmpCmpProfileVariantEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CmpProfileVariant));
 
     const isBusy = isFetching || isDeleting || isUpdating || isBulkDeleting || isBulkEnabling || isBulkDisabling || isBulkForceDeleting;
 
@@ -211,11 +214,11 @@ export default function AdministratorsList() {
                     ),
 
                     cmpProfile.cmpUrl || '',
-                    <Badge color="primary">{cmpProfile.variant}</Badge>,
+                    <Badge color="primary">{getEnumLabel(cmpCmpProfileVariantEnum, cmpProfile.variant)}</Badge>,
                     <StatusBadge enabled={cmpProfile.enabled} />,
                 ],
             })),
-        [cmpProfiles],
+        [cmpProfiles, cmpCmpProfileVariantEnum],
     );
 
     return (

@@ -71,7 +71,7 @@ export default function CmpProfileForm() {
     const isFetchingIssuanceAttributes = useSelector(raProfileSelectors.isFetchingIssuanceAttributes);
     const isFetchingRevocationAttributes = useSelector(raProfileSelectors.isFetchingRevocationAttributes);
     const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
-    const preotectionMethodEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ProtectionMethod));
+    const protectionMethodEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ProtectionMethod));
     const cmpCmpProfileVariantEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CmpProfileVariant));
 
     const [issueGroupAttributesCallbackAttributes, setIssueGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
@@ -87,10 +87,10 @@ export default function CmpProfileForm() {
 
     const protectionMethodOptions = useMemo(
         () => [
-            { value: ProtectionMethod.SharedSecret, label: getEnumLabel(preotectionMethodEnum, ProtectionMethod.SharedSecret) },
-            { value: ProtectionMethod.Signature, label: getEnumLabel(preotectionMethodEnum, ProtectionMethod.Signature) },
+            { value: ProtectionMethod.SharedSecret, label: getEnumLabel(protectionMethodEnum, ProtectionMethod.SharedSecret) },
+            { value: ProtectionMethod.Signature, label: getEnumLabel(protectionMethodEnum, ProtectionMethod.Signature) },
         ],
-        [preotectionMethodEnum],
+        [protectionMethodEnum],
     );
 
     const cmpProfileVariantOptions = useMemo(
@@ -250,14 +250,14 @@ export default function CmpProfileForm() {
                 selectedRequestProtectionMethod: cmpProfile?.requestProtectionMethod
                     ? {
                           value: cmpProfile?.requestProtectionMethod,
-                          label: getEnumLabel(preotectionMethodEnum, cmpProfile?.requestProtectionMethod),
+                          label: getEnumLabel(protectionMethodEnum, cmpProfile?.requestProtectionMethod),
                       }
                     : undefined,
                 requestProtectionMethod: cmpProfile?.requestProtectionMethod || (undefined as any),
                 selectedResponseProtectionMethod: cmpProfile?.responseProtectionMethod
                     ? {
                           value: cmpProfile?.responseProtectionMethod,
-                          label: getEnumLabel(preotectionMethodEnum, cmpProfile?.responseProtectionMethod),
+                          label: getEnumLabel(protectionMethodEnum, cmpProfile?.responseProtectionMethod),
                       }
                     : undefined,
                 responseProtectionMethod: cmpProfile?.responseProtectionMethod || (undefined as any),
@@ -290,7 +290,7 @@ export default function CmpProfileForm() {
                 variant: undefined as any,
             };
         }
-    }, [editMode, cmpProfile, cmpCmpProfileVariantEnum, preotectionMethodEnum]);
+    }, [editMode, cmpProfile, cmpCmpProfileVariantEnum, protectionMethodEnum]);
 
     const onRaProfileChange = useCallback(
         (form: FormApi<FormValues>, value?: string) => {
@@ -596,7 +596,14 @@ export default function CmpProfileForm() {
                                                 title={editMode ? 'Update' : 'Create'}
                                                 inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
                                                 inProgress={submitting}
-                                                disabled={pristine || submitting || !valid || isBusy}
+                                                disabled={
+                                                    pristine ||
+                                                    submitting ||
+                                                    !valid ||
+                                                    isBusy ||
+                                                    !values.selectedRequestProtectionMethod ||
+                                                    !values.selectedResponseProtectionMethod
+                                                }
                                             />
 
                                             <Button color="default" onClick={onCancelClick} disabled={submitting}>

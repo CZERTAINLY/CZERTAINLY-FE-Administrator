@@ -2,6 +2,8 @@ import AttributeViewer from 'components/Attributes/AttributeViewer';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import StatusBadge from 'components/StatusBadge';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+// import { Link, useParams } from 'react-router-dom';
 
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
@@ -10,9 +12,9 @@ import { actions, selectors } from 'ducks/cmp-profiles';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Col, Container, Row } from 'reactstrap';
+import { Badge, Col, Container, Row } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { Resource } from '../../../../types/openapi';
+import { PlatformEnum, Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 
 export default function AdministratorDetail() {
@@ -25,6 +27,8 @@ export default function AdministratorDetail() {
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
     const isDisabling = useSelector(selectors.isDisabling);
     const isEnabling = useSelector(selectors.isEnabling);
+    const cmpCmpProfileVariantEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CmpProfileVariant));
+    const protectionMethodEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ProtectionMethod));
 
     const deleteErrorMessage = useSelector(selectors.deleteErrorMessage);
 
@@ -140,6 +144,13 @@ export default function AdministratorDetail() {
                           columns: ['Description', cmpProfile.description || ''],
                       },
                       {
+                          id: 'variant',
+                          columns: [
+                              'Variant',
+                              <Badge color="primary">{getEnumLabel(cmpCmpProfileVariantEnum, cmpProfile.variant)}</Badge> || '',
+                          ],
+                      },
+                      {
                           id: 'status',
                           columns: ['Status', <StatusBadge enabled={cmpProfile.enabled} />],
                       },
@@ -148,7 +159,7 @@ export default function AdministratorDetail() {
                           columns: ['CMP URL', cmpProfile.cmpUrl || 'N/A'],
                       },
                   ],
-        [cmpProfile],
+        [cmpProfile, cmpCmpProfileVariantEnum],
     );
 
     const raProfileDetailData: TableDataRow[] = useMemo(
@@ -183,6 +194,45 @@ export default function AdministratorDetail() {
         [cmpProfile],
     );
 
+    const requestConfigurationData: TableDataRow[] = useMemo(
+        () =>
+            !cmpProfile || !cmpProfile.requestProtectionMethod
+                ? []
+                : [
+                      {
+                          id: 'requestProtectionMethod',
+                          columns: ['Request Protection Method', getEnumLabel(protectionMethodEnum, cmpProfile?.requestProtectionMethod)],
+                      },
+                  ],
+        [cmpProfile, protectionMethodEnum],
+    );
+
+    const responseConfigurationData: TableDataRow[] = useMemo(
+        () =>
+            !cmpProfile
+                ? []
+                : [
+                      {
+                          id: 'responseProtectionMethod',
+                          columns: ['Response Protection Method', getEnumLabel(protectionMethodEnum, cmpProfile?.responseProtectionMethod)],
+                      },
+                      {
+                          id: 'signingCertificate',
+                          columns: [
+                              'Signing Certificate',
+                              cmpProfile?.signingCertificate ? (
+                                  <Link to={`/certificates/detail/${cmpProfile.signingCertificate.uuid}`}>
+                                      {cmpProfile?.signingCertificate.commonName}
+                                  </Link>
+                              ) : (
+                                  'N/A'
+                              ),
+                          ],
+                      },
+                  ],
+        [cmpProfile, protectionMethodEnum],
+    );
+
     const raProfileText = useMemo(
         () => (raProfileDetailData.length > 0 ? 'RA Profile Configuration' : 'Default RA Profile not selected'),
         [raProfileDetailData],
@@ -204,49 +254,63 @@ export default function AdministratorDetail() {
                         <CustomTable headers={tableHeader} data={cmpProfileDetailData} />
                     </Widget>
                 </Col>
+                <Col>
+                    {cmpProfile && (
+                        <CustomAttributeWidget
+                            resource={Resource.CmpProfiles}
+                            resourceUuid={cmpProfile.uuid}
+                            attributes={cmpProfile.customAttributes}
+                        />
+                    )}
+                </Col>
             </Row>
+            <Row xs="1" sm="1" md="2" lg="2" xl="2">
+                <Col>
+                    <Widget title="Request Configuration">
+                        <CustomTable headers={tableHeader} data={requestConfigurationData} />
+                    </Widget>
+                </Col>
+                <Col>
+                    <Widget title="Response Configuration">
+                        <CustomTable headers={tableHeader} data={responseConfigurationData} />
+                    </Widget>
+                </Col>
+            </Row>
+            {/* <Widget title={raProfileText} busy={isBusy}> */}
+            {raProfileDetailData.length === 0 ? (
+                <></>
+            ) : (
+                <>
+                    <Row xs="1" sm="1" md="2" lg="2" xl="2">
+                        <Col>
+                            <Widget title={raProfileText} busy={isBusy}>
+                                <CustomTable headers={tableHeader} data={raProfileDetailData} />
+                            </Widget>
+                        </Col>
+                        <Col>
+                            {cmpProfile?.issueCertificateAttributes === undefined || cmpProfile.issueCertificateAttributes.length === 0 ? (
+                                <></>
+                            ) : (
+                                <Widget title="List of Attributes to Issue Certificate" busy={isBusy}>
+                                    <AttributeViewer attributes={cmpProfile?.issueCertificateAttributes} />
+                                </Widget>
+                            )}
+                        </Col>
 
-            {cmpProfile && (
-                <CustomAttributeWidget
-                    resource={Resource.CmpProfiles}
-                    resourceUuid={cmpProfile.uuid}
-                    attributes={cmpProfile.customAttributes}
-                />
+                        <Col>
+                            {cmpProfile?.revokeCertificateAttributes === undefined ||
+                            cmpProfile.revokeCertificateAttributes.length === 0 ? (
+                                <></>
+                            ) : (
+                                <Widget title="List of Attributes to Revoke Certificate" busy={isBusy}>
+                                    <AttributeViewer attributes={cmpProfile?.revokeCertificateAttributes} />
+                                </Widget>
+                            )}
+                        </Col>
+                    </Row>
+                </>
             )}
-
-            <Widget title={raProfileText} busy={isBusy} titleSize="large">
-                {raProfileDetailData.length === 0 ? (
-                    <></>
-                ) : (
-                    <>
-                        <CustomTable headers={tableHeader} data={raProfileDetailData} />
-
-                        <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                            <Col>
-                                {cmpProfile?.issueCertificateAttributes === undefined ||
-                                cmpProfile.issueCertificateAttributes.length === 0 ? (
-                                    <></>
-                                ) : (
-                                    <Widget title="List of Attributes to Issue Certificate" busy={isBusy}>
-                                        <AttributeViewer attributes={cmpProfile?.issueCertificateAttributes} />
-                                    </Widget>
-                                )}
-                            </Col>
-
-                            <Col>
-                                {cmpProfile?.revokeCertificateAttributes === undefined ||
-                                cmpProfile.revokeCertificateAttributes.length === 0 ? (
-                                    <></>
-                                ) : (
-                                    <Widget title="List of Attributes to Revoke Certificate" busy={isBusy}>
-                                        <AttributeViewer attributes={cmpProfile?.revokeCertificateAttributes} />
-                                    </Widget>
-                                )}
-                            </Col>
-                        </Row>
-                    </>
-                )}
-            </Widget>
+            {/* </Widget> */}
 
             <Dialog
                 isOpen={confirmDelete}
