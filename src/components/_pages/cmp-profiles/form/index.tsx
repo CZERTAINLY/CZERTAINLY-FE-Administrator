@@ -371,7 +371,6 @@ export default function CmpProfileForm() {
         [defaultValues],
     );
 
-    console.log('defaultValues', defaultValues);
     return (
         <Widget title={title} busy={isBusy}>
             {!isFetchingDetail && (
