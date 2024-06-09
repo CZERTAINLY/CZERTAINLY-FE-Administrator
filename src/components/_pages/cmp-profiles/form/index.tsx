@@ -227,13 +227,14 @@ export default function CmpProfileForm() {
                 }),
             );
         }
+
+        if (cmpProfile?.responseProtectionMethod === ProtectionMethod.Signature) {
+            dispatch(cmpProfileActions.listCmpSigningCertificates());
+        }
     }, [dispatch, cmpProfile]);
 
     const defaultValues: FormValues = useMemo(() => {
         if (editMode && cmpProfile) {
-            if (cmpProfile.responseProtectionMethod === ProtectionMethod.Signature) {
-                dispatch(cmpProfileActions.listCmpSigningCertificates());
-            }
             return {
                 name: cmpProfile?.name || '',
                 description: cmpProfile?.description || '',

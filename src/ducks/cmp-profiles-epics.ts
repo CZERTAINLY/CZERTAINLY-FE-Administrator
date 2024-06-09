@@ -5,7 +5,6 @@ import { extractError } from 'utils/net';
 import { actions as userInterfaceActions } from './user-interface';
 
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { actions as alertActions } from './alerts';
 import { actions as appRedirectActions } from './app-redirect';
 import { slice } from './cmp-profiles';
 import { transformCertificateListResponseDtoToModel } from './transform/certificates';
@@ -58,7 +57,7 @@ const listCmpSigningCertificates: AppEpic = (action$, state$, deps) => {
                             error: extractError(error, 'Failed to get CMP Signing Certificates list'),
                         }),
                         appRedirectActions.fetchError({ error, message: 'Failed to get CMP Signing Certificates list' }),
-                        alertActions.error(extractError(error, 'Failed to get CMP Signing Certificates list')),
+                        // alertActions.error(extractError(error, 'Failed to get CMP Signing Certificates list')),
                     ),
                 ),
             ),
@@ -77,7 +76,7 @@ const getCmpProfile: AppEpic = (action$, state$, deps) => {
                     of(
                         slice.actions.getCmpProfileFailure({ error: extractError(error, 'Failed to get CMP Profile details') }),
                         appRedirectActions.fetchError({ error, message: 'Failed to get CMP Profile details' }),
-                        alertActions.error(extractError(error, 'Failed to get CMP Profile details')),
+                        // alertActions.error(extractError(error, 'Failed to get CMP Profile details')),
                     ),
                 ),
             ),
