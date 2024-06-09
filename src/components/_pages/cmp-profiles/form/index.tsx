@@ -26,6 +26,7 @@ import {
 import { RaProfileSimplifiedModel } from 'types/ra-profiles';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 import { collectFormAttributes } from 'utils/attributes/attributes';
+import { isObjectSame } from 'utils/common-utils';
 import { composeValidators, validateAlphaNumericWithoutAccents, validateLength, validateRequired } from 'utils/validators';
 import styles from './cmpForm.module.scss';
 
@@ -230,6 +231,9 @@ export default function CmpProfileForm() {
 
     const defaultValues: FormValues = useMemo(() => {
         if (editMode && cmpProfile) {
+            if (cmpProfile.responseProtectionMethod === ProtectionMethod.Signature) {
+                dispatch(cmpProfileActions.listCmpSigningCertificates());
+            }
             return {
                 name: cmpProfile?.name || '',
                 description: cmpProfile?.description || '',
@@ -290,7 +294,7 @@ export default function CmpProfileForm() {
                 variant: undefined as any,
             };
         }
-    }, [editMode, cmpProfile, cmpCmpProfileVariantEnum, protectionMethodEnum]);
+    }, [editMode, cmpProfile, cmpCmpProfileVariantEnum, protectionMethodEnum, dispatch]);
 
     const onRaProfileChange = useCallback(
         (form: FormApi<FormValues>, value?: string) => {
@@ -355,6 +359,19 @@ export default function CmpProfileForm() {
         );
     }, [raProfileIssuanceAttrDescs, cmpProfile?.issueCertificateAttributes, issueGroupAttributesCallbackAttributes]);
 
+    const areDefaultValuesSame = useCallback(
+        (values: FormValues) => {
+            const areValuesSame = isObjectSame(
+                values as unknown as Record<string, unknown>,
+                defaultValues as unknown as Record<string, unknown>,
+            );
+
+            return areValuesSame;
+        },
+        [defaultValues],
+    );
+
+    console.log('defaultValues', defaultValues);
     return (
         <Widget title={title} busy={isBusy}>
             {!isFetchingDetail && (
@@ -589,29 +606,29 @@ export default function CmpProfileForm() {
                                             },
                                         ]}
                                     />
-
-                                    <div className="d-flex justify-content-end">
-                                        <ButtonGroup>
-                                            <ProgressButton
-                                                title={editMode ? 'Update' : 'Create'}
-                                                inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
-                                                inProgress={submitting}
-                                                disabled={
-                                                    pristine ||
-                                                    submitting ||
-                                                    !valid ||
-                                                    isBusy ||
-                                                    !values.selectedRequestProtectionMethod ||
-                                                    !values.selectedResponseProtectionMethod
-                                                }
-                                            />
-
-                                            <Button color="default" onClick={onCancelClick} disabled={submitting}>
-                                                Cancel
-                                            </Button>
-                                        </ButtonGroup>
-                                    </div>
                                 </Widget>
+                                <div className="d-flex justify-content-end">
+                                    <ButtonGroup>
+                                        <ProgressButton
+                                            title={editMode ? 'Update' : 'Create'}
+                                            inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
+                                            inProgress={submitting}
+                                            disabled={
+                                                pristine ||
+                                                submitting ||
+                                                !valid ||
+                                                isBusy ||
+                                                !values.selectedRequestProtectionMethod ||
+                                                !values.selectedResponseProtectionMethod ||
+                                                areDefaultValuesSame(values)
+                                            }
+                                        />
+
+                                        <Button color="default" onClick={onCancelClick} disabled={submitting}>
+                                            Cancel
+                                        </Button>
+                                    </ButtonGroup>
+                                </div>
                             </BootstrapForm>
                         );
                     }}
