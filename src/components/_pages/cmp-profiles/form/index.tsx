@@ -295,7 +295,7 @@ export default function CmpProfileForm() {
                 variant: undefined as any,
             };
         }
-    }, [editMode, cmpProfile, cmpCmpProfileVariantEnum, protectionMethodEnum, dispatch]);
+    }, [editMode, cmpProfile, cmpCmpProfileVariantEnum, protectionMethodEnum]);
 
     const onRaProfileChange = useCallback(
         (form: FormApi<FormValues>, value?: string) => {
