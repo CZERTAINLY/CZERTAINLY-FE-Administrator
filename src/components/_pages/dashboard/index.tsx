@@ -7,7 +7,7 @@ import { actions, selectors } from 'ducks/statisticsDashboard';
 import { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { FilterConditionOperator, FilterFieldSource } from 'types/openapi';
-import { getCertificateDonutChartColors } from 'utils/dashboard';
+import { getCertificateDonutChartColors, getCertificateDonutChartColorsByDaysOfExpiration } from 'utils/dashboard';
 import { getDateInString } from 'utils/dateUtil';
 import CountBadge from './DashboardItem/CountBadge';
 import DonutChart from './DashboardItem/DonutChart';
@@ -31,9 +31,13 @@ function Dashboard() {
         return getCertificateDonutChartColors(dashboard?.certificateStatByComplianceStatus);
     }, [dashboard?.certificateStatByComplianceStatus]);
 
-    const certofocateValidationStatusColorOptions = useMemo(() => {
+    const certificateValidationStatusColorOptions = useMemo(() => {
         return getCertificateDonutChartColors(dashboard?.certificateStatByValidationStatus);
     }, [dashboard?.certificateStatByValidationStatus]);
+
+    const certificateByExpirationDaysColorOptions = useMemo(() => {
+        return getCertificateDonutChartColorsByDaysOfExpiration(dashboard?.certificateStatByExpiry);
+    }, [dashboard?.certificateStatByExpiry]);
 
     return (
         <Container className="themed-container" fluid={true}>
@@ -81,7 +85,7 @@ function Dashboard() {
 
                 <Col>
                     <DonutChart
-                        colorOptions={certofocateValidationStatusColorOptions}
+                        colorOptions={certificateValidationStatusColorOptions}
                         title={'Certificates by Validation'}
                         data={dashboard?.certificateStatByValidationStatus}
                         entity={EntityType.CERTIFICATE}
@@ -141,6 +145,7 @@ function Dashboard() {
 
                 <Col>
                     <DonutChart
+                        colorOptions={certificateByExpirationDaysColorOptions}
                         title={'Certificates by Expiration in Days'}
                         data={dashboard?.certificateStatByExpiry}
                         entity={EntityType.CERTIFICATE}

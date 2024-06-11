@@ -79,3 +79,27 @@ export function getCertificateDonutChartColors(certificateStatByStatus?: { [key:
 
     return updatedColorObject;
 }
+
+const colorMap: { [key: string]: string } = {
+    '10': '#632828',
+    '20': '#9c0012',
+    '30': '#f37d63',
+    '60': '#7fa2c1',
+    '90': '#008ffb',
+    More: '#1ab394',
+    expired: '#eb3349',
+};
+
+type CertificatesByExpirationDays = {
+    [key: string]: number;
+};
+
+export function getCertificateDonutChartColorsByDaysOfExpiration(
+    certificateStatByExpirationDays?: CertificatesByExpirationDays,
+): ColorOptions | undefined {
+    if (!certificateStatByExpirationDays) {
+        return undefined;
+    }
+
+    return { colors: Object.keys(certificateStatByExpirationDays).map((key) => colorMap[key]) };
+}
