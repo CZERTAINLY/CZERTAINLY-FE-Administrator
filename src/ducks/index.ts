@@ -3,6 +3,7 @@ import { AnyAction } from 'redux';
 import { Epic, combineEpics } from 'redux-observable';
 import acmeAccountsEpics from './acme-accounts-epics';
 import acmeProfilesEpics from './acme-profiles-epics';
+import cmpProfilesEpics from './cmp-profiles-epics';
 import scepProfilesEpics from './scep-profiles-epics';
 
 import appRedirectEpics from './app-redirect-epics';
@@ -71,6 +72,7 @@ export const epics = combineEpics(
     ...raProfilesEpics,
     ...acmeAccountsEpics,
     ...acmeProfilesEpics,
+    ...cmpProfilesEpics,
     ...scepProfilesEpics,
     ...complianceProfilesEpics,
     ...credentialsEpics,
