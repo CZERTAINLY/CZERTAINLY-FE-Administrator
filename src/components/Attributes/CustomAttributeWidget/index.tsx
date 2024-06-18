@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Field, Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import Select from 'react-select';
@@ -31,8 +31,17 @@ export default function CustomAttributeWidget({ resource, resourceUuid, attribut
 
     const [attribute, setAttribute] = useState<CustomAttributeModel>();
 
+    const prevAttributesRef = useRef<AttributeResponseModel[] | undefined>();
+
     useEffect(() => {
-        if (attributes?.length && !isAttributeContentLoaded) {
+        if (prevAttributesRef.current !== attributes) {
+            setIsAttributeContentLoaded(false);
+        }
+        prevAttributesRef.current = attributes;
+    }, [attributes]);
+
+    useEffect(() => {
+        if (attributes && !isAttributeContentLoaded) {
             dispatch(
                 customAttributesActions.loadCustomAttributeContent({
                     resource: resource,
@@ -44,6 +53,7 @@ export default function CustomAttributeWidget({ resource, resourceUuid, attribut
             setIsAttributeContentLoaded(true);
         }
     }, [attributes, resource, resourceUuid, isAttributeContentLoaded, dispatch]);
+
     const addCustomAttribute = (attributeUuid: string, content: BaseAttributeContentModel[] | undefined) => {
         if (content) {
             dispatch(

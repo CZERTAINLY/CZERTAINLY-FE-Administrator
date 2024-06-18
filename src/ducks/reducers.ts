@@ -3,6 +3,7 @@ import { initialState } from './initial-state';
 
 import { slice as acmeAccountsSlice } from './acme-accounts';
 import { slice as acmeProfilesSlice } from './acme-profiles';
+import { slice as cmpProfilesSlice } from './cmp-profiles';
 import { slice as scepProfilesSlice } from './scep-profiles';
 
 import { alertsSlice } from './alert-slice';
@@ -67,6 +68,7 @@ export const reducers = combineReducers<typeof initialState, any>({
     [acmeAccountsSlice.name]: acmeAccountsSlice.reducer,
     [acmeProfilesSlice.name]: acmeProfilesSlice.reducer,
     [scepProfilesSlice.name]: scepProfilesSlice.reducer,
+    [cmpProfilesSlice.name]: cmpProfilesSlice.reducer,
     [initialComplianceProfilesSlice.name]: initialComplianceProfilesSlice.reducer,
     [initialCredentialsSlice.name]: initialCredentialsSlice.reducer,
     [initialEntitiesSlice.name]: initialEntitiesSlice.reducer,
