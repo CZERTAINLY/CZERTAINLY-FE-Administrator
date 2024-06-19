@@ -541,7 +541,7 @@ export default function RaProfileDetail() {
                       },
                       {
                           id: 'URL',
-                          columns: ['URL', cmpDetails.cmpUrl || ''],
+                          columns: ['CMP URL', cmpDetails.cmpUrl || ''],
                       },
                   ],
         [cmpDetails],

@@ -184,30 +184,7 @@ export default function ProtocolActivationDialogBody({ protocol, raProfileUuid, 
                 ),
         },
     ];
-    if (protocol === Protocol.ACME) {
-        attributeTabs.push({
-            title: 'Revocation attributes',
-            content:
-                !revocationAttributes || revocationAttributes.length === 0 ? (
-                    <></>
-                ) : (
-                    <Field name="RevocationAttributes">
-                        {({ input, meta }) => (
-                            <FormGroup>
-                                <AttributeEditor
-                                    id="revocationAttributes"
-                                    attributeDescriptors={revocationAttributes}
-                                    groupAttributesCallbackAttributes={revokeGroupAttributesCallbackAttributes}
-                                    setGroupAttributesCallbackAttributes={setRevokeGroupAttributesCallbackAttributes}
-                                />
-                            </FormGroup>
-                        )}
-                    </Field>
-                ),
-        });
-    }
-
-    if (protocol === Protocol.CMP) {
+    if (protocol === Protocol.ACME || protocol === Protocol.CMP) {
         attributeTabs.push({
             title: 'Revocation attributes',
             content:
