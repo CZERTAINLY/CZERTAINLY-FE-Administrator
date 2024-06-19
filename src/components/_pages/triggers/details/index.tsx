@@ -51,7 +51,7 @@ const TriggerDetails = () => {
         }),
         [deviceType],
     );
-    const { nodes, edges } = useTransformTriggerObjectToNodesAndEdges(triggerDetails);
+    const { nodes, edges } = useTransformTriggerObjectToNodesAndEdges(triggerDetails, rules, actions);
 
     // useEffect(() => {
     //     if (!triggerDetails) return;
@@ -580,6 +580,7 @@ const TriggerDetails = () => {
                                 flowChartEdges={edges}
                                 flowChartNodes={nodes}
                                 defaultViewport={defaultViewport}
+                                flowDirection="TB"
                             />
                         ),
                     },

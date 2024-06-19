@@ -328,7 +328,7 @@ export function transformCertifacetObjectToNodesAndEdges(
                     redirectUrl: chain?.uuid ? `/certificates/detail/${chain.uuid}` : undefined,
                     entityLabel: chain.commonName,
                     icon: chainLength - 1 === index && certificateChain?.completeChain ? 'fa fa-medal' : 'fa fa-certificate',
-                    isMainNode: true,
+                    // isMainNode: true,
                     certificateNodeData: {
                         certificateNodeStatus: chain.state,
                         certificateNodeValidationStatus: chain.validationStatus,

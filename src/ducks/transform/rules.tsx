@@ -4,9 +4,10 @@ import style from 'components/FlowChart/CustomFlowNode/customFlowNode.module.scs
 import SwitchWidget from 'components/SwitchWidget';
 import { actions as alertActions } from 'ducks/alerts';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import { actions as rulesActions } from 'ducks/rules';
+import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Edge } from 'reactflow';
+import { Edge, MarkerType } from 'reactflow';
 import { OtherProperties } from 'types/flowchart';
 import { PlatformEnum, Resource, UpdateTriggerRequestDtoEventEnum } from 'types/openapi';
 
@@ -653,16 +654,37 @@ export function transformTriggerHistorySummaryDtoToModel(triggerHistorySummaryDt
 //     return { nodes, edges };
 // }
 
-export function useTransformTriggerObjectToNodesAndEdges(triggerDetails?: TriggerDetailModel): { nodes: CustomNode[]; edges: Edge[] } {
+export function useTransformTriggerObjectToNodesAndEdges(
+    triggerDetails?: TriggerDetailModel,
+    rules?: RuleModel[],
+    actions?: ActionModel[],
+): { nodes: CustomNode[]; edges: Edge[] } {
     const nodes: CustomNode[] = [];
     const edges: Edge[] = [];
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const eventNameEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ResourceEvent));
-
+    const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.TriggerType));
     const dispatch = useDispatch();
+
+    const executions = useSelector(rulesSelectors.executions);
+    const conditions = useSelector(rulesSelectors.conditions);
+    // log recieved executions and conditions
+    console.log('executions', executions);
+    console.log('conditions', conditions);
+
+    // use rules and actions show for adding if not attached already to the trigger
+    console.log('rules', rules);
+    console.log('actions', actions);
+    useEffect(() => {
+        dispatch(rulesActions.listExecutions({ resource: triggerDetails?.resource }));
+        dispatch(rulesActions.listConditions({ resource: triggerDetails?.resource }));
+    }, [triggerDetails, dispatch]);
+
     if (!triggerDetails) {
         return { nodes, edges };
     }
+
+    // list all available rules and executions
 
     const otherPropertiesCurrentCertificate: OtherProperties[] = [];
 
@@ -692,13 +714,13 @@ export function useTransformTriggerObjectToNodesAndEdges(triggerDetails?: Trigge
         // propertyContent: <div>hi</div>,
         propertyContent: (
             <div className={cx('d-flex align-items-center ')}>
-                <h6 className={cx('m-0', style.entityLabel)}>Entity Name :</h6>
+                <h6 className={cx('m-0', style.entityLabel)}>Ignore Trigger :</h6>
                 <div className="ms-1">
                     <SwitchWidget
                         checked={triggerDetails.ignoreTrigger}
                         onClick={() => {
                             if (triggerDetails?.ignoreTrigger) {
-                                dispatch(alertActions.info('Please add actions from the actions table'));
+                                dispatch(alertActions.info('Please add actions from the actions node'));
                                 // triggerHighlight();
                             } else {
                                 dispatch(
@@ -741,7 +763,7 @@ export function useTransformTriggerObjectToNodesAndEdges(triggerDetails?: Trigge
 
     otherPropertiesCurrentCertificate.push({
         propertyName: 'Type',
-        propertyValue: triggerDetails.type,
+        propertyValue: getEnumLabel(triggerTypeEnum, triggerDetails.type),
     });
 
     if (triggerDetails?.event) {
@@ -764,13 +786,188 @@ export function useTransformTriggerObjectToNodesAndEdges(triggerDetails?: Trigge
             isMainNode: true,
             // redirectUrl: triggerDetails.uuid ? `/triggers/detail/${triggerDetails.uuid}` : undefined,
             description: triggerDetails.description,
-            expandedByDefault: true,
+            expandedByDefault: false,
+            // onNodeAddButtonClick: () => {},
+            onNodeAddButtonClick(event) {
+                console.log('evt', event);
+            },
             // certificateNodeStatus: triggerDetails.state,
             // certificateNodeValidationStatus: triggerDetails.validationStatus,
             // otherProperties: otherPropertiesCurrentCertificate,
             otherProperties: otherPropertiesCurrentCertificate,
         },
     });
+
+    if (triggerDetails.rules.length) {
+        // use above code for reference
+
+        triggerDetails.rules.forEach((rule, index) => {
+            const otherProperties: OtherProperties[] = [
+                {
+                    propertyName: 'Rule Name',
+                    propertyValue: rule.name,
+                    copyable: true,
+                },
+                {
+                    propertyName: 'Rule Description',
+                    propertyValue: rule.description,
+                    // copyable: true,
+                },
+            ];
+
+            nodes.push({
+                id: `rule-${rule.uuid}`,
+                type: 'customFlowNode',
+                position: { x: 0, y: 0 },
+                // width: nodeWidth,
+                // height: nodeHeight,
+                data: {
+                    customNodeCardTitle: `Rule ${index + 1}`,
+                    // redirectUrl: rule?.uuid ? `/certificates/detail/${rule.uuid}` : undefined,
+                    entityLabel: rule.name,
+                    icon: 'fa fa-certificate',
+                    // isMainNode: true,
+                    // certificateNodeData: {
+                    //     certificateNodeStatus: chain.state,
+                    //     certificateNodeValidationStatus: chain.validationStatus,
+                    // },
+                    otherProperties: otherProperties,
+                },
+            });
+
+            edges.push({
+                id: `e1-rule-${rule.uuid}`,
+                source: `rule-${rule.uuid}`,
+                target: '1',
+                type: 'floating',
+                markerEnd: { type: MarkerType.Arrow },
+            });
+        });
+    }
+
+    if (triggerDetails.actions.length) {
+        triggerDetails.actions.forEach((action, index) => {
+            const otherProperties: OtherProperties[] = [
+                {
+                    propertyName: 'Action Name',
+                    propertyValue: action.name,
+                    copyable: true,
+                },
+                {
+                    propertyName: 'Action Description',
+                    propertyValue: action.description,
+                    // copyable: true,
+                },
+            ];
+
+            nodes.push({
+                id: `action-${action.uuid}`,
+                type: 'customFlowNode',
+                position: { x: 0, y: 0 },
+                // width: nodeWidth,
+                // height: nodeHeight,
+                data: {
+                    customNodeCardTitle: `Action ${index + 1}`,
+                    // redirectUrl: rule?.uuid ? `/certificates/detail/${rule.uuid}` : undefined,
+                    entityLabel: action.name,
+                    icon: 'fa fa-certificate',
+                    // isMainNode: true,
+                    // certificateNodeData: {
+                    //     certificateNodeStatus: chain.state,
+                    //     certificateNodeValidationStatus: chain.validationStatus,
+                    // },
+                    otherProperties: otherProperties,
+                },
+            });
+
+            edges.push({
+                id: `e1-action-${action.uuid}`,
+                source: `action-${action.uuid}`,
+                target: '1',
+                type: 'floating',
+                markerEnd: { type: MarkerType.Arrow },
+            });
+        });
+    }
+
+    // add the remaining rules and actions as nodes without edges
+
+    if (rules?.length) {
+        const rulesNotAttachedToTrigger = rules.filter((rule) => !triggerDetails.rules.find((r) => r.uuid === rule.uuid));
+
+        rulesNotAttachedToTrigger.forEach((rule, index) => {
+            const otherProperties: OtherProperties[] = [
+                {
+                    propertyName: 'Rule Name',
+                    propertyValue: rule.name,
+                    copyable: true,
+                },
+                {
+                    propertyName: 'Rule Description',
+                    propertyValue: rule.description,
+                    // copyable: true,
+                },
+            ];
+
+            nodes.push({
+                id: `rule-${rule.uuid}`,
+                type: 'customFlowNode',
+                position: { x: 0, y: 0 },
+                // width: nodeWidth,
+                // height: nodeHeight,
+                data: {
+                    customNodeCardTitle: `Rule ${index + 1}`,
+                    // redirectUrl: rule?.uuid ? `/certificates/detail/${rule.uuid}` : undefined,
+                    entityLabel: rule.name,
+                    icon: 'fa fa-certificate',
+                    // isMainNode: true,
+                    // certificateNodeData: {
+                    //     certificateNodeStatus: chain.state,
+                    //     certificateNodeValidationStatus: chain.validationStatus,
+                    // },
+                    otherProperties: otherProperties,
+                },
+            });
+        });
+    }
+
+    if (actions?.length) {
+        const actionsNotAttachedToTrigger = actions.filter((action) => !triggerDetails.actions.find((a) => a.uuid === action.uuid));
+        actionsNotAttachedToTrigger.forEach((action, index) => {
+            const otherProperties: OtherProperties[] = [
+                {
+                    propertyName: 'Action Name',
+                    propertyValue: action.name,
+                    copyable: true,
+                },
+                {
+                    propertyName: 'Action Description',
+                    propertyValue: action.description,
+                    // copyable: true,
+                },
+            ];
+
+            nodes.push({
+                id: `action-${action.uuid}`,
+                type: 'customFlowNode',
+                position: { x: 2000, y: 0 },
+                // width: nodeWidth,
+                // height: nodeHeight,
+                data: {
+                    customNodeCardTitle: `Action ${index + 1}`,
+                    // redirectUrl: rule?.uuid ? `/certificates/detail/${rule.uuid}` : undefined,
+                    entityLabel: action.name,
+                    icon: 'fa fa-certificate',
+                    // isMainNode: true,
+                    // certificateNodeData: {
+                    //     certificateNodeStatus: chain.state,
+                    //     certificateNodeValidationStatus: chain.validationStatus,
+                    // },
+                    otherProperties: otherProperties,
+                },
+            });
+        });
+    }
 
     return { nodes, edges };
 }

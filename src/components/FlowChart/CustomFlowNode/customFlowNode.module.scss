@@ -92,8 +92,8 @@
     word-wrap: break-word;
 }
 .mainNodeBody {
-    border-width: 3px;
-    border-color: $czertainly-blue;
+    border-width: 4px;
+    // border-color: $czertainly-blue;
 }
 
 .expandButtonContainer {
@@ -278,6 +278,19 @@
 }
 
 .expandButtonUnknown {
+    background-color: #3754a566 !important;
+    border: none !important;
+    &:hover {
+        background-color: #3754a5ec !important;
+        border: none;
+    }
+    &:active {
+        background-color: #3754a5d8 !important;
+        border: none;
+    }
+}
+
+.addButton {
     background-color: #3754a566 !important;
     border: none !important;
     &:hover {

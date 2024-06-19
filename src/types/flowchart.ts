@@ -25,6 +25,7 @@ export interface CustomNodeData {
     description?: string;
     otherProperties?: OtherProperties[];
     expandedByDefault?: boolean;
+    onNodeAddButtonClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
     // certificateNodeStatus?: CertificateState;
     // certificateNodeValidationStatus?: CertificateValidationStatus;
     certificateNodeData?: CertificateNodeData;

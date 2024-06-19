@@ -22,6 +22,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }:
     const toggle = () => setCollapse(!collapse);
     const copyToClipboard = useCopyToClipboard();
 
+    // TODO: use only for certificates not for rules
     const getStatusClasses = () => {
         switch (data?.certificateNodeData?.certificateNodeValidationStatus) {
             case CertificateValidationStatus.Valid:
@@ -46,6 +47,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }:
         }
     };
 
+    // TODO: use only for certificates not for rules
     const getExpandButtonStatusClasses = () => {
         switch (data?.certificateNodeData?.certificateNodeValidationStatus) {
             case CertificateValidationStatus.Valid:
@@ -83,12 +85,27 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }:
                     getStatusClasses(),
                 )}
             >
-                {selected && data.otherProperties && (
+                {selected && (
                     <div className={style.expandButtonContainer}>
-                        <Button color="primary" onClick={toggle} className={cx(style.expandButton, getExpandButtonStatusClasses())}>
-                            {/* <span className="mx-auto">{status}</span> */}
-                            <i className={cx('fa ', { 'fa-chevron-down': !collapse, 'fa-chevron-up': collapse })} />
-                        </Button>
+                        <div className="d-flex flex-column">
+                            {data.otherProperties && (
+                                <Button color="primary" onClick={toggle} className={cx(style.expandButton, getExpandButtonStatusClasses())}>
+                                    {/* <span className="mx-auto">{status}</span> */}
+                                    <i className={cx('fa ', { 'fa-chevron-down': !collapse, 'fa-chevron-up': collapse })} />
+                                </Button>
+                            )}
+                            {/* TODO: Make this button to be collapsible and expandable to the right side, show attachable items to that
+                            specific node */}
+                            {data.onNodeAddButtonClick && (
+                                <Button
+                                    color="primary"
+                                    className={cx('mt-1', style.expandButton, style.addButton)}
+                                    onClick={data.onNodeAddButtonClick}
+                                >
+                                    <i className={cx('fa fa-plus')} />
+                                </Button>
+                            )}
+                        </div>
                     </div>
                 )}
                 <div className="d-flex my-1">
@@ -125,7 +142,6 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }:
                         <Collapse
                             isOpen={collapse}
                             // onEntered={onEntered} onExited={onExited}
-
                             className="w-100"
                         >
                             <div className={cx(style.listContainer, { [style.listContainerDragging]: dragging })}>

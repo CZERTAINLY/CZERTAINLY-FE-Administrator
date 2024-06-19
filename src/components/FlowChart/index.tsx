@@ -31,6 +31,7 @@ export interface CustomNode extends Node {
 
 export interface FlowChartProps {
     flowChartTitle?: string;
+    flowDirection?: 'TB' | 'BT' | 'LR' | 'RL';
     flowChartNodes: CustomNode[];
     flowChartEdges: Edge[];
     defaultViewport?: Viewport | undefined;
@@ -77,7 +78,7 @@ const getLayoutedElements = (nodes: CustomNode[], edges: Edge[], direction = 'TB
     return { nodes, edges };
 };
 
-const FlowChart = ({ flowChartTitle, flowChartEdges, flowChartNodes, defaultViewport, busy }: FlowChartProps) => {
+const FlowChart = ({ flowChartTitle, flowChartEdges, flowChartNodes, defaultViewport, busy, flowDirection }: FlowChartProps) => {
     const [nodes, setNodes] = useState(flowChartNodes);
     const [edges, setEdges] = useState(flowChartEdges);
     const defaultEdgeOptions = { animated: true };
@@ -88,10 +89,10 @@ const FlowChart = ({ flowChartTitle, flowChartEdges, flowChartNodes, defaultView
     // const onConnect = useCallback((connection: Edge | Connection) => setEdges((eds) => addEdge(connection, eds)), [setEdges]);
 
     useEffect(() => {
-        const { nodes, edges } = getLayoutedElements(flowChartNodes, flowChartEdges);
+        const { nodes, edges } = getLayoutedElements(flowChartNodes, flowChartEdges, flowDirection);
         setNodes(nodes);
         setEdges(edges);
-    }, [flowChartEdges, flowChartNodes]);
+    }, [flowChartEdges, flowChartNodes, flowDirection]);
 
     return (
         <Widget className={style.flowWidget} busy={busy}>
