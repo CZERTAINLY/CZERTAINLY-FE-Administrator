@@ -580,7 +580,7 @@ const TriggerDetails = () => {
                                 flowChartEdges={edges}
                                 flowChartNodes={nodes}
                                 defaultViewport={defaultViewport}
-                                flowDirection="TB"
+                                flowDirection="STAR"
                             />
                         ),
                     },

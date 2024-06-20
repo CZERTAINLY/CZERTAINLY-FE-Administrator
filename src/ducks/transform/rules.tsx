@@ -669,12 +669,8 @@ export function useTransformTriggerObjectToNodesAndEdges(
     const executions = useSelector(rulesSelectors.executions);
     const conditions = useSelector(rulesSelectors.conditions);
     // log recieved executions and conditions
-    console.log('executions', executions);
-    console.log('conditions', conditions);
 
     // use rules and actions show for adding if not attached already to the trigger
-    console.log('rules', rules);
-    console.log('actions', actions);
     useEffect(() => {
         dispatch(rulesActions.listExecutions({ resource: triggerDetails?.resource }));
         dispatch(rulesActions.listConditions({ resource: triggerDetails?.resource }));
@@ -789,7 +785,7 @@ export function useTransformTriggerObjectToNodesAndEdges(
             expandedByDefault: false,
             // onNodeAddButtonClick: () => {},
             onNodeAddButtonClick(event) {
-                console.log('evt', event);
+                console.log('add event logic', event);
             },
             // certificateNodeStatus: triggerDetails.state,
             // certificateNodeValidationStatus: triggerDetails.validationStatus,
@@ -820,7 +816,7 @@ export function useTransformTriggerObjectToNodesAndEdges(
                 type: 'customFlowNode',
                 position: { x: 0, y: 0 },
                 // width: nodeWidth,
-                // height: nodeHeight,
+                // // height: nodeHeight,
                 data: {
                     customNodeCardTitle: `Rule ${index + 1}`,
                     // redirectUrl: rule?.uuid ? `/certificates/detail/${rule.uuid}` : undefined,
@@ -865,11 +861,12 @@ export function useTransformTriggerObjectToNodesAndEdges(
                 type: 'customFlowNode',
                 position: { x: 0, y: 0 },
                 // width: nodeWidth,
-                // height: nodeHeight,
+                // // height: nodeHeight,
                 data: {
                     customNodeCardTitle: `Action ${index + 1}`,
                     // redirectUrl: rule?.uuid ? `/certificates/detail/${rule.uuid}` : undefined,
                     entityLabel: action.name,
+                    // description: action.description,
                     icon: 'fa fa-certificate',
                     // isMainNode: true,
                     // certificateNodeData: {
@@ -892,82 +889,82 @@ export function useTransformTriggerObjectToNodesAndEdges(
 
     // add the remaining rules and actions as nodes without edges
 
-    if (rules?.length) {
-        const rulesNotAttachedToTrigger = rules.filter((rule) => !triggerDetails.rules.find((r) => r.uuid === rule.uuid));
+    // if (rules?.length) {
+    //     const rulesNotAttachedToTrigger = rules.filter((rule) => !triggerDetails.rules.find((r) => r.uuid === rule.uuid));
 
-        rulesNotAttachedToTrigger.forEach((rule, index) => {
-            const otherProperties: OtherProperties[] = [
-                {
-                    propertyName: 'Rule Name',
-                    propertyValue: rule.name,
-                    copyable: true,
-                },
-                {
-                    propertyName: 'Rule Description',
-                    propertyValue: rule.description,
-                    // copyable: true,
-                },
-            ];
+    //     rulesNotAttachedToTrigger.forEach((rule, index) => {
+    //         const otherProperties: OtherProperties[] = [
+    //             {
+    //                 propertyName: 'Rule Name',
+    //                 propertyValue: rule.name,
+    //                 copyable: true,
+    //             },
+    //             {
+    //                 propertyName: 'Rule Description',
+    //                 propertyValue: rule.description,
+    //                 // copyable: true,
+    //             },
+    //         ];
 
-            nodes.push({
-                id: `rule-${rule.uuid}`,
-                type: 'customFlowNode',
-                position: { x: 0, y: 0 },
-                // width: nodeWidth,
-                // height: nodeHeight,
-                data: {
-                    customNodeCardTitle: `Rule ${index + 1}`,
-                    // redirectUrl: rule?.uuid ? `/certificates/detail/${rule.uuid}` : undefined,
-                    entityLabel: rule.name,
-                    icon: 'fa fa-certificate',
-                    // isMainNode: true,
-                    // certificateNodeData: {
-                    //     certificateNodeStatus: chain.state,
-                    //     certificateNodeValidationStatus: chain.validationStatus,
-                    // },
-                    otherProperties: otherProperties,
-                },
-            });
-        });
-    }
+    //         nodes.push({
+    //             id: `rule-${rule.uuid}`,
+    //             type: 'customFlowNode',
+    //             position: { x: 0, y: 0 },
+    //             // width: nodeWidth,
+    //             // // height: nodeHeight,
+    //             data: {
+    //                 customNodeCardTitle: `Rule ${index + 1}`,
+    //                 // redirectUrl: rule?.uuid ? `/certificates/detail/${rule.uuid}` : undefined,
+    //                 entityLabel: rule.name,
+    //                 icon: 'fa fa-certificate',
+    //                 // isMainNode: true,
+    //                 // certificateNodeData: {
+    //                 //     certificateNodeStatus: chain.state,
+    //                 //     certificateNodeValidationStatus: chain.validationStatus,
+    //                 // },
+    //                 otherProperties: otherProperties,
+    //             },
+    //         });
+    //     });
+    // }
 
-    if (actions?.length) {
-        const actionsNotAttachedToTrigger = actions.filter((action) => !triggerDetails.actions.find((a) => a.uuid === action.uuid));
-        actionsNotAttachedToTrigger.forEach((action, index) => {
-            const otherProperties: OtherProperties[] = [
-                {
-                    propertyName: 'Action Name',
-                    propertyValue: action.name,
-                    copyable: true,
-                },
-                {
-                    propertyName: 'Action Description',
-                    propertyValue: action.description,
-                    // copyable: true,
-                },
-            ];
+    // if (actions?.length) {
+    //     const actionsNotAttachedToTrigger = actions.filter((action) => !triggerDetails.actions.find((a) => a.uuid === action.uuid));
+    //     actionsNotAttachedToTrigger.forEach((action, index) => {
+    //         const otherProperties: OtherProperties[] = [
+    //             {
+    //                 propertyName: 'Action Name',
+    //                 propertyValue: action.name,
+    //                 copyable: true,
+    //             },
+    //             {
+    //                 propertyName: 'Action Description',
+    //                 propertyValue: action.description,
+    //                 // copyable: true,
+    //             },
+    //         ];
 
-            nodes.push({
-                id: `action-${action.uuid}`,
-                type: 'customFlowNode',
-                position: { x: 2000, y: 0 },
-                // width: nodeWidth,
-                // height: nodeHeight,
-                data: {
-                    customNodeCardTitle: `Action ${index + 1}`,
-                    // redirectUrl: rule?.uuid ? `/certificates/detail/${rule.uuid}` : undefined,
-                    entityLabel: action.name,
-                    icon: 'fa fa-certificate',
-                    // isMainNode: true,
-                    // certificateNodeData: {
-                    //     certificateNodeStatus: chain.state,
-                    //     certificateNodeValidationStatus: chain.validationStatus,
-                    // },
-                    otherProperties: otherProperties,
-                },
-            });
-        });
-    }
+    //         nodes.push({
+    //             id: `action-${action.uuid}`,
+    //             type: 'customFlowNode',
+    //             position: { x: 2000, y: 0 },
+    //             // width: nodeWidth,
+    //             // // height: nodeHeight,
+    //             data: {
+    //                 customNodeCardTitle: `Action ${index + 1}`,
+    //                 // redirectUrl: rule?.uuid ? `/certificates/detail/${rule.uuid}` : undefined,
+    //                 entityLabel: action.name,
+    //                 icon: 'fa fa-certificate',
+    //                 // isMainNode: true,
+    //                 // certificateNodeData: {
+    //                 //     certificateNodeStatus: chain.state,
+    //                 //     certificateNodeValidationStatus: chain.validationStatus,
+    //                 // },
+    //                 otherProperties: otherProperties,
+    //             },
+    //         });
+    //     });
+    // }
 
     return { nodes, edges };
 }

@@ -5,7 +5,9 @@ function getNodeIntersection(intersectionNode: CustomNode, targetNode: CustomNod
     const { positionAbsolute: intersectionNodePosition } = intersectionNode;
     const targetPosition = targetNode.positionAbsolute;
     const w = nodeWidth / 2;
-    const h = nodeHeight / 2;
+    const currentIntersectionNodeNodeHeight = intersectionNode?.data?.description ? nodeHeight + 35 : nodeHeight;
+
+    const h = currentIntersectionNodeNodeHeight / 2;
 
     if (!intersectionNodePosition || !targetPosition) return { x: 0, y: 0 };
 

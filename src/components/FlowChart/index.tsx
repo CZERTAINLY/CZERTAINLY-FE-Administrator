@@ -31,7 +31,7 @@ export interface CustomNode extends Node {
 
 export interface FlowChartProps {
     flowChartTitle?: string;
-    flowDirection?: 'TB' | 'BT' | 'LR' | 'RL';
+    flowDirection?: 'TB' | 'BT' | 'LR' | 'RL' | 'STAR';
     flowChartNodes: CustomNode[];
     flowChartEdges: Edge[];
     defaultViewport?: Viewport | undefined;
@@ -47,35 +47,105 @@ dagreGraph.setDefaultEdgeLabel(() => ({}));
 export const nodeWidth = 400;
 export const nodeHeight = 100;
 
+// const getLayoutedElements = (nodes: CustomNode[], edges: Edge[], direction = 'TB') => {
+//     const isHorizontal = direction === 'LR';
+//     dagreGraph.setGraph({ rankdir: direction });
+
+//     nodes.forEach((node) => {
+//         const currentNodeHeight = node.data.otherProperties?.length ? nodeHeight + node.data.otherProperties?.length * 20 : nodeHeight;
+
+//         // node.data.isMainNode
+//         dagreGraph.setNode(node.id, { width: nodeWidth, height: currentNodeHeight });
+//     });
+
+//     edges.forEach((edge) => {
+//         dagreGraph.setEdge(edge.source, edge.target);
+//     });
+
+//     dagre.layout(dagreGraph);
+
+//     nodes.forEach((node: CustomNode) => {
+//         const nodeWithPosition = dagreGraph.node(node.id);
+//         node.targetPosition = isHorizontal ? Position.Left : Position.Top;
+//         node.sourcePosition = isHorizontal ? Position.Right : Position.Bottom;
+
+//         node.position = {
+//             x: nodeWithPosition.x - nodeWidth / 2,
+//             y: nodeWithPosition.y - nodeHeight / 2,
+//         };
+
+//         return node;
+//     });
+
+//     return { nodes, edges };
+// };
+
 const getLayoutedElements = (nodes: CustomNode[], edges: Edge[], direction = 'TB') => {
-    const isHorizontal = direction === 'LR';
-    dagreGraph.setGraph({ rankdir: direction });
+    if (direction === 'STAR') {
+        const centerX = window.innerWidth / 2;
+        const centerY = window.innerHeight / 2;
+        const minRadius = 250; // Minimum radius
+        const mainNode = nodes.find((node) => node.data.isMainNode);
+        const surroundingNodes = nodes.filter((node) => !node.data.isMainNode);
+        const angleIncrement = (2 * Math.PI) / surroundingNodes.length;
 
-    nodes.forEach((node) => {
-        const currentNodeHeight = node.data.otherProperties?.length ? nodeHeight + node.data.otherProperties?.length * 20 : nodeHeight;
-        dagreGraph.setNode(node.id, { width: nodeWidth, height: currentNodeHeight });
-    });
+        // Calculate dynamic radius based on the number of nodes to ensure minimum distance of 200px
+        let dynamicRadius = surroundingNodes.length * 60; // Example calculation, adjust as needed
+        dynamicRadius = Math.max(dynamicRadius, minRadius); // Ensure radius is not less than minRadius
 
-    edges.forEach((edge) => {
-        dagreGraph.setEdge(edge.source, edge.target);
-    });
+        if (mainNode) {
+            const currentNodeHeight = mainNode.data?.description ? nodeHeight + 35 : nodeHeight;
+            // Position the main node at the center
+            mainNode.position = { x: centerX - nodeWidth / 2, y: centerY - currentNodeHeight / 2 };
+        }
 
-    dagre.layout(dagreGraph);
+        surroundingNodes.forEach((node, index) => {
+            // Calculate the angle for the current node
+            const angle = angleIncrement * index;
+            const currentNodeHeight = node.data?.description ? nodeHeight + 35 : nodeHeight;
 
-    nodes.forEach((node: CustomNode) => {
-        const nodeWithPosition = dagreGraph.node(node.id);
-        node.targetPosition = isHorizontal ? Position.Left : Position.Top;
-        node.sourcePosition = isHorizontal ? Position.Right : Position.Bottom;
+            // Calculate and set the position for each surrounding node using the dynamic radius
+            node.position = {
+                x: centerX + dynamicRadius * Math.cos(angle) - nodeWidth / 2,
+                y: centerY + dynamicRadius * Math.sin(angle) - currentNodeHeight / 2,
+            };
+            // Set target and source positions for better edge connections
+            node.targetPosition = Position.Top;
+            node.sourcePosition = Position.Bottom;
+        });
 
-        node.position = {
-            x: nodeWithPosition.x - nodeWidth / 2,
-            y: nodeWithPosition.y - nodeHeight / 2,
-        };
+        return { nodes, edges };
+    } else {
+        const isHorizontal = direction === 'LR';
+        dagreGraph.setGraph({ rankdir: direction });
 
-        return node;
-    });
+        nodes.forEach((node) => {
+            // const currentNodeHeight = node.data.otherProperties?.length ? nodeHeight + node.data.otherProperties?.length * 20 : nodeHeight;
+            const currentNodeHeight = node.data?.description ? nodeHeight + 35 : nodeHeight;
+            dagreGraph.setNode(node.id, { width: nodeWidth, height: currentNodeHeight });
+        });
 
-    return { nodes, edges };
+        edges.forEach((edge) => {
+            dagreGraph.setEdge(edge.source, edge.target);
+        });
+
+        dagre.layout(dagreGraph);
+
+        nodes.forEach((node: CustomNode) => {
+            const nodeWithPosition = dagreGraph.node(node.id);
+            node.targetPosition = isHorizontal ? Position.Left : Position.Top;
+            node.sourcePosition = isHorizontal ? Position.Right : Position.Bottom;
+            const currentNodeHeight = node.data?.description ? nodeHeight + 35 : nodeHeight;
+            node.position = {
+                x: nodeWithPosition.x - nodeWidth / 2,
+                y: nodeWithPosition.y - currentNodeHeight / 2,
+            };
+
+            return node;
+        });
+
+        return { nodes, edges };
+    }
 };
 
 const FlowChart = ({ flowChartTitle, flowChartEdges, flowChartNodes, defaultViewport, busy, flowDirection }: FlowChartProps) => {
