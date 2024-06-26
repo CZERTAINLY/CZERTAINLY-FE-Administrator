@@ -581,6 +581,24 @@ const TriggerDetails = () => {
                                 flowChartNodes={nodes}
                                 defaultViewport={defaultViewport}
                                 flowDirection="STAR"
+                                legends={[
+                                    {
+                                        color: '#afbbdb',
+                                        icon: 'fa fa-rocket',
+                                        label: 'Trigger',
+                                    },
+                                    {
+                                        color: '#1ab394e1',
+                                        icon: 'fa fa-bolt',
+                                        label: 'Action',
+                                    },
+
+                                    {
+                                        color: '#7fa2c1',
+                                        icon: 'fa fa-book',
+                                        label: 'Rule',
+                                    },
+                                ]}
                             />
                         ),
                     },

@@ -1905,6 +1905,7 @@ export default function CertificateDetail() {
                                 flowChartEdges={certificateEdges}
                                 flowChartNodes={certificateNodes}
                                 defaultViewport={defaultViewport}
+                                flowDirection="TB"
                             />
                         ) : (
                             // Todo: Add a placeholder for the flow chart

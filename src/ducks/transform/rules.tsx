@@ -1,13 +1,17 @@
 import cx from 'classnames';
 import { CustomNode } from 'components/FlowChart';
 import style from 'components/FlowChart/CustomFlowNode/customFlowNode.module.scss';
+import ProgressButton from 'components/ProgressButton';
 import SwitchWidget from 'components/SwitchWidget';
 import { actions as alertActions } from 'ducks/alerts';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
-import { useEffect } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
+import Select from 'react-select';
 import { Edge, MarkerType } from 'reactflow';
+import { FormGroup, Label } from 'reactstrap';
 import { OtherProperties } from 'types/flowchart';
 import { PlatformEnum, Resource, UpdateTriggerRequestDtoEventEnum } from 'types/openapi';
 
@@ -258,401 +262,10 @@ export function transformTriggerHistorySummaryDtoToModel(triggerHistorySummaryDt
     };
 }
 
-// export function transformCertifacetObjectToNodesAndEdges(
-//     certificate?: CertificateDetailResponseModel,
-//     users?: UserResponseModel[],
-//     locations?: LocationResponseModel[],
-//     raProfileSelected?: RaProfileResponseModel,
-//     certificateChain?: CertificateChainResponseModel,
-// ) {
-//     const nodes: CustomNode[] = [];
-//     const edges: Edge[] = [];
-
-//     if (!certificate) {
-//         return { nodes, edges };
-//     }
-
-//     const otherPropertiesCurrentCertificate: OtherProperties[] = [
-//         {
-//             propertyName: 'State',
-//             propertyContent: <CertificateStatus status={certificate.state} />,
-//         },
-//     ];
-
-//     if (certificate?.validationStatus) {
-//         otherPropertiesCurrentCertificate.push({
-//             propertyName: 'Validation Status',
-//             propertyContent: <CertificateStatus status={certificate.validationStatus} />,
-//         });
-//     }
-
-//     otherPropertiesCurrentCertificate.push({
-//         propertyName: 'Subject DN',
-//         propertyValue: certificate.subjectDn,
-//         copyable: true,
-//     });
-
-//     if (certificate?.serialNumber) {
-//         otherPropertiesCurrentCertificate.push({
-//             propertyName: 'Serial Number',
-//             propertyValue: certificate.serialNumber,
-//             copyable: true,
-//         });
-//     }
-//     if (certificate?.fingerprint) {
-//         otherPropertiesCurrentCertificate.push({
-//             propertyName: 'Fingerprint',
-//             propertyValue: certificate.fingerprint,
-//             copyable: true,
-//         });
-//     }
-
-//     if (!certificateChain?.certificates?.length && !certificateChain?.completeChain) {
-//         if (certificate?.issuerDn) {
-//             otherPropertiesCurrentCertificate.push({
-//                 propertyName: 'Issuer DN',
-//                 propertyValue: certificate.issuerDn,
-//                 copyable: true,
-//             });
-//         }
-//         if (certificate?.issuerSerialNumber) {
-//             otherPropertiesCurrentCertificate.push({
-//                 propertyName: 'Issuer Sr. No.',
-//                 propertyValue: certificate.issuerSerialNumber,
-//                 copyable: true,
-//             });
-//         }
-//     }
-//     nodes.push({
-//         id: '1',
-//         type: 'customFlowNode',
-//         position: { x: 0, y: 0 },
-//         width: defaultNodeWidth,
-//         height: defaultNodeHeight,
-//         data: {
-//             customNodeCardTitle: 'Current Certificate',
-//             entityLabel: certificate.commonName,
-//             icon: 'fa fa-certificate',
-//             isMainNode: true,
-//             certificateNodeStatus: certificate.state,
-//             certificateNodeValidationStatus: certificate.validationStatus,
-//             otherProperties: otherPropertiesCurrentCertificate,
-//         },
-//     });
-
-//     if (certificateChain && certificateChain?.certificates?.length) {
-//         certificateChain.certificates.forEach((chain, index) => {
-//             const chainLength = certificateChain?.certificates?.length || 0;
-
-//             const otherProperties: OtherProperties[] = [
-//                 {
-//                     propertyName: 'State',
-//                     propertyContent: <CertificateStatus status={chain.state} />,
-//                 },
-//                 {
-//                     propertyName: 'Validation Status',
-//                     propertyContent: <CertificateStatus status={chain.validationStatus} />,
-//                 },
-//                 {
-//                     propertyName: 'Subject DN',
-//                     propertyValue: chain.subjectDn,
-//                     copyable: true,
-//                 },
-//             ];
-
-//             if (chain?.serialNumber) {
-//                 otherProperties.push({
-//                     propertyName: 'Serial Number',
-//                     propertyValue: chain?.serialNumber,
-//                     copyable: true,
-//                 });
-//             }
-
-//             if (chain?.fingerprint) {
-//                 otherProperties.push({
-//                     propertyName: 'Fingerprint',
-//                     propertyValue: chain.fingerprint,
-//                     copyable: true,
-//                 });
-//             }
-
-//             if (chainLength - 1 === index && !certificateChain?.completeChain) {
-//                 if (chain?.issuerDn) {
-//                     otherProperties.push({
-//                         propertyName: 'Issuer DN',
-//                         propertyValue: chain.issuerDn,
-//                         copyable: true,
-//                     });
-//                 }
-//                 if (chain?.issuerSerialNumber) {
-//                     otherProperties.push({
-//                         propertyName: 'Issuer Sr. No.',
-//                         propertyValue: chain.issuerSerialNumber,
-//                         copyable: true,
-//                     });
-//                 }
-//             }
-
-//             nodes.push({
-//                 id: `chain-${index}`,
-//                 type: 'customFlowNode',
-//                 position: { x: 0, y: 0 },
-//                 width: defaultNodeWidth,
-//                 height: defaultNodeHeight,
-//                 data: {
-//                     customNodeCardTitle: chainLength - 1 === index && certificateChain?.completeChain ? `Root CA` : `Intermediate CA`,
-//                     redirectUrl: chain?.uuid ? `/certificates/detail/${chain.uuid}` : undefined,
-//                     entityLabel: chain.commonName,
-//                     icon: chainLength - 1 === index && certificateChain?.completeChain ? 'fa fa-medal' : 'fa fa-certificate',
-//                     isMainNode: true,
-//                     certificateNodeStatus: chain.state,
-//                     certificateNodeValidationStatus: chain.validationStatus,
-//                     otherProperties: otherProperties,
-//                 },
-//             });
-//             edges.push({
-//                 id: `e1-chain-${index}`,
-//                 // source: "1",
-//                 source: index === 0 ? '1' : `chain-${index - 1}`,
-//                 // target: `chain-${index}`,
-//                 target: `chain-${index}`,
-//                 type: 'floating',
-//                 markerEnd: { type: MarkerType.Arrow },
-//             });
-//         });
-//     }
-
-//     if (users?.length) {
-//         const user = users.find((u) => u.username === certificate?.owner);
-//         if (user) {
-//             const userOtherProperties: OtherProperties[] = [
-//                 {
-//                     propertyName: 'Username',
-//                     propertyValue: user.username,
-//                     copyable: true,
-//                 },
-//                 { propertyName: 'User UUID', propertyValue: user.uuid, copyable: true },
-//                 {
-//                     propertyName: 'User Enabled',
-//                     propertyValue: user.enabled ? 'Yes' : 'No',
-//                 },
-//             ];
-
-//             if (user?.email) {
-//                 userOtherProperties.push({
-//                     propertyName: 'Email',
-//                     propertyValue: user.email,
-//                     copyable: true,
-//                 });
-//             }
-
-//             nodes.push({
-//                 id: '2',
-//                 type: 'customFlowNode',
-//                 position: { x: 0, y: 0 },
-//                 width: defaultNodeWidth,
-//                 height: defaultNodeHeight,
-//                 data: {
-//                     customNodeCardTitle: 'Owner',
-//                     icon: 'fa fa fa-user',
-//                     entityLabel: user?.username || '',
-//                     description: user?.description || '',
-//                     redirectUrl: user?.uuid ? `/users/detail/${user?.uuid}` : undefined,
-//                     otherProperties: userOtherProperties,
-//                 },
-//             });
-//             edges.push({
-//                 id: 'e1-2',
-//                 source: '1',
-//                 target: '2',
-//                 type: 'floating',
-//                 markerEnd: { type: MarkerType.Arrow },
-//             });
-//         }
-//     }
-
-//     if (certificate?.key) {
-//         const keyOtherProperties: OtherProperties[] = [];
-
-//         if (certificate?.key?.owner) {
-//             keyOtherProperties.push({
-//                 propertyName: 'Key Owner',
-//                 propertyValue: certificate.key.owner,
-//                 copyable: true,
-//             });
-//         }
-
-//         if (certificate?.key?.tokenProfileName) {
-//             keyOtherProperties.push({
-//                 propertyName: 'Key Token ProfileName',
-//                 propertyValue: certificate.key.tokenProfileName,
-//                 copyable: true,
-//             });
-//         }
-//         nodes.push({
-//             id: '4',
-//             type: 'customFlowNode',
-//             position: { x: 0, y: 0 },
-//             width: defaultNodeWidth,
-//             height: defaultNodeHeight,
-//             data: {
-//                 customNodeCardTitle: 'Key',
-//                 entityLabel: certificate?.key?.name || '',
-//                 icon: 'fa fa fa-key',
-//                 description: certificate?.key?.description || '',
-//                 redirectUrl:
-//                     certificate?.key?.uuid && certificate?.key?.tokenInstanceUuid
-//                         ? `/keys/detail/${certificate.key.tokenInstanceUuid}/${certificate.key.uuid}`
-//                         : undefined,
-//                 otherProperties: keyOtherProperties,
-//             },
-//         });
-//         edges.push({
-//             id: 'e1-4',
-//             source: '4',
-//             target: '1',
-//             type: 'floating',
-//             markerEnd: { type: MarkerType.Arrow },
-//         });
-//     }
-
-//     if (certificate?.groups?.length) {
-//         certificate?.groups.forEach((group) => {
-//             nodes.push({
-//                 id: '3',
-//                 type: 'customFlowNode',
-//                 position: { x: 0, y: 0 },
-//                 width: defaultNodeWidth,
-//                 height: defaultNodeHeight,
-//                 data: {
-//                     customNodeCardTitle: 'Group',
-//                     description: group?.description || '',
-//                     icon: 'fa fa fa-users',
-//                     entityLabel: group?.name || '',
-//                     redirectUrl: group?.uuid ? `/groups/detail/${group?.uuid}` : undefined,
-//                 },
-//             });
-//             edges.push({
-//                 id: 'e1-3',
-//                 source: '3',
-//                 target: '1',
-//                 type: 'floating',
-//                 markerEnd: { type: MarkerType.Arrow },
-//             });
-//         });
-//     }
-
-//     if (certificate?.raProfile) {
-//         const raProfileOtherProperties: OtherProperties[] = [];
-
-//         if (certificate?.raProfile?.enabled) {
-//             raProfileOtherProperties.push({
-//                 propertyName: 'RA Profile Enabled',
-//                 propertyValue: certificate.raProfile.enabled ? 'Yes' : 'No',
-//             });
-//         }
-
-//         nodes.push({
-//             id: '5',
-//             type: 'customFlowNode',
-//             position: { x: 0, y: 0 },
-//             width: defaultNodeWidth,
-//             height: defaultNodeHeight,
-//             data: {
-//                 customNodeCardTitle: 'RA Profile',
-//                 icon: 'fa fa fa-address-card',
-//                 entityLabel: certificate?.raProfile?.name || '',
-//                 redirectUrl:
-//                     certificate?.raProfile?.uuid && certificate?.raProfile.authorityInstanceUuid
-//                         ? `/raProfiles/detail/${certificate.raProfile.authorityInstanceUuid}/${certificate.raProfile.uuid}`
-//                         : undefined,
-//                 otherProperties: raProfileOtherProperties,
-//             },
-//         });
-//         edges.push({
-//             id: 'e1-5',
-//             source: '1',
-//             target: '5',
-//             type: 'floating',
-//             markerEnd: { type: MarkerType.Arrow },
-//         });
-
-//         if (raProfileSelected) {
-//             nodes.push({
-//                 id: '7',
-//                 type: 'customFlowNode',
-//                 position: { x: 0, y: 0 },
-//                 width: defaultNodeWidth,
-//                 height: defaultNodeHeight,
-//                 data: {
-//                     customNodeCardTitle: 'Authority',
-//                     icon: 'fa fa fa-stamp',
-//                     entityLabel: raProfileSelected.authorityInstanceName || '',
-//                     redirectUrl: `/authorities/detail/${raProfileSelected.authorityInstanceUuid}`,
-//                     otherProperties: [
-//                         {
-//                             propertyName: 'Authority Instance Name',
-//                             propertyValue: raProfileSelected.authorityInstanceName,
-//                             copyable: true,
-//                         },
-
-//                         {
-//                             propertyName: 'Authority UUID',
-//                             propertyValue: raProfileSelected.authorityInstanceUuid,
-//                             copyable: true,
-//                         },
-//                     ],
-//                 },
-//             });
-//             edges.push({
-//                 id: 'e7-5',
-//                 target: '7',
-//                 source: '5',
-//                 type: 'floating',
-//                 markerEnd: { type: MarkerType.Arrow },
-//             });
-//         }
-//     }
-//     if (locations?.length) {
-//         locations.forEach((location) => {
-//             const otherPropertiesLocation: OtherProperties[] = [
-//                 {
-//                     propertyName: 'Location Enabled',
-//                     propertyValue: location.enabled ? 'Yes' : 'No',
-//                 },
-//             ];
-//             if (location?.description) {
-//                 otherPropertiesLocation.push({
-//                     propertyName: 'Description',
-//                     propertyValue: location?.description,
-//                 });
-//             }
-//             nodes.push({
-//                 id: location?.uuid || '',
-//                 type: 'customFlowNode',
-//                 position: { x: 0, y: 0 },
-//                 width: defaultNodeWidth,
-//                 height: defaultNodeHeight,
-//                 data: {
-//                     customNodeCardTitle: 'Location',
-//                     icon: 'fa fa fa-map-marker',
-//                     entityLabel: location?.name || '',
-//                     redirectUrl: location?.uuid ? `/locations/detail/${certificate?.uuid}/${location?.uuid}` : undefined,
-//                     otherProperties: otherPropertiesLocation,
-//                 },
-//             });
-//             edges.push({
-//                 id: `e${location?.uuid}-1`,
-//                 target: location?.uuid || '',
-//                 source: '1',
-//                 type: 'floating',
-//                 markerEnd: { type: MarkerType.Arrow },
-//             });
-//         });
-//     }
-
-//     return { nodes, edges };
-// }
+interface SelectChangeValue {
+    value: string;
+    label: string;
+}
 
 export function useTransformTriggerObjectToNodesAndEdges(
     triggerDetails?: TriggerDetailModel,
@@ -661,20 +274,223 @@ export function useTransformTriggerObjectToNodesAndEdges(
 ): { nodes: CustomNode[]; edges: Edge[] } {
     const nodes: CustomNode[] = [];
     const edges: Edge[] = [];
+    const [newActions, setNewActions] = useState<SelectChangeValue[]>([]);
+    const [newRules, setNewRules] = useState<SelectChangeValue[]>([]);
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const eventNameEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ResourceEvent));
     const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.TriggerType));
     const dispatch = useDispatch();
-
+    const isUpdatingTrigger = useSelector(rulesSelectors.isUpdatingTrigger);
     const executions = useSelector(rulesSelectors.executions);
     const conditions = useSelector(rulesSelectors.conditions);
+    const { id } = useParams();
+
+    const onUpdateActionsConfirmed = useCallback(
+        (newValues: SelectChangeValue[]) => {
+            if (!id || !triggerDetails) return;
+
+            const newActionsUuids = newValues.map((newAction) => newAction.value);
+
+            const previousAndNewActionsUuid = triggerDetails?.actions.map((action) => action.uuid);
+            const allActionsUuids = [...(previousAndNewActionsUuid || []), ...newActionsUuids];
+            dispatch(
+                rulesActions.updateTrigger({
+                    triggerUuid: id,
+                    trigger: {
+                        actionsUuids: allActionsUuids,
+                        ignoreTrigger: false,
+                        resource: triggerDetails.resource,
+                        type: triggerDetails.type,
+                        rulesUuids: triggerDetails?.rules.map((rule) => rule.uuid) || [],
+                        eventResource: triggerDetails.eventResource,
+                        description: triggerDetails.description || '',
+                        event: (triggerDetails.event as unknown as UpdateTriggerRequestDtoEventEnum) || undefined,
+                    },
+                }),
+            );
+        },
+        [dispatch, id, triggerDetails],
+    );
+
+    const onUpdateRulesConfirmed = useCallback(
+        (newValues: SelectChangeValue[]) => {
+            if (!id || !triggerDetails) return;
+
+            const newRulesUuids = newValues.map((newRule) => newRule.value);
+
+            const previousAndNewRulesUuid = triggerDetails?.rules.map((rule) => rule.uuid);
+            const allRules = [...(previousAndNewRulesUuid || []), ...newRulesUuids];
+
+            dispatch(
+                rulesActions.updateTrigger({
+                    triggerUuid: id,
+                    trigger: {
+                        rulesUuids: allRules,
+                        ignoreTrigger: triggerDetails.ignoreTrigger,
+                        resource: triggerDetails.resource,
+                        type: triggerDetails.type,
+                        actionsUuids: triggerDetails?.actions.map((action) => action.uuid) || [],
+                        eventResource: triggerDetails.eventResource,
+                        description: triggerDetails.description || '',
+                        event: (triggerDetails.event as unknown as UpdateTriggerRequestDtoEventEnum) || undefined,
+                    },
+                }),
+            );
+        },
+        [dispatch, id, triggerDetails],
+    );
+    const rulesOptions = useMemo(() => {
+        const filteredRules = rules?.filter((rule) => !triggerDetails?.rules.find((triggerRule) => triggerRule.uuid === rule.uuid));
+        return filteredRules?.map((rule) => ({
+            value: rule.uuid,
+            label: rule.name,
+        }));
+    }, [rules, triggerDetails]);
     // log recieved executions and conditions
+
+    const actionOptions = useMemo(() => {
+        const filteredActions = actions?.filter(
+            (action) => !triggerDetails?.actions.find((triggerAction) => triggerAction.uuid === action.uuid),
+        );
+        return filteredActions?.map((action) => ({
+            value: action.uuid,
+            label: action.name,
+        }));
+    }, [actions, triggerDetails]);
 
     // use rules and actions show for adding if not attached already to the trigger
     useEffect(() => {
         dispatch(rulesActions.listExecutions({ resource: triggerDetails?.resource }));
         dispatch(rulesActions.listConditions({ resource: triggerDetails?.resource }));
     }, [triggerDetails, dispatch]);
+
+    // Step 1: Create a ref for the target element
+    const addNewRuleDiv = useRef<HTMLDivElement>(null);
+
+    // Step 2: Handle the onKeyDown event on the Select component
+    const onRuleChange = () => {
+        console.log('handle keydown');
+        // Check for a specific key if needed, e.g., Enter
+        // if (event.key === 'Enter') {
+        // Step 3: Programmatically click and focus the element
+        const labelElement = addNewRuleDiv.current;
+        console.log('labelElement', labelElement);
+        if (labelElement) {
+            console.log('addLabel', labelElement);
+            labelElement.click(); // Simulate a click event
+
+            labelElement.focus(); // Set focus
+
+            console.log('click and focus called');
+            // }
+        }
+    };
+
+    const renderAddButtonContent = useMemo(() => {
+        return (
+            <div className="w-100">
+                <h6 className="text-muted">Update Trigger</h6>
+                {/* <Form>
+                    <Label> Add Rules</Label>
+                    <Select placeholder="Add New Rule Rule" options={rulesOptions} isMulti />
+                </Form> */}
+                <div
+                    className="w-100"
+                    // style={{ background: 'red' }}
+                    ref={addNewRuleDiv}
+                    tabIndex={-1} // Make the div focusable
+                >
+                    <FormGroup>
+                        <Label for="addnewRule">Add Rules</Label>
+
+                        <div className="w-100">
+                            <Select
+                                className="nodrag"
+                                placeholder="Add New Rule"
+                                options={rulesOptions}
+                                onChange={(event) => {
+                                    setNewRules(event?.map((e) => e));
+                                    onRuleChange();
+                                }}
+                                isMulti
+                                value={newRules}
+                                // onKeyDown={(e) => {
+                                //     // e.nativeEvent.getelementById('addNewRuleLabel').focus();
+                                //     handleKeyDown(e);
+
+                                //     e.stopPropagation();
+                                // }}
+                                // onKeyDown={handleKeyDown}
+                            />
+                        </div>
+                    </FormGroup>
+                </div>
+
+                <div className="w-100">
+                    <FormGroup>
+                        <Label for="raProfile">Add Actions</Label>
+
+                        <div className="w-100">
+                            <Select
+                                className="nodrag"
+                                placeholder="Add New Action"
+                                options={actionOptions}
+                                isMulti
+                                value={newActions}
+                                // onValueClick
+                                onChange={(event) => {
+                                    setNewActions(event?.map((e) => e));
+                                    // event.stopPropagation();
+                                    console.log('event', event);
+                                }}
+                            />
+                        </div>
+                    </FormGroup>
+                </div>
+                <div className="flex">
+                    <ProgressButton
+                        title={'Update'}
+                        inProgress={isUpdatingTrigger}
+                        onClick={() => {
+                            console.log('newactions', newActions);
+                            console.log('newRules', newRules);
+                            // dispatch(rulesActions.updateTrigger)
+                            // const newActionsUuids = newValues.map((newAction) => newAction.value);
+                            // const previousAndNewActionsUuid = triggerDetails?.actions.map((action) => action.uuid);
+                            // const allActionsUuids = [...(previousAndNewActionsUuid || []), ...newActionsUuids];
+                            if (!triggerDetails) return;
+                            const newActionsUuids = newActions.map((newAction) => newAction.value);
+                            const newRulesUuids = newRules.map((newRule) => newRule.value);
+
+                            const previousAndNewActionsUuid = triggerDetails?.actions.map((action) => action.uuid);
+                            const previousAndNewRulesUuid = triggerDetails?.rules.map((rule) => rule.uuid);
+
+                            const allActionsUuids = [...(previousAndNewActionsUuid || []), ...newActionsUuids];
+                            const allRulesUuids = [...(previousAndNewRulesUuid || []), ...newRulesUuids];
+
+                            dispatch(
+                                rulesActions.updateTrigger({
+                                    triggerUuid: triggerDetails?.uuid,
+                                    trigger: {
+                                        actionsUuids: allActionsUuids,
+                                        rulesUuids: allRulesUuids,
+                                        ignoreTrigger: false,
+                                        resource: triggerDetails.resource,
+                                        type: triggerDetails.type,
+                                        eventResource: triggerDetails.eventResource,
+                                        description: triggerDetails.description || '',
+                                        event: (triggerDetails.event as unknown as UpdateTriggerRequestDtoEventEnum) || undefined,
+                                    },
+                                }),
+                            );
+                            setNewActions([]);
+                            setNewRules([]);
+                        }}
+                    />
+                </div>
+            </div>
+        );
+    }, [rulesOptions, actionOptions, isUpdatingTrigger, newActions, newRules, triggerDetails, dispatch]);
 
     if (!triggerDetails) {
         return { nodes, edges };
@@ -783,10 +599,8 @@ export function useTransformTriggerObjectToNodesAndEdges(
             // redirectUrl: triggerDetails.uuid ? `/triggers/detail/${triggerDetails.uuid}` : undefined,
             description: triggerDetails.description,
             expandedByDefault: false,
-            // onNodeAddButtonClick: () => {},
-            onNodeAddButtonClick(event) {
-                console.log('add event logic', event);
-            },
+            // addButtonContent: () => {},
+            addButtonContent: renderAddButtonContent,
             // certificateNodeStatus: triggerDetails.state,
             // certificateNodeValidationStatus: triggerDetails.validationStatus,
             // otherProperties: otherPropertiesCurrentCertificate,
@@ -821,7 +635,26 @@ export function useTransformTriggerObjectToNodesAndEdges(
                     customNodeCardTitle: `Rule ${index + 1}`,
                     // redirectUrl: rule?.uuid ? `/certificates/detail/${rule.uuid}` : undefined,
                     entityLabel: rule.name,
-                    icon: 'fa fa-certificate',
+                    icon: 'fa fa-book',
+                    group: 'rules',
+                    deleteAction: () => {
+                        // console.log('delete action');
+                        dispatch(
+                            rulesActions.updateTrigger({
+                                triggerUuid: triggerDetails.uuid,
+                                trigger: {
+                                    rulesUuids: triggerDetails.rules.filter((r) => r.uuid !== rule.uuid).map((r) => r.uuid),
+                                    ignoreTrigger: triggerDetails.ignoreTrigger,
+                                    resource: triggerDetails.resource,
+                                    type: triggerDetails.type,
+                                    actionsUuids: triggerDetails?.actions.map((action) => action.uuid) || [],
+                                    eventResource: triggerDetails.eventResource,
+                                    description: triggerDetails.description || '',
+                                    event: (triggerDetails.event as unknown as UpdateTriggerRequestDtoEventEnum) || undefined,
+                                },
+                            }),
+                        );
+                    },
                     // isMainNode: true,
                     // certificateNodeData: {
                     //     certificateNodeStatus: chain.state,
@@ -867,7 +700,25 @@ export function useTransformTriggerObjectToNodesAndEdges(
                     // redirectUrl: rule?.uuid ? `/certificates/detail/${rule.uuid}` : undefined,
                     entityLabel: action.name,
                     // description: action.description,
-                    icon: 'fa fa-certificate',
+                    icon: 'fa fa-bolt',
+                    group: 'actions',
+                    deleteAction: () => {
+                        dispatch(
+                            rulesActions.updateTrigger({
+                                triggerUuid: triggerDetails.uuid,
+                                trigger: {
+                                    actionsUuids: triggerDetails.actions.filter((a) => a.uuid !== action.uuid).map((a) => a.uuid),
+                                    ignoreTrigger: triggerDetails.ignoreTrigger,
+                                    resource: triggerDetails.resource,
+                                    type: triggerDetails.type,
+                                    rulesUuids: triggerDetails?.rules.map((rule) => rule.uuid) || [],
+                                    eventResource: triggerDetails.eventResource,
+                                    description: triggerDetails.description || '',
+                                    event: (triggerDetails.event as unknown as UpdateTriggerRequestDtoEventEnum) || undefined,
+                                },
+                            }),
+                        );
+                    },
                     // isMainNode: true,
                     // certificateNodeData: {
                     //     certificateNodeStatus: chain.state,
@@ -886,85 +737,6 @@ export function useTransformTriggerObjectToNodesAndEdges(
             });
         });
     }
-
-    // add the remaining rules and actions as nodes without edges
-
-    // if (rules?.length) {
-    //     const rulesNotAttachedToTrigger = rules.filter((rule) => !triggerDetails.rules.find((r) => r.uuid === rule.uuid));
-
-    //     rulesNotAttachedToTrigger.forEach((rule, index) => {
-    //         const otherProperties: OtherProperties[] = [
-    //             {
-    //                 propertyName: 'Rule Name',
-    //                 propertyValue: rule.name,
-    //                 copyable: true,
-    //             },
-    //             {
-    //                 propertyName: 'Rule Description',
-    //                 propertyValue: rule.description,
-    //                 // copyable: true,
-    //             },
-    //         ];
-
-    //         nodes.push({
-    //             id: `rule-${rule.uuid}`,
-    //             type: 'customFlowNode',
-    //             position: { x: 0, y: 0 },
-    //             // width: nodeWidth,
-    //             // // height: nodeHeight,
-    //             data: {
-    //                 customNodeCardTitle: `Rule ${index + 1}`,
-    //                 // redirectUrl: rule?.uuid ? `/certificates/detail/${rule.uuid}` : undefined,
-    //                 entityLabel: rule.name,
-    //                 icon: 'fa fa-certificate',
-    //                 // isMainNode: true,
-    //                 // certificateNodeData: {
-    //                 //     certificateNodeStatus: chain.state,
-    //                 //     certificateNodeValidationStatus: chain.validationStatus,
-    //                 // },
-    //                 otherProperties: otherProperties,
-    //             },
-    //         });
-    //     });
-    // }
-
-    // if (actions?.length) {
-    //     const actionsNotAttachedToTrigger = actions.filter((action) => !triggerDetails.actions.find((a) => a.uuid === action.uuid));
-    //     actionsNotAttachedToTrigger.forEach((action, index) => {
-    //         const otherProperties: OtherProperties[] = [
-    //             {
-    //                 propertyName: 'Action Name',
-    //                 propertyValue: action.name,
-    //                 copyable: true,
-    //             },
-    //             {
-    //                 propertyName: 'Action Description',
-    //                 propertyValue: action.description,
-    //                 // copyable: true,
-    //             },
-    //         ];
-
-    //         nodes.push({
-    //             id: `action-${action.uuid}`,
-    //             type: 'customFlowNode',
-    //             position: { x: 2000, y: 0 },
-    //             // width: nodeWidth,
-    //             // // height: nodeHeight,
-    //             data: {
-    //                 customNodeCardTitle: `Action ${index + 1}`,
-    //                 // redirectUrl: rule?.uuid ? `/certificates/detail/${rule.uuid}` : undefined,
-    //                 entityLabel: action.name,
-    //                 icon: 'fa fa-certificate',
-    //                 // isMainNode: true,
-    //                 // certificateNodeData: {
-    //                 //     certificateNodeStatus: chain.state,
-    //                 //     certificateNodeValidationStatus: chain.validationStatus,
-    //                 // },
-    //                 otherProperties: otherProperties,
-    //             },
-    //         });
-    //     });
-    // }
 
     return { nodes, edges };
 }

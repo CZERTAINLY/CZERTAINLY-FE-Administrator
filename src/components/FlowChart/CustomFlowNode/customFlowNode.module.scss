@@ -102,12 +102,26 @@
     right: -40px;
 }
 
-.expandButton {
+.nodeButton {
     border-radius: 10rem !important;
     width: 26px !important;
     height: 26px !important;
     padding: 0 !important;
     font-size: 10px !important;
+}
+
+.deleteButton {
+    background-color: #e37582 !important;
+
+    border: none !important;
+    &:hover {
+        background-color: #eb3349ec !important;
+        border: none;
+    }
+    &:active {
+        background-color: #eb3349d8 !important;
+        border: none;
+    }
 }
 
 .expiringStatus {
@@ -146,12 +160,14 @@
     }
 }
 
-.validStatus {
+.validStatus,
+.actionGroupNodeStatus {
     color: #1ab394e1 !important;
     border-color: #1ab394e1 !important;
 }
 
-.expandButtonValid {
+.expandButtonValid,
+.actionsGroupNodeExpandButton {
     background-color: #1ab3949f !important;
     border: none !important;
     &:hover {
@@ -182,12 +198,14 @@
     }
 }
 
-.notCheckedStatus {
+.notCheckedStatus,
+.rulesGroupNodeStatus {
     color: #7fa2c1 !important;
     border-color: #7fa2c1 !important;
 }
 
-.expandButtonNotChecked {
+.expandButtonNotChecked,
+.rulesGroupNodeExpandButton {
     background-color: #7fa2c1a1 !important;
     border: none !important;
     &:hover {
@@ -301,4 +319,32 @@
         background-color: #3754a5d8 !important;
         border: none;
     }
+}
+
+.groupNode {
+    width: 242.5px;
+}
+
+.addContentContainer {
+    // position: absolute;
+    // margin-left: 1rem;
+    // margin: auto;
+    background-color: white;
+    padding: 0.5rem;
+    padding-bottom: 0.9rem;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 350px;
+    min-height: 55px;
+    // border-style: solid;
+    // border-color: #3754a566;
+    // border-width: 2px;
+    text-align: left;
+    z-index: 2;
+    // box-shadow:
+    //     2.25px 2.25px 0.75px -0.75px rgba(0, 0, 0, 0.15),
+    //     1.5px 1.5px 0.75px 0px rgba(0, 0, 0, 0.105),
+    //     0.75px 0.75px 2.25px 0px rgba(0, 0, 0, 0.09);
 }

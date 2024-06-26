@@ -11,7 +11,7 @@ import style from './customFlowNode.module.scss';
 
 export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }: EntityNodeProps) {
     const [collapse, setCollapse] = useState(data.expandedByDefault ?? false);
-
+    const [addNodeContentCollapse, setAddNodeContentCollapse] = useState(false);
     // const [status, setStatus] = useState('+');
     // TODO: Use this during dynamic flowchart updates
     // const onEntering = () => setStatus("Opening...");
@@ -41,10 +41,16 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }:
                 return style.expiringStatus;
             case CertificateValidationStatus.Failed:
                 return style.failedStatus;
-
-            default:
-                return style.unknownStatus;
         }
+
+        switch (data?.group) {
+            case 'rules':
+                return style.rulesGroupNodeStatus;
+            case 'actions':
+                return style.actionGroupNodeStatus;
+        }
+
+        return style.unknownStatus;
     };
 
     // TODO: use only for certificates not for rules
@@ -66,117 +72,158 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }:
                 return style.expandButtonFailed;
             case CertificateValidationStatus.Inactive:
                 return style.expandButtonInactive;
-            default:
-                return style.expandButtonUnknown;
+            // default:
+            //     return style.expandButtonUnknown;
         }
+        switch (data?.group) {
+            case 'rules':
+                return style.rulesGroupNodeExpandButton;
+            case 'actions':
+                return style.actionsGroupNodeExpandButton;
+            // default:
+            //     return style.unknownNode;
+        }
+
+        return style.expandButtonUnknown;
     };
 
     return (
         <>
             <Handle hidden={data.handleHide === 'target'} className={cx(style.handleUp)} type="target" position={Position.Top} />
-
-            <div
-                className={cx(
-                    style.customNodeBackground,
-                    { [style.selectedBackground]: dragging },
-                    {
-                        [style.mainNodeBody]: data.isMainNode,
-                    },
-                    getStatusClasses(),
-                )}
-            >
-                {selected && (
-                    <div className={style.expandButtonContainer}>
-                        <div className="d-flex flex-column">
-                            {data.otherProperties && (
-                                <Button color="primary" onClick={toggle} className={cx(style.expandButton, getExpandButtonStatusClasses())}>
-                                    {/* <span className="mx-auto">{status}</span> */}
-                                    <i className={cx('fa ', { 'fa-chevron-down': !collapse, 'fa-chevron-up': collapse })} />
-                                </Button>
-                            )}
-                            {/* TODO: Make this button to be collapsible and expandable to the right side, show attachable items to that
+            <div className="d-flex align-items-start">
+                <div
+                    className={cx(
+                        style.customNodeBackground,
+                        { [style.selectedBackground]: dragging },
+                        {
+                            [style.mainNodeBody]: data.isMainNode,
+                            [style.groupNode]: data.group,
+                        },
+                        getStatusClasses(),
+                    )}
+                >
+                    {selected && (
+                        <div className={style.expandButtonContainer}>
+                            <div className="d-flex flex-column">
+                                {data.otherProperties && (
+                                    <Button
+                                        color="primary"
+                                        onClick={toggle}
+                                        className={cx(style.nodeButton, getExpandButtonStatusClasses())}
+                                    >
+                                        {/* <span className="mx-auto">{status}</span> */}
+                                        <i className={cx('fa ', { 'fa-chevron-down': !collapse, 'fa-chevron-up': collapse })} />
+                                    </Button>
+                                )}
+                                {/* TODO: Make this button to be collapsible and expandable to the right side, show attachable items to that
                             specific node */}
-                            {data.onNodeAddButtonClick && (
-                                <Button
-                                    color="primary"
-                                    className={cx('mt-1', style.expandButton, style.addButton)}
-                                    onClick={data.onNodeAddButtonClick}
-                                >
-                                    <i className={cx('fa fa-plus')} />
-                                </Button>
-                            )}
-                        </div>
-                    </div>
-                )}
-                <div className="d-flex my-1">
-                    <i className={cx(style.iconStyle, data.icon, getStatusClasses())}></i>
+                                {data.addButtonContent && (
+                                    <Button
+                                        color="primary"
+                                        className={cx('mt-1', style.nodeButton, style.addButton)}
+                                        // onClick={data.addButtonContent}
+                                        title="Add connections to this node"
+                                        onClick={() => setAddNodeContentCollapse(!addNodeContentCollapse)}
+                                    >
+                                        {/* <i className={cx('fa fa-plus')} /> */}
+                                        <i
+                                            className={cx('fa ', {
+                                                'fa-plus': !addNodeContentCollapse,
+                                                'fa-minus': addNodeContentCollapse,
+                                            })}
+                                        />
+                                    </Button>
+                                )}
 
-                    <h6 className={cx(style.customNodeCardTitle, 'my-auto ms-2')}>{data.customNodeCardTitle}</h6>
-                </div>
-
-                {data.redirectUrl ? (
-                    <div className={cx('d-flex ms-2', style.entityLabel)}>
-                        <h6>Entity Name :</h6>
-                        &nbsp;
-                        <Link to={data.redirectUrl}>
-                            <h6 className="text-wrap">{data.entityLabel}</h6>
-                        </Link>
-                    </div>
-                ) : (
-                    <div className={cx('d-flex ms-2', style.entityLabel)}>
-                        <h6>Entity Name :</h6>
-                        &nbsp;
-                        <h6>{data.entityLabel}</h6>
-                    </div>
-                )}
-                {data.description && (
-                    <div className="d-flex ms-2">
-                        <h6>Description :</h6>
-                        &nbsp;
-                        <h6>{data.description}</h6>
-                    </div>
-                )}
-
-                {data.otherProperties && (
-                    <>
-                        <Collapse
-                            isOpen={collapse}
-                            // onEntered={onEntered} onExited={onExited}
-                            className="w-100"
-                        >
-                            <div className={cx(style.listContainer, { [style.listContainerDragging]: dragging })}>
-                                <ul className={cx('list-group p-1', style.listStyle)}>
-                                    {data.otherProperties.map((property, index) => (
-                                        <li key={index} className="list-group-item text-wrap p-0 ps-1">
-                                            {property?.propertyName && (
-                                                <span className={style.propertyName}>{property.propertyName} : </span>
-                                            )}
-                                            {property?.propertyValue && (
-                                                <span className={style.propertyValue}>{property.propertyValue}</span>
-                                            )}
-                                            {property?.copyable && property?.propertyValue && (
-                                                <i
-                                                    onClick={() => {
-                                                        if (typeof property.propertyValue === 'string') {
-                                                            copyToClipboard(
-                                                                property.propertyValue,
-                                                                `${property.propertyName} copied to clipboard`,
-                                                                `Failed to copy ${property.propertyName} to clipboard`,
-                                                            );
-                                                        }
-                                                    }}
-                                                    className="fa fa-copy ms-2"
-                                                />
-                                            )}
-                                            {property?.propertyContent && <>{property.propertyContent}</>}
-                                        </li>
-                                    ))}
-                                </ul>
+                                {data.deleteAction && (
+                                    <Button
+                                        color="danger"
+                                        className={cx('mt-1', style.nodeButton, style.deleteButton)}
+                                        onClick={data.deleteAction}
+                                        title="Delete this node"
+                                    >
+                                        <i className={cx('fa fa-trash text-white')} />
+                                    </Button>
+                                )}
                             </div>
-                        </Collapse>
-                    </>
-                )}
+                        </div>
+                    )}
+                    <div className="d-flex my-1">
+                        <i className={cx(style.iconStyle, data.icon, getStatusClasses())}></i>
+
+                        <h6 className={cx(style.customNodeCardTitle, 'my-auto ms-2')}>{data.customNodeCardTitle}</h6>
+                    </div>
+
+                    {data.redirectUrl ? (
+                        <div className={cx('d-flex ms-2', style.entityLabel)}>
+                            <h6>Entity Name :</h6>
+                            &nbsp;
+                            <Link to={data.redirectUrl}>
+                                <h6 className="text-wrap">{data.entityLabel}</h6>
+                            </Link>
+                        </div>
+                    ) : (
+                        <div className={cx('d-flex ms-2', style.entityLabel)}>
+                            <h6>Entity Name :</h6>
+                            &nbsp;
+                            <h6>{data.entityLabel}</h6>
+                        </div>
+                    )}
+                    {data.description && (
+                        <div className="d-flex ms-2">
+                            <h6>Description :</h6>
+                            &nbsp;
+                            <h6>{data.description}</h6>
+                        </div>
+                    )}
+
+                    {data.otherProperties && (
+                        <>
+                            <Collapse
+                                isOpen={collapse}
+                                // onEntered={onEntered} onExited={onExited}
+                                className="w-100"
+                            >
+                                <div className={cx(style.listContainer, { [style.listContainerDragging]: dragging })}>
+                                    <ul className={cx('list-group p-1', style.listStyle)}>
+                                        {data.otherProperties.map((property, index) => (
+                                            <li key={index} className="list-group-item text-wrap p-0 ps-1">
+                                                {property?.propertyName && (
+                                                    <span className={style.propertyName}>{property.propertyName} : </span>
+                                                )}
+                                                {property?.propertyValue && (
+                                                    <span className={style.propertyValue}>{property.propertyValue}</span>
+                                                )}
+                                                {property?.copyable && property?.propertyValue && (
+                                                    <i
+                                                        onClick={() => {
+                                                            if (typeof property.propertyValue === 'string') {
+                                                                copyToClipboard(
+                                                                    property.propertyValue,
+                                                                    `${property.propertyName} copied to clipboard`,
+                                                                    `Failed to copy ${property.propertyName} to clipboard`,
+                                                                );
+                                                            }
+                                                        }}
+                                                        className="fa fa-copy ms-2"
+                                                    />
+                                                )}
+                                                {property?.propertyContent && <>{property.propertyContent}</>}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </Collapse>
+                        </>
+                    )}
+
+                    <Collapse isOpen={addNodeContentCollapse}>
+                        <div className={style.addContentContainer}>{data.addButtonContent}</div>
+                    </Collapse>
+                </div>
             </div>
+
+            {/* <Collapse isOpen={addNodeContentCollapse}>hiiiiiiii</Collapse> */}
             <Handle hidden={data.handleHide === 'source'} className={style.handleDown} type="source" position={Position.Bottom} id="a" />
         </>
     );

@@ -1,4 +1,4 @@
-import { CustomNode, nodeWidth } from 'components/FlowChart';
+import { CustomNode } from 'components/FlowChart';
 import CertificateStatus from 'components/_pages/certificates/CertificateStatus';
 import { Edge, MarkerType } from 'reactflow';
 import {
@@ -249,7 +249,7 @@ export function transformCertifacetObjectToNodesAndEdges(
         id: '1',
         type: 'customFlowNode',
         position: { x: 0, y: 0 },
-        width: nodeWidth,
+        // width: nodeWidth,
         // height: nodeHeight,
         data: {
             customNodeCardTitle: 'Current Certificate',
@@ -321,7 +321,7 @@ export function transformCertifacetObjectToNodesAndEdges(
                 id: `chain-${index}`,
                 type: 'customFlowNode',
                 position: { x: 0, y: 0 },
-                width: nodeWidth,
+                // width: nodeWidth,
                 // height: nodeHeight,
                 data: {
                     customNodeCardTitle: chainLength - 1 === index && certificateChain?.completeChain ? `Root CA` : `Intermediate CA`,
@@ -376,7 +376,7 @@ export function transformCertifacetObjectToNodesAndEdges(
                 id: '2',
                 type: 'customFlowNode',
                 position: { x: 0, y: 0 },
-                width: nodeWidth,
+                // width: nodeWidth,
                 // height: nodeHeight,
                 data: {
                     customNodeCardTitle: 'Owner',
@@ -419,7 +419,7 @@ export function transformCertifacetObjectToNodesAndEdges(
             id: '4',
             type: 'customFlowNode',
             position: { x: 0, y: 0 },
-            width: nodeWidth,
+            // width: nodeWidth,
             // height: nodeHeight,
             data: {
                 customNodeCardTitle: 'Key',
@@ -448,7 +448,7 @@ export function transformCertifacetObjectToNodesAndEdges(
                 id: '3',
                 type: 'customFlowNode',
                 position: { x: 0, y: 0 },
-                width: nodeWidth,
+                // width: nodeWidth,
                 // height: nodeHeight,
                 data: {
                     customNodeCardTitle: 'Group',
@@ -482,7 +482,7 @@ export function transformCertifacetObjectToNodesAndEdges(
             id: '5',
             type: 'customFlowNode',
             position: { x: 0, y: 0 },
-            width: nodeWidth,
+            // width: nodeWidth,
             // height: nodeHeight,
             data: {
                 customNodeCardTitle: 'RA Profile',
@@ -508,7 +508,7 @@ export function transformCertifacetObjectToNodesAndEdges(
                 id: '7',
                 type: 'customFlowNode',
                 position: { x: 0, y: 0 },
-                width: nodeWidth,
+                // width: nodeWidth,
                 // height: nodeHeight,
                 data: {
                     customNodeCardTitle: 'Authority',
@@ -557,7 +557,7 @@ export function transformCertifacetObjectToNodesAndEdges(
                 id: location?.uuid || '',
                 type: 'customFlowNode',
                 position: { x: 0, y: 0 },
-                width: nodeWidth,
+                // width: nodeWidth,
                 // height: nodeHeight,
                 data: {
                     customNodeCardTitle: 'Location',
