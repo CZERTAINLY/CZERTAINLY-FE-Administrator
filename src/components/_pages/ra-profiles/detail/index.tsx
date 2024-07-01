@@ -160,6 +160,13 @@ export default function RaProfileDetail() {
         dispatch(raProfilesActions.getComplianceProfilesForRaProfile({ authorityUuid: authorityId, uuid: id }));
     }, [id, dispatch, authorityId]);
 
+    // use effect to clear the ra profile detail when the component is unmounted
+    useEffect(() => {
+        return () => {
+            dispatch(raProfilesActions.clearRaProfileDetail());
+        };
+    }, [dispatch]);
+
     const onEditClick = useCallback(() => {
         if (!raProfile) return;
         navigate(`../../../edit/${raProfile.authorityInstanceUuid}/${raProfile?.uuid}`, { relative: 'path' });

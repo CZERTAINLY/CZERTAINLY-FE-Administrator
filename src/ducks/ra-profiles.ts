@@ -168,6 +168,10 @@ export const slice = createSlice({
             state.isFetchingDetail = false;
         },
 
+        clearRaProfileDetail: (state, action: PayloadAction<void>) => {
+            state.raProfile = undefined;
+        },
+
         createRaProfile: (
             state,
             action: PayloadAction<{
