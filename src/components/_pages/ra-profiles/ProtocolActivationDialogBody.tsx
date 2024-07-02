@@ -2,6 +2,7 @@ import AttributeEditor from 'components/Attributes/AttributeEditor';
 import Spinner from 'components/Spinner';
 
 import { actions as acmeProfilesActions, selectors as acmeProfilesSelectors } from 'ducks/acme-profiles';
+import { actions as cmpProfilesActions, selectors as cmpProfilesSelectors } from 'ducks/cmp-profiles';
 import { actions as raProfilesActions, selectors as raProfilesSelectors } from 'ducks/ra-profiles';
 import { actions as scepProfilesActions, selectors as scepProfilesSelectors } from 'ducks/scep-profiles';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -18,8 +19,9 @@ import { validateRequired } from 'utils/validators';
 import TabLayout from '../../Layout/TabLayout';
 
 export enum Protocol {
-    'ACME',
-    'SCEP',
+    ACME = 'ACME',
+    SCEP = 'SCEP',
+    CMP = 'CMP',
 }
 
 interface Props {
@@ -35,8 +37,9 @@ export default function ProtocolActivationDialogBody({ protocol, raProfileUuid, 
 
     const acmeProfiles = useSelector(acmeProfilesSelectors.acmeProfiles);
     const scepProfiles = useSelector(scepProfilesSelectors.scepProfiles);
+    const cmpProfiles = useSelector(cmpProfilesSelectors.cmpProfiles);
 
-    const profiles = protocol === Protocol.ACME ? acmeProfiles : scepProfiles;
+    const profiles = protocol === Protocol.ACME ? acmeProfiles : Protocol.CMP ? cmpProfiles : scepProfiles;
 
     const issuanceAttributes = useSelector(raProfilesSelectors.issuanceAttributes);
     const revocationAttributes = useSelector(raProfilesSelectors.revocationAttributes);
@@ -45,7 +48,11 @@ export default function ProtocolActivationDialogBody({ protocol, raProfileUuid, 
     const [revokeGroupAttributesCallbackAttributes, setRevokeGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 
     const isFetchingProfiles = useSelector(
-        protocol === Protocol.ACME ? acmeProfilesSelectors.isFetchingList : scepProfilesSelectors.isFetchingList,
+        protocol === Protocol.ACME
+            ? acmeProfilesSelectors.isFetchingList
+            : Protocol.CMP
+              ? cmpProfilesSelectors.isFetchingList
+              : scepProfilesSelectors.isFetchingList,
     );
     const isFetchingIssuanceAttributes = useSelector(raProfilesSelectors.isFetchingIssuanceAttributes);
     const isFetchingRevocationAttributes = useSelector(raProfilesSelectors.isFetchingRevocationAttributes);
@@ -59,7 +66,13 @@ export default function ProtocolActivationDialogBody({ protocol, raProfileUuid, 
         () => {
             if (!visible) return;
 
-            dispatch(protocol === Protocol.ACME ? acmeProfilesActions.listAcmeProfiles() : scepProfilesActions.listScepProfiles());
+            dispatch(
+                protocol === Protocol.ACME
+                    ? acmeProfilesActions.listAcmeProfiles()
+                    : Protocol.CMP
+                      ? cmpProfilesActions.listCmpProfiles()
+                      : scepProfilesActions.listScepProfiles(),
+            );
             if (!raProfileUuid) return;
             dispatch(
                 raProfilesActions.listIssuanceAttributeDescriptors({ authorityUuid: authorityInstanceUuid || '', uuid: raProfileUuid }),
@@ -112,14 +125,24 @@ export default function ProtocolActivationDialogBody({ protocol, raProfileUuid, 
                               revokeCertificateAttributes: revocationAttribs,
                           },
                       })
-                    : raProfilesActions.activateScep({
-                          authorityUuid: authorityInstanceUuid || '',
-                          uuid: raProfileUuid,
-                          scepProfileUuid: values.profiles.value,
-                          raProfileActivateScepRequest: {
-                              issueCertificateAttributes: issuanceAttribs,
-                          },
-                      }),
+                    : Protocol.CMP
+                      ? raProfilesActions.activateCmp({
+                            authorityUuid: authorityInstanceUuid || '',
+                            uuid: raProfileUuid,
+                            cmpProfileUuid: values.profiles.value,
+                            raProfileActivateCmpRequest: {
+                                issueCertificateAttributes: issuanceAttribs,
+                                revokeCertificateAttributes: revocationAttribs,
+                            },
+                        })
+                      : raProfilesActions.activateScep({
+                            authorityUuid: authorityInstanceUuid || '',
+                            uuid: raProfileUuid,
+                            scepProfileUuid: values.profiles.value,
+                            raProfileActivateScepRequest: {
+                                issueCertificateAttributes: issuanceAttribs,
+                            },
+                        }),
             );
 
             onClose();
@@ -161,7 +184,7 @@ export default function ProtocolActivationDialogBody({ protocol, raProfileUuid, 
                 ),
         },
     ];
-    if (protocol === Protocol.ACME) {
+    if (protocol === Protocol.ACME || protocol === Protocol.CMP) {
         attributeTabs.push({
             title: 'Revocation attributes',
             content:
