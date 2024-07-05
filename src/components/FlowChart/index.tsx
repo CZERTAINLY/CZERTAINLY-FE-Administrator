@@ -59,7 +59,7 @@ const getLayoutedElements = (nodes: CustomNode[], edges: Edge[], direction = 'TB
         const centerY = window.innerHeight / 2;
         const minRadius = 250; // Minimum radius
         const mainNode = nodes.find((node) => node.data.isMainNode);
-        const surroundingNodes = nodes.filter((node) => !node.data.isMainNode);
+        const surroundingNodes = nodes.filter((node) => !node.data.isMainNode && !node.hidden);
         const angleIncrement = (2 * Math.PI) / surroundingNodes.length;
 
         // Calculate dynamic radius based on the number of nodes to ensure minimum distance of 200px
@@ -120,9 +120,6 @@ const getLayoutedElements = (nodes: CustomNode[], edges: Edge[], direction = 'TB
                     };
                 });
             });
-
-            // Optionally, log or return the nodes with their new positions
-            console.log(nodesByGroups);
         } else {
             surroundingNodes.forEach((node, index) => {
                 // Calculate the angle for the current node

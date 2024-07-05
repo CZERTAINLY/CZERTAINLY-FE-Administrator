@@ -80,8 +80,8 @@ export type RuleRequestModel = RuleRequestDto;
 
 export type TriggerDetailDto = TriggerDetailDtoApi;
 export type TriggerDetailModel = Omit<TriggerDetailDto, 'rules | actions'> & {
-    rules: Array<RuleModel>;
-    actions: Array<ActionModel>;
+    rules: Array<RuleDetailModel>;
+    actions: Array<ActionDetailModel>;
 };
 
 export type TriggerDto = TriggerDtoApi;

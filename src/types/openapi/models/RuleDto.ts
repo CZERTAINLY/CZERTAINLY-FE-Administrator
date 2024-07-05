@@ -16,7 +16,6 @@ import type {
 } from './';
 
 /**
- * List of Rules in the Rule Trigger
  * @export
  * @interface RuleDto
  */
