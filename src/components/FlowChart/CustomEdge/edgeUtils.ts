@@ -4,7 +4,7 @@ import { CustomNode, nodeHeight, nodeWidth } from '..';
 function getNodeIntersection(intersectionNode: CustomNode, targetNode: CustomNode) {
     const { positionAbsolute: intersectionNodePosition } = intersectionNode;
     const targetPosition = targetNode.positionAbsolute;
-    const currentIntersectionNodeWidth = intersectionNode?.data?.group ? 242.5 : nodeWidth;
+    const currentIntersectionNodeWidth = intersectionNode?.data?.group || intersectionNode.hidden !== undefined ? 242.5 : nodeWidth;
     const w = currentIntersectionNodeWidth / 2;
     const currentIntersectionNodeNodeHeight = intersectionNode?.data?.description ? nodeHeight + 35 : nodeHeight;
 

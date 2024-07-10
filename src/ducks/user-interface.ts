@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { createSelector } from 'reselect';
 import { AjaxError } from 'rxjs/ajax';
-import { GlobalModalModel, LockWidgetNameEnum, WidgetLockErrorModel, WidgetLockModel } from 'types/user-interface';
+import { GlobalModalModel, LockWidgetNameEnum, ReactFlowUI, WidgetLockErrorModel, WidgetLockModel } from 'types/user-interface';
 import { createFeatureSelector } from 'utils/ducks';
 import { getLockWidgetObject } from 'utils/net';
 
@@ -12,6 +12,7 @@ export type State = {
     attributeCallbackValue?: string;
     initiateFormCallback?: boolean;
     formCallbackValue?: string;
+    reactFlowUI?: ReactFlowUI;
 };
 
 export const initialState: State = {
@@ -113,6 +114,14 @@ export const slice = createSlice({
         clearFormCallbackValue: (state) => {
             state.formCallbackValue = undefined;
         },
+
+        setReactFlowUI: (state, action: PayloadAction<ReactFlowUI>) => {
+            state.reactFlowUI = action.payload;
+        },
+
+        clearReactFlowUI: (state) => {
+            state.reactFlowUI = undefined;
+        },
     },
 });
 
@@ -124,6 +133,7 @@ const selectInitiateAttributeCallback = createSelector(selectState, (state) => s
 const selectAttributeCallbackValue = createSelector(selectState, (state) => state.attributeCallbackValue);
 const selectCallbackValue = createSelector(selectState, (state) => state.formCallbackValue);
 const selectInitiateFormCallback = createSelector(selectState, (state) => state.initiateFormCallback);
+const selectReactFlowUI = createSelector(selectState, (state) => state.reactFlowUI);
 
 export const selectors = {
     selectState,
@@ -133,6 +143,7 @@ export const selectors = {
     selectAttributeCallbackValue,
     selectCallbackValue,
     selectInitiateFormCallback,
+    selectReactFlowUI,
 };
 
 export const actions = slice.actions;

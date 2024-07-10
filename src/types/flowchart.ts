@@ -34,6 +34,7 @@ export interface CustomNodeData {
 }
 export interface EntityNodeProps extends NodeProps {
     data: CustomNodeData;
+    hidden?: boolean;
 }
 
 export interface FlowChartProps {

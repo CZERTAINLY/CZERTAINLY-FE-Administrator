@@ -1,6 +1,7 @@
 import cx from 'classnames';
-import { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { actions as userInterfaceActions, selectors as userInterfaceSelectors } from 'ducks/user-interface';
+import { useCallback, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Handle, Position } from 'reactflow';
 import { Button, Collapse } from 'reactstrap';
@@ -9,16 +10,97 @@ import { CertificateValidationStatus } from 'types/openapi';
 import { useCopyToClipboard } from 'utils/common-hooks';
 import style from './customFlowNode.module.scss';
 
-export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }: EntityNodeProps) {
+export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, id }: EntityNodeProps) {
     const [collapse, setCollapse] = useState(data.expandedByDefault ?? false);
     const [addNodeContentCollapse, setAddNodeContentCollapse] = useState(false);
-    // const [status, setStatus] = useState('+');
-    // TODO: Use this during dynamic flowchart updates
-    // const onEntering = () => setStatus("Opening...");
-    // const onExiting = () => setStatus("Closing...");
+    const reactFlowUI = useSelector(userInterfaceSelectors.selectReactFlowUI);
+    const [showHiddenNodes, setShowHiddenNodes] = useState(false);
+
+    const currentnodes = reactFlowUI?.flowChartNodes;
+    const thisNodeState = currentnodes?.find((node) => node?.id === id);
+
+    const hasHiddenChildren = useMemo(() => {
+        return currentnodes?.some((node) => node?.parentId === id && node.hidden !== undefined);
+    }, [currentnodes, id]);
     const dispatch = useDispatch();
-    // const onEntered = () => setStatus('-');
-    // const onExited = () => setStatus('+');
+
+    const toggleHiddenNodes = useCallback(
+        (showHiddenNodes: boolean) => {
+            // const
+            if (showHiddenNodes) {
+                const updatedNodes = currentnodes?.map((node, i) => {
+                    const totalNodes = currentnodes?.filter((node) => node.parentId === id).length || 1; // Total child nodes
+
+                    const angleIncrement = (2 * Math.PI) / totalNodes; // Divide the circle based on the number of groups
+                    const multiplier = totalNodes < 3 ? 300 : 180;
+                    const nodeRadius = multiplier * (totalNodes * 0.3); // Smaller radius for nodes within a group
+                    const nodeAngle = ((2 * Math.PI) / totalNodes) * i;
+                    const onlyTwoNodes = totalNodes === 2;
+                    let yOffset = 0;
+                    if (onlyTwoNodes && i === 1) {
+                        yOffset = 105;
+                    }
+
+                    if (node?.parentId === id && node.hidden !== undefined) {
+                        const angle = angleIncrement * i; // Calculate angle for this node
+                        const position = {
+                            // x: xPos + Math.cos(angle) * radius, // Calculate x position
+                            // y: yPos + Math.sin(angle) * radius, // Calculate y position
+                            // x: xPos + nodeRadius * 1.75 * Math.cos(nodeAngle),
+                            // y: yPos + nodeRadius * Math.sin(nodeAngle) + yOffset,
+                            x: nodeRadius * 1.75 * Math.cos(nodeAngle),
+                            y: nodeRadius * Math.sin(nodeAngle) + yOffset,
+                        };
+
+                        return {
+                            ...node,
+                            position: position,
+                            // position: {
+                            //     x: xPos + 100,
+                            //     y: yPos + 100,
+                            // },
+                            hidden: false,
+                        };
+                    }
+                    return node;
+                });
+
+                dispatch(
+                    userInterfaceActions.setReactFlowUI({
+                        flowChartNodes: updatedNodes || [],
+                        flowChartEdges: reactFlowUI?.flowChartEdges || [],
+                        flowDirection: reactFlowUI?.flowDirection,
+                        legends: reactFlowUI?.legends,
+                    }),
+                );
+            } else {
+                const updatedNodes = currentnodes?.map((node) => {
+                    if (node?.parentId === id && node.hidden !== undefined) {
+                        return {
+                            ...node,
+                            // position: {
+                            //     x: xPos + 100,
+                            //     y: yPos + 100,
+                            // },
+                            hidden: true,
+                        };
+                    }
+                    return node;
+                });
+
+                dispatch(
+                    userInterfaceActions.setReactFlowUI({
+                        flowChartNodes: updatedNodes || [],
+                        flowChartEdges: reactFlowUI?.flowChartEdges || [],
+                        flowDirection: reactFlowUI?.flowDirection,
+                        legends: reactFlowUI?.legends,
+                    }),
+                );
+            }
+        },
+        [currentnodes, reactFlowUI, dispatch, id],
+    );
+
     const toggle = () => setCollapse(!collapse);
     const copyToClipboard = useCopyToClipboard();
 
@@ -49,6 +131,15 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }:
             case 'actions':
                 return style.actionGroupNodeStatus;
         }
+
+        // switch(data)
+
+        // switch (thisNodeState?.hidden) {
+        //     case true:
+        //         return style.hiddenStatus;
+        //     case false:
+        //         return style.hiddenStatus;
+        // }
 
         return style.unknownStatus;
     };
@@ -98,6 +189,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }:
                         {
                             [style.mainNodeBody]: data.isMainNode,
                             [style.groupNode]: data.group,
+                            [style.hiddenStatus]: thisNodeState?.hidden !== undefined,
                         },
                         getStatusClasses(),
                     )}
@@ -115,6 +207,21 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos }:
                                         <i className={cx('fa ', { 'fa-chevron-down': !collapse, 'fa-chevron-up': collapse })} />
                                     </Button>
                                 )}
+
+                                {hasHiddenChildren ? (
+                                    <Button
+                                        color="primary"
+                                        onClick={() => {
+                                            setShowHiddenNodes(!showHiddenNodes);
+                                            toggleHiddenNodes(!showHiddenNodes);
+                                        }}
+                                        className={cx('mt-1', style.nodeButton, getExpandButtonStatusClasses())}
+                                    >
+                                        {/* <span className="mx-auto">{status}</span> */}
+                                        <i className={cx('fa ', { 'fa-eye': !showHiddenNodes, 'fa-eye-slash': showHiddenNodes })} />
+                                    </Button>
+                                ) : null}
+                                {/* 
                                 {/* TODO: Make this button to be collapsible and expandable to the right side, show attachable items to that
                             specific node */}
                                 {data.addButtonContent && (

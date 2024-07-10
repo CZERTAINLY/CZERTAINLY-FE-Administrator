@@ -603,6 +603,62 @@ export function useTransformTriggerObjectToNodesAndEdges(
                         },
                     ],
                 },
+                {
+                    uuid: 'a5c73bb1-b0de-4057-b598-de11b6bf5aba',
+                    name: 'test-execution-3',
+                    description: 'test-execution-3',
+                    type: 'setField',
+                    resource: 'certificates',
+                    items: [
+                        {
+                            fieldSource: 'property',
+                            fieldIdentifier: 'GROUP_NAME',
+                            data: '["b9f33da1-595d-4747-a30b-b381700046ce"]',
+                        },
+                    ],
+                },
+                {
+                    uuid: 'bf1140f6-5a1c-48a7-ab8d-92303b198a64',
+                    name: 'test-execution-4',
+                    description: 'test-execution-4',
+                    type: 'setField',
+                    resource: 'certificates',
+                    items: [
+                        {
+                            fieldSource: 'property',
+                            fieldIdentifier: 'GROUP_NAME',
+                            data: '["b9f33da1-595d-4747-a30b-b381700046ce"]',
+                        },
+                    ],
+                },
+                {
+                    uuid: 'bf1140f6-5a1c-48a7-ab8d-92303b198a65',
+                    name: 'test-execution-5',
+                    description: 'test-execution-5',
+                    type: 'setField',
+                    resource: 'certificates',
+                    items: [
+                        {
+                            fieldSource: 'property',
+                            fieldIdentifier: 'GROUP_NAME',
+                            data: '["b9f33da1-595d-4747-a30b-b381700046ce"]',
+                        },
+                    ],
+                },
+                {
+                    uuid: 'bf1140f6-5a1c-48a7-ab8d-92303b198a66',
+                    name: 'test-execution-6',
+                    description: 'test-execution-6',
+                    type: 'setField',
+                    resource: 'certificates',
+                    items: [
+                        {
+                            fieldSource: 'property',
+                            fieldIdentifier: 'GROUP_NAME',
+                            data: '["b9f33da1-595d-4747-a30b-b381700046ce"]',
+                        },
+                    ],
+                },
             ];
             let tempExec: CustomNode[] = [];
             if (index === 0) {
@@ -610,10 +666,12 @@ export function useTransformTriggerObjectToNodesAndEdges(
                     id: `execution-${execution.uuid}`,
                     type: 'customFlowNode',
                     hidden: true,
+                    parentId: `action-${action.uuid}`,
                     position: { x: 0, y: 0 },
                     // width: nodeWidth,
                     data: {
                         // hidden: true,
+                        // group: 'executions',
                         customNodeCardTitle: `Execution ${index + 1}`,
                         entityLabel: execution.name,
                         icon: 'fa fa-cogs',
@@ -639,8 +697,8 @@ export function useTransformTriggerObjectToNodesAndEdges(
             edges.push(
                 ...tempExec.map((execution) => ({
                     id: `e1-execution-${execution.id}`,
-                    source: `action-${action.uuid}`,
-                    target: execution.id,
+                    target: `action-${action.uuid}`,
+                    source: execution.id,
                     type: 'floating',
                     markerEnd: { type: MarkerType.Arrow },
                 })),

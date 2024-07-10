@@ -1,8 +1,10 @@
 import Widget from 'components/Widget';
 import dagre from 'dagre';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 
 import cx from 'classnames';
+import { actions as userInterfaceActions, selectors as userInterfaceSelectors } from 'ducks/user-interface';
+import { useDispatch, useSelector } from 'react-redux';
 import {
     Background,
     BackgroundVariant,
@@ -170,29 +172,66 @@ const getLayoutedElements = (nodes: CustomNode[], edges: Edge[], direction = 'TB
 };
 
 const FlowChart = ({ flowChartTitle, flowChartEdges, flowChartNodes, defaultViewport, busy, flowDirection, legends }: FlowChartProps) => {
-    const [nodes, setNodes] = useState(flowChartNodes);
-    const [edges, setEdges] = useState(flowChartEdges);
     const defaultEdgeOptions = { animated: true };
+    const reactFlowUI = useSelector(userInterfaceSelectors.selectReactFlowUI);
+    const dispatch = useDispatch();
 
-    const onNodesChange = useCallback((changes: NodeChange[]) => setNodes((nds) => applyNodeChanges(changes, nds)), [setNodes]);
-    const onEdgesChange = useCallback((changes: EdgeChange[]) => setEdges((eds) => applyEdgeChanges(changes, eds)), [setEdges]);
-    // TODO: Implement onConnect in future if needed
+    const onNodesChange = useCallback(
+        (changes: NodeChange[]) => {
+            const newNodes = applyNodeChanges(changes, reactFlowUI?.flowChartNodes ?? []);
+            dispatch(
+                userInterfaceActions.setReactFlowUI({
+                    flowChartNodes: newNodes,
+                    flowChartEdges: reactFlowUI?.flowChartEdges || [],
+                    flowDirection: reactFlowUI?.flowDirection,
+                    legends: reactFlowUI?.legends,
+                }),
+            );
+        },
+        [dispatch, reactFlowUI],
+    );
+
+    const onEdgesChange = useCallback(
+        (changes: EdgeChange[]) => {
+            const newEdges = applyEdgeChanges(changes, reactFlowUI?.flowChartEdges ?? []);
+            dispatch(
+                userInterfaceActions.setReactFlowUI({
+                    flowChartNodes: reactFlowUI?.flowChartNodes || [],
+                    flowChartEdges: newEdges,
+                    flowDirection: reactFlowUI?.flowDirection,
+                    legends: reactFlowUI?.legends,
+                }),
+            );
+        },
+        [dispatch, reactFlowUI],
+    );
+
+    // // TODO: Implement onConnect in future if needed
     // const onConnect = useCallback((connection: Edge | Connection) => setEdges((eds) => addEdge(connection, eds)), [setEdges]);
 
     useEffect(() => {
+        // initial placement of nodes and edges
         const { nodes, edges } = getLayoutedElements(flowChartNodes, flowChartEdges, flowDirection);
-        setNodes(nodes);
-        setEdges(edges);
-    }, [flowChartEdges, flowChartNodes, flowDirection]);
+        // setNodes(nodes);
+        // setEdges(edges);
+
+        dispatch(
+            userInterfaceActions.setReactFlowUI({
+                flowChartNodes: nodes,
+                flowChartEdges: edges,
+                flowDirection,
+            }),
+        );
+    }, [flowChartEdges, flowChartNodes, flowDirection, dispatch]);
 
     return (
         <Widget className={style.flowWidget} busy={busy}>
             {flowChartTitle && <h5 className="text-muted">{flowChartTitle}</h5>}
             <div className={cx(style.flowChartContainer, style.floatingedges)}>
                 <ReactFlow
-                    nodes={nodes}
+                    nodes={reactFlowUI?.flowChartNodes}
                     proOptions={{ hideAttribution: true }}
-                    edges={edges}
+                    edges={reactFlowUI?.flowChartEdges}
                     onNodesChange={onNodesChange}
                     onEdgesChange={onEdgesChange}
                     nodeTypes={nodeTypes}
