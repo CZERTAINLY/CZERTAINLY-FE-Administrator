@@ -17,8 +17,8 @@ interface CertificateNodeData {
 
 export interface CustomNodeData {
     isMainNode?: boolean;
-    customNodeCardTitle: string;
-    entityLabel: string;
+    customNodeCardTitle?: string;
+    entityLabel?: string;
     redirectUrl?: string;
     icon?: string;
     handleHide?: 'source' | 'target';
@@ -27,6 +27,7 @@ export interface CustomNodeData {
     expandedByDefault?: boolean;
     group?: string;
     addButtonContent?: React.ReactNode;
+    formContent?: React.ReactNode;
     deleteAction?: () => void;
     // certificateNodeStatus?: CertificateState;
     // certificateNodeValidationStatus?: CertificateValidationStatus;

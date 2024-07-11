@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { CustomNode } from 'components/FlowChart';
 import { createSelector } from 'reselect';
 import { AjaxError } from 'rxjs/ajax';
 import { GlobalModalModel, LockWidgetNameEnum, ReactFlowUI, WidgetLockErrorModel, WidgetLockModel } from 'types/user-interface';
@@ -121,6 +122,19 @@ export const slice = createSlice({
 
         clearReactFlowUI: (state) => {
             state.reactFlowUI = undefined;
+        },
+
+        setShowHiddenNodes: (state, action: PayloadAction<boolean>) => {
+            if (state.reactFlowUI) {
+                state.reactFlowUI.showHiddenNodes = action.payload;
+            }
+        },
+
+        insertReactFlowFormNode: (state, action: PayloadAction<CustomNode>) => {
+            const noPresentFormNode = state.reactFlowUI?.flowChartNodes?.some((node) => node.id === 'ReactFlowFormNode');
+            if (action.payload.id === 'ReactFlowFormNode' && !noPresentFormNode) {
+                state.reactFlowUI?.flowChartNodes.push(action.payload);
+            }
         },
     },
 });

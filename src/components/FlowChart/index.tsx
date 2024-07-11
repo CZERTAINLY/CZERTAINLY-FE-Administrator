@@ -5,6 +5,7 @@ import { useCallback, useEffect } from 'react';
 import cx from 'classnames';
 import { actions as userInterfaceActions, selectors as userInterfaceSelectors } from 'ducks/user-interface';
 import { useDispatch, useSelector } from 'react-redux';
+
 import {
     Background,
     BackgroundVariant,
@@ -15,6 +16,7 @@ import {
     NodeChange,
     Position,
     ReactFlow,
+    ReactFlowProvider,
     Viewport,
     applyEdgeChanges,
     applyNodeChanges,
@@ -24,6 +26,7 @@ import { CustomNodeData } from 'types/flowchart';
 import FloatingEdge from './CustomEdge';
 import CustomFlowNode from './CustomFlowNode';
 import style from './flowChart.module.scss';
+import LegendComponent from './LegendWidget';
 const nodeTypes = { customFlowNode: CustomFlowNode };
 
 export interface CustomNode extends Node {
@@ -34,6 +37,7 @@ export interface LegendItem {
     icon: string;
     label: string;
     color: string;
+    onClick?: () => void;
 }
 
 export interface FlowChartProps {
@@ -171,7 +175,15 @@ const getLayoutedElements = (nodes: CustomNode[], edges: Edge[], direction = 'TB
     }
 };
 
-const FlowChart = ({ flowChartTitle, flowChartEdges, flowChartNodes, defaultViewport, busy, flowDirection, legends }: FlowChartProps) => {
+const FlowChartContent = ({
+    flowChartTitle,
+    flowChartEdges,
+    flowChartNodes,
+    defaultViewport,
+    busy,
+    flowDirection,
+    legends,
+}: FlowChartProps) => {
     const defaultEdgeOptions = { animated: true };
     const reactFlowUI = useSelector(userInterfaceSelectors.selectReactFlowUI);
     const dispatch = useDispatch();
@@ -245,23 +257,16 @@ const FlowChart = ({ flowChartTitle, flowChartEdges, flowChartNodes, defaultView
                     <Background variant={BackgroundVariant.Dots} gap={16} size={1} />
                 </ReactFlow>
             </div>
-            {legends?.length && (
-                <div className={style.legendContainer}>
-                    {/* <h6>Legend</h6> */}
-                    <div className={style.legendItems}>
-                        {legends.map((legend, index) => (
-                            <div key={index} className={style.legendItem}>
-                                <div className={style.legendIcon} style={{ color: legend.color }}>
-                                    <i className={legend.icon} style={{ padding: '5px' }} />
-                                </div>
-                                <span>{legend.label}</span>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
+
+            {legends && <LegendComponent legends={legends} />}
         </Widget>
     );
 };
+
+const FlowChart = (props: FlowChartProps) => (
+    <ReactFlowProvider>
+        <FlowChartContent {...props} />
+    </ReactFlowProvider>
+);
 
 export default FlowChart;

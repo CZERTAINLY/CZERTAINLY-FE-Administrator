@@ -19,3 +19,17 @@
     margin-bottom: 10px;
     display: flex;
 }
+
+.groupConditionBadgeOnly {
+    max-width: 100%;
+    white-space: normal;
+    font-size: 10.25px;
+    word-wrap: break-word;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: auto;
+    background-color: #6c757d !important;
+    padding: 5px;
+    color: white;
+    border-radius: 10px;
+}

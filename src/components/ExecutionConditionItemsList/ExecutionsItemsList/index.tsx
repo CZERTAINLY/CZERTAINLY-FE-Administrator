@@ -13,9 +13,10 @@ interface ExecutionsItemsListProps {
     executionItems: ExecutionItemModel[];
     executionName: string;
     executionUuid: string;
+    smallerBadges?: boolean;
 }
 
-const ExecutionsItemsList = ({ executionItems = [], executionName, executionUuid }: ExecutionsItemsListProps) => {
+const ExecutionsItemsList = ({ executionItems = [], executionName, executionUuid, smallerBadges }: ExecutionsItemsListProps) => {
     const searchGroupEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.FilterFieldSource));
     const availableFilters = useSelector(selectors.availableFilters(EntityType.ACTIONS));
     const platformEnums = useSelector(enumSelectors.platformEnums);
@@ -103,7 +104,77 @@ const ExecutionsItemsList = ({ executionItems = [], executionName, executionUuid
         });
     }, [executionItems, availableFilters, searchGroupEnum, booleanOptions, platformEnums]);
 
-    return (
+    const renderSmallerExecutionsBadges = useMemo(() => {
+        return executionItems.map((f, i) => {
+            const field = availableFilters
+                .find((a) => a.filterFieldSource === f.fieldSource)
+                ?.searchFieldData?.find((s) => s.fieldIdentifier === f.fieldIdentifier);
+
+            const label = field ? field.fieldLabel : f.fieldIdentifier;
+            let value = '';
+            let coincideValueToShow = '';
+            if (Array.isArray(field?.value)) {
+                if (Array.isArray(f.data)) {
+                    const actionDataValues = f.data as string[];
+                    const coincideValues = field?.value.filter((v) => actionDataValues.includes(v.uuid));
+
+                    if (coincideValues?.length) coincideValueToShow = coincideValues?.map((v) => v.name).join(', ');
+                }
+            }
+
+            value = coincideValueToShow?.length
+                ? coincideValueToShow
+                : field && field.type === FilterFieldType.Boolean
+                  ? `'${booleanOptions.find((b) => !!f.data === b.value)?.label}'`
+                  : Array.isArray(f.data)
+                    ? `${f.data
+                          .map(
+                              (v) =>
+                                  `'${
+                                      field?.platformEnum
+                                          ? platformEnums[field.platformEnum][v]?.label
+                                          : v?.name
+                                            ? v.name
+                                            : field && field.attributeContentType === AttributeContentType.Date
+                                              ? getFormattedDate(v as unknown as string)
+                                              : field && field.attributeContentType === AttributeContentType.Datetime
+                                                ? getFormattedDateTime(v as unknown as string)
+                                                : v
+                                  }'`,
+                          )
+                          .join(', ')}`
+                    : f.data
+                      ? `'${
+                            field?.platformEnum
+                                ? platformEnums[field.platformEnum][f.data as unknown as string]?.label
+                                : field && field.attributeContentType === AttributeContentType.Date
+                                  ? getFormattedDate(f.data as unknown as string)
+                                  : field && field.attributeContentType === AttributeContentType.Datetime
+                                    ? getFormattedDateTime(f.data as unknown as string)
+                                    : f.data
+                        }'`
+                      : '';
+
+            return (
+                <div style={{ display: 'flex', flexWrap: 'wrap', flexDirection: 'column' }}>
+                    <span
+                        className={cx('text-muted ')}
+                        style={{ fontSize: '12.5px', marginLeft: '2.5px', marginBottom: '2.5px' }}
+                    >{`${executionName}`}</span>
+
+                    <span key={i} className={styles.groupSmallerBadge}>
+                        <b>{f?.fieldSource && getEnumLabel(searchGroupEnum, f?.fieldSource)}&nbsp;</b>'{label}
+                        '&nbsp;to&nbsp;
+                        {value}
+                    </span>
+                </div>
+            );
+        });
+    }, [executionItems, executionName, availableFilters, searchGroupEnum, booleanOptions, platformEnums]);
+
+    return smallerBadges ? (
+        <>{renderSmallerExecutionsBadges}</>
+    ) : (
         <div className={styles.groupConditionContainerDiv} key={executionUuid}>
             <h6 className={cx('text-muted', styles.groupConditionTitle)}>{`${executionName}`}</h6>
             <div className="ms-3">{renderActionBadges}</div>

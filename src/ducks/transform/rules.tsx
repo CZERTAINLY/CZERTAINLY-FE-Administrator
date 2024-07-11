@@ -1,4 +1,6 @@
 import cx from 'classnames';
+import ConditionsItemsList from 'components/ExecutionConditionItemsList/ConditionsItemsList';
+import ExecutionsItemsList from 'components/ExecutionConditionItemsList/ExecutionsItemsList';
 import { CustomNode } from 'components/FlowChart';
 import style from 'components/FlowChart/CustomFlowNode/customFlowNode.module.scss';
 import ProgressButton from 'components/ProgressButton';
@@ -518,6 +520,57 @@ export function useTransformTriggerObjectToNodesAndEdges(
                 type: 'floating',
                 markerEnd: { type: MarkerType.Arrow },
             });
+
+            if (rule.conditions.length) {
+                rule.conditions.forEach((condition, index) => {
+                    nodes.push({
+                        id: `condition-${condition.uuid}-rule-${rule.uuid}`,
+                        type: 'customFlowNode',
+                        hidden: true,
+                        parentId: `rule-${rule.uuid}`,
+                        position: { x: 0, y: 0 },
+                        data: {
+                            redirectUrl: `/conditions/detail/${condition.uuid}`,
+                            customNodeCardTitle: `Condition ${index + 1}`,
+                            entityLabel: condition.name,
+                            icon: 'fa fa-filter',
+                            description: condition.description,
+
+                            otherProperties: [
+                                {
+                                    propertyName: 'Condition Name',
+                                    propertyValue: condition.name,
+                                    copyable: true,
+                                },
+                                {
+                                    propertyName: 'Condition Description',
+                                    propertyValue: condition.description,
+                                },
+                                {
+                                    propertyName: 'Condition Items',
+                                    propertyContent: (
+                                        <ConditionsItemsList
+                                            conditionName={condition.name}
+                                            conditionUuid={condition.uuid}
+                                            conditionItems={condition.items}
+                                            key={condition.uuid}
+                                            smallerBadges
+                                        />
+                                    ),
+                                },
+                            ],
+                        },
+                    });
+
+                    edges.push({
+                        id: `e1-condition-${condition.uuid}-rule-${rule.uuid}`,
+                        source: `condition-${condition.uuid}-rule-${rule.uuid}`,
+                        target: `rule-${rule.uuid}`,
+                        type: 'floating',
+                        markerEnd: { type: MarkerType.Arrow },
+                    });
+                });
+            }
         });
     }
 
@@ -574,135 +627,55 @@ export function useTransformTriggerObjectToNodesAndEdges(
                 markerEnd: { type: MarkerType.Arrow },
             });
 
-            const staticExec = [
-                {
-                    uuid: '03c17fa8-9629-44eb-bdcc-9500636a7a6a',
-                    name: 'test-execution-1',
-                    description: 'test-execution-1',
-                    type: 'setField',
-                    resource: 'certificates',
-                    items: [
-                        {
-                            fieldSource: 'property',
-                            fieldIdentifier: 'OWNER',
-                            data: '["257779ee-ecad-448f-9abf-83b332b75568"]',
+            if (action.executions.length) {
+                action.executions.forEach((execution, index) => {
+                    nodes.push({
+                        id: `execution-${execution.uuid}-action-${action.uuid}`,
+                        type: 'customFlowNode',
+                        hidden: true,
+                        parentId: `action-${action.uuid}`,
+                        position: { x: 0, y: 0 },
+                        data: {
+                            customNodeCardTitle: `Execution ${index + 1}`,
+                            entityLabel: execution.name,
+                            icon: 'fa fa-cogs',
+                            description: execution.description,
+                            otherProperties: [
+                                {
+                                    propertyName: 'Execution Name',
+                                    propertyValue: execution.name,
+                                    copyable: true,
+                                },
+                                {
+                                    propertyName: 'Execution Description',
+                                    propertyValue: execution.description,
+                                    // copyable: true,
+                                },
+                                {
+                                    propertyName: 'Execution Items',
+                                    propertyContent: (
+                                        <ExecutionsItemsList
+                                            executionItems={execution.items}
+                                            key={execution.uuid}
+                                            executionName={execution.name}
+                                            executionUuid={execution.uuid}
+                                            smallerBadges
+                                        />
+                                    ),
+                                },
+                            ],
                         },
-                    ],
-                },
-                {
-                    uuid: 'f8d86690-9ad5-404a-8600-835e6afb08d2',
-                    name: 'test-execution-2',
-                    description: 'test-execution-2',
-                    type: 'setField',
-                    resource: 'certificates',
-                    items: [
-                        {
-                            fieldSource: 'property',
-                            fieldIdentifier: 'RA_PROFILE_NAME',
-                            data: '["31682b51-a0c7-4248-897b-5f5a8a9fadb2"]',
-                        },
-                    ],
-                },
-                {
-                    uuid: 'a5c73bb1-b0de-4057-b598-de11b6bf5aba',
-                    name: 'test-execution-3',
-                    description: 'test-execution-3',
-                    type: 'setField',
-                    resource: 'certificates',
-                    items: [
-                        {
-                            fieldSource: 'property',
-                            fieldIdentifier: 'GROUP_NAME',
-                            data: '["b9f33da1-595d-4747-a30b-b381700046ce"]',
-                        },
-                    ],
-                },
-                {
-                    uuid: 'bf1140f6-5a1c-48a7-ab8d-92303b198a64',
-                    name: 'test-execution-4',
-                    description: 'test-execution-4',
-                    type: 'setField',
-                    resource: 'certificates',
-                    items: [
-                        {
-                            fieldSource: 'property',
-                            fieldIdentifier: 'GROUP_NAME',
-                            data: '["b9f33da1-595d-4747-a30b-b381700046ce"]',
-                        },
-                    ],
-                },
-                {
-                    uuid: 'bf1140f6-5a1c-48a7-ab8d-92303b198a65',
-                    name: 'test-execution-5',
-                    description: 'test-execution-5',
-                    type: 'setField',
-                    resource: 'certificates',
-                    items: [
-                        {
-                            fieldSource: 'property',
-                            fieldIdentifier: 'GROUP_NAME',
-                            data: '["b9f33da1-595d-4747-a30b-b381700046ce"]',
-                        },
-                    ],
-                },
-                {
-                    uuid: 'bf1140f6-5a1c-48a7-ab8d-92303b198a66',
-                    name: 'test-execution-6',
-                    description: 'test-execution-6',
-                    type: 'setField',
-                    resource: 'certificates',
-                    items: [
-                        {
-                            fieldSource: 'property',
-                            fieldIdentifier: 'GROUP_NAME',
-                            data: '["b9f33da1-595d-4747-a30b-b381700046ce"]',
-                        },
-                    ],
-                },
-            ];
-            let tempExec: CustomNode[] = [];
-            if (index === 0) {
-                tempExec = staticExec.map((execution, index) => ({
-                    id: `execution-${execution.uuid}`,
-                    type: 'customFlowNode',
-                    hidden: true,
-                    parentId: `action-${action.uuid}`,
-                    position: { x: 0, y: 0 },
-                    // width: nodeWidth,
-                    data: {
-                        // hidden: true,
-                        // group: 'executions',
-                        customNodeCardTitle: `Execution ${index + 1}`,
-                        entityLabel: execution.name,
-                        icon: 'fa fa-cogs',
-                        description: execution.description,
-                        otherProperties: [
-                            {
-                                propertyName: 'Execution Name',
-                                propertyValue: execution.name,
-                                copyable: true,
-                            },
-                            {
-                                propertyName: 'Execution Description',
-                                propertyValue: execution.description,
-                                // copyable: true,
-                            },
-                        ],
-                    },
-                }));
+                    });
+
+                    edges.push({
+                        id: `e1-execution-${execution.uuid}-action-${action.uuid}`,
+                        source: `execution-${execution.uuid}-action-${action.uuid}`,
+                        target: `action-${action.uuid}`,
+                        type: 'floating',
+                        markerEnd: { type: MarkerType.Arrow },
+                    });
+                });
             }
-
-            nodes.push(...tempExec);
-
-            edges.push(
-                ...tempExec.map((execution) => ({
-                    id: `e1-execution-${execution.id}`,
-                    target: `action-${action.uuid}`,
-                    source: execution.id,
-                    type: 'floating',
-                    markerEnd: { type: MarkerType.Arrow },
-                })),
-            );
         });
     }
 

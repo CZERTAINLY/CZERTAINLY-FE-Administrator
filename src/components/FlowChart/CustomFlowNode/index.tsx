@@ -31,25 +31,22 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                 const updatedNodes = currentnodes?.map((node, i) => {
                     const totalNodes = currentnodes?.filter((node) => node.parentId === id).length || 1; // Total child nodes
 
-                    const angleIncrement = (2 * Math.PI) / totalNodes; // Divide the circle based on the number of groups
-                    const multiplier = totalNodes < 3 ? 300 : 180;
+                    const multiplier = totalNodes < 3 ? 300 : 200;
                     const nodeRadius = multiplier * (totalNodes * 0.3); // Smaller radius for nodes within a group
                     const nodeAngle = ((2 * Math.PI) / totalNodes) * i;
-                    const onlyTwoNodes = totalNodes === 2;
-                    let yOffset = 0;
-                    if (onlyTwoNodes && i === 1) {
-                        yOffset = 105;
+
+                    if (node?.parentId !== id && node.hidden === false) {
+                        return {
+                            ...node,
+                            hidden: true,
+                        };
                     }
 
                     if (node?.parentId === id && node.hidden !== undefined) {
-                        const angle = angleIncrement * i; // Calculate angle for this node
+                        const positionMultiplier = totalNodes < 2 ? 3.5 : 1.75;
                         const position = {
-                            // x: xPos + Math.cos(angle) * radius, // Calculate x position
-                            // y: yPos + Math.sin(angle) * radius, // Calculate y position
-                            // x: xPos + nodeRadius * 1.75 * Math.cos(nodeAngle),
-                            // y: yPos + nodeRadius * Math.sin(nodeAngle) + yOffset,
-                            x: nodeRadius * 1.75 * Math.cos(nodeAngle),
-                            y: nodeRadius * Math.sin(nodeAngle) + yOffset,
+                            x: nodeRadius * positionMultiplier * Math.cos(nodeAngle),
+                            y: nodeRadius * positionMultiplier * Math.sin(nodeAngle),
                         };
 
                         return {
@@ -132,15 +129,6 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                 return style.actionGroupNodeStatus;
         }
 
-        // switch(data)
-
-        // switch (thisNodeState?.hidden) {
-        //     case true:
-        //         return style.hiddenStatus;
-        //     case false:
-        //         return style.hiddenStatus;
-        // }
-
         return style.unknownStatus;
     };
 
@@ -163,16 +151,12 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                 return style.expandButtonFailed;
             case CertificateValidationStatus.Inactive:
                 return style.expandButtonInactive;
-            // default:
-            //     return style.expandButtonUnknown;
         }
         switch (data?.group) {
             case 'rules':
                 return style.rulesGroupNodeExpandButton;
             case 'actions':
                 return style.actionsGroupNodeExpandButton;
-            // default:
-            //     return style.unknownNode;
         }
 
         return style.expandButtonUnknown;
@@ -184,7 +168,8 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
             <div className="d-flex align-items-start">
                 <div
                     className={cx(
-                        style.customNodeBackground,
+                        // style.customNodeBackground,
+                        { [style.customNodeBackground]: !data.formContent },
                         { [style.selectedBackground]: dragging },
                         {
                             [style.mainNodeBody]: data.isMainNode,
@@ -261,7 +246,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                         <h6 className={cx(style.customNodeCardTitle, 'my-auto ms-2')}>{data.customNodeCardTitle}</h6>
                     </div>
 
-                    {data.redirectUrl ? (
+                    {data.redirectUrl && data.entityLabel ? (
                         <div className={cx('d-flex ms-2', style.entityLabel)}>
                             <h6>Entity Name :</h6>
                             &nbsp;
@@ -269,12 +254,14 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                                 <h6 className="text-wrap">{data.entityLabel}</h6>
                             </Link>
                         </div>
-                    ) : (
+                    ) : data.entityLabel ? (
                         <div className={cx('d-flex ms-2', style.entityLabel)}>
                             <h6>Entity Name :</h6>
                             &nbsp;
                             <h6>{data.entityLabel}</h6>
                         </div>
+                    ) : (
+                        <div className="mt-4" />
                     )}
                     {data.description && (
                         <div className="d-flex ms-2">
@@ -322,6 +309,12 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                                 </div>
                             </Collapse>
                         </>
+                    )}
+
+                    {data?.formContent && (
+                        <div className="m-auto" style={{ minWidth: '500px' }}>
+                            {data.formContent}
+                        </div>
                     )}
 
                     <Collapse isOpen={addNodeContentCollapse}>
