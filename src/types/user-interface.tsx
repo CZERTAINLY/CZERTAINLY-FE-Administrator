@@ -126,7 +126,7 @@ export interface ReactFlowUI {
     flowChartEdges: Edge[];
     flowDirection?: 'TB' | 'BT' | 'LR' | 'RL' | 'STAR';
     legends?: LegendItem[];
-    showHiddenNodes?: boolean;
+    expandedHiddenNodeId?: string;
 }
 
 export const AddNewAttributeList: AddNewAttributeType[] = [

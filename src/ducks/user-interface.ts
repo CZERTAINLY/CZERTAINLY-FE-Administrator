@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { CustomNode } from 'components/FlowChart';
+import { Edge } from 'reactflow';
 import { createSelector } from 'reselect';
 import { AjaxError } from 'rxjs/ajax';
 import { GlobalModalModel, LockWidgetNameEnum, ReactFlowUI, WidgetLockErrorModel, WidgetLockModel } from 'types/user-interface';
@@ -124,9 +125,21 @@ export const slice = createSlice({
             state.reactFlowUI = undefined;
         },
 
-        setShowHiddenNodes: (state, action: PayloadAction<boolean>) => {
+        updateReactFlowNodes: (state, action: PayloadAction<CustomNode[]>) => {
             if (state.reactFlowUI) {
-                state.reactFlowUI.showHiddenNodes = action.payload;
+                state.reactFlowUI.flowChartNodes = action.payload;
+            }
+        },
+
+        updateReactFlowEdges: (state, action: PayloadAction<Edge[]>) => {
+            if (state.reactFlowUI) {
+                state.reactFlowUI.flowChartEdges = action.payload;
+            }
+        },
+
+        setShowHiddenNodes: (state, action: PayloadAction<string | undefined>) => {
+            if (state.reactFlowUI) {
+                state.reactFlowUI.expandedHiddenNodeId = action.payload;
             }
         },
 
@@ -147,7 +160,10 @@ const selectInitiateAttributeCallback = createSelector(selectState, (state) => s
 const selectAttributeCallbackValue = createSelector(selectState, (state) => state.attributeCallbackValue);
 const selectCallbackValue = createSelector(selectState, (state) => state.formCallbackValue);
 const selectInitiateFormCallback = createSelector(selectState, (state) => state.initiateFormCallback);
-const selectReactFlowUI = createSelector(selectState, (state) => state.reactFlowUI);
+const reactFlowUI = createSelector(selectState, (state) => state.reactFlowUI);
+const flowChartNodes = createSelector(reactFlowUI, (state) => state?.flowChartNodes);
+const flowChartEdges = createSelector(reactFlowUI, (state) => state?.flowChartEdges);
+const expandedHiddenNodeId = createSelector(reactFlowUI, (state) => state?.expandedHiddenNodeId);
 
 export const selectors = {
     selectState,
@@ -157,7 +173,10 @@ export const selectors = {
     selectAttributeCallbackValue,
     selectCallbackValue,
     selectInitiateFormCallback,
-    selectReactFlowUI,
+    reactFlowUI,
+    flowChartNodes,
+    flowChartEdges,
+    expandedHiddenNodeId,
 };
 
 export const actions = slice.actions;

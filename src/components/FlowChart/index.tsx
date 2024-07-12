@@ -185,37 +185,26 @@ const FlowChartContent = ({
     legends,
 }: FlowChartProps) => {
     const defaultEdgeOptions = { animated: true };
-    const reactFlowUI = useSelector(userInterfaceSelectors.selectReactFlowUI);
+    const flowChartNodesState = useSelector(userInterfaceSelectors.flowChartNodes);
+    const flowChartEdgesState = useSelector(userInterfaceSelectors.flowChartEdges);
+
     const dispatch = useDispatch();
 
     const onNodesChange = useCallback(
         (changes: NodeChange[]) => {
-            const newNodes = applyNodeChanges(changes, reactFlowUI?.flowChartNodes ?? []);
-            dispatch(
-                userInterfaceActions.setReactFlowUI({
-                    flowChartNodes: newNodes,
-                    flowChartEdges: reactFlowUI?.flowChartEdges || [],
-                    flowDirection: reactFlowUI?.flowDirection,
-                    legends: reactFlowUI?.legends,
-                }),
-            );
+            const newNodes = applyNodeChanges(changes, flowChartNodesState ?? []);
+
+            dispatch(userInterfaceActions.updateReactFlowNodes(newNodes));
         },
-        [dispatch, reactFlowUI],
+        [dispatch, flowChartNodesState],
     );
 
     const onEdgesChange = useCallback(
         (changes: EdgeChange[]) => {
-            const newEdges = applyEdgeChanges(changes, reactFlowUI?.flowChartEdges ?? []);
-            dispatch(
-                userInterfaceActions.setReactFlowUI({
-                    flowChartNodes: reactFlowUI?.flowChartNodes || [],
-                    flowChartEdges: newEdges,
-                    flowDirection: reactFlowUI?.flowDirection,
-                    legends: reactFlowUI?.legends,
-                }),
-            );
+            const newEdges = applyEdgeChanges(changes, flowChartEdgesState ?? []);
+            dispatch(userInterfaceActions.updateReactFlowEdges(newEdges));
         },
-        [dispatch, reactFlowUI],
+        [dispatch, flowChartEdgesState],
     );
 
     // // TODO: Implement onConnect in future if needed
@@ -224,8 +213,6 @@ const FlowChartContent = ({
     useEffect(() => {
         // initial placement of nodes and edges
         const { nodes, edges } = getLayoutedElements(flowChartNodes, flowChartEdges, flowDirection);
-        // setNodes(nodes);
-        // setEdges(edges);
 
         dispatch(
             userInterfaceActions.setReactFlowUI({
@@ -241,9 +228,9 @@ const FlowChartContent = ({
             {flowChartTitle && <h5 className="text-muted">{flowChartTitle}</h5>}
             <div className={cx(style.flowChartContainer, style.floatingedges)}>
                 <ReactFlow
-                    nodes={reactFlowUI?.flowChartNodes}
+                    nodes={flowChartNodesState}
                     proOptions={{ hideAttribution: true }}
-                    edges={reactFlowUI?.flowChartEdges}
+                    edges={flowChartEdgesState}
                     onNodesChange={onNodesChange}
                     onEdgesChange={onEdgesChange}
                     nodeTypes={nodeTypes}
@@ -251,7 +238,6 @@ const FlowChartContent = ({
                     defaultViewport={defaultViewport}
                     defaultEdgeOptions={defaultEdgeOptions}
                     edgeTypes={edgeTypes}
-                    // connectionLineComponent={FloatingConnectionLine}
                 >
                     <Controls />
                     <Background variant={BackgroundVariant.Dots} gap={16} size={1} />

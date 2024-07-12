@@ -13,90 +13,70 @@ import style from './customFlowNode.module.scss';
 export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, id }: EntityNodeProps) {
     const [collapse, setCollapse] = useState(data.expandedByDefault ?? false);
     const [addNodeContentCollapse, setAddNodeContentCollapse] = useState(false);
-    const reactFlowUI = useSelector(userInterfaceSelectors.selectReactFlowUI);
-    const [showHiddenNodes, setShowHiddenNodes] = useState(false);
 
-    const currentnodes = reactFlowUI?.flowChartNodes;
-    const thisNodeState = currentnodes?.find((node) => node?.id === id);
+    const flowChartNoedesState = useSelector(userInterfaceSelectors.flowChartNodes);
+    const expandedHiddenNodeId = useSelector(userInterfaceSelectors.expandedHiddenNodeId);
+
+    const thisNodeState = useMemo(() => {
+        return flowChartNoedesState?.find((node) => node?.id === id);
+    }, [flowChartNoedesState, id]);
 
     const hasHiddenChildren = useMemo(() => {
-        return currentnodes?.some((node) => node?.parentId === id && node.hidden !== undefined);
-    }, [currentnodes, id]);
+        return flowChartNoedesState?.some((node) => node?.parentId === id && node.hidden !== undefined);
+    }, [flowChartNoedesState, id]);
     const dispatch = useDispatch();
 
-    const toggleHiddenNodes = useCallback(
-        (showHiddenNodes: boolean) => {
-            // const
-            if (showHiddenNodes) {
-                const updatedNodes = currentnodes?.map((node, i) => {
-                    const totalNodes = currentnodes?.filter((node) => node.parentId === id).length || 1; // Total child nodes
+    const toggleHiddenNodes = useCallback(() => {
+        if (expandedHiddenNodeId !== id) {
+            const updatedNodes = flowChartNoedesState?.map((node, i) => {
+                const totalNodes = flowChartNoedesState?.filter((node) => node.parentId === id).length || 1; // Total child nodes
 
-                    const multiplier = totalNodes < 3 ? 300 : 200;
-                    const nodeRadius = multiplier * (totalNodes * 0.3); // Smaller radius for nodes within a group
-                    const nodeAngle = ((2 * Math.PI) / totalNodes) * i;
+                const multiplier = totalNodes < 3 ? 300 : 200;
+                const nodeRadius = multiplier * (totalNodes * 0.3); // Smaller radius for nodes within a group
+                const nodeAngle = ((2 * Math.PI) / totalNodes) * i;
 
-                    if (node?.parentId !== id && node.hidden === false) {
-                        return {
-                            ...node,
-                            hidden: true,
-                        };
-                    }
+                if (node?.parentId !== id && node.hidden === false) {
+                    return {
+                        ...node,
+                        hidden: true,
+                    };
+                }
 
-                    if (node?.parentId === id && node.hidden !== undefined) {
-                        const positionMultiplier = totalNodes < 2 ? 3.5 : 1.75;
-                        const position = {
-                            x: nodeRadius * positionMultiplier * Math.cos(nodeAngle),
-                            y: nodeRadius * positionMultiplier * Math.sin(nodeAngle),
-                        };
+                if (node?.parentId === id && node.hidden !== undefined) {
+                    const positionMultiplier = totalNodes < 2 ? 3.5 : 1.75;
+                    const position = {
+                        x: nodeRadius * positionMultiplier * Math.cos(nodeAngle),
+                        y: nodeRadius * positionMultiplier * Math.sin(nodeAngle),
+                    };
 
-                        return {
-                            ...node,
-                            position: position,
-                            // position: {
-                            //     x: xPos + 100,
-                            //     y: yPos + 100,
-                            // },
-                            hidden: false,
-                        };
-                    }
-                    return node;
-                });
+                    return {
+                        ...node,
+                        position: position,
+                        hidden: false,
+                    };
+                }
+                return node;
+            });
 
-                dispatch(
-                    userInterfaceActions.setReactFlowUI({
-                        flowChartNodes: updatedNodes || [],
-                        flowChartEdges: reactFlowUI?.flowChartEdges || [],
-                        flowDirection: reactFlowUI?.flowDirection,
-                        legends: reactFlowUI?.legends,
-                    }),
-                );
-            } else {
-                const updatedNodes = currentnodes?.map((node) => {
-                    if (node?.parentId === id && node.hidden !== undefined) {
-                        return {
-                            ...node,
-                            // position: {
-                            //     x: xPos + 100,
-                            //     y: yPos + 100,
-                            // },
-                            hidden: true,
-                        };
-                    }
-                    return node;
-                });
+            if (updatedNodes) dispatch(userInterfaceActions.updateReactFlowNodes(updatedNodes));
 
-                dispatch(
-                    userInterfaceActions.setReactFlowUI({
-                        flowChartNodes: updatedNodes || [],
-                        flowChartEdges: reactFlowUI?.flowChartEdges || [],
-                        flowDirection: reactFlowUI?.flowDirection,
-                        legends: reactFlowUI?.legends,
-                    }),
-                );
-            }
-        },
-        [currentnodes, reactFlowUI, dispatch, id],
-    );
+            dispatch(userInterfaceActions.setShowHiddenNodes(id));
+        } else {
+            const updatedNodes = flowChartNoedesState?.map((node) => {
+                if (node?.parentId === id && node.hidden !== undefined) {
+                    return {
+                        ...node,
+                        hidden: true,
+                    };
+                }
+                return node;
+            });
+
+            if (updatedNodes) dispatch(userInterfaceActions.updateReactFlowNodes(updatedNodes));
+
+            dispatch(userInterfaceActions.setShowHiddenNodes(undefined));
+        }
+    }, [flowChartNoedesState, dispatch, id, expandedHiddenNodeId]);
 
     const toggle = () => setCollapse(!collapse);
     const copyToClipboard = useCopyToClipboard();
@@ -197,13 +177,18 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                                     <Button
                                         color="primary"
                                         onClick={() => {
-                                            setShowHiddenNodes(!showHiddenNodes);
-                                            toggleHiddenNodes(!showHiddenNodes);
+                                            // setShowHiddenNodes(!expandedHiddenNodeId);
+                                            toggleHiddenNodes();
                                         }}
                                         className={cx('mt-1', style.nodeButton, getExpandButtonStatusClasses())}
                                     >
                                         {/* <span className="mx-auto">{status}</span> */}
-                                        <i className={cx('fa ', { 'fa-eye': !showHiddenNodes, 'fa-eye-slash': showHiddenNodes })} />
+                                        <i
+                                            className={cx('fa ', {
+                                                'fa-eye': expandedHiddenNodeId !== id,
+                                                'fa-eye-slash': expandedHiddenNodeId === id,
+                                            })}
+                                        />
                                     </Button>
                                 ) : null}
                                 {/* 
