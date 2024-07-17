@@ -77,10 +77,6 @@
     }
 }
 
-.listStyle {
-    max-width: 375px;
-}
-
 .propertyName {
     font-weight: bold;
     color: $gray-500;
@@ -348,4 +344,8 @@
     //     2.25px 2.25px 0.75px -0.75px rgba(0, 0, 0, 0.15),
     //     1.5px 1.5px 0.75px 0px rgba(0, 0, 0, 0.105),
     //     0.75px 0.75px 2.25px 0px rgba(0, 0, 0, 0.09);
+}
+
+.expandedNode {
+    width: 600px;
 }

@@ -15,7 +15,6 @@ import { Edge, MarkerType } from 'reactflow';
 import { FormGroup, Label } from 'reactstrap';
 import { OtherProperties } from 'types/flowchart';
 import { PlatformEnum, Resource, UpdateTriggerRequestDtoEventEnum } from 'types/openapi';
-
 import {
     ActionDetailDto,
     ActionDetailModel,
@@ -282,7 +281,7 @@ export function useTransformTriggerObjectToNodesAndEdges(
     const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.TriggerType));
     const dispatch = useDispatch();
     const isUpdatingTrigger = useSelector(rulesSelectors.isUpdatingTrigger);
-
+    // const flowChartNodesState = useSelector(userInterfaceSelectors.flowChartNodes);
     const rulesOptions = useMemo(() => {
         const filteredRules = rules?.filter((rule) => !triggerDetails?.rules.find((triggerRule) => triggerRule.uuid === rule.uuid));
         return filteredRules?.map((rule) => ({
@@ -490,24 +489,27 @@ export function useTransformTriggerObjectToNodesAndEdges(
                 data: {
                     customNodeCardTitle: `Rule ${index + 1}`,
                     entityLabel: rule.name,
+                    redirectUrl: `../rules/detail/${rule.uuid}`,
                     icon: 'fa fa-book',
                     group: 'rules',
-                    deleteAction: () => {
-                        dispatch(
-                            rulesActions.updateTrigger({
-                                triggerUuid: triggerDetails.uuid,
-                                trigger: {
-                                    rulesUuids: triggerDetails.rules.filter((r) => r.uuid !== rule.uuid).map((r) => r.uuid),
-                                    ignoreTrigger: triggerDetails.ignoreTrigger,
-                                    resource: triggerDetails.resource,
-                                    type: triggerDetails.type,
-                                    actionsUuids: triggerDetails?.actions.map((action) => action.uuid) || [],
-                                    eventResource: triggerDetails.eventResource,
-                                    description: triggerDetails.description || '',
-                                    event: (triggerDetails.event as unknown as UpdateTriggerRequestDtoEventEnum) || undefined,
-                                },
-                            }),
-                        );
+                    deleteAction: {
+                        action: () => {
+                            dispatch(
+                                rulesActions.updateTrigger({
+                                    triggerUuid: triggerDetails.uuid,
+                                    trigger: {
+                                        rulesUuids: triggerDetails.rules.filter((r) => r.uuid !== rule.uuid).map((r) => r.uuid),
+                                        ignoreTrigger: triggerDetails.ignoreTrigger,
+                                        resource: triggerDetails.resource,
+                                        type: triggerDetails.type,
+                                        actionsUuids: triggerDetails?.actions.map((action) => action.uuid) || [],
+                                        eventResource: triggerDetails.eventResource,
+                                        description: triggerDetails.description || '',
+                                        event: (triggerDetails.event as unknown as UpdateTriggerRequestDtoEventEnum) || undefined,
+                                    },
+                                }),
+                            );
+                        },
                     },
                     otherProperties: otherProperties,
                 },
@@ -535,7 +537,29 @@ export function useTransformTriggerObjectToNodesAndEdges(
                             entityLabel: condition.name,
                             icon: 'fa fa-filter',
                             description: condition.description,
-
+                            deleteAction: {
+                                disableCondition: 'SingleChild',
+                                disabledMessage: 'The rule must have at least one condition',
+                                action: () => {
+                                    dispatch(
+                                        rulesActions.updateRule({
+                                            ruleUuid: rule.uuid,
+                                            noRedirect: true,
+                                            rule: {
+                                                description: rule.description,
+                                                conditionsUuids: rule.conditions
+                                                    .filter((c) => c.uuid !== condition.uuid)
+                                                    .map((c) => c.uuid),
+                                            },
+                                        }),
+                                    );
+                                    dispatch(
+                                        rulesActions.getTrigger({
+                                            triggerUuid: triggerDetails.uuid,
+                                        }),
+                                    );
+                                },
+                            },
                             otherProperties: [
                                 {
                                     propertyName: 'Condition Name',
@@ -596,24 +620,32 @@ export function useTransformTriggerObjectToNodesAndEdges(
                 data: {
                     customNodeCardTitle: `Action ${index + 1}`,
                     entityLabel: action.name,
+                    redirectUrl: `../actions/detail/${action.uuid}`,
                     icon: 'fa fa-bolt',
                     group: 'actions',
-                    deleteAction: () => {
-                        dispatch(
-                            rulesActions.updateTrigger({
-                                triggerUuid: triggerDetails.uuid,
-                                trigger: {
-                                    actionsUuids: triggerDetails.actions.filter((a) => a.uuid !== action.uuid).map((a) => a.uuid),
-                                    ignoreTrigger: triggerDetails.ignoreTrigger,
-                                    resource: triggerDetails.resource,
-                                    type: triggerDetails.type,
-                                    rulesUuids: triggerDetails?.rules.map((rule) => rule.uuid) || [],
-                                    eventResource: triggerDetails.eventResource,
-                                    description: triggerDetails.description || '',
-                                    event: (triggerDetails.event as unknown as UpdateTriggerRequestDtoEventEnum) || undefined,
-                                },
-                            }),
-                        );
+                    deleteAction: {
+                        action: () => {
+                            dispatch(
+                                rulesActions.updateTrigger({
+                                    triggerUuid: triggerDetails.uuid,
+                                    trigger: {
+                                        actionsUuids: triggerDetails.actions.filter((a) => a.uuid !== action.uuid).map((a) => a.uuid),
+                                        ignoreTrigger: triggerDetails.ignoreTrigger,
+                                        resource: triggerDetails.resource,
+                                        type: triggerDetails.type,
+                                        rulesUuids: triggerDetails?.rules.map((rule) => rule.uuid) || [],
+                                        eventResource: triggerDetails.eventResource,
+                                        description: triggerDetails.description || '',
+                                        event: (triggerDetails.event as unknown as UpdateTriggerRequestDtoEventEnum) || undefined,
+                                    },
+                                }),
+                            );
+                            dispatch(
+                                rulesActions.getTrigger({
+                                    triggerUuid: triggerDetails.uuid,
+                                }),
+                            );
+                        },
                     },
                     otherProperties: otherProperties,
                 },
@@ -637,9 +669,33 @@ export function useTransformTriggerObjectToNodesAndEdges(
                         position: { x: 0, y: 0 },
                         data: {
                             customNodeCardTitle: `Execution ${index + 1}`,
+                            redirectUrl: `/executions/detail/${execution.uuid}`,
                             entityLabel: execution.name,
                             icon: 'fa fa-cogs',
                             description: execution.description,
+                            deleteAction: {
+                                disableCondition: 'SingleChild',
+                                disabledMessage: 'The action must have at least one execution',
+                                action: () => {
+                                    dispatch(
+                                        rulesActions.updateAction({
+                                            actionUuid: action.uuid,
+                                            noRedirect: true,
+                                            action: {
+                                                description: action.description,
+                                                executionsUuids: action.executions
+                                                    .filter((e) => e.uuid !== execution.uuid)
+                                                    .map((e) => e.uuid),
+                                            },
+                                        }),
+                                    );
+                                    dispatch(
+                                        rulesActions.getTrigger({
+                                            triggerUuid: triggerDetails.uuid,
+                                        }),
+                                    );
+                                },
+                            },
                             otherProperties: [
                                 {
                                     propertyName: 'Execution Name',

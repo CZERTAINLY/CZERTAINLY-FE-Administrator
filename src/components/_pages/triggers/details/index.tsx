@@ -1,5 +1,4 @@
 import cx from 'classnames';
-import ActionsForm from 'components/_pages/actions/form';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import FlowChart, { CustomNode } from 'components/FlowChart';
@@ -11,11 +10,10 @@ import { actions as alertActions } from 'ducks/alerts';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useTransformTriggerObjectToNodesAndEdges } from 'ducks/transform/rules';
-import { actions as userInterfaceActions } from 'ducks/user-interface';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
-import { Edge, ReactFlowProvider } from 'reactflow';
+import { Edge } from 'reactflow';
 import { Button, ButtonGroup, Col, Container, Input, Row } from 'reactstrap';
 import { PlatformEnum, UpdateTriggerRequestDtoEventEnum } from 'types/openapi';
 import { DeviceType, useDeviceType } from 'utils/common-hooks';
@@ -576,48 +574,32 @@ const TriggerDetails = () => {
                     {
                         title: 'Flow',
                         content: (
-                            <ReactFlowProvider>
-                                <FlowChart
-                                    busy={isBusy}
-                                    flowChartTitle="Trigger Flow"
-                                    flowChartEdges={edges}
-                                    flowChartNodes={nodes}
-                                    defaultViewport={defaultViewport}
-                                    flowDirection="STAR"
-                                    legends={[
-                                        {
-                                            color: '#afbbdb',
-                                            icon: 'fa fa-rocket',
-                                            label: 'Trigger',
-                                        },
-                                        {
-                                            color: '#1ab394e1',
-                                            icon: 'fa fa-bolt',
-                                            label: 'Action',
-                                            onClick: () => {
-                                                dispatch(
-                                                    userInterfaceActions.insertReactFlowFormNode({
-                                                        id: 'ReactFlowFormNode',
-                                                        type: 'customFlowNode',
-                                                        data: {
-                                                            customNodeCardTitle: '',
-                                                            entityLabel: '',
-                                                            formContent: <ActionsForm />,
-                                                        },
-                                                        position: { x: 0, y: 0 },
-                                                    }),
-                                                );
-                                            },
-                                        },
+                            <FlowChart
+                                busy={isBusy}
+                                flowChartTitle="Trigger Flow"
+                                flowChartEdges={edges}
+                                flowChartNodes={nodes}
+                                defaultViewport={defaultViewport}
+                                flowDirection="STAR"
+                                legends={[
+                                    {
+                                        color: '#afbbdb',
+                                        icon: 'fa fa-rocket',
+                                        label: 'Trigger',
+                                    },
+                                    {
+                                        color: '#1ab394e1',
+                                        icon: 'fa fa-bolt',
+                                        label: 'Action',
+                                    },
 
-                                        {
-                                            color: '#7fa2c1',
-                                            icon: 'fa fa-book',
-                                            label: 'Rule',
-                                        },
-                                    ]}
-                                />
-                            </ReactFlowProvider>
+                                    {
+                                        color: '#7fa2c1',
+                                        icon: 'fa fa-book',
+                                        label: 'Rule',
+                                    },
+                                ]}
+                            />
                         ),
                     },
                 ]}

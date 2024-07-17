@@ -137,6 +137,11 @@ export const slice = createSlice({
             }
         },
 
+        deleteNode: (state, action: PayloadAction<string>) => {
+            if (state.reactFlowUI) {
+                state.reactFlowUI.flowChartNodes = state.reactFlowUI.flowChartNodes.filter((node) => node.id !== action.payload);
+            }
+        },
         setShowHiddenNodes: (state, action: PayloadAction<string | undefined>) => {
             if (state.reactFlowUI) {
                 state.reactFlowUI.expandedHiddenNodeId = action.payload;

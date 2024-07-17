@@ -144,12 +144,7 @@ const ConditionsItemsList = ({ conditionItems = [], conditionName, conditionUuid
                         : '';
 
             return (
-                <div style={{ display: 'flex', flexWrap: 'wrap', flexDirection: 'column' }}>
-                    <span
-                        className={cx('text-muted ')}
-                        style={{ fontSize: '12.5px', marginLeft: '2.5px', marginBottom: '2.5px' }}
-                    >{`${conditionName}`}</span>
-
+                <div className="mt-1">
                     <span
                         key={i}
                         title={`${getEnumLabel(searchGroupEnum, condition.fieldSource)} ${label} ${getEnumLabel(
@@ -165,12 +160,12 @@ const ConditionsItemsList = ({ conditionItems = [], conditionName, conditionUuid
                 </div>
             );
         });
-    }, [FilterConditionOperatorEnum, availableFilters, conditionName, booleanOptions, conditionItems, platformEnums, searchGroupEnum]);
+    }, [FilterConditionOperatorEnum, availableFilters, booleanOptions, conditionItems, platformEnums, searchGroupEnum]);
 
     if (isFetchingConditionDetails) return <Spinner active={isFetchingConditionDetails} />;
 
     return smallerBadges ? (
-        <>{renderSmallerConditionsBadges}</>
+        <div className="d-flex flex-wrap">{renderSmallerConditionsBadges}</div>
     ) : (
         <div className={styles.groupConditionContainerDiv} key={conditionUuid}>
             <h6 className={cx('text-muted', styles.groupConditionTitle)}>{`${conditionName}`}</h6>

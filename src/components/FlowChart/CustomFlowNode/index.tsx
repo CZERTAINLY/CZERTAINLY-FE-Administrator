@@ -1,4 +1,5 @@
 import cx from 'classnames';
+import { actions as alertActions } from 'ducks/alerts';
 import { actions as userInterfaceActions, selectors as userInterfaceSelectors } from 'ducks/user-interface';
 import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -147,6 +148,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
             <Handle hidden={data.handleHide === 'target'} className={cx(style.handleUp)} type="target" position={Position.Top} />
             <div className="d-flex align-items-start">
                 <div
+                    // style={{ width: '500px' }}
                     className={cx(
                         // style.customNodeBackground,
                         { [style.customNodeBackground]: !data.formContent },
@@ -157,6 +159,9 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                             [style.hiddenStatus]: thisNodeState?.hidden !== undefined,
                         },
                         getStatusClasses(),
+                        {
+                            [style.expandedNode]: collapse,
+                        },
                     )}
                 >
                     {selected && (
@@ -216,7 +221,33 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                                     <Button
                                         color="danger"
                                         className={cx('mt-1', style.nodeButton, style.deleteButton)}
-                                        onClick={data.deleteAction}
+                                        onClick={() => {
+                                            if (data.deleteAction) {
+                                                switch (data.deleteAction.disableCondition) {
+                                                    case 'SingleChild':
+                                                        const totalSiblings = flowChartNoedesState?.filter(
+                                                            (node) => node.parentId === thisNodeState?.parentId && node.id !== id,
+                                                        ).length;
+                                                        if (totalSiblings === 0) {
+                                                            dispatch(
+                                                                alertActions.error(
+                                                                    data.deleteAction.disabledMessage ||
+                                                                        'Cannot the last node of this group',
+                                                                ),
+                                                            );
+                                                            return;
+                                                        }
+                                                        break;
+                                                }
+
+                                                data.deleteAction.action();
+                                                const childrenNodes = flowChartNoedesState?.filter((node) => node.parentId === id);
+                                                childrenNodes?.forEach((node) => {
+                                                    dispatch(userInterfaceActions.deleteNode(node.id));
+                                                });
+                                                dispatch(userInterfaceActions.deleteNode(id));
+                                            }
+                                        }}
                                         title="Delete this node"
                                     >
                                         <i className={cx('fa fa-trash text-white')} />
@@ -264,7 +295,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                                 className="w-100"
                             >
                                 <div className={cx(style.listContainer, { [style.listContainerDragging]: dragging })}>
-                                    <ul className={cx('list-group p-1', style.listStyle)}>
+                                    <ul className={cx('list-group p-1')}>
                                         {data.otherProperties.map((property, index) => (
                                             <li key={index} className="list-group-item text-wrap p-0 ps-1">
                                                 {property?.propertyName && (

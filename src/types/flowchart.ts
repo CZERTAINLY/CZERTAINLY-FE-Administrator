@@ -28,7 +28,11 @@ export interface CustomNodeData {
     group?: string;
     addButtonContent?: React.ReactNode;
     formContent?: React.ReactNode;
-    deleteAction?: () => void;
+    deleteAction?: {
+        disableCondition?: 'SingleChild';
+        disabledMessage?: string;
+        action: () => void;
+    };
     // certificateNodeStatus?: CertificateState;
     // certificateNodeValidationStatus?: CertificateValidationStatus;
     certificateNodeData?: CertificateNodeData;

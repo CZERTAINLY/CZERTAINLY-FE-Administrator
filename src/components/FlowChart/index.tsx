@@ -1,6 +1,6 @@
 import Widget from 'components/Widget';
 import dagre from 'dagre';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import cx from 'classnames';
 import { actions as userInterfaceActions, selectors as userInterfaceSelectors } from 'ducks/user-interface';
@@ -187,8 +187,9 @@ const FlowChartContent = ({
     const defaultEdgeOptions = { animated: true };
     const flowChartNodesState = useSelector(userInterfaceSelectors.flowChartNodes);
     const flowChartEdgesState = useSelector(userInterfaceSelectors.flowChartEdges);
-
     const dispatch = useDispatch();
+
+    const [flowChartInitialised, setFlowChartInitialised] = useState(false);
 
     const onNodesChange = useCallback(
         (changes: NodeChange[]) => {
@@ -212,6 +213,8 @@ const FlowChartContent = ({
 
     useEffect(() => {
         // initial placement of nodes and edges
+        if (!flowChartNodes.length || !flowChartEdges.length || flowChartInitialised) return;
+
         const { nodes, edges } = getLayoutedElements(flowChartNodes, flowChartEdges, flowDirection);
 
         dispatch(
@@ -221,7 +224,8 @@ const FlowChartContent = ({
                 flowDirection,
             }),
         );
-    }, [flowChartEdges, flowChartNodes, flowDirection, dispatch]);
+        setFlowChartInitialised(true);
+    }, [flowChartEdges, flowChartNodes, flowDirection, dispatch, flowChartInitialised]);
 
     return (
         <Widget className={style.flowWidget} busy={busy}>
