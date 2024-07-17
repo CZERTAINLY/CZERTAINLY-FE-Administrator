@@ -12,7 +12,7 @@ import { useCopyToClipboard } from 'utils/common-hooks';
 import style from './customFlowNode.module.scss';
 
 export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, id }: EntityNodeProps) {
-    const [collapse, setCollapse] = useState(data.expandedByDefault ?? false);
+    const [isNodeExpanded, setIsNodeExpanded] = useState(data.expandedByDefault ?? false);
     const [addNodeContentCollapse, setAddNodeContentCollapse] = useState(false);
 
     const flowChartNoedesState = useSelector(userInterfaceSelectors.flowChartNodes);
@@ -45,8 +45,10 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
 
                 if (node?.parentId === id && node.hidden !== undefined) {
                     const positionMultiplier = totalNodes < 2 ? 3.5 : 1.75;
+                    const xPosition = nodeRadius * positionMultiplier * Math.cos(nodeAngle);
+                    const xWithExpandedOffset = isNodeExpanded && xPosition > 0 ? xPosition + 350 : xPosition;
                     const position = {
-                        x: nodeRadius * positionMultiplier * Math.cos(nodeAngle),
+                        x: xWithExpandedOffset,
                         y: nodeRadius * positionMultiplier * Math.sin(nodeAngle),
                     };
 
@@ -77,9 +79,9 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
 
             dispatch(userInterfaceActions.setShowHiddenNodes(undefined));
         }
-    }, [flowChartNoedesState, dispatch, id, expandedHiddenNodeId]);
+    }, [flowChartNoedesState, dispatch, id, expandedHiddenNodeId, isNodeExpanded]);
 
-    const toggle = () => setCollapse(!collapse);
+    const toggle = () => setIsNodeExpanded(!isNodeExpanded);
     const copyToClipboard = useCopyToClipboard();
 
     // TODO: use only for certificates not for rules
@@ -160,7 +162,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                         },
                         getStatusClasses(),
                         {
-                            [style.expandedNode]: collapse,
+                            [style.expandedNode]: isNodeExpanded,
                         },
                     )}
                 >
@@ -174,7 +176,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                                         className={cx(style.nodeButton, getExpandButtonStatusClasses())}
                                     >
                                         {/* <span className="mx-auto">{status}</span> */}
-                                        <i className={cx('fa ', { 'fa-chevron-down': !collapse, 'fa-chevron-up': collapse })} />
+                                        <i className={cx('fa ', { 'fa-chevron-down': !isNodeExpanded, 'fa-chevron-up': isNodeExpanded })} />
                                     </Button>
                                 )}
 
@@ -290,7 +292,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                     {data.otherProperties && (
                         <>
                             <Collapse
-                                isOpen={collapse}
+                                isOpen={isNodeExpanded}
                                 // onEntered={onEntered} onExited={onExited}
                                 className="w-100"
                             >

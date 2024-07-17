@@ -156,13 +156,8 @@ const ExecutionsItemsList = ({ executionItems = [], executionName, executionUuid
                       : '';
 
             return (
-                <div style={{ display: 'flex', flexWrap: 'wrap', flexDirection: 'column' }}>
-                    <span
-                        className={cx('text-muted ')}
-                        style={{ fontSize: '12.5px', marginLeft: '2.5px', marginBottom: '2.5px' }}
-                    >{`${executionName}`}</span>
-
-                    <span key={i} className={styles.groupSmallerBadge}>
+                <div key={i} className="mt-2 me-1">
+                    <span className={styles.groupSmallerBadge}>
                         <b>{f?.fieldSource && getEnumLabel(searchGroupEnum, f?.fieldSource)}&nbsp;</b>'{label}
                         '&nbsp;to&nbsp;
                         {value}
@@ -170,10 +165,13 @@ const ExecutionsItemsList = ({ executionItems = [], executionName, executionUuid
                 </div>
             );
         });
-    }, [executionItems, executionName, availableFilters, searchGroupEnum, booleanOptions, platformEnums]);
+    }, [executionItems, availableFilters, searchGroupEnum, booleanOptions, platformEnums]);
 
     return smallerBadges ? (
-        <>{renderSmallerExecutionsBadges}</>
+        <div>
+            <h6 className={cx('text-muted', styles.groupConditionTitle)}>{`${executionName}'s Execution Items`}</h6>
+            <div className="d-flex flex-wrap">{renderSmallerExecutionsBadges}</div>
+        </div>
     ) : (
         <div className={styles.groupConditionContainerDiv} key={executionUuid}>
             <h6 className={cx('text-muted', styles.groupConditionTitle)}>{`${executionName}`}</h6>

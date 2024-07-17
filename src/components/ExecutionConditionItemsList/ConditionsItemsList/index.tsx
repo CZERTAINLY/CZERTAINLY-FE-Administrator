@@ -144,9 +144,8 @@ const ConditionsItemsList = ({ conditionItems = [], conditionName, conditionUuid
                         : '';
 
             return (
-                <div className="mt-1">
+                <div key={i} className="mt-2 me-1">
                     <span
-                        key={i}
                         title={`${getEnumLabel(searchGroupEnum, condition.fieldSource)} ${label} ${getEnumLabel(
                             FilterConditionOperatorEnum,
                             condition.operator,
@@ -165,7 +164,10 @@ const ConditionsItemsList = ({ conditionItems = [], conditionName, conditionUuid
     if (isFetchingConditionDetails) return <Spinner active={isFetchingConditionDetails} />;
 
     return smallerBadges ? (
-        <div className="d-flex flex-wrap">{renderSmallerConditionsBadges}</div>
+        <div>
+            <h6 className={cx('text-muted', styles.groupConditionTitle)}>{`${conditionName}'s Condition Items`}</h6>
+            <div className="d-flex flex-wrap">{renderSmallerConditionsBadges}</div>
+        </div>
     ) : (
         <div className={styles.groupConditionContainerDiv} key={conditionUuid}>
             <h6 className={cx('text-muted', styles.groupConditionTitle)}>{`${conditionName}`}</h6>
