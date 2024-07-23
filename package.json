@@ -5,7 +5,7 @@
     "private": true,
     "dependencies": {
         "@openapitools/openapi-generator-cli": "^2.6.0",
-        "@reduxjs/toolkit": "^1.9.3",
+        "@reduxjs/toolkit": "^2.0.0",
         "@testing-library/jest-dom": "^6.0.0",
         "@testing-library/react": "^15.0.0",
         "@testing-library/user-event": "^14.4.3",
