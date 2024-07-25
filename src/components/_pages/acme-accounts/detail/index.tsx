@@ -155,14 +155,7 @@ export default function AcmeAccountDetail() {
             },
             {
                 id: 'contacts',
-                columns: [
-                    'Contacts',
-                    <>
-                        {acmeAccount.contact.map((contact) => (
-                            <div key={contact}>{contact}</div>
-                        ))}
-                    </>,
-                ],
+                columns: ['Contacts', <>{acmeAccount?.contact?.map((contact) => <div key={contact}>{contact}</div>)}</>],
             },
         ];
     }, [acmeAccount]);
