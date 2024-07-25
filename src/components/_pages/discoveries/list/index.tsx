@@ -72,7 +72,7 @@ function DiscoveryList() {
                     discovery.connectorName ? (
                         <Link to={`../connectors/detail/${discovery.connectorUuid}`}>{discovery.connectorName ?? 'Unassigned'}</Link>
                     ) : (
-                        discovery.connectorName ?? 'Unassigned'
+                        (discovery.connectorName ?? 'Unassigned')
                     ),
                     <Badge color="secondary">{discovery.kind}</Badge>,
                     <DiscoveryStatus status={discovery.status} />,
