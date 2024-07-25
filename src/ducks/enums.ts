@@ -32,7 +32,7 @@ const platformEnums = createSelector(state, (state: State) => state.platformEnum
 const platformEnum = (platformEnum: PlatformEnum) => createSelector(platformEnums, (platformEnums) => platformEnums[platformEnum]);
 
 export const getEnumLabel = (platformEnum: { [key: string]: EnumItemModel } | undefined, enumItemKey: string): string =>
-    platformEnum ? platformEnum[enumItemKey]?.label ?? enumItemKey : enumItemKey;
+    platformEnum ? (platformEnum[enumItemKey]?.label ?? enumItemKey) : enumItemKey;
 
 export const selectors = {
     state,

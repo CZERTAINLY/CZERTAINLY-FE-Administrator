@@ -153,7 +153,7 @@ export default function AcmeAccountList() {
                                 {acmeAccount.acmeProfileName ?? 'Unassigned'}
                             </Link>
                         ) : (
-                            acmeAccount.acmeProfileName ?? 'Unassigned'
+                            (acmeAccount.acmeProfileName ?? 'Unassigned')
                         ),
 
                         acmeAccount.raProfile ? (
@@ -163,7 +163,7 @@ export default function AcmeAccountList() {
                                 {acmeAccount.raProfile.name ?? 'Unassigned'}
                             </Link>
                         ) : (
-                            acmeAccount.raProfile ?? 'Unassigned'
+                            (acmeAccount.raProfile ?? 'Unassigned')
                         ),
 
                         <StatusBadge enabled={acmeAccount.enabled} />,
