@@ -1,7 +1,7 @@
 import cx from 'classnames';
 import { actions as alertActions } from 'ducks/alerts';
 import { actions as userInterfaceActions, selectors as userInterfaceSelectors } from 'ducks/user-interface';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Handle, Position } from 'reactflow';
@@ -81,8 +81,15 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
         }
     }, [flowChartNoedesState, dispatch, id, expandedHiddenNodeId, isNodeExpanded]);
 
-    const toggle = () => setIsNodeExpanded(!isNodeExpanded);
+    const expandToggle = useCallback(() => {
+        setIsNodeExpanded(!isNodeExpanded);
+    }, [isNodeExpanded]);
+
     const copyToClipboard = useCopyToClipboard();
+
+    useEffect(() => {
+        if (isNodeExpanded && data?.expandAction) data.expandAction();
+    }, [data, isNodeExpanded]);
 
     // TODO: use only for certificates not for rules
     const getStatusClasses = () => {
@@ -172,7 +179,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                                 {data.otherProperties && (
                                     <Button
                                         color="primary"
-                                        onClick={toggle}
+                                        onClick={expandToggle}
                                         className={cx(style.nodeButton, getExpandButtonStatusClasses())}
                                     >
                                         {/* <span className="mx-auto">{status}</span> */}

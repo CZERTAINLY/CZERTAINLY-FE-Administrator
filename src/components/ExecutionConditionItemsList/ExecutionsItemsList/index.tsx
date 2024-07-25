@@ -1,9 +1,10 @@
 import cx from 'classnames';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { EntityType, selectors } from 'ducks/filters';
+import { selectors as rulesSelectors } from 'ducks/rules';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { Badge } from 'reactstrap';
+import { Badge, Spinner } from 'reactstrap';
 import { AttributeContentType, FilterFieldType, PlatformEnum, SearchFieldDataDto } from 'types/openapi';
 import { ExecutionItemModel } from 'types/rules';
 import { getFormattedDate, getFormattedDateTime } from 'utils/dateUtil';
@@ -20,6 +21,14 @@ const ExecutionsItemsList = ({ executionItems = [], executionName, executionUuid
     const searchGroupEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.FilterFieldSource));
     const availableFilters = useSelector(selectors.availableFilters(EntityType.ACTIONS));
     const platformEnums = useSelector(enumSelectors.platformEnums);
+
+    const isFetchingConditionDetails = useSelector(rulesSelectors.isFetchingConditionDetails);
+    const isFetchingAvailableFiltersConditions = useSelector(selectors.isFetchingFilters(EntityType.ACTIONS));
+
+    const isLoading = useMemo(
+        () => isFetchingAvailableFiltersConditions || isFetchingConditionDetails,
+        [isFetchingAvailableFiltersConditions, isFetchingConditionDetails],
+    );
 
     const booleanOptions = useMemo(
         () => [
@@ -166,6 +175,8 @@ const ExecutionsItemsList = ({ executionItems = [], executionName, executionUuid
             );
         });
     }, [executionItems, availableFilters, searchGroupEnum, booleanOptions, platformEnums]);
+
+    if (isLoading) return <Spinner color="gray" active={isFetchingConditionDetails} />;
 
     return smallerBadges ? (
         <div>

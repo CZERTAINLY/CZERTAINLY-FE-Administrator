@@ -1,3 +1,4 @@
+import { ApiClients } from 'api';
 import cx from 'classnames';
 import ConditionsItemsList from 'components/ExecutionConditionItemsList/ConditionsItemsList';
 import ExecutionsItemsList from 'components/ExecutionConditionItemsList/ExecutionsItemsList';
@@ -7,6 +8,7 @@ import ProgressButton from 'components/ProgressButton';
 import SwitchWidget from 'components/SwitchWidget';
 import { actions as alertActions } from 'ducks/alerts';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { EntityType, actions as filterActions } from 'ducks/filters';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -560,6 +562,19 @@ export function useTransformTriggerObjectToNodesAndEdges(
                                     );
                                 },
                             },
+                            expandAction: () => {
+                                dispatch(
+                                    filterActions.getAvailableFilters({
+                                        entity: EntityType.CONDITIONS,
+                                        getAvailableFiltersApi: (apiClients: ApiClients) => {
+                                            return apiClients.resources.listResourceRuleFilterFields({
+                                                resource: triggerDetails.resource,
+                                                settable: true,
+                                            });
+                                        },
+                                    }),
+                                );
+                            },
                             otherProperties: [
                                 {
                                     propertyName: 'Condition Name',
@@ -673,6 +688,19 @@ export function useTransformTriggerObjectToNodesAndEdges(
                             entityLabel: execution.name,
                             icon: 'fa fa-cogs',
                             description: execution.description,
+                            expandAction: () => {
+                                dispatch(
+                                    filterActions.getAvailableFilters({
+                                        entity: EntityType.ACTIONS,
+                                        getAvailableFiltersApi: (apiClients: ApiClients) => {
+                                            return apiClients.resources.listResourceRuleFilterFields({
+                                                resource: triggerDetails.resource,
+                                                settable: true,
+                                            });
+                                        },
+                                    }),
+                                );
+                            },
                             deleteAction: {
                                 disableCondition: 'SingleChild',
                                 disabledMessage: 'The action must have at least one execution',

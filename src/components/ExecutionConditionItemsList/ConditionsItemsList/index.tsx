@@ -23,6 +23,13 @@ const ConditionsItemsList = ({ conditionItems = [], conditionName, conditionUuid
     const platformEnums = useSelector(enumSelectors.platformEnums);
     const isFetchingConditionDetails = useSelector(rulesSelectors.isFetchingConditionDetails);
 
+    const isFetchingAvailableFiltersConditions = useSelector(selectors.isFetchingFilters(EntityType.CONDITIONS));
+
+    const isLoading = useMemo(
+        () => isFetchingAvailableFiltersConditions || isFetchingConditionDetails,
+        [isFetchingAvailableFiltersConditions, isFetchingConditionDetails],
+    );
+
     const booleanOptions = useMemo(
         () => [
             { label: 'True', value: true },
@@ -161,7 +168,7 @@ const ConditionsItemsList = ({ conditionItems = [], conditionName, conditionUuid
         });
     }, [FilterConditionOperatorEnum, availableFilters, booleanOptions, conditionItems, platformEnums, searchGroupEnum]);
 
-    if (isFetchingConditionDetails) return <Spinner active={isFetchingConditionDetails} />;
+    if (isLoading) return <Spinner color="gray" active={isFetchingConditionDetails} />;
 
     return smallerBadges ? (
         <div>

@@ -25,6 +25,7 @@ export interface CustomNodeData {
     description?: string;
     otherProperties?: OtherProperties[];
     expandedByDefault?: boolean;
+    expandAction?: () => void;
     group?: string;
     addButtonContent?: React.ReactNode;
     formContent?: React.ReactNode;
