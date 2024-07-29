@@ -1,7 +1,4 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-    "extends": ["config:base"],
-    "postUpgradeTasks": {
-        "fileFilters": ["**/*.json", "**/*.md", "**/*.yml", "**/*.js", "**/*.ts"]
-    }
+    "extends": ["config:base"]
 }
