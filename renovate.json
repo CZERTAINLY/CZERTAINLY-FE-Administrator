@@ -1,9 +1,7 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
     "extends": ["config:base"],
-    "allowedPostUpgradeCommands": ["npx prettier --write ."],
     "postUpgradeTasks": {
-        "commands": ["npx prettier --write ."],
         "fileFilters": ["**/*.json", "**/*.md", "**/*.yml", "**/*.js", "**/*.ts"]
     }
 }
