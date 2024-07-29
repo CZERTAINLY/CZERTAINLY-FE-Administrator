@@ -307,13 +307,13 @@ export default function CertificateList({
                                     {certificate.raProfile.name ?? 'Unassigned'}
                                 </Link>
                             ) : (
-                                (certificate.raProfile ?? 'Unassigned')
+                                certificate.raProfile ?? 'Unassigned'
                             )}
                         </span>,
                         certificate?.ownerUuid ? (
                             <Link to={`../users/detail/${certificate?.ownerUuid}`}>{certificate.owner ?? 'Unassigned'}</Link>
                         ) : (
-                            (certificate.owner ?? 'Unassigned')
+                            certificate.owner ?? 'Unassigned'
                         ),
                         certificate.serialNumber || '',
                         certificate.signatureAlgorithm,

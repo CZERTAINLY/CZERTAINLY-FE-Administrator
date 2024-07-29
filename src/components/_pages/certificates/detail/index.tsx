@@ -1031,7 +1031,7 @@ export default function CertificateDetail() {
                           certificate?.ownerUuid ? (
                               <Link to={`../../users/detail/${certificate.ownerUuid}`}>{certificate.owner ?? 'Unassigned'}</Link>
                           ) : (
-                              (certificate.owner ?? 'Unassigned')
+                              certificate.owner ?? 'Unassigned'
                           ),
                           <div className="d-flex">
                               <Button

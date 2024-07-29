@@ -364,7 +364,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
     const createInput = (descriptor: DataAttributeModel | CustomAttributeModel): JSX.Element => {
         if (descriptor.contentType === AttributeContentType.Codeblock) {
             const attributes = formState.values[name.slice(0, name.indexOf('.'))];
-            const language = attributes ? (attributes[descriptor.name]?.language ?? 'javascript') : 'javascript';
+            const language = attributes ? attributes[descriptor.name]?.language ?? 'javascript' : 'javascript';
 
             return (
                 <>

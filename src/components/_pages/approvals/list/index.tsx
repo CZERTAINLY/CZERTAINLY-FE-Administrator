@@ -193,7 +193,7 @@ export default function ApprovalsList() {
                 approval.creatorUsername ? (
                     <Link to={`../users/detail/${approval.creatorUuid}`}>{approval.creatorUsername ?? 'Unassigned'}</Link>
                 ) : (
-                    (approval.creatorUsername ?? 'Unassigned')
+                    approval.creatorUsername ?? 'Unassigned'
                 ),
                 approval.resource || '',
                 approval.resourceAction || '',

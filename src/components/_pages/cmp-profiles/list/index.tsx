@@ -210,7 +210,7 @@ export default function AdministratorsList() {
                             {cmpProfile.raProfile.name ?? 'Unassigned'}
                         </Link>
                     ) : (
-                        (cmpProfile.raProfile ?? 'Unassigned')
+                        cmpProfile.raProfile ?? 'Unassigned'
                     ),
 
                     cmpProfile.cmpUrl || '',

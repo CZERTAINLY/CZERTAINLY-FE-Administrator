@@ -192,7 +192,7 @@ function RaProfileList() {
                             {raProfile.authorityInstanceName ?? 'Unassigned'}
                         </Link>
                     ) : (
-                        (raProfile.authorityInstanceName ?? 'Unassigned')
+                        raProfile.authorityInstanceName ?? 'Unassigned'
                     ),
 
                     getProtocolsForDisplay(raProfile.enabledProtocols),

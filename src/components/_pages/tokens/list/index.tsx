@@ -156,7 +156,7 @@ function TokenList() {
                     token.connectorName ? (
                         <Link to={`../connectors/detail/${token.connectorUuid}`}>{token.connectorName ?? 'Unassigned'}</Link>
                     ) : (
-                        (token.connectorName ?? 'Unassigned')
+                        token.connectorName ?? 'Unassigned'
                     ),
 
                     <Badge color="secondary">{token.kind}</Badge>,

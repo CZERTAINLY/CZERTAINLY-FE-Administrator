@@ -209,7 +209,7 @@ export default function ScepProfiles() {
                             {scepProfile.raProfile.name ?? 'Unassigned'}
                         </Link>
                     ) : (
-                        (scepProfile.raProfile ?? 'Unassigned')
+                        scepProfile.raProfile ?? 'Unassigned'
                     ),
 
                     <StatusBadge enabled={scepProfile.enabled} />,

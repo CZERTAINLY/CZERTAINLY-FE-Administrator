@@ -238,7 +238,7 @@ function TokenProfileList() {
                             {tokenProfile.tokenInstanceName ?? 'Unassigned'}
                         </Link>
                     ) : (
-                        (tokenProfile.tokenInstanceName ?? 'Unassigned')
+                        tokenProfile.tokenInstanceName ?? 'Unassigned'
                     ),
 
                     <TokenStatusBadge status={tokenProfile.tokenInstanceStatus} />,

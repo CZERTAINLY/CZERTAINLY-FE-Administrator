@@ -122,7 +122,7 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
                     color={'default'}
                     onClick={() =>
                         form.change('content', [
-                            ...(isList ? (contentValues ?? []) : []),
+                            ...(isList ? contentValues ?? [] : []),
                             { data: ContentFieldConfiguration[contentType].initial },
                         ])
                     }
