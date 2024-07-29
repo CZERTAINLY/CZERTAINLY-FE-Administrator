@@ -13,10 +13,6 @@ RUN npm ci --silent
 RUN npm install -g --silent
 # RUN npm install -g
 COPY . ./
-
-# Run Prettier to format the code
-RUN npx prettier --write .
-
 RUN npm run build
 
 # production environment
