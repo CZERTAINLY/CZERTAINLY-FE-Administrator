@@ -1,5 +1,6 @@
 import { store } from 'index';
 import { createSelector } from 'reselect';
+import { MessageModel } from 'types/alerts';
 import { createFeatureSelector } from 'utils/ducks';
 import { alertsSlice, State } from './alert-slice';
 
@@ -16,7 +17,7 @@ export const actions = alertsSlice.actions;
 
 setInterval(() => {
     const alerts = store.getState().alerts;
-    alerts.messages.forEach((message) => {
+    alerts.messages.forEach((message: MessageModel) => {
         if (Date.now() - message.time > 17000) {
             store.dispatch(actions.hide(message.id));
         }
