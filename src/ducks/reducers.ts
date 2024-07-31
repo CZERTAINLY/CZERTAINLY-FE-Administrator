@@ -1,5 +1,4 @@
 import { combineReducers } from 'redux';
-import { initialState } from './initial-state';
 
 import { slice as acmeAccountsSlice } from './acme-accounts';
 import { slice as acmeProfilesSlice } from './acme-profiles';
@@ -48,7 +47,7 @@ import { slice as utilsActuatorSlice } from './utilsActuator';
 import { slice as utilsCertificateSlice } from './utilsCertificate';
 import { slice as utilsCertificateRequestSlice } from './utilsCertificateRequest';
 import { slice as utilsOidSlice } from './utilsOid';
-export const reducers = combineReducers<typeof initialState, any>({
+export const reducers = combineReducers({
     [alertsSlice.name]: alertsSlice.reducer,
     [userInterfaceSlice.name]: userInterfaceSlice.reducer,
     [appRedirectSlice.name]: appRedirectSlice.reducer,

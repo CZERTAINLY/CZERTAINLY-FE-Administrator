@@ -58,7 +58,7 @@ function EntityList() {
                     entity.connectorName ? (
                         <Link to={`../connectors/detail/${entity.connectorUuid}`}>{entity.connectorName ?? 'Unassigned'}</Link>
                     ) : (
-                        entity.connectorName ?? 'Unassigned'
+                        (entity.connectorName ?? 'Unassigned')
                     ),
                     <Badge color="primary">{entity.kind}</Badge>,
                 ],
