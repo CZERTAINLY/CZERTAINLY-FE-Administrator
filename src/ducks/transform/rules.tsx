@@ -638,7 +638,10 @@ export function useTransformTriggerObjectToNodesAndEdges(
                     redirectUrl: `../actions/detail/${action.uuid}`,
                     icon: 'fa fa-bolt',
                     group: 'actions',
+
                     deleteAction: {
+                        disableCondition: 'SingleChild',
+                        disabledMessage: 'The Trigger must have at least one action if it is not ignored',
                         action: () => {
                             dispatch(
                                 rulesActions.updateTrigger({

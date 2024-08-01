@@ -235,13 +235,16 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                                                 switch (data.deleteAction.disableCondition) {
                                                     case 'SingleChild':
                                                         const totalSiblings = flowChartNoedesState?.filter(
-                                                            (node) => node.parentId === thisNodeState?.parentId && node.id !== id,
+                                                            (node) =>
+                                                                node.parentId === thisNodeState?.parentId &&
+                                                                node.id !== id &&
+                                                                node.parentId !== undefined,
                                                         ).length;
                                                         if (totalSiblings === 0) {
                                                             dispatch(
                                                                 alertActions.error(
                                                                     data.deleteAction.disabledMessage ||
-                                                                        'Cannot the last node of this group',
+                                                                        'Cannot delete the last node of this group',
                                                                 ),
                                                             );
                                                             return;

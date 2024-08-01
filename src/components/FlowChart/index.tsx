@@ -1,6 +1,6 @@
 import Widget from 'components/Widget';
 import dagre from 'dagre';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 
 import cx from 'classnames';
 import { actions as userInterfaceActions, selectors as userInterfaceSelectors } from 'ducks/user-interface';
@@ -189,8 +189,6 @@ const FlowChartContent = ({
     const flowChartEdgesState = useSelector(userInterfaceSelectors.flowChartEdges);
     const dispatch = useDispatch();
 
-    const [flowChartInitialised, setFlowChartInitialised] = useState(false);
-
     const onNodesChange = useCallback(
         (changes: NodeChange[]) => {
             const newNodes = applyNodeChanges(changes, flowChartNodesState ?? []);
@@ -212,9 +210,11 @@ const FlowChartContent = ({
     // const onConnect = useCallback((connection: Edge | Connection) => setEdges((eds) => addEdge(connection, eds)), [setEdges]);
 
     useEffect(() => {
-        // initial placement of nodes and edges
-        if (!flowChartNodes.length || !flowChartEdges.length || flowChartInitialised) return;
-
+        if (!flowChartNodes.length) {
+            dispatch(userInterfaceActions.clearReactFlowUI());
+            return;
+        }
+        // TODO : Implement another separate plotting function for already created flowchart
         const { nodes, edges } = getLayoutedElements(flowChartNodes, flowChartEdges, flowDirection);
 
         dispatch(
@@ -224,8 +224,7 @@ const FlowChartContent = ({
                 flowDirection,
             }),
         );
-        setFlowChartInitialised(true);
-    }, [flowChartEdges, flowChartNodes, flowDirection, dispatch, flowChartInitialised]);
+    }, [flowChartEdges, flowChartNodes, flowDirection, dispatch]);
 
     return (
         <Widget className={style.flowWidget} busy={busy}>
