@@ -402,8 +402,7 @@ export function useTransformTriggerObjectToNodesAndEdges(
                         checked={triggerDetails.ignoreTrigger}
                         onClick={() => {
                             if (triggerDetails?.ignoreTrigger) {
-                                dispatch(alertActions.info('Please add actions from the actions node'));
-                                // triggerHighlight();
+                                dispatch(alertActions.info('Please add actions from the Add Actions dropdown'));
                             } else {
                                 dispatch(
                                     rulesActions.updateTrigger({
