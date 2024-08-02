@@ -569,7 +569,6 @@ export function useTransformTriggerObjectToNodesAndEdges(
                                         getAvailableFiltersApi: (apiClients: ApiClients) => {
                                             return apiClients.resources.listResourceRuleFilterFields({
                                                 resource: triggerDetails.resource,
-                                                settable: true,
                                             });
                                         },
                                     }),
