@@ -18,8 +18,12 @@ export const nodes: CustomNode[] = [
             entityLabel: 'demo.3key.test',
             icon: 'fa fa-certificate',
             isMainNode: true,
-            certificateNodeStatus: CertificateState.Issued,
-            certificateNodeValidationStatus: CertificateValidationStatus.Valid,
+            certificateNodeData: {
+                certificateNodeStatus: CertificateState.Issued,
+                certificateNodeValidationStatus: CertificateValidationStatus.Valid,
+            },
+            // certificateNodeStatus: CertificateState.Issued,
+            // certificateNodeValidationStatus: CertificateValidationStatus.Valid,
             description: 'This is a description',
             otherProperties: [
                 {

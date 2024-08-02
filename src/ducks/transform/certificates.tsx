@@ -1,4 +1,4 @@
-import { CustomNode, nodeHeight, nodeWidth } from 'components/FlowChart';
+import { CustomNode } from 'components/FlowChart';
 import CertificateStatus from 'components/_pages/certificates/CertificateStatus';
 import { Edge, MarkerType } from 'reactflow';
 import {
@@ -249,15 +249,17 @@ export function transformCertifacetObjectToNodesAndEdges(
         id: '1',
         type: 'customFlowNode',
         position: { x: 0, y: 0 },
-        width: nodeWidth,
-        height: nodeHeight,
+        // width: nodeWidth,
+        // height: nodeHeight,
         data: {
             customNodeCardTitle: 'Current Certificate',
             entityLabel: certificate.commonName,
             icon: 'fa fa-certificate',
             isMainNode: true,
-            certificateNodeStatus: certificate.state,
-            certificateNodeValidationStatus: certificate.validationStatus,
+            certificateNodeData: {
+                certificateNodeStatus: certificate.state,
+                certificateNodeValidationStatus: certificate.validationStatus,
+            },
             otherProperties: otherPropertiesCurrentCertificate,
         },
     });
@@ -319,16 +321,18 @@ export function transformCertifacetObjectToNodesAndEdges(
                 id: `chain-${index}`,
                 type: 'customFlowNode',
                 position: { x: 0, y: 0 },
-                width: nodeWidth,
-                height: nodeHeight,
+                // width: nodeWidth,
+                // height: nodeHeight,
                 data: {
                     customNodeCardTitle: chainLength - 1 === index && certificateChain?.completeChain ? `Root CA` : `Intermediate CA`,
                     redirectUrl: chain?.uuid ? `/certificates/detail/${chain.uuid}` : undefined,
                     entityLabel: chain.commonName,
                     icon: chainLength - 1 === index && certificateChain?.completeChain ? 'fa fa-medal' : 'fa fa-certificate',
-                    isMainNode: true,
-                    certificateNodeStatus: chain.state,
-                    certificateNodeValidationStatus: chain.validationStatus,
+                    // isMainNode: true,
+                    certificateNodeData: {
+                        certificateNodeStatus: chain.state,
+                        certificateNodeValidationStatus: chain.validationStatus,
+                    },
                     otherProperties: otherProperties,
                 },
             });
@@ -372,8 +376,8 @@ export function transformCertifacetObjectToNodesAndEdges(
                 id: '2',
                 type: 'customFlowNode',
                 position: { x: 0, y: 0 },
-                width: nodeWidth,
-                height: nodeHeight,
+                // width: nodeWidth,
+                // height: nodeHeight,
                 data: {
                     customNodeCardTitle: 'Owner',
                     icon: 'fa fa fa-user',
@@ -415,8 +419,8 @@ export function transformCertifacetObjectToNodesAndEdges(
             id: '4',
             type: 'customFlowNode',
             position: { x: 0, y: 0 },
-            width: nodeWidth,
-            height: nodeHeight,
+            // width: nodeWidth,
+            // height: nodeHeight,
             data: {
                 customNodeCardTitle: 'Key',
                 entityLabel: certificate?.key?.name || '',
@@ -444,8 +448,8 @@ export function transformCertifacetObjectToNodesAndEdges(
                 id: '3',
                 type: 'customFlowNode',
                 position: { x: 0, y: 0 },
-                width: nodeWidth,
-                height: nodeHeight,
+                // width: nodeWidth,
+                // height: nodeHeight,
                 data: {
                     customNodeCardTitle: 'Group',
                     description: group?.description || '',
@@ -478,8 +482,8 @@ export function transformCertifacetObjectToNodesAndEdges(
             id: '5',
             type: 'customFlowNode',
             position: { x: 0, y: 0 },
-            width: nodeWidth,
-            height: nodeHeight,
+            // width: nodeWidth,
+            // height: nodeHeight,
             data: {
                 customNodeCardTitle: 'RA Profile',
                 icon: 'fa fa fa-address-card',
@@ -504,8 +508,8 @@ export function transformCertifacetObjectToNodesAndEdges(
                 id: '7',
                 type: 'customFlowNode',
                 position: { x: 0, y: 0 },
-                width: nodeWidth,
-                height: nodeHeight,
+                // width: nodeWidth,
+                // height: nodeHeight,
                 data: {
                     customNodeCardTitle: 'Authority',
                     icon: 'fa fa fa-stamp',
@@ -553,8 +557,8 @@ export function transformCertifacetObjectToNodesAndEdges(
                 id: location?.uuid || '',
                 type: 'customFlowNode',
                 position: { x: 0, y: 0 },
-                width: nodeWidth,
-                height: nodeHeight,
+                // width: nodeWidth,
+                // height: nodeHeight,
                 data: {
                     customNodeCardTitle: 'Location',
                     icon: 'fa fa fa-map-marker',

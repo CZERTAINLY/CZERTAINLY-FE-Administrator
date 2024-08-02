@@ -1,7 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { CustomNode } from 'components/FlowChart';
+import { Edge } from 'reactflow';
 import { createSelector } from 'reselect';
 import { AjaxError } from 'rxjs/ajax';
-import { GlobalModalModel, LockWidgetNameEnum, WidgetLockErrorModel, WidgetLockModel } from 'types/user-interface';
+import { GlobalModalModel, LockWidgetNameEnum, ReactFlowUI, WidgetLockErrorModel, WidgetLockModel } from 'types/user-interface';
 import { createFeatureSelector } from 'utils/ducks';
 import { getLockWidgetObject } from 'utils/net';
 
@@ -12,6 +14,7 @@ export type State = {
     attributeCallbackValue?: string;
     initiateFormCallback?: boolean;
     formCallbackValue?: string;
+    reactFlowUI?: ReactFlowUI;
 };
 
 export const initialState: State = {
@@ -113,6 +116,44 @@ export const slice = createSlice({
         clearFormCallbackValue: (state) => {
             state.formCallbackValue = undefined;
         },
+
+        setReactFlowUI: (state, action: PayloadAction<ReactFlowUI>) => {
+            state.reactFlowUI = action.payload;
+        },
+
+        clearReactFlowUI: (state) => {
+            state.reactFlowUI = undefined;
+        },
+
+        updateReactFlowNodes: (state, action: PayloadAction<CustomNode[]>) => {
+            if (state.reactFlowUI) {
+                state.reactFlowUI.flowChartNodes = action.payload;
+            }
+        },
+
+        updateReactFlowEdges: (state, action: PayloadAction<Edge[]>) => {
+            if (state.reactFlowUI) {
+                state.reactFlowUI.flowChartEdges = action.payload;
+            }
+        },
+
+        deleteNode: (state, action: PayloadAction<string>) => {
+            if (state.reactFlowUI) {
+                state.reactFlowUI.flowChartNodes = state.reactFlowUI.flowChartNodes.filter((node) => node.id !== action.payload);
+            }
+        },
+        setShowHiddenNodes: (state, action: PayloadAction<string | undefined>) => {
+            if (state.reactFlowUI) {
+                state.reactFlowUI.expandedHiddenNodeId = action.payload;
+            }
+        },
+
+        insertReactFlowFormNode: (state, action: PayloadAction<CustomNode>) => {
+            const noPresentFormNode = state.reactFlowUI?.flowChartNodes?.some((node) => node.id === 'ReactFlowFormNode');
+            if (action.payload.id === 'ReactFlowFormNode' && !noPresentFormNode) {
+                state.reactFlowUI?.flowChartNodes.push(action.payload);
+            }
+        },
     },
 });
 
@@ -124,6 +165,10 @@ const selectInitiateAttributeCallback = createSelector(selectState, (state) => s
 const selectAttributeCallbackValue = createSelector(selectState, (state) => state.attributeCallbackValue);
 const selectCallbackValue = createSelector(selectState, (state) => state.formCallbackValue);
 const selectInitiateFormCallback = createSelector(selectState, (state) => state.initiateFormCallback);
+const reactFlowUI = createSelector(selectState, (state) => state.reactFlowUI);
+const flowChartNodes = createSelector(reactFlowUI, (state) => state?.flowChartNodes);
+const flowChartEdges = createSelector(reactFlowUI, (state) => state?.flowChartEdges);
+const expandedHiddenNodeId = createSelector(reactFlowUI, (state) => state?.expandedHiddenNodeId);
 
 export const selectors = {
     selectState,
@@ -133,6 +178,10 @@ export const selectors = {
     selectAttributeCallbackValue,
     selectCallbackValue,
     selectInitiateFormCallback,
+    reactFlowUI,
+    flowChartNodes,
+    flowChartEdges,
+    expandedHiddenNodeId,
 };
 
 export const actions = slice.actions;
