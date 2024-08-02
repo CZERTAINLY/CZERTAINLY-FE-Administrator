@@ -350,8 +350,9 @@ export function useTransformTriggerObjectToNodesAndEdges(
                 </div>
                 <div className="flex">
                     <ProgressButton
-                        title={'Update'}
+                        title="Update"
                         inProgress={isUpdatingTrigger}
+                        disabled={isUpdatingTrigger || (!newActions.length && !newRules.length)}
                         onClick={() => {
                             if (!triggerDetails) return;
                             const newActionsUuids = newActions.map((newAction) => newAction.value);
@@ -369,7 +370,7 @@ export function useTransformTriggerObjectToNodesAndEdges(
                                     trigger: {
                                         actionsUuids: allActionsUuids,
                                         rulesUuids: allRulesUuids,
-                                        ignoreTrigger: false,
+                                        ignoreTrigger: allActionsUuids.length === 0 ? true : false,
                                         resource: triggerDetails.resource,
                                         type: triggerDetails.type,
                                         eventResource: triggerDetails.eventResource,
