@@ -4,6 +4,7 @@ import { marked } from 'marked';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Field, useForm, useFormState } from 'react-final-form';
 
+import { actions as alertActions } from 'ducks/alerts';
 import Select from 'react-select';
 import Editor from 'react-simple-code-editor';
 
@@ -43,6 +44,24 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
     const attributeCallbackValue = useSelector(userInterfaceSelectors.selectAttributeCallbackValue);
     const initiateAttributeCallback = useSelector(userInterfaceSelectors.selectInitiateAttributeCallback);
     const dispatch = useDispatch();
+    const [infoElement, setInfoElement] = useState<string>('');
+
+    useEffect(() => {
+        const parseMarked = async () => {
+            try {
+                if (descriptor && isDataAttributeModel(descriptor)) {
+                    const content = await marked.parse(getAttributeContent(descriptor.contentType, descriptor.content).toString());
+                    return content;
+                }
+            } catch (error) {
+                dispatch(alertActions.error('An error occurred while parsing data'));
+            }
+        };
+
+        parseMarked().then((contentData) => {
+            if (contentData) setInfoElement(contentData);
+        });
+    }, [dispatch, descriptor]);
 
     useEffect(() => {
         if (descriptor?.name) {
@@ -475,9 +494,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
         return (
             <Card color="default">
                 <CardHeader>{descriptor.properties.label}</CardHeader>
-                <CardBody>
-                    {parse(DOMPurify.sanitize(marked.parse(getAttributeContent(descriptor.contentType, descriptor.content).toString())))}
-                </CardBody>
+                <CardBody>{parse(DOMPurify.sanitize(infoElement))}</CardBody>
             </Card>
         );
     };
