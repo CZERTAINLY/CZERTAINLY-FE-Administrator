@@ -6,11 +6,9 @@
     "dependencies": {
         "@openapitools/openapi-generator-cli": "^2.6.0",
         "@reduxjs/toolkit": "^2.0.0",
-        "@testing-library/jest-dom": "^6.0.0",
         "@types/dagre": "^0.7.48",
         "@types/dompurify": "^3.0.0",
         "@types/file-saver": "^2.0.5",
-        "@types/jest": "^29.5.0",
         "@types/lodash.debounce": "^4.0.7",
         "@types/marked": "^6.0.0",
         "@types/node": "^20.0.0",
