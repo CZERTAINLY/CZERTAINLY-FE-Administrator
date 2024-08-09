@@ -14,6 +14,7 @@ import { Link, useParams } from 'react-router-dom';
 import { Col, Container, Label, Row } from 'reactstrap';
 
 import CustomAttributeWidget from 'components/Attributes/CustomAttributeWidget';
+import TabLayout from 'components/Layout/TabLayout';
 import { actions as rulesActions, selectors as ruleSelectors } from 'ducks/rules';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { dateFormatter } from 'utils/dateUtil';
@@ -224,70 +225,94 @@ export default function DiscoveryDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                <Col>
-                    <Widget
-                        title="Certificate Discovery Details"
-                        busy={isBusy}
-                        widgetButtons={buttons}
-                        titleSize="large"
-                        refreshAction={getFreshDiscoveryDetails}
-                        widgetLockName={LockWidgetNameEnum.DiscoveryDetails}
-                    >
-                        <br />
+            <TabLayout
+                tabs={[
+                    {
+                        title: 'Details',
+                        content: (
+                            <Widget>
+                                <Row xs="1" sm="1" md="2" lg="2" xl="2">
+                                    <Col>
+                                        <Widget
+                                            title="Certificate Discovery Details"
+                                            busy={isBusy}
+                                            widgetButtons={buttons}
+                                            titleSize="large"
+                                            refreshAction={getFreshDiscoveryDetails}
+                                            widgetLockName={LockWidgetNameEnum.DiscoveryDetails}
+                                        >
+                                            <br />
 
-                        <CustomTable headers={detailHeaders} data={detailData} />
-                    </Widget>
-                </Col>
-                <Col>
-                    <Widget title="Attributes" titleSize="large">
-                        <br />
-                        <Label>Discovery Attributes</Label>
-                        <AttributeViewer attributes={discovery?.attributes} />
-                    </Widget>
-                </Col>
-            </Row>
+                                            <CustomTable headers={detailHeaders} data={detailData} />
+                                        </Widget>
+                                    </Col>
 
-            <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                <Col>
-                    {discovery && (
-                        <CustomAttributeWidget
-                            resource={Resource.Discoveries}
-                            resourceUuid={discovery.uuid}
-                            attributes={discovery.customAttributes}
-                        />
-                    )}
-                </Col>
-                <Col>
-                    <Widget title="Metadata" titleSize="large">
-                        <br />
-                        <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={discovery?.metadata} />
-                    </Widget>
-                </Col>
-            </Row>
+                                    <Col>
+                                        <Widget title="Metadata" titleSize="large">
+                                            <br />
+                                            <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={discovery?.metadata} />
+                                        </Widget>
+                                    </Col>
+                                </Row>
 
-            <Row>
-                <Col md={triggerHistorySummary?.associationObjectUuid !== id ? '12' : '8'}>
-                    <Widget title="Assigned Triggers" busy={isBusy} titleSize="large" widgetLockName={LockWidgetNameEnum.DiscoveryDetails}>
-                        <CustomTable headers={triggerHeaders} data={triggerTableData} />
-                    </Widget>
-                </Col>
+                                <Row>
+                                    <Col md={triggerHistorySummary?.associationObjectUuid !== id ? '12' : '8'}>
+                                        <Widget
+                                            title="Assigned Triggers"
+                                            busy={isBusy}
+                                            titleSize="large"
+                                            widgetLockName={LockWidgetNameEnum.DiscoveryDetails}
+                                        >
+                                            <CustomTable headers={triggerHeaders} data={triggerTableData} />
+                                        </Widget>
+                                    </Col>
 
-                {triggerHistorySummary?.associationObjectUuid === id && (
-                    <Col md="4">
-                        <Widget
-                            title="Triggers summary"
-                            titleSize="large"
-                            busy={isFetchingTriggerSummary}
-                            refreshAction={getFreshTriggerHistorySummary}
-                        >
-                            <CustomTable headers={detailHeaders} data={triggersSummary} />
-                        </Widget>
-                    </Col>
-                )}
-            </Row>
-            {discovery?.uuid && <DiscoveryCertificates id={discovery.uuid} triggerHistorySummary={triggerHistorySummary} />}
-
+                                    {triggerHistorySummary?.associationObjectUuid === id && (
+                                        <Col md="4">
+                                            <Widget
+                                                title="Triggers summary"
+                                                titleSize="large"
+                                                busy={isFetchingTriggerSummary}
+                                                refreshAction={getFreshTriggerHistorySummary}
+                                            >
+                                                <CustomTable headers={detailHeaders} data={triggersSummary} />
+                                            </Widget>
+                                        </Col>
+                                    )}
+                                </Row>
+                                {discovery?.uuid && (
+                                    <DiscoveryCertificates id={discovery.uuid} triggerHistorySummary={triggerHistorySummary} />
+                                )}
+                            </Widget>
+                        ),
+                    },
+                    {
+                        title: 'Attributes',
+                        content: (
+                            <Widget>
+                                <Row xs="1" sm="1" md="2" lg="2" xl="2">
+                                    <Col>
+                                        <Widget title="Attributes" titleSize="large">
+                                            <br />
+                                            <Label>Discovery Attributes</Label>
+                                            <AttributeViewer attributes={discovery?.attributes} />
+                                        </Widget>
+                                    </Col>
+                                    <Col>
+                                        {discovery && (
+                                            <CustomAttributeWidget
+                                                resource={Resource.Discoveries}
+                                                resourceUuid={discovery.uuid}
+                                                attributes={discovery.customAttributes}
+                                            />
+                                        )}
+                                    </Col>
+                                </Row>
+                            </Widget>
+                        ),
+                    },
+                ]}
+            />
             <Dialog
                 isOpen={confirmDelete}
                 caption="Delete Certification Discovery"
