@@ -20,7 +20,7 @@ For more information, please refer to the [CZERTAINLY documentation](https://doc
 
 ### Generating API Types
 
-This section provides a guide on how to generate TypeScript DTOs from the OpenAPI specification, including some required customizations
+This section provides a guide on how to generate typeScript tlasses for DTOs and APIs from the OpenAPI specification, including some required customizations
 
 ##### Step 1: Generate TypeScript Data Transfer Objects (DTOs)
 
@@ -29,6 +29,34 @@ To generate TypeScript Data Transfer Objects (DTOs) from the OpenAPI specificati
 ```sh
 npm run generate-types
 ```
+
+#### Step 2: Fix Type Errors in Generated Code
+
+Sometimes, you may encounter type errors in the generated code, such as:
+
+```sh
+Type 'PaginationRequestDto' is not assignable to type 'string | number | boolean | (string | number | boolean)[]'.ts(2322)
+(property) 'paginationRequestDto': PaginationRequestDto
+```
+
+Original generated code:
+
+```sh
+const query: HttpQuery = { // required parameters are used directly since they are already checked by throwIfNullOrUndefined
+    'paginationRequestDto': paginationRequestDto,
+};
+```
+
+Updated code to fix the type error:
+
+```sh
+const query: HttpQuery = {};
+if (paginationRequestDto != null) {
+    Object.assign(query, paginationRequestDto);
+}
+```
+
+This change ensures that paginationRequestDto is only assigned to query if it is not null or undefined, avoiding the type error.
 
 ## Docker container
 
