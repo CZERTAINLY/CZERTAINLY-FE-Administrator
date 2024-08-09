@@ -61,6 +61,10 @@ import ScepProfileEdit from './_pages/scep-profiles/form';
 
 import ScepProfilesList from './_pages/scep-profiles/list';
 
+import CmpProfileDetails from './_pages/cmp-profiles/details';
+import CmpProfileEdit from './_pages/cmp-profiles/form';
+import CmpProfilesList from './_pages/cmp-profiles/list';
+
 import GlobalMetadataList from './_pages/global-metadata/list';
 import GroupDetail from './_pages/group/detail';
 import GroupEdit from './_pages/group/form';
@@ -241,6 +245,15 @@ export default function AppRouter() {
                     <Route path={`/${Resource.ScepProfiles.toLowerCase()}/detail/:id`} element={<ScepProfileDetail />} />
                     <Route path={`/${Resource.ScepProfiles.toLowerCase()}/edit/:id`} element={<ScepProfileEdit />} />
                     <Route path={`/${Resource.ScepProfiles.toLowerCase()}/add`} element={<ScepProfileEdit />} />
+
+                    <Route path={`/${Resource.CmpProfiles.toLowerCase()}`} element={<CmpProfilesList />} />
+                    <Route
+                        path={`/${Resource.CmpProfiles.toLowerCase()}/list`}
+                        element={<Navigate to={`/${Resource.CmpProfiles.toLowerCase()}`} />}
+                    />
+                    <Route path={`/${Resource.CmpProfiles.toLowerCase()}/detail/:id`} element={<CmpProfileDetails />} />
+                    <Route path={`/${Resource.CmpProfiles.toLowerCase()}/edit/:id`} element={<CmpProfileEdit />} />
+                    <Route path={`/${Resource.CmpProfiles.toLowerCase()}/add`} element={<CmpProfileEdit />} />
 
                     <Route path={`/${Resource.Groups.toLowerCase()}`} element={<GroupList />} />
                     <Route

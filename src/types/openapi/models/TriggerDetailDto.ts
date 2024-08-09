@@ -12,9 +12,9 @@
  */
 
 import type {
-    ActionDto,
+    ActionDetailDto,
     Resource,
-    RuleDto,
+    RuleDetailDto,
     TriggerType,
 } from './';
 
@@ -70,16 +70,16 @@ export interface TriggerDetailDto {
     eventResource?: Resource;
     /**
      * List of Rules in the Rule Trigger
-     * @type {Array<RuleDto>}
+     * @type {Array<RuleDetailDto>}
      * @memberof TriggerDetailDto
      */
-    rules: Array<RuleDto>;
+    rules: Array<RuleDetailDto>;
     /**
      * List of Action Groups in the Rule Trigger
-     * @type {Array<ActionDto>}
+     * @type {Array<ActionDetailDto>}
      * @memberof TriggerDetailDto
      */
-    actions: Array<ActionDto>;
+    actions: Array<ActionDetailDto>;
 }
 
 /**

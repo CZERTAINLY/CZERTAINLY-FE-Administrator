@@ -18,6 +18,7 @@ import type {
 } from './';
 
 /**
+ * List of executions
  * @export
  * @interface ExecutionDto
  */

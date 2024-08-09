@@ -16,7 +16,7 @@ COPY . ./
 RUN npm run build
 
 # production environment
-FROM nginxinc/nginx-unprivileged:1.25.4-alpine
+FROM nginxinc/nginx-unprivileged:1.27.0-alpine
 
 WORKDIR /usr/share/nginx/html
 

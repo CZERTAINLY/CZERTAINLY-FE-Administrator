@@ -1,4 +1,6 @@
 import CredentialForm from 'components/_pages/credentials/form';
+import { CustomNode, LegendItem } from 'components/FlowChart';
+import { Edge } from 'reactflow';
 
 export enum LockTypeEnum {
     GENERIC,
@@ -67,7 +69,9 @@ export enum LockWidgetNameEnum {
     ListOfACMEAccounts,
     ACMEAccountDetails,
     ListOfACMEProfiles,
+    ListOfCMPProfiles,
     ACMEProfileDetails,
+    CMPProfileDetails,
     ListOfSCEPProfiles,
     SCEPProfileDetails,
     PlatformSettings,
@@ -115,6 +119,14 @@ export interface GlobalModalModel {
 export interface AddNewAttributeType {
     name: string;
     content: JSX.Element;
+}
+
+export interface ReactFlowUI {
+    flowChartNodes: CustomNode[];
+    flowChartEdges: Edge[];
+    flowDirection?: 'TB' | 'BT' | 'LR' | 'RL' | 'STAR';
+    legends?: LegendItem[];
+    expandedHiddenNodeId?: string;
 }
 
 export const AddNewAttributeList: AddNewAttributeType[] = [

@@ -115,7 +115,7 @@ function CredentialList() {
                     credential.connectorName ? (
                         <Link to={`../connectors/detail/${credential.connectorUuid}`}>{credential.connectorName ?? 'Unassigned'}</Link>
                     ) : (
-                        credential.connectorName ?? 'Unassigned'
+                        (credential.connectorName ?? 'Unassigned')
                     ),
                 ],
             })),

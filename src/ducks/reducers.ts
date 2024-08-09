@@ -1,8 +1,8 @@
 import { combineReducers } from 'redux';
-import { initialState } from './initial-state';
 
 import { slice as acmeAccountsSlice } from './acme-accounts';
 import { slice as acmeProfilesSlice } from './acme-profiles';
+import { slice as cmpProfilesSlice } from './cmp-profiles';
 import { slice as scepProfilesSlice } from './scep-profiles';
 
 import { alertsSlice } from './alert-slice';
@@ -47,7 +47,7 @@ import { slice as utilsActuatorSlice } from './utilsActuator';
 import { slice as utilsCertificateSlice } from './utilsCertificate';
 import { slice as utilsCertificateRequestSlice } from './utilsCertificateRequest';
 import { slice as utilsOidSlice } from './utilsOid';
-export const reducers = combineReducers<typeof initialState, any>({
+export const reducers = combineReducers({
     [alertsSlice.name]: alertsSlice.reducer,
     [userInterfaceSlice.name]: userInterfaceSlice.reducer,
     [appRedirectSlice.name]: appRedirectSlice.reducer,
@@ -67,6 +67,7 @@ export const reducers = combineReducers<typeof initialState, any>({
     [acmeAccountsSlice.name]: acmeAccountsSlice.reducer,
     [acmeProfilesSlice.name]: acmeProfilesSlice.reducer,
     [scepProfilesSlice.name]: scepProfilesSlice.reducer,
+    [cmpProfilesSlice.name]: cmpProfilesSlice.reducer,
     [initialComplianceProfilesSlice.name]: initialComplianceProfilesSlice.reducer,
     [initialCredentialsSlice.name]: initialCredentialsSlice.reducer,
     [initialEntitiesSlice.name]: initialEntitiesSlice.reducer,

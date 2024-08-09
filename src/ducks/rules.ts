@@ -381,7 +381,7 @@ export const slice = createSlice({
             state.isUpdatingExecution = false;
         },
 
-        updateAction: (state, action: PayloadAction<{ actionUuid: string; action: UpdateActionRequestModel }>) => {
+        updateAction: (state, action: PayloadAction<{ actionUuid: string; action: UpdateActionRequestModel; noRedirect?: boolean }>) => {
             state.isUpdatingAction = true;
         },
 
@@ -421,7 +421,7 @@ export const slice = createSlice({
             state.isUpdatingCondition = false;
         },
 
-        updateRule: (state, action: PayloadAction<{ ruleUuid: string; rule: UpdateRuleRequestModel }>) => {
+        updateRule: (state, action: PayloadAction<{ ruleUuid: string; rule: UpdateRuleRequestModel; noRedirect?: boolean }>) => {
             state.isUpdatingRule = true;
         },
         updateRuleSuccess: (state, action: PayloadAction<{ rule: RuleDetailModel }>) => {

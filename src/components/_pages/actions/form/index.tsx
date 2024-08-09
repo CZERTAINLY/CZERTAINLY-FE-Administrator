@@ -152,6 +152,7 @@ const ActionsForm = () => {
                                     <Label for="resource">Resource</Label>
 
                                     <Select
+                                        className="nodrag"
                                         {...input}
                                         maxMenuHeight={140}
                                         menuPlacement="auto"
@@ -193,6 +194,7 @@ const ActionsForm = () => {
                                     <Label for="description">Executions</Label>
 
                                     <Select
+                                        className="nodrag"
                                         isDisabled={values.resource === Resource.None || !values.resource}
                                         {...input}
                                         options={executionsOptions}

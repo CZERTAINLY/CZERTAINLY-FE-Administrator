@@ -20,3 +20,18 @@
     margin-bottom: 10px;
     display: flex;
 }
+
+.groupSmallerBadge {
+    max-width: 100%;
+    white-space: normal;
+    font-size: 10.25px;
+    word-wrap: break-word;
+    flex-grow: 1; // Allow the item to grow to fill available space
+    flex-shrink: 1; // Allow the item to shrink if necessary
+    flex-basis: auto; //
+    background-color: #6c757d !important;
+    padding: 5px;
+    color: white;
+    border-radius: 10px;
+    // border-radius: 5px;
+}
