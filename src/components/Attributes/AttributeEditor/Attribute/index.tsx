@@ -476,7 +476,11 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
             <Card color="default">
                 <CardHeader>{descriptor.properties.label}</CardHeader>
                 <CardBody>
-                    {parse(DOMPurify.sanitize(marked.parse(getAttributeContent(descriptor.contentType, descriptor.content).toString())))}
+                    {parse(
+                        DOMPurify.sanitize(
+                            marked.parse(getAttributeContent(descriptor.contentType, descriptor.content).toString()) as string,
+                        ),
+                    )}
                 </CardBody>
             </Card>
         );
