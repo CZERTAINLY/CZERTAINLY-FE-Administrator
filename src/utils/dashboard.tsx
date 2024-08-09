@@ -80,14 +80,14 @@ export function getCertificateDonutChartColors(certificateStatByStatus?: { [key:
     return updatedColorObject;
 }
 
-const colorMap: { [key: string]: string } = {
+const colorMapByDaysOfExpiration: { [key: string]: string } = {
     '10': '#632828',
     '20': '#9c0012',
     '30': '#f37d63',
     '60': '#7fa2c1',
     '90': '#008ffb',
     More: '#1ab394',
-    expired: '#eb3349',
+    Expired: '#eb3349',
 };
 
 type CertificatesByExpirationDays = {
@@ -101,5 +101,9 @@ export function getCertificateDonutChartColorsByDaysOfExpiration(
         return undefined;
     }
 
-    return { colors: Object.keys(certificateStatByExpirationDays).map((key) => colorMap[key]) };
+    const getColorByDaysOfExpiration = (certificateStatByExpirationDay: string) => {
+        return colorMapByDaysOfExpiration[certificateStatByExpirationDay];
+    };
+
+    return { colors: Object.keys(certificateStatByExpirationDays).map((key) => getColorByDaysOfExpiration(key)) };
 }
