@@ -668,34 +668,6 @@ export default function FilterWidgetRuleAction({
                             .find((a) => a.filterFieldSource === f.fieldSource)
                             ?.searchFieldData?.find((s) => s.fieldIdentifier === f.fieldIdentifier);
                         const label = field ? field.fieldLabel : f.fieldIdentifier;
-                        // const value =
-                        //     field && field.type === FilterFieldType.Boolean
-                        //         ? `'${booleanOptions.find((b) => !!f.data === b.value)?.label}'`
-                        //         : Array.isArray(f.data)
-                        //           ? `${f.data
-                        //                 .map(
-                        //                     (v) =>
-                        //                         `'${
-                        //                             field?.platformEnum
-                        //                                 ? platformEnums[field.platformEnum][v]?.label
-                        //                                 : v?.name
-                        //                                   ? v.name
-                        //                                   : field && checkIfFieldIsDate(field)
-                        //                                     ? v?.label
-                        //                                         ? getFormattedDateTime(v.label)
-                        //                                         : getFormattedDateTime(v)
-                        //                                     : v
-                        //                         }'`,
-                        //                 )
-                        //                 .join(', ')}`
-                        //           : f.data
-                        //             ? `'${
-                        //                   field?.platformEnum
-                        //                       ? platformEnums[field.platformEnum][f.data as unknown as string]?.label
-                        //                       : f.data
-                        //               }'`
-                        //             : '';
-
                         const value =
                             field && field.type === FilterFieldType.Boolean
                                 ? `'${booleanOptions.find((b) => !!f.data === b.value)?.label}'`

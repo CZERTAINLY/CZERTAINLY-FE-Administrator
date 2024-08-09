@@ -6,6 +6,7 @@ import {
     AuditLogApi,
     AuthenticationManagementApi,
     AuthorityManagementApi,
+    CMPProfileManagementApi,
     CallbackApi,
     CertificateInventoryApi,
     CertificateKeyGroupApi,
@@ -71,6 +72,7 @@ export interface ApiClients {
     acmeAccounts: ACMEAccountManagementApi;
     acmeProfiles: ACMEProfileManagementApi;
     scepProfiles: SCEPProfileManagementApi;
+    cmpProfiles: CMPProfileManagementApi;
     certificateGroups: CertificateKeyGroupApi;
     clientOperations: ClientOperationsV2Api;
     discoveries: DiscoveryManagementApi;
@@ -116,6 +118,7 @@ export const backendClient: ApiClients = {
     acmeAccounts: new ACMEAccountManagementApi(configuration),
     acmeProfiles: new ACMEProfileManagementApi(configuration),
     scepProfiles: new SCEPProfileManagementApi(configuration),
+    cmpProfiles: new CMPProfileManagementApi(configuration),
     certificateGroups: new CertificateKeyGroupApi(configuration),
     clientOperations: new ClientOperationsV2Api(configuration),
     discoveries: new DiscoveryManagementApi(configuration),

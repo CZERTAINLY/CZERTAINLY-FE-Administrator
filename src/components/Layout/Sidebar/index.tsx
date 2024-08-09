@@ -50,6 +50,7 @@ export default function Sidebar() {
                         childrenLinks={[
                             { _key: '/acmeaccounts', name: 'ACME Accounts', link: '/acmeaccounts' },
                             { _key: '/acmeprofiles', name: 'ACME Profiles', link: '/acmeprofiles' },
+                            { _key: '/cmpprofiles', name: 'CMP Profiles', link: '/cmpprofiles' },
                             { _key: '/scepprofiles', name: 'SCEP Profiles', link: '/scepprofiles' },
                         ]}
                     />

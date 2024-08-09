@@ -1,5 +1,5 @@
-import { configureStore } from '@reduxjs/toolkit';
-import { AnyAction, applyMiddleware, compose } from 'redux';
+import { configureStore, Middleware } from '@reduxjs/toolkit';
+import { AnyAction } from 'redux';
 import { createEpicMiddleware } from 'redux-observable';
 
 import { backendClient } from './api';
@@ -14,16 +14,12 @@ export default function configure() {
         },
     });
 
-    const composeEnhancers = compose();
-    const enhancer = composeEnhancers(applyMiddleware(epicMiddleware));
-
     const store = configureStore({
         reducer: reducers,
-        enhancers: [enhancer],
         middleware: (getDefaultMiddleware) =>
             getDefaultMiddleware({
                 serializableCheck: false, // disable immutability checks because of date => should be refactored and date should not be stored in state
-            }),
+            }).concat(epicMiddleware as Middleware),
         preloadedState: initialState,
     });
 

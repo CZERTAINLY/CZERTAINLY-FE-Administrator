@@ -17,6 +17,7 @@ import type {
 } from './';
 
 /**
+ * List of Action Groups in the Rule Trigger
  * @export
  * @interface ActionDetailDto
  */

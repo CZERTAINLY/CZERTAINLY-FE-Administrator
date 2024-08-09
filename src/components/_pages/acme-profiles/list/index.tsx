@@ -201,7 +201,7 @@ export default function AdministratorsList() {
                             {acmeProfile.raProfile.name ?? 'Unassigned'}
                         </Link>
                     ) : (
-                        acmeProfile.raProfile ?? 'Unassigned'
+                        (acmeProfile.raProfile ?? 'Unassigned')
                     ),
 
                     acmeProfile.directoryUrl || '',

@@ -12,7 +12,7 @@
  */
 
 /**
- * Source of the field in the condition item
+ * Source of the field in the execution item
  * @export
  * @enum {string}
  */
