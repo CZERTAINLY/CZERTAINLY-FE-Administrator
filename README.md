@@ -18,6 +18,18 @@ Bulk operations can be performed on most of the objects from their list page. To
 
 For more information, please refer to the [CZERTAINLY documentation](https://docs.czertainly.com).
 
+### Generating API Types
+
+This section provides a guide on how to generate TypeScript DTOs from the OpenAPI specification, including some required customizations
+
+##### Step 1: Generate TypeScript Data Transfer Objects (DTOs)
+
+To generate TypeScript Data Transfer Objects (DTOs) from the OpenAPI specification, use the following command. This command will generate the types and format the generated files using Prettier.
+
+```sh
+npm run generate-types
+```
+
 ## Docker container
 
 Admin Web Interface is provided as a Docker container. Use the `docker pull 3keycompany/czertainly-frontend-administrator:tagname` to pull the required image from the repository. It can be configured using the following environment variables:
