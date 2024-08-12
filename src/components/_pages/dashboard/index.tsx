@@ -7,7 +7,11 @@ import { actions, selectors } from 'ducks/statisticsDashboard';
 import { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { FilterConditionOperator, FilterFieldSource } from 'types/openapi';
-import { getCertificateDonutChartColors, getCertificateDonutChartColorsByDaysOfExpiration } from 'utils/dashboard';
+import {
+    getCertificateDonutChartColors,
+    getCertificateDonutChartColorsByDaysOfExpiration,
+    getDonutChartColorsByRandomNumberOfOptions,
+} from 'utils/dashboard';
 import { getDateInString } from 'utils/dateUtil';
 import CountBadge from './DashboardItem/CountBadge';
 import DonutChart from './DashboardItem/DonutChart';
@@ -39,6 +43,7 @@ function Dashboard() {
         return getCertificateDonutChartColorsByDaysOfExpiration(dashboard?.certificateStatByExpiry);
     }, [dashboard?.certificateStatByExpiry]);
 
+    console.log('dashboard?.certificateStatByKeySize', dashboard?.certificateStatByKeySize);
     return (
         <Container className="themed-container" fluid={true}>
             <Row>
@@ -208,6 +213,9 @@ function Dashboard() {
                 <Col>
                     <DonutChart
                         title={'Certificates by Key Size'}
+                        colorOptions={getDonutChartColorsByRandomNumberOfOptions(
+                            Object.keys(dashboard?.certificateStatByKeySize || {}).length,
+                        )}
                         data={dashboard?.certificateStatByKeySize}
                         entity={EntityType.CERTIFICATE}
                         onSetFilter={(index, labels) => [

@@ -90,13 +90,9 @@ const colorMapByDaysOfExpiration: { [key: string]: string } = {
     Expired: '#eb3349',
 };
 
-type CertificatesByExpirationDays = {
+export function getCertificateDonutChartColorsByDaysOfExpiration(certificateStatByExpirationDays?: {
     [key: string]: number;
-};
-
-export function getCertificateDonutChartColorsByDaysOfExpiration(
-    certificateStatByExpirationDays?: CertificatesByExpirationDays,
-): ColorOptions | undefined {
+}): ColorOptions | undefined {
     if (!certificateStatByExpirationDays) {
         return undefined;
     }
@@ -106,4 +102,32 @@ export function getCertificateDonutChartColorsByDaysOfExpiration(
     };
 
     return { colors: Object.keys(certificateStatByExpirationDays).map((key) => getColorByDaysOfExpiration(key)) };
+}
+
+const baseColors = ['#632828', '#9c0012', '#f37d63', '#7fa2c1', '#008ffb', '#1ab394', '#eb3349'];
+
+function hslToHex(h: number, s: number, l: number): string {
+    l /= 100;
+    const a = (s * Math.min(l, 1 - l)) / 100;
+    const f = (n: number) => {
+        const k = (n + h / 30) % 12;
+        const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+        return Math.round(255 * color)
+            .toString(16)
+            .padStart(2, '0');
+    };
+    return `#${f(0)}${f(8)}${f(4)}`;
+}
+
+export function getDonutChartColorsByRandomNumberOfOptions(numberOfOptions: number): ColorOptions {
+    const colors = [...baseColors];
+    const saturation = 70;
+    const lightness = 50;
+
+    for (let i = baseColors.length; i < numberOfOptions; i++) {
+        const hue = ((i * 360) / numberOfOptions) % 360;
+        colors.push(hslToHex(hue, saturation, lightness));
+    }
+
+    return { colors: colors.slice(0, numberOfOptions) };
 }
