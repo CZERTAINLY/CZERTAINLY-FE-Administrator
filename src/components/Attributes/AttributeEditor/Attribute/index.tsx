@@ -183,7 +183,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                 {({ input, meta }) => (
                     <>
                         {descriptor.properties.visible ? (
-                            <Label for={name}>
+                            <Label for={`${name}Select`}>
                                 {descriptor.properties.label}
                                 {descriptor.properties.required ? ' *' : ''}
                             </Label>
@@ -194,6 +194,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                         {!addNewAttributeValue ? (
                             <Select
                                 {...input}
+                                inputId={`${name}Select`}
                                 maxMenuHeight={140}
                                 menuPlacement="auto"
                                 options={getUpdatedOptionsForEditSelect(input.value, options)}
