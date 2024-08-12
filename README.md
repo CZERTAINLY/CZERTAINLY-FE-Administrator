@@ -30,7 +30,7 @@ To generate TypeScript Data Transfer Objects (DTOs) from the OpenAPI specificati
 npm run generate-types
 ```
 
-#### Step 2: Fix Type Errors in Generated Code
+##### Step 2: Fix Type Errors in Generated Code
 
 Sometimes, you may encounter type errors in the generated code, such as:
 
@@ -57,6 +57,38 @@ if (paginationRequestDto != null) {
 ```
 
 This change ensures that paginationRequestDto is only assigned to query if it is not null or undefined, avoiding the type error.
+
+##### Step 3: Manually Add BaseAttributeContentDto to DataAttribute Interface
+
+When OpenAPI model types are generated, the BaseAttributeContentDto gets removed from the DataAttribute interface. This issue arises due to some internal library problem, and ideally, it should not occur.
+
+Update DataAttribute as following
+
+```sh
+interface DataAttribute {
+    # Add the following property to DataAttribute interface
+    /**
+     * Content of the Attribute
+     * @type {Array<BaseAttributeContentDto>}
+     * @memberof DataAttribute
+     */
+    content?: Array<BaseAttributeContentDto>;
+}
+```
+
+Make sure to manually add the content property back to the DataAttribute interface after generating the types.
+
+Do not forget to import BaseAttributeContentDto
+
+```sh
+import type {
+    AttributeCallback,
+    AttributeContentType,
+    AttributeType,
+    BaseAttributeConstraint, # Add this import
+    DataAttributeProperties,
+} from './';
+```
 
 ## Docker container
 
