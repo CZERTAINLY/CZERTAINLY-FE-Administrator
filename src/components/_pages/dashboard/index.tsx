@@ -233,6 +233,9 @@ function Dashboard() {
                 <Col>
                     <DonutChart
                         title={'Certificates by RA Profile'}
+                        colorOptions={getDonutChartColorsByRandomNumberOfOptions(
+                            Object.keys(dashboard?.raProfileStatByCertificateCount || {}).length,
+                        )}
                         data={dashboard?.raProfileStatByCertificateCount}
                         entity={EntityType.CERTIFICATE}
                         onSetFilter={(index, labels) =>
@@ -261,6 +264,7 @@ function Dashboard() {
                 <Col>
                     <DonutChart
                         title={'Certificates by Group'}
+                        colorOptions={getDonutChartColorsByRandomNumberOfOptions(3)}
                         data={dashboard?.groupStatByCertificateCount}
                         entity={EntityType.CERTIFICATE}
                         onSetFilter={(index, labels) =>

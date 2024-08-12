@@ -104,7 +104,7 @@ export function getCertificateDonutChartColorsByDaysOfExpiration(certificateStat
     return { colors: Object.keys(certificateStatByExpirationDays).map((key) => getColorByDaysOfExpiration(key)) };
 }
 
-const baseColors = ['#632828', '#9c0012', '#f37d63', '#7fa2c1', '#008ffb', '#1ab394', '#eb3349'];
+const baseColors = ['#1ab394', '#008ffb', '#7fa2c1', '#f37d63', '#632828', '#eb3349', '#9c0012'];
 
 function hslToHex(h: number, s: number, l: number): string {
     l /= 100;
