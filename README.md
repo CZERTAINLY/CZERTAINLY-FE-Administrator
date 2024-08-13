@@ -22,7 +22,7 @@ For more information, please refer to the [CZERTAINLY documentation](https://doc
 
 This section provides a guide on how to generate typeScript tlasses for DTOs and APIs from the OpenAPI specification, including some required customizations
 
-##### Step 1: Generate TypeScript Data Transfer Objects (DTOs)
+#### Step 1: Generate TypeScript Data Transfer Objects (DTOs)
 
 To generate TypeScript Data Transfer Objects (DTOs) from the OpenAPI specification, use the following command. This command will generate the types and format the generated files using Prettier.
 
@@ -30,7 +30,7 @@ To generate TypeScript Data Transfer Objects (DTOs) from the OpenAPI specificati
 npm run generate-types
 ```
 
-##### Step 2: Fix Type Errors in Generated Code
+#### Step 2: Fix Type Errors in Generated Code
 
 Sometimes, you may encounter type errors in the generated code, such as:
 
@@ -50,7 +50,7 @@ const query: HttpQuery = { // required parameters are used directly since they a
 Updated code to fix the type error:
 
 ```sh
-const query: HttpQuery = {};
+const query: HttpQuery = {};`
 if (paginationRequestDto != null) {
     Object.assign(query, paginationRequestDto);
 }
@@ -58,11 +58,11 @@ if (paginationRequestDto != null) {
 
 This change ensures that paginationRequestDto is only assigned to query if it is not null or undefined, avoiding the type error.
 
-##### Step 3: Manually Add BaseAttributeContentDto to DataAttribute Interface
+#### Step 3: Manually Add BaseAttributeContentDto to DataAttribute Interface
 
-When OpenAPI model types are generated, the BaseAttributeContentDto gets removed from the DataAttribute interface. This issue arises due to some internal library problem, and ideally, it should not occur.
+Currently, when OpenAPI model types are generated, the BaseAttributeContentDto gets removed from the `DataAttribute` interface. This issue arises due to internal library problem generating hierarchical (inheritance) types.
 
-Update DataAttribute as following
+Update interface DataAttribute as following
 
 ```sh
 interface DataAttribute {
