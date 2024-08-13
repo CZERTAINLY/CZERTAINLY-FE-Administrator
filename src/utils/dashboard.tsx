@@ -124,9 +124,13 @@ export function getDonutChartColorsByRandomNumberOfOptions(numberOfOptions: numb
     const saturation = 70;
     const lightness = 50;
 
-    for (let i = baseColors.length; i < numberOfOptions; i++) {
-        const hue = ((i * 360) / numberOfOptions) % 360;
-        colors.push(hslToHex(hue, saturation, lightness));
+    const additionalColorsNeeded = numberOfOptions - baseColors.length;
+    if (additionalColorsNeeded > 0) {
+        const hueStep = 360 / additionalColorsNeeded;
+        for (let i = 0; i < additionalColorsNeeded; i++) {
+            const hue = (i * hueStep) % 360; // evenly spaced hues for additional colors
+            colors.push(hslToHex(hue, saturation, lightness));
+        }
     }
 
     return { colors: colors.slice(0, numberOfOptions) };
