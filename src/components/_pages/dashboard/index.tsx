@@ -43,7 +43,6 @@ function Dashboard() {
         return getCertificateDonutChartColorsByDaysOfExpiration(dashboard?.certificateStatByExpiry);
     }, [dashboard?.certificateStatByExpiry]);
 
-    console.log('dashboard?.certificateStatByKeySize', dashboard?.certificateStatByKeySize);
     return (
         <Container className="themed-container" fluid={true}>
             <Row>
