@@ -467,11 +467,12 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                             <Field name="type" validate={validateRequired()}>
                                 {({ input, meta }) => (
                                     <FormGroup>
-                                        <Label for="type">Select Key Type</Label>
+                                        <Label for="typeSelect">Select Key Type</Label>
 
                                         <Select
                                             {...input}
                                             id="type"
+                                            inputId="typeSelect"
                                             maxMenuHeight={140}
                                             menuPlacement="auto"
                                             options={optionsForType()}

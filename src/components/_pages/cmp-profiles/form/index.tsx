@@ -447,9 +447,10 @@ export default function CmpProfileForm() {
                                     <Field name="selectedRequestProtectionMethod">
                                         {({ input, meta }) => (
                                             <FormGroup>
-                                                <Label for="selectedRequestProtectionMethod">Requested Protection Method</Label>
+                                                <Label for="selectedRequestProtectionMethodSelect">Requested Protection Method</Label>
                                                 <Select
                                                     {...input}
+                                                    inputId="selectedRequestProtectionMethodSelect"
                                                     id="selectedRequestProtectionMethod"
                                                     maxMenuHeight={140}
                                                     menuPlacement="auto"
@@ -488,9 +489,10 @@ export default function CmpProfileForm() {
                                     <Field name="selectedResponseProtectionMethod">
                                         {({ input, meta }) => (
                                             <FormGroup>
-                                                <Label for="selectedResponseProtectionMethod">Response Protection Method</Label>
+                                                <Label for="selectedResponseProtectionMethodSelect">Response Protection Method</Label>
                                                 <Select
                                                     {...input}
+                                                    inputId="selectedResponseProtectionMethodSelect"
                                                     id="selectedResponseProtectionMethod"
                                                     maxMenuHeight={140}
                                                     menuPlacement="auto"
@@ -543,10 +545,11 @@ export default function CmpProfileForm() {
                                     <Field name="selectedRaProfile">
                                         {({ input, meta }) => (
                                             <FormGroup>
-                                                <Label for="selectedRaProfile">Default RA Profile</Label>
+                                                <Label for="selectedRaProfileSelect">Default RA Profile</Label>
 
                                                 <Select
                                                     {...input}
+                                                    inputId="selectedRaProfileSelect"
                                                     id="selectedRaProfile"
                                                     maxMenuHeight={140}
                                                     menuPlacement="auto"

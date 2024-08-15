@@ -439,9 +439,10 @@ export default function DiscoveryForm() {
                             <Field name="storeKind" validate={validateRequired()}>
                                 {({ input, meta }) => (
                                     <FormGroup>
-                                        <Label for="storeKind">Kind</Label>
+                                        <Label for="storeKindSelect">Kind</Label>
 
                                         <Select
+                                            inputId="storeKindSelect"
                                             {...input}
                                             maxMenuHeight={140}
                                             menuPlacement="auto"

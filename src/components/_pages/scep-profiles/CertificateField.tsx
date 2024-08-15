@@ -35,9 +35,10 @@ export default function CertificateField({ certificates }: Props) {
         <Field name="certificate" type="select" validate={validateRequired()}>
             {({ input, meta }) => (
                 <FormGroup>
-                    <Label for="certificate">CA Certificate</Label>
+                    <Label for="certificateSelect">CA Certificate</Label>
                     <Select
                         {...input}
+                        inputId="certificateSelect"
                         id="certificate"
                         maxMenuHeight={140}
                         menuPlacement="auto"

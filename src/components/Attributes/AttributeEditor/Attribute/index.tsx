@@ -212,6 +212,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                         ) : (
                             <Select
                                 {...input}
+                                inputId={`${name}Select`}
                                 maxMenuHeight={140}
                                 menuPlacement="auto"
                                 options={options}
@@ -267,7 +268,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
         return (
             <>
                 {descriptor.properties.visible ? (
-                    <Label for={`${name}.content`}>
+                    <Label for={`${name}-content`}>
                         {descriptor.properties.label}
                         {descriptor.properties.required ? ' *' : ''}
                     </Label>
@@ -369,19 +370,18 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
 
             return (
                 <>
-                    <Label for={`${name}.code`}>
+                    <Label for={`${name}.codeTextArea`}>
                         {descriptor.properties.label}
                         {descriptor.properties.required ? ' *' : ''}
+                        <span style={{ fontStyle: 'italic' }}> ({language})</span>
                     </Label>
                     &nbsp;
-                    <Label for={`${name}.code`} style={{ fontStyle: 'italic' }}>
-                        ({language})
-                    </Label>
                     <Field name={`${name}.code`} type={getFormType(descriptor.contentType)}>
                         {({ input }) => {
                             return (
                                 <Editor
                                     {...input}
+                                    textareaId={`${name}.codeTextArea`}
                                     id={`${name}.code`}
                                     value={input.value}
                                     onValueChange={(code) => {
