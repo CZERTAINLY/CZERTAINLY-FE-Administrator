@@ -247,9 +247,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                         )}
                         {descriptor.properties.visible ? (
                             <>
-                                <FormText color={descriptor.properties.required ? 'dark' : undefined} style={{ marginTop: '0.2em' }}>
-                                    {descriptor.description}
-                                </FormText>
+                                <FormText style={{ marginTop: '0.2em' }}>{descriptor.description}</FormText>
 
                                 <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
                                     {meta.error}
@@ -306,7 +304,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                                 )}
                             </Field>
 
-                            <FormText color={descriptor.properties.required ? 'dark' : undefined}>{descriptor.description}</FormText>
+                            <FormText>{descriptor.description}</FormText>
                         </div>
                         &nbsp;
                         <div style={{ width: '13rem' }}>
@@ -445,7 +443,6 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                         {descriptor.properties.visible ? (
                             <>
                                 <FormText
-                                    color={descriptor.properties.required ? 'dark' : undefined}
                                     style={
                                         descriptor.contentType === AttributeContentType.Boolean
                                             ? { display: 'block', marginTop: '-0.8em' }
