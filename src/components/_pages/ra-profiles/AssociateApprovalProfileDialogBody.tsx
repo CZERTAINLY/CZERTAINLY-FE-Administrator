@@ -65,10 +65,11 @@ const AssociateApprovalProfileDialogBody = ({ raProfile, visible, onClose, avail
                         <Field name="approvalProfiles" validate={validateRequired()}>
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="approvalProfile">Select Approval profile</Label>
+                                    <Label for="approvalProfileSelect">Select Approval profile</Label>
 
                                     <Select
                                         {...input}
+                                        inputId="approvalProfileSelect"
                                         maxMenuHeight={140}
                                         menuPlacement="auto"
                                         options={optionsForApprovalProfiles}
