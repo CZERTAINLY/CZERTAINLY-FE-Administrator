@@ -141,7 +141,7 @@ describe('Custom AttributeEditor component', () => {
         `, () => {
         cy.get('label').eq(11).should('contain.text', 'test-property-file');
         cy.get('label').eq(12).should('contain.text', 'File content');
-        cy.get('.text-muted').eq(0).should('contain.text', 'Select or Drag & Drop file to Drop Zone.');
+        cy.get('.text-muted').eq(10).should('contain.text', 'Select or Drag & Drop file to Drop Zone.');
         cy.get('input').eq(9).should('have.attr', 'placeholder', 'Select or drag & drop test-property-file File');
         cy.get('input').eq(10).should('have.attr', 'placeholder', 'File not selected');
     });
