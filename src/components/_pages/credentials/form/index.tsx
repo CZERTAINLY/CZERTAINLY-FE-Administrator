@@ -246,6 +246,7 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
                                     <Label for="name">Credential Name</Label>
 
                                     <Input
+                                        id="name"
                                         {...input}
                                         valid={!meta.error && meta.touched}
                                         invalid={!!meta.error && meta.touched}
@@ -263,10 +264,11 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
                             <Field name="credentialProvider" validate={validateRequired()}>
                                 {({ input, meta }) => (
                                     <FormGroup>
-                                        <Label for="credentialProvider">Credential Provider</Label>
+                                        <Label for="credentialProviderSelect">Credential Provider</Label>
 
                                         <Select
                                             {...input}
+                                            inputId="credentialProviderSelect"
                                             maxMenuHeight={140}
                                             menuPlacement="auto"
                                             options={optionsForCredentialProviders}
@@ -296,6 +298,7 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
                                         <Label for="credentialProvider">Credential Provider</Label>
 
                                         <Input
+                                            id="credentialProvider"
                                             {...input}
                                             valid={!meta.error && meta.touched}
                                             invalid={!!meta.error && meta.touched}
@@ -312,9 +315,10 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
                             <Field name="storeKind" validate={validateRequired()}>
                                 {({ input, meta }) => (
                                     <FormGroup>
-                                        <Label for="storeKind">Kind</Label>
+                                        <Label for="storeKindSelect">Kind</Label>
 
                                         <Select
+                                            inputId="storeKindSelect"
                                             {...input}
                                             maxMenuHeight={140}
                                             menuPlacement="auto"
@@ -347,6 +351,7 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
                                         <Label for="storeKind">Kind</Label>
 
                                         <Input
+                                            id="storeKind"
                                             {...input}
                                             valid={!meta.error && meta.touched}
                                             invalid={!!meta.error && meta.touched}

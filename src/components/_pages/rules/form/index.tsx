@@ -117,6 +117,7 @@ const RulesForm = () => {
 
                                     <Input
                                         {...input}
+                                        id="name"
                                         valid={!meta.error && meta.touched}
                                         invalid={!!meta.error && meta.touched}
                                         type="text"
@@ -135,6 +136,7 @@ const RulesForm = () => {
 
                                     <Input
                                         {...input}
+                                        id="description"
                                         valid={!meta.error && meta.touched}
                                         invalid={!!meta.error && meta.touched}
                                         type="text"
@@ -149,10 +151,11 @@ const RulesForm = () => {
                         <Field name="selectedResource" validate={validateRequired()}>
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="resource">Resource</Label>
+                                    <Label for="resourceSelect">Resource</Label>
 
                                     <Select
                                         {...input}
+                                        inputId="resourceSelect"
                                         maxMenuHeight={140}
                                         menuPlacement="auto"
                                         options={resourceOptionsWithRuleEvaluator || []}

@@ -211,6 +211,7 @@ export default function ConnectorForm() {
                                         <FormGroup>
                                             <Label for="url">URL</Label>
                                             <Input
+                                                id="url"
                                                 {...input}
                                                 valid={!meta.error && meta.touched}
                                                 invalid={!!meta.error && meta.touched}
@@ -225,10 +226,11 @@ export default function ConnectorForm() {
                                 <Field name="authenticationType">
                                     {({ input, meta }) => (
                                         <FormGroup>
-                                            <Label for="authenticationType">Authentication Type</Label>
+                                            <Label for="authenticationTypeSelect">Authentication Type</Label>
 
                                             <Select
                                                 {...input}
+                                                inputId="authenticationTypeSelect"
                                                 maxMenuHeight={140}
                                                 menuPlacement="auto"
                                                 options={optionsForAuth}
@@ -257,6 +259,7 @@ export default function ConnectorForm() {
                                                     <Label for="username">Username</Label>
 
                                                     <Input
+                                                        id="username"
                                                         {...input}
                                                         valid={!meta.error && meta.touched}
                                                         invalid={!!meta.error && meta.touched}
@@ -274,6 +277,7 @@ export default function ConnectorForm() {
                                                     <Label for="password">Password</Label>
 
                                                     <Input
+                                                        id="password"
                                                         {...input}
                                                         valid={!meta.error && meta.touched}
                                                         invalid={!!meta.error && meta.touched}
@@ -295,6 +299,7 @@ export default function ConnectorForm() {
                                                 <Label for="clientCert">Client Certificate</Label>
 
                                                 <Input
+                                                    id="clientCert"
                                                     {...input}
                                                     valid={!meta.error && meta.touched}
                                                     invalid={!!meta.error && meta.touched}
@@ -419,6 +424,7 @@ export default function ConnectorForm() {
                                                         <Label for="name">Connector Name</Label>
 
                                                         <Input
+                                                            id="name"
                                                             {...input}
                                                             valid={!meta.error && meta.touched}
                                                             invalid={!!meta.error && meta.touched}

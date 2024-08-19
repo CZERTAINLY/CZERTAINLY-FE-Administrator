@@ -313,10 +313,11 @@ export function useTransformTriggerObjectToNodesAndEdges(
                 <h6 className="text-muted">Update Trigger</h6>
                 <div className="w-100" tabIndex={-1}>
                     <FormGroup>
-                        <Label for="addnewRule">Add Rules</Label>
+                        <Label for="addnewRuleSelect">Add Rules</Label>
 
                         <div className="w-100">
                             <Select
+                                inputId="addnewRuleSelect"
                                 className="nodrag"
                                 placeholder="Add New Rule"
                                 options={rulesOptions}
@@ -332,10 +333,11 @@ export function useTransformTriggerObjectToNodesAndEdges(
 
                 <div className="w-100">
                     <FormGroup>
-                        <Label for="raProfile">Add Actions</Label>
+                        <Label for="raProfileSelect">Add Actions</Label>
 
                         <div className="w-100">
                             <Select
+                                inputId="raProfileSelect"
                                 className="nodrag"
                                 placeholder="Add New Action"
                                 options={actionOptions}
