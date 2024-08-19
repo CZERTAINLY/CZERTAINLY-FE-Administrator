@@ -1,6 +1,6 @@
 import { Buffer } from 'buffer';
 import { InputType } from 'reactstrap/types/lib/Input';
-import { AttributeContentType } from 'types/openapi';
+import { AttributeContentType, FilterFieldType } from 'types/openapi';
 
 export const removeNullValues = (obj: any): any => {
     if (obj === null || obj === undefined) {
@@ -70,7 +70,7 @@ export const base64ToUtf8 = (str: string): string => {
     return Buffer.from(str, 'base64').toString('utf8');
 };
 
-export const getFormType = (type: AttributeContentType): InputType => {
+export const getFormTypeFromAttributeContentType = (type: AttributeContentType): InputType => {
     switch (type) {
         case AttributeContentType.Boolean:
             return 'checkbox';
@@ -94,6 +94,21 @@ export const getFormType = (type: AttributeContentType): InputType => {
             return 'file';
         case AttributeContentType.Secret:
             return 'password';
+        default:
+            return 'text';
+    }
+};
+
+export const getFormTypeFromFilterFieldType = (type: FilterFieldType) => {
+    switch (type) {
+        case FilterFieldType.Date:
+            return 'date';
+        case FilterFieldType.Datetime:
+            return 'datetime';
+        case FilterFieldType.String:
+            return 'text';
+        case FilterFieldType.Number:
+            return 'number';
         default:
             return 'text';
     }

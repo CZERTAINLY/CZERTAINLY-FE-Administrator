@@ -112,7 +112,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
 
     if (!descriptor) return <></>;
 
-    const getFormType = (type: AttributeContentType): InputType => {
+    const getFormTypeFromAttributeContentType = (type: AttributeContentType): InputType => {
         switch (type) {
             case AttributeContentType.Boolean:
                 return 'checkbox';
@@ -179,7 +179,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
 
     const createSelect = (descriptor: DataAttributeModel | CustomAttributeModel): JSX.Element => {
         return (
-            <Field name={name} validate={buildValidators()} type={getFormType(descriptor.contentType)}>
+            <Field name={name} validate={buildValidators()} type={getFormTypeFromAttributeContentType(descriptor.contentType)}>
                 {({ input, meta }) => (
                     <>
                         {descriptor.properties.visible ? (
@@ -284,7 +284,11 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                         <div style={{ flexGrow: 1 }}>
                             <Label for={`${name}-content`}>File content</Label>
 
-                            <Field name={`${name}.content`} validate={buildValidators()} type={getFormType(descriptor.contentType)}>
+                            <Field
+                                name={`${name}.content`}
+                                validate={buildValidators()}
+                                type={getFormTypeFromAttributeContentType(descriptor.contentType)}
+                            >
                                 {({ input, meta }) => (
                                     <>
                                         <Input
@@ -374,7 +378,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                     <Label for={`${name}.code`} style={{ fontStyle: 'italic' }}>
                         ({language})
                     </Label>
-                    <Field name={`${name}.code`} type={getFormType(descriptor.contentType)}>
+                    <Field name={`${name}.code`} type={getFormTypeFromAttributeContentType(descriptor.contentType)}>
                         {({ input }) => {
                             return (
                                 <Editor
@@ -401,7 +405,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
         }
 
         return (
-            <Field name={name} validate={buildValidators()} type={getFormType(descriptor.contentType)}>
+            <Field name={name} validate={buildValidators()} type={getFormTypeFromAttributeContentType(descriptor.contentType)}>
                 {({ input, meta }) => (
                     <>
                         {descriptor.properties.visible && descriptor.contentType !== AttributeContentType.Boolean ? (
@@ -418,7 +422,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                             id={name}
                             valid={!meta.error && meta.touched}
                             invalid={!!meta.error && meta.touched}
-                            type={descriptor.properties.visible ? getFormType(descriptor.contentType) : 'hidden'}
+                            type={descriptor.properties.visible ? getFormTypeFromAttributeContentType(descriptor.contentType) : 'hidden'}
                             placeholder={`Enter ${descriptor.properties.label}`}
                             disabled={descriptor.properties.readOnly || busy}
                             step={getStepValue(descriptor.contentType)}

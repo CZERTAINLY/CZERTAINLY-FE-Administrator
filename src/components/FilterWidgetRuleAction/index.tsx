@@ -12,7 +12,7 @@ import { Observable } from 'rxjs';
 import { SearchFieldListModel } from 'types/certificate';
 import { AttributeContentType, FilterFieldSource, FilterFieldType, PlatformEnum, SearchFieldDataDto } from 'types/openapi';
 import { ExecutionItemModel, ExecutionItemRequestModel } from 'types/rules';
-import { getFormType, getStepValue } from 'utils/common-utils';
+import { getFormTypeFromAttributeContentType, getFormTypeFromFilterFieldType, getStepValue } from 'utils/common-utils';
 import { getFormattedDate, getFormattedDateByType, getFormattedDateTime, getFormattedUtc } from 'utils/dateUtil';
 import styles from './FilterWidgetRuleAction.module.scss';
 
@@ -619,8 +619,10 @@ export default function FilterWidgetRuleAction({
                                             id="value"
                                             type={
                                                 currentField?.attributeContentType && checkIfFieldIsDate(currentField)
-                                                    ? getFormType(currentField?.attributeContentType)
-                                                    : 'text'
+                                                    ? getFormTypeFromAttributeContentType(currentField?.attributeContentType)
+                                                    : currentField?.type
+                                                      ? getFormTypeFromFilterFieldType(currentField?.type)
+                                                      : 'text'
                                             }
                                             step={
                                                 currentField?.attributeContentType

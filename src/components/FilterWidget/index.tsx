@@ -19,7 +19,7 @@ import {
     SearchFieldDataDto,
     SearchFilterRequestDto,
 } from 'types/openapi';
-import { getFormType, getStepValue } from 'utils/common-utils';
+import { getFormTypeFromAttributeContentType, getFormTypeFromFilterFieldType, getStepValue } from 'utils/common-utils';
 import { getFormattedDate, getFormattedDateTime } from 'utils/dateUtil';
 import styles from './FilterWidget.module.scss';
 
@@ -425,8 +425,10 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
                                             id="value"
                                             type={
                                                 currentField?.attributeContentType && checkIfFieldIsDate(currentField)
-                                                    ? getFormType(currentField?.attributeContentType)
-                                                    : 'text'
+                                                    ? getFormTypeFromAttributeContentType(currentField?.attributeContentType)
+                                                    : currentField?.type
+                                                      ? getFormTypeFromFilterFieldType(currentField?.type)
+                                                      : 'text'
                                             }
                                             step={
                                                 currentField?.attributeContentType
