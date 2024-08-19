@@ -251,11 +251,12 @@ export default function TokenProfileForm({ usesGlobalModal = false }: TokenProfi
                         <Field name="token" validate={validateRequired()}>
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="token">Select Token</Label>
+                                    <Label for="tokenSelect">Select Token</Label>
 
                                     <Select
                                         {...input}
                                         id="token"
+                                        inputId="tokenSelect"
                                         maxMenuHeight={140}
                                         menuPlacement="auto"
                                         options={optionsForAuthorities}
@@ -282,11 +283,12 @@ export default function TokenProfileForm({ usesGlobalModal = false }: TokenProfi
                         <Field name="usages">
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="usages">Key Usages</Label>
+                                    <Label for="usagesSelect">Key Usages</Label>
 
                                     <Select
                                         {...input}
                                         id="usages"
+                                        inputId="usagesSelect"
                                         isMulti={true}
                                         maxMenuHeight={140}
                                         menuPlacement="auto"

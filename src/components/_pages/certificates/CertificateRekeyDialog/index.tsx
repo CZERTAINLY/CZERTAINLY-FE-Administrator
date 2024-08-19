@@ -276,11 +276,12 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
                                 <Field name="key" validate={validateRequired()}>
                                     {({ input, meta, onChange }) => (
                                         <FormGroup>
-                                            <Label for="key">Select Key</Label>
+                                            <Label for="keySelect">Select Key</Label>
 
                                             <Select
                                                 {...input}
                                                 id="key"
+                                                inputId="keySelect"
                                                 maxMenuHeight={140}
                                                 menuPlacement="auto"
                                                 options={keyOptions}

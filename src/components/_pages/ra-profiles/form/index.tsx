@@ -226,9 +226,10 @@ export default function RaProfileForm() {
                         <Field name="authority" validate={validateRequired()}>
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="authority">Select Authority</Label>
+                                    <Label for="authoritySelect">Select Authority</Label>
 
                                     <Select
+                                        inputId="authoritySelect"
                                         {...input}
                                         id="authority"
                                         maxMenuHeight={140}

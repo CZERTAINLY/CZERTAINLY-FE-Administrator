@@ -215,10 +215,11 @@ export default function ProtocolActivationDialogBody({ protocol, raProfileUuid, 
                         <Field name="profiles" validate={validateRequired()}>
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="profiles">{`Select ${protocol} profile`}</Label>
+                                    <Label for="profilesSelect">{`Select ${protocol} profile`}</Label>
 
                                     <Select
                                         {...input}
+                                        inputId="profilesSelect"
                                         maxMenuHeight={140}
                                         menuPlacement="auto"
                                         options={optionsForProfiles}

@@ -325,11 +325,12 @@ const NotificationInstanceForm = () => {
                         <Field name="selectedNotificationInstanceProvider" validate={validateRequired()}>
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="selectedNotificationInstanceProvider">Notification Instance Provider</Label>
+                                    <Label for="notificationInstanceProviderSelect">Notification Instance Provider</Label>
 
                                     <Select
                                         {...input}
-                                        id="selectedNotificationInstanceProvider"
+                                        id="notificationInstanceProvider"
+                                        inputId="notificationInstanceProviderSelect"
                                         maxMenuHeight={140}
                                         menuPlacement="auto"
                                         options={optionsForNotificationProviders}
@@ -349,10 +350,11 @@ const NotificationInstanceForm = () => {
                         <Field name="kind" validate={validateRequired()}>
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="kind">Notification Instance Kind</Label>
+                                    <Label for="kindSelect">Notification Instance Kind</Label>
                                     <Select
                                         {...input}
                                         id="kind"
+                                        inputId="kindSelect"
                                         maxMenuHeight={140}
                                         menuPlacement="auto"
                                         options={kindOptions}

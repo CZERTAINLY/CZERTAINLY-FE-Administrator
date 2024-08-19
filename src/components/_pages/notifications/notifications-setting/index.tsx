@@ -144,12 +144,13 @@ const NotificationsSetting = () => {
                                                         <Field name={`notificationsMapping[${notificationSelect.code}]`}>
                                                             {({ input, meta }) => (
                                                                 <FormGroup>
-                                                                    <Label for={`notificationInstanceSelect${notificationSelect.code}`}>
+                                                                    <Label for={`notificationInstance${notificationSelect.code}Select`}>
                                                                         {notificationSelect.label}
                                                                     </Label>
                                                                     <Select
                                                                         {...input}
-                                                                        id={`notificationInstanceSelect${notificationSelect.code}`}
+                                                                        id={`notificationInstance${notificationSelect.code}`}
+                                                                        inputId={`notificationInstance${notificationSelect.code}Select`}
                                                                         maxMenuHeight={140}
                                                                         menuPlacement="auto"
                                                                         options={notificationsOptions}

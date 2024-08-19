@@ -354,9 +354,10 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
                         <Row>
                             <Col>
                                 <FormGroup>
-                                    <Label for="group">Filter Field Source</Label>
+                                    <Label for="groupSelectInput">Filter Field Source</Label>
                                     <Select
                                         id="group"
+                                        inputId="groupSelectInput"
                                         options={availableFilters.map((f) => ({
                                             label: getEnumLabel(searchGroupEnum, f.filterFieldSource),
                                             value: f.filterFieldSource,
@@ -375,9 +376,10 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
 
                             <Col>
                                 <FormGroup>
-                                    <Label for="field">Filter Field</Label>
+                                    <Label for="fieldSelectInput">Filter Field</Label>
                                     <Select
                                         id="field"
+                                        inputId="fieldSelectInput"
                                         options={currentFields?.map((f) => ({ label: f.fieldLabel, value: f.fieldIdentifier }))}
                                         onChange={(e) => {
                                             setFilterField(e);
@@ -393,9 +395,10 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
 
                             <Col>
                                 <FormGroup>
-                                    <Label for="conditions">Filter Condition</Label>
+                                    <Label for="conditionsSelectInput">Filter Condition</Label>
                                     <Select
                                         id="conditions"
+                                        inputId="conditionsSelectInput"
                                         options={
                                             filterField
                                                 ? currentField?.conditions.map((c) => ({

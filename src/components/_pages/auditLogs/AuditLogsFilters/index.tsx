@@ -2,7 +2,7 @@ import { FormApi } from 'final-form';
 import createDecorator from 'final-form-calculate';
 import { useCallback } from 'react';
 import { Field, Form } from 'react-final-form';
-import { Button, ButtonGroup, Form as BootstrapForm, FormGroup, Input, Label } from 'reactstrap';
+import { Form as BootstrapForm, Button, ButtonGroup, FormGroup, Input, Label } from 'reactstrap';
 
 import { AuditLogFilterModel } from 'types/auditLogs';
 import styles from './auditLogsFilters.module.scss';
@@ -76,7 +76,7 @@ function AuditLogsFilters({ objects, operationStates, operations, onClear, onFil
                                 {({ input }) => (
                                     <FormGroup>
                                         <Label for="author">Author</Label>
-                                        <Input {...input} type="text" placeholder="Author name" disabled={submitting} />
+                                        <Input {...input} type="text" placeholder="Author name" disabled={submitting} id="author" />
                                     </FormGroup>
                                 )}
                             </Field>
@@ -84,7 +84,7 @@ function AuditLogsFilters({ objects, operationStates, operations, onClear, onFil
                                 {({ input }) => (
                                     <FormGroup>
                                         <Label for="createdFrom">Created between</Label>
-                                        <Input {...input} type="date" placeholder="Created from" disabled={submitting} />
+                                        <Input {...input} type="date" placeholder="Created from" disabled={submitting} id="createdFrom" />
                                     </FormGroup>
                                 )}
                             </Field>
@@ -92,7 +92,7 @@ function AuditLogsFilters({ objects, operationStates, operations, onClear, onFil
                                 {({ input }) => (
                                     <FormGroup>
                                         <Label for="createdTp">and</Label>
-                                        <Input {...input} type="date" placeholder="Created to" disabled={submitting} />
+                                        <Input {...input} type="date" placeholder="Created to" disabled={submitting} id="createdTp" />
                                     </FormGroup>
                                 )}
                             </Field>
@@ -102,7 +102,7 @@ function AuditLogsFilters({ objects, operationStates, operations, onClear, onFil
                                 {({ input }) => (
                                     <FormGroup>
                                         <Label for="affected">Affected Data</Label>
-                                        <Input {...input} type="select" disabled={submitting}>
+                                        <Input {...input} type="select" disabled={submitting} id="affected">
                                             <option>- All -</option>
                                             {objects.map((op) => (
                                                 <option key={op} value={op}>
@@ -117,7 +117,7 @@ function AuditLogsFilters({ objects, operationStates, operations, onClear, onFil
                                 {({ input }) => (
                                     <FormGroup>
                                         <Label for="operation">Operation</Label>
-                                        <Input {...input} type="select" disabled={submitting}>
+                                        <Input {...input} type="select" disabled={submitting} id="operation">
                                             <option>- All -</option>
                                             {operations.map((op) => (
                                                 <option key={op} value={op}>
@@ -132,7 +132,7 @@ function AuditLogsFilters({ objects, operationStates, operations, onClear, onFil
                                 {({ input }) => (
                                     <FormGroup>
                                         <Label for="operationStatus">Operation Status</Label>
-                                        <Input {...input} type="select" disabled={submitting}>
+                                        <Input {...input} type="select" disabled={submitting} id="operationStatus">
                                             <option>- All -</option>
                                             {operationStates.map((op) => (
                                                 <option key={op} value={op}>
@@ -147,7 +147,7 @@ function AuditLogsFilters({ objects, operationStates, operations, onClear, onFil
                                 {({ input }) => (
                                     <FormGroup>
                                         <Label for="origination">Origination</Label>
-                                        <Input {...input} type="select" disabled={submitting}>
+                                        <Input {...input} type="select" disabled={submitting} id="origination">
                                             <option>- All -</option>
                                             {objects.map((op) => (
                                                 <option key={op} value={op}>
@@ -162,7 +162,13 @@ function AuditLogsFilters({ objects, operationStates, operations, onClear, onFil
                                 {({ input }) => (
                                     <FormGroup>
                                         <Label for="objectIdentifier">Object Identifier</Label>
-                                        <Input {...input} type="text" placeholder="Object identifier" disabled={submitting} />
+                                        <Input
+                                            {...input}
+                                            type="text"
+                                            placeholder="Object identifier"
+                                            disabled={submitting}
+                                            id="objectIdentifier"
+                                        />
                                     </FormGroup>
                                 )}
                             </Field>

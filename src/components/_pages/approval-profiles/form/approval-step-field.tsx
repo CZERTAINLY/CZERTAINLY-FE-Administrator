@@ -226,9 +226,10 @@ export default function ApprovalStepField({ approvalSteps }: Props) {
                         </Col>
                         <Col>
                             <FormGroup>
-                                <Label htmlFor="approverType">Approver Type</Label>
+                                <Label htmlFor="approverTypeSelect">Approver Type</Label>
                                 <Select
                                     id="approverType"
+                                    inputId="approverTypeSelect"
                                     maxMenuHeight={140}
                                     menuPlacement="auto"
                                     options={approverTypeOptions}
@@ -277,10 +278,11 @@ export default function ApprovalStepField({ approvalSteps }: Props) {
                                 >
                                     {({ input, meta }) => (
                                         <FormGroup>
-                                            <Label htmlFor="selectedApprover">Select {selectedApprovalTypeList[index].label}</Label>
+                                            <Label htmlFor="approverSelect">Select {selectedApprovalTypeList[index].label}</Label>
                                             <Select
                                                 {...input}
-                                                id="selectedApprover"
+                                                id="approver"
+                                                inputId="approverSelect"
                                                 maxMenuHeight={140}
                                                 menuPlacement="auto"
                                                 options={getApproverOptions(selectedApprovalTypeList[index].label)}

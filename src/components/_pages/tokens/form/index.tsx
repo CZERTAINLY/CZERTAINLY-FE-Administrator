@@ -250,6 +250,7 @@ export default function TokenForm() {
                                     <Label for="name">Token Name</Label>
 
                                     <Input
+                                        id="name"
                                         {...input}
                                         valid={!meta.error && meta.touched}
                                         invalid={!!meta.error && meta.touched}
@@ -267,11 +268,12 @@ export default function TokenForm() {
                             <Field name="tokenProvider" validate={validateRequired()}>
                                 {({ input, meta }) => (
                                     <FormGroup>
-                                        <Label for="tokenProvider">Cryptography Provider</Label>
+                                        <Label for="tokenProviderSelect">Cryptography Provider</Label>
 
                                         <Select
                                             {...input}
                                             maxMenuHeight={140}
+                                            inputId="tokenProviderSelect"
                                             menuPlacement="auto"
                                             options={optionsForTokenProviders}
                                             placeholder="Select Cryptography Provider"
@@ -302,6 +304,7 @@ export default function TokenForm() {
                                         <Label for="tokenProvider">Cryptography Provider</Label>
 
                                         <Input
+                                            id="tokenProvider"
                                             {...input}
                                             valid={!meta.error && meta.touched}
                                             invalid={!!meta.error && meta.touched}
@@ -318,10 +321,11 @@ export default function TokenForm() {
                             <Field name="storeKind" validate={validateRequired()}>
                                 {({ input, meta }) => (
                                     <FormGroup>
-                                        <Label for="storeKind">Kind</Label>
+                                        <Label for="storeKindSelect">Kind</Label>
 
                                         <Select
                                             {...input}
+                                            inputId="storeKindSelect"
                                             maxMenuHeight={140}
                                             menuPlacement="auto"
                                             options={optionsForKinds}
@@ -353,6 +357,7 @@ export default function TokenForm() {
                                         <Label for="storeKind">Kind</Label>
 
                                         <Input
+                                            id="storeKind"
                                             {...input}
                                             valid={!meta.error && meta.touched}
                                             invalid={!!meta.error && meta.touched}
