@@ -134,7 +134,12 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
             value: currentFilters[selectedFilter].condition,
         });
 
-        if (field.type === FilterFieldType.String || field.type === FilterFieldType.Number || field.type === FilterFieldType.Date) {
+        if (
+            field.type === FilterFieldType.String ||
+            field.type === FilterFieldType.Number ||
+            field.type === FilterFieldType.Date ||
+            field.type === FilterFieldType.Datetime
+        ) {
             setFilterValue(currentFilters[selectedFilter].value);
             return;
         }
@@ -346,6 +351,9 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
         [isFetchingAvailableFilters, FilterConditionOperatorEnum, disableBadgeRemove, onRemoveFilterClick, searchGroupEnum, busyBadges],
     );
 
+    console.log('currentField?.type', currentField?.type);
+    console.log('currentField?.attributeContentType', currentField?.attributeContentType);
+
     return (
         <>
             <Widget title={title} busy={isFetchingAvailableFilters} titleSize="larger">
@@ -423,6 +431,7 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
                                     {currentField?.type === undefined ||
                                     currentField?.type === FilterFieldType.String ||
                                     currentField?.type === FilterFieldType.Date ||
+                                    currentField?.type === FilterFieldType.Datetime ||
                                     currentField?.type === FilterFieldType.Number ? (
                                         <Input
                                             id="value"

@@ -104,7 +104,7 @@ export const getFormTypeFromFilterFieldType = (type: FilterFieldType) => {
         case FilterFieldType.Date:
             return 'date';
         case FilterFieldType.Datetime:
-            return 'datetime';
+            return 'datetime-local';
         case FilterFieldType.String:
             return 'text';
         case FilterFieldType.Number:
