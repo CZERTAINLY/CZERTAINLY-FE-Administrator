@@ -2,10 +2,10 @@ import cx from 'classnames';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { EntityType, selectors } from 'ducks/filters';
 import { selectors as rulesSelectors } from 'ducks/rules';
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { Badge, Spinner } from 'reactstrap';
-import { AttributeContentType, FilterFieldType, PlatformEnum, SearchFieldDataDto } from 'types/openapi';
+import { AttributeContentType, FilterFieldType, PlatformEnum } from 'types/openapi';
 import { ExecutionItemModel } from 'types/rules';
 import { getFormattedDate, getFormattedDateTime } from 'utils/dateUtil';
 import styles from './executionsItemsList.module.scss';
@@ -38,17 +38,6 @@ const ExecutionsItemsList = ({ executionItems = [], executionName, executionUuid
         [],
     );
 
-    const checkIfFieldIsDate = useCallback((field: SearchFieldDataDto) => {
-        if (
-            field.attributeContentType === AttributeContentType.Date ||
-            field.attributeContentType === AttributeContentType.Time ||
-            field.attributeContentType === AttributeContentType.Datetime
-        ) {
-            return true;
-        } else {
-            return false;
-        }
-    }, []);
     const renderActionBadges = useMemo(() => {
         if (!executionItems) return null;
         return executionItems.map((f, i) => {
