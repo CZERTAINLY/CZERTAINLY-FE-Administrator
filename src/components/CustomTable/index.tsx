@@ -346,7 +346,12 @@ function CustomTable({
                 >
                     {header.id === '__checkbox__' ? (
                         hasAllCheckBox && multiSelect ? (
-                            <input type="checkbox" checked={checkAllChecked} onChange={onCheckAllCheckboxClick} />
+                            <input
+                                id={`${header.id}__checkbox__`}
+                                type="checkbox"
+                                checked={checkAllChecked}
+                                onChange={onCheckAllCheckboxClick}
+                            />
                         ) : (
                             <>&nbsp;</>
                         )
@@ -418,6 +423,7 @@ function CustomTable({
                             ) : (
                                 <td>
                                     <input
+                                        id={`${row.id}__checkbox__`}
                                         type="checkbox"
                                         checked={tblCheckedRows.includes(row.id)}
                                         onChange={onRowCheckboxClick}

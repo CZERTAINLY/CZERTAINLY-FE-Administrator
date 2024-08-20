@@ -51,10 +51,11 @@ export default function CertificateGroupDialog({ uuids, onCancel, onUpdate }: Pr
     return (
         <>
             <FormGroup>
-                <Label for="group">Groups</Label>
+                <Label for="groupSelect">Groups</Label>
 
                 <Select
                     id="group"
+                    inputId="groupSelect"
                     options={groupOptions}
                     value={selectedGroups}
                     placeholder="Select groups"

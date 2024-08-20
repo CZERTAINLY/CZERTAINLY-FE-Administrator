@@ -47,10 +47,11 @@ export default function CertificateGroupDialog({ uuids, onCancel, onUpdate }: Pr
     return (
         <>
             <FormGroup>
-                <Label for="raProfile">RA Profile</Label>
+                <Label for="raProfileSelect">RA Profile</Label>
 
                 <Select
                     id="raProfile"
+                    inputId="raProfileSelect"
                     options={raProfiles.map((raProfile) => ({
                         value: raProfile.uuid + ':#' + raProfile.authorityInstanceUuid,
                         label: raProfile.name,

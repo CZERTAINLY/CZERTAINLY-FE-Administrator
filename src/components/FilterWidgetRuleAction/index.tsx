@@ -573,9 +573,10 @@ export default function FilterWidgetRuleAction({
                         <Row>
                             <Col>
                                 <FormGroup>
-                                    <Label for="group">Field Source</Label>
+                                    <Label for="groupSelect">Field Source</Label>
                                     <Select
                                         id="group"
+                                        inputId="groupSelect"
                                         options={availableFilters.map((f) => ({
                                             label: getEnumLabel(searchGroupEnum, f.filterFieldSource),
                                             value: f.filterFieldSource,
@@ -593,9 +594,10 @@ export default function FilterWidgetRuleAction({
 
                             <Col>
                                 <FormGroup>
-                                    <Label for="field">Field</Label>
+                                    <Label for="fieldSelect">Field</Label>
                                     <Select
                                         id="field"
+                                        inputId="fieldSelect"
                                         options={currentFields?.map((f) => ({ label: f.fieldLabel, value: f.fieldIdentifier }))}
                                         onChange={(e) => {
                                             setFilterField(e);
@@ -610,13 +612,13 @@ export default function FilterWidgetRuleAction({
 
                             <Col>
                                 <FormGroup>
-                                    <Label for="value">Value</Label>
+                                    <Label for="valueSelect">Value</Label>
                                     {currentField?.type === undefined ||
                                     currentField?.type === FilterFieldType.String ||
                                     currentField?.type === FilterFieldType.Date ||
                                     currentField?.type === FilterFieldType.Number ? (
                                         <Input
-                                            id="value"
+                                            id="valueSelect"
                                             type={
                                                 currentField?.attributeContentType && checkIfFieldIsDate(currentField)
                                                     ? getFormType(currentField?.attributeContentType)
@@ -637,6 +639,7 @@ export default function FilterWidgetRuleAction({
                                     ) : currentField?.type === FilterFieldType.Boolean ? (
                                         <Select
                                             id="value"
+                                            inputId="valueSelect"
                                             options={filterField ? booleanOptions : undefined}
                                             value={filterValue || null}
                                             onChange={(e) => {

@@ -141,6 +141,7 @@ function WidgetButtons({ buttons, justify = 'center' }: Props) {
         let style;
 
         let btnProps: ButtonProps = {
+            key: button.icon + button.tooltip + button.id || '',
             className: 'btn btn-link',
             color: 'white',
             onClick: button.onClick,

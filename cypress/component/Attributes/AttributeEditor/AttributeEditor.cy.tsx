@@ -106,31 +106,31 @@ describe('Custom AttributeEditor component', () => {
     it(`🟢 Input label should be "test float property"
         🟢 Input must be of type number
         🟢 Input placeholder must be "Enter test float property"`, () => {
-        cy.get('label').eq(6).should('contain.text', 'test float property');
+        cy.get('label').eq(5).should('contain.text', 'test float property');
         cy.get('input').eq(5).should('have.attr', 'type', 'number').should('have.attr', 'placeholder', 'Enter test float property');
     });
 
     it(`🟢 Input label should be "test date property"
         🟢 Input must be of type date`, () => {
-        cy.get('label').eq(7).should('contain.text', 'test date property');
+        cy.get('label').eq(6).should('contain.text', 'test date property');
         cy.get('input').eq(6).should('have.attr', 'type', 'date');
     });
 
     it(`🟢 Input label should be "test datetime property"
         🟢 Input must be of type datetime-local`, () => {
-        cy.get('label').eq(8).should('contain.text', 'test datetime property');
+        cy.get('label').eq(7).should('contain.text', 'test datetime property');
         cy.get('input').eq(7).should('have.attr', 'type', 'datetime-local');
     });
 
     it(`🟢 Input label should be "test-property-text"
         🟢 Input placeholder must be "Enter test-property-text"`, () => {
-        cy.get('label').eq(9).should('contain.text', 'test-property-text');
+        cy.get('label').eq(8).should('contain.text', 'test-property-text');
         cy.get('textarea').eq(1).should('have.attr', 'placeholder', 'Enter test-property-text');
     });
 
     it(`🟢 Input label should be "test-property-time"
         🟢 Input must be of type time`, () => {
-        cy.get('label').eq(10).should('contain.text', 'test-property-time');
+        cy.get('label').eq(9).should('contain.text', 'test-property-time');
         cy.get('input').eq(8).should('have.attr', 'type', 'time');
     });
 
@@ -139,8 +139,8 @@ describe('Custom AttributeEditor component', () => {
         🟢 Dropdown Input must have a placeholder "Select or Drag & Drop file to Drop Zone."
         🟢 Dropdown Input must have a placeholder "File not selected"
         `, () => {
-        cy.get('label').eq(11).should('contain.text', 'test-property-file');
-        cy.get('label').eq(12).should('contain.text', 'File content');
+        cy.get('label').eq(10).should('contain.text', 'test-property-file');
+        cy.get('label').eq(11).should('contain.text', 'File content');
         cy.get('.text-muted').eq(10).should('contain.text', 'Select or Drag & Drop file to Drop Zone.');
         cy.get('input').eq(9).should('have.attr', 'placeholder', 'Select or drag & drop test-property-file File');
         cy.get('input').eq(10).should('have.attr', 'placeholder', 'File not selected');
@@ -368,7 +368,7 @@ describe('Data Attribute AttributeEditor', () => {
         cy.get('input').eq(0).should('have.value', 'data.cveradar.com').clear().type('test.com');
         cy.get('input').eq(1).should('not.be.checked').check();
         cy.get('input').eq(2).should('have.value', '80').type('80');
-        cy.get('#react-select-19-input').should('exist').click().wait(clickWait);
+        cy.get('#react-select-19-live-region').siblings('div').eq(0).click().wait(clickWait);
         cy.get('#react-select-19-option-0').should('exist').click().wait(clickWait);
     });
 });
@@ -601,7 +601,7 @@ describe('Contstraint Check AttributeEditor', () => {
     it(`🟢 Select first option of the dropdown
         🟢 Select first option of the next dropdown
         🟢 Type incorrect input and verify the validation check`, () => {
-        cy.get('#react-select-32-input').should('exist').click().wait(clickWait);
+        cy.get('#react-select-32-live-region').siblings('div').eq(0).click().wait(clickWait);
         cy.get('#react-select-32-option-0').should('exist').should('contain.text', 'Basic').click().wait(clickWait);
 
         cy.window()
@@ -615,7 +615,7 @@ describe('Contstraint Check AttributeEditor', () => {
             )
             .wait(callbackWait);
 
-        cy.get('#react-select-33-input').should('exist').click().wait(clickWait);
+        cy.get('#react-select-33-live-region').siblings('div').eq(0).click().wait(clickWait);
         cy.get('#react-select-33-option-0').should('exist').should('contain.text', 'lab01-testssh').click().wait(clickWait);
 
         cy.get('input[name="__attributes__authority__.authority_server_address"]').should('exist').type('test.');
@@ -748,12 +748,15 @@ describe('Tabbed AttributeEditor component', () => {
 
         cy.get('.nav-link').eq(1).should('contain.text', 'Custom Attributes').click().wait(clickWait);
 
-        cy.get('#react-select-35-input').should('exist').click().wait(clickWait);
+        // cy.get('#react-select-35-live-region').should('exist').click().wait(clickWait);
+        cy.get('#react-select-35-live-region').should('exist').siblings('div').eq(0).click().wait(clickWait);
         cy.get('#react-select-35-option-0').should('exist').click().wait(clickWait);
 
         cy.get('.nav-link').eq(0).should('contain.text', 'Connector Attributes').click().wait(clickWait);
 
-        cy.get('#react-select-36-input').should('exist').click().wait(clickWait);
+        // cy.get('#react-select-36-live-region').should('exist').click().wait(clickWait);
+        cy.get('#react-select-36-live-region').should('exist').siblings('div').eq(0).click().wait(clickWait);
+
         cy.get('#react-select-36-option-0').should('exist').click().wait(clickWait);
 
         cy.wait(reduxActionWait)
@@ -768,7 +771,8 @@ describe('Tabbed AttributeEditor component', () => {
             )
             .wait(callbackWait);
 
-        cy.get('#react-select-37-input').should('exist').click().wait(clickWait);
+        // cy.get('#react-select-37-live-region').should('exist').click().wait(clickWait);
+        cy.get('#react-select-37-live-region').should('exist').siblings('div').eq(0).click().wait(clickWait);
         cy.get('#react-select-37-option-0').should('exist').click().wait(clickWait);
     });
 
@@ -887,7 +891,8 @@ describe('Global Modal AttributeEditor component', () => {
         🟢 The value must be auto filled in the next dropdown
         `, () => {
         cy.get('input[name="__attributes__entity__.host"]').should('exist').type('test');
-        cy.get('#react-select-40-input').should('exist').click().wait(clickWait);
+        // cy.get('#react-select-40-input').should('exist').click().wait(clickWait);
+        cy.get('#react-select-40-live-region').should('exist').siblings('div').eq(0).click().wait(clickWait);
         cy.get('#react-select-40-option-0').should('exist').click().wait(clickWait);
         cy.window()
             .its('store')
@@ -899,7 +904,8 @@ describe('Global Modal AttributeEditor component', () => {
                 }),
             )
             .wait(callbackWait);
-        cy.get('#react-select-41-input').should('exist').click().wait(clickWait);
+        // cy.get('#react-select-41-input').should('exist').click().wait(clickWait);
+        cy.get('#react-select-41-live-region').should('exist').siblings('div').eq(0).click().wait(clickWait);
         cy.get('.fa-add').should('exist').click().wait(clickWait);
 
         cy.wait(reduxActionWait)
@@ -926,10 +932,12 @@ describe('Global Modal AttributeEditor component', () => {
             .wait(reduxActionWait);
 
         cy.get('input[name="name"]').should('exist').type('test-credential');
-        cy.get('#react-select-42-input').should('exist').click().wait(clickWait);
+        // cy.get('#react-select-42-input').should('exist').click().wait(clickWait);
+        cy.get('#react-select-42-live-region').should('exist').siblings('div').eq(0).click().wait(clickWait);
         cy.get('#react-select-42-option-0').should('exist').click().wait(clickWait);
 
-        cy.get('#react-select-43-input').should('exist').click().wait(clickWait);
+        // cy.get('#react-select-43-input').should('exist').click().wait(clickWait);
+        cy.get('#react-select-43-live-region').should('exist').siblings('div').eq(0).click().wait(clickWait);
         cy.get('#react-select-43-option-1').should('exist').click().wait(clickWait);
 
         cy.wait(reduxActionWait)
