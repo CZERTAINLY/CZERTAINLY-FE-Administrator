@@ -491,11 +491,12 @@ export default function AcmeProfileForm() {
                             <Field name="raProfile">
                                 {({ input, meta }) => (
                                     <FormGroup>
-                                        <Label for="raProfile">Default RA Profile</Label>
+                                        <Label for="raProfileSelect">Default RA Profile</Label>
 
                                         <Select
                                             {...input}
                                             id="raProfile"
+                                            inputId="raProfileSelect"
                                             maxMenuHeight={140}
                                             menuPlacement="auto"
                                             options={optionsForRaProfiles}

@@ -180,6 +180,7 @@ const TriggerForm = () => {
 
                                     <Input
                                         {...input}
+                                        id="name"
                                         valid={!meta.error && meta.touched}
                                         invalid={!!meta.error && meta.touched}
                                         type="text"
@@ -198,6 +199,7 @@ const TriggerForm = () => {
 
                                     <Input
                                         {...input}
+                                        id="description"
                                         valid={!meta.error && meta.touched}
                                         invalid={!!meta.error && meta.touched}
                                         type="text"
@@ -211,10 +213,12 @@ const TriggerForm = () => {
                         <Field name="selectedTriggerType" validate={validateRequired()}>
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="triggerType">Type</Label>
+                                    <Label for="triggerTypeSelect">Type</Label>
 
                                     <Select
                                         {...input}
+                                        inputId="triggerTypeSelect"
+                                        id="triggerType"
                                         maxMenuHeight={140}
                                         menuPlacement="auto"
                                         options={ruleTriggerTypeOptions}
@@ -246,10 +250,12 @@ const TriggerForm = () => {
                         <Field name="selectedTriggerResource" validate={validateRequired()}>
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="eventResource">Event Resource</Label>
+                                    <Label for="eventResourceSelect">Event Resource</Label>
 
                                     <Select
                                         {...input}
+                                        id="eventResource"
+                                        inputId="eventResourceSelect"
                                         maxMenuHeight={140}
                                         menuPlacement="auto"
                                         options={resourceEventsOptions}
@@ -296,10 +302,12 @@ const TriggerForm = () => {
                             <Field name="selectedEvent" validate={validateRequired()}>
                                 {({ input, meta }) => (
                                     <FormGroup>
-                                        <Label for="selectedEvent">Event</Label>
+                                        <Label for="eventSelect">Event</Label>
 
                                         <Select
                                             {...input}
+                                            id="event"
+                                            inputId="eventSelect"
                                             maxMenuHeight={140}
                                             menuPlacement="auto"
                                             options={resourceEventNameOptions || []}
@@ -347,10 +355,12 @@ const TriggerForm = () => {
                         <Field name="selectedResource">
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="selectedResource">Resource</Label>
+                                    <Label for="resourceSelect">Resource</Label>
 
                                     <Select
                                         {...input}
+                                        id="resource"
+                                        inputId="resourceSelect"
                                         maxMenuHeight={140}
                                         menuPlacement="auto"
                                         options={resourceOptions || []}
@@ -374,10 +384,12 @@ const TriggerForm = () => {
                         <Field name="rulesUuids">
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="description">Rules</Label>
+                                    <Label for="ruleSelect">Rules</Label>
 
                                     <Select
                                         isDisabled={values.resource === Resource.None || !values.resource}
+                                        id="rules"
+                                        inputId="ruleSelect"
                                         {...input}
                                         options={rulesOptions}
                                         isMulti
@@ -391,11 +403,12 @@ const TriggerForm = () => {
                         <Field name="actionsUuids">
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="description">Actions</Label>
+                                    <Label for="actionsSelect">Actions</Label>
 
                                     <Select
                                         isDisabled={values.resource === Resource.None || !values.resource || values.ignoreTrigger}
                                         {...input}
+                                        inputId="actionsSelect"
                                         options={actionsOptions}
                                         isMulti
                                         placeholder="Select Actions"

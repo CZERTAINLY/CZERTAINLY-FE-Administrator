@@ -351,9 +351,10 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                             <Field name="owner" validate={composeValidators(validateAlphaNumericWithSpecialChars())}>
                                 {({ input, meta }) => (
                                     <FormGroup>
-                                        <Label for="owner">Owner</Label>
+                                        <Label for="ownerSelect">Owner</Label>
 
                                         <Select
+                                            inputId="ownerSelect"
                                             {...input}
                                             maxMenuHeight={140}
                                             menuPlacement="auto"
@@ -401,10 +402,11 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                         <Field name="selectedGroups">
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="selectedGroups">Groups</Label>
+                                    <Label for="selectedGroupsSelect">Groups</Label>
 
                                     <Select
                                         {...input}
+                                        inputId="selectedGroupsSelect"
                                         maxMenuHeight={140}
                                         menuPlacement="auto"
                                         options={optionsForGroups}
@@ -431,10 +433,11 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                         <Field name="tokenProfile" validate={validateRequired()}>
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="tokenProfile">Token Profile</Label>
+                                    <Label for="tokenProfileSelect">Token Profile</Label>
 
                                     <Select
                                         {...input}
+                                        inputId="tokenProfileSelect"
                                         maxMenuHeight={140}
                                         menuPlacement="auto"
                                         options={optionsForKeys}
@@ -464,11 +467,12 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                             <Field name="type" validate={validateRequired()}>
                                 {({ input, meta }) => (
                                     <FormGroup>
-                                        <Label for="type">Select Key Type</Label>
+                                        <Label for="typeSelect">Select Key Type</Label>
 
                                         <Select
                                             {...input}
                                             id="type"
+                                            inputId="typeSelect"
                                             maxMenuHeight={140}
                                             menuPlacement="auto"
                                             options={optionsForType()}

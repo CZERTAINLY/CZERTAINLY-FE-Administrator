@@ -66,11 +66,12 @@ const RenderRequestKey = ({ values }: { values: FormValues }) => {
         <Field name="key" validate={validateRequired()}>
             {({ input, meta }) => (
                 <FormGroup>
-                    <Label for="key">Key</Label>
+                    <Label for="renderRequestKeySelect">Key</Label>
 
                     <Select
                         {...input}
                         id="key"
+                        inputId="renderRequestKeySelect"
                         maxMenuHeight={140}
                         menuPlacement="auto"
                         options={keyOptions}

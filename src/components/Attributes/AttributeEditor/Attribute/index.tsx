@@ -183,7 +183,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                 {({ input, meta }) => (
                     <>
                         {descriptor.properties.visible ? (
-                            <Label for={name}>
+                            <Label for={`${name}Select`}>
                                 {descriptor.properties.label}
                                 {descriptor.properties.required ? ' *' : ''}
                             </Label>
@@ -194,6 +194,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                         {!addNewAttributeValue ? (
                             <Select
                                 {...input}
+                                inputId={`${name}Select`}
                                 maxMenuHeight={140}
                                 menuPlacement="auto"
                                 options={getUpdatedOptionsForEditSelect(input.value, options)}
@@ -211,6 +212,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                         ) : (
                             <Select
                                 {...input}
+                                inputId={`${name}Select`}
                                 maxMenuHeight={140}
                                 menuPlacement="auto"
                                 options={options}
@@ -245,9 +247,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                         )}
                         {descriptor.properties.visible ? (
                             <>
-                                <FormText color={descriptor.properties.required ? 'dark' : undefined} style={{ marginTop: '0.2em' }}>
-                                    {descriptor.description}
-                                </FormText>
+                                <FormText style={{ marginTop: '0.2em' }}>{descriptor.description}</FormText>
 
                                 <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
                                     {meta.error}
@@ -266,7 +266,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
         return (
             <>
                 {descriptor.properties.visible ? (
-                    <Label for={`${name}.content`}>
+                    <Label for={`${name}-content`}>
                         {descriptor.properties.label}
                         {descriptor.properties.required ? ' *' : ''}
                     </Label>
@@ -304,7 +304,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                                 )}
                             </Field>
 
-                            <FormText color={descriptor.properties.required ? 'dark' : undefined}>{descriptor.description}</FormText>
+                            <FormText>{descriptor.description}</FormText>
                         </div>
                         &nbsp;
                         <div style={{ width: '13rem' }}>
@@ -368,19 +368,18 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
 
             return (
                 <>
-                    <Label for={`${name}.code`}>
+                    <Label for={`${name}.codeTextArea`}>
                         {descriptor.properties.label}
                         {descriptor.properties.required ? ' *' : ''}
+                        <span style={{ fontStyle: 'italic' }}> ({language})</span>
                     </Label>
                     &nbsp;
-                    <Label for={`${name}.code`} style={{ fontStyle: 'italic' }}>
-                        ({language})
-                    </Label>
                     <Field name={`${name}.code`} type={getFormType(descriptor.contentType)}>
                         {({ input }) => {
                             return (
                                 <Editor
                                     {...input}
+                                    textareaId={`${name}.codeTextArea`}
                                     id={`${name}.code`}
                                     value={input.value}
                                     onValueChange={(code) => {
@@ -444,7 +443,6 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                         {descriptor.properties.visible ? (
                             <>
                                 <FormText
-                                    color={descriptor.properties.required ? 'dark' : undefined}
                                     style={
                                         descriptor.contentType === AttributeContentType.Boolean
                                             ? { display: 'block', marginTop: '-0.8em' }

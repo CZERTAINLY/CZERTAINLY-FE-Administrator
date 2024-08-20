@@ -675,10 +675,11 @@ export default function LocationDetail() {
                                     <Field name="raProfile" validate={validateRequired()}>
                                         {({ input, meta }) => (
                                             <FormGroup>
-                                                <Label for="certificate">RA Profile</Label>
+                                                <Label for="certificateSelect">RA Profile</Label>
 
                                                 <Select
                                                     {...input}
+                                                    inputId="certificateSelect"
                                                     maxMenuHeight={140}
                                                     menuPlacement="auto"
                                                     options={raProfiles.map((p) => ({
