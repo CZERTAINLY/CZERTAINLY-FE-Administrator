@@ -186,16 +186,7 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
 
             setFilterValue(newFilterValue);
         }
-    }, [
-        availableFilters,
-        currentFilters,
-        selectedFilter,
-        booleanOptions,
-        platformEnums,
-        FilterConditionOperatorEnum,
-        searchGroupEnum,
-        checkIfFieldAttributeTypeIsDate,
-    ]);
+    }, [availableFilters, currentFilters, selectedFilter, booleanOptions, platformEnums, FilterConditionOperatorEnum, searchGroupEnum]);
 
     const onUnselectFiltersClick = useCallback(
         (e: React.MouseEvent<HTMLDivElement>) => {
@@ -350,7 +341,7 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
         }
 
         return [];
-    }, [currentField, currentFilters, selectedFilter, checkIfFieldAttributeTypeIsDate]);
+    }, [currentField, currentFilters, selectedFilter]);
 
     const getBadgeContent = useCallback(
         (itemNumber: number, fieldSource: string, fieldCondition: string, label: string, value: string) => {

@@ -190,7 +190,6 @@ export default function FilterWidgetRuleAction({
             setSelectedFilter({ filterNumber: -1, isEditEnabled: false });
         }
     }, [
-        checkIfFieldAttributeTypeIsDate,
         fieldSource,
         filterField,
         filterValue,
@@ -247,7 +246,7 @@ export default function FilterWidgetRuleAction({
                 setSelectedFilter({ filterNumber: -1, isEditEnabled: false });
             }
         },
-        [actions, onActionsUpdate, checkIfFieldAttributeTypeIsDate, availableFilters],
+        [actions, onActionsUpdate, availableFilters],
     );
 
     const toggleFilter = useCallback(
@@ -321,7 +320,7 @@ export default function FilterWidgetRuleAction({
         }
 
         return [];
-    }, [currentField, actions, selectedFilter, checkIfFieldAttributeTypeIsDate]);
+    }, [currentField, actions, selectedFilter]);
     const updateFilterValueDateTime = useCallback(() => {
         const currentActionData = actions[selectedFilter.filterNumber]?.data;
         const currentFieldThis = currentFields?.find((f) => f.fieldIdentifier === actions[selectedFilter.filterNumber]?.fieldIdentifier);
@@ -371,7 +370,7 @@ export default function FilterWidgetRuleAction({
                 return;
             }
         }
-    }, [actions, checkIfFieldAttributeTypeIsDate, selectedFilter, currentFields]);
+    }, [actions, selectedFilter, currentFields]);
     useEffect(() => {
         // this effect is for updating dropdowns when a filter is selected
 
@@ -486,7 +485,6 @@ export default function FilterWidgetRuleAction({
         // currentField,
         platformEnums,
         searchGroupEnum,
-        checkIfFieldAttributeTypeIsDate,
     ]);
 
     useEffect(() => {
