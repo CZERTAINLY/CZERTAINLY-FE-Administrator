@@ -218,7 +218,6 @@ const TriggerForm = () => {
                                     <Select
                                         {...input}
                                         inputId="triggerTypeSelect"
-                                        id="triggerType"
                                         maxMenuHeight={140}
                                         menuPlacement="auto"
                                         options={ruleTriggerTypeOptions}
@@ -254,7 +253,6 @@ const TriggerForm = () => {
 
                                     <Select
                                         {...input}
-                                        id="eventResource"
                                         inputId="eventResourceSelect"
                                         maxMenuHeight={140}
                                         menuPlacement="auto"
@@ -306,7 +304,6 @@ const TriggerForm = () => {
 
                                         <Select
                                             {...input}
-                                            id="event"
                                             inputId="eventSelect"
                                             maxMenuHeight={140}
                                             menuPlacement="auto"

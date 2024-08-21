@@ -329,7 +329,6 @@ const NotificationInstanceForm = () => {
 
                                     <Select
                                         {...input}
-                                        id="notificationInstanceProvider"
                                         inputId="notificationInstanceProviderSelect"
                                         maxMenuHeight={140}
                                         menuPlacement="auto"

@@ -146,7 +146,6 @@ const ExecutionForm = () => {
 
                                     <Select
                                         {...input}
-                                        id="type"
                                         inputId="typeSelect"
                                         options={executionTypeOptions}
                                         placeholder="Select Execution Type"

@@ -151,7 +151,6 @@ const ConditionForm = () => {
 
                                     <Select
                                         {...input}
-                                        id="type"
                                         inputId="typeSelect"
                                         options={typeOptions}
                                         placeholder="Select Condition Type"

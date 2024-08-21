@@ -401,7 +401,7 @@ export default function DiscoveryForm() {
                             )}
                         </Field>
 
-                        <Field name="discoveryProviderSelect" validate={validateRequired()}>
+                        <Field name="discoveryProvider" validate={validateRequired()}>
                             {({ input, meta }) => (
                                 <FormGroup>
                                     <Label for="discoveryProviderSelect">Discovery Provider</Label>
