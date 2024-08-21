@@ -69,7 +69,7 @@ const getAuthResources: AppEpic = (action$, state$, deps) => {
                 catchError((err) =>
                     of(
                         slice.actions.getAuthResourcesFailure(),
-                        appRedirectActions.fetchError({ error: err.payload.error, message: 'Failed to get user resources' }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to get user resources' }),
                     ),
                 ),
             ),
@@ -87,7 +87,7 @@ const getObjectsForResource: AppEpic = (action$, state$, deps) => {
                 catchError((err) =>
                     of(
                         slice.actions.getObjectsForResourceFailure(),
-                        appRedirectActions.fetchError({ error: err.payload.error, message: 'Failed to get objects list' }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to get objects list' }),
                     ),
                 ),
             ),

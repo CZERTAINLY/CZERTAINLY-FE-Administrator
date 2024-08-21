@@ -61,13 +61,19 @@ const listResourceCustomAttributes: AppEpic = (action$, state$, deps) => {
         filter(slice.actions.listResourceCustomAttributes.match),
         switchMap((action) =>
             deps.apiClients.customAttributes.getResourceCustomAttributes({ resource: action.payload }).pipe(
-                map((list) => slice.actions.listResourceCustomAttributesSuccess(list.map(transformCustomAttributeDtoToModel))),
+                switchMap((list) =>
+                    of(
+                        slice.actions.listResourceCustomAttributesSuccess(list.map(transformCustomAttributeDtoToModel)),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.CustomAttributeWidget),
+                    ),
+                ),
                 catchError((err) =>
                     of(
                         slice.actions.listResourceCustomAttributesFailure({
                             error: extractError(err, 'Failed to get Resource Custom Attributes list'),
                         }),
                         appRedirectActions.fetchError({ error: err, message: 'Failed to get Resource Custom Attributes list' }),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.CustomAttributeWidget),
                     ),
                 ),
             ),
