@@ -208,8 +208,9 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
         }
 
         const field = availableFilters
-            .find((f) => f?.filterFieldSource === currentFilters[selectedFilter]?.fieldSource)
-            ?.searchFieldData?.find((f) => f?.fieldIdentifier === currentFilters[selectedFilter]?.fieldIdentifier);
+            .find((f) => f?.filterFieldSource === filterGroup.value)
+            ?.searchFieldData?.find((f) => f?.fieldIdentifier === filterField.value);
+
         const updatedFilterItem: SearchFilterModel = {
             fieldSource: filterGroup.value,
             fieldIdentifier: filterField.value,
@@ -363,9 +364,6 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
         [isFetchingAvailableFilters, FilterConditionOperatorEnum, disableBadgeRemove, onRemoveFilterClick, searchGroupEnum, busyBadges],
     );
 
-    console.log('currentField?.type', currentField?.type);
-    console.log('currentField?.attributeContentType', currentField?.attributeContentType);
-
     return (
         <>
             <Widget title={title} busy={isFetchingAvailableFilters} titleSize="larger">
@@ -457,10 +455,20 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
                                             step={
                                                 currentField?.attributeContentType
                                                     ? getStepValue(currentField?.attributeContentType)
-                                                    : undefined
+                                                    : currentField?.type
+                                                      ? getStepValue(currentField?.type)
+                                                      : undefined
                                             }
                                             value={filterValue?.toString() || ''}
                                             onChange={(e) => {
+                                                if (
+                                                    (currentField?.attributeContentType && checkIfFieldAttributeTypeIsDate(currentField)) ||
+                                                    (currentField?.type && getFormTypeFromFilterFieldType(currentField?.type))
+                                                ) {
+                                                    const dateTimeVal = getFormattedDateTime(e.target.value);
+                                                    setFilterValue(JSON.parse(JSON.stringify(dateTimeVal)));
+                                                    return;
+                                                }
                                                 setFilterValue(JSON.parse(JSON.stringify(e.target.value)));
                                             }}
                                             placeholder="Enter filter value"
