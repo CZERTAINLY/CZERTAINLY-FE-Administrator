@@ -17,7 +17,7 @@ import {
     isCustomAttributeModel,
     isDataAttributeModel,
 } from 'types/attributes';
-import { AttributeConstraintType, AttributeContentType } from 'types/openapi';
+import { AttributeConstraintType, AttributeContentType, RangeAttributeConstraintData } from 'types/openapi';
 
 import CustomSelectComponent from 'components/CustomSelectComponent';
 import { useDispatch, useSelector } from 'react-redux';
@@ -154,6 +154,17 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                     const pattern = new RegExp((regexValidator as RegexpAttributeConstraintModel).data ?? '');
                     const errorMessage = regexValidator.errorMessage;
                     validators.push(validatePattern(pattern, errorMessage));
+                }
+
+                const rangeValidator = descriptor.constraints?.find((c) => c.type === AttributeConstraintType.Range);
+                if (rangeValidator?.data) {
+                    const rangeData = rangeValidator.data as RangeAttributeConstraintData;
+                    const { from, to } = rangeData;
+                    if (from && to) {
+                        const pattern = new RegExp(`^(?:${from === 1 ? '[1-9]\\d{0,' + (to.toString().length - 1) + '}' : from}|${to})$`);
+                        const errorMessage = rangeValidator.errorMessage;
+                        validators.push(validatePattern(pattern, errorMessage));
+                    }
                 }
             }
         }

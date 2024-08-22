@@ -155,7 +155,6 @@ const ActionsForm = () => {
 
                                     <Select
                                         className="nodrag"
-                                        id="resource"
                                         inputId="resourceSelect"
                                         {...input}
                                         maxMenuHeight={140}
