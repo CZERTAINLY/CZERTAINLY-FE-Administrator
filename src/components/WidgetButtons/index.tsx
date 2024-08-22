@@ -141,7 +141,6 @@ function WidgetButtons({ buttons, justify = 'center' }: Props) {
         let style;
 
         let btnProps: ButtonProps = {
-            key: button.icon + button.tooltip + button.id || '',
             className: 'btn btn-link',
             color: 'white',
             onClick: button.onClick,
@@ -155,7 +154,7 @@ function WidgetButtons({ buttons, justify = 'center' }: Props) {
         const key = button.icon + button.tooltip + button.id || '';
 
         return button.custom ? (
-            <span key={button.icon + button.tooltip}>{button.custom}</span>
+            <span key={key}>{button.custom}</span>
         ) : (
             <Button key={key} {...btnProps} title={button.tooltip} hidden={button.hidden}>
                 <i className={classNames[button.icon]} style={style} />
