@@ -127,6 +127,19 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
             value: currentFilters[selectedFilter].condition,
         });
 
+        if (checkIfFieldAttributeTypeIsDate(field)) {
+            if (field.attributeContentType === AttributeContentType.Date) {
+                const dateVal = getFormattedDate(currentFilters[selectedFilter].value as unknown as string);
+                setFilterValue(JSON.parse(JSON.stringify(dateVal)));
+                return;
+            }
+            if (field.attributeContentType === AttributeContentType.Datetime) {
+                const dateTimeVal = getFormattedDateTime(currentFilters[selectedFilter].value as unknown as string);
+                setFilterValue(JSON.parse(JSON.stringify(dateTimeVal)));
+                return;
+            }
+        }
+
         if (
             field.type === FilterFieldType.String ||
             field.type === FilterFieldType.Number ||
@@ -217,9 +230,11 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
             condition: filterCondition.value,
             value: filterValue
                 ? typeof filterValue === 'string'
-                    ? field && checkIfFieldTypeIsDate(field.type)
-                        ? getFormattedUtc(field.type, filterValue)
-                        : filterValue
+                    ? field?.attributeContentType && checkIfFieldAttributeTypeIsDate(field)
+                        ? getFormattedUtc(field.attributeContentType, filterValue)
+                        : field?.type && checkIfFieldTypeIsDate(field.type)
+                          ? getFormattedUtc(field.type, filterValue)
+                          : filterValue
                     : Array.isArray(filterValue)
                       ? filterValue.map((v) => (v as any).value)
                       : (filterValue as any).value
