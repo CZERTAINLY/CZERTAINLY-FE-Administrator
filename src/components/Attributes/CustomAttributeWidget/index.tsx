@@ -2,13 +2,14 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Field, Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import Select from 'react-select';
-import { Form as BootstrapForm, Col, Row } from 'reactstrap';
+import { Form as BootstrapForm, Col, FormText, Row } from 'reactstrap';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../ducks/customAttributes';
 import { AttributeResponseModel, BaseAttributeContentModel, CustomAttributeModel } from '../../../types/attributes';
 import { Resource } from '../../../types/openapi';
 import ContentValueField from '../../Input/DynamicContent/ContentValueField';
 import Widget from '../../Widget';
 import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from '../AttributeViewer';
+import style from './customAttributeWidget.module.scss';
 
 export type Props = {
     resource: Resource;
@@ -128,14 +129,17 @@ export default function CustomAttributeWidget({ resource, resourceUuid, attribut
                                 </Col>
                                 <Col xs="6" sm="6" md="6" lg="6" xl="6">
                                     {attribute && (
-                                        <ContentValueField
-                                            descriptor={attribute}
-                                            onSubmit={(uuid, content) => {
-                                                form.change('selectCustomAttribute', undefined);
-                                                setAttribute(undefined);
-                                                addCustomAttribute(uuid, content);
-                                            }}
-                                        />
+                                        <div className={style.valueFieldContainer}>
+                                            <ContentValueField
+                                                descriptor={attribute}
+                                                onSubmit={(uuid, content) => {
+                                                    form.change('selectCustomAttribute', undefined);
+                                                    setAttribute(undefined);
+                                                    addCustomAttribute(uuid, content);
+                                                }}
+                                            />
+                                            <FormText className={style.formatTextStyle}>{attribute.description}</FormText>
+                                        </div>
                                     )}
                                 </Col>
                             </Row>
