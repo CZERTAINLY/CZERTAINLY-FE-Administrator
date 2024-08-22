@@ -357,7 +357,6 @@ export default function TokenForm() {
                                         <Label for="storeKind">Kind</Label>
 
                                         <Input
-                                            id="storeKind"
                                             {...input}
                                             valid={!meta.error && meta.touched}
                                             invalid={!!meta.error && meta.touched}
