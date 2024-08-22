@@ -3,6 +3,7 @@ import { Field, Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import Select from 'react-select';
 import { Form as BootstrapForm, Col, FormText, Row } from 'reactstrap';
+import { LockWidgetNameEnum } from 'types/user-interface';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../ducks/customAttributes';
 import { AttributeResponseModel, BaseAttributeContentModel, CustomAttributeModel } from '../../../types/attributes';
 import { Resource } from '../../../types/openapi';
@@ -95,7 +96,12 @@ export default function CustomAttributeWidget({ resource, resourceUuid, attribut
     );
 
     return (
-        <Widget title={'Custom Attributes'} busy={isFetchingResourceCustomAttributes || isUpdatingContent} titleSize="large">
+        <Widget
+            title={'Custom Attributes'}
+            busy={isFetchingResourceCustomAttributes || isUpdatingContent}
+            titleSize="large"
+            widgetLockName={LockWidgetNameEnum.CustomAttributeWidget}
+        >
             <AttributeViewer
                 attributes={loadedAttributes}
                 descriptors={resourceCustomAttributes}

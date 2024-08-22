@@ -208,6 +208,7 @@ export default function LocationForm() {
                                     <Label for="name">Location Name</Label>
 
                                     <Input
+                                        id="name"
                                         {...input}
                                         valid={!meta.error && meta.touched}
                                         invalid={!!meta.error && meta.touched}
@@ -224,10 +225,11 @@ export default function LocationForm() {
                         <Field name="description" validate={composeValidators(validateLength(0, 300))}>
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="name">Location Description</Label>
+                                    <Label for="description">Location Description</Label>
 
                                     <Input
                                         {...input}
+                                        id="description"
                                         valid={!meta.error && meta.touched}
                                         invalid={!!meta.error && meta.touched}
                                         type="text"
@@ -242,10 +244,11 @@ export default function LocationForm() {
                         <Field name="entity" validate={validateRequired()}>
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="entity">Entity</Label>
+                                    <Label for="entitySelect">Entity</Label>
 
                                     <Select
                                         {...input}
+                                        inputId="entitySelect"
                                         maxMenuHeight={140}
                                         menuPlacement="auto"
                                         options={optionsForEntities}

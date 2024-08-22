@@ -79,3 +79,59 @@ export function getCertificateDonutChartColors(certificateStatByStatus?: { [key:
 
     return updatedColorObject;
 }
+
+const colorMapByDaysOfExpiration: { [key: string]: string } = {
+    '10': '#632828',
+    '20': '#9c0012',
+    '30': '#f37d63',
+    '60': '#7fa2c1',
+    '90': '#008ffb',
+    More: '#1ab394',
+    Expired: '#eb3349',
+};
+
+export function getCertificateDonutChartColorsByDaysOfExpiration(certificateStatByExpirationDays?: {
+    [key: string]: number;
+}): ColorOptions | undefined {
+    if (!certificateStatByExpirationDays) {
+        return undefined;
+    }
+
+    const getColorByDaysOfExpiration = (certificateStatByExpirationDay: string) => {
+        return colorMapByDaysOfExpiration[certificateStatByExpirationDay];
+    };
+
+    return { colors: Object.keys(certificateStatByExpirationDays).map((key) => getColorByDaysOfExpiration(key)) };
+}
+
+const baseColors = ['#5d80f9', '#00a0e3', '#2b2a29', '#eb3349', '#1ab394', '#f3c363', '#6c757d', '#3754a5', '#3fb24d', '#1473b5'];
+
+function hslToHex(h: number, s: number, l: number): string {
+    l /= 100;
+    const a = (s * Math.min(l, 1 - l)) / 100;
+    const f = (n: number) => {
+        const k = (n + h / 30) % 12;
+        const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+        return Math.round(255 * color)
+            .toString(16)
+            .padStart(2, '0');
+    };
+    return `#${f(0)}${f(8)}${f(4)}`;
+}
+
+export function getDonutChartColorsByRandomNumberOfOptions(numberOfOptions: number): ColorOptions {
+    const colors = [...baseColors];
+    const saturation = 70;
+    const lightness = 50;
+
+    const additionalColorsNeeded = numberOfOptions - baseColors.length;
+    if (additionalColorsNeeded > 0) {
+        const hueStep = 360 / additionalColorsNeeded;
+        for (let i = 0; i < additionalColorsNeeded; i++) {
+            const hue = (i * hueStep) % 360; // evenly spaced hues for additional colors
+            colors.push(hslToHex(hue, saturation, lightness));
+        }
+    }
+
+    return { colors: colors.slice(0, numberOfOptions) };
+}

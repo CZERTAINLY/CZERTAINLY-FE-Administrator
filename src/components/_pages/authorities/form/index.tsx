@@ -268,6 +268,7 @@ export default function AuthorityForm() {
 
                                     <Input
                                         {...input}
+                                        id="name"
                                         valid={!meta.error && meta.touched}
                                         invalid={!!meta.error && meta.touched}
                                         type="text"
@@ -284,10 +285,11 @@ export default function AuthorityForm() {
                             <Field name="authorityProvider" validate={validateRequired()}>
                                 {({ input, meta }) => (
                                     <FormGroup>
-                                        <Label for="authorityProvider">Authority Provider</Label>
+                                        <Label for="authorityProviderSelect">Authority Provider</Label>
 
                                         <Select
                                             {...input}
+                                            inputId="authorityProviderSelect"
                                             maxMenuHeight={140}
                                             menuPlacement="auto"
                                             options={optionsForAuthorityProviders}
@@ -335,10 +337,11 @@ export default function AuthorityForm() {
                             <Field name="storeKind" validate={validateRequired()}>
                                 {({ input, meta }) => (
                                     <FormGroup>
-                                        <Label for="storeKind">Kind</Label>
+                                        <Label for="storeKindSelect">Kind</Label>
 
                                         <Select
                                             {...input}
+                                            inputId="storeKindSelect"
                                             maxMenuHeight={140}
                                             menuPlacement="auto"
                                             options={optionsForKinds}

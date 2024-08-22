@@ -28,6 +28,7 @@ const listGroups: AppEpic = (action$, state$, deps) => {
                 catchError((err) =>
                     of(
                         slice.actions.listGroupsFailure({ error: extractError(err, 'Failed to get Group list') }),
+                        alertActions.error(extractError(err, 'Failed to get Group list')),
                         userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfGroups),
                     ),
                 ),

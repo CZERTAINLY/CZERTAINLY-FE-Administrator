@@ -229,6 +229,7 @@ export default function EntityForm() {
                                     <Label for="name">Entity Name</Label>
 
                                     <Input
+                                        id="name"
                                         {...input}
                                         valid={!meta.error && meta.touched}
                                         invalid={!!meta.error && meta.touched}
@@ -246,10 +247,11 @@ export default function EntityForm() {
                             <Field name="entityProvider" validate={validateRequired()}>
                                 {({ input, meta }) => (
                                     <FormGroup>
-                                        <Label for="entityProvider">Entity Provider</Label>
+                                        <Label for="entityProviderSelect">Entity Provider</Label>
 
                                         <Select
                                             {...input}
+                                            inputId="entityProviderSelect"
                                             maxMenuHeight={140}
                                             menuPlacement="auto"
                                             options={optionsForEntityProviders}
@@ -297,9 +299,10 @@ export default function EntityForm() {
                             <Field name="storeKind" validate={validateRequired()}>
                                 {({ input, meta }) => (
                                     <FormGroup>
-                                        <Label for="storeKind">Kind</Label>
+                                        <Label for="storeKindSelect">Kind</Label>
 
                                         <Select
+                                            inputId="storeKindSelect"
                                             {...input}
                                             maxMenuHeight={140}
                                             menuPlacement="auto"

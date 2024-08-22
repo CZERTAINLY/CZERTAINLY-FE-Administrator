@@ -117,6 +117,7 @@ const ActionsForm = () => {
 
                                     <Input
                                         {...input}
+                                        id="name"
                                         valid={!meta.error && meta.touched}
                                         invalid={!!meta.error && meta.touched}
                                         type="text"
@@ -135,6 +136,7 @@ const ActionsForm = () => {
 
                                     <Input
                                         {...input}
+                                        id="description"
                                         valid={!meta.error && meta.touched}
                                         invalid={!!meta.error && meta.touched}
                                         type="text"
@@ -149,10 +151,11 @@ const ActionsForm = () => {
                         <Field name="selectedResource" validate={validateRequired()}>
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="resource">Resource</Label>
+                                    <Label for="resourceSelect">Resource</Label>
 
                                     <Select
                                         className="nodrag"
+                                        inputId="resourceSelect"
                                         {...input}
                                         maxMenuHeight={140}
                                         menuPlacement="auto"

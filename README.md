@@ -18,6 +18,78 @@ Bulk operations can be performed on most of the objects from their list page. To
 
 For more information, please refer to the [CZERTAINLY documentation](https://docs.czertainly.com).
 
+### Generating API Types
+
+This section provides a guide on how to generate typeScript tlasses for DTOs and APIs from the OpenAPI specification, including some required customizations
+
+#### Step 1: Generate TypeScript Data Transfer Objects (DTOs)
+
+To generate TypeScript Data Transfer Objects (DTOs) from the OpenAPI specification, use the following command. This command will generate the types and format the generated files using Prettier.
+
+```sh
+npm run generate-types
+```
+
+#### Step 2: Fix Type Errors in Generated Code
+
+Sometimes, you may encounter type errors in the generated code, such as:
+
+```sh
+Type 'PaginationRequestDto' is not assignable to type 'string | number | boolean | (string | number | boolean)[]'.ts(2322)
+(property) 'paginationRequestDto': PaginationRequestDto
+```
+
+Original generated code:
+
+```sh
+const query: HttpQuery = { // required parameters are used directly since they are already checked by throwIfNullOrUndefined
+    'paginationRequestDto': paginationRequestDto,
+};
+```
+
+Updated code to fix the type error:
+
+```sh
+const query: HttpQuery = {};`
+if (paginationRequestDto != null) {
+    Object.assign(query, paginationRequestDto);
+}
+```
+
+This change ensures that paginationRequestDto is only assigned to query if it is not null or undefined, avoiding the type error.
+
+#### Step 3: Manually Add BaseAttributeContentDto to DataAttribute Interface
+
+Currently, when OpenAPI model types are generated, the BaseAttributeContentDto gets removed from the `DataAttribute` interface. This issue arises due to internal library problem generating hierarchical (inheritance) types.
+
+Update interface DataAttribute as following
+
+```sh
+interface DataAttribute {
+    # Add the following property to DataAttribute interface
+    /**
+     * Content of the Attribute
+     * @type {Array<BaseAttributeContentDto>}
+     * @memberof DataAttribute
+     */
+    content?: Array<BaseAttributeContentDto>;
+}
+```
+
+Make sure to manually add the content property back to the DataAttribute interface after generating the types.
+
+Do not forget to import BaseAttributeContentDto
+
+```sh
+import type {
+    AttributeCallback,
+    AttributeContentType,
+    AttributeType,
+    BaseAttributeConstraint, # Add this import
+    DataAttributeProperties,
+} from './';
+```
+
 ## Docker container
 
 Admin Web Interface is provided as a Docker container. Use the `docker pull 3keycompany/czertainly-frontend-administrator:tagname` to pull the required image from the repository. It can be configured using the following environment variables:

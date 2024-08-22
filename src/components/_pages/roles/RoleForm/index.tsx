@@ -118,6 +118,7 @@ function RoleForm() {
                                         <Label for="name">Role Name</Label>
 
                                         <Input
+                                            id="name"
                                             {...input}
                                             valid={!meta.error && meta.touched}
                                             invalid={!!meta.error && meta.touched}
@@ -137,6 +138,7 @@ function RoleForm() {
                                         <Label for="description">Description</Label>
 
                                         <Input
+                                            id="description"
                                             {...input}
                                             valid={!meta.error && meta.touched}
                                             invalid={!!meta.error && meta.touched}
