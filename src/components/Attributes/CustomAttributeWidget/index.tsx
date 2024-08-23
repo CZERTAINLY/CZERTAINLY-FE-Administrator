@@ -135,7 +135,7 @@ export default function CustomAttributeWidget({ resource, resourceUuid, attribut
                                 </Col>
                                 <Col xs="6" sm="6" md="6" lg="6" xl="6">
                                     {attribute && (
-                                        <div className={style.valueFieldContainer}>
+                                        <div>
                                             <ContentValueField
                                                 descriptor={attribute}
                                                 onSubmit={(uuid, content) => {
