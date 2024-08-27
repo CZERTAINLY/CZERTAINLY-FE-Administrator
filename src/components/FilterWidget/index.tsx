@@ -452,14 +452,14 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
 
                             <Col>
                                 <FormGroup>
-                                    <Label for="value">Filter Value</Label>
+                                    <Label for="valueSelect">Filter Value</Label>
                                     {currentField?.type === undefined ||
                                     currentField?.type === FilterFieldType.String ||
                                     currentField?.type === FilterFieldType.Date ||
                                     currentField?.type === FilterFieldType.Datetime ||
                                     currentField?.type === FilterFieldType.Number ? (
                                         <Input
-                                            id="value"
+                                            id="valueSelect"
                                             type={
                                                 currentField?.attributeContentType && checkIfFieldAttributeTypeIsDate(currentField)
                                                     ? getFormTypeFromAttributeContentType(currentField?.attributeContentType)
@@ -492,6 +492,7 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
                                     ) : currentField?.type === FilterFieldType.Boolean ? (
                                         <Select
                                             id="value"
+                                            inputId="valueSelect"
                                             options={filterField ? booleanOptions : undefined}
                                             value={filterValue || null}
                                             onChange={(e) => {
@@ -502,6 +503,7 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
                                     ) : (
                                         <Select
                                             id="value"
+                                            inputId="valueSelect"
                                             options={objectValueOptions}
                                             value={filterValue || null}
                                             onChange={(e) => {
