@@ -94,6 +94,13 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
         }
     }, []);
 
+    const currentFields = useMemo(
+        () => availableFilters.find((f) => f.filterFieldSource === filterGroup?.value)?.searchFieldData,
+        [availableFilters, filterGroup],
+    );
+
+    const currentField = useMemo(() => currentFields?.find((f) => f.fieldIdentifier === filterField?.value), [filterField, currentFields]);
+
     useEffect(() => {
         dispatch(actions.getAvailableFilters({ entity, getAvailableFiltersApi }));
     }, [dispatch, entity, getAvailableFiltersApi]);
@@ -199,7 +206,16 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
 
             setFilterValue(newFilterValue);
         }
-    }, [availableFilters, currentFilters, selectedFilter, booleanOptions, platformEnums, FilterConditionOperatorEnum, searchGroupEnum]);
+    }, [
+        availableFilters,
+        currentFilters,
+        selectedFilter,
+        booleanOptions,
+        platformEnums,
+        FilterConditionOperatorEnum,
+        searchGroupEnum,
+        currentField,
+    ]);
 
     const onUnselectFiltersClick = useCallback(
         (e: React.MouseEvent<HTMLDivElement>) => {
@@ -314,13 +330,6 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
         [selectedFilter],
     );
 
-    const currentFields = useMemo(
-        () => availableFilters.find((f) => f.filterFieldSource === filterGroup?.value)?.searchFieldData,
-        [availableFilters, filterGroup],
-    );
-
-    const currentField = useMemo(() => currentFields?.find((f) => f.fieldIdentifier === filterField?.value), [filterField, currentFields]);
-
     const objectValueOptions: ObjectValueOptions[] = useMemo(() => {
         if (!currentField) return [];
 
@@ -358,7 +367,7 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
         }
 
         return [];
-    }, [currentField, currentFilters, selectedFilter]);
+    }, [currentField, currentFilters, selectedFilter, platformEnums]);
 
     const getBadgeContent = useCallback(
         (itemNumber: number, fieldSource: string, fieldCondition: string, label: string, value: string) => {
