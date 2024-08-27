@@ -186,7 +186,7 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
                     if (checkIfFieldAttributeTypeIsDate(field)) {
                         label = getFormattedDateTime(v);
                     } else {
-                        label = v;
+                        label = currentField?.platformEnum ? getEnumLabel(platformEnums[currentField.platformEnum], v) : v;
                     }
                     value = v;
                 } else {
@@ -199,6 +199,7 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
 
             setFilterValue(newFilterValue);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [availableFilters, currentFilters, selectedFilter, booleanOptions, platformEnums, FilterConditionOperatorEnum, searchGroupEnum]);
 
     const onUnselectFiltersClick = useCallback(
@@ -321,43 +322,47 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
 
     const currentField = useMemo(() => currentFields?.find((f) => f.fieldIdentifier === filterField?.value), [filterField, currentFields]);
 
-    const objectValueOptions: ObjectValueOptions[] = useMemo(() => {
-        if (!currentField) return [];
+    const objectValueOptions: ObjectValueOptions[] = useMemo(
+        () => {
+            if (!currentField) return [];
 
-        if (Array.isArray(currentField?.value)) {
-            const objectOptions = currentField?.value?.map((v, i) => {
-                let label = '';
-                let value = '';
-                if (typeof v === 'string') {
-                    if (checkIfFieldAttributeTypeIsDate(currentField)) {
-                        label = getFormattedDateTime(v);
+            if (Array.isArray(currentField?.value)) {
+                const objectOptions = currentField?.value?.map((v, i) => {
+                    let label = '';
+                    let value = '';
+                    if (typeof v === 'string') {
+                        if (checkIfFieldAttributeTypeIsDate(currentField)) {
+                            label = getFormattedDateTime(v);
+                        } else {
+                            label = currentField?.platformEnum ? getEnumLabel(platformEnums[currentField.platformEnum], v) : v;
+                        }
+                        value = v;
                     } else {
-                        label = v;
+                        label = v?.name || JSON.stringify(v);
+                        value = v;
                     }
-                    value = v;
-                } else {
-                    label = v?.name || JSON.stringify(v);
-                    value = v;
-                }
 
-                return { label, value };
-            });
+                    return { label, value };
+                });
 
-            if (selectedFilter === -1) return objectOptions;
+                if (selectedFilter === -1) return objectOptions;
 
-            const currentValue = currentFilters[selectedFilter].value;
-            const filteredOptions = objectOptions.filter((o) => {
-                if (Array.isArray(currentValue)) {
-                    return !currentValue.some((a) => a?.name === o?.label);
-                } else {
-                    return JSON.stringify(currentValue) !== o?.value;
-                }
-            });
-            return filteredOptions;
-        }
+                const currentValue = currentFilters[selectedFilter].value;
+                const filteredOptions = objectOptions.filter((o) => {
+                    if (Array.isArray(currentValue)) {
+                        return !currentValue.some((a) => a?.name === o?.label);
+                    } else {
+                        return JSON.stringify(currentValue) !== o?.value;
+                    }
+                });
+                return filteredOptions;
+            }
 
-        return [];
-    }, [currentField, currentFilters, selectedFilter]);
+            return [];
+        },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [currentField, currentFilters, selectedFilter],
+    );
 
     const getBadgeContent = useCallback(
         (itemNumber: number, fieldSource: string, fieldCondition: string, label: string, value: string) => {
