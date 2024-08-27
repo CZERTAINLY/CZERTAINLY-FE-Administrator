@@ -72,13 +72,20 @@ export const getAttributeContent = (contentType: AttributeContentType, content: 
 
 const getAttributeFormValue = (contentType: AttributeContentType, item: any) => {
     if (contentType === AttributeContentType.Datetime) {
-        const returnVal = item?.value?.data ? { data: new Date(item.value.data).toISOString() } : new Date(item).toISOString();
+        const returnVal = item?.value?.data
+            ? { data: new Date(item.value.data).toISOString() }
+            : typeof item === 'string'
+              ? { data: new Date(item).toISOString() }
+              : new Date(item).toISOString();
         return returnVal;
     }
     if (contentType === AttributeContentType.Date) {
+        console.log('inside date =>item', item);
         const returnVal = item?.value?.data
             ? { data: new Date(item.value.data).toISOString().slice(0, 10) }
-            : new Date(item).toISOString().slice(0, 10);
+            : typeof item === 'string'
+              ? { data: new Date(item).toISOString().slice(0, 10) }
+              : new Date(item).toISOString().slice(0, 10);
 
         return returnVal;
     }
