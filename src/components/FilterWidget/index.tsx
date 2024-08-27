@@ -214,7 +214,7 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
         platformEnums,
         FilterConditionOperatorEnum,
         searchGroupEnum,
-        currentField,
+        currentField?.platformEnum,
     ]);
 
     const onUnselectFiltersClick = useCallback(
@@ -334,7 +334,6 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
         if (!currentField) return [];
 
         if (Array.isArray(currentField?.value)) {
-            console.log('currentField', currentField);
             const objectOptions = currentField?.value?.map((v, i) => {
                 let label = '';
                 let value = '';
@@ -511,7 +510,6 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
                                         />
                                     ) : (
                                         <Select
-                                            placeholder="sel"
                                             id="value"
                                             options={objectValueOptions}
                                             value={filterValue || null}
