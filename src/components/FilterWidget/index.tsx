@@ -186,7 +186,7 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
                     if (checkIfFieldAttributeTypeIsDate(field)) {
                         label = getFormattedDateTime(v);
                     } else {
-                        label = v;
+                        label = currentField?.platformEnum ? getEnumLabel(platformEnums[currentField.platformEnum], v) : v;
                     }
                     value = v;
                 } else {
@@ -325,6 +325,7 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
         if (!currentField) return [];
 
         if (Array.isArray(currentField?.value)) {
+            console.log('currentField', currentField);
             const objectOptions = currentField?.value?.map((v, i) => {
                 let label = '';
                 let value = '';
@@ -332,7 +333,7 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
                     if (checkIfFieldAttributeTypeIsDate(currentField)) {
                         label = getFormattedDateTime(v);
                     } else {
-                        label = v;
+                        label = currentField?.platformEnum ? getEnumLabel(platformEnums[currentField.platformEnum], v) : v;
                     }
                     value = v;
                 } else {
@@ -501,6 +502,7 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
                                         />
                                     ) : (
                                         <Select
+                                            placeholder="sel"
                                             id="value"
                                             options={objectValueOptions}
                                             value={filterValue || null}
