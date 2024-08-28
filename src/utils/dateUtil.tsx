@@ -213,3 +213,9 @@ export const checkIfFieldAttributeTypeIsDate = (field: SearchFieldDataDto) => {
         return false;
     }
 };
+
+export const checkIfFieldTypeIsDate = (type: FilterFieldType) => {
+    if (type === FilterFieldType.Date || type === FilterFieldType.Datetime) {
+        return true;
+    }
+};
