@@ -278,7 +278,6 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
         dispatch,
         entity,
         onFilterUpdate,
-        checkIfFieldTypeIsDate,
     ]);
 
     const onRemoveFilterClick = useCallback(
