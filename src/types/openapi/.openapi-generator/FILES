@@ -113,6 +113,8 @@ models/CertificateEventHistoryDto.ts
 models/CertificateFormat.ts
 models/CertificateFormatEncoding.ts
 models/CertificateInLocationDto.ts
+models/CertificateProtocol.ts
+models/CertificateProtocolDto.ts
 models/CertificateRequestDto.ts
 models/CertificateRequestFormat.ts
 models/CertificateResponseDto.ts
@@ -353,6 +355,7 @@ models/UpdateConditionRequestDto.ts
 models/UpdateExecutionRequestDto.ts
 models/UpdateKeyUsageRequestDto.ts
 models/UpdateRuleRequestDto.ts
+models/UpdateScheduledJob.ts
 models/UpdateTriggerRequestDto.ts
 models/UpdateUserRequestDto.ts
 models/UploadCertificateRequestDto.ts
