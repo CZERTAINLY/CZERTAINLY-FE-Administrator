@@ -641,7 +641,6 @@ export function useTransformTriggerObjectToNodesAndEdges(
                     group: 'actions',
 
                     deleteAction: {
-                        disableCondition: 'SingleChild',
                         disabledMessage: 'The Trigger must have at least one action if it is not ignored',
                         action: () => {
                             dispatch(
