@@ -480,28 +480,6 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
                                             }
                                             value={filterValue?.toString() || ''}
                                             onChange={(e) => {
-                                                if (
-                                                    (currentField?.attributeContentType && checkIfFieldAttributeTypeIsDate(currentField)) ||
-                                                    (currentField?.type && checkIfFieldTypeIsDate(currentField?.type))
-                                                ) {
-                                                    if (
-                                                        currentField?.attributeContentType === AttributeContentType.Date ||
-                                                        currentField?.type === FilterFieldType.Date
-                                                    ) {
-                                                        const dateVal = getFormattedDate(e.target.value);
-                                                        setFilterValue(JSON.parse(JSON.stringify(dateVal)));
-                                                        return;
-                                                    }
-                                                    if (
-                                                        currentField?.attributeContentType === AttributeContentType.Datetime ||
-                                                        currentField?.type === FilterFieldType.Datetime
-                                                    ) {
-                                                        const dateTimeVal = getFormattedDateTime(e.target.value);
-                                                        setFilterValue(JSON.parse(JSON.stringify(dateTimeVal)));
-                                                        return;
-                                                    }
-                                                    return;
-                                                }
                                                 setFilterValue(JSON.parse(JSON.stringify(e.target.value)));
                                             }}
                                             placeholder="Enter filter value"
