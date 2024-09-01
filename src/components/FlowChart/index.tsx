@@ -71,11 +71,12 @@ const getLayoutedElements = (nodes: CustomNode[], edges: Edge[], direction = 'TB
         // Calculate dynamic radius based on the number of nodes to ensure minimum distance of 200px
         let dynamicRadius = surroundingNodes.length * 60; // Example calculation, adjust as needed
         dynamicRadius = Math.max(dynamicRadius, minRadius); // Ensure radius is not less than minRadius
-
+        let mainNodePosition = { x: 0, y: 0 };
         if (mainNode) {
             const currentNodeHeight = mainNode.data?.description ? nodeHeight + 35 : nodeHeight;
             // Position the main node at the center
             mainNode.position = { x: centerX - nodeWidth / 2, y: centerY - currentNodeHeight / 2 };
+            mainNodePosition = mainNode.position;
         }
 
         const someGroupedNodes = surroundingNodes.some((node) => node.data.group);
@@ -102,56 +103,51 @@ const getLayoutedElements = (nodes: CustomNode[], edges: Edge[], direction = 'TB
 
             groupKeys.forEach((groupKey, index) => {
                 const angle = angleIncrement * index;
+                // check if it is a odd index
+                // const isOdd = index % 2 === 1;
                 const groupPosition = {
-                    x: centerX + radius * 1.75 * Math.cos(angle),
-                    y: centerY + radius * Math.sin(angle),
+                    x: mainNodePosition.x + radius * 1.75 * Math.cos(angle),
+                    y: mainNodePosition.y + radius * Math.sin(angle),
                 };
 
                 // Position each node in the group around the group's central position
-                nodesByGroups[groupKey] = nodesByGroups[groupKey].map((node, nodeIndex) => {
+                nodesByGroups[groupKey].forEach((node, nodeIndex) => {
                     const nodeAngle = ((2 * Math.PI) / nodesByGroups[groupKey].length) * nodeIndex;
                     const nodeRadius = 125 * (nodesByGroups[groupKey].length * 0.3); // Smaller radius for nodes within a group
+                    // const lastOutOfTwoNodes = nodesByGroups[groupKey].length % 2 === 0;
                     const onlyTwoNodes = nodesByGroups[groupKey].length === 2;
                     let yOffset = 0;
                     if (onlyTwoNodes && nodeIndex === 1) {
                         yOffset = 105;
                     }
-                    return {
-                        ...node,
-                        position: {
-                            x: groupPosition.x + nodeRadius * 1.75 * Math.cos(nodeAngle),
-                            y: groupPosition.y + nodeRadius * Math.sin(nodeAngle) + yOffset,
-                        },
+                    node.position = {
+                        x: groupPosition.x + nodeRadius * 1.75 * Math.cos(nodeAngle),
+                        y: groupPosition.y + nodeRadius * Math.sin(nodeAngle) + yOffset,
                     };
                 });
             });
-
-            const updatedNodes = Object.values(nodesByGroups).flat();
-            return { nodes: mainNode ? [mainNode, ...updatedNodes] : updatedNodes, edges };
         } else {
-            const updatedSurroundingNodes = surroundingNodes.map((node, index) => {
+            surroundingNodes.forEach((node, index) => {
                 // Calculate the angle for the current node
                 const angle = angleIncrement * index;
                 const currentNodeHeight = node.data?.description ? nodeHeight + 35 : nodeHeight;
 
                 // Calculate and set the position for each surrounding node using the dynamic radius
-                return {
-                    ...node,
-                    position: {
-                        x: centerX + dynamicRadius * Math.cos(angle) - nodeWidth / 2,
-                        y: centerY + dynamicRadius * Math.sin(angle) - currentNodeHeight / 2,
-                    },
-                    targetPosition: Position.Top,
-                    sourcePosition: Position.Bottom,
+                node.position = {
+                    x: centerX + dynamicRadius * Math.cos(angle) - nodeWidth / 2,
+                    y: centerY + dynamicRadius * Math.sin(angle) - currentNodeHeight / 2,
                 };
+                node.targetPosition = Position.Top;
+                node.sourcePosition = Position.Bottom;
             });
-            return { nodes: mainNode ? [mainNode, ...updatedSurroundingNodes] : updatedSurroundingNodes, edges };
         }
+        return { nodes, edges };
     } else {
         const isHorizontal = direction === 'LR';
         dagreGraph.setGraph({ rankdir: direction });
 
         nodes.forEach((node) => {
+            // const currentNodeHeight = node.data.otherProperties?.length ? nodeHeight + node.data.otherProperties?.length * 20 : nodeHeight;
             const currentNodeHeight = node.data?.description ? nodeHeight + 35 : nodeHeight;
             dagreGraph.setNode(node.id, { width: nodeWidth, height: currentNodeHeight });
         });
@@ -162,21 +158,20 @@ const getLayoutedElements = (nodes: CustomNode[], edges: Edge[], direction = 'TB
 
         dagre.layout(dagreGraph);
 
-        const updatedNodes = nodes.map((node: CustomNode) => {
+        nodes.forEach((node: CustomNode) => {
             const nodeWithPosition = dagreGraph.node(node.id);
+            node.targetPosition = isHorizontal ? Position.Left : Position.Top;
+            node.sourcePosition = isHorizontal ? Position.Right : Position.Bottom;
             const currentNodeHeight = node.data?.description ? nodeHeight + 35 : nodeHeight;
-            return {
-                ...node,
-                targetPosition: isHorizontal ? Position.Left : Position.Top,
-                sourcePosition: isHorizontal ? Position.Right : Position.Bottom,
-                position: {
-                    x: nodeWithPosition.x - nodeWidth / 2,
-                    y: nodeWithPosition.y - currentNodeHeight / 2,
-                },
+            node.position = {
+                x: nodeWithPosition.x - nodeWidth / 2,
+                y: nodeWithPosition.y - currentNodeHeight / 2,
             };
+
+            return node;
         });
 
-        return { nodes: updatedNodes, edges };
+        return { nodes, edges };
     }
 };
 const FlowChartContent = ({
@@ -237,6 +232,13 @@ const FlowChartContent = ({
             }),
         );
     }, [flowChartEdges, flowChartNodes, flowDirection, dispatch]);
+
+    // unmounting effect
+    useEffect(() => {
+        return () => {
+            dispatch(userInterfaceActions.clearReactFlowUI());
+        };
+    }, [dispatch]);
 
     return (
         <Widget className={style.flowWidget} busy={busy}>
