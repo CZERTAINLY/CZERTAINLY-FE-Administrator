@@ -158,20 +158,21 @@ const getLayoutedElements = (nodes: CustomNode[], edges: Edge[], direction = 'TB
 
         dagre.layout(dagreGraph);
 
-        nodes.forEach((node: CustomNode) => {
+        const updatedNodes = nodes.map((node: CustomNode) => {
             const nodeWithPosition = dagreGraph.node(node.id);
-            node.targetPosition = isHorizontal ? Position.Left : Position.Top;
-            node.sourcePosition = isHorizontal ? Position.Right : Position.Bottom;
             const currentNodeHeight = node.data?.description ? nodeHeight + 35 : nodeHeight;
-            node.position = {
-                x: nodeWithPosition.x - nodeWidth / 2,
-                y: nodeWithPosition.y - currentNodeHeight / 2,
+            return {
+                ...node,
+                targetPosition: isHorizontal ? Position.Left : Position.Top,
+                sourcePosition: isHorizontal ? Position.Right : Position.Bottom,
+                position: {
+                    x: nodeWithPosition.x - nodeWidth / 2,
+                    y: nodeWithPosition.y - currentNodeHeight / 2,
+                },
             };
-
-            return node;
         });
 
-        return { nodes, edges };
+        return { nodes: updatedNodes, edges };
     }
 };
 const FlowChartContent = ({
