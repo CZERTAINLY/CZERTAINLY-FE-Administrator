@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { Badge, Container } from 'reactstrap';
@@ -207,14 +207,14 @@ function TokenProfileList() {
     );
 
     const getTokenProfileUsages = (tokenProfile: TokenProfileResponseModel) => {
-        return tokenProfile.usages.map((keyUsage) => {
+        return tokenProfile.usages.map((keyUsage, i) => {
             return (
-                <>
+                <React.Fragment key={keyUsage + i}>
                     &nbsp;
                     <Badge color="secondary" key={keyUsage}>
                         {keyUsage}
                     </Badge>
-                </>
+                </React.Fragment>
             );
         });
     };
@@ -238,7 +238,7 @@ function TokenProfileList() {
                             {tokenProfile.tokenInstanceName ?? 'Unassigned'}
                         </Link>
                     ) : (
-                        tokenProfile.tokenInstanceName ?? 'Unassigned'
+                        (tokenProfile.tokenInstanceName ?? 'Unassigned')
                     ),
 
                     <TokenStatusBadge status={tokenProfile.tokenInstanceStatus} />,

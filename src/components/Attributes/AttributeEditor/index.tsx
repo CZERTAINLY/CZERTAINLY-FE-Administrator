@@ -160,7 +160,7 @@ export default function AttributeEditor({
                     : 'value'
                 : 'value';
             const currentContent = formAttribute
-                ? getObjectPropertyValue(formAttributes[formAttribute], formMappingPath) ?? formAttributes[formAttribute]
+                ? (getObjectPropertyValue(formAttributes[formAttribute], formMappingPath) ?? formAttributes[formAttribute])
                 : undefined;
 
             const depDescriptor = attributeDescriptors.find(
@@ -302,7 +302,7 @@ export default function AttributeEditor({
 
         const descriptorsToLoad =
             attributeDescriptors === prevDescriptors && attributes === prevAttributes
-                ? groupAttributesCallbackAttributes ?? []
+                ? (groupAttributesCallbackAttributes ?? [])
                 : [...attributeDescriptors, ...groupAttributesCallbackAttributes];
 
         setPrevGroupDescriptors(groupAttributesCallbackAttributes);

@@ -494,12 +494,14 @@ const updateAction: AppEpic = (action$, state, deps) => {
                     updateActionRequestDto: transformUpdateActionRequestModelToDto(action.payload.action),
                 })
                 .pipe(
-                    switchMap((action) =>
+                    switchMap((actionDetail) =>
                         of(
                             slice.actions.updateActionSuccess({
-                                action: transformActionDetailDtoToModel(action),
+                                action: transformActionDetailDtoToModel(actionDetail),
                             }),
-                            appRedirectActions.redirect({ url: `../actions/detail/${action.uuid}` }),
+                            ...(action?.payload?.noRedirect
+                                ? []
+                                : [appRedirectActions.redirect({ url: `../actions/detail/${actionDetail.uuid}` })]),
                         ),
                     ),
                     catchError((err) =>
@@ -557,7 +559,7 @@ const updateRule: AppEpic = (action$, state, deps) => {
                     switchMap((rule) =>
                         of(
                             slice.actions.updateRuleSuccess({ rule: transformRuleDetailDtoToModel(rule) }),
-                            appRedirectActions.redirect({ url: `../rules/detail/${rule.uuid}` }),
+                            ...(action?.payload?.noRedirect ? [] : [appRedirectActions.redirect({ url: `../rules/detail/${rule.uuid}` })]),
                         ),
                     ),
                     catchError((err) =>

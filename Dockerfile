@@ -1,9 +1,9 @@
 # build environment
-FROM node:20-alpine as build
+FROM node:20-alpine AS build
 
 WORKDIR /app
 
-ENV PATH /app/node_modules/.bin:$PATH
+ENV PATH=/app/node_modules/.bin:$PATH
 
 COPY package.json ./
 COPY package-lock.json ./
@@ -16,7 +16,7 @@ COPY . ./
 RUN npm run build
 
 # production environment
-FROM nginxinc/nginx-unprivileged:1.25.4-alpine
+FROM nginxinc/nginx-unprivileged:1.27.0-alpine
 
 WORKDIR /usr/share/nginx/html
 

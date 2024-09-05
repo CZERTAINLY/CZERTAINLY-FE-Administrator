@@ -114,6 +114,7 @@ const ConditionForm = () => {
                                     <Input
                                         {...input}
                                         valid={!meta.error && meta.touched}
+                                        id="name"
                                         invalid={!!meta.error && meta.touched}
                                         type="text"
                                         placeholder="Enter the Condition Group Name"
@@ -131,6 +132,7 @@ const ConditionForm = () => {
 
                                     <Input
                                         {...input}
+                                        id="description"
                                         valid={!meta.error && meta.touched}
                                         invalid={!!meta.error && meta.touched}
                                         type="text"
@@ -145,10 +147,11 @@ const ConditionForm = () => {
                         <Field name="selectedType" validate={validateRequired()}>
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="type">Condition Type</Label>
+                                    <Label for="typeSelect">Condition Type</Label>
 
                                     <Select
                                         {...input}
+                                        inputId="typeSelect"
                                         options={typeOptions}
                                         placeholder="Select Condition Type"
                                         onChange={(event) => {
@@ -169,10 +172,12 @@ const ConditionForm = () => {
                         <Field name="selectedResource" validate={validateRequired()}>
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="resource">Resource</Label>
+                                    <Label for="resourceSelect">Resource</Label>
 
                                     <Select
                                         {...input}
+                                        id="resource"
+                                        inputId="resourceSelect"
                                         maxMenuHeight={140}
                                         menuPlacement="auto"
                                         options={resourceOptionsWithRuleEvaluator || []}

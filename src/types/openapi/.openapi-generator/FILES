@@ -6,6 +6,7 @@ apis/ApprovalProfileInventoryApi.ts
 apis/AuditLogApi.ts
 apis/AuthenticationManagementApi.ts
 apis/AuthorityManagementApi.ts
+apis/CMPProfileManagementApi.ts
 apis/CallbackApi.ts
 apis/CertificateInventoryApi.ts
 apis/CertificateKeyGroupApi.ts
@@ -52,6 +53,7 @@ models/ActionDetailDto.ts
 models/ActionDto.ts
 models/ActionRequestDto.ts
 models/ActivateAcmeForRaProfileRequestDto.ts
+models/ActivateCmpForRaProfileRequestDto.ts
 models/ActivateScepForRaProfileRequestDto.ts
 models/AddLocationRequestDto.ts
 models/AddRaProfileRequestDto.ts
@@ -111,6 +113,8 @@ models/CertificateEventHistoryDto.ts
 models/CertificateFormat.ts
 models/CertificateFormatEncoding.ts
 models/CertificateInLocationDto.ts
+models/CertificateProtocol.ts
+models/CertificateProtocolDto.ts
 models/CertificateRequestDto.ts
 models/CertificateRequestFormat.ts
 models/CertificateResponseDto.ts
@@ -131,6 +135,10 @@ models/ClientCertificateRenewRequestDto.ts
 models/ClientCertificateRequestDto.ts
 models/ClientCertificateRevocationDto.ts
 models/ClientCertificateSignRequestDto.ts
+models/CmpProfileDetailDto.ts
+models/CmpProfileDto.ts
+models/CmpProfileEditRequestDto.ts
+models/CmpProfileRequestDto.ts
 models/CodeBlockAttributeContent.ts
 models/CodeBlockAttributeContentData.ts
 models/ComplianceConnectorAndGroupsDto.ts
@@ -267,9 +275,11 @@ models/PaginationRequestDto.ts
 models/PlatformEnum.ts
 models/PlatformSettingsDto.ts
 models/ProgrammingLanguageEnum.ts
+models/ProtectionMethod.ts
 models/PushToLocationRequestDto.ts
 models/RaProfileAcmeDetailResponseDto.ts
 models/RaProfileAssociationRequestDto.ts
+models/RaProfileCmpDetailResponseDto.ts
 models/RaProfileDto.ts
 models/RaProfileScepDetailResponseDto.ts
 models/RandomDataRequestDto.ts
@@ -345,6 +355,7 @@ models/UpdateConditionRequestDto.ts
 models/UpdateExecutionRequestDto.ts
 models/UpdateKeyUsageRequestDto.ts
 models/UpdateRuleRequestDto.ts
+models/UpdateScheduledJob.ts
 models/UpdateTriggerRequestDto.ts
 models/UpdateUserRequestDto.ts
 models/UploadCertificateRequestDto.ts

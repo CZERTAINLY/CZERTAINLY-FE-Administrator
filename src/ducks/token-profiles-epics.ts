@@ -32,6 +32,7 @@ const listTokenProfiles: AppEpic = (action$, state$, deps) => {
                 catchError((error) =>
                     of(
                         slice.actions.listTokenProfilesFailure({ error: extractError(error, 'Failed to get Token profiles list') }),
+                        alertActions.error(extractError(error, 'Failed to get Token profiles list')),
                         userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfTokenProfiles),
                     ),
                 ),

@@ -175,9 +175,9 @@ export default function ScepProfileForm() {
             renewalThreshold: editMode ? scepProfileSelector?.renewThreshold || 0 : 0,
             includeCaCertificate: editMode ? scepProfileSelector?.includeCaCertificate || false : false,
             includeCaCertificateChain: editMode ? scepProfileSelector?.includeCaCertificateChain || false : false,
-            enableIntune: editMode ? scepProfileSelector?.enableIntune ?? false : false,
-            intuneTenant: editMode ? scepProfileSelector?.intuneTenant ?? '' : '',
-            intuneApplicationId: editMode ? scepProfileSelector?.intuneApplicationId ?? '' : '',
+            enableIntune: editMode ? (scepProfileSelector?.enableIntune ?? false) : false,
+            intuneTenant: editMode ? (scepProfileSelector?.intuneTenant ?? '') : '',
+            intuneApplicationId: editMode ? (scepProfileSelector?.intuneApplicationId ?? '') : '',
             intuneApplicationKey: '',
             raProfile: editMode
                 ? scepProfileSelector?.raProfile
@@ -262,11 +262,12 @@ export default function ScepProfileForm() {
                             <Field name="raProfile">
                                 {({ input, meta }) => (
                                     <FormGroup>
-                                        <Label for="raProfile">Default RA Profile</Label>
+                                        <Label for="raProfileSelect">Default RA Profile</Label>
 
                                         <Select
                                             {...input}
                                             id="raProfile"
+                                            inputId="raProfileSelect"
                                             maxMenuHeight={140}
                                             menuPlacement="auto"
                                             options={optionsForRaProfiles}

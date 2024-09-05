@@ -14,8 +14,10 @@ import {
     transformComplianceProfileSimplifiedDtoToModel,
     transformRaProfileAcmeDetailResponseDtoToModel,
     transformRaProfileActivateAcmeRequestModelToDto,
+    transformRaProfileActivateCmpRequestModelToDto,
     transformRaProfileActivateScepRequestModelToDto,
     transformRaProfileAddRequestModelToDto,
+    transformRaProfileCmpDetailResponseDtoToModel,
     transformRaProfileEditRequestModelToDto,
     transformRaProfileResponseDtoToModel,
     transformRaProfileScepDetailResponseDtoToModel,
@@ -288,6 +290,81 @@ const getAcmeDetails: AppEpic = (action$, state$, deps) => {
                         of(
                             slice.actions.getAcmeDetailsFailure({ error: extractError(err, 'Failed to get ACME details') }),
                             appRedirectActions.fetchError({ error: err, message: 'Failed to get ACME details' }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
+const activateCmp: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.activateCmp.match),
+        switchMap((action) =>
+            deps.apiClients.raProfiles
+                .activateCmpForRaProfile({
+                    authorityUuid: action.payload.authorityUuid,
+                    raProfileUuid: action.payload.uuid,
+                    cmpProfileUuid: action.payload.cmpProfileUuid,
+                    activateCmpForRaProfileRequestDto: transformRaProfileActivateCmpRequestModelToDto(
+                        action.payload.raProfileActivateCmpRequest,
+                    ),
+                })
+                .pipe(
+                    map((raProfileCmpDetailResponse) =>
+                        slice.actions.activateCmpSuccess({
+                            raProfileCmpDetailResponse: transformRaProfileCmpDetailResponseDtoToModel(raProfileCmpDetailResponse),
+                        }),
+                    ),
+
+                    catchError((err) =>
+                        of(
+                            slice.actions.activateCmpFailure({ error: extractError(err, 'Failed to activate CMP') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to activate CMP' }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
+const deactivateCmp: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.deactivateCmp.match),
+        switchMap((action) =>
+            deps.apiClients.raProfiles
+                .deactivateCmpForRaProfile({ authorityUuid: action.payload.authorityUuid, raProfileUuid: action.payload.uuid })
+                .pipe(
+                    map(() => slice.actions.deactivateCmpSuccess({ uuid: action.payload.uuid })),
+
+                    catchError((err) =>
+                        of(
+                            slice.actions.deactivateCmpFailure({ error: extractError(err, 'Failed to deactivate CMP') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to deactivate CMP' }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
+const getCmpDetails: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.getCmpDetails.match),
+        switchMap((action) =>
+            deps.apiClients.raProfiles
+                .getCmpForRaProfile({ authorityUuid: action.payload.authorityUuid, raProfileUuid: action.payload.uuid })
+                .pipe(
+                    map((cmpDetails) =>
+                        slice.actions.getCmpDetailsSuccess({
+                            raCmpLink: transformRaProfileCmpDetailResponseDtoToModel(cmpDetails),
+                        }),
+                    ),
+
+                    catchError((err) =>
+                        of(
+                            slice.actions.getCmpDetailsFailure({ error: extractError(err, 'Failed to get CMP details') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to get CMP details' }),
                         ),
                     ),
                 ),
@@ -703,6 +780,9 @@ const epics = [
     enableRaProfile,
     disableRaProfile,
     deleteRaProfile,
+    activateCmp,
+    deactivateCmp,
+    getCmpDetails,
     activateAcme,
     deactivateAcme,
     getAcmeDetails,

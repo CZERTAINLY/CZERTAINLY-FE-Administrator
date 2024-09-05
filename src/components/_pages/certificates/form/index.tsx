@@ -208,11 +208,12 @@ export default function CertificateForm() {
                             <Field name="raProfile" validate={validateRequired()}>
                                 {({ input, meta, onChange }) => (
                                     <FormGroup>
-                                        <Label for="raProfile">RA Profile</Label>
+                                        <Label for="raProfileSelect">RA Profile</Label>
 
                                         <Select
                                             {...input}
                                             id="raProfile"
+                                            inputId="raProfileSelect"
                                             maxMenuHeight={140}
                                             menuPlacement="auto"
                                             options={options}
@@ -231,10 +232,11 @@ export default function CertificateForm() {
                             <Field name="uploadCsr">
                                 {({ input, meta, onChange }) => (
                                     <FormGroup>
-                                        <Label for="uploadCsr">Key Source</Label>
+                                        <Label for="uploadCsrSelect">Key Source</Label>
                                         <Select
                                             {...input}
                                             id="uploadCsr"
+                                            inputId="uploadCsrSelect"
                                             maxMenuHeight={140}
                                             menuPlacement="auto"
                                             options={inputOptions}
@@ -285,11 +287,12 @@ export default function CertificateForm() {
                                     <Field name="tokenProfile" validate={validateRequired()}>
                                         {({ input, meta, onChange }) => (
                                             <FormGroup>
-                                                <Label for="tokenProfile">Token Profile</Label>
+                                                <Label for="tokenProfileSelect">Token Profile</Label>
 
                                                 <Select
                                                     {...input}
                                                     id="tokenProfile"
+                                                    inputId="tokenProfileSelect"
                                                     maxMenuHeight={140}
                                                     menuPlacement="auto"
                                                     options={tokenProfileOptions}

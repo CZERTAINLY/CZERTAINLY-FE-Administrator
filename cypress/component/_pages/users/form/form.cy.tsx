@@ -7,7 +7,7 @@ import { Route, Routes } from 'react-router-dom';
 
 import UserEdit from '../../../../../src/components/_pages/users/form';
 import '../../../../../src/resources/styles/theme.scss';
-import { reduxActionWait } from '../../../../utils/constants';
+import { clickWait, reduxActionWait } from '../../../../utils/constants';
 import { userFormMockData } from './mock-data';
 
 describe('UserForm component - Add User', () => {
@@ -58,8 +58,10 @@ describe('UserForm component - Add User', () => {
         cy.get('label').eq(6).should('contain.text', 'Email');
         cy.get('input').eq(7).should('have.attr', 'placeholder', 'Email address');
         cy.get('label').eq(7).should('contain.text', 'Input Type');
-        cy.get('#react-select-3-input').should('exist');
-        cy.get('#react-select-3-input')
+        cy.get('#react-select-3-live-region')
+            .siblings('div')
+            .eq(0)
+            .click()
             .should('exist')
             .then(($select) => {
                 cy.wait(500); // wait for 500ms
@@ -77,13 +79,13 @@ describe('UserForm component - Add User', () => {
 
     it(`🟢 Enter all form values`, () => {
         cy.get('input').eq(1).type('testUser');
-        cy.get('#react-select-6-input').should('exist').click();
+        cy.get('#react-select-6-live-region').siblings('div').eq(0).click().wait(clickWait);
         cy.get('#react-select-6-option-0').should('exist').click();
         cy.get('input').eq(4).type('Test description');
         cy.get('input').eq(5).type('Test First Name');
         cy.get('input').eq(6).type('Test Last Name');
         cy.get('input').eq(7).type('test@email.com');
-        cy.get('#react-select-7-input').should('exist').click();
+        cy.get('#react-select-7-live-region').siblings('div').eq(0).click().wait(clickWait);
         cy.get('#react-select-7-option-1').should('exist').click();
         cy.get('td').eq(1).should('exist').click();
     });

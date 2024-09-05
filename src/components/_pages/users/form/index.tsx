@@ -450,6 +450,7 @@ function UserForm() {
                                         <Label for="username">Username</Label>
 
                                         <Input
+                                            id="username"
                                             {...input}
                                             valid={!meta.error && meta.touched}
                                             invalid={!!meta.error && meta.touched}
@@ -466,10 +467,11 @@ function UserForm() {
                             <Field name="selectedGroups">
                                 {({ input }) => (
                                     <FormGroup>
-                                        <Label for="selectedGroups">Groups</Label>
+                                        <Label for="selectedGroupsSelect">Groups</Label>
 
                                         <Select
                                             {...input}
+                                            inputId="selectedGroupsSelect"
                                             maxMenuHeight={140}
                                             menuPlacement="auto"
                                             options={optionsForGroup}
@@ -488,6 +490,7 @@ function UserForm() {
 
                                         <Input
                                             {...input}
+                                            id="description"
                                             valid={!meta.error && meta.touched}
                                             invalid={!!meta.error && meta.touched}
                                             type="text"
@@ -506,6 +509,7 @@ function UserForm() {
                                         <Label for="firstName">First Name</Label>
 
                                         <Input
+                                            id="firstName"
                                             {...input}
                                             valid={!meta.error && meta.touched}
                                             invalid={!!meta.error && meta.touched}
@@ -525,6 +529,7 @@ function UserForm() {
                                         <Label for="lastName">Last Name</Label>
 
                                         <Input
+                                            id="lastName"
                                             {...input}
                                             valid={!meta.error && meta.touched}
                                             invalid={!!meta.error && meta.touched}
@@ -544,6 +549,7 @@ function UserForm() {
                                         <Label for="email">Email</Label>
 
                                         <Input
+                                            id="email"
                                             {...input}
                                             valid={!meta.error && meta.touched}
                                             invalid={!!meta.error && meta.touched}
@@ -560,9 +566,10 @@ function UserForm() {
                             <Field name="inputType">
                                 {({ input }) => (
                                     <FormGroup>
-                                        <Label for="inputType">Input Type</Label>
+                                        <Label for="inputTypeSelect">Input Type</Label>
 
                                         <Select
+                                            inputId="inputTypeSelect"
                                             {...input}
                                             maxMenuHeight={140}
                                             menuPlacement="auto"
@@ -600,11 +607,12 @@ function UserForm() {
                                 <Field name="certificateUuid">
                                     {({ input, meta }) => (
                                         <FormGroup>
-                                            <Label for="certificateUuid">Certificate</Label>
+                                            <Label for="certificateUuidSelect">Certificate</Label>
 
                                             <Select
                                                 {...input}
                                                 //ref={certSelectRef}
+                                                inputId="certificateUuidSelect"
                                                 maxMenuHeight={140}
                                                 menuPlacement="auto"
                                                 value={selectedCertificate}

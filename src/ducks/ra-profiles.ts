@@ -6,8 +6,10 @@ import {
     ComplianceProfileSimplifiedModel,
     RaProfileAcmeDetailResponseModel,
     RaProfileActivateAcmeRequestModel,
+    RaProfileActivateCmpRequestModel,
     RaProfileActivateScepRequestModel,
     RaProfileAddRequestModel,
+    RaProfileCmpDetailResponseModel,
     RaProfileEditRequestModel,
     RaProfileResponseModel,
     RaProfileScepDetailResponseModel,
@@ -25,6 +27,7 @@ export type State = {
 
     acmeDetails?: RaProfileAcmeDetailResponseModel;
     scepDetails?: RaProfileScepDetailResponseModel;
+    cmpDetails?: RaProfileCmpDetailResponseModel;
     associatedApprovalProfiles: ProfileApprovalModel[];
 
     issuanceAttributesDescriptors?: AttributeDescriptorModel[];
@@ -41,6 +44,7 @@ export type State = {
 
     isFetchingAcmeDetails: boolean;
     isFetchingScepDetails: boolean;
+    isFetchingCmpDetails: boolean;
 
     isFetchingAssociatedComplianceProfiles: boolean;
 
@@ -54,6 +58,8 @@ export type State = {
     isBulkDisabling: boolean;
     isActivatingAcme: boolean;
     isDeactivatingAcme: boolean;
+    isActivatingCmp: boolean;
+    isDeactivatingCmp: boolean;
     isActivatingScep: boolean;
     isDeactivatingScep: boolean;
     isCheckingCompliance: boolean;
@@ -81,6 +87,7 @@ export const initialState: State = {
     isFetchingRevocationAttributes: false,
     isFetchingAcmeDetails: false,
     isFetchingScepDetails: false,
+    isFetchingCmpDetails: false,
     isFetchingAssociatedComplianceProfiles: false,
     isCreating: false,
     isDeleting: false,
@@ -92,6 +99,8 @@ export const initialState: State = {
     isBulkDisabling: false,
     isActivatingAcme: false,
     isDeactivatingAcme: false,
+    isActivatingCmp: false,
+    isDeactivatingCmp: false,
     isActivatingScep: false,
     isDeactivatingScep: false,
     isCheckingCompliance: false,
@@ -157,6 +166,10 @@ export const slice = createSlice({
 
         getRaProfileDetailFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingDetail = false;
+        },
+
+        clearRaProfileDetail: (state, action: PayloadAction<void>) => {
+            state.raProfile = undefined;
         },
 
         createRaProfile: (
@@ -294,6 +307,52 @@ export const slice = createSlice({
 
         getAcmeDetailsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingAcmeDetails = false;
+        },
+        activateCmp: (
+            state,
+            action: PayloadAction<{
+                authorityUuid: string;
+                uuid: string;
+                cmpProfileUuid: string;
+                raProfileActivateCmpRequest: RaProfileActivateCmpRequestModel;
+            }>,
+        ) => {
+            state.isActivatingCmp = true;
+        },
+
+        activateCmpSuccess: (state, action: PayloadAction<{ raProfileCmpDetailResponse: RaProfileCmpDetailResponseModel }>) => {
+            state.isActivatingCmp = false;
+            state.cmpDetails = action.payload.raProfileCmpDetailResponse;
+        },
+
+        activateCmpFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isActivatingCmp = false;
+        },
+
+        deactivateCmp: (state, action: PayloadAction<{ authorityUuid: string; uuid: string }>) => {
+            state.isDeactivatingCmp = true;
+        },
+
+        deactivateCmpSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isDeactivatingCmp = false;
+            state.cmpDetails = undefined;
+        },
+
+        deactivateCmpFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isDeactivatingCmp = false;
+        },
+
+        getCmpDetails: (state, action: PayloadAction<{ authorityUuid: string; uuid: string }>) => {
+            state.isFetchingCmpDetails = true;
+        },
+
+        getCmpDetailsSuccess: (state, action: PayloadAction<{ raCmpLink: RaProfileCmpDetailResponseModel }>) => {
+            state.isFetchingCmpDetails = false;
+            state.cmpDetails = action.payload.raCmpLink;
+        },
+
+        getCmpDetailsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingCmpDetails = false;
         },
 
         activateScep: (
@@ -584,6 +643,7 @@ const raProfiles = createSelector(state, (state: State) => state.raProfiles);
 const associatedApprovalProfiles = createSelector(state, (state: State) => state.associatedApprovalProfiles);
 const acmeDetails = createSelector(state, (state: State) => state.acmeDetails);
 const scepDetails = createSelector(state, (state: State) => state.scepDetails);
+const cmpDetails = createSelector(state, (state: State) => state.cmpDetails);
 const issuanceAttributes = createSelector(state, (state: State) => state.issuanceAttributesDescriptors);
 const revocationAttributes = createSelector(state, (state: State) => state.revocationAttributesDescriptors);
 
@@ -597,6 +657,7 @@ const isFetchingIssuanceAttributes = createSelector(state, (state: State) => sta
 const isFetchingRevocationAttributes = createSelector(state, (state: State) => state.isFetchingRevocationAttributes);
 const isFetchingAcmeDetails = createSelector(state, (state: State) => state.isFetchingAcmeDetails);
 const isFetchingScepDetails = createSelector(state, (state: State) => state.isFetchingScepDetails);
+const isFetchingCmpDetails = createSelector(state, (state: State) => state.isFetchingCmpDetails);
 const isCreating = createSelector(state, (state: State) => state.isCreating);
 const isDeleting = createSelector(state, (state: State) => state.isDeleting);
 const isBulkDeleting = createSelector(state, (state: State) => state.isBulkDeleting);
@@ -609,6 +670,10 @@ const isActivatingAcme = createSelector(state, (state: State) => state.isActivat
 const isDeactivatingAcme = createSelector(state, (state: State) => state.isDeactivatingAcme);
 const isActivatingScep = createSelector(state, (state: State) => state.isActivatingScep);
 const isDeactivatingScep = createSelector(state, (state: State) => state.isDeactivatingScep);
+
+const isActivatingCmp = createSelector(state, (state: State) => state.isActivatingCmp);
+const isDeactivatingCmp = createSelector(state, (state: State) => state.isDeactivatingCmp);
+
 const isFetchingAssociatedComplianceProfiles = createSelector(state, (state: State) => state.isFetchingAssociatedComplianceProfiles);
 const associatedComplianceProfiles = createSelector(state, (state: State) => state.associatedComplianceProfiles);
 
@@ -623,6 +688,7 @@ export const selectors = {
 
     acmeDetails,
     scepDetails,
+    cmpDetails,
     issuanceAttributes,
     revocationAttributes,
 
@@ -635,6 +701,7 @@ export const selectors = {
     isFetchingRevocationAttributes,
     isFetchingAcmeDetails,
     isFetchingScepDetails,
+    isFetchingCmpDetails,
     isCreating,
     isDeleting,
     isBulkDeleting,
@@ -644,6 +711,8 @@ export const selectors = {
     isDisabling,
     isBulkDisabling,
     isActivatingAcme,
+    isActivatingCmp,
+    isDeactivatingCmp,
     isDeactivatingAcme,
     isActivatingScep,
     isDeactivatingScep,

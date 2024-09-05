@@ -1,6 +1,6 @@
 import { parseExpression } from 'cron-parser';
 import cronstrue from 'cronstrue';
-import { AttributeContentType } from 'types/openapi';
+import { AttributeContentType, FilterFieldType, SearchFieldDataDto } from 'types/openapi';
 
 function leading0(s: string, count: number) {
     while (s.length < count) {
@@ -151,7 +151,7 @@ export function getFormattedDate(dateString: string): string {
 }
 
 // type formatType = 'datetime' | 'date' | 'time';
-export function getFormattedUtc(type: AttributeContentType, dateString: string): string {
+export function getFormattedUtc(type: AttributeContentType | FilterFieldType, dateString: string): string {
     if (type === 'datetime') {
         const date = new Date(dateString);
         return date.toISOString();
@@ -200,4 +200,22 @@ export const getFormattedDateByType = (dateString: string, type: AttributeConten
     }
 
     return dateString;
+};
+
+export const checkIfFieldAttributeTypeIsDate = (field: SearchFieldDataDto) => {
+    if (
+        field.attributeContentType === AttributeContentType.Date ||
+        field.attributeContentType === AttributeContentType.Time ||
+        field.attributeContentType === AttributeContentType.Datetime
+    ) {
+        return true;
+    } else {
+        return false;
+    }
+};
+
+export const checkIfFieldTypeIsDate = (type: FilterFieldType) => {
+    if (type === FilterFieldType.Date || type === FilterFieldType.Datetime) {
+        return true;
+    }
 };

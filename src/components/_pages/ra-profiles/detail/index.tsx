@@ -38,6 +38,7 @@ export default function RaProfileDetail() {
     const raProfile = useSelector(raProfilesSelectors.raProfile);
     const acmeDetails = useSelector(raProfilesSelectors.acmeDetails);
     const scepDetails = useSelector(raProfilesSelectors.scepDetails);
+    const cmpDetails = useSelector(raProfilesSelectors.cmpDetails);
     const associatedComplianceProfiles = useSelector(raProfilesSelectors.associatedComplianceProfiles);
     const associatedApprovalProfiles = useSelector(raProfilesSelectors.associatedApprovalProfiles);
 
@@ -46,12 +47,15 @@ export default function RaProfileDetail() {
     const isFetchingProfile = useSelector(raProfilesSelectors.isFetchingDetail);
     const isFetchingAcmeDetails = useSelector(raProfilesSelectors.isFetchingAcmeDetails);
     const isFetchingScepDetails = useSelector(raProfilesSelectors.isFetchingScepDetails);
+    const isFetchingCmpDetails = useSelector(raProfilesSelectors.isFetchingCmpDetails);
 
     const isDeleting = useSelector(raProfilesSelectors.isDeleting);
     const isEnabling = useSelector(raProfilesSelectors.isEnabling);
     const isDisabling = useSelector(raProfilesSelectors.isDisabling);
     const isActivatingAcme = useSelector(raProfilesSelectors.isActivatingAcme);
     const isDeactivatingAcme = useSelector(raProfilesSelectors.isDeactivatingAcme);
+    const isActivatingCmp = useSelector(raProfilesSelectors.isActivatingCmp);
+    const isDeactivatingCmp = useSelector(raProfilesSelectors.isDeactivatingCmp);
     const isActivatingScep = useSelector(raProfilesSelectors.isActivatingScep);
     const isDeactivatingScep = useSelector(raProfilesSelectors.isDeactivatingScep);
     const isFetchingAssociatedComplianceProfiles = useSelector(raProfilesSelectors.isFetchingAssociatedComplianceProfiles);
@@ -60,9 +64,11 @@ export default function RaProfileDetail() {
 
     const [activateAcmeDialog, setActivateAcmeDialog] = useState(false);
     const [activateScepDialog, setActivateScepDialog] = useState(false);
+    const [activateCmpDialog, setActivateCmpDialog] = useState(false);
 
     const [confirmDeactivateAcme, setConfirmDeactivateAcme] = useState<boolean>(false);
     const [confirmDeactivateScep, setConfirmDeactivateScep] = useState<boolean>(false);
+    const [confirmDeactivateCmp, setConfirmDeactivateCmp] = useState<boolean>(false);
 
     const [complianceCheck, setComplianceCheck] = useState<boolean>(false);
 
@@ -84,8 +90,17 @@ export default function RaProfileDetail() {
             isFetchingAcmeDetails ||
             isActivatingScep ||
             isDeactivatingScep ||
+            isFetchingScepDetails ||
+            isFetchingCmpDetails,
+        [
+            isActivatingAcme,
+            isDeactivatingAcme,
+            isFetchingAcmeDetails,
+            isActivatingScep,
+            isDeactivatingScep,
             isFetchingScepDetails,
-        [isActivatingAcme, isDeactivatingAcme, isFetchingAcmeDetails, isActivatingScep, isDeactivatingScep, isFetchingScepDetails],
+            isFetchingCmpDetails,
+        ],
     );
 
     const getFreshRaProfileDetail = useCallback(() => {
@@ -105,6 +120,7 @@ export default function RaProfileDetail() {
 
         dispatch(raProfilesActions.getAcmeDetails({ authorityUuid: authorityId, uuid: id }));
         dispatch(raProfilesActions.getScepDetails({ authorityUuid: authorityId, uuid: id }));
+        dispatch(raProfilesActions.getCmpDetails({ authorityUuid: authorityId, uuid: id }));
     }, [id, dispatch, authorityId]);
 
     const getFreshAssociatedApprovalProfiles = useCallback(() => {
@@ -144,6 +160,13 @@ export default function RaProfileDetail() {
         dispatch(raProfilesActions.getComplianceProfilesForRaProfile({ authorityUuid: authorityId, uuid: id }));
     }, [id, dispatch, authorityId]);
 
+    // use effect to clear the ra profile detail when the component is unmounted
+    useEffect(() => {
+        return () => {
+            dispatch(raProfilesActions.clearRaProfileDetail());
+        };
+    }, [dispatch]);
+
     const onEditClick = useCallback(() => {
         if (!raProfile) return;
         navigate(`../../../edit/${raProfile.authorityInstanceUuid}/${raProfile?.uuid}`, { relative: 'path' });
@@ -179,6 +202,16 @@ export default function RaProfileDetail() {
 
     const openAcmeActivationDialog = useCallback(() => {
         setActivateAcmeDialog(true);
+    }, []);
+
+    const onDeactivateCmpConfirmed = useCallback(() => {
+        if (!raProfile) return;
+        dispatch(raProfilesActions.deactivateCmp({ authorityUuid: raProfile.authorityInstanceUuid, uuid: raProfile.uuid }));
+        setConfirmDeactivateCmp(false);
+    }, [dispatch, raProfile]);
+
+    const openCmpActivationDialog = useCallback(() => {
+        setActivateCmpDialog(true);
     }, []);
 
     const onDeactivateScepConfirmed = useCallback(() => {
@@ -500,6 +533,27 @@ export default function RaProfileDetail() {
         [acmeDetails],
     );
 
+    const cmpProfileData: TableDataRow[] = useMemo(
+        () =>
+            !cmpDetails
+                ? []
+                : [
+                      {
+                          id: 'uuid',
+                          columns: ['UUID', cmpDetails.uuid || ''],
+                      },
+                      {
+                          id: 'name',
+                          columns: ['Name', cmpDetails.name || ''],
+                      },
+                      {
+                          id: 'URL',
+                          columns: ['CMP URL', cmpDetails.cmpUrl || ''],
+                      },
+                  ],
+        [cmpDetails],
+    );
+
     const scepProfileData: TableDataRow[] = useMemo(
         () =>
             !scepDetails
@@ -646,19 +700,77 @@ export default function RaProfileDetail() {
                     ),
                 ],
             },
+
+            {
+                id: 'cmp',
+                columns: [
+                    'CMP',
+                    <StatusBadge enabled={cmpDetails ? (cmpDetails.cmpAvailable ? true : false) : false} />,
+                    <ProgressButton
+                        className="btn btn-primary btn-sm"
+                        type="button"
+                        title={cmpDetails?.cmpAvailable ? 'Deactivate' : 'Activate'}
+                        inProgressTitle={cmpDetails?.cmpAvailable ? 'Deactivating...' : 'Activating...'}
+                        inProgress={isActivatingCmp || isDeactivatingCmp}
+                        onClick={() => (cmpDetails?.cmpAvailable ? setConfirmDeactivateCmp(true) : openCmpActivationDialog())}
+                    />,
+                ],
+                detailColumns: [
+                    <></>,
+                    <></>,
+                    <></>,
+                    !cmpDetails || !cmpDetails.cmpAvailable ? (
+                        <>CMP is not active</>
+                    ) : (
+                        <>
+                            <b>Protocol settings</b>
+                            <br />
+                            <br />
+                            <CustomTable hasHeader={false} headers={protocolProfileHeaders} data={cmpProfileData} />
+
+                            {cmpDetails && cmpDetails.issueCertificateAttributes && cmpDetails.issueCertificateAttributes.length > 0 ? (
+                                <>
+                                    <b>Settings for certificate issuing</b>
+                                    <br />
+                                    <br />
+                                    <AttributeViewer hasHeader={false} attributes={cmpDetails?.issueCertificateAttributes} />
+                                </>
+                            ) : (
+                                <></>
+                            )}
+
+                            {cmpDetails && cmpDetails.revokeCertificateAttributes && cmpDetails.revokeCertificateAttributes.length > 0 ? (
+                                <>
+                                    <b>Settings for certificate revocation</b>
+                                    <br />
+                                    <br />
+                                    <AttributeViewer hasHeader={false} attributes={cmpDetails?.revokeCertificateAttributes} />
+                                </>
+                            ) : (
+                                <></>
+                            )}
+                        </>
+                    ),
+                ],
+            },
         ],
         [
             acmeDetails,
             scepDetails,
+            cmpDetails,
             isActivatingAcme,
             isDeactivatingAcme,
+            isActivatingCmp,
+            isDeactivatingCmp,
             isActivatingScep,
             isDeactivatingScep,
             protocolProfileHeaders,
             acmeProfileData,
             scepProfileData,
+            cmpProfileData,
             openAcmeActivationDialog,
             openScepActivationDialog,
+            openCmpActivationDialog,
         ],
     );
 
@@ -789,6 +901,17 @@ export default function RaProfileDetail() {
             />
 
             <Dialog
+                isOpen={confirmDeactivateCmp}
+                caption="Deactivate CMP"
+                body="You are about to deactivate CMP protocol for the RA profile. Is this what you want to do?"
+                toggle={() => setConfirmDeactivateCmp(false)}
+                buttons={[
+                    { color: 'danger', onClick: onDeactivateCmpConfirmed, body: 'Yes, deactivate' },
+                    { color: 'secondary', onClick: () => setConfirmDeactivateCmp(false), body: 'Cancel' },
+                ]}
+            />
+
+            <Dialog
                 isOpen={confirmDeactivateScep}
                 caption="Deactivate SCEP"
                 body="You are about to deactivate SCEP protocol for the RA profile. Is this what you want to do?"
@@ -810,6 +933,20 @@ export default function RaProfileDetail() {
                     authorityInstanceUuid: raProfile?.authorityInstanceUuid,
                 })}
                 toggle={() => setActivateAcmeDialog(false)}
+                buttons={[]}
+            />
+
+            <Dialog
+                isOpen={activateCmpDialog}
+                caption={`Activate CMP protocol`}
+                body={ProtocolActivationDialogBody({
+                    protocol: Protocol.CMP,
+                    visible: activateCmpDialog,
+                    onClose: () => setActivateCmpDialog(false),
+                    raProfileUuid: raProfile?.uuid,
+                    authorityInstanceUuid: raProfile?.authorityInstanceUuid,
+                })}
+                toggle={() => setActivateCmpDialog(false)}
                 buttons={[]}
             />
 

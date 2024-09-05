@@ -17,7 +17,7 @@ import {
     isCustomAttributeModel,
     isDataAttributeModel,
 } from 'types/attributes';
-import { AttributeConstraintType, AttributeContentType } from 'types/openapi';
+import { AttributeConstraintType, AttributeContentType, RangeAttributeConstraintData } from 'types/openapi';
 
 import CustomSelectComponent from 'components/CustomSelectComponent';
 import { useDispatch, useSelector } from 'react-redux';
@@ -112,7 +112,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
 
     if (!descriptor) return <></>;
 
-    const getFormType = (type: AttributeContentType): InputType => {
+    const getFormTypeFromAttributeContentType = (type: AttributeContentType): InputType => {
         switch (type) {
             case AttributeContentType.Boolean:
                 return 'checkbox';
@@ -155,6 +155,17 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                     const errorMessage = regexValidator.errorMessage;
                     validators.push(validatePattern(pattern, errorMessage));
                 }
+
+                const rangeValidator = descriptor.constraints?.find((c) => c.type === AttributeConstraintType.Range);
+                if (rangeValidator?.data) {
+                    const rangeData = rangeValidator.data as RangeAttributeConstraintData;
+                    const { from, to } = rangeData;
+                    if (from && to) {
+                        const pattern = new RegExp(`^(?:${from === 1 ? '[1-9]\\d{0,' + (to.toString().length - 1) + '}' : from}|${to})$`);
+                        const errorMessage = rangeValidator.errorMessage;
+                        validators.push(validatePattern(pattern, errorMessage));
+                    }
+                }
             }
         }
 
@@ -179,11 +190,11 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
 
     const createSelect = (descriptor: DataAttributeModel | CustomAttributeModel): JSX.Element => {
         return (
-            <Field name={name} validate={buildValidators()} type={getFormType(descriptor.contentType)}>
+            <Field name={name} validate={buildValidators()} type={getFormTypeFromAttributeContentType(descriptor.contentType)}>
                 {({ input, meta }) => (
                     <>
                         {descriptor.properties.visible ? (
-                            <Label for={name}>
+                            <Label for={`${name}Select`}>
                                 {descriptor.properties.label}
                                 {descriptor.properties.required ? ' *' : ''}
                             </Label>
@@ -194,6 +205,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                         {!addNewAttributeValue ? (
                             <Select
                                 {...input}
+                                inputId={`${name}Select`}
                                 maxMenuHeight={140}
                                 menuPlacement="auto"
                                 options={getUpdatedOptionsForEditSelect(input.value, options)}
@@ -211,6 +223,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                         ) : (
                             <Select
                                 {...input}
+                                inputId={`${name}Select`}
                                 maxMenuHeight={140}
                                 menuPlacement="auto"
                                 options={options}
@@ -245,9 +258,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                         )}
                         {descriptor.properties.visible ? (
                             <>
-                                <FormText color={descriptor.properties.required ? 'dark' : undefined} style={{ marginTop: '0.2em' }}>
-                                    {descriptor.description}
-                                </FormText>
+                                <FormText style={{ marginTop: '0.2em' }}>{descriptor.description}</FormText>
 
                                 <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
                                     {meta.error}
@@ -266,7 +277,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
         return (
             <>
                 {descriptor.properties.visible ? (
-                    <Label for={`${name}.content`}>
+                    <Label for={`${name}-content`}>
                         {descriptor.properties.label}
                         {descriptor.properties.required ? ' *' : ''}
                     </Label>
@@ -286,7 +297,11 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                         <div style={{ flexGrow: 1 }}>
                             <Label for={`${name}-content`}>File content</Label>
 
-                            <Field name={`${name}.content`} validate={buildValidators()} type={getFormType(descriptor.contentType)}>
+                            <Field
+                                name={`${name}.content`}
+                                validate={buildValidators()}
+                                type={getFormTypeFromAttributeContentType(descriptor.contentType)}
+                            >
                                 {({ input, meta }) => (
                                     <>
                                         <Input
@@ -304,7 +319,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                                 )}
                             </Field>
 
-                            <FormText color={descriptor.properties.required ? 'dark' : undefined}>{descriptor.description}</FormText>
+                            <FormText>{descriptor.description}</FormText>
                         </div>
                         &nbsp;
                         <div style={{ width: '13rem' }}>
@@ -364,23 +379,22 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
     const createInput = (descriptor: DataAttributeModel | CustomAttributeModel): JSX.Element => {
         if (descriptor.contentType === AttributeContentType.Codeblock) {
             const attributes = formState.values[name.slice(0, name.indexOf('.'))];
-            const language = attributes ? attributes[descriptor.name]?.language ?? 'javascript' : 'javascript';
+            const language = attributes ? (attributes[descriptor.name]?.language ?? 'javascript') : 'javascript';
 
             return (
                 <>
-                    <Label for={`${name}.code`}>
+                    <Label for={`${name}.codeTextArea`}>
                         {descriptor.properties.label}
                         {descriptor.properties.required ? ' *' : ''}
+                        <span style={{ fontStyle: 'italic' }}> ({language})</span>
                     </Label>
                     &nbsp;
-                    <Label for={`${name}.code`} style={{ fontStyle: 'italic' }}>
-                        ({language})
-                    </Label>
-                    <Field name={`${name}.code`} type={getFormType(descriptor.contentType)}>
+                    <Field name={`${name}.code`} type={getFormTypeFromAttributeContentType(descriptor.contentType)}>
                         {({ input }) => {
                             return (
                                 <Editor
                                     {...input}
+                                    textareaId={`${name}.codeTextArea`}
                                     id={`${name}.code`}
                                     value={input.value}
                                     onValueChange={(code) => {
@@ -403,7 +417,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
         }
 
         return (
-            <Field name={name} validate={buildValidators()} type={getFormType(descriptor.contentType)}>
+            <Field name={name} validate={buildValidators()} type={getFormTypeFromAttributeContentType(descriptor.contentType)}>
                 {({ input, meta }) => (
                     <>
                         {descriptor.properties.visible && descriptor.contentType !== AttributeContentType.Boolean ? (
@@ -420,7 +434,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                             id={name}
                             valid={!meta.error && meta.touched}
                             invalid={!!meta.error && meta.touched}
-                            type={descriptor.properties.visible ? getFormType(descriptor.contentType) : 'hidden'}
+                            type={descriptor.properties.visible ? getFormTypeFromAttributeContentType(descriptor.contentType) : 'hidden'}
                             placeholder={`Enter ${descriptor.properties.label}`}
                             disabled={descriptor.properties.readOnly || busy}
                             step={getStepValue(descriptor.contentType)}
@@ -444,7 +458,6 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                         {descriptor.properties.visible ? (
                             <>
                                 <FormText
-                                    color={descriptor.properties.required ? 'dark' : undefined}
                                     style={
                                         descriptor.contentType === AttributeContentType.Boolean
                                             ? { display: 'block', marginTop: '-0.8em' }
@@ -476,7 +489,11 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
             <Card color="default">
                 <CardHeader>{descriptor.properties.label}</CardHeader>
                 <CardBody>
-                    {parse(DOMPurify.sanitize(marked.parse(getAttributeContent(descriptor.contentType, descriptor.content).toString())))}
+                    {parse(
+                        DOMPurify.sanitize(
+                            marked.parse(getAttributeContent(descriptor.contentType, descriptor.content).toString()) as string,
+                        ),
+                    )}
                 </CardBody>
             </Card>
         );

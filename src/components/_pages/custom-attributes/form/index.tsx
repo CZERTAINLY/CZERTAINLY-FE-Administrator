@@ -128,10 +128,11 @@ export default function CustomAttributeForm() {
                         <Field name="resources" type={'text'}>
                             {({ input }) => (
                                 <FormGroup>
-                                    <Label for="resources">Resources</Label>
+                                    <Label for="resourcesSelect">Resources</Label>
                                     <Select
                                         {...input}
                                         id="resources"
+                                        inputId="resourcesSelect"
                                         placeholder="Resources"
                                         options={resources.map((r) => ({ label: getEnumLabel(resourceEnum, r), value: r }))}
                                         isMulti={true}

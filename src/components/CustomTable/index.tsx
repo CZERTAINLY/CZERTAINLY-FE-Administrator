@@ -346,7 +346,12 @@ function CustomTable({
                 >
                     {header.id === '__checkbox__' ? (
                         hasAllCheckBox && multiSelect ? (
-                            <input type="checkbox" checked={checkAllChecked} onChange={onCheckAllCheckboxClick} />
+                            <input
+                                id={`${header.id}__checkbox__`}
+                                type="checkbox"
+                                checked={checkAllChecked}
+                                onChange={onCheckAllCheckboxClick}
+                            />
                         ) : (
                             <>&nbsp;</>
                         )
@@ -418,6 +423,7 @@ function CustomTable({
                             ) : (
                                 <td>
                                     <input
+                                        id={`${row.id}__checkbox__`}
                                         type="checkbox"
                                         checked={tblCheckedRows.includes(row.id)}
                                         onChange={onRowCheckboxClick}
@@ -536,46 +542,54 @@ function CustomTable({
             ) : (
                 <div className={styles.paginationContainer}>
                     <div>
-                        <Input type="select" value={paginationData ? paginationData.pageSize : pageSize} onChange={onPageSizeChange}>
-                            {paginationData ? (
-                                paginationData.itemsPerPageOptions.map((option) => <option key={option}>{option}</option>)
-                            ) : (
-                                <>
-                                    <option>10</option>
-                                    <option>20</option>
-                                    <option>50</option>
-                                    <option>100</option>
-                                </>
-                            )}
-                        </Input>
-                    </div>
-
-                    {pagination}
-
-                    <div style={{ textAlign: 'right' }}>
-                        {paginationData ? (
-                            <div>
-                                Showing {(paginationData.page - 1) * paginationData.pageSize + 1} to{' '}
-                                {(paginationData.page - 1) * paginationData.pageSize + paginationData.loadedPageSize >
-                                paginationData.totalItems
-                                    ? paginationData.totalItems
-                                    : (paginationData.page - 1) * paginationData.pageSize + paginationData.loadedPageSize}{' '}
-                                items of {paginationData.totalItems}
-                            </div>
-                        ) : (
-                            <div>
-                                Showing {(page - 1) * pageSize + (tblData.length > 0 ? 1 : 0)} to{' '}
-                                {(page - 1) * pageSize + pageSize > tblData.length ? tblData.length : (page - 1) * pageSize + pageSize} of{' '}
-                                {tblData.length} entries
-                            </div>
-                        )}
-
-                        {searchKey && data.length - tblData.length > 0 ? (
-                            <div>{data.length - tblData.length} of loaded entries filtered</div>
+                        {tblData?.length ? (
+                            <Input type="select" value={paginationData ? paginationData.pageSize : pageSize} onChange={onPageSizeChange}>
+                                {paginationData ? (
+                                    paginationData.itemsPerPageOptions.map((option) => <option key={option}>{option}</option>)
+                                ) : (
+                                    <>
+                                        <option>10</option>
+                                        <option>20</option>
+                                        <option>50</option>
+                                        <option>100</option>
+                                    </>
+                                )}
+                            </Input>
                         ) : (
                             <></>
                         )}
                     </div>
+
+                    {pagination}
+
+                    {tblData?.length ? (
+                        <div style={{ textAlign: 'right' }}>
+                            {paginationData ? (
+                                <div>
+                                    Showing {(paginationData.page - 1) * paginationData.pageSize + 1} to{' '}
+                                    {(paginationData.page - 1) * paginationData.pageSize + paginationData.loadedPageSize >
+                                    paginationData.totalItems
+                                        ? paginationData.totalItems
+                                        : (paginationData.page - 1) * paginationData.pageSize + paginationData.loadedPageSize}{' '}
+                                    items of {paginationData.totalItems}
+                                </div>
+                            ) : (
+                                <div>
+                                    Showing {(page - 1) * pageSize + (tblData.length > 0 ? 1 : 0)} to{' '}
+                                    {(page - 1) * pageSize + pageSize > tblData.length ? tblData.length : (page - 1) * pageSize + pageSize}{' '}
+                                    of {tblData.length} entries
+                                </div>
+                            )}
+
+                            {searchKey && data.length - tblData.length > 0 ? (
+                                <div>{data.length - tblData.length} of loaded entries filtered</div>
+                            ) : (
+                                <></>
+                            )}
+                        </div>
+                    ) : (
+                        <div>No items to show</div>
+                    )}
                 </div>
             )}
             {newRowWidgetProps && (

@@ -5,10 +5,14 @@ import {
     RaProfileAcmeDetailResponseModel,
     RaProfileActivateAcmeRequestDto,
     RaProfileActivateAcmeRequestModel,
+    RaProfileActivateCmpRequestDto,
+    RaProfileActivateCmpRequestModel,
     RaProfileActivateScepRequestDto,
     RaProfileActivateScepRequestModel,
     RaProfileAddRequestDto,
     RaProfileAddRequestModel,
+    RaProfileCmpDetailResponseDto,
+    RaProfileCmpDetailResponseModel,
     RaProfileEditRequestDto,
     RaProfileEditRequestModel,
     RaProfileResponseDto,
@@ -49,6 +53,26 @@ export function transformRaProfileAcmeDetailResponseDtoToModel(
         ...raAcmeResponse,
         issueCertificateAttributes: raAcmeResponse.issueCertificateAttributes?.map(transformAttributeResponseDtoToModel),
         revokeCertificateAttributes: raAcmeResponse.revokeCertificateAttributes?.map(transformAttributeResponseDtoToModel),
+    };
+}
+
+export function transformRaProfileActivateCmpRequestModelToDto(
+    raCmpRequest: RaProfileActivateCmpRequestModel,
+): RaProfileActivateCmpRequestDto {
+    return {
+        ...raCmpRequest,
+        issueCertificateAttributes: raCmpRequest.issueCertificateAttributes.map(transformAttributeRequestModelToDto),
+        revokeCertificateAttributes: raCmpRequest.revokeCertificateAttributes.map(transformAttributeRequestModelToDto),
+    };
+}
+
+export function transformRaProfileCmpDetailResponseDtoToModel(
+    raCmpResponse: RaProfileCmpDetailResponseDto,
+): RaProfileCmpDetailResponseModel {
+    return {
+        ...raCmpResponse,
+        issueCertificateAttributes: raCmpResponse.issueCertificateAttributes?.map(transformAttributeResponseDtoToModel),
+        revokeCertificateAttributes: raCmpResponse.revokeCertificateAttributes?.map(transformAttributeResponseDtoToModel),
     };
 }
 
