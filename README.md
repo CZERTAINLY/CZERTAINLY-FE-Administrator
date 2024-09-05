@@ -1,6 +1,6 @@
 # CZERTAINLY Administrator User Interface
 
-> This repository is part of the commercial open-source project CZERTAINLY. You can find more information about the project at [CZERTAINLY](https://github.com/3KeyCompany/CZERTAINLY) repository, including the contribution guide.
+> This repository is part of the commercial open-source project CZERTAINLY. You can find more information about the project at [CZERTAINLY](https://github.com/CZERTAINLY/CZERTAINLY) repository, including the contribution guide.
 
 Administrator User Interface or commonly called as Admin UI consists of the administrative web interface where various administrative tasks can be performed on top of the platform by the administrators.
 
@@ -92,7 +92,7 @@ import type {
 
 ## Docker container
 
-Admin Web Interface is provided as a Docker container. Use the `docker pull 3keycompany/czertainly-frontend-administrator:tagname` to pull the required image from the repository. It can be configured using the following environment variables:
+Admin Web Interface is provided as a Docker container. Use the `docker pull czertainly/czertainly-frontend-administrator:tagname` to pull the required image from the repository. It can be configured using the following environment variables:
 
 | Variable     | Description                                            | Required                                      | Default value    |
 | ------------ | ------------------------------------------------------ | --------------------------------------------- | ---------------- |
