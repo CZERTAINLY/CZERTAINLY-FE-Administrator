@@ -54,9 +54,9 @@ export default function SchedulerJobDetail() {
         setCronExpression(schedulerJob?.cronExpression);
     };
     const saveEditedJob = useCallback(() => {
-        console.log('In', schedulerJob);
+       
         if (!schedulerJob) return;
-        console.log('out', schedulerJob);
+        
 
         dispatch(
             actions.updateSchedulerJob({
@@ -78,7 +78,7 @@ export default function SchedulerJobDetail() {
     const handlecronchage = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         const validexp = isValidCronExpression;
-        console.log(validexp);
+     
         setCronExpression(value);
         if (!validexp) {
             // setCronExpression(value)
