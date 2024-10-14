@@ -10,7 +10,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 
-import { Badge, Container } from 'reactstrap';
+import { Badge, Container, Button, Modal, ModalFooter, ModalHeader, ModalBody, Form, FormGroup, Label, Input } from 'reactstrap';
 
 import SwitchField from 'components/Input/SwitchField';
 import { PlatformEnum, SchedulerJobExecutionStatus } from 'types/openapi';
@@ -33,6 +33,7 @@ export default function SchedulerJobDetail() {
     const schedulerJobExecutionStatusEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.SchedulerJobExecutionStatus));
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const [Editmodel, setEditmodel] = useState<boolean>(false);
 
     const isBusy = useMemo(() => isFetching || isDeleting || isEnabling, [isFetching, isDeleting, isEnabling]);
 
@@ -40,10 +41,54 @@ export default function SchedulerJobDetail() {
         if (!id) return;
         dispatch(actions.getSchedulerJobDetail({ uuid: id }));
     }, [id, dispatch]);
+    const [CronExpression, setCronExpression] = useState(schedulerJob?.cronExpression);
+
+    const [CronError, setCronError] = useState<string | null>(null);
+
 
     useEffect(() => {
         getFreshSchedulerJobDetails();
     }, [id, getFreshSchedulerJobDetails]);
+
+    const editSchedulejob = () => {
+        setEditmodel(true);
+        setCronExpression(schedulerJob?.cronExpression);
+    };
+    const saveEditedJob = useCallback(() => {
+        console.log("In", schedulerJob)
+        if (!schedulerJob) return;
+        console.log("out", schedulerJob)
+    
+        dispatch(actions.updateSchedulerJob({
+            uuid: schedulerJob.uuid, 
+            updateScheduledJob: {                
+                jobName: schedulerJob.jobName,
+                cronExpression: CronExpression,
+            }
+          }));
+        
+         setEditmodel(false)
+    },[CronExpression])
+    
+  
+    const isValidCronExpression = (expression: string) => {
+         const cronRegex = /^([0-5]?[0-9]\/[1-9][0-9]*)\*{3}\?(\*)$/;
+        return cronRegex.test(expression);
+    };
+    const handlecronchage = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        const validexp = isValidCronExpression;
+        console.log(validexp);
+        setCronExpression(value);
+        if (!validexp) {
+            // setCronExpression(value)
+            // setCronError(null);
+        }
+        else {
+            // setCronError("Error")
+        }
+
+    }
 
     const onDeleteConfirmed = useCallback(() => {
         if (!schedulerJob) return;
@@ -54,6 +99,14 @@ export default function SchedulerJobDetail() {
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
+            {
+                icon: 'edit',
+                disabled: schedulerJob?.system ?? true,
+                tooltip: 'Edit',
+                onClick: () => {
+                    editSchedulejob();
+                },
+            },
             {
                 icon: 'trash',
                 disabled: schedulerJob?.system ?? true,
@@ -101,63 +154,98 @@ export default function SchedulerJobDetail() {
             !schedulerJob
                 ? []
                 : [
-                      {
-                          id: 'uuid',
-                          columns: ['UUID', schedulerJob.uuid],
-                      },
-                      {
-                          id: 'name',
-                          columns: ['Name', schedulerJob.jobName],
-                      },
-                      {
-                          id: 'jobType',
-                          columns: ['Job Type', schedulerJob.jobType ?? ''],
-                      },
-                      {
-                          id: 'oneTime',
-                          columns: ['One Time Only', <SwitchField label="" viewOnly={{ checked: schedulerJob.oneTime }} id="oneTime" />],
-                      },
-                      {
-                          id: 'system',
-                          columns: ['System Job', <SwitchField label="" viewOnly={{ checked: schedulerJob.system }} id="system" />],
-                      },
-                      {
-                          id: 'enabled',
-                          columns: ['Enabled', <SwitchField label="" viewOnly={{ checked: schedulerJob.enabled }} id="enabled" />],
-                      },
-                      {
-                          id: 'status',
-                          columns: [
-                              'Last Execution Status',
-                              <Badge
-                                  color={
-                                      schedulerJob.lastExecutionStatus === SchedulerJobExecutionStatus.Failed
-                                          ? 'danger'
-                                          : schedulerJob.lastExecutionStatus === SchedulerJobExecutionStatus.Succeeded
+                    {
+                        id: 'uuid',
+                        columns: ['UUID', schedulerJob.uuid],
+                    },
+                    {
+                        id: 'name',
+                        columns: ['Name', schedulerJob.jobName],
+                    },
+                    {
+                        id: 'jobType',
+                        columns: ['Job Type', schedulerJob.jobType ?? ''],
+                    },
+                    {
+                        id: 'oneTime',
+                        columns: ['One Time Only', <SwitchField label="" viewOnly={{ checked: schedulerJob.oneTime }} id="oneTime" />],
+                    },
+                    {
+                        id: 'system',
+                        columns: ['System Job', <SwitchField label="" viewOnly={{ checked: schedulerJob.system }} id="system" />],
+                    },
+                    {
+                        id: 'enabled',
+                        columns: ['Enabled', <SwitchField label="" viewOnly={{ checked: schedulerJob.enabled }} id="enabled" />],
+                    },
+                    {
+                        id: 'status',
+                        columns: [
+                            'Last Execution Status',
+                            <Badge
+                                color={
+                                    schedulerJob.lastExecutionStatus === SchedulerJobExecutionStatus.Failed
+                                        ? 'danger'
+                                        : schedulerJob.lastExecutionStatus === SchedulerJobExecutionStatus.Succeeded
                                             ? 'success'
                                             : 'primary'
-                                  }
-                              >
-                                  {getEnumLabel(schedulerJobExecutionStatusEnum, schedulerJob.lastExecutionStatus)}
-                              </Badge>,
-                          ],
-                      },
-                      {
-                          id: 'cron',
-                          columns: [
-                              'Cron Expression',
-                              <>
-                                  {schedulerJob.cronExpression}&nbsp;
-                                  <i className="fa fa-info-circle" title={getStrongFromCronExpression(schedulerJob.cronExpression)}></i>
-                              </>,
-                          ],
-                      },
-                  ],
+                                }
+                            >
+                                {getEnumLabel(schedulerJobExecutionStatusEnum, schedulerJob.lastExecutionStatus)}
+                            </Badge>,
+                        ],
+                    },
+                    {
+                        id: 'cron',
+                        columns: [
+                            'Cron Expression',
+                            <>
+                                {schedulerJob.cronExpression}&nbsp;
+                                <i className="fa fa-info-circle" title={getStrongFromCronExpression(schedulerJob.cronExpression)}></i>
+                            </>,
+                        ],
+                    },
+                ],
         [schedulerJob, schedulerJobExecutionStatusEnum],
     );
 
     return (
         <Container className="themed-container" fluid>
+            <Modal isOpen={Editmodel} toggle={editSchedulejob} modalTransition={{ timeout: 2000 }}>
+                <Form onSubmit={saveEditedJob}>
+                    <ModalHeader toggle={editSchedulejob}>Edit Scheduled Job</ModalHeader>
+
+                    <ModalBody>
+                        <FormGroup>
+                            <Label for="UUID">UUID</Label>
+                            <Input
+                                type="text"
+                                id="UUID"
+                                value={schedulerJob?.uuid}
+                           
+                            />
+                        </FormGroup>
+
+                        <FormGroup>
+                            <Label for="CronExpression">CronExpression</Label>
+                            <Input
+                                type="text"
+                                id="CronExpression"
+                                value={CronExpression}
+                                onChange={handlecronchage}
+                     
+                            />
+                            <p className='text-danger'> {CronError}</p>
+                        </FormGroup>
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button color="primary">Save Changes</Button>{' '}
+                        <Button color="secondary" onClick={() => setEditmodel(false)}>
+                            Cancel
+                        </Button>
+                    </ModalFooter>
+                </Form>
+            </Modal>
             <Widget
                 title="Scheduled Job Details"
                 busy={isBusy}

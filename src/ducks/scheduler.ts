@@ -11,6 +11,7 @@ export type State = {
     isFetchingDetail: boolean;
     isDeleting: boolean;
     isEnabling: boolean;
+    isUpdated: boolean;
 };
 
 export const initialState: State = {
@@ -20,6 +21,7 @@ export const initialState: State = {
     isFetchingDetail: false,
     isDeleting: false,
     isEnabling: false,
+    isUpdated: false,
 };
 
 export const slice = createSlice({
@@ -78,6 +80,25 @@ export const slice = createSlice({
         deleteSchedulerJob: (state, action: PayloadAction<{ uuid: string; redirect: boolean }>) => {
             state.isDeleting = true;
         },
+
+        // New actions for updating scheduler job
+        updateSchedulerJob: (state, action: PayloadAction<{ uuid: string; updateScheduledJob: Partial<SchedulerJobDetailModel>; }>) => {
+            state.isUpdated = false;
+        },
+
+        updateSchedulerJobSuccess: (state, action: PayloadAction<{ uuid: string; updateScheduledJob: Partial<SchedulerJobDetailModel>; }>) => {
+            state.isUpdated = true;
+            if (state.schedulerJob) {
+              
+                state.schedulerJob = { ...state.schedulerJob, ...action.payload.updateScheduledJob };
+            }
+        },
+
+        updateSchedulerJobFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isUpdated = false;
+            console.error('Update failed:', action.payload.error);
+        },
+
 
         deleteSchedulerJobSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isDeleting = false;
@@ -166,23 +187,24 @@ export const slice = createSlice({
 const state = createFeatureSelector<State>(slice.name);
 
 const schedulerJob = createSelector(state, (state) => state.schedulerJob);
+
 const schedulerJobs = createSelector(state, (state) => state.schedulerJobs);
 const schedulerJobHistory = createSelector(state, (state) => state.schedulerJobHistory);
 
 const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
+const isUpdating = createSelector(state, (state) => state.isUpdated);
 const isEnabling = createSelector(state, (state) => state.isEnabling);
 
 export const selectors = {
     state,
-
     schedulerJob,
     schedulerJobs,
     schedulerJobHistory,
-
     isFetchingDetail,
     isDeleting,
     isEnabling,
+    isUpdating,
 };
 
 export const actions = slice.actions;
