@@ -38,8 +38,7 @@ export type IconName =
     | 'key'
     | 'link'
     | 'recycle'
-    | 'rekey'
-    | 'edit';
+    | 'rekey';
 
 export interface WidgetButtonProps {
     icon: IconName;
@@ -93,7 +92,6 @@ const colors = {
     link: 'auto',
     recycle: 'auto',
     rekey: 'auto',
-    edit: 'auto',
 };
 
 const classNames = {
@@ -133,7 +131,6 @@ const classNames = {
     link: 'fa fa-link',
     recycle: 'fa fa-recycle',
     rekey: 'fa fa-random',
-    edit: 'fa fa-pencil',
 };
 
 //TODO: Add refresh button put it on left which should be optional

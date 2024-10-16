@@ -19,9 +19,10 @@ type Props = {
     description?: string | JSX.Element;
     validators: ((value: any) => string | undefined | Promise<string | undefined>)[];
     inputGroupIcon?: InputGroupIcon;
+    value?: string;
 };
 
-export default function TextField({ id, label, inputType, disabled = false, validators, description, inputGroupIcon }: Props) {
+export default function TextField({ id, label, inputType, disabled = false, validators, description, inputGroupIcon, value }: Props) {
     return (
         <Field name={id} validate={composeValidators(...validators)}>
             {({ input, meta }) => (
@@ -36,6 +37,7 @@ export default function TextField({ id, label, inputType, disabled = false, vali
                             id={id}
                             placeholder={label}
                             disabled={disabled}
+                            value={value}
                         />
                         {inputGroupIcon?.icon && (
                             <InputGroupText

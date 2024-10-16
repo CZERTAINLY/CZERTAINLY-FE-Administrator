@@ -1,27 +1,46 @@
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
-
+import TextField from 'components/Input/TextField';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
-
+import { Field, Form } from 'react-final-form';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions, selectors } from 'ducks/scheduler';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
-
-import { Badge, Container, Button, Modal, ModalFooter, ModalHeader, ModalBody, Form, FormGroup, Label, Input } from 'reactstrap';
-
+import { useParams, useNavigate } from 'react-router-dom';
+import ProgressButton from 'components/ProgressButton';
+import { actions as userInterfaceActions } from '../../../../ducks/user-interface';
+import {
+    Form as BootstrapForm,
+    Badge,
+    Container,
+    Button,
+    Modal,
+    ModalFooter,
+    ModalHeader,
+    ModalBody,
+    FormGroup,
+    Label,
+    Input,
+    ButtonGroup,
+} from 'reactstrap';
+import Cron from 'react-cron-generator';
 import SwitchField from 'components/Input/SwitchField';
 import { PlatformEnum, SchedulerJobExecutionStatus } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { getStrongFromCronExpression } from 'utils/dateUtil';
-
+import { composeValidators, validateAlphaNumericWithSpecialChars, validateQuartzCronExpression, validateRequired } from 'utils/validators';
+import { mutators } from 'utils/attributes/attributeEditorMutators';
 import SchedulerJobHistory from './SchedulerJobHistory';
+interface FormValues {
+    jobName: string | undefined;
+    cronExpression: string | undefined;
+}
 
 export default function SchedulerJobDetail() {
     const dispatch = useDispatch();
-
+    const navigate = useNavigate();
     const { id } = useParams();
 
     const schedulerJob = useSelector(selectors.schedulerJob);
@@ -53,40 +72,28 @@ export default function SchedulerJobDetail() {
         setEditmodel(true);
         setCronExpression(schedulerJob?.cronExpression);
     };
-    const saveEditedJob = useCallback(() => {
-       
-        if (!schedulerJob) return;
-        
 
-        dispatch(
-            actions.updateSchedulerJob({
-                uuid: schedulerJob.uuid,
-                updateScheduledJob: {
-                    jobName: schedulerJob.jobName,
-                    cronExpression: CronExpression,
-                },
-            }),
-        );
-
-        setEditmodel(false);
-    }, [CronExpression]);
-
-    const isValidCronExpression = (expression: string) => {
-        const cronRegex = /^([0-5]?[0-9]\/[1-9][0-9]*)\*{3}\?(\*)$/;
-        return cronRegex.test(expression);
-    };
-    const handlecronchage = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        const validexp = isValidCronExpression;
-     
-        setCronExpression(value);
-        if (!validexp) {
-            // setCronExpression(value)
-            // setCronError(null);
-        } else {
-            // setCronError("Error")
-        }
-    };
+    const onSubmit = useCallback(
+        (values: FormValues) => {
+            if (schedulerJob?.uuid == undefined) {
+                return;
+            } else {
+                dispatch(
+                    actions.updateSchedulerJob({
+                        uuid: schedulerJob?.uuid,
+                        updateScheduledJob: {                          
+                            cronExpression: values.cronExpression,
+                        },
+                    }),
+                );
+            }
+            setEditmodel(false);
+        },
+        [dispatch, schedulerJob],
+    );
+    const onCancel = useCallback(() => {
+        navigate(-1);
+    }, [navigate]);
 
     const onDeleteConfirmed = useCallback(() => {
         if (!schedulerJob) return;
@@ -98,9 +105,9 @@ export default function SchedulerJobDetail() {
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
-                icon: 'edit',
+                icon: 'pencil',
                 disabled: schedulerJob?.system ?? true,
-                tooltip: 'Edit',
+                tooltip: 'pencil',
                 onClick: () => {
                     editSchedulejob();
                 },
@@ -210,29 +217,82 @@ export default function SchedulerJobDetail() {
     return (
         <Container className="themed-container" fluid>
             <Modal isOpen={Editmodel} toggle={editSchedulejob} modalTransition={{ timeout: 2000 }}>
-                <Form onSubmit={saveEditedJob}>
-                    <ModalHeader toggle={editSchedulejob}>Edit Scheduled Job</ModalHeader>
+                <Form onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
+                    {({ handleSubmit, pristine, submitting, values, valid, form }) => (
+                        <BootstrapForm onSubmit={handleSubmit}>
+                            <Widget>
+                                {schedulerJob?.cronExpression && (
+                                    <>
+                                        <TextField id="jobName" label={schedulerJob.jobName} validators={[]} disabled />
 
-                    <ModalBody>
-                        <FormGroup>
-                            <Label for="UUID">UUID</Label>
-                            <Input type="text" id="UUID" value={schedulerJob?.uuid} />
-                        </FormGroup>
+                                        <TextField
+                                            value={CronExpression}
+                                            id="cronExpression"
+                                            label="Cron Expression"
+                                            validators={[validateRequired(), validateQuartzCronExpression(schedulerJob.cronExpression)]}
+                                            description={getStrongFromCronExpression(schedulerJob.cronExpression)}
+                                            inputGroupIcon={{
+                                                icon: 'fa fa-stopwatch',
+                                                onClick: () => {
+                                                    dispatch(
+                                                        userInterfaceActions.showGlobalModal({
+                                                            content: (
+                                                                <div>
+                                                                    <div className="d-flex justify-content-center">
+                                                                        <Cron
+                                                                            value={schedulerJob.cronExpression}
+                                                                            onChange={(e) => {
+                                                                                setCronExpression(e);
+                                                                                dispatch(
+                                                                                    userInterfaceActions.setOkButtonCallback(() => {
+                                                                                        dispatch(userInterfaceActions.hideGlobalModal());
+                                                                                        form.mutators.setAttribute('cronExpression', e);
+                                                                                    }),
+                                                                                );
+                                                                            }}
+                                                                            showResultText={true}
+                                                                            showResultCron={true}
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                            ),
+                                                            showCancelButton: true,
+                                                            okButtonCallback: () => {
+                                                                dispatch(userInterfaceActions.hideGlobalModal());
+                                                            },
+                                                            showOkButton: true,
+                                                            isOpen: true,
+                                                            size: 'lg',
+                                                            title: 'Select Cron timings',
+                                                        }),
+                                                    );
+                                                },
+                                            }}
+                                        />
+                                    </>
+                                )}
+                                {
+                                    <div className="d-flex justify-content-end">
+                                        <ButtonGroup>
+                                            <ProgressButton
+                                                title="Edit"
+                                                inProgressTitle="Updating..."
+                                                inProgress={submitting}
+                                                // disabled={!valid}
+                                            />
 
-                        <FormGroup>
-                            <Label for="CronExpression">CronExpression</Label>
-                            <Input type="text" id="CronExpression" value={CronExpression} onChange={handlecronchage} />
-                            <p className="text-danger"> {CronError}</p>
-                        </FormGroup>
-                    </ModalBody>
-                    <ModalFooter>
-                        <Button color="primary">Save Changes</Button>{' '}
-                        <Button color="secondary" onClick={() => setEditmodel(false)}>
-                            Cancel
-                        </Button>
-                    </ModalFooter>
+                                            <Button color="default" onClick={onCancel} disabled={submitting}>
+                                                Cancel
+                                            </Button>
+                                        </ButtonGroup>
+                                    </div>
+                                }
+                            </Widget>
+                        </BootstrapForm>
+                    )}
                 </Form>
             </Modal>
+
             <Widget
                 title="Scheduled Job Details"
                 busy={isBusy}
