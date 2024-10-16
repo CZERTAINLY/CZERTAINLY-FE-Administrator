@@ -126,6 +126,30 @@ const deleteSchedulerJob: AppEpic = (action$, state$, deps) => {
     );
 };
 
+const UpdateScheduledJob: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.updateSchedulerJob.match),
+        switchMap((action) =>
+            deps.apiClients.scheduler
+                .updateScheduledJob({
+                    uuid: action.payload.uuid,
+                    updateScheduledJob: action.payload.updateScheduledJob,
+                })
+                .pipe(
+                    mergeMap(() =>
+                        of(
+                            slice.actions.updateSchedulerJobSuccess({
+                                uuid: action.payload.uuid,
+                                updateScheduledJob: action.payload.updateScheduledJob,
+                            }),
+                        ),
+                    ),
+                    catchError((err) => of(appRedirectActions.fetchError({ error: err, message: 'Failed to update Scheduled Job' }))),
+                ),
+        ),
+    );
+};
+
 const enableSchedulerJob: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.enableSchedulerJob.match),
@@ -237,6 +261,7 @@ const epics = [
     disableSchedulerJob,
     bulkEnableSchedulerJobs,
     bulkDisableSchedulerJobs,
+    UpdateScheduledJob,
 ];
 
 export default epics;
