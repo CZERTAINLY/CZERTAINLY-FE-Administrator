@@ -30,7 +30,7 @@ export default function SchedulerJobDetail() {
 
     const schedulerJobExecutionStatusEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.SchedulerJobExecutionStatus));
 
-    const [confirmDelete, setConfirmDelete] = useState(false);
+    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [editCronOpen, setEditCronOpen] = useState(false);
     const [newCronExpression, setNewCronExpression] = useState('');
     const [cronModalOpen, setCronModalOpen] = useState(false);
