@@ -220,7 +220,7 @@ export class LocationManagementApi extends BaseAPI {
     getSearchableFieldInformation(opts?: OperationOpts): Observable<AjaxResponse<Array<SearchFieldDataByGroupDto>>>
     getSearchableFieldInformation(opts?: OperationOpts): Observable<Array<SearchFieldDataByGroupDto> | AjaxResponse<Array<SearchFieldDataByGroupDto>>> {
         return this.request<Array<SearchFieldDataByGroupDto>>({
-            url: '/v1/search',
+            url: '/v1/locations/search',
             method: 'GET',
         }, opts?.responseOpts);
     };
