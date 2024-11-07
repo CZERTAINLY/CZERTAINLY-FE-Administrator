@@ -1469,7 +1469,7 @@ export default function CertificateDetail() {
                 width: 'auto',
             },
             {
-                content: 'Multiple Entires',
+                content: 'Multiple Entries',
                 align: 'center',
                 sortable: true,
                 id: 'multiEntries',
@@ -1548,7 +1548,7 @@ export default function CertificateDetail() {
                 width: 'auto',
             },
             {
-                content: 'Multiple Entires',
+                content: 'Multiple Entries',
                 align: 'center',
                 sortable: true,
                 id: 'multiEntries',
