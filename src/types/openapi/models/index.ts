@@ -76,6 +76,7 @@ export * from './CertificateRequestFormat';
 export * from './CertificateResponseDto';
 export * from './CertificateRevocationReason';
 export * from './CertificateState';
+export * from './CertificateSubjectType';
 export * from './CertificateType';
 export * from './CertificateUpdateObjectsDto';
 export * from './CertificateValidationCheck';

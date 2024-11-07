@@ -120,6 +120,7 @@ models/CertificateRequestFormat.ts
 models/CertificateResponseDto.ts
 models/CertificateRevocationReason.ts
 models/CertificateState.ts
+models/CertificateSubjectType.ts
 models/CertificateType.ts
 models/CertificateUpdateObjectsDto.ts
 models/CertificateValidationCheck.ts

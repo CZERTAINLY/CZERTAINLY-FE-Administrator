@@ -5,6 +5,7 @@ import { CertificateDetailResponseModel } from 'types/certificate';
 import {
     CertificateEventHistoryDtoStatusEnum,
     CertificateState,
+    CertificateSubjectType,
     CertificateType,
     CertificateValidationStatus,
     ComplianceRuleStatus,
@@ -27,7 +28,7 @@ export const emptyCertificate: CertificateDetailResponseModel = {
     keySize: -1,
     keyUsage: [],
     extendedKeyUsage: [],
-    basicConstraints: '',
+    subjectType: CertificateSubjectType.EndEntity,
     state: CertificateState.PendingIssue,
     validationStatus: CertificateValidationStatus.NotChecked,
     fingerprint: '',
@@ -70,7 +71,13 @@ export function downloadFile(content: any, fileName: string) {
 }
 
 export function getCertificateStatusColor(
-    status: CertificateState | CertificateValidationStatus | CertificateEventHistoryDtoStatusEnum | ComplianceStatus | ComplianceRuleStatus,
+    status:
+        | CertificateState
+        | CertificateValidationStatus
+        | CertificateEventHistoryDtoStatusEnum
+        | ComplianceStatus
+        | ComplianceRuleStatus
+        | CertificateSubjectType,
 ) {
     switch (status) {
         case CertificateState.Requested:
@@ -130,6 +137,15 @@ export function getCertificateStatusColor(
         case CertificateEventHistoryDtoStatusEnum.Success:
             return '#1ab394';
 
+        case CertificateSubjectType.EndEntity:
+            return '#6c757d';
+        case CertificateSubjectType.SelfSignedEndEntity:
+            return '#f37d63';
+        case CertificateSubjectType.IntermediateCa:
+            return '#3754a5';
+        case CertificateSubjectType.RootCa:
+            return '#1ab394';
+
         default:
             return '#6c757d';
     }
@@ -140,6 +156,7 @@ export function useGetStatusText() {
     const certificateValidationStatusEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateValidationStatus));
     const complianceStatusEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ComplianceStatus));
     const complianceRuleStatusEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ComplianceRuleStatus));
+    const certificateSubjectTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateSubjectType));
 
     return useCallback(
         (
@@ -148,7 +165,8 @@ export function useGetStatusText() {
                 | CertificateValidationStatus
                 | CertificateEventHistoryDtoStatusEnum
                 | ComplianceStatus
-                | ComplianceRuleStatus,
+                | ComplianceRuleStatus
+                | CertificateSubjectType,
         ) => {
             switch (status) {
                 case CertificateValidationStatus.Valid:
@@ -187,11 +205,23 @@ export function useGetStatusText() {
                 case ComplianceRuleStatus.Na:
                     return getEnumLabel(complianceRuleStatusEnum, status);
 
+                case CertificateSubjectType.EndEntity:
+                case CertificateSubjectType.SelfSignedEndEntity:
+                case CertificateSubjectType.IntermediateCa:
+                case CertificateSubjectType.RootCa:
+                    return getEnumLabel(certificateSubjectTypeEnum, status);
+
                 default:
                     return 'Unknown';
             }
         },
-        [certificateStatusEnum, certificateValidationStatusEnum, complianceStatusEnum, complianceRuleStatusEnum],
+        [
+            certificateStatusEnum,
+            certificateValidationStatusEnum,
+            complianceStatusEnum,
+            complianceRuleStatusEnum,
+            certificateSubjectTypeEnum,
+        ],
     );
 }
 
