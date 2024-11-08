@@ -171,12 +171,10 @@ export const slice = createSlice({
             action: PayloadAction<{ uuid: string; updateScheduledJob: Partial<SchedulerJobDetailModel> }>,
         ) => {
             state.isUpdatingCron = false;
-            if (state.schedulerJob && state.schedulerJob.uuid === action.payload.uuid) {
-                state.schedulerJob = {
-                    ...state.schedulerJob,
-                    cronExpression: action.payload.updateScheduledJob.cronExpression || '',
-                };
-            }
+            state.schedulerJob =
+                state.schedulerJob?.uuid === action.payload.uuid
+                    ? { ...state.schedulerJob, cronExpression: action.payload.updateScheduledJob.cronExpression || '' }
+                    : state.schedulerJob;
         },
 
         updateSchedulerJobCronFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
