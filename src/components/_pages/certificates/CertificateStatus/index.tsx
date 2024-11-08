@@ -2,6 +2,7 @@ import { Badge } from 'reactstrap';
 import {
     CertificateEventHistoryDtoStatusEnum,
     CertificateState,
+    CertificateSubjectType,
     CertificateValidationStatus,
     ComplianceRuleStatus,
     ComplianceStatus,
@@ -10,7 +11,13 @@ import { getCertificateStatusColor, useGetStatusText } from 'utils/certificate';
 import { capitalize } from 'utils/common-utils';
 
 interface Props {
-    status: CertificateState | CertificateValidationStatus | CertificateEventHistoryDtoStatusEnum | ComplianceStatus | ComplianceRuleStatus;
+    status:
+        | CertificateState
+        | CertificateValidationStatus
+        | CertificateEventHistoryDtoStatusEnum
+        | ComplianceStatus
+        | ComplianceRuleStatus
+        | CertificateSubjectType;
     asIcon?: boolean;
 }
 

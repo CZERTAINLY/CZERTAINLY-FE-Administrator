@@ -293,10 +293,26 @@ function Dashboard() {
 
                 <Col>
                     <DonutChart
-                        title={'Certificates by Constraints'}
-                        data={dashboard?.certificateStatByBasicConstraints}
+                        title={'Certificates by Subject type'}
+                        data={dashboard?.certificateStatBySubjectType}
                         entity={EntityType.CERTIFICATE}
-                        onSetFilter={(_index, _labels) => []}
+                        onSetFilter={(index, labels) => {
+                            const certificateSubjectTypeEnum = platformEnums?.CertificateSubjectType;
+                            const certificateSubjectTypeList = Object.keys(certificateSubjectTypeEnum).map(
+                                (key) => certificateSubjectTypeEnum[key],
+                            );
+                            const selectedCertificateSubjectType = certificateSubjectTypeList.find(
+                                (status) => status.label === labels[index],
+                            );
+                            return [
+                                {
+                                    fieldSource: FilterFieldSource.Property,
+                                    condition: FilterConditionOperator.Equals,
+                                    fieldIdentifier: 'SUBJECT_TYPE',
+                                    value: selectedCertificateSubjectType?.code ? [selectedCertificateSubjectType?.code] : [''],
+                                },
+                            ];
+                        }}
                         redirect="../certificates"
                     />
                 </Col>
