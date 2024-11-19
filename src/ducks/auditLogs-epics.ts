@@ -73,7 +73,7 @@ const exportLogs: AppEpic = (action$, state, deps) => {
                     searchFilterRequestDto: action.payload.map(transformSearchFilterModelToDto),
                 })
                 .pipe(
-                    map((blob) => slice.actions.exportLogsSuccess(window.URL.createObjectURL(blob))),
+                    map((blob) => slice.actions.exportLogsSuccess(blob)),
                     catchError((error) =>
                         of(
                             slice.actions.exportLogsFailure(),

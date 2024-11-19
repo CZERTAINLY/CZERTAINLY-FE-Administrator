@@ -6,7 +6,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import { useDispatch, useSelector } from 'react-redux';
 
-import { Button, ButtonGroup, Container } from 'reactstrap';
+import { Button, Container } from 'reactstrap';
 import { dateFormatter } from 'utils/dateUtil';
 
 import { ApiClients } from 'api';
@@ -25,7 +25,6 @@ function AuditLogs() {
     const navigate = useNavigate();
 
     const auditLogs = useSelector(selectors.auditLogs);
-    const exportUrl = useSelector(selectors.exportUrl);
     const currentFilters = useSelector(filterSelectors.currentFilters(EntityType.AUDIT_LOG));
 
     const isFetchingPageData = useSelector(selectors.isFetchingPageData);
@@ -46,23 +45,6 @@ function AuditLogs() {
     const purgeCallback = useCallback(() => dispatch(auditLogActions.purgeLogs(currentFilters)), [dispatch, currentFilters]);
 
     const exportCallback = useCallback(() => dispatch(auditLogActions.exportLogs(currentFilters)), [dispatch, currentFilters]);
-
-    const exportPurgeButtonsNode = useMemo(
-        () => (
-            <ButtonGroup>
-                <Button color={'default'} onClick={exportCallback}>
-                    Export
-                </Button>
-                {/* Added eslint-disable-next-line because the anchor tag is blank and is used to download the file */}
-                {/* eslint-disable-next-line jsx-a11y/anchor-has-content */}
-                <a id={'exportLink'} href={exportUrl} download="auditLogs.zip" hidden={true} />
-                <Button type="submit" color="primary" onClick={purgeCallback}>
-                    Purge
-                </Button>
-            </ButtonGroup>
-        ),
-        [purgeCallback, exportCallback, exportUrl],
-    );
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
@@ -261,7 +243,6 @@ function AuditLogs() {
             <PagedList
                 entity={EntityType.AUDIT_LOG}
                 onListCallback={onListCallback}
-                // onDeleteCallback={(uuids) => uuids.map((uuid) => dispatch(actions.deleteEntity({ uuid })))}
                 getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.auditLogs.getSearchableFieldInformation5(), [])}
                 addHidden={true}
                 hasCheckboxes={false}

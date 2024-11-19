@@ -1,9 +1,4 @@
-import {
-    AuditLogDto,
-    AuditLogItemDto,
-    AuditLogItemModel,
-    AuditLogModel,
-} from 'types/auditLogs';
+import { AuditLogDto, AuditLogItemDto, AuditLogItemModel, AuditLogModel } from 'types/auditLogs';
 
 export function transformAuditLogItemDtoToModel(auditLog: AuditLogItemDto): AuditLogItemModel {
     return { ...auditLog };

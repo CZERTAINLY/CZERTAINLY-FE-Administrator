@@ -5,7 +5,6 @@ import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     auditLogs: AuditLogItemModel[];
-    exportUrl: string | undefined;
 
     isFetchingPageData: boolean;
     isPurging: boolean;
@@ -14,8 +13,6 @@ export type State = {
 
 export const initialState: State = {
     auditLogs: [],
-    exportUrl: undefined,
-
     isFetchingPageData: false,
     isPurging: false,
     isExporting: false,
@@ -53,12 +50,20 @@ export const slice = createSlice({
         },
 
         exportLogs: (state, action: PayloadAction<SearchFilterModel[]>) => {
-            state.exportUrl = undefined;
             state.isExporting = true;
         },
 
-        exportLogsSuccess: (state, action: PayloadAction<string>) => {
-            state.exportUrl = action.payload;
+        exportLogsSuccess: (state, action: PayloadAction<Blob>) => {
+            // Dynamically create an anchor element for download
+            const downloadUrl = URL.createObjectURL(action.payload);
+            const a = document.createElement('a');
+            a.href = downloadUrl;
+            a.download = 'auditLogs.zip';
+            document.body.appendChild(a); // Temporarily add to DOM
+            a.click(); // Trigger file download
+            document.body.removeChild(a); // Remove the element
+            URL.revokeObjectURL(downloadUrl); // Release the object URL
+
             state.isExporting = false;
         },
 
@@ -71,7 +76,6 @@ export const slice = createSlice({
 const state = createFeatureSelector<State>(slice.name);
 
 const auditLogs = createSelector(state, (state) => state.auditLogs);
-const exportUrl = createSelector(state, (state) => state.exportUrl);
 
 const isFetchingPageData = createSelector(state, (state) => state.isFetchingPageData);
 const isPurging = createSelector(state, (state) => state.isPurging);
@@ -81,7 +85,6 @@ export const selectors = {
     state,
 
     auditLogs,
-    exportUrl,
     isFetchingPageData,
     isPurging,
     isExporting,
