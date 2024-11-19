@@ -26,6 +26,7 @@ import {
     CertificateFormatEncoding,
     CertificateRequestFormat,
     CertificateRevocationReason,
+    CertificateSubjectType,
     CertificateValidationStatus,
 } from '../../../../types/openapi';
 
@@ -1422,8 +1423,8 @@ export default function CertificateDetail() {
                       ],
                   },
                   {
-                      id: 'basicConstraint',
-                      columns: ['Basic Constraint', certificate.basicConstraints],
+                      id: 'subjectType',
+                      columns: ['Subject Type', <CertificateStatus status={certificate.subjectType} />],
                   },
               ];
         if (certificate?.state !== CertStatus.Requested) {
@@ -1437,7 +1438,7 @@ export default function CertificateDetail() {
             certDetail.unshift({
                 id: 'trustedCa',
                 columns: [
-                    certificate?.basicConstraints?.includes('End Entity') ? 'Trusted Self-Signed' : 'Trusted CA',
+                    certificate?.subjectType == CertificateSubjectType.SelfSignedEndEntity ? 'Trusted Self-Signed' : 'Trusted CA',
                     <SwitchWidget disabled={isUpdatingTrustedStatus} checked={certificate.trustedCa ?? false} onClick={switchCallback} />,
                 ],
             });
@@ -1468,7 +1469,7 @@ export default function CertificateDetail() {
                 width: 'auto',
             },
             {
-                content: 'Multiple Entires',
+                content: 'Multiple Entries',
                 align: 'center',
                 sortable: true,
                 id: 'multiEntries',
@@ -1547,7 +1548,7 @@ export default function CertificateDetail() {
                 width: 'auto',
             },
             {
-                content: 'Multiple Entires',
+                content: 'Multiple Entries',
                 align: 'center',
                 sortable: true,
                 id: 'multiEntries',
