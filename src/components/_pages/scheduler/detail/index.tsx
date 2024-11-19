@@ -7,7 +7,7 @@ import { actions, selectors } from 'ducks/scheduler';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { Badge, Container, Button } from 'reactstrap';
+import { Badge, Container } from 'reactstrap';
 import SwitchField from 'components/Input/SwitchField';
 import { PlatformEnum, SchedulerJobExecutionStatus } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
