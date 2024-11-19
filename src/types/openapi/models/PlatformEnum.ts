@@ -63,6 +63,11 @@ export enum PlatformEnum {
     TriggerType = 'TriggerType',
     ConditionType = 'ConditionType',
     ExecutionType = 'ExecutionType',
-    ResourceEvent = 'ResourceEvent'
+    ResourceEvent = 'ResourceEvent',
+    Module = 'Module',
+    ActorType = 'ActorType',
+    AuthMethod = 'AuthMethod',
+    Operation = 'Operation',
+    OperationResult = 'OperationResult'
 }
 
