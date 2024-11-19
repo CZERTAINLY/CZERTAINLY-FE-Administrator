@@ -25,7 +25,6 @@ export type IconName =
     | 'sync'
     | 'minus'
     | 'lock'
-    | 'edit'
     | 'refresh'
     | 'reload'
     | 'handshake'
@@ -78,7 +77,6 @@ const colors = {
     minus: 'red',
     gavel: 'auto',
     lock: 'auto',
-    edit: 'auto',
     refresh: 'auto',
     reload: 'auto',
     handshake: 'red',
@@ -118,7 +116,6 @@ const classNames = {
     minus: 'fa fa-minus',
     gavel: 'fa fa-gavel',
     lock: 'fa fa-lock',
-    edit: 'fa fa-edit',
     stopwatch: 'fa fa-stopwatch',
     refresh: 'fa fa-refresh',
     reload: 'fa fa-rotate-right',

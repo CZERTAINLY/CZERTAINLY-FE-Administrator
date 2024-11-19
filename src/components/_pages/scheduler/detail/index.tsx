@@ -2,32 +2,31 @@ import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
-
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions, selectors } from 'ducks/scheduler';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-
-import { Badge, Container, Input, InputGroup, Button, InputGroupText } from 'reactstrap';
+import { Badge, Container, Button } from 'reactstrap';
 import SwitchField from 'components/Input/SwitchField';
 import { PlatformEnum, SchedulerJobExecutionStatus } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { getStrongFromCronExpression } from 'utils/dateUtil';
-
-import SchedulerJobHistory from './SchedulerJobHistory';
 import Cron from 'react-cron-generator';
+import { validateQuartzCronExpression, validateRequired } from 'utils/validators';
+import TextField from 'components/Input/TextField';
+import { Form } from 'react-final-form';
+import SchedulerJobHistory from './SchedulerJobHistory';
 
 export default function SchedulerJobDetail() {
     const dispatch = useDispatch();
     const { id } = useParams();
     const schedulerJob = useSelector(selectors.schedulerJob);
-
     const isFetching = useSelector(selectors.isFetchingDetail);
     const isDeleting = useSelector(selectors.isDeleting);
     const isEnabling = useSelector(selectors.isEnabling);
     const isUpdatingCron = useSelector(selectors.isUpdatingCron);
-
+    const [originalCronExpression, setOriginalCronExpression] = useState<string>('');
     const schedulerJobExecutionStatusEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.SchedulerJobExecutionStatus));
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
@@ -62,9 +61,14 @@ export default function SchedulerJobDetail() {
         }
     }, [schedulerJob, dispatch, newCronExpression]);
 
+    const handleCronSelectChange = (value: string) => {
+        setNewCronExpression(value);
+    };
+
     const openEditCronModal = useCallback(() => {
         if (schedulerJob) {
             setNewCronExpression(schedulerJob.cronExpression);
+            setOriginalCronExpression(schedulerJob.cronExpression);
         }
         setEditCronOpen(true);
     }, [schedulerJob]);
@@ -96,7 +100,7 @@ export default function SchedulerJobDetail() {
                 },
             },
             {
-                icon: 'edit',
+                icon: 'pencil',
                 disabled: !schedulerJob,
                 tooltip: 'Edit CRON Expression',
                 onClick: openEditCronModal,
@@ -190,7 +194,6 @@ export default function SchedulerJobDetail() {
                 widgetLockName={LockWidgetNameEnum.SchedulerJobDetail}
             >
                 <br />
-
                 <CustomTable headers={detailHeaders} data={detailData} />
             </Widget>
             {id && <SchedulerJobHistory uuid={id} />}
@@ -206,46 +209,71 @@ export default function SchedulerJobDetail() {
                 ]}
             />
             <Dialog
+                size="lg"
                 isOpen={editCronOpen}
                 caption="Edit CRON Expression"
                 body={
-                    <InputGroup>
-                        <Input
-                            type="text"
-                            value={newCronExpression}
-                            onChange={(e) => setNewCronExpression(e.target.value)}
-                            placeholder="Enter new CRON expression"
-                        />
-                        <InputGroupText>
-                            <Button color="link" onClick={() => setCronModalOpen(true)}>
-                                <i className="fa fa-stopwatch" />
-                            </Button>
-                        </InputGroupText>
-                    </InputGroup>
+                    <Form
+                        onSubmit={handleCronSave}
+                        initialValues={{ cronExpression: newCronExpression }}
+                        render={({ handleSubmit, values }) => (
+                            <form onSubmit={handleSubmit}>
+                                <TextField
+                                    id="cronExpression"
+                                    label="Cron Expression"
+                                    validators={[validateRequired(), validateQuartzCronExpression(values.cronExpression)]}
+                                    description={getStrongFromCronExpression(values.cronExpression)}
+                                    inputGroupIcon={{
+                                        icon: 'fa fa-stopwatch',
+                                        onClick: () => setCronModalOpen(true),
+                                    }}
+                                />
+                                <div className="d-flex justify-content-between mt-3">
+                                    <button type="submit" className="btn btn-primary">
+                                        Save
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="btn btn-secondary"
+                                        onClick={() => {
+                                            setNewCronExpression(originalCronExpression);
+                                            setEditCronOpen(false);
+                                        }}
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </form>
+                        )}
+                    />
                 }
                 toggle={() => setEditCronOpen(false)}
-                buttons={[
-                    { color: 'primary', onClick: handleCronSave, body: 'Save' },
-                    { color: 'secondary', onClick: () => setEditCronOpen(false), body: 'Cancel' },
-                ]}
             />
+
             <Dialog
+                size="lg"
                 isOpen={cronModalOpen}
                 caption="Select CRON Expression"
-                body={<Cron value={newCronExpression} onChange={(value) => setNewCronExpression(value)} showResultText showResultCron />}
+                body={
+                    <div className="d-flex justify-content-center">
+                        <Cron value={newCronExpression} onChange={handleCronSelectChange} showResultText showResultCron />
+                    </div>
+                }
                 toggle={() => setCronModalOpen(false)}
                 buttons={[
                     {
                         color: 'primary',
                         onClick: () => {
-                            handleCronSave();
                             setCronModalOpen(false);
                         },
                         body: 'Ok',
                     },
                     {
                         color: 'secondary',
-                        onClick: () => setCronModalOpen(false),
+                        onClick: () => {
+                            setNewCronExpression(originalCronExpression);
+                            setCronModalOpen(false);
+                        },
                         body: 'Cancel',
                     },
                 ]}
