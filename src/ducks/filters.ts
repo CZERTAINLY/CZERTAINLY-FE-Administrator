@@ -6,6 +6,7 @@ import { SearchFieldListModel, SearchFilterModel } from 'types/certificate';
 import { createFeatureSelector } from 'utils/ducks';
 
 export const enum EntityType {
+    AUDIT_LOG,
     ENTITY,
     LOCATION,
     CERTIFICATE,

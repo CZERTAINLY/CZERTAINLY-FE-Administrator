@@ -55,6 +55,8 @@ models/ActionRequestDto.ts
 models/ActivateAcmeForRaProfileRequestDto.ts
 models/ActivateCmpForRaProfileRequestDto.ts
 models/ActivateScepForRaProfileRequestDto.ts
+models/ActorRecord.ts
+models/ActorType.ts
 models/AddLocationRequestDto.ts
 models/AddRaProfileRequestDto.ts
 models/AddTokenProfileRequestDto.ts
@@ -82,8 +84,8 @@ models/AttributeMappingDto.ts
 models/AttributeType.ts
 models/AttributeValueTarget.ts
 models/AuditLogDto.ts
-models/AuditLogFilter.ts
 models/AuditLogResponseDto.ts
+models/AuthMethod.ts
 models/AuthResourceDto.ts
 models/AuthType.ts
 models/AuthenticationServiceExceptionDto.ts
@@ -258,6 +260,7 @@ models/LocationsResponseDto.ts
 models/MetadataAttribute.ts
 models/MetadataAttributeProperties.ts
 models/MetadataResponseDto.ts
+models/Module.ts
 models/MultipleCertificateObjectUpdateDto.ts
 models/NameAndIdDto.ts
 models/NameAndUuidDto.ts
@@ -271,7 +274,8 @@ models/NotificationSettingsDto.ts
 models/ObjectAttributeContent.ts
 models/ObjectPermissionsDto.ts
 models/ObjectPermissionsRequestDto.ts
-models/Pageable.ts
+models/Operation.ts
+models/OperationResult.ts
 models/PaginationRequestDto.ts
 models/PlatformEnum.ts
 models/PlatformSettingsDto.ts
@@ -296,6 +300,7 @@ models/ResourceDto.ts
 models/ResourceEventDto.ts
 models/ResourcePermissionsDto.ts
 models/ResourcePermissionsRequestDto.ts
+models/ResourceRecord.ts
 models/ResponseAttributeDto.ts
 models/ResponseMetadataDto.ts
 models/RoleDetailDto.ts
@@ -328,6 +333,7 @@ models/SignatureRequestData.ts
 models/SignatureResponseData.ts
 models/SimplifiedComplianceProfileDto.ts
 models/SimplifiedRaProfileDto.ts
+models/SourceRecord.ts
 models/StatisticsDto.ts
 models/StringAttributeContent.ts
 models/SubjectPermissionsDto.ts
