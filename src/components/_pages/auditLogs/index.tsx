@@ -294,6 +294,7 @@ function AuditLogs() {
                             className="btn btn-link p-0 ms-2"
                             color="white"
                             title="Detail"
+                            key={`detail${log.id}`}
                             onClick={() => {
                                 dispatch(
                                     userInterfaceActions.showGlobalModal({
