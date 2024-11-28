@@ -1,6 +1,8 @@
 import { actions as auditLogActions, selectors } from 'ducks/auditLogs';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { EntityType, selectors as filterSelectors } from 'ducks/filters';
+import { actions as userInterfaceActions } from '../../../ducks/user-interface';
+
 import { useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -11,14 +13,18 @@ import { dateFormatter } from 'utils/dateUtil';
 
 import { ApiClients } from 'api';
 import { WidgetButtonProps } from 'components/WidgetButtons';
-import { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { SearchRequestModel } from 'types/certificate';
 import PagedList from 'components/PagedList/PagedList';
 import { PlatformEnum } from 'types/openapi/models';
 
-import styles from './auditLogs.module.scss';
-import ObjectValues from './ObjectValues';
+import { AuditLogItemModel } from 'types/auditLogs';
+
+type AuditLogDetailItem = {
+    property: string;
+    propertyValue: string;
+};
 
 function AuditLogs() {
     const dispatch = useDispatch();
@@ -66,6 +72,82 @@ function AuditLogs() {
             },
         ],
         [exportCallback, purgeCallback],
+    );
+
+    const createAuditLogDetailData = useCallback(
+        (auditLog: AuditLogItemModel): AuditLogDetailItem[] => [
+            {
+                property: 'Resource',
+                propertyValue: getEnumLabel(resourceEnum, auditLog.resource.type),
+            },
+            {
+                property: 'Resource UUIDs',
+                propertyValue: auditLog.resource.uuids?.join(', ') ?? '',
+            },
+            {
+                property: 'Resource names',
+                propertyValue: auditLog.resource.names?.join(', ') ?? '',
+            },
+            {
+                property: 'Affiliated resource',
+                propertyValue: auditLog.affiliatedResource ? getEnumLabel(resourceEnum, auditLog.affiliatedResource.type) : '',
+            },
+            {
+                property: 'Affiliated resource UUIDs',
+                propertyValue: auditLog.affiliatedResource?.uuids?.join(', ') ?? '',
+            },
+            {
+                property: 'Affiliated resource names',
+                propertyValue: auditLog.affiliatedResource?.names?.join(', ') ?? '',
+            },
+            {
+                property: 'Request method',
+                propertyValue: auditLog.source?.method ?? '',
+            },
+            {
+                property: 'Request path',
+                propertyValue: auditLog.source?.path ?? '',
+            },
+            {
+                property: 'Request IP address',
+                propertyValue: auditLog.source?.ipAddress ?? '',
+            },
+            {
+                property: 'Message',
+                propertyValue: auditLog.message ?? '',
+            },
+            {
+                property: 'Operation data',
+                propertyValue: JSON.stringify(auditLog.operationData, null, 3),
+            },
+            {
+                property: 'Additional data',
+                propertyValue: JSON.stringify(auditLog.additionalData, null, 3),
+            },
+        ],
+        [resourceEnum],
+    );
+
+    const createAuditLogDetailRows = (a: AuditLogDetailItem) => ({
+        id: a.property,
+        columns: [a.property, a.propertyValue],
+    });
+
+    const auditLogsDetailRowHeaders: TableHeader[] = useMemo(
+        () => [
+            {
+                content: 'Property',
+                align: 'left',
+                id: 'property',
+                width: '25%',
+            },
+            {
+                content: 'Value',
+                align: 'left',
+                id: 'value',
+            },
+        ],
+        [],
     );
 
     const auditLogsRowHeaders: TableHeader[] = useMemo(
@@ -119,14 +201,9 @@ function AuditLogs() {
                 width: '5%',
             },
             {
-                content: 'Operation data',
-                align: 'center',
-                id: 'operationData',
-            },
-            {
-                content: 'Additional data',
-                align: 'center',
-                id: 'additionalData',
+                content: '',
+                id: 'moreInfo',
+                width: '2%',
             },
         ],
         [],
@@ -213,29 +290,49 @@ function AuditLogs() {
                         </span>,
                         getEnumLabel(operationEnum, log.operation),
                         getEnumLabel(operationResultEnum, log.operationResult),
-                        log.operationData ? <span className={styles.showMore}>Show more...</span> : 'None',
-                        log.additionalData ? <span className={styles.showMore}>Show more...</span> : 'None',
+                        <Button
+                            className="btn btn-link p-0 ms-2"
+                            color="white"
+                            title="Detail"
+                            onClick={() => {
+                                dispatch(
+                                    userInterfaceActions.showGlobalModal({
+                                        content: (
+                                            <CustomTable
+                                                headers={auditLogsDetailRowHeaders}
+                                                data={createAuditLogDetailData(log).map(createAuditLogDetailRows)}
+                                            />
+                                        ),
+                                        isOpen: true,
+                                        showCloseButton: true,
+                                        title: 'Audit log detail',
+                                        size: 'xl',
+                                    }),
+                                );
+                            }}
+                        >
+                            <i
+                                className="fa fa-info"
+                                style={{ color: 'auto', marginBottom: '9.5px', marginLeft: '4px', fontSize: '14px' }}
+                            />
+                        </Button>,
+                        // log.operationData ? <span className={styles.showMore}>Show more...</span> : 'None',
+                        // log.additionalData ? <span className={styles.showMore}>Show more...</span> : 'None',
                     ],
-
-                    detailColumns:
-                        !log.operationData && !log.additionalData
-                            ? undefined
-                            : [
-                                  <></>,
-                                  <></>,
-                                  <></>,
-                                  <></>,
-                                  <></>,
-                                  <></>,
-                                  <></>,
-                                  <></>,
-                                  <></>,
-                                  log.operationData ? <ObjectValues obj={log.operationData} /> : <></>,
-                                  log.additionalData ? <ObjectValues obj={log.additionalData} /> : <></>,
-                              ],
                 };
             }),
-        [auditLogs, navigate, moduleEnum, actorEnum, resourceEnum, operationEnum, operationResultEnum],
+        [
+            auditLogs,
+            navigate,
+            moduleEnum,
+            actorEnum,
+            resourceEnum,
+            operationEnum,
+            operationResultEnum,
+            auditLogsDetailRowHeaders,
+            createAuditLogDetailData,
+            dispatch,
+        ],
     );
 
     return (
@@ -249,7 +346,7 @@ function AuditLogs() {
                 additionalButtons={buttons}
                 headers={auditLogsRowHeaders}
                 data={auditLogsList}
-                hasDetails={true}
+                hasDetails={false}
                 isBusy={isBusy}
                 title="Audit logs"
                 entityNameSingular="an Audit log"
