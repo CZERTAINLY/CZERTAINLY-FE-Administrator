@@ -34,8 +34,9 @@ export function dateFormatter(date: any): string {
         const day = leading0(dateObj.getDate().toString(), 2);
         const hours = leading0(dateObj.getHours().toString(), 2);
         const minutes = leading0(dateObj.getMinutes().toString(), 2);
+        const seconds = leading0(dateObj.getSeconds().toString(), 2);
 
-        return `${year}-${month}-${day} ${hours}:${minutes}`;
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 
         /*
       return new Intl.DateTimeFormat("en-GB", {
