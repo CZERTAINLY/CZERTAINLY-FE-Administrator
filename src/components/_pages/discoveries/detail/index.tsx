@@ -135,7 +135,10 @@ export default function DiscoveryDetail() {
                       },
                       {
                           id: 'providerStatus',
-                          columns: ['Discovery Provider Status', <DiscoveryStatus key="providerStatus" status={discovery.connectorStatus} />],
+                          columns: [
+                              'Discovery Provider Status',
+                              <DiscoveryStatus key="providerStatus" status={discovery.connectorStatus} />,
+                          ],
                       },
                       {
                           id: 'status',
