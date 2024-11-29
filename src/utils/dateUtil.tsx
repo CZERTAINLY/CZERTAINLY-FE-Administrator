@@ -10,6 +10,19 @@ function leading0(s: string, count: number) {
     return s;
 }
 
+export function durationFormatter(startDate: string | null | undefined, endDate: string | null | undefined): string {
+    try {
+        return startDate
+            ? endDate
+                ? timeFormatter(new Date(endDate).valueOf() - new Date(startDate).valueOf())
+                : timeFormatter(new Date().valueOf() - new Date(startDate).valueOf())
+            : '';
+    } catch (error) {
+        console.debug('Unable to convert the given date strings to date object');
+        return '';
+    }
+}
+
 export function timeFormatter(date: any): string {
     try {
         const dateObj = new Date(date);
@@ -34,8 +47,9 @@ export function dateFormatter(date: any): string {
         const day = leading0(dateObj.getDate().toString(), 2);
         const hours = leading0(dateObj.getHours().toString(), 2);
         const minutes = leading0(dateObj.getMinutes().toString(), 2);
+        const seconds = leading0(dateObj.getSeconds().toString(), 2);
 
-        return `${year}-${month}-${day} ${hours}:${minutes}`;
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 
         /*
       return new Intl.DateTimeFormat("en-GB", {
