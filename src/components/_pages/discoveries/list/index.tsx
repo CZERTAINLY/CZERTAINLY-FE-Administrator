@@ -5,7 +5,7 @@ import { Badge, Container } from 'reactstrap';
 
 import { actions, selectors } from 'ducks/discoveries';
 import { EntityType } from 'ducks/filters';
-import { dateFormatter, timeFormatter } from 'utils/dateUtil';
+import { dateFormatter, durationFormatter } from 'utils/dateUtil';
 
 import { ApiClients } from 'api';
 import { TableDataRow, TableHeader } from 'components/CustomTable';
@@ -91,11 +91,7 @@ function DiscoveryList() {
                     ),
                     <Badge color="secondary">{discovery.kind}</Badge>,
                     discovery.startTime ? <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(discovery.startTime)}</span> : '',
-                    discovery.startTime
-                        ? discovery.endTime
-                            ? timeFormatter(new Date(discovery.endTime).valueOf() - new Date(discovery.startTime).valueOf())
-                            : timeFormatter(new Date().valueOf() - new Date(discovery.startTime).valueOf())
-                        : '',
+                    <span style={{ whiteSpace: 'nowrap' }}>{durationFormatter(discovery.startTime, discovery.endTime)}</span>,
                     <DiscoveryStatus status={discovery.status} />,
                     discovery.totalCertificatesDiscovered?.toString() || '0',
                 ],

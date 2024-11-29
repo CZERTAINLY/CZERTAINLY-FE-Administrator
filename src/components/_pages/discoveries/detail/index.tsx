@@ -17,7 +17,7 @@ import CustomAttributeWidget from 'components/Attributes/CustomAttributeWidget';
 import TabLayout from 'components/Layout/TabLayout';
 import { actions as rulesActions, selectors as ruleSelectors } from 'ducks/rules';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { dateFormatter, timeFormatter } from 'utils/dateUtil';
+import { dateFormatter, durationFormatter } from 'utils/dateUtil';
 import { PlatformEnum, Resource } from '../../../../types/openapi';
 import DiscoveryStatus from '../DiscoveryStatus';
 import DiscoveryCertificates from './DiscoveryCertificates';
@@ -159,13 +159,7 @@ export default function DiscoveryDetail() {
                           id: 'duration',
                           columns: [
                               'Duration',
-                              <span style={{ whiteSpace: 'nowrap' }}>
-                                  {discovery.startTime
-                                      ? discovery.endTime
-                                          ? timeFormatter(new Date(discovery.endTime).valueOf() - new Date(discovery.startTime).valueOf())
-                                          : timeFormatter(new Date().valueOf() - new Date(discovery.startTime).valueOf())
-                                      : ''}
-                              </span>,
+                              <span style={{ whiteSpace: 'nowrap' }}>{durationFormatter(discovery.startTime, discovery.endTime)}</span>,
                           ],
                       },
                       {

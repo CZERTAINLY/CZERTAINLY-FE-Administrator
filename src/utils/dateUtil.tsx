@@ -10,6 +10,19 @@ function leading0(s: string, count: number) {
     return s;
 }
 
+export function durationFormatter(startDate: string | null | undefined, endDate: string | null | undefined): string {
+    try {
+        return startDate
+            ? endDate
+                ? timeFormatter(new Date(endDate).valueOf() - new Date(startDate).valueOf())
+                : timeFormatter(new Date().valueOf() - new Date(startDate).valueOf())
+            : '';
+    } catch (error) {
+        console.debug('Unable to convert the given date strings to date object');
+        return '';
+    }
+}
+
 export function timeFormatter(date: any): string {
     try {
         const dateObj = new Date(date);
