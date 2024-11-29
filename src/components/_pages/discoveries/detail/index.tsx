@@ -159,7 +159,9 @@ export default function DiscoveryDetail() {
                           id: 'duration',
                           columns: [
                               'Duration',
-                              <span style={{ whiteSpace: 'nowrap' }}>{durationFormatter(discovery.startTime, discovery.endTime)}</span>,
+                              <span key="duration" style={{ whiteSpace: 'nowrap' }}>
+                                  {durationFormatter(discovery.startTime, discovery.endTime)}
+                              </span>,
                           ],
                       },
                       {

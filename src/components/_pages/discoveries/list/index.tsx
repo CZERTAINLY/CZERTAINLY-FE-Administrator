@@ -91,7 +91,9 @@ function DiscoveryList() {
                     ),
                     <Badge color="secondary">{discovery.kind}</Badge>,
                     discovery.startTime ? <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(discovery.startTime)}</span> : '',
-                    <span style={{ whiteSpace: 'nowrap' }}>{durationFormatter(discovery.startTime, discovery.endTime)}</span>,
+                    <span key={`duration${discovery.uuid}`} style={{ whiteSpace: 'nowrap' }}>
+                        {durationFormatter(discovery.startTime, discovery.endTime)}
+                    </span>,
                     <DiscoveryStatus status={discovery.status} />,
                     discovery.totalCertificatesDiscovered?.toString() || '0',
                 ],
