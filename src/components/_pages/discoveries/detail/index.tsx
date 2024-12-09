@@ -169,7 +169,11 @@ export default function DiscoveryDetail() {
                       },
                       {
                           id: 'totalCertificatesDiscovered',
-                          columns: ['Total Certificates Discovered', discovery.totalCertificatesDiscovered?.toString() || '0'],
+                          columns: ['Total Certificates Discovered', discovery.connectorTotalCertificatesDiscovered?.toString() || '0'],
+                      },
+                      {
+                          id: 'totalCertificatesDownloaded',
+                          columns: ['Total Certificates Downloaded', discovery.totalCertificatesDiscovered?.toString() || '0'],
                       },
                       {
                           id: 'message',
