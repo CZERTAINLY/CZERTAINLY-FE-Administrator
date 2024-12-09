@@ -45,11 +45,6 @@ export default function DiscoveryDetail() {
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.TriggerType));
 
-    // useEffect(() => {
-    //     if (!id) return;
-    //     dispatch(rulesActions.getTriggerHistorySummary({ triggerObjectUuid: id }));
-    // }, [id, dispatch]);
-
     const getFreshTriggerHistorySummary = useCallback(() => {
         if (!id) return;
         dispatch(rulesActions.getTriggerHistorySummary({ triggerObjectUuid: id }));

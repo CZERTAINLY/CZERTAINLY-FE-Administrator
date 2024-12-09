@@ -51,17 +51,6 @@ export function dateFormatter(date: any): string {
         const seconds = leading0(dateObj.getSeconds().toString(), 2);
 
         return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-
-        /*
-      return new Intl.DateTimeFormat("en-GB", {
-         year: "numeric",
-         month: "2-digit",
-         day: "2-digit",
-         hour: "numeric",
-         minute: "numeric",
-         second: "numeric",
-      }).format(new Date(date));
-      */
     } catch (error) {
         console.debug('Unable to convert the given date to date object');
         return date;
@@ -165,7 +154,6 @@ export function getFormattedDate(dateString: string): string {
     return formattedDate;
 }
 
-// type formatType = 'datetime' | 'date' | 'time';
 export function getFormattedUtc(type: AttributeContentType | FilterFieldType, dateString: string): string {
     if (type === 'datetime') {
         const date = new Date(dateString);
