@@ -27,11 +27,12 @@ export function timeFormatter(date: any): string {
     try {
         const dateObj = new Date(date);
 
+        const days = Math.floor(dateObj.getTime() / (1000 * 60 * 60 * 24));
         const hours = leading0(dateObj.getUTCHours().toString(), 2);
         const minutes = leading0(dateObj.getMinutes().toString(), 2);
         const seconds = leading0(dateObj.getSeconds().toString(), 2);
 
-        return `${hours}:${minutes}:${seconds}`;
+        return days > 0 ? `${leading0(days.toString(), 2)}.${hours}:${minutes}:${seconds}` : `${hours}:${minutes}:${seconds}`;
     } catch (error) {
         console.debug('Unable to convert the given time to date object');
         return date;
@@ -50,17 +51,6 @@ export function dateFormatter(date: any): string {
         const seconds = leading0(dateObj.getSeconds().toString(), 2);
 
         return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-
-        /*
-      return new Intl.DateTimeFormat("en-GB", {
-         year: "numeric",
-         month: "2-digit",
-         day: "2-digit",
-         hour: "numeric",
-         minute: "numeric",
-         second: "numeric",
-      }).format(new Date(date));
-      */
     } catch (error) {
         console.debug('Unable to convert the given date to date object');
         return date;
@@ -164,7 +154,6 @@ export function getFormattedDate(dateString: string): string {
     return formattedDate;
 }
 
-// type formatType = 'datetime' | 'date' | 'time';
 export function getFormattedUtc(type: AttributeContentType | FilterFieldType, dateString: string): string {
     if (type === 'datetime') {
         const date = new Date(dateString);
