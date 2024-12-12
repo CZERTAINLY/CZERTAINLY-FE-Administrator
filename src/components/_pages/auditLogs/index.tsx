@@ -40,6 +40,7 @@ function AuditLogs() {
     // enum selectors
     const moduleEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Module));
     const actorEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ActorType));
+    const authMethodEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AuthMethod));
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const operationEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Operation));
     const operationResultEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.OperationResult));
@@ -166,7 +167,7 @@ function AuditLogs() {
             },
             {
                 content: 'Module',
-                align: 'center',
+                align: 'left',
                 id: 'module',
                 width: '5%',
             },
@@ -175,6 +176,12 @@ function AuditLogs() {
                 align: 'left',
                 id: 'actor',
                 width: '10%',
+            },
+            {
+                content: 'Auth method',
+                align: 'left',
+                id: 'authMethod',
+                width: '5%',
             },
             {
                 content: 'Resource',
@@ -239,6 +246,7 @@ function AuditLogs() {
                                 ''
                             )}
                         </span>,
+                        getEnumLabel(authMethodEnum, log.actor.authMethod),
                         <span style={{ whiteSpace: 'nowrap' }}>
                             {getEnumLabel(resourceEnum, log.resource.type)}
                             {log.resource.uuids && log.resource.uuids.length > 0 && log.resource.names && log.resource.names.length > 0 ? (
@@ -327,6 +335,7 @@ function AuditLogs() {
             navigate,
             moduleEnum,
             actorEnum,
+            authMethodEnum,
             resourceEnum,
             operationEnum,
             operationResultEnum,
