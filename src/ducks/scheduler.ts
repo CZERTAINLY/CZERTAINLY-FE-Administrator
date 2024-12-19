@@ -11,6 +11,7 @@ export type State = {
     isFetchingDetail: boolean;
     isDeleting: boolean;
     isEnabling: boolean;
+    isUpdatingCron: boolean;
 };
 
 export const initialState: State = {
@@ -20,6 +21,7 @@ export const initialState: State = {
     isFetchingDetail: false,
     isDeleting: false,
     isEnabling: false,
+    isUpdatingCron: false,
 };
 
 export const slice = createSlice({
@@ -160,6 +162,24 @@ export const slice = createSlice({
         disableSchedulerJobFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isEnabling = false;
         },
+        updateSchedulerJobCron: (state, action: PayloadAction<{ uuid: string; cronExpression: string }>) => {
+            state.isUpdatingCron = true;
+        },
+
+        updateSchedulerJobCronSuccess: (
+            state,
+            action: PayloadAction<{ uuid: string; updateScheduledJob: Partial<SchedulerJobDetailModel> }>,
+        ) => {
+            state.isUpdatingCron = false;
+            state.schedulerJob =
+                state.schedulerJob?.uuid === action.payload.uuid
+                    ? { ...state.schedulerJob, cronExpression: action.payload.updateScheduledJob.cronExpression || '' }
+                    : state.schedulerJob;
+        },
+
+        updateSchedulerJobCronFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isUpdatingCron = false;
+        },
     },
 });
 
@@ -172,6 +192,7 @@ const schedulerJobHistory = createSelector(state, (state) => state.schedulerJobH
 const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
 const isEnabling = createSelector(state, (state) => state.isEnabling);
+const isUpdatingCron = createSelector(state, (state) => state.isUpdatingCron);
 
 export const selectors = {
     state,
@@ -183,6 +204,7 @@ export const selectors = {
     isFetchingDetail,
     isDeleting,
     isEnabling,
+    isUpdatingCron,
 };
 
 export const actions = slice.actions;
