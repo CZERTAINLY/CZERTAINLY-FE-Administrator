@@ -1,11 +1,13 @@
 import { TableDataRow, TableHeader } from 'components/CustomTable';
 
 import Widget from 'components/Widget';
+import Dialog from 'components/Dialog';
 
 import { actions, selectors } from 'ducks/discoveries';
 import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { Button } from 'reactstrap';
 
 import { TriggerHistorySummaryModel } from 'types/rules';
 import { dateFormatter } from 'utils/dateUtil';
@@ -13,6 +15,7 @@ import PagedCustomTable from '../../../CustomTable/PagedCustomTable';
 import TabLayout from '../../../Layout/TabLayout';
 import TriggerHistorySummaryViewer from './TriggerHistorySummaryViewer';
 import styles from './discoveryCertificates.module.scss';
+
 interface Props {
     id: string;
     triggerHistorySummary?: TriggerHistorySummaryModel;
@@ -25,6 +28,8 @@ export default function DiscoveryCertificates({ id, triggerHistorySummary }: Pro
     const isFetchingDiscoveryCertificates = useSelector(selectors.isFetchingDiscoveryCertificates);
 
     const [newlyDiscovered, setNewlyDiscovered] = useState<boolean | undefined>(undefined);
+    const [showMessage, setShowMessage] = useState<boolean>(false);
+    const [message, setMessage] = useState<string>();
 
     const onReloadData = useCallback(
         (pageSize: number, pageNumber: number) => {
@@ -73,6 +78,10 @@ export default function DiscoveryCertificates({ id, triggerHistorySummary }: Pro
                 id: 'triggers',
                 content: 'Triggers',
             });
+            discoveryHeaders.push({
+                id: 'errorInfo',
+                content: '',
+            });
         }
 
         return discoveryHeaders;
@@ -97,6 +106,21 @@ export default function DiscoveryCertificates({ id, triggerHistorySummary }: Pro
                     certificateColumns.push(
                         triggerHistoryObjectSummary ? (
                             <TriggerHistorySummaryViewer triggerHistoryObjectSummary={triggerHistoryObjectSummary} />
+                        ) : (
+                            ''
+                        ),
+                        r.processedError ? (
+                            <Button
+                                color="white"
+                                size="sm"
+                                className="p-1"
+                                onClick={() => {
+                                    setMessage(r.processedError ?? '');
+                                    setShowMessage(true);
+                                }}
+                            >
+                                <i className="fa fa-info-circle"></i>
+                            </Button>
                         ) : (
                             ''
                         ),
@@ -130,6 +154,14 @@ export default function DiscoveryCertificates({ id, triggerHistorySummary }: Pro
                     { title: 'Existing', onClick: () => setNewlyDiscovered(false), content: pagedTable },
                 ]}
                 onlyActiveTabContent={true}
+            />
+            <Dialog
+                isOpen={showMessage}
+                size={'lg'}
+                caption="Processing error"
+                body={message}
+                toggle={() => setShowMessage(false)}
+                buttons={[{ color: 'primary', onClick: () => setShowMessage(false), body: 'Close' }]}
             />
         </Widget>
     );

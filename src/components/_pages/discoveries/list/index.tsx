@@ -5,6 +5,7 @@ import { Badge, Container } from 'reactstrap';
 
 import { actions, selectors } from 'ducks/discoveries';
 import { EntityType } from 'ducks/filters';
+import { dateFormatter, durationFormatter } from 'utils/dateUtil';
 
 import { ApiClients } from 'api';
 import { TableDataRow, TableHeader } from 'components/CustomTable';
@@ -45,11 +46,25 @@ function DiscoveryList() {
                 width: '15%',
             },
             {
+                content: 'Start time',
+                align: 'center',
+                sortable: true,
+                id: 'startTime',
+                width: '10%',
+            },
+            {
+                content: 'Duration',
+                align: 'center',
+                sortable: true,
+                id: 'duration',
+                width: '5%',
+            },
+            {
                 content: 'Status',
                 align: 'center',
                 sortable: true,
                 id: 'status',
-                width: '15%',
+                width: '10%',
             },
             {
                 content: 'Total Certificates',
@@ -57,7 +72,7 @@ function DiscoveryList() {
                 sortable: true,
                 sortType: 'numeric',
                 id: 'totalCertificates',
-                width: '15%',
+                width: '10%',
             },
         ],
         [],
@@ -75,6 +90,10 @@ function DiscoveryList() {
                         (discovery.connectorName ?? 'Unassigned')
                     ),
                     <Badge color="secondary">{discovery.kind}</Badge>,
+                    discovery.startTime ? <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(discovery.startTime)}</span> : '',
+                    <span key={`duration${discovery.uuid}`} style={{ whiteSpace: 'nowrap' }}>
+                        {durationFormatter(discovery.startTime, discovery.endTime)}
+                    </span>,
                     <DiscoveryStatus status={discovery.status} />,
                     discovery.totalCertificatesDiscovered?.toString() || '0',
                 ],
