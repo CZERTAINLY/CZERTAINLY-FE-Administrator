@@ -17,7 +17,7 @@ import CustomAttributeWidget from 'components/Attributes/CustomAttributeWidget';
 import TabLayout from 'components/Layout/TabLayout';
 import { actions as rulesActions, selectors as ruleSelectors } from 'ducks/rules';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { dateFormatter } from 'utils/dateUtil';
+import { dateFormatter, durationFormatter } from 'utils/dateUtil';
 import { PlatformEnum, Resource } from '../../../../types/openapi';
 import DiscoveryStatus from '../DiscoveryStatus';
 import DiscoveryCertificates from './DiscoveryCertificates';
@@ -44,11 +44,6 @@ export default function DiscoveryDetail() {
     );
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.TriggerType));
-
-    // useEffect(() => {
-    //     if (!id) return;
-    //     dispatch(rulesActions.getTriggerHistorySummary({ triggerObjectUuid: id }));
-    // }, [id, dispatch]);
 
     const getFreshTriggerHistorySummary = useCallback(() => {
         if (!id) return;
@@ -134,6 +129,13 @@ export default function DiscoveryDetail() {
                           ],
                       },
                       {
+                          id: 'providerStatus',
+                          columns: [
+                              'Discovery Provider Status',
+                              <DiscoveryStatus key="providerStatus" status={discovery.connectorStatus} />,
+                          ],
+                      },
+                      {
                           id: 'status',
                           columns: ['Status', <DiscoveryStatus status={discovery.status} />],
                       },
@@ -146,11 +148,27 @@ export default function DiscoveryDetail() {
                       },
                       {
                           id: 'endTime',
-                          columns: ['Discovery End Time', <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(discovery.endTime)}</span>],
+                          columns: [
+                              'Discovery End Time',
+                              discovery.endTime ? <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(discovery.endTime)}</span> : '',
+                          ],
+                      },
+                      {
+                          id: 'duration',
+                          columns: [
+                              'Duration',
+                              <span key="duration" style={{ whiteSpace: 'nowrap' }}>
+                                  {durationFormatter(discovery.startTime, discovery.endTime)}
+                              </span>,
+                          ],
                       },
                       {
                           id: 'totalCertificatesDiscovered',
-                          columns: ['Total Certificates Discovered', discovery.totalCertificatesDiscovered?.toString() || '0'],
+                          columns: ['Total Certificates Discovered', discovery.connectorTotalCertificatesDiscovered?.toString() || '0'],
+                      },
+                      {
+                          id: 'totalCertificatesDownloaded',
+                          columns: ['Total Certificates Downloaded', discovery.totalCertificatesDiscovered?.toString() || '0'],
                       },
                       {
                           id: 'message',

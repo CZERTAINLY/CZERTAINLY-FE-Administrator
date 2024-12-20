@@ -1,21 +1,4 @@
-import {
-    AuditLogDto,
-    AuditLogFilterDto,
-    AuditLogFilterModel,
-    AuditLogItemDto,
-    AuditLogItemModel,
-    AuditLogModel,
-    PageableDto,
-    PageableModel,
-} from 'types/auditLogs';
-
-export function transformPageableModelToDto(pageable: PageableModel): PageableDto {
-    return { ...pageable };
-}
-
-export function transformAuditLogFilterModelToDto(filter: AuditLogFilterModel): AuditLogFilterDto {
-    return { ...filter };
-}
+import { AuditLogDto, AuditLogItemDto, AuditLogItemModel, AuditLogModel } from 'types/auditLogs';
 
 export function transformAuditLogItemDtoToModel(auditLog: AuditLogItemDto): AuditLogItemModel {
     return { ...auditLog };

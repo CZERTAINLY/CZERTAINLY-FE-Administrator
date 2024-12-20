@@ -1,110 +1,154 @@
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
-import Widget from 'components/Widget';
-
 import { actions as auditLogActions, selectors } from 'ducks/auditLogs';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { EntityType, selectors as filterSelectors } from 'ducks/filters';
+import { actions as userInterfaceActions } from '../../../ducks/user-interface';
+
+import { useCallback, useMemo } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { useDispatch, useSelector } from 'react-redux';
 
-import { Button, ButtonGroup, Container } from 'reactstrap';
-import { AuditLogFilterModel } from 'types/auditLogs';
+import { Button, Container } from 'reactstrap';
 import { dateFormatter } from 'utils/dateUtil';
 
-import styles from './auditLogs.module.scss';
-
+import { ApiClients } from 'api';
+import { WidgetButtonProps } from 'components/WidgetButtons';
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import AuditLogsFilters from './AuditLogsFilters';
-import ObjectValues from './ObjectValues';
+import { SearchRequestModel } from 'types/certificate';
+import PagedList from 'components/PagedList/PagedList';
+import { PlatformEnum } from 'types/openapi/models';
 
-const defaultPageSize = 10;
+import { AuditLogItemModel } from 'types/auditLogs';
+
+type AuditLogDetailItem = {
+    property: string;
+    propertyValue: string;
+};
 
 function AuditLogs() {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
-    const totalItems = useSelector(selectors.totalItems);
+    const auditLogs = useSelector(selectors.auditLogs);
+    const currentFilters = useSelector(filterSelectors.currentFilters(EntityType.AUDIT_LOG));
+
     const isFetchingPageData = useSelector(selectors.isFetchingPageData);
-    const isFetchingObjects = useSelector(selectors.isFetchingObjects);
-    const isFetchingOperations = useSelector(selectors.isFetchingOperations);
-    const isFetchingStatuses = useSelector(selectors.isFetchingStatuses);
     const isPurging = useSelector(selectors.isPurging);
-    const exportUrl = useSelector(selectors.exportUrl);
     const isExporting = useSelector(selectors.isExporting);
-    const logs = useSelector(selectors.pageData);
-    const objects = useSelector(selectors.objects);
-    const operations = useSelector(selectors.operations);
-    const states = useSelector(selectors.statuses);
 
-    const isBusy = isFetchingPageData || isFetchingObjects || isFetchingOperations || isFetchingStatuses || isPurging || isExporting;
-    const isFilterBusy = isFetchingObjects || isFetchingOperations || isFetchingStatuses;
+    // enum selectors
+    const moduleEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Module));
+    const actorEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ActorType));
+    const authMethodEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AuthMethod));
+    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
+    const operationEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Operation));
+    const operationResultEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.OperationResult));
 
-    const [page, setPage] = useState(1);
-    const [pageSize, setPageSize] = useState(defaultPageSize);
+    const isBusy = isFetchingPageData || isPurging || isExporting;
 
-    const [filters, setFilters] = useState<AuditLogFilterModel>({});
+    const onListCallback = useCallback((filters: SearchRequestModel) => dispatch(auditLogActions.listAuditLogs(filters)), [dispatch]);
 
-    const getFreshData = useCallback(() => {
-        dispatch(auditLogActions.listLogs({ page: page - 1, size: pageSize, filters }));
-    }, [page, pageSize, filters, dispatch]);
-    useEffect(() => {
-        dispatch(auditLogActions.listObjects());
-        dispatch(auditLogActions.listOperations());
-        dispatch(auditLogActions.listStatuses());
-    }, [dispatch]);
+    const purgeCallback = useCallback(() => dispatch(auditLogActions.purgeLogs(currentFilters)), [dispatch, currentFilters]);
 
-    useEffect(() => {
-        getFreshData();
-    }, [getFreshData]);
+    const exportCallback = useCallback(() => dispatch(auditLogActions.exportLogs(currentFilters)), [dispatch, currentFilters]);
 
-    useEffect(() => {
-        const link = document.getElementById('exportLink');
-        if (link && exportUrl) {
-            link.click();
-        }
-    }, [exportUrl]);
-
-    const onFiltersChanged = useCallback(
-        (filters: AuditLogFilterModel) => {
-            const filterValues = Object.entries(filters).reduce(
-                (acc, [key, value]) => (value ? { ...acc, [key]: value.toString() } : acc),
-                {},
-            );
-
-            setFilters(filterValues);
-            setPage(1);
-        },
-        [setFilters],
+    const buttons: WidgetButtonProps[] = useMemo(
+        () => [
+            {
+                icon: 'download',
+                disabled: false,
+                tooltip: 'Export Audit logs',
+                onClick: () => {
+                    exportCallback();
+                },
+            },
+            {
+                icon: 'trash',
+                disabled: false,
+                tooltip: 'Purge Audit logs',
+                onClick: () => {
+                    purgeCallback();
+                },
+            },
+        ],
+        [exportCallback, purgeCallback],
     );
 
-    const onClearFilters = useCallback(() => {
-        setFilters({});
-        setPage(1);
-    }, [setFilters]);
-
-    const purgeCallback = useCallback(
-        () => dispatch(auditLogActions.purgeLogs({ page: page - 1, size: pageSize, filters })),
-        [dispatch, page, pageSize, filters],
+    const createAuditLogDetailData = useCallback(
+        (auditLog: AuditLogItemModel): AuditLogDetailItem[] => [
+            {
+                property: 'Resource',
+                propertyValue: getEnumLabel(resourceEnum, auditLog.resource.type),
+            },
+            {
+                property: 'Resource UUIDs',
+                propertyValue: auditLog.resource.uuids?.join(', ') ?? '',
+            },
+            {
+                property: 'Resource names',
+                propertyValue: auditLog.resource.names?.join(', ') ?? '',
+            },
+            {
+                property: 'Affiliated resource',
+                propertyValue: auditLog.affiliatedResource ? getEnumLabel(resourceEnum, auditLog.affiliatedResource.type) : '',
+            },
+            {
+                property: 'Affiliated resource UUIDs',
+                propertyValue: auditLog.affiliatedResource?.uuids?.join(', ') ?? '',
+            },
+            {
+                property: 'Affiliated resource names',
+                propertyValue: auditLog.affiliatedResource?.names?.join(', ') ?? '',
+            },
+            {
+                property: 'Request method',
+                propertyValue: auditLog.source?.method ?? '',
+            },
+            {
+                property: 'Request path',
+                propertyValue: auditLog.source?.path ?? '',
+            },
+            {
+                property: 'Request IP address',
+                propertyValue: auditLog.source?.ipAddress ?? '',
+            },
+            {
+                property: 'Message',
+                propertyValue: auditLog.message ?? '',
+            },
+            {
+                property: 'Operation data',
+                propertyValue: JSON.stringify(auditLog.operationData, null, 3),
+            },
+            {
+                property: 'Additional data',
+                propertyValue: JSON.stringify(auditLog.additionalData, null, 3),
+            },
+        ],
+        [resourceEnum],
     );
 
-    const exportCallback = useCallback(
-        () => dispatch(auditLogActions.exportLogs({ page: page - 1, size: pageSize, filters })),
-        [dispatch, page, pageSize, filters],
-    );
+    const createAuditLogDetailRows = (a: AuditLogDetailItem) => ({
+        id: a.property,
+        columns: [a.property, a.propertyValue],
+    });
 
-    const exportPurgeButtonsNode = useMemo(
-        () => (
-            <ButtonGroup>
-                <Button color={'default'} onClick={exportCallback}>
-                    Export
-                </Button>
-                {/* Added eslint-disable-next-line because the anchor tag is blank and is used to download the file */}
-                {/* eslint-disable-next-line jsx-a11y/anchor-has-content */}
-                <a id={'exportLink'} href={exportUrl} download="auditLogs.zip" hidden={true} />
-                <Button type="submit" color="primary" onClick={purgeCallback}>
-                    Purge
-                </Button>
-            </ButtonGroup>
-        ),
-        [purgeCallback, exportCallback, exportUrl],
+    const auditLogsDetailRowHeaders: TableHeader[] = useMemo(
+        () => [
+            {
+                content: 'Property',
+                align: 'left',
+                id: 'property',
+                width: '25%',
+            },
+            {
+                content: 'Value',
+                align: 'left',
+                id: 'value',
+            },
+        ],
+        [],
     );
 
     const auditLogsRowHeaders: TableHeader[] = useMemo(
@@ -116,48 +160,57 @@ function AuditLogs() {
                 width: '5%',
             },
             {
-                content: 'Author',
-                // sortable: true,
+                content: 'Logged at',
                 align: 'left',
-                id: 'author',
-                width: '10%',
-            },
-            {
-                content: 'Created',
-                // sortable: true,
-                // sortType: "date",
-                id: 'created',
-                width: '10%',
-            },
-            {
-                content: 'Operation Status',
-                id: '',
-                width: '10%',
-            },
-            {
-                content: 'Origination',
-                id: '',
+                id: 'loggedAt',
                 width: '5%',
             },
             {
-                content: 'Affected Data',
-                id: '',
+                content: 'Module',
+                align: 'left',
+                id: 'module',
                 width: '5%',
             },
             {
-                content: 'Object Identifier',
-                id: '',
+                content: 'Actor',
+                align: 'left',
+                id: 'actor',
+                width: '10%',
+            },
+            {
+                content: 'Auth method',
+                align: 'left',
+                id: 'authMethod',
+                width: '5%',
+            },
+            {
+                content: 'Resource',
+                align: 'left',
+                id: 'resource',
+                width: '10%',
+            },
+            {
+                content: 'Affiliated resource',
+                align: 'left',
+                id: 'affiliatedResource',
                 width: '10%',
             },
             {
                 content: 'Operation',
-                id: '',
-                width: '10%',
+                align: 'center',
+                id: 'operation',
+                width: '5%',
             },
             {
-                content: 'Additional Data',
-                id: '',
-                width: '10%',
+                content: 'Operation result',
+                align: 'center',
+                id: 'operationResult',
+                width: '5%',
+            },
+            {
+                content: '',
+                id: 'moreInfo',
+                width: '2%',
             },
         ],
         [],
@@ -165,79 +218,152 @@ function AuditLogs() {
 
     const auditLogsList: TableDataRow[] = useMemo(
         () =>
-            logs.map((log) => {
+            auditLogs.map((log) => {
                 return {
                     id: log.id,
 
                     columns: [
                         '' + log.id,
-                        log.author,
-                        <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(log.created)}</span>,
-                        log.operationStatus,
-                        log.origination,
-                        log.affected,
-                        log.objectIdentifier,
-                        log.operation,
-                        log.additionalData ? <span className={styles.showMore}>Show more...</span> : 'None',
+                        <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(log.loggedAt)}</span>,
+                        getEnumLabel(moduleEnum, log.module),
+                        <span style={{ whiteSpace: 'nowrap' }}>
+                            {getEnumLabel(actorEnum, log.actor.type)}
+                            {log.actor.uuid && log.actor.name ? (
+                                <Link to={`../users/detail/${log.actor.uuid}`}> {log.actor.name}</Link>
+                            ) : log.actor.uuid ? (
+                                <Button
+                                    color="white"
+                                    size="sm"
+                                    className="p-0 ms-1"
+                                    onClick={() => {
+                                        navigate(`../users/detail/${log.actor.uuid}`);
+                                    }}
+                                >
+                                    {' '}
+                                    <i className="fa fa-circle-arrow-right"></i>
+                                </Button>
+                            ) : (
+                                ''
+                            )}
+                        </span>,
+                        getEnumLabel(authMethodEnum, log.actor.authMethod),
+                        <span style={{ whiteSpace: 'nowrap' }}>
+                            {getEnumLabel(resourceEnum, log.resource.type)}
+                            {log.resource.uuids && log.resource.uuids.length > 0 && log.resource.names && log.resource.names.length > 0 ? (
+                                <Link to={`../${log.resource.type}/detail/${log.resource.uuids[0]}`}> {log.resource.names[0]}</Link>
+                            ) : log.resource.uuids && log.resource.uuids.length > 0 ? (
+                                <Button
+                                    color="white"
+                                    size="sm"
+                                    className="p-0 ms-1"
+                                    onClick={() => {
+                                        navigate(`../${log.resource.type}/detail/${log.resource.uuids ? log.resource.uuids[0] : ''}`);
+                                    }}
+                                >
+                                    {' '}
+                                    <i className="fa fa-circle-arrow-right"></i>
+                                </Button>
+                            ) : (
+                                ''
+                            )}
+                        </span>,
+                        <span style={{ whiteSpace: 'nowrap' }}>
+                            {log.affiliatedResource ? getEnumLabel(resourceEnum, log.affiliatedResource.type) : ''}
+                            {log.affiliatedResource &&
+                            log.affiliatedResource.uuids &&
+                            log.affiliatedResource.uuids.length > 0 &&
+                            log.affiliatedResource.names &&
+                            log.affiliatedResource.names.length > 0 ? (
+                                <Link to={`../${log.affiliatedResource.type}/detail/${log.affiliatedResource.uuids[0]}`}>
+                                    {' '}
+                                    {log.affiliatedResource.names[0]}
+                                </Link>
+                            ) : log.affiliatedResource && log.affiliatedResource.uuids && log.affiliatedResource.uuids.length > 0 ? (
+                                <Button
+                                    color="white"
+                                    size="sm"
+                                    className="p-0 ms-1"
+                                    onClick={() => {
+                                        navigate(
+                                            `../${log.affiliatedResource ? log.affiliatedResource.type : ''}/detail/${log.affiliatedResource && log.affiliatedResource.uuids ? log.affiliatedResource.uuids[0] : ''}`,
+                                        );
+                                    }}
+                                >
+                                    {' '}
+                                    <i className="fa fa-circle-arrow-right"></i>
+                                </Button>
+                            ) : (
+                                ''
+                            )}
+                        </span>,
+                        getEnumLabel(operationEnum, log.operation),
+                        getEnumLabel(operationResultEnum, log.operationResult),
+                        <Button
+                            className="btn btn-link p-0 ms-2"
+                            color="white"
+                            title="Detail"
+                            key={`detail${log.id}`}
+                            onClick={() => {
+                                dispatch(
+                                    userInterfaceActions.showGlobalModal({
+                                        content: (
+                                            <CustomTable
+                                                headers={auditLogsDetailRowHeaders}
+                                                data={createAuditLogDetailData(log).map(createAuditLogDetailRows)}
+                                            />
+                                        ),
+                                        isOpen: true,
+                                        showCloseButton: true,
+                                        title: 'Audit log detail',
+                                        size: 'xl',
+                                    }),
+                                );
+                            }}
+                        >
+                            <i
+                                className="fa fa-info"
+                                style={{ color: 'auto', marginBottom: '9.5px', marginLeft: '4px', fontSize: '14px' }}
+                            />
+                        </Button>,
+                        // log.operationData ? <span className={styles.showMore}>Show more...</span> : 'None',
+                        // log.additionalData ? <span className={styles.showMore}>Show more...</span> : 'None',
                     ],
-
-                    detailColumns: !log.additionalData ? undefined : [<></>, <ObjectValues obj={log.additionalData} />],
                 };
             }),
-        [logs],
-    );
-
-    const paginationData = useMemo(
-        () => ({
-            page,
-            totalItems: totalItems,
-            pageSize,
-            loadedPageSize: pageSize,
-            totalPages: Math.ceil(totalItems / pageSize),
-            itemsPerPageOptions: [10, 20, 50, 100],
-        }),
-        [page, pageSize, totalItems],
-    );
-
-    const onPageSizeChanged = useCallback(
-        (pageSize: number) => {
-            setPageSize(pageSize);
-            setPage(1);
-        },
-        [setPageSize, setPage],
+        [
+            auditLogs,
+            navigate,
+            moduleEnum,
+            actorEnum,
+            authMethodEnum,
+            resourceEnum,
+            operationEnum,
+            operationResultEnum,
+            auditLogsDetailRowHeaders,
+            createAuditLogDetailData,
+            dispatch,
+        ],
     );
 
     return (
         <Container className="themed-container" fluid>
-            <Widget title="Filter Audit Logs" busy={isFilterBusy} titleSize="large">
-                <AuditLogsFilters
-                    operations={operations}
-                    operationStates={states}
-                    objects={objects}
-                    onClear={onClearFilters}
-                    onFilters={onFiltersChanged}
-                />
-            </Widget>
-
-            <Widget
-                title="Audit Logs"
-                busy={isBusy}
-                widgetLockName={LockWidgetNameEnum.AuditLogs}
-                widgetExtraTopNode={exportPurgeButtonsNode}
-                titleSize="large"
-                refreshAction={getFreshData}
-            >
-                <CustomTable
-                    headers={auditLogsRowHeaders}
-                    data={auditLogsList}
-                    hasPagination={true}
-                    hasDetails={true}
-                    canSearch={false}
-                    paginationData={paginationData}
-                    onPageChanged={setPage}
-                    onPageSizeChanged={onPageSizeChanged}
-                />
-            </Widget>
+            <PagedList
+                entity={EntityType.AUDIT_LOG}
+                onListCallback={onListCallback}
+                getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.auditLogs.getSearchableFieldInformation5(), [])}
+                addHidden={true}
+                hasCheckboxes={false}
+                additionalButtons={buttons}
+                headers={auditLogsRowHeaders}
+                data={auditLogsList}
+                hasDetails={false}
+                isBusy={isBusy}
+                title="Audit logs"
+                entityNameSingular="an Audit log"
+                entityNamePlural="Audit logs"
+                filterTitle="Audit logs Filter"
+                pageWidgetLockName={LockWidgetNameEnum.AuditLogs}
+            />
         </Container>
     );
 }

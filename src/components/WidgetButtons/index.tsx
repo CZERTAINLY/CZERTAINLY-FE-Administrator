@@ -39,7 +39,6 @@ export type IconName =
     | 'link'
     | 'recycle'
     | 'rekey';
-
 export interface WidgetButtonProps {
     icon: IconName;
     id?: string;
@@ -117,6 +116,7 @@ const classNames = {
     minus: 'fa fa-minus',
     gavel: 'fa fa-gavel',
     lock: 'fa fa-lock',
+    stopwatch: 'fa fa-stopwatch',
     refresh: 'fa fa-refresh',
     reload: 'fa fa-rotate-right',
     handshake: 'fa fa-circle-exclamation',

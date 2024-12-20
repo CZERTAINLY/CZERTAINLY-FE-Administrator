@@ -228,6 +228,40 @@ const bulkDisableSchedulerJobs: AppEpic = (action$, state$, deps) => {
     );
 };
 
+const updateSchedulerJobCron: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.updateSchedulerJobCron.match),
+        switchMap((action) =>
+            deps.apiClients.scheduler
+                .updateScheduledJob({
+                    uuid: action.payload.uuid,
+                    updateScheduledJob: { cronExpression: action.payload.cronExpression },
+                })
+                .pipe(
+                    mergeMap((response) =>
+                        of(
+                            slice.actions.updateSchedulerJobCronSuccess({
+                                uuid: action.payload.uuid,
+                                updateScheduledJob: response,
+                            }),
+                        ),
+                    ),
+                    catchError((err) =>
+                        of(
+                            slice.actions.updateSchedulerJobCronFailure({
+                                error: extractError(err, 'Failed to update cron expression'),
+                            }),
+                            appRedirectActions.fetchError({
+                                error: err,
+                                message: 'Failed to update cron expression',
+                            }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
 const epics = [
     listSchedulerJobs,
     listSchedulerJobHistory,
@@ -237,6 +271,7 @@ const epics = [
     disableSchedulerJob,
     bulkEnableSchedulerJobs,
     bulkDisableSchedulerJobs,
+    updateSchedulerJobCron,
 ];
 
 export default epics;
