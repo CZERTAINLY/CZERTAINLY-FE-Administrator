@@ -11,6 +11,7 @@ import ContentValueField from '../../Input/DynamicContent/ContentValueField';
 import Widget from '../../Widget';
 import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from '../AttributeViewer';
 import style from './customAttributeWidget.module.scss';
+import { Console } from 'console';
 
 export type Props = {
     resource: Resource;

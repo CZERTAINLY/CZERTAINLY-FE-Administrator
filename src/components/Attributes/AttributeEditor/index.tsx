@@ -26,6 +26,7 @@ import { AttributeContentType, AttributeValueTarget, FunctionGroupCode, Resource
 import { base64ToUtf8 } from 'utils/common-utils';
 import { getFormattedDateTime } from 'utils/dateUtil';
 import { Attribute } from './Attribute';
+import CustomAttributeAddSelect from 'components/Attributes/AttributeEditor/CustormAttributeAddSelect';
 
 // same empty array is used to prevent re-rendering of the component
 // !!! never modify the attributes field inside of the component !!!
@@ -83,6 +84,9 @@ export default function AttributeEditor({
 
     // stores previous callback data in order to be possible to detect what data changed
     const [previousCallbackData, setPreviousCallbackData] = useState<{ [callbackId: string]: any }>({});
+
+    // used to store custom attributes which user has selected
+    const [shownCustomAttributes, setShownCustomAttributes] = useState<{ [uuid: string]: string }[]>([]);
 
     // workaround to be possible to set options from multiple places;
     // multiple effects can modify opts during single render call
@@ -258,20 +262,60 @@ export default function AttributeEditor({
         [callbackParentUuid, callbackResource, connectorUuid, dispatch, functionGroupCode, kind],
     );
 
+    /*
+     * Get non-required custom attributes
+     */
+    const nonRequiredCustomAttributeDescriptors = useMemo(
+        () =>
+            attributeDescriptors.filter((descriptor) => {
+                if (isCustomAttributeModel(descriptor)) {
+                    return !descriptor.properties.required;
+                }
+                return false;
+            }),
+        [attributeDescriptors],
+    );
+
+    /*
+     * Get non-required custom attributes which weren't shown by user
+     */
+    const notYetShownCustomAttributeDescriptors = useMemo(
+        () =>
+            nonRequiredCustomAttributeDescriptors.filter((descriptor) => !shownCustomAttributes.find((el) => el.uuid === descriptor.uuid)),
+        [nonRequiredCustomAttributeDescriptors, shownCustomAttributes],
+    );
+
+    /*
+     * Filter and rearrange custom attributes which should be rendered
+     */
+    const renderedAttributeDescriptors = useMemo(() => {
+        const initiallyShownDescriptors = [...attributeDescriptors, ...groupAttributesCallbackAttributes].filter(
+            (descriptor) => !nonRequiredCustomAttributeDescriptors.find((el) => el.uuid === descriptor.uuid),
+        );
+        const rendered = [
+            ...initiallyShownDescriptors,
+            ...nonRequiredCustomAttributeDescriptors.filter((descriptor) =>
+                shownCustomAttributes.find((el) => el.uuid === descriptor.uuid),
+            ),
+        ];
+        return rendered;
+    }, [nonRequiredCustomAttributeDescriptors, shownCustomAttributes]);
+
     /**
      * Groups attributes for rendering according to the attribute descriptor group property
      */
     const groupedAttributesDescriptors: { [key: string]: (DataAttributeModel | InfoAttributeModel | CustomAttributeModel)[] } =
         useMemo(() => {
             const grouped: { [key: string]: (DataAttributeModel | InfoAttributeModel | CustomAttributeModel)[] } = {};
-            [...attributeDescriptors, ...groupAttributesCallbackAttributes].forEach((descriptor) => {
+
+            renderedAttributeDescriptors.forEach((descriptor) => {
                 if (isDataAttributeModel(descriptor) || isInfoAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
                     const groupName = descriptor.properties.group || '__';
                     grouped[groupName] ? grouped[groupName].push(descriptor) : (grouped[groupName] = [descriptor]);
                 }
             });
             return grouped;
-        }, [attributeDescriptors, groupAttributesCallbackAttributes]);
+        }, [renderedAttributeDescriptors]);
 
     /**
      * Clean form attributes, callback data and previous form state whenever passed attribute descriptors or attributes changed
@@ -644,7 +688,8 @@ export default function AttributeEditor({
 
     const attrs = useMemo(() => {
         const attrs: JSX.Element[] = [];
-        for (const group in groupedAttributesDescriptors)
+        Object.keys(groupedAttributesDescriptors).forEach((group, i, arr) => {
+            console.log(group);
             attrs.push(
                 <Widget key={group} title={group === '__' ? '' : group} busy={isRunningCb}>
                     {groupedAttributesDescriptors[group].map((descriptor) => (
@@ -657,9 +702,17 @@ export default function AttributeEditor({
                             />
                         </div>
                     ))}
+                    {i === arr.length - 1 && notYetShownCustomAttributeDescriptors.length > 0 && (
+                        <CustomAttributeAddSelect
+                            onAdd={(attribute) => {
+                                setShownCustomAttributes((state) => [...state, { uuid: attribute.uuid }]);
+                            }}
+                            attributeDescriptors={notYetShownCustomAttributeDescriptors}
+                        />
+                    )}
                 </Widget>,
             );
-
+        });
         return attrs;
     }, [groupedAttributesDescriptors, isRunningCb, id, options]);
 
