@@ -36,7 +36,7 @@
         "react-dom": "^18.2.0",
         "react-final-form": "^6.5.9",
         "react-redux": "^9.0.0",
-        "react-router-dom": "^6.9.0",
+        "react-router-dom": "^7.0.0",
         "react-scripts": "^5.0.1",
         "react-select": "^5.7.2",
         "react-simple-code-editor": "^0.14.0",
