@@ -83,10 +83,6 @@ export const validateLength = (min: number, max: number) => (value: any) => {
         : `Value must be between ${min} and ${max} characters long`;
 };
 
-export const validateUrlSafe = () => {
-    return validatePattern(/^[a-zA-Z0-9-._~]+$/, 'Value can only contain numbers or letters, dash, underscore, dot or tilde.');
-};
-
 export const validateQuartzCronExpression = (cronExpression: string | undefined) => (value: string) => {
     const validationInput = getValueFromObject(value);
 
