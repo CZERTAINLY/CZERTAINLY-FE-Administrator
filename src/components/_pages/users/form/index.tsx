@@ -23,14 +23,7 @@ import { UserDetailModel } from 'types/auth';
 import { CertificateDetailResponseModel, CertificateListResponseModel } from 'types/certificate';
 
 import { EntityType } from 'ducks/filters';
-import {
-    composeValidators,
-    validateAlphaNumericWithSpecialChars,
-    validateEmail,
-    validateLength,
-    validateRequired,
-    validateUrlSafe,
-} from 'utils/validators';
+import { composeValidators, validateAlphaNumericWithSpecialChars, validateEmail, validateLength, validateRequired } from 'utils/validators';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
 import { CertificateState as CertStatus, Resource } from '../../../../types/openapi';
 import { mutators } from '../../../../utils/attributes/attributeEditorMutators';
@@ -444,7 +437,7 @@ function UserForm() {
                 {({ handleSubmit, pristine, submitting, values, valid, form }) => (
                     <BootstrapForm onSubmit={handleSubmit}>
                         <Widget title={title} busy={isBusy} widgetExtraTopNode={enableCheckButton}>
-                            <Field name="username" validate={composeValidators(validateRequired(), validateUrlSafe())}>
+                            <Field name="username" validate={composeValidators(validateRequired())}>
                                 {({ input, meta }) => (
                                     <FormGroup>
                                         <Label for="username">Username</Label>
