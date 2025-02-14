@@ -32,7 +32,6 @@
     // 20px for footer height
     padding: #{$navbar-height + $content-padding-vertical} $content-padding-horizontal ($content-padding-vertical + 20px);
     background-color: $body-bg;
-    overflow: auto;
 
     box-shadow: -6px 0px 10px -10px rgba(0, 0, 0, 0.5);
 }

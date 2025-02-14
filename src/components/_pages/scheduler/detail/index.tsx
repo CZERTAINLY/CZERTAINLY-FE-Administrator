@@ -18,6 +18,10 @@ import TextField from 'components/Input/TextField';
 import { Form } from 'react-final-form';
 import SchedulerJobHistory from './SchedulerJobHistory';
 
+interface EditFormValues {
+    cronExpression: string | undefined;
+}
+
 export default function SchedulerJobDetail() {
     const dispatch = useDispatch();
     const { id } = useParams();
@@ -54,12 +58,15 @@ export default function SchedulerJobDetail() {
         setConfirmDelete(false);
     }, [schedulerJob, dispatch]);
 
-    const handleCronSave = useCallback(() => {
-        if (schedulerJob && newCronExpression) {
-            dispatch(actions.updateSchedulerJobCron({ uuid: schedulerJob.uuid, cronExpression: newCronExpression }));
-            setEditCronOpen(false);
-        }
-    }, [schedulerJob, dispatch, newCronExpression]);
+    const handleCronSave = useCallback(
+        (values: EditFormValues) => {
+            if (schedulerJob && values.cronExpression) {
+                dispatch(actions.updateSchedulerJobCron({ uuid: schedulerJob.uuid, cronExpression: values.cronExpression }));
+                setEditCronOpen(false);
+            }
+        },
+        [schedulerJob, dispatch],
+    );
 
     const handleCronSelectChange = (value: string) => {
         setNewCronExpression(value);
