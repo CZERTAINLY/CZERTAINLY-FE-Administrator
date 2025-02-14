@@ -81,7 +81,7 @@ const getCryptographicKeyDetail: AppEpic = (action$, state$, deps) => {
         filter(slice.actions.getCryptographicKeyDetail.match),
         switchMap((action) =>
             deps.apiClients.cryptographicKeys
-                .getKey({ tokenInstanceUuid: action.payload.tokenInstanceUuid, uuid: action.payload.uuid })
+                .getKey1({ tokenInstanceUuid: action.payload.tokenInstanceUuid, uuid: action.payload.uuid })
                 .pipe(
                     switchMap((profileDto) =>
                         of(
@@ -190,7 +190,6 @@ const updateCryptographicKey: AppEpic = (action$, state$, deps) => {
             deps.apiClients.cryptographicKeys
                 .editKey({
                     uuid: action.payload.profileUuid,
-                    tokenInstanceUuid: action.payload.tokenInstanceUuid,
                     editKeyRequestDto: transformCryptographicKeyEditRequestModelToDto(action.payload.cryptographicKeyEditRequest),
                 })
                 .pipe(
@@ -323,7 +322,7 @@ const deleteCryptographicKey: AppEpic = (action$, state$, deps) => {
         filter(slice.actions.deleteCryptographicKey.match),
         switchMap((action) =>
             deps.apiClients.cryptographicKeys
-                .deleteKey({
+                .deleteKey1({
                     tokenInstanceUuid: action.payload.tokenInstanceUuid,
                     uuid: action.payload.uuid,
                     requestBody: action.payload.keyItemUuid,
