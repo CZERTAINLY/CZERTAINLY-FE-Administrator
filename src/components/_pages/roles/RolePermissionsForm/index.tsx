@@ -13,8 +13,6 @@ import { actions as rolesActions, selectors as rolesSelectors } from 'ducks/role
 import { SubjectPermissionsModel } from 'types/roles';
 import RolePermissionsEditor from '../RolePermissionsEdior';
 
-import style from './style.module.scss';
-
 function RoleForm() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
