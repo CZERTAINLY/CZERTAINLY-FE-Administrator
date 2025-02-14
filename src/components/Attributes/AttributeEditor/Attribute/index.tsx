@@ -46,7 +46,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
 
     useEffect(() => {
         if (descriptor?.name) {
-            const addNewAttributeValue = AddNewAttributeList.find((a) => a.name === descriptor.name);
+            const addNewAttributeValue = AddNewAttributeList.find((a) => a.contentType === descriptor.contentType);
             setIsAddNewAttributeValue(addNewAttributeValue);
         }
     }, [descriptor]);
@@ -246,7 +246,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                                                         content: addNewAttributeValue.content,
                                                         isOpen: true,
                                                         size: 'lg',
-                                                        title: `Add New ${descriptor.name}`,
+                                                        title: `Add New ${addNewAttributeValue.name}`,
                                                     }),
                                                 );
                                             }}
