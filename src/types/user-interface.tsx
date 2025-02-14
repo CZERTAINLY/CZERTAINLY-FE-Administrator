@@ -1,6 +1,7 @@
 import CredentialForm from 'components/_pages/credentials/form';
 import { CustomNode, LegendItem } from 'components/FlowChart';
 import { Edge } from 'reactflow';
+import { AttributeContentType } from 'types/openapi';
 
 export enum LockTypeEnum {
     GENERIC,
@@ -119,6 +120,7 @@ export interface GlobalModalModel {
 
 export interface AddNewAttributeType {
     name: string;
+    contentType: AttributeContentType;
     content: JSX.Element;
 }
 
@@ -132,7 +134,8 @@ export interface ReactFlowUI {
 
 export const AddNewAttributeList: AddNewAttributeType[] = [
     {
-        name: 'credential',
+        name: 'Credential',
+        contentType: AttributeContentType.Credential,
         content: <CredentialForm usesGlobalModal />,
     },
 ];
