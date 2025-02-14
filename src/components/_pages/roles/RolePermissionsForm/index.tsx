@@ -13,6 +13,8 @@ import { actions as rolesActions, selectors as rolesSelectors } from 'ducks/role
 import { SubjectPermissionsModel } from 'types/roles';
 import RolePermissionsEditor from '../RolePermissionsEdior';
 
+import style from './style.module.scss';
+
 function RoleForm() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -115,7 +117,7 @@ function RoleForm() {
                     <ButtonGroup>
                         <ProgressButton
                             title="Save"
-                            inProgressTitle="Svaing..."
+                            inProgressTitle="Saving..."
                             inProgress={isCreatingRole || isUpdatingRole || isUpdatingRolePermissions}
                             disabled={isCreatingRole || isUpdatingRole || roleSelector?.systemRole}
                             onClick={onSubmit}
