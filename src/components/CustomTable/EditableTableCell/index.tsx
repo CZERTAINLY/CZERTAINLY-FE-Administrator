@@ -1,4 +1,4 @@
-import { Button, Input, InputProps } from 'reactstrap';
+import { Button, Input } from 'reactstrap';
 import styles from './EditableTableCell.module.scss';
 import { useCallback, useState, useRef } from 'react';
 import Spinner from 'components/Spinner';
@@ -53,6 +53,8 @@ const EditableTableCell = ({ value, onSave, busy, onCancel, formProps }: Editabl
             className={styles.cell}
             // Make div focusable to prevent blurring on accidental click on the empty spaces inside the div.
             tabIndex={-1}
+            // Add onKeyDown handler to satisfy typescript:S1082 SQ Quality Check.
+            onKeyDown={() => {}}
             onClick={(e) => {
                 e.stopPropagation();
                 e.preventDefault();

@@ -168,7 +168,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 }),
             );
         },
-        [dispatch, keyItem],
+        [dispatch, keyItem, keyUuid],
     );
 
     const buttons: WidgetButtonProps[] = useMemo(
@@ -269,6 +269,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                           columns: [
                               'Name',
                               <EditableTableCell
+                                  key="name"
                                   value={keyItem.name}
                                   onSave={(newKeyItemName) => onEditName(newKeyItemName)}
                                   busy={isUpdatingKeyItem}
@@ -287,7 +288,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                           columns: ['Key Algorithm', keyItem.keyAlgorithm],
                       },
                   ],
-        [keyItem, keyTypeEnum, isUpdatingKeyItem],
+        [keyItem, keyTypeEnum, isUpdatingKeyItem, onEditName],
     );
 
     const detailDataSlice2: TableDataRow[] = useMemo(
