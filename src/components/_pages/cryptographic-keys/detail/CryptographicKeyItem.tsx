@@ -20,6 +20,8 @@ import { dateFormatter } from 'utils/dateUtil';
 import KeyStateBadge from '../KeyStateBadge';
 import KeyStatus from '../KeyStatus';
 import SignVerifyData from './SignVerifyData';
+import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
+import EditableTableCell from 'components/CustomTable/EditableTableCell';
 
 interface Props {
     keyUuid: string;
@@ -31,6 +33,8 @@ interface Props {
 
 export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, tokenProfileUuid, keyItem, totalKeyItems }: Props) {
     const dispatch = useDispatch();
+
+    const isUpdatingKeyItem = useSelector(selectors.isUpdatingKeyItem);
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
@@ -149,6 +153,24 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
         setConfirmDestroy(false);
     }, [dispatch, keyItem, tokenInstanceUuid, keyUuid]);
 
+    const onEditName = useCallback(
+        (newKeyItemName: string) => {
+            if (!keyItem) return;
+            if (keyItem.name === newKeyItemName) return;
+
+            dispatch(
+                actions.updateCryptographicKeyItem({
+                    uuid: keyUuid,
+                    keyItemUuid: keyItem.uuid,
+                    cryptographicKeyItemEditRequest: {
+                        name: newKeyItemName,
+                    },
+                }),
+            );
+        },
+        [dispatch, keyItem],
+    );
+
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
             {
@@ -244,7 +266,17 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                       },
                       {
                           id: 'name',
-                          columns: ['Name', keyItem.name],
+                          columns: [
+                              'Name',
+                              <EditableTableCell
+                                  value={keyItem.name}
+                                  onSave={(newKeyItemName) => onEditName(newKeyItemName)}
+                                  busy={isUpdatingKeyItem}
+                                  formProps={{
+                                      validate: composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars()),
+                                  }}
+                              />,
+                          ],
                       },
                       {
                           id: 'Type',
@@ -255,7 +287,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                           columns: ['Key Algorithm', keyItem.keyAlgorithm],
                       },
                   ],
-        [keyItem, keyTypeEnum],
+        [keyItem, keyTypeEnum, isUpdatingKeyItem],
     );
 
     const detailDataSlice2: TableDataRow[] = useMemo(
