@@ -4,14 +4,14 @@
     display: flex;
     flex-direction: row;
     width: 100%;
-    align-items: flex-start;
+    min-height: 0;
     gap: 1.25em;
 }
 
 .resources {
-    margin-bottom: 30px;
-    width: 12em;
-    flex-shrink: 0;
+    width: 13em;
+    min-width: 10em;
+    overflow: auto;
 }
 
 .resources > div {
@@ -32,15 +32,25 @@
 }
 
 .permissions {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25em;
     flex-grow: 1;
     min-width: 0;
+}
 
-    position: sticky;
-    top: $navbar-height + 20px;
+.permissionsInner {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25em;
+    padding: 6px;
+    margin: -6px;
+    min-height: 0;
+    overflow: auto;
 }
 
 .permissionsWidget {
-    margin-bottom: 1.25em;
+    margin-bottom: 0;
 }
 
 .action {

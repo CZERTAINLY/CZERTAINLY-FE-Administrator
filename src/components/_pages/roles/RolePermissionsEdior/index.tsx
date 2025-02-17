@@ -14,6 +14,7 @@ import { SubjectPermissionsModel } from 'types/roles';
 import style from './style.module.scss';
 
 interface Props {
+    submitButtonsGroup: React.ReactNode;
     resources?: AuthResourceModel[];
     permissions?: SubjectPermissionsModel;
     disabled?: boolean;
@@ -21,6 +22,7 @@ interface Props {
 }
 
 function RolePermissionsEditor({
+    submitButtonsGroup,
     resources,
     permissions = { allowAllResources: false, resources: [] },
     disabled = false,
@@ -169,17 +171,14 @@ function RolePermissionsEditor({
     );
 
     const resourceList = useMemo(
-        () => (
-            <div className={style.resources}>
-                {resources?.map((resource) => (
-                    <div key={resource.uuid} data-selected={currentResource === resource} onClick={() => onResourceSelected(resource)}>
-                        {resource.displayName}
-                        <br />
-                        <sup>{getPermissions(resource)}</sup>
-                    </div>
-                ))}
-            </div>
-        ),
+        () =>
+            resources?.map((resource) => (
+                <div key={resource.uuid} data-selected={currentResource === resource} onClick={() => onResourceSelected(resource)}>
+                    {resource.displayName}
+                    <br />
+                    <sup>{getPermissions(resource)}</sup>
+                </div>
+            )),
         [currentResource, getPermissions, onResourceSelected, resources],
     );
 
@@ -189,44 +188,38 @@ function RolePermissionsEditor({
                 <></>
             ) : (
                 <Widget title="Resource Action Permissions" busy={isBusy} className={style.permissionsWidget}>
-                    {!currentResource ? (
-                        <></>
-                    ) : (
-                        <>
-                            <label className={style.allPermissions} htmlFor="allPermissions">
-                                <input
-                                    id="allPermissions"
-                                    type="checkbox"
-                                    checked={permissions?.resources.find((r) => r.name === currentResource.name)?.allowAllActions || false}
-                                    disabled={disabled || permissions.allowAllResources}
-                                    onChange={(e) => allowAllActions(currentResource, e.target.checked)}
-                                />
-                                &nbsp;&nbsp;&nbsp;Allow All Permissions
-                            </label>
+                    <label className={style.allPermissions} htmlFor="allPermissions">
+                        <input
+                            id="allPermissions"
+                            type="checkbox"
+                            checked={permissions?.resources.find((r) => r.name === currentResource.name)?.allowAllActions || false}
+                            disabled={disabled || permissions.allowAllResources}
+                            onChange={(e) => allowAllActions(currentResource, e.target.checked)}
+                        />
+                        &nbsp;&nbsp;&nbsp;Allow All Permissions
+                    </label>
 
-                            <div className={style.action}>
-                                {currentResource.actions.map((action) => (
-                                    <label key={action.uuid}>
-                                        <input
-                                            type="checkbox"
-                                            checked={
-                                                permissions?.resources
-                                                    .find((r) => r.name === currentResource.name)
-                                                    ?.actions.includes(action.name) || false
-                                            }
-                                            disabled={
-                                                disabled ||
-                                                permissions?.allowAllResources ||
-                                                permissions?.resources.find((r) => r.name === currentResource.name)?.allowAllActions
-                                            }
-                                            onChange={(e) => allowAction(currentResource, action.name, e.target.checked)}
-                                        />
-                                        &nbsp;&nbsp;&nbsp;{action.name}
-                                    </label>
-                                ))}
-                            </div>
-                        </>
-                    )}
+                    <div className={style.action}>
+                        {currentResource.actions.map((action) => (
+                            <label key={action.uuid}>
+                                <input
+                                    type="checkbox"
+                                    checked={
+                                        permissions?.resources
+                                            .find((r) => r.name === currentResource.name)
+                                            ?.actions.includes(action.name) || false
+                                    }
+                                    disabled={
+                                        disabled ||
+                                        permissions?.allowAllResources ||
+                                        permissions?.resources.find((r) => r.name === currentResource.name)?.allowAllActions
+                                    }
+                                    onChange={(e) => allowAction(currentResource, action.name, e.target.checked)}
+                                />
+                                &nbsp;&nbsp;&nbsp;{action.name}
+                            </label>
+                        ))}
+                    </div>
                 </Widget>
             ),
         [allowAction, allowAllActions, currentResource, disabled, isBusy, permissions.allowAllResources, permissions?.resources],
@@ -459,7 +452,6 @@ function RolePermissionsEditor({
 
     return (
         <>
-            <br />
             <label htmlFor="allResources">
                 <input
                     id="allResources"
@@ -473,31 +465,37 @@ function RolePermissionsEditor({
                 />
                 &nbsp;&nbsp;&nbsp;Allow All Actions for All Resources
             </label>
-            <br />
-            <br />
-
             <div className={style.container}>
-                {resourceList}
-
+                <div className={style.resources}>{resourceList}</div>
                 <div className={style.permissions}>
-                    {permissionsList}
-                    {!currentResource?.objectAccess ? (
-                        <></>
-                    ) : (
-                        <Widget title="Object Action Permissions" busy={isFetchingObjects} widgetButtons={buttons}>
-                            <br />
+                    {currentResource && (
+                        <div className={style.permissionsInner}>
+                            {permissionsList}
+                            {!currentResource?.objectAccess ? (
+                                <></>
+                            ) : (
+                                <Widget
+                                    title="Object Action Permissions"
+                                    busy={isFetchingObjects}
+                                    widgetButtons={buttons}
+                                    className={style.permissionsWidget}
+                                >
+                                    <br />
 
-                            <CustomTable
-                                hasCheckboxes={true}
-                                headers={objectHeaders}
-                                data={objectRows}
-                                onCheckedRowsChanged={(rows) => setSelectedObjects(rows as string[])}
-                            />
-                        </Widget>
+                                    <CustomTable
+                                        hasCheckboxes={true}
+                                        headers={objectHeaders}
+                                        data={objectRows}
+                                        onCheckedRowsChanged={(rows) => setSelectedObjects(rows as string[])}
+                                    />
+                                </Widget>
+                            )}
+                        </div>
                     )}
+
+                    {resources !== undefined && <div>{submitButtonsGroup}</div>}
                 </div>
             </div>
-
             <Dialog
                 isOpen={objectListDialog}
                 caption="Edit Object Level Permissions"
