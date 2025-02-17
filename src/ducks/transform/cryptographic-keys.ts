@@ -16,6 +16,8 @@ import {
     CryptographicKeyItemDetailResponseDto,
     CryptographicKeyItemDetailResponseModel,
     CryptographicKeyItemDto,
+    CryptographicKeyItemEditRequestDto,
+    CryptographicKeyItemEditRequestModel,
     CryptographicKeyItemModel,
     CryptographicKeyKeyUsageBulkUpdateRequestDto,
     CryptographicKeyKeyUsageBulkUpdateRequestModel,
@@ -81,6 +83,14 @@ export function transformCryptographicKeyEditRequestModelToDto(
     return {
         ...keyEditReq,
         customAttributes: keyEditReq.customAttributes?.map(transformAttributeRequestModelToDto),
+    };
+}
+
+export function transformCryptographicKeyItemEditRequestModelToDto(
+    keyItemEditReq: CryptographicKeyItemEditRequestModel,
+): CryptographicKeyItemEditRequestDto {
+    return {
+        ...keyItemEditReq,
     };
 }
 

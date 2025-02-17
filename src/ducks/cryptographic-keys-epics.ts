@@ -20,6 +20,8 @@ import {
     transformCryptographicKeyDetailResponseDtoToModel,
     transformCryptographicKeyEditRequestModelToDto,
     transformCryptographicKeyItemBulkCompromiseModelToDto,
+    transformCryptographicKeyItemEditRequestModelToDto,
+    transformCryptographicKeyItemResponseDtoToModel,
     transformCryptographicKeyPairResponseDtoToModel,
     transformCryptographicKeyResponseDtoToModel,
     transformKeyHistoryDtoToModel,
@@ -215,6 +217,45 @@ const updateCryptographicKey: AppEpic = (action$, state$, deps) => {
 
                     catchError((err) =>
                         of(slice.actions.updateCryptographicKeyFailure({ error: extractError(err, 'Failed to update Key') })),
+                    ),
+                ),
+        ),
+    );
+};
+
+const updateCryptographicKeyItem: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.updateCryptographicKeyItem.match),
+        switchMap((action) =>
+            deps.apiClients.cryptographicKeys
+                .editKeyItem({
+                    uuid: action.payload.uuid,
+                    keyItemUuid: action.payload.keyItemUuid,
+                    editKeyItemDto: transformCryptographicKeyItemEditRequestModelToDto(action.payload.cryptographicKeyItemEditRequest),
+                })
+                .pipe(
+                    mergeMap((cryptographicKeyItemDto) =>
+                        iif(
+                            () => !!action.payload.redirect,
+                            of(
+                                slice.actions.updateCryptographicKeyItemSuccess({
+                                    cryptographicKeyItem: transformCryptographicKeyItemResponseDtoToModel(cryptographicKeyItemDto),
+                                    redirect: action.payload.redirect,
+                                }),
+
+                                appRedirectActions.redirect({ url: action.payload.redirect! }),
+                            ),
+                            of(
+                                slice.actions.updateCryptographicKeyItemSuccess({
+                                    cryptographicKeyItem: transformCryptographicKeyItemResponseDtoToModel(cryptographicKeyItemDto),
+                                    redirect: action.payload.redirect,
+                                }),
+                            ),
+                        ),
+                    ),
+
+                    catchError((err) =>
+                        of(slice.actions.updateCryptographicKeyItemFailure({ error: extractError(err, 'Failed to update Key Item') })),
                     ),
                 ),
         ),
@@ -767,6 +808,7 @@ const epics = [
     getAttributesDescriptors,
     createCryptographicKey,
     updateCryptographicKey,
+    updateCryptographicKeyItem,
     enableCryptographicKey,
     disableCryptographicKey,
     deleteCryptographicKey,
