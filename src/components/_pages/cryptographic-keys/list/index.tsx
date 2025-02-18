@@ -243,13 +243,7 @@ function CryptographicKeyList() {
                         <KeyStatusCircle status={cryptographicKey.enabled} />,
                         <KeyStateCircle state={cryptographicKey.state} />,
                         <span style={{ whiteSpace: 'nowrap' }}>
-                            <Link
-                                to={`./detail/${cryptographicKey.tokenInstanceUuid || 'unknown'}/${cryptographicKey.keyWrapperUuid}/${
-                                    cryptographicKey.uuid
-                                }`}
-                            >
-                                {cryptographicKey.name}
-                            </Link>
+                            <Link to={`./detail/${cryptographicKey.keyWrapperUuid}/${cryptographicKey.uuid}`}>{cryptographicKey.name}</Link>
                         </span>,
                         <Badge color="secondary">{getEnumLabel(keyTypeEnum, cryptographicKey.type)}</Badge>,
                         cryptographicKey.keyAlgorithm,

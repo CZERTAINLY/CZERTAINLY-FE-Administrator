@@ -65,7 +65,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
 
     const getFreshHistory = useCallback(() => {
         if (!keyItem) return;
-        dispatch(actions.getHistory({ keyItemUuid: keyItem.uuid, tokenInstanceUuid: tokenInstanceUuid, keyUuid: keyUuid }));
+        dispatch(actions.getHistory({ keyItemUuid: keyItem.uuid, keyUuid: keyUuid }));
     }, [dispatch, tokenInstanceUuid, keyUuid, keyItem]);
 
     useEffect(() => {
@@ -87,26 +87,25 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
         dispatch(
             actions.enableCryptographicKey({
                 keyItemUuid: [keyItem.uuid],
-                tokenInstanceUuid: tokenInstanceUuid,
                 uuid: keyUuid,
             }),
         );
     }, [dispatch, keyItem, tokenInstanceUuid, keyUuid]);
 
     const onDisableClick = useCallback(() => {
+        if (!keyItem) return;
         dispatch(
             actions.disableCryptographicKey({
                 keyItemUuid: [keyItem.uuid],
-                tokenInstanceUuid: tokenInstanceUuid,
                 uuid: keyUuid,
             }),
         );
     }, [dispatch, keyItem, tokenInstanceUuid, keyUuid]);
 
     const onUpdateKeyUsageConfirmed = useCallback(() => {
+        if (!keyItem) return;
         dispatch(
             actions.updateKeyUsage({
-                tokenInstanceUuid: tokenInstanceUuid,
                 uuid: keyUuid,
                 usage: { usage: keyUsages, uuids: [keyItem.uuid] },
             }),
@@ -115,10 +114,10 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
     }, [dispatch, keyUsages, keyItem, keyUuid, tokenInstanceUuid]);
 
     const onDeleteConfirmed = useCallback(() => {
+        if (!keyItem) return;
         dispatch(
             actions.deleteCryptographicKey({
                 keyItemUuid: [keyItem.uuid],
-                tokenInstanceUuid: tokenInstanceUuid,
                 uuid: keyUuid,
                 redirect: totalKeyItems === 1 ? '../../../' : undefined,
             }),
@@ -135,7 +134,6 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                     uuids: [keyItem.uuid],
                     reason: compromiseReason,
                 },
-                tokenInstanceUuid: tokenInstanceUuid,
                 uuid: keyUuid,
             }),
         );
@@ -146,7 +144,6 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
         dispatch(
             actions.destroyCryptographicKey({
                 keyItemUuid: [keyItem.uuid],
-                tokenInstanceUuid: tokenInstanceUuid,
                 uuid: keyUuid,
             }),
         );
@@ -157,7 +154,6 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
         (newKeyItemName: string) => {
             if (!keyItem) return;
             if (keyItem.name === newKeyItemName) return;
-
             dispatch(
                 actions.updateCryptographicKeyItem({
                     uuid: keyUuid,
@@ -223,7 +219,8 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
             },
             {
                 icon: 'sign',
-                disabled: keyItem.state !== KeyState.Active || !keyItem.enabled || !keyItem.usage.includes(KeyUsage.Sign),
+                disabled:
+                    keyItem.state !== KeyState.Active || !keyItem.enabled || !keyItem.usage.includes(KeyUsage.Sign) || !tokenInstanceUuid,
                 tooltip: 'Sign',
                 onClick: () => {
                     setSignData(true);
@@ -231,7 +228,8 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
             },
             {
                 icon: 'verify',
-                disabled: keyItem.state !== KeyState.Active || !keyItem.enabled || !keyItem.usage.includes(KeyUsage.Verify),
+                disabled:
+                    keyItem.state !== KeyState.Active || !keyItem.enabled || !keyItem.usage.includes(KeyUsage.Verify) || !tokenInstanceUuid,
                 tooltip: 'Verify',
                 onClick: () => {
                     setVerifyData(true);
@@ -509,14 +507,26 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                     </Col>
                 ) : null}
             </Row>
+
             <Widget title="Event History" className="mt-3" titleSize="large" refreshAction={getFreshHistory}>
                 <CustomTable headers={historyHeaders} data={historyEntry} hasPagination={true} />
             </Widget>
-
             <Dialog
                 isOpen={confirmDelete}
                 caption="Delete Key"
-                body="You are about to delete Key. Is this what you want to do?"
+                body={
+                    <div>
+                        <p>You are about to delete Key. Is this what you want to do?</p>
+                        {tokenInstanceUuid ? (
+                            ''
+                        ) : (
+                            <p>
+                                Note that no token instance is associated with the Key. The key record will be removed from the platform,
+                                but will not be deleted in external key storage service.
+                            </p>
+                        )}
+                    </div>
+                }
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
@@ -554,6 +564,14 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 body={
                     <div>
                         <p>You are about to destroy the Key. Is this what you want to do?</p>
+                        {tokenInstanceUuid ? (
+                            ''
+                        ) : (
+                            <p>
+                                Note that token instance is not associated with the Key. The key will be marked as destroyed, but will not
+                                be destroyed in external key storage service.
+                            </p>
+                        )}
                         <p>
                             <b>Warning:</b> This action cannot be undone.
                         </p>

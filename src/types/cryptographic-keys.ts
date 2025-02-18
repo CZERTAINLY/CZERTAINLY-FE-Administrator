@@ -40,7 +40,7 @@ export type CryptographicKeyPairResponseModel = CryptographicKeyPairResponseDto;
 
 export type CryptographicKeyDetailResponseDto = KeyDetailDto;
 export type CryptographicKeyDetailResponseModel = Omit<CryptographicKeyDetailResponseDto, 'attributes | customAttributes | group'> & {
-    attributes: Array<AttributeResponseModel>;
+    attributes?: Array<AttributeResponseModel>;
     customAttributes?: Array<AttributeResponseModel>;
     groups?: Array<CertificateGroupResponseModel>;
 };
