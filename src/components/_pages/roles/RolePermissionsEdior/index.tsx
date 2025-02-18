@@ -470,6 +470,7 @@ function RolePermissionsEditor({
                 <div className={style.permissions}>
                     {currentResource && (
                         <div className={style.permissionsInner}>
+                            <span className="fw-bold">{currentResource.displayName} Permissions</span>
                             {permissionsList}
                             {!currentResource?.objectAccess ? (
                                 <></>
