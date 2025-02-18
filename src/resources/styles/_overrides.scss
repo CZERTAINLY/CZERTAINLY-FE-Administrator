@@ -168,11 +168,6 @@
 
 .badge {
     font-size: 12px;
-    word-break: break-all;
-    display: inline-block;
-    white-space: normal;
-    overflow-wrap: break-word;
-    text-align: left;
 
     .list-group-item > & {
         margin-top: 2px;
