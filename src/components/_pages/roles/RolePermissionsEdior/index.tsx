@@ -468,33 +468,30 @@ function RolePermissionsEditor({
             <div className={style.container}>
                 <div className={style.resources}>{resourceList}</div>
                 <div className={style.permissions}>
-                    {currentResource && (
-                        <div className={style.permissionsInner}>
-                            <span className="fw-bold">{currentResource.displayName} Permissions</span>
-                            {permissionsList}
-                            {!currentResource?.objectAccess ? (
-                                <></>
-                            ) : (
-                                <Widget
-                                    title="Object Action Permissions"
-                                    busy={isFetchingObjects}
-                                    widgetButtons={buttons}
-                                    className={style.permissionsWidget}
-                                >
-                                    <br />
+                    <div className={style.permissionsInner}>
+                        {permissionsList}
+                        {!currentResource?.objectAccess ? (
+                            <></>
+                        ) : (
+                            <Widget
+                                title="Object Action Permissions"
+                                busy={isFetchingObjects}
+                                widgetButtons={buttons}
+                                className={style.permissionsWidget}
+                            >
+                                <br />
 
-                                    <CustomTable
-                                        hasCheckboxes={true}
-                                        headers={objectHeaders}
-                                        data={objectRows}
-                                        onCheckedRowsChanged={(rows) => setSelectedObjects(rows as string[])}
-                                    />
-                                </Widget>
-                            )}
-                        </div>
-                    )}
+                                <CustomTable
+                                    hasCheckboxes={true}
+                                    headers={objectHeaders}
+                                    data={objectRows}
+                                    onCheckedRowsChanged={(rows) => setSelectedObjects(rows as string[])}
+                                />
+                            </Widget>
+                        )}
+                    </div>
 
-                    {resources !== undefined && <div>{submitButtonsGroup}</div>}
+                    {resources !== undefined && <div className="d-flex justify-content-end">{submitButtonsGroup}</div>}
                 </div>
             </div>
             <Dialog
