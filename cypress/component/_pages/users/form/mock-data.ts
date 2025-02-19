@@ -3,6 +3,7 @@ import {
     AttributeType,
     CertificateRequestFormat,
     CertificateState,
+    CertificateSubjectType,
     CertificateType,
     CertificateValidationStatus,
     ComplianceStatus,
@@ -264,6 +265,7 @@ const userFormMockData = {
             extendedKeyUsage: ['1.3.6.1.5.5.7.3.1'],
             keyUsage: ['digitalSignature', 'keyEncipherment'],
             basicConstraints: 'Subject Type=End Entity',
+            subjectType: CertificateSubjectType.EndEntity,
             metadata: [],
             certificateContent: '',
             subjectAlternativeNames: {
