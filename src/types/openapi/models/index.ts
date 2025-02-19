@@ -150,6 +150,7 @@ export * from './CustomAttributeDefinitionDto';
 export * from './CustomAttributeProperties';
 export * from './CustomAttributeUpdateRequestDto';
 export * from './DataAttribute';
+export * from './DataAttributeContent';
 export * from './DataAttributeProperties';
 export * from './DateAttributeContent';
 export * from './DateTimeAttributeConstraint';
