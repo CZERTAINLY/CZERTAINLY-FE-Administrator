@@ -6,6 +6,7 @@ import {
     BulkCompromiseKeyRequestDto,
     BulkKeyUsageRequestDto,
     CompromiseKeyRequestDto,
+    EditKeyItemDto,
     EditKeyRequestDto,
     KeyDetailDto,
     KeyDto,
@@ -27,6 +28,9 @@ export type CryptographicKeyEditRequestDto = EditKeyRequestDto;
 export type CryptographicKeyEditRequestModel = Omit<CryptographicKeyEditRequestDto, 'customAttributes'> & {
     customAttributes?: Array<AttributeRequestModel>;
 };
+
+export type CryptographicKeyItemEditRequestDto = EditKeyItemDto;
+export type CryptographicKeyItemEditRequestModel = CryptographicKeyItemEditRequestDto;
 
 export type CryptographicKeyResponseDto = KeyItemDto;
 export type CryptographicKeyResponseModel = CryptographicKeyResponseDto;

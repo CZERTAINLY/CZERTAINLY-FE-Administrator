@@ -28,8 +28,8 @@ import type {
 } from './';
 
 /**
- * @type BaseAttributeContentDto
- * Base Attribute content definition
+ * @type DataAttributeContent
+ * Content of the Attribute
  * @export
  */
-export type BaseAttributeContentDto = BooleanAttributeContent | CodeBlockAttributeContent | CredentialAttributeContent | DateAttributeContent | DateTimeAttributeContent | FileAttributeContent | FloatAttributeContent | IntegerAttributeContent | ObjectAttributeContent | SecretAttributeContent | StringAttributeContent | TextAttributeContent | TimeAttributeContent;
+export type DataAttributeContent = BooleanAttributeContent | CodeBlockAttributeContent | CredentialAttributeContent | DateAttributeContent | DateTimeAttributeContent | FileAttributeContent | FloatAttributeContent | IntegerAttributeContent | ObjectAttributeContent | SecretAttributeContent | StringAttributeContent | TextAttributeContent | TimeAttributeContent;
