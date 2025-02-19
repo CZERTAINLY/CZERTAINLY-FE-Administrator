@@ -3,19 +3,20 @@
 .container {
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap;
     width: 100%;
-    margin-bottom: 3em;
+    align-items: flex-start;
+    gap: 1.25em;
 }
 
 .resources {
-    margin-bottom: 1em;
+    margin-bottom: 30px;
+    width: 12em;
+    flex-shrink: 0;
 }
 
 .resources > div {
     padding: 0.5em;
-    width: 15em;
-    height: 4em;
+    min-height: 3em;
     background-color: #eee;
     border-bottom: solid 1px #fff;
 }
@@ -31,8 +32,15 @@
 }
 
 .permissions {
-    padding-left: 0.5em;
-    flex: 2;
+    flex-grow: 1;
+    min-width: 0;
+
+    position: sticky;
+    top: $navbar-height + 20px;
+}
+
+.permissionsWidget {
+    margin-bottom: 1.25em;
 }
 
 .action {
