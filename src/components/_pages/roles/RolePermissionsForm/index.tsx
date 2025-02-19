@@ -115,7 +115,7 @@ function RoleForm() {
                     <ButtonGroup>
                         <ProgressButton
                             title="Save"
-                            inProgressTitle="Svaing..."
+                            inProgressTitle="Saving..."
                             inProgress={isCreatingRole || isUpdatingRole || isUpdatingRolePermissions}
                             disabled={isCreatingRole || isUpdatingRole || roleSelector?.systemRole}
                             onClick={onSubmit}

@@ -188,7 +188,7 @@ function RolePermissionsEditor({
             !currentResource ? (
                 <></>
             ) : (
-                <Widget title="Resource Action Permissions" busy={isBusy}>
+                <Widget title="Resource Action Permissions" busy={isBusy} className={style.permissionsWidget}>
                     {!currentResource ? (
                         <></>
                     ) : (
@@ -481,7 +481,6 @@ function RolePermissionsEditor({
 
                 <div className={style.permissions}>
                     {permissionsList}
-
                     {!currentResource?.objectAccess ? (
                         <></>
                     ) : (
