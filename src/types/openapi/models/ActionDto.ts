@@ -33,6 +33,12 @@ export interface ActionDto {
      */
     name: string;
     /**
+     * Object Display Name
+     * @type {string}
+     * @memberof ActionDto
+     */
+    displayName: string;
+    /**
      * Description of the action
      * @type {string}
      * @memberof ActionDto

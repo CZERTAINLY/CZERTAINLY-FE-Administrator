@@ -50,7 +50,10 @@ function RolePermissionsEditor({
 
             if (perms?.allowAllActions) return 'All actions allowed';
 
-            const actions = perms?.actions.join(', ');
+            const actions = perms?.actions
+                .map((actionName) => resource.actions.find((el) => el.name === actionName)?.displayName)
+                .filter((el) => el)
+                .join(', ');
 
             return actions ? actions : 'No permissions assigned';
         },
@@ -216,7 +219,7 @@ function RolePermissionsEditor({
                                     }
                                     onChange={(e) => allowAction(currentResource, action.name, e.target.checked)}
                                 />
-                                &nbsp;&nbsp;&nbsp;{action.name}
+                                &nbsp;&nbsp;&nbsp;{action.displayName}
                             </label>
                         ))}
                     </div>
@@ -239,7 +242,7 @@ function RolePermissionsEditor({
                 (action) =>
                     ({
                         id: action.name,
-                        content: action.name,
+                        content: action.displayName,
                         sortable: false,
                         align: 'center',
                         width: '5em',
