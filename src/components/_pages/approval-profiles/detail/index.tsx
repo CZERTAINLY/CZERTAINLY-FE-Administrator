@@ -60,7 +60,7 @@ const ApprovalProfileDetails = () => {
                 onClick: () => setConfirmDelete(true),
             },
         ],
-        [profileApprovalDetail, onEditClick],
+        [onEditClick],
     );
 
     const detailHeaders: TableHeader[] = useMemo(
