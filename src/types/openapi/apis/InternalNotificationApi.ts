@@ -15,7 +15,7 @@ import type { Observable } from 'rxjs';
 import type { AjaxResponse } from 'rxjs/ajax';
 import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
 import type { OperationOpts, HttpHeaders, HttpQuery } from '../runtime';
-import type { AuthenticationServiceExceptionDto, ErrorMessageDto, NotificationRequestDto, NotificationResponseDto } from '../models';
+import type { NotificationRequestDto, NotificationResponseDto } from '../models';
 
 export interface BulkDeleteNotificationRequest {
     requestBody: Array<string>;

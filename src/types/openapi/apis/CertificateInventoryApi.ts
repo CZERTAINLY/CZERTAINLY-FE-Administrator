@@ -17,7 +17,6 @@ import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
 import type { OperationOpts, HttpHeaders, HttpQuery } from '../runtime';
 import type {
     ApprovalResponseDto,
-    AuthenticationServiceExceptionDto,
     BaseAttributeDto,
     BulkOperationResponse,
     CertificateChainDownloadResponseDto,
@@ -33,7 +32,6 @@ import type {
     CertificateUpdateObjectsDto,
     CertificateValidationResultDto,
     ClientCertificateRequestDto,
-    ErrorMessageDto,
     LocationDto,
     MultipleCertificateObjectUpdateDto,
     PaginationRequestDto,

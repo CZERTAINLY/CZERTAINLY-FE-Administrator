@@ -21,8 +21,6 @@ import type {
     ApprovalProfileRequestDto,
     ApprovalProfileResponseDto,
     ApprovalProfileUpdateRequestDto,
-    AuthenticationServiceExceptionDto,
-    ErrorMessageDto,
     PaginationRequestDto,
     UuidDto,
 } from '../models';

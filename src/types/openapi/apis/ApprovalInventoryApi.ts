@@ -19,8 +19,6 @@ import type {
     ApprovalDetailDto,
     ApprovalResponseDto,
     ApprovalUserDto,
-    AuthenticationServiceExceptionDto,
-    ErrorMessageDto,
     PaginationRequestDto,
     UserApprovalDto,
 } from '../models';
