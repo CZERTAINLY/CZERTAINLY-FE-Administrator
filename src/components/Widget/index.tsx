@@ -33,6 +33,7 @@ interface Props {
     hideWidgetButtons?: boolean;
     lockSize?: 'small' | 'normal' | 'large';
     widgetInfoCard?: WidgetInfoCard;
+    innerContainerProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
 }
 
 function Widget({
@@ -50,6 +51,7 @@ function Widget({
     hideWidgetButtons = false,
     lockSize = 'normal',
     widgetInfoCard,
+    innerContainerProps,
 }: Props) {
     const widgetLock = useSelector(selectors.selectWidgetLocks).find((lock) => lock.widgetName === widgetLockName);
     const [showWidgetInfo, setShowWidgetInfo] = useState(false);
@@ -138,7 +140,7 @@ function Widget({
                     lockType={widgetLock.lockType}
                 />
             ) : (
-                <div>{children}</div>
+                <div {...innerContainerProps}>{children}</div>
             )}
 
             <Spinner active={busy} />
