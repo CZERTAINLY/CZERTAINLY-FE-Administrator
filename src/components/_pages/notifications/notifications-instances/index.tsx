@@ -99,14 +99,12 @@ const NotificationInstanceList = () => {
                 : notificationInstances.map((notificationInstance) => ({
                       id: notificationInstance.uuid,
                       columns: [
-                          (
-                              <Link to={`../../../notificationinstances/detail/${notificationInstance.uuid}`}>
-                                  {notificationInstance.name}
-                              </Link>
-                          ) || '',
+                          <Link to={`../../../notificationinstances/detail/${notificationInstance.uuid}`}>
+                              {notificationInstance.name}
+                          </Link>,
                           notificationInstance.description || '',
                           <Badge color="primary">{notificationInstance.connectorName}</Badge>,
-                          <Badge color="primary">{notificationInstance.kind}</Badge> || '',
+                          <Badge color="primary">{notificationInstance.kind}</Badge>,
                       ],
                   })),
         [notificationInstances],

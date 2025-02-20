@@ -15,7 +15,6 @@ export type State = {
     isFetchingDetail: boolean;
     isUpdating: boolean;
     isDeleting: boolean;
-    isEnabling: boolean;
     isCreating: boolean;
     deleteErrorMessage: string;
     totalItems?: number;
@@ -28,7 +27,6 @@ export const initialState: State = {
     isFetchingList: false,
     isFetchingDetail: false,
     isDeleting: false,
-    isEnabling: false,
     isCreating: false,
     deleteErrorMessage: '',
     totalItems: undefined,
@@ -93,38 +91,6 @@ export const slice = createSlice({
             state.isFetchingList = false;
         },
 
-        enableApprovalProfile: (state, action: PayloadAction<{ uuid: string }>) => {
-            state.isEnabling = true;
-        },
-
-        enableApprovalProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
-            state.isEnabling = false;
-
-            const profileIndex = state.profileApprovalList.findIndex((profile) => profile.uuid === action.payload.uuid);
-
-            if (profileIndex >= 0) state.profileApprovalList[profileIndex].enabled = true;
-
-            if (state.profileApprovalDetail?.uuid === action.payload.uuid) state.profileApprovalDetail.enabled = true;
-        },
-        enableApprovalProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isEnabling = false;
-        },
-
-        disableApprovalProfile: (state, action: PayloadAction<{ uuid: string }>) => {
-            state.isEnabling = true;
-        },
-        disableApprovalProfileSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
-            state.isEnabling = false;
-
-            const profileIndex = state.profileApprovalList.findIndex((profile) => profile.uuid === action.payload.uuid);
-
-            if (profileIndex >= 0) state.profileApprovalList[profileIndex].enabled = false;
-
-            if (state.profileApprovalDetail?.uuid === action.payload.uuid) state.profileApprovalDetail.enabled = false;
-        },
-        disableApprovalProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isEnabling = false;
-        },
         deleteApprovalProfile: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isDeleting = true;
         },
@@ -168,7 +134,6 @@ const profileApprovalList = createSelector(state, (state) => state.profileApprov
 const isCreating = createSelector(state, (state) => state.isCreating);
 const isFetchingDetail = createSelector(state, (state) => state.isFetchingDetail);
 const isFetchingList = createSelector(state, (state) => state.isFetchingList);
-const isEnabling = createSelector(state, (state) => state.isEnabling);
 const deleteErrorMessage = createSelector(state, (state) => state.deleteErrorMessage);
 const totalItems = createSelector(state, (state) => state.totalItems);
 const isUpdating = createSelector(state, (state) => state.isUpdating);
@@ -180,7 +145,6 @@ export const selectors = {
     profileApprovalList,
     isCreating,
     isFetchingDetail,
-    isEnabling,
     deleteErrorMessage,
     totalItems,
     isUpdating,
