@@ -17,6 +17,7 @@ import type {
     AttributeType,
     BaseAttributeConstraint,
     BaseAttributeContentDto,
+    DataAttributeContent,
     DataAttributeProperties,
 } from './';
 
@@ -87,3 +88,5 @@ export interface DataAttribute {
      */
     attributeCallback?: AttributeCallback;
 }
+
+

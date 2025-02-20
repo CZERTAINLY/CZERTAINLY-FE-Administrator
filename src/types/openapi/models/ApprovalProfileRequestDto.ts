@@ -33,6 +33,12 @@ export interface ApprovalProfileRequestDto {
      */
     description?: string;
     /**
+     * Enable of the Approval profile
+     * @type {boolean}
+     * @memberof ApprovalProfileRequestDto
+     */
+    enabled: boolean;
+    /**
      * Expiration of the Approval profile in hours
      * @type {number}
      * @memberof ApprovalProfileRequestDto
