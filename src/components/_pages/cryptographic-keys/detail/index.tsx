@@ -22,6 +22,12 @@ import { dateFormatter } from 'utils/dateUtil';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import CryptographicKeyItem from './CryptographicKeyItem';
 
+export const keyWithoutTokenInstanceActionNotes = {
+    delete: 'Note that no token instance is associated with the Key. The key record will be removed from the platform, but will not be deleted in external key storage service.',
+    destroy:
+        'Note that no token instance is associated with the Key. The key will be marked as destroyed, but will not be destroyed in external key storage service.',
+};
+
 export default function CryptographicKeyDetail() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -417,14 +423,7 @@ export default function CryptographicKeyDetail() {
                 body={
                     <div>
                         <p>You are about to delete the Key. Is this what you want to do?</p>
-                        {cryptographicKey?.tokenInstanceUuid ? (
-                            ''
-                        ) : (
-                            <p>
-                                Note that no token instance is associated with the Key. The key record will be removed from the platform,
-                                but will not be deleted in external key storage service.
-                            </p>
-                        )}
+                        {!!cryptographicKey?.tokenInstanceUuid && <p>{keyWithoutTokenInstanceActionNotes.delete}</p>}
                     </div>
                 }
                 toggle={() => setConfirmDelete(false)}
@@ -464,14 +463,7 @@ export default function CryptographicKeyDetail() {
                 body={
                     <div>
                         <p>You are about to destroy the Key. Is this what you want to do?</p>
-                        {cryptographicKey?.tokenInstanceUuid ? (
-                            ''
-                        ) : (
-                            <p>
-                                Note that token instance is not associated with the Key. The key will be marked as destroyed, but will not
-                                be destroyed in external key storage service.
-                            </p>
-                        )}
+                        {!!cryptographicKey?.tokenInstanceUuid && <p>{keyWithoutTokenInstanceActionNotes.destroy}</p>}
                     </div>
                 }
                 toggle={() => setConfirmDestroy(false)}

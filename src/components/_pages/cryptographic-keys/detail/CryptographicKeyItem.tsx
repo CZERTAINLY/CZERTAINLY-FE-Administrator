@@ -22,6 +22,7 @@ import KeyStatus from '../KeyStatus';
 import SignVerifyData from './SignVerifyData';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
 import EditableTableCell from 'components/CustomTable/EditableTableCell';
+import { keyWithoutTokenInstanceActionNotes } from 'components/_pages/cryptographic-keys/detail';
 
 interface Props {
     keyUuid: string;
@@ -517,14 +518,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 body={
                     <div>
                         <p>You are about to delete Key. Is this what you want to do?</p>
-                        {tokenInstanceUuid ? (
-                            ''
-                        ) : (
-                            <p>
-                                Note that no token instance is associated with the Key. The key record will be removed from the platform,
-                                but will not be deleted in external key storage service.
-                            </p>
-                        )}
+                        {!!tokenInstanceUuid && <p>{keyWithoutTokenInstanceActionNotes.delete}</p>}
                     </div>
                 }
                 toggle={() => setConfirmDelete(false)}
@@ -564,14 +558,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 body={
                     <div>
                         <p>You are about to destroy the Key. Is this what you want to do?</p>
-                        {tokenInstanceUuid ? (
-                            ''
-                        ) : (
-                            <p>
-                                Note that token instance is not associated with the Key. The key will be marked as destroyed, but will not
-                                be destroyed in external key storage service.
-                            </p>
-                        )}
+                        {!!tokenInstanceUuid && <p>{keyWithoutTokenInstanceActionNotes.destroy}</p>}
                         <p>
                             <b>Warning:</b> This action cannot be undone.
                         </p>
