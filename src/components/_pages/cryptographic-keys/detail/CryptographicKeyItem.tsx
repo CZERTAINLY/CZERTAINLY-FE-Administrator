@@ -67,11 +67,11 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
     const getFreshHistory = useCallback(() => {
         if (!keyItem) return;
         dispatch(actions.getHistory({ keyItemUuid: keyItem.uuid, keyUuid: keyUuid }));
-    }, [dispatch, tokenInstanceUuid, keyUuid, keyItem]);
+    }, [dispatch, keyUuid, keyItem]);
 
     useEffect(() => {
         getFreshHistory();
-    }, [getFreshHistory, tokenInstanceUuid, keyUuid]);
+    }, [getFreshHistory, keyUuid]);
 
     useEffect(() => {
         if (history) {
@@ -91,7 +91,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 uuid: keyUuid,
             }),
         );
-    }, [dispatch, keyItem, tokenInstanceUuid, keyUuid]);
+    }, [dispatch, keyItem, keyUuid]);
 
     const onDisableClick = useCallback(() => {
         if (!keyItem) return;
@@ -101,7 +101,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 uuid: keyUuid,
             }),
         );
-    }, [dispatch, keyItem, tokenInstanceUuid, keyUuid]);
+    }, [dispatch, keyItem, keyUuid]);
 
     const onUpdateKeyUsageConfirmed = useCallback(() => {
         if (!keyItem) return;
@@ -112,7 +112,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
             }),
         );
         setKeyUsageUpdate(false);
-    }, [dispatch, keyUsages, keyItem, keyUuid, tokenInstanceUuid]);
+    }, [dispatch, keyUsages, keyItem, keyUuid]);
 
     const onDeleteConfirmed = useCallback(() => {
         if (!keyItem) return;
@@ -124,7 +124,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
             }),
         );
         setConfirmDelete(false);
-    }, [dispatch, keyItem, tokenInstanceUuid, keyUuid, totalKeyItems]);
+    }, [dispatch, keyItem, keyUuid, totalKeyItems]);
 
     const onCompromise = useCallback(() => {
         if (!keyItem) return;
@@ -139,7 +139,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
             }),
         );
         setConfirmCompromise(false);
-    }, [dispatch, keyItem, tokenInstanceUuid, keyUuid, compromiseReason]);
+    }, [dispatch, keyItem, keyUuid, compromiseReason]);
 
     const onDestroy = useCallback(() => {
         dispatch(
@@ -149,7 +149,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
             }),
         );
         setConfirmDestroy(false);
-    }, [dispatch, keyItem, tokenInstanceUuid, keyUuid]);
+    }, [dispatch, keyItem, keyUuid]);
 
     const onEditName = useCallback(
         (newKeyItemName: string) => {
@@ -237,7 +237,16 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 },
             },
         ],
-        [onDisableClick, onEnableClick, setConfirmCompromise, setConfirmDestroy, keyItem.enabled, keyItem.state, keyItem.usage],
+        [
+            onDisableClick,
+            onEnableClick,
+            setConfirmCompromise,
+            setConfirmDestroy,
+            keyItem.enabled,
+            keyItem.state,
+            keyItem.usage,
+            tokenInstanceUuid,
+        ],
     );
 
     const detailHeaders: TableHeader[] = useMemo(
