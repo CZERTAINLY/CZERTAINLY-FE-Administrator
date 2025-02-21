@@ -1,4 +1,3 @@
-import cx from 'classnames';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { useCallback, useMemo, useState } from 'react';
@@ -14,13 +13,12 @@ import {
     isCustomAttributeModelArray,
 } from 'types/attributes';
 import { MetadataItemModel, MetadataModel } from 'types/locations';
-import { NameAndUuidDto, PlatformEnum, Resource } from 'types/openapi';
-import { getAttributeContent } from 'utils/attributes/attributes';
+import { AttributeContentType, NameAndUuidDto, PlatformEnum, Resource } from 'types/openapi';
+import { getAttributeContent, getAttributeCopyValue } from 'utils/attributes/attributes';
 import { useCopyToClipboard } from 'utils/common-hooks';
 import { actions as userInterfaceActions } from '../../../ducks/user-interface';
 import ContentValueField from '../../Input/DynamicContent/ContentValueField';
 import WidgetButtons, { WidgetButtonProps } from '../../WidgetButtons';
-import styles from './attributeViewer.module.scss';
 
 export enum ATTRIBUTE_VIEWER_TYPE {
     ATTRIBUTE,
@@ -57,28 +55,11 @@ export default function AttributeViewer({
 
     const onCopyContentClick = useCallback(
         (attribute: AttributeResponseModel) => {
-            let textToCopy = '';
             if (!attribute?.content?.length) return;
-            // if (attribute.content.length > 1) textToCopy = attribute?.content?.map((content) => content.data).join(', ');
-            // if (attribute.content.length === 1) textToCopy = attribute.content[0]?.reference.toString();
 
-            // check if reference is there or if no reference then use .data to copy
+            const textToCopy = getAttributeCopyValue(attribute.contentType, attribute.content);
 
-            if (attribute.content.length > 1) {
-                textToCopy = attribute.content
-                    .map((content) => {
-                        if (content.reference) {
-                            return content.reference;
-                        }
-                        return content.data;
-                    })
-                    .join(', ');
-            }
-            if (attribute.content.length === 1) {
-                textToCopy = attribute.content[0]?.reference?.toString() || attribute.content[0]?.data.toString();
-            }
-
-            if (attribute) {
+            if (attribute && textToCopy) {
                 copyToClipboard(textToCopy, 'Custom Attribute content was copied to clipboard', 'Failed to copy to clipboard');
             }
         },
@@ -210,11 +191,18 @@ export default function AttributeViewer({
                     {getContent(attribute.contentType, attribute.content)}
                     {resource && renderSourceObjectsButton(attribute, resource)}
                 </>,
-                <i
-                    className={cx('fa fa-copy', styles.copyContentButton)}
-                    onClick={() => {
-                        onCopyContentClick(attribute);
-                    }}
+                <WidgetButtons
+                    key="copy"
+                    buttons={[
+                        {
+                            icon: 'copy',
+                            disabled: AttributeContentType.Secret === attribute.contentType,
+                            onClick: () => {
+                                onCopyContentClick(attribute);
+                            },
+                            tooltip: 'Copy to clipboard',
+                        },
+                    ]}
                 />,
             ],
         }),
@@ -254,7 +242,7 @@ export default function AttributeViewer({
             } else {
                 buttons.push({
                     icon: 'copy',
-                    disabled: false,
+                    disabled: AttributeContentType.Secret === attribute.contentType,
                     tooltip: 'Copy to clipboard',
                     onClick: () => {
                         onCopyContentClick(attribute);
