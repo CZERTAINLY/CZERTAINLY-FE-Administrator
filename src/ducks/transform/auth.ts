@@ -13,7 +13,6 @@ import {
     UserUpdateRequestModel,
 } from 'types/auth';
 import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToModel } from './attributes';
-import { ActionDto, ActionModel } from 'types/rules';
 
 export function transformResourceDtoToModel(resource: AuthResourceDto): AuthResourceModel {
     return {
