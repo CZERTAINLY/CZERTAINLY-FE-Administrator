@@ -1,7 +1,7 @@
 import { Props as CustomAttributeWidgetProps } from 'components/Attributes/CustomAttributeWidget';
 import { AttributeResponseModel, CustomAttributeDto } from 'types/attributes';
 import { CertificateDetailResponseModel } from 'types/certificate';
-import { AttributeContentType, AttributeType, Resource, ResponseAttributeDto } from 'types/openapi';
+import { AttributeContentType, AttributeType, CertificateSubjectType, Resource, ResponseAttributeDto } from 'types/openapi';
 
 export const successData = [
     {
@@ -225,6 +225,7 @@ export const certificateDetailSuccess = {
     extendedKeyUsage: ['1.2'],
     keyUsage: ['digitalSignature'],
     basicConstraints: 'Subject Type=End Entity',
+    subjectType: CertificateSubjectType.EndEntity,
     metadata: [
         {
             connectorUuid: '11fa486c-3638-4c3e-99f5-9561d9700030',

@@ -14,14 +14,17 @@
     overflow: auto;
 }
 
-.resources > div {
+.resources > button {
     padding: 0.5em;
+    width: 100%;
+    text-align: start;
     min-height: 3em;
     background-color: #eee;
+    border: solid 1px #eee;
     border-bottom: solid 1px #fff;
 }
 
-.resources > div[data-selected='true'] {
+.resources > button[data-selected='true'] {
     background-color: #ddd;
     position: sticky;
     top: 0;
@@ -29,7 +32,7 @@
     z-index: 10;
 }
 
-.resources > div > sup {
+.resources > button > sup {
     display: block;
     margin-top: 0.75em;
     line-height: 1em;
