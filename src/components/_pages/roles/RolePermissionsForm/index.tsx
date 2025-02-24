@@ -11,7 +11,7 @@ import { actions as authActions, selectors as authSelectors } from 'ducks/auth';
 import { actions as rolesActions, selectors as rolesSelectors } from 'ducks/roles';
 
 import { SubjectPermissionsModel } from 'types/roles';
-import RolePermissionsEditor from '../RolePermissionsEdior';
+import RolePermissionsEditor from '../RolePermissionsEditor';
 
 import style from './style.module.scss';
 
