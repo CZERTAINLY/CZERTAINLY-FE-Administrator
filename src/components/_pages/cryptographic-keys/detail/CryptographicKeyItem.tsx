@@ -527,7 +527,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 body={
                     <div>
                         <p>You are about to delete Key. Is this what you want to do?</p>
-                        {!!tokenInstanceUuid && <p>{keyWithoutTokenInstanceActionNotes.delete}</p>}
+                        {!tokenInstanceUuid && <p>{keyWithoutTokenInstanceActionNotes.delete}</p>}
                     </div>
                 }
                 toggle={() => setConfirmDelete(false)}
@@ -567,7 +567,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 body={
                     <div>
                         <p>You are about to destroy the Key. Is this what you want to do?</p>
-                        {!!tokenInstanceUuid && <p>{keyWithoutTokenInstanceActionNotes.destroy}</p>}
+                        {!tokenInstanceUuid && <p>{keyWithoutTokenInstanceActionNotes.destroy}</p>}
                         <p>
                             <b>Warning:</b> This action cannot be undone.
                         </p>

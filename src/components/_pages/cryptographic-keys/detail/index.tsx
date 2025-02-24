@@ -423,7 +423,7 @@ export default function CryptographicKeyDetail() {
                 body={
                     <div>
                         <p>You are about to delete the Key. Is this what you want to do?</p>
-                        {!!cryptographicKey?.tokenInstanceUuid && <p>{keyWithoutTokenInstanceActionNotes.delete}</p>}
+                        {!cryptographicKey?.tokenInstanceUuid && <p>{keyWithoutTokenInstanceActionNotes.delete}</p>}
                     </div>
                 }
                 toggle={() => setConfirmDelete(false)}
@@ -463,7 +463,7 @@ export default function CryptographicKeyDetail() {
                 body={
                     <div>
                         <p>You are about to destroy the Key. Is this what you want to do?</p>
-                        {!!cryptographicKey?.tokenInstanceUuid && <p>{keyWithoutTokenInstanceActionNotes.destroy}</p>}
+                        {!cryptographicKey?.tokenInstanceUuid && <p>{keyWithoutTokenInstanceActionNotes.destroy}</p>}
                     </div>
                 }
                 toggle={() => setConfirmDestroy(false)}
