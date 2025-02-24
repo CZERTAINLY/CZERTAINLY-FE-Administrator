@@ -299,7 +299,7 @@ export default function AttributeEditor({
             ),
         ];
         return rendered;
-    }, [nonRequiredCustomAttributeDescriptors, shownCustomAttributes]);
+    }, [nonRequiredCustomAttributeDescriptors, shownCustomAttributes, groupAttributesCallbackAttributes]);
 
     /**
      * Groups attributes for rendering according to the attribute descriptor group property
@@ -688,8 +688,24 @@ export default function AttributeEditor({
 
     const attrs = useMemo(() => {
         const attrs: JSX.Element[] = [];
-        Object.keys(groupedAttributesDescriptors).forEach((group, i, arr) => {
-            console.log(group);
+
+        const attributeSelector = (
+            <CustomAttributeAddSelect
+                onAdd={(attribute) => {
+                    setShownCustomAttributes((state) => [...state, { uuid: attribute.uuid }]);
+                }}
+                attributeDescriptors={notYetShownCustomAttributeDescriptors}
+            />
+        );
+
+        const groupedAttributesDescriptorsKeys = Object.keys(groupedAttributesDescriptors);
+
+        // Show the attribute selector even when there no attributes are displayed, but some non required attributes exist
+        if (groupedAttributesDescriptorsKeys.length === 0 && notYetShownCustomAttributeDescriptors.length > 0) {
+            return <Widget busy={isRunningCb}>{attributeSelector}</Widget>;
+        }
+
+        groupedAttributesDescriptorsKeys.forEach((group, i, arr) => {
             attrs.push(
                 <Widget key={group} title={group === '__' ? '' : group} busy={isRunningCb}>
                     {groupedAttributesDescriptors[group].map((descriptor) => (
@@ -702,14 +718,7 @@ export default function AttributeEditor({
                             />
                         </div>
                     ))}
-                    {i === arr.length - 1 && notYetShownCustomAttributeDescriptors.length > 0 && (
-                        <CustomAttributeAddSelect
-                            onAdd={(attribute) => {
-                                setShownCustomAttributes((state) => [...state, { uuid: attribute.uuid }]);
-                            }}
-                            attributeDescriptors={notYetShownCustomAttributeDescriptors}
-                        />
-                    )}
+                    {i === arr.length - 1 && notYetShownCustomAttributeDescriptors.length > 0 && attributeSelector}
                 </Widget>,
             );
         });
