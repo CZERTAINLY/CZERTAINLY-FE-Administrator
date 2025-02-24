@@ -7,7 +7,7 @@ import {
     isDataAttributeModel,
 } from 'types/attributes';
 import { AttributeContentType, CodeBlockAttributeContent, FileAttributeContentData, SecretAttributeContent } from 'types/openapi';
-import { utf8ToBase64 } from 'utils/common-utils';
+import { base64ToUtf8, utf8ToBase64 } from 'utils/common-utils';
 import { getFormattedDateTime } from 'utils/dateUtil';
 import CodeBlock from '../../components/Attributes/CodeBlock';
 
@@ -21,6 +21,41 @@ export const attributeFieldNameTransform: { [name: string]: string } = {
     entityProvider: 'Entity Provider',
     cryptographyProvider: 'Cryptography Provider',
     notificationProvider: 'Notification Provider',
+};
+export const getAttributeCopyValue = (contentType: AttributeContentType, content: BaseAttributeContentModel[] | undefined) => {
+    if (!content) return undefined;
+
+    const mapping = (content: BaseAttributeContentModel): string | undefined => {
+        switch (contentType) {
+            case AttributeContentType.Codeblock:
+                if (typeof content.data === 'object' && 'code' in content.data) return base64ToUtf8(content.data.code);
+                return content.data.toString();
+            case AttributeContentType.Credential:
+                if (typeof content.data === 'object' && 'name' in content.data) return content.data.name;
+                return content.data.toString();
+            case AttributeContentType.File:
+                if (typeof content.data === 'object' && 'content' in content.data) return base64ToUtf8(content.data.content);
+                return content.data.toString();
+            case AttributeContentType.Object:
+                return JSON.stringify(content.data);
+            case AttributeContentType.Boolean:
+                return content.data ? 'true' : 'false';
+            case AttributeContentType.Time:
+                return content.data.toString();
+            case AttributeContentType.Date:
+                return content.data.toString();
+            case AttributeContentType.Datetime:
+                return getFormattedDateTime(content.data.toString());
+            case AttributeContentType.Float:
+            case AttributeContentType.Integer:
+            case AttributeContentType.String:
+            case AttributeContentType.Text:
+                return content.data.toString();
+            case AttributeContentType.Secret:
+                return undefined;
+        }
+    };
+    return content.map(mapping).join(', ');
 };
 
 export const getAttributeContent = (contentType: AttributeContentType, content: BaseAttributeContentModel[] | undefined) => {

@@ -263,7 +263,7 @@ function UserForm() {
                                         ? values.certificateUuid
                                         : undefined
                                     : undefined,
-                            certificateData: values.inputType?.value === 'upload' && certToUpload ? certFileContent : undefined,
+                            certificateData: values.inputType?.value === 'upload' ? certFileContent : undefined,
                             customAttributes: collectFormAttributes('customUser', resourceCustomAttributes, values),
                         },
                     }),
@@ -280,7 +280,7 @@ function UserForm() {
                             email: values.email || undefined,
                             groupUuids: values.selectedGroups.map((g) => g.value),
                             enabled: values.enabled,
-                            certificateData: values.inputType?.value === 'upload' && certToUpload ? certFileContent : undefined,
+                            certificateData: values.inputType?.value === 'upload' ? certFileContent : undefined,
                             certificateUuid:
                                 values.inputType?.value === 'select'
                                     ? values.certificateUuid
@@ -294,7 +294,7 @@ function UserForm() {
             }
         },
 
-        [user, certToUpload, certFileContent, dispatch, editMode, userRoles, resourceCustomAttributes],
+        [user, certFileContent, dispatch, editMode, userRoles, resourceCustomAttributes],
     );
 
     const onCancel = useCallback(() => {

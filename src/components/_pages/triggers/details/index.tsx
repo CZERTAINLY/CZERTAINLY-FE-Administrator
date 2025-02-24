@@ -439,7 +439,7 @@ const TriggerDetails = () => {
                   return {
                       id: action.uuid,
                       columns: [
-                          <Link to={`../../actions/detail/${action.uuid}`}>{action.name}</Link> || '',
+                          <Link to={`../../actions/detail/${action.uuid}`}>{action.name}</Link>,
                           action.description || '',
                           <Button
                               className="btn btn-link text-danger"
@@ -490,7 +490,7 @@ const TriggerDetails = () => {
                       return {
                           id: rule.uuid,
                           columns: [
-                              <Link to={`../../rules/detail/${rule.uuid}`}>{rule.name}</Link> || '',
+                              <Link to={`../../rules/detail/${rule.uuid}`}>{rule.name}</Link>,
                               rule.description || '',
                               <Button
                                   className="btn btn-link text-danger"

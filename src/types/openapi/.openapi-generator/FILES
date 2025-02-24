@@ -86,6 +86,7 @@ models/AttributeValueTarget.ts
 models/AuditLogDto.ts
 models/AuditLogResponseDto.ts
 models/AuditLoggingSettingsDto.ts
+models/AuthActionDto.ts
 models/AuthMethod.ts
 models/AuthResourceDto.ts
 models/AuthType.ts

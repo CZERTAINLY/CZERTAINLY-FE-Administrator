@@ -83,7 +83,9 @@ const getCryptographicKeyDetail: AppEpic = (action$, state$, deps) => {
         filter(slice.actions.getCryptographicKeyDetail.match),
         switchMap((action) =>
             deps.apiClients.cryptographicKeys
-                .getKey1({ tokenInstanceUuid: action.payload.tokenInstanceUuid, uuid: action.payload.uuid })
+                .getKey({
+                    uuid: action.payload.uuid,
+                })
                 .pipe(
                     switchMap((profileDto) =>
                         of(
@@ -169,7 +171,7 @@ const createCryptographicKey: AppEpic = (action$, state$, deps) => {
                                     uuid: obj.uuid,
                                     tokenInstanceUuid: action.payload.tokenInstanceUuid,
                                 }),
-                                appRedirectActions.redirect({ url: `../keys/detail/${action.payload.tokenInstanceUuid}/${obj.uuid}` }),
+                                appRedirectActions.redirect({ url: `../keys/detail/${obj.uuid}` }),
                             ),
                         ),
                     ),
@@ -222,7 +224,6 @@ const updateCryptographicKey: AppEpic = (action$, state$, deps) => {
         ),
     );
 };
-
 const updateCryptographicKeyItem: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.updateCryptographicKeyItem.match),
@@ -288,7 +289,6 @@ const enableCryptographicKey: AppEpic = (action$, state$, deps) => {
         switchMap((action) =>
             deps.apiClients.cryptographicKeys
                 .enableKey({
-                    tokenInstanceUuid: action.payload.tokenInstanceUuid,
                     uuid: action.payload.uuid,
                     requestBody: action.payload.keyItemUuid,
                 })
@@ -306,7 +306,6 @@ const enableCryptographicKey: AppEpic = (action$, state$, deps) => {
                             ...err.response.map((keyItemUuid: string) =>
                                 slice.actions.getHistory({
                                     keyItemUuid,
-                                    tokenInstanceUuid: action.payload.tokenInstanceUuid,
                                     keyUuid: action.payload.uuid,
                                 }),
                             ),
@@ -325,7 +324,6 @@ const disableCryptographicKey: AppEpic = (action$, state$, deps) => {
         switchMap((action) =>
             deps.apiClients.cryptographicKeys
                 .disableKey({
-                    tokenInstanceUuid: action.payload.tokenInstanceUuid,
                     uuid: action.payload.uuid,
                     requestBody: action.payload.keyItemUuid,
                 })
@@ -346,7 +344,6 @@ const disableCryptographicKey: AppEpic = (action$, state$, deps) => {
                             ...err.response.map((keyItemUuid: string) =>
                                 slice.actions.getHistory({
                                     keyItemUuid,
-                                    tokenInstanceUuid: action.payload.tokenInstanceUuid,
                                     keyUuid: action.payload.uuid,
                                 }),
                             ),
@@ -363,8 +360,7 @@ const deleteCryptographicKey: AppEpic = (action$, state$, deps) => {
         filter(slice.actions.deleteCryptographicKey.match),
         switchMap((action) =>
             deps.apiClients.cryptographicKeys
-                .deleteKey1({
-                    tokenInstanceUuid: action.payload.tokenInstanceUuid,
+                .deleteKey({
                     uuid: action.payload.uuid,
                     requestBody: action.payload.keyItemUuid,
                 })
@@ -532,7 +528,6 @@ const updateKeyUsage: AppEpic = (action$, state$, deps) => {
         switchMap((action) =>
             deps.apiClients.cryptographicKeys
                 .updateKeyUsages1({
-                    tokenInstanceUuid: action.payload.tokenInstanceUuid,
                     uuid: action.payload.uuid,
                     updateKeyUsageRequestDto: action.payload.usage,
                 })
@@ -605,7 +600,6 @@ const compromiseCryptographicKey: AppEpic = (action$, state$, deps) => {
         switchMap((action) =>
             deps.apiClients.cryptographicKeys
                 .compromiseKey({
-                    tokenInstanceUuid: action.payload.tokenInstanceUuid,
                     uuid: action.payload.uuid,
                     compromiseKeyRequestDto: transformCryptographicKeyCompromiseModelToDto(action.payload.request),
                 })
@@ -626,7 +620,6 @@ const compromiseCryptographicKey: AppEpic = (action$, state$, deps) => {
                             ...err.response.map((keyItemUuid: string) =>
                                 slice.actions.getHistory({
                                     keyItemUuid,
-                                    tokenInstanceUuid: action.payload.tokenInstanceUuid,
                                     keyUuid: action.payload.uuid,
                                 }),
                             ),
@@ -700,7 +693,6 @@ const destroyCryptographicKey: AppEpic = (action$, state$, deps) => {
         switchMap((action) =>
             deps.apiClients.cryptographicKeys
                 .destroyKey({
-                    tokenInstanceUuid: action.payload.tokenInstanceUuid,
                     uuid: action.payload.uuid,
                     requestBody: action.payload.keyItemUuid,
                 })
@@ -721,7 +713,6 @@ const destroyCryptographicKey: AppEpic = (action$, state$, deps) => {
                             ...err.response.map((keyItemUuid: string) =>
                                 slice.actions.getHistory({
                                     keyItemUuid,
-                                    tokenInstanceUuid: action.payload.tokenInstanceUuid,
                                     keyUuid: action.payload.uuid,
                                 }),
                             ),
@@ -779,7 +770,6 @@ const getKeyHistory: AppEpic = (action$, state, deps) => {
             deps.apiClients.cryptographicKeys
                 .getEventHistory({
                     keyItemUuid: action.payload.keyItemUuid,
-                    tokenInstanceUuid: action.payload.tokenInstanceUuid,
                     uuid: action.payload.keyUuid,
                 })
                 .pipe(

@@ -79,7 +79,7 @@ export default function PlatformSettingsDetail() {
                           id: 'utilsUrl',
                           columns: [
                               'Utils Service URL',
-                              (
+                              platformSettings.utils.utilsServiceUrl ? (
                                   <>
                                       {platformSettings.utils.utilsServiceUrl}&nbsp;
                                       {health ? (
@@ -88,7 +88,9 @@ export default function PlatformSettingsDetail() {
                                           <i className="fa fa-exclamation-circle" style={{ color: 'red' }} aria-hidden="true" />
                                       )}
                                   </>
-                              ) ?? 'n/a',
+                              ) : (
+                                  'n/a'
+                              ),
                           ],
                       },
                   ],

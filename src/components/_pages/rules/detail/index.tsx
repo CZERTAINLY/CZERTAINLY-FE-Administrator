@@ -271,7 +271,7 @@ const RuleDetails = () => {
                   return {
                       id: condition.uuid,
                       columns: [
-                          <Link to={`../../conditions/detail/${condition.uuid}`}>{condition.name}</Link> || '',
+                          <Link to={`../../conditions/detail/${condition.uuid}`}>{condition.name}</Link>,
                           getEnumLabel(conditionTypeEnum, condition.type),
                           condition.description || '',
                           <Button

@@ -12,7 +12,7 @@
  */
 
 import type {
-    ActionDto,
+    AuthActionDto,
     Resource,
 } from './';
 
@@ -53,10 +53,10 @@ export interface AuthResourceDto {
     objectAccess: boolean;
     /**
      * List of Actions for the Resource
-     * @type {Array<ActionDto>}
+     * @type {Array<AuthActionDto>}
      * @memberof AuthResourceDto
      */
-    actions: Array<ActionDto>;
+    actions: Array<AuthActionDto>;
 }
 
 

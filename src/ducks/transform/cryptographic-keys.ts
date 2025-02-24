@@ -50,7 +50,7 @@ export function transformCryptographicKeyDetailResponseDtoToModel(
     return {
         ...keyResponse,
         items: keyResponse.items.map(transformCryptographicKeyItemResponseDtoToModel),
-        attributes: keyResponse.attributes.map(transformAttributeResponseDtoToModel),
+        attributes: keyResponse.attributes?.map(transformAttributeResponseDtoToModel),
         customAttributes: keyResponse.customAttributes?.map(transformAttributeResponseDtoToModel),
     };
 }

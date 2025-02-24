@@ -1311,13 +1311,7 @@ export default function CertificateDetail() {
                       id: 'key',
                       columns: [
                           'Key',
-                          certificate.key && certificate.key.tokenInstanceUuid ? (
-                              <Link to={`../keys/detail/${certificate.key?.tokenInstanceUuid}/${certificate.key?.uuid}`}>
-                                  {certificate.key?.name}
-                              </Link>
-                          ) : (
-                              ''
-                          ),
+                          certificate.key ? <Link to={`../keys/detail/${certificate.key.uuid}`}>{certificate.key.name}</Link> : '',
                       ],
                   },
                   {

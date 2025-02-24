@@ -344,10 +344,6 @@ export default function RaProfileDetail() {
                 content: 'Description',
             },
             {
-                id: 'enabled',
-                content: 'Enabled',
-            },
-            {
                 id: 'expiry',
                 content: 'Expiry (in hours)',
             },
@@ -369,8 +365,6 @@ export default function RaProfileDetail() {
                           <Link to={`../../../approvalprofiles/detail/${profile!.uuid}`}>{profile!.name}</Link>,
 
                           profile.description || '',
-
-                          <StatusBadge enabled={profile.enabled} />,
 
                           profile?.expiry?.toString() || '',
 

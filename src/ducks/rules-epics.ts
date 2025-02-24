@@ -7,10 +7,10 @@ import { actions as alertActions } from './alerts';
 import { actions as appRedirectActions } from './app-redirect';
 
 import * as slice from './rules';
-import { transformActionDtoToModel } from './transform/auth';
 import {
     tranformExecutionRequestModelToDto,
     transformActionDetailDtoToModel,
+    transformActionDtoToModel,
     transformActionRequestModelToDto,
     transformConditionDtoToModel,
     transformConditionRequestModelToDto,
