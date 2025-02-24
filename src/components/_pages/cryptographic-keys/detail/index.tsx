@@ -22,12 +22,18 @@ import { dateFormatter } from 'utils/dateUtil';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import CryptographicKeyItem from './CryptographicKeyItem';
 
+export const keyWithoutTokenInstanceActionNotes = {
+    delete: 'Note that no token instance is associated with the Key. The key record will be removed from the platform, but will not be deleted in external key storage service.',
+    destroy:
+        'Note that no token instance is associated with the Key. The key will be marked as destroyed, but will not be destroyed in external key storage service.',
+};
+
 export default function CryptographicKeyDetail() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const { id, tokenId, keyItemUuid } = useParams();
-    const relativePath = keyItemUuid ? '../../../..' : '../../..';
+    const { id, keyItemUuid } = useParams();
+    const relativePath = '../..' + (keyItemUuid ? '/..' : '');
 
     const cryptographicKey = useSelector(selectors.cryptographicKey);
     const state = useSelector(selectors.state);
@@ -56,18 +62,18 @@ export default function CryptographicKeyDetail() {
     );
 
     const getFreshCryptographicKeyDetails = useCallback(() => {
-        if (!id || !tokenId) return;
+        if (!id) return;
 
-        dispatch(actions.getCryptographicKeyDetail({ tokenInstanceUuid: tokenId, uuid: id }));
-    }, [id, dispatch, tokenId]);
+        dispatch(actions.getCryptographicKeyDetail({ uuid: id }));
+    }, [id, dispatch]);
 
     useEffect(() => {
         getFreshCryptographicKeyDetails();
-    }, [getFreshCryptographicKeyDetails, id, tokenId]);
+    }, [getFreshCryptographicKeyDetails, id]);
 
     const onEditClick = useCallback(() => {
         if (!cryptographicKey) return;
-        navigate(`${relativePath}/edit/${cryptographicKey.tokenInstanceUuid}/${cryptographicKey?.uuid}`, { relative: 'path' });
+        navigate(`${relativePath}/edit/${cryptographicKey.uuid}`, { relative: 'path' });
     }, [navigate, cryptographicKey, relativePath]);
 
     const onEnableClick = useCallback(() => {
@@ -75,7 +81,6 @@ export default function CryptographicKeyDetail() {
         dispatch(
             actions.enableCryptographicKey({
                 keyItemUuid: [],
-                tokenInstanceUuid: cryptographicKey.tokenInstanceUuid,
                 uuid: cryptographicKey.uuid,
             }),
         );
@@ -86,7 +91,6 @@ export default function CryptographicKeyDetail() {
         dispatch(
             actions.disableCryptographicKey({
                 keyItemUuid: [],
-                tokenInstanceUuid: cryptographicKey.tokenInstanceUuid,
                 uuid: cryptographicKey.uuid,
             }),
         );
@@ -97,9 +101,8 @@ export default function CryptographicKeyDetail() {
         dispatch(
             actions.deleteCryptographicKey({
                 keyItemUuid: [],
-                tokenInstanceUuid: cryptographicKey.tokenInstanceUuid || 'unknown',
                 uuid: cryptographicKey.uuid,
-                redirect: cryptographicKey.items.length > 1 ? `${relativePath}/` : undefined,
+                redirect: relativePath,
             }),
         );
         setConfirmDelete(false);
@@ -111,7 +114,6 @@ export default function CryptographicKeyDetail() {
         dispatch(
             actions.compromiseCryptographicKey({
                 request: { reason: compromiseReason },
-                tokenInstanceUuid: cryptographicKey.tokenInstanceUuid,
                 uuid: cryptographicKey.uuid,
             }),
         );
@@ -123,7 +125,6 @@ export default function CryptographicKeyDetail() {
         dispatch(
             actions.destroyCryptographicKey({
                 keyItemUuid: [],
-                tokenInstanceUuid: cryptographicKey.tokenInstanceUuid,
                 uuid: cryptographicKey.uuid,
             }),
         );
@@ -418,8 +419,13 @@ export default function CryptographicKeyDetail() {
 
             <Dialog
                 isOpen={confirmDelete}
-                caption="Delete Token Profile"
-                body="You are about to delete Token Profile. Is this what you want to do?"
+                caption="Delete Key"
+                body={
+                    <div>
+                        <p>You are about to delete the Key. Is this what you want to do?</p>
+                        {!cryptographicKey?.tokenInstanceUuid && <p>{keyWithoutTokenInstanceActionNotes.delete}</p>}
+                    </div>
+                }
                 toggle={() => setConfirmDelete(false)}
                 buttons={[
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
@@ -454,7 +460,12 @@ export default function CryptographicKeyDetail() {
             <Dialog
                 isOpen={confirmDestroy}
                 caption={`Destroy Key`}
-                body={`You are about to destroy the Key. Is this what you want to do?`}
+                body={
+                    <div>
+                        <p>You are about to destroy the Key. Is this what you want to do?</p>
+                        {!cryptographicKey?.tokenInstanceUuid && <p>{keyWithoutTokenInstanceActionNotes.destroy}</p>}
+                    </div>
+                }
                 toggle={() => setConfirmDestroy(false)}
                 buttons={[
                     { color: 'danger', onClick: onDestroy, body: 'Yes, Destroy' },

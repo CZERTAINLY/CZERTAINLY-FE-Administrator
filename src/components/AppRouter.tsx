@@ -325,15 +325,14 @@ export default function AppRouter() {
                     <Route path={`/${Resource.TokenProfiles.toLowerCase()}/detail/:tokenId/:id`} element={<TokenProfileDetail />} />
                     <Route path={`/${Resource.TokenProfiles.toLowerCase()}/add`} element={<TokenProfileForm />} />
                     <Route path={`/${Resource.TokenProfiles.toLowerCase()}/edit/:tokenId/:id`} element={<TokenProfileForm />} />
+                    <Route path={`/${Resource.TokenProfiles.toLowerCase()}/edit/:tokenId/:id`} element={<TokenProfileForm />} />
 
                     <Route path={`/${Resource.Keys.toLowerCase()}`} element={<CryptographicKeyList />} />
                     <Route path={`/${Resource.Keys.toLowerCase()}/list`} element={<Navigate to={`/${Resource.Keys.toLowerCase()}`} />} />
-                    <Route
-                        path={`/${Resource.Keys.toLowerCase()}/detail/:tokenId/:id/:keyItemUuid?`}
-                        element={<CryptographicKeyDetail />}
-                    />
+
+                    <Route path={`/${Resource.Keys.toLowerCase()}/detail/:id/:keyItemUuid?`} element={<CryptographicKeyDetail />} />
                     <Route path={`/${Resource.Keys.toLowerCase()}/add`} element={<CryptographicKeyForm />} />
-                    <Route path={`/${Resource.Keys.toLowerCase()}/edit/:tokenId/:id`} element={<CryptographicKeyForm />} />
+                    <Route path={`/${Resource.Keys.toLowerCase()}/edit/:id`} element={<CryptographicKeyForm />} />
 
                     <Route path={`/${Resource.Settings.toLowerCase()}`} element={<PlatformSettingsDetail />} />
                     <Route path={`/${Resource.Settings.toLowerCase()}/edit`} element={<PlatformSettingsEdit />} />

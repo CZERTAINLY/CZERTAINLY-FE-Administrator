@@ -25,7 +25,7 @@ export interface EditKeyRequestDto {
      * @type {string}
      * @memberof EditKeyRequestDto
      */
-    tokenProfileUuid: string;
+    tokenProfileUuid?: string;
     /**
      * Name of the Cryptographic Key
      * @type {string}

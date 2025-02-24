@@ -1,6 +1,6 @@
 import {
-    ActionDto,
-    ActionModel,
+    AuthActionDto,
+    AuthActionModel,
     AuthResourceDto,
     AuthResourceModel,
     RoleResponseDto,
@@ -17,11 +17,11 @@ import { transformAttributeRequestModelToDto, transformAttributeResponseDtoToMod
 export function transformResourceDtoToModel(resource: AuthResourceDto): AuthResourceModel {
     return {
         ...resource,
-        actions: resource.actions.map(transformActionDtoToModel),
+        actions: resource.actions.map(transformAuthActionDtoToModel),
     };
 }
 
-export function transformActionDtoToModel(action: ActionDto): ActionModel {
+export function transformAuthActionDtoToModel(action: AuthActionDto): AuthActionModel {
     return { ...action };
 }
 

@@ -40,6 +40,6 @@ export class ServerConfiguration<T extends { [key: string]: string }> {
     }
 }
 
-const server1 = new ServerConfiguration<{  }>("http://localhost:41357", {  }, "Generated server url");
+const server1 = new ServerConfiguration<{  }>("http://localhost:46591", {  }, "Generated server url");
 
 export const servers = [server1];

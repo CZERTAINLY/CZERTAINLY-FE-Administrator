@@ -90,7 +90,7 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
         dispatch(groupActions.listGroups());
         if (editMode) {
             dispatch(userActions.list());
-            dispatch(cryptographicKeysActions.getCryptographicKeyDetail({ tokenInstanceUuid: tokenId!, uuid: id! }));
+            dispatch(cryptographicKeysActions.getCryptographicKeyDetail({ uuid: id! }));
         }
     }, [dispatch, editMode, id, tokenId]);
 
@@ -149,13 +149,13 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                 dispatch(
                     cryptographicKeysActions.updateCryptographicKey({
                         profileUuid: id!,
-                        tokenInstanceUuid: values.tokenProfile!.value.tokenInstanceUuid,
-                        redirect: `../../../keys/detail/${values.tokenProfile!.value.tokenInstanceUuid}/${id}`,
+                        redirect: `../../keys/detail/${id}`,
                         cryptographicKeyEditRequest: {
                             description: values.description,
-                            tokenProfileUuid: values.tokenProfile!.value.uuid,
+                            tokenProfileUuid: values.tokenProfile ? values.tokenProfile.value.uuid : undefined,
                             ownerUuid: values.owner ? values.owner.value : undefined,
                             groupUuids: values?.selectedGroups?.length ? values?.selectedGroups?.map((group) => group.value) : [],
+                            customAttributes: collectFormAttributes('customCryptographicKey', resourceCustomAttributes, values),
                             name: values.name,
                         },
                     }),
@@ -430,7 +430,7 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                             )}
                         </Field>
 
-                        <Field name="tokenProfile" validate={validateRequired()}>
+                        <Field name="tokenProfile" validate={editMode ? undefined : validateRequired()}>
                             {({ input, meta }) => (
                                 <FormGroup>
                                     <Label for="tokenProfileSelect">Token Profile</Label>
@@ -454,6 +454,7 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                                                     ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
                                                     : { ...provided },
                                         }}
+                                        isDisabled={editMode}
                                     />
 
                                     <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>

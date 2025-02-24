@@ -42,6 +42,7 @@ export * from './AttributeValueTarget';
 export * from './AuditLogDto';
 export * from './AuditLogResponseDto';
 export * from './AuditLoggingSettingsDto';
+export * from './AuthActionDto';
 export * from './AuthMethod';
 export * from './AuthResourceDto';
 export * from './AuthType';

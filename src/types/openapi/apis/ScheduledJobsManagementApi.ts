@@ -57,89 +57,69 @@ export interface UpdateScheduledJobRequest {
  * no description
  */
 export class ScheduledJobsManagementApi extends BaseAPI {
+
     /**
      * Delete Scheduled job
      */
-    deleteScheduledJob({ uuid }: DeleteScheduledJobRequest): Observable<void>;
-    deleteScheduledJob({ uuid }: DeleteScheduledJobRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
+    deleteScheduledJob({ uuid }: DeleteScheduledJobRequest): Observable<void>
+    deleteScheduledJob({ uuid }: DeleteScheduledJobRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
     deleteScheduledJob({ uuid }: DeleteScheduledJobRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'deleteScheduledJob');
 
-        return this.request<void>(
-            {
-                url: '/v1/scheduler/jobs/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-                method: 'DELETE',
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<void>({
+            url: '/v1/scheduler/jobs/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+            method: 'DELETE',
+        }, opts?.responseOpts);
+    };
 
     /**
      * Disabling of Scheduled job
      */
-    disableScheduledJob({ uuid }: DisableScheduledJobRequest): Observable<void>;
-    disableScheduledJob({ uuid }: DisableScheduledJobRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
+    disableScheduledJob({ uuid }: DisableScheduledJobRequest): Observable<void>
+    disableScheduledJob({ uuid }: DisableScheduledJobRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
     disableScheduledJob({ uuid }: DisableScheduledJobRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'disableScheduledJob');
 
-        return this.request<void>(
-            {
-                url: '/v1/scheduler/jobs/{uuid}/disable'.replace('{uuid}', encodeURI(uuid)),
-                method: 'PATCH',
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<void>({
+            url: '/v1/scheduler/jobs/{uuid}/disable'.replace('{uuid}', encodeURI(uuid)),
+            method: 'PATCH',
+        }, opts?.responseOpts);
+    };
 
     /**
      * Enabling of Scheduled job
      */
-    enableScheduledJob({ uuid }: EnableScheduledJobRequest): Observable<void>;
-    enableScheduledJob({ uuid }: EnableScheduledJobRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>;
+    enableScheduledJob({ uuid }: EnableScheduledJobRequest): Observable<void>
+    enableScheduledJob({ uuid }: EnableScheduledJobRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
     enableScheduledJob({ uuid }: EnableScheduledJobRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'enableScheduledJob');
 
-        return this.request<void>(
-            {
-                url: '/v1/scheduler/jobs/{uuid}/enable'.replace('{uuid}', encodeURI(uuid)),
-                method: 'PATCH',
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<void>({
+            url: '/v1/scheduler/jobs/{uuid}/enable'.replace('{uuid}', encodeURI(uuid)),
+            method: 'PATCH',
+        }, opts?.responseOpts);
+    };
 
     /**
      * Scheduled job detail
      */
-    getScheduledJobDetail({ uuid }: GetScheduledJobDetailRequest): Observable<ScheduledJobDetailDto>;
-    getScheduledJobDetail({ uuid }: GetScheduledJobDetailRequest, opts?: OperationOpts): Observable<AjaxResponse<ScheduledJobDetailDto>>;
-    getScheduledJobDetail(
-        { uuid }: GetScheduledJobDetailRequest,
-        opts?: OperationOpts,
-    ): Observable<ScheduledJobDetailDto | AjaxResponse<ScheduledJobDetailDto>> {
+    getScheduledJobDetail({ uuid }: GetScheduledJobDetailRequest): Observable<ScheduledJobDetailDto>
+    getScheduledJobDetail({ uuid }: GetScheduledJobDetailRequest, opts?: OperationOpts): Observable<AjaxResponse<ScheduledJobDetailDto>>
+    getScheduledJobDetail({ uuid }: GetScheduledJobDetailRequest, opts?: OperationOpts): Observable<ScheduledJobDetailDto | AjaxResponse<ScheduledJobDetailDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'getScheduledJobDetail');
 
-        return this.request<ScheduledJobDetailDto>(
-            {
-                url: '/v1/scheduler/jobs/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-                method: 'GET',
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<ScheduledJobDetailDto>({
+            url: '/v1/scheduler/jobs/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+            method: 'GET',
+        }, opts?.responseOpts);
+    };
 
     /**
      * Scheduled job history
      */
-    getScheduledJobHistory({ pagination, uuid }: GetScheduledJobHistoryRequest): Observable<ScheduledJobHistoryResponseDto>;
-    getScheduledJobHistory(
-        { pagination, uuid }: GetScheduledJobHistoryRequest,
-        opts?: OperationOpts,
-    ): Observable<AjaxResponse<ScheduledJobHistoryResponseDto>>;
-    getScheduledJobHistory(
-        { pagination, uuid }: GetScheduledJobHistoryRequest,
-        opts?: OperationOpts,
-    ): Observable<ScheduledJobHistoryResponseDto | AjaxResponse<ScheduledJobHistoryResponseDto>> {
+    getScheduledJobHistory({ pagination, uuid }: GetScheduledJobHistoryRequest): Observable<ScheduledJobHistoryResponseDto>
+    getScheduledJobHistory({ pagination, uuid }: GetScheduledJobHistoryRequest, opts?: OperationOpts): Observable<AjaxResponse<ScheduledJobHistoryResponseDto>>
+    getScheduledJobHistory({ pagination, uuid }: GetScheduledJobHistoryRequest, opts?: OperationOpts): Observable<ScheduledJobHistoryResponseDto | AjaxResponse<ScheduledJobHistoryResponseDto>> {
         throwIfNullOrUndefined(pagination, 'pagination', 'getScheduledJobHistory');
         throwIfNullOrUndefined(uuid, 'uuid', 'getScheduledJobHistory');
 
@@ -148,25 +128,19 @@ export class ScheduledJobsManagementApi extends BaseAPI {
             Object.assign(query, pagination);
         }
 
-        return this.request<ScheduledJobHistoryResponseDto>(
-            {
-                url: '/v1/scheduler/jobs/{uuid}/history'.replace('{uuid}', encodeURI(uuid)),
-                method: 'GET',
-                query,
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<ScheduledJobHistoryResponseDto>({
+            url: '/v1/scheduler/jobs/{uuid}/history'.replace('{uuid}', encodeURI(uuid)),
+            method: 'GET',
+            query,
+        }, opts?.responseOpts);
+    };
 
     /**
      * List of scheduled jobs
      */
-    listScheduledJobs({ pagination }: ListScheduledJobsRequest): Observable<ScheduledJobsResponseDto>;
-    listScheduledJobs({ pagination }: ListScheduledJobsRequest, opts?: OperationOpts): Observable<AjaxResponse<ScheduledJobsResponseDto>>;
-    listScheduledJobs(
-        { pagination }: ListScheduledJobsRequest,
-        opts?: OperationOpts,
-    ): Observable<ScheduledJobsResponseDto | AjaxResponse<ScheduledJobsResponseDto>> {
+    listScheduledJobs({ pagination }: ListScheduledJobsRequest): Observable<ScheduledJobsResponseDto>
+    listScheduledJobs({ pagination }: ListScheduledJobsRequest, opts?: OperationOpts): Observable<AjaxResponse<ScheduledJobsResponseDto>>
+    listScheduledJobs({ pagination }: ListScheduledJobsRequest, opts?: OperationOpts): Observable<ScheduledJobsResponseDto | AjaxResponse<ScheduledJobsResponseDto>> {
         throwIfNullOrUndefined(pagination, 'pagination', 'listScheduledJobs');
 
         const query: HttpQuery = {};
@@ -174,28 +148,19 @@ export class ScheduledJobsManagementApi extends BaseAPI {
             Object.assign(query, pagination);
         }
 
-        return this.request<ScheduledJobsResponseDto>(
-            {
-                url: '/v1/scheduler/jobs',
-                method: 'GET',
-                query,
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<ScheduledJobsResponseDto>({
+            url: '/v1/scheduler/jobs',
+            method: 'GET',
+            query,
+        }, opts?.responseOpts);
+    };
 
     /**
      * Edit Scheduled job
      */
-    updateScheduledJob({ uuid, updateScheduledJob }: UpdateScheduledJobRequest): Observable<ScheduledJobDetailDto>;
-    updateScheduledJob(
-        { uuid, updateScheduledJob }: UpdateScheduledJobRequest,
-        opts?: OperationOpts,
-    ): Observable<AjaxResponse<ScheduledJobDetailDto>>;
-    updateScheduledJob(
-        { uuid, updateScheduledJob }: UpdateScheduledJobRequest,
-        opts?: OperationOpts,
-    ): Observable<ScheduledJobDetailDto | AjaxResponse<ScheduledJobDetailDto>> {
+    updateScheduledJob({ uuid, updateScheduledJob }: UpdateScheduledJobRequest): Observable<ScheduledJobDetailDto>
+    updateScheduledJob({ uuid, updateScheduledJob }: UpdateScheduledJobRequest, opts?: OperationOpts): Observable<AjaxResponse<ScheduledJobDetailDto>>
+    updateScheduledJob({ uuid, updateScheduledJob }: UpdateScheduledJobRequest, opts?: OperationOpts): Observable<ScheduledJobDetailDto | AjaxResponse<ScheduledJobDetailDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'updateScheduledJob');
         throwIfNullOrUndefined(updateScheduledJob, 'updateScheduledJob', 'updateScheduledJob');
 
@@ -203,14 +168,12 @@ export class ScheduledJobsManagementApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<ScheduledJobDetailDto>(
-            {
-                url: '/v1/scheduler/jobs/{uuid}'.replace('{uuid}', encodeURI(uuid)),
-                method: 'PUT',
-                headers,
-                body: updateScheduledJob,
-            },
-            opts?.responseOpts,
-        );
-    }
+        return this.request<ScheduledJobDetailDto>({
+            url: '/v1/scheduler/jobs/{uuid}'.replace('{uuid}', encodeURI(uuid)),
+            method: 'PUT',
+            headers,
+            body: updateScheduledJob,
+        }, opts?.responseOpts);
+    };
+
 }

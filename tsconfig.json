@@ -18,5 +18,5 @@
         "jsx": "react-jsx"
     },
     "include": ["src", "cypress", "cypress.d.ts"],
-    "files": ["src/types/global.d.ts", "./src/components/_pages/action-groups/form/ActionGroupFormValues.tsx"]
+    "files": ["src/types/global.d.ts"]
 }
