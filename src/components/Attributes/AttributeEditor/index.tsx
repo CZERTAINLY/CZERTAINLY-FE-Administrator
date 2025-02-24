@@ -299,7 +299,7 @@ export default function AttributeEditor({
             ),
         ];
         return rendered;
-    }, [nonRequiredCustomAttributeDescriptors, shownCustomAttributes, groupAttributesCallbackAttributes]);
+    }, [nonRequiredCustomAttributeDescriptors, shownCustomAttributes, groupAttributesCallbackAttributes, attributeDescriptors]);
 
     /**
      * Groups attributes for rendering according to the attribute descriptor group property
@@ -723,7 +723,7 @@ export default function AttributeEditor({
             );
         });
         return attrs;
-    }, [groupedAttributesDescriptors, isRunningCb, id, options]);
+    }, [groupedAttributesDescriptors, isRunningCb, id, options, notYetShownCustomAttributeDescriptors]);
 
     return <>{attrs}</>;
 }
