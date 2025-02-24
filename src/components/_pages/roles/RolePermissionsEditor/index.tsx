@@ -5,11 +5,11 @@ import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions as authActions, selectors as authSelectors } from 'ducks/auth';
-import { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Input } from 'reactstrap';
 import { AuthResourceModel } from 'types/auth';
-import { SubjectPermissionsModel } from 'types/roles';
+import { ObjectPermissionsResponseModel, ResourcePermissionsResponseModel, SubjectPermissionsModel } from 'types/roles';
 
 import style from './style.module.scss';
 
@@ -120,6 +120,39 @@ function RolePermissionsEditor({
         [clonePerms, onPermissionsChanged],
     );
 
+    const setOLPExistingResourcePermissions = useCallback(
+        (
+            resourcePermissions: ResourcePermissionsResponseModel,
+            objectUuid: string,
+            objectName: string,
+            action: string,
+            permissions: 'allow' | 'deny',
+        ) => {
+            const objectPermissions = resourcePermissions.objects?.find((o) => o.uuid === objectUuid);
+
+            if (objectPermissions) {
+                if (permissions === 'allow') {
+                    if (!objectPermissions.allow.includes(action)) objectPermissions.allow.push(action);
+                    if (objectPermissions.deny.includes(action))
+                        objectPermissions.deny = objectPermissions.deny.filter((a) => a !== action);
+                } else if (permissions === 'deny') {
+                    if (!objectPermissions.deny.includes(action)) objectPermissions.deny.push(action);
+                    if (objectPermissions.allow.includes(action))
+                        objectPermissions.allow = objectPermissions.allow.filter((a) => a !== action);
+                }
+            } else {
+                if (!resourcePermissions.objects) resourcePermissions.objects = [];
+
+                resourcePermissions.objects.push({
+                    uuid: objectUuid,
+                    name: objectName,
+                    allow: permissions === 'allow' ? [action] : [],
+                    deny: permissions === 'deny' ? [action] : [],
+                });
+            }
+        },
+        [],
+    );
     const setOLP = useCallback(
         (resourceUuid: string, objectUuid: string, objectName: string, action: string, permissions: 'allow' | 'deny') => {
             const resource = resources?.find((r) => r.uuid === resourceUuid);
@@ -130,28 +163,7 @@ function RolePermissionsEditor({
             const resourcePermissions = newPermissions.resources.find((r) => r.name === resource.name);
 
             if (resourcePermissions) {
-                const objectPermissions = resourcePermissions.objects?.find((o) => o.uuid === objectUuid);
-
-                if (objectPermissions) {
-                    if (permissions === 'allow') {
-                        if (!objectPermissions.allow.includes(action)) objectPermissions.allow.push(action);
-                        if (objectPermissions.deny.includes(action))
-                            objectPermissions.deny = objectPermissions.deny.filter((a) => a !== action);
-                    } else if (permissions === 'deny') {
-                        if (!objectPermissions.deny.includes(action)) objectPermissions.deny.push(action);
-                        if (objectPermissions.allow.includes(action))
-                            objectPermissions.allow = objectPermissions.allow.filter((a) => a !== action);
-                    }
-                } else {
-                    if (!resourcePermissions.objects) resourcePermissions.objects = [];
-
-                    resourcePermissions.objects.push({
-                        uuid: objectUuid,
-                        name: objectName,
-                        allow: permissions === 'allow' ? [action] : [],
-                        deny: permissions === 'deny' ? [action] : [],
-                    });
-                }
+                setOLPExistingResourcePermissions(resourcePermissions, objectUuid, objectName, action, permissions);
             } else {
                 newPermissions.resources.push({
                     name: resource.name,
@@ -170,17 +182,17 @@ function RolePermissionsEditor({
 
             onPermissionsChanged?.(newPermissions);
         },
-        [clonePerms, onPermissionsChanged, resources],
+        [clonePerms, onPermissionsChanged, resources, setOLPExistingResourcePermissions],
     );
 
     const resourceList = useMemo(
         () =>
             resources?.map((resource) => (
-                <div key={resource.uuid} data-selected={currentResource === resource} onClick={() => onResourceSelected(resource)}>
+                <button key={resource.uuid} data-selected={currentResource === resource} onClick={() => onResourceSelected(resource)}>
                     {resource.displayName}
                     <br />
                     <sup>{getPermissions(resource)}</sup>
-                </div>
+                </button>
             )),
         [currentResource, getPermissions, onResourceSelected, resources],
     );
@@ -252,6 +264,30 @@ function RolePermissionsEditor({
         [currentResource],
     );
 
+    const getObjectRowActions = useCallback(
+        (object: ObjectPermissionsResponseModel): JSX.Element[] =>
+            currentResource?.actions.map((action) => (
+                <label
+                    htmlFor={`${object.uuid}_${action.name}`}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                    }}
+                >
+                    <Input
+                        key={`${object.uuid}_${action.name}`}
+                        id={`${object.uuid}_${action.name}`}
+                        type="switch"
+                        checked={object.allow.includes(action.name)}
+                        disabled={disabled}
+                        onChange={(e) =>
+                            setOLP(currentResource.uuid, object.uuid, object.name, action.name, e.target.checked ? 'allow' : 'deny')
+                        }
+                    />
+                </label>
+            )) || [],
+        [currentResource?.actions, currentResource?.uuid, disabled, setOLP],
+    );
+
     const objectRows: TableDataRow[] = useMemo(
         () =>
             permissions.resources
@@ -259,37 +295,14 @@ function RolePermissionsEditor({
                 ?.objects?.map((object) => ({
                     id: object.uuid,
                     columns: [
-                        <span style={{ whiteSpace: 'nowrap' }}>{object.name}</span>,
-
-                        ...(currentResource?.actions.map((action) => (
-                            <label
-                                htmlFor={`${object.uuid}_${action.name}`}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                }}
-                            >
-                                <Input
-                                    key={`${object.uuid}_${action.name}`}
-                                    id={`${object.uuid}_${action.name}`}
-                                    type="switch"
-                                    checked={object.allow.includes(action.name)}
-                                    disabled={disabled}
-                                    onChange={(e) =>
-                                        setOLP(
-                                            currentResource.uuid,
-                                            object.uuid,
-                                            object.name,
-                                            action.name,
-                                            e.target.checked ? 'allow' : 'deny',
-                                        )
-                                    }
-                                />
-                            </label>
-                        )) || []),
+                        <span key="name" style={{ whiteSpace: 'nowrap' }}>
+                            {object.name}
+                        </span>,
+                        ...getObjectRowActions(object),
                     ],
                 })) || [],
 
-        [currentResource?.actions, currentResource?.name, currentResource?.uuid, disabled, permissions.resources, setOLP],
+        [currentResource?.name, permissions.resources, getObjectRowActions],
     );
 
     const onAddClick = useCallback(() => {
