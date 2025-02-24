@@ -26,7 +26,7 @@ import { AttributeContentType, AttributeValueTarget, FunctionGroupCode, Resource
 import { base64ToUtf8 } from 'utils/common-utils';
 import { getFormattedDateTime } from 'utils/dateUtil';
 import { Attribute } from './Attribute';
-import CustomAttributeAddSelect from 'components/Attributes/AttributeEditor/CustormAttributeAddSelect';
+import CustomAttributeAddSelect from 'components/Attributes/AttributeEditor/CustomAttributeAddSelect';
 
 // same empty array is used to prevent re-rendering of the component
 // !!! never modify the attributes field inside of the component !!!
