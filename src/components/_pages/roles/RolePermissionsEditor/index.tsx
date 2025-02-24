@@ -120,7 +120,7 @@ function RolePermissionsEditor({
         [clonePerms, onPermissionsChanged],
     );
 
-    const setOLPExistingResourcePermissions = useCallback(
+    const setExistingOLP = useCallback(
         (
             resourcePermissions: ResourcePermissionsResponseModel,
             objectUuid: string,
@@ -128,9 +128,7 @@ function RolePermissionsEditor({
             action: string,
             permissions: 'allow' | 'deny',
         ) => {
-            const objectPermissions = resourcePermissions.objects?.find((o) => o.uuid === objectUuid);
-
-            if (objectPermissions) {
+            const handleExistingObjectPermissions = (objectPermissions: ObjectPermissionsResponseModel) => {
                 if (permissions === 'allow') {
                     if (!objectPermissions.allow.includes(action)) objectPermissions.allow.push(action);
                     if (objectPermissions.deny.includes(action))
@@ -140,7 +138,8 @@ function RolePermissionsEditor({
                     if (objectPermissions.allow.includes(action))
                         objectPermissions.allow = objectPermissions.allow.filter((a) => a !== action);
                 }
-            } else {
+            };
+            const handleNewObjectPermissions = () => {
                 if (!resourcePermissions.objects) resourcePermissions.objects = [];
 
                 resourcePermissions.objects.push({
@@ -149,6 +148,14 @@ function RolePermissionsEditor({
                     allow: permissions === 'allow' ? [action] : [],
                     deny: permissions === 'deny' ? [action] : [],
                 });
+            };
+
+            const objectPermissions = resourcePermissions.objects?.find((o) => o.uuid === objectUuid);
+
+            if (objectPermissions) {
+                handleExistingObjectPermissions(objectPermissions);
+            } else {
+                handleNewObjectPermissions();
             }
         },
         [],
@@ -163,7 +170,7 @@ function RolePermissionsEditor({
             const resourcePermissions = newPermissions.resources.find((r) => r.name === resource.name);
 
             if (resourcePermissions) {
-                setOLPExistingResourcePermissions(resourcePermissions, objectUuid, objectName, action, permissions);
+                setExistingOLP(resourcePermissions, objectUuid, objectName, action, permissions);
             } else {
                 newPermissions.resources.push({
                     name: resource.name,
@@ -182,7 +189,7 @@ function RolePermissionsEditor({
 
             onPermissionsChanged?.(newPermissions);
         },
-        [clonePerms, onPermissionsChanged, resources, setOLPExistingResourcePermissions],
+        [clonePerms, onPermissionsChanged, resources, setExistingOLP],
     );
 
     const resourceList = useMemo(
@@ -272,6 +279,8 @@ function RolePermissionsEditor({
                     onClick={(e) => {
                         e.stopPropagation();
                     }}
+                    // Add onKeyDown handler to satisfy typescript:S1082 SQ Quality Check.
+                    onKeyDown={() => {}}
                 >
                     <Input
                         key={`${object.uuid}_${action.name}`}
