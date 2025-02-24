@@ -34,12 +34,6 @@ export interface ActionDetailDto {
      */
     name: string;
     /**
-     * Object Display Name
-     * @type {string}
-     * @memberof ActionDto
-     */
-    displayName: string;
-    /**
      * Description of the action
      * @type {string}
      * @memberof ActionDetailDto
