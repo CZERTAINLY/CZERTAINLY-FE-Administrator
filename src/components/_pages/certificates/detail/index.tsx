@@ -69,7 +69,7 @@ import CertificateRenewDialog from '../CertificateRenewDialog';
 import cx from 'classnames';
 import FlowChart, { CustomNode } from 'components/FlowChart';
 import SwitchWidget from 'components/SwitchWidget';
-import { transformCertifacetObjectToNodesAndEdges } from 'ducks/transform/certificates';
+import { transformCertificateObjectToNodesAndEdges } from 'ducks/transform/certificates';
 import { Edge } from 'reactflow';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { DeviceType, useCopyToClipboard, useDeviceType } from 'utils/common-hooks';
@@ -119,7 +119,7 @@ export default function CertificateDetail() {
     const [chainDownloadSwitch, setTriggerChainDownload] = useState<ChainDownloadSwitchState>({ isDownloadTriggered: false });
     const [certificateDownloadSwitch, setCertificateDownload] = useState<ChainDownloadSwitchState>({ isDownloadTriggered: false });
 
-    const [isFlowTabOpenend, setIsFlowTabOpenend] = useState<boolean>(false);
+    const [isFlowTabOpened, setIsFlowTabOpened] = useState<boolean>(false);
     const [raProfileOptions, setRaProfileOptions] = useState<{ label: string; value: string }[]>([]);
     const [userOptions, setUserOptions] = useState<{ label: string; value: string }[]>([]);
     const [certificateRevokeReasonOptions, setCertificateRevokeReasonOptions] = useState<{ label: string; value: string }[]>([]);
@@ -202,7 +202,7 @@ export default function CertificateDetail() {
     );
 
     const transformCertificate = useCallback(() => {
-        const { nodes, edges } = transformCertifacetObjectToNodesAndEdges(
+        const { nodes, edges } = transformCertificateObjectToNodesAndEdges(
             certificate,
             users,
             certLocations,
@@ -285,9 +285,9 @@ export default function CertificateDetail() {
     }, [dispatch, id]);
 
     useEffect(() => {
-        if (!id && isFlowTabOpenend) return;
+        if (!id && isFlowTabOpened) return;
         getCertificateChainDetails();
-    }, [isFlowTabOpenend, id, getCertificateChainDetails]);
+    }, [isFlowTabOpened, id, getCertificateChainDetails]);
 
     useEffect(() => {
         getFreshCertificateLocations();
@@ -1890,7 +1890,7 @@ export default function CertificateDetail() {
                     {
                         title: 'Flow',
                         onClick: () => {
-                            setIsFlowTabOpenend(true);
+                            setIsFlowTabOpened(true);
                             getCertificateChainDetails();
                         },
                         content: certificateNodes.length ? (

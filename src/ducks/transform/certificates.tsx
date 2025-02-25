@@ -180,7 +180,7 @@ export function transformCertificateComplianceCheckModelToDto(check: Certificate
     return { ...check };
 }
 
-export function transformCertifacetObjectToNodesAndEdges(
+export function transformCertificateObjectToNodesAndEdges(
     certificate?: CertificateDetailResponseModel,
     users?: UserResponseModel[],
     locations?: LocationResponseModel[],
@@ -348,10 +348,17 @@ export function transformCertifacetObjectToNodesAndEdges(
         });
     }
 
-    if (users?.length) {
-        const user = users.find((u) => u.username === certificate?.owner);
+    if (users?.length || (certificate.owner && certificate.ownerUuid)) {
+        const user = users?.find((u) => u.username === certificate?.owner);
+        const userOtherProperties: OtherProperties[] = [];
+        let entityLabel = '';
+        let description = undefined;
+        let redirectUrl = undefined;
         if (user) {
-            const userOtherProperties: OtherProperties[] = [
+            entityLabel = user.username;
+            description = user.description;
+            redirectUrl = `/users/detail/${user?.uuid}`;
+            userOtherProperties.push(
                 {
                     propertyName: 'Username',
                     propertyValue: user.username,
@@ -362,7 +369,7 @@ export function transformCertifacetObjectToNodesAndEdges(
                     propertyName: 'User Enabled',
                     propertyValue: user.enabled ? 'Yes' : 'No',
                 },
-            ];
+            );
 
             if (user?.email) {
                 userOtherProperties.push({
@@ -371,30 +378,32 @@ export function transformCertifacetObjectToNodesAndEdges(
                     copyable: true,
                 });
             }
-
-            nodes.push({
-                id: '2',
-                type: 'customFlowNode',
-                position: { x: 0, y: 0 },
-                // width: nodeWidth,
-                // height: nodeHeight,
-                data: {
-                    customNodeCardTitle: 'Owner',
-                    icon: 'fa fa fa-user',
-                    entityLabel: user?.username || '',
-                    description: user?.description || '',
-                    redirectUrl: user?.uuid ? `/users/detail/${user?.uuid}` : undefined,
-                    otherProperties: userOtherProperties,
-                },
-            });
-            edges.push({
-                id: 'e1-2',
-                source: '1',
-                target: '2',
-                type: 'floating',
-                markerEnd: { type: MarkerType.Arrow },
-            });
+        } else if (certificate.owner && certificate.ownerUuid) {
+            entityLabel = certificate.owner;
+            redirectUrl = `/users/detail/${certificate.ownerUuid}`;
         }
+        nodes.push({
+            id: '2',
+            type: 'customFlowNode',
+            position: { x: 0, y: 0 },
+            // width: nodeWidth,
+            // height: nodeHeight,
+            data: {
+                customNodeCardTitle: 'Owner',
+                icon: 'fa fa fa-user',
+                entityLabel,
+                description,
+                redirectUrl,
+                otherProperties: userOtherProperties,
+            },
+        });
+        edges.push({
+            id: 'e1-2',
+            source: '1',
+            target: '2',
+            type: 'floating',
+            markerEnd: { type: MarkerType.Arrow },
+        });
     }
 
     if (certificate?.key) {
@@ -426,10 +435,7 @@ export function transformCertifacetObjectToNodesAndEdges(
                 entityLabel: certificate?.key?.name || '',
                 icon: 'fa fa fa-key',
                 description: certificate?.key?.description || '',
-                redirectUrl:
-                    certificate?.key?.uuid && certificate?.key?.tokenInstanceUuid
-                        ? `/keys/detail/${certificate.key.tokenInstanceUuid}/${certificate.key.uuid}`
-                        : undefined,
+                redirectUrl: certificate?.key?.uuid ? `/keys/detail/${certificate.key.uuid}` : undefined,
                 otherProperties: keyOtherProperties,
             },
         });
@@ -443,9 +449,10 @@ export function transformCertifacetObjectToNodesAndEdges(
     }
 
     if (certificate?.groups?.length) {
-        certificate?.groups.forEach((group) => {
+        certificate?.groups.forEach((group, i) => {
+            const nodeId = `3-group-${i}`;
             nodes.push({
-                id: '3',
+                id: nodeId,
                 type: 'customFlowNode',
                 position: { x: 0, y: 0 },
                 // width: nodeWidth,
@@ -459,8 +466,8 @@ export function transformCertifacetObjectToNodesAndEdges(
                 },
             });
             edges.push({
-                id: 'e1-3',
-                source: '3',
+                id: `e1-${nodeId}`,
+                source: nodeId,
                 target: '1',
                 type: 'floating',
                 markerEnd: { type: MarkerType.Arrow },
