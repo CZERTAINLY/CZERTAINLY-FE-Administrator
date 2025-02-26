@@ -106,6 +106,7 @@ export const customAttributeEditorMockData: AttributeEditorProps = {
             contentType: AttributeContentType.Codeblock,
             properties: {
                 label: 'Test property codeblock',
+                required: true,
                 group: 'test-group',
             },
             content: [

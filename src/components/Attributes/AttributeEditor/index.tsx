@@ -14,6 +14,7 @@ import {
     CustomAttributeModel,
     DataAttributeModel,
     FileAttributeContentModel,
+    GroupAttributeModel,
     InfoAttributeModel,
     isAttributeDescriptorModel,
     isCustomAttributeModel,
@@ -26,6 +27,7 @@ import { AttributeContentType, AttributeValueTarget, FunctionGroupCode, Resource
 import { base64ToUtf8 } from 'utils/common-utils';
 import { getFormattedDateTime } from 'utils/dateUtil';
 import { Attribute } from './Attribute';
+import CustomAttributeAddSelect from 'components/Attributes/AttributeEditor/CustomAttributeAddSelect';
 
 // same empty array is used to prevent re-rendering of the component
 // !!! never modify the attributes field inside of the component !!!
@@ -83,6 +85,10 @@ export default function AttributeEditor({
 
     // stores previous callback data in order to be possible to detect what data changed
     const [previousCallbackData, setPreviousCallbackData] = useState<{ [callbackId: string]: any }>({});
+
+    // used to store custom attributes which user has selected
+    const [prevShownCustomAttributes, setPrevShownCustomAttributes] = useState<AttributeDescriptorModel[]>([]);
+    const [shownCustomAttributes, setShownCustomAttributes] = useState<AttributeDescriptorModel[]>([]);
 
     // workaround to be possible to set options from multiple places;
     // multiple effects can modify opts during single render call
@@ -258,20 +264,67 @@ export default function AttributeEditor({
         [callbackParentUuid, callbackResource, connectorUuid, dispatch, functionGroupCode, kind],
     );
 
+    /*
+     * Get non-required custom attributes, without a value assigned
+     */
+    const initiallyHiddenCustomAttributeDescriptors = useMemo(
+        () =>
+            attributeDescriptors.filter((descriptor) => {
+                if (isCustomAttributeModel(descriptor)) {
+                    const attribute = attributes.find((el) => el.name === descriptor.name);
+                    return !descriptor.properties.required && !attribute?.content;
+                }
+                return false;
+            }),
+        [attributeDescriptors, attributes],
+    );
+
+    /*
+     * Get non-required custom attributes which weren't shown by user
+     */
+    const notYetShownCustomAttributeDescriptors = useMemo(
+        () =>
+            initiallyHiddenCustomAttributeDescriptors.filter(
+                (descriptor) => !shownCustomAttributes.find((el) => el.uuid === descriptor.uuid),
+            ),
+        [initiallyHiddenCustomAttributeDescriptors, shownCustomAttributes],
+    );
+
+    /*
+     * Filter and order custom attributes which should be rendered
+     */
+    const orderedAttributeDescriptors = useMemo(() => {
+        const initiallyShownDescriptors = [...attributeDescriptors, ...groupAttributesCallbackAttributes].filter(
+            (descriptor) => !initiallyHiddenCustomAttributeDescriptors.find((el) => el.uuid === descriptor.uuid),
+        );
+        const ordered = [
+            ...initiallyShownDescriptors,
+            ...initiallyHiddenCustomAttributeDescriptors
+                .filter((descriptor) => shownCustomAttributes.find((el) => el.uuid === descriptor.uuid))
+                .sort(
+                    (a, b) =>
+                        shownCustomAttributes.findIndex((el) => el.uuid === a.uuid) -
+                        shownCustomAttributes.findIndex((el) => el.uuid === b.uuid),
+                ),
+        ];
+        return ordered;
+    }, [initiallyHiddenCustomAttributeDescriptors, shownCustomAttributes, groupAttributesCallbackAttributes, attributeDescriptors]);
+
     /**
      * Groups attributes for rendering according to the attribute descriptor group property
      */
     const groupedAttributesDescriptors: { [key: string]: (DataAttributeModel | InfoAttributeModel | CustomAttributeModel)[] } =
         useMemo(() => {
             const grouped: { [key: string]: (DataAttributeModel | InfoAttributeModel | CustomAttributeModel)[] } = {};
-            [...attributeDescriptors, ...groupAttributesCallbackAttributes].forEach((descriptor) => {
+
+            orderedAttributeDescriptors.forEach((descriptor) => {
                 if (isDataAttributeModel(descriptor) || isInfoAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
                     const groupName = descriptor.properties.group || '__';
                     grouped[groupName] ? grouped[groupName].push(descriptor) : (grouped[groupName] = [descriptor]);
                 }
             });
             return grouped;
-        }, [attributeDescriptors, groupAttributesCallbackAttributes]);
+        }, [orderedAttributeDescriptors]);
 
     /**
      * Clean form attributes, callback data and previous form state whenever passed attribute descriptors or attributes changed
@@ -283,6 +336,138 @@ export default function AttributeEditor({
         dispatch(connectorActions.clearCallbackData());
     }, [attributeDescriptors, attributes, dispatch, form.mutators, id]);
 
+    const setAttributeFormValue = useCallback(
+        (
+            descriptor: DataAttributeModel | CustomAttributeModel,
+            attribute: AttributeResponseModel | undefined,
+            formAttributeName: string,
+            setDefaultOnRequiredValuesOnly: boolean,
+        ) => {
+            let formAttributeValue = undefined;
+
+            function handleFileAttributeContentType() {
+                if (attribute?.content) {
+                    form.mutators.setAttribute(
+                        `${formAttributeName}.content`,
+                        (attribute.content as FileAttributeContentModel[])[0].reference,
+                    );
+                    form.mutators.setAttribute(
+                        `${formAttributeName}.fileName`,
+                        (attribute.content as FileAttributeContentModel[])[0].data.fileName || 'unknown',
+                    );
+                    form.mutators.setAttribute(
+                        `${formAttributeName}.mimeType`,
+                        (attribute.content as FileAttributeContentModel[])[0].data.mimeType || 'unknown',
+                    );
+                } else if (descriptor.content) {
+                    form.mutators.setAttribute(
+                        `${formAttributeName}.content`,
+                        (descriptor.content as FileAttributeContentModel[])[0].reference,
+                    );
+                    form.mutators.setAttribute(
+                        `${formAttributeName}.fileName`,
+                        (descriptor.content as FileAttributeContentModel[])[0].data.fileName || 'unknown',
+                    );
+                    form.mutators.setAttribute(
+                        `${formAttributeName}.mimeType`,
+                        (descriptor.content as FileAttributeContentModel[])[0].data.mimeType || 'unknown',
+                    );
+                }
+            }
+
+            if (descriptor.contentType === AttributeContentType.File) {
+                handleFileAttributeContentType();
+                return;
+            }
+
+            function getMultiSelectListAttributeValue() {
+                if (Array.isArray(attribute?.content)) {
+                    formAttributeValue = attribute!.content.map((content) => ({
+                        label: content.reference
+                            ? content.reference
+                            : descriptor.contentType === AttributeContentType.Datetime
+                              ? getFormattedDateTime(content.data.toString())
+                              : content.data.toString(),
+                        value: content,
+                    }));
+                } else {
+                    formAttributeValue = undefined;
+                }
+            }
+            function getSelectListAttributeValue() {
+                if (attribute?.content) {
+                    formAttributeValue = {
+                        label: attribute.content[0].reference
+                            ? attribute.content[0].reference
+                            : descriptor.contentType === AttributeContentType.Datetime
+                              ? getFormattedDateTime(attribute.content[0].data.toString())
+                              : attribute.content[0].data.toString(),
+                        value: attribute.content[0],
+                    };
+                } else {
+                    formAttributeValue = undefined;
+                }
+            }
+
+            if (descriptor.properties.list && descriptor.properties.multiSelect) {
+                getMultiSelectListAttributeValue();
+            } else if (descriptor.properties.list) {
+                getSelectListAttributeValue();
+            } else if (attribute?.content) {
+                formAttributeValue = attribute.content[0].reference ?? attribute.content[0].data;
+            } else if (
+                descriptor.content &&
+                descriptor.content.length > 0 &&
+                (!setDefaultOnRequiredValuesOnly || descriptor.properties.required)
+            ) {
+                formAttributeValue = descriptor.content[0].reference ?? descriptor.content[0].data;
+            }
+
+            if (
+                descriptor.contentType === AttributeContentType.Codeblock &&
+                formAttributeValue !== undefined &&
+                (formAttributeValue as CodeBlockAttributeContentDataModel).code !== undefined
+            ) {
+                formAttributeValue = {
+                    code: base64ToUtf8((formAttributeValue as CodeBlockAttributeContentDataModel).code),
+                    language: (formAttributeValue as CodeBlockAttributeContentDataModel).language,
+                };
+            }
+
+            form.mutators.setAttribute(formAttributeName, formAttributeValue);
+        },
+        [form.mutators],
+    );
+    const getAttributeStaticOptions = useCallback(
+        (descriptor: DataAttributeModel | CustomAttributeModel | GroupAttributeModel, formAttributeName: string) => {
+            let newOptions = {};
+            if (
+                (isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) &&
+                descriptor.properties.list &&
+                Array.isArray(descriptor.content)
+            ) {
+                newOptions = {
+                    ...newOptions,
+                    [formAttributeName]: descriptor.content.map((data) => ({
+                        label: data.reference ?? data.data.toString(),
+                        value: data,
+                    })),
+                };
+            }
+
+            if (isDataAttributeModel(descriptor) || isGroupAttributeModel(descriptor)) {
+                // Perform initial callbacks based on "static" mappings
+                if (descriptor.attributeCallback) {
+                    let mappings = buildCallbackMappings(descriptor);
+                    if (mappings) {
+                        executeCallback(mappings, descriptor, formAttributeName);
+                    }
+                }
+            }
+            return newOptions;
+        },
+        [buildCallbackMappings, executeCallback],
+    );
     /**
      * Called on first render
      * Setups final form values and initial values (based on descriptors and attributes passed)
@@ -316,109 +501,14 @@ export default function AttributeEditor({
                 const attribute = attributes.find((a) => a.name === descriptor.name);
 
                 // Build "static" options from the descriptor
-                if (
-                    (isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) &&
-                    descriptor.properties.list &&
-                    Array.isArray(descriptor.content)
-                ) {
-                    newOptions = {
-                        ...newOptions,
-                        [formAttributeName]: descriptor.content.map((data) => ({
-                            label: data.reference ?? data.data.toString(),
-                            value: data,
-                        })),
-                    };
-                }
-
-                if (isDataAttributeModel(descriptor) || isGroupAttributeModel(descriptor)) {
-                    // Perform initial callbacks based on "static" mappings
-                    if (descriptor.attributeCallback) {
-                        let mappings = buildCallbackMappings(descriptor);
-                        if (mappings) {
-                            executeCallback(mappings, descriptor, formAttributeName);
-                        }
-                    }
-                }
+                newOptions = {
+                    ...newOptions,
+                    ...getAttributeStaticOptions(descriptor, formAttributeName),
+                };
 
                 // Set initial values from the attribute
                 if (isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
-                    if (descriptor.contentType === AttributeContentType.File) {
-                        if (attribute?.content) {
-                            form.mutators.setAttribute(
-                                `${formAttributeName}.content`,
-                                (attribute.content as FileAttributeContentModel[])[0].reference,
-                            );
-                            form.mutators.setAttribute(
-                                `${formAttributeName}.fileName`,
-                                (attribute.content as FileAttributeContentModel[])[0].data.fileName || 'unknown',
-                            );
-                            form.mutators.setAttribute(
-                                `${formAttributeName}.mimeType`,
-                                (attribute.content as FileAttributeContentModel[])[0].data.mimeType || 'unknown',
-                            );
-                        } else if (descriptor.content) {
-                            form.mutators.setAttribute(
-                                `${formAttributeName}.content`,
-                                (descriptor.content as FileAttributeContentModel[])[0].reference,
-                            );
-                            form.mutators.setAttribute(
-                                `${formAttributeName}.fileName`,
-                                (descriptor.content as FileAttributeContentModel[])[0].data.fileName || 'unknown',
-                            );
-                            form.mutators.setAttribute(
-                                `${formAttributeName}.mimeType`,
-                                (descriptor.content as FileAttributeContentModel[])[0].data.mimeType || 'unknown',
-                            );
-                        }
-                        return;
-                    }
-
-                    let formAttributeValue = undefined;
-
-                    if (descriptor.properties.list && descriptor.properties.multiSelect) {
-                        if (Array.isArray(attribute?.content)) {
-                            formAttributeValue = attribute!.content.map((content) => ({
-                                label: content.reference
-                                    ? content.reference
-                                    : descriptor.contentType === AttributeContentType.Datetime
-                                      ? getFormattedDateTime(content.data.toString())
-                                      : content.data.toString(),
-                                value: content,
-                            }));
-                        } else {
-                            formAttributeValue = undefined;
-                        }
-                    } else if (descriptor.properties.list) {
-                        if (attribute?.content) {
-                            formAttributeValue = {
-                                label: attribute.content[0].reference
-                                    ? attribute.content[0].reference
-                                    : descriptor.contentType === AttributeContentType.Datetime
-                                      ? getFormattedDateTime(attribute.content[0].data.toString())
-                                      : attribute.content[0].data.toString(),
-                                value: attribute.content[0],
-                            };
-                        } else {
-                            formAttributeValue = undefined;
-                        }
-                    } else if (attribute?.content) {
-                        formAttributeValue = attribute.content[0].reference ?? attribute.content[0].data;
-                    } else if (descriptor.content && descriptor.content.length > 0) {
-                        formAttributeValue = descriptor.content[0].reference ?? descriptor.content[0].data;
-                    }
-
-                    if (
-                        descriptor.contentType === AttributeContentType.Codeblock &&
-                        formAttributeValue !== undefined &&
-                        (formAttributeValue as CodeBlockAttributeContentDataModel).code !== undefined
-                    ) {
-                        formAttributeValue = {
-                            code: base64ToUtf8((formAttributeValue as CodeBlockAttributeContentDataModel).code),
-                            language: (formAttributeValue as CodeBlockAttributeContentDataModel).language,
-                        };
-                    }
-
-                    form.mutators.setAttribute(formAttributeName, formAttributeValue);
+                    setAttributeFormValue(descriptor, attribute, formAttributeName, true);
                 }
             }
         });
@@ -435,15 +525,39 @@ export default function AttributeEditor({
         attributeDescriptors,
         groupAttributesCallbackAttributes,
         attributes,
-        form.mutators,
         options,
         dispatch,
         prevDescriptors,
         prevAttributes,
         prevGroupDescriptors,
         buildCallbackMappings,
+        setAttributeFormValue,
+        getAttributeStaticOptions,
     ]);
 
+    /**
+     * Setups default values of shown custom attributes attributes
+     */
+    useEffect(() => {
+        // run this effect only when the list of shown attributes changes
+        if (prevShownCustomAttributes === shownCustomAttributes) return;
+
+        setPrevShownCustomAttributes(shownCustomAttributes);
+
+        shownCustomAttributes.forEach((descriptor) => {
+            if (isCustomAttributeModel(descriptor)) {
+                const formAttributeName = `__attributes__${id}__.${descriptor.name}`;
+                const attribute = attributes.find((a) => a.name === descriptor.name);
+
+                // Only set the value for attributes whose value was not yet modified
+                if (!getObjectPropertyValue(formState.values, formAttributeName)) {
+                    setAttributeFormValue(descriptor, attribute, formAttributeName, false);
+                }
+            }
+        });
+
+        setPreviousFormValues(formState.values);
+    }, [id, formState.values, attributes, prevShownCustomAttributes, shownCustomAttributes, setAttributeFormValue, getObjectPropertyValue]);
     /**
      * Called on every form change
      * Evaluates changed attributes and eventually performs a callback whenever necessary
@@ -529,7 +643,7 @@ export default function AttributeEditor({
 
     useEffect(() => {
         if (!initiateAttributeCallback) return;
-        let newOptions: { [attributeName: string]: { label: string; value: any }[] } = {};
+
         const descriptorsToLoad = [...attributeDescriptors, ...groupAttributesCallbackAttributes];
         setPrevGroupDescriptors(groupAttributesCallbackAttributes);
         setPrevDescriptors(attributeDescriptors);
@@ -538,28 +652,7 @@ export default function AttributeEditor({
             if (isDataAttributeModel(descriptor) || isGroupAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
                 const formAttributeName = `__attributes__${id}__.${descriptor.name}`;
 
-                if (
-                    (isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) &&
-                    descriptor.properties.list &&
-                    Array.isArray(descriptor.content)
-                ) {
-                    newOptions = {
-                        ...newOptions,
-                        [formAttributeName]: descriptor.content.map((data) => ({
-                            label: data.reference ?? data.data.toString(),
-                            value: data,
-                        })),
-                    };
-                }
-
-                if (isDataAttributeModel(descriptor) || isGroupAttributeModel(descriptor)) {
-                    if (descriptor.attributeCallback) {
-                        let mappings = buildCallbackMappings(descriptor);
-                        if (mappings) {
-                            executeCallback(mappings, descriptor, formAttributeName);
-                        }
-                    }
-                }
+                getAttributeStaticOptions(descriptor, formAttributeName);
             }
         });
         // This effect should only be called if the initiateAttributeCallback value is updated
@@ -640,11 +733,28 @@ export default function AttributeEditor({
 
     /*
       Attribute Form Rendering
-   */
+    */
 
     const attrs = useMemo(() => {
         const attrs: JSX.Element[] = [];
-        for (const group in groupedAttributesDescriptors)
+
+        const attributeSelector = (
+            <CustomAttributeAddSelect
+                onAdd={(attribute) => {
+                    setShownCustomAttributes((state) => [...state, attribute]);
+                }}
+                attributeDescriptors={notYetShownCustomAttributeDescriptors}
+            />
+        );
+
+        const groupedAttributesDescriptorsKeys = Object.keys(groupedAttributesDescriptors);
+
+        // Show the attribute selector even when there no attributes are displayed, but some non required attributes exist
+        if (groupedAttributesDescriptorsKeys.length === 0 && notYetShownCustomAttributeDescriptors.length > 0) {
+            return <Widget busy={isRunningCb}>{attributeSelector}</Widget>;
+        }
+
+        groupedAttributesDescriptorsKeys.forEach((group, i, arr) => {
             attrs.push(
                 <Widget key={group} title={group === '__' ? '' : group} busy={isRunningCb}>
                     {groupedAttributesDescriptors[group].map((descriptor) => (
@@ -657,11 +767,12 @@ export default function AttributeEditor({
                             />
                         </div>
                     ))}
+                    {i === arr.length - 1 && notYetShownCustomAttributeDescriptors.length > 0 && attributeSelector}
                 </Widget>,
             );
-
+        });
         return attrs;
-    }, [groupedAttributesDescriptors, isRunningCb, id, options]);
+    }, [groupedAttributesDescriptors, isRunningCb, id, options, notYetShownCustomAttributeDescriptors]);
 
     return <>{attrs}</>;
 }

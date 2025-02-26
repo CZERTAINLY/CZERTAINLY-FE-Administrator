@@ -771,6 +771,8 @@ describe('Tabbed AttributeEditor component', () => {
             )
             .wait(callbackWait);
 
+        cy.get('.nav-link').eq(1).should('contain.text', 'Custom Attributes').click().wait(clickWait);
+
         // cy.get('#react-select-37-live-region').should('exist').click().wait(clickWait);
         cy.get('#react-select-37-live-region').should('exist').siblings('div').eq(0).click().wait(clickWait);
         cy.get('#react-select-37-option-0').should('exist').click().wait(clickWait);
@@ -892,8 +894,8 @@ describe('Global Modal AttributeEditor component', () => {
         `, () => {
         cy.get('input[name="__attributes__entity__.host"]').should('exist').type('test');
         // cy.get('#react-select-40-input').should('exist').click().wait(clickWait);
-        cy.get('#react-select-40-live-region').should('exist').siblings('div').eq(0).click().wait(clickWait);
-        cy.get('#react-select-40-option-0').should('exist').click().wait(clickWait);
+        cy.get('#react-select-41-live-region').should('exist').siblings('div').eq(0).click().wait(clickWait);
+        cy.get('#react-select-41-option-0').should('exist').click().wait(clickWait);
         cy.window()
             .its('store')
             .invoke(
@@ -905,7 +907,7 @@ describe('Global Modal AttributeEditor component', () => {
             )
             .wait(callbackWait);
         // cy.get('#react-select-41-input').should('exist').click().wait(clickWait);
-        cy.get('#react-select-41-live-region').should('exist').siblings('div').eq(0).click().wait(clickWait);
+        cy.get('#react-select-42-live-region').should('exist').siblings('div').eq(0).click().wait(clickWait);
         cy.get('.fa-add').should('exist').click().wait(clickWait);
 
         cy.wait(reduxActionWait)
@@ -933,12 +935,12 @@ describe('Global Modal AttributeEditor component', () => {
 
         cy.get('input[name="name"]').should('exist').type('test-credential');
         // cy.get('#react-select-42-input').should('exist').click().wait(clickWait);
-        cy.get('#react-select-42-live-region').should('exist').siblings('div').eq(0).click().wait(clickWait);
-        cy.get('#react-select-42-option-0').should('exist').click().wait(clickWait);
+        cy.get('#react-select-43-live-region').should('exist').siblings('div').eq(0).click().wait(clickWait);
+        cy.get('#react-select-43-option-0').should('exist').click().wait(clickWait);
 
         // cy.get('#react-select-43-input').should('exist').click().wait(clickWait);
-        cy.get('#react-select-43-live-region').should('exist').siblings('div').eq(0).click().wait(clickWait);
-        cy.get('#react-select-43-option-1').should('exist').click().wait(clickWait);
+        cy.get('#react-select-44-live-region').should('exist').siblings('div').eq(0).click().wait(clickWait);
+        cy.get('#react-select-44-option-1').should('exist').click().wait(clickWait);
 
         cy.wait(reduxActionWait)
             .window()
