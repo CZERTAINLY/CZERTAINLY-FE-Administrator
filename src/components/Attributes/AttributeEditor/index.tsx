@@ -86,7 +86,8 @@ export default function AttributeEditor({
     const [previousCallbackData, setPreviousCallbackData] = useState<{ [callbackId: string]: any }>({});
 
     // used to store custom attributes which user has selected
-    const [shownCustomAttributes, setShownCustomAttributes] = useState<{ [uuid: string]: string }[]>([]);
+    const [prevShownCustomAttributes, setPrevShownCustomAttributes] = useState<AttributeDescriptorModel[]>([]);
+    const [shownCustomAttributes, setShownCustomAttributes] = useState<AttributeDescriptorModel[]>([]);
 
     // workaround to be possible to set options from multiple places;
     // multiple effects can modify opts during single render call
@@ -263,17 +264,18 @@ export default function AttributeEditor({
     );
 
     /*
-     * Get non-required custom attributes
+     * Get non-required custom attributes, without a value assigned
      */
-    const nonRequiredCustomAttributeDescriptors = useMemo(
+    const initiallyHiddenCustomAttributeDescriptors = useMemo(
         () =>
             attributeDescriptors.filter((descriptor) => {
                 if (isCustomAttributeModel(descriptor)) {
-                    return !descriptor.properties.required;
+                    const attribute = attributes.find((el) => el.name === descriptor.name);
+                    return !descriptor.properties.required && !attribute?.content;
                 }
                 return false;
             }),
-        [attributeDescriptors],
+        [attributeDescriptors, attributes],
     );
 
     /*
@@ -281,25 +283,31 @@ export default function AttributeEditor({
      */
     const notYetShownCustomAttributeDescriptors = useMemo(
         () =>
-            nonRequiredCustomAttributeDescriptors.filter((descriptor) => !shownCustomAttributes.find((el) => el.uuid === descriptor.uuid)),
-        [nonRequiredCustomAttributeDescriptors, shownCustomAttributes],
+            initiallyHiddenCustomAttributeDescriptors.filter(
+                (descriptor) => !shownCustomAttributes.find((el) => el.uuid === descriptor.uuid),
+            ),
+        [initiallyHiddenCustomAttributeDescriptors, shownCustomAttributes],
     );
 
     /*
-     * Filter and rearrange custom attributes which should be rendered
+     * Filter and order custom attributes which should be rendered
      */
-    const renderedAttributeDescriptors = useMemo(() => {
+    const orderedAttributeDescriptors = useMemo(() => {
         const initiallyShownDescriptors = [...attributeDescriptors, ...groupAttributesCallbackAttributes].filter(
-            (descriptor) => !nonRequiredCustomAttributeDescriptors.find((el) => el.uuid === descriptor.uuid),
+            (descriptor) => !initiallyHiddenCustomAttributeDescriptors.find((el) => el.uuid === descriptor.uuid),
         );
-        const rendered = [
+        const ordered = [
             ...initiallyShownDescriptors,
-            ...nonRequiredCustomAttributeDescriptors.filter((descriptor) =>
-                shownCustomAttributes.find((el) => el.uuid === descriptor.uuid),
-            ),
+            ...initiallyHiddenCustomAttributeDescriptors
+                .filter((descriptor) => shownCustomAttributes.find((el) => el.uuid === descriptor.uuid))
+                .sort(
+                    (a, b) =>
+                        shownCustomAttributes.findIndex((el) => el.uuid === a.uuid) -
+                        shownCustomAttributes.findIndex((el) => el.uuid === b.uuid),
+                ),
         ];
-        return rendered;
-    }, [nonRequiredCustomAttributeDescriptors, shownCustomAttributes, groupAttributesCallbackAttributes, attributeDescriptors]);
+        return ordered;
+    }, [initiallyHiddenCustomAttributeDescriptors, shownCustomAttributes, groupAttributesCallbackAttributes, attributeDescriptors]);
 
     /**
      * Groups attributes for rendering according to the attribute descriptor group property
@@ -308,14 +316,14 @@ export default function AttributeEditor({
         useMemo(() => {
             const grouped: { [key: string]: (DataAttributeModel | InfoAttributeModel | CustomAttributeModel)[] } = {};
 
-            renderedAttributeDescriptors.forEach((descriptor) => {
+            orderedAttributeDescriptors.forEach((descriptor) => {
                 if (isDataAttributeModel(descriptor) || isInfoAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
                     const groupName = descriptor.properties.group || '__';
                     grouped[groupName] ? grouped[groupName].push(descriptor) : (grouped[groupName] = [descriptor]);
                 }
             });
             return grouped;
-        }, [renderedAttributeDescriptors]);
+        }, [orderedAttributeDescriptors]);
 
     /**
      * Clean form attributes, callback data and previous form state whenever passed attribute descriptors or attributes changed
@@ -327,6 +335,97 @@ export default function AttributeEditor({
         dispatch(connectorActions.clearCallbackData());
     }, [attributeDescriptors, attributes, dispatch, form.mutators, id]);
 
+    const setAttributeFormValue = useCallback(
+        (
+            descriptor: DataAttributeModel | CustomAttributeModel,
+            attribute: AttributeResponseModel | undefined,
+            formAttributeName: string,
+            setDefaultOnRequiredValuesOnly: boolean,
+        ) => {
+            if (descriptor.contentType === AttributeContentType.File) {
+                if (attribute?.content) {
+                    form.mutators.setAttribute(
+                        `${formAttributeName}.content`,
+                        (attribute.content as FileAttributeContentModel[])[0].reference,
+                    );
+                    form.mutators.setAttribute(
+                        `${formAttributeName}.fileName`,
+                        (attribute.content as FileAttributeContentModel[])[0].data.fileName || 'unknown',
+                    );
+                    form.mutators.setAttribute(
+                        `${formAttributeName}.mimeType`,
+                        (attribute.content as FileAttributeContentModel[])[0].data.mimeType || 'unknown',
+                    );
+                } else if (descriptor.content) {
+                    form.mutators.setAttribute(
+                        `${formAttributeName}.content`,
+                        (descriptor.content as FileAttributeContentModel[])[0].reference,
+                    );
+                    form.mutators.setAttribute(
+                        `${formAttributeName}.fileName`,
+                        (descriptor.content as FileAttributeContentModel[])[0].data.fileName || 'unknown',
+                    );
+                    form.mutators.setAttribute(
+                        `${formAttributeName}.mimeType`,
+                        (descriptor.content as FileAttributeContentModel[])[0].data.mimeType || 'unknown',
+                    );
+                }
+                return;
+            }
+
+            let formAttributeValue = undefined;
+
+            if (descriptor.properties.list && descriptor.properties.multiSelect) {
+                if (Array.isArray(attribute?.content)) {
+                    formAttributeValue = attribute!.content.map((content) => ({
+                        label: content.reference
+                            ? content.reference
+                            : descriptor.contentType === AttributeContentType.Datetime
+                              ? getFormattedDateTime(content.data.toString())
+                              : content.data.toString(),
+                        value: content,
+                    }));
+                } else {
+                    formAttributeValue = undefined;
+                }
+            } else if (descriptor.properties.list) {
+                if (attribute?.content) {
+                    formAttributeValue = {
+                        label: attribute.content[0].reference
+                            ? attribute.content[0].reference
+                            : descriptor.contentType === AttributeContentType.Datetime
+                              ? getFormattedDateTime(attribute.content[0].data.toString())
+                              : attribute.content[0].data.toString(),
+                        value: attribute.content[0],
+                    };
+                } else {
+                    formAttributeValue = undefined;
+                }
+            } else if (attribute?.content) {
+                formAttributeValue = attribute.content[0].reference ?? attribute.content[0].data;
+            } else if (
+                descriptor.content &&
+                descriptor.content.length > 0 &&
+                (!setDefaultOnRequiredValuesOnly || descriptor.properties.required)
+            ) {
+                formAttributeValue = descriptor.content[0].reference ?? descriptor.content[0].data;
+            }
+
+            if (
+                descriptor.contentType === AttributeContentType.Codeblock &&
+                formAttributeValue !== undefined &&
+                (formAttributeValue as CodeBlockAttributeContentDataModel).code !== undefined
+            ) {
+                formAttributeValue = {
+                    code: base64ToUtf8((formAttributeValue as CodeBlockAttributeContentDataModel).code),
+                    language: (formAttributeValue as CodeBlockAttributeContentDataModel).language,
+                };
+            }
+
+            form.mutators.setAttribute(formAttributeName, formAttributeValue);
+        },
+        [form.mutators],
+    );
     /**
      * Called on first render
      * Setups final form values and initial values (based on descriptors and attributes passed)
@@ -386,83 +485,7 @@ export default function AttributeEditor({
 
                 // Set initial values from the attribute
                 if (isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
-                    if (descriptor.contentType === AttributeContentType.File) {
-                        if (attribute?.content) {
-                            form.mutators.setAttribute(
-                                `${formAttributeName}.content`,
-                                (attribute.content as FileAttributeContentModel[])[0].reference,
-                            );
-                            form.mutators.setAttribute(
-                                `${formAttributeName}.fileName`,
-                                (attribute.content as FileAttributeContentModel[])[0].data.fileName || 'unknown',
-                            );
-                            form.mutators.setAttribute(
-                                `${formAttributeName}.mimeType`,
-                                (attribute.content as FileAttributeContentModel[])[0].data.mimeType || 'unknown',
-                            );
-                        } else if (descriptor.content) {
-                            form.mutators.setAttribute(
-                                `${formAttributeName}.content`,
-                                (descriptor.content as FileAttributeContentModel[])[0].reference,
-                            );
-                            form.mutators.setAttribute(
-                                `${formAttributeName}.fileName`,
-                                (descriptor.content as FileAttributeContentModel[])[0].data.fileName || 'unknown',
-                            );
-                            form.mutators.setAttribute(
-                                `${formAttributeName}.mimeType`,
-                                (descriptor.content as FileAttributeContentModel[])[0].data.mimeType || 'unknown',
-                            );
-                        }
-                        return;
-                    }
-
-                    let formAttributeValue = undefined;
-
-                    if (descriptor.properties.list && descriptor.properties.multiSelect) {
-                        if (Array.isArray(attribute?.content)) {
-                            formAttributeValue = attribute!.content.map((content) => ({
-                                label: content.reference
-                                    ? content.reference
-                                    : descriptor.contentType === AttributeContentType.Datetime
-                                      ? getFormattedDateTime(content.data.toString())
-                                      : content.data.toString(),
-                                value: content,
-                            }));
-                        } else {
-                            formAttributeValue = undefined;
-                        }
-                    } else if (descriptor.properties.list) {
-                        if (attribute?.content) {
-                            formAttributeValue = {
-                                label: attribute.content[0].reference
-                                    ? attribute.content[0].reference
-                                    : descriptor.contentType === AttributeContentType.Datetime
-                                      ? getFormattedDateTime(attribute.content[0].data.toString())
-                                      : attribute.content[0].data.toString(),
-                                value: attribute.content[0],
-                            };
-                        } else {
-                            formAttributeValue = undefined;
-                        }
-                    } else if (attribute?.content) {
-                        formAttributeValue = attribute.content[0].reference ?? attribute.content[0].data;
-                    } else if (descriptor.content && descriptor.content.length > 0) {
-                        formAttributeValue = descriptor.content[0].reference ?? descriptor.content[0].data;
-                    }
-
-                    if (
-                        descriptor.contentType === AttributeContentType.Codeblock &&
-                        formAttributeValue !== undefined &&
-                        (formAttributeValue as CodeBlockAttributeContentDataModel).code !== undefined
-                    ) {
-                        formAttributeValue = {
-                            code: base64ToUtf8((formAttributeValue as CodeBlockAttributeContentDataModel).code),
-                            language: (formAttributeValue as CodeBlockAttributeContentDataModel).language,
-                        };
-                    }
-
-                    form.mutators.setAttribute(formAttributeName, formAttributeValue);
+                    setAttributeFormValue(descriptor, attribute, formAttributeName, true);
                 }
             }
         });
@@ -479,15 +502,38 @@ export default function AttributeEditor({
         attributeDescriptors,
         groupAttributesCallbackAttributes,
         attributes,
-        form.mutators,
         options,
         dispatch,
         prevDescriptors,
         prevAttributes,
         prevGroupDescriptors,
         buildCallbackMappings,
+        setAttributeFormValue,
     ]);
 
+    /**
+     * Setups default values of shown custom attributes attributes
+     */
+    useEffect(() => {
+        // run this effect only when the list of shown attributes changes
+        if (prevShownCustomAttributes === shownCustomAttributes) return;
+
+        setPrevShownCustomAttributes(shownCustomAttributes);
+
+        shownCustomAttributes.forEach((descriptor) => {
+            if (isCustomAttributeModel(descriptor)) {
+                const formAttributeName = `__attributes__${id}__.${descriptor.name}`;
+                const attribute = attributes.find((a) => a.name === descriptor.name);
+
+                // Only set the value for attributes whose value was not yet modified
+                if (!getObjectPropertyValue(formState.values, formAttributeName)) {
+                    setAttributeFormValue(descriptor, attribute, formAttributeName, false);
+                }
+            }
+        });
+
+        setPreviousFormValues(formState.values);
+    }, [id, formState.values, attributes, prevShownCustomAttributes, shownCustomAttributes, setAttributeFormValue]);
     /**
      * Called on every form change
      * Evaluates changed attributes and eventually performs a callback whenever necessary
@@ -684,7 +730,7 @@ export default function AttributeEditor({
 
     /*
       Attribute Form Rendering
-   */
+    */
 
     const attrs = useMemo(() => {
         const attrs: JSX.Element[] = [];
@@ -692,7 +738,7 @@ export default function AttributeEditor({
         const attributeSelector = (
             <CustomAttributeAddSelect
                 onAdd={(attribute) => {
-                    setShownCustomAttributes((state) => [...state, { uuid: attribute.uuid }]);
+                    setShownCustomAttributes((state) => [...state, attribute]);
                 }}
                 attributeDescriptors={notYetShownCustomAttributeDescriptors}
             />
