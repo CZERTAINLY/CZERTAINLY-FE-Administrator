@@ -343,7 +343,9 @@ export default function AttributeEditor({
             formAttributeName: string,
             setDefaultOnRequiredValuesOnly: boolean,
         ) => {
-            if (descriptor.contentType === AttributeContentType.File) {
+            let formAttributeValue = undefined;
+
+            function handleFileAttributeContentType() {
                 if (attribute?.content) {
                     form.mutators.setAttribute(
                         `${formAttributeName}.content`,
@@ -371,12 +373,14 @@ export default function AttributeEditor({
                         (descriptor.content as FileAttributeContentModel[])[0].data.mimeType || 'unknown',
                     );
                 }
+            }
+
+            if (descriptor.contentType === AttributeContentType.File) {
+                handleFileAttributeContentType();
                 return;
             }
 
-            let formAttributeValue = undefined;
-
-            if (descriptor.properties.list && descriptor.properties.multiSelect) {
+            function getMultiSelectListAttributeValue() {
                 if (Array.isArray(attribute?.content)) {
                     formAttributeValue = attribute!.content.map((content) => ({
                         label: content.reference
@@ -389,7 +393,8 @@ export default function AttributeEditor({
                 } else {
                     formAttributeValue = undefined;
                 }
-            } else if (descriptor.properties.list) {
+            }
+            function getSelectListAttributeValue() {
                 if (attribute?.content) {
                     formAttributeValue = {
                         label: attribute.content[0].reference
@@ -402,6 +407,12 @@ export default function AttributeEditor({
                 } else {
                     formAttributeValue = undefined;
                 }
+            }
+
+            if (descriptor.properties.list && descriptor.properties.multiSelect) {
+                getMultiSelectListAttributeValue();
+            } else if (descriptor.properties.list) {
+                getSelectListAttributeValue();
             } else if (attribute?.content) {
                 formAttributeValue = attribute.content[0].reference ?? attribute.content[0].data;
             } else if (
