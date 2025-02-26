@@ -14,6 +14,7 @@ import {
     CustomAttributeModel,
     DataAttributeModel,
     FileAttributeContentModel,
+    GroupAttributeModel,
     InfoAttributeModel,
     isAttributeDescriptorModel,
     isCustomAttributeModel,
@@ -426,6 +427,36 @@ export default function AttributeEditor({
         },
         [form.mutators],
     );
+    const getAttributeStaticOptions = useCallback(
+        (descriptor: DataAttributeModel | CustomAttributeModel | GroupAttributeModel, formAttributeName: string) => {
+            let newOptions = {};
+            if (
+                (isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) &&
+                descriptor.properties.list &&
+                Array.isArray(descriptor.content)
+            ) {
+                newOptions = {
+                    ...newOptions,
+                    [formAttributeName]: descriptor.content.map((data) => ({
+                        label: data.reference ?? data.data.toString(),
+                        value: data,
+                    })),
+                };
+            }
+
+            if (isDataAttributeModel(descriptor) || isGroupAttributeModel(descriptor)) {
+                // Perform initial callbacks based on "static" mappings
+                if (descriptor.attributeCallback) {
+                    let mappings = buildCallbackMappings(descriptor);
+                    if (mappings) {
+                        executeCallback(mappings, descriptor, formAttributeName);
+                    }
+                }
+            }
+            return newOptions;
+        },
+        [buildCallbackMappings, executeCallback],
+    );
     /**
      * Called on first render
      * Setups final form values and initial values (based on descriptors and attributes passed)
@@ -459,29 +490,10 @@ export default function AttributeEditor({
                 const attribute = attributes.find((a) => a.name === descriptor.name);
 
                 // Build "static" options from the descriptor
-                if (
-                    (isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) &&
-                    descriptor.properties.list &&
-                    Array.isArray(descriptor.content)
-                ) {
-                    newOptions = {
-                        ...newOptions,
-                        [formAttributeName]: descriptor.content.map((data) => ({
-                            label: data.reference ?? data.data.toString(),
-                            value: data,
-                        })),
-                    };
-                }
-
-                if (isDataAttributeModel(descriptor) || isGroupAttributeModel(descriptor)) {
-                    // Perform initial callbacks based on "static" mappings
-                    if (descriptor.attributeCallback) {
-                        let mappings = buildCallbackMappings(descriptor);
-                        if (mappings) {
-                            executeCallback(mappings, descriptor, formAttributeName);
-                        }
-                    }
-                }
+                newOptions = {
+                    ...newOptions,
+                    ...getAttributeStaticOptions(descriptor, formAttributeName),
+                };
 
                 // Set initial values from the attribute
                 if (isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
@@ -509,6 +521,7 @@ export default function AttributeEditor({
         prevGroupDescriptors,
         buildCallbackMappings,
         setAttributeFormValue,
+        getAttributeStaticOptions,
     ]);
 
     /**
@@ -533,7 +546,7 @@ export default function AttributeEditor({
         });
 
         setPreviousFormValues(formState.values);
-    }, [id, formState.values, attributes, prevShownCustomAttributes, shownCustomAttributes, setAttributeFormValue]);
+    }, [id, formState.values, attributes, prevShownCustomAttributes, shownCustomAttributes, setAttributeFormValue, getObjectPropertyValue]);
     /**
      * Called on every form change
      * Evaluates changed attributes and eventually performs a callback whenever necessary
@@ -619,7 +632,7 @@ export default function AttributeEditor({
 
     useEffect(() => {
         if (!initiateAttributeCallback) return;
-        let newOptions: { [attributeName: string]: { label: string; value: any }[] } = {};
+
         const descriptorsToLoad = [...attributeDescriptors, ...groupAttributesCallbackAttributes];
         setPrevGroupDescriptors(groupAttributesCallbackAttributes);
         setPrevDescriptors(attributeDescriptors);
@@ -628,28 +641,7 @@ export default function AttributeEditor({
             if (isDataAttributeModel(descriptor) || isGroupAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
                 const formAttributeName = `__attributes__${id}__.${descriptor.name}`;
 
-                if (
-                    (isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) &&
-                    descriptor.properties.list &&
-                    Array.isArray(descriptor.content)
-                ) {
-                    newOptions = {
-                        ...newOptions,
-                        [formAttributeName]: descriptor.content.map((data) => ({
-                            label: data.reference ?? data.data.toString(),
-                            value: data,
-                        })),
-                    };
-                }
-
-                if (isDataAttributeModel(descriptor) || isGroupAttributeModel(descriptor)) {
-                    if (descriptor.attributeCallback) {
-                        let mappings = buildCallbackMappings(descriptor);
-                        if (mappings) {
-                            executeCallback(mappings, descriptor, formAttributeName);
-                        }
-                    }
-                }
+                getAttributeStaticOptions(descriptor, formAttributeName);
             }
         });
         // This effect should only be called if the initiateAttributeCallback value is updated
