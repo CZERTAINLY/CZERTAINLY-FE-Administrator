@@ -180,20 +180,11 @@ export function transformCertificateComplianceCheckModelToDto(check: Certificate
     return { ...check };
 }
 
-export function transformCertificateObjectToNodesAndEdges(
-    certificate?: CertificateDetailResponseModel,
-    users?: UserResponseModel[],
-    locations?: LocationResponseModel[],
-    raProfileSelected?: RaProfileResponseModel,
-    certificateChain?: CertificateChainResponseModel,
+function addCertificateNode(
+    certificate: CertificateDetailResponseDto,
+    nodes: CustomNode[],
+    certificateChain: CertificateChainResponseModel | undefined,
 ) {
-    const nodes: CustomNode[] = [];
-    const edges: Edge[] = [];
-
-    if (!certificate) {
-        return { nodes, edges };
-    }
-
     const otherPropertiesCurrentCertificate: OtherProperties[] = [
         {
             propertyName: 'State',
@@ -263,91 +254,13 @@ export function transformCertificateObjectToNodesAndEdges(
             otherProperties: otherPropertiesCurrentCertificate,
         },
     });
-
-    if (certificateChain && certificateChain?.certificates?.length) {
-        certificateChain.certificates.forEach((chain, index) => {
-            const chainLength = certificateChain?.certificates?.length || 0;
-
-            const otherProperties: OtherProperties[] = [
-                {
-                    propertyName: 'State',
-                    propertyContent: <CertificateStatus status={chain.state} />,
-                },
-                {
-                    propertyName: 'Validation Status',
-                    propertyContent: <CertificateStatus status={chain.validationStatus} />,
-                },
-                {
-                    propertyName: 'Subject DN',
-                    propertyValue: chain.subjectDn,
-                    copyable: true,
-                },
-            ];
-
-            if (chain?.serialNumber) {
-                otherProperties.push({
-                    propertyName: 'Serial Number',
-                    propertyValue: chain?.serialNumber,
-                    copyable: true,
-                });
-            }
-
-            if (chain?.fingerprint) {
-                otherProperties.push({
-                    propertyName: 'Fingerprint',
-                    propertyValue: chain.fingerprint,
-                    copyable: true,
-                });
-            }
-
-            if (chainLength - 1 === index && !certificateChain?.completeChain) {
-                if (chain?.issuerDn) {
-                    otherProperties.push({
-                        propertyName: 'Issuer DN',
-                        propertyValue: chain.issuerDn,
-                        copyable: true,
-                    });
-                }
-                if (chain?.issuerSerialNumber) {
-                    otherProperties.push({
-                        propertyName: 'Issuer Sr. No.',
-                        propertyValue: chain.issuerSerialNumber,
-                        copyable: true,
-                    });
-                }
-            }
-
-            nodes.push({
-                id: `chain-${index}`,
-                type: 'customFlowNode',
-                position: { x: 0, y: 0 },
-                // width: nodeWidth,
-                // height: nodeHeight,
-                data: {
-                    customNodeCardTitle: chainLength - 1 === index && certificateChain?.completeChain ? `Root CA` : `Intermediate CA`,
-                    redirectUrl: chain?.uuid ? `/certificates/detail/${chain.uuid}` : undefined,
-                    entityLabel: chain.commonName,
-                    icon: chainLength - 1 === index && certificateChain?.completeChain ? 'fa fa-medal' : 'fa fa-certificate',
-                    // isMainNode: true,
-                    certificateNodeData: {
-                        certificateNodeStatus: chain.state,
-                        certificateNodeValidationStatus: chain.validationStatus,
-                    },
-                    otherProperties: otherProperties,
-                },
-            });
-            edges.push({
-                id: `e1-chain-${index}`,
-                // source: "1",
-                source: index === 0 ? '1' : `chain-${index - 1}`,
-                // target: `chain-${index}`,
-                target: `chain-${index}`,
-                type: 'floating',
-                markerEnd: { type: MarkerType.Arrow },
-            });
-        });
-    }
-
+}
+function addOwnerNodeAndEdges(
+    certificate: CertificateDetailResponseModel,
+    nodes: CustomNode[],
+    edges: Edge[],
+    users: UserResponseModel[] | undefined,
+) {
     if (users?.length || (certificate.owner && certificate.ownerUuid)) {
         const user = users?.find((u) => u.username === certificate?.owner);
         const userOtherProperties: OtherProperties[] = [];
@@ -405,7 +318,8 @@ export function transformCertificateObjectToNodesAndEdges(
             markerEnd: { type: MarkerType.Arrow },
         });
     }
-
+}
+function addKeyNodeAndEdges(certificate: CertificateDetailResponseModel, nodes: CustomNode[], edges: Edge[]) {
     if (certificate?.key) {
         const keyOtherProperties: OtherProperties[] = [];
 
@@ -447,7 +361,8 @@ export function transformCertificateObjectToNodesAndEdges(
             markerEnd: { type: MarkerType.Arrow },
         });
     }
-
+}
+function addGroupsNodesAndEdges(certificate: CertificateDetailResponseModel, nodes: CustomNode[], edges: Edge[]) {
     if (certificate?.groups?.length) {
         certificate?.groups.forEach((group, i) => {
             const nodeId = `3-group-${i}`;
@@ -474,7 +389,13 @@ export function transformCertificateObjectToNodesAndEdges(
             });
         });
     }
-
+}
+function addRaProfileNodeAndEdges(
+    certificate: CertificateDetailResponseModel,
+    nodes: CustomNode[],
+    edges: Edge[],
+    raProfileSelected: RaProfileResponseModel | undefined,
+) {
     if (certificate?.raProfile) {
         const raProfileOtherProperties: OtherProperties[] = [];
 
@@ -546,6 +467,13 @@ export function transformCertificateObjectToNodesAndEdges(
             });
         }
     }
+}
+function addLocationsNodesAndEdges(
+    certificate: CertificateDetailResponseModel,
+    nodes: CustomNode[],
+    edges: Edge[],
+    locations: LocationResponseModel[] | undefined,
+) {
     if (locations?.length) {
         locations.forEach((location) => {
             const otherPropertiesLocation: OtherProperties[] = [
@@ -583,6 +511,28 @@ export function transformCertificateObjectToNodesAndEdges(
             });
         });
     }
+}
+
+export function transformCertificateObjectToNodesAndEdges(
+    certificate?: CertificateDetailResponseModel,
+    users?: UserResponseModel[],
+    locations?: LocationResponseModel[],
+    raProfileSelected?: RaProfileResponseModel,
+    certificateChain?: CertificateChainResponseModel,
+) {
+    const nodes: CustomNode[] = [];
+    const edges: Edge[] = [];
+
+    if (!certificate) {
+        return { nodes, edges };
+    }
+
+    addCertificateNode(certificate, nodes, certificateChain);
+    addOwnerNodeAndEdges(certificate, nodes, edges, users);
+    addKeyNodeAndEdges(certificate, nodes, edges);
+    addGroupsNodesAndEdges(certificate, nodes, edges);
+    addRaProfileNodeAndEdges(certificate, nodes, edges, raProfileSelected);
+    addLocationsNodesAndEdges(certificate, nodes, edges, locations);
 
     return { nodes, edges };
 }
