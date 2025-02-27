@@ -14,6 +14,7 @@ import profileApprovalEpics from './approval-profiles-epics';
 import approvalsEpic from './approvals-epic';
 
 import authEpics from './auth-epics';
+import authSettingsEpics from './auth-settings-epics';
 import authoritiesEpics from './authorities-epics';
 import groupsEpics from './certificateGroups-epics';
 import certificatesEpics from './certificates-epics';
@@ -58,6 +59,7 @@ export type AppEpic = Epic<AnyAction, AnyAction, AppState, EpicDependencies>;
 export const epics = combineEpics(
     ...startupEpics,
     ...authEpics,
+    ...authSettingsEpics,
     ...appRedirectEpics,
     ...dashboardEpics,
     ...groupsEpics,
