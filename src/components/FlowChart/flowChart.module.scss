@@ -16,7 +16,7 @@
     }
 }
 
-.floatingedges {
+.floatingEdges {
     flex-direction: column;
     display: flex;
     flex-grow: 1;
@@ -33,6 +33,6 @@
     }
 }
 
-.floatingedges .react-flow__handle {
+.floatingEdges .react-flow__handle {
     opacity: 0;
 }

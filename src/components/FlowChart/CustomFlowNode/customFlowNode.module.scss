@@ -55,6 +55,16 @@
     font-weight: bold;
     color: $gray-600 !important;
     font-size: medium;
+    min-width: 0;
+    flex-shrink: 1;
+    width: calc(100% - 0.5rem);
+    display: flex;
+}
+
+.entityLabel > * {
+    min-width: 0;
+    flex-shrink: 1;
+    word-wrap: break-word;
 }
 
 .listContainer {
