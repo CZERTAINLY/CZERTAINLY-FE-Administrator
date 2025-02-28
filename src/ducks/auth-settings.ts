@@ -16,6 +16,7 @@ export type State = {
     isUpdatingSettings: boolean;
     isUpdatingProvider: boolean;
     isRemovingProvider: boolean;
+    isCreatingProvider: boolean;
 };
 
 export const initialState: State = {
@@ -24,6 +25,7 @@ export const initialState: State = {
     isUpdatingSettings: false,
     isUpdatingProvider: false,
     isRemovingProvider: false,
+    isCreatingProvider: false,
 };
 
 export const slice = createSlice({
@@ -52,7 +54,19 @@ export const slice = createSlice({
             state.isUpdatingSettings = true;
         },
 
-        updateAuthenticationSettingsSuccess: (state, action: PayloadAction<void>) => {
+        updateAuthenticationSettingsSuccess: (
+            state,
+            action: PayloadAction<{ authenticationSettingsUpdateModel: AuthenticationSettingsUpdateModel }>,
+        ) => {
+            if (!state.authenticationSettings) return;
+            const authenticationSettings: AuthenticationSettingsModel = { ...state.authenticationSettings };
+            for (const provider of action.payload.authenticationSettingsUpdateModel?.oauth2Providers || []) {
+                if (!authenticationSettings.oauth2Providers) {
+                    authenticationSettings.oauth2Providers = {};
+                }
+                authenticationSettings.oauth2Providers[provider.name] = provider;
+            }
+            state.authenticationSettings = authenticationSettings;
             state.isUpdatingSettings = false;
         },
 
@@ -73,6 +87,42 @@ export const slice = createSlice({
             state.isFetchingProvider = false;
         },
 
+        updateOAuth2Provider: (
+            state,
+            action: PayloadAction<{
+                providerName: string;
+                oauth2ProviderSettingsUpdateModel: OAuth2ProviderSettingsUpdateModel;
+            }>,
+        ) => {
+            state.isUpdatingProvider = true;
+        },
+
+        updateOAuth2ProviderSuccess: (state, action: PayloadAction<void>) => {
+            state.isUpdatingProvider = false;
+        },
+
+        updateOAuth2ProviderFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isUpdatingProvider = false;
+        },
+
+        createOAuth2Provider: (
+            state,
+            action: PayloadAction<{
+                providerName: string;
+                oauth2ProviderSettingsUpdateModel: OAuth2ProviderSettingsUpdateModel;
+            }>,
+        ) => {
+            state.isCreatingProvider = true;
+        },
+
+        createOAuth2ProviderSuccess: (state, action: PayloadAction<void>) => {
+            state.isCreatingProvider = false;
+        },
+
+        createOAuth2ProviderFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isCreatingProvider = false;
+        },
+
         removeOAuth2Provider: (state, action: PayloadAction<{ providerName: string }>) => {
             state.isRemovingProvider = true;
         },
@@ -84,21 +134,6 @@ export const slice = createSlice({
         removeOAuth2ProviderFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isRemovingProvider = false;
         },
-
-        updateOAuth2ProviderSettings: (
-            state,
-            action: PayloadAction<{ providerName: string; oAuth2ProviderSettingsUpdateModel: OAuth2ProviderSettingsUpdateModel }>,
-        ) => {
-            state.isUpdatingProvider = true;
-        },
-
-        updateOAuth2ProviderSettingsSuccess: (state, action: PayloadAction<void>) => {
-            state.isUpdatingProvider = false;
-        },
-
-        updateOAuth2ProviderSettingsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isUpdatingProvider = false;
-        },
     },
 });
 
@@ -108,10 +143,11 @@ const authenticationSettings = createSelector(state, (state) => state.authentica
 const oauth2Provider = createSelector(state, (state) => state.oauth2Provider);
 
 const isFetchingSettings = createSelector(state, (state) => state.isFetchingSettings);
-const isFetchingProviders = createSelector(state, (state) => state.isFetchingProvider);
+const isFetchingProvider = createSelector(state, (state) => state.isFetchingProvider);
 const isUpdatingSettings = createSelector(state, (state) => state.isUpdatingSettings);
 const isUpdatingProvider = createSelector(state, (state) => state.isUpdatingProvider);
 const isRemovingProvider = createSelector(state, (state) => state.isRemovingProvider);
+const isCreatingProvider = createSelector(state, (state) => state.isCreatingProvider);
 
 export const selectors = {
     state,
@@ -119,10 +155,11 @@ export const selectors = {
     oauth2Provider,
 
     isFetchingSettings,
-    isFetchingProviders,
+    isFetchingProvider,
     isUpdatingSettings,
     isUpdatingProvider,
     isRemovingProvider,
+    isCreatingProvider,
 };
 
 export const actions = slice.actions;

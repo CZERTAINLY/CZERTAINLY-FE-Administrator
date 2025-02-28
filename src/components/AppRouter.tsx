@@ -137,6 +137,8 @@ import Layout from './Layout';
 import Spinner from './Spinner';
 
 import { Resource } from 'types/openapi';
+import OAuth2ProviderForm from 'components/_pages/auth-settings/form';
+import OAuth2ProviderDetail from 'components/_pages/auth-settings/detail';
 
 export default function AppRouter() {
     const profile = useSelector(selectors.profile);
@@ -311,7 +313,10 @@ export default function AppRouter() {
                     <Route path={`/globalmetadata/add`} element={<GlobalMetadataEdit />} />
                     <Route path={`/globalmetadata/edit/:id`} element={<GlobalMetadataEdit />} />
 
-                    <Route path={`/authentication`} element={<AuthenticationSettings />} />
+                    <Route path={`/authenticationsettings`} element={<AuthenticationSettings />} />
+                    <Route path={`/authenticationsettings/detail/:providerName`} element={<OAuth2ProviderDetail />} />
+                    <Route path={`/authenticationsettings/edit/:providerName`} element={<OAuth2ProviderForm />} />
+                    <Route path={`/authenticationsettings/add`} element={<OAuth2ProviderForm />} />
 
                     <Route path={`/${Resource.Tokens.toLowerCase()}`} element={<TokenList />} />
                     <Route

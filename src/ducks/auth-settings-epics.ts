@@ -3,6 +3,7 @@ import { of } from 'rxjs';
 import { catchError, filter, mergeMap } from 'rxjs/operators';
 import { extractError } from 'utils/net';
 import { slice } from './auth-settings';
+import { actions as alertActions } from './alerts';
 
 import {
     transformAuthenticationSettingsDtoToModel,
@@ -45,7 +46,12 @@ const updateAuthenticationSettings: AppEpic = (action$, state$, deps) => {
                     ),
                 })
                 .pipe(
-                    mergeMap(() => of(slice.actions.updateAuthenticationSettingsSuccess())),
+                    mergeMap(() =>
+                        of(
+                            slice.actions.updateAuthenticationSettingsSuccess(action.payload),
+                            alertActions.success('Authentication settings updated successfully.'),
+                        ),
+                    ),
                     catchError((err) =>
                         of(
                             slice.actions.updateAuthenticationSettingsFailure({
@@ -83,25 +89,62 @@ const getOAuth2ProviderSettings: AppEpic = (action$, state$, deps) => {
         ),
     );
 };
-const updateOAuth2ProviderSettings: AppEpic = (action$, state$, deps) => {
+const updateOAuth2Provider: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
-        filter(slice.actions.updateOAuth2ProviderSettings.match),
+        filter(slice.actions.updateOAuth2Provider.match),
         mergeMap((action) =>
             deps.apiClients.settings
                 .updateOAuth2ProviderSettings({
                     providerName: action.payload.providerName,
                     oAuth2ProviderSettingsUpdateDto: transformOAuth2ProviderSettingsUpdateModelToDto(
-                        action.payload.oAuth2ProviderSettingsUpdateModel,
+                        action.payload.oauth2ProviderSettingsUpdateModel,
                     ),
                 })
                 .pipe(
-                    mergeMap((provider) => of(slice.actions.updateOAuth2ProviderSettingsSuccess())),
+                    mergeMap(() =>
+                        of(
+                            slice.actions.updateOAuth2ProviderSuccess(),
+                            alertActions.success('OAuth2 Provider settings has been updated successfully'),
+                            appRedirectActions.redirect({ url: `../authenticationsettings/detail/${action.payload.providerName}` }),
+                        ),
+                    ),
                     catchError((err) =>
                         of(
-                            slice.actions.updateOAuth2ProviderSettingsFailure({
-                                error: extractError(err, 'Failed to get OAuth2 provider settings'),
+                            slice.actions.updateOAuth2ProviderFailure({
+                                error: extractError(err, 'Failed to update OAuth2 provider settings'),
                             }),
-                            appRedirectActions.fetchError({ error: err, message: 'Failed to get OAuth2 provider settings' }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to update OAuth2 provider settings' }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+const createOAuth2Provider: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.createOAuth2Provider.match),
+        mergeMap((action) =>
+            deps.apiClients.settings
+                .updateOAuth2ProviderSettings({
+                    providerName: action.payload.providerName,
+                    oAuth2ProviderSettingsUpdateDto: transformOAuth2ProviderSettingsUpdateModelToDto(
+                        action.payload.oauth2ProviderSettingsUpdateModel,
+                    ),
+                })
+                .pipe(
+                    mergeMap(() =>
+                        of(
+                            slice.actions.createOAuth2ProviderSuccess(),
+                            alertActions.success('OAuth2 Provider has been created'),
+                            appRedirectActions.redirect({ url: `../authenticationsettings/detail/${action.payload.providerName}` }),
+                        ),
+                    ),
+                    catchError((err) =>
+                        of(
+                            slice.actions.createOAuth2ProviderFailure({
+                                error: extractError(err, 'Failed to create OAuth2 provider'),
+                            }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to create OAuth2 provider' }),
                         ),
                     ),
                 ),
@@ -113,7 +156,13 @@ const removeOAuth2Provider: AppEpic = (action$, state$, deps) => {
         filter(slice.actions.removeOAuth2Provider.match),
         mergeMap((action) =>
             deps.apiClients.settings.removeOAuth2Provider({ providerName: action.payload.providerName }).pipe(
-                mergeMap(() => of(slice.actions.removeOAuth2ProviderSuccess())),
+                mergeMap(() =>
+                    of(
+                        slice.actions.removeOAuth2ProviderSuccess(),
+                        alertActions.success('OAuth2 Provider has been removed'),
+                        appRedirectActions.redirect({ url: `../authenticationsettings` }),
+                    ),
+                ),
                 catchError((err) =>
                     of(
                         slice.actions.getOAuth2ProviderSettingsFailure({
@@ -131,7 +180,8 @@ const epics = [
     getAuthenticationSettings,
     updateAuthenticationSettings,
     getOAuth2ProviderSettings,
-    updateOAuth2ProviderSettings,
+    updateOAuth2Provider,
+    createOAuth2Provider,
     removeOAuth2Provider,
 ];
 
