@@ -31,13 +31,15 @@ export class ServerConfiguration<T extends { [key: string]: string }> {
     public getUrl(): string {
         let replacedUrl = this.url;
         for (const key in this.variableConfiguration) {
-            var re = new RegExp("{" + key + "}","g");
-            replacedUrl = replacedUrl.replace(re, this.variableConfiguration[key]);
+            if (this.variableConfiguration.hasOwnProperty(key)) {
+                 const re = new RegExp("{" + key + "}","g");
+                 replacedUrl = replacedUrl.replace(re, this.variableConfiguration[key]);
+            }
         }
         return replacedUrl;
     }
 }
 
-const server1 = new ServerConfiguration<{  }>("http://localhost:8080", {  }, "Generated server url");
+const server1 = new ServerConfiguration<{  }>("http://localhost:46591", {  }, "Generated server url");
 
 export const servers = [server1];

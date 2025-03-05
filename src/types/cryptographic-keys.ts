@@ -6,6 +6,7 @@ import {
     BulkCompromiseKeyRequestDto,
     BulkKeyUsageRequestDto,
     CompromiseKeyRequestDto,
+    EditKeyItemDto,
     EditKeyRequestDto,
     KeyDetailDto,
     KeyDto,
@@ -28,6 +29,9 @@ export type CryptographicKeyEditRequestModel = Omit<CryptographicKeyEditRequestD
     customAttributes?: Array<AttributeRequestModel>;
 };
 
+export type CryptographicKeyItemEditRequestDto = EditKeyItemDto;
+export type CryptographicKeyItemEditRequestModel = CryptographicKeyItemEditRequestDto;
+
 export type CryptographicKeyResponseDto = KeyItemDto;
 export type CryptographicKeyResponseModel = CryptographicKeyResponseDto;
 
@@ -36,7 +40,7 @@ export type CryptographicKeyPairResponseModel = CryptographicKeyPairResponseDto;
 
 export type CryptographicKeyDetailResponseDto = KeyDetailDto;
 export type CryptographicKeyDetailResponseModel = Omit<CryptographicKeyDetailResponseDto, 'attributes | customAttributes | group'> & {
-    attributes: Array<AttributeResponseModel>;
+    attributes?: Array<AttributeResponseModel>;
     customAttributes?: Array<AttributeResponseModel>;
     groups?: Array<CertificateGroupResponseModel>;
 };

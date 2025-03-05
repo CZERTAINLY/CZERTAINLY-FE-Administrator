@@ -11,7 +11,9 @@ import { actions as authActions, selectors as authSelectors } from 'ducks/auth';
 import { actions as rolesActions, selectors as rolesSelectors } from 'ducks/roles';
 
 import { SubjectPermissionsModel } from 'types/roles';
-import RolePermissionsEditor from '../RolePermissionsEdior';
+import RolePermissionsEditor from '../RolePermissionsEditor';
+
+import style from './style.module.scss';
 
 function RoleForm() {
     const dispatch = useDispatch();
@@ -95,10 +97,14 @@ function RoleForm() {
     }, [navigate]);
 
     return (
-        <Container className="themed-container" fluid>
+        <Container className="themed-container fixed-screen-height-container" fluid>
             <Widget
                 title={`${roleSelector?.name || ''} Role Permissions`}
                 busy={isFetchingRoleDetail || isFetchingPermissions || isFetchingResources || isUpdatingRolePermissions}
+                className={style.widget}
+                innerContainerProps={{
+                    className: style.innerContainer,
+                }}
             >
                 <RolePermissionsEditor
                     resources={resourcesSelector}
@@ -107,25 +113,22 @@ function RoleForm() {
                     onPermissionsChanged={(perms) => {
                         setPermissions(perms);
                     }}
+                    submitButtonsGroup={
+                        <ButtonGroup>
+                            <ProgressButton
+                                title="Save"
+                                inProgressTitle="Saving..."
+                                inProgress={isCreatingRole || isUpdatingRole || isUpdatingRolePermissions}
+                                disabled={isCreatingRole || isUpdatingRole || roleSelector?.systemRole}
+                                onClick={onSubmit}
+                            />
+
+                            <Button color="default" onClick={onCancel} disabled={isCreatingRole || isUpdatingRole}>
+                                Cancel
+                            </Button>
+                        </ButtonGroup>
+                    }
                 />
-
-                <br />
-
-                <div className="d-flex justify-content-end">
-                    <ButtonGroup>
-                        <ProgressButton
-                            title="Save"
-                            inProgressTitle="Svaing..."
-                            inProgress={isCreatingRole || isUpdatingRole || isUpdatingRolePermissions}
-                            disabled={isCreatingRole || isUpdatingRole || roleSelector?.systemRole}
-                            onClick={onSubmit}
-                        />
-
-                        <Button color="default" onClick={onCancel} disabled={isCreatingRole || isUpdatingRole}>
-                            Cancel
-                        </Button>
-                    </ButtonGroup>
-                </div>
             </Widget>
         </Container>
     );

@@ -244,7 +244,7 @@ const FlowChartContent = ({
     return (
         <Widget className={style.flowWidget} busy={busy}>
             {flowChartTitle && <h5 className="text-muted">{flowChartTitle}</h5>}
-            <div className={cx(style.flowChartContainer, style.floatingedges)}>
+            <div className={cx(style.flowChartContainer, style.floatingEdges)}>
                 <ReactFlow
                     nodes={flowChartNodesState}
                     proOptions={{ hideAttribution: true }}

@@ -50,7 +50,7 @@ const query: HttpQuery = { // required parameters are used directly since they a
 Updated code to fix the type error:
 
 ```sh
-const query: HttpQuery = {};`
+const query: HttpQuery = {};
 if (paginationRequestDto != null) {
     Object.assign(query, paginationRequestDto);
 }

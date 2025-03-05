@@ -92,44 +92,6 @@ const listApprovalProfiles: AppEpic = (action$, state$, deps) => {
     );
 };
 
-const enableApprovalProfile: AppEpic = (action$, state$, deps) => {
-    return action$.pipe(
-        filter(slice.actions.enableApprovalProfile.match),
-
-        switchMap((action) =>
-            deps.apiClients.approvalProfiles.enableApprovalProfile({ uuid: action.payload.uuid }).pipe(
-                map(() => slice.actions.enableApprovalProfileSuccess({ uuid: action.payload.uuid })),
-
-                catchError((err) =>
-                    of(
-                        appRedirectActions.fetchError({ error: err, message: 'Failed to enable approval profile' }),
-                        slice.actions.enableApprovalProfileFailure(err),
-                    ),
-                ),
-            ),
-        ),
-    );
-};
-
-const disableApprovalProfile: AppEpic = (action$, state$, deps) => {
-    return action$.pipe(
-        filter(slice.actions.disableApprovalProfile.match),
-
-        switchMap((action) =>
-            deps.apiClients.approvalProfiles.disableApprovalProfile({ uuid: action.payload.uuid }).pipe(
-                map(() => slice.actions.disableApprovalProfileSuccess({ uuid: action.payload.uuid })),
-
-                catchError((err) =>
-                    of(
-                        appRedirectActions.fetchError({ error: err, message: 'Failed to disable approval profile' }),
-                        slice.actions.disableApprovalProfileFailure(err),
-                    ),
-                ),
-            ),
-        ),
-    );
-};
-
 const deleteApprovalProfile: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.deleteApprovalProfile.match),
@@ -181,14 +143,6 @@ const editApprovalProfile: AppEpic = (action$, state$, deps) => {
     );
 };
 
-const epics = [
-    getApprovalProfile,
-    createApprovalProfile,
-    listApprovalProfiles,
-    enableApprovalProfile,
-    disableApprovalProfile,
-    deleteApprovalProfile,
-    editApprovalProfile,
-];
+const epics = [getApprovalProfile, createApprovalProfile, listApprovalProfiles, deleteApprovalProfile, editApprovalProfile];
 
 export default epics;

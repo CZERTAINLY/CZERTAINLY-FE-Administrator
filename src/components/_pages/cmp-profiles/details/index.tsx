@@ -145,10 +145,7 @@ export default function AdministratorDetail() {
                       },
                       {
                           id: 'variant',
-                          columns: [
-                              'Variant',
-                              <Badge color="primary">{getEnumLabel(cmpCmpProfileVariantEnum, cmpProfile.variant)}</Badge> || '',
-                          ],
+                          columns: ['Variant', <Badge color="primary">{getEnumLabel(cmpCmpProfileVariantEnum, cmpProfile.variant)}</Badge>],
                       },
                       {
                           id: 'status',

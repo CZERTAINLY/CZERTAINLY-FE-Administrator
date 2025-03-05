@@ -5,15 +5,16 @@ import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions as authActions, selectors as authSelectors } from 'ducks/auth';
-import { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Input } from 'reactstrap';
 import { AuthResourceModel } from 'types/auth';
-import { SubjectPermissionsModel } from 'types/roles';
+import { ObjectPermissionsResponseModel, ResourcePermissionsResponseModel, SubjectPermissionsModel } from 'types/roles';
 
 import style from './style.module.scss';
 
 interface Props {
+    submitButtonsGroup: React.ReactNode;
     resources?: AuthResourceModel[];
     permissions?: SubjectPermissionsModel;
     disabled?: boolean;
@@ -21,6 +22,7 @@ interface Props {
 }
 
 function RolePermissionsEditor({
+    submitButtonsGroup,
     resources,
     permissions = { allowAllResources: false, resources: [] },
     disabled = false,
@@ -48,7 +50,10 @@ function RolePermissionsEditor({
 
             if (perms?.allowAllActions) return 'All actions allowed';
 
-            const actions = perms?.actions.join(', ');
+            const actions = perms?.actions
+                .map((actionName) => resource.actions.find((el) => el.name === actionName)?.displayName)
+                .filter((el) => el)
+                .join(', ');
 
             return actions ? actions : 'No permissions assigned';
         },
@@ -115,6 +120,46 @@ function RolePermissionsEditor({
         [clonePerms, onPermissionsChanged],
     );
 
+    const setExistingOLP = useCallback(
+        (
+            resourcePermissions: ResourcePermissionsResponseModel,
+            objectUuid: string,
+            objectName: string,
+            action: string,
+            permissions: 'allow' | 'deny',
+        ) => {
+            const handleExistingObjectPermissions = (objectPermissions: ObjectPermissionsResponseModel) => {
+                if (permissions === 'allow') {
+                    if (!objectPermissions.allow.includes(action)) objectPermissions.allow.push(action);
+                    if (objectPermissions.deny.includes(action))
+                        objectPermissions.deny = objectPermissions.deny.filter((a) => a !== action);
+                } else if (permissions === 'deny') {
+                    if (!objectPermissions.deny.includes(action)) objectPermissions.deny.push(action);
+                    if (objectPermissions.allow.includes(action))
+                        objectPermissions.allow = objectPermissions.allow.filter((a) => a !== action);
+                }
+            };
+            const handleNewObjectPermissions = () => {
+                if (!resourcePermissions.objects) resourcePermissions.objects = [];
+
+                resourcePermissions.objects.push({
+                    uuid: objectUuid,
+                    name: objectName,
+                    allow: permissions === 'allow' ? [action] : [],
+                    deny: permissions === 'deny' ? [action] : [],
+                });
+            };
+
+            const objectPermissions = resourcePermissions.objects?.find((o) => o.uuid === objectUuid);
+
+            if (objectPermissions) {
+                handleExistingObjectPermissions(objectPermissions);
+            } else {
+                handleNewObjectPermissions();
+            }
+        },
+        [],
+    );
     const setOLP = useCallback(
         (resourceUuid: string, objectUuid: string, objectName: string, action: string, permissions: 'allow' | 'deny') => {
             const resource = resources?.find((r) => r.uuid === resourceUuid);
@@ -125,28 +170,7 @@ function RolePermissionsEditor({
             const resourcePermissions = newPermissions.resources.find((r) => r.name === resource.name);
 
             if (resourcePermissions) {
-                const objectPermissions = resourcePermissions.objects?.find((o) => o.uuid === objectUuid);
-
-                if (objectPermissions) {
-                    if (permissions === 'allow') {
-                        if (!objectPermissions.allow.includes(action)) objectPermissions.allow.push(action);
-                        if (objectPermissions.deny.includes(action))
-                            objectPermissions.deny = objectPermissions.deny.filter((a) => a !== action);
-                    } else if (permissions === 'deny') {
-                        if (!objectPermissions.deny.includes(action)) objectPermissions.deny.push(action);
-                        if (objectPermissions.allow.includes(action))
-                            objectPermissions.allow = objectPermissions.allow.filter((a) => a !== action);
-                    }
-                } else {
-                    if (!resourcePermissions.objects) resourcePermissions.objects = [];
-
-                    resourcePermissions.objects.push({
-                        uuid: objectUuid,
-                        name: objectName,
-                        allow: permissions === 'allow' ? [action] : [],
-                        deny: permissions === 'deny' ? [action] : [],
-                    });
-                }
+                setExistingOLP(resourcePermissions, objectUuid, objectName, action, permissions);
             } else {
                 newPermissions.resources.push({
                     name: resource.name,
@@ -165,21 +189,18 @@ function RolePermissionsEditor({
 
             onPermissionsChanged?.(newPermissions);
         },
-        [clonePerms, onPermissionsChanged, resources],
+        [clonePerms, onPermissionsChanged, resources, setExistingOLP],
     );
 
     const resourceList = useMemo(
-        () => (
-            <div className={style.resources}>
-                {resources?.map((resource) => (
-                    <div key={resource.uuid} data-selected={currentResource === resource} onClick={() => onResourceSelected(resource)}>
-                        {resource.displayName}
-                        <br />
-                        <sup>{getPermissions(resource)}</sup>
-                    </div>
-                ))}
-            </div>
-        ),
+        () =>
+            resources?.map((resource) => (
+                <button key={resource.uuid} data-selected={currentResource === resource} onClick={() => onResourceSelected(resource)}>
+                    {resource.displayName}
+                    <br />
+                    <sup>{getPermissions(resource)}</sup>
+                </button>
+            )),
         [currentResource, getPermissions, onResourceSelected, resources],
     );
 
@@ -188,45 +209,39 @@ function RolePermissionsEditor({
             !currentResource ? (
                 <></>
             ) : (
-                <Widget title="Resource Action Permissions" busy={isBusy}>
-                    {!currentResource ? (
-                        <></>
-                    ) : (
-                        <>
-                            <label className={style.allPermissions} htmlFor="allPermissions">
-                                <input
-                                    id="allPermissions"
-                                    type="checkbox"
-                                    checked={permissions?.resources.find((r) => r.name === currentResource.name)?.allowAllActions || false}
-                                    disabled={disabled || permissions.allowAllResources}
-                                    onChange={(e) => allowAllActions(currentResource, e.target.checked)}
-                                />
-                                &nbsp;&nbsp;&nbsp;Allow All Permissions
-                            </label>
+                <Widget title="Resource Action Permissions" busy={isBusy} className={style.permissionsWidget}>
+                    <label className={style.allPermissions} htmlFor="allPermissions">
+                        <input
+                            id="allPermissions"
+                            type="checkbox"
+                            checked={permissions?.resources.find((r) => r.name === currentResource.name)?.allowAllActions || false}
+                            disabled={disabled || permissions.allowAllResources}
+                            onChange={(e) => allowAllActions(currentResource, e.target.checked)}
+                        />
+                        &nbsp;&nbsp;&nbsp;Allow All Permissions
+                    </label>
 
-                            <div className={style.action}>
-                                {currentResource.actions.map((action) => (
-                                    <label key={action.uuid}>
-                                        <input
-                                            type="checkbox"
-                                            checked={
-                                                permissions?.resources
-                                                    .find((r) => r.name === currentResource.name)
-                                                    ?.actions.includes(action.name) || false
-                                            }
-                                            disabled={
-                                                disabled ||
-                                                permissions?.allowAllResources ||
-                                                permissions?.resources.find((r) => r.name === currentResource.name)?.allowAllActions
-                                            }
-                                            onChange={(e) => allowAction(currentResource, action.name, e.target.checked)}
-                                        />
-                                        &nbsp;&nbsp;&nbsp;{action.name}
-                                    </label>
-                                ))}
-                            </div>
-                        </>
-                    )}
+                    <div className={style.action}>
+                        {currentResource.actions.map((action) => (
+                            <label key={action.uuid}>
+                                <input
+                                    type="checkbox"
+                                    checked={
+                                        permissions?.resources
+                                            .find((r) => r.name === currentResource.name)
+                                            ?.actions.includes(action.name) || false
+                                    }
+                                    disabled={
+                                        disabled ||
+                                        permissions?.allowAllResources ||
+                                        permissions?.resources.find((r) => r.name === currentResource.name)?.allowAllActions
+                                    }
+                                    onChange={(e) => allowAction(currentResource, action.name, e.target.checked)}
+                                />
+                                &nbsp;&nbsp;&nbsp;{action.displayName}
+                            </label>
+                        ))}
+                    </div>
                 </Widget>
             ),
         [allowAction, allowAllActions, currentResource, disabled, isBusy, permissions.allowAllResources, permissions?.resources],
@@ -246,7 +261,7 @@ function RolePermissionsEditor({
                 (action) =>
                     ({
                         id: action.name,
-                        content: action.name,
+                        content: action.displayName,
                         sortable: false,
                         align: 'center',
                         width: '5em',
@@ -256,6 +271,32 @@ function RolePermissionsEditor({
         [currentResource],
     );
 
+    const getObjectRowActions = useCallback(
+        (object: ObjectPermissionsResponseModel): JSX.Element[] =>
+            currentResource?.actions.map((action) => (
+                <label
+                    htmlFor={`${object.uuid}_${action.name}`}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                    }}
+                    // Add onKeyDown handler to satisfy typescript:S1082 SQ Quality Check.
+                    onKeyDown={() => {}}
+                >
+                    <Input
+                        key={`${object.uuid}_${action.name}`}
+                        id={`${object.uuid}_${action.name}`}
+                        type="switch"
+                        checked={object.allow.includes(action.name)}
+                        disabled={disabled}
+                        onChange={(e) =>
+                            setOLP(currentResource.uuid, object.uuid, object.name, action.name, e.target.checked ? 'allow' : 'deny')
+                        }
+                    />
+                </label>
+            )) || [],
+        [currentResource?.actions, currentResource?.uuid, disabled, setOLP],
+    );
+
     const objectRows: TableDataRow[] = useMemo(
         () =>
             permissions.resources
@@ -263,37 +304,14 @@ function RolePermissionsEditor({
                 ?.objects?.map((object) => ({
                     id: object.uuid,
                     columns: [
-                        <span style={{ whiteSpace: 'nowrap' }}>{object.name}</span>,
-
-                        ...(currentResource?.actions.map((action) => (
-                            <label
-                                htmlFor={`${object.uuid}_${action.name}`}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                }}
-                            >
-                                <Input
-                                    key={`${object.uuid}_${action.name}`}
-                                    id={`${object.uuid}_${action.name}`}
-                                    type="switch"
-                                    checked={object.allow.includes(action.name)}
-                                    disabled={disabled}
-                                    onChange={(e) =>
-                                        setOLP(
-                                            currentResource.uuid,
-                                            object.uuid,
-                                            object.name,
-                                            action.name,
-                                            e.target.checked ? 'allow' : 'deny',
-                                        )
-                                    }
-                                />
-                            </label>
-                        )) || []),
+                        <span key="name" style={{ whiteSpace: 'nowrap' }}>
+                            {object.name}
+                        </span>,
+                        ...getObjectRowActions(object),
                     ],
                 })) || [],
 
-        [currentResource?.actions, currentResource?.name, currentResource?.uuid, disabled, permissions.resources, setOLP],
+        [currentResource?.name, permissions.resources, getObjectRowActions],
     );
 
     const onAddClick = useCallback(() => {
@@ -459,7 +477,6 @@ function RolePermissionsEditor({
 
     return (
         <>
-            <br />
             <label htmlFor="allResources">
                 <input
                     id="allResources"
@@ -473,32 +490,35 @@ function RolePermissionsEditor({
                 />
                 &nbsp;&nbsp;&nbsp;Allow All Actions for All Resources
             </label>
-            <br />
-            <br />
-
             <div className={style.container}>
-                {resourceList}
-
+                <div className={style.resources}>{resourceList}</div>
                 <div className={style.permissions}>
-                    {permissionsList}
+                    <div className={style.permissionsInner}>
+                        {permissionsList}
+                        {!currentResource?.objectAccess ? (
+                            <></>
+                        ) : (
+                            <Widget
+                                title="Object Action Permissions"
+                                busy={isFetchingObjects}
+                                widgetButtons={buttons}
+                                className={style.permissionsWidget}
+                            >
+                                <br />
 
-                    {!currentResource?.objectAccess ? (
-                        <></>
-                    ) : (
-                        <Widget title="Object Action Permissions" busy={isFetchingObjects} widgetButtons={buttons}>
-                            <br />
+                                <CustomTable
+                                    hasCheckboxes={true}
+                                    headers={objectHeaders}
+                                    data={objectRows}
+                                    onCheckedRowsChanged={(rows) => setSelectedObjects(rows as string[])}
+                                />
+                            </Widget>
+                        )}
+                    </div>
 
-                            <CustomTable
-                                hasCheckboxes={true}
-                                headers={objectHeaders}
-                                data={objectRows}
-                                onCheckedRowsChanged={(rows) => setSelectedObjects(rows as string[])}
-                            />
-                        </Widget>
-                    )}
+                    {resources !== undefined && <div className="d-flex justify-content-end">{submitButtonsGroup}</div>}
                 </div>
             </div>
-
             <Dialog
                 isOpen={objectListDialog}
                 caption="Edit Object Level Permissions"

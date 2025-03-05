@@ -1,6 +1,5 @@
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
-import StatusBadge from 'components/StatusBadge';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as profileApprovalActions, selectors as profileApprovalSelectors } from 'ducks/approval-profiles';
@@ -18,12 +17,11 @@ const ApprovalProfileDetails = () => {
 
     const profileApprovalDetail = useSelector(profileApprovalSelectors.profileApprovalDetail);
     const isFetchingDetail = useSelector(profileApprovalSelectors.isFetchingDetail);
-    const isEnabling = useSelector(profileApprovalSelectors.isEnabling);
     const deleteErrorMessage = useSelector(profileApprovalSelectors.deleteErrorMessage);
     const isDeleting = useSelector(profileApprovalSelectors.isDeleting);
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
-    const isBusy = useMemo(() => isFetchingDetail || isEnabling || isDeleting, [isFetchingDetail, isEnabling, isDeleting]);
+    const isBusy = useMemo(() => isFetchingDetail || isDeleting, [isFetchingDetail, isDeleting]);
 
     const getFreshData = useCallback(() => {
         if (!id) return;
@@ -42,16 +40,6 @@ const ApprovalProfileDetails = () => {
         setConfirmDelete(false);
     }, [profileApprovalDetail, dispatch]);
 
-    const onEnableClick = useCallback(() => {
-        if (!profileApprovalDetail) return;
-        dispatch(profileApprovalActions.enableApprovalProfile({ uuid: profileApprovalDetail.uuid }));
-    }, [profileApprovalDetail, dispatch]);
-
-    const onDisableClick = useCallback(() => {
-        if (!profileApprovalDetail) return;
-        dispatch(profileApprovalActions.disableApprovalProfile({ uuid: profileApprovalDetail.uuid }));
-    }, [profileApprovalDetail, dispatch]);
-
     const onEditClick = useCallback(() => {
         if (!profileApprovalDetail) return;
         navigate(`/approvalprofiles/edit/${profileApprovalDetail.uuid}`);
@@ -66,25 +54,13 @@ const ApprovalProfileDetails = () => {
                 onClick: () => onEditClick(),
             },
             {
-                icon: 'check',
-                disabled: profileApprovalDetail?.enabled || false,
-                tooltip: 'Enable',
-                onClick: () => onEnableClick(),
-            },
-            {
-                icon: 'times',
-                disabled: !(profileApprovalDetail?.enabled || false),
-                tooltip: 'Disable',
-                onClick: () => onDisableClick(),
-            },
-            {
                 icon: 'trash',
                 disabled: false,
                 tooltip: 'Delete',
                 onClick: () => setConfirmDelete(true),
             },
         ],
-        [profileApprovalDetail, onDisableClick, onEnableClick, onEditClick],
+        [onEditClick],
     );
 
     const detailHeaders: TableHeader[] = useMemo(
@@ -122,11 +98,6 @@ const ApprovalProfileDetails = () => {
                       {
                           id: 'associations',
                           columns: ['Associations', profileApprovalDetail?.associations.toString() || ''],
-                      },
-
-                      {
-                          id: 'status',
-                          columns: ['Status', <StatusBadge enabled={profileApprovalDetail.enabled} />],
                       },
 
                       {
@@ -168,27 +139,27 @@ const ApprovalProfileDetails = () => {
         [],
     );
 
-    const getApprovalType = (appovalProfileStep: ProfileApprovalStepModel) => {
-        if (appovalProfileStep.userUuid) {
+    const getApprovalType = (approvalProfileStep: ProfileApprovalStepModel) => {
+        if (approvalProfileStep.userUuid) {
             return ApproverType.User;
         }
-        if (appovalProfileStep.roleUuid) {
+        if (approvalProfileStep.roleUuid) {
             return ApproverType.Role;
         }
-        if (appovalProfileStep.groupUuid) {
+        if (approvalProfileStep.groupUuid) {
             return ApproverType.Group;
         }
     };
 
-    const renderApproverRedirect = useCallback((appovalProfileStep: ProfileApprovalStepModel) => {
-        if (appovalProfileStep.userUuid) {
-            return <Link to={`../users/detail/${appovalProfileStep.userUuid}`}>{appovalProfileStep.username}</Link>;
+    const renderApproverRedirect = useCallback((approvalProfileStep: ProfileApprovalStepModel) => {
+        if (approvalProfileStep.userUuid) {
+            return <Link to={`../users/detail/${approvalProfileStep.userUuid}`}>{approvalProfileStep.username}</Link>;
         }
-        if (appovalProfileStep.roleUuid) {
-            return <Link to={`../roles/detail/${appovalProfileStep.roleUuid}`}>{appovalProfileStep.roleName}</Link>;
+        if (approvalProfileStep.roleUuid) {
+            return <Link to={`../roles/detail/${approvalProfileStep.roleUuid}`}>{approvalProfileStep.roleName}</Link>;
         }
-        if (appovalProfileStep.groupUuid) {
-            return <Link to={`../groups/detail/${appovalProfileStep.groupUuid}`}>{appovalProfileStep.roleName}</Link>;
+        if (approvalProfileStep.groupUuid) {
+            return <Link to={`../groups/detail/${approvalProfileStep.groupUuid}`}>{approvalProfileStep.roleName}</Link>;
         }
     }, []);
 

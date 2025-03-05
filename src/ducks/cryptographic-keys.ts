@@ -9,6 +9,8 @@ import {
     CryptographicKeyEditRequestModel,
     CryptographicKeyHistoryModel,
     CryptographicKeyItemBulkCompromiseRequestModel,
+    CryptographicKeyItemDetailResponseModel,
+    CryptographicKeyItemEditRequestModel,
     CryptographicKeyKeyUsageBulkUpdateRequestModel,
     CryptographicKeyKeyUsageUpdateRequestModel,
     CryptographicKeyPairResponseModel,
@@ -30,6 +32,7 @@ export type State = {
 
     isFetchingKeyPairs: boolean;
     isFetchingDetail: boolean;
+    isUpdatingKeyItem: boolean;
     isUpdatingKeyUsage: boolean;
     isBulkUpdatingKeyUsage: boolean;
 
@@ -65,6 +68,7 @@ export const initialState: State = {
 
     isFetchingKeyPairs: false,
     isFetchingDetail: false,
+    isUpdatingKeyItem: false,
     isUpdatingKeyUsage: false,
     isBulkUpdatingKeyUsage: false,
     isCreating: false,
@@ -137,7 +141,7 @@ export const slice = createSlice({
             state.isFetchingKeyPairs = false;
         },
 
-        getCryptographicKeyDetail: (state, action: PayloadAction<{ tokenInstanceUuid: string; uuid: string }>) => {
+        getCryptographicKeyDetail: (state, action: PayloadAction<{ uuid: string }>) => {
             state.cryptographicKey = undefined;
             state.isFetchingDetail = true;
         },
@@ -221,7 +225,6 @@ export const slice = createSlice({
             state,
             action: PayloadAction<{
                 profileUuid: string;
-                tokenInstanceUuid: string;
                 cryptographicKeyEditRequest: CryptographicKeyEditRequestModel;
                 redirect?: string;
             }>,
@@ -241,7 +244,38 @@ export const slice = createSlice({
             state.isUpdating = false;
         },
 
-        enableCryptographicKey: (state, action: PayloadAction<{ tokenInstanceUuid: string; uuid: string; keyItemUuid: Array<string> }>) => {
+        updateCryptographicKeyItem: (
+            state,
+            action: PayloadAction<{
+                uuid: string;
+                keyItemUuid: string;
+                cryptographicKeyItemEditRequest: CryptographicKeyItemEditRequestModel;
+                redirect?: string;
+            }>,
+        ) => {
+            state.isUpdatingKeyItem = true;
+        },
+
+        updateCryptographicKeyItemSuccess: (
+            state,
+            action: PayloadAction<{ cryptographicKeyItem: CryptographicKeyItemDetailResponseModel; redirect?: string }>,
+        ) => {
+            state.isUpdatingKeyItem = false;
+            if (state.cryptographicKey?.items) {
+                state.cryptographicKey.items = state.cryptographicKey.items.map((keyItem) => {
+                    if (keyItem.uuid === action.payload.cryptographicKeyItem.uuid) {
+                        return action.payload.cryptographicKeyItem;
+                    }
+                    return keyItem;
+                });
+            }
+        },
+
+        updateCryptographicKeyItemFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isUpdatingKeyItem = false;
+        },
+
+        enableCryptographicKey: (state, action: PayloadAction<{ uuid: string; keyItemUuid: Array<string> }>) => {
             state.isEnabling = true;
         },
 
@@ -271,10 +305,7 @@ export const slice = createSlice({
             state.isEnabling = false;
         },
 
-        disableCryptographicKey: (
-            state,
-            action: PayloadAction<{ tokenInstanceUuid: string; uuid: string; keyItemUuid: Array<string> }>,
-        ) => {
+        disableCryptographicKey: (state, action: PayloadAction<{ uuid: string; keyItemUuid: Array<string> }>) => {
             state.isDisabling = true;
         },
 
@@ -304,10 +335,7 @@ export const slice = createSlice({
             state.isDisabling = false;
         },
 
-        deleteCryptographicKey: (
-            state,
-            action: PayloadAction<{ tokenInstanceUuid: string; uuid: string; keyItemUuid: Array<string>; redirect?: string }>,
-        ) => {
+        deleteCryptographicKey: (state, action: PayloadAction<{ uuid: string; keyItemUuid: Array<string>; redirect?: string }>) => {
             state.isDeleting = true;
         },
 
@@ -338,10 +366,7 @@ export const slice = createSlice({
             state.isDeleting = false;
         },
 
-        compromiseCryptographicKey: (
-            state,
-            action: PayloadAction<{ tokenInstanceUuid: string; uuid: string; request: CryptographicKeyCompromiseRequestModel }>,
-        ) => {
+        compromiseCryptographicKey: (state, action: PayloadAction<{ uuid: string; request: CryptographicKeyCompromiseRequestModel }>) => {
             state.isCompromising = true;
         },
 
@@ -376,10 +401,7 @@ export const slice = createSlice({
             state.isCompromising = false;
         },
 
-        destroyCryptographicKey: (
-            state,
-            action: PayloadAction<{ tokenInstanceUuid: string; uuid: string; keyItemUuid: Array<string> }>,
-        ) => {
+        destroyCryptographicKey: (state, action: PayloadAction<{ uuid: string; keyItemUuid: Array<string> }>) => {
             state.isDestroying = true;
         },
 
@@ -524,10 +546,7 @@ export const slice = createSlice({
             state.isBulkDisabling = false;
         },
 
-        updateKeyUsage: (
-            state,
-            action: PayloadAction<{ tokenInstanceUuid: string; uuid: string; usage: CryptographicKeyKeyUsageUpdateRequestModel }>,
-        ) => {
+        updateKeyUsage: (state, action: PayloadAction<{ uuid: string; usage: CryptographicKeyKeyUsageUpdateRequestModel }>) => {
             state.isUpdatingKeyUsage = true;
         },
 
@@ -685,7 +704,7 @@ export const slice = createSlice({
             state.isBulkDestroying = false;
         },
 
-        getHistory: (state, action: PayloadAction<{ tokenInstanceUuid: string; keyUuid: string; keyItemUuid: string }>) => {
+        getHistory: (state, action: PayloadAction<{ keyUuid: string; keyItemUuid: string }>) => {
             // set key history for the uuid as empty array
             state.keyHistory?.forEach((keyHistoryItem) => {
                 if (keyHistoryItem.uuid === action.payload.keyItemUuid) {
@@ -729,6 +748,7 @@ const isBulkDestroying = createSelector(state, (state: State) => state.isBulkDes
 const isSyncing = createSelector(state, (state: State) => state.isSyncing);
 
 const isUpdatingKeyUsage = createSelector(state, (state: State) => state.isUpdatingKeyUsage);
+const isUpdatingKeyItem = createSelector(state, (state: State) => state.isUpdatingKeyItem);
 const isBulkUpdatingKeyUsage = createSelector(state, (state: State) => state.isBulkUpdatingKeyUsage);
 
 const isFetchingAttributes = createSelector(state, (state: State) => state.isFetchingAttributes);
@@ -761,6 +781,7 @@ export const selectors = {
     isSyncing,
 
     isUpdatingKeyUsage,
+    isUpdatingKeyItem,
     isBulkUpdatingKeyUsage,
 
     isFetchingAttributes,

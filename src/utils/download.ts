@@ -40,12 +40,12 @@ export function downloadFileZip(
 
         if (!certificate) continue;
 
-        let content: string | Buffer;
+        let content: string | Uint8Array;
 
         if (fileType === 'pem') {
             content = formatPEM(certificate.certificateContent || '');
         } else {
-            content = Buffer.from(certificate.certificateContent || '', 'base64');
+            content = new Uint8Array(Buffer.from(certificate.certificateContent || '', 'base64'));
         }
 
         zip.file(certificate.commonName.replace('*.', '_.') + '_' + certificate.serialNumber + '.' + fileType, content);

@@ -1,0 +1,7 @@
+@import 'variables';
+
+// Used to set a fixed height to the <Container/> on a page.
+// Height equals to 100vh minus vertical padding used on the layout content wrapper.
+.fixed-screen-height-container {
+    height: calc(100vh - ($navbar-height + $content-padding-vertical) - ($content-padding-vertical + 20px));
+}

@@ -85,10 +85,14 @@ models/AttributeType.ts
 models/AttributeValueTarget.ts
 models/AuditLogDto.ts
 models/AuditLogResponseDto.ts
+models/AuditLoggingSettingsDto.ts
+models/AuthActionDto.ts
 models/AuthMethod.ts
 models/AuthResourceDto.ts
 models/AuthType.ts
 models/AuthenticationServiceExceptionDto.ts
+models/AuthenticationSettingsDto.ts
+models/AuthenticationSettingsUpdateDto.ts
 models/AuthorityInstanceDto.ts
 models/AuthorityInstanceRequestDto.ts
 models/AuthorityInstanceUpdateRequestDto.ts
@@ -191,6 +195,7 @@ models/CustomAttributeDefinitionDto.ts
 models/CustomAttributeProperties.ts
 models/CustomAttributeUpdateRequestDto.ts
 models/DataAttribute.ts
+models/DataAttributeContent.ts
 models/DataAttributeProperties.ts
 models/DateAttributeContent.ts
 models/DateTimeAttributeConstraint.ts
@@ -204,6 +209,7 @@ models/DiscoveryHistoryDetailDto.ts
 models/DiscoveryHistoryDto.ts
 models/DiscoveryResponseDto.ts
 models/DiscoveryStatus.ts
+models/EditKeyItemDto.ts
 models/EditKeyRequestDto.ts
 models/EditLocationRequestDto.ts
 models/EditRaProfileRequestDto.ts
@@ -257,6 +263,7 @@ models/KeyType.ts
 models/KeyUsage.ts
 models/LocationDto.ts
 models/LocationsResponseDto.ts
+models/LoggingSettingsDto.ts
 models/MetadataAttribute.ts
 models/MetadataAttributeProperties.ts
 models/MetadataResponseDto.ts
@@ -271,6 +278,8 @@ models/NotificationInstanceUpdateRequestDto.ts
 models/NotificationRequestDto.ts
 models/NotificationResponseDto.ts
 models/NotificationSettingsDto.ts
+models/OAuth2ProviderSettingsDto.ts
+models/OAuth2ProviderSettingsUpdateDto.ts
 models/ObjectAttributeContent.ts
 models/ObjectPermissionsDto.ts
 models/ObjectPermissionsRequestDto.ts
@@ -298,6 +307,7 @@ models/RequestAttributeDto.ts
 models/Resource.ts
 models/ResourceDto.ts
 models/ResourceEventDto.ts
+models/ResourceLoggingSettingsDto.ts
 models/ResourcePermissionsDto.ts
 models/ResourcePermissionsRequestDto.ts
 models/ResourceRecord.ts

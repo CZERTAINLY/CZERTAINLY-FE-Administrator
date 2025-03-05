@@ -20,6 +20,8 @@ import {
     transformCryptographicKeyDetailResponseDtoToModel,
     transformCryptographicKeyEditRequestModelToDto,
     transformCryptographicKeyItemBulkCompromiseModelToDto,
+    transformCryptographicKeyItemEditRequestModelToDto,
+    transformCryptographicKeyItemResponseDtoToModel,
     transformCryptographicKeyPairResponseDtoToModel,
     transformCryptographicKeyResponseDtoToModel,
     transformKeyHistoryDtoToModel,
@@ -81,7 +83,9 @@ const getCryptographicKeyDetail: AppEpic = (action$, state$, deps) => {
         filter(slice.actions.getCryptographicKeyDetail.match),
         switchMap((action) =>
             deps.apiClients.cryptographicKeys
-                .getKey({ tokenInstanceUuid: action.payload.tokenInstanceUuid, uuid: action.payload.uuid })
+                .getKey({
+                    uuid: action.payload.uuid,
+                })
                 .pipe(
                     switchMap((profileDto) =>
                         of(
@@ -167,7 +171,7 @@ const createCryptographicKey: AppEpic = (action$, state$, deps) => {
                                     uuid: obj.uuid,
                                     tokenInstanceUuid: action.payload.tokenInstanceUuid,
                                 }),
-                                appRedirectActions.redirect({ url: `../keys/detail/${action.payload.tokenInstanceUuid}/${obj.uuid}` }),
+                                appRedirectActions.redirect({ url: `../keys/detail/${obj.uuid}` }),
                             ),
                         ),
                     ),
@@ -190,7 +194,6 @@ const updateCryptographicKey: AppEpic = (action$, state$, deps) => {
             deps.apiClients.cryptographicKeys
                 .editKey({
                     uuid: action.payload.profileUuid,
-                    tokenInstanceUuid: action.payload.tokenInstanceUuid,
                     editKeyRequestDto: transformCryptographicKeyEditRequestModelToDto(action.payload.cryptographicKeyEditRequest),
                 })
                 .pipe(
@@ -216,6 +219,44 @@ const updateCryptographicKey: AppEpic = (action$, state$, deps) => {
 
                     catchError((err) =>
                         of(slice.actions.updateCryptographicKeyFailure({ error: extractError(err, 'Failed to update Key') })),
+                    ),
+                ),
+        ),
+    );
+};
+const updateCryptographicKeyItem: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.updateCryptographicKeyItem.match),
+        switchMap((action) =>
+            deps.apiClients.cryptographicKeys
+                .editKeyItem({
+                    uuid: action.payload.uuid,
+                    keyItemUuid: action.payload.keyItemUuid,
+                    editKeyItemDto: transformCryptographicKeyItemEditRequestModelToDto(action.payload.cryptographicKeyItemEditRequest),
+                })
+                .pipe(
+                    mergeMap((cryptographicKeyItemDto) =>
+                        iif(
+                            () => !!action.payload.redirect,
+                            of(
+                                slice.actions.updateCryptographicKeyItemSuccess({
+                                    cryptographicKeyItem: transformCryptographicKeyItemResponseDtoToModel(cryptographicKeyItemDto),
+                                    redirect: action.payload.redirect,
+                                }),
+
+                                appRedirectActions.redirect({ url: action.payload.redirect! }),
+                            ),
+                            of(
+                                slice.actions.updateCryptographicKeyItemSuccess({
+                                    cryptographicKeyItem: transformCryptographicKeyItemResponseDtoToModel(cryptographicKeyItemDto),
+                                    redirect: action.payload.redirect,
+                                }),
+                            ),
+                        ),
+                    ),
+
+                    catchError((err) =>
+                        of(slice.actions.updateCryptographicKeyItemFailure({ error: extractError(err, 'Failed to update Key Item') })),
                     ),
                 ),
         ),
@@ -248,7 +289,6 @@ const enableCryptographicKey: AppEpic = (action$, state$, deps) => {
         switchMap((action) =>
             deps.apiClients.cryptographicKeys
                 .enableKey({
-                    tokenInstanceUuid: action.payload.tokenInstanceUuid,
                     uuid: action.payload.uuid,
                     requestBody: action.payload.keyItemUuid,
                 })
@@ -266,7 +306,6 @@ const enableCryptographicKey: AppEpic = (action$, state$, deps) => {
                             ...err.response.map((keyItemUuid: string) =>
                                 slice.actions.getHistory({
                                     keyItemUuid,
-                                    tokenInstanceUuid: action.payload.tokenInstanceUuid,
                                     keyUuid: action.payload.uuid,
                                 }),
                             ),
@@ -285,7 +324,6 @@ const disableCryptographicKey: AppEpic = (action$, state$, deps) => {
         switchMap((action) =>
             deps.apiClients.cryptographicKeys
                 .disableKey({
-                    tokenInstanceUuid: action.payload.tokenInstanceUuid,
                     uuid: action.payload.uuid,
                     requestBody: action.payload.keyItemUuid,
                 })
@@ -306,7 +344,6 @@ const disableCryptographicKey: AppEpic = (action$, state$, deps) => {
                             ...err.response.map((keyItemUuid: string) =>
                                 slice.actions.getHistory({
                                     keyItemUuid,
-                                    tokenInstanceUuid: action.payload.tokenInstanceUuid,
                                     keyUuid: action.payload.uuid,
                                 }),
                             ),
@@ -324,7 +361,6 @@ const deleteCryptographicKey: AppEpic = (action$, state$, deps) => {
         switchMap((action) =>
             deps.apiClients.cryptographicKeys
                 .deleteKey({
-                    tokenInstanceUuid: action.payload.tokenInstanceUuid,
                     uuid: action.payload.uuid,
                     requestBody: action.payload.keyItemUuid,
                 })
@@ -492,7 +528,6 @@ const updateKeyUsage: AppEpic = (action$, state$, deps) => {
         switchMap((action) =>
             deps.apiClients.cryptographicKeys
                 .updateKeyUsages1({
-                    tokenInstanceUuid: action.payload.tokenInstanceUuid,
                     uuid: action.payload.uuid,
                     updateKeyUsageRequestDto: action.payload.usage,
                 })
@@ -565,7 +600,6 @@ const compromiseCryptographicKey: AppEpic = (action$, state$, deps) => {
         switchMap((action) =>
             deps.apiClients.cryptographicKeys
                 .compromiseKey({
-                    tokenInstanceUuid: action.payload.tokenInstanceUuid,
                     uuid: action.payload.uuid,
                     compromiseKeyRequestDto: transformCryptographicKeyCompromiseModelToDto(action.payload.request),
                 })
@@ -586,7 +620,6 @@ const compromiseCryptographicKey: AppEpic = (action$, state$, deps) => {
                             ...err.response.map((keyItemUuid: string) =>
                                 slice.actions.getHistory({
                                     keyItemUuid,
-                                    tokenInstanceUuid: action.payload.tokenInstanceUuid,
                                     keyUuid: action.payload.uuid,
                                 }),
                             ),
@@ -660,7 +693,6 @@ const destroyCryptographicKey: AppEpic = (action$, state$, deps) => {
         switchMap((action) =>
             deps.apiClients.cryptographicKeys
                 .destroyKey({
-                    tokenInstanceUuid: action.payload.tokenInstanceUuid,
                     uuid: action.payload.uuid,
                     requestBody: action.payload.keyItemUuid,
                 })
@@ -681,7 +713,6 @@ const destroyCryptographicKey: AppEpic = (action$, state$, deps) => {
                             ...err.response.map((keyItemUuid: string) =>
                                 slice.actions.getHistory({
                                     keyItemUuid,
-                                    tokenInstanceUuid: action.payload.tokenInstanceUuid,
                                     keyUuid: action.payload.uuid,
                                 }),
                             ),
@@ -739,7 +770,6 @@ const getKeyHistory: AppEpic = (action$, state, deps) => {
             deps.apiClients.cryptographicKeys
                 .getEventHistory({
                     keyItemUuid: action.payload.keyItemUuid,
-                    tokenInstanceUuid: action.payload.tokenInstanceUuid,
                     uuid: action.payload.keyUuid,
                 })
                 .pipe(
@@ -768,6 +798,7 @@ const epics = [
     getAttributesDescriptors,
     createCryptographicKey,
     updateCryptographicKey,
+    updateCryptographicKeyItem,
     enableCryptographicKey,
     disableCryptographicKey,
     deleteCryptographicKey,

@@ -6,7 +6,6 @@ import { Container } from 'reactstrap';
 import { actions as profileApprovalActions, selectors as profileApprovalSelector } from 'ducks/approval-profiles';
 
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
-import StatusBadge from 'components/StatusBadge';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { LockWidgetNameEnum } from 'types/user-interface';
@@ -62,10 +61,6 @@ export default function ApprovalProfilesList() {
                 content: 'Description',
             },
             {
-                id: 'isEnabled',
-                content: 'Enabled',
-            },
-            {
                 id: 'version',
                 content: 'Version',
             },
@@ -91,8 +86,6 @@ export default function ApprovalProfilesList() {
                     <Link to={`./detail/${approvalProfile.uuid}`}>{approvalProfile.name}</Link>,
 
                     approvalProfile.description || '',
-
-                    <StatusBadge enabled={approvalProfile.enabled} />,
 
                     <>{approvalProfile.version}</>,
 

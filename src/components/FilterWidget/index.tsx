@@ -186,7 +186,7 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
                     if (checkIfFieldAttributeTypeIsDate(field)) {
                         label = getFormattedDateTime(v);
                     } else {
-                        label = currentField?.platformEnum ? getEnumLabel(platformEnums[currentField.platformEnum], v) : v;
+                        label = field.platformEnum ? getEnumLabel(platformEnums[field.platformEnum], v) : v;
                     }
                     value = v;
                 } else {
