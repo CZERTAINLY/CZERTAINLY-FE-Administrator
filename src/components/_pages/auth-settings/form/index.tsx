@@ -2,16 +2,28 @@ import TextField from 'components/Input/TextField';
 import ProgressButton from 'components/ProgressButton';
 import Widget from 'components/Widget';
 import { actions, selectors } from 'ducks/auth-settings';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Field, Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-import Select from 'react-select';
 import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 import { isObjectSame } from 'utils/common-utils';
-import { composeValidators, validateAlphaNumericWithSpecialChars, validatePositiveInteger, validateRequired } from 'utils/validators';
+import {
+    composeValidators,
+    validateAlphaNumericWithoutAccents,
+    validateAlphaNumericWithSpecialChars,
+    validatePositiveInteger,
+    validateRequired,
+} from 'utils/validators';
+import CustomSelect from '../../../Input/CustomSelect';
+import { MultiValue } from 'react-select';
+import { OAuth2ProviderSettingsUpdateDto } from 'types/auth-settings';
 
+interface OptionType {
+    value: string;
+    label: string;
+}
 interface FormValues {
     name: string;
     issuerUrl?: string;
@@ -21,11 +33,11 @@ interface FormValues {
     tokenUrl?: string;
     jwkSetUrl?: string;
     jwkSet?: string;
-    scope?: Array<string>;
+    scope?: OptionType[];
     logoutUrl?: string;
     postLogoutUrl?: string;
     userInfoUrl?: string;
-    audiences?: Array<string>;
+    audiences?: OptionType[];
     skew?: number;
     sessionMaxInactiveInterval?: number;
 }
@@ -42,6 +54,9 @@ export default function OAuth2ProviderForm() {
     const isUpdatingProvider = useSelector(selectors.isUpdatingProvider);
     const isCreatingProvider = useSelector(selectors.isCreatingProvider);
 
+    const [audienceOptions, setAudienceOptions] = useState<OptionType[]>([]);
+    const [scopeOptions, setScopeOptions] = useState<OptionType[]>([]);
+
     const isBusy = useMemo(
         () => isFetchingProvider || isUpdatingProvider || isCreatingProvider,
         [isFetchingProvider, isUpdatingProvider, isCreatingProvider],
@@ -52,9 +67,19 @@ export default function OAuth2ProviderForm() {
         dispatch(actions.getOAuth2ProviderSettings({ providerName }));
     }, [dispatch, providerName]);
 
+    useEffect(() => {
+        if (!oauth2Provider) return;
+        setAudienceOptions(oauth2Provider.audiences?.map((el) => ({ label: el, value: el })) || []);
+        setScopeOptions(oauth2Provider.scope?.map((el) => ({ label: el, value: el })) || []);
+    }, [oauth2Provider]);
+
     const defaultValues: FormValues = useMemo(() => {
         if (editMode && oauth2Provider) {
-            return oauth2Provider;
+            return {
+                ...oauth2Provider,
+                scope: oauth2Provider.scope?.map((el) => ({ label: el, value: el })) || [],
+                audiences: oauth2Provider.audiences?.map((el) => ({ label: el, value: el })) || [],
+            };
         } else {
             return {
                 name: '',
@@ -82,48 +107,35 @@ export default function OAuth2ProviderForm() {
 
     const onSubmit = useCallback(
         (values: FormValues) => {
+            const updateModel: OAuth2ProviderSettingsUpdateDto = {
+                issuerUrl: values.issuerUrl,
+                clientId: values.clientId,
+                clientSecret: values.clientSecret,
+                authorizationUrl: values.authorizationUrl,
+                tokenUrl: values.tokenUrl,
+                jwkSetUrl: values.jwkSetUrl,
+                jwkSet: values.jwkSet,
+                scope: values.scope?.map((el) => el.value),
+                logoutUrl: values.logoutUrl,
+                postLogoutUrl: values.postLogoutUrl,
+                userInfoUrl: values.userInfoUrl,
+                audiences: values.audiences?.map((el) => el.value),
+                skew: values.skew,
+                sessionMaxInactiveInterval: values.sessionMaxInactiveInterval,
+            };
+
             if (editMode) {
                 dispatch(
                     actions.updateOAuth2Provider({
                         providerName,
-                        oauth2ProviderSettingsUpdateModel: {
-                            issuerUrl: values.issuerUrl,
-                            clientId: values.clientId,
-                            clientSecret: values.clientSecret,
-                            authorizationUrl: values.authorizationUrl,
-                            tokenUrl: values.tokenUrl,
-                            jwkSetUrl: values.jwkSetUrl,
-                            jwkSet: values.jwkSet,
-                            scope: values.scope,
-                            logoutUrl: values.logoutUrl,
-                            postLogoutUrl: values.postLogoutUrl,
-                            userInfoUrl: values.userInfoUrl,
-                            audiences: values.audiences,
-                            skew: values.skew,
-                            sessionMaxInactiveInterval: values.sessionMaxInactiveInterval,
-                        },
+                        oauth2ProviderSettingsUpdateModel: updateModel,
                     }),
                 );
             } else {
                 dispatch(
                     actions.createOAuth2Provider({
                         providerName: values.name,
-                        oauth2ProviderSettingsUpdateModel: {
-                            issuerUrl: values.issuerUrl,
-                            clientId: values.clientId,
-                            clientSecret: values.clientSecret,
-                            authorizationUrl: values.authorizationUrl,
-                            tokenUrl: values.tokenUrl,
-                            jwkSetUrl: values.jwkSetUrl,
-                            jwkSet: values.jwkSet,
-                            scope: values.scope,
-                            logoutUrl: values.logoutUrl,
-                            postLogoutUrl: values.postLogoutUrl,
-                            userInfoUrl: values.userInfoUrl,
-                            audiences: values.audiences,
-                            skew: values.skew,
-                            sessionMaxInactiveInterval: values.sessionMaxInactiveInterval,
-                        },
+                        oauth2ProviderSettingsUpdateModel: updateModel,
                     }),
                 );
             }
@@ -151,44 +163,36 @@ export default function OAuth2ProviderForm() {
                             label={'Provider Name *'}
                             id={'name'}
                             validators={[composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())]}
+                            disabled={editMode}
                         />
 
                         <TextField id="clientId" label="Client Id" validators={[]} />
                         <TextField id="clientSecret" label="Client Secret" validators={[]} />
 
-                        <FormGroup>
-                            <Label for="scope">Scope</Label>
-                            <Select
-                                id="scope"
-                                inputId="scope"
-                                options={[]}
-                                value={null}
-                                onChange={(e) => {
-                                    // setFilterValue(e);
-                                }}
-                                isMulti={true}
-                                isClearable={true}
-                                isDisabled={false}
-                            />
-                        </FormGroup>
-                        <FormGroup>
-                            <Label for="audiences">Audiences</Label>
-                            <Select
-                                classNames={{}}
-                                components={{}}
-                                id="audiences"
-                                inputId="audiences"
-                                options={[]}
-                                value={null}
-                                onChange={(e) => {
-                                    // setFilterValue(e);
-                                }}
-                                isMulti={true}
-                                isClearable={true}
-                                isDisabled={false}
-                                menuIsOpen={false}
-                            />
-                        </FormGroup>
+                        <CustomSelect
+                            id="scope"
+                            inputId="scope"
+                            label="Scope"
+                            options={scopeOptions}
+                            value={values.scope}
+                            onChange={(e) => form.change('scope', e as OptionType[])}
+                            isMulti={true}
+                            isClearable={true}
+                            allowTextInput={true}
+                            validators={[]}
+                        />
+                        <CustomSelect
+                            id="audiences"
+                            inputId="audiences"
+                            label="Audiences"
+                            options={audienceOptions}
+                            value={values.audiences}
+                            onChange={(e) => form.change('audiences', e as OptionType[])}
+                            isMulti={true}
+                            isClearable={true}
+                            allowTextInput={true}
+                            validators={[validateAlphaNumericWithoutAccents()]}
+                        />
 
                         <TextField
                             id="jwkSetUrl"
