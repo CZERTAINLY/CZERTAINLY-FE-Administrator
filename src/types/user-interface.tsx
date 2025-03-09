@@ -33,7 +33,7 @@ export enum LockWidgetNameEnum {
     NotificationStore,
     ApprovalProfileDetails,
     AuthenticationProviderDetails,
-    AuthenticationProviderList,
+    AuthenticationSettings,
     ListOfApprovals,
     ListOfApprovalProfiles,
     ListOfCertificates,

@@ -13,6 +13,8 @@ import {
 } from './transform/auth-settings';
 
 import { actions as appRedirectActions } from './app-redirect';
+import { actions as userInterfaceActions } from './user-interface';
+import { LockWidgetNameEnum } from 'types/user-interface';
 
 const getAuthenticationSettings: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -20,14 +22,17 @@ const getAuthenticationSettings: AppEpic = (action$, state$, deps) => {
         mergeMap(() =>
             deps.apiClients.settings.getAuthenticationSettings().pipe(
                 mergeMap((settings) =>
-                    of(slice.actions.getAuthenticationSettingsSuccess({ settings: transformAuthenticationSettingsDtoToModel(settings) })),
+                    of(
+                        slice.actions.getAuthenticationSettingsSuccess({ settings: transformAuthenticationSettingsDtoToModel(settings) }),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.AuthenticationSettings),
+                    ),
                 ),
                 catchError((err) =>
                     of(
                         slice.actions.getAuthenticationSettingsFailure({
                             error: extractError(err, 'Failed to get authentication settings'),
                         }),
-                        appRedirectActions.fetchError({ error: err, message: 'Failed to get authentication settings' }),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.AuthenticationSettings),
                     ),
                 ),
             ),
@@ -75,6 +80,7 @@ const getOAuth2ProviderSettings: AppEpic = (action$, state$, deps) => {
                         slice.actions.getOAuth2ProviderSettingsSuccess({
                             oauth2Provider: transformOAuth2ProviderSettingsDtoToModel(provider),
                         }),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.AuthenticationProviderDetails),
                     ),
                 ),
                 catchError((err) =>
@@ -83,6 +89,7 @@ const getOAuth2ProviderSettings: AppEpic = (action$, state$, deps) => {
                             error: extractError(err, 'Failed to get OAuth2 provider settings'),
                         }),
                         appRedirectActions.fetchError({ error: err, message: 'Failed to get OAuth2 provider settings' }),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.AuthenticationProviderDetails),
                     ),
                 ),
             ),

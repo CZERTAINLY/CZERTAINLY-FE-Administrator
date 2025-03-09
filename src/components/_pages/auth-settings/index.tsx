@@ -109,7 +109,7 @@ const AuthenticationSettings = () => {
                                 widgetButtons={providersButtons}
                                 refreshAction={getAuthenticationSettings}
                                 titleSize="larger"
-                                widgetLockName={LockWidgetNameEnum.AuthenticationProviderList}
+                                widgetLockName={LockWidgetNameEnum.AuthenticationSettings}
                                 lockSize="large"
                                 busy={isBusy}
                             >
@@ -120,7 +120,14 @@ const AuthenticationSettings = () => {
                     {
                         title: 'Configuration',
                         content: (
-                            <Widget title="Authentication Settings" titleSize="larger" busy={isBusy}>
+                            <Widget
+                                title="Authentication Settings"
+                                titleSize="larger"
+                                refreshAction={getAuthenticationSettings}
+                                busy={isBusy}
+                                widgetLockName={LockWidgetNameEnum.AuthenticationSettings}
+                                lockSize="large"
+                            >
                                 <Form initialValues={initialValues} onSubmit={onSubmit}>
                                     {({ handleSubmit, values, submitting }) => (
                                         <BootstrapForm onSubmit={handleSubmit} className="mt-2">
