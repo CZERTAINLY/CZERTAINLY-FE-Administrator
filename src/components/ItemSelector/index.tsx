@@ -53,7 +53,7 @@ function ItemSelector({ content, value, items, onChange, showFilter, selectedIte
                         <div className={styles.inputContainer}>
                             <Input
                                 id="filter"
-                                placeholder={content?.filterPlaceholder || 'Search items'}
+                                placeholder={content?.filterPlaceholder ?? 'Search items'}
                                 onChange={(event) => setFilter(event.target.value)}
                             />
                         </div>

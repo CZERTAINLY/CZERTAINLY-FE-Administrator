@@ -1,7 +1,6 @@
 import TabLayout from 'components/Layout/TabLayout';
 import Widget from 'components/Widget';
 import { actions, selectors } from 'ducks/settings';
-import { actions as authActions, selectors as authSelectors } from 'ducks/auth';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Container, Form as BootstrapForm, FormGroup, Label, ButtonGroup } from 'reactstrap';
@@ -34,7 +33,7 @@ type AuditFormValues = Omit<CommonFormValues, 'output'> & {
         value: AuditLoggingSettingsDtoOutputEnum;
     };
 };
-type EventFormValues = CommonFormValues;
+type EventFormValues = Omit<CommonFormValues, 'output'>;
 
 const LoggingSetting = () => {
     const dispatch = useDispatch();
