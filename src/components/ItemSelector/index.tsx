@@ -1,5 +1,5 @@
 import { Input } from 'reactstrap';
-import styles from './styles.module.scss';
+import styles from './ItemSelector.module.scss';
 import { useCallback, useMemo, useState } from 'react';
 
 type Props = {
@@ -26,7 +26,7 @@ function ItemSelector({ content, value, items, onChange, showFilter, selectedIte
             const newValue = value.includes(itemValue) ? value.filter((v) => v !== itemValue) : [...value, itemValue];
             onChange(newValue);
         },
-        [value],
+        [value, onChange],
     );
 
     const selectedItemStyles: Record<typeof selectedItemStyleVariant, {}> = {

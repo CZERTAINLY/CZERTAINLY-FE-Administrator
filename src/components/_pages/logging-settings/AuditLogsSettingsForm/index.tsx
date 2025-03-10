@@ -1,5 +1,5 @@
-import ItemSelector from 'components/_pages/logging-settings/ItemSelector';
 import CheckboxField from 'components/Input/CheckboxField';
+import ItemSelector from 'components/ItemSelector';
 import ProgressButton from 'components/ProgressButton';
 import Widget from 'components/Widget';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
@@ -117,7 +117,7 @@ const AuditLogsSettingForm = () => {
                     value: el,
                 }))
                 .sort((a, b) => a.label.localeCompare(b.label)),
-        [moduleEnum],
+        [resourceEnum],
     );
 
     return (
