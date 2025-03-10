@@ -8,7 +8,11 @@ import { updateBackendUtilsClients } from '../api';
 import { actions as alertActions } from './alerts';
 import { actions as appRedirectActions } from './app-redirect';
 import { slice } from './settings';
-import { transformSettingsPlatformDtoToModel } from './transform/settings';
+import {
+    transformLoggingSettingsDtoToModel,
+    transformLoggingSettingsModelToDto,
+    transformSettingsPlatformDtoToModel,
+} from './transform/settings';
 import { actions as userInterfaceActions } from './user-interface';
 
 const getPlatformSettings: AppEpic = (action$, state$, deps) => {
@@ -101,6 +105,65 @@ const updateNotificationsSettings: AppEpic = (action$, state$, deps) => {
     );
 };
 
-const epics = [getPlatformSettings, updatePlatformSettings, getNotificationsSettings, updateNotificationsSettings];
+const getLoggingSettings: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.getLoggingSettings.match),
+        mergeMap(() =>
+            deps.apiClients.settings.getLoggingSettings().pipe(
+                mergeMap((settings) =>
+                    of(
+                        slice.actions.getLoggingSettingsSuccess(transformLoggingSettingsDtoToModel(settings)),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.LoggingSettings),
+                    ),
+                ),
+                catchError((err) =>
+                    of(
+                        slice.actions.getLoggingSettingsFailure({
+                            error: extractError(err, 'Failed to get logging settings'),
+                        }),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.LoggingSettings),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+const updateLoggingSettings: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.updateLoggingSettings.match),
+        mergeMap((action) =>
+            deps.apiClients.settings
+                .updateLoggingSettings({
+                    loggingSettingsDto: transformLoggingSettingsModelToDto(action.payload),
+                })
+                .pipe(
+                    mergeMap(() =>
+                        of(
+                            slice.actions.updateLoggingSettingsSuccess(action.payload),
+                            alertActions.success('Logging settings updated successfully.'),
+                        ),
+                    ),
+                    catchError((err) =>
+                        of(
+                            slice.actions.updateLoggingSettingsFailure({
+                                error: extractError(err, 'Failed to update logging settings'),
+                            }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to update logging settings' }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
+const epics = [
+    getPlatformSettings,
+    updatePlatformSettings,
+    getNotificationsSettings,
+    updateNotificationsSettings,
+    getLoggingSettings,
+    updateLoggingSettings,
+];
 
 export default epics;
