@@ -37,7 +37,7 @@ export default function TextField({ id, label, inputType, disabled = false, vali
                                 invalid={isInvalid}
                                 type={inputType ?? 'text'}
                                 id={id}
-                                placeholder={label || placeholder}
+                                placeholder={placeholder || label}
                                 disabled={disabled}
                             />
                             {inputGroupIcon?.icon && (

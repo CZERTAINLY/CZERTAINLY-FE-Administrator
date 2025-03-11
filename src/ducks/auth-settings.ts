@@ -59,13 +59,20 @@ export const slice = createSlice({
             action: PayloadAction<{ authenticationSettingsUpdateModel: AuthenticationSettingsUpdateModel }>,
         ) => {
             if (!state.authenticationSettings) return;
-            const authenticationSettings: AuthenticationSettingsModel = { ...state.authenticationSettings };
+            const authenticationSettings: AuthenticationSettingsModel = {
+                ...state.authenticationSettings,
+            };
+
             for (const provider of action.payload.authenticationSettingsUpdateModel?.oauth2Providers || []) {
                 if (!authenticationSettings.oauth2Providers) {
                     authenticationSettings.oauth2Providers = {};
                 }
                 authenticationSettings.oauth2Providers[provider.name] = provider;
             }
+            delete action.payload.authenticationSettingsUpdateModel.oauth2Providers;
+
+            Object.assign(authenticationSettings, action.payload.authenticationSettingsUpdateModel);
+
             state.authenticationSettings = authenticationSettings;
             state.isUpdatingSettings = false;
         },

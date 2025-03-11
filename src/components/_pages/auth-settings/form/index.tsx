@@ -19,6 +19,7 @@ import {
 import CustomSelect from '../../../Input/CustomSelect';
 import { MultiValue } from 'react-select';
 import { OAuth2ProviderSettingsUpdateDto } from 'types/auth-settings';
+import { update } from 'cypress/types/lodash';
 
 interface OptionType {
     value: string;
@@ -110,7 +111,6 @@ export default function OAuth2ProviderForm() {
             const updateModel: OAuth2ProviderSettingsUpdateDto = {
                 issuerUrl: values.issuerUrl,
                 clientId: values.clientId,
-                clientSecret: values.clientSecret,
                 authorizationUrl: values.authorizationUrl,
                 tokenUrl: values.tokenUrl,
                 jwkSetUrl: values.jwkSetUrl,
@@ -132,6 +132,7 @@ export default function OAuth2ProviderForm() {
                     }),
                 );
             } else {
+                Object.assign(updateModel, { clientSecret: values.clientSecret });
                 dispatch(
                     actions.createOAuth2Provider({
                         providerName: values.name,
@@ -160,14 +161,14 @@ export default function OAuth2ProviderForm() {
                 {({ handleSubmit, pristine, submitting, values, valid, form }) => (
                     <BootstrapForm onSubmit={handleSubmit}>
                         <TextField
-                            label={'Provider Name *'}
+                            label={'Provider Name'}
                             id={'name'}
                             validators={[composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())]}
                             disabled={editMode}
                         />
 
                         <TextField id="clientId" label="Client Id" validators={[]} />
-                        <TextField id="clientSecret" label="Client Secret" validators={[]} />
+                        <TextField id="clientSecret" label="Client Secret" validators={!editMode ? [validateRequired()] : []} />
 
                         <CustomSelect
                             id="scope"
@@ -176,9 +177,9 @@ export default function OAuth2ProviderForm() {
                             options={scopeOptions}
                             value={values.scope}
                             onChange={(e) => form.change('scope', e as OptionType[])}
-                            isMulti={true}
-                            isClearable={true}
-                            allowTextInput={true}
+                            isMulti
+                            isClearable
+                            allowTextInput
                             validators={[]}
                         />
                         <CustomSelect
@@ -188,10 +189,10 @@ export default function OAuth2ProviderForm() {
                             options={audienceOptions}
                             value={values.audiences}
                             onChange={(e) => form.change('audiences', e as OptionType[])}
-                            isMulti={true}
-                            isClearable={true}
-                            allowTextInput={true}
-                            validators={[validateAlphaNumericWithoutAccents()]}
+                            isMulti
+                            isClearable
+                            allowTextInput
+                            validators={[]}
                         />
 
                         <TextField

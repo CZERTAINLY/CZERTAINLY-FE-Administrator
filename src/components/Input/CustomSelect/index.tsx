@@ -116,7 +116,7 @@ export default function CustomSelect({ allowTextInput, isMulti, options = [], va
 
 type CustomOptionProps = OptionProps<OptionType, boolean, GroupBase<OptionType>>;
 
-const CustomOption: React.FC<CustomOptionProps> = (props) => {
+function CustomOption(props: CustomOptionProps) {
     const { data } = props;
     return (
         <components.Option {...props}>
@@ -124,4 +124,4 @@ const CustomOption: React.FC<CustomOptionProps> = (props) => {
             {data.label}
         </components.Option>
     );
-};
+}
