@@ -6,22 +6,24 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Container, Form as BootstrapForm, FormGroup, Label, ButtonGroup } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { Form } from 'react-final-form';
-import ItemSelector from 'components/ItemSelector';
-import CheckboxField from 'components/Input/CheckboxField';
 import { AuditLoggingSettingsDtoOutputEnum, Module, PlatformEnum, Resource } from 'types/openapi';
 
-import Select from 'react-select';
+import Select, { Props as SelectProps } from 'react-select';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { isObjectSame } from 'utils/common-utils';
 import ProgressButton from 'components/ProgressButton';
+import SwitchField from 'components/Input/SwitchField';
+
+type ModuleOptionType = { value: Module; label: string };
+type ResourceOptionType = { value: Resource; label: string };
 
 type CommonFormValues = {
     logAllModules: boolean;
     logAllResources: boolean;
-    loggedModules?: Module[];
-    ignoredModules?: Module[];
-    loggedResources?: Resource[];
-    ignoredResources?: Resource[];
+    loggedModules?: ModuleOptionType[];
+    ignoredModules?: ModuleOptionType[];
+    loggedResources?: ResourceOptionType[];
+    ignoredResources?: ResourceOptionType[];
     output?: {
         label: string;
         value: AuditLoggingSettingsDtoOutputEnum;
@@ -109,10 +111,10 @@ const LoggingSetting = () => {
                     auditLogs: {
                         logAllModules: values.logAllModules,
                         logAllResources: values.logAllResources,
-                        ignoredModules: values.ignoredModules,
-                        ignoredResources: values.ignoredResources,
-                        loggedModules: values.loggedModules,
-                        loggedResources: values.loggedResources,
+                        ignoredModules: values.ignoredModules?.map((el) => el.value),
+                        ignoredResources: values.ignoredResources?.map((el) => el.value),
+                        loggedModules: values.loggedModules?.map((el) => el.value),
+                        loggedResources: values.loggedResources?.map((el) => el.value),
                         output: values.output.value,
                     },
                 }),
@@ -123,14 +125,31 @@ const LoggingSetting = () => {
 
     const auditFormInitialValues = useMemo(() => {
         if (!loggingSettings) return {};
+        const auditLogs = loggingSettings.auditLogs;
         return {
-            ...loggingSettings.auditLogs,
+            ...auditLogs,
+            ignoredModules: auditLogs?.ignoredModules?.map((el) => ({
+                value: el,
+                label: getEnumLabel(moduleEnum, el),
+            })),
+            ignoredResources: auditLogs?.ignoredResources?.map((el) => ({
+                value: el,
+                label: getEnumLabel(resourceEnum, el),
+            })),
+            loggedModules: auditLogs?.loggedModules?.map((el) => ({
+                value: el,
+                label: getEnumLabel(moduleEnum, el),
+            })),
+            loggedResources: auditLogs?.loggedResources?.map((el) => ({
+                value: el,
+                label: getEnumLabel(resourceEnum, el),
+            })),
             output: {
                 label: loggingSettings.auditLogs.output,
                 value: loggingSettings.auditLogs.output,
             },
         } as AuditFormValues;
-    }, [loggingSettings]);
+    }, [loggingSettings, moduleEnum, resourceEnum]);
 
     const hasAuditFormValuesChanged = useCallback(
         (values: AuditFormValues) =>
@@ -148,10 +167,10 @@ const LoggingSetting = () => {
                     eventLogs: {
                         logAllModules: values.logAllModules,
                         logAllResources: values.logAllResources,
-                        ignoredModules: values.ignoredModules,
-                        ignoredResources: values.ignoredResources,
-                        loggedModules: values.loggedModules,
-                        loggedResources: values.loggedResources,
+                        ignoredModules: values.ignoredModules?.map((el) => el.value),
+                        ignoredResources: values.ignoredResources?.map((el) => el.value),
+                        loggedModules: values.loggedModules?.map((el) => el.value),
+                        loggedResources: values.loggedResources?.map((el) => el.value),
                     },
                 }),
             );
@@ -161,8 +180,27 @@ const LoggingSetting = () => {
 
     const eventFormInitialValues = useMemo(() => {
         if (!loggingSettings) return {};
-        return loggingSettings.eventLogs;
-    }, [loggingSettings]);
+        const eventLogs = loggingSettings.eventLogs;
+        return {
+            ...eventLogs,
+            ignoredModules: eventLogs?.ignoredModules?.map((el) => ({
+                value: el,
+                label: getEnumLabel(moduleEnum, el),
+            })),
+            ignoredResources: eventLogs?.ignoredResources?.map((el) => ({
+                value: el,
+                label: getEnumLabel(resourceEnum, el),
+            })),
+            loggedModules: eventLogs?.loggedModules?.map((el) => ({
+                value: el,
+                label: getEnumLabel(moduleEnum, el),
+            })),
+            loggedResources: eventLogs?.loggedResources?.map((el) => ({
+                value: el,
+                label: getEnumLabel(resourceEnum, el),
+            })),
+        };
+    }, [loggingSettings, moduleEnum, resourceEnum]);
 
     const hasEventFormValuesChanged = useCallback(
         (values: EventFormValues) =>
@@ -177,66 +215,80 @@ const LoggingSetting = () => {
             hasValuesChanged: (values: T) => boolean,
             formType: 'audit' | 'event',
         ) => {
+            const commonSelectProps: SelectProps = { minMenuHeight: 200, closeMenuOnSelect: false, isMulti: true };
+            const loggedSelectProps: SelectProps = {
+                styles: {
+                    multiValue: (provided) => ({
+                        ...provided,
+                        border: '1px solid var(--bs-green)',
+                        background: 'var(--bs-success-bg-subtle)',
+                    }),
+                },
+            };
+            const ignoredSelectProps: SelectProps = {
+                styles: {
+                    multiValue: (provided) => ({
+                        ...provided,
+                        border: '1px solid var(--bs-red)',
+                        background: 'var(--bs-danger-bg-subtle)',
+                    }),
+                },
+            };
+
             return (
                 <Form initialValues={initialValues} onSubmit={onSubmit}>
                     {({ handleSubmit, values, submitting, form }) => (
                         <BootstrapForm onSubmit={handleSubmit} className="mt-2">
                             <Widget title="Module Logging">
-                                <br />
-                                <CheckboxField id="logAllModules" label="Collect logs for all modules" />
+                                <SwitchField id="logAllModules" label="Collect logs for all modules" />
                                 {!values.logAllModules ? (
-                                    <ItemSelector
-                                        value={values.loggedModules || []}
-                                        items={moduleSelectorItems}
-                                        onChange={(e) => form.change('loggedModules', e as Module[])}
-                                        content={{
-                                            selectedLabel: 'Logged Modules',
-                                            label: 'Select Modules to Log',
-                                        }}
-                                        selectedItemStyleVariant="green"
-                                    />
+                                    <FormGroup>
+                                        <Label for="loggedModules">Select Modules to Log</Label>
+                                        <Select
+                                            {...commonSelectProps}
+                                            {...loggedSelectProps}
+                                            value={values.loggedModules || []}
+                                            options={moduleSelectorItems}
+                                            onChange={(e) => form.change('loggedModules', e as ModuleOptionType[])}
+                                        />
+                                    </FormGroup>
                                 ) : (
-                                    <ItemSelector
-                                        value={values.ignoredModules || []}
-                                        items={moduleSelectorItems}
-                                        onChange={(e) => form.change('ignoredModules', e as Module[])}
-                                        content={{
-                                            selectedLabel: 'Ignored Modules',
-                                            label: 'Select Modules to Ignore',
-                                        }}
-                                        selectedItemStyleVariant="red"
-                                    />
+                                    <FormGroup>
+                                        <Label for="ignoredModules">Select Modules to Ignore</Label>
+                                        <Select
+                                            {...commonSelectProps}
+                                            {...ignoredSelectProps}
+                                            value={values.ignoredModules || []}
+                                            options={moduleSelectorItems}
+                                            onChange={(e) => form.change('ignoredModules', e as ModuleOptionType[])}
+                                        />
+                                    </FormGroup>
                                 )}
                             </Widget>
                             <Widget title="Resource Logging">
-                                <br />
-                                <CheckboxField id="logAllResources" label="Collect logs for all resources" />
+                                <SwitchField id="logAllResources" label="Collect logs for all resources" />
                                 {!values.logAllResources ? (
-                                    <ItemSelector
-                                        value={values.loggedResources || []}
-                                        items={resourceSelectorItems}
-                                        onChange={(e) => form.change('loggedResources', e as Resource[])}
-                                        content={{
-                                            selectedLabel: 'Logged Resources',
-                                            label: 'Select Resources to Log',
-                                            filterPlaceholder: 'Search for Resources',
-                                        }}
-                                        selectedItemStyleVariant="green"
-                                        showFilter
-                                    />
+                                    <FormGroup>
+                                        <Label for="loggedResources">Select Resources to Log</Label>
+                                        <Select
+                                            {...commonSelectProps}
+                                            {...loggedSelectProps}
+                                            value={values.loggedResources || []}
+                                            options={resourceSelectorItems}
+                                            onChange={(e) => form.change('loggedResources', e as ResourceOptionType[])}
+                                        />
+                                    </FormGroup>
                                 ) : (
-                                    <ItemSelector
-                                        value={values.ignoredResources || []}
-                                        items={resourceSelectorItems}
-                                        onChange={(e) => form.change('ignoredResources', e as Resource[])}
-                                        content={{
-                                            selectedLabel: 'Ignored Resources',
-                                            label: 'Select Resources to Ignore',
-                                            filterPlaceholder: 'Search for Resources',
-                                        }}
-                                        selectedItemStyleVariant="red"
-                                        showFilter
-                                    />
+                                    <FormGroup>
+                                        <Label for="ignoredResources">Select Resources to Ignore</Label>
+                                        <Select
+                                            {...commonSelectProps}
+                                            {...ignoredSelectProps}
+                                            value={values.ignoredResources || []}
+                                            options={resourceSelectorItems}
+                                            onChange={(e) => form.change('ignoredResources', e as ResourceOptionType[])}
+                                        />
+                                    </FormGroup>
                                 )}
                             </Widget>
                             {formType === 'audit' && (
