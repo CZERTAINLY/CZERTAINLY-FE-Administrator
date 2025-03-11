@@ -1,5 +1,5 @@
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
-import CheckboxField from 'components/Input/CheckboxField';
+import SwitchField from 'components/Input/SwitchField';
 import TabLayout from 'components/Layout/TabLayout';
 import ProgressButton from 'components/ProgressButton';
 import Widget from 'components/Widget';
@@ -131,7 +131,7 @@ const AuthenticationSettings = () => {
                                 <Form initialValues={initialValues} onSubmit={onSubmit}>
                                     {({ handleSubmit, values, submitting }) => (
                                         <BootstrapForm onSubmit={handleSubmit} className="mt-2">
-                                            <CheckboxField id="disableLocalhostUser" label="Disable Localhost User" />
+                                            <SwitchField id="disableLocalhostUser" label="Disable Localhost User" />
                                             <div className="d-flex justify-content-end">
                                                 <ButtonGroup>
                                                     <ProgressButton
