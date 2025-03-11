@@ -9,17 +9,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 import { isObjectSame } from 'utils/common-utils';
-import {
-    composeValidators,
-    validateAlphaNumericWithoutAccents,
-    validateAlphaNumericWithSpecialChars,
-    validatePositiveInteger,
-    validateRequired,
-} from 'utils/validators';
+import { composeValidators, validateAlphaNumericWithSpecialChars, validatePositiveInteger, validateRequired } from 'utils/validators';
 import CustomSelect from '../../../Input/CustomSelect';
-import { MultiValue } from 'react-select';
 import { OAuth2ProviderSettingsUpdateDto } from 'types/auth-settings';
-import { update } from 'cypress/types/lodash';
 
 interface OptionType {
     value: string;
@@ -141,7 +133,7 @@ export default function OAuth2ProviderForm() {
                 );
             }
         },
-        [dispatch, providerName],
+        [dispatch, providerName, editMode],
     );
 
     const areDefaultValuesSame = useCallback(

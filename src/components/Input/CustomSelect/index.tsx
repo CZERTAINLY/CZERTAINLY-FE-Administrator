@@ -68,26 +68,25 @@ export default function CustomSelect({ allowTextInput, isMulti, options = [], va
     const handleChange = async (newValue: SingleValue<OptionType> | MultiValue<OptionType>, actionMeta: ActionMeta<OptionType>) => {
         const newSelection = newValue as OptionType | OptionType[];
 
-        if (Array.isArray(newSelection)) {
-            setNewOptions((prev) => prev.map((el) => ({ ...el, isNew: false })));
+        setNewOptions((prev) => prev.map((el) => ({ ...el, isNew: false })));
 
+        if (Array.isArray(newSelection)) {
             for (const item of newSelection) {
                 if (item.isNew) {
                     const isValid = await validateOption(item.value);
                     if (!isValid) return;
+
                     setNewOptions((prev) => {
                         if (prev.find((el) => el.value === item.value)) return prev;
                         return [item, ...prev];
                     });
                 }
             }
-        } else {
-            if (newSelection.isNew) {
-                const isValid = await validateOption(newSelection.value);
-                if (!isValid) return;
+        } else if (newSelection.isNew) {
+            const isValid = await validateOption(newSelection.value);
+            if (!isValid) return;
 
-                setNewOptions((prev) => [...prev, { ...newSelection, isNew: false }]);
-            }
+            setNewOptions((prev) => [...prev, { ...newSelection, isNew: false }]);
         }
 
         setError(null);

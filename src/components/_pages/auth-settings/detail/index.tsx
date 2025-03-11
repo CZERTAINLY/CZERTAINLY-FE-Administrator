@@ -37,7 +37,7 @@ export default function OAuth2ProviderDetail() {
     const onDeleteClick = useCallback(() => {
         if (!providerName) return;
         dispatch(actions.removeOAuth2Provider({ providerName }));
-    }, [navigate, providerName]);
+    }, [dispatch, providerName]);
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [

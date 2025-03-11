@@ -9,7 +9,7 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { Form as BootstrapForm, ButtonGroup, Container, Row } from 'reactstrap';
+import { Form as BootstrapForm, ButtonGroup, Container } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { renderOAuth2StateBadge } from 'utils/oauth2Providers';
 
@@ -58,7 +58,7 @@ const AuthenticationSettings = () => {
                 },
             },
         ],
-        [],
+        [navigate],
     );
 
     const providerHeaders: TableHeader[] = useMemo(
@@ -77,11 +77,16 @@ const AuthenticationSettings = () => {
 
     const providerDataRows: TableDataRow[] = useMemo(
         () =>
-            !authenticationSettings || !authenticationSettings.oauth2Providers
+            !authenticationSettings?.oauth2Providers
                 ? []
                 : Object.entries(authenticationSettings.oauth2Providers).map(([providerName, provider]) => ({
                       id: providerName,
-                      columns: [<Link to={`./detail/${providerName}`}>{providerName}</Link>, renderOAuth2StateBadge(provider)],
+                      columns: [
+                          <Link key="link" to={`./detail/${providerName}`}>
+                              {providerName}
+                          </Link>,
+                          renderOAuth2StateBadge(provider),
+                      ],
                   })),
         [authenticationSettings],
     );
