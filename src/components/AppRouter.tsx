@@ -134,6 +134,7 @@ import SchedulerJobDetail from './_pages/scheduler/detail';
 import SchedulerJobsList from './_pages/scheduler/list';
 import Layout from './Layout';
 import Spinner from './Spinner';
+import LoggingSetting from 'components/_pages/logging-settings';
 
 export default function AppRouter() {
     const profile = useSelector(selectors.profile);
@@ -346,6 +347,8 @@ export default function AppRouter() {
                     <Route path={`/notificationinstances/detail/:id`} element={<NotificationInstanceDetail />} />
                     <Route path={`/notificationinstances/add`} element={<NotificationInstanceForm />} />
                     <Route path={`/notificationinstances/edit/:id`} element={<NotificationInstanceForm />} />
+
+                    <Route path={`/loggingsettings`} element={<LoggingSetting />} />
 
                     <Route path={`/conditions/add`} element={<ConditionForm />} />
                     <Route path={`/conditions/detail/:id`} element={<ConditionDetails />} />

@@ -1,4 +1,11 @@
-import { SettingsPlatformDto, SettingsPlatformModel, SettingsUtilsDto, SettingsUtilsModel } from '../../types/settings';
+import {
+    SettingsPlatformDto,
+    SettingsPlatformModel,
+    SettingsUtilsDto,
+    SettingsUtilsModel,
+    SettingsLoggingModel,
+    SettingsLoggingDto,
+} from '../../types/settings';
 
 export function transformSettingsUtilsDtoToModel(settings: SettingsUtilsDto): SettingsUtilsModel {
     return { ...settings };
@@ -9,4 +16,12 @@ export function transformSettingsPlatformDtoToModel(settings: SettingsPlatformDt
         ...settings,
         utils: transformSettingsUtilsDtoToModel(settings.utils),
     };
+}
+
+export function transformLoggingSettingsDtoToModel(loggingSettings: SettingsLoggingDto): SettingsLoggingModel {
+    return { ...loggingSettings };
+}
+
+export function transformLoggingSettingsModelToDto(loggingSettings: SettingsLoggingModel): SettingsLoggingDto {
+    return { ...loggingSettings };
 }
