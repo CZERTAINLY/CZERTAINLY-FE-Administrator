@@ -116,6 +116,8 @@ export default function OAuth2ProviderForm() {
                 sessionMaxInactiveInterval: values.sessionMaxInactiveInterval,
             };
 
+            Object.assign(updateModel, { clientSecret: values.clientSecret });
+
             if (editMode) {
                 dispatch(
                     actions.updateOAuth2Provider({
@@ -124,7 +126,6 @@ export default function OAuth2ProviderForm() {
                     }),
                 );
             } else {
-                Object.assign(updateModel, { clientSecret: values.clientSecret });
                 dispatch(
                     actions.createOAuth2Provider({
                         providerName: values.name,
