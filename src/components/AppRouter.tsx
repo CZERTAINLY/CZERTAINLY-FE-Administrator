@@ -135,6 +135,7 @@ import AppLogin from './AppLogin/AppLogin';
 import AppRedirect from './AppRedirect';
 import Layout from './Layout';
 import Spinner from './Spinner';
+import LoggingSetting from 'components/_pages/logging-settings';
 
 import { Resource } from 'types/openapi';
 import OAuth2ProviderForm from 'components/_pages/auth-settings/form';
@@ -356,6 +357,8 @@ export default function AppRouter() {
                     <Route path={`/notificationinstances/detail/:id`} element={<NotificationInstanceDetail />} />
                     <Route path={`/notificationinstances/add`} element={<NotificationInstanceForm />} />
                     <Route path={`/notificationinstances/edit/:id`} element={<NotificationInstanceForm />} />
+
+                    <Route path={`/loggingsettings`} element={<LoggingSetting />} />
 
                     <Route path={`/conditions/add`} element={<ConditionForm />} />
                     <Route path={`/conditions/detail/:id`} element={<ConditionDetails />} />
