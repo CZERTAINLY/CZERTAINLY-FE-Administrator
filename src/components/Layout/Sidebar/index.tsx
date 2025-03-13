@@ -79,6 +79,7 @@ export default function Sidebar() {
                             { _key: '/globalmetadata', name: 'Global Metadata', link: '/globalmetadata' },
                             { _key: '/notificationsSetting', name: 'Notifications', link: '/notificationssettings' },
                             { _key: '/loggingSettings', name: 'Logging', link: '/loggingsettings' },
+                            { _key: '/authenticationSetting', name: 'Authentication', link: '/authenticationsettings' },
                         ]}
                     />
 

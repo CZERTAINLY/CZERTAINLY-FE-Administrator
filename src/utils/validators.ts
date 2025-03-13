@@ -2,8 +2,8 @@ import cronValidator from 'cron-expression-validator';
 
 export const composeValidators =
     (...validators: any[]) =>
-    (value: any) =>
-        validators.reduce((error, validator) => error || validator(value), undefined);
+    (value: any, allValues?: object, fieldState?: any) =>
+        validators.reduce((error, validator) => error || validator(value, allValues, fieldState), undefined);
 
 export const validateRequired = () => (value: any) => ((Array.isArray(value) ? value.length > 0 : value) ? undefined : 'Required Field');
 

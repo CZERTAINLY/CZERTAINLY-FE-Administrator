@@ -9,6 +9,7 @@ import { alertsSlice } from './alert-slice';
 import { slice as appRedirectSlice } from './app-redirect';
 import { slice as auditLogsSlice } from './auditLogs';
 import { slice as authSlice } from './auth';
+import { slice as authSettingsSlice } from './auth-settings';
 import { slice as userInterfaceSlice } from './user-interface';
 
 import { slice as profileApprovalSlice } from './approval-profiles';
@@ -52,6 +53,7 @@ export const reducers = combineReducers({
     [userInterfaceSlice.name]: userInterfaceSlice.reducer,
     [appRedirectSlice.name]: appRedirectSlice.reducer,
     [authSlice.name]: authSlice.reducer,
+    [authSettingsSlice.name]: authSettingsSlice.reducer,
     [dashboardSlice.name]: dashboardSlice.reducer,
     [groupsSlice.name]: groupsSlice.reducer,
     [connectorsSlice.name]: connectorsSlice.reducer,

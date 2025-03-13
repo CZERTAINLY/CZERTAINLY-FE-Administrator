@@ -2,28 +2,33 @@ import { selectors } from 'ducks/auth';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
-import AcmeAccountDetail from './_pages/acme-accounts/detail';
 
+import AuditLogs from './_pages/auditLogs';
+import Dashboard from './_pages/dashboard';
+import AuthenticationSettings from './_pages/auth-settings';
+
+import AcmeAccountDetail from './_pages/acme-accounts/detail';
 import AcmeAccountsList from './_pages/acme-accounts/list';
+
 import AcmeProfileDetail from './_pages/acme-profiles/detail';
 import AcmeProfileEdit from './_pages/acme-profiles/form';
-
 import AcmeProfilesList from './_pages/acme-profiles/list';
-import AuditLogs from './_pages/auditLogs';
+
 import AuthorityDetail from './_pages/authorities/detail';
 import AuthorityEdit from './_pages/authorities/form';
-
 import AuthoritiesList from './_pages/authorities/list';
+
 import CertificateDetail from './_pages/certificates/detail';
 import CertificateEdit from './_pages/certificates/form';
-
 import CertificatesList from './_pages/certificates/list';
+
 import ComplianceProfileDetail from './_pages/compliance-profiles/detail';
 import ComplianceProfileEdit from './_pages/compliance-profiles/form';
-
 import ComplianceProfilesList from './_pages/compliance-profiles/list';
+
 import ConnectorDetail from './_pages/connectors/detail';
 import ConnectorEdit from './_pages/connectors/form';
+import ConnectorsList from './_pages/connectors/list';
 
 import ApprovalProfileDetails from './_pages/approval-profiles/detail';
 import ApprovalProfilesForm from './_pages/approval-profiles/form';
@@ -32,80 +37,73 @@ import ApprovalProfiles from './_pages/approval-profiles/list';
 import ApprovalDetails from './_pages/approvals/details';
 import ApprovalsList from './_pages/approvals/list';
 
-import ConnectorsList from './_pages/connectors/list';
 import CredentialDetail from './_pages/credentials/detail';
 import CredentialEdit from './_pages/credentials/form';
-
 import CredentialsList from './_pages/credentials/list';
+
 import CryptographicKeyDetail from './_pages/cryptographic-keys/detail';
 import CryptographicKeyForm from './_pages/cryptographic-keys/form';
 import CryptographicKeyList from './_pages/cryptographic-keys/list';
+
 import CustomAttributesDetail from './_pages/custom-attributes/detail';
 import CustomAttributesEdit from './_pages/custom-attributes/form';
-
 import CustomAttributesList from './_pages/custom-attributes/list';
-import Dashboard from './_pages/dashboard';
+
 import DiscoveryDetail from './_pages/discoveries/detail';
 import DiscoveryEdit from './_pages/discoveries/form';
-
 import DiscoveriesList from './_pages/discoveries/list';
+
 import EntityDetail from './_pages/entities/detail';
 import EntityEdit from './_pages/entities/form';
-
 import EntitiesList from './_pages/entities/list';
-import GlobalMetadataDetail from './_pages/global-metadata/detail';
-import GlobalMetadataEdit from './_pages/global-metadata/form';
 
 import ScepProfileDetail from './_pages/scep-profiles/detail';
 import ScepProfileEdit from './_pages/scep-profiles/form';
-
 import ScepProfilesList from './_pages/scep-profiles/list';
 
 import CmpProfileDetails from './_pages/cmp-profiles/details';
 import CmpProfileEdit from './_pages/cmp-profiles/form';
 import CmpProfilesList from './_pages/cmp-profiles/list';
 
+import GlobalMetadataDetail from './_pages/global-metadata/detail';
+import GlobalMetadataEdit from './_pages/global-metadata/form';
 import GlobalMetadataList from './_pages/global-metadata/list';
+
 import GroupDetail from './_pages/group/detail';
 import GroupEdit from './_pages/group/form';
-
 import GroupList from './_pages/group/list';
 
 import LocationDetail from './_pages/locations/detail';
 import LocationEdit from './_pages/locations/form';
-
 import LocationsList from './_pages/locations/list';
+
 import RaProfileDetail from './_pages/ra-profiles/detail';
 import RaProfileEdit from './_pages/ra-profiles/form';
-
 import RaProfilesList from './_pages/ra-profiles/list';
-import RoleDetail from './_pages/roles/detail';
 
 import PlatformSettingsDetail from './_pages/platform-settings/detail';
 import PlatformSettingsEdit from './_pages/platform-settings/form';
+
+import RoleDetail from './_pages/roles/detail';
 import RolesList from './_pages/roles/list';
 import RoleEdit from './_pages/roles/RoleForm';
 import RolePermissions from './_pages/roles/RolePermissionsForm';
 import RoleUsers from './_pages/roles/RoleUsersForm';
+
 import TokenProfileDetail from './_pages/token-profiles/detail';
 import TokenProfileForm from './_pages/token-profiles/form';
 import TokenProfileList from './_pages/token-profiles/list';
+
 import TokenDetail from './_pages/tokens/detail';
 import TokenEdit from './_pages/tokens/form';
-
 import TokenList from './_pages/tokens/list';
 
 import UserProfileDetail from './_pages/user-profile/detail';
 import UserProfileEdit from './_pages/user-profile/form';
+
 import UserDetail from './_pages/users/detail';
 import UserEdit from './_pages/users/form';
-
 import UsersList from './_pages/users/list';
-import AppLogin from './AppLogin/AppLogin';
-
-import AppRedirect from './AppRedirect';
-
-import { Resource } from 'types/openapi';
 
 import NotificationsList from './_pages/notifications/list';
 import NotificationInstanceDetail from './_pages/notifications/notification-instance-details';
@@ -132,9 +130,16 @@ import RulesList from './_pages/rules/list';
 
 import SchedulerJobDetail from './_pages/scheduler/detail';
 import SchedulerJobsList from './_pages/scheduler/list';
+
+import AppLogin from './AppLogin/AppLogin';
+import AppRedirect from './AppRedirect';
 import Layout from './Layout';
 import Spinner from './Spinner';
 import LoggingSetting from 'components/_pages/logging-settings';
+
+import { Resource } from 'types/openapi';
+import OAuth2ProviderForm from 'components/_pages/auth-settings/form';
+import OAuth2ProviderDetail from 'components/_pages/auth-settings/detail';
 
 export default function AppRouter() {
     const profile = useSelector(selectors.profile);
@@ -308,6 +313,11 @@ export default function AppRouter() {
                     <Route path={`/globalmetadata/detail/:id`} element={<GlobalMetadataDetail />} />
                     <Route path={`/globalmetadata/add`} element={<GlobalMetadataEdit />} />
                     <Route path={`/globalmetadata/edit/:id`} element={<GlobalMetadataEdit />} />
+
+                    <Route path={`/authenticationsettings`} element={<AuthenticationSettings />} />
+                    <Route path={`/authenticationsettings/detail/:providerName`} element={<OAuth2ProviderDetail />} />
+                    <Route path={`/authenticationsettings/edit/:providerName`} element={<OAuth2ProviderForm />} />
+                    <Route path={`/authenticationsettings/add`} element={<OAuth2ProviderForm />} />
 
                     <Route path={`/${Resource.Tokens.toLowerCase()}`} element={<TokenList />} />
                     <Route

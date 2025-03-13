@@ -32,6 +32,8 @@ export enum LockWidgetNameEnum {
     ConnectorAttributes,
     NotificationStore,
     ApprovalProfileDetails,
+    AuthenticationProviderDetails,
+    AuthenticationSettings,
     ListOfApprovals,
     ListOfApprovalProfiles,
     ListOfCertificates,

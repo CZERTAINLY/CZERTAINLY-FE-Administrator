@@ -189,6 +189,15 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
     };
 
     const createSelect = (descriptor: DataAttributeModel | CustomAttributeModel): JSX.Element => {
+        const errorStyles = {
+            border: 'solid 1px red',
+            '&:hover': { border: 'solid 1px red' },
+            '&:active': {
+                border: 'solid 1px red',
+                boxShadow: '0 0 3px red',
+            },
+            '&:focus-within': { border: 'solid 1px red', boxShadow: '0 0 3px red' },
+        };
         return (
             <Field name={name} validate={buildValidators()} type={getFormTypeFromAttributeContentType(descriptor.contentType)}>
                 {({ input, meta }) => (
@@ -213,7 +222,10 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                                 styles={{
                                     control: (provided) =>
                                         meta.touched && meta.invalid
-                                            ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
+                                            ? {
+                                                  ...provided,
+                                                  ...errorStyles,
+                                              }
                                             : { ...provided },
                                 }}
                                 isDisabled={descriptor.properties.readOnly || busy}
@@ -231,7 +243,10 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                                 styles={{
                                     control: (provided) =>
                                         meta.touched && meta.invalid
-                                            ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
+                                            ? {
+                                                  ...provided,
+                                                  ...errorStyles,
+                                              }
                                             : { ...provided },
                                 }}
                                 isDisabled={descriptor.properties.readOnly}
