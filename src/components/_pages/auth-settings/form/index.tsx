@@ -192,8 +192,8 @@ export default function OAuth2ProviderForm() {
                             id="jwkSetUrl"
                             label="JWK Set Url"
                             validators={[
-                                (value) => {
-                                    if (!values.jwkSet) {
+                                (value, allValues) => {
+                                    if (!allValues.jwkSet) {
                                         return value ? undefined : 'JWK Set URL is required if JWK Set is not provided';
                                     }
                                     return undefined;
