@@ -56,14 +56,14 @@ export default function OAuth2ProviderForm() {
     );
 
     useEffect(() => {
+        dispatch(actions.resetState());
         if (!providerName) return;
         dispatch(actions.getOAuth2ProviderSettings({ providerName }));
     }, [dispatch, providerName]);
 
     useEffect(() => {
-        if (!oauth2Provider) return;
-        setAudienceOptions(oauth2Provider.audiences?.map((el) => ({ label: el, value: el })) || []);
-        setScopeOptions(oauth2Provider.scope?.map((el) => ({ label: el, value: el })) || []);
+        setAudienceOptions(oauth2Provider?.audiences?.map((el) => ({ label: el, value: el })) || []);
+        setScopeOptions(oauth2Provider?.scope?.map((el) => ({ label: el, value: el })) || []);
     }, [oauth2Provider]);
 
     const defaultValues: FormValues = useMemo(() => {
@@ -161,7 +161,12 @@ export default function OAuth2ProviderForm() {
                         />
 
                         <TextField id="clientId" label="Client Id" validators={[]} />
-                        <TextField id="clientSecret" label="Client Secret" validators={!editMode ? [validateRequired()] : []} />
+                        <TextField
+                            id="clientSecret"
+                            label="Client Secret"
+                            validators={!editMode ? [validateRequired()] : []}
+                            inputType="password"
+                        />
 
                         <CustomSelect
                             id="scope"

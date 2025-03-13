@@ -22,6 +22,7 @@ export default function OAuth2ProviderDetail() {
 
     const getFreshData = useCallback(() => {
         if (!providerName) return;
+        dispatch(actions.resetState());
         dispatch(actions.getOAuth2ProviderSettings({ providerName }));
     }, [dispatch, providerName]);
 
