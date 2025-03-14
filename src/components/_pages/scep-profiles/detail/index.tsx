@@ -13,7 +13,7 @@ import { actions, selectors } from 'ducks/scep-profiles';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router';
 import { Container } from 'reactstrap';
 import { Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';

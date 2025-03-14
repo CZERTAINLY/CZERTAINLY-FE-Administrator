@@ -1,7 +1,7 @@
 import { actions, selectors } from 'ducks/app-redirect';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 export default function AppRedirect() {
     const dispatch = useDispatch();

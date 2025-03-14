@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router';
 import { Container } from 'reactstrap';
 
 import { actions as profileApprovalActions, selectors as profileApprovalSelector } from 'ducks/approval-profiles';

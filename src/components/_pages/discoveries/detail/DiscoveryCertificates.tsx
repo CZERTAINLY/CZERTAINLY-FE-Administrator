@@ -6,7 +6,7 @@ import Dialog from 'components/Dialog';
 import { actions, selectors } from 'ducks/discoveries';
 import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { Button } from 'reactstrap';
 
 import { TriggerHistorySummaryModel } from 'types/rules';

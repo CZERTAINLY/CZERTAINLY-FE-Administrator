@@ -10,7 +10,7 @@ import { actions as keyActions, selectors as keySelectors } from 'ducks/cryptogr
 import { actions, selectors } from 'ducks/tokens';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router';
 import { Container, Label } from 'reactstrap';
 import { Resource, TokenInstanceStatus } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';

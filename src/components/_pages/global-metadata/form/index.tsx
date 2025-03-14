@@ -8,7 +8,7 @@ import { actions, selectors } from 'ducks/globalMetadata';
 import { useCallback, useEffect, useMemo } from 'react';
 import { Field, Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router';
 import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
 import { GlobalMetadataCreateRequestModel, GlobalMetadataUpdateRequestModel } from 'types/globalMetadata';
 import { AttributeContentType, PlatformEnum } from 'types/openapi';

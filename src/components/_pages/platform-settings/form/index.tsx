@@ -7,7 +7,7 @@ import { actions, selectors } from 'ducks/settings';
 import { useCallback, useEffect, useMemo } from 'react';
 import { Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { Form as BootstrapForm, Button, ButtonGroup } from 'reactstrap';
 import { SettingsPlatformModel } from 'types/settings';
 

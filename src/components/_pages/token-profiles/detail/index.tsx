@@ -11,7 +11,7 @@ import { actions as tokenProfilesActions, selectors as tokenProfilesSelectors } 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router';
 import Select from 'react-select';
 
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';

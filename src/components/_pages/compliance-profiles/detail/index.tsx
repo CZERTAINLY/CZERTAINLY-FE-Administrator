@@ -9,7 +9,7 @@ import WidgetButtons, { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions, selectors } from 'ducks/compliance-profiles';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router';
 import Select from 'react-select';
 
 import { Badge, Button, Col, Container, Label, Row } from 'reactstrap';

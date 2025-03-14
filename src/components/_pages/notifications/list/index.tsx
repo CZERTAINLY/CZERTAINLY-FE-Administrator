@@ -8,7 +8,7 @@ import { selectors as pagingSelectors } from 'ducks/paging';
 import { TableDataRow, TableHeader } from 'components/CustomTable';
 import PagedList from 'components/PagedList/PagedList';
 import { WidgetButtonProps } from 'components/WidgetButtons';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { Button, Container } from 'reactstrap';
 import { SearchRequestModel } from 'types/certificate';
 import { LockWidgetNameEnum } from 'types/user-interface';

@@ -11,7 +11,7 @@ import { selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { actions, selectors } from 'ducks/users';
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router';
 import { Badge, Container } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { Resource } from '../../../../types/openapi';

@@ -15,7 +15,7 @@ import { actions as userInterfaceActions } from '../../../../ducks/user-interfac
 
 import { Field, Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router';
 
 import Select from 'react-select';
 import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';

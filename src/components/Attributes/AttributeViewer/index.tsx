@@ -3,7 +3,7 @@ import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { useCallback, useMemo, useState } from 'react';
 import { Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { Form as BootstrapForm, Button } from 'reactstrap';
 import {
     AttributeDescriptorModel,

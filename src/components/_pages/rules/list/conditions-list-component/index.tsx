@@ -7,7 +7,7 @@ import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router';
 import Select from 'react-select';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { useRuleEvaluatorResourceOptions } from 'utils/rules';

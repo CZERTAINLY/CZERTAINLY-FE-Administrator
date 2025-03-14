@@ -12,7 +12,7 @@ import { actions as raProfilesActions, selectors as raProfilesSelectors } from '
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router';
 
 import { Col, Container, Label, Row } from 'reactstrap';
 import { Resource } from '../../../../types/openapi';

@@ -3,7 +3,7 @@ import { actions as certificateActions } from 'ducks/certificates';
 import { actions as customAttributesActions } from 'ducks/customAttributes';
 import { actions as rolesActions } from 'ducks/roles';
 import { actions as userActions } from 'ducks/users';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router';
 
 import UserEdit from '../../../../../src/components/_pages/users/form';
 import '../../../../../src/resources/styles/theme.scss';

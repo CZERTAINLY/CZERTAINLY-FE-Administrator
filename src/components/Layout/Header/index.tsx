@@ -1,7 +1,7 @@
 import cx from 'classnames';
 import { useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink } from 'react-router';
 import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Nav, NavItem, Navbar } from 'reactstrap';
 
 import { selectors } from 'ducks/auth';

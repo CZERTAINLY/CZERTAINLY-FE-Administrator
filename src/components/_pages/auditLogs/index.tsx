@@ -4,7 +4,7 @@ import { EntityType, selectors as filterSelectors } from 'ducks/filters';
 import { actions as userInterfaceActions } from '../../../ducks/user-interface';
 
 import { useCallback, useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router';
 
 import { useDispatch, useSelector } from 'react-redux';
 

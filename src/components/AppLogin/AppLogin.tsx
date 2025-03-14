@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router';
 
 import logo from 'resources/images/czertainly_logo.svg';
 import style from './style.module.scss';
