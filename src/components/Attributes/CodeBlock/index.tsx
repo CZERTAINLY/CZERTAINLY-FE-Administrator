@@ -1,4 +1,4 @@
-import * as DOMPurify from 'dompurify';
+import DOMPurify from 'dompurify';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github.css';
 import parse from 'html-react-parser';
@@ -15,7 +15,7 @@ type Props = {
 
 export const getHighLightedCode = (code: string, language: ProgrammingLanguageEnum) => {
     try {
-        return hljs.highlight(language, code == null ? '' : code).value;
+        return hljs.highlight(code == null ? '' : code, { language }).value;
     } catch (e) {
         console.error(e);
         return code;
