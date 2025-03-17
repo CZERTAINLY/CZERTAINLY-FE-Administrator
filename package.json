@@ -4,7 +4,7 @@
     "homepage": ".",
     "private": true,
     "dependencies": {
-        "@openapitools/openapi-generator-cli": "^2.18.2",
+        "@openapitools/openapi-generator-cli": "^2.18.4",
         "@reduxjs/toolkit": "^2.6.1",
         "@types/dagre": "^0.7.48",
         "@types/file-saver": "^2.0.5",
