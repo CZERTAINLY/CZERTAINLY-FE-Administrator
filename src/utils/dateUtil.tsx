@@ -1,4 +1,4 @@
-import { parseExpression } from 'cron-parser';
+import { CronExpressionParser } from 'cron-parser';
 import cronstrue from 'cronstrue';
 import { AttributeContentType, FilterFieldType, SearchFieldDataDto } from 'types/openapi';
 
@@ -61,9 +61,9 @@ const getCronTimes = (cronExpression: string | undefined) => {
     if (cronExpression) {
         try {
             const times = [];
-            const expression = parseExpression(cronExpression ?? '', { iterator: true });
+            const expression = CronExpressionParser.parse(cronExpression ?? '');
             for (let i = 0; i < 5; i++) {
-                const value = expression.next().value;
+                const value = expression.next();
                 times.push(value.toDate());
             }
             return times;

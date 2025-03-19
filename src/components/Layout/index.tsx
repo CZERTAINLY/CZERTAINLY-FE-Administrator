@@ -1,6 +1,6 @@
 import cx from 'classnames';
 import { useCallback, useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet } from 'react-router';
 
 import Alerts from 'components/Alerts';
 import GlobalModal from 'components/GlobalModal';

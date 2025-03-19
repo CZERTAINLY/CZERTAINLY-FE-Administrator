@@ -1,7 +1,7 @@
 import { selectors } from 'ducks/auth';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { HashRouter, Navigate, Route, Routes } from 'react-router';
 
 import AuditLogs from './_pages/auditLogs';
 import Dashboard from './_pages/dashboard';

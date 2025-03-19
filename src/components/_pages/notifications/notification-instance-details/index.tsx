@@ -7,7 +7,7 @@ import { actions as customAttributesActions, selectors as customAttributesSelect
 import { actions as notificationsActions, selectors as notificationsSelectors } from 'ducks/notifications';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router';
 import { Container, Label } from 'reactstrap';
 const NotificationInstanceDetails = () => {
     const { id } = useParams();

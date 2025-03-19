@@ -1,6 +1,6 @@
 import TabLayout from 'components/Layout/TabLayout';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 import { Container } from 'reactstrap';
 import ActionsListComponent from './actions-list-component';
 import ExecutionsListComponent from './executions-list-component';

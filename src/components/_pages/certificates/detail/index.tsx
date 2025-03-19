@@ -34,7 +34,7 @@ import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router';
 import Select from 'react-select';
 
 import { actions as raProfilesActions, selectors as raProfilesSelectors } from 'ducks/ra-profiles';

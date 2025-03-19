@@ -8,7 +8,7 @@ import { actions as authSettingsActions, selectors as authSettingsSelectors } fr
 import { useCallback, useEffect, useMemo } from 'react';
 import { Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router';
 import { Form as BootstrapForm, ButtonGroup, Container } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { renderOAuth2StateBadge } from 'utils/oauth2Providers';

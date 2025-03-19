@@ -12,7 +12,7 @@ import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rule
 import { useTransformTriggerObjectToNodesAndEdges } from 'ducks/transform/rules';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router';
 import { Edge } from 'reactflow';
 import { Button, ButtonGroup, Col, Container, Input, Row } from 'reactstrap';
 import { PlatformEnum, UpdateTriggerRequestDtoEventEnum } from 'types/openapi';

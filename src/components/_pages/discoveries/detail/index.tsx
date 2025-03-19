@@ -9,7 +9,7 @@ import { actions, selectors } from 'ducks/discoveries';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router';
 
 import { Col, Container, Label, Row } from 'reactstrap';
 

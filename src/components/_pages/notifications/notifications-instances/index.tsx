@@ -5,7 +5,7 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as notificationsActions, selectors as notificationsSelectors } from 'ducks/notifications';
 import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router';
 import { Badge } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
 

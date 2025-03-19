@@ -8,7 +8,7 @@ import { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import PagedList from 'components/PagedList/PagedList';
 import { EntityType } from 'ducks/filters';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { Badge, Button } from 'reactstrap';
 import { SearchRequestModel } from 'types/certificate';
 import { PlatformEnum, SchedulerJobExecutionStatus } from 'types/openapi';

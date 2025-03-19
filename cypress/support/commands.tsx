@@ -3,7 +3,7 @@ import { mount } from 'cypress/react18';
 import { reducers } from 'ducks/reducers';
 import React from 'react';
 import { Provider } from 'react-redux';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router';
 
 Cypress.Commands.add('mount', (component, options = {}, initialRoute = '/') => {
     const { ...mountOptions } = options;

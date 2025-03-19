@@ -5,7 +5,7 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as profileApprovalActions, selectors as profileApprovalSelectors } from 'ducks/approval-profiles';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router';
 import { Col, Container, Row } from 'reactstrap';
 import { ApproverType, ProfileApprovalStepModel } from 'types/approval-profiles';
 import { LockWidgetNameEnum } from 'types/user-interface';

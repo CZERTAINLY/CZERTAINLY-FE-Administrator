@@ -7,7 +7,7 @@ import { actions as approvalActions, selectors as approvalSelectors } from 'duck
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router';
 import { Button, Col, Container, Input, Row } from 'reactstrap';
 import { ApproverType, ProfileApprovalStepModel } from 'types/approval-profiles';
 import { DetailApprovalStepModel } from 'types/approvals';
