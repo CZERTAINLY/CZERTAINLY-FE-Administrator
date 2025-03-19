@@ -10,8 +10,7 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as tokenProfilesActions, selectors as tokenProfilesSelectors } from 'ducks/token-profiles';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router';
-import { Link, useParams } from 'react-router';
+import { Link, useNavigate, useParams } from 'react-router';
 import Select from 'react-select';
 
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
