@@ -1,5 +1,5 @@
 # build environment
-FROM node:20-alpine AS build
+FROM node:22-alpine AS build
 
 WORKDIR /app
 
@@ -16,7 +16,7 @@ COPY . ./
 RUN npm run build
 
 # production environment
-FROM nginxinc/nginx-unprivileged:1.27.0-alpine
+FROM nginxinc/nginx-unprivileged:1.27.4-alpine
 
 WORKDIR /usr/share/nginx/html
 
