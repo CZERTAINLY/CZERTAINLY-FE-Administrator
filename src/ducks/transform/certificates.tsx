@@ -255,6 +255,89 @@ function addCertificateNode(
         },
     });
 }
+
+function addCertificateChainNodesAndEdges(nodes: CustomNode[], edges: Edge[], certificateChain: CertificateChainResponseModel | undefined) {
+    if (certificateChain?.certificates?.length) {
+        certificateChain.certificates.forEach((chain, index) => {
+            const chainLength = certificateChain?.certificates?.length || 0;
+
+            const otherProperties: OtherProperties[] = [
+                {
+                    propertyName: 'State',
+                    propertyContent: <CertificateStatus status={chain.state} />,
+                },
+                {
+                    propertyName: 'Validation Status',
+                    propertyContent: <CertificateStatus status={chain.validationStatus} />,
+                },
+                {
+                    propertyName: 'Subject DN',
+                    propertyValue: chain.subjectDn,
+                    copyable: true,
+                },
+            ];
+
+            if (chain?.serialNumber) {
+                otherProperties.push({
+                    propertyName: 'Serial Number',
+                    propertyValue: chain?.serialNumber,
+                    copyable: true,
+                });
+            }
+
+            if (chain?.fingerprint) {
+                otherProperties.push({
+                    propertyName: 'Fingerprint',
+                    propertyValue: chain.fingerprint,
+                    copyable: true,
+                });
+            }
+
+            if (chainLength - 1 === index && !certificateChain?.completeChain) {
+                if (chain?.issuerDn) {
+                    otherProperties.push({
+                        propertyName: 'Issuer DN',
+                        propertyValue: chain.issuerDn,
+                        copyable: true,
+                    });
+                }
+                if (chain?.issuerSerialNumber) {
+                    otherProperties.push({
+                        propertyName: 'Issuer Sr. No.',
+                        propertyValue: chain.issuerSerialNumber,
+                        copyable: true,
+                    });
+                }
+            }
+
+            nodes.push({
+                id: `chain-${index}`,
+                type: 'customFlowNode',
+                position: { x: 0, y: 0 },
+                data: {
+                    customNodeCardTitle: chainLength - 1 === index && certificateChain?.completeChain ? `Root CA` : `Intermediate CA`,
+                    redirectUrl: chain?.uuid ? `/certificates/detail/${chain.uuid}` : undefined,
+                    entityLabel: chain.commonName,
+                    icon: chainLength - 1 === index && certificateChain?.completeChain ? 'fa fa-medal' : 'fa fa-certificate',
+                    certificateNodeData: {
+                        certificateNodeStatus: chain.state,
+                        certificateNodeValidationStatus: chain.validationStatus,
+                    },
+                    otherProperties: otherProperties,
+                },
+            });
+            edges.push({
+                id: `e1-chain-${index}`,
+                // source: "1",
+                source: index === 0 ? '1' : `chain-${index - 1}`,
+                // target: `chain-${index}`,
+                target: `chain-${index}`,
+                type: 'floating',
+                markerEnd: { type: MarkerType.Arrow },
+            });
+        });
+    }
+}
 function addOwnerNodeAndEdges(
     certificate: CertificateDetailResponseModel,
     nodes: CustomNode[],
@@ -528,6 +611,7 @@ export function transformCertificateObjectToNodesAndEdges(
     }
 
     addCertificateNode(certificate, nodes, certificateChain);
+    addCertificateChainNodesAndEdges(nodes, edges, certificateChain);
     addOwnerNodeAndEdges(certificate, nodes, edges, users);
     addKeyNodeAndEdges(certificate, nodes, edges);
     addGroupsNodesAndEdges(certificate, nodes, edges);
