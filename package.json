@@ -9,7 +9,7 @@
         "@types/dagre": "^0.7.48",
         "@types/file-saver": "^2.0.5",
         "@types/lodash.debounce": "^4.0.7",
-        "@types/node": "^20.0.0",
+        "@types/node": "^22.0.0",
         "@types/react": "^18.3.18",
         "@types/react-dom": "^18.3.5",
         "bootstrap": "^5.3.3",
