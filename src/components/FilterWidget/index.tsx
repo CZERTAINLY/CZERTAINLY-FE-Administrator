@@ -199,7 +199,6 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
 
             setFilterValue(newFilterValue);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [availableFilters, currentFilters, selectedFilter, booleanOptions, platformEnums, FilterConditionOperatorEnum, searchGroupEnum]);
 
     const onUnselectFiltersClick = useCallback(

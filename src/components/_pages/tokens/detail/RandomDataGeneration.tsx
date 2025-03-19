@@ -27,15 +27,11 @@ export default function RandomDataGeneration({ tokenUuid, visible, onClose }: Pr
 
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 
-    useEffect(
-        () => {
-            if (!visible) return;
-            if (!tokenUuid) return;
-            dispatch(actions.listRandomAttributeDescriptors({ tokenInstanceUuid: tokenUuid }));
-        },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [visible, tokenUuid, dispatch],
-    );
+    useEffect(() => {
+        if (!visible) return;
+        if (!tokenUuid) return;
+        dispatch(actions.listRandomAttributeDescriptors({ tokenInstanceUuid: tokenUuid }));
+    }, [visible, tokenUuid, dispatch]);
 
     const onSubmit = useCallback(
         (values: any) => {

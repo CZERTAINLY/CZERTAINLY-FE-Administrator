@@ -7,7 +7,7 @@ import { actions as alertActions } from './alerts';
 import { actions as appRedirectActions } from './app-redirect';
 import { actions as userInterfaceActions } from './user-interface';
 
-import { store } from 'index';
+import { store } from 'App';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { slice } from './discoveries';
 import { EntityType } from './filters';

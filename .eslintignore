@@ -1,8 +1,0 @@
-src/types/openapi/
-src/resources/fonts/fontawesome/css
-github/
-build/
-config-overrides.js
-cypress.config.js
-cypress/support
-src/setupProxy.js
