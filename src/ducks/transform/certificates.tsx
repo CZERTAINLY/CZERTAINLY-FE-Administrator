@@ -56,10 +56,7 @@ export function transformSearchFilterModelToDto(search: SearchFilterModel): Sear
 }
 
 export function transformSearchRequestModelToDto(search: SearchRequestModel): SearchRequestDto {
-    return {
-        ...search,
-        filters: search.filters?.map(transformSearchFilterModelToDto),
-    };
+    return { ...search, filters: search.filters?.map(transformSearchFilterModelToDto) };
 }
 
 export function transformRaProfileSimplifiedDtoToModel(raProfile: RaProfileSimplifiedDto): RaProfileSimplifiedModel {
@@ -69,10 +66,7 @@ export function transformRaProfileSimplifiedDtoToModel(raProfile: RaProfileSimpl
 export function transformCertificateComplianceResponseDtoToModel(
     cerCompliance: CertificateComplianceResponseDto,
 ): CertificateComplianceResponseModel {
-    return {
-        ...cerCompliance,
-        attributes: cerCompliance.attributes?.map(transformAttributeResponseDtoToModel),
-    };
+    return { ...cerCompliance, attributes: cerCompliance.attributes?.map(transformAttributeResponseDtoToModel) };
 }
 
 export function transformCertificateDetailResponseDtoToModel(certificate: CertificateDetailResponseDto): CertificateDetailResponseModel {
@@ -96,15 +90,11 @@ export function transformCertificateResponseDtoToModel(certificate: CertificateL
 }
 
 export function transformCertificateListResponseDtoToModel(certificates: CertificateListResponseDto): CertificateListResponseModel {
-    return {
-        ...certificates,
-    };
+    return { ...certificates };
 }
 
 export function transformCertificateContentResponseDtoToModel(contents: CertificateContentResponseDto): CertificateContentResponseModel {
-    return {
-        ...contents,
-    };
+    return { ...contents };
 }
 
 export function transformCertificateSignRequestModelToDto(signRequest: CertificateSignRequestModel): CertificateSignRequestDto {
@@ -116,10 +106,7 @@ export function transformCertificateSignRequestModelToDto(signRequest: Certifica
 }
 
 export function transformCertificateRevokeRequestModelToDto(revokeRequest: CertificateRevokeRequestModel): CertificateRevokeRequestDto {
-    return {
-        ...revokeRequest,
-        attributes: revokeRequest.attributes.map(transformAttributeRequestModelToDto),
-    };
+    return { ...revokeRequest, attributes: revokeRequest.attributes.map(transformAttributeRequestModelToDto) };
 }
 
 export function transformCertificateRenewRequestModelToDto(renewRequest: CertificateRenewRequestModel): CertificateRenewRequestDto {
@@ -135,10 +122,7 @@ export function transformSearchFieldDtoToModel(searchField: SearchFieldDto): Sea
 }
 
 export function transformSearchFieldListDtoToModel(searchFields: SearchFieldListDto): SearchFieldListModel {
-    return {
-        ...searchFields,
-        searchFieldData: searchFields.searchFieldData?.map(transformSearchFieldDtoToModel),
-    };
+    return { ...searchFields, searchFieldData: searchFields.searchFieldData?.map(transformSearchFieldDtoToModel) };
 }
 
 export function transformCertificateHistoryDtoToModel(history: CertificateHistoryDto): CertificateHistoryModel {
@@ -150,17 +134,11 @@ export function transformCertificateObjectModelToDto(certificateObject: Certific
 }
 
 export function transformCertificateBulkObjectModelToDto(bulk: CertificateBulkObjectModel): CertificateBulkObjectDto {
-    return {
-        ...bulk,
-        filters: bulk.filters?.map(transformSearchFilterModelToDto),
-    };
+    return { ...bulk, filters: bulk.filters?.map(transformSearchFilterModelToDto) };
 }
 
 export function transformCertificateBulkDeleteRequestModelToDto(bulk: CertificateBulkDeleteRequestModel): CertificateBulkDeleteRequestDto {
-    return {
-        ...bulk,
-        filters: bulk.filters?.map(transformSearchFilterModelToDto),
-    };
+    return { ...bulk, filters: bulk.filters?.map(transformSearchFilterModelToDto) };
 }
 
 export function transformCertificateBulkDeleteResponseDtoToModel(
@@ -170,10 +148,7 @@ export function transformCertificateBulkDeleteResponseDtoToModel(
 }
 
 export function transformCertificateUploadModelToDto(upload: CertificateUploadModel): CertificateUploadDto {
-    return {
-        ...upload,
-        customAttributes: upload.customAttributes.map(transformAttributeRequestModelToDto),
-    };
+    return { ...upload, customAttributes: upload.customAttributes.map(transformAttributeRequestModelToDto) };
 }
 
 export function transformCertificateComplianceCheckModelToDto(check: CertificateComplianceCheckModel): CertificateComplianceCheckDto {
@@ -186,10 +161,7 @@ function addCertificateNode(
     certificateChain: CertificateChainResponseModel | undefined,
 ) {
     const otherPropertiesCurrentCertificate: OtherProperties[] = [
-        {
-            propertyName: 'State',
-            propertyContent: <CertificateStatus status={certificate.state} />,
-        },
+        { propertyName: 'State', propertyContent: <CertificateStatus status={certificate.state} /> },
     ];
 
     if (certificate?.validationStatus) {
@@ -199,34 +171,18 @@ function addCertificateNode(
         });
     }
 
-    otherPropertiesCurrentCertificate.push({
-        propertyName: 'Subject DN',
-        propertyValue: certificate.subjectDn,
-        copyable: true,
-    });
+    otherPropertiesCurrentCertificate.push({ propertyName: 'Subject DN', propertyValue: certificate.subjectDn, copyable: true });
 
     if (certificate?.serialNumber) {
-        otherPropertiesCurrentCertificate.push({
-            propertyName: 'Serial Number',
-            propertyValue: certificate.serialNumber,
-            copyable: true,
-        });
+        otherPropertiesCurrentCertificate.push({ propertyName: 'Serial Number', propertyValue: certificate.serialNumber, copyable: true });
     }
     if (certificate?.fingerprint) {
-        otherPropertiesCurrentCertificate.push({
-            propertyName: 'Fingerprint',
-            propertyValue: certificate.fingerprint,
-            copyable: true,
-        });
+        otherPropertiesCurrentCertificate.push({ propertyName: 'Fingerprint', propertyValue: certificate.fingerprint, copyable: true });
     }
 
     if (!certificateChain?.certificates?.length && !certificateChain?.completeChain) {
         if (certificate?.issuerDn) {
-            otherPropertiesCurrentCertificate.push({
-                propertyName: 'Issuer DN',
-                propertyValue: certificate.issuerDn,
-                copyable: true,
-            });
+            otherPropertiesCurrentCertificate.push({ propertyName: 'Issuer DN', propertyValue: certificate.issuerDn, copyable: true });
         }
         if (certificate?.issuerSerialNumber) {
             otherPropertiesCurrentCertificate.push({
@@ -259,54 +215,28 @@ function addCertificateNode(
 function addCertificateChainNodesAndEdges(nodes: CustomNode[], edges: Edge[], certificateChain: CertificateChainResponseModel | undefined) {
     if (certificateChain?.certificates?.length) {
         certificateChain.certificates.forEach((chain, index) => {
-            const chainLength = certificateChain?.certificates?.length || 0;
+            const chainLength = certificateChain?.certificates?.length ?? 0;
 
             const otherProperties: OtherProperties[] = [
-                {
-                    propertyName: 'State',
-                    propertyContent: <CertificateStatus status={chain.state} />,
-                },
-                {
-                    propertyName: 'Validation Status',
-                    propertyContent: <CertificateStatus status={chain.validationStatus} />,
-                },
-                {
-                    propertyName: 'Subject DN',
-                    propertyValue: chain.subjectDn,
-                    copyable: true,
-                },
+                { propertyName: 'State', propertyContent: <CertificateStatus status={chain.state} /> },
+                { propertyName: 'Validation Status', propertyContent: <CertificateStatus status={chain.validationStatus} /> },
+                { propertyName: 'Subject DN', propertyValue: chain.subjectDn, copyable: true },
             ];
 
             if (chain?.serialNumber) {
-                otherProperties.push({
-                    propertyName: 'Serial Number',
-                    propertyValue: chain?.serialNumber,
-                    copyable: true,
-                });
+                otherProperties.push({ propertyName: 'Serial Number', propertyValue: chain?.serialNumber, copyable: true });
             }
 
             if (chain?.fingerprint) {
-                otherProperties.push({
-                    propertyName: 'Fingerprint',
-                    propertyValue: chain.fingerprint,
-                    copyable: true,
-                });
+                otherProperties.push({ propertyName: 'Fingerprint', propertyValue: chain.fingerprint, copyable: true });
             }
 
             if (chainLength - 1 === index && !certificateChain?.completeChain) {
                 if (chain?.issuerDn) {
-                    otherProperties.push({
-                        propertyName: 'Issuer DN',
-                        propertyValue: chain.issuerDn,
-                        copyable: true,
-                    });
+                    otherProperties.push({ propertyName: 'Issuer DN', propertyValue: chain.issuerDn, copyable: true });
                 }
                 if (chain?.issuerSerialNumber) {
-                    otherProperties.push({
-                        propertyName: 'Issuer Sr. No.',
-                        propertyValue: chain.issuerSerialNumber,
-                        copyable: true,
-                    });
+                    otherProperties.push({ propertyName: 'Issuer Sr. No.', propertyValue: chain.issuerSerialNumber, copyable: true });
                 }
             }
 
@@ -319,10 +249,7 @@ function addCertificateChainNodesAndEdges(nodes: CustomNode[], edges: Edge[], ce
                     redirectUrl: chain?.uuid ? `/certificates/detail/${chain.uuid}` : undefined,
                     entityLabel: chain.commonName,
                     icon: chainLength - 1 === index && certificateChain?.completeChain ? 'fa fa-medal' : 'fa fa-certificate',
-                    certificateNodeData: {
-                        certificateNodeStatus: chain.state,
-                        certificateNodeValidationStatus: chain.validationStatus,
-                    },
+                    certificateNodeData: { certificateNodeStatus: chain.state, certificateNodeValidationStatus: chain.validationStatus },
                     otherProperties: otherProperties,
                 },
             });
@@ -355,24 +282,13 @@ function addOwnerNodeAndEdges(
             description = user.description;
             redirectUrl = `/users/detail/${user?.uuid}`;
             userOtherProperties.push(
-                {
-                    propertyName: 'Username',
-                    propertyValue: user.username,
-                    copyable: true,
-                },
+                { propertyName: 'Username', propertyValue: user.username, copyable: true },
                 { propertyName: 'User UUID', propertyValue: user.uuid, copyable: true },
-                {
-                    propertyName: 'User Enabled',
-                    propertyValue: user.enabled ? 'Yes' : 'No',
-                },
+                { propertyName: 'User Enabled', propertyValue: user.enabled ? 'Yes' : 'No' },
             );
 
             if (user?.email) {
-                userOtherProperties.push({
-                    propertyName: 'Email',
-                    propertyValue: user.email,
-                    copyable: true,
-                });
+                userOtherProperties.push({ propertyName: 'Email', propertyValue: user.email, copyable: true });
             }
         } else if (certificate.owner && certificate.ownerUuid) {
             entityLabel = certificate.owner;
@@ -393,13 +309,7 @@ function addOwnerNodeAndEdges(
                 otherProperties: userOtherProperties,
             },
         });
-        edges.push({
-            id: 'e1-2',
-            source: '1',
-            target: '2',
-            type: 'floating',
-            markerEnd: { type: MarkerType.Arrow },
-        });
+        edges.push({ id: 'e1-2', source: '1', target: '2', type: 'floating', markerEnd: { type: MarkerType.Arrow } });
     }
 }
 function addKeyNodeAndEdges(certificate: CertificateDetailResponseModel, nodes: CustomNode[], edges: Edge[]) {
@@ -407,11 +317,7 @@ function addKeyNodeAndEdges(certificate: CertificateDetailResponseModel, nodes: 
         const keyOtherProperties: OtherProperties[] = [];
 
         if (certificate?.key?.owner) {
-            keyOtherProperties.push({
-                propertyName: 'Key Owner',
-                propertyValue: certificate.key.owner,
-                copyable: true,
-            });
+            keyOtherProperties.push({ propertyName: 'Key Owner', propertyValue: certificate.key.owner, copyable: true });
         }
 
         if (certificate?.key?.tokenProfileName) {
@@ -436,13 +342,7 @@ function addKeyNodeAndEdges(certificate: CertificateDetailResponseModel, nodes: 
                 otherProperties: keyOtherProperties,
             },
         });
-        edges.push({
-            id: 'e1-4',
-            source: '4',
-            target: '1',
-            type: 'floating',
-            markerEnd: { type: MarkerType.Arrow },
-        });
+        edges.push({ id: 'e1-4', source: '4', target: '1', type: 'floating', markerEnd: { type: MarkerType.Arrow } });
     }
 }
 function addGroupsNodesAndEdges(certificate: CertificateDetailResponseModel, nodes: CustomNode[], edges: Edge[]) {
@@ -463,13 +363,7 @@ function addGroupsNodesAndEdges(certificate: CertificateDetailResponseModel, nod
                     redirectUrl: group?.uuid ? `/groups/detail/${group?.uuid}` : undefined,
                 },
             });
-            edges.push({
-                id: `e1-${nodeId}`,
-                source: nodeId,
-                target: '1',
-                type: 'floating',
-                markerEnd: { type: MarkerType.Arrow },
-            });
+            edges.push({ id: `e1-${nodeId}`, source: nodeId, target: '1', type: 'floating', markerEnd: { type: MarkerType.Arrow } });
         });
     }
 }
@@ -506,13 +400,7 @@ function addRaProfileNodeAndEdges(
                 otherProperties: raProfileOtherProperties,
             },
         });
-        edges.push({
-            id: 'e1-5',
-            source: '1',
-            target: '5',
-            type: 'floating',
-            markerEnd: { type: MarkerType.Arrow },
-        });
+        edges.push({ id: 'e1-5', source: '1', target: '5', type: 'floating', markerEnd: { type: MarkerType.Arrow } });
 
         if (raProfileSelected) {
             nodes.push({
@@ -527,27 +415,13 @@ function addRaProfileNodeAndEdges(
                     entityLabel: raProfileSelected.authorityInstanceName || '',
                     redirectUrl: `/authorities/detail/${raProfileSelected.authorityInstanceUuid}`,
                     otherProperties: [
-                        {
-                            propertyName: 'Authority Instance Name',
-                            propertyValue: raProfileSelected.authorityInstanceName,
-                            copyable: true,
-                        },
+                        { propertyName: 'Authority Instance Name', propertyValue: raProfileSelected.authorityInstanceName, copyable: true },
 
-                        {
-                            propertyName: 'Authority UUID',
-                            propertyValue: raProfileSelected.authorityInstanceUuid,
-                            copyable: true,
-                        },
+                        { propertyName: 'Authority UUID', propertyValue: raProfileSelected.authorityInstanceUuid, copyable: true },
                     ],
                 },
             });
-            edges.push({
-                id: 'e7-5',
-                target: '7',
-                source: '5',
-                type: 'floating',
-                markerEnd: { type: MarkerType.Arrow },
-            });
+            edges.push({ id: 'e7-5', target: '7', source: '5', type: 'floating', markerEnd: { type: MarkerType.Arrow } });
         }
     }
 }
@@ -560,16 +434,10 @@ function addLocationsNodesAndEdges(
     if (locations?.length) {
         locations.forEach((location) => {
             const otherPropertiesLocation: OtherProperties[] = [
-                {
-                    propertyName: 'Location Enabled',
-                    propertyValue: location.enabled ? 'Yes' : 'No',
-                },
+                { propertyName: 'Location Enabled', propertyValue: location.enabled ? 'Yes' : 'No' },
             ];
             if (location?.description) {
-                otherPropertiesLocation.push({
-                    propertyName: 'Description',
-                    propertyValue: location?.description,
-                });
+                otherPropertiesLocation.push({ propertyName: 'Description', propertyValue: location?.description });
             }
             nodes.push({
                 id: location?.uuid || '',
