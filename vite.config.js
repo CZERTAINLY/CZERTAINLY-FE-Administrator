@@ -16,6 +16,7 @@ export default defineConfig(async () => {
     const proxyConfig = await loadProxyConfig();
     return {
         server: {
+            open: true,
             proxy: proxyConfig.server.proxy,
         },
         build: {
