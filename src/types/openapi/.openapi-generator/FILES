@@ -16,7 +16,7 @@ apis/ConnectorAuthenticationApi.ts
 apis/ConnectorManagementApi.ts
 apis/ConnectorRegistrationApi.ts
 apis/CredentialManagementApi.ts
-apis/CryptographicKeyControllerApi.ts
+apis/CryptographicKeyManagementApi.ts
 apis/CryptographicOperationsControllerApi.ts
 apis/CustomAttributesApi.ts
 apis/DiscoveryManagementApi.ts
@@ -34,7 +34,7 @@ apis/SCEPProfileManagementApi.ts
 apis/ScheduledJobsManagementApi.ts
 apis/SettingsApi.ts
 apis/StatisticsDashboardApi.ts
-apis/TokenInstanceControllerApi.ts
+apis/TokenInstanceManagementApi.ts
 apis/TokenProfileManagementApi.ts
 apis/UserManagementApi.ts
 apis/WorkflowActionsManagementApi.ts
@@ -96,7 +96,7 @@ models/AuthenticationSettingsUpdateDto.ts
 models/AuthorityInstanceDto.ts
 models/AuthorityInstanceRequestDto.ts
 models/AuthorityInstanceUpdateRequestDto.ts
-models/BaseAttributeConstraint.ts
+models/BaseAttributeConstraintDto.ts
 models/BaseAttributeContentDto.ts
 models/BaseAttributeDto.ts
 models/BooleanAttributeContent.ts
@@ -125,6 +125,7 @@ models/CertificateRequestDto.ts
 models/CertificateRequestFormat.ts
 models/CertificateResponseDto.ts
 models/CertificateRevocationReason.ts
+models/CertificateSettingsDto.ts
 models/CertificateState.ts
 models/CertificateSubjectType.ts
 models/CertificateType.ts
@@ -132,6 +133,7 @@ models/CertificateUpdateObjectsDto.ts
 models/CertificateValidationCheck.ts
 models/CertificateValidationCheckDto.ts
 models/CertificateValidationResultDto.ts
+models/CertificateValidationSettingsDto.ts
 models/CertificateValidationStatus.ts
 models/CipherDataRequestDto.ts
 models/CipherRequestData.ts
@@ -195,7 +197,6 @@ models/CustomAttributeDefinitionDto.ts
 models/CustomAttributeProperties.ts
 models/CustomAttributeUpdateRequestDto.ts
 models/DataAttribute.ts
-models/DataAttributeContent.ts
 models/DataAttributeProperties.ts
 models/DateAttributeContent.ts
 models/DateTimeAttributeConstraint.ts
@@ -296,6 +297,7 @@ models/RaProfileAssociationRequestDto.ts
 models/RaProfileCmpDetailResponseDto.ts
 models/RaProfileDto.ts
 models/RaProfileScepDetailResponseDto.ts
+models/RaProfileValidationUpdateDto.ts
 models/RandomDataRequestDto.ts
 models/RandomDataResponseDto.ts
 models/RangeAttributeConstraint.ts

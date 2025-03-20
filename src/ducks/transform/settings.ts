@@ -14,7 +14,7 @@ export function transformSettingsUtilsDtoToModel(settings: SettingsUtilsDto): Se
 export function transformSettingsPlatformDtoToModel(settings: SettingsPlatformDto): SettingsPlatformModel {
     return {
         ...settings,
-        utils: transformSettingsUtilsDtoToModel(settings.utils),
+        utils: settings.utils ? transformSettingsUtilsDtoToModel(settings.utils) : undefined,
     };
 }
 

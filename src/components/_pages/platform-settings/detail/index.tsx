@@ -79,7 +79,7 @@ export default function PlatformSettingsDetail() {
                           id: 'utilsUrl',
                           columns: [
                               'Utils Service URL',
-                              platformSettings.utils.utilsServiceUrl ? (
+                              platformSettings.utils?.utilsServiceUrl ? (
                                   <>
                                       {platformSettings.utils.utilsServiceUrl}&nbsp;
                                       {health ? (

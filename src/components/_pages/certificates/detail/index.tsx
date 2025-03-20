@@ -258,7 +258,7 @@ export default function CertificateDetail() {
     }, [dispatch, id, certificate, getFreshRaProfileDetail]);
 
     useEffect(() => {
-        if (!settings?.utils.utilsServiceUrl) return;
+        if (!settings?.utils?.utilsServiceUrl) return;
         dispatch(utilsActuatorActions.health());
     }, [dispatch, settings]);
 

@@ -22,7 +22,7 @@ const getPlatformSettings: AppEpic = (action$, state$, deps) => {
             deps.apiClients.settings.getPlatformSettings().pipe(
                 switchMap((platformSettings) => {
                     const platformSettingsModel = transformSettingsPlatformDtoToModel(platformSettings);
-                    updateBackendUtilsClients(platformSettingsModel.utils.utilsServiceUrl);
+                    updateBackendUtilsClients(platformSettingsModel.utils?.utilsServiceUrl);
                     return of(
                         slice.actions.getPlatformSettingsSuccess(platformSettingsModel),
                         userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.PlatformSettings),
@@ -45,7 +45,7 @@ const updatePlatformSettings: AppEpic = (action$, state$, deps) => {
         switchMap((action) =>
             deps.apiClients.settings.updatePlatformSettings({ platformSettingsDto: action.payload }).pipe(
                 mergeMap(() => {
-                    updateBackendUtilsClients(action.payload.utils.utilsServiceUrl);
+                    updateBackendUtilsClients(action.payload.utils?.utilsServiceUrl);
                     return of(
                         slice.actions.updatePlatformSettingsSuccess(action.payload),
                         appRedirectActions.redirect({ url: `../settings` }),
