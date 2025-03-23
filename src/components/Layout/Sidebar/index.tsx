@@ -77,9 +77,10 @@ export default function Sidebar() {
                             { _key: '/settings', name: 'Platform', link: '/settings' },
                             { _key: '/customattributes', name: 'Custom Attributes', link: '/customattributes' },
                             { _key: '/globalmetadata', name: 'Global Metadata', link: '/globalmetadata' },
-                            { _key: '/notificationsSetting', name: 'Notifications', link: '/notificationssettings' },
+                            { _key: '/notificationsSettings', name: 'Notifications', link: '/notificationssettings' },
                             { _key: '/loggingSettings', name: 'Logging', link: '/loggingsettings' },
-                            { _key: '/authenticationSetting', name: 'Authentication', link: '/authenticationsettings' },
+                            { _key: '/authenticationSettings', name: 'Authentication', link: '/authenticationsettings' },
+                            { _key: '/certificatesSettings', name: 'Certificates', link: '/certificatesettings' },
                         ]}
                     />
 

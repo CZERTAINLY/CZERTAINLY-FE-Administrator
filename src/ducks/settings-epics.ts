@@ -1,3 +1,4 @@
+import { AnyAction } from '@reduxjs/toolkit';
 import { AppEpic } from 'ducks';
 import { of } from 'rxjs';
 import { catchError, filter, mergeMap, switchMap } from 'rxjs/operators';
@@ -43,13 +44,17 @@ const updatePlatformSettings: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.updatePlatformSettings.match),
         switchMap((action) =>
-            deps.apiClients.settings.updatePlatformSettings({ platformSettingsDto: action.payload }).pipe(
+            deps.apiClients.settings.updatePlatformSettings({ platformSettingsDto: action.payload.settingsDto }).pipe(
                 mergeMap(() => {
-                    updateBackendUtilsClients(action.payload.utils?.utilsServiceUrl);
-                    return of(
-                        slice.actions.updatePlatformSettingsSuccess(action.payload),
-                        appRedirectActions.redirect({ url: `../settings` }),
-                    );
+                    if (typeof action.payload.settingsDto.utils === 'object') {
+                        updateBackendUtilsClients(action.payload.settingsDto.utils?.utilsServiceUrl);
+                    }
+                    const actions = [
+                        slice.actions.updatePlatformSettingsSuccess(action.payload.settingsDto),
+                        alertActions.success('Platform settings updated successfully.'),
+                        action.payload.redirect ? appRedirectActions.redirect({ url: action.payload.redirect }) : undefined,
+                    ].filter((el) => el) as AnyAction[];
+                    return of(...actions);
                 }),
                 catchError((err) =>
                     of(

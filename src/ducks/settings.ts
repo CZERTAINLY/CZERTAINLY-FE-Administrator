@@ -43,13 +43,13 @@ export const slice = createSlice({
             state.isFetchingPlatform = false;
         },
 
-        updatePlatformSettings: (state, action: PayloadAction<SettingsPlatformModel>) => {
+        updatePlatformSettings: (state, action: PayloadAction<{ settingsDto: SettingsPlatformModel; redirect?: string }>) => {
             state.isUpdatingPlatform = true;
         },
 
         updatePlatformSettingsSuccess: (state, action: PayloadAction<SettingsPlatformModel>) => {
             state.isUpdatingPlatform = false;
-            state.platformSettings = action.payload;
+            state.platformSettings = { ...state.platformSettings, ...action.payload };
         },
 
         updatePlatformSettingsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {

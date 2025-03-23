@@ -26,7 +26,7 @@ export default function PlatformSettingsForm() {
     const onSubmit = useCallback(
         (values: SettingsPlatformModel) => {
             const requestSettings = values.utils ? values : emptySettings;
-            dispatch(actions.updatePlatformSettings(requestSettings));
+            dispatch(actions.updatePlatformSettings({ settingsDto: requestSettings, redirect: '../settings' }));
         },
         [dispatch, emptySettings],
     );
