@@ -1,4 +1,3 @@
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import TextField from 'components/Input/TextField';
 import ProgressButton from 'components/ProgressButton';
 import { actions, selectors } from 'ducks/settings';
@@ -9,6 +8,45 @@ import { Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { SettingsPlatformModel } from 'types/settings';
 import { useNavigate } from 'react-router';
+
+const validateUrl = (url?: string): string | undefined => {
+    if (!url || /^https?:\/\/[a-zA-Z0-9\-.]+(:[0-9]+?)?(\/[a-zA-Z0-9\-.]*)*/g.test(url)) {
+        return undefined;
+    }
+    return 'Please enter valid URL.';
+};
+
+const validateHealthUrl = async (url?: string): Promise<string | undefined> => {
+    if (!url) {
+        return undefined;
+    }
+    const error = 'Please enter reachable and valid Utils Service URL (with /health endpoint).';
+    try {
+        const result = await fetch(url + '/health');
+        const json = await result.json();
+        return result.status === 200 && json.status === 'UP' ? undefined : error;
+    } catch {
+        return error;
+    }
+};
+
+class DebouncingHealthValidation {
+    clearTimeout = () => {};
+    validateHealth = (url?: string) => {
+        return new Promise<string | undefined>((resolve) => {
+            this.clearTimeout();
+
+            const timerId = setTimeout(() => {
+                resolve(validateHealthUrl(url));
+            }, 600);
+
+            this.clearTimeout = () => {
+                clearTimeout(timerId);
+                resolve(undefined);
+            };
+        });
+    };
+}
 
 const UtilsSettingsForm = () => {
     const dispatch = useDispatch();
@@ -35,45 +73,6 @@ const UtilsSettingsForm = () => {
             dispatch(actions.getPlatformSettings());
         }
     }, [dispatch, platformSettings]);
-
-    const validateUrl = (url?: string): string | undefined => {
-        if (!url || /^https?:\/\/[a-zA-Z0-9\-.]+(:[0-9]+?)?(\/[a-zA-Z0-9\-.]*)*/g.test(url)) {
-            return undefined;
-        }
-        return 'Please enter valid URL.';
-    };
-
-    const validateHealthUrl = async (url?: string): Promise<string | undefined> => {
-        if (!url) {
-            return undefined;
-        }
-        const error = 'Please enter reachable and valid Utils Service URL (with /health endpoint).';
-        try {
-            const result = await fetch(url + '/health');
-            const json = await result.json();
-            return result.status === 200 && json.status === 'UP' ? undefined : error;
-        } catch {
-            return error;
-        }
-    };
-
-    class DebouncingHealthValidation {
-        clearTimeout = () => {};
-        validateHealth = (url?: string) => {
-            return new Promise<string | undefined>((resolve) => {
-                this.clearTimeout();
-
-                const timerId = setTimeout(() => {
-                    resolve(validateHealthUrl(url));
-                }, 600);
-
-                this.clearTimeout = () => {
-                    clearTimeout(timerId);
-                    resolve(undefined);
-                };
-            });
-        };
-    }
 
     const debouncingHealthValidation = new DebouncingHealthValidation();
 

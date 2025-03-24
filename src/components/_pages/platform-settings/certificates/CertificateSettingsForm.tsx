@@ -1,11 +1,10 @@
 import SwitchField from 'components/Input/SwitchField';
 import ProgressButton from 'components/ProgressButton';
-import Widget from 'components/Widget';
 import { useCallback, useEffect, useMemo } from 'react';
 import { Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { actions, selectors } from 'ducks/settings';
-import { Form as BootstrapForm, ButtonGroup, Container } from 'reactstrap';
+import { Form as BootstrapForm, ButtonGroup } from 'reactstrap';
 import { isObjectSame } from 'utils/common-utils';
 import { validatePositiveInteger } from 'utils/validators';
 import TextField from 'components/Input/TextField';
