@@ -3,7 +3,7 @@
         "target": "es2015",
         "lib": ["dom", "dom.iterable", "esnext"],
         "allowJs": true,
-        "baseUrl": "src",
+        "baseUrl": ".",
         "skipLibCheck": true,
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
@@ -15,7 +15,17 @@
         "resolveJsonModule": true,
         "isolatedModules": true,
         "noEmit": true,
-        "jsx": "react-jsx"
+        "jsx": "react-jsx",
+        "paths": {
+            "types": ["./src/types"],
+            "types/*": ["./src/types/*"],
+            "utils": ["./src/utils"],
+            "utils/*": ["./src/utils/*"],
+            "ducks": ["./src/ducks"],
+            "ducks/*": ["./src/ducks/*"],
+            "components": ["./src/components"],
+            "components/*": ["./src/components/*"]
+        }
     },
     "include": ["src", "cypress", "cypress.d.ts", "."],
     "files": ["src/types/global.d.ts", "src/react-app-env.d.ts"]

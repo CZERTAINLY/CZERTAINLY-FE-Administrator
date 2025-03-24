@@ -7,7 +7,7 @@ import { actions, selectors } from 'ducks/discoveries';
 import { EntityType } from 'ducks/filters';
 import { dateFormatter, durationFormatter } from 'utils/dateUtil';
 
-import { ApiClients } from 'api';
+import { ApiClients } from '../../../../api';
 import { TableDataRow, TableHeader } from 'components/CustomTable';
 import PagedList from 'components/PagedList/PagedList';
 import { SearchRequestModel } from 'types/certificate';

@@ -4,7 +4,7 @@ import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
 
 import { extractError } from 'utils/net';
 
-import { store } from 'App';
+import { store } from '../App';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { actions as appRedirectActions } from './app-redirect';
 import { slice as certsSlice } from './certificates';
