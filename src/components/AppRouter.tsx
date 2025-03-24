@@ -10,7 +10,6 @@ import OAuth2ProviderForm from './_pages/auth-settings/form';
 import OAuth2ProviderDetail from './_pages/auth-settings/detail';
 
 import LoggingSettings from './_pages/logging-settings';
-import CertificateSettings from './_pages/certificate-settings';
 
 import AcmeAccountDetail from './_pages/acme-accounts/detail';
 import AcmeAccountsList from './_pages/acme-accounts/list';
@@ -320,8 +319,6 @@ export default function AppRouter() {
                     <Route path={`/authenticationsettings/detail/:providerName`} element={<OAuth2ProviderDetail />} />
                     <Route path={`/authenticationsettings/edit/:providerName`} element={<OAuth2ProviderForm />} />
                     <Route path={`/authenticationsettings/add`} element={<OAuth2ProviderForm />} />
-
-                    <Route path={`/certificatesettings`} element={<CertificateSettings />} />
 
                     <Route path={`/${Resource.Tokens.toLowerCase()}`} element={<TokenList />} />
                     <Route

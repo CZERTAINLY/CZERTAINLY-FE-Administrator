@@ -44,15 +44,15 @@ const updatePlatformSettings: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.updatePlatformSettings.match),
         switchMap((action) =>
-            deps.apiClients.settings.updatePlatformSettings({ platformSettingsUpdateDto: action.payload.settingsDto }).pipe(
+            deps.apiClients.settings.updatePlatformSettings({ platformSettingsUpdateDto: action.payload }).pipe(
                 mergeMap(() => {
-                    if (typeof action.payload.settingsDto.utils === 'object') {
-                        updateBackendUtilsClients(action.payload.settingsDto.utils?.utilsServiceUrl);
+                    if (typeof action.payload.utils === 'object') {
+                        updateBackendUtilsClients(action.payload.utils?.utilsServiceUrl);
                     }
                     const actions = [
-                        slice.actions.updatePlatformSettingsSuccess(action.payload.settingsDto),
+                        slice.actions.updatePlatformSettingsSuccess(action.payload),
                         alertActions.success('Platform settings updated successfully.'),
-                        action.payload.redirect ? appRedirectActions.redirect({ url: action.payload.redirect }) : undefined,
+                        appRedirectActions.redirect({ url: '../settings' }),
                     ].filter((el) => el) as AnyAction[];
                     return of(...actions);
                 }),

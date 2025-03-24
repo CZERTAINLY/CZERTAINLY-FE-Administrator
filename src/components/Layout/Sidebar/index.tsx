@@ -80,7 +80,6 @@ export default function Sidebar() {
                             { _key: '/notificationsSettings', name: 'Notifications', link: '/notificationssettings' },
                             { _key: '/loggingSettings', name: 'Logging', link: '/loggingsettings' },
                             { _key: '/authenticationSettings', name: 'Authentication', link: '/authenticationsettings' },
-                            { _key: '/certificatesSettings', name: 'Certificates', link: '/certificatesettings' },
                         ]}
                     />
 
