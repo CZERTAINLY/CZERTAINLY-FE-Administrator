@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { mount } from 'cypress/react18';
+import { mount } from 'cypress/react';
 import { reducers } from 'ducks/reducers';
 import React from 'react';
 import { Provider } from 'react-redux';

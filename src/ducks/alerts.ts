@@ -1,4 +1,4 @@
-import { store } from 'index';
+import { store } from 'App';
 import { createSelector } from 'reselect';
 import { MessageModel } from 'types/alerts';
 import { createFeatureSelector } from 'utils/ducks';
