@@ -11,12 +11,15 @@ import { validatePositiveInteger } from 'utils/validators';
 import TextField from 'components/Input/TextField';
 
 type FormValues = {
-    validationEnabled: boolean;
-    validationFrequency?: number;
+    enabled: boolean;
+    frequency?: number;
     expiringThreshold?: number;
 };
 
 const CertificateSetting = () => {
+    const DEFAULT_FREQUENCY = 1;
+    const DEFAULT_EXPIRING_THRESHOLD = 30;
+
     const dispatch = useDispatch();
 
     const platformSettings = useSelector(selectors.platformSettings);
@@ -34,15 +37,15 @@ const CertificateSetting = () => {
     const isBusy = useMemo(() => isFetching || isUpdating, [isFetching, isUpdating]);
 
     const initialValues = useMemo(() => {
-        const validationSettings = platformSettings?.certificates?.certificateValidationSettingsDto;
+        const validationSettings = platformSettings?.certificates?.validation;
         if (!validationSettings) return {};
 
         return {
-            validationEnabled: validationSettings.validationEnabled,
-            expiringThreshold: validationSettings.expiringThreshold?.toString(),
-            validationFrequency: validationSettings.validationFrequency?.toString(),
+            enabled: validationSettings.enabled,
+            expiringThreshold: validationSettings.expiringThreshold?.toString() || DEFAULT_EXPIRING_THRESHOLD,
+            frequency: validationSettings.frequency?.toString() || DEFAULT_FREQUENCY,
         } as FormValues;
-    }, [platformSettings?.certificates?.certificateValidationSettingsDto]);
+    }, [platformSettings?.certificates?.validation]);
 
     const onSubmit = useCallback(
         (values: FormValues) => {
@@ -50,7 +53,7 @@ const CertificateSetting = () => {
                 actions.updatePlatformSettings({
                     settingsDto: {
                         certificates: {
-                            certificateValidationSettingsDto: values,
+                            validation: values,
                         },
                     },
                 }),
@@ -73,13 +76,13 @@ const CertificateSetting = () => {
                 <Form initialValues={initialValues} onSubmit={onSubmit}>
                     {({ handleSubmit, pristine, submitting, valid, values }) => (
                         <BootstrapForm onSubmit={handleSubmit} className="mt-2">
-                            <SwitchField id="validationEnabled" label="Enable certificate validation" />
-                            {values.validationEnabled && (
+                            <SwitchField id="enabled" label="Enable certificate validation" />
+                            {values.enabled && (
                                 <>
                                     <TextField
-                                        id="validationFrequency"
-                                        label="Validation interval"
-                                        description="The number of days between consecutive validation runs."
+                                        id="frequency"
+                                        label="Validation frequency"
+                                        description="Certificates validation frequency specified in days."
                                         validators={[validatePositiveInteger()]}
                                         inputType="number"
                                     />

@@ -27,10 +27,10 @@ import type {
     EditRaProfileRequestDto,
     ErrorMessageDto,
     RaProfileAcmeDetailResponseDto,
+    RaProfileCertificateValidationSettingsUpdateDto,
     RaProfileCmpDetailResponseDto,
     RaProfileDto,
     RaProfileScepDetailResponseDto,
-    RaProfileValidationUpdateDto,
     SimplifiedComplianceProfileDto,
     UuidDto,
 } from '../models';
@@ -185,7 +185,7 @@ export interface ListRaProfilesRequest {
 export interface UpdateRaProfileValidationConfigurationRequest {
     authorityUuid: string;
     raProfileUuid: string;
-    raProfileValidationUpdateDto: RaProfileValidationUpdateDto;
+    raProfileCertificateValidationSettingsUpdateDto: RaProfileCertificateValidationSettingsUpdateDto;
 }
 
 /**
@@ -691,12 +691,12 @@ export class RAProfileManagementApi extends BaseAPI {
     /**
      * Update validation configuration of RA profile
      */
-    updateRaProfileValidationConfiguration({ authorityUuid, raProfileUuid, raProfileValidationUpdateDto }: UpdateRaProfileValidationConfigurationRequest): Observable<RaProfileDto>
-    updateRaProfileValidationConfiguration({ authorityUuid, raProfileUuid, raProfileValidationUpdateDto }: UpdateRaProfileValidationConfigurationRequest, opts?: OperationOpts): Observable<AjaxResponse<RaProfileDto>>
-    updateRaProfileValidationConfiguration({ authorityUuid, raProfileUuid, raProfileValidationUpdateDto }: UpdateRaProfileValidationConfigurationRequest, opts?: OperationOpts): Observable<RaProfileDto | AjaxResponse<RaProfileDto>> {
+    updateRaProfileValidationConfiguration({ authorityUuid, raProfileUuid, raProfileCertificateValidationSettingsUpdateDto }: UpdateRaProfileValidationConfigurationRequest): Observable<RaProfileDto>
+    updateRaProfileValidationConfiguration({ authorityUuid, raProfileUuid, raProfileCertificateValidationSettingsUpdateDto }: UpdateRaProfileValidationConfigurationRequest, opts?: OperationOpts): Observable<AjaxResponse<RaProfileDto>>
+    updateRaProfileValidationConfiguration({ authorityUuid, raProfileUuid, raProfileCertificateValidationSettingsUpdateDto }: UpdateRaProfileValidationConfigurationRequest, opts?: OperationOpts): Observable<RaProfileDto | AjaxResponse<RaProfileDto>> {
         throwIfNullOrUndefined(authorityUuid, 'authorityUuid', 'updateRaProfileValidationConfiguration');
         throwIfNullOrUndefined(raProfileUuid, 'raProfileUuid', 'updateRaProfileValidationConfiguration');
-        throwIfNullOrUndefined(raProfileValidationUpdateDto, 'raProfileValidationUpdateDto', 'updateRaProfileValidationConfiguration');
+        throwIfNullOrUndefined(raProfileCertificateValidationSettingsUpdateDto, 'raProfileCertificateValidationSettingsUpdateDto', 'updateRaProfileValidationConfiguration');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
@@ -706,7 +706,7 @@ export class RAProfileManagementApi extends BaseAPI {
             url: '/v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/validation'.replace('{authorityUuid}', encodeURI(authorityUuid)).replace('{raProfileUuid}', encodeURI(raProfileUuid)),
             method: 'PATCH',
             headers,
-            body: raProfileValidationUpdateDto,
+            body: raProfileCertificateValidationSettingsUpdateDto,
         }, opts?.responseOpts);
     };
 

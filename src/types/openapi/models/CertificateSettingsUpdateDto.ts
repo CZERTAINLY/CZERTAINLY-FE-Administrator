@@ -12,17 +12,18 @@
  */
 
 import type {
-    CertificateValidationSettingsDto,
+    CertificateValidationSettingsUpdateDto,
 } from './';
 
 /**
  * @export
- * @interface CertificateSettingsDto
+ * @interface CertificateSettingsUpdateDto
  */
-export interface CertificateSettingsDto {
+export interface CertificateSettingsUpdateDto {
     /**
-     * @type {CertificateValidationSettingsDto}
-     * @memberof CertificateSettingsDto
+     * Settings of validation of certificates
+     * @type {CertificateValidationSettingsUpdateDto}
+     * @memberof CertificateSettingsUpdateDto
      */
-    validation?: CertificateValidationSettingsDto;
+    validation?: CertificateValidationSettingsUpdateDto;
 }
