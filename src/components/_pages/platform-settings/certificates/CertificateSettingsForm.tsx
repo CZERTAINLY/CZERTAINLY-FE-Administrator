@@ -69,44 +69,46 @@ const CertificateSettingsForm = () => {
     );
 
     return (
-        <Form initialValues={initialValues} onSubmit={onSubmit}>
-            {({ handleSubmit, pristine, submitting, valid, values }) => (
-                <BootstrapForm onSubmit={handleSubmit} className="mt-2">
-                    <SwitchField id="enabled" label="Enable Certificate Validation" />
-                    {values.enabled && (
-                        <>
-                            <TextField
-                                id="frequency"
-                                label="Validation Frequency"
-                                description="Certificates validation frequency specified in days."
-                                validators={[validatePositiveInteger()]}
-                                inputType="number"
-                            />
-                            <TextField
-                                id="expiringThreshold"
-                                label="Expiring Threshold"
-                                description="How many days before expiration should certificate's validation status change to Expiring."
-                                validators={[validatePositiveInteger()]}
-                                inputType="number"
-                            />
-                        </>
-                    )}
-                    {
-                        <div className="d-flex justify-content-end">
-                            <ButtonGroup>
-                                <ProgressButton
-                                    title={'Save'}
-                                    inProgressTitle={'Saving..'}
-                                    disabled={submitting || isBusy || areDefaultValuesSame(values)}
-                                    inProgress={submitting || isBusy}
-                                    type="submit"
+        <div style={{ paddingTop: '1.5em', paddingBottom: '1.5em' }}>
+            <Form initialValues={initialValues} onSubmit={onSubmit}>
+                {({ handleSubmit, pristine, submitting, valid, values }) => (
+                    <BootstrapForm onSubmit={handleSubmit} className="mt-2">
+                        <SwitchField id="enabled" label="Enable Certificate Validation" />
+                        {values.enabled && (
+                            <>
+                                <TextField
+                                    id="frequency"
+                                    label="Validation Frequency"
+                                    description="Validation frequency of certificates specified in days."
+                                    validators={[validatePositiveInteger()]}
+                                    inputType="number"
                                 />
-                            </ButtonGroup>
-                        </div>
-                    }
-                </BootstrapForm>
-            )}
-        </Form>
+                                <TextField
+                                    id="expiringThreshold"
+                                    label="Expiring Threshold"
+                                    description="How many days before expiration should certificate's validation status change to Expiring."
+                                    validators={[validatePositiveInteger()]}
+                                    inputType="number"
+                                />
+                            </>
+                        )}
+                        {
+                            <div className="d-flex justify-content-end">
+                                <ButtonGroup>
+                                    <ProgressButton
+                                        title={'Save'}
+                                        inProgressTitle={'Saving...'}
+                                        disabled={submitting || isBusy || areDefaultValuesSame(values)}
+                                        inProgress={submitting || isBusy}
+                                        type="submit"
+                                    />
+                                </ButtonGroup>
+                            </div>
+                        }
+                    </BootstrapForm>
+                )}
+            </Form>
+        </div>
     );
 };
 

@@ -10,11 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { SettingsPlatformModel } from 'types/settings';
 import { useNavigate } from 'react-router';
 
-type Props = {
-    // platformSettings?: SettingsPlatformModel;
-};
-
-const UtilsSettingsForm = ({}: Props) => {
+const UtilsSettingsForm = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -99,7 +95,7 @@ const UtilsSettingsForm = ({}: Props) => {
                                         title={'Save'}
                                         inProgressTitle={'Saving...'}
                                         inProgress={submitting}
-                                        disabled={pristine || submitting || !valid}
+                                        disabled={pristine || submitting || !valid || isBusy}
                                     />
                                     <Button color="default" onClick={() => navigate(-1)} disabled={submitting}>
                                         Cancel

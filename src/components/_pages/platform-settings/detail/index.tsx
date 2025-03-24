@@ -20,10 +20,8 @@ export default function PlatformSettingsDetail() {
     const isFetchingPlatform = useSelector(selectors.isFetchingPlatform);
 
     const getFreshPlatformSettings = useCallback(() => {
-        if (!platformSettings) {
-            dispatch(actions.getPlatformSettings());
-        }
-    }, [dispatch, platformSettings]);
+        dispatch(actions.getPlatformSettings());
+    }, [dispatch]);
 
     useEffect(() => {
         getFreshPlatformSettings();
