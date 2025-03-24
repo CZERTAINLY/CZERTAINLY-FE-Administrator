@@ -21,6 +21,7 @@ import { LockWidgetNameEnum } from 'types/user-interface';
 import AssociateApprovalProfileDialogBody from '../AssociateApprovalProfileDialogBody';
 import AssociateComplianceProfileDialogBody from '../AssociateComplianceProfileDialogBody';
 import ProtocolActivationDialogBody, { Protocol } from '../ProtocolActivationDialogBody';
+import CertificateValidationForm from 'components/_pages/ra-profiles/CertificateValidationForm';
 
 interface DeassociateApprovalProfileDialogState {
     isDialogOpen: boolean;
@@ -856,6 +857,15 @@ export default function RaProfileDetail() {
                 </Widget>
             )}
 
+            <Widget
+                title="Certificate Validation"
+                busy={isBusy}
+                titleSize="large"
+                refreshAction={getFreshAssociatedApprovalProfiles}
+                lockSize="large"
+            >
+                <CertificateValidationForm raProfile={raProfile} />
+            </Widget>
             <Dialog
                 isOpen={confirmDelete}
                 caption="Delete RA Profile"

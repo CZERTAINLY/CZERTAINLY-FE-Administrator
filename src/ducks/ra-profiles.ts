@@ -14,6 +14,7 @@ import {
     RaProfileResponseModel,
     RaProfileScepDetailResponseModel,
 } from 'types/ra-profiles';
+import { SettingsCertificatesModel } from 'types/settings';
 import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
@@ -208,6 +209,26 @@ export const slice = createSlice({
         },
 
         updateRaProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isUpdating = false;
+        },
+
+        updateCertificateValidation: (
+            state,
+            action: PayloadAction<{
+                profileUuid: string;
+                authorityInstanceUuid: string;
+                certificateValidationEditRequest: SettingsCertificatesModel;
+            }>,
+        ) => {
+            state.isUpdating = true;
+        },
+
+        updateCertificateValidationSuccess: (state, action: PayloadAction<{ raProfile: RaProfileResponseModel }>) => {
+            state.isUpdating = false;
+            state.raProfile = action.payload.raProfile;
+        },
+
+        updateCertificateValidationFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdating = false;
         },
 
