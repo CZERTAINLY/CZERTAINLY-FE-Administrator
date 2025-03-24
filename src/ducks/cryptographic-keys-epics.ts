@@ -10,7 +10,7 @@ import { transformAttributeDescriptorDtoToModel } from './transform/attributes';
 import { transformSearchRequestModelToDto } from './transform/certificates';
 import { actions as userInterfaceActions } from './user-interface';
 
-import { store } from 'index';
+import { store } from 'App';
 import { EntityType } from './filters';
 import { actions as pagingActions } from './paging';
 import {
