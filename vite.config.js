@@ -22,6 +22,7 @@ export default defineConfig(async () => {
         build: {
             outDir: 'build',
         },
+        base: '/administrator', // In the start-nginx.sh, the value is updated accordingly, based on the passed ENV variables
         css: {
             preprocessorOptions: {
                 scss: {
