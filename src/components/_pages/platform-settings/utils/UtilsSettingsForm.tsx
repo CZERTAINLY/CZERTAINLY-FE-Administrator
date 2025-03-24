@@ -10,7 +10,7 @@ import { SettingsPlatformModel } from 'types/settings';
 import { useNavigate } from 'react-router';
 
 const validateUrl = (url?: string): string | undefined => {
-    if (!url || /^https?:\/\/[a-zA-Z0-9\-.]+(:[0-9]+?)?(\/[a-zA-Z0-9\-.]*)*/g.test(url)) {
+    if (!url || /^https?:\/\/[a-zA-Z0-9\-.]+(:\d+?)?(\/[a-zA-Z0-9\-.]*)*/g.test(url)) {
         return undefined;
     }
     return 'Please enter valid URL.';

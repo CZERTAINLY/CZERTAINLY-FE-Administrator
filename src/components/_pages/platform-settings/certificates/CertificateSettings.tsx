@@ -28,7 +28,7 @@ const CertificateSettings = ({ platformSettings }: Props) => {
         const rows = [
             {
                 id: 'enabled',
-                columns: ['Validation Enabled', <SwitchWidget disabled checked={validation.enabled} />],
+                columns: ['Validation Enabled', <SwitchWidget key="enabled" disabled checked={validation.enabled} />],
             },
         ];
         if (validation.enabled && typeof validation.frequency === 'number' && typeof validation.expiringThreshold === 'number') {

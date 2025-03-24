@@ -13,6 +13,7 @@ async function loadProxyConfig() {
     }
 }
 export default defineConfig(async () => {
+    console.log('PROCESS ENV', process.env);
     const proxyConfig = await loadProxyConfig();
     return {
         server: {
@@ -22,6 +23,7 @@ export default defineConfig(async () => {
         build: {
             outDir: 'build',
         },
+        base: process.env.BASE_URL || '/',
         css: {
             preprocessorOptions: {
                 scss: {
