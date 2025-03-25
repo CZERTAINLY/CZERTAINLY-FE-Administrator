@@ -23,7 +23,7 @@ export default defineConfig(async () => {
         build: {
             outDir: 'build',
         },
-        base: process.env.BASE_URL || '/',
+        base: './',
         css: {
             preprocessorOptions: {
                 scss: {
