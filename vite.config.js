@@ -13,7 +13,6 @@ async function loadProxyConfig() {
     }
 }
 export default defineConfig(async () => {
-    console.log('PROCESS ENV', process.env);
     const proxyConfig = await loadProxyConfig();
     return {
         server: {
