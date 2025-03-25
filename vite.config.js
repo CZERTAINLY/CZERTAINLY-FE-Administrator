@@ -6,9 +6,9 @@ import eslint from 'vite-plugin-eslint';
 async function loadProxyConfig() {
     try {
         const { default: customProxyConfig } = await import('./src/setupProxy.js');
-        return customProxyConfig;
+        return customProxyConfig.server.proxy;
     } catch (error) {
-        return { server: { proxy: {} } };
+        return {};
     }
 }
 export default defineConfig(async () => {
@@ -16,7 +16,7 @@ export default defineConfig(async () => {
     return {
         server: {
             open: true,
-            proxy: proxyConfig.server.proxy,
+            proxy: proxyConfig,
         },
         build: {
             outDir: 'build',
