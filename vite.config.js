@@ -22,6 +22,7 @@ export default defineConfig(async () => {
         build: {
             outDir: 'build',
         },
+        base: './',
         css: {
             preprocessorOptions: {
                 scss: {
