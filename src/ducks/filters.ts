@@ -1,5 +1,5 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ApiClients } from 'api';
+import { ApiClients } from '../api';
 import { WritableDraft } from 'immer/dist/internal';
 import { Observable } from 'rxjs';
 import { SearchFieldListModel, SearchFilterModel } from 'types/certificate';

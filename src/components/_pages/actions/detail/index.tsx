@@ -1,4 +1,4 @@
-import { ApiClients } from 'api';
+import { ApiClients } from '../../../../api';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import ConditionsExecutionsList from 'components/ExecutionConditionItemsList';

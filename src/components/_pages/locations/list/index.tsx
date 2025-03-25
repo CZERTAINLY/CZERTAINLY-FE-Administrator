@@ -7,7 +7,7 @@ import { EntityType } from 'ducks/filters';
 import { actions, selectors } from 'ducks/locations';
 import { selectors as pagingSelectors } from 'ducks/paging';
 
-import { ApiClients } from 'api';
+import { ApiClients } from '../../../../api';
 import { TableDataRow, TableHeader } from 'components/CustomTable';
 import PagedList from 'components/PagedList/PagedList';
 import StatusBadge from 'components/StatusBadge';
