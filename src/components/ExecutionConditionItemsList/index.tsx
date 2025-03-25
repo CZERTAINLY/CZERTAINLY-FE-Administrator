@@ -1,4 +1,4 @@
-import { ApiClients } from 'api';
+import { ApiClients } from '../../api';
 import Spinner from 'components/Spinner';
 import Widget from 'components/Widget';
 import { EntityType, actions as filterActions, selectors } from 'ducks/filters';

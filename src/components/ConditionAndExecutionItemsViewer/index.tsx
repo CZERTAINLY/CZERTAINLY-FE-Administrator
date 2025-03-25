@@ -1,4 +1,4 @@
-import { ApiClients } from 'api';
+import { ApiClients } from '../../api';
 import FilterWidget from 'components/FilterWidget';
 import FilterWidgetRuleAction from 'components/FilterWidgetRuleAction';
 import { EntityType, actions as filterActions } from 'ducks/filters';

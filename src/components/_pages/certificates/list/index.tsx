@@ -13,7 +13,7 @@ import { Link } from 'react-router';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { Badge, Container, DropdownItem, DropdownMenu, DropdownToggle, UncontrolledButtonDropdown } from 'reactstrap';
 
-import { ApiClients } from 'api';
+import { ApiClients } from '../../../../api';
 import PagedList from 'components/PagedList/PagedList';
 import { actions as userAction, selectors as userSelectors } from 'ducks/users';
 import { SearchRequestModel } from 'types/certificate';

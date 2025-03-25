@@ -4,7 +4,7 @@ import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
 import { actions as appRedirectActions } from './app-redirect';
 import { actions as userInterfaceActions } from './user-interface';
 
-import { store } from 'App';
+import { store } from '../App';
 import { EntityType } from './filters';
 import { actions as pagingActions } from './paging';
 

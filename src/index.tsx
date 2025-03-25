@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import 'reactflow/dist/style.css';
 import reportWebVitals from './reportWebVitals';
 import './resources/styles/theme.scss';
-import App from 'App';
+import App from './App';
 
 const container = document.getElementById('root')!;
 const root = createRoot(container);

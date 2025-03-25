@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button, Container } from 'reactstrap';
 import { dateFormatter } from 'utils/dateUtil';
 
-import { ApiClients } from 'api';
+import { ApiClients } from '../../../api';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import { LockWidgetNameEnum } from 'types/user-interface';
