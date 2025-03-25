@@ -20,7 +20,6 @@ FROM nginxinc/nginx-unprivileged:1.27.4-alpine
 
 WORKDIR /usr/share/nginx/html
 
-ENV BASE_URL=/administrator
 ENV API_URL=/api
 ENV LOGIN_URL=/login
 ENV LOGOUT_URL=/logout
