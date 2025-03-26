@@ -16,7 +16,7 @@ apis/ConnectorAuthenticationApi.ts
 apis/ConnectorManagementApi.ts
 apis/ConnectorRegistrationApi.ts
 apis/CredentialManagementApi.ts
-apis/CryptographicKeyControllerApi.ts
+apis/CryptographicKeyManagementApi.ts
 apis/CryptographicOperationsControllerApi.ts
 apis/CustomAttributesApi.ts
 apis/DiscoveryManagementApi.ts
@@ -34,7 +34,7 @@ apis/SCEPProfileManagementApi.ts
 apis/ScheduledJobsManagementApi.ts
 apis/SettingsApi.ts
 apis/StatisticsDashboardApi.ts
-apis/TokenInstanceControllerApi.ts
+apis/TokenInstanceManagementApi.ts
 apis/TokenProfileManagementApi.ts
 apis/UserManagementApi.ts
 apis/WorkflowActionsManagementApi.ts
@@ -96,7 +96,7 @@ models/AuthenticationSettingsUpdateDto.ts
 models/AuthorityInstanceDto.ts
 models/AuthorityInstanceRequestDto.ts
 models/AuthorityInstanceUpdateRequestDto.ts
-models/BaseAttributeConstraint.ts
+models/BaseAttributeConstraintDto.ts
 models/BaseAttributeContentDto.ts
 models/BaseAttributeDto.ts
 models/BooleanAttributeContent.ts
@@ -125,6 +125,8 @@ models/CertificateRequestDto.ts
 models/CertificateRequestFormat.ts
 models/CertificateResponseDto.ts
 models/CertificateRevocationReason.ts
+models/CertificateSettingsDto.ts
+models/CertificateSettingsUpdateDto.ts
 models/CertificateState.ts
 models/CertificateSubjectType.ts
 models/CertificateType.ts
@@ -132,6 +134,8 @@ models/CertificateUpdateObjectsDto.ts
 models/CertificateValidationCheck.ts
 models/CertificateValidationCheckDto.ts
 models/CertificateValidationResultDto.ts
+models/CertificateValidationSettingsDto.ts
+models/CertificateValidationSettingsUpdateDto.ts
 models/CertificateValidationStatus.ts
 models/CipherDataRequestDto.ts
 models/CipherRequestData.ts
@@ -195,7 +199,6 @@ models/CustomAttributeDefinitionDto.ts
 models/CustomAttributeProperties.ts
 models/CustomAttributeUpdateRequestDto.ts
 models/DataAttribute.ts
-models/DataAttributeContent.ts
 models/DataAttributeProperties.ts
 models/DateAttributeContent.ts
 models/DateTimeAttributeConstraint.ts
@@ -247,6 +250,7 @@ models/InfoAttribute.ts
 models/InfoAttributeProperties.ts
 models/IntegerAttributeContent.ts
 models/IssueToLocationRequestDto.ts
+models/JwkDto.ts
 models/KeyAlgorithm.ts
 models/KeyAssociationDto.ts
 models/KeyCompromiseReason.ts
@@ -288,11 +292,14 @@ models/OperationResult.ts
 models/PaginationRequestDto.ts
 models/PlatformEnum.ts
 models/PlatformSettingsDto.ts
+models/PlatformSettingsUpdateDto.ts
 models/ProgrammingLanguageEnum.ts
 models/ProtectionMethod.ts
 models/PushToLocationRequestDto.ts
 models/RaProfileAcmeDetailResponseDto.ts
 models/RaProfileAssociationRequestDto.ts
+models/RaProfileCertificateValidationSettingsDto.ts
+models/RaProfileCertificateValidationSettingsUpdateDto.ts
 models/RaProfileCmpDetailResponseDto.ts
 models/RaProfileDto.ts
 models/RaProfileScepDetailResponseDto.ts

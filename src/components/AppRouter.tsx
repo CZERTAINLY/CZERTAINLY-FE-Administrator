@@ -6,6 +6,10 @@ import { HashRouter, Navigate, Route, Routes } from 'react-router';
 import AuditLogs from './_pages/auditLogs';
 import Dashboard from './_pages/dashboard';
 import AuthenticationSettings from './_pages/auth-settings';
+import OAuth2ProviderForm from './_pages/auth-settings/form';
+import OAuth2ProviderDetail from './_pages/auth-settings/detail';
+
+import LoggingSettings from './_pages/logging-settings';
 
 import AcmeAccountDetail from './_pages/acme-accounts/detail';
 import AcmeAccountsList from './_pages/acme-accounts/list';
@@ -135,11 +139,8 @@ import AppLogin from './AppLogin/AppLogin';
 import AppRedirect from './AppRedirect';
 import Layout from './Layout';
 import Spinner from './Spinner';
-import LoggingSetting from 'components/_pages/logging-settings';
 
 import { Resource } from 'types/openapi';
-import OAuth2ProviderForm from 'components/_pages/auth-settings/form';
-import OAuth2ProviderDetail from 'components/_pages/auth-settings/detail';
 
 export default function AppRouter() {
     const profile = useSelector(selectors.profile);
@@ -358,7 +359,7 @@ export default function AppRouter() {
                     <Route path={`/notificationinstances/add`} element={<NotificationInstanceForm />} />
                     <Route path={`/notificationinstances/edit/:id`} element={<NotificationInstanceForm />} />
 
-                    <Route path={`/loggingsettings`} element={<LoggingSetting />} />
+                    <Route path={`/loggingsettings`} element={<LoggingSettings />} />
 
                     <Route path={`/conditions/add`} element={<ConditionForm />} />
                     <Route path={`/conditions/detail/:id`} element={<ConditionDetails />} />

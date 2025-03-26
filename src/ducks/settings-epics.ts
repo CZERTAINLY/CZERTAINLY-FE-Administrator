@@ -1,3 +1,4 @@
+import { AnyAction } from '@reduxjs/toolkit';
 import { AppEpic } from 'ducks';
 import { of } from 'rxjs';
 import { catchError, filter, mergeMap, switchMap } from 'rxjs/operators';
@@ -22,7 +23,7 @@ const getPlatformSettings: AppEpic = (action$, state$, deps) => {
             deps.apiClients.settings.getPlatformSettings().pipe(
                 switchMap((platformSettings) => {
                     const platformSettingsModel = transformSettingsPlatformDtoToModel(platformSettings);
-                    updateBackendUtilsClients(platformSettingsModel.utils.utilsServiceUrl);
+                    updateBackendUtilsClients(platformSettingsModel.utils?.utilsServiceUrl);
                     return of(
                         slice.actions.getPlatformSettingsSuccess(platformSettingsModel),
                         userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.PlatformSettings),
@@ -43,13 +44,17 @@ const updatePlatformSettings: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.updatePlatformSettings.match),
         switchMap((action) =>
-            deps.apiClients.settings.updatePlatformSettings({ platformSettingsDto: action.payload }).pipe(
+            deps.apiClients.settings.updatePlatformSettings({ platformSettingsUpdateDto: action.payload }).pipe(
                 mergeMap(() => {
-                    updateBackendUtilsClients(action.payload.utils.utilsServiceUrl);
-                    return of(
+                    if (typeof action.payload.utils === 'object') {
+                        updateBackendUtilsClients(action.payload.utils?.utilsServiceUrl);
+                    }
+                    const actions = [
                         slice.actions.updatePlatformSettingsSuccess(action.payload),
-                        appRedirectActions.redirect({ url: `../settings` }),
-                    );
+                        alertActions.success('Platform settings updated successfully.'),
+                        appRedirectActions.redirect({ url: '../settings' }),
+                    ].filter((el) => el) as AnyAction[];
+                    return of(...actions);
                 }),
                 catchError((err) =>
                     of(
