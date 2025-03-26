@@ -18,9 +18,6 @@ import DropDownListForm from 'components/DropDownForm';
 import SwitchWidget from 'components/SwitchWidget';
 import { Container, Label } from 'reactstrap';
 
-// Adding eslint supress no-useless concat warning
-/* eslint-disable no-useless-concat */
-
 interface ChainDownloadSwitchState {
     isDownloadTriggered: boolean;
     certificateEncoding?: CertificateFormatEncoding;

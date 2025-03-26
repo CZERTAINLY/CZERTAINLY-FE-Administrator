@@ -4,7 +4,7 @@ import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
 import { AppEpic } from 'ducks';
 import { extractError } from 'utils/net';
 
-import { store } from 'index';
+import { store } from '../App';
 import { actions as appRedirectActions } from './app-redirect';
 import { slice } from './entities';
 import { EntityType } from './filters';

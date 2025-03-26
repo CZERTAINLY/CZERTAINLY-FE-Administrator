@@ -72,7 +72,7 @@ const TestWidgetLockedGeneric = () => {
             };
             dispatch(userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ConnectorDetails));
         }
-    }, [isBusy]);
+    }, [isBusy, dispatch]);
 
     const refreshAction = () => {
         setIsBusy(true);
@@ -119,7 +119,7 @@ const TestWidgetLockedClient = () => {
             };
             dispatch(userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ConnectorDetails));
         }
-    }, [isBusy]);
+    }, [isBusy, dispatch]);
 
     const refreshAction = () => {
         setIsBusy(true);
@@ -201,7 +201,7 @@ const TestWidgetLockedService = () => {
             lockDetails: 'Test lock details service error',
         };
         dispatch(userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ConnectorDetails));
-    }, [isBusy]);
+    }, [isBusy, dispatch]);
 
     const refreshAction = () => {
         setIsBusy(true);
@@ -249,7 +249,7 @@ const TestWidgetLockedServer = () => {
             lockDetails: 'Test lock details server error',
         };
         dispatch(userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ConnectorDetails));
-    }, [isBusy]);
+    }, [isBusy, dispatch]);
 
     const refreshAction = () => {
         setIsBusy(true);
@@ -297,7 +297,7 @@ const TestWidgetLockedNetwork = () => {
             lockDetails: 'Test lock details network error',
         };
         dispatch(userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ConnectorDetails));
-    }, [isBusy]);
+    }, [isBusy, dispatch]);
 
     const refreshAction = () => {
         setIsBusy(true);

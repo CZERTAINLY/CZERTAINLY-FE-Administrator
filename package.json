@@ -3,6 +3,7 @@
     "version": "2.14.1",
     "homepage": ".",
     "private": true,
+    "type": "module",
     "dependencies": {
         "@openapitools/openapi-generator-cli": "^2.18.4",
         "@reduxjs/toolkit": "^2.6.1",
@@ -34,7 +35,6 @@
         "react-final-form": "^6.5.9",
         "react-redux": "^9.2.0",
         "react-router": "^7.3.0",
-        "react-scripts": "^5.0.1",
         "react-select": "^5.10.1",
         "react-simple-code-editor": "^0.14.1",
         "reactflow": "^11.11.4",
@@ -46,11 +46,10 @@
         "web-vitals": "^4.2.4"
     },
     "scripts": {
-        "start": "react-scripts start",
-        "build": "react-scripts build",
-        "lint": "eslint && prettier --check \"**/**.{ts,js,tsx}\" \"*.{json,md,yml}\"",
-        "test": "react-scripts test",
-        "eject": "react-scripts eject",
+        "start": "vite",
+        "build": "vite build",
+        "serve": "vite preview",
+        "lint": "eslint ./src && prettier --check \"**/**.{ts,js,tsx}\" \"*.{json,md,yml}\"",
         "prepare": "husky install",
         "generate-types": "openapi-generator-cli generate --generator-key typescript-rxjs-remote && prettier --write \"src/types/openapi/apis/*.ts\" && prettier --write \"src/types/openapi/models/*.ts\"",
         "generate-types-local": "openapi-generator-cli generate --generator-key typescript-rxjs-local && prettier --write \"src/types/openapi/apis/*.ts\" && prettier --write \"src/types/openapi/models/*.ts\"",
@@ -75,13 +74,19 @@
         ]
     },
     "devDependencies": {
-        "cypress": "^13.6.1",
+        "@typescript-eslint/parser": "^8.26.1",
+        "@vitejs/plugin-react": "^4.3.4",
+        "cypress": "^14.2.0",
+        "cypress-vite": "^1.6.0",
+        "eslint": "^9.22.0",
         "eslint-config-prettier": "^10.1.1",
         "eslint-plugin-jsx-a11y": "^6.10.2",
         "eslint-plugin-prettier": "^5.2.3",
-        "eslint-plugin-react-hooks": "^4.6.0",
+        "eslint-plugin-react-hooks": "^5.2.0",
         "husky": "^9.0.0",
-        "prettier": "^3.5.3"
+        "prettier": "^3.5.3",
+        "vite": "^6.2.2",
+        "vite-plugin-eslint": "^1.8.1"
     },
     "overrides": {
         "typescript": "^5.8.2"

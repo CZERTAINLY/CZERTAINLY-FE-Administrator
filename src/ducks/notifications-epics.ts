@@ -1,6 +1,6 @@
 import { AnyAction } from '@reduxjs/toolkit';
 import { AppEpic } from 'ducks';
-import { store } from 'index';
+import { store } from '../App';
 import { iif, of } from 'rxjs';
 import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
 import { FunctionGroupCode } from 'types/openapi';

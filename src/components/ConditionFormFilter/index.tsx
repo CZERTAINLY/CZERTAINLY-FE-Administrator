@@ -1,4 +1,4 @@
-import { ApiClients } from 'api';
+import { ApiClients } from '../../api';
 import cx from 'classnames';
 import FilterWidget from 'components/FilterWidget';
 import FilterWidgetRuleAction from 'components/FilterWidgetRuleAction';

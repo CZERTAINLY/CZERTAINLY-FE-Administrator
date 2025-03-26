@@ -76,8 +76,6 @@ import { DeviceType, useCopyToClipboard, useDeviceType } from 'utils/common-hook
 import CertificateStatus from '../CertificateStatus';
 import CertificateDownloadForm from './CertificateDownloadForm';
 import styles from './certificateDetail.module.scss';
-// Adding eslint supress no-useless concat warning
-/* eslint-disable no-useless-concat */
 
 interface ChainDownloadSwitchState {
     isDownloadTriggered: boolean;

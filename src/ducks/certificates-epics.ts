@@ -8,7 +8,7 @@ import { actions as appRedirectActions } from './app-redirect';
 import * as slice from './certificates';
 import { transformAttributeDescriptorDtoToModel, transformAttributeResponseDtoToModel } from './transform/attributes';
 
-import { store } from 'index';
+import { store } from '../App';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { EntityType } from './filters';
 import { actions as pagingActions } from './paging';
