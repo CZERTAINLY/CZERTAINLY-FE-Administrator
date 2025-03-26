@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { actions, selectors } from 'ducks/settings';
 import { Form as BootstrapForm, ButtonGroup } from 'reactstrap';
 import { isObjectSame } from 'utils/common-utils';
-import { validatePositiveInteger } from 'utils/validators';
+import { validateNonZeroInteger, validatePositiveInteger } from 'utils/validators';
 import TextField from 'components/Input/TextField';
 
 type FormValues = {
@@ -79,14 +79,14 @@ const CertificateSettingsForm = () => {
                                     id="frequency"
                                     label="Validation Frequency"
                                     description="Validation frequency of certificates specified in days."
-                                    validators={[validatePositiveInteger()]}
+                                    validators={[validateNonZeroInteger(), validatePositiveInteger()]}
                                     inputType="number"
                                 />
                                 <TextField
                                     id="expiringThreshold"
                                     label="Expiring Threshold"
                                     description="How many days before expiration should certificate's validation status change to Expiring."
-                                    validators={[validatePositiveInteger()]}
+                                    validators={[validateNonZeroInteger(), validatePositiveInteger()]}
                                     inputType="number"
                                 />
                             </>
