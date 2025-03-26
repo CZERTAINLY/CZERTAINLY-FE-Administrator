@@ -126,6 +126,7 @@ models/CertificateRequestFormat.ts
 models/CertificateResponseDto.ts
 models/CertificateRevocationReason.ts
 models/CertificateSettingsDto.ts
+models/CertificateSettingsUpdateDto.ts
 models/CertificateState.ts
 models/CertificateSubjectType.ts
 models/CertificateType.ts
@@ -134,6 +135,7 @@ models/CertificateValidationCheck.ts
 models/CertificateValidationCheckDto.ts
 models/CertificateValidationResultDto.ts
 models/CertificateValidationSettingsDto.ts
+models/CertificateValidationSettingsUpdateDto.ts
 models/CertificateValidationStatus.ts
 models/CipherDataRequestDto.ts
 models/CipherRequestData.ts
@@ -248,6 +250,7 @@ models/InfoAttribute.ts
 models/InfoAttributeProperties.ts
 models/IntegerAttributeContent.ts
 models/IssueToLocationRequestDto.ts
+models/JwkDto.ts
 models/KeyAlgorithm.ts
 models/KeyAssociationDto.ts
 models/KeyCompromiseReason.ts
@@ -289,15 +292,17 @@ models/OperationResult.ts
 models/PaginationRequestDto.ts
 models/PlatformEnum.ts
 models/PlatformSettingsDto.ts
+models/PlatformSettingsUpdateDto.ts
 models/ProgrammingLanguageEnum.ts
 models/ProtectionMethod.ts
 models/PushToLocationRequestDto.ts
 models/RaProfileAcmeDetailResponseDto.ts
 models/RaProfileAssociationRequestDto.ts
+models/RaProfileCertificateValidationSettingsDto.ts
+models/RaProfileCertificateValidationSettingsUpdateDto.ts
 models/RaProfileCmpDetailResponseDto.ts
 models/RaProfileDto.ts
 models/RaProfileScepDetailResponseDto.ts
-models/RaProfileValidationUpdateDto.ts
 models/RandomDataRequestDto.ts
 models/RandomDataResponseDto.ts
 models/RangeAttributeConstraint.ts

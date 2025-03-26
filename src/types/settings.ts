@@ -1,5 +1,6 @@
 import {
     PlatformSettingsDto,
+    PlatformSettingsUpdateDto,
     UtilsSettingsDto,
     LoggingSettingsDto,
     ResourceLoggingSettingsDto as ResourceLoggingSettingsDtoApi,
@@ -15,6 +16,9 @@ export type SettingsCertificatesModel = SettingsCertificatesDto;
 
 export type SettingsPlatformDto = PlatformSettingsDto;
 export type SettingsPlatformModel = SettingsPlatformDto;
+
+export type SettingsPlatformUpdateDto = PlatformSettingsUpdateDto;
+export type SettingsPlatformUpdateModel = SettingsPlatformUpdateDto;
 
 export type SettingsLoggingDto = LoggingSettingsDto;
 export type SettingsLoggingModel = SettingsLoggingDto;

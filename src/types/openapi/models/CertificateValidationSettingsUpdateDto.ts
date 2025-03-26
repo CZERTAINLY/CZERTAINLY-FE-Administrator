@@ -13,25 +13,25 @@
 
 /**
  * @export
- * @interface CertificateValidationSettingsDto
+ * @interface CertificateValidationSettingsUpdateDto
  */
-export interface CertificateValidationSettingsDto {
+export interface CertificateValidationSettingsUpdateDto {
     /**
      * Indicator whether validation of certificates should be enabled
      * @type {boolean}
-     * @memberof CertificateValidationSettingsDto
+     * @memberof CertificateValidationSettingsUpdateDto
      */
     enabled: boolean;
     /**
      * Frequency of validation of certificates in days
      * @type {number}
-     * @memberof CertificateValidationSettingsDto
+     * @memberof CertificateValidationSettingsUpdateDto
      */
     frequency?: number;
     /**
      * How many days before expiration should certificate validation status change to Expiring
      * @type {number}
-     * @memberof CertificateValidationSettingsDto
+     * @memberof CertificateValidationSettingsUpdateDto
      */
     expiringThreshold?: number;
 }

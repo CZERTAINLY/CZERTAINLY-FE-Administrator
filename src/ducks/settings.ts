@@ -1,7 +1,7 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { NotificationSettingsDto } from 'types/openapi';
 import { createFeatureSelector } from 'utils/ducks';
-import { SettingsPlatformModel, SettingsLoggingModel } from '../types/settings';
+import { SettingsPlatformModel, SettingsLoggingModel, SettingsPlatformUpdateModel } from '../types/settings';
 
 export type State = {
     platformSettings?: SettingsPlatformModel;
@@ -43,11 +43,11 @@ export const slice = createSlice({
             state.isFetchingPlatform = false;
         },
 
-        updatePlatformSettings: (state, action: PayloadAction<{ settingsDto: SettingsPlatformModel; redirect?: string }>) => {
+        updatePlatformSettings: (state, action: PayloadAction<SettingsPlatformUpdateModel>) => {
             state.isUpdatingPlatform = true;
         },
 
-        updatePlatformSettingsSuccess: (state, action: PayloadAction<SettingsPlatformModel>) => {
+        updatePlatformSettingsSuccess: (state, action: PayloadAction<SettingsPlatformUpdateModel>) => {
             state.isUpdatingPlatform = false;
             state.platformSettings = { ...state.platformSettings, ...action.payload };
         },

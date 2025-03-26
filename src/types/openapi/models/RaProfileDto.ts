@@ -12,6 +12,7 @@
  */
 
 import type {
+    RaProfileCertificateValidationSettingsDto,
     ResponseAttributeDto,
 } from './';
 
@@ -81,21 +82,9 @@ export interface RaProfileDto {
      */
     enabledProtocols?: Array<string>;
     /**
-     * Indicator whether validation of certificates associated with RA profile should be enabled
-     * @type {boolean}
+     * Settings for validation of certificates associated with the RA Profile
+     * @type {RaProfileCertificateValidationSettingsDto}
      * @memberof RaProfileDto
      */
-    validationEnabled: boolean;
-    /**
-     * Frequency of validation of certificates in days
-     * @type {number}
-     * @memberof RaProfileDto
-     */
-    validationFrequency?: number;
-    /**
-     * How many days before expiration should certificate validation status change to Expiring
-     * @type {number}
-     * @memberof RaProfileDto
-     */
-    expiringThreshold?: number;
+    certificateValidationSettings?: RaProfileCertificateValidationSettingsDto;
 }

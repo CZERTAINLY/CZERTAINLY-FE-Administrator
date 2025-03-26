@@ -13,25 +13,25 @@
 
 /**
  * @export
- * @interface CertificateValidationSettingsDto
+ * @interface RaProfileCertificateValidationSettingsDto
  */
-export interface CertificateValidationSettingsDto {
+export interface RaProfileCertificateValidationSettingsDto {
     /**
-     * Indicator whether validation of certificates should be enabled
+     * Indicator whether validation of certificates associated with RA profile should be enabled, if null, then values in platform settings will be used
      * @type {boolean}
-     * @memberof CertificateValidationSettingsDto
+     * @memberof RaProfileCertificateValidationSettingsDto
      */
-    enabled: boolean;
+    enabled?: boolean;
     /**
      * Frequency of validation of certificates in days
      * @type {number}
-     * @memberof CertificateValidationSettingsDto
+     * @memberof RaProfileCertificateValidationSettingsDto
      */
     frequency?: number;
     /**
      * How many days before expiration should certificate validation status change to Expiring
      * @type {number}
-     * @memberof CertificateValidationSettingsDto
+     * @memberof RaProfileCertificateValidationSettingsDto
      */
     expiringThreshold?: number;
 }
