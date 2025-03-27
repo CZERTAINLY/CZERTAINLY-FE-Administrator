@@ -9,12 +9,12 @@ import {
     RaProfileActivateCmpRequestModel,
     RaProfileActivateScepRequestModel,
     RaProfileAddRequestModel,
+    RaProfileCertificateValidationSettingsUpdateModel,
     RaProfileCmpDetailResponseModel,
     RaProfileEditRequestModel,
     RaProfileResponseModel,
     RaProfileScepDetailResponseModel,
 } from 'types/ra-profiles';
-import { SettingsCertificatesModel } from 'types/settings';
 import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
@@ -212,23 +212,27 @@ export const slice = createSlice({
             state.isUpdating = false;
         },
 
-        updateCertificateValidation: (
+        updateRaProfileCertificateValidation: (
             state,
             action: PayloadAction<{
                 profileUuid: string;
                 authorityInstanceUuid: string;
-                certificateValidationEditRequest: SettingsCertificatesModel;
+                validation: RaProfileCertificateValidationSettingsUpdateModel;
             }>,
         ) => {
             state.isUpdating = true;
         },
 
-        updateCertificateValidationSuccess: (state, action: PayloadAction<{ raProfile: RaProfileResponseModel }>) => {
+        updateRaProfileCertificateValidationSuccess: (state, action: PayloadAction<{ raProfile: RaProfileResponseModel }>) => {
             state.isUpdating = false;
-            state.raProfile = action.payload.raProfile;
+            state.raProfile = {
+                ...action.payload.raProfile,
+                attributes: state.raProfile?.attributes!,
+                customAttributes: state.raProfile?.customAttributes,
+            };
         },
 
-        updateCertificateValidationFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+        updateRaProfileCertificateValidationFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdating = false;
         },
 

@@ -2,28 +2,38 @@ import { Button, Input } from 'reactstrap';
 import styles from './EditableTableCell.module.scss';
 import { useCallback, useState, useRef } from 'react';
 import Spinner from 'components/Spinner';
-import { Field, Form } from 'react-final-form';
+import { Field, FieldRenderProps, Form } from 'react-final-form';
 
-export interface EditableTableCellProps {
-    value: string;
-    onSave: (value: string) => void;
+export interface EditableTableCellProps<TValue> {
+    value: TValue;
+    onSave: (value: TValue) => void;
     busy?: boolean;
     onCancel?: () => void;
+    renderField?: (props: FieldRenderProps<TValue, HTMLElement, TValue>) => React.ReactNode;
+    renderValue?: (value: TValue) => React.ReactNode;
     formProps?: {
-        validate?: (value: string) => any;
+        validate?: (value: TValue) => any;
     };
 }
 
-interface FormValues {
-    field: string;
+interface FormValues<TValue> {
+    field: TValue;
 }
 
-const EditableTableCell = ({ value, onSave, busy, onCancel, formProps }: EditableTableCellProps) => {
+const EditableTableCell = <TValue,>({
+    value,
+    onSave,
+    busy,
+    onCancel,
+    renderField,
+    renderValue,
+    formProps,
+}: EditableTableCellProps<TValue>) => {
     const [isEditing, setIsEditing] = useState(false);
     const blurListenerWrapperRef = useRef<HTMLDivElement>(null);
 
     const handleSave = useCallback(
-        (formValues: FormValues) => {
+        (formValues: FormValues<TValue>) => {
             setIsEditing(false);
             onSave(formValues.field);
         },
@@ -44,10 +54,11 @@ const EditableTableCell = ({ value, onSave, busy, onCancel, formProps }: Editabl
         [handleCancel],
     );
 
-    const initialValues: FormValues = { field: value };
+    const initialValues: FormValues<TValue> = { field: value };
 
     return isEditing ? (
         <div
+            data-editable-cell-opened={isEditing}
             ref={blurListenerWrapperRef}
             onBlur={handleBlur}
             className={styles.cell}
@@ -64,22 +75,24 @@ const EditableTableCell = ({ value, onSave, busy, onCancel, formProps }: Editabl
                 {({ handleSubmit }) => (
                     <>
                         <Field name="field" validate={formProps?.validate}>
-                            {({ input, meta }) => (
-                                <Input
-                                    {...input}
-                                    id="field"
-                                    type="text"
-                                    autoFocus
-                                    className={styles.editInput}
-                                    invalid={meta.touched && meta.error}
-                                    onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                                        if (e.key === 'Enter') {
-                                            e.preventDefault();
-                                            handleSubmit();
-                                        }
-                                    }}
-                                />
-                            )}
+                            {renderField ??
+                                (({ input, meta }) => (
+                                    <Input
+                                        {...input}
+                                        value={input.value as string}
+                                        id="field"
+                                        type="text"
+                                        autoFocus
+                                        className={styles.editInput}
+                                        invalid={meta.touched && meta.error}
+                                        onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                                            if (e.key === 'Enter') {
+                                                e.preventDefault();
+                                                handleSubmit();
+                                            }
+                                        }}
+                                    />
+                                ))}
                         </Field>
                         <div className={styles.btnGroup}>
                             <Button
@@ -105,7 +118,7 @@ const EditableTableCell = ({ value, onSave, busy, onCancel, formProps }: Editabl
         </div>
     ) : (
         <div className={styles.cell}>
-            {value}
+            {typeof renderValue === 'function' ? renderValue(value) : typeof value === 'string' ? value : ''}
             <Spinner active={busy} />
             <Button
                 title="Edit"

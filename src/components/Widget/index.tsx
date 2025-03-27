@@ -26,7 +26,7 @@ interface Props {
     className?: string;
     children?: React.ReactNode | React.ReactNode[];
     busy?: boolean;
-    widgetLockName?: LockWidgetNameEnum;
+    widgetLockName?: LockWidgetNameEnum | LockWidgetNameEnum[];
     refreshAction?: () => void;
     widgetButtons?: WidgetButtonProps[];
     widgetExtraTopNode?: React.ReactNode;
@@ -53,7 +53,9 @@ function Widget({
     widgetInfoCard,
     innerContainerProps,
 }: Props) {
-    const widgetLock = useSelector(selectors.selectWidgetLocks).find((lock) => lock.widgetName === widgetLockName);
+    const widgetLock = useSelector(selectors.selectWidgetLocks).find(
+        (lock) => lock.widgetName === widgetLockName || (Array.isArray(widgetLockName) && widgetLockName.includes(lock.widgetName)),
+    );
     const [showWidgetInfo, setShowWidgetInfo] = useState(false);
 
     const getTitleText = () =>

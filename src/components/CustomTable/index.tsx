@@ -525,7 +525,7 @@ function CustomTable({
             ) : (
                 <></>
             )}
-            <div className="table-responsive">
+            <div className={cx('table-responsive', styles.logsTableContainer)}>
                 <Table className={cx('table-hover', styles.logsTable)} size="sm">
                     {!hasHeader ? (
                         <></>

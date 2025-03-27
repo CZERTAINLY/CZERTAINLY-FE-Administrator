@@ -664,12 +664,7 @@ const bulkUpdateRaProfile: AppEpic = (action$, state, deps) => {
                                 map((raProfile) =>
                                     slice.actions.bulkUpdateRaProfileSuccess({
                                         uuids: action.payload.raProfileRequest.certificateUuids!,
-                                        raProfile: {
-                                            ...raProfile,
-                                            attributes: raProfile?.attributes?.length
-                                                ? raProfile.attributes.map(transformAttributeResponseDtoToModel)
-                                                : [],
-                                        },
+                                        raProfile: transformRaProfileResponseDtoToModel(raProfile),
                                     }),
                                 ),
 

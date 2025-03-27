@@ -7,6 +7,8 @@ import {
     EditRaProfileRequestDto,
     RaProfileAcmeDetailResponseDto as RaProfileAcmeDetailResponseDtoOpenApi,
     RaProfileCmpDetailResponseDto as RaProfileCmpDetailResponseDtoOpenApi,
+    RaProfileCertificateValidationSettingsDto as RaProfileCertificateValidationSettingsDtoApi,
+    RaProfileCertificateValidationSettingsUpdateDto as RaProfileCertificateValidationSettingsUpdateDtoApi,
     RaProfileDto,
     RaProfileScepDetailResponseDto as RaProfileScepDetailResponseDtoOpenApi,
     SimplifiedComplianceProfileDto,
@@ -64,13 +66,26 @@ export type RaProfileEditRequestModel = Omit<RaProfileEditRequestDto, 'attribute
     customAttributes?: Array<AttributeRequestModel>;
 };
 
+export type RaProfileCertificateValidationSettingsUpdateDto = RaProfileCertificateValidationSettingsUpdateDtoApi;
+export type RaProfileCertificateValidationSettingsUpdateModel = Omit<RaProfileCertificateValidationSettingsUpdateDto, 'enabled'> & {
+    usePlatformSettings: boolean;
+    enabled: boolean;
+};
+
 export type RaProfileSimplifiedDto = SimplifiedRaProfileDto;
 export type RaProfileSimplifiedModel = RaProfileSimplifiedDto;
 
+export type RaProfileCertificateValidationSettingsDto = RaProfileCertificateValidationSettingsDtoApi;
+export type RaProfileCertificateValidationSettingsModel = Omit<RaProfileCertificateValidationSettingsDto, 'enabled'> & {
+    usePlatformSettings: boolean;
+    enabled: boolean;
+};
+
 export type RaProfileResponseDto = RaProfileDto;
-export type RaProfileResponseModel = Omit<RaProfileResponseDto, 'attributes | customAttributes'> & {
+export type RaProfileResponseModel = Omit<RaProfileResponseDto, 'attributes' | 'customAttributes' | 'certificateValidationSettings'> & {
     attributes: Array<AttributeResponseModel>;
     customAttributes?: Array<AttributeResponseModel>;
+    certificateValidationSettings: RaProfileCertificateValidationSettingsModel;
 };
 
 export type ComplianceProfileSimplifiedDto = SimplifiedComplianceProfileDto;
