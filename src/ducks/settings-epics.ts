@@ -43,7 +43,7 @@ const updatePlatformSettings: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.updatePlatformSettings.match),
         switchMap((action) =>
-            deps.apiClients.settings.updatePlatformSettings({ platformSettingsDto: action.payload }).pipe(
+            deps.apiClients.settings.updatePlatformSettings({ platformSettingsUpdateDto: action.payload }).pipe(
                 mergeMap(() => {
                     updateBackendUtilsClients(action.payload.utils.utilsServiceUrl);
                     return of(

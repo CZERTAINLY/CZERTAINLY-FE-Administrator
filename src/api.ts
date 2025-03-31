@@ -15,7 +15,7 @@ import {
     Configuration,
     ConnectorManagementApi,
     CredentialManagementApi,
-    CryptographicKeyControllerApi,
+    CryptographicKeyManagementApi,
     CryptographicOperationsControllerApi,
     CustomAttributesApi,
     DiscoveryManagementApi,
@@ -88,7 +88,7 @@ export interface ApiClients {
     enums: EnumsApi;
     tokenInstances: TokenInstanceControllerApi;
     tokenProfiles: TokenProfileManagementApi;
-    cryptographicKeys: CryptographicKeyControllerApi;
+    cryptographicKeys: CryptographicKeyManagementApi;
     cryptographicOperations: CryptographicOperationsControllerApi;
     utilsOid?: OIDUtilsAPIApi;
     utilsActuator?: ActuatorApi;
@@ -134,7 +134,7 @@ export const backendClient: ApiClients = {
     enums: new EnumsApi(configuration),
     tokenInstances: new TokenInstanceControllerApi(configuration),
     tokenProfiles: new TokenProfileManagementApi(configuration),
-    cryptographicKeys: new CryptographicKeyControllerApi(configuration),
+    cryptographicKeys: new CryptographicKeyManagementApi(configuration),
     cryptographicOperations: new CryptographicOperationsControllerApi(configuration),
 };
 
