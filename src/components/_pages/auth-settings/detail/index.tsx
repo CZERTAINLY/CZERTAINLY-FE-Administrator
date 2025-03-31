@@ -1,15 +1,17 @@
+import JwkSetKeysTable from 'components/_pages/auth-settings/JwkSetKeysTable';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions, selectors } from 'ducks/auth-settings';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 
 import { Container } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { renderOAuth2StateBadge } from 'utils/oauth2Providers';
+import { renderOAuth2StateBadges } from 'utils/oauth2Providers';
 
 export default function OAuth2ProviderDetail() {
     const { providerName } = useParams();
@@ -82,22 +84,36 @@ export default function OAuth2ProviderDetail() {
                 ? []
                 : [
                       { id: 'name', columns: ['Name', <>{oauth2Provider.name}</>] },
-                      { id: 'state', columns: ['State', renderOAuth2StateBadge(oauth2Provider)] },
+                      { id: 'scheme', columns: ['Authentication Scheme', renderOAuth2StateBadges(oauth2Provider)] },
                       { id: 'clientId', columns: ['Client Id', <>{oauth2Provider.clientId}</>] },
                       { id: 'issuerUrl', columns: ['Issuer Url', <>{oauth2Provider.issuerUrl}</>] },
                       { id: 'authorizationUrl', columns: ['Authorization Url', <>{oauth2Provider.authorizationUrl}</>] },
                       { id: 'tokenUrl', columns: ['Token Url', <>{oauth2Provider.tokenUrl}</>] },
-                      { id: 'jwkSet', columns: ['JWK Set', <>{oauth2Provider.jwkSet}</>] },
                       { id: 'jwkSetUrl', columns: ['JWK Set Url', <>{oauth2Provider.jwkSetUrl}</>] },
                       { id: 'logoutUrl', columns: ['Logout Url', <>{oauth2Provider.logoutUrl}</>] },
                       { id: 'postLogoutUrl', columns: ['Post Logout Url', <>{oauth2Provider.postLogoutUrl}</>] },
                       { id: 'userInfoUrl', columns: ['User Info Url', <>{oauth2Provider.userInfoUrl}</>] },
                       { id: 'scope', columns: ['Scope', <>{oauth2Provider.scope?.join(', ')}</>] },
                       { id: 'audiences', columns: ['Audiences', <>{oauth2Provider.audiences?.join(', ')}</>] },
-                      { id: 'skew', columns: ['Skew', <>{oauth2Provider.skew}</>] },
+                      {
+                          id: 'skew',
+                          columns: [
+                              'Skew',
+                              <>
+                                  {oauth2Provider.skew}{' '}
+                                  <span className="text-muted">second{Number(oauth2Provider.skew) > 1 ? 's' : ''}</span>
+                              </>,
+                          ],
+                      },
                       {
                           id: 'sessionMaxInactiveInterval',
-                          columns: ['Session Max Inactive Interval', <>{oauth2Provider.sessionMaxInactiveInterval}</>],
+                          columns: [
+                              'Session Max Inactive Interval',
+                              <>
+                                  {oauth2Provider.sessionMaxInactiveInterval}{' '}
+                                  <span className="text-muted">second{Number(oauth2Provider.skew) > 1 ? 's' : ''}</span>
+                              </>,
+                          ],
                       },
                   ],
         [oauth2Provider],
@@ -113,6 +129,15 @@ export default function OAuth2ProviderDetail() {
                 refreshAction={getFreshData}
             >
                 <CustomTable headers={headers} data={data} />
+            </Widget>
+            <Widget
+                title="JWK Set Keys"
+                busy={isFetchingProvider}
+                widgetLockName={LockWidgetNameEnum.AuthenticationProviderDetails}
+                titleSize="large"
+                refreshAction={getFreshData}
+            >
+                <JwkSetKeysTable jwkSetKeys={oauth2Provider?.jwkSetKeys} />
             </Widget>
         </Container>
     );

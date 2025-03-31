@@ -2,14 +2,14 @@ import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
     AuthenticationSettingsModel,
     AuthenticationSettingsUpdateModel,
-    OAuth2ProviderSettingsModel,
+    OAuth2ProviderSettingsResponseModel,
     OAuth2ProviderSettingsUpdateModel,
 } from 'types/auth-settings';
 import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     authenticationSettings?: AuthenticationSettingsModel;
-    oauth2Provider?: OAuth2ProviderSettingsModel;
+    oauth2Provider?: OAuth2ProviderSettingsResponseModel;
 
     isFetchingSettings: boolean;
     isFetchingProvider: boolean;
@@ -89,11 +89,14 @@ export const slice = createSlice({
             state.isUpdatingSettings = false;
         },
 
+        resetOAuth2ProviderSettings: (state, action: PayloadAction<void>) => {
+            state.oauth2Provider = undefined;
+        },
         getOAuth2ProviderSettings: (state, action: PayloadAction<{ providerName: string }>) => {
             state.isFetchingProvider = true;
         },
 
-        getOAuth2ProviderSettingsSuccess: (state, action: PayloadAction<{ oauth2Provider: OAuth2ProviderSettingsModel }>) => {
+        getOAuth2ProviderSettingsSuccess: (state, action: PayloadAction<{ oauth2Provider: OAuth2ProviderSettingsResponseModel }>) => {
             state.oauth2Provider = action.payload.oauth2Provider;
             state.isFetchingProvider = false;
         },

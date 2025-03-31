@@ -3,8 +3,8 @@ import {
     AuthenticationSettingsModel,
     AuthenticationSettingsUpdateDto,
     AuthenticationSettingsUpdateModel,
-    OAuth2ProviderSettingsDto,
-    OAuth2ProviderSettingsModel,
+    OAuth2ProviderSettingsResponseDto,
+    OAuth2ProviderSettingsResponseModel,
     OAuth2ProviderSettingsUpdateDto,
     OAuth2ProviderSettingsUpdateModel,
 } from 'types/auth-settings';
@@ -13,7 +13,9 @@ export function transformAuthenticationSettingsDtoToModel(authenticationSettings
     return { ...authenticationSettings };
 }
 
-export function transformOAuth2ProviderSettingsDtoToModel(oauth2provider: OAuth2ProviderSettingsDto): OAuth2ProviderSettingsModel {
+export function transformOAuth2ProviderSettingsDtoToModel(
+    oauth2provider: OAuth2ProviderSettingsResponseDto,
+): OAuth2ProviderSettingsResponseModel {
     return { ...oauth2provider };
 }
 

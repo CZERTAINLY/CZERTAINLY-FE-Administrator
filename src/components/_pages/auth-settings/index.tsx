@@ -1,17 +1,20 @@
+import JwkSetKeysTable from 'components/_pages/auth-settings/JwkSetKeysTable';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
 import SwitchField from 'components/Input/SwitchField';
 import TabLayout from 'components/Layout/TabLayout';
 import ProgressButton from 'components/ProgressButton';
+import Spinner from 'components/Spinner';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as authSettingsActions, selectors as authSettingsSelectors } from 'ducks/auth-settings';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
-import { Form as BootstrapForm, ButtonGroup, Container } from 'reactstrap';
+import { Form as BootstrapForm, Button, ButtonGroup, Container } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { renderOAuth2StateBadge } from 'utils/oauth2Providers';
+import { renderOAuth2StateBadges } from 'utils/oauth2Providers';
 
 type FormValues = {
     disableLocalhostUser: boolean;
@@ -25,6 +28,11 @@ const AuthenticationSettings = () => {
     const isFetchingSettings = useSelector(authSettingsSelectors.isFetchingSettings);
     const isUpdatingSettings = useSelector(authSettingsSelectors.isUpdatingSettings);
 
+    const oauth2Provider = useSelector(authSettingsSelectors.oauth2Provider);
+    const isFetchingProvider = useSelector(authSettingsSelectors.isFetchingProvider);
+    const [selectedProvider, setSelectedProvider] = useState<string | null>(null);
+    const [jwkSetKeysDialog, setJwkSetKeysDialog] = useState(false);
+
     const getAuthenticationSettings = useCallback(() => {
         dispatch(authSettingsActions.getAuthenticationSettings());
     }, [dispatch]);
@@ -32,6 +40,12 @@ const AuthenticationSettings = () => {
     useEffect(() => {
         getAuthenticationSettings();
     }, [getAuthenticationSettings]);
+
+    useEffect(() => {
+        if (!selectedProvider) return;
+        dispatch(authSettingsActions.resetOAuth2ProviderSettings());
+        dispatch(authSettingsActions.getOAuth2ProviderSettings({ providerName: selectedProvider }));
+    }, [dispatch, selectedProvider]);
 
     const isBusy = useMemo(() => isFetchingSettings, [isFetchingSettings]);
 
@@ -47,6 +61,15 @@ const AuthenticationSettings = () => {
         [dispatch],
     );
 
+    const onShowProviderJwkSetKeys = useCallback((providerName: string) => {
+        setSelectedProvider(providerName);
+        setJwkSetKeysDialog(true);
+    }, []);
+
+    const onCloseProviderJwkSetKeys = useCallback(() => {
+        setSelectedProvider(null);
+        setJwkSetKeysDialog(false);
+    }, []);
     const providersButtons: WidgetButtonProps[] = useMemo(
         () => [
             {
@@ -68,8 +91,18 @@ const AuthenticationSettings = () => {
                 content: 'Name',
             },
             {
-                id: 'status',
-                content: 'Status',
+                id: 'issuerUrl',
+                content: 'Issuer URL',
+            },
+            {
+                id: 'scheme',
+                content: 'Authentication scheme',
+                align: 'center',
+            },
+            {
+                id: 'moreInfo',
+                content: '',
+                width: '2%',
             },
         ],
         [],
@@ -85,10 +118,20 @@ const AuthenticationSettings = () => {
                           <Link key="link" to={`./detail/${providerName}`}>
                               {providerName}
                           </Link>,
-                          renderOAuth2StateBadge(provider),
+                          provider.issuerUrl ?? '',
+                          renderOAuth2StateBadges(provider),
+                          <Button
+                              className="btn btn-link py-0 px-1 ms-2"
+                              color="white"
+                              title="Detail"
+                              key="jwkKeyInfo"
+                              onClick={() => onShowProviderJwkSetKeys(providerName)}
+                          >
+                              <i className="fa fa-key" style={{ color: 'auto' }} />
+                          </Button>,
                       ],
                   })),
-        [authenticationSettings],
+        [authenticationSettings, onShowProviderJwkSetKeys],
     );
 
     const initialValues = useMemo(() => {
@@ -155,6 +198,22 @@ const AuthenticationSettings = () => {
                         ),
                     },
                 ]}
+            />
+            <Dialog
+                size="xl"
+                isOpen={jwkSetKeysDialog}
+                caption={`JWK Set Keys of "${selectedProvider}"`}
+                body={
+                    isFetchingProvider ? (
+                        <div style={{ height: '100px' }}>
+                            <Spinner active={isFetchingProvider} />
+                        </div>
+                    ) : (
+                        <JwkSetKeysTable jwkSetKeys={oauth2Provider?.jwkSetKeys} />
+                    )
+                }
+                toggle={onCloseProviderJwkSetKeys}
+                buttons={[{ color: 'secondary', onClick: onCloseProviderJwkSetKeys, body: 'Close' }]}
             />
         </Container>
     );

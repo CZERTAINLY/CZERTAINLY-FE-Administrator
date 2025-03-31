@@ -12,10 +12,19 @@ export function isValidOAuth2Provider(provider: OAuth2ProviderSettingsModel) {
     );
 }
 
-export function renderOAuth2StateBadge(provider: OAuth2ProviderSettingsModel) {
-    if (isValidOAuth2Provider(provider)) {
-        return <Badge color="success">Valid</Badge>;
-    } else {
-        return <Badge color="danger">Invalid</Badge>;
+export function renderOAuth2StateBadges(provider: OAuth2ProviderSettingsModel) {
+    const badges = [];
+    if (provider.issuerUrl) {
+        badges.push(<Badge color="secondary">JWT Bearer</Badge>);
     }
+    if (isValidOAuth2Provider(provider)) {
+        badges.push(<Badge color="secondary">OAuth2 Flow</Badge>);
+    }
+    return (
+        <div>
+            {badges.map((el, i) => (
+                <span key={i}>{el} &nbsp;</span>
+            ))}
+        </div>
+    );
 }

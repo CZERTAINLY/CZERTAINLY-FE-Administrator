@@ -6,10 +6,16 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Field, Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
-import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
+import { Form as BootstrapForm, Button, ButtonGroup, Col, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 import { isObjectSame } from 'utils/common-utils';
-import { composeValidators, validateAlphaNumericWithSpecialChars, validatePositiveInteger, validateRequired } from 'utils/validators';
+import {
+    composeValidators,
+    validateAlphaNumericWithSpecialChars,
+    validateCustomUrl,
+    validatePositiveInteger,
+    validateRequired,
+} from 'utils/validators';
 import CustomSelect from '../../../Input/CustomSelect';
 import { OAuth2ProviderSettingsUpdateDto } from 'types/auth-settings';
 
@@ -158,14 +164,45 @@ export default function OAuth2ProviderForm() {
                             id={'name'}
                             validators={[composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())]}
                             disabled={editMode}
+                            description="OAuth2 Provider Name"
                         />
 
-                        <TextField id="clientId" label="Client Id" validators={[]} />
+                        <TextField
+                            id="jwkSetUrl"
+                            label="JWK Set Url"
+                            validators={[
+                                (value, allValues) => {
+                                    if (!allValues.jwkSet) {
+                                        return value ? undefined : 'JWK Set URL is required if JWK Set is not provided';
+                                    }
+                                    return undefined;
+                                },
+                                validateCustomUrl,
+                            ]}
+                            disabled={!!values.jwkSet}
+                            description="The URL where the JSON Web Key Set (JWKS) containing the public keys used to verify JWT tokens can be retrieved."
+                        />
+                        <TextField
+                            id="jwkSet"
+                            label="JWK Set"
+                            validators={[]}
+                            disabled={!!values.jwkSetUrl}
+                            placeholder="Enter JWK Set encoded in Base64"
+                            description="Base64 encoded JWK Set, provided in case JWK Set URL is not available"
+                        />
+
+                        <TextField
+                            id="clientId"
+                            label="Client Id"
+                            validators={[]}
+                            description="The client ID used to identify the client application during the authorization process."
+                        />
                         <TextField
                             id="clientSecret"
                             label="Client Secret"
                             validators={!editMode ? [validateRequired()] : []}
                             inputType="password"
+                            description="The client secret used by the client application to authenticate with the authorization server."
                         />
 
                         <CustomSelect
@@ -179,6 +216,7 @@ export default function OAuth2ProviderForm() {
                             isClearable
                             allowTextInput
                             validators={[]}
+                            description="The list of scopes that define the access levels and permissions requested by the client application."
                         />
                         <CustomSelect
                             id="audiences"
@@ -191,71 +229,69 @@ export default function OAuth2ProviderForm() {
                             isClearable
                             allowTextInput
                             validators={[]}
+                            description="A list of expected audiences for validating the issued tokens, used to match the intended recipients of the tokens."
                         />
 
                         <TextField
-                            id="jwkSetUrl"
-                            label="JWK Set Url"
-                            validators={[
-                                (value, allValues) => {
-                                    if (!allValues.jwkSet) {
-                                        return value ? undefined : 'JWK Set URL is required if JWK Set is not provided';
-                                    }
-                                    return undefined;
-                                },
-                            ]}
-                            disabled={!!values.jwkSet}
+                            id="issuerUrl"
+                            label="Issuer Url"
+                            validators={[validateCustomUrl]}
+                            description="URL of issuer issuing authentication tokens. If provided, authentication via JWT token is enabled for this provider."
                         />
                         <TextField
-                            id="jwkSet"
-                            label="JWK Set"
-                            validators={[]}
-                            disabled={!!values.jwkSetUrl}
-                            placeholder="Enter JWK Set encoded in Base64"
+                            id="tokenUrl"
+                            label="Token Url"
+                            validators={[validateCustomUrl]}
+                            description="The URL used to exchange the authorization code or credentials for an access token."
                         />
-                        <TextField id="issuerUrl" label="Issuer Url" validators={[]} />
-                        <TextField id="authorizationUrl" label="Authorization Url" validators={[]} />
-                        <TextField id="tokenUrl" label="Token Url" validators={[]} />
-                        <TextField id="logoutUrl" label="Logout Url" validators={[]} />
-                        <TextField id="postLogoutUrl" label="Post Logout Url" validators={[]} />
-                        <TextField id="userInfoUrl" label="User Info Url" validators={[]} />
+                        <TextField
+                            id="authorizationUrl"
+                            label="Authorization Url"
+                            validators={[validateCustomUrl]}
+                            description="The URL where the authorization server redirects the user for login and authorization."
+                        />
+                        <TextField
+                            id="userInfoUrl"
+                            label="User Info Url"
+                            validators={[validateCustomUrl]}
+                            description="The URL containing information about user."
+                        />
 
-                        <Field name="skew" validate={composeValidators(validatePositiveInteger())}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="skew">Skew Time</Label>
+                        <TextField
+                            id="logoutUrl"
+                            label="Logout Url"
+                            validators={[validateCustomUrl]}
+                            description="URL to end session on provider side."
+                        />
+                        <TextField
+                            id="postLogoutUrl"
+                            label="Post Logout Url"
+                            validators={[validateCustomUrl]}
+                            description="URL that user will be redirected after logout from application."
+                        />
+                        <Row xs="1" sm="1" md="2" lg="2" xl="2">
+                            <Col>
+                                <TextField
+                                    id="skew"
+                                    label="Skew Time"
+                                    validators={[validatePositiveInteger()]}
+                                    placeholder="Enter Time in Seconds"
+                                    inputType="number"
+                                    description="The allowed time skew, in seconds, for token validation. This accounts for clock differences between systems. Default value is 30 seconds."
+                                />
+                            </Col>
 
-                                    <Input
-                                        {...input}
-                                        id="skew"
-                                        type="number"
-                                        placeholder="Enter Time in Seconds"
-                                        valid={!meta.error && meta.touched}
-                                        invalid={!!meta.error && meta.touched}
-                                    />
-
-                                    <FormFeedback>{meta.error}</FormFeedback>
-                                </FormGroup>
-                            )}
-                        </Field>
-                        <Field name="sessionMaxInactiveInterval" validate={composeValidators(validatePositiveInteger())}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="sessionMaxInactiveInterval">Session Max Inactive Interval</Label>
-
-                                    <Input
-                                        {...input}
-                                        id="sessionMaxInactiveInterval"
-                                        type="number"
-                                        placeholder="Enter Time in Seconds"
-                                        valid={!meta.error && meta.touched}
-                                        invalid={!!meta.error && meta.touched}
-                                    />
-
-                                    <FormFeedback>{meta.error}</FormFeedback>
-                                </FormGroup>
-                            )}
-                        </Field>
+                            <Col>
+                                <TextField
+                                    id="sessionMaxInactiveInterval"
+                                    label="Session Max Inactive Interval"
+                                    validators={[validatePositiveInteger()]}
+                                    placeholder="Enter Time in Seconds"
+                                    inputType="number"
+                                    description="Duration in seconds after which will inactive user's session be terminated."
+                                />
+                            </Col>
+                        </Row>
 
                         <div className="d-flex justify-content-end">
                             <ButtonGroup>
