@@ -1,16 +1,24 @@
 import {
     PlatformSettingsDto,
+    PlatformSettingsUpdateDto,
     UtilsSettingsDto,
     LoggingSettingsDto,
     ResourceLoggingSettingsDto as ResourceLoggingSettingsDtoApi,
     AuditLoggingSettingsDto as AuditLoggingSettingsDtoApi,
+    CertificateSettingsDto as CertificateSettingsDtoApi,
 } from './openapi';
 
 export type SettingsUtilsDto = UtilsSettingsDto;
 export type SettingsUtilsModel = SettingsUtilsDto;
 
+export type SettingsCertificatesDto = CertificateSettingsDtoApi;
+export type SettingsCertificatesModel = SettingsCertificatesDto;
+
 export type SettingsPlatformDto = PlatformSettingsDto;
-export type SettingsPlatformModel = Omit<SettingsPlatformDto, 'utils'> & { utils: SettingsUtilsModel };
+export type SettingsPlatformModel = SettingsPlatformDto;
+
+export type SettingsPlatformUpdateDto = PlatformSettingsUpdateDto;
+export type SettingsPlatformUpdateModel = SettingsPlatformUpdateDto;
 
 export type SettingsLoggingDto = LoggingSettingsDto;
 export type SettingsLoggingModel = SettingsLoggingDto;

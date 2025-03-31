@@ -1254,6 +1254,7 @@ export const groupAttributeAtributeEditorMockData = {
             },
         ],
         customAttributes: [],
+        validationEnabled: true,
     } as RaProfileResponseModel,
 };
 

@@ -5,17 +5,23 @@ import {
     SettingsUtilsModel,
     SettingsLoggingModel,
     SettingsLoggingDto,
+    SettingsCertificatesDto,
+    SettingsCertificatesModel,
 } from '../../types/settings';
 
 export function transformSettingsUtilsDtoToModel(settings: SettingsUtilsDto | undefined): SettingsUtilsModel {
     if (settings === undefined) return {};
     return { ...settings };
 }
+export function transformSettingsCertificatesDtoToModel(settings: SettingsCertificatesDto): SettingsCertificatesModel {
+    return { ...settings };
+}
 
 export function transformSettingsPlatformDtoToModel(settings: SettingsPlatformDto): SettingsPlatformModel {
     return {
         ...settings,
-        utils: transformSettingsUtilsDtoToModel(settings.utils),
+        certificates: settings.certificates ? transformSettingsCertificatesDtoToModel(settings.certificates) : undefined,
+        utils: settings.utils ? transformSettingsUtilsDtoToModel(settings.utils) : undefined,
     };
 }
 

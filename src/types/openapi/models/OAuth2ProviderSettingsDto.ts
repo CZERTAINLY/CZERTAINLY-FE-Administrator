@@ -11,6 +11,10 @@
  * Do not edit the class manually.
  */
 
+import type {
+    JwkDto,
+} from './';
+
 /**
  * @export
  * @interface OAuth2ProviderSettingsDto
@@ -106,4 +110,10 @@ export interface OAuth2ProviderSettingsDto {
      * @memberof OAuth2ProviderSettingsDto
      */
     sessionMaxInactiveInterval?: number;
+    /**
+     * List of public keys used by the provider
+     * @type {Array<JwkDto>}
+     * @memberof OAuth2ProviderSettingsDto
+     */
+    jwkSetKeys: Array<JwkDto>;
 }

@@ -113,6 +113,7 @@ export class InternalNotificationApi extends BaseAPI {
         if (request != null) {
             Object.assign(query, request);
         }
+
         return this.request<NotificationResponseDto>({
             url: '/v1/notifications',
             method: 'GET',
