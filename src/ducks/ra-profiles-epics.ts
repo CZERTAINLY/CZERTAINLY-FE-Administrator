@@ -17,7 +17,7 @@ import {
     transformRaProfileActivateCmpRequestModelToDto,
     transformRaProfileActivateScepRequestModelToDto,
     transformRaProfileAddRequestModelToDto,
-    transformRaProfileCertificateValidationSettingsUpdateModelToDto as transformRaProfileCertificateValidationSettingsUpdateModelToDto,
+    transformRaProfileCertificateValidationSettingsUpdateModelToDto,
     transformRaProfileCmpDetailResponseDtoToModel,
     transformRaProfileEditRequestModelToDto,
     transformRaProfileResponseDtoToModel,

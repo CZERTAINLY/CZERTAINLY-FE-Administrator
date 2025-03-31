@@ -118,7 +118,7 @@ const EditableTableCell = <TValue,>({
         </div>
     ) : (
         <div className={styles.cell}>
-            {typeof renderValue === 'function' ? renderValue(value) : typeof value === 'string' ? value : ''}
+            {typeof renderValue === 'function' ? renderValue(value) : (value as React.ReactNode)}
             <Spinner active={busy} />
             <Button
                 title="Edit"
