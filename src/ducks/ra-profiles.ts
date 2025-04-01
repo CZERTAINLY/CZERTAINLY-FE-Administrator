@@ -9,6 +9,7 @@ import {
     RaProfileActivateCmpRequestModel,
     RaProfileActivateScepRequestModel,
     RaProfileAddRequestModel,
+    RaProfileCertificateValidationSettingsUpdateModel,
     RaProfileCmpDetailResponseModel,
     RaProfileEditRequestModel,
     RaProfileResponseModel,
@@ -208,6 +209,30 @@ export const slice = createSlice({
         },
 
         updateRaProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isUpdating = false;
+        },
+
+        updateRaProfileCertificateValidation: (
+            state,
+            action: PayloadAction<{
+                profileUuid: string;
+                authorityInstanceUuid: string;
+                validation: RaProfileCertificateValidationSettingsUpdateModel;
+            }>,
+        ) => {
+            state.isUpdating = true;
+        },
+
+        updateRaProfileCertificateValidationSuccess: (state, action: PayloadAction<{ raProfile: RaProfileResponseModel }>) => {
+            state.isUpdating = false;
+            state.raProfile = {
+                ...action.payload.raProfile,
+                attributes: state.raProfile?.attributes!,
+                customAttributes: state.raProfile?.customAttributes,
+            };
+        },
+
+        updateRaProfileCertificateValidationFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdating = false;
         },
 

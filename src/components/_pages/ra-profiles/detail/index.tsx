@@ -9,11 +9,12 @@ import WidgetButtons, { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions as approvalProfileActions } from 'ducks/approval-profiles';
 import { actions as raProfilesActions, selectors as raProfilesSelectors } from 'ducks/ra-profiles';
+import { actions as settingsActions, selectors as settingsSelectors } from 'ducks/settings';
+
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router';
-
-import { Col, Container, Label, Row } from 'reactstrap';
+import { Col, Container, Row } from 'reactstrap';
 import { Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 
@@ -21,6 +22,10 @@ import { LockWidgetNameEnum } from 'types/user-interface';
 import AssociateApprovalProfileDialogBody from '../AssociateApprovalProfileDialogBody';
 import AssociateComplianceProfileDialogBody from '../AssociateComplianceProfileDialogBody';
 import ProtocolActivationDialogBody, { Protocol } from '../ProtocolActivationDialogBody';
+import TabLayout from 'components/Layout/TabLayout';
+import CertificateValidationDialogBody from 'components/_pages/ra-profiles/CertificateValidationDialogBody';
+import SwitchWidget from 'components/SwitchWidget';
+import { renderExpiringThresholdLabel, renderValidationFrequencyLabel } from 'utils/certificate-validation';
 
 interface DeassociateApprovalProfileDialogState {
     isDialogOpen: boolean;
@@ -42,7 +47,7 @@ export default function RaProfileDetail() {
     const associatedApprovalProfiles = useSelector(raProfilesSelectors.associatedApprovalProfiles);
 
     const isDissociatingApprovalProfile = useSelector(raProfilesSelectors.isDissociatingApprovalProfile);
-    const isfetchingApprvoalProfiles = useSelector(raProfilesSelectors.isFetchingApprovalProfiles);
+    const isFetchingApprovalProfiles = useSelector(raProfilesSelectors.isFetchingApprovalProfiles);
     const isFetchingProfile = useSelector(raProfilesSelectors.isFetchingDetail);
     const isFetchingAcmeDetails = useSelector(raProfilesSelectors.isFetchingAcmeDetails);
     const isFetchingScepDetails = useSelector(raProfilesSelectors.isFetchingScepDetails);
@@ -58,6 +63,9 @@ export default function RaProfileDetail() {
     const isActivatingScep = useSelector(raProfilesSelectors.isActivatingScep);
     const isDeactivatingScep = useSelector(raProfilesSelectors.isDeactivatingScep);
     const isFetchingAssociatedComplianceProfiles = useSelector(raProfilesSelectors.isFetchingAssociatedComplianceProfiles);
+
+    const platformSettings = useSelector(settingsSelectors.platformSettings);
+    const isFetchingPlatform = useSelector(settingsSelectors.isFetchingPlatform);
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
@@ -77,9 +85,26 @@ export default function RaProfileDetail() {
     const [confirmDeassociateApprovalProfileDialog, setConfirmDeassociateApprovalProfileDialog] =
         useState<DeassociateApprovalProfileDialogState>();
 
+    const [certificateValidationDialog, setCertificateValidationDialog] = useState<boolean>(false);
+
     const isBusy = useMemo(
-        () => isFetchingProfile || isDeleting || isEnabling || isDisabling || isfetchingApprvoalProfiles || isDissociatingApprovalProfile,
-        [isFetchingProfile, isDeleting, isEnabling, isDisabling, isfetchingApprvoalProfiles, isDissociatingApprovalProfile],
+        () =>
+            isFetchingProfile ||
+            isDeleting ||
+            isEnabling ||
+            isDisabling ||
+            isFetchingApprovalProfiles ||
+            isDissociatingApprovalProfile ||
+            isFetchingPlatform,
+        [
+            isFetchingProfile,
+            isDeleting,
+            isEnabling,
+            isDisabling,
+            isFetchingApprovalProfiles,
+            isDissociatingApprovalProfile,
+            isFetchingPlatform,
+        ],
     );
 
     const isWorkingWithProtocol = useMemo(
@@ -148,6 +173,12 @@ export default function RaProfileDetail() {
             getFreshAvailableProtocols();
         }
     }, [raProfile, getFreshAvailableProtocols]);
+
+    useEffect(() => {
+        if (platformSettings) return;
+
+        dispatch(settingsActions.getPlatformSettings());
+    }, [dispatch, platformSettings]);
 
     useEffect(() => {
         if (!id || !authorityId) return;
@@ -332,6 +363,20 @@ export default function RaProfileDetail() {
         [getFreshAllApprovalProfiles],
     );
 
+    const certificateValidationButtons: WidgetButtonProps[] = useMemo(
+        () => [
+            {
+                icon: 'pencil',
+                disabled: false,
+                tooltip: 'Edit Validation Settings',
+                onClick: () => {
+                    setCertificateValidationDialog(true);
+                },
+            },
+        ],
+        [],
+    );
+
     const approvalProfilesHeaders: TableHeader[] = useMemo(
         () => [
             {
@@ -449,47 +494,44 @@ export default function RaProfileDetail() {
         [],
     );
 
-    const detailData: TableDataRow[] = useMemo(
-        () =>
-            !raProfile
-                ? []
-                : [
-                      {
-                          id: 'uuid',
-                          columns: ['UUID', raProfile.uuid],
-                      },
-                      {
-                          id: 'name',
-                          columns: ['Name', raProfile.name],
-                      },
-                      {
-                          id: 'description',
-                          columns: ['Description', raProfile.description || ''],
-                      },
-                      {
-                          id: 'enabled',
-                          columns: ['Enabled', <StatusBadge enabled={raProfile!.enabled} />],
-                      },
-                      {
-                          id: 'authorityUuid',
-                          columns: ['Authority Instance UUID', raProfile.authorityInstanceUuid],
-                      },
-                      {
-                          id: 'authorityName',
-                          columns: [
-                              'Authority Instance Name',
-                              raProfile.authorityInstanceUuid ? (
-                                  <Link to={`../../authorities/detail/${raProfile.authorityInstanceUuid}`}>
-                                      {raProfile.authorityInstanceName}
-                                  </Link>
-                              ) : (
-                                  ''
-                              ),
-                          ],
-                      },
-                  ],
-        [raProfile],
-    );
+    const detailData: TableDataRow[] = useMemo(() => {
+        if (!raProfile) return [];
+        const data = [
+            {
+                id: 'uuid',
+                columns: ['UUID', raProfile.uuid],
+            },
+            {
+                id: 'name',
+                columns: ['Name', raProfile.name],
+            },
+            {
+                id: 'description',
+                columns: ['Description', raProfile.description || ''],
+            },
+            {
+                id: 'enabled',
+                columns: ['Enabled', <StatusBadge enabled={raProfile!.enabled} />],
+            },
+            {
+                id: 'authorityUuid',
+                columns: ['Authority Instance UUID', raProfile.authorityInstanceUuid],
+            },
+            {
+                id: 'authorityName',
+                columns: [
+                    'Authority Instance Name',
+                    raProfile.authorityInstanceUuid ? (
+                        <Link to={`../../authorities/detail/${raProfile.authorityInstanceUuid}`}>{raProfile.authorityInstanceName}</Link>
+                    ) : (
+                        ''
+                    ),
+                ],
+            },
+        ];
+
+        return data;
+    }, [raProfile]);
 
     const protocolProfileHeaders: TableHeader[] = useMemo(
         () => [
@@ -767,94 +809,209 @@ export default function RaProfileDetail() {
         ],
     );
 
+    const certificateValidationHeaders: TableHeader[] = useMemo(
+        () => [
+            {
+                id: 'setting',
+                content: 'Setting',
+                width: '70%',
+            },
+            {
+                id: 'value',
+                content: 'Value',
+                width: '30%',
+            },
+        ],
+        [],
+    );
+
+    const certificateValidationData: TableDataRow[] = useMemo(() => {
+        if (!raProfile) return [];
+        const raProfileValidationSettings = raProfile.certificateValidationSettings;
+        const platformValidationSettings = platformSettings?.certificates?.validation;
+
+        const data = [
+            {
+                id: 'usePlatformSettings',
+                columns: [
+                    'Platform Validation Settings Used',
+                    <SwitchWidget key="usePlatformSettings" checked={raProfileValidationSettings.usePlatformSettings} disabled />,
+                ],
+            },
+        ];
+
+        let mappedValidation: {
+            enabled?: boolean;
+            frequency?: number;
+            expiringThreshold?: number;
+        } = {
+            enabled: false,
+        };
+
+        if (raProfileValidationSettings.enabled) {
+            mappedValidation = {
+                enabled: raProfileValidationSettings.enabled,
+                frequency: raProfileValidationSettings.frequency,
+                expiringThreshold: raProfileValidationSettings.expiringThreshold,
+            };
+        }
+        if (raProfileValidationSettings.usePlatformSettings) {
+            mappedValidation = {
+                enabled: platformValidationSettings?.enabled,
+                frequency: platformValidationSettings?.frequency,
+                expiringThreshold: platformValidationSettings?.expiringThreshold,
+            };
+        }
+
+        data.push({
+            id: 'enabled',
+            columns: ['Validation Enabled', <SwitchWidget key="validationEnabled" disabled checked={mappedValidation.enabled} />],
+        });
+
+        if (mappedValidation.enabled) {
+            data.push(
+                {
+                    id: 'frequency',
+                    columns: ['Validation Frequency', renderValidationFrequencyLabel(mappedValidation.frequency)],
+                },
+                {
+                    id: 'expiringThreshold',
+                    columns: ['Expiring Threshold', renderExpiringThresholdLabel(mappedValidation.expiringThreshold)],
+                },
+            );
+        }
+
+        return data;
+    }, [raProfile, platformSettings]);
+
     return (
         <Container className="themed-container" fluid>
-            <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                <Col>
-                    <Widget
-                        title="RA Profile Details"
-                        busy={isFetchingProfile}
-                        widgetButtons={buttons}
-                        titleSize="large"
-                        refreshAction={getFreshRaProfileDetail}
-                        widgetLockName={LockWidgetNameEnum.RaProfileDetails}
-                        lockSize="large"
-                    >
-                        <br />
+            <TabLayout
+                tabs={[
+                    {
+                        title: 'Details',
+                        content: (
+                            <Widget>
+                                <Row xs="1" sm="1" md="2" lg="2" xl="2">
+                                    <Col>
+                                        <Widget
+                                            title="RA Profile Details"
+                                            busy={isFetchingProfile}
+                                            widgetButtons={buttons}
+                                            titleSize="large"
+                                            refreshAction={getFreshRaProfileDetail}
+                                            widgetLockName={LockWidgetNameEnum.RaProfileDetails}
+                                            lockSize="large"
+                                        >
+                                            <br />
 
-                        <CustomTable headers={detailHeaders} data={detailData} />
-                    </Widget>
+                                            <CustomTable headers={detailHeaders} data={detailData} />
+                                        </Widget>
+                                    </Col>
+                                    <Col>
+                                        <Widget
+                                            title="Compliance Profiles"
+                                            busy={isFetchingAssociatedComplianceProfiles}
+                                            widgetButtons={complianceProfileButtons}
+                                            titleSize="large"
+                                            refreshAction={getFreshComplianceRaProfileDetail}
+                                            widgetLockName={LockWidgetNameEnum.RaProfileComplianceDetails}
+                                            lockSize="large"
+                                        >
+                                            <CustomTable headers={complianceProfileHeaders} data={complianceProfileData} />
+                                        </Widget>
 
-                    <Widget
-                        title="Compliance Profiles"
-                        busy={isFetchingAssociatedComplianceProfiles}
-                        widgetButtons={complianceProfileButtons}
-                        titleSize="large"
-                        refreshAction={getFreshComplianceRaProfileDetail}
-                        widgetLockName={LockWidgetNameEnum.RaProfileComplianceDetails}
-                        lockSize="large"
-                    >
-                        <CustomTable headers={complianceProfileHeaders} data={complianceProfileData} />
-                    </Widget>
+                                        <Widget
+                                            title="Approval Profiles"
+                                            busy={isBusy}
+                                            widgetButtons={approvalProfilesButtons}
+                                            titleSize="large"
+                                            refreshAction={getFreshAssociatedApprovalProfiles}
+                                            lockSize="large"
+                                            widgetLockName={LockWidgetNameEnum.ListOfApprovalProfiles}
+                                        >
+                                            <CustomTable headers={approvalProfilesHeaders} data={approvalProfilesData} />
+                                        </Widget>
+                                    </Col>
+                                </Row>
+                            </Widget>
+                        ),
+                    },
+                    {
+                        title: 'Protocols',
+                        content: (
+                            <Widget>
+                                {!raProfile?.legacyAuthority && (
+                                    <Widget
+                                        title="Available Protocols"
+                                        busy={isBusy || isWorkingWithProtocol}
+                                        titleSize="large"
+                                        refreshAction={getFreshAvailableProtocols}
+                                        widgetLockName={LockWidgetNameEnum.RaProfileDetails}
+                                    >
+                                        <br />
 
-                    <Widget
-                        title="Approval Profiles"
-                        busy={isBusy}
-                        widgetButtons={approvalProfilesButtons}
-                        titleSize="large"
-                        refreshAction={getFreshAssociatedApprovalProfiles}
-                        lockSize="large"
-                        widgetLockName={LockWidgetNameEnum.ListOfApprovalProfiles}
-                    >
-                        <CustomTable headers={approvalProfilesHeaders} data={approvalProfilesData} />
-                    </Widget>
-                </Col>
+                                        <CustomTable hasDetails={true} headers={availableProtocolsHeaders} data={availableProtocolsData} />
+                                    </Widget>
+                                )}
+                            </Widget>
+                        ),
+                        disabled: !!raProfile?.legacyAuthority,
+                    },
+                    {
+                        title: 'Attributes',
+                        content: (
+                            <Widget>
+                                <Row xs="1" sm="1" md="2" lg="2" xl="2">
+                                    <Col>
+                                        <Widget
+                                            title="RA Profile Attributes"
+                                            busy={isBusy}
+                                            titleSize="large"
+                                            widgetLockName={LockWidgetNameEnum.RaProfileDetails}
+                                            lockSize="large"
+                                        >
+                                            {!raProfile || !raProfile.attributes || raProfile.attributes.length === 0 ? (
+                                                <></>
+                                            ) : (
+                                                <AttributeViewer attributes={raProfile?.attributes} />
+                                            )}
+                                        </Widget>
+                                    </Col>
 
-                <Col>
-                    <Widget
-                        title="Attributes"
-                        busy={isBusy}
-                        titleSize="large"
-                        widgetLockName={LockWidgetNameEnum.RaProfileDetails}
-                        lockSize="large"
-                    >
-                        {!raProfile || !raProfile.attributes || raProfile.attributes.length === 0 ? (
-                            <></>
-                        ) : (
-                            <>
-                                <br />
-                                <Label>RA profile Attributes</Label>
-                                <AttributeViewer attributes={raProfile?.attributes} />
-                            </>
-                        )}
-                    </Widget>
-
-                    {raProfile && (
-                        <CustomAttributeWidget
-                            resource={Resource.RaProfiles}
-                            resourceUuid={raProfile.uuid}
-                            attributes={raProfile.customAttributes}
-                        />
-                    )}
-                </Col>
-            </Row>
-
-            <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                <Col></Col>
-            </Row>
-            {!raProfile?.legacyAuthority && (
-                <Widget
-                    title="Available protocols"
-                    busy={isBusy || isWorkingWithProtocol}
-                    titleSize="large"
-                    refreshAction={getFreshAvailableProtocols}
-                    widgetLockName={LockWidgetNameEnum.RaProfileDetails}
-                >
-                    <br />
-
-                    <CustomTable hasDetails={true} headers={availableProtocolsHeaders} data={availableProtocolsData} />
-                </Widget>
-            )}
+                                    <Col>
+                                        {raProfile && (
+                                            <CustomAttributeWidget
+                                                resource={Resource.RaProfiles}
+                                                resourceUuid={raProfile.uuid}
+                                                attributes={raProfile.customAttributes}
+                                            />
+                                        )}
+                                    </Col>
+                                </Row>
+                            </Widget>
+                        ),
+                    },
+                    {
+                        title: 'Validation',
+                        content: (
+                            <Widget>
+                                <Widget
+                                    title="Certificate Validation Details"
+                                    busy={isBusy}
+                                    widgetButtons={certificateValidationButtons}
+                                    titleSize="large"
+                                    refreshAction={getFreshRaProfileDetail}
+                                    widgetLockName={[LockWidgetNameEnum.RaProfileDetails, LockWidgetNameEnum.PlatformSettings]}
+                                    lockSize="large"
+                                >
+                                    <CustomTable headers={certificateValidationHeaders} data={certificateValidationData} />
+                                </Widget>
+                            </Widget>
+                        ),
+                    },
+                ]}
+            />
 
             <Dialog
                 isOpen={confirmDelete}
@@ -979,6 +1136,18 @@ export default function RaProfileDetail() {
                     raProfile: raProfile,
                 })}
                 toggle={() => setAssociateApprovalProfileDialog(false)}
+                buttons={[]}
+            />
+
+            <Dialog
+                isOpen={certificateValidationDialog}
+                caption={`Edit Certificate Validation Settings`}
+                body={CertificateValidationDialogBody({
+                    platformSettings,
+                    onClose: () => setCertificateValidationDialog(false),
+                    raProfile: raProfile,
+                })}
+                toggle={() => setCertificateValidationDialog(false)}
                 buttons={[]}
             />
 

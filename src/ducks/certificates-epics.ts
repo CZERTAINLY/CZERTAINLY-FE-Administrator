@@ -6,7 +6,7 @@ import { actions as alertActions } from './alerts';
 import { actions as appRedirectActions } from './app-redirect';
 
 import * as slice from './certificates';
-import { transformAttributeDescriptorDtoToModel, transformAttributeResponseDtoToModel } from './transform/attributes';
+import { transformAttributeDescriptorDtoToModel } from './transform/attributes';
 
 import { store } from '../App';
 import { LockWidgetNameEnum } from 'types/user-interface';
@@ -664,12 +664,7 @@ const bulkUpdateRaProfile: AppEpic = (action$, state, deps) => {
                                 map((raProfile) =>
                                     slice.actions.bulkUpdateRaProfileSuccess({
                                         uuids: action.payload.raProfileRequest.certificateUuids!,
-                                        raProfile: {
-                                            ...raProfile,
-                                            attributes: raProfile?.attributes?.length
-                                                ? raProfile.attributes.map(transformAttributeResponseDtoToModel)
-                                                : [],
-                                        },
+                                        raProfile: transformRaProfileResponseDtoToModel(raProfile),
                                     }),
                                 ),
 

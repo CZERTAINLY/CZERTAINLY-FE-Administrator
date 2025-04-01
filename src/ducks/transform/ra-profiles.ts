@@ -11,6 +11,8 @@ import {
     RaProfileActivateScepRequestModel,
     RaProfileAddRequestDto,
     RaProfileAddRequestModel,
+    RaProfileCertificateValidationSettingsUpdateDto,
+    RaProfileCertificateValidationSettingsUpdateModel,
     RaProfileCmpDetailResponseDto,
     RaProfileCmpDetailResponseModel,
     RaProfileEditRequestDto,
@@ -28,11 +30,32 @@ export function transformRaProfileSimplifiedDtoToModel(raProfile: RaProfileSimpl
     return { ...raProfile };
 }
 
+export function transformRaProfileCertificateValidationSettingsDtoToModel(
+    validationSettings?: RaProfileCertificateValidationSettingsUpdateDto,
+): RaProfileCertificateValidationSettingsUpdateModel {
+    return {
+        ...validationSettings,
+        usePlatformSettings: validationSettings?.enabled === undefined,
+        enabled: !!validationSettings?.enabled,
+    };
+}
+
 export function transformRaProfileResponseDtoToModel(raResponse: RaProfileResponseDto): RaProfileResponseModel {
     return {
         ...raResponse,
+        certificateValidationSettings: transformRaProfileCertificateValidationSettingsDtoToModel(raResponse.certificateValidationSettings),
         attributes: raResponse?.attributes?.length ? raResponse.attributes.map(transformAttributeResponseDtoToModel) : [],
         customAttributes: raResponse.customAttributes?.map(transformAttributeResponseDtoToModel),
+    };
+}
+
+export function transformRaProfileCertificateValidationSettingsUpdateModelToDto(
+    raProfile: RaProfileCertificateValidationSettingsUpdateModel,
+): RaProfileCertificateValidationSettingsUpdateDto {
+    return {
+        enabled: raProfile.usePlatformSettings ? undefined : raProfile.enabled,
+        frequency: raProfile.frequency,
+        expiringThreshold: raProfile.expiringThreshold,
     };
 }
 
