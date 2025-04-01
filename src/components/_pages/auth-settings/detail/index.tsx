@@ -100,8 +100,7 @@ export default function OAuth2ProviderDetail() {
                           columns: [
                               'Skew',
                               <>
-                                  {oauth2Provider.skew}{' '}
-                                  <span className="text-muted">second{Number(oauth2Provider.skew) > 1 ? 's' : ''}</span>
+                                  {oauth2Provider.skew} second{Number(oauth2Provider.skew) > 1 ? 's' : ''}
                               </>,
                           ],
                       },
@@ -110,8 +109,8 @@ export default function OAuth2ProviderDetail() {
                           columns: [
                               'Session Max Inactive Interval',
                               <>
-                                  {oauth2Provider.sessionMaxInactiveInterval}{' '}
-                                  <span className="text-muted">second{Number(oauth2Provider.skew) > 1 ? 's' : ''}</span>
+                                  {oauth2Provider.sessionMaxInactiveInterval} second
+                                  {Number(oauth2Provider.sessionMaxInactiveInterval) > 1 ? 's' : ''}
                               </>,
                           ],
                       },

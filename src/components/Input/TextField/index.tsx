@@ -2,7 +2,7 @@ import cx from 'classnames';
 import { Field } from 'react-final-form';
 import { FormFeedback, FormGroup, FormText, Input, InputGroup, InputGroupText, Label } from 'reactstrap';
 import { InputType } from 'reactstrap/types/lib/Input';
-import { composeValidators } from 'utils/validators';
+import { composeValidators, validateRequired } from 'utils/validators';
 import styles from './TextField.module.scss';
 
 interface InputGroupIcon {
@@ -20,16 +20,31 @@ type Props = {
     validators: ((value: any, allValues: any, fieldState: any) => string | undefined | Promise<string | undefined>)[];
     inputGroupIcon?: InputGroupIcon;
     placeholder?: string;
+    required?: boolean;
 };
 
-export default function TextField({ id, label, inputType, disabled = false, validators, description, inputGroupIcon, placeholder }: Props) {
+export default function TextField({
+    id,
+    label,
+    inputType,
+    disabled = false,
+    validators,
+    description,
+    inputGroupIcon,
+    placeholder,
+    required,
+}: Props) {
     return (
-        <Field name={id} validate={composeValidators(...validators)} type={inputType ?? 'text'}>
+        <Field name={id} validate={composeValidators(required && validateRequired(), ...validators)} type={inputType ?? 'text'}>
             {({ input, meta }) => {
                 const isInvalid = !!meta.error && meta.touched;
+                // console.log({ id, isInvalid });
                 return (
                     <FormGroup>
-                        <Label for={id}>{label}</Label>
+                        <Label for={id}>
+                            {label}
+                            {required && '*'}
+                        </Label>
                         <InputGroup>
                             <Input
                                 {...input}
