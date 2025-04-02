@@ -36,6 +36,8 @@ export default defineConfig(async () => {
             preprocessorOptions: {
                 scss: {
                     includePaths: [path.resolve(__dirname, 'src')],
+                    quietDeps: true,
+                    silenceDeprecations: ['mixed-decls', 'import', 'global-builtin', 'color-functions'],
                 },
             },
         },

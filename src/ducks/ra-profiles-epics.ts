@@ -17,6 +17,7 @@ import {
     transformRaProfileActivateCmpRequestModelToDto,
     transformRaProfileActivateScepRequestModelToDto,
     transformRaProfileAddRequestModelToDto,
+    transformRaProfileCertificateValidationSettingsUpdateModelToDto,
     transformRaProfileCmpDetailResponseDtoToModel,
     transformRaProfileEditRequestModelToDto,
     transformRaProfileResponseDtoToModel,
@@ -144,6 +145,40 @@ const updateRaProfile: AppEpic = (action$, state$, deps) => {
                         of(
                             (slice.actions.updateRaProfileFailure({ error: extractError(err, 'Failed to update profile') }),
                             alertActions.error(extractError(err, 'Failed to update profile'))),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
+const updateRaProfileCertificateValidation: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.updateRaProfileCertificateValidation.match),
+        switchMap((action) =>
+            deps.apiClients.raProfiles
+                .updateRaProfileValidationConfiguration({
+                    raProfileUuid: action.payload.profileUuid,
+                    authorityUuid: action.payload.authorityInstanceUuid,
+                    raProfileCertificateValidationSettingsUpdateDto: transformRaProfileCertificateValidationSettingsUpdateModelToDto(
+                        action.payload.validation,
+                    ),
+                })
+                .pipe(
+                    mergeMap((raProfileDto) =>
+                        of(
+                            slice.actions.updateRaProfileCertificateValidationSuccess({
+                                raProfile: transformRaProfileResponseDtoToModel(raProfileDto),
+                            }),
+                        ),
+                    ),
+
+                    catchError((err) =>
+                        of(
+                            (slice.actions.updateRaProfileCertificateValidationFailure({
+                                error: extractError(err, 'Failed to update profile validation settings'),
+                            }),
+                            alertActions.error(extractError(err, 'Failed to update profile validation settings'))),
                         ),
                     ),
                 ),
@@ -777,6 +812,7 @@ const epics = [
     getRaProfileDetail,
     createRaProfile,
     updateRaProfile,
+    updateRaProfileCertificateValidation,
     enableRaProfile,
     disableRaProfile,
     deleteRaProfile,

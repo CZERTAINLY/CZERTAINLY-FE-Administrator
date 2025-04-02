@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { SettingsPlatformModel } from 'types/settings';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import SwitchWidget from 'components/SwitchWidget';
+import { renderExpiringThresholdLabel, renderValidationFrequencyLabel } from 'utils/certificate-validation';
 
 type Props = {
     platformSettings?: SettingsPlatformModel;
@@ -35,11 +36,11 @@ const CertificateSettings = ({ platformSettings }: Props) => {
             rows.push(
                 {
                     id: 'validationFrequency',
-                    columns: ['Validation Frequency', validation.frequency.toString()],
+                    columns: ['Validation Frequency', renderValidationFrequencyLabel(validation.frequency)],
                 },
                 {
                     id: 'expiringThreshold',
-                    columns: ['Expiring Threshold', validation.expiringThreshold.toString()],
+                    columns: ['Expiring Threshold', renderExpiringThresholdLabel(validation.expiringThreshold)],
                 },
             );
         }
