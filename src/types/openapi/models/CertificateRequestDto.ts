@@ -66,10 +66,10 @@ export interface CertificateRequestDto {
     subjectDn: string;
     /**
      * Subject alternative names
-     * @type {{ [key: string]: object; }}
+     * @type {{ [key: string]: Array<string>; }}
      * @memberof CertificateRequestDto
      */
-    subjectAlternativeNames?: { [key: string]: object; };
+    subjectAlternativeNames?: { [key: string]: Array<string>; };
     /**
      * CSR Attributes
      * @type {Array<ResponseAttributeDto>}

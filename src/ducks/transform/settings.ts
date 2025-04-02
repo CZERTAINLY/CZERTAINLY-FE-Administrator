@@ -9,7 +9,8 @@ import {
     SettingsCertificatesModel,
 } from '../../types/settings';
 
-export function transformSettingsUtilsDtoToModel(settings: SettingsUtilsDto): SettingsUtilsModel {
+export function transformSettingsUtilsDtoToModel(settings: SettingsUtilsDto | undefined): SettingsUtilsModel {
+    if (settings === undefined) return {};
     return { ...settings };
 }
 export function transformSettingsCertificatesDtoToModel(settings: SettingsCertificatesDto): SettingsCertificatesModel {

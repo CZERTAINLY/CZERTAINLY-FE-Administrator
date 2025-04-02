@@ -3,7 +3,9 @@ import cronValidator from 'cron-expression-validator';
 export const composeValidators =
     (...validators: any[]) =>
     (value: any, allValues?: object, fieldState?: any) =>
-        validators.reduce((error, validator) => error || validator(value, allValues, fieldState), undefined);
+        validators
+            .filter((validator) => typeof validator === 'function')
+            .reduce((error, validator) => error || validator(value, allValues, fieldState), undefined);
 
 export const validateRequired = () => (value: any) => ((Array.isArray(value) ? value.length > 0 : value) ? undefined : 'Required Field');
 
@@ -53,12 +55,7 @@ export const validateCustom = (pattern: string, value: string) => {
 };
 
 export const validateCustomUrl = (value: string) => {
-    return !value ||
-        new RegExp(
-            /^((http|https):\/\/)?(www.)?(?!.*(http|https|www.))[a-zA-Z0-9_-]+(\.[a-zA-Z]+)+((\/)[\w#]+)*(\/\w+\?[a-zA-Z0-9_]+=\w+(&[a-zA-Z0-9_]+=\w+)*)?\/?$/g,
-        ).test(value)
-        ? undefined
-        : 'Value must be a valid url';
+    return !value || new RegExp(/^(https?:\/\/)?([\w.-]+)(:\d+)?(\/[\w#.-]*)*\/?$/g).test(value) ? undefined : 'Value must be a valid url';
 };
 
 export const validateCustomIp = (value: string) => {

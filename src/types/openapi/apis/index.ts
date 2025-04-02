@@ -23,6 +23,7 @@ export * from './EntityManagementApi';
 export * from './EnumsApi';
 export * from './ExternalNotificationManagementApi';
 export * from './GlobalMetadataApi';
+export * from './InfoApi';
 export * from './InternalNotificationApi';
 export * from './LocalOperationsApi';
 export * from './LocationManagementApi';

@@ -1,7 +1,11 @@
+import { Fragment } from 'react/jsx-runtime';
 import { Badge } from 'reactstrap';
 import { OAuth2ProviderSettingsModel } from 'types/auth-settings';
 
-export function isValidOAuth2Provider(provider: OAuth2ProviderSettingsModel) {
+export function isValidJWTBearerProvider(provider: OAuth2ProviderSettingsModel) {
+    return Boolean(provider.issuerUrl);
+}
+export function isValidOAuth2FlowProvider(provider: OAuth2ProviderSettingsModel) {
     return Boolean(
         provider.clientId &&
             provider.authorizationUrl &&
@@ -12,10 +16,21 @@ export function isValidOAuth2Provider(provider: OAuth2ProviderSettingsModel) {
     );
 }
 
-export function renderOAuth2StateBadge(provider: OAuth2ProviderSettingsModel) {
-    if (isValidOAuth2Provider(provider)) {
-        return <Badge color="success">Valid</Badge>;
-    } else {
-        return <Badge color="danger">Invalid</Badge>;
+export function renderOAuth2StateBadges(provider: OAuth2ProviderSettingsModel) {
+    const badges = [];
+    if (isValidJWTBearerProvider(provider)) {
+        badges.push('JWT Bearer');
     }
+    if (isValidOAuth2FlowProvider(provider)) {
+        badges.push('OAuth2 Flow');
+    }
+    return (
+        <div>
+            {badges.map((el) => (
+                <Fragment key={el}>
+                    <Badge color="secondary"> {el} </Badge>&nbsp;
+                </Fragment>
+            ))}
+        </div>
+    );
 }

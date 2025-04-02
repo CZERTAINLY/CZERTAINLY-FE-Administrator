@@ -22,7 +22,7 @@ import type {
     ErrorMessageDto,
     LoggingSettingsDto,
     NotificationSettingsDto,
-    OAuth2ProviderSettingsDto,
+    OAuth2ProviderSettingsResponseDto,
     OAuth2ProviderSettingsUpdateDto,
     PlatformSettingsDto,
     PlatformSettingsUpdateDto,
@@ -101,12 +101,12 @@ export class SettingsApi extends BaseAPI {
     /**
      * Get OAuth2 Provider settings
      */
-    getOAuth2ProviderSettings({ providerName }: GetOAuth2ProviderSettingsRequest): Observable<OAuth2ProviderSettingsDto>
-    getOAuth2ProviderSettings({ providerName }: GetOAuth2ProviderSettingsRequest, opts?: OperationOpts): Observable<AjaxResponse<OAuth2ProviderSettingsDto>>
-    getOAuth2ProviderSettings({ providerName }: GetOAuth2ProviderSettingsRequest, opts?: OperationOpts): Observable<OAuth2ProviderSettingsDto | AjaxResponse<OAuth2ProviderSettingsDto>> {
+    getOAuth2ProviderSettings({ providerName }: GetOAuth2ProviderSettingsRequest): Observable<OAuth2ProviderSettingsResponseDto>
+    getOAuth2ProviderSettings({ providerName }: GetOAuth2ProviderSettingsRequest, opts?: OperationOpts): Observable<AjaxResponse<OAuth2ProviderSettingsResponseDto>>
+    getOAuth2ProviderSettings({ providerName }: GetOAuth2ProviderSettingsRequest, opts?: OperationOpts): Observable<OAuth2ProviderSettingsResponseDto | AjaxResponse<OAuth2ProviderSettingsResponseDto>> {
         throwIfNullOrUndefined(providerName, 'providerName', 'getOAuth2ProviderSettings');
 
-        return this.request<OAuth2ProviderSettingsDto>({
+        return this.request<OAuth2ProviderSettingsResponseDto>({
             url: '/v1/settings/authentication/oauth2Providers/{providerName}'.replace('{providerName}', encodeURI(providerName)),
             method: 'GET',
         }, opts?.responseOpts);

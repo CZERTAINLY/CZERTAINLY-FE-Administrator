@@ -9,13 +9,14 @@ import Select, {
     ActionMeta,
     GroupBase,
 } from 'react-select';
-import { FormFeedback, FormGroup, Label } from 'reactstrap';
+import { FormFeedback, FormGroup, FormText, Label } from 'reactstrap';
 import styles from './CustomSelect.module.scss';
 
 type OptionType = { label: string; value: string; isNew?: boolean };
 
 type Props = SelectProps<OptionType, boolean> & {
     label: string;
+    description?: string;
 } & (
         | {
               allowTextInput?: false;
@@ -27,7 +28,7 @@ type Props = SelectProps<OptionType, boolean> & {
           }
     );
 
-export default function CustomSelect({ allowTextInput, isMulti, options = [], validators = [], ...props }: Props) {
+export default function CustomSelect({ allowTextInput, isMulti, options = [], validators = [], description, ...props }: Props) {
     const [newOptions, setNewOptions] = useState<OptionType[]>([]);
     const [inputValue, setInputValue] = useState('');
     const [error, setError] = useState<string | null>(null);
@@ -107,7 +108,9 @@ export default function CustomSelect({ allowTextInput, isMulti, options = [], va
                 components={{ Option: CustomOption }}
                 styles={{ menu: (provided) => ({ ...provided, zIndex: 5 }) }}
                 classNames={{ control: () => (error ? styles.customSelectStylingError : '') }}
+                noOptionsMessage={allowTextInput ? () => 'Type in to create an option' : undefined}
             />
+            {description && <FormText>{description}</FormText>}
             {error && <FormFeedback style={{ display: 'block' }}>{error}</FormFeedback>}
         </FormGroup>
     );

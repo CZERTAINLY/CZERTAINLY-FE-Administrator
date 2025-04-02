@@ -210,10 +210,10 @@ export interface CertificateDetailDto {
     certificateContent: string;
     /**
      * Subject alternative names
-     * @type {{ [key: string]: object; }}
+     * @type {{ [key: string]: Array<string>; }}
      * @memberof CertificateDetailDto
      */
-    subjectAlternativeNames?: { [key: string]: object; };
+    subjectAlternativeNames?: { [key: string]: Array<string>; };
     /**
      * Locations associated to the Certificate
      * @type {Array<LocationDto>}

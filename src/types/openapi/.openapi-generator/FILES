@@ -24,6 +24,7 @@ apis/EntityManagementApi.ts
 apis/EnumsApi.ts
 apis/ExternalNotificationManagementApi.ts
 apis/GlobalMetadataApi.ts
+apis/InfoApi.ts
 apis/InternalNotificationApi.ts
 apis/LocalOperationsApi.ts
 apis/LocationManagementApi.ts
@@ -57,10 +58,12 @@ models/ActivateCmpForRaProfileRequestDto.ts
 models/ActivateScepForRaProfileRequestDto.ts
 models/ActorRecord.ts
 models/ActorType.ts
+models/ActuatorHealthDto.ts
 models/AddLocationRequestDto.ts
 models/AddRaProfileRequestDto.ts
 models/AddTokenProfileRequestDto.ts
 models/AddUserRequestDto.ts
+models/AppInfoDto.ts
 models/ApprovalDetailDto.ts
 models/ApprovalDetailStepDto.ts
 models/ApprovalDto.ts
@@ -186,6 +189,7 @@ models/ConnectorMetadataResponseDto.ts
 models/ConnectorRequestDto.ts
 models/ConnectorStatus.ts
 models/ConnectorUpdateRequestDto.ts
+models/CoreInfoResponseDto.ts
 models/CredentialAttributeContent.ts
 models/CredentialAttributeContentData.ts
 models/CredentialDto.ts
@@ -200,6 +204,7 @@ models/CustomAttributeProperties.ts
 models/CustomAttributeUpdateRequestDto.ts
 models/DataAttribute.ts
 models/DataAttributeProperties.ts
+models/DatabaseInfoDto.ts
 models/DateAttributeContent.ts
 models/DateTimeAttributeConstraint.ts
 models/DateTimeAttributeConstraintData.ts
@@ -283,6 +288,7 @@ models/NotificationRequestDto.ts
 models/NotificationResponseDto.ts
 models/NotificationSettingsDto.ts
 models/OAuth2ProviderSettingsDto.ts
+models/OAuth2ProviderSettingsResponseDto.ts
 models/OAuth2ProviderSettingsUpdateDto.ts
 models/ObjectAttributeContent.ts
 models/ObjectPermissionsDto.ts
