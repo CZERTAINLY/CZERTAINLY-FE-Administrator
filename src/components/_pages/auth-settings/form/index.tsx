@@ -6,7 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Form, FormRenderProps } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
-import { Form as BootstrapForm, Button, ButtonGroup, Col, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
+import { Form as BootstrapForm, Button, ButtonGroup, Col, Row } from 'reactstrap';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 import { isObjectSame } from 'utils/common-utils';
 import { validateAlphaNumericWithSpecialChars, validateCustomUrl, validatePositiveInteger } from 'utils/validators';
@@ -67,8 +67,6 @@ export default function OAuth2ProviderForm() {
 
     const [audienceOptions, setAudienceOptions] = useState<OptionType[]>([]);
     const [scopeOptions, setScopeOptions] = useState<OptionType[]>([]);
-
-    const [selectedAuthScheme, setSelectedAuthScheme] = useState<AuthenticationScheme | null>(null);
 
     const isBusy = useMemo(
         () => isFetchingProvider || isUpdatingProvider || isCreatingProvider,

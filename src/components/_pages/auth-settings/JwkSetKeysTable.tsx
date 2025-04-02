@@ -61,6 +61,7 @@ const JwkSetKeysTable = ({ jwkSetKeys }: Props) => {
                 columns: [
                     'Base64 Encoded Value',
                     <span
+                        key="value"
                         style={{
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
@@ -85,7 +86,12 @@ const JwkSetKeysTable = ({ jwkSetKeys }: Props) => {
                               columns: [key.kid, key.keyType, key.algorithm],
                               detailColumns: [
                                   <></>,
-                                  <CustomTable hasHeader={false} headers={detailHeaders} data={createDetailDataForTable(key)} />,
+                                  <CustomTable
+                                      key="details"
+                                      hasHeader={false}
+                                      headers={detailHeaders}
+                                      data={createDetailDataForTable(key)}
+                                  />,
                               ],
                           }) as TableDataRow,
                   ),

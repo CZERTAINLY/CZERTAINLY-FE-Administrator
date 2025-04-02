@@ -55,12 +55,7 @@ export const validateCustom = (pattern: string, value: string) => {
 };
 
 export const validateCustomUrl = (value: string) => {
-    return !value ||
-        new RegExp(
-            /^((http|https):\/\/)?(www.)?(?!.*(http|https|www.))[\w.-]+(:[\d]{1,5})?((\/)[\w#.-]+)*(\/[\w.-]+\?[\w.-]+=\w+(&[\w-]+=[\w.-]+)*)?\/?$/g,
-        ).test(value)
-        ? undefined
-        : 'Value must be a valid url';
+    return !value || new RegExp(/^(https?:\/\/)?([\w.-]+)(:\d+)?(\/[\w#.-]*)*\/?$/g).test(value) ? undefined : 'Value must be a valid url';
 };
 
 export const validateCustomIp = (value: string) => {

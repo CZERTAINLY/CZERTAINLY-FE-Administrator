@@ -1,3 +1,4 @@
+import { Fragment } from 'react/jsx-runtime';
 import { Badge } from 'reactstrap';
 import { OAuth2ProviderSettingsModel } from 'types/auth-settings';
 
@@ -18,15 +19,17 @@ export function isValidOAuth2FlowProvider(provider: OAuth2ProviderSettingsModel)
 export function renderOAuth2StateBadges(provider: OAuth2ProviderSettingsModel) {
     const badges = [];
     if (isValidJWTBearerProvider(provider)) {
-        badges.push(<Badge color="secondary">JWT Bearer</Badge>);
+        badges.push('JWT Bearer');
     }
     if (isValidOAuth2FlowProvider(provider)) {
-        badges.push(<Badge color="secondary">OAuth2 Flow</Badge>);
+        badges.push('OAuth2 Flow');
     }
     return (
         <div>
-            {badges.map((el, i) => (
-                <span key={i}>{el} &nbsp;</span>
+            {badges.map((el) => (
+                <Fragment key={el}>
+                    <Badge color="secondary"> {el} </Badge>&nbsp;
+                </Fragment>
             ))}
         </div>
     );
