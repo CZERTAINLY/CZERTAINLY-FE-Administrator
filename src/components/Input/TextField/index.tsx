@@ -38,7 +38,6 @@ export default function TextField({
         <Field name={id} validate={composeValidators(required && validateRequired(), ...validators)} type={inputType ?? 'text'}>
             {({ input, meta }) => {
                 const isInvalid = !!meta.error && meta.touched;
-                // console.log({ id, isInvalid });
                 return (
                     <FormGroup>
                         <Label for={id}>
