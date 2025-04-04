@@ -6,6 +6,7 @@ import { NotificationInstanceModel, NotificationInstanceRequestModel, Notificati
 import { ListMappingAttributesRequest } from 'types/openapi';
 import { createFeatureSelector } from 'utils/ducks';
 
+const MAX_FAILED_RETRY_COUNT = 10;
 export type State = {
     overviewNotifications: NotificationModel[];
     notifications: NotificationModel[];
@@ -17,11 +18,12 @@ export type State = {
     mappingAttributes?: DataAttributeModel[];
 
     isFetchingMappingAttributes: boolean;
-    isFetchingnotificationProviderAttributesDescriptors: boolean;
+    isFetchingNotificationProviderAttributesDescriptors: boolean;
     isDeletingNotificationInstance: boolean;
     isFetchingNotificationProviders: boolean;
     isFetchingNotificationInstanceDetail: boolean;
     isFetchingOverview: boolean;
+    failedFetchingOverviewCount: number;
     isFetchingNotificationInstances: boolean;
     isCreatingNotificationInstance: boolean;
     isEditingNotificationInstance: boolean;
@@ -37,13 +39,14 @@ export const initialState: State = {
     notificationInstances: [],
 
     isFetchingMappingAttributes: false,
-    isFetchingnotificationProviderAttributesDescriptors: false,
+    isFetchingNotificationProviderAttributesDescriptors: false,
     isDeletingNotificationInstance: false,
     isFetchingNotificationProviders: false,
     isFetchingNotificationInstanceDetail: false,
     isFetchingNotificationInstances: false,
     isCreatingNotificationInstance: false,
     isFetchingOverview: false,
+    failedFetchingOverviewCount: MAX_FAILED_RETRY_COUNT,
     isEditingNotificationInstance: false,
     isDeleting: false,
     isBulkDeleting: false,
@@ -57,17 +60,21 @@ export const slice = createSlice({
     initialState,
 
     reducers: {
-        listOverviewNotifications: (state, action: PayloadAction<void>) => {
+        listOverviewNotifications: (state, action: PayloadAction<void>) => {},
+
+        listOverviewNotificationsStarted: (state, action: PayloadAction<void>) => {
             state.isFetchingOverview = true;
         },
 
         listOverviewNotificationsSuccess: (state, action: PayloadAction<NotificationModel[]>) => {
             state.isFetchingOverview = false;
             state.overviewNotifications = action.payload;
+            state.failedFetchingOverviewCount = MAX_FAILED_RETRY_COUNT;
         },
 
         listOverviewNotificationsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingOverview = false;
+            state.failedFetchingOverviewCount = state.failedFetchingOverviewCount - 1;
         },
 
         listNotifications: (state, action: PayloadAction<{ unread: boolean; pagination: SearchRequestModel }>) => {
@@ -134,7 +141,7 @@ export const slice = createSlice({
 
         getNotificationAttributesDescriptors: (state, action: PayloadAction<{ uuid: string; kind: string }>) => {
             state.notificationProviderAttributesDescriptors = [];
-            state.isFetchingnotificationProviderAttributesDescriptors = true;
+            state.isFetchingNotificationProviderAttributesDescriptors = true;
         },
 
         getNotificationAttributesDescriptorsSuccess: (
@@ -142,11 +149,11 @@ export const slice = createSlice({
             action: PayloadAction<{ attributeDescriptor: AttributeDescriptorModel[] }>,
         ) => {
             state.notificationProviderAttributesDescriptors = action.payload.attributeDescriptor;
-            state.isFetchingnotificationProviderAttributesDescriptors = false;
+            state.isFetchingNotificationProviderAttributesDescriptors = false;
         },
 
         getNotificationAttributeDescriptorsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isFetchingnotificationProviderAttributesDescriptors = false;
+            state.isFetchingNotificationProviderAttributesDescriptors = false;
         },
 
         getNotificationInstance: (state, action: PayloadAction<{ uuid: string }>) => {
