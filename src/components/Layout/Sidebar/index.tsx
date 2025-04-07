@@ -1,7 +1,5 @@
-import { useSelector } from 'react-redux';
 import LinksGroup from './LinksGroup';
 import style from './Sidebar.module.scss';
-import { selectors } from 'ducks/auth';
 import { Resource } from 'types/openapi';
 import { useMemo } from 'react';
 
