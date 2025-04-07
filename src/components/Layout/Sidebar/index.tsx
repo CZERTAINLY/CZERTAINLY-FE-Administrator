@@ -195,19 +195,24 @@ function getAllowedMenuItems(allowedResources?: Resource[]): MenuItemMapping[] {
             }
             continue;
         }
-        if (mapping.requiredResources === undefined || mapping.requiredResources.length === 0) {
-            allowedLinks.push(mapping);
-        } else if (mapping.requiredResources?.find((resource) => allowedResources.includes(resource))) {
+        if (
+            mapping.requiredResources === undefined ||
+            mapping.requiredResources.length === 0 ||
+            mapping.requiredResources.find((resource) => allowedResources.includes(resource))
+        ) {
             allowedLinks.push(mapping);
         }
     }
 
     return allowedLinks;
 }
-export default function Sidebar() {
-    const profile = useSelector(selectors.profile);
 
-    const allowedMenuItems = useMemo(() => getAllowedMenuItems(profile?.permissions.allowedListings), [profile]);
+type Props = {
+    allowedResources?: Resource[];
+};
+export default function Sidebar({ allowedResources }: Props) {
+    const allowedMenuItems = useMemo(() => getAllowedMenuItems(allowedResources), [allowedResources]);
+
     function renderMenuItem(mapping: MenuItemMapping) {
         if ('children' in mapping) {
             return <LinksGroup _key={mapping._key} header={mapping.header} childrenLinks={mapping.children} />;
