@@ -12,6 +12,7 @@ import { Form as BootstrapForm, ButtonGroup, Col, Container, FormGroup, Label, R
 import { PlatformEnum } from 'types/openapi';
 import { isObjectSame, removeNullValues } from 'utils/common-utils';
 import NotificationInstanceList from '../notifications-instances';
+import { LockWidgetNameEnum } from 'types/user-interface';
 
 type FormValues = {
     notificationsMapping: {
@@ -130,6 +131,7 @@ const NotificationsSetting = () => {
                         content: (
                             <Widget
                                 refreshAction={getFreshNotificationSettings}
+                                widgetLockName={LockWidgetNameEnum.NotificationSettings}
                                 title="Notifications Instances Settings"
                                 titleSize="larger"
                                 busy={isBusy}

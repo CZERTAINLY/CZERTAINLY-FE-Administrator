@@ -349,6 +349,8 @@ export * from './UserCertificateDto';
 export * from './UserDetailDto';
 export * from './UserDto';
 export * from './UserIdentificationRequestDto';
+export * from './UserProfileDetailDto';
+export * from './UserProfilePermissionsDto';
 export * from './UtilsSettingsDto';
 export * from './UuidDto';
 export * from './VerificationResponseData';

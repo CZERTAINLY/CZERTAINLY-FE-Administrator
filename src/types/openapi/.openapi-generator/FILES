@@ -394,6 +394,8 @@ models/UserCertificateDto.ts
 models/UserDetailDto.ts
 models/UserDto.ts
 models/UserIdentificationRequestDto.ts
+models/UserProfileDetailDto.ts
+models/UserProfilePermissionsDto.ts
 models/UtilsSettingsDto.ts
 models/UuidDto.ts
 models/VerificationResponseData.ts
