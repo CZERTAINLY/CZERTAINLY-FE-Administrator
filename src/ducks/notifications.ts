@@ -23,7 +23,7 @@ export type State = {
     isFetchingNotificationProviders: boolean;
     isFetchingNotificationInstanceDetail: boolean;
     isFetchingOverview: boolean;
-    failedFetchingOverviewCount: number;
+    failedFetchingOverviewRemainingCount: number;
     isFetchingNotificationInstances: boolean;
     isCreatingNotificationInstance: boolean;
     isEditingNotificationInstance: boolean;
@@ -46,7 +46,7 @@ export const initialState: State = {
     isFetchingNotificationInstances: false,
     isCreatingNotificationInstance: false,
     isFetchingOverview: false,
-    failedFetchingOverviewCount: MAX_FAILED_RETRY_COUNT,
+    failedFetchingOverviewRemainingCount: MAX_FAILED_RETRY_COUNT,
     isEditingNotificationInstance: false,
     isDeleting: false,
     isBulkDeleting: false,
@@ -66,15 +66,19 @@ export const slice = createSlice({
             state.isFetchingOverview = true;
         },
 
+        resetFailedFetchingCount: (state, action: PayloadAction<void>) => {
+            state.failedFetchingOverviewRemainingCount = MAX_FAILED_RETRY_COUNT;
+        },
+
         listOverviewNotificationsSuccess: (state, action: PayloadAction<NotificationModel[]>) => {
             state.isFetchingOverview = false;
             state.overviewNotifications = action.payload;
-            state.failedFetchingOverviewCount = MAX_FAILED_RETRY_COUNT;
+            state.failedFetchingOverviewRemainingCount = MAX_FAILED_RETRY_COUNT;
         },
 
         listOverviewNotificationsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingOverview = false;
-            state.failedFetchingOverviewCount = state.failedFetchingOverviewCount - 1;
+            state.failedFetchingOverviewRemainingCount = state.failedFetchingOverviewRemainingCount - 1;
         },
 
         listNotifications: (state, action: PayloadAction<{ unread: boolean; pagination: SearchRequestModel }>) => {

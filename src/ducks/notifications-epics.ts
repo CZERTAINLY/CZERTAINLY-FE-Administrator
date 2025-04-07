@@ -26,7 +26,7 @@ import {
 const listOverviewNotifications: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listOverviewNotifications.match),
-        filter(() => state$.value.notifications.failedFetchingOverviewCount > 0),
+        filter(() => state$.value.notifications.failedFetchingOverviewRemainingCount > 0),
         switchMap(() => of(slice.actions.listOverviewNotificationsStarted())),
         switchMap((action) =>
             deps.apiClients.internalNotificationApi.listNotifications({ request: { unread: true } }).pipe(
