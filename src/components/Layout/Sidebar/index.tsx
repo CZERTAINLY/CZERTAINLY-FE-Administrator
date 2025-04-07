@@ -53,13 +53,13 @@ const menuItemMappings: MenuItemMapping[] = [
                 _key: '/raprofiles',
                 name: 'RA Profiles',
                 link: '/raprofiles',
-                requiredResources: [Resource.RaProfiles, Resource.Authorities],
+                requiredResources: [Resource.RaProfiles],
             },
             {
                 _key: '/tokenprofiles',
                 name: 'Token Profiles',
                 link: '/tokenprofiles',
-                requiredResources: [Resource.Tokens, Resource.TokenProfiles],
+                requiredResources: [Resource.TokenProfiles],
             },
             {
                 _key: '/complianceprofiles',
@@ -91,7 +91,7 @@ const menuItemMappings: MenuItemMapping[] = [
                 _key: '/acmeaccounts',
                 name: 'ACME Accounts',
                 link: '/acmeaccounts',
-                requiredResources: [Resource.AcmeAccounts, Resource.AcmeProfiles],
+                requiredResources: [Resource.AcmeAccounts],
             },
             { _key: '/acmeprofiles', name: 'ACME Profiles', link: '/acmeprofiles', requiredResources: [Resource.AcmeProfiles] },
             { _key: '/cmpprofiles', name: 'CMP Profiles', link: '/cmpprofiles', requiredResources: [Resource.CmpProfiles] },
@@ -188,7 +188,7 @@ function getAllowedMenuItems(allowedResources?: Resource[]): MenuItemMapping[] {
     for (const mapping of menuItemMappings) {
         if ('children' in mapping) {
             mapping.children = mapping.children.filter((el) => {
-                return !!el.requiredResources?.every((resource) => allowedResources.includes(resource));
+                return !!el.requiredResources?.some((resource) => allowedResources.includes(resource));
             });
             if (mapping.children.length > 0) {
                 allowedLinks.push(mapping);
