@@ -412,14 +412,12 @@ export default function AttributeEditor({
             function setBooleanAttributeValue() {
                 if (attribute?.content?.[0]?.data !== undefined) {
                     formAttributeValue = attribute.content[0].data;
+                } else if (descriptor.properties.required) {
+                    // set value to false, if attribute is required, has no value, and no default value are provided
+                    // otherwise allow the value to be undefined
+                    formAttributeValue = descriptor.content?.[0]?.data ?? false;
                 } else {
-                    if (descriptor.properties.required) {
-                        // if attribute is required set value to false, if no value, and no default value are provided
-                        // otherwise allow the value to be undefined
-                        formAttributeValue = descriptor.content?.[0]?.data ?? false;
-                    } else {
-                        formAttributeValue = descriptor.content?.[0]?.data;
-                    }
+                    formAttributeValue = descriptor.content?.[0]?.data;
                 }
             }
 
