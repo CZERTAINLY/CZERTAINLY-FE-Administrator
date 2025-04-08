@@ -1,6 +1,4 @@
 import {
-    PaginationDto,
-    PaginationModel,
     SchedulerJobDetailDto,
     SchedulerJobDetailModel,
     SchedulerJobDto,
@@ -19,8 +17,4 @@ export function transformSchedulerJobHistoryDtoToModel(history: SchedulerJobHist
 
 export function transformSchedulerJobDetailDtoToModel(schedulerJob: SchedulerJobDetailDto): SchedulerJobDetailModel {
     return { ...schedulerJob };
-}
-
-export function transformPaginationModelToDto(pagination: PaginationModel): PaginationDto {
-    return { ...pagination };
 }

@@ -96,7 +96,7 @@ export default function CertificateForm() {
 
     const submitCallback = useCallback(
         (values: FormValues) => {
-            if (!values.raProfile) return;
+            if (!values.raProfile?.value.authorityInstanceUuid) return;
 
             const attributes = collectFormAttributes(
                 'issuance_attributes',
@@ -134,7 +134,7 @@ export default function CertificateForm() {
 
     const onRaProfileChange = useCallback(
         (event: SingleValue<{ label: string; value: RaProfileResponseModel }>) => {
-            if (!event) return;
+            if (!event?.value.authorityInstanceUuid) return;
             dispatch(connectorActions.clearCallbackData());
             setGroupAttributesCallbackAttributes([]);
             dispatch(
@@ -165,10 +165,12 @@ export default function CertificateForm() {
 
     const options = useMemo(
         () =>
-            raProfiles.map((raProfile) => ({
-                label: raProfile.name,
-                value: raProfile,
-            })),
+            raProfiles
+                .filter((el) => el.authorityInstanceUuid)
+                .map((raProfile) => ({
+                    label: raProfile.name,
+                    value: raProfile,
+                })),
         [raProfiles],
     );
 

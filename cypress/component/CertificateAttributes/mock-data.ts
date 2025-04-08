@@ -1,5 +1,12 @@
 import { CertificateDetailResponseModel } from 'types/certificate';
-import { CertificateState, CertificateSubjectType, CertificateType, CertificateValidationStatus, ComplianceStatus } from 'types/openapi';
+import {
+    CertificateRequestFormat,
+    CertificateState,
+    CertificateSubjectType,
+    CertificateType,
+    CertificateValidationStatus,
+    ComplianceStatus,
+} from 'types/openapi';
 import '../../../src/resources/styles/theme.scss';
 
 const cert: CertificateDetailResponseModel = {
@@ -51,6 +58,7 @@ const cert: CertificateDetailResponseModel = {
     customAttributes: [],
     certificateRequest: {
         certificateType: CertificateType.X509,
+        certificateRequestFormat: CertificateRequestFormat.Pkcs10,
         publicKeyAlgorithm: 'RSA',
         signatureAlgorithm: 'SHA256withRSA',
         content:

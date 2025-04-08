@@ -122,7 +122,7 @@ function CredentialDetail() {
                       },
                       {
                           id: 'credentialProviderUuid',
-                          columns: ['Credential Provider UUID', credential.connectorUuid],
+                          columns: ['Credential Provider UUID', credential.connectorUuid ?? ''],
                       },
                   ],
         [credential],

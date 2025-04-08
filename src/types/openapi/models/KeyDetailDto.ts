@@ -40,7 +40,7 @@ export interface KeyDetailDto {
      * @type {string}
      * @memberof KeyDetailDto
      */
-    description: string;
+    description?: string;
     /**
      * Creation time of the Key. If the key is discovered from the connector, then it will be returned
      * @type {string}
@@ -64,13 +64,13 @@ export interface KeyDetailDto {
      * @type {string}
      * @memberof KeyDetailDto
      */
-    tokenInstanceUuid: string;
+    tokenInstanceUuid?: string;
     /**
      * Token Instance Name
      * @type {string}
      * @memberof KeyDetailDto
      */
-    tokenInstanceName: string;
+    tokenInstanceName?: string;
     /**
      * Custom Attributes for the Cryptographic Key
      * @type {Array<ResponseAttributeDto>}

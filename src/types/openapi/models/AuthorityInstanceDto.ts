@@ -55,13 +55,13 @@ export interface AuthorityInstanceDto {
      * @type {string}
      * @memberof AuthorityInstanceDto
      */
-    connectorUuid: string;
+    connectorUuid?: string;
     /**
      * Name of Authority provider
      * @type {string}
      * @memberof AuthorityInstanceDto
      */
-    connectorName: string;
+    connectorName?: string;
     /**
      * Authority Instance Kind
      * @type {string}

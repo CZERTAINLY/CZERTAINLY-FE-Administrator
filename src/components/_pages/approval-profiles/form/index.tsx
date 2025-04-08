@@ -52,7 +52,7 @@ function ApprovalProfileForm() {
     const defaultValues: ProfileApprovalRequestModel = useMemo(
         () =>
             editMode && profileApprovalDetail
-                ? profileApprovalDetail
+                ? { ...profileApprovalDetail, enabled: false }
                 : {
                       name: '',
                       enabled: false,

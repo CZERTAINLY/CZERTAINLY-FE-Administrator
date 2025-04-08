@@ -147,7 +147,7 @@ export interface CertificateDetailDto {
      * @type {CertificateType}
      * @memberof CertificateDetailDto
      */
-    certificateType?: CertificateType;
+    certificateType: CertificateType;
     /**
      * Serial number of the issuer
      * @type {string}
@@ -159,7 +159,7 @@ export interface CertificateDetailDto {
      * @type {ComplianceStatus}
      * @memberof CertificateDetailDto
      */
-    complianceStatus?: ComplianceStatus;
+    complianceStatus: ComplianceStatus;
     /**
      * UUID of the issuer certificate
      * @type {string}
@@ -177,7 +177,7 @@ export interface CertificateDetailDto {
      * @type {boolean}
      * @memberof CertificateDetailDto
      */
-    trustedCa: boolean;
+    trustedCa?: boolean;
     /**
      * Extended key usages
      * @type {Array<string>}
@@ -189,13 +189,13 @@ export interface CertificateDetailDto {
      * @type {Array<string>}
      * @memberof CertificateDetailDto
      */
-    keyUsage: Array<string>;
+    keyUsage?: Array<string>;
     /**
      * Certificate subject type
      * @type {CertificateSubjectType}
      * @memberof CertificateDetailDto
      */
-    subjectType: CertificateSubjectType;
+    subjectType?: CertificateSubjectType;
     /**
      * Certificate metadata
      * @type {Array<MetadataResponseDto>}
@@ -207,7 +207,7 @@ export interface CertificateDetailDto {
      * @type {string}
      * @memberof CertificateDetailDto
      */
-    certificateContent: string;
+    certificateContent?: string;
     /**
      * Subject alternative names
      * @type {{ [key: string]: Array<string>; }}
