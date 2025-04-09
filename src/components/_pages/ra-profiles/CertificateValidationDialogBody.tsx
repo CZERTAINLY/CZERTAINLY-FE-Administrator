@@ -54,7 +54,7 @@ export default function CertificateValidationDialogBody({ raProfile, platformSet
             dispatch(
                 actions.updateRaProfileCertificateValidation({
                     profileUuid: raProfile.uuid,
-                    authorityInstanceUuid: raProfile.authorityInstanceUuid || 'unknown',
+                    authorityInstanceUuid: raProfile.authorityInstanceUuid ?? 'unknown',
                     validation: {
                         usePlatformSettings: values.usePlatformSettings,
                         enabled: values.enabled,

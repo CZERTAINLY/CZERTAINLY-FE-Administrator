@@ -210,18 +210,17 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
         [credentialProvider],
     );
 
-    const defaultValues: FormValues = useMemo(
-        () => ({
+    const defaultValues: FormValues = useMemo(() => {
+        const credentialProvider = credential?.connectorUuid
+            ? { value: credential.connectorUuid!, label: credential.connectorName! }
+            : undefined;
+
+        return {
             name: editMode ? credential?.name || undefined : undefined,
-            credentialProvider: editMode
-                ? credential?.connectorUuid
-                    ? { value: credential.connectorUuid!, label: credential.connectorName! }
-                    : undefined
-                : undefined,
+            credentialProvider: editMode ? credentialProvider : undefined,
             storeKind: editMode ? (credential ? { value: credential?.kind, label: credential?.kind } : undefined) : undefined,
-        }),
-        [editMode, credential],
-    );
+        };
+    }, [editMode, credential]);
 
     const title = useMemo(() => (editMode ? 'Edit Credential' : 'Create Credential'), [editMode]);
 

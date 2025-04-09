@@ -238,7 +238,7 @@ describe('Info Attribute AttributeEditor', () => {
 
 const DataAttributeEditorComponent = () => {
     const authorityProviders = useSelector(authoritySelectors.authorityProviders);
-    const authorityProviderAttributeDescriptors = useSelector(authoritySelectors.authorityProviderAttributeDescriptors) || [];
+    const authorityProviderAttributeDescriptors = useSelector(authoritySelectors.authorityProviderAttributeDescriptors) ?? [];
     const authoritySelector = useSelector(authoritySelectors.authority);
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
     const [authorityProvider, setAuthorityProvider] = useState<ConnectorResponseModel>();
@@ -456,7 +456,7 @@ describe('Group Attribute AttributeEditor', () => {
             .invoke(
                 'dispatch',
                 authoritiesActions.getRAProfilesAttributesDescriptorsSuccess({
-                    authorityUuid: groupAttributeAtributeEditorMockData.raProfileResponseModel.authorityInstanceUuid || 'unknown',
+                    authorityUuid: groupAttributeAtributeEditorMockData.raProfileResponseModel.authorityInstanceUuid ?? 'unknown',
                     attributesDescriptors: groupAttributeAtributeEditorMockData.groupAttributeArray.map(
                         transformAttributeDescriptorDtoToModel,
                     ),
@@ -805,18 +805,15 @@ const GlobalModalAttributeEditor = () => {
     const entityProviderAttributeDescriptors = useSelector(entitySelectors.entityProviderAttributeDescriptors);
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
     const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
-    const defaultValues: GlobalModalAttributeEditorFormValues = useMemo(
-        () => ({
+    const defaultValues: GlobalModalAttributeEditorFormValues = useMemo(() => {
+        const entityProvider = entity?.connectorUuid ? { value: entity.connectorUuid!, label: entity.connectorName! } : undefined;
+
+        return {
             name: editMode ? entity?.name || undefined : undefined,
-            entityProvider: editMode
-                ? entity?.connectorUuid
-                    ? { value: entity.connectorUuid!, label: entity.connectorName! }
-                    : undefined
-                : undefined,
+            entityProvider: editMode ? entityProvider : undefined,
             storeKind: editMode ? (entity ? { value: entity?.kind, label: entity?.kind } : undefined) : undefined,
-        }),
-        [editMode, entity],
-    );
+        };
+    }, [editMode, entity]);
 
     return (
         <>

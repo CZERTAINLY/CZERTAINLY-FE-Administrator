@@ -199,24 +199,24 @@ export default function RaProfileDetail() {
 
     const onEditClick = useCallback(() => {
         if (!raProfile) return;
-        navigate(`../../../edit/${raProfile.authorityInstanceUuid || 'unknown'}/${raProfile?.uuid}`, { relative: 'path' });
+        navigate(`../../../edit/${raProfile.authorityInstanceUuid ?? 'unknown'}/${raProfile?.uuid}`, { relative: 'path' });
     }, [navigate, raProfile]);
 
     const onEnableClick = useCallback(() => {
         if (!raProfile) return;
-        dispatch(raProfilesActions.enableRaProfile({ authorityUuid: raProfile.authorityInstanceUuid || 'unknown', uuid: raProfile.uuid }));
+        dispatch(raProfilesActions.enableRaProfile({ authorityUuid: raProfile.authorityInstanceUuid ?? 'unknown', uuid: raProfile.uuid }));
     }, [dispatch, raProfile]);
 
     const onDisableClick = useCallback(() => {
         if (!raProfile) return;
-        dispatch(raProfilesActions.disableRaProfile({ authorityUuid: raProfile.authorityInstanceUuid || 'unknown', uuid: raProfile.uuid }));
+        dispatch(raProfilesActions.disableRaProfile({ authorityUuid: raProfile.authorityInstanceUuid ?? 'unknown', uuid: raProfile.uuid }));
     }, [dispatch, raProfile]);
 
     const onDeleteConfirmed = useCallback(() => {
         if (!raProfile) return;
         dispatch(
             raProfilesActions.deleteRaProfile({
-                authorityUuid: raProfile.authorityInstanceUuid || 'unknown',
+                authorityUuid: raProfile.authorityInstanceUuid ?? 'unknown',
                 uuid: raProfile.uuid,
                 redirect: '../../../raprofiles',
             }),
@@ -226,7 +226,7 @@ export default function RaProfileDetail() {
 
     const onDeactivateAcmeConfirmed = useCallback(() => {
         if (!raProfile) return;
-        dispatch(raProfilesActions.deactivateAcme({ authorityUuid: raProfile.authorityInstanceUuid || 'unknown', uuid: raProfile.uuid }));
+        dispatch(raProfilesActions.deactivateAcme({ authorityUuid: raProfile.authorityInstanceUuid ?? 'unknown', uuid: raProfile.uuid }));
         setConfirmDeactivateAcme(false);
     }, [dispatch, raProfile]);
 
@@ -236,7 +236,7 @@ export default function RaProfileDetail() {
 
     const onDeactivateCmpConfirmed = useCallback(() => {
         if (!raProfile) return;
-        dispatch(raProfilesActions.deactivateCmp({ authorityUuid: raProfile.authorityInstanceUuid || 'unknown', uuid: raProfile.uuid }));
+        dispatch(raProfilesActions.deactivateCmp({ authorityUuid: raProfile.authorityInstanceUuid ?? 'unknown', uuid: raProfile.uuid }));
         setConfirmDeactivateCmp(false);
     }, [dispatch, raProfile]);
 
@@ -246,7 +246,7 @@ export default function RaProfileDetail() {
 
     const onDeactivateScepConfirmed = useCallback(() => {
         if (!raProfile) return;
-        dispatch(raProfilesActions.deactivateScep({ authorityUuid: raProfile.authorityInstanceUuid || 'unknown', uuid: raProfile.uuid }));
+        dispatch(raProfilesActions.deactivateScep({ authorityUuid: raProfile.authorityInstanceUuid ?? 'unknown', uuid: raProfile.uuid }));
         setConfirmDeactivateScep(false);
     }, [dispatch, raProfile]);
 
