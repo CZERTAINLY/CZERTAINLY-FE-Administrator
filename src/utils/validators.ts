@@ -7,7 +7,11 @@ export const composeValidators =
             .filter((validator) => typeof validator === 'function')
             .reduce((error, validator) => error || validator(value, allValues, fieldState), undefined);
 
-export const validateRequired = () => (value: any) => ((Array.isArray(value) ? value.length > 0 : value) ? undefined : 'Required Field');
+export const validateRequired = () => (value: any) => {
+    let isValid = !!(Array.isArray(value) ? value.length > 0 : value);
+    isValid = isValid || (typeof value === 'boolean' && value !== undefined);
+    return isValid ? undefined : 'Required Field';
+};
 
 const getValueFromObject = (value: any) => {
     if (typeof value === 'object' && value && value.hasOwnProperty('label') && value.hasOwnProperty('value')) {
