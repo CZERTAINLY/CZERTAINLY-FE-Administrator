@@ -4,12 +4,13 @@ import Widget from 'components/Widget';
 import { selectors as enumSelectors } from 'ducks/enums';
 import { actions as notificationActions, selectors as notificationsSelectors } from 'ducks/notifications';
 import { actions as settingsActions, selectors as settingsSelectors } from 'ducks/settings';
+import { selectors as authSelectors } from 'ducks/auth';
 import { useCallback, useEffect, useMemo } from 'react';
 import { Field, Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import Select from 'react-select';
 import { Form as BootstrapForm, ButtonGroup, Col, Container, FormGroup, Label, Row } from 'reactstrap';
-import { PlatformEnum } from 'types/openapi';
+import { PlatformEnum, Resource } from 'types/openapi';
 import { isObjectSame, removeNullValues } from 'utils/common-utils';
 import NotificationInstanceList from '../notifications-instances';
 import { LockWidgetNameEnum } from 'types/user-interface';
@@ -31,6 +32,8 @@ const NotificationsSetting = () => {
     const notificationInstances = useSelector(notificationsSelectors.notificationInstances);
     const isFetchingInstances = useSelector(notificationsSelectors.isFetchingNotificationInstances);
     const isFetchingNotificationsSetting = useSelector(settingsSelectors.isFetchingNotificationsSetting);
+
+    const profile = useSelector(authSelectors.profile);
 
     const getFreshNotificationSettings = useCallback(() => {
         dispatch(settingsActions.getNotificationsSettings());
@@ -128,6 +131,7 @@ const NotificationsSetting = () => {
                     },
                     {
                         title: 'Configuration',
+                        disabled: !profile?.permissions.allowedListings.includes(Resource.Settings),
                         content: (
                             <Widget
                                 refreshAction={getFreshNotificationSettings}
