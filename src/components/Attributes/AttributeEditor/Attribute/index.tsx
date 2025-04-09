@@ -431,6 +431,15 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
             );
         }
 
+        function transformInputValue(value: any) {
+            if (descriptor.contentType === AttributeContentType.Datetime) {
+                return getFormattedDateTime(value);
+            } else if (descriptor.contentType === AttributeContentType.Boolean && descriptor.properties.required) {
+                return value ?? false;
+            }
+            return value;
+        }
+
         return (
             <Field name={name} validate={buildValidators()} type={getFormTypeFromAttributeContentType(descriptor.contentType)}>
                 {({ input, meta }) => (
@@ -453,9 +462,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                             placeholder={`Enter ${descriptor.properties.label}`}
                             disabled={descriptor.properties.readOnly || busy}
                             step={getStepValue(descriptor.contentType)}
-                            value={
-                                descriptor.contentType === AttributeContentType.Datetime ? getFormattedDateTime(input.value) : input.value
-                            }
+                            value={transformInputValue(input.value)}
                         />
 
                         {descriptor.properties.visible && descriptor.contentType === AttributeContentType.Boolean ? (
