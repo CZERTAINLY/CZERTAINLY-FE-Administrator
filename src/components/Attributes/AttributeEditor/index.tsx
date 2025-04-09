@@ -380,7 +380,7 @@ export default function AttributeEditor({
                 return;
             }
 
-            function getMultiSelectListAttributeValue() {
+            function setMultiSelectListAttributeValue() {
                 if (Array.isArray(attribute?.content)) {
                     formAttributeValue = attribute!.content.map((content) => ({
                         label: content.reference
@@ -394,7 +394,7 @@ export default function AttributeEditor({
                     formAttributeValue = undefined;
                 }
             }
-            function getSelectListAttributeValue() {
+            function setSelectListAttributeValue() {
                 if (attribute?.content) {
                     formAttributeValue = {
                         label: attribute.content[0].reference
@@ -409,10 +409,22 @@ export default function AttributeEditor({
                 }
             }
 
+            function setBooleanAttributeValue() {
+                if (attribute?.content?.[0]?.data !== undefined) {
+                    formAttributeValue = attribute.content[0].data;
+                } else if (descriptor.properties.required) {
+                    // set value to false, if attribute is required, has no value, and no default value are provided
+                    // otherwise allow the value to be undefined
+                    formAttributeValue = descriptor.content?.[0]?.data ?? false;
+                } else {
+                    formAttributeValue = descriptor.content?.[0]?.data;
+                }
+            }
+
             if (descriptor.properties.list && descriptor.properties.multiSelect) {
-                getMultiSelectListAttributeValue();
+                setMultiSelectListAttributeValue();
             } else if (descriptor.properties.list) {
-                getSelectListAttributeValue();
+                setSelectListAttributeValue();
             } else if (attribute?.content) {
                 formAttributeValue = attribute.content[0].reference ?? attribute.content[0].data;
             } else if (
@@ -432,6 +444,9 @@ export default function AttributeEditor({
                     code: base64ToUtf8((formAttributeValue as CodeBlockAttributeContentDataModel).code),
                     language: (formAttributeValue as CodeBlockAttributeContentDataModel).language,
                 };
+            }
+            if (descriptor.contentType === AttributeContentType.Boolean) {
+                setBooleanAttributeValue();
             }
 
             form.mutators.setAttribute(formAttributeName, formAttributeValue);
