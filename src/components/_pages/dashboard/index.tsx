@@ -225,7 +225,7 @@ function Dashboard() {
                         <DonutChart
                             title={'Certificates by Key Size'}
                             colorOptions={getDonutChartColorsByRandomNumberOfOptions(
-                                Object.keys(dashboard?.certificateStatByKeySize || {}).length,
+                                Object.keys(dashboard?.certificateStatByKeySize ?? {}).length,
                             )}
                             data={dashboard?.certificateStatByKeySize}
                             entity={EntityType.CERTIFICATE}
@@ -246,7 +246,7 @@ function Dashboard() {
                         <DonutChart
                             title={'Certificates by RA Profile'}
                             colorOptions={getDonutChartColorsByRandomNumberOfOptions(
-                                Object.keys(dashboard?.raProfileStatByCertificateCount || {}).length,
+                                Object.keys(dashboard?.raProfileStatByCertificateCount ?? {}).length,
                             )}
                             data={dashboard?.raProfileStatByCertificateCount}
                             entity={EntityType.CERTIFICATE}
@@ -278,7 +278,7 @@ function Dashboard() {
                         <DonutChart
                             title={'Certificates by Group'}
                             colorOptions={getDonutChartColorsByRandomNumberOfOptions(
-                                Object.keys(dashboard?.groupStatByCertificateCount || {}).length,
+                                Object.keys(dashboard?.groupStatByCertificateCount ?? {}).length,
                             )}
                             data={dashboard?.groupStatByCertificateCount}
                             entity={EntityType.CERTIFICATE}
