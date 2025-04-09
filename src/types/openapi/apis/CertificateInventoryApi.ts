@@ -36,7 +36,6 @@ import type {
     ErrorMessageDto,
     LocationDto,
     MultipleCertificateObjectUpdateDto,
-    PaginationRequestDto,
     RemoveCertificateDto,
     SearchFieldDataByGroupDto,
     SearchRequestDto,
@@ -96,7 +95,8 @@ export interface GetCertificateValidationResultRequest {
 
 export interface ListCertificateApprovalsRequest {
     uuid: string;
-    paginationRequestDto: PaginationRequestDto;
+    itemsPerPage?: number;
+    pageNumber?: number;
 }
 
 export interface ListCertificateLocationsRequest {
@@ -354,16 +354,15 @@ export class CertificateInventoryApi extends BaseAPI {
     /**
      * List Certificates Approvals
      */
-    listCertificateApprovals({ uuid, paginationRequestDto }: ListCertificateApprovalsRequest): Observable<ApprovalResponseDto>
-    listCertificateApprovals({ uuid, paginationRequestDto }: ListCertificateApprovalsRequest, opts?: OperationOpts): Observable<AjaxResponse<ApprovalResponseDto>>
-    listCertificateApprovals({ uuid, paginationRequestDto }: ListCertificateApprovalsRequest, opts?: OperationOpts): Observable<ApprovalResponseDto | AjaxResponse<ApprovalResponseDto>> {
+    listCertificateApprovals({ uuid, itemsPerPage, pageNumber }: ListCertificateApprovalsRequest): Observable<ApprovalResponseDto>
+    listCertificateApprovals({ uuid, itemsPerPage, pageNumber }: ListCertificateApprovalsRequest, opts?: OperationOpts): Observable<AjaxResponse<ApprovalResponseDto>>
+    listCertificateApprovals({ uuid, itemsPerPage, pageNumber }: ListCertificateApprovalsRequest, opts?: OperationOpts): Observable<ApprovalResponseDto | AjaxResponse<ApprovalResponseDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'listCertificateApprovals');
-        throwIfNullOrUndefined(paginationRequestDto, 'paginationRequestDto', 'listCertificateApprovals');
 
         const query: HttpQuery = {};
-        if (paginationRequestDto != null) {
-            Object.assign(query, paginationRequestDto);
-        }
+
+        if (itemsPerPage != null) { query['itemsPerPage'] = itemsPerPage; }
+        if (pageNumber != null) { query['pageNumber'] = pageNumber; }
 
         return this.request<ApprovalResponseDto>({
             url: '/v1/certificates/{uuid}/approvals'.replace('{uuid}', encodeURI(uuid)),

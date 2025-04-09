@@ -1,5 +1,5 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ApprovalModel, ApprovalUserModel, DetailApprovalModel, ResponseApprovalModel, UserApprovalModel } from 'types/approvals';
+import { ApprovalModel, DetailApprovalModel, ResponseApprovalModel, UserApprovalModel } from 'types/approvals';
 import { ApprovalDetailDtoStatusEnum, ApprovalDtoStatusEnum } from 'types/openapi';
 import { createFeatureSelector } from 'utils/ducks';
 
@@ -75,12 +75,7 @@ export const slice = createSlice({
             state.isFetchingList = false;
         },
 
-        listUserApprovals: (
-            state,
-            action: PayloadAction<
-                { paginationRequestDto: { itemsPerPage: number; pageNumber: number } } & { approvalUserDto: ApprovalUserModel }
-            >,
-        ) => {
+        listUserApprovals: (state, action: PayloadAction<{ itemsPerPage: number; pageNumber: number; history?: boolean }>) => {
             state.userApprovals = [];
             state.userApprovalsTotalItems = 0;
             state.isFetchingUserList = true;

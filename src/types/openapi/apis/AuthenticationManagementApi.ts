@@ -23,6 +23,7 @@ import type {
     Resource,
     UpdateUserRequestDto,
     UserDetailDto,
+    UserProfileDetailDto,
 } from '../models';
 
 export interface GetObjectsForResourceRequest {
@@ -67,10 +68,10 @@ export class AuthenticationManagementApi extends BaseAPI {
     /**
      * Profile Authorization
      */
-    profile(): Observable<UserDetailDto>
-    profile(opts?: OperationOpts): Observable<AjaxResponse<UserDetailDto>>
-    profile(opts?: OperationOpts): Observable<UserDetailDto | AjaxResponse<UserDetailDto>> {
-        return this.request<UserDetailDto>({
+    profile(): Observable<UserProfileDetailDto>
+    profile(opts?: OperationOpts): Observable<AjaxResponse<UserProfileDetailDto>>
+    profile(opts?: OperationOpts): Observable<UserProfileDetailDto | AjaxResponse<UserProfileDetailDto>> {
+        return this.request<UserProfileDetailDto>({
             url: '/v1/auth/profile',
             method: 'GET',
         }, opts?.responseOpts);

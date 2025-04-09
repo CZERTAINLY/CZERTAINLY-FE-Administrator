@@ -61,11 +61,11 @@ export interface CredentialDto {
      * @type {string}
      * @memberof CredentialDto
      */
-    connectorUuid: string;
+    connectorUuid?: string;
     /**
      * Name of Credential provider Connector
      * @type {string}
      * @memberof CredentialDto
      */
-    connectorName: string;
+    connectorName?: string;
 }

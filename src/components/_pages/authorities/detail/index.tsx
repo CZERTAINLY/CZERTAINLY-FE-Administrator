@@ -114,7 +114,7 @@ export default function AuthorityDetail() {
                       },
                       {
                           id: 'authorityProviderUUID',
-                          columns: ['Authority Provider UUID', authority.connectorUuid],
+                          columns: ['Authority Provider UUID', authority?.connectorUuid ?? ''],
                       },
                       {
                           id: 'authorityProviderName',

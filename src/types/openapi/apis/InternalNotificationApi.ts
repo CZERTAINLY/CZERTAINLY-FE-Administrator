@@ -18,7 +18,6 @@ import type { OperationOpts, HttpHeaders, HttpQuery } from '../runtime';
 import type {
     AuthenticationServiceExceptionDto,
     ErrorMessageDto,
-    NotificationRequestDto,
     NotificationResponseDto,
 } from '../models';
 
@@ -35,7 +34,9 @@ export interface DeleteNotificationRequest {
 }
 
 export interface ListNotificationsRequest {
-    request: NotificationRequestDto;
+    unread?: boolean;
+    itemsPerPage?: number;
+    pageNumber?: number;
 }
 
 export interface MarkNotificationAsReadRequest {
@@ -104,15 +105,15 @@ export class InternalNotificationApi extends BaseAPI {
     /**
      * List notifications for logged user
      */
-    listNotifications({ request }: ListNotificationsRequest): Observable<NotificationResponseDto>
-    listNotifications({ request }: ListNotificationsRequest, opts?: OperationOpts): Observable<AjaxResponse<NotificationResponseDto>>
-    listNotifications({ request }: ListNotificationsRequest, opts?: OperationOpts): Observable<NotificationResponseDto | AjaxResponse<NotificationResponseDto>> {
-        throwIfNullOrUndefined(request, 'request', 'listNotifications');
+    listNotifications({ unread, itemsPerPage, pageNumber }: ListNotificationsRequest): Observable<NotificationResponseDto>
+    listNotifications({ unread, itemsPerPage, pageNumber }: ListNotificationsRequest, opts?: OperationOpts): Observable<AjaxResponse<NotificationResponseDto>>
+    listNotifications({ unread, itemsPerPage, pageNumber }: ListNotificationsRequest, opts?: OperationOpts): Observable<NotificationResponseDto | AjaxResponse<NotificationResponseDto>> {
 
         const query: HttpQuery = {};
-        if (request != null) {
-            Object.assign(query, request);
-        }
+
+        if (unread != null) { query['unread'] = unread; }
+        if (itemsPerPage != null) { query['itemsPerPage'] = itemsPerPage; }
+        if (pageNumber != null) { query['pageNumber'] = pageNumber; }
 
         return this.request<NotificationResponseDto>({
             url: '/v1/notifications',

@@ -456,7 +456,7 @@ describe('Group Attribute AttributeEditor', () => {
             .invoke(
                 'dispatch',
                 authoritiesActions.getRAProfilesAttributesDescriptorsSuccess({
-                    authorityUuid: groupAttributeAtributeEditorMockData.raProfileResponseModel.authorityInstanceUuid,
+                    authorityUuid: groupAttributeAtributeEditorMockData.raProfileResponseModel.authorityInstanceUuid || 'unknown',
                     attributesDescriptors: groupAttributeAtributeEditorMockData.groupAttributeArray.map(
                         transformAttributeDescriptorDtoToModel,
                     ),
@@ -537,8 +537,8 @@ const ConstraintCheckAttributeEditorComponent = () => {
         () => ({
             name: editMode ? authoritySelector?.name || undefined : undefined,
             authorityProvider: editMode
-                ? authoritySelector
-                    ? { value: authoritySelector.connectorUuid, label: authoritySelector.connectorName }
+                ? authoritySelector?.connectorUuid
+                    ? { value: authoritySelector.connectorUuid!, label: authoritySelector.connectorName! }
                     : undefined
                 : undefined,
             storeKind: editMode
@@ -808,7 +808,11 @@ const GlobalModalAttributeEditor = () => {
     const defaultValues: GlobalModalAttributeEditorFormValues = useMemo(
         () => ({
             name: editMode ? entity?.name || undefined : undefined,
-            entityProvider: editMode ? (entity ? { value: entity.connectorUuid, label: entity.connectorName } : undefined) : undefined,
+            entityProvider: editMode
+                ? entity?.connectorUuid
+                    ? { value: entity.connectorUuid!, label: entity.connectorName! }
+                    : undefined
+                : undefined,
             storeKind: editMode ? (entity ? { value: entity?.kind, label: entity?.kind } : undefined) : undefined,
         }),
         [editMode, entity],

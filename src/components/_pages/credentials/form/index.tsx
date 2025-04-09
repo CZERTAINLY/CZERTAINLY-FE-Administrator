@@ -98,7 +98,8 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
 
     useEffect(() => {
         if (editMode && credentialProviders && credentialProviders.length > 0 && credential?.uuid === id) {
-            const provider = credentialProviders.find((p) => p.uuid === credential?.connectorUuid);
+            if (!credential?.connectorUuid) return;
+            const provider = credentialProviders.find((p) => p.uuid === credential.connectorUuid);
             if (!provider) return;
 
             setCredentialProvider(provider);
@@ -213,8 +214,8 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
         () => ({
             name: editMode ? credential?.name || undefined : undefined,
             credentialProvider: editMode
-                ? credential
-                    ? { value: credential.connectorUuid, label: credential.connectorName }
+                ? credential?.connectorUuid
+                    ? { value: credential.connectorUuid!, label: credential.connectorName! }
                     : undefined
                 : undefined,
             storeKind: editMode ? (credential ? { value: credential?.kind, label: credential?.kind } : undefined) : undefined,

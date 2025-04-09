@@ -56,19 +56,19 @@ export interface AcmeAccountListResponseDto {
      * @type {SimplifiedRaProfileDto}
      * @memberof AcmeAccountListResponseDto
      */
-    raProfile: SimplifiedRaProfileDto;
+    raProfile?: SimplifiedRaProfileDto;
     /**
      * Name of the ACME Profile
      * @type {string}
      * @memberof AcmeAccountListResponseDto
      */
-    acmeProfileName: string;
+    acmeProfileName?: string;
     /**
      * UUID of the ACME Profile
      * @type {string}
      * @memberof AcmeAccountListResponseDto
      */
-    acmeProfileUuid: string;
+    acmeProfileUuid?: string;
 }
 
 

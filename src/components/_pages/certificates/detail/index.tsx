@@ -274,7 +274,7 @@ export default function CertificateDetail() {
 
     const getFreshApprovalList = useCallback(() => {
         if (!id) return;
-        dispatch(actions.listCertificateApprovals({ uuid: id, paginationRequestDto: {} }));
+        dispatch(actions.listCertificateApprovals({ uuid: id }));
     }, [dispatch, id]);
 
     const getCertificateChainDetails = useCallback(() => {
@@ -1404,7 +1404,7 @@ export default function CertificateDetail() {
                       id: 'extendedKeyUsage',
                       columns: [
                           'Extended Key Usage',
-                          certificate?.extendedKeyUsage?.map(function (name) {
+                          certificate.extendedKeyUsage?.map(function (name) {
                               return (
                                   <div key={name} style={{ margin: '1px' }}>
                                       <Badge>{name}</Badge>
@@ -1416,13 +1416,19 @@ export default function CertificateDetail() {
                   },
                   {
                       id: 'subjectType',
-                      columns: ['Subject Type', <CertificateStatus status={certificate.subjectType} />],
+                      columns: [
+                          'Subject Type',
+                          certificate.subjectType ? <CertificateStatus status={certificate.subjectType} /> : <>n/a</>,
+                      ],
                   },
               ];
         if (certificate?.state !== CertStatus.Requested) {
             certDetail.push({
                 id: 'asn1structure',
-                columns: ['ASN.1 Structure', certificate ? <Asn1Dialog content={certificate.certificateContent} /> : <>n/a</>],
+                columns: [
+                    'ASN.1 Structure',
+                    certificate?.certificateContent ? <Asn1Dialog content={certificate.certificateContent} /> : <>n/a</>,
+                ],
             });
         }
 
