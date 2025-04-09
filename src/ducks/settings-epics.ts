@@ -78,7 +78,7 @@ const getNotificationsSettings: AppEpic = (action$, state$, deps) => {
                 catchError((err) =>
                     of(
                         slice.actions.getNotificationsSettingsFailure({ error: extractError(err, 'Failed to get notifications settings') }),
-                        appRedirectActions.fetchError({ error: err, message: 'Failed to get notifications settings' }),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.NotificationSettings),
                     ),
                 ),
             ),

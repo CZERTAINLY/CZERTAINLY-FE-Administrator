@@ -1,11 +1,11 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AuthResourceModel, UserDetailModel, UserUpdateRequestModel } from 'types/auth';
+import { AuthResourceModel, UserDetailModel, UserProfileDetailModel, UserUpdateRequestModel } from 'types/auth';
 import { NameAndUuidModel } from 'types/locations';
 import { Resource } from 'types/openapi';
 import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
-    profile?: UserDetailModel;
+    profile?: UserProfileDetailModel;
     resources?: AuthResourceModel[];
     objects?: NameAndUuidModel[];
 
@@ -48,7 +48,7 @@ export const slice = createSlice({
             state.isFetchingProfile = true;
         },
 
-        getProfileSuccess(state, action: PayloadAction<{ profile: UserDetailModel }>) {
+        getProfileSuccess(state, action: PayloadAction<{ profile: UserProfileDetailModel }>) {
             state.isFetchingProfile = false;
             state.profile = action.payload.profile;
         },
@@ -67,7 +67,10 @@ export const slice = createSlice({
 
         updateProfileSuccess(state, action: PayloadAction<{ profile: UserDetailModel; redirect?: string }>) {
             state.isUpdatingProfile = false;
-            state.profile = action.payload.profile;
+            state.profile = {
+                ...state.profile!,
+                ...action.payload.profile,
+            };
         },
 
         updateProfileFailure(state, action: PayloadAction<void>) {
