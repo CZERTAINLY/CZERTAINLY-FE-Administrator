@@ -33,6 +33,7 @@ export const emptyCertificate: CertificateDetailResponseModel = {
     validationStatus: CertificateValidationStatus.NotChecked,
     fingerprint: '',
     certificateType: CertificateType.X509,
+    complianceStatus: ComplianceStatus.NotChecked,
     issuerSerialNumber: '',
     subjectAlternativeNames: {},
     privateKeyAvailability: false,

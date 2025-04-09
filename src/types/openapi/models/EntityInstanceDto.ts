@@ -49,19 +49,19 @@ export interface EntityInstanceDto {
      * @type {string}
      * @memberof EntityInstanceDto
      */
-    status: string;
+    status?: string;
     /**
      * UUID of Entity Provider
      * @type {string}
      * @memberof EntityInstanceDto
      */
-    connectorUuid: string;
+    connectorUuid?: string;
     /**
      * Name of Entity Provider
      * @type {string}
      * @memberof EntityInstanceDto
      */
-    connectorName: string;
+    connectorName?: string;
     /**
      * Entity instance Kind
      * @type {string}

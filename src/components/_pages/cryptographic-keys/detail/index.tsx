@@ -290,7 +290,7 @@ export default function CryptographicKeyDetail() {
                       },
                       {
                           id: 'tokenUuid',
-                          columns: ['Token Instance UUID', cryptographicKey.tokenInstanceUuid],
+                          columns: ['Token Instance UUID', cryptographicKey.tokenInstanceUuid ?? ''],
                       },
                       {
                           id: 'tokenProfileName',

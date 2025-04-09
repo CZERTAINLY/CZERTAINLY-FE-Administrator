@@ -26,7 +26,7 @@ import { keyWithoutTokenInstanceActionNotes } from 'components/_pages/cryptograp
 
 interface Props {
     keyUuid: string;
-    tokenInstanceUuid: string;
+    tokenInstanceUuid?: string;
     tokenProfileUuid?: string;
     keyItem: CryptographicKeyItemDetailResponseModel;
     totalKeyItems: number;
@@ -221,7 +221,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
             {
                 icon: 'sign',
                 disabled:
-                    keyItem.state !== KeyState.Active || !keyItem.enabled || !keyItem.usage.includes(KeyUsage.Sign) || !tokenInstanceUuid,
+                    keyItem.state !== KeyState.Active || !keyItem.enabled || !keyItem.usage?.includes(KeyUsage.Sign) || !tokenInstanceUuid,
                 tooltip: 'Sign',
                 onClick: () => {
                     setSignData(true);
@@ -230,7 +230,10 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
             {
                 icon: 'verify',
                 disabled:
-                    keyItem.state !== KeyState.Active || !keyItem.enabled || !keyItem.usage.includes(KeyUsage.Verify) || !tokenInstanceUuid,
+                    keyItem.state !== KeyState.Active ||
+                    !keyItem.enabled ||
+                    !keyItem.usage?.includes(KeyUsage.Verify) ||
+                    !tokenInstanceUuid,
                 tooltip: 'Verify',
                 onClick: () => {
                     setVerifyData(true);
@@ -325,11 +328,11 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                           id: 'Usages',
                           columns: [
                               'Key Usages',
-                              keyItem.usage.map((usage) => (
+                              keyItem.usage?.map((usage) => (
                                   <Badge key={usage} color="secondary" className="mr-xs">
                                       {usage}
                                   </Badge>
-                              )),
+                              )) ?? 'None',
                           ],
                       },
                       {
@@ -437,7 +440,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
 
     const existingUsages = () => {
         if (!keyItem) return [];
-        return keyItem?.usage.map((usage) => {
+        return keyItem.usage?.map((usage) => {
             return { value: usage, label: usage.charAt(0).toUpperCase() + usage.slice(1).toLowerCase() };
         });
     };

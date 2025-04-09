@@ -44,13 +44,13 @@ export interface RaProfileDto {
      * @type {string}
      * @memberof RaProfileDto
      */
-    authorityInstanceUuid: string;
+    authorityInstanceUuid?: string;
     /**
      * Name of Authority instance
      * @type {string}
      * @memberof RaProfileDto
      */
-    authorityInstanceName: string;
+    authorityInstanceName?: string;
     /**
      * Has Authority of legacy authority provider
      * @type {boolean}

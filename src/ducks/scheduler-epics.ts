@@ -23,7 +23,7 @@ const listSchedulerJobs: AppEpic = (action$, state$, deps) => {
         filter(slice.actions.listSchedulerJobs.match),
         switchMap((action) => {
             store.dispatch(pagingActions.list(EntityType.SCHEDULER));
-            return deps.apiClients.scheduler.listScheduledJobs({ pagination: transformSearchRequestModelToDto(action.payload) }).pipe(
+            return deps.apiClients.scheduler.listScheduledJobs(transformSearchRequestModelToDto(action.payload)).pipe(
                 mergeMap((response) =>
                     of(
                         slice.actions.listSchedulerJobsSuccess(response.scheduledJobs.map(transformSchedulerJobDtoToModel)),
@@ -75,7 +75,7 @@ const listSchedulerJobHistory: AppEpic = (action$, state$, deps) => {
             return deps.apiClients.scheduler
                 .getScheduledJobHistory({
                     uuid: action.payload.uuid,
-                    pagination: transformSearchRequestModelToDto(action.payload.pagination),
+                    ...transformSearchRequestModelToDto(action.payload.pagination),
                 })
                 .pipe(
                     mergeMap((response) =>
