@@ -79,6 +79,7 @@ export enum LockWidgetNameEnum {
     SCEPProfileDetails,
     PlatformSettings,
     LoggingSettings,
+    NotificationSettings,
     ListOfCustomAttributes,
     CustomAttributeDetails,
     ListOfGlobalMetadata,
