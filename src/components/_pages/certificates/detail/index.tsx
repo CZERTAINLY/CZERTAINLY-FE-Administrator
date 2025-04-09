@@ -24,6 +24,7 @@ import { selectors as settingSelectors } from 'ducks/settings';
 import {
     CertificateState as CertStatus,
     CertificateFormatEncoding,
+    CertificateProtocol,
     CertificateRequestFormat,
     CertificateRevocationReason,
     CertificateSubjectType,
@@ -1658,6 +1659,59 @@ export default function CertificateDetail() {
         }));
     }, [approvals]);
 
+    const protocolHeader: TableHeader[] = useMemo(
+        () => [
+            {
+                id: 'property',
+                content: 'Property',
+            },
+            {
+                id: 'value',
+                content: 'Value',
+            },
+        ],
+        [],
+    );
+
+    const protocolData: TableDataRow[] = useMemo(() => {
+        const protocolInfo = certificate?.protocolInfo;
+        if (!protocolInfo) return [];
+
+        function getProtocolProfileLink(): string {
+            if (!protocolInfo) return '';
+            switch (protocolInfo.protocol) {
+                case CertificateProtocol.Acme:
+                    return `../acmeprofiles/detail/${protocolInfo.protocolProfileUuid}`;
+                case CertificateProtocol.Cmp:
+                    return `../cmpprofiles/detail/${protocolInfo.protocolProfileUuid}`;
+                case CertificateProtocol.Scep:
+                    return `../scepprofiles/detail/${protocolInfo.protocolProfileUuid}`;
+            }
+        }
+        const data = [
+            {
+                id: 'protocol',
+                columns: ['Protocol Name', <Badge color="secondary">{protocolInfo.protocol.toUpperCase()}</Badge>],
+            },
+            {
+                id: 'protocolProfileUuid',
+                columns: ['Protocol Profile UUID', <Link to={getProtocolProfileLink()}>{protocolInfo.protocolProfileUuid}</Link>],
+            },
+        ];
+        if (protocolInfo.protocol === CertificateProtocol.Acme && protocolInfo.additionalProtocolUuid) {
+            data.push({
+                id: 'protocolProfileUuid',
+                columns: [
+                    'Protocol Account UUID',
+                    <Link to={`../acmeaccounts/detail/${protocolInfo.protocolProfileUuid}/${protocolInfo.additionalProtocolUuid}`}>
+                        {protocolInfo.additionalProtocolUuid}
+                    </Link>,
+                ],
+            });
+        }
+        return data;
+    }, [certificate?.protocolInfo]);
+
     const defaultViewport = useMemo(
         () => ({
             zoom: 0.5,
@@ -1696,8 +1750,13 @@ export default function CertificateDetail() {
                                             <br />
                                             <CustomTable headers={detailHeaders} data={sanData} />
                                         </Widget>
-
-                                        <Widget title="Other Properties" titleSize="large">
+                                        {certificate?.protocolInfo && (
+                                            <Widget title="Protocol" busy={isBusy} titleSize="large">
+                                                <br />
+                                                <CustomTable headers={protocolHeader} data={protocolData} />
+                                            </Widget>
+                                        )}
+                                        <Widget title="Other Properties" busy={isBusy} titleSize="large">
                                             <br />
                                             <CustomTable headers={propertiesHeaders} data={propertiesData} />
                                         </Widget>
