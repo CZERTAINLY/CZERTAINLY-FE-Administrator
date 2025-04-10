@@ -40,10 +40,9 @@ export default function ApprovalsList() {
     const listUserApprovals = useCallback(() => {
         dispatch(
             approvalActions.listUserApprovals({
-                approvalUserDto: {
-                    history: showHistory,
-                },
-                paginationRequestDto: { itemsPerPage: pageSize, pageNumber },
+                history: showHistory,
+                itemsPerPage: pageSize,
+                pageNumber,
             }),
         );
         setCheckedRows([]);

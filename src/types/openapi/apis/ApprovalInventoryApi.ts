@@ -18,10 +18,8 @@ import type { OperationOpts, HttpHeaders, HttpQuery } from '../runtime';
 import type {
     ApprovalDetailDto,
     ApprovalResponseDto,
-    ApprovalUserDto,
     AuthenticationServiceExceptionDto,
     ErrorMessageDto,
-    PaginationRequestDto,
     UserApprovalDto,
 } from '../models';
 
@@ -39,12 +37,14 @@ export interface GetApprovalRequest {
 }
 
 export interface ListApprovalsRequest {
-    paginationRequestDto: PaginationRequestDto;
+    itemsPerPage?: number;
+    pageNumber?: number;
 }
 
 export interface ListUserApprovalsRequest {
-    paginationRequestDto: PaginationRequestDto;
-    approvalUserDto: ApprovalUserDto;
+    itemsPerPage?: number;
+    pageNumber?: number;
+    history?: boolean;
 }
 
 export interface RejectApprovalRequest {
@@ -113,15 +113,14 @@ export class ApprovalInventoryApi extends BaseAPI {
     /**
      * List of Approvals
      */
-    listApprovals({ paginationRequestDto }: ListApprovalsRequest): Observable<ApprovalResponseDto>
-    listApprovals({ paginationRequestDto }: ListApprovalsRequest, opts?: OperationOpts): Observable<AjaxResponse<ApprovalResponseDto>>
-    listApprovals({ paginationRequestDto }: ListApprovalsRequest, opts?: OperationOpts): Observable<ApprovalResponseDto | AjaxResponse<ApprovalResponseDto>> {
-        throwIfNullOrUndefined(paginationRequestDto, 'paginationRequestDto', 'listApprovals');
+    listApprovals({ itemsPerPage, pageNumber }: ListApprovalsRequest): Observable<ApprovalResponseDto>
+    listApprovals({ itemsPerPage, pageNumber }: ListApprovalsRequest, opts?: OperationOpts): Observable<AjaxResponse<ApprovalResponseDto>>
+    listApprovals({ itemsPerPage, pageNumber }: ListApprovalsRequest, opts?: OperationOpts): Observable<ApprovalResponseDto | AjaxResponse<ApprovalResponseDto>> {
 
         const query: HttpQuery = {};
-        if (paginationRequestDto != null) {
-            Object.assign(query, paginationRequestDto);
-        }
+
+        if (itemsPerPage != null) { query['itemsPerPage'] = itemsPerPage; }
+        if (pageNumber != null) { query['pageNumber'] = pageNumber; }
 
         return this.request<ApprovalResponseDto>({
             url: '/v1/approvals',
@@ -133,19 +132,15 @@ export class ApprovalInventoryApi extends BaseAPI {
     /**
      * List of User\'s Approvals
      */
-    listUserApprovals({ paginationRequestDto, approvalUserDto }: ListUserApprovalsRequest): Observable<ApprovalResponseDto>
-    listUserApprovals({ paginationRequestDto, approvalUserDto }: ListUserApprovalsRequest, opts?: OperationOpts): Observable<AjaxResponse<ApprovalResponseDto>>
-    listUserApprovals({ paginationRequestDto, approvalUserDto }: ListUserApprovalsRequest, opts?: OperationOpts): Observable<ApprovalResponseDto | AjaxResponse<ApprovalResponseDto>> {
-        throwIfNullOrUndefined(paginationRequestDto, 'paginationRequestDto', 'listUserApprovals');
-        throwIfNullOrUndefined(approvalUserDto, 'approvalUserDto', 'listUserApprovals');
+    listUserApprovals({ itemsPerPage, pageNumber, history }: ListUserApprovalsRequest): Observable<ApprovalResponseDto>
+    listUserApprovals({ itemsPerPage, pageNumber, history }: ListUserApprovalsRequest, opts?: OperationOpts): Observable<AjaxResponse<ApprovalResponseDto>>
+    listUserApprovals({ itemsPerPage, pageNumber, history }: ListUserApprovalsRequest, opts?: OperationOpts): Observable<ApprovalResponseDto | AjaxResponse<ApprovalResponseDto>> {
 
         const query: HttpQuery = {};
-        if (paginationRequestDto != null) {
-            Object.assign(query, paginationRequestDto);
-        }
-        if (approvalUserDto != null) {
-            Object.assign(query, approvalUserDto);
-        }
+
+        if (itemsPerPage != null) { query['itemsPerPage'] = itemsPerPage; }
+        if (pageNumber != null) { query['pageNumber'] = pageNumber; }
+        if (history != null) { query['history'] = history; }
 
         return this.request<ApprovalResponseDto>({
             url: '/v1/approvals/user',

@@ -107,7 +107,7 @@ export default function EntityDetail() {
                       },
                       {
                           id: 'entityProviderUUID',
-                          columns: ['Entity Provider UUID', entity.connectorUuid],
+                          columns: ['Entity Provider UUID', entity.connectorUuid ?? ''],
                       },
                       {
                           id: 'entityProviderName',

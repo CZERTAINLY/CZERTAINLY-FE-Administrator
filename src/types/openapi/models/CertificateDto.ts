@@ -138,7 +138,7 @@ export interface CertificateDto {
      * @type {CertificateType}
      * @memberof CertificateDto
      */
-    certificateType?: CertificateType;
+    certificateType: CertificateType;
     /**
      * Serial number of the issuer
      * @type {string}
@@ -150,7 +150,7 @@ export interface CertificateDto {
      * @type {ComplianceStatus}
      * @memberof CertificateDto
      */
-    complianceStatus?: ComplianceStatus;
+    complianceStatus: ComplianceStatus;
     /**
      * UUID of the issuer certificate
      * @type {string}
@@ -168,7 +168,7 @@ export interface CertificateDto {
      * @type {boolean}
      * @memberof CertificateDto
      */
-    trustedCa: boolean;
+    trustedCa?: boolean;
 }
 
 

@@ -27,13 +27,13 @@ export interface CertificateRequestDto {
      * @type {CertificateType}
      * @memberof CertificateRequestDto
      */
-    certificateType?: CertificateType;
+    certificateType: CertificateType;
     /**
      * Certificate request format
      * @type {CertificateRequestFormat}
      * @memberof CertificateRequestDto
      */
-    certificateRequestFormat?: CertificateRequestFormat;
+    certificateRequestFormat: CertificateRequestFormat;
     /**
      * Public key algorithm
      * @type {string}

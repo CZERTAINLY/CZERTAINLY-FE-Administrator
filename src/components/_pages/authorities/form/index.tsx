@@ -234,8 +234,8 @@ export default function AuthorityForm() {
         () => ({
             name: editMode ? authority?.name || undefined : undefined,
             authorityProvider: editMode
-                ? authority
-                    ? { value: authority.connectorUuid, label: authority.connectorName }
+                ? authority?.connectorUuid
+                    ? { value: authority.connectorUuid!, label: authority.connectorName! }
                     : undefined
                 : undefined,
             storeKind: editMode ? (authority ? { value: authority?.kind, label: authority?.kind } : undefined) : undefined,

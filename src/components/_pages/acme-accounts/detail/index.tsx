@@ -40,22 +40,22 @@ export default function AcmeAccountDetail() {
     }, [id, getFreshAcmeAccount]);
 
     const onEnableClick = useCallback(() => {
-        if (!acmeAccount) return;
+        if (!acmeAccount || !acmeProfileId) return;
 
-        dispatch(actions.enableAcmeAccount({ acmeProfileUuid: acmeAccount.acmeProfileUuid, uuid: acmeAccount.uuid }));
-    }, [acmeAccount, dispatch]);
+        dispatch(actions.enableAcmeAccount({ acmeProfileUuid: acmeProfileId, uuid: acmeAccount.uuid }));
+    }, [acmeAccount, acmeProfileId, dispatch]);
 
     const onDisableClick = useCallback(() => {
-        if (!acmeAccount) return;
+        if (!acmeAccount || !acmeProfileId) return;
 
-        dispatch(actions.disableAcmeAccount({ acmeProfileUuid: acmeAccount.acmeProfileUuid, uuid: acmeAccount.uuid }));
-    }, [acmeAccount, dispatch]);
+        dispatch(actions.disableAcmeAccount({ acmeProfileUuid: acmeProfileId, uuid: acmeAccount.uuid }));
+    }, [acmeAccount, acmeProfileId, dispatch]);
 
     const onRevokeConfirmed = useCallback(() => {
-        if (!acmeAccount) return;
-        dispatch(actions.revokeAcmeAccount({ acmeProfileUuid: acmeAccount.acmeProfileUuid, uuid: acmeAccount.uuid }));
+        if (!acmeAccount || !acmeProfileId) return;
+        dispatch(actions.revokeAcmeAccount({ acmeProfileUuid: acmeProfileId, uuid: acmeAccount.uuid }));
         setConfirmRevoke(false);
-    }, [acmeAccount, dispatch]);
+    }, [acmeAccount, acmeProfileId, dispatch]);
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [

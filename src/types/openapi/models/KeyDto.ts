@@ -38,7 +38,7 @@ export interface KeyDto {
      * @type {string}
      * @memberof KeyDto
      */
-    description: string;
+    description?: string;
     /**
      * Creation time of the Key. If the key is discovered from the connector, then it will be returned
      * @type {string}
@@ -62,13 +62,13 @@ export interface KeyDto {
      * @type {string}
      * @memberof KeyDto
      */
-    tokenInstanceUuid: string;
+    tokenInstanceUuid?: string;
     /**
      * Token Instance Name
      * @type {string}
      * @memberof KeyDto
      */
-    tokenInstanceName: string;
+    tokenInstanceName?: string;
     /**
      * Owner of the Key
      * @type {string}
@@ -98,5 +98,5 @@ export interface KeyDto {
      * @type {number}
      * @memberof KeyDto
      */
-    associations?: number;
+    associations: number;
 }

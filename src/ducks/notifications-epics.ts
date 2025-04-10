@@ -29,7 +29,7 @@ const listOverviewNotifications: AppEpic = (action$, state$, deps) => {
         filter(() => state$.value.notifications.failedFetchingOverviewRemainingCount > 0),
         switchMap(() => of(slice.actions.listOverviewNotificationsStarted())),
         switchMap((action) =>
-            deps.apiClients.internalNotificationApi.listNotifications({ request: { unread: true } }).pipe(
+            deps.apiClients.internalNotificationApi.listNotifications({ unread: true }).pipe(
                 mergeMap((response) =>
                     of(
                         slice.actions.listOverviewNotificationsSuccess(response.items.map(transformNotificationDtoToModel)),
@@ -66,9 +66,7 @@ const listNotifications: AppEpic = (action$, state$, deps) => {
         switchMap((action) => {
             store.dispatch(pagingActions.list(EntityType.NOTIFICATIONS));
             return deps.apiClients.internalNotificationApi
-                .listNotifications({
-                    request: { unread: action.payload.unread, ...transformSearchRequestModelToDto(action.payload.pagination) },
-                })
+                .listNotifications({ unread: action.payload.unread, ...transformSearchRequestModelToDto(action.payload.pagination) })
                 .pipe(
                     mergeMap((response) =>
                         of(
