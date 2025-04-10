@@ -1,3 +1,4 @@
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import Spinner from 'components/Spinner';
 import { actions, selectors } from 'ducks/info';
@@ -20,17 +21,43 @@ const PlatformInfoDialogLink = () => {
         dispatch(actions.getPlatformInfo());
     }, [dispatch, isOpen]);
 
+    const headers: TableHeader[] = useMemo(
+        () => [
+            {
+                id: 'component',
+                content: 'Component',
+            },
+            {
+                id: 'version',
+                content: 'Version',
+            },
+        ],
+        [],
+    );
+
+    const data: TableDataRow[] = useMemo(
+        () =>
+            !platformInfo
+                ? []
+                : [
+                      {
+                          id: 'app',
+                          columns: [platformInfo.app.name, platformInfo.app.version],
+                      },
+                      {
+                          id: 'db',
+                          columns: [platformInfo.db.system, platformInfo.db.version],
+                      },
+                  ],
+        [platformInfo],
+    );
+
     const content = useMemo(() => {
         if (!platformInfo) return;
         const copyText = `${platformInfo.app.name}: ${platformInfo.app.version}\n${platformInfo.db.system}: ${platformInfo.db.version}`;
         return (
             <div>
-                <p>
-                    {platformInfo.app.name}: {platformInfo.app.version}
-                </p>
-                <p>
-                    {platformInfo.db.system}: {platformInfo.db.version}
-                </p>
+                <CustomTable data={data} headers={headers} />
                 <br />
                 <div>
                     Click to copy:{' '}
@@ -52,7 +79,7 @@ const PlatformInfoDialogLink = () => {
                 </div>
             </div>
         );
-    }, [platformInfo, copyToClipboard]);
+    }, [platformInfo, copyToClipboard, data, headers]);
 
     return (
         <>
