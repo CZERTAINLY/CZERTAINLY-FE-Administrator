@@ -128,6 +128,7 @@ export default function CertificateDetail() {
     const certificateTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateType));
     const certificateRevocationReason = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateRevocationReason));
     const certificateValidationCheck = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateValidationCheck));
+    const certificateProtocol = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateProtocol));
     const isFetchingApprovals = useSelector(selectors.isFetchingApprovals);
     const isFetching = useSelector(selectors.isFetchingDetail);
     const isDeleting = useSelector(selectors.isDeleting);
@@ -1700,7 +1701,7 @@ export default function CertificateDetail() {
                 columns: [
                     'Protocol Name',
                     <Badge key="protocol" color="secondary">
-                        {protocolInfo.protocol.toUpperCase()}
+                        {getEnumLabel(certificateProtocol, protocolInfo.protocol)}
                     </Badge>,
                 ],
             },
@@ -1729,7 +1730,7 @@ export default function CertificateDetail() {
             });
         }
         return data;
-    }, [certificate?.protocolInfo]);
+    }, [certificate?.protocolInfo, certificateProtocol]);
 
     const defaultViewport = useMemo(
         () => ({
