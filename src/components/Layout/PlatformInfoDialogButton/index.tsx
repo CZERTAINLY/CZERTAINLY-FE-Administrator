@@ -6,9 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button } from 'reactstrap';
 import { useCopyToClipboard } from 'utils/common-hooks';
 
-type Props = {};
-
-const PlatformInfoDialogLink = ({}: Props) => {
+const PlatformInfoDialogLink = () => {
     const dispatch = useDispatch();
     const [isOpen, setIsOpen] = useState(false);
 
