@@ -1,6 +1,7 @@
 import cx from 'classnames';
 
 import style from './Footer.module.scss';
+import PlatformInfoDialogButton from 'components/Layout/PlatformInfoDialogButton';
 
 interface Props {
     className?: string;
@@ -23,6 +24,8 @@ function Footer({ className }: Props) {
                 <a href="https://www.czertainly.com" target="_blank" rel="noopener noreferrer">
                     About Us
                 </a>
+                <span className={style.spacer}>·</span>
+                <PlatformInfoDialogButton />
             </div>
         </footer>
     );
