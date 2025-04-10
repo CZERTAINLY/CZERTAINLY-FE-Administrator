@@ -1697,19 +1697,32 @@ export default function CertificateDetail() {
         const data = [
             {
                 id: 'protocol',
-                columns: ['Protocol Name', <Badge color="secondary">{protocolInfo.protocol.toUpperCase()}</Badge>],
+                columns: [
+                    'Protocol Name',
+                    <Badge key="protocol" color="secondary">
+                        {protocolInfo.protocol.toUpperCase()}
+                    </Badge>,
+                ],
             },
             {
                 id: 'protocolProfileUuid',
-                columns: ['Protocol Profile UUID', <Link to={getProtocolProfileLink()}>{protocolInfo.protocolProfileUuid}</Link>],
+                columns: [
+                    'Protocol Profile UUID',
+                    <Link key="protocolProfileUuid" to={getProtocolProfileLink()}>
+                        {protocolInfo.protocolProfileUuid}
+                    </Link>,
+                ],
             },
         ];
         if (protocolInfo.protocol === CertificateProtocol.Acme && protocolInfo.additionalProtocolUuid) {
             data.push({
-                id: 'protocolProfileUuid',
+                id: 'additionalProfileUuid',
                 columns: [
                     'Protocol Account UUID',
-                    <Link to={`../acmeaccounts/detail/${protocolInfo.protocolProfileUuid}/${protocolInfo.additionalProtocolUuid}`}>
+                    <Link
+                        key="additionalProfileUuid"
+                        to={`../acmeaccounts/detail/${protocolInfo.protocolProfileUuid}/${protocolInfo.additionalProtocolUuid}`}
+                    >
                         {protocolInfo.additionalProtocolUuid}
                     </Link>,
                 ],
