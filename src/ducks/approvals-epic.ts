@@ -35,7 +35,8 @@ const listApprovals: AppEpic = (action$, state$, deps) => {
         switchMap((action) =>
             deps.apiClients.approvals
                 .listApprovals({
-                    paginationRequestDto: action.payload,
+                    itemsPerPage: action.payload.itemsPerPage,
+                    pageNumber: action.payload.pageNumber,
                 })
                 .pipe(
                     switchMap((response) =>
@@ -63,8 +64,9 @@ const listUserApprovals: AppEpic = (action$, state$, deps) => {
         switchMap((action) =>
             deps.apiClients.approvals
                 .listUserApprovals({
-                    approvalUserDto: action.payload.approvalUserDto,
-                    paginationRequestDto: action.payload.paginationRequestDto,
+                    itemsPerPage: action.payload.itemsPerPage,
+                    pageNumber: action.payload.pageNumber,
+                    // history: {},
                 })
                 .pipe(
                     switchMap((response) => of(slice.actions.listUserApprovalsSuccess(response))),

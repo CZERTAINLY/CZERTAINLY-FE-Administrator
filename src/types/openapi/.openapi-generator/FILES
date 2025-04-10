@@ -69,7 +69,6 @@ models/ApprovalDetailStepDto.ts
 models/ApprovalDto.ts
 models/ApprovalProfileDetailDto.ts
 models/ApprovalProfileDto.ts
-models/ApprovalProfileForVersionDto.ts
 models/ApprovalProfileRequestDto.ts
 models/ApprovalProfileResponseDto.ts
 models/ApprovalProfileUpdateRequestDto.ts
@@ -77,7 +76,6 @@ models/ApprovalResponseDto.ts
 models/ApprovalStepDto.ts
 models/ApprovalStepRecipientDto.ts
 models/ApprovalStepRequestDto.ts
-models/ApprovalUserDto.ts
 models/AttributeCallback.ts
 models/AttributeCallbackMapping.ts
 models/AttributeConstraintType.ts
@@ -284,7 +282,6 @@ models/NotificationDto.ts
 models/NotificationInstanceDto.ts
 models/NotificationInstanceRequestDto.ts
 models/NotificationInstanceUpdateRequestDto.ts
-models/NotificationRequestDto.ts
 models/NotificationResponseDto.ts
 models/NotificationSettingsDto.ts
 models/OAuth2ProviderSettingsDto.ts
@@ -295,7 +292,6 @@ models/ObjectPermissionsDto.ts
 models/ObjectPermissionsRequestDto.ts
 models/Operation.ts
 models/OperationResult.ts
-models/PaginationRequestDto.ts
 models/PlatformEnum.ts
 models/PlatformSettingsDto.ts
 models/PlatformSettingsUpdateDto.ts
@@ -394,6 +390,8 @@ models/UserCertificateDto.ts
 models/UserDetailDto.ts
 models/UserDto.ts
 models/UserIdentificationRequestDto.ts
+models/UserProfileDetailDto.ts
+models/UserProfilePermissionsDto.ts
 models/UtilsSettingsDto.ts
 models/UuidDto.ts
 models/VerificationResponseData.ts

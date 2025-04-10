@@ -27,7 +27,7 @@ export interface ApprovalStepRecipientDto {
      * @type {string}
      * @memberof ApprovalStepRecipientDto
      */
-    userUuid: string;
+    userUuid?: string;
     /**
      * Username of the recipient
      * @type {string}

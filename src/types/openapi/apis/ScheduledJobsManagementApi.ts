@@ -18,7 +18,6 @@ import type { OperationOpts, HttpHeaders, HttpQuery } from '../runtime';
 import type {
     AuthenticationServiceExceptionDto,
     ErrorMessageDto,
-    PaginationRequestDto,
     ScheduledJobDetailDto,
     ScheduledJobHistoryResponseDto,
     ScheduledJobsResponseDto,
@@ -42,12 +41,14 @@ export interface GetScheduledJobDetailRequest {
 }
 
 export interface GetScheduledJobHistoryRequest {
-    pagination: PaginationRequestDto;
     uuid: string;
+    itemsPerPage?: number;
+    pageNumber?: number;
 }
 
 export interface ListScheduledJobsRequest {
-    pagination: PaginationRequestDto;
+    itemsPerPage?: number;
+    pageNumber?: number;
 }
 
 export interface UpdateScheduledJobRequest {
@@ -119,16 +120,15 @@ export class ScheduledJobsManagementApi extends BaseAPI {
     /**
      * Scheduled job history
      */
-    getScheduledJobHistory({ pagination, uuid }: GetScheduledJobHistoryRequest): Observable<ScheduledJobHistoryResponseDto>
-    getScheduledJobHistory({ pagination, uuid }: GetScheduledJobHistoryRequest, opts?: OperationOpts): Observable<AjaxResponse<ScheduledJobHistoryResponseDto>>
-    getScheduledJobHistory({ pagination, uuid }: GetScheduledJobHistoryRequest, opts?: OperationOpts): Observable<ScheduledJobHistoryResponseDto | AjaxResponse<ScheduledJobHistoryResponseDto>> {
-        throwIfNullOrUndefined(pagination, 'pagination', 'getScheduledJobHistory');
+    getScheduledJobHistory({ uuid, itemsPerPage, pageNumber }: GetScheduledJobHistoryRequest): Observable<ScheduledJobHistoryResponseDto>
+    getScheduledJobHistory({ uuid, itemsPerPage, pageNumber }: GetScheduledJobHistoryRequest, opts?: OperationOpts): Observable<AjaxResponse<ScheduledJobHistoryResponseDto>>
+    getScheduledJobHistory({ uuid, itemsPerPage, pageNumber }: GetScheduledJobHistoryRequest, opts?: OperationOpts): Observable<ScheduledJobHistoryResponseDto | AjaxResponse<ScheduledJobHistoryResponseDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'getScheduledJobHistory');
 
         const query: HttpQuery = {};
-        if (pagination != null) {
-            Object.assign(query, pagination);
-        }
+
+        if (itemsPerPage != null) { query['itemsPerPage'] = itemsPerPage; }
+        if (pageNumber != null) { query['pageNumber'] = pageNumber; }
 
         return this.request<ScheduledJobHistoryResponseDto>({
             url: '/v1/scheduler/jobs/{uuid}/history'.replace('{uuid}', encodeURI(uuid)),
@@ -140,15 +140,14 @@ export class ScheduledJobsManagementApi extends BaseAPI {
     /**
      * List of scheduled jobs
      */
-    listScheduledJobs({ pagination }: ListScheduledJobsRequest): Observable<ScheduledJobsResponseDto>
-    listScheduledJobs({ pagination }: ListScheduledJobsRequest, opts?: OperationOpts): Observable<AjaxResponse<ScheduledJobsResponseDto>>
-    listScheduledJobs({ pagination }: ListScheduledJobsRequest, opts?: OperationOpts): Observable<ScheduledJobsResponseDto | AjaxResponse<ScheduledJobsResponseDto>> {
-        throwIfNullOrUndefined(pagination, 'pagination', 'listScheduledJobs');
+    listScheduledJobs({ itemsPerPage, pageNumber }: ListScheduledJobsRequest): Observable<ScheduledJobsResponseDto>
+    listScheduledJobs({ itemsPerPage, pageNumber }: ListScheduledJobsRequest, opts?: OperationOpts): Observable<AjaxResponse<ScheduledJobsResponseDto>>
+    listScheduledJobs({ itemsPerPage, pageNumber }: ListScheduledJobsRequest, opts?: OperationOpts): Observable<ScheduledJobsResponseDto | AjaxResponse<ScheduledJobsResponseDto>> {
 
         const query: HttpQuery = {};
-        if (pagination != null) {
-            Object.assign(query, pagination);
-        }
+
+        if (itemsPerPage != null) { query['itemsPerPage'] = itemsPerPage; }
+        if (pageNumber != null) { query['pageNumber'] = pageNumber; }
 
         return this.request<ScheduledJobsResponseDto>({
             url: '/v1/scheduler/jobs',

@@ -21,7 +21,7 @@ const getApprovalProfile: AppEpic = (action$, state$, deps) => {
             deps.apiClients.approvalProfiles
                 .getApprovalProfile({
                     uuid: action.payload.uuid,
-                    approvalProfileForVersionDto: action.payload.version ? { version: action.payload.version } : {},
+                    ...(action.payload.version ? { version: action.payload.version } : {}),
                 })
                 .pipe(
                     switchMap((response) =>
@@ -73,21 +73,23 @@ const listApprovalProfiles: AppEpic = (action$, state$, deps) => {
         filter(slice.actions.listApprovalProfiles.match),
 
         switchMap((action) =>
-            deps.apiClients.approvalProfiles.listApprovalProfiles({ paginationRequestDto: action.payload || {} }).pipe(
-                switchMap((response) =>
-                    of(
-                        slice.actions.listApprovalProfilesSuccess(response),
-                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfApprovalProfiles),
+            deps.apiClients.approvalProfiles
+                .listApprovalProfiles({ itemsPerPage: action.payload?.itemsPerPage, pageNumber: action.payload?.pageNumber })
+                .pipe(
+                    switchMap((response) =>
+                        of(
+                            slice.actions.listApprovalProfilesSuccess(response),
+                            userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfApprovalProfiles),
+                        ),
                     ),
-                ),
 
-                catchError((err) =>
-                    of(
-                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfApprovalProfiles),
-                        slice.actions.listApprovalProfilesFailure({ error: extractError(err, 'Failed to get Approval Profiles list') }),
+                    catchError((err) =>
+                        of(
+                            userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.ListOfApprovalProfiles),
+                            slice.actions.listApprovalProfilesFailure({ error: extractError(err, 'Failed to get Approval Profiles list') }),
+                        ),
                     ),
                 ),
-            ),
         ),
     );
 };

@@ -6,6 +6,7 @@ import {
     UpdateUserRequestDto,
     UserCertificateDto as UserCertificateDtoOpenApi,
     UserDetailDto as UserDetailDtoOpenApi,
+    UserProfileDetailDto as UserProfileDetailDtoOpenApi,
 } from './openapi';
 
 export type AuthActionDto = AuthActionDtoApi;
@@ -21,7 +22,14 @@ export type RoleResponseDto = RoleDto;
 export type RoleResponseModel = RoleResponseDto;
 
 export type UserDetailDto = UserDetailDtoOpenApi;
-export type UserDetailModel = Omit<UserDetailDto, 'certificate | roles | customAttributes'> & {
+export type UserDetailModel = Omit<UserDetailDto, 'certificate' | 'roles' | 'customAttributes'> & {
+    certificate?: UserCertificateModel;
+    roles: Array<RoleResponseModel>;
+    customAttributes?: Array<AttributeResponseModel>;
+};
+
+export type UserProfileDetailDto = UserProfileDetailDtoOpenApi;
+export type UserProfileDetailModel = Omit<UserProfileDetailDto, 'certificate' | 'roles' | 'customAttributes'> & {
     certificate?: UserCertificateModel;
     roles: Array<RoleResponseModel>;
     customAttributes?: Array<AttributeResponseModel>;

@@ -42,7 +42,7 @@ export interface KeyItemDto {
      * @type {string}
      * @memberof KeyItemDto
      */
-    description: string;
+    description?: string;
     /**
      * Creation time of the Key. If the key is discovered from the connector, then it will be returned
      * @type {string}
@@ -72,13 +72,13 @@ export interface KeyItemDto {
      * @type {string}
      * @memberof KeyItemDto
      */
-    tokenInstanceUuid: string;
+    tokenInstanceUuid?: string;
     /**
      * Token Instance Name
      * @type {string}
      * @memberof KeyItemDto
      */
-    tokenInstanceName: string;
+    tokenInstanceName?: string;
     /**
      * Owner of the Key
      * @type {string}
@@ -102,13 +102,13 @@ export interface KeyItemDto {
      * @type {number}
      * @memberof KeyItemDto
      */
-    associations?: number;
+    associations: number;
     /**
      * UUID of the key item in the Connector
      * @type {string}
      * @memberof KeyItemDto
      */
-    keyReferenceUuid: string;
+    keyReferenceUuid?: string;
     /**
      * Type of the Key
      * @type {KeyType}
@@ -126,19 +126,19 @@ export interface KeyItemDto {
      * @type {KeyFormat}
      * @memberof KeyItemDto
      */
-    format?: KeyFormat;
+    format: KeyFormat;
     /**
      * Key Length
      * @type {number}
      * @memberof KeyItemDto
      */
-    length?: number;
+    length: number;
     /**
      * Key Usages
      * @type {Array<KeyUsage>}
      * @memberof KeyItemDto
      */
-    usage: Array<KeyUsage>;
+    usage?: Array<KeyUsage>;
     /**
      * Boolean describing if the key is enabled or not
      * @type {boolean}

@@ -36,6 +36,7 @@ export default function TabLayout({ tabs, onlyActiveTabContent = false, selected
                     <NavItem key={`nav-${i}`}>
                         <NavLink
                             className={cx({ active: activeTab === i })}
+                            disabled={t.disabled}
                             onClick={() => {
                                 if (t.disabled) {
                                     return;

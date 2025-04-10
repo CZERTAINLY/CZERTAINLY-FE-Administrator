@@ -7,7 +7,6 @@ import {
     ApprovalResponseDto,
     ApprovalStepRecipientDto,
     ApprovalStepRecipientDtoStatusEnum,
-    ApprovalUserDto,
     Resource as ResourceEnum,
     UserApprovalDto,
 } from './openapi';
@@ -47,5 +46,3 @@ export type ResponseApprovalDto = ApprovalResponseDto;
 export type ResponseApprovalModel = Omit<ResponseApprovalDto, 'approvals'> & {
     approvals: Array<ApprovalModel>;
 };
-
-export type ApprovalUserModel = ApprovalUserDto;
