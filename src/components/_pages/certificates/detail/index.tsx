@@ -24,6 +24,7 @@ import { selectors as settingSelectors } from 'ducks/settings';
 import {
     CertificateState as CertStatus,
     CertificateFormatEncoding,
+    CertificateProtocol,
     CertificateRequestFormat,
     CertificateRevocationReason,
     CertificateSubjectType,
@@ -127,6 +128,7 @@ export default function CertificateDetail() {
     const certificateTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateType));
     const certificateRevocationReason = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateRevocationReason));
     const certificateValidationCheck = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateValidationCheck));
+    const certificateProtocol = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateProtocol));
     const isFetchingApprovals = useSelector(selectors.isFetchingApprovals);
     const isFetching = useSelector(selectors.isFetchingDetail);
     const isDeleting = useSelector(selectors.isDeleting);
@@ -1664,6 +1666,72 @@ export default function CertificateDetail() {
         }));
     }, [approvals]);
 
+    const protocolHeader: TableHeader[] = useMemo(
+        () => [
+            {
+                id: 'property',
+                content: 'Property',
+            },
+            {
+                id: 'value',
+                content: 'Value',
+            },
+        ],
+        [],
+    );
+
+    const protocolData: TableDataRow[] = useMemo(() => {
+        const protocolInfo = certificate?.protocolInfo;
+        if (!protocolInfo) return [];
+
+        function getProtocolProfileLink(): string {
+            if (!protocolInfo) return '';
+            switch (protocolInfo.protocol) {
+                case CertificateProtocol.Acme:
+                    return `../acmeprofiles/detail/${protocolInfo.protocolProfileUuid}`;
+                case CertificateProtocol.Cmp:
+                    return `../cmpprofiles/detail/${protocolInfo.protocolProfileUuid}`;
+                case CertificateProtocol.Scep:
+                    return `../scepprofiles/detail/${protocolInfo.protocolProfileUuid}`;
+            }
+        }
+        const data = [
+            {
+                id: 'protocol',
+                columns: [
+                    'Protocol Name',
+                    <Badge key="protocol" color="secondary">
+                        {getEnumLabel(certificateProtocol, protocolInfo.protocol)}
+                    </Badge>,
+                ],
+            },
+            {
+                id: 'protocolProfileUuid',
+                columns: [
+                    'Protocol Profile UUID',
+                    <Link key="protocolProfileUuid" to={getProtocolProfileLink()}>
+                        {protocolInfo.protocolProfileUuid}
+                    </Link>,
+                ],
+            },
+        ];
+        if (protocolInfo.protocol === CertificateProtocol.Acme && protocolInfo.additionalProtocolUuid) {
+            data.push({
+                id: 'additionalProfileUuid',
+                columns: [
+                    'Protocol Account UUID',
+                    <Link
+                        key="additionalProfileUuid"
+                        to={`../acmeaccounts/detail/${protocolInfo.protocolProfileUuid}/${protocolInfo.additionalProtocolUuid}`}
+                    >
+                        {protocolInfo.additionalProtocolUuid}
+                    </Link>,
+                ],
+            });
+        }
+        return data;
+    }, [certificate?.protocolInfo, certificateProtocol]);
+
     const defaultViewport = useMemo(
         () => ({
             zoom: 0.5,
@@ -1702,8 +1770,13 @@ export default function CertificateDetail() {
                                             <br />
                                             <CustomTable headers={detailHeaders} data={sanData} />
                                         </Widget>
-
-                                        <Widget title="Other Properties" titleSize="large">
+                                        {certificate?.protocolInfo && (
+                                            <Widget title="Protocol" busy={isBusy} titleSize="large">
+                                                <br />
+                                                <CustomTable headers={protocolHeader} data={protocolData} />
+                                            </Widget>
+                                        )}
+                                        <Widget title="Other Properties" busy={isBusy} titleSize="large">
                                             <br />
                                             <CustomTable headers={propertiesHeaders} data={propertiesData} />
                                         </Widget>
