@@ -28,6 +28,7 @@ import { slice as customAttributesSlice } from './customAttributes';
 import { slice as discoveriesSlice } from './discoveries';
 import { slice as initialEntitiesSlice } from './entities';
 import { slice as enumsSlice } from './enums';
+import { slice as infoSlice } from './info';
 import { slice as initialFiltersSlice } from './filters';
 import { slice as globalMetadataSlice } from './globalMetadata';
 import { slice as initialLocationsSlice } from './locations';
@@ -84,6 +85,7 @@ export const reducers = combineReducers({
     [approvalSlice.name]: approvalSlice.reducer,
     [notificationsSlice.name]: notificationsSlice.reducer,
     [enumsSlice.name]: enumsSlice.reducer,
+    [infoSlice.name]: infoSlice.reducer,
     [tokenSlice.name]: tokenSlice.reducer,
     [tokenProfileSlice.name]: tokenProfileSlice.reducer,
     [cryptographicKeySlice.name]: cryptographicKeySlice.reducer,

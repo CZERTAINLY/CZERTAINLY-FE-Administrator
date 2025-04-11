@@ -23,6 +23,7 @@ import {
     EnumsApi,
     ExternalNotificationManagementApi,
     GlobalMetadataApi,
+    InfoApi,
     InternalNotificationApi,
     LocationManagementApi,
     RAProfileManagementApi,
@@ -86,6 +87,7 @@ export interface ApiClients {
     internalNotificationApi: InternalNotificationApi;
     externalNotificationManagementApi: ExternalNotificationManagementApi;
     enums: EnumsApi;
+    info: InfoApi;
     tokenInstances: TokenInstanceControllerApi;
     tokenProfiles: TokenProfileManagementApi;
     cryptographicKeys: CryptographicKeyManagementApi;
@@ -132,6 +134,7 @@ export const backendClient: ApiClients = {
     internalNotificationApi: new InternalNotificationApi(configuration),
     externalNotificationManagementApi: new ExternalNotificationManagementApi(configuration),
     enums: new EnumsApi(configuration),
+    info: new InfoApi(configuration),
     tokenInstances: new TokenInstanceControllerApi(configuration),
     tokenProfiles: new TokenProfileManagementApi(configuration),
     cryptographicKeys: new CryptographicKeyManagementApi(configuration),
