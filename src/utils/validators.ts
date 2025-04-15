@@ -22,12 +22,13 @@ const getValueFromObject = (value: any) => {
 };
 
 export const validatePattern = (pattern: RegExp, message?: string) => (value: any) => {
+    if (Array.isArray(value)) {
+        return value.reduce((prev, curr) => prev && pattern.test(getValueFromObject(curr)), true)
+            ? undefined
+            : message || `Value must conform to ${pattern}`;
+    }
     const validationInput = getValueFromObject(value);
-    return (Array.isArray(value) && value.reduce((prev, curr) => prev && pattern.test(getValueFromObject(curr)), true)) ||
-        !validationInput ||
-        pattern.test(validationInput)
-        ? undefined
-        : message || `Value must conform to ${pattern}`;
+    return !validationInput || pattern.test(validationInput) ? undefined : message || `Value must conform to ${pattern}`;
 };
 
 export const validateInteger = () => validatePattern(/^[+-]?(\d*)$/, 'Value must be an integer');
@@ -51,14 +52,10 @@ export const validateAlphaNumericWithSpecialChars = () => {
 
 export const validateEmail = () => validatePattern(/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]+$/, 'Value must be a valid email address');
 
-export const validateUrl = () =>
-    validatePattern(/^((http(s?)?):\/\/)?[a-zA-Z0-9\-.]+:[0-9]+?$/g, 'Value must be a valid url. Example: http://localhost:8443');
+export const validateRoutelessUrl = () =>
+    validatePattern(/^((https?):\/\/)?[a-zA-Z0-9\-.]+(:[0-9]+)?$/, 'Value must be a valid url. Example: http://localhost:8443');
 
-export const validateCustom = (pattern: string, value: string) => {
-    return !value || new RegExp(pattern).test(value) ? undefined : `Value must conform to '${pattern}'`;
-};
-
-export const validateCustomUrl = (value: string) => {
+export const validateUrlWithRoute = (value: string) => {
     return !value || new RegExp(/^(https?:\/\/)?([\w.-]+)(:\d+)?(\/[\w#.-]*)*\/?$/g).test(value) ? undefined : 'Value must be a valid url';
 };
 
@@ -69,12 +66,6 @@ export const validateCustomIp = (value: string) => {
         ).test(value)
         ? undefined
         : 'Value must be a valid ip address';
-};
-
-export const validateCustomPort = (value: string) => {
-    return !value || new RegExp(/^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$/).test(value)
-        ? undefined
-        : 'Value must be a valid port';
 };
 
 export const validateLength = (min: number, max: number) => (value: any) => {
