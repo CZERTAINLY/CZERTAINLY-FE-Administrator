@@ -53,7 +53,7 @@ export const validateAlphaNumericWithSpecialChars = () => {
 export const validateEmail = () => validatePattern(/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]+$/, 'Value must be a valid email address');
 
 export const validateRoutelessUrl = () =>
-    validatePattern(/^((https?):\/\/)?[a-zA-Z0-9\-.]+(:[0-9]+)?$/, 'Value must be a valid url. Example: http://localhost:8443');
+    validatePattern(/^((https?):\/\/)?[a-zA-Z0-9\-.]+(:\d+)?$/, 'Value must be a valid url. Example: http://localhost:8443');
 
 export const validateUrlWithRoute = (value: string) => {
     return !value || new RegExp(/^(https?:\/\/)?([\w.-]+)(:\d+)?(\/[\w#.-]*)*\/?$/g).test(value) ? undefined : 'Value must be a valid url';

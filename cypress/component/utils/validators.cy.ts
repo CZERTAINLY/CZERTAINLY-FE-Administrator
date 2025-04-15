@@ -25,7 +25,7 @@ describe('Validator Functions', () => {
     }
 
     describe('validatePattern', () => {
-        const validator1 = validatePattern(/[0-9]+/, 'Value must contain only digits');
+        const validator1 = validatePattern(/\d+/, 'Value must contain only digits');
         const validator2 = validatePattern(/[a-zA-Z]+/, 'Value must contain only letters');
         const data = {
             label: 'Label',
@@ -74,7 +74,7 @@ describe('Validator Functions', () => {
         });
 
         it('should accept falsy values as validators', () => {
-            const validator = composeValidators(false && validateRequired());
+            const validator = composeValidators(false);
 
             expectToPass(validator(null));
         });
@@ -186,7 +186,7 @@ describe('Validator Functions', () => {
         it('should fail for values with accents or other unsupported characters', () => {
             expectToFail(validator('é'));
             expectToFail(validator('か'));
-            expectToFail(validator('#/\\\'\"'));
+            expectToFail(validator('#/\\\'"'));
         });
     });
 
@@ -261,9 +261,8 @@ describe('Validator Functions', () => {
 
     describe('validateCustomIp', () => {
         it('should pass for valid IP addresses', () => {
-            expectToPass(validateCustomIp('192.168.1.1'));
+            expectToPass(validateCustomIp('192.0.2.34'));
             expectToPass(validateCustomIp('127.0.0.1'));
-            expectToPass(validateCustomIp('234.123.2.32'));
         });
 
         it('should fail for invalid IPs', () => {
