@@ -8,7 +8,7 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions, selectors } from 'ducks/entities';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router';
 
 import { Container, Label } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
@@ -107,7 +107,7 @@ export default function EntityDetail() {
                       },
                       {
                           id: 'entityProviderUUID',
-                          columns: ['Entity Provider UUID', entity.connectorUuid],
+                          columns: ['Entity Provider UUID', entity.connectorUuid ?? ''],
                       },
                       {
                           id: 'entityProviderName',

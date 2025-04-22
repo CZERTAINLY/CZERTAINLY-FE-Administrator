@@ -6,7 +6,7 @@ import { actions as userAction, selectors as userSelectors } from 'ducks/users';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Field, useForm } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 import Select from 'react-select';
 import { Button, Col, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
 import { ApprovalStepRequestModel, ApproverType } from 'types/approval-profiles';

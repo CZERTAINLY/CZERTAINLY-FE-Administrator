@@ -8,7 +8,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Field, Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router';
 
 import Select from 'react-select';
 import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
@@ -98,7 +98,8 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
 
     useEffect(() => {
         if (editMode && credentialProviders && credentialProviders.length > 0 && credential?.uuid === id) {
-            const provider = credentialProviders.find((p) => p.uuid === credential?.connectorUuid);
+            if (!credential?.connectorUuid) return;
+            const provider = credentialProviders.find((p) => p.uuid === credential.connectorUuid);
             if (!provider) return;
 
             setCredentialProvider(provider);
@@ -209,18 +210,17 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
         [credentialProvider],
     );
 
-    const defaultValues: FormValues = useMemo(
-        () => ({
+    const defaultValues: FormValues = useMemo(() => {
+        const credentialProvider = credential?.connectorUuid
+            ? { value: credential.connectorUuid!, label: credential.connectorName! }
+            : undefined;
+
+        return {
             name: editMode ? credential?.name || undefined : undefined,
-            credentialProvider: editMode
-                ? credential
-                    ? { value: credential.connectorUuid, label: credential.connectorName }
-                    : undefined
-                : undefined,
+            credentialProvider: editMode ? credentialProvider : undefined,
             storeKind: editMode ? (credential ? { value: credential?.kind, label: credential?.kind } : undefined) : undefined,
-        }),
-        [editMode, credential],
-    );
+        };
+    }, [editMode, credential]);
 
     const title = useMemo(() => (editMode ? 'Edit Credential' : 'Create Credential'), [editMode]);
 

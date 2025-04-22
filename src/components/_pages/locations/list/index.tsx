@@ -1,13 +1,13 @@
 import { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { Badge, Container } from 'reactstrap';
 
 import { EntityType } from 'ducks/filters';
 import { actions, selectors } from 'ducks/locations';
 import { selectors as pagingSelectors } from 'ducks/paging';
 
-import { ApiClients } from 'api';
+import { ApiClients } from '../../../../api';
 import { TableDataRow, TableHeader } from 'components/CustomTable';
 import PagedList from 'components/PagedList/PagedList';
 import StatusBadge from 'components/StatusBadge';

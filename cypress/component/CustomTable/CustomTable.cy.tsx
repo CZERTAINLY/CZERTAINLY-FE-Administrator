@@ -36,7 +36,7 @@ const CustomTableTest = () => {
             totalPages: Math.ceil(20 / pageSize),
             itemsPerPageOptions: [5, 10],
         }),
-        [page, pageSize, detailData],
+        [page, pageSize],
     );
 
     return (

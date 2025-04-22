@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { actions, selectors } from 'ducks/notifications';
 
 import Widget from 'components/Widget';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router';
 import { Button, Col, Dropdown, DropdownMenu, DropdownToggle, Row } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { formatTimeAgo } from 'utils/dateUtil';

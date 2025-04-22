@@ -3,7 +3,7 @@ import { actions as alertActions } from 'ducks/alerts';
 import { actions as userInterfaceActions, selectors as userInterfaceSelectors } from 'ducks/user-interface';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { Handle, Position } from 'reactflow';
 import { Button, Collapse } from 'reactstrap';
 import { EntityNodeProps } from 'types/flowchart';

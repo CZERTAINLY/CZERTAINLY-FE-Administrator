@@ -1,7 +1,7 @@
 import { actions as approvalActions, selectors as approvalSelectors } from 'ducks/approvals';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router';
 import { Button, Container } from 'reactstrap';
 
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
@@ -40,10 +40,9 @@ export default function ApprovalsList() {
     const listUserApprovals = useCallback(() => {
         dispatch(
             approvalActions.listUserApprovals({
-                approvalUserDto: {
-                    history: showHistory,
-                },
-                paginationRequestDto: { itemsPerPage: pageSize, pageNumber },
+                history: showHistory,
+                itemsPerPage: pageSize,
+                pageNumber,
             }),
         );
         setCheckedRows([]);

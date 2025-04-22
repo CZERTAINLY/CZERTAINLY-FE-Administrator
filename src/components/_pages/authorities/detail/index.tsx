@@ -8,7 +8,7 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions, selectors } from 'ducks/authorities';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router';
 import { Container, Label } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { Resource } from '../../../../types/openapi';
@@ -114,7 +114,7 @@ export default function AuthorityDetail() {
                       },
                       {
                           id: 'authorityProviderUUID',
-                          columns: ['Authority Provider UUID', authority.connectorUuid],
+                          columns: ['Authority Provider UUID', authority?.connectorUuid ?? ''],
                       },
                       {
                           id: 'authorityProviderName',

@@ -1,21 +1,22 @@
-const { defineConfig } = require('cypress');
+import { defineConfig } from 'cypress';
+import vitePreprocessor from 'cypress-vite';
 
-module.exports = defineConfig({
+export default defineConfig({
     e2e: {
         experimentalStudio: true,
-        setupNodeEvents(on, config) {
-            // implement node event listeners here
+        setupNodeEvents(on) {
+            on('file:preprocessor', vitePreprocessor());
         },
     },
     env: {
-        ADMIN_URL: 'http://localhost:3000/',
+        ADMIN_URL: 'http://localhost:5173/',
         ADMIN_USERNAME: 'czertainly-admin',
         ADMIN_PASSWORD: 'your-strong-password',
     },
     component: {
         devServer: {
-            framework: 'create-react-app',
-            bundler: 'webpack',
+            framework: 'react',
+            bundler: 'vite',
         },
     },
 });

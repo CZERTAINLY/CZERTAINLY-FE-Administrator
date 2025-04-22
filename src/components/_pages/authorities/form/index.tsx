@@ -11,7 +11,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Field, Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router';
 
 import Select, { SingleValue } from 'react-select';
 import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
@@ -234,8 +234,8 @@ export default function AuthorityForm() {
         () => ({
             name: editMode ? authority?.name || undefined : undefined,
             authorityProvider: editMode
-                ? authority
-                    ? { value: authority.connectorUuid, label: authority.connectorName }
+                ? authority?.connectorUuid
+                    ? { value: authority.connectorUuid!, label: authority.connectorName! }
                     : undefined
                 : undefined,
             storeKind: editMode ? (authority ? { value: authority?.kind, label: authority?.kind } : undefined) : undefined,

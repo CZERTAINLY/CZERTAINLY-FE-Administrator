@@ -24,6 +24,7 @@ import { selectors as settingSelectors } from 'ducks/settings';
 import {
     CertificateState as CertStatus,
     CertificateFormatEncoding,
+    CertificateProtocol,
     CertificateRequestFormat,
     CertificateRevocationReason,
     CertificateSubjectType,
@@ -34,7 +35,7 @@ import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router';
 import Select from 'react-select';
 
 import { actions as raProfilesActions, selectors as raProfilesSelectors } from 'ducks/ra-profiles';
@@ -76,8 +77,6 @@ import { DeviceType, useCopyToClipboard, useDeviceType } from 'utils/common-hook
 import CertificateStatus from '../CertificateStatus';
 import CertificateDownloadForm from './CertificateDownloadForm';
 import styles from './certificateDetail.module.scss';
-// Adding eslint supress no-useless concat warning
-/* eslint-disable no-useless-concat */
 
 interface ChainDownloadSwitchState {
     isDownloadTriggered: boolean;
@@ -129,6 +128,7 @@ export default function CertificateDetail() {
     const certificateTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateType));
     const certificateRevocationReason = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateRevocationReason));
     const certificateValidationCheck = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateValidationCheck));
+    const certificateProtocol = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateProtocol));
     const isFetchingApprovals = useSelector(selectors.isFetchingApprovals);
     const isFetching = useSelector(selectors.isFetchingDetail);
     const isDeleting = useSelector(selectors.isDeleting);
@@ -258,7 +258,7 @@ export default function CertificateDetail() {
     }, [dispatch, id, certificate, getFreshRaProfileDetail]);
 
     useEffect(() => {
-        if (!settings?.utils.utilsServiceUrl) return;
+        if (!settings?.utils?.utilsServiceUrl) return;
         dispatch(utilsActuatorActions.health());
     }, [dispatch, settings]);
 
@@ -276,7 +276,7 @@ export default function CertificateDetail() {
 
     const getFreshApprovalList = useCallback(() => {
         if (!id) return;
-        dispatch(actions.listCertificateApprovals({ uuid: id, paginationRequestDto: {} }));
+        dispatch(actions.listCertificateApprovals({ uuid: id }));
     }, [dispatch, id]);
 
     const getCertificateChainDetails = useCallback(() => {
@@ -1406,7 +1406,7 @@ export default function CertificateDetail() {
                       id: 'extendedKeyUsage',
                       columns: [
                           'Extended Key Usage',
-                          certificate?.extendedKeyUsage?.map(function (name) {
+                          certificate.extendedKeyUsage?.map(function (name) {
                               return (
                                   <div key={name} style={{ margin: '1px' }}>
                                       <Badge>{name}</Badge>
@@ -1418,13 +1418,19 @@ export default function CertificateDetail() {
                   },
                   {
                       id: 'subjectType',
-                      columns: ['Subject Type', <CertificateStatus status={certificate.subjectType} />],
+                      columns: [
+                          'Subject Type',
+                          certificate.subjectType ? <CertificateStatus status={certificate.subjectType} /> : <>n/a</>,
+                      ],
                   },
               ];
         if (certificate?.state !== CertStatus.Requested) {
             certDetail.push({
                 id: 'asn1structure',
-                columns: ['ASN.1 Structure', certificate ? <Asn1Dialog content={certificate.certificateContent} /> : <>n/a</>],
+                columns: [
+                    'ASN.1 Structure',
+                    certificate?.certificateContent ? <Asn1Dialog content={certificate.certificateContent} /> : <>n/a</>,
+                ],
             });
         }
 
@@ -1660,6 +1666,72 @@ export default function CertificateDetail() {
         }));
     }, [approvals]);
 
+    const protocolHeader: TableHeader[] = useMemo(
+        () => [
+            {
+                id: 'property',
+                content: 'Property',
+            },
+            {
+                id: 'value',
+                content: 'Value',
+            },
+        ],
+        [],
+    );
+
+    const protocolData: TableDataRow[] = useMemo(() => {
+        const protocolInfo = certificate?.protocolInfo;
+        if (!protocolInfo) return [];
+
+        function getProtocolProfileLink(): string {
+            if (!protocolInfo) return '';
+            switch (protocolInfo.protocol) {
+                case CertificateProtocol.Acme:
+                    return `../acmeprofiles/detail/${protocolInfo.protocolProfileUuid}`;
+                case CertificateProtocol.Cmp:
+                    return `../cmpprofiles/detail/${protocolInfo.protocolProfileUuid}`;
+                case CertificateProtocol.Scep:
+                    return `../scepprofiles/detail/${protocolInfo.protocolProfileUuid}`;
+            }
+        }
+        const data = [
+            {
+                id: 'protocol',
+                columns: [
+                    'Protocol Name',
+                    <Badge key="protocol" color="secondary">
+                        {getEnumLabel(certificateProtocol, protocolInfo.protocol)}
+                    </Badge>,
+                ],
+            },
+            {
+                id: 'protocolProfileUuid',
+                columns: [
+                    'Protocol Profile UUID',
+                    <Link key="protocolProfileUuid" to={getProtocolProfileLink()}>
+                        {protocolInfo.protocolProfileUuid}
+                    </Link>,
+                ],
+            },
+        ];
+        if (protocolInfo.protocol === CertificateProtocol.Acme && protocolInfo.additionalProtocolUuid) {
+            data.push({
+                id: 'additionalProfileUuid',
+                columns: [
+                    'Protocol Account UUID',
+                    <Link
+                        key="additionalProfileUuid"
+                        to={`../acmeaccounts/detail/${protocolInfo.protocolProfileUuid}/${protocolInfo.additionalProtocolUuid}`}
+                    >
+                        {protocolInfo.additionalProtocolUuid}
+                    </Link>,
+                ],
+            });
+        }
+        return data;
+    }, [certificate?.protocolInfo, certificateProtocol]);
+
     const defaultViewport = useMemo(
         () => ({
             zoom: 0.5,
@@ -1698,8 +1770,13 @@ export default function CertificateDetail() {
                                             <br />
                                             <CustomTable headers={detailHeaders} data={sanData} />
                                         </Widget>
-
-                                        <Widget title="Other Properties" titleSize="large">
+                                        {certificate?.protocolInfo && (
+                                            <Widget title="Protocol" busy={isBusy} titleSize="large">
+                                                <br />
+                                                <CustomTable headers={protocolHeader} data={protocolData} />
+                                            </Widget>
+                                        )}
+                                        <Widget title="Other Properties" busy={isBusy} titleSize="large">
                                             <br />
                                             <CustomTable headers={propertiesHeaders} data={propertiesData} />
                                         </Widget>

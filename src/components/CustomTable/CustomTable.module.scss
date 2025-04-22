@@ -50,15 +50,18 @@
     min-width: 712px;
 }
 
+.logsTableContainer:has(div[data-editable-cell-opened='true']) {
+    overflow-y: visible;
+    overflow-x: clip;
+}
+
 .logsTable {
     min-width: 100%;
 }
 
 .dataCell {
     white-space: pre-wrap;
-
     text-overflow: ellipsis;
-    overflow: hidden;
 }
 
 .header {

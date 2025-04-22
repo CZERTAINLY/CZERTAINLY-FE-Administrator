@@ -1,10 +1,10 @@
 import { AppEpic } from 'ducks';
-import { from, of } from 'rxjs';
+import { of } from 'rxjs';
 import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
 import { actions as appRedirectActions } from './app-redirect';
 import { actions as userInterfaceActions } from './user-interface';
 
-import { store } from 'index';
+import { store } from '../App';
 import { EntityType } from './filters';
 import { actions as pagingActions } from './paging';
 

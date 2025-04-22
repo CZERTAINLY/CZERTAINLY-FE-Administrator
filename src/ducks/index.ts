@@ -1,4 +1,4 @@
-import { ApiClients } from 'api';
+import { ApiClients } from '../api';
 import { AnyAction } from 'redux';
 import { Epic, combineEpics } from 'redux-observable';
 import acmeAccountsEpics from './acme-accounts-epics';
@@ -14,6 +14,7 @@ import profileApprovalEpics from './approval-profiles-epics';
 import approvalsEpic from './approvals-epic';
 
 import authEpics from './auth-epics';
+import authSettingsEpics from './auth-settings-epics';
 import authoritiesEpics from './authorities-epics';
 import groupsEpics from './certificateGroups-epics';
 import certificatesEpics from './certificates-epics';
@@ -28,6 +29,7 @@ import entitiesEpics from './entities-epics';
 import enumsEpics from './enums-epics';
 import filtersEpics from './filters-epics';
 import globalMetadataEpics from './globalMetadata-epics';
+import infoEpics from './info-epics';
 import locationsEpics from './locations-epics';
 import notificationsEpics from './notifications-epics';
 import raProfilesEpics from './ra-profiles-epics';
@@ -58,6 +60,7 @@ export type AppEpic = Epic<AnyAction, AnyAction, AppState, EpicDependencies>;
 export const epics = combineEpics(
     ...startupEpics,
     ...authEpics,
+    ...authSettingsEpics,
     ...appRedirectEpics,
     ...dashboardEpics,
     ...groupsEpics,
@@ -88,6 +91,7 @@ export const epics = combineEpics(
     ...approvalsEpic,
     ...notificationsEpics,
     ...enumsEpics,
+    ...infoEpics,
     ...tokenEpics,
     ...tokenProfileEpics,
     ...cryptographicKeyEpics,

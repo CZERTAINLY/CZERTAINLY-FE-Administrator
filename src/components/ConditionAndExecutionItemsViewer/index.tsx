@@ -1,11 +1,11 @@
-import { ApiClients } from 'api';
+import { ApiClients } from '../../api';
 import FilterWidget from 'components/FilterWidget';
 import FilterWidgetRuleAction from 'components/FilterWidgetRuleAction';
 import { EntityType, actions as filterActions } from 'ducks/filters';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 import { Resource } from 'types/openapi';
 import { conditionGroupToFilter, filterToConditionItems } from 'utils/rules';
 type FormType = 'condtionItems' | 'executionItems';

@@ -1,6 +1,6 @@
 import cx from 'classnames';
 import React, { useCallback, useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router';
 import { Collapse } from 'reactstrap';
 
 import style from './LinksGroup.module.scss';

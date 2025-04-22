@@ -2,6 +2,7 @@ import { of } from 'rxjs';
 import { catchError, filter, map, switchMap } from 'rxjs/operators';
 
 import { AppEpic } from 'ducks';
+import { actions as notificationActions } from 'ducks/notifications';
 
 import { actions as appRedirectActions } from './app-redirect';
 
@@ -23,6 +24,13 @@ const getProfile: AppEpic = (action$, state$, deps) => {
                 }),
             ),
         ),
+    );
+};
+
+const getProfileSuccess: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.getProfileSuccess.match),
+        switchMap(() => of(notificationActions.resetFailedFetchingCount())),
     );
 };
 
@@ -95,6 +103,6 @@ const getObjectsForResource: AppEpic = (action$, state$, deps) => {
     );
 };
 
-export const epics = [getProfile, getAuthResources, updateProfile, updateProfileSuccess, getObjectsForResource];
+export const epics = [getProfile, getProfileSuccess, getAuthResources, updateProfile, updateProfileSuccess, getObjectsForResource];
 
 export default epics;

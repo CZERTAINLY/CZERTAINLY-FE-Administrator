@@ -1254,6 +1254,13 @@ export const groupAttributeAtributeEditorMockData = {
             },
         ],
         customAttributes: [],
+        validationEnabled: true,
+        certificateValidationSettings: {
+            enabled: true,
+            usePlatformSettings: false,
+            expiringThreshold: 1,
+            frequency: 30,
+        },
     } as RaProfileResponseModel,
 };
 

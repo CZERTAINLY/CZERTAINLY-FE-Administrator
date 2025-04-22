@@ -4,14 +4,14 @@ import { EntityType, selectors as filterSelectors } from 'ducks/filters';
 import { actions as userInterfaceActions } from '../../../ducks/user-interface';
 
 import { useCallback, useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router';
 
 import { useDispatch, useSelector } from 'react-redux';
 
 import { Button, Container } from 'reactstrap';
 import { dateFormatter } from 'utils/dateUtil';
 
-import { ApiClients } from 'api';
+import { ApiClients } from '../../../api';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import { LockWidgetNameEnum } from 'types/user-interface';

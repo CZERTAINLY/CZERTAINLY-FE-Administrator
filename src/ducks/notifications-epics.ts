@@ -1,6 +1,6 @@
 import { AnyAction } from '@reduxjs/toolkit';
 import { AppEpic } from 'ducks';
-import { store } from 'index';
+import { store } from '../App';
 import { iif, of } from 'rxjs';
 import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
 import { FunctionGroupCode } from 'types/openapi';
@@ -26,8 +26,10 @@ import {
 const listOverviewNotifications: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listOverviewNotifications.match),
+        filter(() => state$.value.notifications.failedFetchingOverviewRemainingCount > 0),
+        switchMap(() => of(slice.actions.listOverviewNotificationsStarted())),
         switchMap((action) =>
-            deps.apiClients.internalNotificationApi.listNotifications({ request: { unread: true } }).pipe(
+            deps.apiClients.internalNotificationApi.listNotifications({ unread: true }).pipe(
                 mergeMap((response) =>
                     of(
                         slice.actions.listOverviewNotificationsSuccess(response.items.map(transformNotificationDtoToModel)),
@@ -64,9 +66,7 @@ const listNotifications: AppEpic = (action$, state$, deps) => {
         switchMap((action) => {
             store.dispatch(pagingActions.list(EntityType.NOTIFICATIONS));
             return deps.apiClients.internalNotificationApi
-                .listNotifications({
-                    request: { unread: action.payload.unread, ...transformSearchRequestModelToDto(action.payload.pagination) },
-                })
+                .listNotifications({ unread: action.payload.unread, ...transformSearchRequestModelToDto(action.payload.pagination) })
                 .pipe(
                     mergeMap((response) =>
                         of(

@@ -1,4 +1,4 @@
-import { ApiClients } from 'api';
+import { ApiClients } from '../../api';
 import cx from 'classnames';
 import ConditionsItemsList from 'components/ExecutionConditionItemsList/ConditionsItemsList';
 import ExecutionsItemsList from 'components/ExecutionConditionItemsList/ExecutionsItemsList';

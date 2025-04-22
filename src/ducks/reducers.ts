@@ -9,6 +9,7 @@ import { alertsSlice } from './alert-slice';
 import { slice as appRedirectSlice } from './app-redirect';
 import { slice as auditLogsSlice } from './auditLogs';
 import { slice as authSlice } from './auth';
+import { slice as authSettingsSlice } from './auth-settings';
 import { slice as userInterfaceSlice } from './user-interface';
 
 import { slice as profileApprovalSlice } from './approval-profiles';
@@ -27,6 +28,7 @@ import { slice as customAttributesSlice } from './customAttributes';
 import { slice as discoveriesSlice } from './discoveries';
 import { slice as initialEntitiesSlice } from './entities';
 import { slice as enumsSlice } from './enums';
+import { slice as infoSlice } from './info';
 import { slice as initialFiltersSlice } from './filters';
 import { slice as globalMetadataSlice } from './globalMetadata';
 import { slice as initialLocationsSlice } from './locations';
@@ -52,6 +54,7 @@ export const reducers = combineReducers({
     [userInterfaceSlice.name]: userInterfaceSlice.reducer,
     [appRedirectSlice.name]: appRedirectSlice.reducer,
     [authSlice.name]: authSlice.reducer,
+    [authSettingsSlice.name]: authSettingsSlice.reducer,
     [dashboardSlice.name]: dashboardSlice.reducer,
     [groupsSlice.name]: groupsSlice.reducer,
     [connectorsSlice.name]: connectorsSlice.reducer,
@@ -82,6 +85,7 @@ export const reducers = combineReducers({
     [approvalSlice.name]: approvalSlice.reducer,
     [notificationsSlice.name]: notificationsSlice.reducer,
     [enumsSlice.name]: enumsSlice.reducer,
+    [infoSlice.name]: infoSlice.reducer,
     [tokenSlice.name]: tokenSlice.reducer,
     [tokenProfileSlice.name]: tokenProfileSlice.reducer,
     [cryptographicKeySlice.name]: cryptographicKeySlice.reducer,

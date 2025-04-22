@@ -1,11 +1,11 @@
 import { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { Badge, Container } from 'reactstrap';
 
 import { actions, selectors } from 'ducks/entities';
 
-import { ApiClients } from 'api';
+import { ApiClients } from '../../../../api';
 import { TableDataRow, TableHeader } from 'components/CustomTable';
 import PagedList from 'components/PagedList/PagedList';
 import { EntityType } from 'ducks/filters';

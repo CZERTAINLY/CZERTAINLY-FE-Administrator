@@ -9,7 +9,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Field, Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router';
 
 import Select from 'react-select';
 import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
@@ -202,14 +202,15 @@ export default function EntityForm() {
         [entityProvider],
     );
 
-    const defaultValues: FormValues = useMemo(
-        () => ({
+    const defaultValues: FormValues = useMemo(() => {
+        const entityProvider = entity?.connectorUuid ? { value: entity.connectorUuid!, label: entity.connectorName! } : undefined;
+
+        return {
             name: editMode ? entity?.name || undefined : undefined,
-            entityProvider: editMode ? (entity ? { value: entity.connectorUuid, label: entity.connectorName } : undefined) : undefined,
-            storeKind: editMode ? (entity ? { value: entity?.kind, label: entity?.kind } : undefined) : undefined,
-        }),
-        [editMode, entity],
-    );
+            entityProvider: editMode ? entityProvider : undefined,
+            storeKind: editMode ? (entity ? { value: entity.kind, label: entity.kind } : undefined) : undefined,
+        };
+    }, [editMode, entity]);
 
     const title = useMemo(() => (editMode ? 'Edit Entity' : 'Create Entity'), [editMode]);
 

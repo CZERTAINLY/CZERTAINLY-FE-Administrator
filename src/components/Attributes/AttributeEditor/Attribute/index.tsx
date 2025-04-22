@@ -1,4 +1,4 @@
-import * as DOMPurify from 'dompurify';
+import DOMPurify from 'dompurify';
 import parse from 'html-react-parser';
 import { marked } from 'marked';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -189,6 +189,15 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
     };
 
     const createSelect = (descriptor: DataAttributeModel | CustomAttributeModel): JSX.Element => {
+        const errorStyles = {
+            border: 'solid 1px red',
+            '&:hover': { border: 'solid 1px red' },
+            '&:active': {
+                border: 'solid 1px red',
+                boxShadow: '0 0 3px red',
+            },
+            '&:focus-within': { border: 'solid 1px red', boxShadow: '0 0 3px red' },
+        };
         return (
             <Field name={name} validate={buildValidators()} type={getFormTypeFromAttributeContentType(descriptor.contentType)}>
                 {({ input, meta }) => (
@@ -213,7 +222,10 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                                 styles={{
                                     control: (provided) =>
                                         meta.touched && meta.invalid
-                                            ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
+                                            ? {
+                                                  ...provided,
+                                                  ...errorStyles,
+                                              }
                                             : { ...provided },
                                 }}
                                 isDisabled={descriptor.properties.readOnly || busy}
@@ -231,7 +243,10 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                                 styles={{
                                     control: (provided) =>
                                         meta.touched && meta.invalid
-                                            ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
+                                            ? {
+                                                  ...provided,
+                                                  ...errorStyles,
+                                              }
                                             : { ...provided },
                                 }}
                                 isDisabled={descriptor.properties.readOnly}
@@ -416,6 +431,15 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
             );
         }
 
+        function transformInputValue(value: any) {
+            if (descriptor.contentType === AttributeContentType.Datetime) {
+                return getFormattedDateTime(value);
+            } else if (descriptor.contentType === AttributeContentType.Boolean && descriptor.properties.required) {
+                return value ?? false;
+            }
+            return value;
+        }
+
         return (
             <Field name={name} validate={buildValidators()} type={getFormTypeFromAttributeContentType(descriptor.contentType)}>
                 {({ input, meta }) => (
@@ -438,9 +462,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                             placeholder={`Enter ${descriptor.properties.label}`}
                             disabled={descriptor.properties.readOnly || busy}
                             step={getStepValue(descriptor.contentType)}
-                            value={
-                                descriptor.contentType === AttributeContentType.Datetime ? getFormattedDateTime(input.value) : input.value
-                            }
+                            value={transformInputValue(input.value)}
                         />
 
                         {descriptor.properties.visible && descriptor.contentType === AttributeContentType.Boolean ? (

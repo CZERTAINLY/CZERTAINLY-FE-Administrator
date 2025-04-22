@@ -3,7 +3,7 @@ import Dialog from 'components/Dialog';
 
 import { WidgetButtonProps } from 'components/WidgetButtons';
 
-import { ApiClients } from 'api';
+import { ApiClients } from '../../../../api';
 import PagedList from 'components/PagedList/PagedList';
 import { actions, selectors } from 'ducks/cryptographic-keys';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
@@ -11,7 +11,7 @@ import { EntityType } from 'ducks/filters';
 import { selectors as pagingSelectors } from 'ducks/paging';
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import Select from 'react-select';
 import { Badge, Container } from 'reactstrap';
 import { SearchRequestModel } from 'types/certificate';

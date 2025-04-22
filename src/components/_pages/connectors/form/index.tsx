@@ -8,7 +8,7 @@ import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Field, Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router';
 
 import Select from 'react-select';
 import { Badge, Form as BootstrapForm, Button, ButtonGroup, Container, FormFeedback, FormGroup, Input, Label, Table } from 'reactstrap';
@@ -17,7 +17,7 @@ import { AuthType, ConnectorStatus, PlatformEnum, Resource } from 'types/openapi
 
 import { attributeFieldNameTransform, collectFormAttributes } from 'utils/attributes/attributes';
 
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired, validateUrl } from 'utils/validators';
+import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired, validateRoutelessUrl } from 'utils/validators';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
 import { mutators } from '../../../../utils/attributes/attributeEditorMutators';
 import AttributeEditor from '../../../Attributes/AttributeEditor';
@@ -206,7 +206,7 @@ export default function ConnectorForm() {
                     {({ handleSubmit, pristine, submitting, values }) => (
                         <BootstrapForm onSubmit={handleSubmit}>
                             <Widget title={connectorWidgetTitle} titleSize="large">
-                                <Field name="url" validate={composeValidators(validateRequired(), validateUrl())}>
+                                <Field name="url" validate={composeValidators(validateRequired(), validateRoutelessUrl())}>
                                     {({ input, meta }) => (
                                         <FormGroup>
                                             <Label for="url">URL</Label>

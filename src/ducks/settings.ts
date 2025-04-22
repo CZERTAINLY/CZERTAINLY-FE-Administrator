@@ -1,22 +1,29 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { NotificationSettingsDto } from 'types/openapi';
 import { createFeatureSelector } from 'utils/ducks';
-import { SettingsPlatformModel } from '../types/settings';
+import { SettingsPlatformModel, SettingsLoggingModel, SettingsPlatformUpdateModel } from '../types/settings';
 
 export type State = {
     platformSettings?: SettingsPlatformModel;
     isFetchingPlatform: boolean;
     isUpdatingPlatform: boolean;
-    isUpdatingNotificationsSetting: boolean;
+
     notificationsSettings?: NotificationSettingsDto;
     isFetchingNotificationsSetting: boolean;
+    isUpdatingNotificationsSetting: boolean;
+
+    loggingSettings?: SettingsLoggingModel;
+    isFetchingLoggingSetting: boolean;
+    isUpdatingLoggingSetting: boolean;
 };
 
 export const initialState: State = {
     isFetchingPlatform: false,
     isUpdatingPlatform: false,
-    isUpdatingNotificationsSetting: false,
     isFetchingNotificationsSetting: false,
+    isUpdatingNotificationsSetting: false,
+    isFetchingLoggingSetting: false,
+    isUpdatingLoggingSetting: false,
 };
 
 export const slice = createSlice({
@@ -36,13 +43,13 @@ export const slice = createSlice({
             state.isFetchingPlatform = false;
         },
 
-        updatePlatformSettings: (state, action: PayloadAction<SettingsPlatformModel>) => {
+        updatePlatformSettings: (state, action: PayloadAction<SettingsPlatformUpdateModel>) => {
             state.isUpdatingPlatform = true;
         },
 
-        updatePlatformSettingsSuccess: (state, action: PayloadAction<SettingsPlatformModel>) => {
+        updatePlatformSettingsSuccess: (state, action: PayloadAction<SettingsPlatformUpdateModel>) => {
             state.isUpdatingPlatform = false;
-            state.platformSettings = action.payload;
+            state.platformSettings = { ...state.platformSettings, ...action.payload };
         },
 
         updatePlatformSettingsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -74,6 +81,32 @@ export const slice = createSlice({
         updateNotificationsSettingsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdatingNotificationsSetting = false;
         },
+
+        getLoggingSettings: (state, action: PayloadAction<void>) => {
+            state.isFetchingLoggingSetting = true;
+        },
+
+        getLoggingSettingsSuccess: (state, action: PayloadAction<SettingsLoggingModel>) => {
+            state.loggingSettings = action.payload;
+            state.isFetchingLoggingSetting = false;
+        },
+
+        getLoggingSettingsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingLoggingSetting = false;
+        },
+
+        updateLoggingSettings: (state, action: PayloadAction<SettingsLoggingModel>) => {
+            state.isUpdatingLoggingSetting = true;
+        },
+
+        updateLoggingSettingsSuccess: (state, action: PayloadAction<SettingsLoggingModel>) => {
+            state.isUpdatingLoggingSetting = false;
+            state.loggingSettings = action.payload;
+        },
+
+        updateLoggingSettingsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isUpdatingLoggingSetting = false;
+        },
     },
 });
 
@@ -82,18 +115,28 @@ const state = createFeatureSelector<State>(slice.name);
 const platformSettings = createSelector(state, (state: State) => state.platformSettings);
 const isFetchingPlatform = createSelector(state, (state: State) => state.isFetchingPlatform);
 const isUpdatingPlatform = createSelector(state, (state: State) => state.isUpdatingPlatform);
+
 const notificationsSettings = createSelector(state, (state: State) => state.notificationsSettings);
 const isFetchingNotificationsSetting = createSelector(state, (state: State) => state.isFetchingNotificationsSetting);
 const isUpdatingNotificationsSetting = createSelector(state, (state: State) => state.isUpdatingNotificationsSetting);
+
+const loggingSettings = createSelector(state, (state: State) => state.loggingSettings);
+const isFetchingLoggingSetting = createSelector(state, (state: State) => state.isFetchingLoggingSetting);
+const isUpdatingLoggingSetting = createSelector(state, (state: State) => state.isUpdatingLoggingSetting);
 
 export const selectors = {
     state,
     platformSettings,
     isFetchingPlatform,
     isUpdatingPlatform,
+
     notificationsSettings,
     isFetchingNotificationsSetting,
     isUpdatingNotificationsSetting,
+
+    loggingSettings,
+    isFetchingLoggingSetting,
+    isUpdatingLoggingSetting,
 };
 
 export const actions = slice.actions;

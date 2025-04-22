@@ -2,7 +2,7 @@ import Widget from 'components/Widget';
 import { EntityType, actions } from 'ducks/filters';
 import ReactApexChart from 'react-apexcharts';
 import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { SearchFilterModel } from 'types/certificate';
 import { DashboardDict } from 'types/statisticsDashboard';
 import { getValues, useGetLabels } from 'utils/dashboard';
