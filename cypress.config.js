@@ -8,11 +8,6 @@ export default defineConfig({
             on('file:preprocessor', vitePreprocessor());
         },
     },
-    env: {
-        ADMIN_URL: 'http://localhost:5173/',
-        ADMIN_USERNAME: 'czertainly-admin',
-        ADMIN_PASSWORD: 'your-strong-password',
-    },
     component: {
         devServer: {
             framework: 'react',

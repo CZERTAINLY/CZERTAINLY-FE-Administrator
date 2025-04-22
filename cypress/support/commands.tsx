@@ -4,6 +4,7 @@ import { reducers } from 'ducks/reducers';
 import React from 'react';
 import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router';
+import 'cypress-file-upload';
 
 Cypress.Commands.add('mount', (component, options = {}, initialRoute = '/') => {
     const { ...mountOptions } = options;
@@ -28,4 +29,12 @@ Cypress.Commands.add('mount', (component, options = {}, initialRoute = '/') => {
     );
 
     return mount(wrapped, mountOptions);
+});
+
+Cypress.Commands.add('adminLogin', (url: string, username: string, password: string) => {
+    cy.visit(url);
+    cy.get('button').click();
+    cy.get('#username').clear().type(username);
+    cy.get('#password').clear().type(password);
+    cy.get('#kc-login').click();
 });
