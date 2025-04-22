@@ -27,7 +27,7 @@ import {
     composeValidators,
     validateAlphaNumericWithoutAccents,
     validateCustomIp,
-    validateCustomUrl,
+    validateUrlWithRoute,
     validateInteger,
     validateLength,
     validateRequired,
@@ -368,7 +368,7 @@ export default function AcmeProfileForm() {
                         <Widget title="Terms of Service Configuration">
                             <Row xs="1" sm="1" md="2" lg="2" xl="2">
                                 <Col>
-                                    <Field name="termsUrl" validate={composeValidators((value: string) => validateCustomUrl(value))}>
+                                    <Field name="termsUrl" validate={composeValidators((value: string) => validateUrlWithRoute(value))}>
                                         {({ input, meta }) => (
                                             <FormGroup>
                                                 <Label for="termsUrl">Terms of Service URL</Label>
@@ -389,7 +389,7 @@ export default function AcmeProfileForm() {
                                 </Col>
 
                                 <Col>
-                                    <Field name="webSite" validate={composeValidators((value: string) => validateCustomUrl(value))}>
+                                    <Field name="webSite" validate={composeValidators((value: string) => validateUrlWithRoute(value))}>
                                         {({ input, meta }) => (
                                             <FormGroup>
                                                 <Label for="websiteUrl">Website URL</Label>
@@ -417,7 +417,7 @@ export default function AcmeProfileForm() {
                                     <Col>
                                         <Field
                                             name="termsChangeUrl"
-                                            validate={composeValidators((value: string) => validateCustomUrl(value))}
+                                            validate={composeValidators((value: string) => validateUrlWithRoute(value))}
                                         >
                                             {({ input, meta }) => (
                                                 <FormGroup>
