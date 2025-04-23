@@ -9,7 +9,6 @@ try {
     envJson = JSON.parse(fs.readFileSync(path.resolve('cypress.env.json'), 'utf-8'));
 } catch (err) {
     console.warn('No cypress.env.json found or failed to parse');
-    envJson = {};
 }
 
 // Pull admin URL from env or fallback to cypress.env.json
