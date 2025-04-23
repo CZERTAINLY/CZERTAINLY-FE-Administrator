@@ -20,7 +20,7 @@ function uploadCertificateAndGetId() {
         const certId = response?.body?.uuid;
         expect(certId).to.exist;
         cy.get(`tr[data-id="${certId}"]`).should('exist');
-        return certId;
+        return cy.wrap(certId);
     });
 }
 
