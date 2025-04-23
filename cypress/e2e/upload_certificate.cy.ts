@@ -28,9 +28,13 @@ describe('template spec', () => {
     beforeEach(() => {
         cy.viewport(1280, 720);
 
-        cy.session('admin-login', () => {
-            cy.adminLogin(Cypress.env('ADMIN_URL'), Cypress.env('ADMIN_USERNAME'), Cypress.env('ADMIN_PASSWORD'));
-        });
+        const useMtls = Boolean(Cypress.env('USE_MTLS'));
+
+        if (!useMtls) {
+            cy.session('admin-login', () => {
+                cy.adminLogin(Cypress.env('ADMIN_URL'), Cypress.env('ADMIN_USERNAME'), Cypress.env('ADMIN_PASSWORD'));
+            });
+        }
 
         // Setup intercepts and visit page
         cy.intercept('POST', '/api/v1/certificates/upload').as('uploadCert');
