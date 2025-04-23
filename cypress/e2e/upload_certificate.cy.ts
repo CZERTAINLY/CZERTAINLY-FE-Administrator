@@ -3,6 +3,8 @@ const certificate =
 
 describe('template spec', () => {
     beforeEach(() => {
+        cy.viewport(1280, 720);
+
         cy.session('admin-login', () => {
             cy.adminLogin(Cypress.env('ADMIN_URL'), Cypress.env('ADMIN_USERNAME'), Cypress.env('ADMIN_PASSWORD'));
         });
@@ -16,7 +18,7 @@ describe('template spec', () => {
 
     it('uploadAndDeleteCertificate', () => {
         // Click on the "Certificates" menu item
-        cy.get('._nav_7mj3y_74 > :nth-child(1) > :nth-child(2) > a > div > ._menuLabel_x9a1g_30').click();
+        cy.get('[data-cy="Certificates"]').click();
         // Click on the "Upload Certificate" button
         cy.get('[title="Upload Certificate"] > .fa').click();
 
@@ -57,7 +59,7 @@ describe('template spec', () => {
 
     it('uploadAndBulkDeleteCertificate', () => {
         // Click on the "Certificates" menu item
-        cy.get('._nav_7mj3y_74 > :nth-child(1) > :nth-child(2) > a > div > ._menuLabel_x9a1g_30').click();
+        cy.get('[data-cy="Certificates"]').click();
         // Click on the "Upload Certificate" button
         cy.get('[title="Upload Certificate"] > .fa').click();
 
