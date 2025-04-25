@@ -82,13 +82,13 @@ export default function ProtocolActivationDialogBody({ protocol, raProfileUuid, 
 
             dispatch(
                 raProfilesActions.listIssuanceAttributeDescriptors({
-                    authorityUuid: authorityInstanceUuid || '',
+                    authorityUuid: authorityInstanceUuid ?? '',
                     uuid: raProfileUuid,
                 }),
             );
             dispatch(
                 raProfilesActions.listRevocationAttributeDescriptors({
-                    authorityUuid: authorityInstanceUuid || '',
+                    authorityUuid: authorityInstanceUuid ?? '',
                     uuid: raProfileUuid,
                 }),
             );
