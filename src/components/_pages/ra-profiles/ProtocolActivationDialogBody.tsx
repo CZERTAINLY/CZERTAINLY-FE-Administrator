@@ -66,32 +66,36 @@ export default function ProtocolActivationDialogBody({ protocol, raProfileUuid, 
         [isFetchingProfiles, isFetchingIssuanceAttributes, isFetchingRevocationAttributes],
     );
 
-    useEffect(() => {
-        if (!visible) return;
+    useEffect(
+        () => {
+            if (!visible) return;
 
-        const profileListActions = {
-            [Protocol.ACME]: acmeProfilesActions.listAcmeProfiles,
-            [Protocol.CMP]: cmpProfilesActions.listCmpProfiles,
-            [Protocol.SCEP]: scepProfilesActions.listScepProfiles,
-        };
+            const profileListActions = {
+                [Protocol.ACME]: acmeProfilesActions.listAcmeProfiles,
+                [Protocol.CMP]: cmpProfilesActions.listCmpProfiles,
+                [Protocol.SCEP]: scepProfilesActions.listScepProfiles,
+            };
 
-        dispatch(profileListActions[protocol]());
+            dispatch(profileListActions[protocol]());
 
-        if (!raProfileUuid) return;
+            if (!raProfileUuid) return;
 
-        dispatch(
-            raProfilesActions.listIssuanceAttributeDescriptors({
-                authorityUuid: authorityInstanceUuid || '',
-                uuid: raProfileUuid,
-            }),
-        );
-        dispatch(
-            raProfilesActions.listRevocationAttributeDescriptors({
-                authorityUuid: authorityInstanceUuid || '',
-                uuid: raProfileUuid,
-            }),
-        );
-    }, [visible]);
+            dispatch(
+                raProfilesActions.listIssuanceAttributeDescriptors({
+                    authorityUuid: authorityInstanceUuid || '',
+                    uuid: raProfileUuid,
+                }),
+            );
+            dispatch(
+                raProfilesActions.listRevocationAttributeDescriptors({
+                    authorityUuid: authorityInstanceUuid || '',
+                    uuid: raProfileUuid,
+                }),
+            );
+        },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [visible],
+    );
 
     const optionsForProfiles = useMemo(
         () =>
