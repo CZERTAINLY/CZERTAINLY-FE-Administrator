@@ -40,12 +40,14 @@ export default function ProtocolActivationDialogBody({ protocol, raProfileUuid, 
     const scepProfiles = useSelector(scepProfilesSelectors.scepProfiles);
     const cmpProfiles = useSelector(cmpProfilesSelectors.cmpProfiles);
 
-    const profileMap = {
-        [Protocol.ACME]: acmeProfiles,
-        [Protocol.CMP]: cmpProfiles,
-        [Protocol.SCEP]: scepProfiles,
-    };
-    const profiles = profileMap[protocol] ?? [];
+    const profiles = useMemo(() => {
+        const profileMap = {
+            [Protocol.ACME]: acmeProfiles,
+            [Protocol.CMP]: cmpProfiles,
+            [Protocol.SCEP]: scepProfiles,
+        };
+        return profileMap[protocol] ?? [];
+    }, [protocol, acmeProfiles, cmpProfiles, scepProfiles]);
 
     const issuanceAttributes = useSelector(raProfilesSelectors.issuanceAttributes);
     const revocationAttributes = useSelector(raProfilesSelectors.revocationAttributes);
@@ -58,7 +60,7 @@ export default function ProtocolActivationDialogBody({ protocol, raProfileUuid, 
         [Protocol.CMP]: cmpProfilesSelectors.isFetchingList,
         [Protocol.SCEP]: scepProfilesSelectors.isFetchingList,
     };
-    const isFetchingProfiles = useSelector(fetchingSelectorMap[protocol]);
+    const isFetchingProfiles = useSelector(fetchingSelectorMap[protocol] ?? (() => false));
     const isFetchingIssuanceAttributes = useSelector(raProfilesSelectors.isFetchingIssuanceAttributes);
     const isFetchingRevocationAttributes = useSelector(raProfilesSelectors.isFetchingRevocationAttributes);
 
@@ -77,7 +79,13 @@ export default function ProtocolActivationDialogBody({ protocol, raProfileUuid, 
                 [Protocol.SCEP]: scepProfilesActions.listScepProfiles,
             };
 
-            dispatch(profileListActions[protocol]());
+            const profileAction = profileListActions[protocol];
+            if (!profileAction) {
+                dispatch(alertActions.error(`Unsupported protocol: ${protocol}`));
+                return;
+            }
+
+            dispatch(profileAction());
 
             if (!raProfileUuid) return;
 
