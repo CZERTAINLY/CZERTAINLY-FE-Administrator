@@ -1,6 +1,7 @@
 import AttributeEditor from 'components/Attributes/AttributeEditor';
 import Spinner from 'components/Spinner';
 
+import { actions as alertActions } from 'ducks/alerts';
 import { actions as acmeProfilesActions, selectors as acmeProfilesSelectors } from 'ducks/acme-profiles';
 import { actions as cmpProfilesActions, selectors as cmpProfilesSelectors } from 'ducks/cmp-profiles';
 import { actions as raProfilesActions, selectors as raProfilesSelectors } from 'ducks/ra-profiles';
@@ -44,7 +45,7 @@ export default function ProtocolActivationDialogBody({ protocol, raProfileUuid, 
         [Protocol.CMP]: cmpProfiles,
         [Protocol.SCEP]: scepProfiles,
     };
-    const profiles = profileMap[protocol];
+    const profiles = profileMap[protocol] ?? [];
 
     const issuanceAttributes = useSelector(raProfilesSelectors.issuanceAttributes);
     const revocationAttributes = useSelector(raProfilesSelectors.revocationAttributes);
@@ -157,7 +158,11 @@ export default function ProtocolActivationDialogBody({ protocol, raProfileUuid, 
                 }),
             };
 
-            dispatch(activationPayloadMap[protocol]);
+            if (activationPayloadMap[protocol]) {
+                dispatch(activationPayloadMap[protocol]);
+            } else {
+                dispatch(alertActions.error(`Invalid protocol value: ${protocol}`));
+            }
 
             onClose();
         },
