@@ -37,9 +37,9 @@ describe('Info  Attribute Descriptor Viewer', () => {
         cy.get('td').eq(11).should('contain.text', 'test-data-2');
     });
 
-    it(`🟢 should show details of first row when clicked
-        🟢 should have valid details
-        🟢 should close the details of first row`, () => {
+    it(`should show details of first row when clicked
+        should have valid details
+        should close the details of first row`, () => {
         cy.get('.fa-caret-down').eq(0).click().wait(clickWait);
         cy.get('td').eq(12).should('contain.text', 'Name');
         cy.get('td').eq(13).should('contain.text', 'test-name-1');
@@ -56,9 +56,9 @@ describe('Info  Attribute Descriptor Viewer', () => {
         cy.get('.fa-caret-up').eq(0).click().wait(clickWait);
     });
 
-    it(`🟢 should show details of second row when clicked
-        🟢 should have valid details
-        🟢 should close the details of second row
+    it(`should show details of second row when clicked
+        should have valid details
+        should close the details of second row
     `, () => {
         cy.get('.fa-caret-down').eq(1).click().wait(clickWait);
         cy.get('td').eq(18).should('contain.text', 'Name');
@@ -111,9 +111,9 @@ describe('Data Attribute Descriptor Viewer', () => {
         cy.get('td').eq(11).should('contain.text', '5985');
     });
 
-    it(`🟢 should show details of first row when clicked
-        🟢 should have valid details
-        🟢 should close the details of first row`, () => {
+    it(`should show details of first row when clicked
+        should have valid details
+        should close the details of first row`, () => {
         cy.get('.fa-caret-down').eq(0).click().wait(clickWait);
         cy.get('td').eq(11).should('contain.text', 'Name');
         cy.get('td').eq(13).should('contain.text', 'https');
@@ -140,9 +140,9 @@ describe('Data Attribute Descriptor Viewer', () => {
         cy.get('.fa-caret-up').eq(0).click().wait(clickWait);
     });
 
-    it(`🟢 should show details of second row when clicked
-        🟢 should have valid details
-        🟢 should close the details of first row`, () => {
+    it(`should show details of second row when clicked
+        should have valid details
+        should close the details of first row`, () => {
         cy.get('.fa-caret-down').eq(1).click().wait(clickWait);
         cy.get('td').eq(18).should('contain.text', 'Name');
         cy.get('td').eq(19).should('contain.text', 'port');
@@ -204,9 +204,9 @@ describe('Group Attribute Descriptor Viewer', () => {
         cy.get('td').eq(11).should('contain.text', '');
     });
 
-    it(`🟢 should show details of first row when clicked
-        🟢 should have valid details
-        🟢 should close the details of first row`, () => {
+    it(`should show details of first row when clicked
+        should have valid details
+        should close the details of first row`, () => {
         cy.get('.fa-caret-down').eq(0).click().wait(clickWait);
         cy.get('td').eq(12).should('contain.text', 'Name');
         cy.get('td').eq(13).should('contain.text', 'raprofile_ca_select_group');
@@ -215,9 +215,9 @@ describe('Group Attribute Descriptor Viewer', () => {
         cy.get('.fa-caret-up').eq(0).click().wait(clickWait);
     });
 
-    it(`🟢 should show details of second row when clicked
-        🟢 should have valid details
-        🟢 should close the details of second row`, () => {
+    it(`should show details of second row when clicked
+        should have valid details
+        should close the details of second row`, () => {
         cy.get('.fa-caret-down').eq(1).click().wait(clickWait);
         cy.get('td').eq(18).should('contain.text', 'Name');
         cy.get('td').eq(19).should('contain.text', 'raprofile_template_name');

@@ -157,6 +157,7 @@ export default function AttributeViewer({
             if ('sourceObjects' in attribute && attribute.sourceObjects.length > 0 && resource) {
                 return (
                     <Button
+                        data-cy="source-button"
                         className="btn btn-link p-0 ms-2"
                         color="white"
                         title="Source objects"
@@ -195,6 +196,7 @@ export default function AttributeViewer({
                     key="copy"
                     buttons={[
                         {
+                            id: 'copy',
                             icon: 'copy',
                             disabled: AttributeContentType.Secret === attribute.contentType,
                             onClick: () => {
@@ -232,6 +234,7 @@ export default function AttributeViewer({
             const buttons: WidgetButtonProps[] = [];
             if (editingAttributesNames.find((a) => a === attributeName)) {
                 buttons.push({
+                    id: 'cancel',
                     icon: 'times',
                     disabled: false,
                     tooltip: 'Cancel',
@@ -241,6 +244,7 @@ export default function AttributeViewer({
                 });
             } else {
                 buttons.push({
+                    id: 'copy',
                     icon: 'copy',
                     disabled: AttributeContentType.Secret === attribute.contentType,
                     tooltip: 'Copy to clipboard',
@@ -249,6 +253,7 @@ export default function AttributeViewer({
                     },
                 });
                 buttons.push({
+                    id: 'edit',
                     icon: 'pencil',
                     disabled: descriptor.properties.readOnly,
                     tooltip: descriptor.properties.readOnly ? 'Attribute is read only, edit is disabled' : 'Edit',
@@ -259,6 +264,7 @@ export default function AttributeViewer({
             }
             onRemove &&
                 buttons.push({
+                    id: 'delete',
                     icon: 'trash',
                     disabled: descriptor.properties.required,
                     tooltip: descriptor.properties.required ? "Attribute is required, can't be removed" : 'Remove',
@@ -288,6 +294,7 @@ export default function AttributeViewer({
                                     {({ values }) => (
                                         <BootstrapForm className="mt-3">
                                             <ContentValueField
+                                                id={descriptor.name}
                                                 descriptor={descriptor}
                                                 initialContent={a.content}
                                                 onSubmit={(uuid, content) => {

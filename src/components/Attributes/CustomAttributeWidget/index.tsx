@@ -97,6 +97,7 @@ export default function CustomAttributeWidget({ resource, resourceUuid, attribut
 
     return (
         <Widget
+            id={`${resourceUuid}-customAttributeWidget`}
             title={'Custom Attributes'}
             busy={isFetchingResourceCustomAttributes || isUpdatingContent}
             titleSize="large"
@@ -137,6 +138,7 @@ export default function CustomAttributeWidget({ resource, resourceUuid, attribut
                                     {attribute && (
                                         <div>
                                             <ContentValueField
+                                                id={resourceUuid}
                                                 descriptor={attribute}
                                                 onSubmit={(uuid, content) => {
                                                     form.change('selectCustomAttribute', undefined);

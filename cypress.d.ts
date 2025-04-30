@@ -1,4 +1,4 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore, PayloadAction } from '@reduxjs/toolkit';
 import { mount } from 'cypress/react';
 import { reducers } from 'ducks/reducers';
 
@@ -14,6 +14,9 @@ declare global {
         interface Chainable {
             mount: typeof mount;
             dataCy(value: string): Chainable<JQuery<HTMLElement>>;
+            dispatchActions(...actions: Array<PayloadAction<any, any>>): Chainable<void>;
+            assertValueCopiedToClipboard(value: string): void;
+            findExactText(text: string): Chainable<JQuery<HTMLElement>>;
         }
     }
     interface Window {

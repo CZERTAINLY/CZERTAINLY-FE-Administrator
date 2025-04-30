@@ -136,8 +136,6 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                 return 'file';
             case AttributeContentType.Secret:
                 return 'password';
-            default:
-                return 'text';
         }
     };
 
@@ -304,6 +302,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                     <></>
                 ) : (
                     <div
+                        id={`${name}-dragAndDrop`}
                         className="border border-light rounded mb-0"
                         style={{ display: 'flex', flexWrap: 'wrap', padding: '1em', borderStyle: 'dashed !important' }}
                         onDrop={onFileDrop}
@@ -508,7 +507,7 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
 
     const createInfo = (descriptor: InfoAttributeModel): JSX.Element => {
         return (
-            <Card color="default">
+            <Card color="default" id={`${descriptor.name}Info`}>
                 <CardHeader>{descriptor.properties.label}</CardHeader>
                 <CardBody>
                     {parse(

@@ -1,10 +1,18 @@
 import { Props as AttributeEditorProps } from 'components/Attributes/AttributeEditor';
 import CredentialForm from 'components/_pages/credentials/form';
 import { SingleValue } from 'react-select';
-import { AttributeDescriptorDto, CustomAttributeDto, CustomAttributeModel, InfoAttributeModel } from 'types/attributes';
+import {
+    AttributeDescriptorDto,
+    AttributeDescriptorModel,
+    AttributeResponseModel,
+    CustomAttributeDto,
+    CustomAttributeModel,
+    InfoAttributeModel,
+} from 'types/attributes';
 import { ConnectorResponseDto } from 'types/connectors';
 import { CryptographicKeyPairResponseModel } from 'types/cryptographic-keys';
 import {
+    AttributeConstraintType,
     AttributeContentType,
     AttributeType,
     AuthorityInstanceDto,
@@ -229,6 +237,210 @@ export const customAttributeEditorMockData: AttributeEditorProps = {
                 list: false,
                 multiSelect: false,
             },
+        },
+    ] as CustomAttributeModel[],
+};
+
+export const customNonRequiredAttributeEditorMockData: AttributeEditorProps = {
+    id: 'test',
+    attributes: [
+        {
+            uuid: 'test-uuid-2',
+            name: 'test-name-2',
+            description: 'test-description-string-2',
+            type: AttributeType.Custom,
+            contentType: AttributeContentType.String,
+            content: [{ data: 'test-content' }],
+        },
+        {
+            uuid: 'test-uuid-4',
+            name: 'test-name-4',
+            description: 'test-description-boolean-4',
+            type: AttributeType.Custom,
+            contentType: AttributeContentType.Boolean,
+            content: [{ data: true }],
+        },
+        {
+            uuid: 'test-uuid-5',
+            name: 'test-name-5',
+            type: AttributeType.Custom,
+            contentType: AttributeContentType.Text,
+            content: [
+                {
+                    data: 'test-content-1',
+                },
+            ],
+        },
+        {
+            uuid: 'test-uuid-6',
+            name: 'test-name-6',
+            type: AttributeType.Custom,
+            contentType: AttributeContentType.Text,
+            content: [
+                {
+                    data: 'test-content-1',
+                },
+                {
+                    data: 'test-content-2',
+                },
+            ],
+        },
+    ] as AttributeResponseModel[],
+
+    attributeDescriptors: [
+        {
+            uuid: 'test-uuid-1',
+            name: 'test-name-1',
+            description: 'test-description-boolean-1',
+            type: AttributeType.Custom,
+            contentType: AttributeContentType.Boolean,
+            properties: {
+                label: 'Test property boolean 1',
+                visible: true,
+                required: true,
+                readOnly: true,
+                list: false,
+                multiSelect: false,
+            },
+        },
+        {
+            uuid: 'test-uuid-2',
+            name: 'test-name-2',
+            description: 'test-description-string-2',
+            type: AttributeType.Custom,
+            contentType: AttributeContentType.String,
+            properties: {
+                label: 'Test property string 2',
+                visible: true,
+                required: false,
+                readOnly: false,
+                list: false,
+                multiSelect: false,
+            },
+        },
+
+        {
+            uuid: 'test-uuid-3',
+            name: 'test-name-3',
+            description: 'test-description-integer-3',
+            type: AttributeType.Custom,
+            contentType: AttributeContentType.Integer,
+            properties: {
+                label: 'Test property integer 3',
+                visible: true,
+                required: false,
+                readOnly: false,
+                list: false,
+                multiSelect: false,
+            },
+        },
+        {
+            uuid: 'test-uuid-4',
+            name: 'test-name-4',
+            description: 'test-description-boolean-4',
+            type: AttributeType.Custom,
+            contentType: AttributeContentType.Boolean,
+            properties: {
+                label: 'Test property boolean 4',
+                visible: true,
+                required: false,
+                readOnly: true,
+                list: false,
+                multiSelect: false,
+            },
+        },
+        {
+            uuid: 'test-uuid-5',
+            name: 'test-name-5',
+            description: 'test-description-drop-down-5',
+            type: AttributeType.Custom,
+            contentType: AttributeContentType.Text,
+            properties: {
+                label: 'Test property select 5',
+                visible: true,
+                required: false,
+                readOnly: false,
+                list: true,
+                multiSelect: false,
+            },
+            content: [
+                {
+                    data: 'test-default-content-1',
+                },
+                {
+                    data: 'test-default-content-2',
+                },
+            ],
+        },
+        {
+            uuid: 'test-uuid-6',
+            name: 'test-name-6',
+            description: 'test-description-drop-down-6',
+            type: AttributeType.Custom,
+            contentType: AttributeContentType.Text,
+            properties: {
+                label: 'Test property multiselect 6',
+                visible: true,
+                required: false,
+                readOnly: false,
+                list: true,
+                multiSelect: true,
+            },
+            content: [
+                {
+                    data: 'test-default-content-1',
+                },
+                {
+                    data: 'test-default-content-2',
+                },
+            ],
+        },
+        {
+            uuid: 'test-uuid-7',
+            name: 'test-name-7',
+            description: 'test-description-boolean-7',
+            type: AttributeType.Custom,
+            contentType: AttributeContentType.Boolean,
+            properties: {
+                label: 'Test property boolean 7',
+                visible: true,
+                required: false,
+                readOnly: false,
+                list: false,
+                multiSelect: false,
+            },
+        },
+        {
+            uuid: 'test-uuid-8',
+            name: 'test-name-8',
+            description: 'test-description-boolean-8',
+            type: AttributeType.Custom,
+            contentType: AttributeContentType.Boolean,
+            properties: {
+                label: 'Test property boolean 8',
+                visible: true,
+                required: false,
+                readOnly: false,
+                list: false,
+                multiSelect: false,
+            },
+            content: [{ data: true }],
+        },
+        {
+            uuid: 'test-uuid-9',
+            name: 'test-name-9',
+            description: 'test-description-string-9',
+            type: AttributeType.Custom,
+            contentType: AttributeContentType.String,
+            properties: {
+                label: 'Test property string 9',
+                visible: true,
+                required: false,
+                readOnly: false,
+                list: false,
+                multiSelect: false,
+            },
+            content: [{ data: 'default-string' }],
         },
     ] as CustomAttributeModel[],
 };
@@ -1264,6 +1476,71 @@ export const groupAttributeAtributeEditorMockData = {
     } as RaProfileResponseModel,
 };
 
+export const callbackVariationsAtributeEditorMockData = {
+    attributeDescriptors: [
+        {
+            uuid: '9b5b38a2-9bcc-4178-8d02-7817cc3f3ada',
+            name: 'raprofile_select_ca_method',
+            description: 'Select how the CA will be chosen, either by ComputerName or search',
+            content: [
+                {
+                    reference: 'Search for all available CAs',
+                    data: 'search',
+                },
+                {
+                    reference: 'Use the ConfigString to select existing CA',
+                    data: 'configstring',
+                },
+            ],
+            type: AttributeType.Data,
+            contentType: AttributeContentType.String,
+            properties: {
+                label: 'Select CA Method',
+                visible: true,
+                required: true,
+                readOnly: false,
+                list: true,
+                multiSelect: false,
+            },
+        },
+        {
+            uuid: '0f26f6a0-94ca-420b-bbd8-4324218d7692',
+            name: 'raprofile_ca_select_group',
+            description: 'For identification of select CA method',
+            type: AttributeType.Group,
+            attributeCallback: {
+                mappings: [
+                    {
+                        from: 'raprofile_authority_uuid.data',
+                        to: 'authority_instance_uuid',
+                        targets: ['pathVariable'],
+                    },
+                    {
+                        from: 'raprofile_select_ca_method.data',
+                        to: 'ca_select_method',
+                        targets: ['pathVariable'],
+                    },
+                ],
+            },
+        },
+    ] as AttributeDescriptorModel[],
+    callbackSuccessObjectArray: [
+        {
+            reference: 'lab01-testssh',
+            data: {
+                uuid: '91c105e3-29d4-46e5-88c3-2ba7fb1fbd40',
+                name: 'lab01-testssh',
+            },
+        },
+        {
+            reference: 'adcs-lab02-login',
+            data: {
+                uuid: '34e58936-c041-4aa6-8ae7-ab2157da290b',
+                name: 'adcs-lab02-login',
+            },
+        },
+    ],
+};
 export const constraintCheckAttributeEditorMockData = {
     attributeDescriptorDtoArray: [
         {
@@ -1368,6 +1645,70 @@ export const constraintCheckAttributeEditorMockData = {
     ],
 };
 
+export const constraintTypesCheckMockData = {
+    attributeDescriptors: [
+        {
+            uuid: '06cf66eb-5c1e-4edf-8308-617565a5d6b0',
+            name: 'String',
+            type: AttributeType.Data,
+            contentType: AttributeContentType.String,
+            properties: {
+                label: 'String',
+                list: false,
+                multiSelect: false,
+                readOnly: false,
+                required: false,
+                visible: true,
+            },
+            constraints: [
+                {
+                    type: AttributeConstraintType.RegExp,
+                    data: '^_(.*)_$',
+                },
+            ],
+        },
+        {
+            uuid: '06cf66eb-5c1e-4edf-8308-617565a5d6b0',
+            name: 'Integer',
+            type: AttributeType.Data,
+            contentType: AttributeContentType.Integer,
+            properties: {
+                label: 'Integer',
+                list: false,
+                multiSelect: false,
+                readOnly: false,
+                required: false,
+                visible: true,
+            },
+            constraints: [
+                {
+                    type: AttributeConstraintType.Range,
+                    data: {
+                        from: 1,
+                        to: 10,
+                    },
+                    errorMessage: 'Value should be between 1 and 10',
+                },
+            ],
+        },
+        {
+            uuid: '06cf66eb-5c1e-4edf-8308-617565a5d6b0',
+            name: 'TextSelect',
+            type: AttributeType.Data,
+            contentType: AttributeContentType.Text,
+            properties: {
+                label: 'TextSelect',
+                list: true,
+                multiSelect: false,
+                readOnly: false,
+                required: true,
+                visible: true,
+            },
+            content: [{ data: 'Option1' }, { data: 'Option2' }],
+        },
+    ] as AttributeDescriptorModel[],
+};
+
 export const tabAttributeEditorMockData = {
     tokenProfileDtoArray: [] as TokenProfileDto[],
     certificateGroupSelectArray: [],
@@ -1390,7 +1731,7 @@ export const tabAttributeEditorMockData = {
                 label: 'Distribution method',
                 visible: true,
                 group: 'Test',
-                required: false,
+                required: true,
                 readOnly: false,
                 list: true,
                 multiSelect: false,
@@ -1579,6 +1920,452 @@ export const globalModalAttributeEditorMockData = {
             },
         },
     ],
+};
+
+export const attributeContentTypesMockData = {
+    basicFields: {
+        id: 'test',
+        attributes: [
+            {
+                uuid: '06cf66eb-5c0e-4edf-8308-617565a546b0',
+                name: 'SetFile',
+                type: AttributeType.Data,
+                contentType: AttributeContentType.File,
+                content: [
+                    {
+                        reference: 'content',
+                        data: {
+                            content:
+                                'ewogICAgIm5hbWUiOiAiVXNpbmcgZml4dHVyZXMgdG8gcmVwcmVzZW50IGRhdGEiLAogICAgImVtYWlsIjogImhlbGxvQGN5cHJlc3MuaW8iLAogICAgImJvZHkiOiAiRml4dHVyZXMgYXJlIGEgZ3JlYXQgd2F5IHRvIG1vY2sgZGF0YSBmb3IgcmVzcG9uc2VzIHRvIHJvdXRlcyIKfQo=',
+                            fileName: 'example.json',
+                            mimeType: 'application/json',
+                        },
+                    },
+                ],
+            },
+        ] as AttributeResponseModel[],
+        attributeDescriptors: [
+            {
+                uuid: '06cf66eb-5c1e-4edf-8308-617565a5d6b0',
+                name: 'String',
+                type: AttributeType.Data,
+                contentType: AttributeContentType.String,
+                properties: {
+                    label: 'String',
+                    list: false,
+                    multiSelect: false,
+                    readOnly: false,
+                    required: false,
+                    visible: true,
+                },
+            },
+            {
+                uuid: '06cf66eb-5c1e-4edf-8308-617565a5d6b1',
+                name: 'Text',
+                content: [],
+                type: AttributeType.Data,
+                contentType: AttributeContentType.Text,
+                properties: {
+                    label: 'Text',
+                    list: false,
+                    multiSelect: false,
+                    readOnly: false,
+                    required: false,
+                    visible: true,
+                },
+            },
+            {
+                uuid: '06cf66eb-5c1e-4edf-8308-617565a5d6b2',
+                name: 'Integer',
+                type: AttributeType.Data,
+                contentType: AttributeContentType.Integer,
+                properties: {
+                    label: 'Integer',
+                    list: false,
+                    multiSelect: false,
+                    readOnly: false,
+                    required: false,
+                    visible: true,
+                },
+            },
+            {
+                uuid: '06cf66eb-5c1e-4edf-8308-617565a5d6b3',
+                name: 'Boolean',
+                type: AttributeType.Data,
+                contentType: AttributeContentType.Boolean,
+                properties: {
+                    label: 'Boolean',
+                    list: false,
+                    multiSelect: false,
+                    readOnly: false,
+                    required: false,
+                    visible: true,
+                },
+            },
+            {
+                uuid: '06cf66eb-5c1e-4edf-8308-617565a5d6b4',
+                name: 'Float',
+                type: AttributeType.Data,
+                contentType: AttributeContentType.Float,
+                properties: {
+                    label: 'Float',
+                    list: false,
+                    multiSelect: false,
+                    readOnly: false,
+                    required: false,
+                    visible: true,
+                },
+            },
+            {
+                uuid: '06cf66eb-5c1e-4edf-8308-617565a5d6b5',
+                name: 'Date',
+                type: AttributeType.Data,
+                contentType: AttributeContentType.Date,
+                properties: {
+                    label: 'Date',
+                    list: false,
+                    multiSelect: false,
+                    readOnly: false,
+                    required: false,
+                    visible: true,
+                },
+            },
+            {
+                uuid: '06cf66eb-5c1e-4edf-8308-617565a5d6b6',
+                name: 'Time',
+                type: AttributeType.Data,
+                contentType: AttributeContentType.Time,
+                properties: {
+                    label: 'Time',
+                    list: false,
+                    multiSelect: false,
+                    readOnly: false,
+                    required: false,
+                    visible: true,
+                },
+            },
+            {
+                uuid: '06cf66eb-5c1e-4edf-8308-617565a5d67',
+                name: 'DatetimeSimple',
+                type: AttributeType.Data,
+                contentType: AttributeContentType.Datetime,
+                properties: {
+                    label: 'Datetime',
+                    list: false,
+                    multiSelect: false,
+                    readOnly: false,
+                    required: false,
+                    visible: true,
+                },
+            },
+            {
+                uuid: '06cf66eb-5c1e-4edf-8308-617565addd7',
+                name: 'DatetimeSelect',
+                type: AttributeType.Data,
+                contentType: AttributeContentType.Datetime,
+                properties: {
+                    label: 'DatetimeSelect',
+                    visible: true,
+                    required: false,
+                    readOnly: false,
+                    list: true,
+                    multiSelect: false,
+                },
+                content: [
+                    {
+                        data: '2017-06-01T08:30',
+                    },
+                    {
+                        data: '2022-01-01T12:30',
+                    },
+                ],
+            },
+            {
+                uuid: '06cf66eb-5c1e-4edf-8308-617565adda7',
+                name: 'DatetimeMultiselect',
+                type: AttributeType.Data,
+                contentType: AttributeContentType.Datetime,
+                properties: {
+                    label: 'DatetimeMultiselect',
+                    visible: true,
+                    required: false,
+                    readOnly: false,
+                    list: true,
+                    multiSelect: true,
+                },
+                content: [
+                    {
+                        data: '2017-06-01T08:30',
+                    },
+                    {
+                        data: '2022-01-01T12:30',
+                    },
+                ],
+            },
+            {
+                uuid: '06cf66eb-5c1e-4edf-8308-617565a5d6b9',
+                name: 'Secret',
+
+                type: AttributeType.Data,
+                contentType: AttributeContentType.Secret,
+                properties: {
+                    label: 'Secret',
+                    list: false,
+                    multiSelect: false,
+                    readOnly: false,
+                    required: false,
+                    visible: true,
+                },
+            },
+            {
+                uuid: '06cf66eb-5c1e-4edf-8308-617565a546b0',
+                name: 'File',
+                type: AttributeType.Data,
+                contentType: AttributeContentType.File,
+                properties: {
+                    label: 'File',
+                    list: false,
+                    multiSelect: false,
+                    readOnly: false,
+                    required: false,
+                    visible: true,
+                },
+            },
+            {
+                uuid: '06cf66eb-5c0e-0fdf-8308-617565a546b0',
+                name: 'DefaultFile',
+                type: AttributeType.Data,
+                contentType: AttributeContentType.File,
+                properties: {
+                    label: 'DefaultFile',
+                    list: false,
+                    multiSelect: false,
+                    readOnly: false,
+                    required: false,
+                    visible: true,
+                },
+                content: [
+                    {
+                        reference: 'content',
+                        data: {
+                            content:
+                                'ewogICAgIm5hbWUiOiAiVXNpbmcgZml4dHVyZXMgdG8gcmVwcmVzZW50IGRhdGEiLAogICAgImVtYWlsIjogImhlbGxvQGN5cHJlc3MuaW8iLAogICAgImJvZHkiOiAiRml4dHVyZXMgYXJlIGEgZ3JlYXQgd2F5IHRvIG1vY2sgZGF0YSBmb3IgcmVzcG9uc2VzIHRvIHJvdXRlcyIKfQo=',
+                            fileName: 'example.json',
+                            mimeType: 'application/json',
+                        },
+                    },
+                ],
+            },
+            {
+                uuid: '06cf66eb-5c0e-4edf-8308-617565a546b0',
+                name: 'SetFile',
+                type: AttributeType.Data,
+                contentType: AttributeContentType.File,
+                properties: {
+                    label: 'SetFile',
+                    list: false,
+                    multiSelect: false,
+                    readOnly: false,
+                    required: false,
+                    visible: true,
+                },
+            },
+            {
+                uuid: '06cf66eb-5c1e-4edf-8308-617565a5d6b0',
+                name: 'Credential',
+                type: AttributeType.Data,
+                contentType: AttributeContentType.Credential,
+                properties: {
+                    label: 'Credential',
+                    list: true,
+                    multiSelect: false,
+                    readOnly: false,
+                    required: false,
+                    visible: true,
+                },
+                content: [
+                    {
+                        reference: 'Credential1',
+                        data: {
+                            uuid: '0bc86bea-d2cf-4ca2-ac8f-01d5d3d99c73',
+                            name: 'Credential1',
+                        },
+                    },
+                    {
+                        reference: 'Credential2',
+                        data: {
+                            uuid: '1b34f386-ee3b-47ea-a0c2-0bff311ffcde',
+                            name: 'Credential2',
+                        },
+                    },
+                ],
+            },
+            {
+                uuid: '06cf66eb-5c1e-4edf-8308-617535a5d6b0',
+                name: 'Codeblock',
+                type: AttributeType.Data,
+                contentType: AttributeContentType.Codeblock,
+                properties: {
+                    label: 'Codeblock',
+                    list: false,
+                    multiSelect: false,
+                    readOnly: false,
+                    required: false,
+                    visible: true,
+                },
+                content: [
+                    {
+                        data: {
+                            language: 'html',
+                        },
+                    },
+                ],
+            },
+            {
+                uuid: '06cf66eb-5c1e-4edf-8308-617565a1d6b0',
+                name: 'Object',
+                type: AttributeType.Data,
+                contentType: AttributeContentType.Object,
+                properties: {
+                    label: 'Object',
+                    list: true,
+                    multiSelect: false,
+                    readOnly: false,
+                    required: false,
+                    visible: true,
+                },
+                content: [
+                    {
+                        reference: 'Object1',
+                        data: {
+                            prop1: 'prop1',
+                            prop2: 'prop2',
+                        },
+                    },
+                    {
+                        reference: 'Object2',
+                        data: {
+                            prop1: 'prop1',
+                            prop2: 'prop2',
+                        },
+                    },
+                ],
+            },
+        ] as AttributeDescriptorModel[],
+    },
+    customAttributes: {
+        id: 'test',
+        attributeDescriptors: [
+            {
+                uuid: '06cf66eb-5c1e-4edf-8308-617565a5d6b0',
+                name: 'CustomRequiredBoolean',
+                type: AttributeType.Custom,
+                contentType: AttributeContentType.Boolean,
+                properties: {
+                    label: 'CustomRequiredBoolean',
+                    list: false,
+                    multiSelect: false,
+                    readOnly: false,
+                    required: true,
+                    visible: true,
+                },
+            },
+            {
+                uuid: '06cf66eb-5c1e-4edf-8308-617565a5d6b1',
+                name: 'CustomString',
+                type: AttributeType.Custom,
+                contentType: AttributeContentType.String,
+                properties: {
+                    label: 'CustomString',
+                    list: false,
+                    multiSelect: false,
+                    readOnly: false,
+                    required: false,
+                    visible: true,
+                },
+                content: [
+                    {
+                        data: 'default-content',
+                    },
+                ],
+            },
+            {
+                uuid: '06cf66eb-5c1e-4edf-8308-617565a5d6b2',
+                name: 'CustomBoolean',
+                type: AttributeType.Custom,
+                contentType: AttributeContentType.Boolean,
+                properties: {
+                    label: 'CustomBoolean',
+                    list: false,
+                    multiSelect: false,
+                    readOnly: false,
+                    required: false,
+                    visible: true,
+                },
+            },
+
+            {
+                uuid: '06cf66eb-5c1e-4edf-8308-617565a536b2',
+                name: 'CustomMultiselectText',
+                type: AttributeType.Custom,
+                contentType: AttributeContentType.Text,
+                properties: {
+                    label: 'CustomMultiselectText',
+                    list: true,
+                    multiSelect: true,
+                    readOnly: false,
+                    required: false,
+                    visible: true,
+                },
+                content: [
+                    {
+                        data: 'Option1',
+                    },
+                    {
+                        data: 'Option2',
+                    },
+                    {
+                        data: 'Option3',
+                    },
+                    {
+                        data: 'Option4',
+                    },
+                ],
+            },
+            {
+                uuid: '06cf66eb-5c1e-4edf-8308-617b65a586b2',
+                name: 'CustomMultiselectReference',
+                type: AttributeType.Custom,
+                contentType: AttributeContentType.Text,
+                properties: {
+                    label: 'CustomMultiselectReference',
+                    list: true,
+                    multiSelect: true,
+                    readOnly: false,
+                    required: false,
+                    visible: true,
+                },
+                content: [
+                    {
+                        reference: 'Option1',
+                        data: 'Option1',
+                    },
+                    {
+                        reference: 'Option2',
+                        data: 'Option2',
+                    },
+                    {
+                        reference: 'Option3',
+                        data: 'Option3',
+                    },
+                    {
+                        reference: 'Option4',
+                        data: 'Option4',
+                    },
+                ],
+            },
+        ] as AttributeDescriptorModel[],
+    },
 };
 
 export interface GroupAttributeTestFormValues {

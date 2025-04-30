@@ -34,8 +34,9 @@ export default function CustomAttributeAddSelect({ attributeDescriptors, onAdd }
                         {({ input }) => (
                             <Select
                                 {...input}
+                                inputId="selectAddCustomAttribute"
                                 options={options}
-                                placeholder={`Show...`}
+                                placeholder="Show..."
                                 isClearable={true}
                                 onChange={(v) => {
                                     onAdd(v.value);

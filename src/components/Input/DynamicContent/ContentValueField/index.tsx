@@ -11,12 +11,13 @@ import WidgetButtons from '../../../WidgetButtons';
 import { ContentFieldConfiguration } from '../index';
 
 type Props = {
+    id?: string;
     descriptor: CustomAttributeModel;
     initialContent?: BaseAttributeContentModel[];
     onSubmit: (attributeUuid: string, content: BaseAttributeContentModel[]) => void;
 };
 
-export default function ContentValueField({ descriptor, initialContent, onSubmit }: Props) {
+export default function ContentValueField({ id, descriptor, initialContent, onSubmit }: Props) {
     const form = useForm();
 
     const options = useMemo(
@@ -128,6 +129,7 @@ export default function ContentValueField({ descriptor, initialContent, onSubmit
 
     return ContentFieldConfiguration[descriptor.contentType].type ? (
         <Field
+            data-cy={`${id}-contentValueField`}
             key={descriptor.name}
             name={descriptor.name}
             validate={validators ?? undefined}
@@ -177,6 +179,7 @@ export default function ContentValueField({ descriptor, initialContent, onSubmit
                             <WidgetButtons
                                 buttons={[
                                     {
+                                        id: 'save',
                                         icon: 'plus',
                                         disabled: !inputContent || !meta.valid,
                                         tooltip: 'Save',

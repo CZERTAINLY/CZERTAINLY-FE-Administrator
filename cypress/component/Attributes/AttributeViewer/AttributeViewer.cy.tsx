@@ -36,18 +36,18 @@ describe('AttributeViewer without Metadata', () => {
         cy.get('td').eq(11).find('i.fa.fa-copy').should('exist');
     });
 
-    it(`🟢 check for clickable info icon for codeblock
-        🟢 should open a modal on clicking the code block icon
-        🟢 close the code block modal`, () => {
+    it(`check for clickable info icon for codeblock
+        should open a modal on clicking the code block icon
+        close the code block modal`, () => {
         cy.get('.fa-info').eq(0).click().wait(clickWait);
         cy.get('.modal-content').should('be.visible');
         cy.get('button').filter(':contains("Cancel")').click().wait(clickWait);
     });
 
     it(`should allow sorting of data
-        🟢 check ascending and descending sorting for first column
-        🟢 check ascending and descending sorting for second colum
-        🟢 check ascending and descending sorting for third column`, () => {
+        check ascending and descending sorting for first column
+        check ascending and descending sorting for second colum
+        check ascending and descending sorting for third column`, () => {
         cy.get('.fa-arrow-up').eq(0).click().wait(clickWait);
         cy.get('.fa-arrow-down').eq(0).click().wait(clickWait);
 
@@ -76,12 +76,12 @@ describe('AttributeViewer with Metadata', () => {
     });
 
     it(`should open first connector details
-        🟢 check for correct heading
-        🟢 check for correct number of rows,columns and data elements
-        🟢 check for correct data
-        🟢 check ascending and descending sorting for first column
-        🟢 check ascending and descending sorting for second colum
-        🟢 check ascending and descending sorting for third column`, () => {
+        check for correct heading
+        check for correct number of rows,columns and data elements
+        check for correct data
+        check ascending and descending sorting for first column
+        check ascending and descending sorting for second colum
+        check ascending and descending sorting for third column`, () => {
         cy.get('.fa-caret-down').eq(0).click().wait(clickWait);
         cy.get('th').eq(2).should('contain.text', 'Source Object');
         cy.get('th').eq(3).should('contain.text', 'Name');
@@ -110,12 +110,12 @@ describe('AttributeViewer with Metadata', () => {
     });
 
     it(`should open second connector details
-    🟢 check for correct heading
-    🟢 check for correct number of rows,columns and data elements
-    🟢 check for correct data
-    🟢 check ascending and descending sorting for first column
-    🟢 check ascending and descending sorting for second colum
-    🟢 check ascending and descending sorting for third column`, () => {
+    check for correct heading
+    check for correct number of rows,columns and data elements
+    check for correct data
+    check ascending and descending sorting for first column
+    check ascending and descending sorting for second colum
+    check ascending and descending sorting for third column`, () => {
         cy.get('.fa-caret-down').eq(1).click().wait(clickWait);
         cy.get('th').eq(2).should('contain.text', 'Source Object');
         cy.get('th').eq(3).should('contain.text', 'Name');

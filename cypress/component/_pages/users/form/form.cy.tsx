@@ -30,18 +30,18 @@ describe('UserForm component - Add User', () => {
             .invoke('dispatch', certificateActions.listCertificatesSuccess(userFormMockData.certificateListPayload));
     });
 
-    it(`🟢 Check all inputs and labels"
-        🟢 First label should be Enabled and input must be a checkbox
-        🟢 Second label and input placeholder should be Username
-        🟢 Third label should be Groups and input must be of type select with placeholder Select Groups
-        🟢 Fourth label and input placeholder should be Description
-        🟢 Fifth label and input placeholder should be First Name
-        🟢 Sixth label and input placeholder should be Second Name
-        🟢 Seventh label should be Email and placeholder should be Email address
-        🟢 Eighth label should be Input Type and selected value should be Choose Existing Certificate
-        🟢 Ninth label should be Certificate and input must be of type select with placeholder Select Certificate
-        🟢 At the end there should be a indication for choosing User Roles
-        🟢 A table should be present with headings Name, Role description, System role 
+    it(`Check all inputs and labels
+        First label should be Enabled and input must be a checkbox
+        Second label and input placeholder should be Username
+        Third label should be Groups and input must be of type select with placeholder Select Groups
+        Fourth label and input placeholder should be Description
+        Fifth label and input placeholder should be First Name
+        Sixth label and input placeholder should be Second Name
+        Seventh label should be Email and placeholder should be Email address
+        Eighth label should be Input Type and selected value should be Choose Existing Certificate
+        Ninth label should be Certificate and input must be of type select with placeholder Select Certificate
+        At the end there should be a indication for choosing User Roles
+        A table should be present with headings Name, Role description, System role 
         `, () => {
         cy.get('label').eq(0).should('contain.text', 'Enabled');
         cy.get('input').eq(0).should('have.attr', 'type', 'checkbox');
@@ -77,7 +77,7 @@ describe('UserForm component - Add User', () => {
         cy.get('th').eq(3).should('contain.text', 'System role');
     });
 
-    it(`🟢 Enter all form values`, () => {
+    it(`Enter all form values`, () => {
         cy.get('input').eq(1).type('testUser');
         cy.get('#react-select-6-live-region').siblings('div').eq(0).click().wait(clickWait);
         cy.get('#react-select-6-option-0').should('exist').click();
