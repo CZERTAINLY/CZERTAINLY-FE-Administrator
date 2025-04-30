@@ -27,6 +27,9 @@ yarn-error.log*
 .idea/
 .vscode/
 
-#Proxy Files
+# Proxy Files
 src/*.pem
 src/setupProxy.js
+
+# Cypress
+cypress.env.json

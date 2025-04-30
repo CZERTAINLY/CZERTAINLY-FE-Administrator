@@ -30,7 +30,10 @@ function LinksGroup(props: Props) {
             <li key={props._key} className={cx(style.headerLink, props.className)}>
                 <NavLink to={props.headerLink || ''} className={({ isActive }) => (isActive ? style.headerLinkActive : undefined)}>
                     <div>
-                        <i className={props.glyph} /> <span className={style.menuLabel}>{props.header}</span>
+                        <i className={props.glyph} />{' '}
+                        <span className={style.menuLabel} data-cy={typeof props.header === 'string' ? props.header : undefined}>
+                            {props.header}
+                        </span>
                     </div>
                 </NavLink>
             </li>
@@ -52,7 +55,10 @@ function LinksGroup(props: Props) {
                     }}
                 >
                     <div>
-                        <i className={props.glyph} /> <span className={style.menuLabel}>{props.header}</span>
+                        <i className={props.glyph} />{' '}
+                        <span className={style.menuLabel} data-cy={typeof props.header === 'string' ? props.header : undefined}>
+                            {props.header}
+                        </span>
                     </div>
 
                     <div className={arrowClassName} />
@@ -64,7 +70,10 @@ function LinksGroup(props: Props) {
                             <li key={child.link} className={cx(style.headerLink, props.className)}>
                                 <NavLink to={child.link} className={({ isActive }) => (isActive ? style.headerLinkActive : undefined)}>
                                     <div>
-                                        <i className={props.glyph} /> <span className={style.menuLabel}>{child.name}</span>
+                                        <i className={props.glyph} />{' '}
+                                        <span className={style.menuLabel} data-cy={child.name}>
+                                            {child.name}
+                                        </span>
                                     </div>
                                 </NavLink>
                             </li>

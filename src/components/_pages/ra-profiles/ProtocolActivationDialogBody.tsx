@@ -1,6 +1,7 @@
 import AttributeEditor from 'components/Attributes/AttributeEditor';
 import Spinner from 'components/Spinner';
 
+import { actions as alertActions } from 'ducks/alerts';
 import { actions as acmeProfilesActions, selectors as acmeProfilesSelectors } from 'ducks/acme-profiles';
 import { actions as cmpProfilesActions, selectors as cmpProfilesSelectors } from 'ducks/cmp-profiles';
 import { actions as raProfilesActions, selectors as raProfilesSelectors } from 'ducks/ra-profiles';
@@ -39,7 +40,14 @@ export default function ProtocolActivationDialogBody({ protocol, raProfileUuid, 
     const scepProfiles = useSelector(scepProfilesSelectors.scepProfiles);
     const cmpProfiles = useSelector(cmpProfilesSelectors.cmpProfiles);
 
-    const profiles = protocol === Protocol.ACME ? acmeProfiles : Protocol.CMP ? cmpProfiles : scepProfiles;
+    const profiles = useMemo(() => {
+        const profileMap = {
+            [Protocol.ACME]: acmeProfiles,
+            [Protocol.CMP]: cmpProfiles,
+            [Protocol.SCEP]: scepProfiles,
+        };
+        return profileMap[protocol] ?? [];
+    }, [protocol, acmeProfiles, cmpProfiles, scepProfiles]);
 
     const issuanceAttributes = useSelector(raProfilesSelectors.issuanceAttributes);
     const revocationAttributes = useSelector(raProfilesSelectors.revocationAttributes);
@@ -47,13 +55,12 @@ export default function ProtocolActivationDialogBody({ protocol, raProfileUuid, 
     const [issueGroupAttributesCallbackAttributes, setIssueGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
     const [revokeGroupAttributesCallbackAttributes, setRevokeGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 
-    const isFetchingProfiles = useSelector(
-        protocol === Protocol.ACME
-            ? acmeProfilesSelectors.isFetchingList
-            : Protocol.CMP
-              ? cmpProfilesSelectors.isFetchingList
-              : scepProfilesSelectors.isFetchingList,
-    );
+    const fetchingSelectorMap = {
+        [Protocol.ACME]: acmeProfilesSelectors.isFetchingList,
+        [Protocol.CMP]: cmpProfilesSelectors.isFetchingList,
+        [Protocol.SCEP]: scepProfilesSelectors.isFetchingList,
+    };
+    const isFetchingProfiles = useSelector(fetchingSelectorMap[protocol] ?? (() => false));
     const isFetchingIssuanceAttributes = useSelector(raProfilesSelectors.isFetchingIssuanceAttributes);
     const isFetchingRevocationAttributes = useSelector(raProfilesSelectors.isFetchingRevocationAttributes);
 
@@ -66,19 +73,33 @@ export default function ProtocolActivationDialogBody({ protocol, raProfileUuid, 
         () => {
             if (!visible) return;
 
-            dispatch(
-                protocol === Protocol.ACME
-                    ? acmeProfilesActions.listAcmeProfiles()
-                    : Protocol.CMP
-                      ? cmpProfilesActions.listCmpProfiles()
-                      : scepProfilesActions.listScepProfiles(),
-            );
+            const profileListActions = {
+                [Protocol.ACME]: acmeProfilesActions.listAcmeProfiles,
+                [Protocol.CMP]: cmpProfilesActions.listCmpProfiles,
+                [Protocol.SCEP]: scepProfilesActions.listScepProfiles,
+            };
+
+            const profileAction = profileListActions[protocol];
+            if (!profileAction) {
+                dispatch(alertActions.error(`Unsupported protocol: ${protocol}`));
+                return;
+            }
+
+            dispatch(profileAction());
+
             if (!raProfileUuid) return;
+
             dispatch(
-                raProfilesActions.listIssuanceAttributeDescriptors({ authorityUuid: authorityInstanceUuid || '', uuid: raProfileUuid }),
+                raProfilesActions.listIssuanceAttributeDescriptors({
+                    authorityUuid: authorityInstanceUuid ?? '',
+                    uuid: raProfileUuid,
+                }),
             );
             dispatch(
-                raProfilesActions.listRevocationAttributeDescriptors({ authorityUuid: authorityInstanceUuid || '', uuid: raProfileUuid }),
+                raProfilesActions.listRevocationAttributeDescriptors({
+                    authorityUuid: authorityInstanceUuid ?? '',
+                    uuid: raProfileUuid,
+                }),
             );
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -106,6 +127,7 @@ export default function ProtocolActivationDialogBody({ protocol, raProfileUuid, 
                           values,
                       ) || []
                     : [];
+
             const revocationAttribs: AttributeRequestModel[] =
                 revocationAttributes && revocationAttributes.length > 0
                     ? collectFormAttributes(
@@ -114,48 +136,53 @@ export default function ProtocolActivationDialogBody({ protocol, raProfileUuid, 
                           values,
                       ) || []
                     : [];
-            dispatch(
-                protocol === Protocol.ACME
-                    ? raProfilesActions.activateAcme({
-                          authorityUuid: authorityInstanceUuid || '',
-                          uuid: raProfileUuid,
-                          acmeProfileUuid: values.profiles.value,
-                          raProfileActivateAcmeRequest: {
-                              issueCertificateAttributes: issuanceAttribs,
-                              revokeCertificateAttributes: revocationAttribs,
-                          },
-                      })
-                    : Protocol.CMP
-                      ? raProfilesActions.activateCmp({
-                            authorityUuid: authorityInstanceUuid || '',
-                            uuid: raProfileUuid,
-                            cmpProfileUuid: values.profiles.value,
-                            raProfileActivateCmpRequest: {
-                                issueCertificateAttributes: issuanceAttribs,
-                                revokeCertificateAttributes: revocationAttribs,
-                            },
-                        })
-                      : raProfilesActions.activateScep({
-                            authorityUuid: authorityInstanceUuid || '',
-                            uuid: raProfileUuid,
-                            scepProfileUuid: values.profiles.value,
-                            raProfileActivateScepRequest: {
-                                issueCertificateAttributes: issuanceAttribs,
-                            },
-                        }),
-            );
+
+            const activationPayloadMap = {
+                [Protocol.ACME]: raProfilesActions.activateAcme({
+                    authorityUuid: authorityInstanceUuid || '',
+                    uuid: raProfileUuid,
+                    acmeProfileUuid: values.profiles.value,
+                    raProfileActivateAcmeRequest: {
+                        issueCertificateAttributes: issuanceAttribs,
+                        revokeCertificateAttributes: revocationAttribs,
+                    },
+                }),
+                [Protocol.CMP]: raProfilesActions.activateCmp({
+                    authorityUuid: authorityInstanceUuid || '',
+                    uuid: raProfileUuid,
+                    cmpProfileUuid: values.profiles.value,
+                    raProfileActivateCmpRequest: {
+                        issueCertificateAttributes: issuanceAttribs,
+                        revokeCertificateAttributes: revocationAttribs,
+                    },
+                }),
+                [Protocol.SCEP]: raProfilesActions.activateScep({
+                    authorityUuid: authorityInstanceUuid || '',
+                    uuid: raProfileUuid,
+                    scepProfileUuid: values.profiles.value,
+                    raProfileActivateScepRequest: {
+                        issueCertificateAttributes: issuanceAttribs,
+                    },
+                }),
+            };
+
+            if (activationPayloadMap[protocol]) {
+                dispatch(activationPayloadMap[protocol]);
+            } else {
+                dispatch(alertActions.error(`Invalid protocol value: ${protocol}`));
+            }
 
             onClose();
         },
         [
             dispatch,
             issuanceAttributes,
-            onClose,
-            raProfileUuid,
             revocationAttributes,
-            authorityInstanceUuid,
             issueGroupAttributesCallbackAttributes,
             revokeGroupAttributesCallbackAttributes,
+            raProfileUuid,
+            authorityInstanceUuid,
+            onClose,
             protocol,
         ],
     );

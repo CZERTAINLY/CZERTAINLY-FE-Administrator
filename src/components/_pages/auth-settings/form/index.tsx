@@ -9,7 +9,7 @@ import { useNavigate, useParams } from 'react-router';
 import { Form as BootstrapForm, Button, ButtonGroup, Col, Row } from 'reactstrap';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 import { isObjectSame } from 'utils/common-utils';
-import { validateAlphaNumericWithSpecialChars, validateCustomUrl, validatePositiveInteger } from 'utils/validators';
+import { validateAlphaNumericWithSpecialChars, validateUrlWithRoute, validatePositiveInteger } from 'utils/validators';
 import CustomSelect from '../../../Input/CustomSelect';
 import { OAuth2ProviderSettingsUpdateDto } from 'types/auth-settings';
 import { isValidJWTBearerProvider, isValidOAuth2FlowProvider } from 'utils/oauth2Providers';
@@ -220,7 +220,7 @@ export default function OAuth2ProviderForm() {
                                 }
                                 return undefined;
                             },
-                            validateCustomUrl,
+                            validateUrlWithRoute,
                         ]}
                         disabled={!!values.jwkSet}
                         required={!values.jwkSet}
@@ -289,35 +289,35 @@ export default function OAuth2ProviderForm() {
                     <TextField
                         id="authorizationUrl"
                         label="Authorization Url"
-                        validators={[validateCustomUrl]}
+                        validators={[validateUrlWithRoute]}
                         required={requiredFields.authorizationUrl}
                         description="The URL where the authorization server redirects the user for login and authorization."
                     />
                     <TextField
                         id="logoutUrl"
                         label="Logout Url"
-                        validators={[validateCustomUrl]}
+                        validators={[validateUrlWithRoute]}
                         required={requiredFields.logoutUrl}
                         description="URL to end session on provider side."
                     />
                     <TextField
                         id="postLogoutUrl"
                         label="Post Logout Url"
-                        validators={[validateCustomUrl]}
+                        validators={[validateUrlWithRoute]}
                         required={requiredFields.postLogoutUrl}
                         description="URL that user will be redirected after logout from application."
                     />
                     <TextField
                         id="issuerUrl"
                         label="Issuer Url"
-                        validators={[validateCustomUrl]}
+                        validators={[validateUrlWithRoute]}
                         required={requiredFields.issuerUrl}
                         description="URL of issuer issuing authentication tokens. If provided, authentication via JWT token is enabled for this provider."
                     />
                     <TextField
                         id="userInfoUrl"
                         label="User Info Url"
-                        validators={[validateCustomUrl]}
+                        validators={[validateUrlWithRoute]}
                         description="The URL containing information about user."
                     />
                     <Row xs="1" sm="1" md="2" lg="2" xl="2">
