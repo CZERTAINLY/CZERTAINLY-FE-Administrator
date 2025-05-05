@@ -49,9 +49,9 @@ const GlobalModalAttributeEditor = () => {
                                 content: (
                                     <AttributeEditor
                                         id="entity"
-                                        attributeDescriptors={entityProviderAttributeDescriptors || []}
+                                        attributeDescriptors={entityProviderAttributeDescriptors ?? []}
                                         attributes={entity?.attributes}
-                                        connectorUuid={entityProvider?.uuid || ''}
+                                        connectorUuid={entityProvider?.uuid ?? ''}
                                         functionGroupCode={FunctionGroupCode.EntityProvider}
                                         kind={values?.storeKind?.value}
                                         groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}

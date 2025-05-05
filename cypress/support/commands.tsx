@@ -81,7 +81,6 @@ Cypress.Commands.add('expectActionAfter', (trigger, matcher, callback: any, fail
 });
 
 Cypress.Commands.add('assertValueCopiedToClipboard', (value) => {
-    if (Cypress.isBrowser('firefox')) throw Error('navigator.clipboard is not available in Firefox tests');
     cy.window().then((win) => {
         win.focus();
         win.navigator.clipboard.readText().then((text) => {

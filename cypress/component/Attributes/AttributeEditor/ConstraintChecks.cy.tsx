@@ -17,7 +17,7 @@ import { ConstraintCheckAttributeTestFormValues, constraintCheckAttributeEditorM
 import { cySelectors } from '../../../utils/selectors';
 
 const ConstraintCheckAuthorityProviderAttributeEditorComponent = () => {
-    const authorityProviderAttributeDescriptors = useSelector(authoritySelectors.authorityProviderAttributeDescriptors) || [];
+    const authorityProviderAttributeDescriptors = useSelector(authoritySelectors.authorityProviderAttributeDescriptors) ?? [];
     const authoritySelector = useSelector(authoritySelectors.authority);
     const [authorityProvider, _setAuthorityProvider] = useState<ConnectorResponseModel>();
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
@@ -44,7 +44,7 @@ const ConstraintCheckAuthorityProviderAttributeEditorComponent = () => {
                         id="authority"
                         attributeDescriptors={authorityProviderAttributeDescriptors}
                         attributes={authoritySelector?.attributes}
-                        connectorUuid={authorityProvider?.uuid || ''}
+                        connectorUuid={authorityProvider?.uuid ?? ''}
                         functionGroupCode={FunctionGroupCode.AuthorityProvider}
                         kind={undefined}
                         groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}

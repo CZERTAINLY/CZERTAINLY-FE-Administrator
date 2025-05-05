@@ -106,7 +106,7 @@ function createAllWrapper<T extends SelectorMap>(selectors: T): WithAll<T> {
 
 const commonSelectors = {
     amendCommonSelectInputSelectors: (selectors: SelectorMap, root: ElementSelector, type?: 'multi' | 'single') => {
-        const a = {
+        Object.assign(selectors, {
             selectOption: (option: number | string) => {
                 selectors.control().click().wait(clickWait);
                 if (typeof option === 'string') {
@@ -114,7 +114,7 @@ const commonSelectors = {
                 }
                 return selectors.options().eq(option);
             },
-        };
+        });
         if (type === 'single' || type === undefined) {
             Object.assign(selectors, {
                 value: () => root().find('[class*="singleValue"]'),

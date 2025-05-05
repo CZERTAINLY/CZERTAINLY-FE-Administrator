@@ -36,8 +36,8 @@ const GroupCallbackAttributeEditorComponent = () => {
             ? optionsForAuthorities.find((option) => option.value === raProfileSelector.authorityInstanceUuid)
             : undefined;
         return {
-            name: editMode ? raProfileSelector?.name || '' : '',
-            description: editMode ? raProfileSelector?.description || '' : '',
+            name: editMode ? (raProfileSelector?.name ?? '') : '',
+            description: editMode ? (raProfileSelector?.description ?? '') : '',
             authority: editMode ? authority : undefined,
         };
     }, [editMode, optionsForAuthorities, raProfileSelector]);
@@ -51,7 +51,7 @@ const GroupCallbackAttributeEditorComponent = () => {
                 <form onSubmit={handleSubmit}>
                     <AttributeEditor
                         id="ra-profile"
-                        callbackParentUuid={raProfileSelector?.authorityInstanceUuid || form.getFieldState('authority')?.value?.value}
+                        callbackParentUuid={raProfileSelector?.authorityInstanceUuid ?? form.getFieldState('authority')?.value?.value}
                         callbackResource={Resource.RaProfiles}
                         attributeDescriptors={raProfileAttributeDescriptors}
                         attributes={raProfileSelector?.attributes}

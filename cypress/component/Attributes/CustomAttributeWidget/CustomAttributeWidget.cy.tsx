@@ -5,6 +5,7 @@ import { clickWait, componentLoadWait, reduxActionWait } from '../../../utils/co
 import { dataRenderingMockData, interactionsMockData } from './mock-data';
 import { cySelectors } from '../../../utils/selectors';
 import { AttributeResponseModel } from 'types/attributes';
+import { mockClipboard } from '../../../utils/mockClipboard';
 
 describe('CustomAttributeWidget: Data Rendering', () => {
     beforeEach(() => {
@@ -82,7 +83,8 @@ describe('CustomAttributeWidget: Data Rendering', () => {
     });
 
     it('Should copy data correctly', () => {
-        if (Cypress.isBrowser('firefox')) return;
+        mockClipboard();
+
         cySelectors.customAttributeWidget(dataRenderingMockData.resourceUuid).all(({ rows }) => {
             rows('String').actions('copy').click().wait(clickWait);
             cy.assertValueCopiedToClipboard('string-content');

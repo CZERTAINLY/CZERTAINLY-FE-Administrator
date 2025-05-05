@@ -48,10 +48,10 @@ const TabAttributeEditor = () => {
                                     <AttributeEditor
                                         id="cryptographicKey"
                                         callbackParentUuid={
-                                            keyDetail?.tokenProfileUuid || form.getFieldState('tokenProfile')?.value?.value.uuid || ''
+                                            keyDetail?.tokenProfileUuid ?? form.getFieldState('tokenProfile')?.value?.value.uuid ?? ''
                                         }
                                         callbackResource={Resource.Keys}
-                                        attributeDescriptors={cryptographicKeyAttributeDescriptors || []}
+                                        attributeDescriptors={cryptographicKeyAttributeDescriptors ?? []}
                                         groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
                                         setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
                                     />
