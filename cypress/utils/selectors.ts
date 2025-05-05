@@ -104,6 +104,36 @@ function createAllWrapper<T extends SelectorMap>(selectors: T): WithAll<T> {
     };
 }
 
+const commonSelectors = {
+    amendCommonSelectInputSelectors: (selectors: SelectorMap, root: ElementSelector, type?: 'multi' | 'single') => {
+        const a = {
+            selectOption: (option: number | string) => {
+                selectors.control().click().wait(clickWait);
+                if (typeof option === 'string') {
+                    return selectors.options().findExactText(option);
+                }
+                return selectors.options().eq(option);
+            },
+        };
+        if (type === 'single' || type === undefined) {
+            Object.assign(selectors, {
+                value: () => root().find('[class*="singleValue"]'),
+            });
+        } else {
+            Object.assign(selectors, {
+                values: (option: number | string) => {
+                    const multiValues = root().find('[class*="multiValue"]');
+                    const target = typeof option === 'string' ? multiValues.findExactText(option) : multiValues.eq(option);
+                    return {
+                        value: () => target.find('[class*="MultiValueGeneric"]'),
+                        delete: () => target.find('[class*="MultiValueRemove"]'),
+                    };
+                },
+            });
+        }
+    },
+};
+
 export const cySelectors: ElementSelectors = {
     attributeInput: (inputId, visibility) => {
         const root = () => {
@@ -177,31 +207,9 @@ export const cySelectors: ElementSelectors = {
             placeholder: () => root().find('[class*="placeholder"]'),
             addNew: () => root().find('.fa-add'),
             invalidFeedback: () => root().find('.invalid-feedback'),
-            selectOption: (option: number | string) => {
-                selectors.control().click().wait(clickWait);
-                if (typeof option === 'string') {
-                    return selectors.options().findExactText(option);
-                }
-                return selectors.options().eq(option);
-            },
         };
-        if (type === 'single' || type === undefined) {
-            Object.assign(selectors, {
-                value: () => root().find('[class*="singleValue"]'),
-            });
-        } else {
-            Object.assign(selectors, {
-                values: (option: number | string) => {
-                    const multiValues = root().find('[class*="multiValue"]');
-                    const target = typeof option === 'string' ? multiValues.findExactText(option) : multiValues.eq(option);
 
-                    return {
-                        value: () => target.find('[class*="MultiValueGeneric"]'),
-                        delete: () => target.find('[class*="MultiValueRemove"]'),
-                    };
-                },
-            });
-        }
+        commonSelectors.amendCommonSelectInputSelectors(selectors, root, type as T);
 
         return createAllWrapper(selectors as unknown as AttributeSelectInputSelectors<T>);
     },
@@ -227,31 +235,9 @@ export const cySelectors: ElementSelectors = {
             options: () => cy.get('[class*="option"]'),
             placeholder: () => root().find('[class*="placeholder"]'),
             groupButton: (action: string) => root().parents('div[class*="input-group"]').first().find(`[data-cy="${action}-button"]`),
-            selectOption: (option: number | string) => {
-                selectors.control().click().wait(clickWait);
-                if (typeof option === 'string') {
-                    return selectors.options().findExactText(option);
-                }
-                return selectors.options().eq(option);
-            },
         };
-        if (type === 'single' || type === undefined) {
-            Object.assign(selectors, {
-                value: () => root().find('[class*="singleValue"]'),
-            });
-        } else {
-            Object.assign(selectors, {
-                values: (option: number | string) => {
-                    const multiValues = root().find('[class*="multiValue"]');
-                    const target = typeof option === 'string' ? multiValues.findExactText(option) : multiValues.eq(option);
 
-                    return {
-                        value: () => target.find('[class*="MultiValueGeneric"]'),
-                        delete: () => target.find('[class*="MultiValueRemove"]'),
-                    };
-                },
-            });
-        }
+        commonSelectors.amendCommonSelectInputSelectors(selectors, root, type as T);
 
         return createAllWrapper(selectors as unknown as SelectInputSelectors<T>);
     },

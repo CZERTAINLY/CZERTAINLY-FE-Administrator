@@ -12,7 +12,7 @@ import { ConnectorResponseModel } from 'types/connectors';
 import { FunctionGroupCode } from 'types/openapi';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 import '../../../../src/resources/styles/theme.scss';
-import { callbackWait, clickWait, componentLoadWait, reduxActionWait } from '../../../utils/constants';
+import { callbackWait, clickWait, componentLoadWait } from '../../../utils/constants';
 import { dataAttributeMockData } from './mock-data';
 import { cySelectors } from '../../../utils/selectors';
 
@@ -34,24 +34,22 @@ const DataAttributeEditorComponent = () => {
 
     if (!authorityProvider?.uuid || !authoritySelector?.attributes?.length) return <></>;
     return (
-        <>
-            <Form onSubmit={() => {}} mutators={{ ...mutators() }}>
-                {({ handleSubmit }) => (
-                    <form onSubmit={handleSubmit}>
-                        <AttributeEditor
-                            id="authority"
-                            connectorUuid={authorityProvider.uuid}
-                            attributes={authoritySelector.attributes}
-                            attributeDescriptors={authorityProviderAttributeDescriptors}
-                            functionGroupCode={FunctionGroupCode.AuthorityProvider}
-                            kind={'ADCS'}
-                            groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
-                            setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
-                        />
-                    </form>
-                )}
-            </Form>
-        </>
+        <Form onSubmit={() => {}} mutators={{ ...mutators() }}>
+            {({ handleSubmit }) => (
+                <form onSubmit={handleSubmit}>
+                    <AttributeEditor
+                        id="authority"
+                        connectorUuid={authorityProvider.uuid}
+                        attributes={authoritySelector.attributes}
+                        attributeDescriptors={authorityProviderAttributeDescriptors}
+                        functionGroupCode={FunctionGroupCode.AuthorityProvider}
+                        kind={'ADCS'}
+                        groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                        setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                    />
+                </form>
+            )}
+        </Form>
     );
 };
 

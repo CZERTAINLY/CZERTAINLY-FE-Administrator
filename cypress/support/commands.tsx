@@ -1,4 +1,4 @@
-import { AnyAction, configureStore, Middleware } from '@reduxjs/toolkit';
+import { AnyAction, configureStore } from '@reduxjs/toolkit';
 import { mount } from 'cypress/react';
 import { reduxActionWait } from '../utils/constants';
 import { reducers } from 'ducks/reducers';
@@ -15,12 +15,7 @@ Cypress.Commands.add('mount', (component, options = {}, initialRoute = '/') => {
         middleware: (getDefaultMiddleware) =>
             getDefaultMiddleware({
                 serializableCheck: false,
-            })
-                .concat(((store) => (next) => (action) => {
-                    console.log('[Action Type]: ', (action as any).type);
-                    return next(action);
-                }) as Middleware)
-                .concat(reduxActionListenerMiddleware),
+            }).concat(reduxActionListenerMiddleware),
     });
 
     if (window.Cypress) {

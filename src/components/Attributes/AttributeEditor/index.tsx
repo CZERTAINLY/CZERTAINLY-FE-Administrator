@@ -674,8 +674,7 @@ export default function AttributeEditor({
         // This effect should only be called if the initiateAttributeCallback value is updated
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initiateAttributeCallback]);
-    // console.log('callbackData', callbackData);
-    // console.log('groupAttributesCallbackAttributes', groupAttributesCallbackAttributes);
+
     /**
      * Obtains values from attribute callbacks and updates the form values / options accordingly
      */

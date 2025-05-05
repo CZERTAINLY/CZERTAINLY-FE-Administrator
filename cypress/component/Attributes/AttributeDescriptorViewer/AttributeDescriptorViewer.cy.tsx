@@ -38,7 +38,7 @@ describe('Info  Attribute Descriptor Viewer', () => {
     });
 
     it(`should show details of first row when clicked
-        should have valid details
+        should have valid details for info attributes
         should close the details of first row`, () => {
         cy.get('.fa-caret-down').eq(0).click().wait(clickWait);
         cy.get('td').eq(12).should('contain.text', 'Name');
@@ -57,7 +57,7 @@ describe('Info  Attribute Descriptor Viewer', () => {
     });
 
     it(`should show details of second row when clicked
-        should have valid details
+        should have valid details for info attributes
         should close the details of second row
     `, () => {
         cy.get('.fa-caret-down').eq(1).click().wait(clickWait);
@@ -112,7 +112,7 @@ describe('Data Attribute Descriptor Viewer', () => {
     });
 
     it(`should show details of first row when clicked
-        should have valid details
+        should have valid details for data attributes
         should close the details of first row`, () => {
         cy.get('.fa-caret-down').eq(0).click().wait(clickWait);
         cy.get('td').eq(11).should('contain.text', 'Name');
@@ -141,7 +141,7 @@ describe('Data Attribute Descriptor Viewer', () => {
     });
 
     it(`should show details of second row when clicked
-        should have valid details
+        should have valid details for data attributes
         should close the details of first row`, () => {
         cy.get('.fa-caret-down').eq(1).click().wait(clickWait);
         cy.get('td').eq(18).should('contain.text', 'Name');
@@ -205,7 +205,7 @@ describe('Group Attribute Descriptor Viewer', () => {
     });
 
     it(`should show details of first row when clicked
-        should have valid details
+        should have valid details for group attributes
         should close the details of first row`, () => {
         cy.get('.fa-caret-down').eq(0).click().wait(clickWait);
         cy.get('td').eq(12).should('contain.text', 'Name');
@@ -216,7 +216,7 @@ describe('Group Attribute Descriptor Viewer', () => {
     });
 
     it(`should show details of second row when clicked
-        should have valid details
+        should have valid details for group attributes
         should close the details of second row`, () => {
         cy.get('.fa-caret-down').eq(1).click().wait(clickWait);
         cy.get('td').eq(18).should('contain.text', 'Name');

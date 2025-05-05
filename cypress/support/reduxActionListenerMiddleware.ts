@@ -11,15 +11,15 @@ let listener: Listener | null;
  * Middleware for listening to a single occasion of action dispatch, based on action matcher
  * Clears the listener once an action was matched
  */
-export const reduxActionListenerMiddleware: Middleware = () => (next) => (action) => {
+export const reduxActionListenerMiddleware: Middleware = () => (next) => (action: any) => {
     const result = next(action);
 
     // Defer callback execution to allow the dispatched action to finish executing before running the callback
     queueMicrotask(() => {
         if (!listener) return;
 
-        if (listener.matcher(action as any)) {
-            listener.callback(action as any);
+        if (listener.matcher(action)) {
+            listener.callback(action);
             listener = null;
         }
     });

@@ -118,9 +118,10 @@ describe('CustomAttributeWidget: Add, Edit and Delete Interactions', () => {
         attributeName: string,
         content?: AttributeResponseModel['content'],
     ) {
+        const descriptor = interactionsMockData.attributeDescriptors.find((el) => el.name === attributeName)!;
+
         switch (type) {
             case 'add':
-                const descriptor = interactionsMockData.attributeDescriptors.find((el) => el.name === attributeName)!;
                 savedCurrentAttributes = [
                     ...savedCurrentAttributes,
                     {
@@ -278,10 +279,8 @@ describe('CustomAttributeWidget: Add, Edit and Delete Interactions', () => {
             cySelectors.selectInput('selectCustomAttribute').selectOption('String').click().wait(clickWait);
             cy.expectActionAfter(
                 () => {
-                    cySelectors.input('String').all(({ input, groupButton }) => {
-                        input().should('have.value', 'default-content').clear().type('new-content');
-                        groupButton('save').click().wait(clickWait);
-                    });
+                    cySelectors.input('String').input().should('have.value', 'default-content').clear().type('new-content');
+                    cySelectors.input('String').groupButton('save').click().wait(clickWait);
                 },
                 slice.actions.updateCustomAttributeContent.match,
                 ({ payload }) => {
@@ -295,10 +294,8 @@ describe('CustomAttributeWidget: Add, Edit and Delete Interactions', () => {
 
             cy.expectActionAfter(
                 () => {
-                    cySelectors.input('Boolean').all(({ input, groupButton }) => {
-                        input().check();
-                        groupButton('save').click().wait(clickWait);
-                    });
+                    cySelectors.input('Boolean').input().check();
+                    cySelectors.input('Boolean').groupButton('save').click().wait(clickWait);
                 },
                 slice.actions.updateCustomAttributeContent.match,
                 ({ payload }) => {
@@ -310,10 +307,8 @@ describe('CustomAttributeWidget: Add, Edit and Delete Interactions', () => {
             cySelectors.selectInput('selectCustomAttribute').selectOption('StringSelect').click().wait(clickWait);
             cy.expectActionAfter(
                 () => {
-                    cySelectors.selectInput('StringSelect').all(({ selectOption, groupButton }) => {
-                        selectOption('Option1').click().wait(clickWait);
-                        groupButton('save').click().wait(clickWait);
-                    });
+                    cySelectors.selectInput('StringSelect').selectOption('Option1').click().wait(clickWait);
+                    cySelectors.selectInput('StringSelect').groupButton('save').click().wait(clickWait);
                 },
                 slice.actions.updateCustomAttributeContent.match,
                 ({ payload }) => {
@@ -325,11 +320,9 @@ describe('CustomAttributeWidget: Add, Edit and Delete Interactions', () => {
             cySelectors.selectInput('selectCustomAttribute').selectOption('StringMultiselect').click().wait(clickWait);
             cy.expectActionAfter(
                 () => {
-                    cySelectors.selectInput('StringMultiselect', 'multi').all(({ selectOption, groupButton }) => {
-                        selectOption('Option1').click().wait(clickWait);
-                        selectOption('Option2').click().wait(clickWait);
-                        groupButton('save').click().wait(clickWait);
-                    });
+                    cySelectors.selectInput('StringMultiselect', 'multi').selectOption('Option1').click().wait(clickWait);
+                    cySelectors.selectInput('StringMultiselect', 'multi').selectOption('Option2').click().wait(clickWait);
+                    cySelectors.selectInput('StringMultiselect', 'multi').groupButton('save').click().wait(clickWait);
                 },
                 slice.actions.updateCustomAttributeContent.match,
                 ({ payload }) => {

@@ -1,7 +1,7 @@
 import AttributeEditor from 'components/Attributes/AttributeEditor';
 import { actions as authoritiesActions, selectors as authoritySelectors } from 'ducks/authorities';
 import { actions as connectorActions, slice } from 'ducks/connectors';
-import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
+import { actions as customAttributesActions } from 'ducks/customAttributes';
 import { actions as raProfileActions, selectors as raProfilesSelectors } from 'ducks/ra-profiles';
 import { transformAttributeDescriptorDtoToModel, transformCustomAttributeDtoToModel } from 'ducks/transform/attributes';
 import { transformAuthorityResponseDtoToModel } from 'ducks/transform/authorities';
@@ -12,7 +12,7 @@ import { AttributeDescriptorModel } from 'types/attributes';
 import { FunctionGroupCode, Resource } from 'types/openapi';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 import '../../../../src/resources/styles/theme.scss';
-import { callbackWait, clickWait, componentLoadWait, reduxActionWait } from '../../../utils/constants';
+import { callbackWait, componentLoadWait, reduxActionWait } from '../../../utils/constants';
 import { GroupAttributeTestFormValues, callbackVariationsAtributeEditorMockData, groupAttributeAtributeEditorMockData } from './mock-data';
 import { cySelectors } from '../../../utils/selectors';
 
@@ -31,18 +31,16 @@ const GroupCallbackAttributeEditorComponent = () => {
             })),
         [authorities],
     );
-    const defaultValues: GroupAttributeTestFormValues = useMemo(
-        () => ({
+    const defaultValues: GroupAttributeTestFormValues = useMemo(() => {
+        const authority = raProfileSelector
+            ? optionsForAuthorities.find((option) => option.value === raProfileSelector.authorityInstanceUuid)
+            : undefined;
+        return {
             name: editMode ? raProfileSelector?.name || '' : '',
             description: editMode ? raProfileSelector?.description || '' : '',
-            authority: editMode
-                ? raProfileSelector
-                    ? optionsForAuthorities.find((option) => option.value === raProfileSelector.authorityInstanceUuid)
-                    : undefined
-                : undefined,
-        }),
-        [editMode, optionsForAuthorities, raProfileSelector],
-    );
+            authority: editMode ? authority : undefined,
+        };
+    }, [editMode, optionsForAuthorities, raProfileSelector]);
     if (!raProfileAttributeDescriptors) {
         return <></>;
     }

@@ -15,7 +15,6 @@ import {
     AttributeConstraintType,
     AttributeContentType,
     AttributeType,
-    AttributeValueTarget,
     AuthorityInstanceDto,
     BaseAttributeDto,
     ConnectorDto,

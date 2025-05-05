@@ -34,16 +34,14 @@ interface Props {
 
 const FormInteractionsAttributeEditorComponent = ({ onSubmit, attributes, attributeDescriptors }: Props) => {
     return (
-        <>
-            <Form onSubmit={onSubmit} mutators={{ ...mutators() }}>
-                {({ handleSubmit }) => (
-                    <form onSubmit={handleSubmit}>
-                        <AttributeEditor id="test" attributeDescriptors={attributeDescriptors} attributes={attributes} />
-                        <button id="submit-button">Submit</button>
-                    </form>
-                )}
-            </Form>
-        </>
+        <Form onSubmit={onSubmit} mutators={{ ...mutators() }}>
+            {({ handleSubmit }) => (
+                <form onSubmit={handleSubmit}>
+                    <AttributeEditor id="test" attributeDescriptors={attributeDescriptors} attributes={attributes} />
+                    <button id="submit-button">Submit</button>
+                </form>
+            )}
+        </Form>
     );
 };
 
@@ -107,7 +105,11 @@ describe('Form Interactions: Basic Fields', () => {
     it(`Content Type: Time`, () => {
         cySelectors.attributeInput(getAttributeId('Time')).input().type('08:30');
         testSubmission((attributes) => {
-            expect(getAttributeModel('Time', attributes)?.content[0].data).to.equal('08:30');
+            if (Cypress.isBrowser('firefox')) {
+                expect(getAttributeModel('Time', attributes)?.content[0].data).to.equal('08:30:00');
+            } else {
+                expect(getAttributeModel('Time', attributes)?.content[0].data).to.equal('08:30');
+            }
         });
     });
     it(`Content Type: Datetime`, () => {

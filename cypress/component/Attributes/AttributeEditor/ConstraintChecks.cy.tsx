@@ -1,44 +1,40 @@
 import AttributeEditor from 'components/Attributes/AttributeEditor';
 import { actions as authoritiesActions, selectors as authoritySelectors } from 'ducks/authorities';
 import { actions as connectorActions, slice } from 'ducks/connectors';
-import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
-import { transformAttributeDescriptorDtoToModel, transformCustomAttributeDtoToModel } from 'ducks/transform/attributes';
+import { actions as customAttributesActions } from 'ducks/customAttributes';
+import { transformAttributeDescriptorDtoToModel } from 'ducks/transform/attributes';
 import { transformConnectorResponseDtoToModel } from 'ducks/transform/connectors';
 import { useMemo, useState } from 'react';
 import { Form } from 'react-final-form';
 import { useSelector } from 'react-redux';
 import { AttributeDescriptorModel } from 'types/attributes';
 import { ConnectorResponseModel } from 'types/connectors';
-import { AttributeConstraintType, FunctionGroupCode } from 'types/openapi';
+import { FunctionGroupCode } from 'types/openapi';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 import '../../../../src/resources/styles/theme.scss';
-import { callbackWait, clickWait, componentLoadWait, reduxActionWait } from '../../../utils/constants';
+import { callbackWait, clickWait, componentLoadWait } from '../../../utils/constants';
 import { ConstraintCheckAttributeTestFormValues, constraintCheckAttributeEditorMockData, constraintTypesCheckMockData } from './mock-data';
 import { cySelectors } from '../../../utils/selectors';
 
 const ConstraintCheckAuthorityProviderAttributeEditorComponent = () => {
     const authorityProviderAttributeDescriptors = useSelector(authoritySelectors.authorityProviderAttributeDescriptors) || [];
     const authoritySelector = useSelector(authoritySelectors.authority);
-    const [authorityProvider, setAuthorityProvider] = useState<ConnectorResponseModel>();
+    const [authorityProvider, _setAuthorityProvider] = useState<ConnectorResponseModel>();
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
     const editMode = true;
 
-    const defaultValues: ConstraintCheckAttributeTestFormValues = useMemo(
-        () => ({
+    const defaultValues: ConstraintCheckAttributeTestFormValues = useMemo(() => {
+        const authorityProvider = authoritySelector?.connectorUuid
+            ? { value: authoritySelector.connectorUuid!, label: authoritySelector.connectorName! }
+            : undefined;
+        const storeKind = authoritySelector ? { value: authoritySelector?.kind, label: authoritySelector?.kind } : undefined;
+
+        return {
             name: editMode ? authoritySelector?.name || undefined : undefined,
-            authorityProvider: editMode
-                ? authoritySelector?.connectorUuid
-                    ? { value: authoritySelector.connectorUuid!, label: authoritySelector.connectorName! }
-                    : undefined
-                : undefined,
-            storeKind: editMode
-                ? authoritySelector
-                    ? { value: authoritySelector?.kind, label: authoritySelector?.kind }
-                    : undefined
-                : undefined,
-        }),
-        [editMode, authoritySelector],
-    );
+            authorityProvider: editMode ? authorityProvider : undefined,
+            storeKind: editMode ? storeKind : undefined,
+        };
+    }, [editMode, authoritySelector]);
 
     return (
         <Form onSubmit={() => {}} initialValues={defaultValues} mutators={{ ...mutators<ConstraintCheckAttributeTestFormValues>() }}>

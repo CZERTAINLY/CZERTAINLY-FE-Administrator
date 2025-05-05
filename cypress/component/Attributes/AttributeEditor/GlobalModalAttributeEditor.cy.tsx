@@ -23,18 +23,18 @@ import { cySelectors } from '../../../utils/selectors';
 
 const GlobalModalAttributeEditor = () => {
     const editMode = false;
-    const [entity, setEntity] = useState<EntityResponseModel>();
-    const [entityProvider, setEntityProvider] = useState<ConnectorResponseModel>();
+    const [entity, _setEntity] = useState<EntityResponseModel>();
+    const [entityProvider, _setEntityProvider] = useState<ConnectorResponseModel>();
     const entityProviderAttributeDescriptors = useSelector(entitySelectors.entityProviderAttributeDescriptors);
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
     const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
     const defaultValues: GlobalModalAttributeEditorFormValues = useMemo(() => {
         const entityProvider = entity?.connectorUuid ? { value: entity.connectorUuid!, label: entity.connectorName! } : undefined;
-
+        const storeKind = entity ? { value: entity?.kind, label: entity?.kind } : undefined;
         return {
             name: editMode ? entity?.name || undefined : undefined,
             entityProvider: editMode ? entityProvider : undefined,
-            storeKind: editMode ? (entity ? { value: entity?.kind, label: entity?.kind } : undefined) : undefined,
+            storeKind: editMode ? storeKind : undefined,
         };
     }, [editMode, entity]);
 
