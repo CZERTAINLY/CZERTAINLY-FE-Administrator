@@ -19,7 +19,7 @@ import { cySelectors } from '../../../utils/selectors';
 const ConstraintCheckAuthorityProviderAttributeEditorComponent = () => {
     const authorityProviderAttributeDescriptors = useSelector(authoritySelectors.authorityProviderAttributeDescriptors) ?? [];
     const authoritySelector = useSelector(authoritySelectors.authority);
-    const [authorityProvider, _setAuthorityProvider] = useState<ConnectorResponseModel>();
+    const [authorityProvider] = useState<ConnectorResponseModel>();
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
     const editMode = true;
 

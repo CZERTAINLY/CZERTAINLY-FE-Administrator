@@ -160,7 +160,7 @@ describe('Non-Required Custom Attributes Selection', () => {
             control().click().wait(clickWait);
             options().then((options) => {
                 cy.get('body').click(200, 200);
-                for (let i = 0; i < options.length; i++) {
+                for (let _ of options) {
                     cySelectors.selectInput('selectAddCustomAttribute').selectOption(0).should('exist').click().wait(clickWait);
                 }
             });

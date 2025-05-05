@@ -23,8 +23,8 @@ import { cySelectors } from '../../../utils/selectors';
 
 const GlobalModalAttributeEditor = () => {
     const editMode = false;
-    const [entity, _setEntity] = useState<EntityResponseModel>();
-    const [entityProvider, _setEntityProvider] = useState<ConnectorResponseModel>();
+    const [entity] = useState<EntityResponseModel>();
+    const [entityProvider] = useState<ConnectorResponseModel>();
     const entityProviderAttributeDescriptors = useSelector(entitySelectors.entityProviderAttributeDescriptors);
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
     const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
