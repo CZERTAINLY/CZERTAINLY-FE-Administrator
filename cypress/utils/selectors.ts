@@ -5,7 +5,7 @@ type ElementSelector = () => Cypress.Chainable<JQuery<any>>;
 type SelectorMap = Record<string, ElementSelector | ((...args: any) => any)>;
 
 type WithAll<T extends SelectorMap> = T & {
-    all: (fn: (selectors: Omit<T, 'all'>) => void) => void;
+    all: (fn: (selectors: Omit<T, 'all'>) => void) => Cypress.cy;
 };
 type SelectInputType = 'single' | 'multi';
 
@@ -18,6 +18,22 @@ type AttributeSelectInputSelectors<T extends SelectInputType> = {
     placeholder: ElementSelector;
     addNew: ElementSelector;
     invalidFeedback: ElementSelector;
+    selectOption: (option: number | string) => Cypress.Chainable<JQuery<HTMLElement>>;
+} & (T extends 'single'
+    ? { value: ElementSelector }
+    : {
+          values: (option: number | string) => {
+              delete: ElementSelector;
+              value: ElementSelector;
+          };
+      });
+
+type SelectInputSelectors<T extends SelectInputType> = {
+    input: ElementSelector;
+    control: ElementSelector;
+    options: ElementSelector;
+    placeholder: ElementSelector;
+    groupButton: (action: string) => Cypress.Chainable<JQuery<HTMLElement>>;
     selectOption: (option: number | string) => Cypress.Chainable<JQuery<HTMLElement>>;
 } & (T extends 'single'
     ? { value: ElementSelector }
@@ -53,14 +69,12 @@ interface ElementSelectors {
         body: ElementSelector;
     }>;
     attributeSelectInput<T extends SelectInputType = 'single'>(inputId: string, type?: T): WithAll<AttributeSelectInputSelectors<T>>;
-    selectInput(inputId: string): WithAll<{
+    input(inputId: string): WithAll<{
         input: ElementSelector;
-        value: ElementSelector;
-        control: ElementSelector;
-        options: ElementSelector;
-        placeholder: ElementSelector;
-        selectOption: (option: number | string) => Cypress.Chainable<JQuery<HTMLElement>>;
+        textarea: ElementSelector;
+        groupButton: (action: string) => Cypress.Chainable<JQuery<HTMLElement>>;
     }>;
+    selectInput<T extends SelectInputType = 'single'>(inputId: string, type?: T): WithAll<SelectInputSelectors<T>>;
     customAttributeWidget(resourceUuid: string): WithAll<{
         headers: (index?: number) => Cypress.Chainable<JQuery<HTMLElement>>;
         rows: <T extends number | string | undefined = undefined>(
@@ -71,17 +85,11 @@ interface ElementSelectors {
                   name: ElementSelector;
                   contentType: ElementSelector;
                   content: ElementSelector;
-                  input: ElementSelector;
+                  input: () => {
+                      input: ElementSelector;
+                  };
                   actions: (type?: 'copy' | 'edit' | 'delete' | 'cancel' | 'save' | 'source') => Cypress.Chainable<JQuery<HTMLElement>>;
               };
-        selectAttribute: () => {
-            options: ElementSelector;
-            selectOption: (option: number | string) => Cypress.Chainable<JQuery<HTMLElement>>;
-        };
-    }>;
-    contentValueField(id: string): WithAll<{
-        input: ElementSelector;
-        selectInput: ElementSelector;
     }>;
 }
 
@@ -91,6 +99,7 @@ function createAllWrapper<T extends SelectorMap>(selectors: T): WithAll<T> {
         all: (fn: (selectors: Omit<T, 'all'>) => void) => {
             const { all: _, ...rest } = selectors;
             fn(rest);
+            return cy;
         },
     };
 }
@@ -126,11 +135,10 @@ export const cySelectors: ElementSelectors = {
                 cy.get(`input[id="${inputId}"]`).selectFile(`cypress/fixtures/${fixturePath}`, { force: true }),
             dragAndDropFile: (fixturePath: string) =>
                 cy.fixture(fixturePath).then((content) => {
-                    console.log('after blob', content);
                     const blob = Cypress.Blob.arrayBufferToBlob(content);
                     const testFile = new File([blob], fixturePath);
                     const dataTransfer = new DataTransfer();
-                    console.log('Data transfre');
+
                     dataTransfer.items.add(testFile);
 
                     cy.get(`div[id="${inputId}-dragAndDrop"]`)
@@ -172,7 +180,7 @@ export const cySelectors: ElementSelectors = {
             selectOption: (option: number | string) => {
                 selectors.control().click().wait(clickWait);
                 if (typeof option === 'string') {
-                    return selectors.options().filter(`:contains("${option}")`);
+                    return selectors.options().findExactText(option);
                 }
                 return selectors.options().eq(option);
             },
@@ -185,8 +193,7 @@ export const cySelectors: ElementSelectors = {
             Object.assign(selectors, {
                 values: (option: number | string) => {
                     const multiValues = root().find('[class*="multiValue"]');
-                    const target =
-                        typeof option === 'string' ? multiValues.filter(`:contains("${option}")`).first() : multiValues.eq(option);
+                    const target = typeof option === 'string' ? multiValues.findExactText(option) : multiValues.eq(option);
 
                     return {
                         value: () => target.find('[class*="MultiValueGeneric"]'),
@@ -196,28 +203,57 @@ export const cySelectors: ElementSelectors = {
             });
         }
 
-        return createAllWrapper(selectors as AttributeSelectInputSelectors<T>);
+        return createAllWrapper(selectors as unknown as AttributeSelectInputSelectors<T>);
     },
-    selectInput: (inputId: string) => {
-        const input = () => cy.get(`input[id="${inputId}"]`);
-        const root = () => input().parents('div[class*="container"]').first();
+    input: (inputId) => {
+        const root = () => cy.get(`input[id="${inputId}"]`).parents('div').first();
 
-        const selectors: ReturnType<ElementSelectors['selectInput']> = createAllWrapper({
-            input,
-            value: () => root().find('[class*="singleValue"]'),
-            control: () => root().find('[class*="control"]'),
-            options: () => root().find('[class*="option"]'),
-            placeholder: () => root().find('[class*="placeholder"]'),
-            selectOption: (option: number | string) => {
-                selectors.control().click().wait(clickWait);
-                if (typeof option === 'string') {
-                    return selectors.options().filter(`:contains("${option}")`);
-                }
-                return selectors.options().eq(option);
-            },
+        const selectors: ReturnType<ElementSelectors['input']> = createAllWrapper({
+            input: () => cy.get(`input[id="${inputId}"]`),
+            textarea: () => cy.get(`textarea[id="${inputId}"]`),
+            groupButton: (action: string) => root().find(`[data-cy="${action}-button"]`),
         });
 
         return selectors;
+    },
+    selectInput: <T extends SelectInputType>(inputId: string, type = 'single') => {
+        const input = () => cy.get(`input[id="${inputId}"]`);
+        const root = () => input().parents('div[class*="container"]').first();
+
+        const selectors = {
+            input,
+            value: () => root().find('[class*="singleValue"]'),
+            control: () => root().find('[class*="control"]'),
+            options: () => cy.get('[class*="option"]'),
+            placeholder: () => root().find('[class*="placeholder"]'),
+            groupButton: (action: string) => root().parents('div[class*="input-group"]').first().find(`[data-cy="${action}-button"]`),
+            selectOption: (option: number | string) => {
+                selectors.control().click().wait(clickWait);
+                if (typeof option === 'string') {
+                    return selectors.options().findExactText(option);
+                }
+                return selectors.options().eq(option);
+            },
+        };
+        if (type === 'single' || type === undefined) {
+            Object.assign(selectors, {
+                value: () => root().find('[class*="singleValue"]'),
+            });
+        } else {
+            Object.assign(selectors, {
+                values: (option: number | string) => {
+                    const multiValues = root().find('[class*="multiValue"]');
+                    const target = typeof option === 'string' ? multiValues.findExactText(option) : multiValues.eq(option);
+
+                    return {
+                        value: () => target.find('[class*="MultiValueGeneric"]'),
+                        delete: () => target.find('[class*="MultiValueRemove"]'),
+                    };
+                },
+            });
+        }
+
+        return createAllWrapper(selectors as unknown as SelectInputSelectors<T>);
     },
     customAttributeWidget: (resourceUuid) => {
         const root = () => cy.get(`section[id*="${resourceUuid}-customAttributeWidget"]`);
@@ -242,7 +278,9 @@ export const cySelectors: ElementSelectors = {
                     name: () => row().find('td').eq(0),
                     contentType: () => row().find('td').eq(1),
                     content: () => row().find('td').eq(2),
-                    input: () => row().find('input'),
+                    input: () => ({
+                        input: () => row().find(`input`),
+                    }),
                     actions: (type) => {
                         if (type === undefined) {
                             return row().find('td').eq(3);
@@ -251,20 +289,6 @@ export const cySelectors: ElementSelectors = {
                     },
                 };
             },
-            selectAttribute: () => ({
-                options: () => root().find('.card-header'),
-                selectOption: (option: number | string) => root().find('.card-header'),
-            }),
-        });
-
-        return selectors;
-    },
-    contentValueField: (id) => {
-        const root = () => cy.get(`[data-cy="${id}-contentValueField"]`);
-
-        const selectors: ReturnType<ElementSelectors['contentValueField']> = createAllWrapper({
-            input: () => root().find('input'),
-            selectInput: () => root().find('selectInput'),
         });
 
         return selectors;

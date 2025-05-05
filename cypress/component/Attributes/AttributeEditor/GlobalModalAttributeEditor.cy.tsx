@@ -1,7 +1,7 @@
 import AttributeEditor from 'components/Attributes/AttributeEditor';
 import GlobalModal from 'components/GlobalModal';
 import TabLayout from 'components/Layout/TabLayout';
-import { actions as connectorActions } from 'ducks/connectors';
+import { actions as connectorActions, slice } from 'ducks/connectors';
 import { actions as credentialActions } from 'ducks/credentials';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { actions as entityActions, selectors as entitySelectors } from 'ducks/entities';
@@ -104,14 +104,22 @@ describe('Global Modal AttributeEditor component', () => {
         Should auto fill the value dropdown in the credential select
         `, () => {
         cySelectors.attributeInput(getAttributeId('host')).input().should('exist').type('test');
-        cySelectors.attributeSelectInput(getAttributeId('authType')).selectOption(0).click().wait(clickWait);
 
-        cy.dispatchActions(
-            connectorActions.callbackSuccess({
-                callbackId: getAttributeId('credential'),
-                data: globalModalAttributeEditorMockData.callbackSuccessObjectArrayOne,
-            }),
-        ).wait(callbackWait);
+        cy.expectActionAfter(
+            () => {
+                cySelectors.attributeSelectInput(getAttributeId('authType')).selectOption(0).click().wait(callbackWait);
+            },
+            slice.actions.callbackConnector.match,
+            ({ payload }) => {
+                console.log({ payload, data: globalModalAttributeEditorMockData.callbackSuccessObjectArrayOne });
+                cy.dispatchActions(
+                    connectorActions.callbackSuccess({
+                        callbackId: getAttributeId('credential'),
+                        data: globalModalAttributeEditorMockData.callbackSuccessObjectArrayOne,
+                    }),
+                ).wait(callbackWait);
+            },
+        );
 
         cySelectors.attributeSelectInput(getAttributeId('credential')).all(({ addNew, control }) => {
             control().click().wait(clickWait);

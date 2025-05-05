@@ -1,6 +1,6 @@
 import AttributeEditor from 'components/Attributes/AttributeEditor';
 import { actions as authoritiesActions, selectors as authoritySelectors } from 'ducks/authorities';
-import { actions as connectorActions } from 'ducks/connectors';
+import { actions as connectorActions, slice } from 'ducks/connectors';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { transformAttributeDescriptorDtoToModel, transformCustomAttributeDtoToModel } from 'ducks/transform/attributes';
 import { transformConnectorResponseDtoToModel } from 'ducks/transform/connectors';
@@ -82,14 +82,24 @@ describe('Constraint Checks: Authority Provider AttributeEditor', () => {
 
     it(`Should select options and render callback attributes
         Should validate incorrect input and render error text`, () => {
-        cySelectors.attributeSelectInput(getAttributeId('authority_credential_type')).selectOption('Basic').click().wait(clickWait);
-
-        cy.dispatchActions(
-            connectorActions.callbackSuccess({
-                callbackId: getAttributeId('authority_credential'),
-                data: constraintCheckAttributeEditorMockData.callbackSuccessObjectArray,
-            }),
-        ).wait(callbackWait);
+        cy.expectActionAfter(
+            () => {
+                cySelectors
+                    .attributeSelectInput(getAttributeId('authority_credential_type'))
+                    .selectOption('Basic')
+                    .click()
+                    .wait(callbackWait);
+            },
+            slice.actions.callbackConnector.match,
+            () => {
+                cy.dispatchActions(
+                    connectorActions.callbackSuccess({
+                        callbackId: getAttributeId('authority_credential'),
+                        data: constraintCheckAttributeEditorMockData.callbackSuccessObjectArray,
+                    }),
+                ).wait(callbackWait);
+            },
+        );
 
         cySelectors.attributeSelectInput(getAttributeId('authority_credential')).selectOption('lab01-testssh').click().wait(clickWait);
 
@@ -100,12 +110,12 @@ describe('Constraint Checks: Authority Provider AttributeEditor', () => {
         });
     });
 
-    it('should reset the redux state that was used', () => {
+    it('Should reset the redux state that was used', () => {
         cy.dispatchActions(authoritiesActions.resetState(), connectorActions.resetState(), customAttributesActions.resetState());
     });
 });
 
-describe.only('Constraint Checks: Basic Checks', () => {
+describe('Constraint Checks: Basic Checks', () => {
     function getAttributeId(fieldName: string) {
         return `__attributes__test__.${fieldName}`;
     }

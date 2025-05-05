@@ -1,7 +1,7 @@
 import AttributeEditor from 'components/Attributes/AttributeEditor';
 import TabLayout from 'components/Layout/TabLayout';
 import { actions as certificateGroupActions } from 'ducks/certificateGroups';
-import { actions as connectorActions } from 'ducks/connectors';
+import { actions as connectorActions, slice } from 'ducks/connectors';
 import { actions as cryptographicKeyActions, selectors as cryptographicKeysSelectors } from 'ducks/cryptographic-keys';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { actions as tokenProfileActions } from 'ducks/token-profiles';
@@ -15,7 +15,7 @@ import { AttributeDescriptorModel } from 'types/attributes';
 import { Resource } from 'types/openapi';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 import '../../../../src/resources/styles/theme.scss';
-import { callbackWait, clickWait, componentLoadWait, reduxActionWait } from '../../../utils/constants';
+import { callbackWait, clickWait, componentLoadWait } from '../../../utils/constants';
 import { TabAttributeFormValues, tabAttributeEditorMockData } from './mock-data';
 import { cySelectors } from '../../../utils/selectors';
 
@@ -120,14 +120,21 @@ describe('Tab AttributeEditor Component', () => {
 
         cySelectors.attributeInput(getAttributeIdInKeyEditor('data_keyAlias')).input().should('have.value', 'test-key');
 
-        cySelectors.attributeSelectInput(getAttributeIdInKeyEditor('data_keyAlgorithm')).selectOption(0).click().wait(clickWait);
-
-        cy.dispatchActions(
-            connectorActions.callbackSuccess({
-                callbackId: '__attributes__cryptographicKey__.group_keySpec',
-                data: tabAttributeEditorMockData.callbackSuccessObjectArray,
-            }),
-        ).wait(callbackWait);
+        cy.expectActionAfter(
+            () => {
+                cySelectors.attributeSelectInput(getAttributeIdInKeyEditor('data_keyAlgorithm')).selectOption(0).click().wait(callbackWait);
+            },
+            slice.actions.callbackConnector.match,
+            ({ payload }) => {
+                console.log({ payload, data: tabAttributeEditorMockData.callbackSuccessObjectArray });
+                cy.dispatchActions(
+                    connectorActions.callbackSuccess({
+                        callbackId: '__attributes__cryptographicKey__.group_keySpec',
+                        data: tabAttributeEditorMockData.callbackSuccessObjectArray,
+                    }),
+                ).wait(callbackWait);
+            },
+        );
 
         cySelectors.attributeSelectInput(getAttributeIdInKeyEditor('data_rsaKeySize')).selectOption(0).click().wait(clickWait);
     });

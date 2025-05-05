@@ -1,4 +1,4 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { AnyAction, configureStore, Middleware } from '@reduxjs/toolkit';
 import { mount } from 'cypress/react';
 import { reduxActionWait } from '../utils/constants';
 import { reducers } from 'ducks/reducers';
@@ -6,6 +6,7 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router';
 import 'cypress-file-upload';
+import { reduxActionListenerMiddleware, registerReduxActionListener } from './reduxActionListenerMiddleware';
 
 Cypress.Commands.add('mount', (component, options = {}, initialRoute = '/') => {
     const { ...mountOptions } = options;
@@ -14,11 +15,17 @@ Cypress.Commands.add('mount', (component, options = {}, initialRoute = '/') => {
         middleware: (getDefaultMiddleware) =>
             getDefaultMiddleware({
                 serializableCheck: false,
-            }),
+            })
+                .concat(((store) => (next) => (action) => {
+                    console.log('[Action Type]: ', (action as any).type);
+                    return next(action);
+                }) as Middleware)
+                .concat(reduxActionListenerMiddleware),
     });
 
     if (window.Cypress) {
         window.store = reduxStore;
+        window.registerReduxActionListener = registerReduxActionListener;
     }
 
     const wrapped = (
@@ -45,10 +52,43 @@ Cypress.Commands.add('dispatchActions', (...actions) => {
         cy.wait(reduxActionWait).window().its('store').invoke('dispatch', action);
     });
 });
+Cypress.Commands.add('expectActionAfter', (trigger, matcher, callback: any, failOnActionRun) => {
+    // Create action reference for access across multiple cy command calls.
+    let storedAction: AnyAction;
+
+    // Cy commands are run sequentially
+    // First an action listener is setup for storing the dispatched action
+    // Then, if an action that matched the matcher was dispatched while the trigger function was running,
+    //   store the reference to that action in the storedAction variable.
+    // This allows to run a callback with action payload as argument, and use cy commands inside of it
+    cy.window()
+        .then((win) => {
+            win.registerReduxActionListener(matcher, (action) => {
+                storedAction = action;
+            });
+        })
+        .then(() => {
+            trigger();
+        })
+        .then(() => {
+            if (!storedAction && !failOnActionRun) {
+                throw new Error(`Expected action to be dispatched after trigger.`);
+            }
+            if (storedAction && failOnActionRun) {
+                throw new Error(`Expected action to not be dispatched after trigger.`);
+            }
+            if (!failOnActionRun) {
+                callback?.(storedAction);
+            } else {
+                callback?.(undefined);
+            }
+        });
+});
 
 Cypress.Commands.add('assertValueCopiedToClipboard', (value) => {
     if (Cypress.isBrowser('firefox')) throw Error('navigator.clipboard is not available in Firefox tests');
     cy.window().then((win) => {
+        win.focus();
         win.navigator.clipboard.readText().then((text) => {
             expect(text).to.eq(value);
         });

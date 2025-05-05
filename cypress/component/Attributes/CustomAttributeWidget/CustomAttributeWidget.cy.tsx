@@ -1,82 +1,12 @@
 import CustomAttributeWidget from 'components/Attributes/CustomAttributeWidget';
-import { actions as certificateActions, selectors as certificateSelectors } from 'ducks/certificates';
-import { actions as customAttributesActions } from 'ducks/customAttributes';
-import { transformAttributeResponseDtoToModel, transformCustomAttributeDtoToModel } from 'ducks/transform/attributes';
-
-import { useSelector } from 'react-redux';
-import { Resource } from 'types/openapi';
+import { actions as customAttributesActions, slice } from 'ducks/customAttributes';
 import '../../../../src/resources/styles/theme.scss';
 import { clickWait, componentLoadWait, reduxActionWait } from '../../../utils/constants';
-import {
-    certificateDetailSuccess,
-    customAttributeObj,
-    customAttributeWidgetProps,
-    dataRenderingMockData,
-    successData,
-    updateSuccessObj,
-} from './mock-data';
+import { dataRenderingMockData, interactionsMockData } from './mock-data';
 import { cySelectors } from '../../../utils/selectors';
+import { AttributeResponseModel } from 'types/attributes';
 
-const CustomAttributeCertificateComponent = () => {
-    const certificate = useSelector(certificateSelectors.certificateDetail);
-    return (
-        <CustomAttributeWidget
-            resource={Resource.Certificates}
-            resourceUuid={certificate?.uuid || ''}
-            attributes={certificate?.customAttributes || []}
-        />
-    );
-};
-
-describe('CustomAttributeWidget for Certificate Resource ', () => {
-    beforeEach(() => {
-        cy.mount(<CustomAttributeCertificateComponent />).wait(componentLoadWait);
-        cy.dispatchActions(
-            certificateActions.getCertificateDetailSuccess({ certificate: certificateDetailSuccess }),
-            customAttributesActions.listResourceCustomAttributesSuccess(customAttributeObj.map(transformCustomAttributeDtoToModel)),
-        );
-    });
-
-    it(`Should be able to edit and delete attributes. 
-        Edit should be disabled for readonly attributes.
-        Delete should be disabled for required attributes.
-        Should be able to copy attribute value.
-        `, () => {
-        cySelectors.customAttributeWidget(certificateDetailSuccess.uuid).all(({ rows }) => {
-            rows(0).actions('edit').click().wait(clickWait);
-            rows(0).input().clear().type('666').wait(clickWait);
-            rows(0).actions('save').click().wait(clickWait);
-        });
-
-        cy.dispatchActions(
-            customAttributesActions.updateCustomAttributeContentSuccess({
-                resource: customAttributeWidgetProps.resource,
-                resourceUuid: certificateDetailSuccess.uuid,
-                customAttributes: updateSuccessObj.map(transformAttributeResponseDtoToModel),
-            }),
-        );
-
-        cySelectors.customAttributeWidget(certificateDetailSuccess.uuid).rows(0).actions('delete').click().wait(clickWait);
-
-        cy.dispatchActions(
-            customAttributesActions.updateCustomAttributeContentSuccess({
-                resource: customAttributeWidgetProps.resource,
-                resourceUuid: certificateDetailSuccess.uuid,
-                customAttributes: updateSuccessObj.slice(1).map(transformAttributeResponseDtoToModel),
-            }),
-        );
-
-        cySelectors.customAttributeWidget(certificateDetailSuccess.uuid).rows(0).actions('edit').should('be.disabled');
-        cySelectors.customAttributeWidget(certificateDetailSuccess.uuid).rows(1).actions('delete').should('be.disabled');
-
-        if (!Cypress.isBrowser('firefox')) {
-            cySelectors.customAttributeWidget(certificateDetailSuccess.uuid).rows(0).actions('copy').click().wait(clickWait);
-            cy.assertValueCopiedToClipboard('tempreadonly');
-        }
-    });
-});
-
-describe.only('CustomAttributeWidget: Data Rendering', () => {
+describe('CustomAttributeWidget: Data Rendering', () => {
     beforeEach(() => {
         cy.mount(
             <CustomAttributeWidget
@@ -153,7 +83,7 @@ describe.only('CustomAttributeWidget: Data Rendering', () => {
 
     it('Should copy data correctly', () => {
         if (Cypress.isBrowser('firefox')) return;
-        cySelectors.customAttributeWidget(dataRenderingMockData.resourceUuid).all(({ rows, headers }) => {
+        cySelectors.customAttributeWidget(dataRenderingMockData.resourceUuid).all(({ rows }) => {
             rows('String').actions('copy').click().wait(clickWait);
             cy.assertValueCopiedToClipboard('string-content');
 
@@ -181,50 +111,232 @@ describe.only('CustomAttributeWidget: Data Rendering', () => {
     });
 });
 
-describe('CustomAttributeWidget: Edit and Delete Interactions', () => {
-    beforeEach(() => {
-        cy.mount(<CustomAttributeCertificateComponent />).wait(componentLoadWait);
+describe('CustomAttributeWidget: Add, Edit and Delete Interactions', () => {
+    let savedCurrentAttributes: AttributeResponseModel[] = [];
+    function dispatchUpdateAttributesValueAction(
+        type: 'add' | 'edit' | 'delete',
+        attributeName: string,
+        content?: AttributeResponseModel['content'],
+    ) {
+        switch (type) {
+            case 'add':
+                const descriptor = interactionsMockData.attributeDescriptors.find((el) => el.name === attributeName)!;
+                savedCurrentAttributes = [
+                    ...savedCurrentAttributes,
+                    {
+                        uuid: descriptor.uuid,
+                        name: descriptor.name,
+                        type: descriptor.type,
+                        label: descriptor.properties.label,
+                        contentType: descriptor.contentType,
+                        content,
+                    },
+                ];
+                break;
+            case 'edit':
+                savedCurrentAttributes = savedCurrentAttributes.map((el) => {
+                    if (el.name === attributeName) return { ...el, content };
+                    return el;
+                });
+                break;
+            case 'delete':
+                savedCurrentAttributes = savedCurrentAttributes.filter((el) => el.name !== attributeName);
+                cy.dispatchActions(
+                    customAttributesActions.removeCustomAttributeContentSuccess({
+                        resource: interactionsMockData.resource,
+                        resourceUuid: interactionsMockData.resourceUuid,
+                        customAttributes: savedCurrentAttributes,
+                    }),
+                );
+                return;
+        }
         cy.dispatchActions(
-            certificateActions.getCertificateDetailSuccess({ certificate: certificateDetailSuccess }),
-            customAttributesActions.listResourceCustomAttributesSuccess(customAttributeObj.map(transformCustomAttributeDtoToModel)),
-        );
+            customAttributesActions.updateCustomAttributeContentSuccess({
+                resource: interactionsMockData.resource,
+                resourceUuid: interactionsMockData.resourceUuid,
+                customAttributes: savedCurrentAttributes,
+            }),
+        ).wait(reduxActionWait);
+    }
+    beforeEach(() => {
+        savedCurrentAttributes = JSON.parse(JSON.stringify(interactionsMockData.attributes));
+        cy.mount(
+            <CustomAttributeWidget
+                resource={interactionsMockData.resource}
+                resourceUuid={interactionsMockData.resourceUuid}
+                attributes={savedCurrentAttributes}
+            />,
+        ).wait(componentLoadWait);
+        cy.dispatchActions(customAttributesActions.listResourceCustomAttributesSuccess(interactionsMockData.attributeDescriptors));
     });
 
-    it(`Should be able to edit and delete attributes. 
-        Edit should be disabled for readonly attributes.
-        Delete should be disabled for required attributes.
-        Should be able to copy attribute value.
-        `, () => {
-        cySelectors.customAttributeWidget(certificateDetailSuccess.uuid).all(({ rows }) => {
-            rows(0).actions('edit').click().wait(clickWait);
-            rows(0).input().clear().type('666').wait(clickWait);
-            rows(0).actions('save').click().wait(clickWait);
+    it(`Should be able to edit boolean, text-based, select, multiselect attributes
+        Should render current value in the input field if it exists`, () => {
+        cySelectors.customAttributeWidget(interactionsMockData.resourceUuid).all(({ rows }) => {
+            rows('String').content().should('contain.text', 'content');
+            rows('String').actions('edit').click().wait(clickWait);
+            rows('String').input().input().should('have.value', 'content');
+            rows('String').input().input().clear().type('new-content');
+            cy.expectActionAfter(
+                () => rows('String').actions('save').click().wait(clickWait),
+                slice.actions.updateCustomAttributeContent.match,
+                ({ payload }) => dispatchUpdateAttributesValueAction('edit', 'String', payload.content),
+            );
+            rows('String').content().should('contain.text', 'new-content');
+
+            rows('Boolean').content().should('contain.text', 'true');
+            rows('Boolean').actions('edit').click().wait(clickWait);
+            rows('Boolean').input().input().should('be.checked');
+            rows('Boolean').input().input().uncheck();
+
+            cy.expectActionAfter(
+                () => rows('Boolean').actions('save').click().wait(clickWait),
+                slice.actions.updateCustomAttributeContent.match,
+                ({ payload }) => dispatchUpdateAttributesValueAction('edit', 'Boolean', payload.content),
+            );
+            rows('Boolean').content().should('contain.text', false);
+
+            rows('StringSelect').content().should('contain.text', 'Option1');
+            rows('StringSelect').actions('edit').click().wait(clickWait);
+            cySelectors.selectInput('StringSelect').all(({ value, selectOption }) => {
+                value().should('contain.text', 'Option1');
+                selectOption('Option2').click().wait(clickWait);
+            });
+            cy.expectActionAfter(
+                () => rows('StringSelect').actions('save').click().wait(clickWait),
+                slice.actions.updateCustomAttributeContent.match,
+                ({ payload }) => dispatchUpdateAttributesValueAction('edit', 'StringSelect', payload.content),
+            );
+            rows('StringSelect').content().should('contain.text', 'Option2');
+
+            rows('StringMultiselect').content().should('contain.text', 'Option1, Option2');
+            rows('StringMultiselect').actions('edit').click().wait(clickWait);
+            cySelectors.selectInput('StringMultiselect', 'multi').all(({ values, selectOption }) => {
+                values('Option1').delete().click().wait(clickWait);
+                values('Option2').value().should('exist');
+                selectOption('Option3').click().wait(clickWait);
+            });
+            cy.expectActionAfter(
+                () => rows('StringMultiselect').actions('save').click().wait(clickWait),
+                slice.actions.updateCustomAttributeContent.match,
+                ({ payload }) => dispatchUpdateAttributesValueAction('edit', 'StringMultiselect', payload.content),
+            );
+            rows('StringMultiselect').content().should('contain.text', 'Option2, Option3');
         });
+    });
+    it(`Should render the old value if the changes are unsaved`, () => {
+        cySelectors.customAttributeWidget(interactionsMockData.resourceUuid).all(({ rows }) => {
+            rows('String').actions('edit').click().wait(clickWait);
+            rows('String').input().input().clear().type('new-content');
+            rows('String').actions('cancel').click().wait(clickWait);
+            rows('String').content().should('contain.text', 'content');
+        });
+    });
+    it(`Should be able to delete attributes`, () => {
+        cySelectors.customAttributeWidget(interactionsMockData.resourceUuid).all(({ rows }) => {
+            rows('Boolean').name().should('exist');
+            cy.expectActionAfter(
+                () => rows('Boolean').actions('delete').click().wait(clickWait),
+                slice.actions.removeCustomAttributeContent.match,
+                () => dispatchUpdateAttributesValueAction('delete', 'Boolean'),
+            );
+            rows().should('not.contain.text', 'Boolean');
+            rows('StringMultiselect').name().should('exist');
+            cy.expectActionAfter(
+                () => rows('StringMultiselect').actions('delete').click().wait(clickWait),
+                slice.actions.removeCustomAttributeContent.match,
+                () => dispatchUpdateAttributesValueAction('delete', 'StringMultiselect'),
+            );
+            rows().should('not.contain.text', 'StringMultiselect');
+        });
+    });
+    it(`Should be able to delete attribute from edit mode`, () => {
+        cySelectors.customAttributeWidget(interactionsMockData.resourceUuid).all(({ rows }) => {
+            rows('Boolean').name().should('exist');
+            rows('Boolean').actions('edit').click().wait(clickWait);
+            cy.expectActionAfter(
+                () => rows('Boolean').actions('delete').click().wait(clickWait),
+                slice.actions.removeCustomAttributeContent.match,
+                () => dispatchUpdateAttributesValueAction('delete', 'Boolean'),
+            );
+            rows().should('not.contain.text', 'Boolean');
+        });
+    });
 
-        cy.dispatchActions(
-            customAttributesActions.updateCustomAttributeContentSuccess({
-                resource: customAttributeWidgetProps.resource,
-                resourceUuid: certificateDetailSuccess.uuid,
-                customAttributes: updateSuccessObj.map(transformAttributeResponseDtoToModel),
-            }),
-        );
+    it(`Attribute selector should not be visible when all attributes have value
+        Should be able to add attributes of different types        
+        Default value is set when the attribute is selected
+        `, () => {
+        cySelectors.customAttributeWidget(interactionsMockData.resourceUuid).all(({ rows }) => {
+            cySelectors.selectInput('selectCustomAttribute').input().should('not.exist');
 
-        cySelectors.customAttributeWidget(certificateDetailSuccess.uuid).rows(0).actions('delete').click().wait(clickWait);
+            dispatchUpdateAttributesValueAction('delete', 'String');
+            dispatchUpdateAttributesValueAction('delete', 'Boolean');
+            dispatchUpdateAttributesValueAction('delete', 'StringSelect');
+            dispatchUpdateAttributesValueAction('delete', 'StringMultiselect');
 
-        cy.dispatchActions(
-            customAttributesActions.updateCustomAttributeContentSuccess({
-                resource: customAttributeWidgetProps.resource,
-                resourceUuid: certificateDetailSuccess.uuid,
-                customAttributes: updateSuccessObj.slice(1).map(transformAttributeResponseDtoToModel),
-            }),
-        );
+            cySelectors.selectInput('selectCustomAttribute').selectOption('String').click().wait(clickWait);
+            cy.expectActionAfter(
+                () => {
+                    cySelectors.input('String').all(({ input, groupButton }) => {
+                        input().should('have.value', 'default-content').clear().type('new-content');
+                        groupButton('save').click().wait(clickWait);
+                    });
+                },
+                slice.actions.updateCustomAttributeContent.match,
+                ({ payload }) => {
+                    dispatchUpdateAttributesValueAction('add', 'String', payload.content);
+                },
+            );
 
-        cySelectors.customAttributeWidget(certificateDetailSuccess.uuid).rows(0).actions('edit').should('be.disabled');
-        cySelectors.customAttributeWidget(certificateDetailSuccess.uuid).rows(1).actions('delete').should('be.disabled');
+            rows('String').content().should('contain.text', 'new-content');
 
-        if (!Cypress.isBrowser('firefox')) {
-            cySelectors.customAttributeWidget(certificateDetailSuccess.uuid).rows(0).actions('copy').click().wait(clickWait);
-            cy.assertValueCopiedToClipboard('tempreadonly');
-        }
+            cySelectors.selectInput('selectCustomAttribute').selectOption('Boolean').click().wait(clickWait);
+
+            cy.expectActionAfter(
+                () => {
+                    cySelectors.input('Boolean').all(({ input, groupButton }) => {
+                        input().check();
+                        groupButton('save').click().wait(clickWait);
+                    });
+                },
+                slice.actions.updateCustomAttributeContent.match,
+                ({ payload }) => {
+                    dispatchUpdateAttributesValueAction('add', 'Boolean', payload.content);
+                },
+            );
+            rows('Boolean').content().should('contain.text', 'true');
+
+            cySelectors.selectInput('selectCustomAttribute').selectOption('StringSelect').click().wait(clickWait);
+            cy.expectActionAfter(
+                () => {
+                    cySelectors.selectInput('StringSelect').all(({ selectOption, groupButton }) => {
+                        selectOption('Option1').click().wait(clickWait);
+                        groupButton('save').click().wait(clickWait);
+                    });
+                },
+                slice.actions.updateCustomAttributeContent.match,
+                ({ payload }) => {
+                    dispatchUpdateAttributesValueAction('add', 'StringSelect', payload.content);
+                },
+            );
+            rows('StringSelect').content().should('contain.text', 'Option1');
+
+            cySelectors.selectInput('selectCustomAttribute').selectOption('StringMultiselect').click().wait(clickWait);
+            cy.expectActionAfter(
+                () => {
+                    cySelectors.selectInput('StringMultiselect', 'multi').all(({ selectOption, groupButton }) => {
+                        selectOption('Option1').click().wait(clickWait);
+                        selectOption('Option2').click().wait(clickWait);
+                        groupButton('save').click().wait(clickWait);
+                    });
+                },
+                slice.actions.updateCustomAttributeContent.match,
+                ({ payload }) => {
+                    dispatchUpdateAttributesValueAction('add', 'StringMultiselect', payload.content);
+                },
+            );
+            rows('StringMultiselect').content().should('contain.text', 'Option1, Option2');
+        });
     });
 });

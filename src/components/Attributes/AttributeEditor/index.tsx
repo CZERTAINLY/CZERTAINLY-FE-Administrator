@@ -65,7 +65,7 @@ export default function AttributeEditor({
     const formState = useFormState();
 
     const isRunningCallback = useSelector(connectorSelectors.isRunningCallback);
-    // console.log({ isRunningCallback });
+
     const initiateAttributeCallback = useSelector(userInterfaceSelectors.selectInitiateAttributeCallback);
     // data from callbacks
     const callbackData = useSelector(connectorSelectors.callbackData);
@@ -674,7 +674,8 @@ export default function AttributeEditor({
         // This effect should only be called if the initiateAttributeCallback value is updated
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initiateAttributeCallback]);
-
+    // console.log('callbackData', callbackData);
+    // console.log('groupAttributesCallbackAttributes', groupAttributesCallbackAttributes);
     /**
      * Obtains values from attribute callbacks and updates the form values / options accordingly
      */
@@ -684,7 +685,6 @@ export default function AttributeEditor({
         for (const callbackId in callbackData) {
             if (callbackData[callbackId] === previousCallbackData[callbackId]) continue;
             if (!callbackData[callbackId]) continue;
-
             if (Array.isArray(callbackData[callbackId])) {
                 const groupCallbackAttributes: AttributeDescriptorModel[] = callbackData[callbackId].filter(isAttributeDescriptorModel);
                 // Check if there are any other attributes in the callback data before setting it as empty

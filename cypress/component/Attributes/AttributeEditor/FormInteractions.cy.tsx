@@ -70,14 +70,12 @@ describe('Form Interactions: Basic Fields', () => {
     it(`Content Type: String`, () => {
         cySelectors.attributeInput(getAttributeId('String')).input().type('string');
         testSubmission((attributes) => {
-            console.log({ attributes }, 'Stirng');
             expect(getAttributeModel('String', attributes)?.content[0].data).to.equal('string');
         });
     });
     it(`Content Type: Text`, () => {
         cySelectors.attributeInput(getAttributeId('Text')).textarea().type('string');
         testSubmission((attributes) => {
-            console.log({ attributes });
             expect(getAttributeModel('Text', attributes)?.content[0].data).to.equal('string');
         });
     });
@@ -113,27 +111,34 @@ describe('Form Interactions: Basic Fields', () => {
         });
     });
     it(`Content Type: Datetime`, () => {
-        cySelectors.attributeInput(getAttributeId('DatetimeSimple')).input().type('2017-06-01T08:30');
+        const localInput = '2017-06-01T08:30';
+        const expectedUtc = new Date(localInput).toISOString();
+
+        cySelectors.attributeInput(getAttributeId('DatetimeSimple')).input().type(localInput);
         testSubmission((attributes) => {
-            expect(getAttributeModel('DatetimeSimple', attributes)?.content[0].data).to.equal('2017-06-01T12:30:00.000Z');
+            expect(getAttributeModel('DatetimeSimple', attributes)?.content[0].data).to.equal(expectedUtc);
         });
     });
 
     it(`Content Type: Datetime Select;`, () => {
-        cySelectors.attributeSelectInput(getAttributeId('DatetimeSelect')).selectOption('2017-06-01T08:30').click().wait(clickWait);
+        const localInput = '2017-06-01T08:30';
+        const expectedUtc = new Date(localInput).toISOString();
+
+        cySelectors.attributeSelectInput(getAttributeId('DatetimeSelect')).selectOption(localInput).click().wait(clickWait);
+
         testSubmission((attributes) => {
-            expect(getAttributeModel('DatetimeSelect', attributes)?.content[0].data).to.equal('2017-06-01T12:30:00.000Z');
+            expect(getAttributeModel('DatetimeSelect', attributes)?.content[0].data).to.equal(expectedUtc);
         });
     });
 
     it(`Content Type: Datetime MultiSelect;`, () => {
-        cySelectors
-            .attributeSelectInput(getAttributeId('DatetimeMultiselect'), 'multi')
-            .selectOption('2017-06-01T08:30')
-            .click()
-            .wait(clickWait);
+        const localInput = '2017-06-01T08:30';
+        const expectedUtc = new Date(localInput).toISOString();
+
+        cySelectors.attributeSelectInput(getAttributeId('DatetimeMultiselect'), 'multi').selectOption(localInput).click().wait(clickWait);
+
         testSubmission((attributes) => {
-            expect(getAttributeModel('DatetimeMultiselect', attributes)?.content[0].data).to.equal('2017-06-01T12:30:00.000Z');
+            expect(getAttributeModel('DatetimeMultiselect', attributes)?.content[0].data).to.equal(expectedUtc);
         });
     });
 

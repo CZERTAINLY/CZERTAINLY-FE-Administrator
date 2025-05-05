@@ -129,7 +129,6 @@ export default function ContentValueField({ id, descriptor, initialContent, onSu
 
     return ContentFieldConfiguration[descriptor.contentType].type ? (
         <Field
-            data-cy={`${id}-contentValueField`}
             key={descriptor.name}
             name={descriptor.name}
             validate={validators ?? undefined}
@@ -141,6 +140,7 @@ export default function ContentValueField({ id, descriptor, initialContent, onSu
                     <Col xs="10" sm="10" md="10" lg="10" xl="10">
                         <Select
                             {...input}
+                            inputId={descriptor.name}
                             options={options}
                             menuPortalTarget={document.body}
                             styles={{

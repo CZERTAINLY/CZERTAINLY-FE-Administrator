@@ -15,6 +15,7 @@ import {
     AttributeConstraintType,
     AttributeContentType,
     AttributeType,
+    AttributeValueTarget,
     AuthorityInstanceDto,
     BaseAttributeDto,
     ConnectorDto,
@@ -1477,69 +1478,526 @@ export const groupAttributeAtributeEditorMockData = {
 };
 
 export const callbackVariationsAtributeEditorMockData = {
-    attributeDescriptors: [
-        {
-            uuid: '9b5b38a2-9bcc-4178-8d02-7817cc3f3ada',
-            name: 'raprofile_select_ca_method',
-            description: 'Select how the CA will be chosen, either by ComputerName or search',
-            content: [
-                {
-                    reference: 'Search for all available CAs',
-                    data: 'search',
-                },
-                {
-                    reference: 'Use the ConfigString to select existing CA',
-                    data: 'configstring',
-                },
-            ],
-            type: AttributeType.Data,
-            contentType: AttributeContentType.String,
-            properties: {
-                label: 'Select CA Method',
-                visible: true,
-                required: true,
-                readOnly: false,
-                list: true,
-                multiSelect: false,
-            },
-        },
-        {
-            uuid: '0f26f6a0-94ca-420b-bbd8-4324218d7692',
-            name: 'raprofile_ca_select_group',
-            description: 'For identification of select CA method',
-            type: AttributeType.Group,
-            attributeCallback: {
-                mappings: [
+    basicTest: {
+        attributeDescriptors: [
+            {
+                uuid: 'dfcfb71f-a161-4aa7-8b1f-726b477b3493',
+                name: 'StringSelect',
+                content: [
                     {
-                        from: 'raprofile_authority_uuid.data',
-                        to: 'authority_instance_uuid',
-                        targets: ['pathVariable'],
+                        reference: 'Option1',
+                        data: 'Option1',
                     },
                     {
-                        from: 'raprofile_select_ca_method.data',
-                        to: 'ca_select_method',
-                        targets: ['pathVariable'],
+                        reference: 'Option2',
+                        data: 'Option2',
                     },
                 ],
+                type: AttributeType.Data,
+                contentType: AttributeContentType.String,
+                properties: {
+                    label: 'StringSelect',
+                    visible: true,
+                    required: true,
+                    readOnly: false,
+                    list: true,
+                    multiSelect: false,
+                },
             },
-        },
-    ] as AttributeDescriptorModel[],
-    callbackSuccessObjectArray: [
-        {
-            reference: 'lab01-testssh',
-            data: {
-                uuid: '91c105e3-29d4-46e5-88c3-2ba7fb1fbd40',
-                name: 'lab01-testssh',
+            {
+                uuid: 'dfcfb71f-a161-4aa7-8b1f-726b477b3492',
+                name: 'group_IntegerSelect',
+                description: 'Group for IntegerSelect based on StringSelect',
+                type: AttributeType.Group,
+                attributeCallback: {
+                    mappings: [
+                        {
+                            from: 'StringSelect',
+                            to: 'IntegerSelect',
+                            targets: ['pathVariable'],
+                        },
+                    ],
+                },
             },
-        },
-        {
-            reference: 'adcs-lab02-login',
-            data: {
-                uuid: '34e58936-c041-4aa6-8ae7-ab2157da290b',
-                name: 'adcs-lab02-login',
+            {
+                uuid: 'dfcfb71f-a161-4aa7-8b1f-726b477b349d',
+                name: 'TextSelect',
+                content: [
+                    {
+                        reference: 'Option1',
+                        data: 'Option1',
+                    },
+                    {
+                        reference: 'Option2',
+                        data: 'Option2',
+                    },
+                ],
+                type: AttributeType.Data,
+                contentType: AttributeContentType.String,
+                properties: {
+                    label: 'TextSelect',
+                    visible: true,
+                    required: true,
+                    readOnly: false,
+                    list: true,
+                    multiSelect: false,
+                },
             },
-        },
-    ],
+        ] as AttributeDescriptorModel[],
+        callbackResourceSuccess: [
+            {
+                uuid: 'dfcfb71f-a161-4aa7-8b1f-726b477b3494',
+                name: 'IntegerSelect',
+                content: [
+                    {
+                        reference: 'IntegerOption1',
+                        data: 1,
+                    },
+                    {
+                        reference: 'IntegerOption2',
+                        data: 2,
+                    },
+                ],
+                type: AttributeType.Data,
+                contentType: AttributeContentType.Integer,
+                properties: {
+                    label: 'IntegerSelect',
+                    visible: true,
+                    required: true,
+                    readOnly: false,
+                    list: true,
+                    multiSelect: false,
+                },
+            },
+        ] as AttributeDescriptorModel[],
+    },
+    invalidMappingTest: {
+        attributeDescriptors: [
+            {
+                uuid: 'dfcfb71f-a161-4aa7-8b1f-726b477b3493',
+                name: 'StringSelect',
+                content: [
+                    {
+                        reference: 'Option1',
+                        data: 'Option1',
+                    },
+                    {
+                        reference: 'Option2',
+                        data: 'Option2',
+                    },
+                ],
+                type: AttributeType.Data,
+                contentType: AttributeContentType.String,
+                properties: {
+                    label: 'StringSelect',
+                    visible: true,
+                    required: true,
+                    readOnly: false,
+                    list: true,
+                    multiSelect: false,
+                },
+            },
+            {
+                uuid: 'dfcfb71f-a161-4aa7-8b1f-726b477b3492',
+                name: 'group_IntegerSelect',
+                type: AttributeType.Group,
+                attributeCallback: {
+                    mappings: [
+                        {
+                            from: undefined,
+                            targets: [],
+                        },
+                    ],
+                },
+            },
+        ] as AttributeDescriptorModel[],
+        callbackResourceSuccess: [
+            {
+                uuid: 'dfcfb71f-a161-4aa7-8b1f-726b477b3494',
+                name: 'IntegerSelect',
+                content: [
+                    {
+                        reference: 'IntegerOption1',
+                        data: 1,
+                    },
+                    {
+                        reference: 'IntegerOption2',
+                        data: 2,
+                    },
+                ],
+                type: AttributeType.Data,
+                contentType: AttributeContentType.Integer,
+                properties: {
+                    label: 'IntegerSelect',
+                    visible: true,
+                    required: true,
+                    readOnly: false,
+                    list: true,
+                    multiSelect: false,
+                },
+            },
+        ] as AttributeDescriptorModel[],
+    },
+    defaultValuesTest: {
+        attributeDescriptors: [
+            {
+                uuid: 'dfcfb71f-a161-4aa7-8b1f-726b477b3493',
+                name: 'StringSelect',
+                content: [
+                    {
+                        reference: 'Option1',
+                        data: 'Option1',
+                    },
+                    {
+                        reference: 'Option2',
+                        data: 'Option2',
+                    },
+                ],
+                type: AttributeType.Data,
+                contentType: AttributeContentType.String,
+                properties: {
+                    label: 'StringSelect',
+                    visible: true,
+                    required: true,
+                    readOnly: false,
+                    list: true,
+                    multiSelect: false,
+                },
+            },
+            {
+                uuid: 'dfcfb71f-a161-4aa7-8b1f-726b477b3492',
+                name: 'group_DefaultText',
+                type: AttributeType.Group,
+                attributeCallback: {
+                    mappings: [
+                        {
+                            from: 'StringSelect',
+                            targets: [],
+                        },
+                    ],
+                },
+            },
+        ] as AttributeDescriptorModel[],
+        callbackResourceSuccess: [
+            {
+                uuid: 'dfcfb71f-a161-4aa7-8b1f-726b477b3494',
+                name: 'DefaultText',
+                content: [{ data: 'default-content' }],
+                type: AttributeType.Data,
+                contentType: AttributeContentType.Text,
+                properties: {
+                    label: 'DefaultText',
+                    visible: true,
+                    required: true,
+                    readOnly: false,
+                    list: false,
+                    multiSelect: false,
+                },
+            },
+        ] as AttributeDescriptorModel[],
+    },
+    nestedAttributeCallbacksTest: {
+        attributeDescriptors: [
+            {
+                uuid: '69cfb71f-a161-4aa7-8b1f-726b477b3493',
+                name: 'StringSelect',
+                content: [
+                    {
+                        reference: 'Option1',
+                        data: 'Option1',
+                    },
+                    {
+                        reference: 'Option2',
+                        data: 'Option2',
+                    },
+                ],
+                type: AttributeType.Data,
+                contentType: AttributeContentType.String,
+                properties: {
+                    label: 'StringSelect',
+                    visible: true,
+                    required: true,
+                    readOnly: false,
+                    list: true,
+                    multiSelect: false,
+                },
+            },
+            {
+                uuid: '5fcfb71f-a161-4aa7-8b1f-726b477b3492',
+                name: 'group_IntegerSelect',
+                type: AttributeType.Group,
+                attributeCallback: {
+                    mappings: [
+                        {
+                            from: 'StringSelect',
+                            targets: [],
+                        },
+                    ],
+                },
+            },
+        ] as AttributeDescriptorModel[],
+        callbackResourceSuccess1: [
+            {
+                uuid: '1fcfb71f-a161-4aa7-8b1f-726b477b3494',
+                name: 'DefaultText',
+                content: [{ data: 'default-content' }],
+                type: AttributeType.Data,
+                contentType: AttributeContentType.Text,
+                properties: {
+                    label: 'DefaultText',
+                    visible: true,
+                    required: true,
+                    readOnly: false,
+                    list: false,
+                    multiSelect: false,
+                },
+            },
+            {
+                uuid: '2fcfb71f-a161-4aa7-8b1f-726b477b3494',
+                name: 'IntegerSelect',
+                content: [
+                    { reference: 'Integer1', data: 1 },
+                    { reference: 'Integer2', data: 2 },
+                ],
+                type: AttributeType.Data,
+                contentType: AttributeContentType.Integer,
+                properties: {
+                    label: 'IntegerSelect',
+                    visible: true,
+                    required: true,
+                    readOnly: false,
+                    list: true,
+                    multiSelect: false,
+                },
+            },
+            {
+                uuid: '3fcfb71f-a161-4aa7-8b1f-726b477b3494',
+                name: 'group_DefaultBoolean',
+                type: AttributeType.Group,
+                attributeCallback: {
+                    mappings: [
+                        {
+                            from: 'IntegerSelect.reference',
+                            targets: [],
+                        },
+                    ],
+                },
+            },
+        ] as AttributeDescriptorModel[],
+        callbackResourceSuccess2: [
+            {
+                uuid: '4fcfb71f-a16d-4aa7-8b1f-726b477b3494',
+                name: 'DefaultBoolean',
+                content: [{ data: true }],
+                type: AttributeType.Data,
+                contentType: AttributeContentType.Boolean,
+                properties: {
+                    label: 'DefaultBoolean',
+                    visible: true,
+                    required: false,
+                    readOnly: false,
+                    list: false,
+                    multiSelect: false,
+                },
+            },
+        ] as AttributeDescriptorModel[],
+    },
+    multipleAttributeCallbacksTest: {
+        attributeDescriptors: [
+            {
+                uuid: '69cfb71f-a161-4aa7-8b1f-726b477b3493',
+                name: 'StringSelect1',
+                content: [
+                    {
+                        reference: 'Option1',
+                        data: 'Option1',
+                    },
+                    {
+                        reference: 'Option2',
+                        data: 'Option2',
+                    },
+                ],
+                type: AttributeType.Data,
+                contentType: AttributeContentType.String,
+                properties: {
+                    label: 'StringSelect1',
+                    visible: true,
+                    required: true,
+                    readOnly: false,
+                    list: true,
+                    multiSelect: false,
+                },
+            },
+            {
+                uuid: '5fcfb71f-a161-4aa7-8b1f-7260477b3492',
+                name: 'group_IntegerSelect1',
+                type: AttributeType.Group,
+                attributeCallback: {
+                    mappings: [
+                        {
+                            from: 'StringSelect1',
+                            targets: [],
+                        },
+                    ],
+                },
+            },
+            {
+                uuid: '69cfb71f-a161-4aa7-8b1f-726b470b3493',
+                name: 'StringSelect2',
+                content: [
+                    {
+                        reference: 'Option1',
+                        data: 'Option1',
+                    },
+                    {
+                        reference: 'Option2',
+                        data: 'Option2',
+                    },
+                ],
+                type: AttributeType.Data,
+                contentType: AttributeContentType.String,
+                properties: {
+                    label: 'StringSelect2',
+                    visible: true,
+                    required: true,
+                    readOnly: false,
+                    list: true,
+                    multiSelect: false,
+                },
+            },
+            {
+                uuid: '5fcfb71f-a161-4aa7-8b1f-426bd77b3492',
+                name: 'group_IntegerSelect2',
+                type: AttributeType.Group,
+                attributeCallback: {
+                    mappings: [
+                        {
+                            from: 'StringSelect2',
+                            targets: [],
+                        },
+                    ],
+                },
+            },
+        ] as AttributeDescriptorModel[],
+        callbackResourceSuccess1: [
+            {
+                uuid: '2fc4321f-a161-4aa7-8b1f-726b47g3494',
+                name: 'IntegerSelect1',
+                content: [
+                    { reference: 'Integer1', data: 1 },
+                    { reference: 'Integer2', data: 2 },
+                ],
+                type: AttributeType.Data,
+                contentType: AttributeContentType.Integer,
+                properties: {
+                    label: 'IntegerSelect1',
+                    visible: true,
+                    required: true,
+                    readOnly: false,
+                    list: true,
+                    multiSelect: false,
+                },
+            },
+        ] as AttributeDescriptorModel[],
+        callbackResourceSuccess2: [
+            {
+                uuid: '2fcfb71f-a161-4aa7-8b1f-726b477b3494',
+                name: 'IntegerSelect2',
+                content: [
+                    { reference: 'Integer1', data: 1 },
+                    { reference: 'Integer2', data: 2 },
+                ],
+                type: AttributeType.Data,
+                contentType: AttributeContentType.Integer,
+                properties: {
+                    label: 'IntegerSelect2',
+                    visible: true,
+                    required: true,
+                    readOnly: false,
+                    list: true,
+                    multiSelect: false,
+                },
+            },
+        ] as AttributeDescriptorModel[],
+    },
+    repeatCallbackTest: {
+        attributeDescriptors: [
+            {
+                uuid: '69cfb71f-a161-4aa7-8b1f-726b477b3493',
+                name: 'StringSelect',
+                content: [
+                    {
+                        reference: 'Option1',
+                        data: 'Option1',
+                    },
+                    {
+                        reference: 'Option2',
+                        data: 'Option2',
+                    },
+                ],
+                type: AttributeType.Data,
+                contentType: AttributeContentType.String,
+                properties: {
+                    label: 'StringSelect',
+                    visible: true,
+                    required: true,
+                    readOnly: false,
+                    list: true,
+                    multiSelect: false,
+                },
+            },
+            {
+                uuid: '5fcfb71f-a161-4aa7-8b1f-726b477b3492',
+                name: 'group_DefaultTextOrIntegerSelect',
+                type: AttributeType.Group,
+                attributeCallback: {
+                    mappings: [
+                        {
+                            from: 'StringSelect',
+                            targets: ['pathVariable'],
+                        },
+                    ],
+                },
+            },
+        ] as AttributeDescriptorModel[],
+        callbackResourceSuccess1: [
+            {
+                uuid: '1fcfb71f-a161-4aa7-8b1f-726b477b3494',
+                name: 'DefaultText',
+                content: [{ data: 'default-content' }],
+                type: AttributeType.Data,
+                contentType: AttributeContentType.Text,
+                properties: {
+                    label: 'DefaultText',
+                    visible: true,
+                    required: true,
+                    readOnly: false,
+                    list: false,
+                    multiSelect: false,
+                },
+            },
+        ] as AttributeDescriptorModel[],
+        callbackResourceSuccess2: [
+            {
+                uuid: '2fcfb71f-a161-4aa7-8b1f-726b477b3494',
+                name: 'IntegerSelect',
+                content: [
+                    { reference: 'Integer1', data: 1 },
+                    { reference: 'Integer2', data: 2 },
+                ],
+                type: AttributeType.Data,
+                contentType: AttributeContentType.Integer,
+                properties: {
+                    label: 'IntegerSelect',
+                    visible: true,
+                    required: true,
+                    readOnly: false,
+                    list: true,
+                    multiSelect: false,
+                },
+            },
+        ] as AttributeDescriptorModel[],
+    },
 };
 export const constraintCheckAttributeEditorMockData = {
     attributeDescriptorDtoArray: [

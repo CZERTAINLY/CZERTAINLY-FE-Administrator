@@ -1,6 +1,6 @@
 import AttributeEditor from 'components/Attributes/AttributeEditor';
 import { actions as authoritiesActions, selectors as authoritySelectors } from 'ducks/authorities';
-import { actions as connectorActions } from 'ducks/connectors';
+import { actions as connectorActions, slice } from 'ducks/connectors';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { actions as raProfileActions, selectors as raProfilesSelectors } from 'ducks/ra-profiles';
 import { transformAttributeDescriptorDtoToModel, transformCustomAttributeDtoToModel } from 'ducks/transform/attributes';
@@ -9,7 +9,7 @@ import { useMemo, useState } from 'react';
 import { Form } from 'react-final-form';
 import { useSelector } from 'react-redux';
 import { AttributeDescriptorModel } from 'types/attributes';
-import { Resource } from 'types/openapi';
+import { FunctionGroupCode, Resource } from 'types/openapi';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 import '../../../../src/resources/styles/theme.scss';
 import { callbackWait, clickWait, componentLoadWait, reduxActionWait } from '../../../utils/constants';
@@ -66,7 +66,7 @@ const GroupCallbackAttributeEditorComponent = () => {
     );
 };
 
-describe.only('Group Attribute AttributeEditor', () => {
+describe('Group Attribute AttributeEditor', () => {
     function getAttributeId(fieldName: string) {
         return `__attributes__ra-profile__.${fieldName}`;
     }
@@ -109,7 +109,7 @@ describe.only('Group Attribute AttributeEditor', () => {
     it('Should display "CA Name" label and description, and renders expected selected CA and template values', () => {
         cySelectors.attributeSelectInput(getAttributeId('raprofile_ca_name')).all(({ label, description }) => {
             label().should('contain.text', 'CA Name');
-            description().should('contain.text', 'Identification of the certification authority').pause();
+            description().should('contain.text', 'Identification of the certification authority');
         });
 
         cySelectors
@@ -129,23 +129,20 @@ describe.only('Group Attribute AttributeEditor', () => {
         );
     });
 });
+type Props = Omit<React.ComponentProps<typeof AttributeEditor>, 'id'>;
 
-const CallbackVariationsAttributeEditorComponent = () => {
+const CallbackVariationsAttributeEditorComponent = (props: Props) => {
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 
-    console.log(groupAttributeAtributeEditorMockData.groupAttributeArray.map(transformAttributeDescriptorDtoToModel));
     return (
         <Form onSubmit={() => {}} mutators={{ ...mutators() }}>
             {({ handleSubmit, form }) => (
                 <form onSubmit={handleSubmit}>
                     <AttributeEditor
                         id="test"
-                        callbackParentUuid={'test-uuid'}
-                        callbackResource={Resource.RaProfiles}
-                        attributeDescriptors={callbackVariationsAtributeEditorMockData.attributeDescriptors}
-                        attributes={[]}
                         groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
                         setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                        {...props}
                     />
                 </form>
             )}
@@ -153,25 +150,251 @@ const CallbackVariationsAttributeEditorComponent = () => {
     );
 };
 
-describe('Group Attributes Variations', () => {
+describe('Group Callback Attributes: General Tests', () => {
     function getAttributeId(fieldName: string) {
         return `__attributes__test__.${fieldName}`;
     }
 
-    beforeEach(() => {
-        cy.mount(<CallbackVariationsAttributeEditorComponent />).wait(componentLoadWait);
-        cy.dispatchActions(
-            connectorActions.callbackSuccess({
-                callbackId: getAttributeId('raprofile_ca_select_group'),
-                data: groupAttributeAtributeEditorMockData.callbackSuccessObjectArray,
-            }),
-        ).wait(reduxActionWait);
+    it('Should run the callback, and generate a proper mappings object for Connector callback', () => {
+        cy.mount(
+            <CallbackVariationsAttributeEditorComponent
+                functionGroupCode={FunctionGroupCode.AuthorityProvider}
+                connectorUuid="connector-uuid"
+                kind="connector-kind"
+                attributeDescriptors={callbackVariationsAtributeEditorMockData.basicTest.attributeDescriptors}
+            />,
+        ).wait(componentLoadWait);
+
+        cy.expectActionAfter(
+            () => {
+                cySelectors.attributeSelectInput(getAttributeId('StringSelect')).selectOption('Option1').click().wait(callbackWait);
+            },
+            slice.actions.callbackConnector.match,
+            ({ payload }) => {
+                expect(payload.callbackConnector).to.deep.equal({
+                    functionGroup: FunctionGroupCode.AuthorityProvider,
+                    kind: 'connector-kind',
+                    uuid: 'connector-uuid',
+                    requestAttributeCallback: {
+                        body: {},
+                        name: 'group_IntegerSelect',
+                        pathVariable: { IntegerSelect: 'Option1' },
+                        requestParameter: {},
+                        uuid: 'dfcfb71f-a161-4aa7-8b1f-726b477b3492',
+                    },
+                });
+                cy.dispatchActions(
+                    connectorActions.callbackSuccess({
+                        callbackId: payload.callbackId,
+                        data: callbackVariationsAtributeEditorMockData.basicTest.callbackResourceSuccess,
+                    }),
+                ).wait(reduxActionWait);
+            },
+        );
+        cySelectors.attributeSelectInput(getAttributeId('IntegerSelect')).input().should('exist');
     });
 
-    it('Should do smth idk ', () => {
-        cySelectors.attributeSelectInput(getAttributeId('String')).selectOption('Option1').click().wait(clickWait);
+    it('Should run the callback, and generate a proper mappings object for Resource callback', () => {
+        cy.mount(
+            <CallbackVariationsAttributeEditorComponent
+                callbackParentUuid="resource-uuid"
+                callbackResource={Resource.RaProfiles}
+                attributeDescriptors={callbackVariationsAtributeEditorMockData.basicTest.attributeDescriptors}
+            />,
+        ).wait(componentLoadWait);
 
-        cySelectors.attributeSelectInput(getAttributeId('Text')).input().should('have.attr', 'value', 'Basic');
+        cy.expectActionAfter(
+            () => {
+                cySelectors.attributeSelectInput(getAttributeId('StringSelect')).selectOption('Option1').click().wait(callbackWait);
+            },
+            slice.actions.callbackResource.match,
+            ({ payload }) => {
+                expect(payload.callbackResource).to.deep.equal({
+                    parentObjectUuid: 'resource-uuid',
+                    resource: Resource.RaProfiles,
+                    requestAttributeCallback: {
+                        body: {},
+                        name: 'group_IntegerSelect',
+                        pathVariable: { IntegerSelect: 'Option1' },
+                        requestParameter: {},
+                        uuid: 'dfcfb71f-a161-4aa7-8b1f-726b477b3492',
+                    },
+                });
+                cy.dispatchActions(
+                    connectorActions.callbackSuccess({
+                        callbackId: payload.callbackId,
+                        data: callbackVariationsAtributeEditorMockData.basicTest.callbackResourceSuccess,
+                    }),
+                ).wait(reduxActionWait);
+            },
+        );
+        cySelectors.attributeSelectInput(getAttributeId('IntegerSelect')).input().should('exist');
+    });
+
+    it('Should not run the callback, if mapping.from is unset', () => {
+        cy.mount(
+            <CallbackVariationsAttributeEditorComponent
+                attributeDescriptors={callbackVariationsAtributeEditorMockData.invalidMappingTest.attributeDescriptors}
+            />,
+        ).wait(componentLoadWait);
+
+        cy.expectActionAfter(
+            () => {
+                cySelectors.attributeSelectInput(getAttributeId('StringSelect')).selectOption('Option1').click().wait(callbackWait);
+            },
+            slice.actions.callbackConnector.match,
+            () => {},
+            true,
+        );
+    });
+
+    it('Should set default value after callback is run', () => {
+        cy.mount(
+            <CallbackVariationsAttributeEditorComponent
+                attributeDescriptors={callbackVariationsAtributeEditorMockData.defaultValuesTest.attributeDescriptors}
+            />,
+        ).wait(componentLoadWait);
+
+        cy.expectActionAfter(
+            () => {
+                cySelectors.attributeSelectInput(getAttributeId('StringSelect')).selectOption('Option1').click().wait(callbackWait);
+            },
+            slice.actions.callbackConnector.match,
+            ({ payload }) => {
+                cy.dispatchActions(
+                    connectorActions.callbackSuccess({
+                        callbackId: payload.callbackId,
+                        data: callbackVariationsAtributeEditorMockData.defaultValuesTest.callbackResourceSuccess,
+                    }),
+                ).wait(reduxActionWait);
+            },
+        );
+        cySelectors.attributeInput(getAttributeId('DefaultText')).textarea().should('contain.text', 'default-content');
+    });
+
+    // TODO: Enable the test after this behavior is fixed
+    it.skip(`Should be able to run the callback fetched from another attribute callback
+        All of attributes returned by different callbacks should be visible
+        `, () => {
+        cy.mount(
+            <CallbackVariationsAttributeEditorComponent
+                attributeDescriptors={callbackVariationsAtributeEditorMockData.nestedAttributeCallbacksTest.attributeDescriptors}
+            />,
+        ).wait(componentLoadWait);
+
+        cy.expectActionAfter(
+            () => {
+                cySelectors.attributeSelectInput(getAttributeId('StringSelect')).selectOption('Option1').click().wait(callbackWait);
+            },
+            slice.actions.callbackConnector.match,
+            ({ payload }) => {
+                cy.dispatchActions(
+                    connectorActions.callbackSuccess({
+                        callbackId: payload.callbackId,
+                        data: callbackVariationsAtributeEditorMockData.nestedAttributeCallbacksTest.callbackResourceSuccess1,
+                    }),
+                ).wait(reduxActionWait);
+            },
+        );
+        cy.expectActionAfter(
+            () => {
+                cySelectors.attributeSelectInput(getAttributeId('IntegerSelect')).selectOption('Integer1').click().wait(callbackWait);
+            },
+            slice.actions.callbackConnector.match,
+            ({ payload }) => {
+                cy.dispatchActions(
+                    connectorActions.callbackSuccess({
+                        callbackId: payload.callbackId,
+                        data: callbackVariationsAtributeEditorMockData.nestedAttributeCallbacksTest.callbackResourceSuccess2,
+                    }),
+                ).wait(reduxActionWait);
+            },
+        );
+        cySelectors.attributeInput(getAttributeId('DefaultText')).textarea().should('contain.text', 'default-content');
+        cySelectors.attributeInput(getAttributeId('DefaultBoolean')).input().should('be.checked');
+    });
+    // TODO: Enable the test after this behavior is fixed
+    it.skip(`Should be able to run multiple callbacks
+        All of attributes returned by different callbacks should be visible
+        `, () => {
+        cy.mount(
+            <CallbackVariationsAttributeEditorComponent
+                attributeDescriptors={callbackVariationsAtributeEditorMockData.multipleAttributeCallbacksTest.attributeDescriptors}
+            />,
+        ).wait(componentLoadWait);
+
+        cy.expectActionAfter(
+            () => {
+                cySelectors.attributeSelectInput(getAttributeId('StringSelect1')).selectOption('Option1').click().wait(callbackWait);
+            },
+            slice.actions.callbackConnector.match,
+            ({ payload }) => {
+                cy.dispatchActions(
+                    connectorActions.callbackSuccess({
+                        callbackId: payload.callbackId,
+                        data: callbackVariationsAtributeEditorMockData.multipleAttributeCallbacksTest.callbackResourceSuccess1,
+                    }),
+                ).wait(reduxActionWait);
+            },
+        );
+        cy.expectActionAfter(
+            () => {
+                cySelectors.attributeSelectInput(getAttributeId('StringSelect2')).selectOption('Option2').click().wait(callbackWait);
+            },
+            slice.actions.callbackConnector.match,
+            ({ payload }) => {
+                cy.dispatchActions(
+                    connectorActions.callbackSuccess({
+                        callbackId: payload.callbackId,
+                        data: callbackVariationsAtributeEditorMockData.multipleAttributeCallbacksTest.callbackResourceSuccess2,
+                    }),
+                ).wait(reduxActionWait);
+            },
+        );
+        cySelectors.attributeSelectInput(getAttributeId('IntegerSelect1')).input().should('exist');
+        cySelectors.attributeSelectInput(getAttributeId('IntegerSelect2')).input().should('exist');
+    });
+
+    it(`Should be able to run the callback with the same callbackId multiple times
+        Current callback attributes should be replaced by the attributes returned by the new callback
+        `, () => {
+        cy.mount(
+            <CallbackVariationsAttributeEditorComponent
+                attributeDescriptors={callbackVariationsAtributeEditorMockData.repeatCallbackTest.attributeDescriptors}
+            />,
+        ).wait(componentLoadWait);
+
+        cy.expectActionAfter(
+            () => {
+                cySelectors.attributeSelectInput(getAttributeId('StringSelect')).selectOption('Option1').click().wait(callbackWait);
+            },
+            slice.actions.callbackConnector.match,
+            ({ payload }) => {
+                cy.dispatchActions(
+                    connectorActions.callbackSuccess({
+                        callbackId: payload.callbackId,
+                        data: callbackVariationsAtributeEditorMockData.repeatCallbackTest.callbackResourceSuccess1,
+                    }),
+                ).wait(reduxActionWait);
+            },
+        );
+        cySelectors.attributeInput(getAttributeId('DefaultText')).textarea().should('contain.text', 'default-content');
+        cy.expectActionAfter(
+            () => {
+                cySelectors.attributeSelectInput(getAttributeId('StringSelect')).selectOption('Option2').click().wait(callbackWait);
+            },
+            slice.actions.callbackConnector.match,
+            ({ payload }) => {
+                cy.dispatchActions(
+                    connectorActions.callbackSuccess({
+                        callbackId: payload.callbackId,
+                        data: callbackVariationsAtributeEditorMockData.repeatCallbackTest.callbackResourceSuccess2,
+                    }),
+                ).wait(reduxActionWait);
+            },
+        );
+        cySelectors.attributeInput(getAttributeId('DefaultText')).textarea().should('not.exist');
+        cySelectors.attributeSelectInput(getAttributeId('IntegerSelect')).input().should('exist');
     });
 
     it(`Reset the redux state that was used`, () => {
