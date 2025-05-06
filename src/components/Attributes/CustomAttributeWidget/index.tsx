@@ -16,10 +16,9 @@ export type Props = {
     resource: Resource;
     resourceUuid: string;
     attributes: AttributeResponseModel[] | undefined;
-    onRemove?: (attributeUuid: string) => void;
 };
 
-export default function CustomAttributeWidget({ resource, resourceUuid, attributes, onRemove }: Props) {
+export default function CustomAttributeWidget({ resource, resourceUuid, attributes }: Props) {
     const dispatch = useDispatch();
     const [isAttributeContentLoaded, setIsAttributeContentLoaded] = useState<boolean>(false);
 
@@ -97,6 +96,7 @@ export default function CustomAttributeWidget({ resource, resourceUuid, attribut
 
     return (
         <Widget
+            id={`${resourceUuid}-customAttributeWidget`}
             title={'Custom Attributes'}
             busy={isFetchingResourceCustomAttributes || isUpdatingContent}
             titleSize="large"
@@ -122,6 +122,7 @@ export default function CustomAttributeWidget({ resource, resourceUuid, attribut
                                         {({ input }) => (
                                             <Select
                                                 {...input}
+                                                inputId="selectCustomAttribute"
                                                 options={options}
                                                 placeholder={`Add...`}
                                                 isClearable={true}
@@ -137,6 +138,7 @@ export default function CustomAttributeWidget({ resource, resourceUuid, attribut
                                     {attribute && (
                                         <div>
                                             <ContentValueField
+                                                id={resourceUuid}
                                                 descriptor={attribute}
                                                 onSubmit={(uuid, content) => {
                                                     form.change('selectCustomAttribute', undefined);

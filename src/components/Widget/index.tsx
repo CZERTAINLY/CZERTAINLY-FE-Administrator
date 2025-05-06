@@ -19,6 +19,7 @@ interface WidgetInfoCard {
 }
 
 interface Props {
+    id?: string;
     title?: string;
     titleLink?: string;
     titleSize?: 'small' | 'medium' | 'large' | 'larger';
@@ -37,6 +38,7 @@ interface Props {
 }
 
 function Widget({
+    id,
     title = '',
     titleLink,
     titleSize = 'medium',
@@ -106,7 +108,7 @@ function Widget({
     }, [widgetButtons, hideWidgetButtons, widgetLock, widgetInfoCard, showWidgetInfo]);
 
     return (
-        <section className={cx(style.widget, className)}>
+        <section className={cx(style.widget, className)} id={id}>
             <div className="d-flex align-items-center">
                 <div>{renderTitle()}</div>
                 {renderRefreshButton()}

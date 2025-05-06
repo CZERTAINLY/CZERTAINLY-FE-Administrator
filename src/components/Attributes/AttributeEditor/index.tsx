@@ -65,6 +65,7 @@ export default function AttributeEditor({
     const formState = useFormState();
 
     const isRunningCallback = useSelector(connectorSelectors.isRunningCallback);
+
     const initiateAttributeCallback = useSelector(userInterfaceSelectors.selectInitiateAttributeCallback);
     // data from callbacks
     const callbackData = useSelector(connectorSelectors.callbackData);
@@ -683,7 +684,6 @@ export default function AttributeEditor({
         for (const callbackId in callbackData) {
             if (callbackData[callbackId] === previousCallbackData[callbackId]) continue;
             if (!callbackData[callbackId]) continue;
-
             if (Array.isArray(callbackData[callbackId])) {
                 const groupCallbackAttributes: AttributeDescriptorModel[] = callbackData[callbackId].filter(isAttributeDescriptorModel);
                 // Check if there are any other attributes in the callback data before setting it as empty
