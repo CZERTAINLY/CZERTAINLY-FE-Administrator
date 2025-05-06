@@ -270,8 +270,7 @@ describe('Group Callback Attributes: General Tests', () => {
         cySelectors.attributeInput(getAttributeId('DefaultText')).textarea().should('contain.text', 'default-content');
     });
 
-    // TODO: Enable the test after this behavior is fixed
-    it.skip(`Should be able to run the callback fetched from another attribute callback
+    it(`Should be able to run the group callback fetched from another attribute's callback
         All of attributes returned by different callbacks should be visible
         `, () => {
         cy.mount(
@@ -311,8 +310,8 @@ describe('Group Callback Attributes: General Tests', () => {
         cySelectors.attributeInput(getAttributeId('DefaultText')).textarea().should('contain.text', 'default-content');
         cySelectors.attributeInput(getAttributeId('DefaultBoolean')).input().should('be.checked');
     });
-    // TODO: Enable the test after this behavior is fixed
-    it.skip(`Should be able to run multiple callbacks
+
+    it(`Should be able to run multiple callbacks
         All of attributes returned by different callbacks should be visible
         `, () => {
         cy.mount(
