@@ -65,7 +65,6 @@ export default function AttributeEditor({
     const formState = useFormState();
 
     const isRunningCallback = useSelector(connectorSelectors.isRunningCallback);
-
     const initiateAttributeCallback = useSelector(userInterfaceSelectors.selectInitiateAttributeCallback);
     // data from callbacks
     const callbackData = useSelector(connectorSelectors.callbackData);
