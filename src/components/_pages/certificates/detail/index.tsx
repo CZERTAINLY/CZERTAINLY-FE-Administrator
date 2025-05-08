@@ -60,7 +60,7 @@ import { collectFormAttributes } from 'utils/attributes/attributes';
 import { downloadFile, formatPEM } from 'utils/certificate';
 
 import { PlatformEnum } from 'types/openapi';
-import { dateFormatter, getFormattedDate } from 'utils/dateUtil';
+import { dateFormatter } from 'utils/dateUtil';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import TabLayout from '../../../Layout/TabLayout';
 import Asn1Dialog from '../Asn1Dialog/Asn1Dialog';
@@ -1234,7 +1234,7 @@ export default function CertificateDetail() {
             !certificate && validationResult?.validationChecks
                 ? []
                 : [
-                      ...Object.entries(validationResult?.validationChecks || {}).map(function ([key, value]) {
+                      ...Object.entries(validationResult?.validationChecks ?? {}).map(function ([key, value]) {
                           return {
                               id: key,
                               columns: [
@@ -1256,7 +1256,7 @@ export default function CertificateDetail() {
                           columns: [
                               'Timestamp',
                               '',
-                              <div style={{ wordBreak: 'break-all' }}>
+                              <div key="timestamp" style={{ wordBreak: 'break-all' }}>
                                   {validationResult?.validationTimestamp ? dateFormatter(validationResult?.validationTimestamp) : ''}
                               </div>,
                           ],
@@ -1266,7 +1266,9 @@ export default function CertificateDetail() {
         validationDataRows.push({
             id: 'validationStatus',
             columns: [
-                <span className="fw-bold">Validation Result</span>,
+                <span key="validationStatus" className="fw-bold">
+                    Validation Result
+                </span>,
                 validationResult?.resultStatus ? <CertificateStatus status={validationResult?.resultStatus}></CertificateStatus> : <></>,
                 <></>,
             ],
@@ -1275,9 +1277,13 @@ export default function CertificateDetail() {
             validationDataRows.push({
                 id: 'message',
                 columns: [
-                    <span className="fw-bold">Validation Message</span>,
+                    <span key="validationMessageSpan" className="fw-bold">
+                        Validation Message
+                    </span>,
                     '',
-                    <div style={{ wordBreak: 'break-all' }}>{validationResult?.message}</div>,
+                    <div key="validationMessage" style={{ wordBreak: 'break-all' }}>
+                        {validationResult?.message}
+                    </div>,
                 ],
             });
         }
