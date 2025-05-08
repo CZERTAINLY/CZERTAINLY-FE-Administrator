@@ -60,7 +60,7 @@ import { collectFormAttributes } from 'utils/attributes/attributes';
 import { downloadFile, formatPEM } from 'utils/certificate';
 
 import { PlatformEnum } from 'types/openapi';
-import { dateFormatter } from 'utils/dateUtil';
+import { dateFormatter, getFormattedDate } from 'utils/dateUtil';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import TabLayout from '../../../Layout/TabLayout';
 import Asn1Dialog from '../Asn1Dialog/Asn1Dialog';
@@ -1229,29 +1229,61 @@ export default function CertificateDetail() {
             : [];
     }, [certificate?.certificateRequest, certificateRequestFormatEnum, certificateTypeEnum]);
 
-    const validationData: TableDataRow[] = useMemo(
-        () =>
+    const validationData: TableDataRow[] = useMemo(() => {
+        let validationDataRows =
             !certificate && validationResult?.validationChecks
                 ? []
-                : Object.entries(validationResult?.validationChecks || {}).map(function ([key, value]) {
-                      return {
-                          id: key,
+                : [
+                      ...Object.entries(validationResult?.validationChecks || {}).map(function ([key, value]) {
+                          return {
+                              id: key,
+                              columns: [
+                                  getEnumLabel(certificateValidationCheck, key),
+                                  value?.status ? <CertificateStatus status={value.status} /> : '',
+                                  <div style={{ wordBreak: 'break-all' }}>
+                                      {value.message?.split('\n').map((str: string, i) => (
+                                          <div key={i}>
+                                              {str}
+                                              <br />
+                                          </div>
+                                      ))}
+                                  </div>,
+                              ],
+                          };
+                      }),
+                      {
+                          id: 'timestamp',
                           columns: [
-                              getEnumLabel(certificateValidationCheck, key),
-                              value?.status ? <CertificateStatus status={value.status} /> : '',
+                              'Timestamp',
+                              '',
                               <div style={{ wordBreak: 'break-all' }}>
-                                  {value.message?.split('\n').map((str: string, i) => (
-                                      <div key={i}>
-                                          {str}
-                                          <br />
-                                      </div>
-                                  ))}
+                                  {validationResult?.validationTimestamp ? dateFormatter(validationResult?.validationTimestamp) : ''}
                               </div>,
                           ],
-                      };
-                  }),
-        [certificate, validationResult, certificateValidationCheck],
-    );
+                      },
+                  ];
+
+        validationDataRows.push({
+            id: 'validationStatus',
+            columns: [
+                <span className="fw-bold">Validation Result</span>,
+                validationResult?.resultStatus ? <CertificateStatus status={validationResult?.resultStatus}></CertificateStatus> : <></>,
+                <></>,
+            ],
+        });
+        if (validationResult?.message) {
+            validationDataRows.push({
+                id: 'message',
+                columns: [
+                    <span className="fw-bold">Validation Message</span>,
+                    '',
+                    <div style={{ wordBreak: 'break-all' }}>{validationResult?.message}</div>,
+                ],
+            });
+        }
+
+        return validationDataRows;
+    }, [certificate, validationResult, certificateValidationCheck]);
 
     const relatedCertificatesData: TableDataRow[] = useMemo(
         () =>
@@ -1876,24 +1908,7 @@ export default function CertificateDetail() {
                                     widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}
                                 >
                                     <br />
-                                    <CustomTable
-                                        headers={validationHeaders}
-                                        data={[
-                                            ...validationData,
-                                            {
-                                                id: 'validationtStatus',
-                                                columns: [
-                                                    <span className="fw-bold">Validation Result</span>,
-                                                    validationResult?.resultStatus ? (
-                                                        <CertificateStatus status={validationResult?.resultStatus}></CertificateStatus>
-                                                    ) : (
-                                                        <></>
-                                                    ),
-                                                    <></>,
-                                                ],
-                                            },
-                                        ]}
-                                    />
+                                    <CustomTable headers={validationHeaders} data={validationData} />
                                 </Widget>
                                 <Widget
                                     title="Compliance Status"

@@ -20,6 +20,9 @@ export enum KeyAlgorithm {
     Rsa = 'RSA',
     Ecdsa = 'ECDSA',
     Falcon = 'FALCON',
+    MlDsa = 'ML-DSA',
+    SlhDsa = 'SLH-DSA',
+    MlKem = 'ML-KEM',
     CrystalsDilithium = 'CRYSTALS-Dilithium',
     Sphincs = 'SPHINCS+',
     Unknown = 'Unknown'
