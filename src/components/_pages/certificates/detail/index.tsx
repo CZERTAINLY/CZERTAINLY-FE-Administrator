@@ -1251,42 +1251,21 @@ export default function CertificateDetail() {
                               ],
                           };
                       }),
-                      {
-                          id: 'timestamp',
-                          columns: [
-                              'Timestamp',
-                              '',
-                              <div key="timestamp" style={{ wordBreak: 'break-all' }}>
-                                  {validationResult?.validationTimestamp ? dateFormatter(validationResult?.validationTimestamp) : ''}
-                              </div>,
-                          ],
-                      },
                   ];
 
         validationDataRows.push({
             id: 'validationStatus',
             columns: [
-                <span key="validationStatus" className="fw-bold">
-                    Validation Result
-                </span>,
+                <div key="validationStatus">
+                    <span className="fw-bold">Validation Result</span>{' '}
+                    {validationResult?.validationTimestamp ? `(${dateFormatter(validationResult?.validationTimestamp)})` : ''}
+                </div>,
                 validationResult?.resultStatus ? <CertificateStatus status={validationResult?.resultStatus}></CertificateStatus> : <></>,
-                <></>,
+                <div key="validationMessage" style={{ wordBreak: 'break-all' }}>
+                    {validationResult?.message}
+                </div>,
             ],
         });
-        if (validationResult?.message) {
-            validationDataRows.push({
-                id: 'message',
-                columns: [
-                    <span key="validationMessageSpan" className="fw-bold">
-                        Validation Message
-                    </span>,
-                    '',
-                    <div key="validationMessage" style={{ wordBreak: 'break-all' }}>
-                        {validationResult?.message}
-                    </div>,
-                ],
-            });
-        }
 
         return validationDataRows;
     }, [certificate, validationResult, certificateValidationCheck]);
