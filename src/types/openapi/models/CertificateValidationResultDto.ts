@@ -33,6 +33,18 @@ export interface CertificateValidationResultDto {
      * @memberof CertificateValidationResultDto
      */
     validationChecks?: { [key: string]: CertificateValidationCheckDto; };
+    /**
+     * Overall certificate validation result message
+     * @type {string}
+     * @memberof CertificateValidationResultDto
+     */
+    message?: string;
+    /**
+     * Date of the most recent validation of the certificate
+     * @type {string}
+     * @memberof CertificateValidationResultDto
+     */
+    validationTimestamp?: string;
 }
 
 

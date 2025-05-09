@@ -22,7 +22,7 @@
             },
             "typescript-rxjs-remote": {
                 "generatorName": "typescript-rxjs",
-                "inputSpec": "https://api.czertainly.com/develop/doc-openapi-czertainly-core.yaml",
+                "inputSpec": "https://api.czertainly.com/main/doc-openapi-czertainly-core.yaml",
                 "output": "./src/types/openapi",
                 "typeMappings": {
                     "set": "Array",
@@ -38,7 +38,7 @@
             },
             "typescript-rxjs-utils": {
                 "generatorName": "typescript-rxjs",
-                "inputSpec": "https://api.czertainly.com/utils/develop/utils-service.yaml",
+                "inputSpec": "https://api.czertainly.com/utils/main/utils-service.yaml",
                 "output": "./src/types/openapi/utils",
                 "typeMappings": {
                     "set": "Array",

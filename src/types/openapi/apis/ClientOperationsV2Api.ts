@@ -156,6 +156,7 @@ export class ClientOperationsV2Api extends BaseAPI {
     };
 
     /**
+     * The rekey operation is used to request a new certificate with a new key pair. The new certificate will be issued with the same subject and attributes as the original certificate, but with a new public key. Therefore, new certificate signing request (CSR) with new key pair needs to be provided, or new key pair managed by the platform needs to be selected. When the same key pair is used, or the subject is changed, the rekey operation will be rejected. 
      * Rekey Certificate
      */
     rekeyCertificate({ authorityUuid, raProfileUuid, certificateUuid, clientCertificateRekeyRequestDto }: RekeyCertificateRequest): Observable<ClientCertificateDataResponseDto>

@@ -44,13 +44,13 @@ export interface ClientCertificateRekeyRequestDto {
      * @type {string}
      * @memberof ClientCertificateRekeyRequestDto
      */
-    keyUuid: string;
+    keyUuid?: string;
     /**
      * Token Profile UUID
      * @type {string}
      * @memberof ClientCertificateRekeyRequestDto
      */
-    tokenProfileUuid: string;
+    tokenProfileUuid?: string;
     /**
      * Signature Attributes. If not provided, existing attributes will be used to generate the new CSR
      * @type {Array<RequestAttributeDto>}
