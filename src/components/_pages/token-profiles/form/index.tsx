@@ -91,12 +91,11 @@ export default function TokenProfileForm({ usesGlobalModal = false }: TokenProfi
         (tokenUuid: string, form: FormApi<FormValues>) => {
             dispatch(connectorActions.clearCallbackData());
             setGroupAttributesCallbackAttributes([]);
-            form.mutators.clearAttributes('ra-profile');
-            if (tokenProfile) setTokenProfile({ ...tokenProfile });
+            form.mutators.clearAttributes('token-profile');
             dispatch(tokensActions.clearTokenProfileAttributesDescriptors());
             dispatch(tokensActions.getTokenProfileAttributesDescriptors({ tokenUuid }));
         },
-        [dispatch, tokenProfile],
+        [dispatch],
     );
 
     const onCancelClick = useCallback(() => {
@@ -156,7 +155,7 @@ export default function TokenProfileForm({ usesGlobalModal = false }: TokenProfi
         ],
     );
 
-    const optionsForAuthorities = useMemo(
+    const optionsForTokens = useMemo(
         () =>
             tokens.map((token) => ({
                 value: token.uuid,
@@ -165,19 +164,15 @@ export default function TokenProfileForm({ usesGlobalModal = false }: TokenProfi
         [tokens],
     );
 
-    const defaultValues: FormValues = useMemo(
-        () => ({
+    const defaultValues: FormValues = useMemo(() => {
+        const token = tokenProfile ? optionsForTokens.find((option) => option.value === tokenProfile.tokenInstanceUuid) : undefined;
+        return {
             name: editMode ? tokenProfile?.name || '' : '',
             description: editMode ? tokenProfile?.description || '' : '',
-            token: editMode
-                ? tokenProfile
-                    ? optionsForAuthorities.find((option) => option.value === tokenProfile.tokenInstanceUuid)
-                    : undefined
-                : undefined,
+            token: editMode ? token : undefined,
             usages: editMode ? tokenProfile?.usages?.map((usage) => ({ value: usage, label: usage })) || [] : [],
-        }),
-        [editMode, optionsForAuthorities, tokenProfile],
-    );
+        };
+    }, [editMode, optionsForTokens, tokenProfile]);
 
     const title = useMemo(() => (editMode ? 'Edit Token Profile' : 'Create Token Profile'), [editMode]);
 
@@ -259,7 +254,7 @@ export default function TokenProfileForm({ usesGlobalModal = false }: TokenProfi
                                         inputId="tokenSelect"
                                         maxMenuHeight={140}
                                         menuPlacement="auto"
-                                        options={optionsForAuthorities}
+                                        options={optionsForTokens}
                                         placeholder="Select to change Token if needed"
                                         onChange={(event: any) => {
                                             onTokenChange(event.value, form);
