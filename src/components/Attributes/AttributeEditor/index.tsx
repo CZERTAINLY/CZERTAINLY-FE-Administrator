@@ -38,7 +38,7 @@ export interface Props {
     id: string;
     attributeDescriptors: AttributeDescriptorModel[];
     groupAttributesCallbackAttributes?: AttributeDescriptorModel[];
-    setGroupAttributesCallbackAttributes?: Function;
+    setGroupAttributesCallbackAttributes?: React.Dispatch<React.SetStateAction<AttributeDescriptorModel[]>>;
     attributes?: AttributeResponseModel[];
     connectorUuid?: string;
     functionGroupCode?: FunctionGroupCode;
@@ -65,7 +65,6 @@ export default function AttributeEditor({
     const formState = useFormState();
 
     const isRunningCallback = useSelector(connectorSelectors.isRunningCallback);
-
     const initiateAttributeCallback = useSelector(userInterfaceSelectors.selectInitiateAttributeCallback);
     // data from callbacks
     const callbackData = useSelector(connectorSelectors.callbackData);
@@ -677,6 +676,7 @@ export default function AttributeEditor({
 
     /**
      * Obtains values from attribute callbacks and updates the form values / options accordingly
+     * Sets groupAttributeCallbackAttributes from callbackData
      */
     useEffect(() => {
         if (previousCallbackData === callbackData) return;
@@ -684,62 +684,53 @@ export default function AttributeEditor({
         for (const callbackId in callbackData) {
             if (callbackData[callbackId] === previousCallbackData[callbackId]) continue;
             if (!callbackData[callbackId]) continue;
-            if (Array.isArray(callbackData[callbackId])) {
-                const groupCallbackAttributes: AttributeDescriptorModel[] = callbackData[callbackId].filter(isAttributeDescriptorModel);
-                // Check if there are any other attributes in the callback data before setting it as empty
-                if (!groupCallbackAttributes.length) {
-                    const callbackDataArray = Object.values(callbackData);
-                    for (let i = 0; i < callbackDataArray.length; i++) {
-                        if (Array.isArray(callbackDataArray[i])) {
-                            const groupCallbackAttributesOther: AttributeDescriptorModel[] =
-                                callbackDataArray[i].filter(isAttributeDescriptorModel);
+            if (!Array.isArray(callbackData[callbackId])) continue;
+            const groupCallbackAttributes: AttributeDescriptorModel[] = callbackData[callbackId].filter(isAttributeDescriptorModel);
 
-                            if (groupCallbackAttributesOther.length) {
-                                groupCallbackAttributes.push(groupCallbackAttributesOther[i]);
-                            }
-                        }
-                    }
+            const descriptors = [...attributeDescriptors, ...groupAttributesCallbackAttributes];
+            const descriptor = descriptors.find((d) => `__attributes__${id}__.${d.name}` === callbackId);
+
+            if (descriptor) {
+                // Set groupAttributesCallbackAttributes inside the loop, to only run this if the callbackData fields have actually been changed.
+                const newGroupCallbackAttributes = Object.values(callbackData)
+                    .filter(Array.isArray)
+                    .map((callbackDataArray) => callbackDataArray.filter(isAttributeDescriptorModel))
+                    .reduce((acc, el) => [...acc, ...el], []);
+                setGroupAttributesCallbackAttributes(newGroupCallbackAttributes);
+            }
+
+            const groupCallbackAttributesContentOpts = groupCallbackAttributes.reduce((acc, attr) => {
+                if (isDataAttributeModel(attr) || isInfoAttributeModel(attr)) {
+                    const formAttributeName = `__attributes__${id}__.${attr.name}`;
+                    const optionsFromGroupCallback = attr.content?.map((value: any) => ({
+                        label: value.reference ?? value.data.toString(),
+                        value,
+                    }));
+                    const callbackContentOpts = optionsFromGroupCallback ? { [formAttributeName]: optionsFromGroupCallback } : {};
+                    return { ...acc, ...callbackContentOpts };
                 }
-                const descriptors = [...attributeDescriptors, ...groupAttributesCallbackAttributes];
-                const descriptor = descriptors.find((d) => `__attributes__${id}__.${d.name}` === callbackId);
 
-                if (descriptor && `__attributes__${id}__.${descriptor.name}` === callbackId) {
-                    setGroupAttributesCallbackAttributes(groupCallbackAttributes);
-                }
+                return { ...acc };
+            }, {});
 
-                const groupCallbackAttributesContentOpts = groupCallbackAttributes.reduce((acc, attr) => {
-                    if (isDataAttributeModel(attr) || isInfoAttributeModel(attr)) {
-                        const formAttributeName = `__attributes__${id}__.${attr.name}`;
-                        const optionsFromGroupCallback = attr.content?.map((value: any) => ({
-                            label: value.reference ?? value.data.toString(),
-                            value,
-                        }));
-                        const callbackContentOpts = optionsFromGroupCallback ? { [formAttributeName]: optionsFromGroupCallback } : {};
-                        return { ...acc, ...callbackContentOpts };
-                    }
+            const callbackContentOpts = {
+                [callbackId]: callbackData[callbackId]
+                    .filter((v: any) => !isAttributeDescriptorModel(v))
+                    .map((value: any) => ({ label: value.reference ?? value.data.toString(), value })),
+            };
 
-                    return { ...acc };
-                }, {});
+            // multiple effects can modify opts during single render call
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+            opts = {
+                ...opts,
+                ...callbackContentOpts,
+                ...groupCallbackAttributesContentOpts,
+            };
 
-                const callbackContentOpts = {
-                    [callbackId]: callbackData[callbackId]
-                        .filter((v: any) => !isAttributeDescriptorModel(v))
-                        .map((value: any) => ({ label: value.reference ?? value.data.toString(), value })),
-                };
+            setOptions({ ...options, ...opts });
 
-                // multiple effects can modify opts during single render call
-                // eslint-disable-next-line react-hooks/exhaustive-deps
-                opts = {
-                    ...opts,
-                    ...callbackContentOpts,
-                    ...groupCallbackAttributesContentOpts,
-                };
-
-                setOptions({ ...options, ...opts });
-
-                if (descriptor && isDataAttributeModel(descriptor) && !descriptor.properties.list) {
-                    form.mutators.setAttribute(callbackId, callbackData[callbackId][0].reference ?? callbackData[callbackId][0].data);
-                }
+            if (descriptor && isDataAttributeModel(descriptor) && !descriptor.properties.list) {
+                form.mutators.setAttribute(callbackId, callbackData[callbackId][0].reference ?? callbackData[callbackId][0].data);
             }
         }
 
