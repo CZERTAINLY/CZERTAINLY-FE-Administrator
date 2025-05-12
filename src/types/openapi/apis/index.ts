@@ -27,6 +27,7 @@ export * from './InfoApi';
 export * from './InternalNotificationApi';
 export * from './LocalOperationsApi';
 export * from './LocationManagementApi';
+export * from './NotificationProfileInventoryApi';
 export * from './RAProfileManagementApi';
 export * from './ResourceManagementApi';
 export * from './RoleManagementApi';

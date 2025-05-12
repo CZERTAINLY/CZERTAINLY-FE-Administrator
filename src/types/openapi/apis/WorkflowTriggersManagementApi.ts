@@ -50,7 +50,6 @@ export interface GetTriggerHistorySummaryRequest {
 
 export interface ListTriggersRequest {
     resource?: Resource;
-    eventResource?: Resource;
 }
 
 export interface UpdateTriggerRequest {
@@ -143,14 +142,13 @@ export class WorkflowTriggersManagementApi extends BaseAPI {
     /**
      * List Triggers
      */
-    listTriggers({ resource, eventResource }: ListTriggersRequest): Observable<Array<TriggerDto>>
-    listTriggers({ resource, eventResource }: ListTriggersRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<TriggerDto>>>
-    listTriggers({ resource, eventResource }: ListTriggersRequest, opts?: OperationOpts): Observable<Array<TriggerDto> | AjaxResponse<Array<TriggerDto>>> {
+    listTriggers({ resource }: ListTriggersRequest): Observable<Array<TriggerDto>>
+    listTriggers({ resource }: ListTriggersRequest, opts?: OperationOpts): Observable<AjaxResponse<Array<TriggerDto>>>
+    listTriggers({ resource }: ListTriggersRequest, opts?: OperationOpts): Observable<Array<TriggerDto> | AjaxResponse<Array<TriggerDto>>> {
 
         const query: HttpQuery = {};
 
         if (resource != null) { query['resource'] = resource; }
-        if (eventResource != null) { query['eventResource'] = eventResource; }
 
         return this.request<Array<TriggerDto>>({
             url: '/v1/workflows/triggers',

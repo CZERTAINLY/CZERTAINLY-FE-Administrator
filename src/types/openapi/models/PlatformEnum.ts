@@ -60,6 +60,7 @@ export enum PlatformEnum {
     AttributeValueTarget = 'AttributeValueTarget',
     ProgrammingLanguageEnum = 'ProgrammingLanguageEnum',
     SchedulerJobExecutionStatus = 'SchedulerJobExecutionStatus',
+    RecipientType = 'RecipientType',
     TriggerType = 'TriggerType',
     ConditionType = 'ConditionType',
     ExecutionType = 'ExecutionType',

@@ -2,8 +2,10 @@ import { Badge } from 'reactstrap';
 
 interface Props {
     value: boolean;
+    invertColor?: boolean;
 }
 
-const BooleanBadge = ({ value }: Props) => (value ? <Badge color="success">Yes</Badge> : <Badge color="danger">No</Badge>);
+const BooleanBadge = ({ value, invertColor }: Props) =>
+    value ? <Badge color={invertColor ? 'danger' : 'success'}>Yes</Badge> : <Badge color={invertColor ? 'success' : 'danger'}>No</Badge>;
 
 export default BooleanBadge;

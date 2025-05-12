@@ -28,6 +28,7 @@ apis/InfoApi.ts
 apis/InternalNotificationApi.ts
 apis/LocalOperationsApi.ts
 apis/LocationManagementApi.ts
+apis/NotificationProfileInventoryApi.ts
 apis/RAProfileManagementApi.ts
 apis/ResourceManagementApi.ts
 apis/RoleManagementApi.ts
@@ -282,6 +283,11 @@ models/NotificationDto.ts
 models/NotificationInstanceDto.ts
 models/NotificationInstanceRequestDto.ts
 models/NotificationInstanceUpdateRequestDto.ts
+models/NotificationProfileDetailDto.ts
+models/NotificationProfileDto.ts
+models/NotificationProfileRequestDto.ts
+models/NotificationProfileResponseDto.ts
+models/NotificationProfileUpdateRequestDto.ts
 models/NotificationResponseDto.ts
 models/NotificationSettingsDto.ts
 models/OAuth2ProviderSettingsDto.ts
@@ -309,6 +315,8 @@ models/RandomDataRequestDto.ts
 models/RandomDataResponseDto.ts
 models/RangeAttributeConstraint.ts
 models/RangeAttributeConstraintData.ts
+models/RecipientDto.ts
+models/RecipientType.ts
 models/RegexpAttributeConstraint.ts
 models/RemoveCertificateDto.ts
 models/RequestAttributeCallback.ts

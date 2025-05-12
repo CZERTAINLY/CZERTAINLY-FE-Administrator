@@ -64,7 +64,7 @@ const PlatformInfoDialogLink = () => {
                     <Button
                         className="btn btn-link py-0 px-1 ms-2"
                         color="white"
-                        title="Public Key"
+                        title="Version Info"
                         key="copy"
                         onClick={() =>
                             copyToClipboard(

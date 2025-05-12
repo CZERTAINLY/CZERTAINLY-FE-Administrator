@@ -17,6 +17,7 @@
  * @enum {string}
  */
 export enum ExecutionType {
-    SetField = 'setField'
+    SetField = 'setField',
+    SendNotification = 'sendNotification'
 }
 

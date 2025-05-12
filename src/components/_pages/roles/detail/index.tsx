@@ -12,6 +12,7 @@ import { Badge, Container } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
+import BooleanBadge from 'components/BooleanBadge/BooleanBadge';
 
 export default function UserDetail() {
     const dispatch = useDispatch();
@@ -141,10 +142,7 @@ export default function UserDetail() {
                       },
                       {
                           id: 'systemRole',
-                          columns: [
-                              'System role ',
-                              <Badge color={!role.systemRole ? 'success' : 'danger'}>{role.systemRole ? 'Yes' : 'No'}</Badge>,
-                          ],
+                          columns: ['System role ', <BooleanBadge key="systemRole" value={role.systemRole} invertColor />],
                       },
                   ],
         [role],

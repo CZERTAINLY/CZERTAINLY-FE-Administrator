@@ -32,6 +32,7 @@ import globalMetadataEpics from './globalMetadata-epics';
 import infoEpics from './info-epics';
 import locationsEpics from './locations-epics';
 import notificationsEpics from './notifications-epics';
+import notificationProfilesEpics from './notification-profiles-epics';
 import raProfilesEpics from './ra-profiles-epics';
 import { reducers } from './reducers';
 import resourcesEpics from './resource-epics';
@@ -90,6 +91,7 @@ export const epics = combineEpics(
     ...profileApprovalEpics,
     ...approvalsEpic,
     ...notificationsEpics,
+    ...notificationProfilesEpics,
     ...enumsEpics,
     ...infoEpics,
     ...tokenEpics,

@@ -65,6 +65,12 @@ const menuItemMappings: MenuItemMapping[] = [
                 link: '/complianceprofiles',
                 requiredResources: [Resource.ComplianceProfiles],
             },
+            {
+                _key: '/notificationProfiles',
+                name: 'Notification Profiles',
+                link: '/notificationprofiles',
+                requiredResources: [Resource.NotificationProfiles],
+            },
         ],
     },
 

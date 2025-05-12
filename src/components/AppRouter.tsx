@@ -114,6 +114,10 @@ import NotificationInstanceDetail from './_pages/notifications/notification-inst
 import NotificationInstanceForm from './_pages/notifications/notification-instance-form';
 import NotificationsSetting from './_pages/notifications/notifications-setting';
 
+import NotificationProfileDetail from './_pages/notifications/notification-profiles/detail';
+import NotificationProfileForm from './_pages/notifications/notification-profiles/form';
+import NotificationProfilesList from './_pages/notifications/notification-profiles/list';
+
 import ConditionDetails from './_pages/conditions/details';
 import ConditionForm from './_pages/conditions/form';
 
@@ -358,6 +362,11 @@ export default function AppRouter() {
                     <Route path={`/notificationinstances/detail/:id`} element={<NotificationInstanceDetail />} />
                     <Route path={`/notificationinstances/add`} element={<NotificationInstanceForm />} />
                     <Route path={`/notificationinstances/edit/:id`} element={<NotificationInstanceForm />} />
+
+                    <Route path={`/notificationprofiles`} element={<NotificationProfilesList />} />
+                    <Route path={`/notificationprofiles/detail/:uuid/:version`} element={<NotificationProfileDetail />} />
+                    <Route path={`/notificationprofiles/add`} element={<NotificationProfileForm />} />
+                    <Route path={`/notificationprofiles/edit/:uuid/:version`} element={<NotificationProfileForm />} />
 
                     <Route path={`/loggingsettings`} element={<LoggingSettings />} />
 
