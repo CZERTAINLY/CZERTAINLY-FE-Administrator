@@ -1229,29 +1229,46 @@ export default function CertificateDetail() {
             : [];
     }, [certificate?.certificateRequest, certificateRequestFormatEnum, certificateTypeEnum]);
 
-    const validationData: TableDataRow[] = useMemo(
-        () =>
+    const validationData: TableDataRow[] = useMemo(() => {
+        let validationDataRows =
             !certificate && validationResult?.validationChecks
                 ? []
-                : Object.entries(validationResult?.validationChecks || {}).map(function ([key, value]) {
-                      return {
-                          id: key,
-                          columns: [
-                              getEnumLabel(certificateValidationCheck, key),
-                              value?.status ? <CertificateStatus status={value.status} /> : '',
-                              <div style={{ wordBreak: 'break-all' }}>
-                                  {value.message?.split('\n').map((str: string, i) => (
-                                      <div key={i}>
-                                          {str}
-                                          <br />
-                                      </div>
-                                  ))}
-                              </div>,
-                          ],
-                      };
-                  }),
-        [certificate, validationResult, certificateValidationCheck],
-    );
+                : [
+                      ...Object.entries(validationResult?.validationChecks ?? {}).map(function ([key, value]) {
+                          return {
+                              id: key,
+                              columns: [
+                                  getEnumLabel(certificateValidationCheck, key),
+                                  value?.status ? <CertificateStatus status={value.status} /> : '',
+                                  <div style={{ wordBreak: 'break-all' }}>
+                                      {value.message?.split('\n').map((str: string, i) => (
+                                          <div key={i}>
+                                              {str}
+                                              <br />
+                                          </div>
+                                      ))}
+                                  </div>,
+                              ],
+                          };
+                      }),
+                  ];
+
+        validationDataRows.push({
+            id: 'validationStatus',
+            columns: [
+                <div key="validationStatus">
+                    <span className="fw-bold">Validation Result</span>{' '}
+                    {validationResult?.validationTimestamp ? `(${dateFormatter(validationResult?.validationTimestamp)})` : ''}
+                </div>,
+                validationResult?.resultStatus ? <CertificateStatus status={validationResult?.resultStatus}></CertificateStatus> : <></>,
+                <div key="validationMessage" style={{ wordBreak: 'break-all' }}>
+                    {validationResult?.message}
+                </div>,
+            ],
+        });
+
+        return validationDataRows;
+    }, [certificate, validationResult, certificateValidationCheck]);
 
     const relatedCertificatesData: TableDataRow[] = useMemo(
         () =>
@@ -1876,24 +1893,7 @@ export default function CertificateDetail() {
                                     widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}
                                 >
                                     <br />
-                                    <CustomTable
-                                        headers={validationHeaders}
-                                        data={[
-                                            ...validationData,
-                                            {
-                                                id: 'validationtStatus',
-                                                columns: [
-                                                    <span className="fw-bold">Validation Result</span>,
-                                                    validationResult?.resultStatus ? (
-                                                        <CertificateStatus status={validationResult?.resultStatus}></CertificateStatus>
-                                                    ) : (
-                                                        <></>
-                                                    ),
-                                                    <></>,
-                                                ],
-                                            },
-                                        ]}
-                                    />
+                                    <CustomTable headers={validationHeaders} data={validationData} />
                                 </Widget>
                                 <Widget
                                     title="Compliance Status"
