@@ -51,26 +51,22 @@ function getDurationFromIso8601String(input: string): Duration {
     if (!input || typeof input !== 'string' || !input.startsWith('P')) {
         return duration;
     }
-
-    const isoRegex = /^P(?:([\d.]+)W)?(?:([\d.]+)D)?(?:T(?:([\d.]+)H)?(?:([\d.]+)M)?(?:([\d.]+)S)?)?$/i;
-
-    const match = isoRegex.exec(input);
-
-    if (!match) {
-        return duration;
+    function parseMatch(value: RegExpExecArray | null): number {
+        return value ? parseFloat(value[1]) : 0;
     }
 
-    const [_fullMatch, weeksStr, daysStr, hoursStr, minutesStr, secondsStr] = match;
+    const weeksMatch = /(\d+(?:\.\d+)?)W/.exec(input);
+    const daysMatch = /(\d+(?:\.\d+)?)D/.exec(input);
 
-    function parseFloatOrZero(value?: string): number {
-        return value ? parseFloat(value) : 0;
-    }
+    const hoursMatch = /(\d+(?:\.\d+)?)H/.exec(input);
+    const minutesMatch = /(\d+(?:\.\d+)?)M/.exec(input);
+    const secondsMatch = /(\d+(?:\.\d+)?)S/.exec(input);
 
-    const weeks = parseFloatOrZero(weeksStr);
-    const days = parseFloatOrZero(daysStr);
-    const hours = parseFloatOrZero(hoursStr);
-    const minutes = parseFloatOrZero(minutesStr);
-    const seconds = parseFloatOrZero(secondsStr);
+    const weeks = parseMatch(weeksMatch);
+    const days = parseMatch(daysMatch);
+    const hours = parseMatch(hoursMatch);
+    const minutes = parseMatch(minutesMatch);
+    const seconds = parseMatch(secondsMatch);
 
     const totalSeconds = (((weeks * 7 + days) * 24 + hours) * 60 + minutes) * 60 + seconds;
 
