@@ -33,6 +33,12 @@ export interface ExecutionItemRequestDto {
      */
     fieldIdentifier?: string;
     /**
+     * UUID of the Notification profile
+     * @type {string}
+     * @memberof ExecutionItemRequestDto
+     */
+    notificationProfileUuid?: string;
+    /**
      * Data of the execution item
      * @type {object}
      * @memberof ExecutionItemRequestDto

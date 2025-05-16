@@ -21,17 +21,29 @@ import type {
  */
 export interface ExecutionItemDto {
     /**
-     * Source of the field in the execution item
+     * Source of the field in the execution item (required in case of set field execution type)
      * @type {FilterFieldSource}
      * @memberof ExecutionItemDto
      */
-    fieldSource: FilterFieldSource;
+    fieldSource?: FilterFieldSource;
     /**
-     * Field identifier of the execution item
+     * Field identifier of the execution item (required in case of set field execution type)
      * @type {string}
      * @memberof ExecutionItemDto
      */
-    fieldIdentifier: string;
+    fieldIdentifier?: string;
+    /**
+     * UUID of the Notification profile (required in case of send notification execution type)
+     * @type {string}
+     * @memberof ExecutionItemDto
+     */
+    notificationProfileUuid?: string;
+    /**
+     * Name of the Notification profile (required in case of send notification execution type)
+     * @type {string}
+     * @memberof ExecutionItemDto
+     */
+    notificationProfileName?: string;
     /**
      * Data of the execution item
      * @type {object}

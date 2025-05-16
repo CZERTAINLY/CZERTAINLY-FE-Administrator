@@ -29,6 +29,8 @@ export enum FilterConditionOperator {
     EndsWith = 'ENDS_WITH',
     Empty = 'EMPTY',
     NotEmpty = 'NOT_EMPTY',
+    InNext = 'IN_NEXT',
+    InPast = 'IN_PAST',
     Success = 'SUCCESS',
     Failed = 'FAILED',
     Unknown = 'UNKNOWN',

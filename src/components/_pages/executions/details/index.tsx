@@ -1,4 +1,5 @@
-import ConditionAndExecutionItemsViewer from 'components/ConditionAndExecutionItemsViewer';
+import { SendNotificationExecutionItems } from 'components/_pages/executions/SendNotificationExecutionItems';
+import ConditionAndSetFieldExecutionItemsViewer from 'components/ConditionAndSetFieldExecutionItemsViewer';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
@@ -9,7 +10,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 import { Button, ButtonGroup, Col, Container, Input, Row } from 'reactstrap';
-import { PlatformEnum } from 'types/openapi';
+import { ExecutionType, PlatformEnum } from 'types/openapi';
+import { ExecutionModel } from 'types/rules';
 
 const ExecutionDetails = () => {
     const { id } = useParams();
@@ -44,6 +46,23 @@ const ExecutionDetails = () => {
         dispatch(rulesActions.deleteExecution({ executionUuid: id }));
         setConfirmDelete(false);
     }, [dispatch, id]);
+
+    const onUpdateSendNotificationExecutionItems = useCallback(
+        (profileUuids: string[]) => {
+            if (!id || !executionDetails) return;
+            dispatch(
+                rulesActions.updateExecution({
+                    executionUuid: id,
+                    execution: {
+                        items: profileUuids.map((el) => ({
+                            notificationProfileUuid: el,
+                        })),
+                    },
+                }),
+            );
+        },
+        [id, dispatch, executionDetails],
+    );
 
     const onUpdateDescriptionConfirmed = useCallback(() => {
         if (!id || !updateDescriptionEditEnable) return;
@@ -186,6 +205,33 @@ const ExecutionDetails = () => {
         ],
     );
 
+    const renderExecutionItems = useCallback(() => {
+        switch (executionDetails?.type) {
+            case ExecutionType.SetField:
+                return (
+                    executionDetails?.resource && (
+                        <ConditionAndSetFieldExecutionItemsViewer resource={executionDetails.resource} formType="executionItems" />
+                    )
+                );
+            case ExecutionType.SendNotification:
+                return (
+                    <SendNotificationExecutionItems
+                        mode="detail"
+                        isUpdating={isUpdatingDetails}
+                        notificationProfileItems={
+                            executionDetails.items.map((el) => ({
+                                label: el.notificationProfileName ?? '',
+                                value: el.notificationProfileUuid ?? '',
+                            })) ?? []
+                        }
+                        onNotificationProfileItemsChange={(newItems) =>
+                            onUpdateSendNotificationExecutionItems(newItems.map((el) => el.value))
+                        }
+                    />
+                );
+        }
+    }, [executionDetails, isUpdatingDetails, onUpdateSendNotificationExecutionItems]);
+
     return (
         <Container className="themed-container" fluid>
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
@@ -201,11 +247,7 @@ const ExecutionDetails = () => {
                     </Widget>
                 </Col>
             </Row>
-            <Row>
-                {executionDetails?.resource && (
-                    <ConditionAndExecutionItemsViewer resource={executionDetails.resource} formType="executionItems" />
-                )}
-            </Row>
+            <Row>{renderExecutionItems()}</Row>
             <Dialog
                 isOpen={confirmDelete}
                 caption={`Delete an Execution`}

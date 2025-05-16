@@ -1,4 +1,4 @@
-import ConditionAndExecutionItemsViewer from 'components/ConditionAndExecutionItemsViewer';
+import ConditionAndSetFieldExecutionItemsViewer from 'components/ConditionAndSetFieldExecutionItemsViewer';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
@@ -204,7 +204,7 @@ const ConditionDetails = () => {
             </Row>
             <Row>
                 {conditionDetails?.resource && (
-                    <ConditionAndExecutionItemsViewer resource={conditionDetails.resource} formType="condtionItems" />
+                    <ConditionAndSetFieldExecutionItemsViewer resource={conditionDetails.resource} formType="conditionItems" />
                 )}
             </Row>
             <Dialog
