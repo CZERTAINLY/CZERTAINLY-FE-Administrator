@@ -311,7 +311,6 @@ function RecipientTypeFields() {
                     <CustomSelect
                         {...input}
                         label="Notification Recipient"
-                        value={formState.values.recipient}
                         onChange={(e) => form.change('recipient', e as OptionType)}
                         error={meta.error && meta.touched && 'Recipient is required'}
                         required

@@ -55,12 +55,12 @@ function getDurationFromIso8601String(input: string): Duration {
         return value ? parseFloat(value[1]) : 0;
     }
 
-    const weeksMatch = /(\d+(?:\.\d+)?)W/.exec(input);
-    const daysMatch = /(\d+(?:\.\d+)?)D/.exec(input);
+    const weeksMatch = /(\d{1,10}(?:\.\d{1,10})?)W/.exec(input);
+    const daysMatch = /(\d{1,10}(?:\.\d{1,10})?)D/.exec(input);
 
-    const hoursMatch = /(\d+(?:\.\d+)?)H/.exec(input);
-    const minutesMatch = /(\d+(?:\.\d+)?)M/.exec(input);
-    const secondsMatch = /(\d+(?:\.\d+)?)S/.exec(input);
+    const hoursMatch = /(\d{1,10}(?:\.\d{1,10})?)H/.exec(input);
+    const minutesMatch = /(\d{1,10}(?:\.\d{1,10})?)M/.exec(input);
+    const secondsMatch = /(\d{1,10}(?:\.\d{1,10})?)S/.exec(input);
 
     const weeks = parseMatch(weeksMatch);
     const days = parseMatch(daysMatch);
