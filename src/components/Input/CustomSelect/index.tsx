@@ -110,7 +110,7 @@ export default function CustomSelect({
     }, [propError]);
     return (
         <FormGroup className={styles.customSelectContainer}>
-            <Label for={props.inputId || props.id}>
+            <Label for={props.inputId ?? props.id}>
                 {props.label} {required ? '*' : ''}
             </Label>
             <Select

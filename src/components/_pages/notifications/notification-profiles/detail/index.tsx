@@ -1,4 +1,3 @@
-import JwkSetKeysTable from 'components/_pages/auth-settings/JwkSetKeysTable';
 import BooleanBadge from 'components/BooleanBadge/BooleanBadge';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import { getInputStringFromIso8601String } from 'components/Input/DurationField';
@@ -45,24 +44,24 @@ export default function NotificationProfileDetail() {
         dispatch(notificationActions.getNotificationInstance({ uuid: notificationProfile.notificationInstance.uuid }));
     }, [dispatch, notificationProfile]);
 
-    const onEditClick = useCallback(() => {
+    const onEditNotificationProfile = useCallback(() => {
         if (!uuid || !version) return;
         navigate(`../notificationprofiles/edit/${uuid}/${version}`);
     }, [navigate, uuid, version]);
 
-    const onDeleteClick = useCallback(() => {
+    const onDeleteNotificationProfile = useCallback(() => {
         if (!uuid || !version) return;
         dispatch(actions.deleteNotificationProfile({ uuid: uuid, redirect: '../notificationprofiles' }));
     }, [dispatch, uuid, version]);
 
-    const buttons: WidgetButtonProps[] = useMemo(
+    const notificationProfileWidgetButtons: WidgetButtonProps[] = useMemo(
         () => [
             {
                 icon: 'pencil',
                 disabled: false,
                 tooltip: 'Edit',
                 onClick: () => {
-                    onEditClick();
+                    onEditNotificationProfile();
                 },
             },
             {
@@ -70,11 +69,11 @@ export default function NotificationProfileDetail() {
                 disabled: false,
                 tooltip: 'Delete',
                 onClick: () => {
-                    onDeleteClick();
+                    onDeleteNotificationProfile();
                 },
             },
         ],
-        [onEditClick, onDeleteClick],
+        [onEditNotificationProfile, onDeleteNotificationProfile],
     );
 
     const headers: TableHeader[] = useMemo(
@@ -116,7 +115,9 @@ export default function NotificationProfileDetail() {
                           id: 'recipientType',
                           columns: [
                               'Recipient Type',
-                              <Badge color="secondary">{getEnumLabel(recipientTypeEnum, notificationProfile.recipient.type)}</Badge>,
+                              <Badge key="recipientType" color="secondary">
+                                  {getEnumLabel(recipientTypeEnum, notificationProfile.recipient.type)}
+                              </Badge>,
                           ],
                       },
                       {
@@ -188,11 +189,11 @@ export default function NotificationProfileDetail() {
                       },
                       {
                           id: 'description',
-                          columns: ['Description', notificationInstance.description || ''],
+                          columns: ['Description', notificationInstance.description ?? ''],
                       },
                       {
                           id: 'kind',
-                          columns: ['Kind', notificationInstance.kind || ''],
+                          columns: ['Kind', notificationInstance.kind ?? ''],
                       },
                       {
                           id: 'notificationProviderUuid',
@@ -219,7 +220,7 @@ export default function NotificationProfileDetail() {
                         title="Notification Profile Details"
                         busy={isFetchingDetail}
                         widgetLockName={LockWidgetNameEnum.NotificationProfileDetails}
-                        widgetButtons={buttons}
+                        widgetButtons={notificationProfileWidgetButtons}
                         titleSize="large"
                         refreshAction={getFreshData}
                     >

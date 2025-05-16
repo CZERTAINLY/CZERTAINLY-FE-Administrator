@@ -35,10 +35,10 @@ export const slice = createSlice({
     reducers: {
         resetState: (state, action: PayloadAction<void>) => {
             Object.keys(state).forEach((key) => {
-                if (!initialState.hasOwnProperty(key)) (state as any)[key] = undefined;
+                if (!initialState.hasOwnProperty(key)) (state as Partial<State>)[key as keyof State] = undefined;
             });
 
-            Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));
+            Object.keys(initialState).forEach((key) => ((state as Partial<State>)[key as keyof State] = (initialState as any)[key]));
         },
 
         listNotificationProfiles: (state, action: PayloadAction<void>) => {

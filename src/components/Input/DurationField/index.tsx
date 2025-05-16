@@ -1,4 +1,4 @@
-import { Field, useForm } from 'react-final-form';
+import { Field } from 'react-final-form';
 import { FormFeedback, FormGroup, FormText, Input, InputGroup, Label } from 'reactstrap';
 import { composeValidators, validateRequired } from 'utils/validators';
 import { useCallback } from 'react';
@@ -31,9 +31,13 @@ function getInputStringFromDuration(duration: Duration): string {
 function getIso8601StringFromDuration(duration: Duration): string {
     const { days, hours, minutes, seconds } = duration;
 
-    const timePart = [hours ? `${hours}H` : '', minutes ? `${minutes}M` : '', seconds ? `${seconds}S` : ''].filter((el) => el).join('');
+    const timeParts = [hours ? `${hours}H` : '', minutes ? `${minutes}M` : '', seconds ? `${seconds}S` : ''].filter((el) => el).join('');
 
-    return 'P' + `${days ? `${days}D` : ''}${timePart ? `T${timePart}` : ''}` || 'T0S';
+    const dayPart = days ? `${days}D` : '';
+    const timePart = timeParts ? `T${timeParts}` : '';
+    const result = `P${dayPart}${timePart}`;
+
+    return result !== 'P' ? result : 'PT0S';
 }
 
 function getDurationFromIso8601String(input: string): Duration {
@@ -48,8 +52,9 @@ function getDurationFromIso8601String(input: string): Duration {
         return duration;
     }
 
-    const isoRegex = /^P(?:(\d+)W)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?)?$/i;
-    const match = input.match(isoRegex);
+    const isoRegex = /^P(?:([\d.]+)W)?(?:([\d.]+)D)?(?:T(?:([\d.]+)H)?(?:([\d.]+)M)?(?:([\d.]+)S)?)?$/i;
+
+    const match = isoRegex.exec(input);
 
     if (!match) {
         return duration;
@@ -78,7 +83,8 @@ function getDurationFromIso8601String(input: string): Duration {
 }
 
 function getDurationFromInputString(input: string) {
-    const regex = /(\d+)\s*(d|h|m|s)/gi;
+    const regex = /(\d{1,10})\s*([dhms])/gi;
+
     const matches = [...input.matchAll(regex)];
 
     const duration: Duration = {
@@ -118,11 +124,11 @@ type Props = {
 };
 
 export default function DurationField({ id, label, disabled = false, description, required }: Props) {
-    const form = useForm();
-
     const validateDuration = useCallback((value: string) => {
         if (!value?.trim()) return undefined;
-        return /^(\d+\s*[dhms]\s*)+$/i.test(value.trim()) ? undefined : 'Invalid duration. Should be formatted as: 0d 0h 0m 0s. eg. 1d 40m';
+        return /^(\d{1,10}\s*[dhms]\s*)+$/i.test(value.trim())
+            ? undefined
+            : 'Invalid duration. Should be formatted as: 0d 0h 0m 0s. eg. 1d 40m';
     }, []);
 
     return (

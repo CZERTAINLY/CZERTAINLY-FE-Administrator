@@ -9,31 +9,31 @@ import {
     NotificationProfileUpdateRequestModel,
 } from 'types/notification-profiles';
 
-export function transformNotificationProfileDtoToModel(notificationProfile: NotificationProfileDto): NotificationProfileModel {
+export function transformNotificationProfileDtoToModel(notificationProfileDto: NotificationProfileDto): NotificationProfileModel {
     return {
-        ...notificationProfile,
+        ...notificationProfileDto,
     };
 }
 export function transformNotificationProfileRequestModelToDto(
-    notificationProfile: NotificationProfileRequestModel,
+    notificationProfileRequestModel: NotificationProfileRequestModel,
 ): NotificationProfileRequestDto {
     return {
-        ...notificationProfile,
+        ...notificationProfileRequestModel,
     };
 }
 
 export function transformNotificationProfileDetailDtoToModel(
-    notificationProfile: NotificationProfileDetailDto,
+    notificationProfileDetailDto: NotificationProfileDetailDto,
 ): NotificationProfileDetailModel {
     return {
-        ...notificationProfile,
+        ...notificationProfileDetailDto,
     };
 }
 
 export function transformNotificationProfileUpdateRequestDtoToModel(
-    notificationProfile: NotificationProfileUpdateRequestDto,
+    notificationProfileUpdateRequestDto: NotificationProfileUpdateRequestDto,
 ): NotificationProfileUpdateRequestModel {
     return {
-        ...notificationProfile,
+        ...notificationProfileUpdateRequestDto,
     };
 }
