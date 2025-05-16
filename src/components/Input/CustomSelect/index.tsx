@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Select, {
     Props as SelectProps,
     OptionProps,
@@ -17,6 +17,7 @@ type OptionType = { label: string; value: string; isNew?: boolean };
 type Props = SelectProps<OptionType, boolean> & {
     label: string;
     description?: string;
+    error?: string;
 } & (
         | {
               allowTextInput?: false;
@@ -28,10 +29,19 @@ type Props = SelectProps<OptionType, boolean> & {
           }
     );
 
-export default function CustomSelect({ allowTextInput, isMulti, options = [], validators = [], description, ...props }: Props) {
+export default function CustomSelect({
+    allowTextInput,
+    isMulti,
+    options = [],
+    validators = [],
+    description,
+    required,
+    error: propError,
+    ...props
+}: Props) {
     const [newOptions, setNewOptions] = useState<OptionType[]>([]);
     const [inputValue, setInputValue] = useState('');
-    const [error, setError] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(propError ?? null);
 
     const allOptions = useMemo(() => {
         return [...newOptions, ...options];
@@ -83,7 +93,7 @@ export default function CustomSelect({ allowTextInput, isMulti, options = [], va
                     });
                 }
             }
-        } else if (newSelection.isNew) {
+        } else if (newSelection?.isNew) {
             const isValid = await validateOption(newSelection.value);
             if (!isValid) return;
 
@@ -95,9 +105,15 @@ export default function CustomSelect({ allowTextInput, isMulti, options = [], va
         props.onChange?.(newSelection, actionMeta);
     };
 
+    useEffect(() => {
+        setError(propError ?? null);
+    }, [propError]);
     return (
         <FormGroup className={styles.customSelectContainer}>
-            <Label for={props.inputId || props.id}>{props.label}</Label>
+            <Label for={props.inputId ?? props.id}>
+                {props.label}
+                {required ? '*' : ''}
+            </Label>
             <Select
                 {...props}
                 isMulti={isMulti}

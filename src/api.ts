@@ -26,6 +26,7 @@ import {
     InfoApi,
     InternalNotificationApi,
     LocationManagementApi,
+    NotificationProfileInventoryApi,
     RAProfileManagementApi,
     ResourceManagementApi,
     RoleManagementApi,
@@ -69,6 +70,7 @@ export interface ApiClients {
     entities: EntityManagementApi;
     resources: ResourceManagementApi;
     locations: LocationManagementApi;
+    notificationProfiles: NotificationProfileInventoryApi;
     certificates: CertificateInventoryApi;
     acmeAccounts: ACMEAccountManagementApi;
     acmeProfiles: ACMEProfileManagementApi;
@@ -114,6 +116,7 @@ export const backendClient: ApiClients = {
     entities: new EntityManagementApi(configuration),
     resources: new ResourceManagementApi(configuration),
     locations: new LocationManagementApi(configuration),
+    notificationProfiles: new NotificationProfileInventoryApi(configuration),
     connectors: new ConnectorManagementApi(configuration),
     callback: new CallbackApi(configuration),
     statisticsDashboard: new StatisticsDashboardApi(configuration),

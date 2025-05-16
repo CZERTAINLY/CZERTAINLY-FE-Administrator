@@ -44,7 +44,7 @@ export interface TriggerDto {
      * @type {TriggerType}
      * @memberof TriggerDto
      */
-    type: TriggerType;
+    type?: TriggerType;
     /**
      * Resource associated with the trigger
      * @type {Resource}
@@ -58,17 +58,11 @@ export interface TriggerDto {
      */
     ignoreTrigger: boolean;
     /**
-     * Event that should fire trigger
+     * Event that trigger can be assigned to
      * @type {string}
      * @memberof TriggerDto
      */
     event?: TriggerDtoEventEnum;
-    /**
-     * Resource associated with trigger event
-     * @type {Resource}
-     * @memberof TriggerDto
-     */
-    eventResource?: Resource;
 }
 
 /**
@@ -76,6 +70,12 @@ export interface TriggerDto {
  * @enum {string}
  */
 export enum TriggerDtoEventEnum {
-    DiscoveryFinished = 'discoveryFinished'
+    CertificateStatusChanged = 'certificate_status_changed',
+    CertificateActionPerformed = 'certificate_action_performed',
+    CertificateDiscovered = 'certificate_discovered',
+    DiscoveryFinished = 'discovery_finished',
+    ApprovalRequested = 'approval_requested',
+    ApprovalClosed = 'approval_closed',
+    ScheduledJobFinished = 'scheduled_job_finished'
 }
 

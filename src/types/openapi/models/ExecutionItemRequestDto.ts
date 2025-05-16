@@ -25,13 +25,13 @@ export interface ExecutionItemRequestDto {
      * @type {FilterFieldSource}
      * @memberof ExecutionItemRequestDto
      */
-    fieldSource: FilterFieldSource;
+    fieldSource?: FilterFieldSource;
     /**
      * Field identifier of the execution item
      * @type {string}
      * @memberof ExecutionItemRequestDto
      */
-    fieldIdentifier: string;
+    fieldIdentifier?: string;
     /**
      * Data of the execution item
      * @type {object}

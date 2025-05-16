@@ -39,6 +39,12 @@ export interface ResourceEventDto {
  * @enum {string}
  */
 export enum ResourceEventDtoEventEnum {
-    DiscoveryFinished = 'discoveryFinished'
+    CertificateStatusChanged = 'certificate_status_changed',
+    CertificateActionPerformed = 'certificate_action_performed',
+    CertificateDiscovered = 'certificate_discovered',
+    DiscoveryFinished = 'discovery_finished',
+    ApprovalRequested = 'approval_requested',
+    ApprovalClosed = 'approval_closed',
+    ScheduledJobFinished = 'scheduled_job_finished'
 }
 

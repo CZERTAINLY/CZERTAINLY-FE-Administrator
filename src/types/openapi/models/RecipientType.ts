@@ -16,8 +16,11 @@
  * @export
  * @enum {string}
  */
-export enum ExecutionType {
-    SetField = 'setField',
-    SendNotification = 'sendNotification'
+export enum RecipientType {
+    None = 'none',
+    User = 'user',
+    Group = 'group',
+    Role = 'role',
+    Owner = 'owner'
 }
 

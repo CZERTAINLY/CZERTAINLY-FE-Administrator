@@ -33,6 +33,7 @@ import { slice as initialFiltersSlice } from './filters';
 import { slice as globalMetadataSlice } from './globalMetadata';
 import { slice as initialLocationsSlice } from './locations';
 import { slice as notificationsSlice } from './notifications';
+import { slice as notificationProfilesSlice } from './notification-profiles';
 import { slice as pagingSlice } from './paging';
 import { slice as raProfilesSlice } from './ra-profiles';
 // import { reducers } from "./reducers";
@@ -84,6 +85,7 @@ export const reducers = combineReducers({
     [profileApprovalSlice.name]: profileApprovalSlice.reducer,
     [approvalSlice.name]: approvalSlice.reducer,
     [notificationsSlice.name]: notificationsSlice.reducer,
+    [notificationProfilesSlice.name]: notificationProfilesSlice.reducer,
     [enumsSlice.name]: enumsSlice.reducer,
     [infoSlice.name]: infoSlice.reducer,
     [tokenSlice.name]: tokenSlice.reducer,

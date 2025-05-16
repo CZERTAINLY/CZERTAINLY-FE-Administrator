@@ -80,6 +80,8 @@ export enum LockWidgetNameEnum {
     PlatformSettings,
     LoggingSettings,
     NotificationSettings,
+    ListOfNotificationProfiles,
+    NotificationProfileDetails,
     ListOfCustomAttributes,
     CustomAttributeDetails,
     ListOfGlobalMetadata,

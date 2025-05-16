@@ -46,7 +46,7 @@ export interface TriggerDetailDto {
      * @type {TriggerType}
      * @memberof TriggerDetailDto
      */
-    type: TriggerType;
+    type?: TriggerType;
     /**
      * Resource associated with the trigger
      * @type {Resource}
@@ -60,17 +60,11 @@ export interface TriggerDetailDto {
      */
     ignoreTrigger: boolean;
     /**
-     * Event that should fire trigger
+     * Event that trigger can be assigned to
      * @type {string}
      * @memberof TriggerDetailDto
      */
     event?: TriggerDetailDtoEventEnum;
-    /**
-     * Resource associated with trigger event
-     * @type {Resource}
-     * @memberof TriggerDetailDto
-     */
-    eventResource?: Resource;
     /**
      * List of Rules in the Rule Trigger
      * @type {Array<RuleDetailDto>}
@@ -90,6 +84,12 @@ export interface TriggerDetailDto {
  * @enum {string}
  */
 export enum TriggerDetailDtoEventEnum {
-    DiscoveryFinished = 'discoveryFinished'
+    CertificateStatusChanged = 'certificate_status_changed',
+    CertificateActionPerformed = 'certificate_action_performed',
+    CertificateDiscovered = 'certificate_discovered',
+    DiscoveryFinished = 'discovery_finished',
+    ApprovalRequested = 'approval_requested',
+    ApprovalClosed = 'approval_closed',
+    ScheduledJobFinished = 'scheduled_job_finished'
 }
 

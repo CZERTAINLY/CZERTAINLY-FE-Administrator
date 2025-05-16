@@ -90,9 +90,9 @@ export class ApprovalProfileInventoryApi extends BaseAPI {
     /**
      * Edit an Approval profile
      */
-    editApprovalProfile({ uuid, approvalProfileUpdateRequestDto }: EditApprovalProfileRequest): Observable<object>
-    editApprovalProfile({ uuid, approvalProfileUpdateRequestDto }: EditApprovalProfileRequest, opts?: OperationOpts): Observable<AjaxResponse<object>>
-    editApprovalProfile({ uuid, approvalProfileUpdateRequestDto }: EditApprovalProfileRequest, opts?: OperationOpts): Observable<object | AjaxResponse<object>> {
+    editApprovalProfile({ uuid, approvalProfileUpdateRequestDto }: EditApprovalProfileRequest): Observable<UuidDto>
+    editApprovalProfile({ uuid, approvalProfileUpdateRequestDto }: EditApprovalProfileRequest, opts?: OperationOpts): Observable<AjaxResponse<UuidDto>>
+    editApprovalProfile({ uuid, approvalProfileUpdateRequestDto }: EditApprovalProfileRequest, opts?: OperationOpts): Observable<UuidDto | AjaxResponse<UuidDto>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'editApprovalProfile');
         throwIfNullOrUndefined(approvalProfileUpdateRequestDto, 'approvalProfileUpdateRequestDto', 'editApprovalProfile');
 
@@ -100,7 +100,7 @@ export class ApprovalProfileInventoryApi extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<object>({
+        return this.request<UuidDto>({
             url: '/v1/approvalProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
             method: 'PUT',
             headers,

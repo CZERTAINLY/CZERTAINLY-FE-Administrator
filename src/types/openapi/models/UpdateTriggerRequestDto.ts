@@ -32,7 +32,7 @@ export interface UpdateTriggerRequestDto {
      * @type {TriggerType}
      * @memberof UpdateTriggerRequestDto
      */
-    type: TriggerType;
+    type?: TriggerType;
     /**
      * Resource associated with the trigger
      * @type {Resource}
@@ -46,17 +46,11 @@ export interface UpdateTriggerRequestDto {
      */
     ignoreTrigger: boolean;
     /**
-     * Event of the trigger
+     * Event that trigger can be assigned to
      * @type {string}
      * @memberof UpdateTriggerRequestDto
      */
     event?: UpdateTriggerRequestDtoEventEnum;
-    /**
-     * Type of the the trigger event source object
-     * @type {Resource}
-     * @memberof UpdateTriggerRequestDto
-     */
-    eventResource?: Resource;
     /**
      * List of UUIDs of existing rules to add to the trigger
      * @type {Array<string>}
@@ -76,6 +70,12 @@ export interface UpdateTriggerRequestDto {
  * @enum {string}
  */
 export enum UpdateTriggerRequestDtoEventEnum {
-    DiscoveryFinished = 'discoveryFinished'
+    CertificateStatusChanged = 'certificate_status_changed',
+    CertificateActionPerformed = 'certificate_action_performed',
+    CertificateDiscovered = 'certificate_discovered',
+    DiscoveryFinished = 'discovery_finished',
+    ApprovalRequested = 'approval_requested',
+    ApprovalClosed = 'approval_closed',
+    ScheduledJobFinished = 'scheduled_job_finished'
 }
 
