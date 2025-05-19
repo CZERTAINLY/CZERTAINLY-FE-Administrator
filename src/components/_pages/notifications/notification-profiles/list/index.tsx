@@ -91,7 +91,7 @@ const NotificationProfilesList = () => {
                           <Badge key="recipientType" className="secondary">
                               {getEnumLabel(recipientTypeEnum, profile.recipientType)}
                           </Badge>,
-                          <BooleanBadge key="internalNotification" value={profile.internalNotification} invertColor />,
+                          <BooleanBadge key="internalNotification" value={profile.internalNotification} />,
                           profile.version.toString(),
                       ],
                   })),

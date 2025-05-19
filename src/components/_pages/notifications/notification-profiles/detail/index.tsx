@@ -152,7 +152,7 @@ export default function NotificationProfileDetail() {
                           id: 'internalNotification',
                           columns: [
                               'Internal Notification',
-                              <BooleanBadge key="internalNotification" value={notificationProfile.internalNotification} invertColor />,
+                              <BooleanBadge key="internalNotification" value={notificationProfile.internalNotification} />,
                           ],
                       },
                       {
