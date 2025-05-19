@@ -11,7 +11,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 import { Button, ButtonGroup, Col, Container, Input, Row } from 'reactstrap';
 import { ExecutionType, PlatformEnum } from 'types/openapi';
-import { ExecutionModel } from 'types/rules';
 
 const ExecutionDetails = () => {
     const { id } = useParams();

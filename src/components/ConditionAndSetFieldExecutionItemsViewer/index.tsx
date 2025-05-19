@@ -52,7 +52,7 @@ const ConditionAndSetFieldExecutionItemsViewer = ({ resource, formType }: Condit
         if (!hasEffectRun && editMode && id) {
             if (formType == 'conditionItems') {
                 if (conditionDetails?.uuid !== id) return;
-                const currentConditions = conditionDetails?.items || [];
+                const currentConditions = conditionDetails?.items ?? [];
 
                 const currentFilters = conditionGroupToFilter(currentConditions);
                 setHasEffectRun(true);
@@ -91,7 +91,7 @@ const ConditionAndSetFieldExecutionItemsViewer = ({ resource, formType }: Condit
                                 conditionUuid: id,
                                 condition: {
                                     items: currentCondition,
-                                    description: conditionDetails.description || '',
+                                    description: conditionDetails.description ?? '',
                                 },
                             }),
                         );

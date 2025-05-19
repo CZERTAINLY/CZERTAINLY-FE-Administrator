@@ -10,3 +10,20 @@
     white-space: normal !important;
     text-align: left !important;
 }
+
+.filterBadgeButton {
+    background: none;
+    border: none;
+    color: #b5bdc5;
+    font-size: medium;
+    padding: 0;
+    padding-left: 5px;
+    padding-right: 2px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.filterBadgeButton:hover {
+    color: red;
+    font-weight: 700;
+}

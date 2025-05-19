@@ -1,7 +1,5 @@
-import { ExecutionFormValues } from 'components/_pages/executions/form';
 import Widget from 'components/Widget';
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useForm, useFormState } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import Select from 'react-select';
 import { Fragment } from 'react/jsx-runtime';
@@ -66,12 +64,12 @@ export function SendNotificationExecutionItems({ mode, isUpdating, notificationP
 
             return (
                 <Fragment key={itemNumber}>
-                    Send notifications to:&nbsp;
+                    <span>Send notifications to:&nbsp;</span>
                     <b>{label}&nbsp;</b>
                     {!disableBadgeRemove && (
-                        <span className={styles.filterBadgeSpan} onClick={() => onRemoveProfileClick(value)}>
+                        <button className={styles.filterBadgeButton} onClick={() => onRemoveProfileClick(value)}>
                             &times;
-                        </span>
+                        </button>
                     )}
                 </Fragment>
             );

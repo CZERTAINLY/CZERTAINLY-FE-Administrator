@@ -25,7 +25,7 @@ export interface ExecutionItemRequestDto {
      * @type {FilterFieldSource}
      * @memberof ExecutionItemRequestDto
      */
-    fieldSource: FilterFieldSource;
+    fieldSource?: FilterFieldSource;
     /**
      * Field identifier of the execution item
      * @type {string}
