@@ -214,19 +214,21 @@ const ExecutionDetails = () => {
                 );
             case ExecutionType.SendNotification:
                 return (
-                    <SendNotificationExecutionItems
-                        mode="detail"
-                        isUpdating={isUpdatingDetails}
-                        notificationProfileItems={
-                            executionDetails.items.map((el) => ({
-                                label: el.notificationProfileName ?? '',
-                                value: el.notificationProfileUuid ?? '',
-                            })) ?? []
-                        }
-                        onNotificationProfileItemsChange={(newItems) =>
-                            onUpdateSendNotificationExecutionItems(newItems.map((el) => el.value))
-                        }
-                    />
+                    <Col>
+                        <SendNotificationExecutionItems
+                            mode="detail"
+                            isUpdating={isUpdatingDetails}
+                            notificationProfileItems={
+                                executionDetails.items.map((el) => ({
+                                    label: el.notificationProfileName ?? '',
+                                    value: el.notificationProfileUuid ?? '',
+                                })) ?? []
+                            }
+                            onNotificationProfileItemsChange={(newItems) =>
+                                onUpdateSendNotificationExecutionItems(newItems.map((el) => el.value))
+                            }
+                        />
+                    </Col>
                 );
         }
     }, [executionDetails, isUpdatingDetails, onUpdateSendNotificationExecutionItems]);
