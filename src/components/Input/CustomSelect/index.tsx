@@ -93,7 +93,7 @@ export default function CustomSelect({
                     });
                 }
             }
-        } else if (newSelection.isNew) {
+        } else if (newSelection?.isNew) {
             const isValid = await validateOption(newSelection.value);
             if (!isValid) return;
 
@@ -111,7 +111,8 @@ export default function CustomSelect({
     return (
         <FormGroup className={styles.customSelectContainer}>
             <Label for={props.inputId ?? props.id}>
-                {props.label} {required ? '*' : ''}
+                {props.label}
+                {required ? '*' : ''}
             </Label>
             <Select
                 {...props}

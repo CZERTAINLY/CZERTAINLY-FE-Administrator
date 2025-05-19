@@ -189,8 +189,12 @@ export default function NotificationProfileForm() {
         >
             <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
                 {({ handleSubmit, pristine, submitting, values, valid, form }) => {
+                    const type = values.recipientType?.value;
                     const isNotificationInstanceRequired =
-                        values.recipientType?.value === RecipientType.Owner || values.recipientType?.value === RecipientType.None;
+                        type === RecipientType.Owner ||
+                        type === RecipientType.None ||
+                        ((type === RecipientType.User || type === RecipientType.Role || type === RecipientType.Group) &&
+                            !values.internalNotification);
                     return (
                         <BootstrapForm onSubmit={handleSubmit}>
                             <TextField
@@ -209,6 +213,7 @@ export default function NotificationProfileForm() {
                                 {({ input, meta }) => (
                                     <CustomSelect
                                         {...input}
+                                        isClearable
                                         label="Notification Instance"
                                         placeholder="Select Notification Instance"
                                         options={notificationInstanceOptions}
@@ -217,13 +222,17 @@ export default function NotificationProfileForm() {
                                         error={
                                             meta.error &&
                                             meta.touched &&
-                                            'Notification Instance is required if Recipient Type is Owner or None'
+                                            'Notification Instance is required if Recipient Type is Owner or None, or if the send internal notifications is false'
                                         }
                                     />
                                 )}
                             </Field>
 
-                            <SwitchField id="internalNotification" label="Send internal notifications" />
+                            <SwitchField
+                                id="internalNotification"
+                                label="Send internal notifications"
+                                disabled={type === RecipientType.Owner || type === RecipientType.None}
+                            />
 
                             <DurationField
                                 label="Frequency"
@@ -333,6 +342,11 @@ function RecipientTypeFields() {
                 onChange={(e) => {
                     form.change('recipientType', e as OptionType);
                     form.resetFieldState('notificationInstance');
+                    switch ((e as OptionType).value) {
+                        case RecipientType.None:
+                        case RecipientType.Owner:
+                            form.change('internalNotification', false);
+                    }
                 }}
                 description="Recipient type of notifications managed by profile."
                 required
