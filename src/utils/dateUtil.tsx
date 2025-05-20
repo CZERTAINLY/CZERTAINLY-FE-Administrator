@@ -1,6 +1,6 @@
 import { CronExpressionParser } from 'cron-parser';
 import cronstrue from 'cronstrue';
-import { AttributeContentType, FilterFieldType, SearchFieldDataDto } from 'types/openapi';
+import { AttributeContentType, FilterConditionOperator, FilterFieldType, SearchFieldDataDto } from 'types/openapi';
 
 function leading0(s: string, count: number) {
     while (s.length < count) {
@@ -217,8 +217,14 @@ export const checkIfFieldAttributeTypeIsDate = (field: SearchFieldDataDto) => {
     }
 };
 
-export const checkIfFieldTypeIsDate = (type: FilterFieldType) => {
+export const checkIfFieldTypeIsDate = (type?: FilterFieldType) => {
     if (type === FilterFieldType.Date || type === FilterFieldType.Datetime) {
+        return true;
+    }
+};
+
+export const checkIfFieldOperatorIsInterval = (operator?: FilterConditionOperator) => {
+    if (operator === FilterConditionOperator.InNext || operator === FilterConditionOperator.InPast) {
         return true;
     }
 };

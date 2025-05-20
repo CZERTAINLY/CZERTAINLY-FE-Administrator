@@ -11,16 +11,22 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { Field, Form, useForm, useFormState } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
-import { Form as BootstrapForm, Button, ButtonGroup } from 'reactstrap';
+import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, FormText, Input, InputGroup, Label } from 'reactstrap';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 import { isObjectSame } from 'utils/common-utils';
-import { validateAlphaNumericWithSpecialChars, validatePositiveInteger, validateRequired, validateNonZeroInteger } from 'utils/validators';
+import {
+    validateAlphaNumericWithSpecialChars,
+    validatePositiveInteger,
+    validateRequired,
+    validateNonZeroInteger,
+    validateDuration,
+} from 'utils/validators';
 import CustomSelect from 'components/Input/CustomSelect';
 import { PlatformEnum, RecipientType } from 'types/openapi';
 import SwitchField from 'components/Input/SwitchField';
 import { NotificationProfileUpdateRequestModel } from 'types/notification-profiles';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import DurationField, { getInputStringFromIso8601String, getIso8601StringFromInputString } from 'components/Input/DurationField';
+import { getInputStringFromIso8601String, getIso8601StringFromInputString } from 'utils/duration';
 
 interface OptionType {
     value: string;
@@ -234,11 +240,27 @@ export default function NotificationProfileForm() {
                                 disabled={type === RecipientType.Owner || type === RecipientType.None}
                             />
 
-                            <DurationField
-                                label="Frequency"
-                                id="frequency"
-                                description="Interval between repeated notification, in format: 0d 0h 0m 0s"
-                            />
+                            <Field name="frequency" validate={validateDuration()}>
+                                {({ input, meta }) => {
+                                    const isInvalid = !!meta.error && meta.touched;
+                                    return (
+                                        <FormGroup>
+                                            <Label for="frequency">Frequency</Label>
+                                            <InputGroup>
+                                                <Input
+                                                    {...input}
+                                                    type="text"
+                                                    valid={!meta.error && meta.touched}
+                                                    invalid={isInvalid}
+                                                    placeholder="ex: 5d 45m"
+                                                />
+                                            </InputGroup>
+                                            {!isInvalid && <FormText>Enter duration in format: 0d 0h 0m 0s</FormText>}
+                                            <FormFeedback className={isInvalid ? 'd-block' : ''}>{meta.error}</FormFeedback>
+                                        </FormGroup>
+                                    );
+                                }}
+                            </Field>
                             <TextField
                                 label="Repetitions"
                                 id="repetitions"

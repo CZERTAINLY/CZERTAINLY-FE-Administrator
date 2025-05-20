@@ -1,8 +1,3 @@
-import { Field } from 'react-final-form';
-import { FormFeedback, FormGroup, FormText, Input, InputGroup, Label } from 'reactstrap';
-import { composeValidators, validateRequired } from 'utils/validators';
-import { useCallback } from 'react';
-
 export type Duration = {
     days: number;
     hours: number;
@@ -109,50 +104,4 @@ function getDurationFromInputString(input: string) {
     }
 
     return duration;
-}
-
-type Props = {
-    id: string;
-    label: string;
-    disabled?: boolean;
-    description?: string | JSX.Element;
-    required?: boolean;
-};
-
-export default function DurationField({ id, label, disabled = false, description, required }: Props) {
-    const validateDuration = useCallback((value: string) => {
-        if (!value?.trim()) return undefined;
-        return /^(\d{1,10}\s*[dhms]\s*)+$/i.test(value.trim())
-            ? undefined
-            : 'Invalid duration. Should be formatted as: 0d 0h 0m 0s. eg. 1d 40m';
-    }, []);
-
-    return (
-        <Field name={id} validate={composeValidators(required && validateRequired(), validateDuration)}>
-            {({ input, meta }) => {
-                const isInvalid = !!meta.error && meta.touched;
-
-                return (
-                    <FormGroup>
-                        <Label for={id}>
-                            {label}
-                            {required && '*'}
-                        </Label>
-                        <InputGroup>
-                            <Input
-                                {...input}
-                                type="text"
-                                valid={!meta.error && meta.touched}
-                                invalid={isInvalid}
-                                placeholder="ex: 5d 45m"
-                                disabled={disabled}
-                            />
-                        </InputGroup>
-                        {!isInvalid && <FormText>{description ?? 'Enter duration in format: 0d 0h 0m 0s'}</FormText>}
-                        <FormFeedback className={isInvalid ? 'd-block' : ''}>{meta.error}</FormFeedback>
-                    </FormGroup>
-                );
-            }}
-        </Field>
-    );
 }
