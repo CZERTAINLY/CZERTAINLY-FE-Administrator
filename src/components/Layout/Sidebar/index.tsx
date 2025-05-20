@@ -149,6 +149,7 @@ const menuItemMappings: MenuItemMapping[] = [
                 link: '/authenticationsettings',
                 requiredResources: [Resource.Settings],
             },
+            { _key: '/events', name: 'Events', link: '/events', requiredResources: [Resource.Settings] },
         ],
     },
 

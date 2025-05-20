@@ -1,0 +1,200 @@
+import Widget from 'components/Widget';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router';
+
+import { Resource } from 'types/openapi';
+
+import { PlatformEnum } from 'types/openapi';
+
+import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import { Button } from 'reactstrap';
+import { TriggerDto } from 'types/rules';
+
+type OptionType = {
+    label: string;
+    value: string;
+};
+
+type Props = {
+    resource?: Resource;
+    selectedTriggers: TriggerDto[];
+    onSelectedTriggersChange: (triggers: TriggerDto[]) => void;
+    noteText?: string;
+};
+
+export default function TriggerEditorWidget({ resource, selectedTriggers, onSelectedTriggersChange, noteText }: Props) {
+    const dispatch = useDispatch();
+
+    const triggers = useSelector(rulesSelectors.triggers);
+
+    const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
+    const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.TriggerType));
+    const eventNameEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ResourceEvent));
+
+    const isFetchingTriggers = useSelector(rulesSelectors.isFetchingTriggers);
+
+    const newTriggerOptions = useMemo(
+        () =>
+            triggers
+                .map((trigger) => ({
+                    label: trigger.name,
+                    value: trigger.uuid,
+                }))
+                .filter((trigger) => !selectedTriggers.find((selectedTrigger) => selectedTrigger.uuid === trigger.value)),
+        [triggers, selectedTriggers],
+    );
+
+    const isBusy = useMemo(() => isFetchingTriggers, [isFetchingTriggers]);
+
+    useEffect(() => {
+        dispatch(rulesActions.listTriggers({ resource }));
+    }, [dispatch, resource]);
+
+    const onAddTrigger = useCallback(
+        (newValues: OptionType[]) => {
+            const previousTriggers = selectedTriggers;
+            const newTriggers = newValues.map((el) => triggers.find((innerEl) => innerEl.uuid === el.value));
+            const allTriggers = [
+                ...previousTriggers,
+                ...(newTriggers.filter((newValue) => !previousTriggers.find((trigger) => trigger.uuid === newValue?.uuid)) as TriggerDto[]),
+            ];
+            onSelectedTriggersChange(allTriggers);
+        },
+        [triggers, selectedTriggers, onSelectedTriggersChange],
+    );
+
+    const onDeleteTrigger = useCallback(
+        (trigger: TriggerDto) => {
+            onSelectedTriggersChange(selectedTriggers.filter((selectedTrigger) => selectedTrigger.uuid !== trigger.uuid));
+        },
+        [selectedTriggers, onSelectedTriggersChange],
+    );
+    const onMoveTriggerUp = useCallback(
+        (trigger: TriggerDto) => {
+            const index = selectedTriggers.findIndex((selectedTrigger) => selectedTrigger.uuid === trigger.uuid);
+            if (index === 0) return;
+            const newSelectedTriggers = [...selectedTriggers];
+            const temp = newSelectedTriggers[index];
+            newSelectedTriggers[index] = newSelectedTriggers[index - 1];
+            newSelectedTriggers[index - 1] = temp;
+            onSelectedTriggersChange(newSelectedTriggers);
+        },
+        [selectedTriggers, onSelectedTriggersChange],
+    );
+
+    const onMoveTriggerDown = useCallback(
+        (trigger: TriggerDto) => {
+            const index = selectedTriggers.findIndex((selectedTrigger) => selectedTrigger.uuid === trigger.uuid);
+            if (index === selectedTriggers.length - 1) return;
+            const newSelectedTriggers = [...selectedTriggers];
+            const temp = newSelectedTriggers[index];
+            newSelectedTriggers[index] = newSelectedTriggers[index + 1];
+            newSelectedTriggers[index + 1] = temp;
+            onSelectedTriggersChange(newSelectedTriggers);
+        },
+        [selectedTriggers, onSelectedTriggersChange],
+    );
+
+    const triggerHeaders: TableHeader[] = [
+        {
+            id: 'name',
+            content: 'Name',
+        },
+        {
+            id: 'triggerType',
+            content: 'Trigger Type',
+        },
+        {
+            id: 'eventName',
+            content: 'Event Name',
+        },
+        {
+            id: 'resource',
+            content: 'Resource',
+        },
+        {
+            id: 'description',
+            content: 'Description',
+        },
+        {
+            id: 'actions',
+            content: 'Actions',
+        },
+    ];
+
+    const triggerTableData: TableDataRow[] = useMemo(() => {
+        const triggerDataListOrderedAsPerSelectedTriggers = triggers
+            .filter((trigger) => selectedTriggers.find((selectedTrigger) => selectedTrigger.uuid === trigger.uuid))
+            .sort(
+                (a, b) =>
+                    selectedTriggers.findIndex((selectedTrigger) => selectedTrigger.uuid === a.uuid) -
+                    selectedTriggers.findIndex((selectedTrigger) => selectedTrigger.uuid === b.uuid),
+            );
+
+        return triggerDataListOrderedAsPerSelectedTriggers.map((trigger, i) => ({
+            id: trigger.uuid,
+            columns: [
+                <Link key="name" to={`../../triggers/detail/${trigger.uuid}`}>
+                    {trigger.name}
+                </Link>,
+                getEnumLabel(triggerTypeEnum, trigger.type ?? ''),
+                getEnumLabel(eventNameEnum, trigger.event ?? ''),
+                getEnumLabel(resourceTypeEnum, trigger.resource ?? ''),
+                trigger.description || '',
+                <div key="actions" className="d-flex">
+                    <Button
+                        className="btn btn-link text-danger"
+                        size="sm"
+                        color="danger"
+                        title="Delete Condition Group"
+                        onClick={() => onDeleteTrigger(trigger)}
+                    >
+                        <i className="fa fa-trash" />
+                    </Button>
+                    <Button
+                        className="btn btn-link"
+                        size="sm"
+                        title="Move Trigger Up"
+                        disabled={i === 0}
+                        onClick={() => onMoveTriggerUp(trigger)}
+                    >
+                        <i className="fa fa-arrow-up" />
+                    </Button>
+
+                    <Button
+                        className="btn btn-link"
+                        size="sm"
+                        title="Move Trigger Down"
+                        disabled={i === selectedTriggers.length - 1}
+                        onClick={() => onMoveTriggerDown(trigger)}
+                    >
+                        <i className="fa fa-arrow-down" />
+                    </Button>
+                </div>,
+            ],
+        }));
+    }, [selectedTriggers, triggers, eventNameEnum, resourceTypeEnum, triggerTypeEnum, onDeleteTrigger, onMoveTriggerUp, onMoveTriggerDown]);
+
+    return (
+        <Widget title="Triggers">
+            {noteText && <p className="text-muted mt-1 ">Note: {noteText}</p>}
+            {/* <p className="text-muted mt-1 ">Note: Triggers will be executed on newly discovered certificate in displayed order</p> */}
+            <CustomTable
+                hasHeader={!!triggerTableData.length}
+                data={triggerTableData}
+                headers={triggerHeaders}
+                newRowWidgetProps={{
+                    selectHint: 'Select Triggers',
+                    immediateAdd: true,
+                    newItemsList: newTriggerOptions,
+                    isBusy,
+                    onAddClick: onAddTrigger,
+                }}
+            />
+        </Widget>
+    );
+}

@@ -93,6 +93,8 @@ export enum LockWidgetNameEnum {
     ListOfNotifications,
     NotificationsOverview,
     CustomAttributeWidget,
+    EventDetails,
+    ListOfEvents,
 }
 
 export interface WidgetLockModel {

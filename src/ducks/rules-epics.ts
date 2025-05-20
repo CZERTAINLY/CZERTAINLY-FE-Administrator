@@ -116,7 +116,7 @@ const listTriggers: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.listTriggers.match),
         switchMap((action) =>
-            deps.apiClients.triggers.listTriggers({ resource: action.payload.resource, eventResource: action.payload.eventResource }).pipe(
+            deps.apiClients.triggers.listTriggers({ resource: action.payload.resource }).pipe(
                 switchMap((triggers) =>
                     of(
                         slice.actions.listTriggersSuccess({

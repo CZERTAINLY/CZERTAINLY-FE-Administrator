@@ -118,6 +118,9 @@ import NotificationProfileDetail from './_pages/notifications/notification-profi
 import NotificationProfileForm from './_pages/notifications/notification-profiles/form';
 import NotificationProfilesList from './_pages/notifications/notification-profiles/list';
 
+import EventDetail from './_pages/events/detail';
+import EventsList from './_pages/events/list';
+
 import ConditionDetails from './_pages/conditions/details';
 import ConditionForm from './_pages/conditions/form';
 
@@ -145,6 +148,7 @@ import Layout from './Layout';
 import Spinner from './Spinner';
 
 import { Resource } from 'types/openapi';
+import EventForm from 'components/_pages/events/form';
 
 export default function AppRouter() {
     const profile = useSelector(selectors.profile);
@@ -364,9 +368,13 @@ export default function AppRouter() {
                     <Route path={`/notificationinstances/edit/:id`} element={<NotificationInstanceForm />} />
 
                     <Route path={`/notificationprofiles`} element={<NotificationProfilesList />} />
-                    <Route path={`/notificationprofiles/detail/:uuid/:version`} element={<NotificationProfileDetail />} />
+                    <Route path={`/notificationprofiles/detail/:id/:version`} element={<NotificationProfileDetail />} />
                     <Route path={`/notificationprofiles/add`} element={<NotificationProfileForm />} />
-                    <Route path={`/notificationprofiles/edit/:uuid/:version`} element={<NotificationProfileForm />} />
+                    <Route path={`/notificationprofiles/edit/:id/:version`} element={<NotificationProfileForm />} />
+
+                    <Route path={`/events`} element={<EventsList />} />
+                    <Route path={`/events/detail/:id`} element={<EventDetail />} />
+                    <Route path={`/events/edit/:id`} element={<EventForm />} />
 
                     <Route path={`/loggingsettings`} element={<LoggingSettings />} />
 
