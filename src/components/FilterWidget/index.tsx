@@ -486,7 +486,7 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
                                             <Input
                                                 id="valueSelect"
                                                 type="text"
-                                                value={filterValue?.toString()}
+                                                value={filterValue?.toString() ?? ''}
                                                 onChange={(e) => {
                                                     setFilterValue(JSON.parse(JSON.stringify(e.target.value)));
                                                 }}
@@ -515,7 +515,7 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
                                                       ? getStepValue(currentField?.type)
                                                       : undefined
                                             }
-                                            value={filterValue?.toString() || ''}
+                                            value={filterValue?.toString() ?? ''}
                                             onChange={(e) => {
                                                 setFilterValue(JSON.parse(JSON.stringify(e.target.value)));
                                             }}
@@ -527,7 +527,7 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
                                             id="value"
                                             inputId="valueSelect"
                                             options={filterField ? booleanOptions : undefined}
-                                            value={filterValue || null}
+                                            value={filterValue ?? null}
                                             onChange={(e) => {
                                                 setFilterValue(e);
                                             }}
@@ -538,7 +538,7 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
                                             id="value"
                                             inputId="valueSelect"
                                             options={objectValueOptions}
-                                            value={filterValue || null}
+                                            value={filterValue ?? null}
                                             onChange={(e) => {
                                                 setFilterValue(e);
                                             }}
