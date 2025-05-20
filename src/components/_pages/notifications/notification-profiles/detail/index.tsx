@@ -1,6 +1,5 @@
 import BooleanBadge from 'components/BooleanBadge/BooleanBadge';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
-import { getInputStringFromIso8601String } from 'components/Input/DurationField';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 
@@ -14,6 +13,7 @@ import { Link, useNavigate, useParams } from 'react-router';
 import { Badge, Col, Container, Row } from 'reactstrap';
 import { PlatformEnum, RecipientType } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
+import { getInputStringFromIso8601String } from 'utils/duration';
 
 export default function NotificationProfileDetail() {
     const { uuid, version } = useParams();
