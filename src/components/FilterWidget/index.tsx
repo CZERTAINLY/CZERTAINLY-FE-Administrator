@@ -406,7 +406,7 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
     );
 
     const renderFilterValueInput = useCallback(() => {
-        if (checkIfFieldOperatorIsInterval(filterCondition?.value) && checkIfFieldTypeIsDate(currentField?.type)) {
+        function renderDurationInput() {
             return (
                 <>
                     <Input
@@ -422,13 +422,7 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
                 </>
             );
         }
-        if (
-            currentField?.type === undefined ||
-            currentField?.type === FilterFieldType.String ||
-            currentField?.type === FilterFieldType.Date ||
-            currentField?.type === FilterFieldType.Datetime ||
-            currentField?.type === FilterFieldType.Number
-        ) {
+        function renderTextOrDateInput() {
             return (
                 <Input
                     id="valueSelect"
@@ -455,7 +449,7 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
                 />
             );
         }
-        if (currentField?.type === FilterFieldType.Boolean) {
+        function renderBooleanInput() {
             return (
                 <Select
                     id="value"
@@ -469,20 +463,38 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
                 />
             );
         }
-        return (
-            <Select
-                id="value"
-                inputId="valueSelect"
-                options={objectValueOptions}
-                value={filterValue ?? null}
-                onChange={(e) => {
-                    setFilterValue(e);
-                }}
-                isMulti={currentField?.multiValue}
-                isClearable={true}
-                isDisabled={!filterField || !filterCondition || noValue[filterCondition.value]}
-            />
-        );
+        function renderDefaultInput() {
+            return (
+                <Select
+                    id="value"
+                    inputId="valueSelect"
+                    options={objectValueOptions}
+                    value={filterValue ?? null}
+                    onChange={(e) => {
+                        setFilterValue(e);
+                    }}
+                    isMulti={currentField?.multiValue}
+                    isClearable={true}
+                    isDisabled={!filterField || !filterCondition || noValue[filterCondition.value]}
+                />
+            );
+        }
+        if (checkIfFieldOperatorIsInterval(filterCondition?.value) && checkIfFieldTypeIsDate(currentField?.type)) {
+            return renderDurationInput();
+        }
+        if (
+            currentField?.type === undefined ||
+            currentField?.type === FilterFieldType.String ||
+            currentField?.type === FilterFieldType.Date ||
+            currentField?.type === FilterFieldType.Datetime ||
+            currentField?.type === FilterFieldType.Number
+        ) {
+            return renderTextOrDateInput();
+        }
+        if (currentField?.type === FilterFieldType.Boolean) {
+            return renderBooleanInput();
+        }
+        return renderDefaultInput();
     }, [booleanOptions, currentField, filterCondition, filterField, filterValue, objectValueOptions]);
     return (
         <>
