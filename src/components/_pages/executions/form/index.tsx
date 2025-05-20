@@ -1,7 +1,7 @@
 import Widget from 'components/Widget';
-import { selectors as rulesSelectors } from 'ducks/rules';
+import { selectors as rulesSelectors, actions as rulesActions } from 'ducks/rules';
 import { useCallback, useMemo } from 'react';
-import { Field, Form } from 'react-final-form';
+import { Field, Form, FormProps } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 
@@ -11,14 +11,13 @@ import { mutators } from 'utils/attributes/attributeEditorMutators';
 import ConditionFormFilter from 'components/ConditionFormFilter';
 import ProgressButton from 'components/ProgressButton';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import { actions as rulesActions } from 'ducks/rules';
 import Select from 'react-select';
 import { ExecutionType, PlatformEnum, Resource } from 'types/openapi';
 import { ExecutionItemRequestModel } from 'types/rules';
 import { isObjectSame } from 'utils/common-utils';
 import { useRuleEvaluatorResourceOptions } from 'utils/rules';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
-
+import { SendNotificationExecutionItems } from 'components/_pages/executions/SendNotificationExecutionItems';
 interface SelectChangeValue {
     value: string;
     label: string;
@@ -30,6 +29,7 @@ export interface ExecutionFormValues {
     resource: Resource;
     description?: string;
     items: ExecutionItemRequestModel[];
+    notificationProfileItems?: SelectChangeValue[];
     selectedType?: SelectChangeValue;
     type?: ExecutionType;
 }
@@ -41,11 +41,15 @@ const ExecutionForm = () => {
     const isCreatingExecution = useSelector(rulesSelectors.isCreatingExecution);
     const { resourceOptionsWithRuleEvaluator, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
     const isBusy = useMemo(() => isCreatingExecution || isFetchingResourcesList, [isCreatingExecution, isFetchingResourcesList]);
-    const executionTyeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ExecutionType));
+    const executionTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ExecutionType));
+    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
 
     const executionTypeOptions = useMemo(() => {
-        return [{ value: ExecutionType.SetField, label: getEnumLabel(executionTyeEnum, ExecutionType.SetField) }];
-    }, [executionTyeEnum]);
+        return [
+            { value: ExecutionType.SetField, label: getEnumLabel(executionTypeEnum, ExecutionType.SetField) },
+            { value: ExecutionType.SendNotification, label: getEnumLabel(executionTypeEnum, ExecutionType.SendNotification) },
+        ];
+    }, [executionTypeEnum]);
 
     const defaultValues: ExecutionFormValues = useMemo(() => {
         return {
@@ -69,18 +73,38 @@ const ExecutionForm = () => {
 
     const onSubmit = useCallback(
         (values: ExecutionFormValues) => {
-            if (values.resource === Resource.None || !values.type) return;
-            dispatch(
-                rulesActions.createExecution({
-                    executionRequestModel: {
-                        items: values.items,
-                        type: values.type,
-                        name: values.name,
-                        description: values.description,
-                        resource: values.resource,
-                    },
-                }),
-            );
+            switch (values.type) {
+                case ExecutionType.SetField:
+                    if (values.resource === Resource.None || !values.type) return;
+                    dispatch(
+                        rulesActions.createExecution({
+                            executionRequestModel: {
+                                items: values.items,
+                                type: values.type,
+                                name: values.name,
+                                description: values.description,
+                                resource: values.resource,
+                            },
+                        }),
+                    );
+                    break;
+                case ExecutionType.SendNotification:
+                    dispatch(
+                        rulesActions.createExecution({
+                            executionRequestModel: {
+                                items:
+                                    values.notificationProfileItems?.map((el) => ({
+                                        notificationProfileUuid: el.value,
+                                    })) ?? [],
+                                type: values.type,
+                                name: values.name,
+                                description: values.description,
+                                resource: values.resource,
+                            },
+                        }),
+                    );
+                    break;
+            }
         },
         [dispatch],
     );
@@ -95,6 +119,21 @@ const ExecutionForm = () => {
         },
         [defaultValues],
     );
+
+    const renderExecutionItems = useCallback(({ values, form }: Partial<FormProps<ExecutionFormValues>>) => {
+        switch (values.selectedType?.value) {
+            case ExecutionType.SetField:
+                return values?.resource && <ConditionFormFilter formType="executionItem" resource={values.resource} />;
+            case ExecutionType.SendNotification:
+                return (
+                    <SendNotificationExecutionItems
+                        mode="form"
+                        notificationProfileItems={values.notificationProfileItems}
+                        onNotificationProfileItemsChange={(newItems) => form?.change('notificationProfileItems', newItems)}
+                    />
+                );
+        }
+    }, []);
 
     return (
         <Widget title={title} busy={isBusy}>
@@ -154,6 +193,11 @@ const ExecutionForm = () => {
                                             if (event?.value) {
                                                 form.change('type', event.value);
                                             }
+                                            form.change('resource', Resource.None);
+                                            form.change('selectedResource', {
+                                                value: Resource.None,
+                                                label: getEnumLabel(resourceEnum, Resource.None),
+                                            });
                                         }}
                                         styles={{
                                             control: (provided) =>
@@ -198,6 +242,7 @@ const ExecutionForm = () => {
                                                     : { ...provided },
                                         }}
                                         isClearable
+                                        isDisabled={values.type === ExecutionType.SendNotification}
                                     />
 
                                     <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
@@ -207,7 +252,7 @@ const ExecutionForm = () => {
                             )}
                         </Field>
 
-                        {values?.resource && <ConditionFormFilter formType="cxecutionItem" resource={values.resource} />}
+                        {renderExecutionItems({ values, form })}
 
                         <div className="d-flex justify-content-end">
                             <ButtonGroup>
@@ -217,11 +262,11 @@ const ExecutionForm = () => {
                                     inProgress={submitting}
                                     disabled={
                                         areDefaultValuesSame(values) ||
-                                        values.resource === Resource.None ||
+                                        (values.resource === Resource.None && values.type !== ExecutionType.SendNotification) ||
                                         submitting ||
                                         !valid ||
                                         isBusy ||
-                                        !values.items.length
+                                        (!values.items.length && !values.notificationProfileItems?.length)
                                     }
                                 />
 

@@ -8,14 +8,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 import { Resource } from 'types/openapi';
 import { conditionGroupToFilter, filterToConditionItems } from 'utils/rules';
-type FormType = 'condtionItems' | 'executionItems';
+type FormType = 'conditionItems' | 'executionItems';
 
 interface ConditionGroupFormFilterProps {
     resource: Resource;
     formType: FormType;
 }
 
-const ConditionAndExecutionItemsViewer = ({ resource, formType }: ConditionGroupFormFilterProps) => {
+const ConditionAndSetFieldExecutionItemsViewer = ({ resource, formType }: ConditionGroupFormFilterProps) => {
     const { id } = useParams();
     const editMode = useMemo(() => !!id, [id]);
 
@@ -39,7 +39,7 @@ const ConditionAndExecutionItemsViewer = ({ resource, formType }: ConditionGroup
     useEffect(() => {
         if (!id) return;
 
-        if (formType === 'condtionItems' && id !== conditionDetails?.uuid) {
+        if (formType === 'conditionItems' && id !== conditionDetails?.uuid) {
             dispatch(rulesActions.getCondition({ conditionUuid: id }));
         }
 
@@ -50,9 +50,9 @@ const ConditionAndExecutionItemsViewer = ({ resource, formType }: ConditionGroup
 
     useEffect(() => {
         if (!hasEffectRun && editMode && id) {
-            if (formType == 'condtionItems') {
+            if (formType == 'conditionItems') {
                 if (conditionDetails?.uuid !== id) return;
-                const currentConditions = conditionDetails?.items || [];
+                const currentConditions = conditionDetails?.items ?? [];
 
                 const currentFilters = conditionGroupToFilter(currentConditions);
                 setHasEffectRun(true);
@@ -69,7 +69,7 @@ const ConditionAndExecutionItemsViewer = ({ resource, formType }: ConditionGroup
     }, []);
 
     const renderFilterWidgetForConditionItems = useMemo(() => {
-        if (formType !== 'condtionItems' || !id || !conditionDetails) return null;
+        if (formType !== 'conditionItems' || !id || !conditionDetails) return null;
         const disableBadgeRemove = conditionDetails.items.length === 1 || isFetchingConditionDetails || isUpdatingCondition;
         const isBusy = isFetchingConditionDetails || isUpdatingCondition;
         return (
@@ -91,7 +91,7 @@ const ConditionAndExecutionItemsViewer = ({ resource, formType }: ConditionGroup
                                 conditionUuid: id,
                                 condition: {
                                     items: currentCondition,
-                                    description: conditionDetails.description || '',
+                                    description: conditionDetails.description ?? '',
                                 },
                             }),
                         );
@@ -140,7 +140,7 @@ const ConditionAndExecutionItemsViewer = ({ resource, formType }: ConditionGroup
 
     const renderWidgetConditionViewer = useMemo(() => {
         switch (formType) {
-            case 'condtionItems':
+            case 'conditionItems':
                 return renderFilterWidgetForConditionItems;
 
             case 'executionItems':
@@ -154,4 +154,4 @@ const ConditionAndExecutionItemsViewer = ({ resource, formType }: ConditionGroup
     return <div>{renderWidgetConditionViewer}</div>;
 };
 
-export default ConditionAndExecutionItemsViewer;
+export default ConditionAndSetFieldExecutionItemsViewer;

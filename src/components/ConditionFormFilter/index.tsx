@@ -11,7 +11,7 @@ import { Resource } from 'types/openapi';
 import { filterToConditionItems } from 'utils/rules';
 import { ConditionFormValues } from '../_pages/conditions/form';
 import styles from './conditionGroupForm.module.scss';
-type FormType = 'conditionItem' | 'cxecutionItem';
+type FormType = 'conditionItem' | 'executionItem';
 interface ConditionGroupFormFilterProps {
     resource: Resource;
     formType: FormType;
@@ -30,7 +30,7 @@ const ConditionFormFilter = ({ resource, formType, includeIgnoreAction }: Condit
         };
     }, [dispatch]);
     const renderFilterWidget = useMemo(() => {
-        return formType === 'cxecutionItem' ? (
+        return formType === 'executionItem' ? (
             <div className={cx({ [styles.disabled]: resource === Resource.None })}>
                 <FilterWidgetRuleAction
                     entity={EntityType.ACTIONS}
