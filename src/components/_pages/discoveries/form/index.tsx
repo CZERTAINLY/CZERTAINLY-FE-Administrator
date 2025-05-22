@@ -5,39 +5,28 @@ import TabLayout from 'components/Layout/TabLayout';
 import ProgressButton from 'components/ProgressButton';
 import Widget from 'components/Widget';
 import { actions as connectorActions } from 'ducks/connectors';
+import { actions as userInterfaceActions } from 'ducks/user-interface';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
-import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-
 import { actions as discoveryActions, selectors as discoverySelectors } from 'ducks/discoveries';
-import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { actions as userInterfaceActions } from '../../../../ducks/user-interface';
+import { actions as rulesActions } from 'ducks/rules';
 
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Field, Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router';
-
+import { useNavigate } from 'react-router';
 import Select from 'react-select';
 import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
+import Cron from 'react-cron-generator';
+
 import { AttributeDescriptorModel } from 'types/attributes';
 import { ConnectorResponseModel } from 'types/connectors';
 import { FunctionGroupCode, Resource } from 'types/openapi';
 
-import Cron from 'react-cron-generator';
-import { PlatformEnum } from 'types/openapi';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
-
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 import { getStrongFromCronExpression } from 'utils/dateUtil';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateQuartzCronExpression, validateRequired } from 'utils/validators';
 import TriggerEditorWidget from 'components/TriggerEditorWidget';
-import { TriggerDto } from 'types/rules';
-
-interface SelectChangeValue {
-    value: string;
-    label: string;
-}
 
 interface FormValues {
     name: string | undefined;

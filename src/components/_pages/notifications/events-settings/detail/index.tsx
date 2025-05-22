@@ -153,12 +153,14 @@ export default function EventDetail() {
                       .map((trigger) => ({
                           id: trigger.uuid,
                           columns: [
-                              <Link to={`../../triggers/detail/${trigger.uuid}`}>{trigger.name}</Link>,
+                              <Link key={trigger.uuid} to={`../../triggers/detail/${trigger.uuid}`}>
+                                  {trigger.name}
+                              </Link>,
                               getEnumLabel(triggerTypeEnum, trigger.type ?? ''),
                               trigger.ignoreTrigger ? 'Yes' : 'No',
                               getEnumLabel(resourceEventEnum, trigger.event ?? ''),
                               getEnumLabel(resourceTypeEnum, trigger.resource ?? ''),
-                              trigger.description || '',
+                              trigger.description ?? '',
                           ],
                       }))
                 : [],

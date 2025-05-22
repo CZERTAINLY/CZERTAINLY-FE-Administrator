@@ -1,14 +1,12 @@
 import Widget from 'components/Widget';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router';
+import { Link } from 'react-router';
 
-import { Resource, TriggerDto } from 'types/openapi';
-
-import { PlatformEnum } from 'types/openapi';
+import { Resource, TriggerDto, PlatformEnum } from 'types/openapi';
 
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import { Button } from 'reactstrap';
@@ -145,7 +143,7 @@ export default function TriggerEditorWidget({ resource, selectedTriggers, onSele
                 getEnumLabel(triggerTypeEnum, trigger.type ?? ''),
                 getEnumLabel(eventNameEnum, trigger.event ?? ''),
                 getEnumLabel(resourceTypeEnum, trigger.resource ?? ''),
-                trigger.description || '',
+                trigger.description ?? '',
                 <div key="actions" className="d-flex">
                     <Button
                         className="btn btn-link text-danger"
@@ -183,7 +181,6 @@ export default function TriggerEditorWidget({ resource, selectedTriggers, onSele
     return (
         <Widget title="Triggers">
             {noteText && <p className="text-muted mt-1 ">Note: {noteText}</p>}
-            {/* <p className="text-muted mt-1 ">Note: Triggers will be executed on newly discovered certificate in displayed order</p> */}
             <CustomTable
                 hasHeader={!!triggerTableData.length}
                 data={triggerTableData}
