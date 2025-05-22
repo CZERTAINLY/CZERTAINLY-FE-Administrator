@@ -28,7 +28,7 @@ export const conditionGroupToFilter = (conditionGroup: ConditionItemModel[]): Se
 };
 
 export const useResourceOptions = () => {
-    const resourceList = useSelector(resourceSelectors.resourceslist);
+    const resourceList = useSelector(resourceSelectors.resourcesList);
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const isFetchingResourcesList = useSelector(resourceSelectors.isFetchingResourcesList);
     const dispatch = useDispatch();
@@ -48,7 +48,7 @@ export const useResourceOptions = () => {
 };
 
 export const useRuleEvaluatorResourceOptions = () => {
-    const resourceList = useSelector(resourceSelectors.resourceslist);
+    const resourceList = useSelector(resourceSelectors.resourcesList);
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const isFetchingResourcesList = useSelector(resourceSelectors.isFetchingResourcesList);
     const dispatch = useDispatch();
@@ -69,7 +69,7 @@ export const useRuleEvaluatorResourceOptions = () => {
 };
 
 export const useHasEventsResourceOptions = () => {
-    const resourceList = useSelector(resourceSelectors.resourceslist);
+    const resourceList = useSelector(resourceSelectors.resourcesList);
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const isFetchingResourcesList = useSelector(resourceSelectors.isFetchingResourcesList);
     const dispatch = useDispatch();

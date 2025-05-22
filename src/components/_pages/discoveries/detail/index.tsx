@@ -184,10 +184,6 @@ export default function DiscoveryDetail() {
             content: 'Name',
         },
         {
-            id: 'eventResource',
-            content: 'Event Resource',
-        },
-        {
             id: 'triggerType',
             content: 'Trigger Type',
         },
@@ -214,11 +210,10 @@ export default function DiscoveryDetail() {
               id: trigger.uuid,
               columns: [
                   <Link to={`../../triggers/detail/${trigger.uuid}`}>{trigger.name}</Link>,
-                  trigger?.eventResource ? getEnumLabel(resourceTypeEnum, trigger.eventResource) : '',
-                  getEnumLabel(triggerTypeEnum, trigger.type),
+                  getEnumLabel(triggerTypeEnum, trigger.type ?? ''),
                   trigger.ignoreTrigger ? 'Yes' : 'No',
-                  getEnumLabel(eventNameEnum, trigger.event || ''),
-                  getEnumLabel(resourceTypeEnum, trigger.resource || ''),
+                  getEnumLabel(eventNameEnum, trigger.event ?? ''),
+                  getEnumLabel(resourceTypeEnum, trigger.resource ?? ''),
                   trigger.description || '',
               ],
           }))

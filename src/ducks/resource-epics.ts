@@ -9,7 +9,7 @@ const listResources: AppEpic = (action$, state$, deps) => {
         filter(slice.actions.listResources.match),
         switchMap(() =>
             deps.apiClients.resources.listResources().pipe(
-                map((resources) => slice.actions.listResourcesSuccess({ resourceslist: resources })),
+                map((resources) => slice.actions.listResourcesSuccess({ resourcesList: resources })),
                 catchError((err) => of(slice.actions.listResourcesFailure({ error: extractError(err, 'Failed to get resources list') }))),
             ),
         ),

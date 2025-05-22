@@ -59,10 +59,10 @@ const TriggerForm = () => {
     const isCreatingTrigger = useSelector(rulesSelectors.isCreatingTrigger);
     const resourceEventEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ResourceEvent));
     const isBusy = useMemo(() => isCreatingTrigger, [isCreatingTrigger]);
-    const resourceslist = useSelector(resourceSelectors.resourceslist);
+    const resourcesList = useSelector(resourceSelectors.resourcesList);
 
-    const resourceOptions = useResourceOptionsFromListWithFilters(resourceslist);
-    const resourceEventsOptions = useResourceOptionsFromListWithFilters(resourceslist, 'hasEvents');
+    const resourceOptions = useResourceOptionsFromListWithFilters(resourcesList);
+    const resourceEventsOptions = useResourceOptionsFromListWithFilters(resourcesList, 'hasEvents');
 
     const resourceEventNameOptions = useMemo(() => {
         if (resourceEvents === undefined) return [];
@@ -148,7 +148,6 @@ const TriggerForm = () => {
                         actionsUuids: values.actionsUuids.map((action) => action.value),
                         event: values?.event,
                         rulesUuids: values.rulesUuids.map((rule) => rule.value),
-                        eventResource: values.eventResource,
                         type: values.triggerType,
                     },
                 }),

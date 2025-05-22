@@ -4,14 +4,14 @@ import { ResourceEventModel, ResourceModel } from 'types/resource';
 import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
-    resourceslist: ResourceModel[];
+    resourcesList: ResourceModel[];
     resourceEvents: ResourceEventModel[];
     isFetchingResourcesList: boolean;
     isFetchingResourceEvents: boolean;
 };
 
 export const initialState: State = {
-    resourceslist: [],
+    resourcesList: [],
     resourceEvents: [],
     isFetchingResourcesList: false,
     isFetchingResourceEvents: false,
@@ -35,9 +35,9 @@ export const slice = createSlice({
             state.isFetchingResourcesList = true;
         },
 
-        listResourcesSuccess(state, action: PayloadAction<{ resourceslist: ResourceModel[] }>) {
+        listResourcesSuccess(state, action: PayloadAction<{ resourcesList: ResourceModel[] }>) {
             state.isFetchingResourcesList = false;
-            state.resourceslist = action.payload.resourceslist;
+            state.resourcesList = action.payload.resourcesList;
         },
 
         listResourcesFailure(state, action: PayloadAction<{ error: string | undefined }>) {
@@ -61,12 +61,12 @@ export const slice = createSlice({
 
 const state = createFeatureSelector<State>(slice.name);
 
-const resourceslist = createSelector(state, (state) => state.resourceslist);
+const resourcesList = createSelector(state, (state) => state.resourcesList);
 const resourceEvents = createSelector(state, (state) => state.resourceEvents);
 const isFetchingResourcesList = createSelector(state, (state) => state.isFetchingResourcesList);
 
 export const selectors = {
-    resourceslist,
+    resourcesList,
     resourceEvents,
     isFetchingResourcesList,
 };

@@ -57,8 +57,7 @@ export default function DiscoveryForm() {
     const discoveryProviders = useSelector(discoverySelectors.discoveryProviders);
     const discoveryProviderAttributeDescriptors = useSelector(discoverySelectors.discoveryProviderAttributeDescriptors);
     const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
-    const triggers = useSelector(rulesSelectors.triggers);
-    const [selectedTriggers, setSelectedTriggers] = useState<TriggerDto[]>([]);
+    const [selectedTriggers, setSelectedTriggers] = useState<string[]>([]);
     const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
     const isFetchingDiscoveryDetail = useSelector(discoverySelectors.isFetchingDetail);
     const isFetchingDiscoveryProviders = useSelector(discoverySelectors.isFetchingDiscoveryProviders);
@@ -126,7 +125,7 @@ export default function DiscoveryForm() {
                 discoveryActions.createDiscovery({
                     request: {
                         name: values.name!,
-                        triggers: selectedTriggers.length ? selectedTriggers.map((trigger) => trigger.uuid) : undefined,
+                        triggers: selectedTriggers.length ? selectedTriggers : undefined,
                         connectorUuid: values.discoveryProvider!.value,
                         kind: values.storeKind?.value!,
                         attributes: collectFormAttributes(

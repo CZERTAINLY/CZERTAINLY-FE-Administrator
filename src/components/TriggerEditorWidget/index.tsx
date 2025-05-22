@@ -6,13 +6,12 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
 
-import { Resource } from 'types/openapi';
+import { Resource, TriggerDto } from 'types/openapi';
 
 import { PlatformEnum } from 'types/openapi';
 
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import { Button } from 'reactstrap';
-import { TriggerDto } from 'types/rules';
 
 type OptionType = {
     label: string;
@@ -21,8 +20,8 @@ type OptionType = {
 
 type Props = {
     resource?: Resource;
-    selectedTriggers: TriggerDto[];
-    onSelectedTriggersChange: (triggers: TriggerDto[]) => void;
+    selectedTriggers: string[];
+    onSelectedTriggersChange: (triggerUuids: string[]) => void;
     noteText?: string;
 };
 
@@ -44,7 +43,7 @@ export default function TriggerEditorWidget({ resource, selectedTriggers, onSele
                     label: trigger.name,
                     value: trigger.uuid,
                 }))
-                .filter((trigger) => !selectedTriggers.find((selectedTrigger) => selectedTrigger.uuid === trigger.value)),
+                .filter((trigger) => !selectedTriggers.find((selectedTrigger) => selectedTrigger === trigger.value)),
         [triggers, selectedTriggers],
     );
 
@@ -60,7 +59,9 @@ export default function TriggerEditorWidget({ resource, selectedTriggers, onSele
             const newTriggers = newValues.map((el) => triggers.find((innerEl) => innerEl.uuid === el.value));
             const allTriggers = [
                 ...previousTriggers,
-                ...(newTriggers.filter((newValue) => !previousTriggers.find((trigger) => trigger.uuid === newValue?.uuid)) as TriggerDto[]),
+                ...(newTriggers.filter((newValue) => !previousTriggers.find((trigger) => trigger === newValue?.uuid)) as TriggerDto[]).map(
+                    (el) => el?.uuid,
+                ),
             ];
             onSelectedTriggersChange(allTriggers);
         },
@@ -69,13 +70,13 @@ export default function TriggerEditorWidget({ resource, selectedTriggers, onSele
 
     const onDeleteTrigger = useCallback(
         (trigger: TriggerDto) => {
-            onSelectedTriggersChange(selectedTriggers.filter((selectedTrigger) => selectedTrigger.uuid !== trigger.uuid));
+            onSelectedTriggersChange(selectedTriggers.filter((selectedTrigger) => selectedTrigger !== trigger.uuid));
         },
         [selectedTriggers, onSelectedTriggersChange],
     );
     const onMoveTriggerUp = useCallback(
         (trigger: TriggerDto) => {
-            const index = selectedTriggers.findIndex((selectedTrigger) => selectedTrigger.uuid === trigger.uuid);
+            const index = selectedTriggers.findIndex((selectedTrigger) => selectedTrigger === trigger.uuid);
             if (index === 0) return;
             const newSelectedTriggers = [...selectedTriggers];
             const temp = newSelectedTriggers[index];
@@ -88,7 +89,7 @@ export default function TriggerEditorWidget({ resource, selectedTriggers, onSele
 
     const onMoveTriggerDown = useCallback(
         (trigger: TriggerDto) => {
-            const index = selectedTriggers.findIndex((selectedTrigger) => selectedTrigger.uuid === trigger.uuid);
+            const index = selectedTriggers.findIndex((selectedTrigger) => selectedTrigger === trigger.uuid);
             if (index === selectedTriggers.length - 1) return;
             const newSelectedTriggers = [...selectedTriggers];
             const temp = newSelectedTriggers[index];
@@ -128,11 +129,11 @@ export default function TriggerEditorWidget({ resource, selectedTriggers, onSele
 
     const triggerTableData: TableDataRow[] = useMemo(() => {
         const triggerDataListOrderedAsPerSelectedTriggers = triggers
-            .filter((trigger) => selectedTriggers.find((selectedTrigger) => selectedTrigger.uuid === trigger.uuid))
+            .filter((trigger) => selectedTriggers.find((selectedTrigger) => selectedTrigger === trigger.uuid))
             .sort(
                 (a, b) =>
-                    selectedTriggers.findIndex((selectedTrigger) => selectedTrigger.uuid === a.uuid) -
-                    selectedTriggers.findIndex((selectedTrigger) => selectedTrigger.uuid === b.uuid),
+                    selectedTriggers.findIndex((selectedTrigger) => selectedTrigger === a.uuid) -
+                    selectedTriggers.findIndex((selectedTrigger) => selectedTrigger === b.uuid),
             );
 
         return triggerDataListOrderedAsPerSelectedTriggers.map((trigger, i) => ({

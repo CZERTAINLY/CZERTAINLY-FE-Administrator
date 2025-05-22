@@ -1,16 +1,21 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { NotificationSettingsDto } from 'types/openapi';
 import { createFeatureSelector } from 'utils/ducks';
-import { SettingsPlatformModel, SettingsLoggingModel, SettingsPlatformUpdateModel } from '../types/settings';
+import {
+    SettingsPlatformModel,
+    SettingsLoggingModel,
+    SettingsPlatformUpdateModel,
+    EventsSettingsDto,
+    EventSettingsDto,
+} from '../types/settings';
 
 export type State = {
     platformSettings?: SettingsPlatformModel;
     isFetchingPlatform: boolean;
     isUpdatingPlatform: boolean;
 
-    notificationsSettings?: NotificationSettingsDto;
-    isFetchingNotificationsSetting: boolean;
-    isUpdatingNotificationsSetting: boolean;
+    eventsSettings?: EventsSettingsDto;
+    isFetchingEventsSetting: boolean;
+    isUpdatingEventsSetting: boolean;
 
     loggingSettings?: SettingsLoggingModel;
     isFetchingLoggingSetting: boolean;
@@ -20,8 +25,8 @@ export type State = {
 export const initialState: State = {
     isFetchingPlatform: false,
     isUpdatingPlatform: false,
-    isFetchingNotificationsSetting: false,
-    isUpdatingNotificationsSetting: false,
+    isFetchingEventsSetting: false,
+    isUpdatingEventsSetting: false,
     isFetchingLoggingSetting: false,
     isUpdatingLoggingSetting: false,
 };
@@ -56,30 +61,37 @@ export const slice = createSlice({
             state.isUpdatingPlatform = false;
         },
 
-        getNotificationsSettings: (state, action: PayloadAction<void>) => {
-            state.isFetchingNotificationsSetting = true;
+        getEventsSettings: (state, action: PayloadAction<void>) => {
+            state.isFetchingEventsSetting = true;
         },
 
-        getNotificationsSettingsSuccess: (state, action: PayloadAction<NotificationSettingsDto>) => {
-            state.notificationsSettings = action.payload;
-            state.isFetchingNotificationsSetting = false;
+        getEventsSettingsSuccess: (state, action: PayloadAction<EventsSettingsDto>) => {
+            state.eventsSettings = action.payload;
+            state.isFetchingEventsSetting = false;
         },
 
-        getNotificationsSettingsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isFetchingNotificationsSetting = false;
+        getEventsSettingsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingEventsSetting = false;
         },
 
-        updateNotificationsSettings: (state, action: PayloadAction<NotificationSettingsDto>) => {
-            state.isUpdatingNotificationsSetting = true;
+        updateEventSettings: (state, action: PayloadAction<{ eventSettings: EventSettingsDto; redirect?: string }>) => {
+            state.isUpdatingEventsSetting = true;
         },
 
-        updateNotificationsSettingsSuccess: (state, action: PayloadAction<NotificationSettingsDto>) => {
-            state.isUpdatingNotificationsSetting = false;
-            state.notificationsSettings = action.payload;
+        updateEventSettingsSuccess: (state, action: PayloadAction<{ eventSettings: EventSettingsDto; redirect?: string }>) => {
+            state.isUpdatingEventsSetting = false;
+            if (state.eventsSettings) {
+                state.eventsSettings = {
+                    eventsMapping: {
+                        ...state.eventsSettings.eventsMapping,
+                        [action.payload.eventSettings.event]: action.payload.eventSettings.triggerUuids,
+                    },
+                };
+            }
         },
 
-        updateNotificationsSettingsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isUpdatingNotificationsSetting = false;
+        updateEventSettingsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isUpdatingEventsSetting = false;
         },
 
         getLoggingSettings: (state, action: PayloadAction<void>) => {
@@ -116,9 +128,9 @@ const platformSettings = createSelector(state, (state: State) => state.platformS
 const isFetchingPlatform = createSelector(state, (state: State) => state.isFetchingPlatform);
 const isUpdatingPlatform = createSelector(state, (state: State) => state.isUpdatingPlatform);
 
-const notificationsSettings = createSelector(state, (state: State) => state.notificationsSettings);
-const isFetchingNotificationsSetting = createSelector(state, (state: State) => state.isFetchingNotificationsSetting);
-const isUpdatingNotificationsSetting = createSelector(state, (state: State) => state.isUpdatingNotificationsSetting);
+const eventsSettings = createSelector(state, (state: State) => state.eventsSettings);
+const isFetchingEventsSetting = createSelector(state, (state: State) => state.isFetchingEventsSetting);
+const isUpdatingEventsSetting = createSelector(state, (state: State) => state.isUpdatingEventsSetting);
 
 const loggingSettings = createSelector(state, (state: State) => state.loggingSettings);
 const isFetchingLoggingSetting = createSelector(state, (state: State) => state.isFetchingLoggingSetting);
@@ -130,9 +142,9 @@ export const selectors = {
     isFetchingPlatform,
     isUpdatingPlatform,
 
-    notificationsSettings,
-    isFetchingNotificationsSetting,
-    isUpdatingNotificationsSetting,
+    eventsSettings,
+    isFetchingEventsSetting,
+    isUpdatingEventsSetting,
 
     loggingSettings,
     isFetchingLoggingSetting,

@@ -79,7 +79,6 @@ export enum LockWidgetNameEnum {
     SCEPProfileDetails,
     PlatformSettings,
     LoggingSettings,
-    NotificationSettings,
     ListOfNotificationProfiles,
     NotificationProfileDetails,
     ListOfCustomAttributes,
@@ -93,8 +92,7 @@ export enum LockWidgetNameEnum {
     ListOfNotifications,
     NotificationsOverview,
     CustomAttributeWidget,
-    EventDetails,
-    ListOfEvents,
+    EventSettings,
 }
 
 export interface WidgetLockModel {
