@@ -16,15 +16,15 @@ import { useHasEventsResourceOptions } from 'utils/rules';
 const EventsList = () => {
     const dispatch = useDispatch();
 
-    const eventsSettings = useSelector(settingsSelectors.eventsSettings);
     const resourceEvents = useSelector(resourceSelectors.resourceEvents);
+    const isFetchingResourcesList = useSelector(resourceSelectors.isFetchingResourcesList);
     const isFetchingEventsSetting = useSelector(settingsSelectors.isFetchingEventsSetting);
 
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const resourceEventEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ResourceEvent));
 
     const [selectedResource, setSelectedResource] = useState<Resource>();
-    const { resourceOptionsWithEvents, isFetchingResourcesList } = useHasEventsResourceOptions();
+    const { resourceOptionsWithEvents, isFetchingResourcesList: isFetchingResourcesWithEventsList } = useHasEventsResourceOptions();
 
     const getEvents = useCallback(() => {
         dispatch(settingsActions.getEventsSettings());
@@ -35,10 +35,14 @@ const EventsList = () => {
     }, [getEvents]);
 
     useEffect(() => {
-        if (!selectedResource) return;
-        dispatch(resourceActions.listResourceEvents({ resource: selectedResource }));
-    }, [dispatch, selectedResource]);
-    const isBusy = useMemo(() => isFetchingEventsSetting || isFetchingResourcesList, [isFetchingEventsSetting, isFetchingResourcesList]);
+        if (resourceEvents.length) return;
+        dispatch(resourceActions.listAllResourceEvents());
+    }, [dispatch, resourceEvents]);
+
+    const isBusy = useMemo(
+        () => isFetchingEventsSetting || isFetchingResourcesList || isFetchingResourcesWithEventsList,
+        [isFetchingEventsSetting, isFetchingResourcesList, isFetchingResourcesWithEventsList],
+    );
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
@@ -81,26 +85,26 @@ const EventsList = () => {
 
     const dataRows: TableDataRow[] = useMemo(
         () =>
-            !eventsSettings
+            !resourceEvents
                 ? []
-                : // : Object.keys(eventsSettings.eventsMapping).map((profile) => ({
-                  //       id: profile,
-                  //       columns: [
-                  //           <Link key="name" to={`./detail/${profile}`}>
-                  //               {profile}
-                  //           </Link>,
-                  //       ],
-                  //   })),
-                  resourceEvents.map((event) => ({
-                      id: event.event,
-                      columns: [
-                          <Link key="name" to={`./detail/${event.event}`}>
-                              {getEnumLabel(resourceEventEnum, event.event)}
-                          </Link>,
-                          event.producedResource ? getEnumLabel(resourceEnum, event.producedResource) : '',
-                      ],
-                  })),
-        [eventsSettings, resourceEvents, resourceEventEnum, resourceEnum],
+                : resourceEvents
+                      .filter((el) => selectedResource === undefined || selectedResource === el.producedResource)
+                      .reduce(
+                          (acc, event) => [
+                              ...acc,
+                              {
+                                  id: event.event,
+                                  columns: [
+                                      <Link key="name" to={`./detail/${event.event}`}>
+                                          {getEnumLabel(resourceEventEnum, event.event)}
+                                      </Link>,
+                                      event.producedResource ? getEnumLabel(resourceEnum, event.producedResource) : '',
+                                  ],
+                              },
+                          ],
+                          [] as TableDataRow[],
+                      ),
+        [resourceEvents, resourceEventEnum, resourceEnum, selectedResource],
     );
 
     return (

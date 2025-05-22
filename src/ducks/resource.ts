@@ -44,6 +44,22 @@ export const slice = createSlice({
             state.isFetchingResourcesList = false;
         },
 
+        listAllResourceEvents: (state, action: PayloadAction<void>) => {
+            state.isFetchingResourceEvents = true;
+        },
+
+        listAllResourceEventsSuccess(state, action: PayloadAction<{ mappedEvents: { [key: string]: ResourceEventModel[] } }>) {
+            state.isFetchingResourceEvents = false;
+            state.resourceEvents = Object.keys(action.payload.mappedEvents).reduce(
+                (acc, mappedEvent) => [...acc, ...action.payload.mappedEvents[mappedEvent]],
+                [] as ResourceEventModel[],
+            );
+        },
+
+        listAllResourceEventsFailure(state, action: PayloadAction<{ error: string | undefined }>) {
+            state.isFetchingResourceEvents = false;
+        },
+
         listResourceEvents: (state, action: PayloadAction<{ resource: Resource }>) => {
             state.isFetchingResourceEvents = true;
         },

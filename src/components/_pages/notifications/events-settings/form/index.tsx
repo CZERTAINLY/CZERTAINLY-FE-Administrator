@@ -1,30 +1,20 @@
-import TextField from 'components/Input/TextField';
 import ProgressButton from 'components/ProgressButton';
 import Widget from 'components/Widget';
-import { actions, selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions as settingsActions, selectors as settingsSelectors } from 'ducks/settings';
+
+import { actions as resourceActions, selectors as resourceSelectors } from 'ducks/resource';
 import { useCallback, useEffect, useMemo } from 'react';
-import { Field, Form, useForm, useFormState } from 'react-final-form';
+import { Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
-import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, FormText, Input, InputGroup, Label } from 'reactstrap';
+import { Form as BootstrapForm, Button, ButtonGroup } from 'reactstrap';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 import { isObjectSame } from 'utils/common-utils';
-import {
-    validateAlphaNumericWithSpecialChars,
-    validatePositiveInteger,
-    validateRequired,
-    validateNonZeroInteger,
-    validateDuration,
-} from 'utils/validators';
 import CustomSelect from 'components/Input/CustomSelect';
-import { EventSettingsDto, EventSettingsDtoEventEnum, PlatformEnum, RecipientType, Resource } from 'types/openapi';
-import SwitchField from 'components/Input/SwitchField';
-import { NotificationProfileUpdateRequestModel } from 'types/notification-profiles';
+import { EventSettingsDto, EventSettingsDtoEventEnum, PlatformEnum, Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { getInputStringFromIso8601String, getIso8601StringFromInputString } from 'utils/duration';
 import TriggerEditorWidget from 'components/TriggerEditorWidget';
-import { TriggerDto } from 'types/rules';
 
 interface OptionType {
     value: string;
@@ -43,14 +33,20 @@ export default function EventForm() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
+    const resourceEvents = useSelector(resourceSelectors.resourceEvents);
     const eventsSettings = useSelector(settingsSelectors.eventsSettings);
+
+    const isFetchingResourcesList = useSelector(resourceSelectors.isFetchingResourcesList);
     const isFetchingEventsSetting = useSelector(settingsSelectors.isFetchingEventsSetting);
     const isUpdatingEventsSetting = useSelector(settingsSelectors.isUpdatingEventsSetting);
 
-    const resourcesEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
-    const resourcesEventEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ResourceEvent));
+    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
+    const resourceEventEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ResourceEvent));
 
-    const isBusy = useMemo(() => isFetchingEventsSetting || isUpdatingEventsSetting, [isFetchingEventsSetting, isUpdatingEventsSetting]);
+    const isBusy = useMemo(
+        () => isFetchingEventsSetting || isUpdatingEventsSetting || isFetchingResourcesList,
+        [isFetchingEventsSetting, isUpdatingEventsSetting, isFetchingResourcesList],
+    );
 
     const eventSettings: EventSettingsDto | undefined = useMemo(() => {
         if (!event || !eventsSettings) return undefined;
@@ -65,20 +61,25 @@ export default function EventForm() {
         dispatch(settingsActions.getEventsSettings());
     }, [dispatch, event]);
 
+    useEffect(() => {
+        if (resourceEvents.length) return;
+        dispatch(resourceActions.listAllResourceEvents());
+    }, [dispatch, resourceEvents]);
+
     const defaultValues: FormValues = useMemo(() => {
         if (!eventSettings) return {};
         return {
             event: {
-                label: getEnumLabel(resourcesEventEnum, eventSettings.event),
+                label: getEnumLabel(resourceEventEnum, eventSettings.event),
                 value: eventSettings.event,
             },
-            // resource: {
-            //     label: getEnumLabel(resourcesEnum, eventDetails?.resource ?? Resource.None),
-            //     value: eventDetails?.resource,
-            // },
+            resource: {
+                label: getEnumLabel(resourceEnum, resourceEvents.find((el) => el.event === event)?.producedResource ?? ''),
+                value: resourceEvents.find((el) => el.event === event)?.producedResource ?? '',
+            },
             triggers: eventSettings.triggerUuids ?? [],
         };
-    }, [eventSettings, resourcesEventEnum]);
+    }, [event, resourceEvents, eventSettings, resourceEnum, resourceEventEnum]);
 
     const onCancel = useCallback(() => {
         navigate(-1);

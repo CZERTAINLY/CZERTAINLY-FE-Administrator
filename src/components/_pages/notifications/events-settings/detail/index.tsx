@@ -5,6 +5,8 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { actions as settingsActions, selectors as settingsSelectors } from 'ducks/settings';
+import { actions as resourceActions, selectors as resourceSelectors } from 'ducks/resource';
+
 import { useCallback, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router';
@@ -20,15 +22,22 @@ export default function EventDetail() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
+    const resourceEvents = useSelector(resourceSelectors.resourceEvents);
     const eventsSettings = useSelector(settingsSelectors.eventsSettings);
     const triggers = useSelector(rulesSelectors.triggers);
+
+    const isFetchingResourcesList = useSelector(resourceSelectors.isFetchingResourcesList);
     const isFetchingEventsSetting = useSelector(settingsSelectors.isFetchingEventsSetting);
     const isFetchingTriggers = useSelector(rulesSelectors.isFetchingTriggers);
 
+    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const resourceEventEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ResourceEvent));
     const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.TriggerType));
-    const isBusy = useMemo(() => isFetchingEventsSetting || isFetchingTriggers, [isFetchingEventsSetting, isFetchingTriggers]);
+    const isBusy = useMemo(
+        () => isFetchingEventsSetting || isFetchingTriggers || isFetchingResourcesList,
+        [isFetchingEventsSetting, isFetchingTriggers, isFetchingResourcesList],
+    );
 
     const eventSettings: EventSettingsDto | undefined = useMemo(() => {
         if (!event || !eventsSettings) return undefined;
@@ -47,6 +56,11 @@ export default function EventDetail() {
     useEffect(() => {
         getFreshData();
     }, [getFreshData]);
+
+    useEffect(() => {
+        if (resourceEvents.length) return;
+        dispatch(resourceActions.listAllResourceEvents());
+    }, [dispatch, resourceEvents]);
 
     const onEditEvent = useCallback(() => {
         if (!event) return;
@@ -80,6 +94,10 @@ export default function EventDetail() {
         [],
     );
 
+    console.log(
+        resourceEvents.find((el) => el.event === event),
+        resourceEvents,
+    );
     const profileData: TableDataRow[] = useMemo(
         () =>
             !eventSettings
@@ -89,8 +107,15 @@ export default function EventDetail() {
                           id: 'name',
                           columns: ['Name', getEnumLabel(resourceEventEnum, eventSettings.event)],
                       },
+                      {
+                          id: 'resource',
+                          columns: [
+                              'Resource',
+                              getEnumLabel(resourceEnum, resourceEvents.find((el) => el.event === event)?.producedResource ?? ''),
+                          ],
+                      },
                   ],
-        [eventSettings, resourceEventEnum],
+        [event, resourceEvents, eventSettings, resourceEventEnum, resourceEnum],
     );
 
     const triggerHeaders: TableHeader[] = [
