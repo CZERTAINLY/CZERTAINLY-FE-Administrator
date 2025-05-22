@@ -21,11 +21,16 @@ import type {
     Resource,
     TriggerDetailDto,
     TriggerDto,
+    TriggerEventAssociationRequestDto,
     TriggerHistoryDto,
     TriggerHistorySummaryDto,
     TriggerRequestDto,
     UpdateTriggerRequestDto,
 } from '../models';
+
+export interface AssociateTriggersRequest {
+    triggerEventAssociationRequestDto: TriggerEventAssociationRequestDto;
+}
 
 export interface CreateTriggerRequest {
     triggerRequestDto: TriggerRequestDto;
@@ -61,6 +66,26 @@ export interface UpdateTriggerRequest {
  * no description
  */
 export class WorkflowTriggersManagementApi extends BaseAPI {
+
+    /**
+     * Associate event with triggers
+     */
+    associateTriggers({ triggerEventAssociationRequestDto }: AssociateTriggersRequest): Observable<void>
+    associateTriggers({ triggerEventAssociationRequestDto }: AssociateTriggersRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    associateTriggers({ triggerEventAssociationRequestDto }: AssociateTriggersRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(triggerEventAssociationRequestDto, 'triggerEventAssociationRequestDto', 'associateTriggers');
+
+        const headers: HttpHeaders = {
+            'Content-Type': 'application/json',
+        };
+
+        return this.request<void>({
+            url: '/v1/workflows/events',
+            method: 'POST',
+            headers,
+            body: triggerEventAssociationRequestDto,
+        }, opts?.responseOpts);
+    };
 
     /**
      * Create Trigger

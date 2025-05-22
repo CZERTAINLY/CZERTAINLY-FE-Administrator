@@ -375,7 +375,6 @@ export function useTransformTriggerObjectToNodesAndEdges(
                                         ignoreTrigger: allActionsUuids.length === 0 ? true : false,
                                         resource: triggerDetails.resource,
                                         type: triggerDetails.type,
-                                        eventResource: triggerDetails.eventResource,
                                         description: triggerDetails.description || '',
                                         event: (triggerDetails.event as unknown as UpdateTriggerRequestDtoEventEnum) || undefined,
                                     },
@@ -417,7 +416,6 @@ export function useTransformTriggerObjectToNodesAndEdges(
                                             resource: triggerDetails.resource,
                                             type: triggerDetails.type,
                                             actionsUuids: [],
-                                            eventResource: triggerDetails.eventResource,
                                             event: (triggerDetails.event as unknown as UpdateTriggerRequestDtoEventEnum) || undefined,
                                         },
                                     }),
@@ -429,24 +427,18 @@ export function useTransformTriggerObjectToNodesAndEdges(
             </div>
         ),
     });
-    // }
 
     otherPropertiesCurrentCertificate.push({
         propertyName: 'Resource',
         propertyValue: getEnumLabel(resourceTypeEnum, triggerDetails.resource),
     });
 
-    if (triggerDetails?.eventResource) {
+    if (triggerDetails?.type) {
         otherPropertiesCurrentCertificate.push({
-            propertyName: 'Event Resource',
-            propertyValue: getEnumLabel(resourceTypeEnum, triggerDetails.eventResource),
+            propertyName: 'Type',
+            propertyValue: getEnumLabel(triggerTypeEnum, triggerDetails.type),
         });
     }
-
-    otherPropertiesCurrentCertificate.push({
-        propertyName: 'Type',
-        propertyValue: getEnumLabel(triggerTypeEnum, triggerDetails.type),
-    });
 
     if (triggerDetails?.event) {
         otherPropertiesCurrentCertificate.push({
@@ -507,7 +499,6 @@ export function useTransformTriggerObjectToNodesAndEdges(
                                         resource: triggerDetails.resource,
                                         type: triggerDetails.type,
                                         actionsUuids: triggerDetails?.actions.map((action) => action.uuid) || [],
-                                        eventResource: triggerDetails.eventResource,
                                         description: triggerDetails.description || '',
                                         event: (triggerDetails.event as unknown as UpdateTriggerRequestDtoEventEnum) || undefined,
                                     },
@@ -652,7 +643,6 @@ export function useTransformTriggerObjectToNodesAndEdges(
                                         resource: triggerDetails.resource,
                                         type: triggerDetails.type,
                                         rulesUuids: triggerDetails?.rules.map((rule) => rule.uuid) || [],
-                                        eventResource: triggerDetails.eventResource,
                                         description: triggerDetails.description || '',
                                         event: (triggerDetails.event as unknown as UpdateTriggerRequestDtoEventEnum) || undefined,
                                     },

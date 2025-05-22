@@ -16,7 +16,7 @@ import { LockWidgetNameEnum } from 'types/user-interface';
 import { getInputStringFromIso8601String } from 'utils/duration';
 
 export default function NotificationProfileDetail() {
-    const { uuid, version } = useParams();
+    const { id, version } = useParams();
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -30,9 +30,9 @@ export default function NotificationProfileDetail() {
     const recipientTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.RecipientType));
 
     const getFreshData = useCallback(() => {
-        if (!uuid || !version) return;
-        dispatch(actions.getNotificationProfileDetail({ uuid, version: Number(version) }));
-    }, [dispatch, uuid, version]);
+        if (!id || !version) return;
+        dispatch(actions.getNotificationProfileDetail({ uuid: id, version: Number(version) }));
+    }, [dispatch, id, version]);
 
     useEffect(() => {
         getFreshData();
@@ -45,14 +45,14 @@ export default function NotificationProfileDetail() {
     }, [dispatch, notificationProfile]);
 
     const onEditNotificationProfile = useCallback(() => {
-        if (!uuid || !version) return;
-        navigate(`../notificationprofiles/edit/${uuid}/${version}`);
-    }, [navigate, uuid, version]);
+        if (!id || !version) return;
+        navigate(`../notificationprofiles/edit/${id}/${version}`);
+    }, [navigate, id, version]);
 
     const onDeleteNotificationProfile = useCallback(() => {
-        if (!uuid || !version) return;
-        dispatch(actions.deleteNotificationProfile({ uuid: uuid, redirect: '../notificationprofiles' }));
-    }, [dispatch, uuid, version]);
+        if (!id || !version) return;
+        dispatch(actions.deleteNotificationProfile({ uuid: id, redirect: '../notificationprofiles' }));
+    }, [dispatch, id, version]);
 
     const notificationProfileWidgetButtons: WidgetButtonProps[] = useMemo(
         () => [

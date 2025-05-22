@@ -39,6 +39,19 @@ export interface ListResourceRuleFilterFieldsRequest {
 export class ResourceManagementApi extends BaseAPI {
 
     /**
+     * This endpoint returns a map of resource events, where the key is the event type and the value is a list of event details.
+     * Retrieve a list of all events that can be triggered by all resources
+     */
+    listAllResourceEvents(): Observable<{ [key: string]: Array<ResourceEventDto>; }>
+    listAllResourceEvents(opts?: OperationOpts): Observable<AjaxResponse<{ [key: string]: Array<ResourceEventDto>; }>>
+    listAllResourceEvents(opts?: OperationOpts): Observable<{ [key: string]: Array<ResourceEventDto>; } | AjaxResponse<{ [key: string]: Array<ResourceEventDto>; }>> {
+        return this.request<{ [key: string]: Array<ResourceEventDto>; }>({
+            url: '/v1/resources/events',
+            method: 'GET',
+        }, opts?.responseOpts);
+    };
+
+    /**
      * Retrieve a list of all events that can be triggered by a resource
      */
     listResourceEvents({ resource }: ListResourceEventsRequest): Observable<Array<ResourceEventDto>>

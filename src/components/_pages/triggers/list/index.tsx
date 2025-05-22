@@ -24,20 +24,15 @@ const TriggerList = () => {
     const eventNameEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ResourceEvent));
     const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.TriggerType));
     const [selectedResource, setSelectedResource] = useState<Resource>();
-    const [selectedEventSource, setSelectedEventSource] = useState<Resource>();
     const isFetchingList = useSelector(rulesSelectors.isFetchingTriggers);
     const isDeleting = useSelector(rulesSelectors.isDeletingTrigger);
 
     const [checkedRows, setCheckedRows] = useState<string[]>([]);
     const [confirmDelete, setConfirmDelete] = useState(false);
-    const { resourceOptionsWithRuleEvaluator, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
 
     const { resourceOptionsWithEvents } = useHasEventsResourceOptions();
 
-    const isBusy = useMemo(
-        () => isFetchingList || isFetchingResourcesList || isDeleting,
-        [isFetchingList, isDeleting, isFetchingResourcesList],
-    );
+    const isBusy = useMemo(() => isFetchingList || isDeleting, [isFetchingList, isDeleting]);
 
     const onDeleteConfirmed = useCallback(() => {
         dispatch(rulesActions.deleteTrigger({ triggerUuid: checkedRows[0] }));
@@ -46,8 +41,8 @@ const TriggerList = () => {
     }, [dispatch, checkedRows]);
 
     const getFreshList = useCallback(() => {
-        dispatch(rulesActions.listTriggers({ resource: selectedResource, eventResource: selectedEventSource }));
-    }, [dispatch, selectedResource, selectedEventSource]);
+        dispatch(rulesActions.listTriggers({ resource: selectedResource }));
+    }, [dispatch, selectedResource]);
 
     useEffect(() => {
         getFreshList();
@@ -59,50 +54,41 @@ const TriggerList = () => {
                 content: 'Name',
                 align: 'left',
                 id: 'name',
-                width: '10%',
+                width: '12%',
                 sortable: true,
             },
             {
                 content: 'Ignore Trigger',
                 align: 'left',
                 id: 'ignoreTrigger',
-                width: '10%',
+                width: '12%',
             },
-
-            {
-                content: 'Event Resource',
-                align: 'left',
-                id: 'triggerResource',
-                width: '10%',
-                sortable: true,
-            },
-
             {
                 content: 'Trigger Type',
                 align: 'left',
                 id: 'triggerType',
-                width: '10%',
+                width: '12%',
                 sortable: true,
             },
             {
                 content: 'Event Name',
                 align: 'left',
                 id: 'eventName',
-                width: '10%',
+                width: '12%',
                 sortable: true,
             },
             {
                 content: 'Resource',
                 align: 'left',
                 id: 'resource',
-                width: '10%',
+                width: '12%',
                 sortable: true,
             },
             {
                 content: 'Description',
                 align: 'left',
                 id: 'description',
-                width: '10%',
+                width: '12%',
             },
         ],
         [],
@@ -116,9 +102,8 @@ const TriggerList = () => {
                     columns: [
                         <Link to={`./detail/${trigger.uuid}`}>{trigger.name}</Link>,
                         trigger.ignoreTrigger ? 'Yes' : 'No',
-                        getEnumLabel(resourceTypeEnum, trigger.eventResource || ''),
-                        getEnumLabel(triggerTypeEnum, trigger.type),
-                        getEnumLabel(eventNameEnum, trigger.event || ''),
+                        getEnumLabel(triggerTypeEnum, trigger.type ?? ''),
+                        getEnumLabel(eventNameEnum, trigger.event ?? ''),
                         getEnumLabel(resourceTypeEnum, trigger.resource),
                         trigger.description || '',
                     ],
@@ -132,26 +117,6 @@ const TriggerList = () => {
             {
                 icon: 'search',
                 disabled: false,
-                tooltip: 'Select Event Resource',
-                onClick: () => {},
-                custom: (
-                    <div className={styles.listSelectContainer}>
-                        <Select
-                            isClearable
-                            maxMenuHeight={140}
-                            menuPlacement="auto"
-                            options={resourceOptionsWithEvents}
-                            placeholder="Select Event Resource"
-                            onChange={(event) => {
-                                setSelectedEventSource(event?.value as Resource);
-                            }}
-                        />
-                    </div>
-                ),
-            },
-            {
-                icon: 'search',
-                disabled: false,
                 tooltip: 'Select Resource',
                 onClick: () => {},
                 custom: (
@@ -160,7 +125,7 @@ const TriggerList = () => {
                             isClearable
                             maxMenuHeight={140}
                             menuPlacement="auto"
-                            options={resourceOptionsWithRuleEvaluator}
+                            options={resourceOptionsWithEvents}
                             placeholder="Select Resource"
                             onChange={(event) => {
                                 setSelectedResource(event?.value as Resource);
@@ -182,7 +147,7 @@ const TriggerList = () => {
                 onClick: () => setConfirmDelete(true),
             },
         ],
-        [checkedRows, resourceOptionsWithRuleEvaluator, navigate, resourceOptionsWithEvents],
+        [checkedRows, navigate, resourceOptionsWithEvents],
     );
 
     return (

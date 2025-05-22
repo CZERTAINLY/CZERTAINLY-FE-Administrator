@@ -229,6 +229,8 @@ models/EntityInstanceResponseDto.ts
 models/EntityInstanceUpdateRequestDto.ts
 models/EnumItemDto.ts
 models/ErrorMessageDto.ts
+models/EventSettingsDto.ts
+models/EventsSettingsDto.ts
 models/ExecutionDto.ts
 models/ExecutionItemDto.ts
 models/ExecutionItemRequestDto.ts
@@ -289,7 +291,6 @@ models/NotificationProfileRequestDto.ts
 models/NotificationProfileResponseDto.ts
 models/NotificationProfileUpdateRequestDto.ts
 models/NotificationResponseDto.ts
-models/NotificationSettingsDto.ts
 models/OAuth2ProviderSettingsDto.ts
 models/OAuth2ProviderSettingsResponseDto.ts
 models/OAuth2ProviderSettingsUpdateDto.ts
@@ -377,6 +378,7 @@ models/TokenProfileDto.ts
 models/TokenProfileKeyUsageRequestDto.ts
 models/TriggerDetailDto.ts
 models/TriggerDto.ts
+models/TriggerEventAssociationRequestDto.ts
 models/TriggerHistoryDto.ts
 models/TriggerHistoryObjectSummaryDto.ts
 models/TriggerHistoryObjectTriggerSummaryDto.ts
