@@ -2,10 +2,10 @@ import cx from 'classnames';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { EntityType, selectors } from 'ducks/filters';
 import { selectors as rulesSelectors } from 'ducks/rules';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { Badge, Spinner } from 'reactstrap';
-import { AttributeContentType, FilterFieldType, PlatformEnum } from 'types/openapi';
+import { AttributeContentType, ExecutionType, FilterFieldType, PlatformEnum } from 'types/openapi';
 import { ExecutionItemModel } from 'types/rules';
 import { getFormattedDate, getFormattedDateTime } from 'utils/dateUtil';
 import styles from './executionsItemsList.module.scss';
@@ -13,11 +13,18 @@ import styles from './executionsItemsList.module.scss';
 interface ExecutionsItemsListProps {
     executionItems: ExecutionItemModel[];
     executionName: string;
+    executionType: ExecutionType;
     executionUuid: string;
     smallerBadges?: boolean;
 }
 
-const ExecutionsItemsList = ({ executionItems = [], executionName, executionUuid, smallerBadges }: ExecutionsItemsListProps) => {
+const ExecutionsItemsList = ({
+    executionItems = [],
+    executionName,
+    executionType,
+    executionUuid,
+    smallerBadges,
+}: ExecutionsItemsListProps) => {
     const searchGroupEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.FilterFieldSource));
     const availableFilters = useSelector(selectors.availableFilters(EntityType.ACTIONS));
     const platformEnums = useSelector(enumSelectors.platformEnums);
@@ -38,7 +45,7 @@ const ExecutionsItemsList = ({ executionItems = [], executionName, executionUuid
         [],
     );
 
-    const renderActionBadges = useMemo(() => {
+    const renderSetFieldActionBadges = useCallback(() => {
         if (!executionItems) return null;
         return executionItems.map((f, i) => {
             const field = availableFilters
@@ -102,7 +109,29 @@ const ExecutionsItemsList = ({ executionItems = [], executionName, executionUuid
         });
     }, [executionItems, availableFilters, searchGroupEnum, booleanOptions, platformEnums]);
 
-    const renderSmallerExecutionsBadges = useMemo(() => {
+    const renderSendNotificationActionBadges = useCallback(() => {
+        if (!executionItems) return null;
+        return executionItems.map((f, i) => {
+            return (
+                <Badge className={styles.groupConditionBadge} key={i}>
+                    <span>Send notifications to:&nbsp;</span>
+                    <b>{f.notificationProfileName}&nbsp;</b>
+                </Badge>
+            );
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [executionItems, availableFilters, searchGroupEnum, booleanOptions, platformEnums]);
+
+    const renderActionBadges = useCallback(() => {
+        switch (executionType) {
+            case ExecutionType.SetField:
+                return renderSetFieldActionBadges();
+            case ExecutionType.SendNotification:
+                return renderSendNotificationActionBadges();
+        }
+    }, [executionType, renderSetFieldActionBadges, renderSendNotificationActionBadges]);
+
+    const renderSmallerSetFieldExecutionsBadges = useCallback(() => {
         return executionItems.map((f, i) => {
             const field = availableFilters
                 .find((a) => a.filterFieldSource === f.fieldSource)
@@ -165,17 +194,40 @@ const ExecutionsItemsList = ({ executionItems = [], executionName, executionUuid
         });
     }, [executionItems, availableFilters, searchGroupEnum, booleanOptions, platformEnums]);
 
+    const renderSmallerSendNotificationExecutionsBadges = useCallback(() => {
+        return executionItems.map((f, i) => {
+            return (
+                <div key={i} className="mt-2 me-1">
+                    <span className={styles.groupSmallerBadge}>
+                        <span>Send notifications to:&nbsp;</span>
+                        <b>{f.notificationProfileName}&nbsp;</b>
+                    </span>
+                </div>
+            );
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [executionItems, availableFilters, searchGroupEnum, booleanOptions, platformEnums]);
+
+    const renderSmallerExecutionsBadges = useCallback(() => {
+        switch (executionType) {
+            case ExecutionType.SetField:
+                return renderSmallerSetFieldExecutionsBadges();
+            case ExecutionType.SendNotification:
+                return renderSmallerSendNotificationExecutionsBadges();
+        }
+    }, [executionType, renderSmallerSendNotificationExecutionsBadges, renderSmallerSetFieldExecutionsBadges]);
+
     if (isLoading) return <Spinner color="gray" active={isFetchingConditionDetails} />;
 
     return smallerBadges ? (
         <div>
             <h6 className={cx('text-muted', styles.groupConditionTitle)}>{`${executionName}'s Execution Items`}</h6>
-            <div className="d-flex flex-wrap">{renderSmallerExecutionsBadges}</div>
+            <div className="d-flex flex-wrap">{renderSmallerExecutionsBadges()}</div>
         </div>
     ) : (
         <div className={styles.groupConditionContainerDiv} key={executionUuid}>
             <h6 className={cx('text-muted', styles.groupConditionTitle)}>{`${executionName}`}</h6>
-            <div className="ms-3">{renderActionBadges}</div>
+            <div className="ms-3">{renderActionBadges()}</div>
         </div>
     );
 };

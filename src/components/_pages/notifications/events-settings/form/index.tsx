@@ -12,7 +12,7 @@ import { Form as BootstrapForm, Button, ButtonGroup } from 'reactstrap';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 import { isObjectSame } from 'utils/common-utils';
 import CustomSelect from 'components/Input/CustomSelect';
-import { EventSettingsDto, EventSettingsDtoEventEnum, PlatformEnum, Resource } from 'types/openapi';
+import { EventSettingsDto, EventSettingsDtoEventEnum, PlatformEnum, Resource, TriggerDtoEventEnum } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import TriggerEditorWidget from 'components/TriggerEditorWidget';
 
@@ -23,7 +23,6 @@ interface OptionType {
 
 interface FormValues {
     event?: OptionType;
-    resource?: OptionType;
     triggers?: string[];
 }
 
@@ -33,14 +32,12 @@ export default function EventForm() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const resourceEvents = useSelector(resourceSelectors.resourceEvents);
     const eventsSettings = useSelector(settingsSelectors.eventsSettings);
 
     const isFetchingResourcesList = useSelector(resourceSelectors.isFetchingResourcesList);
     const isFetchingEventsSetting = useSelector(settingsSelectors.isFetchingEventsSetting);
     const isUpdatingEventsSetting = useSelector(settingsSelectors.isUpdatingEventsSetting);
 
-    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const resourceEventEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ResourceEvent));
 
     const isBusy = useMemo(
@@ -62,9 +59,8 @@ export default function EventForm() {
     }, [dispatch, event]);
 
     useEffect(() => {
-        if (resourceEvents.length) return;
         dispatch(resourceActions.listAllResourceEvents());
-    }, [dispatch, resourceEvents]);
+    }, [dispatch]);
 
     const defaultValues: FormValues = useMemo(() => {
         if (!eventSettings) return {};
@@ -73,13 +69,9 @@ export default function EventForm() {
                 label: getEnumLabel(resourceEventEnum, eventSettings.event),
                 value: eventSettings.event,
             },
-            resource: {
-                label: getEnumLabel(resourceEnum, resourceEvents.find((el) => el.event === event)?.producedResource ?? ''),
-                value: resourceEvents.find((el) => el.event === event)?.producedResource ?? '',
-            },
             triggers: eventSettings.triggerUuids ?? [],
         };
-    }, [event, resourceEvents, eventSettings, resourceEnum, resourceEventEnum]);
+    }, [eventSettings, resourceEventEnum]);
 
     const onCancel = useCallback(() => {
         navigate(-1);
@@ -119,13 +111,13 @@ export default function EventForm() {
                     return (
                         <BootstrapForm onSubmit={handleSubmit}>
                             <CustomSelect label="Event Name" id="name" isDisabled value={values.event} />
-                            <CustomSelect label="Resource" id="resource" isDisabled value={values.resource} />
                             <TriggerEditorWidget
-                                resource={values.resource?.value as Resource | undefined}
+                                event={values.event?.value as TriggerDtoEventEnum}
                                 selectedTriggers={values.triggers ?? []}
                                 onSelectedTriggersChange={(newTriggers) => {
                                     form.change('triggers', newTriggers);
                                 }}
+                                noteText={`Only Triggers associated with the same Event kind are available`}
                             />
 
                             <div className="d-flex justify-content-end">

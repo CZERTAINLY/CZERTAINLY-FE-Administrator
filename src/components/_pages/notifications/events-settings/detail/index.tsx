@@ -15,6 +15,7 @@ import { Container } from 'reactstrap';
 import { EventSettingsDtoEventEnum, PlatformEnum } from 'types/openapi';
 import { EventSettingsDto } from 'types/settings';
 import { LockWidgetNameEnum } from 'types/user-interface';
+import BooleanBadge from 'components/BooleanBadge/BooleanBadge';
 
 export default function EventDetail() {
     const { event } = useParams();
@@ -58,9 +59,8 @@ export default function EventDetail() {
     }, [getFreshData]);
 
     useEffect(() => {
-        if (resourceEvents.length) return;
         dispatch(resourceActions.listAllResourceEvents());
-    }, [dispatch, resourceEvents]);
+    }, [dispatch]);
 
     const onEditEvent = useCallback(() => {
         if (!event) return;
@@ -94,10 +94,6 @@ export default function EventDetail() {
         [],
     );
 
-    console.log(
-        resourceEvents.find((el) => el.event === event),
-        resourceEvents,
-    );
     const profileData: TableDataRow[] = useMemo(
         () =>
             !eventSettings
@@ -110,9 +106,17 @@ export default function EventDetail() {
                       {
                           id: 'resource',
                           columns: [
-                              'Resource',
+                              'Produced by Resource',
                               getEnumLabel(resourceEnum, resourceEvents.find((el) => el.event === event)?.producedResource ?? ''),
                           ],
+                      },
+                      {
+                          id: 'hasTriggers',
+                          columns: ['Has Triggers Assigned', <BooleanBadge value={Boolean(eventSettings.triggerUuids.length)} />],
+                      },
+                      {
+                          id: 'triggersCount',
+                          columns: ['Triggers Count', eventSettings.triggerUuids.length.toString()],
                       },
                   ],
         [event, resourceEvents, eventSettings, resourceEventEnum, resourceEnum],

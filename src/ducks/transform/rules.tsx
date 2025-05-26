@@ -735,6 +735,7 @@ export function useTransformTriggerObjectToNodesAndEdges(
                                             executionItems={execution.items}
                                             key={execution.uuid}
                                             executionName={execution.name}
+                                            executionType={execution.type}
                                             executionUuid={execution.uuid}
                                             smallerBadges
                                         />

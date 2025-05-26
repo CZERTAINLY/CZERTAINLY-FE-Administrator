@@ -12,10 +12,12 @@ import { Link } from 'react-router';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { useHasEventsResourceOptions } from 'utils/rules';
+import BooleanBadge from 'components/BooleanBadge/BooleanBadge';
 
 const EventsList = () => {
     const dispatch = useDispatch();
 
+    const eventsSettings = useSelector(settingsSelectors.eventsSettings);
     const resourceEvents = useSelector(resourceSelectors.resourceEvents);
     const isFetchingResourcesList = useSelector(resourceSelectors.isFetchingResourcesList);
     const isFetchingEventsSetting = useSelector(settingsSelectors.isFetchingEventsSetting);
@@ -35,9 +37,8 @@ const EventsList = () => {
     }, [getEvents]);
 
     useEffect(() => {
-        if (resourceEvents.length) return;
         dispatch(resourceActions.listAllResourceEvents());
-    }, [dispatch, resourceEvents]);
+    }, [dispatch]);
 
     const isBusy = useMemo(
         () => isFetchingEventsSetting || isFetchingResourcesList || isFetchingResourcesWithEventsList,
@@ -52,16 +53,18 @@ const EventsList = () => {
                 tooltip: 'Select Resource',
                 onClick: () => {},
                 custom: (
-                    <Select
-                        isClearable
-                        maxMenuHeight={140}
-                        menuPlacement="auto"
-                        options={resourceOptionsWithEvents}
-                        placeholder="Select Resource"
-                        onChange={(event) => {
-                            setSelectedResource(event?.value as Resource);
-                        }}
-                    />
+                    <div className="mx-1">
+                        <Select
+                            isClearable
+                            maxMenuHeight={140}
+                            menuPlacement="auto"
+                            options={resourceOptionsWithEvents}
+                            placeholder="Select Produced by Resource"
+                            onChange={(event) => {
+                                setSelectedResource(event?.value as Resource);
+                            }}
+                        />
+                    </div>
                 ),
             },
         ],
@@ -76,7 +79,18 @@ const EventsList = () => {
             },
             {
                 id: 'resource',
-                content: 'Produced Resource',
+                content: 'Produced by Resource',
+                sortable: true,
+            },
+            {
+                id: 'hasTrigger',
+                content: 'Has Triggers Assigned',
+                sortable: true,
+                sort: 'desc',
+            },
+            {
+                id: 'triggersCount',
+                content: 'Triggers Count',
                 sortable: true,
             },
         ],
@@ -99,12 +113,14 @@ const EventsList = () => {
                                           {getEnumLabel(resourceEventEnum, event.event)}
                                       </Link>,
                                       event.producedResource ? getEnumLabel(resourceEnum, event.producedResource) : '',
+                                      <BooleanBadge value={Boolean(eventsSettings?.eventsMapping[event.event]?.length)} />,
+                                      (eventsSettings?.eventsMapping[event.event]?.length ?? 0).toString(),
                                   ],
                               },
                           ],
                           [] as TableDataRow[],
                       ),
-        [resourceEvents, resourceEventEnum, resourceEnum, selectedResource],
+        [resourceEvents, resourceEventEnum, resourceEnum, selectedResource, eventsSettings],
     );
 
     return (
@@ -116,6 +132,10 @@ const EventsList = () => {
             widgetLockName={LockWidgetNameEnum.EventSettings}
             lockSize="large"
             busy={isBusy}
+            widgetInfoCard={{
+                title: 'Information',
+                description: 'When an Event is produced, assigned Triggers are fired',
+            }}
         >
             <br />
             <CustomTable headers={headers} data={dataRows} hasPagination={true} />

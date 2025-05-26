@@ -34,7 +34,7 @@ export interface TriggerFormValues {
     name: string;
     description?: string;
     selectedResource?: SelectChangeValue;
-    resource: Resource;
+    resource?: Resource;
     eventResource: Resource;
     selectedTriggerResource?: SelectChangeValue;
     triggerType?: TriggerType;
@@ -102,7 +102,7 @@ const TriggerForm = () => {
 
     const fetchActions = useCallback(
         (resource: Resource) => {
-            dispatch(rulesActions.listActions({ resource: resource }));
+            dispatch(rulesActions.listActions({ resource: resource, withNoneResource: true }));
         },
         [dispatch],
     );
@@ -137,7 +137,7 @@ const TriggerForm = () => {
 
     const onSubmit = useCallback(
         (values: TriggerFormValues) => {
-            if (values.resource === Resource.None || values.eventResource === Resource.None || !values.triggerType) return;
+            if (!values.resource || values.eventResource === Resource.None || !values.triggerType) return;
             dispatch(
                 rulesActions.createTrigger({
                     trigger: {
@@ -347,72 +347,46 @@ const TriggerForm = () => {
                                 }}
                             />
                         </div>
+                        {values.selectedEvent && (
+                            <>
+                                <Field name="rulesUuids">
+                                    {({ input, meta }) => (
+                                        <FormGroup>
+                                            <Label for="ruleSelect">Rules</Label>
 
-                        <Field name="selectedResource">
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="resourceSelect">Resource</Label>
+                                            <Select
+                                                isDisabled={values.resource === Resource.None || !values.resource || !rulesOptions.length}
+                                                id="rules"
+                                                inputId="ruleSelect"
+                                                {...input}
+                                                options={rulesOptions}
+                                                isMulti
+                                                placeholder="Select Rule"
+                                                isClearable
+                                            />
+                                        </FormGroup>
+                                    )}
+                                </Field>
 
-                                    <Select
-                                        {...input}
-                                        id="resource"
-                                        inputId="resourceSelect"
-                                        maxMenuHeight={140}
-                                        menuPlacement="auto"
-                                        options={resourceOptions || []}
-                                        placeholder="Select Resource"
-                                        isDisabled={true}
-                                        styles={{
-                                            control: (provided) =>
-                                                meta.touched && meta.invalid
-                                                    ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
-                                                    : { ...provided },
-                                        }}
-                                    />
+                                <Field name="actionsUuids">
+                                    {({ input, meta }) => (
+                                        <FormGroup>
+                                            <Label for="actionsSelect">Actions</Label>
 
-                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
-                                        {meta.error}
-                                    </div>
-                                </FormGroup>
-                            )}
-                        </Field>
-
-                        <Field name="rulesUuids">
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="ruleSelect">Rules</Label>
-
-                                    <Select
-                                        isDisabled={values.resource === Resource.None || !values.resource}
-                                        id="rules"
-                                        inputId="ruleSelect"
-                                        {...input}
-                                        options={rulesOptions}
-                                        isMulti
-                                        placeholder="Select Rule"
-                                        isClearable
-                                    />
-                                </FormGroup>
-                            )}
-                        </Field>
-
-                        <Field name="actionsUuids">
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="actionsSelect">Actions</Label>
-
-                                    <Select
-                                        isDisabled={values.resource === Resource.None || !values.resource || values.ignoreTrigger}
-                                        {...input}
-                                        inputId="actionsSelect"
-                                        options={actionsOptions}
-                                        isMulti
-                                        placeholder="Select Actions"
-                                        isClearable
-                                    />
-                                </FormGroup>
-                            )}
-                        </Field>
+                                            <Select
+                                                isDisabled={values.resource === Resource.None || !values.resource || values.ignoreTrigger}
+                                                {...input}
+                                                inputId="actionsSelect"
+                                                options={actionsOptions}
+                                                isMulti
+                                                placeholder="Select Actions"
+                                                isClearable
+                                            />
+                                        </FormGroup>
+                                    )}
+                                </Field>
+                            </>
+                        )}
 
                         <div className="d-flex justify-content-end">
                             <ButtonGroup>

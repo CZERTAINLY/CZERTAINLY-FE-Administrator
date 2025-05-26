@@ -6,7 +6,7 @@ import { ConditionItemModel } from 'types/rules';
 // import { EntityType, actions as filterActions } from 'ducks/filters';
 import { selectors as enumSelectors } from 'ducks/enums';
 import { actions as resourceActions, selectors as resourceSelectors } from 'ducks/resource';
-import { PlatformEnum } from 'types/openapi';
+import { PlatformEnum, Resource } from 'types/openapi';
 import { ResourceModel } from 'types/resource';
 
 export const filterToConditionItems = (filter: SearchFilterModel[]): ConditionItemModel[] => {
@@ -60,9 +60,15 @@ export const useRuleEvaluatorResourceOptions = () => {
     const resourceOptionsWithRuleEvaluator = useMemo(() => {
         if (!resourceList.length) return [];
         const resourceListWithRuleEvaluator = resourceList.filter((resource) => resource.hasRuleEvaluator);
-        return resourceListWithRuleEvaluator.map((resource) => {
-            return { value: resource.resource, label: getEnumLabel(resourceTypeEnum, resource.resource) };
-        });
+        return [
+            ...resourceListWithRuleEvaluator.map((resource) => {
+                return { value: resource.resource, label: getEnumLabel(resourceTypeEnum, resource.resource) };
+            }),
+            {
+                label: 'None',
+                value: Resource.None,
+            },
+        ];
     }, [resourceList, resourceTypeEnum]);
 
     return { resourceOptionsWithRuleEvaluator, isFetchingResourcesList };

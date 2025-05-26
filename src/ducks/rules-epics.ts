@@ -1,4 +1,4 @@
-import { of } from 'rxjs';
+import { combineLatest, iif, of } from 'rxjs';
 import { catchError, filter, switchMap } from 'rxjs/operators';
 
 import { AppEpic } from 'ducks';
@@ -29,6 +29,7 @@ import {
     transformUpdateRuleRequestModelToDto,
     transformUpdateTriggerRequestModelToDto,
 } from './transform/rules';
+import { Resource } from 'types/openapi';
 
 const listRules: AppEpic = (action$, state, deps) => {
     return action$.pipe(
@@ -75,7 +76,14 @@ const listActions: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.listActions.match),
         switchMap((action) =>
-            deps.apiClients.actions.listActions({ resource: action.payload.resource }).pipe(
+            iif(
+                () => !!action.payload.withNoneResource,
+                combineLatest([
+                    deps.apiClients.actions.listActions({ resource: action.payload.resource }),
+                    deps.apiClients.actions.listActions({ resource: Resource.None }),
+                ]).pipe(switchMap(([action1, action2]) => of([...action1, ...action2]))),
+                deps.apiClients.actions.listActions({ resource: action.payload.resource }),
+            ).pipe(
                 switchMap((actions) =>
                     of(
                         slice.actions.listActionsSuccess({

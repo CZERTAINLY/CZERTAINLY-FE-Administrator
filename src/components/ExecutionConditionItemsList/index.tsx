@@ -70,6 +70,7 @@ const ConditionsExecutionsList = ({
                     <ExecutionsItemsList
                         executionName={execution.name}
                         executionUuid={execution.uuid}
+                        executionType={execution.type}
                         executionItems={execution.items}
                         key={execution.uuid}
                     />

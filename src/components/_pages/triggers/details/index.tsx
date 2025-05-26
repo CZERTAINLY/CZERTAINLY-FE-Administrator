@@ -83,7 +83,7 @@ const TriggerDetails = () => {
     }, [getFreshDetails]);
 
     useEffect(() => {
-        dispatch(rulesActions.listActions({ resource: triggerDetails?.resource }));
+        dispatch(rulesActions.listActions({ resource: triggerDetails?.resource, withNoneResource: true }));
         dispatch(rulesActions.listRules({ resource: triggerDetails?.resource }));
     }, [triggerDetails, dispatch]);
 

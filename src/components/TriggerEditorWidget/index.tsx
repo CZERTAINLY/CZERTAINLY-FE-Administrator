@@ -6,7 +6,7 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 
-import { Resource, TriggerDto, PlatformEnum } from 'types/openapi';
+import { Resource, TriggerDto, PlatformEnum, TriggerDtoEventEnum } from 'types/openapi';
 
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import { Button } from 'reactstrap';
@@ -18,12 +18,13 @@ type OptionType = {
 
 type Props = {
     resource?: Resource;
+    event?: TriggerDtoEventEnum;
     selectedTriggers: string[];
     onSelectedTriggersChange: (triggerUuids: string[]) => void;
     noteText?: string;
 };
 
-export default function TriggerEditorWidget({ resource, selectedTriggers, onSelectedTriggersChange, noteText }: Props) {
+export default function TriggerEditorWidget({ resource, event, selectedTriggers, onSelectedTriggersChange, noteText }: Props) {
     const dispatch = useDispatch();
 
     const triggers = useSelector(rulesSelectors.triggers);
@@ -37,12 +38,13 @@ export default function TriggerEditorWidget({ resource, selectedTriggers, onSele
     const newTriggerOptions = useMemo(
         () =>
             triggers
+                .filter((trigger) => event === undefined || trigger.event === event)
                 .map((trigger) => ({
                     label: trigger.name,
                     value: trigger.uuid,
                 }))
                 .filter((trigger) => !selectedTriggers.find((selectedTrigger) => selectedTrigger === trigger.value)),
-        [triggers, selectedTriggers],
+        [triggers, selectedTriggers, event],
     );
 
     const isBusy = useMemo(() => isFetchingTriggers, [isFetchingTriggers]);

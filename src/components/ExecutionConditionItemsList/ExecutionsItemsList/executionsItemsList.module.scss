@@ -13,6 +13,8 @@
 .groupConditionTitle {
     min-width: 80px;
     margin-top: 2px;
+    word-break: break-all;
+    flex-shrink: 0;
 }
 
 .groupConditionContainerDiv {
