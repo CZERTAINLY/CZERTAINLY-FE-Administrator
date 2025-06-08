@@ -76,14 +76,7 @@ const listActions: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.listActions.match),
         switchMap((action) =>
-            iif(
-                () => !!action.payload.withNoneResource,
-                combineLatest([
-                    deps.apiClients.actions.listActions({ resource: action.payload.resource }),
-                    deps.apiClients.actions.listActions({ resource: Resource.None }),
-                ]).pipe(switchMap(([action1, action2]) => of([...action1, ...action2]))),
-                deps.apiClients.actions.listActions({ resource: action.payload.resource }),
-            ).pipe(
+            deps.apiClients.actions.listActions({ resource: action.payload.resource }).pipe(
                 switchMap((actions) =>
                     of(
                         slice.actions.listActionsSuccess({

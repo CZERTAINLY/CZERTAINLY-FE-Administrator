@@ -13,6 +13,7 @@
 
 import type {
     Resource,
+    ResourceEvent,
     TriggerType,
 } from './';
 
@@ -59,23 +60,10 @@ export interface TriggerDto {
     ignoreTrigger: boolean;
     /**
      * Event that trigger can be assigned to
-     * @type {string}
+     * @type {ResourceEvent}
      * @memberof TriggerDto
      */
-    event?: TriggerDtoEventEnum;
+    event?: ResourceEvent;
 }
 
-/**
- * @export
- * @enum {string}
- */
-export enum TriggerDtoEventEnum {
-    CertificateStatusChanged = 'certificate_status_changed',
-    CertificateActionPerformed = 'certificate_action_performed',
-    CertificateDiscovered = 'certificate_discovered',
-    DiscoveryFinished = 'discovery_finished',
-    ApprovalRequested = 'approval_requested',
-    ApprovalClosed = 'approval_closed',
-    ScheduledJobFinished = 'scheduled_job_finished'
-}
 

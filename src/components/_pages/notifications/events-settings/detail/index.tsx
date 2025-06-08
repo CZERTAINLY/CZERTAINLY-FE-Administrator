@@ -12,10 +12,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router';
 
 import { Container } from 'reactstrap';
-import { EventSettingsDtoEventEnum, PlatformEnum } from 'types/openapi';
+import { PlatformEnum, ResourceEvent } from 'types/openapi';
 import { EventSettingsDto } from 'types/settings';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import BooleanBadge from 'components/BooleanBadge/BooleanBadge';
+import { TriggerDto } from 'types/rules';
 
 export default function EventDetail() {
     const { event } = useParams();
@@ -43,7 +44,7 @@ export default function EventDetail() {
     const eventSettings: EventSettingsDto | undefined = useMemo(() => {
         if (!event || !eventsSettings) return undefined;
         return {
-            event: event as EventSettingsDtoEventEnum,
+            event: event as ResourceEvent,
             triggerUuids: eventsSettings.eventsMapping[event] ?? [],
         };
     }, [eventsSettings, event]);
@@ -111,10 +112,6 @@ export default function EventDetail() {
                           ],
                       },
                       {
-                          id: 'hasTriggers',
-                          columns: ['Has Triggers Assigned', <BooleanBadge value={Boolean(eventSettings.triggerUuids.length)} />],
-                      },
-                      {
                           id: 'triggersCount',
                           columns: ['Triggers Count', eventSettings.triggerUuids.length.toString()],
                       },
@@ -152,21 +149,19 @@ export default function EventDetail() {
     const triggerTableData: TableDataRow[] = useMemo(
         () =>
             triggers.length
-                ? triggers
-                      .filter((trigger) => eventSettings?.triggerUuids.includes(trigger.uuid))
-                      .map((trigger) => ({
-                          id: trigger.uuid,
-                          columns: [
-                              <Link key={trigger.uuid} to={`../../triggers/detail/${trigger.uuid}`}>
-                                  {trigger.name}
-                              </Link>,
-                              getEnumLabel(triggerTypeEnum, trigger.type ?? ''),
-                              trigger.ignoreTrigger ? 'Yes' : 'No',
-                              getEnumLabel(resourceEventEnum, trigger.event ?? ''),
-                              getEnumLabel(resourceTypeEnum, trigger.resource ?? ''),
-                              trigger.description ?? '',
-                          ],
-                      }))
+                ? (eventSettings?.triggerUuids.map((uuid) => triggers.find((el) => el.uuid === uuid)) as TriggerDto[]).map((trigger) => ({
+                      id: trigger.uuid,
+                      columns: [
+                          <Link key={trigger.uuid} to={`../../triggers/detail/${trigger.uuid}`}>
+                              {trigger.name}
+                          </Link>,
+                          getEnumLabel(triggerTypeEnum, trigger.type ?? ''),
+                          trigger.ignoreTrigger ? 'Yes' : 'No',
+                          getEnumLabel(resourceEventEnum, trigger.event ?? ''),
+                          getEnumLabel(resourceTypeEnum, trigger.resource ?? ''),
+                          trigger.description ?? '',
+                      ],
+                  }))
                 : [],
         [eventSettings, triggers, triggerTypeEnum, resourceTypeEnum, resourceEventEnum],
     );

@@ -15,7 +15,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 import { Edge } from 'reactflow';
 import { Button, ButtonGroup, Col, Container, Input, Row } from 'reactstrap';
-import { PlatformEnum, UpdateTriggerRequestDtoEventEnum } from 'types/openapi';
+import { PlatformEnum } from 'types/openapi';
 import { DeviceType, useDeviceType } from 'utils/common-hooks';
 import styles from './triggerDetails.module.scss';
 
@@ -83,7 +83,7 @@ const TriggerDetails = () => {
     }, [getFreshDetails]);
 
     useEffect(() => {
-        dispatch(rulesActions.listActions({ resource: triggerDetails?.resource, withNoneResource: true }));
+        dispatch(rulesActions.listActions({ resource: triggerDetails?.resource }));
         dispatch(rulesActions.listRules({ resource: triggerDetails?.resource }));
     }, [triggerDetails, dispatch]);
 
@@ -127,7 +127,7 @@ const TriggerDetails = () => {
                         type: triggerDetails.type,
                         actionsUuids: triggerDetails?.actions.map((action) => action.uuid) || [],
                         rulesUuids: triggerDetails?.rules.map((rule) => rule.uuid) || [],
-                        event: (triggerDetails.event as unknown as UpdateTriggerRequestDtoEventEnum) || undefined,
+                        event: triggerDetails.event,
                     },
                 }),
             );
@@ -153,7 +153,7 @@ const TriggerDetails = () => {
                         type: triggerDetails.type,
                         rulesUuids: triggerDetails?.rules.map((rule) => rule.uuid) || [],
                         description: triggerDetails.description || '',
-                        event: (triggerDetails.event as unknown as UpdateTriggerRequestDtoEventEnum) || undefined,
+                        event: triggerDetails.event,
                     },
                 }),
             );
@@ -180,7 +180,7 @@ const TriggerDetails = () => {
                         type: triggerDetails.type,
                         actionsUuids: triggerDetails?.actions.map((action) => action.uuid) || [],
                         description: triggerDetails.description || '',
-                        event: (triggerDetails.event as unknown as UpdateTriggerRequestDtoEventEnum) || undefined,
+                        event: triggerDetails.event,
                     },
                 }),
             );
@@ -203,7 +203,7 @@ const TriggerDetails = () => {
                         resource: triggerDetails.resource,
                         type: triggerDetails.type,
                         actionsUuids: updatedActionsUuid,
-                        event: (triggerDetails.event as unknown as UpdateTriggerRequestDtoEventEnum) || undefined,
+                        event: triggerDetails.event,
                     },
                 }),
             );
@@ -227,7 +227,7 @@ const TriggerDetails = () => {
                         resource: triggerDetails.resource,
                         type: triggerDetails.type,
                         actionsUuids: triggerDetails?.actions.map((action) => action.uuid) || [],
-                        event: (triggerDetails.event as unknown as UpdateTriggerRequestDtoEventEnum) || undefined,
+                        event: triggerDetails.event,
                     },
                 }),
             );
@@ -299,9 +299,7 @@ const TriggerDetails = () => {
                                                       resource: triggerDetails.resource,
                                                       type: triggerDetails.type,
                                                       actionsUuids: [],
-                                                      event:
-                                                          (triggerDetails.event as unknown as UpdateTriggerRequestDtoEventEnum) ||
-                                                          undefined,
+                                                      event: triggerDetails.event,
                                                   },
                                               }),
                                           );

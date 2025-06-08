@@ -28,7 +28,7 @@ import type {
     UpdateTriggerRequestDto,
 } from '../models';
 
-export interface AssociateTriggersRequest {
+export interface AssociateEventTriggersRequest {
     triggerEventAssociationRequestDto: TriggerEventAssociationRequestDto;
 }
 
@@ -38,6 +38,11 @@ export interface CreateTriggerRequest {
 
 export interface DeleteTriggerRequest {
     triggerUuid: string;
+}
+
+export interface GetEventTriggersAssociationsRequest {
+    resource: Resource;
+    associationObjectUuid: string;
 }
 
 export interface GetTriggerRequest {
@@ -70,10 +75,10 @@ export class WorkflowTriggersManagementApi extends BaseAPI {
     /**
      * Associate event with triggers
      */
-    associateTriggers({ triggerEventAssociationRequestDto }: AssociateTriggersRequest): Observable<void>
-    associateTriggers({ triggerEventAssociationRequestDto }: AssociateTriggersRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    associateTriggers({ triggerEventAssociationRequestDto }: AssociateTriggersRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(triggerEventAssociationRequestDto, 'triggerEventAssociationRequestDto', 'associateTriggers');
+    associateEventTriggers({ triggerEventAssociationRequestDto }: AssociateEventTriggersRequest): Observable<void>
+    associateEventTriggers({ triggerEventAssociationRequestDto }: AssociateEventTriggersRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    associateEventTriggers({ triggerEventAssociationRequestDto }: AssociateEventTriggersRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(triggerEventAssociationRequestDto, 'triggerEventAssociationRequestDto', 'associateEventTriggers');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
@@ -118,6 +123,21 @@ export class WorkflowTriggersManagementApi extends BaseAPI {
         return this.request<void>({
             url: '/v1/workflows/triggers/{triggerUuid}'.replace('{triggerUuid}', encodeURI(triggerUuid)),
             method: 'DELETE',
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * Get event triggers associations for resource object
+     */
+    getEventTriggersAssociations({ resource, associationObjectUuid }: GetEventTriggersAssociationsRequest): Observable<{ [key: string]: Array<string>; }>
+    getEventTriggersAssociations({ resource, associationObjectUuid }: GetEventTriggersAssociationsRequest, opts?: OperationOpts): Observable<AjaxResponse<{ [key: string]: Array<string>; }>>
+    getEventTriggersAssociations({ resource, associationObjectUuid }: GetEventTriggersAssociationsRequest, opts?: OperationOpts): Observable<{ [key: string]: Array<string>; } | AjaxResponse<{ [key: string]: Array<string>; }>> {
+        throwIfNullOrUndefined(resource, 'resource', 'getEventTriggersAssociations');
+        throwIfNullOrUndefined(associationObjectUuid, 'associationObjectUuid', 'getEventTriggersAssociations');
+
+        return this.request<{ [key: string]: Array<string>; }>({
+            url: '/v1/workflows/events/{resource}/{associationObjectUuid}'.replace('{resource}', encodeURI(resource)).replace('{associationObjectUuid}', encodeURI(associationObjectUuid)),
+            method: 'GET',
         }, opts?.responseOpts);
     };
 

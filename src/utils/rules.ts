@@ -65,8 +65,8 @@ export const useRuleEvaluatorResourceOptions = () => {
                 return { value: resource.resource, label: getEnumLabel(resourceTypeEnum, resource.resource) };
             }),
             {
-                label: 'None',
-                value: Resource.None,
+                label: 'Any',
+                value: Resource.Any,
             },
         ];
     }, [resourceList, resourceTypeEnum]);

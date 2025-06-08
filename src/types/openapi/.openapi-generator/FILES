@@ -316,7 +316,6 @@ models/RandomDataRequestDto.ts
 models/RandomDataResponseDto.ts
 models/RangeAttributeConstraint.ts
 models/RangeAttributeConstraintData.ts
-models/RecipientDto.ts
 models/RecipientType.ts
 models/RegexpAttributeConstraint.ts
 models/RemoveCertificateDto.ts
@@ -324,6 +323,7 @@ models/RequestAttributeCallback.ts
 models/RequestAttributeDto.ts
 models/Resource.ts
 models/ResourceDto.ts
+models/ResourceEvent.ts
 models/ResourceEventDto.ts
 models/ResourceLoggingSettingsDto.ts
 models/ResourcePermissionsDto.ts

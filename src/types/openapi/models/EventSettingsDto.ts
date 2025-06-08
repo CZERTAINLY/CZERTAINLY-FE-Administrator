@@ -11,17 +11,22 @@
  * Do not edit the class manually.
  */
 
+import type {
+    ResourceEvent,
+} from './';
+
 /**
+ * DTO representing settings of single event
  * @export
  * @interface EventSettingsDto
  */
 export interface EventSettingsDto {
     /**
      * Resource event
-     * @type {string}
+     * @type {ResourceEvent}
      * @memberof EventSettingsDto
      */
-    event: EventSettingsDtoEventEnum;
+    event: ResourceEvent;
     /**
      * List of triggers associated with event
      * @type {Array<string>}
@@ -30,17 +35,4 @@ export interface EventSettingsDto {
     triggerUuids: Array<string>;
 }
 
-/**
- * @export
- * @enum {string}
- */
-export enum EventSettingsDtoEventEnum {
-    CertificateStatusChanged = 'certificate_status_changed',
-    CertificateActionPerformed = 'certificate_action_performed',
-    CertificateDiscovered = 'certificate_discovered',
-    DiscoveryFinished = 'discovery_finished',
-    ApprovalRequested = 'approval_requested',
-    ApprovalClosed = 'approval_closed',
-    ScheduledJobFinished = 'scheduled_job_finished'
-}
 

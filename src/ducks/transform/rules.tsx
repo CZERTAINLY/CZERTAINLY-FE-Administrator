@@ -16,7 +16,7 @@ import Select from 'react-select';
 import { Edge, MarkerType } from 'reactflow';
 import { FormGroup, Label } from 'reactstrap';
 import { OtherProperties } from 'types/flowchart';
-import { PlatformEnum, Resource, UpdateTriggerRequestDtoEventEnum } from 'types/openapi';
+import { PlatformEnum, Resource } from 'types/openapi';
 import {
     ActionDetailDto,
     ActionDetailModel,
@@ -376,7 +376,7 @@ export function useTransformTriggerObjectToNodesAndEdges(
                                         resource: triggerDetails.resource,
                                         type: triggerDetails.type,
                                         description: triggerDetails.description || '',
-                                        event: (triggerDetails.event as unknown as UpdateTriggerRequestDtoEventEnum) || undefined,
+                                        event: triggerDetails.event || undefined,
                                     },
                                 }),
                             );
@@ -416,7 +416,7 @@ export function useTransformTriggerObjectToNodesAndEdges(
                                             resource: triggerDetails.resource,
                                             type: triggerDetails.type,
                                             actionsUuids: [],
-                                            event: (triggerDetails.event as unknown as UpdateTriggerRequestDtoEventEnum) || undefined,
+                                            event: triggerDetails.event || undefined,
                                         },
                                     }),
                                 );
@@ -500,7 +500,7 @@ export function useTransformTriggerObjectToNodesAndEdges(
                                         type: triggerDetails.type,
                                         actionsUuids: triggerDetails?.actions.map((action) => action.uuid) || [],
                                         description: triggerDetails.description || '',
-                                        event: (triggerDetails.event as unknown as UpdateTriggerRequestDtoEventEnum) || undefined,
+                                        event: triggerDetails.event || undefined,
                                     },
                                 }),
                             );
@@ -644,7 +644,7 @@ export function useTransformTriggerObjectToNodesAndEdges(
                                         type: triggerDetails.type,
                                         rulesUuids: triggerDetails?.rules.map((rule) => rule.uuid) || [],
                                         description: triggerDetails.description || '',
-                                        event: (triggerDetails.event as unknown as UpdateTriggerRequestDtoEventEnum) || undefined,
+                                        event: triggerDetails.event || undefined,
                                     },
                                 }),
                             );

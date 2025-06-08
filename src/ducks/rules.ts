@@ -146,7 +146,7 @@ export const slice = createSlice({
             state.isFetchingExecutions = false;
         },
 
-        listActions: (state, action: PayloadAction<{ resource?: Resource; withNoneResource?: boolean }>) => {
+        listActions: (state, action: PayloadAction<{ resource?: Resource }>) => {
             state.isFetchingActions = true;
         },
 

@@ -13,6 +13,7 @@
 
 import type {
     Resource,
+    ResourceEvent,
 } from './';
 
 /**
@@ -22,10 +23,10 @@ import type {
 export interface TriggerEventAssociationRequestDto {
     /**
      * Resource event
-     * @type {string}
+     * @type {ResourceEvent}
      * @memberof TriggerEventAssociationRequestDto
      */
-    event: TriggerEventAssociationRequestDtoEventEnum;
+    event: ResourceEvent;
     /**
      * Event triggers association resource
      * @type {Resource}
@@ -46,17 +47,4 @@ export interface TriggerEventAssociationRequestDto {
     triggerUuids: Array<string>;
 }
 
-/**
- * @export
- * @enum {string}
- */
-export enum TriggerEventAssociationRequestDtoEventEnum {
-    CertificateStatusChanged = 'certificate_status_changed',
-    CertificateActionPerformed = 'certificate_action_performed',
-    CertificateDiscovered = 'certificate_discovered',
-    DiscoveryFinished = 'discovery_finished',
-    ApprovalRequested = 'approval_requested',
-    ApprovalClosed = 'approval_closed',
-    ScheduledJobFinished = 'scheduled_job_finished'
-}
 

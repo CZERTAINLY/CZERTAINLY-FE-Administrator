@@ -37,8 +37,10 @@ const EventsList = () => {
     }, [getEvents]);
 
     useEffect(() => {
-        dispatch(resourceActions.listAllResourceEvents());
-    }, [dispatch]);
+        if (resourceEvents.length !== 0) {
+            dispatch(resourceActions.listAllResourceEvents());
+        }
+    }, [dispatch, resourceEvents]);
 
     const isBusy = useMemo(
         () => isFetchingEventsSetting || isFetchingResourcesList || isFetchingResourcesWithEventsList,
@@ -59,7 +61,7 @@ const EventsList = () => {
                             maxMenuHeight={140}
                             menuPlacement="auto"
                             options={resourceOptionsWithEvents}
-                            placeholder="Select Produced by Resource"
+                            placeholder="Select Resource"
                             onChange={(event) => {
                                 setSelectedResource(event?.value as Resource);
                             }}
@@ -79,14 +81,9 @@ const EventsList = () => {
             },
             {
                 id: 'resource',
-                content: 'Produced by Resource',
+                content: 'Resource',
+                sort: 'asc',
                 sortable: true,
-            },
-            {
-                id: 'hasTrigger',
-                content: 'Has Triggers Assigned',
-                sortable: true,
-                sort: 'desc',
             },
             {
                 id: 'triggersCount',
@@ -113,7 +110,6 @@ const EventsList = () => {
                                           {getEnumLabel(resourceEventEnum, event.event)}
                                       </Link>,
                                       event.producedResource ? getEnumLabel(resourceEnum, event.producedResource) : '',
-                                      <BooleanBadge value={Boolean(eventsSettings?.eventsMapping[event.event]?.length)} />,
                                       (eventsSettings?.eventsMapping[event.event]?.length ?? 0).toString(),
                                   ],
                               },

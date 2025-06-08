@@ -12,12 +12,13 @@
  */
 
 /**
+ * DTO representing settings of multiple events mapped by its enum
  * @export
  * @interface EventsSettingsDto
  */
 export interface EventsSettingsDto {
     /**
-     * Map of triggers associated to event where key is resource event enum
+     * Map of triggers associated to event where key is resource event enum and value is list of trigger UUIDs
      * @type {{ [key: string]: Array<string>; }}
      * @memberof EventsSettingsDto
      */

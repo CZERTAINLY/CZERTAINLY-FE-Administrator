@@ -51,7 +51,11 @@ const ActionsForm = () => {
 
     useEffect(() => {
         if (!selectedResourceState) return;
-        dispatch(rulesActions.listExecutions({ resource: selectedResourceState.value as Resource }));
+        dispatch(
+            rulesActions.listExecutions({
+                resource: selectedResourceState.value as Resource,
+            }),
+        );
     }, [dispatch, selectedResourceState]);
 
     useEffect(() => {

@@ -84,19 +84,19 @@ export default function NotificationProfileForm() {
             return {
                 name: notificationProfile.name,
                 recipientType: {
-                    label: getEnumLabel(recipientTypeEnum, notificationProfile.recipient.type),
-                    value: notificationProfile.recipient.type,
+                    label: getEnumLabel(recipientTypeEnum, notificationProfile.recipientType),
+                    value: notificationProfile.recipientType,
                 },
                 internalNotification: notificationProfile.internalNotification,
                 description: notificationProfile.description,
                 frequency: notificationProfile.frequency ? getInputStringFromIso8601String(notificationProfile.frequency) : undefined,
                 repetitions: notificationProfile.repetitions,
-                ...(notificationProfile.recipient.uuid
+                ...(notificationProfile.recipients
                     ? {
-                          recipient: {
-                              label: notificationProfile.recipient.name!,
-                              value: notificationProfile.recipient.uuid,
-                          },
+                          recipients: notificationProfile.recipients.map((recipient) => ({
+                              label: recipient.name,
+                              value: recipient.uuid,
+                          })),
                       }
                     : {}),
                 ...(notificationProfile.notificationInstance

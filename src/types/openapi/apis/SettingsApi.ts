@@ -164,7 +164,7 @@ export class SettingsApi extends BaseAPI {
     };
 
     /**
-     * Update events settings
+     * Update single event settings
      */
     updateEventSettings({ eventSettingsDto }: UpdateEventSettingsRequest): Observable<void>
     updateEventSettings({ eventSettingsDto }: UpdateEventSettingsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
@@ -184,7 +184,7 @@ export class SettingsApi extends BaseAPI {
     };
 
     /**
-     * Update events settings
+     * Update multiple events settings
      */
     updateEventsSettings({ eventsSettingsDto }: UpdateEventsSettingsRequest): Observable<void>
     updateEventsSettings({ eventsSettingsDto }: UpdateEventsSettingsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
