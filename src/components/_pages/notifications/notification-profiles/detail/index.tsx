@@ -89,7 +89,19 @@ export default function NotificationProfileDetail() {
         ],
         [],
     );
-
+    const recipientHeaders: TableHeader[] = useMemo(
+        () => [
+            {
+                id: 'uuid',
+                content: 'Recipient UUID',
+            },
+            {
+                id: 'name',
+                content: 'Recipient Name',
+            },
+        ],
+        [],
+    );
     const profileData: TableDataRow[] = useMemo(
         () =>
             !notificationProfile
@@ -121,35 +133,6 @@ export default function NotificationProfileDetail() {
                           ],
                       },
                       {
-                          id: 'recipientUuid',
-                          columns: ['Recipient UUID', notificationProfile.recipients?.[0].uuid ?? ''],
-                      },
-                      {
-                          id: 'recipientName',
-                          columns: [
-                              'Recipient Name',
-                              <Link
-                                  key="notificationProviderName"
-                                  to={(() => {
-                                      switch (notificationProfile.recipientType) {
-                                          case RecipientType.User:
-                                              return `../../../users/detail/${notificationProfile.recipients?.[0].uuid}`;
-                                          case RecipientType.Group:
-                                              return `../../../groups/detail/${notificationProfile.recipients?.[0].uuid}`;
-                                          case RecipientType.Role:
-                                              return `../../../roles/detail/${notificationProfile.recipients?.[0].uuid}`;
-                                          case RecipientType.None:
-                                          case RecipientType.Owner:
-                                          default:
-                                              return '';
-                                      }
-                                  })()}
-                              >
-                                  {notificationProfile.recipients?.[0].name}
-                              </Link>,
-                          ],
-                      },
-                      {
                           id: 'internalNotification',
                           columns: [
                               'Internal Notification',
@@ -169,6 +152,37 @@ export default function NotificationProfileDetail() {
                       },
                   ],
         [notificationProfile, recipientTypeEnum],
+    );
+    const recipientsData: TableDataRow[] = useMemo(
+        () =>
+            !notificationProfile?.recipients
+                ? []
+                : notificationProfile.recipients?.map((recipient) => ({
+                      id: recipient.uuid,
+                      columns: [
+                          recipient.uuid ?? '',
+                          <Link
+                              key="name"
+                              to={(() => {
+                                  switch (notificationProfile.recipientType) {
+                                      case RecipientType.User:
+                                          return `../../../users/detail/${recipient.uuid}`;
+                                      case RecipientType.Group:
+                                          return `../../../groups/detail/${recipient.uuid}`;
+                                      case RecipientType.Role:
+                                          return `../../../roles/detail/${recipient.uuid}`;
+                                      case RecipientType.None:
+                                      case RecipientType.Owner:
+                                      default:
+                                          return '';
+                                  }
+                              })()}
+                          >
+                              {recipient.name}
+                          </Link>,
+                      ],
+                  })),
+        [notificationProfile],
     );
     const notificationInstanceData: TableDataRow[] = useMemo(
         () =>
@@ -239,6 +253,20 @@ export default function NotificationProfileDetail() {
                     </Widget>
                 </Col>
             </Row>
+            {!!notificationProfile?.recipients?.length && (
+                <Row>
+                    <Col>
+                        <Widget
+                            title="Recipients"
+                            busy={isFetchingDetail || isFetchingNotificationInstanceDetail}
+                            widgetLockName={LockWidgetNameEnum.NotificationProfileDetails}
+                            titleSize="large"
+                        >
+                            <CustomTable headers={recipientHeaders} data={recipientsData} />
+                        </Widget>
+                    </Col>
+                </Row>
+            )}
         </Container>
     );
 }
