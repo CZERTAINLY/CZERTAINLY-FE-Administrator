@@ -16,6 +16,7 @@ import type {
     SearchFieldDataByGroupDto,
     TriggerDetailDto as TriggerDetailDtoApi,
     TriggerDto as TriggerDtoApi,
+    TriggerEventAssociationRequestDto as TriggerEventAssociationRequestDtoApi,
     TriggerHistoryDto as TriggerHistoryDtoApi,
     TriggerHistoryObjectSummaryDto as TriggerHistoryObjectSummaryDtoApi,
     TriggerHistoryObjectTriggerSummaryDto as TriggerHistoryObjectTriggerSummaryDtoApi,
@@ -138,3 +139,8 @@ export type TriggerHistorySummaryDto = TriggerHistorySummaryDtoApi;
 export type TriggerHistorySummaryModel = Omit<TriggerHistorySummaryDto, 'objects'> & {
     objects: Array<TriggerHistoryObjectSummaryModel>;
 };
+
+export type EventTriggerAssociationModel = { [key: string]: Array<string> };
+
+export type TriggerEventAssociationRequestDto = TriggerEventAssociationRequestDtoApi;
+export type TriggerEventAssociationRequestModel = TriggerEventAssociationRequestDto;

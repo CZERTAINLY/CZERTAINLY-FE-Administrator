@@ -17,7 +17,6 @@ import SwitchWidget from 'components/SwitchWidget';
 import Select from 'react-select';
 import { PlatformEnum, Resource, ResourceEvent, TriggerType } from 'types/openapi';
 import { isObjectSame } from 'utils/common-utils';
-import { useResourceOptionsFromListWithFilters } from 'utils/rules';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
 
 interface SelectChangeValue {
