@@ -23,7 +23,7 @@ export default function EventDetail() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const resourceEvents = useSelector(resourceSelectors.resourceEvents);
+    const allResourceEvents = useSelector(resourceSelectors.allResourceEvents);
     const eventsSettings = useSelector(settingsSelectors.eventsSettings);
     const triggers = useSelector(rulesSelectors.triggers);
 
@@ -107,7 +107,7 @@ export default function EventDetail() {
                           id: 'resource',
                           columns: [
                               'Produced by Resource',
-                              getEnumLabel(resourceEnum, resourceEvents.find((el) => el.event === event)?.producedResource ?? ''),
+                              getEnumLabel(resourceEnum, allResourceEvents.find((el) => el.event === event)?.producedResource ?? ''),
                           ],
                       },
                       {
@@ -115,7 +115,7 @@ export default function EventDetail() {
                           columns: ['Triggers Count', eventSettings.triggerUuids.length.toString()],
                       },
                   ],
-        [event, resourceEvents, eventSettings, resourceEventEnum, resourceEnum],
+        [event, allResourceEvents, eventSettings, resourceEventEnum, resourceEnum],
     );
 
     const triggerHeaders: TableHeader[] = [

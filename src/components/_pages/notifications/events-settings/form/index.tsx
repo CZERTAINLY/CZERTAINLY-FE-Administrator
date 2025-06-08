@@ -34,7 +34,7 @@ export default function EventForm() {
     const navigate = useNavigate();
 
     const eventsSettings = useSelector(settingsSelectors.eventsSettings);
-    const resourceEvents = useSelector(resourceSelectors.resourceEvents);
+    const allResourceEvents = useSelector(resourceSelectors.allResourceEvents);
 
     const isFetchingResourcesList = useSelector(resourceSelectors.isFetchingResourcesList);
     const isFetchingEventsSetting = useSelector(settingsSelectors.isFetchingEventsSetting);
@@ -67,7 +67,7 @@ export default function EventForm() {
 
     const defaultValues: FormValues = useMemo(() => {
         if (!eventSettings) return {};
-        const resource = resourceEvents.find((event) => event.event === eventSettings.event)?.producedResource;
+        const resource = allResourceEvents.find((event) => event.event === eventSettings.event)?.producedResource;
         return {
             event: {
                 label: getEnumLabel(resourceEventEnum, eventSettings.event),
@@ -80,7 +80,7 @@ export default function EventForm() {
 
             triggers: eventSettings.triggerUuids ?? [],
         };
-    }, [eventSettings, resourceEventEnum, resourceEnum, resourceEvents]);
+    }, [eventSettings, resourceEventEnum, resourceEnum, allResourceEvents]);
 
     const onCancel = useCallback(() => {
         navigate(-1);

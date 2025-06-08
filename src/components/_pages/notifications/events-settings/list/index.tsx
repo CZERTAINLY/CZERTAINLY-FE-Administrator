@@ -17,7 +17,7 @@ const EventsList = () => {
     const dispatch = useDispatch();
 
     const eventsSettings = useSelector(settingsSelectors.eventsSettings);
-    const resourceEvents = useSelector(resourceSelectors.resourceEvents);
+    const resourceEvents = useSelector(resourceSelectors.allResourceEvents);
     const isFetchingResourcesList = useSelector(resourceSelectors.isFetchingResourcesList);
     const isFetchingEventsSetting = useSelector(settingsSelectors.isFetchingEventsSetting);
 
@@ -36,10 +36,8 @@ const EventsList = () => {
     }, [getEvents]);
 
     useEffect(() => {
-        if (resourceEvents.length !== 0) {
-            dispatch(resourceActions.listAllResourceEvents());
-        }
-    }, [dispatch, resourceEvents]);
+        dispatch(resourceActions.listAllResourceEvents());
+    }, [dispatch]);
 
     const isBusy = useMemo(
         () => isFetchingEventsSetting || isFetchingResourcesList || isFetchingResourcesWithEventsList,

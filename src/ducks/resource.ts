@@ -5,6 +5,7 @@ import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     resourcesList: ResourceModel[];
+    allResourceEvents: ResourceEventModel[];
     resourceEvents: ResourceEventModel[];
     isFetchingResourcesList: boolean;
     isFetchingResourceEvents: boolean;
@@ -12,6 +13,7 @@ export type State = {
 
 export const initialState: State = {
     resourcesList: [],
+    allResourceEvents: [],
     resourceEvents: [],
     isFetchingResourcesList: false,
     isFetchingResourceEvents: false,
@@ -48,10 +50,12 @@ export const slice = createSlice({
             state.isFetchingResourceEvents = true;
         },
 
-        listAllResourceEventsSuccess(state, action: PayloadAction<{ mappedEvents: { [key: string]: ResourceEventModel[] } }>) {
+        listAllResourceEventsSuccess(state, action: PayloadAction<{ mappedEvents?: { [key: string]: ResourceEventModel[] } }>) {
             state.isFetchingResourceEvents = false;
-            state.resourceEvents = Object.keys(action.payload.mappedEvents).reduce(
-                (acc, mappedEvent) => [...acc, ...action.payload.mappedEvents[mappedEvent]],
+            const mappedEvents = action.payload.mappedEvents;
+            if (!mappedEvents) return;
+            state.allResourceEvents = Object.keys(mappedEvents).reduce(
+                (acc, mappedEvent) => [...acc, ...mappedEvents[mappedEvent]],
                 [] as ResourceEventModel[],
             );
         },
@@ -79,11 +83,13 @@ const state = createFeatureSelector<State>(slice.name);
 
 const resourcesList = createSelector(state, (state) => state.resourcesList);
 const resourceEvents = createSelector(state, (state) => state.resourceEvents);
+const allResourceEvents = createSelector(state, (state) => state.allResourceEvents);
 const isFetchingResourcesList = createSelector(state, (state) => state.isFetchingResourcesList);
 
 export const selectors = {
     resourcesList,
     resourceEvents,
+    allResourceEvents,
     isFetchingResourcesList,
 };
 

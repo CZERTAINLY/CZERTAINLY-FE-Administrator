@@ -52,7 +52,7 @@ const TriggerForm = () => {
 
     const ruleTriggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.TriggerType));
     const actionsList = useSelector(rulesSelectors.actionsList);
-    const resourceEvents = useSelector(resourceSelectors.resourceEvents);
+    const allResourceEvents = useSelector(resourceSelectors.allResourceEvents);
     const rules = useSelector(rulesSelectors.rules);
     const isCreatingTrigger = useSelector(rulesSelectors.isCreatingTrigger);
     const isBusy = useMemo(() => isCreatingTrigger, [isCreatingTrigger]);
@@ -62,32 +62,28 @@ const TriggerForm = () => {
 
     const getResourceEventNameOptions = useCallback(
         (resource?: Resource) => {
-            console.log(resource, resourceEvents);
-            if (resourceEvents === undefined) return [];
-            return resourceEvents
+            if (allResourceEvents === undefined) return [];
+            return allResourceEvents
                 .filter((el) => resource === undefined || el.producedResource === resource)
                 .map((event) => {
                     return { value: event, label: getEnumLabel(resourceEventEnum, event.event) };
                 });
         },
-        [resourceEvents, resourceEventEnum],
+        [allResourceEvents, resourceEventEnum],
     );
 
     useEffect(() => {
-        if (!resourceEvents.length) {
-            dispatch(resourceActions.listAllResourceEvents());
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        dispatch(resourceActions.listAllResourceEvents());
     }, [dispatch]);
 
     const resourceOptions = useMemo(() => {
-        if (resourceEvents === undefined) return [];
-        const resourcesSet = new Set(resourceEvents.map((event) => event.producedResource).filter((el) => el));
+        if (allResourceEvents === undefined) return [];
+        const resourcesSet = new Set(allResourceEvents.map((event) => event.producedResource).filter((el) => el));
         return [...resourcesSet].map((resource) => ({
             label: getEnumLabel(resourceEnum, resource as Resource),
             value: resource as Resource,
         }));
-    }, [resourceEvents, resourceEnum]);
+    }, [allResourceEvents, resourceEnum]);
 
     const actionsOptions = useMemo(() => {
         if (actionsList === undefined) return [];

@@ -143,7 +143,6 @@ export default function NotificationProfileForm() {
                 notificationInstanceUuid: values.notificationInstance?.value,
                 ...recipient,
             };
-            console.log({ updateNotificationProfileRequest });
 
             if (editMode) {
                 dispatch(
