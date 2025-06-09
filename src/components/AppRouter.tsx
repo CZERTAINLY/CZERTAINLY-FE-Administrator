@@ -118,9 +118,6 @@ import NotificationProfileDetail from './_pages/notifications/notification-profi
 import NotificationProfileForm from './_pages/notifications/notification-profiles/form';
 import NotificationProfilesList from './_pages/notifications/notification-profiles/list';
 
-import EventDetail from './_pages/notifications/events-settings/detail';
-import EventForm from './_pages/notifications/events-settings/form';
-
 import ConditionDetails from './_pages/conditions/details';
 import ConditionForm from './_pages/conditions/form';
 
@@ -362,8 +359,6 @@ export default function AppRouter() {
 
                     <Route path={`/notifications`} element={<NotificationsList />} />
                     <Route path={`/events`} element={<EventsSettings />} />
-                    <Route path={`/events/detail/:event`} element={<EventDetail />} />
-                    <Route path={`/events/edit/:event`} element={<EventForm />} />
                     <Route path={`/notificationinstances/detail/:id`} element={<NotificationInstanceDetail />} />
                     <Route path={`/notificationinstances/add`} element={<NotificationInstanceForm />} />
                     <Route path={`/notificationinstances/edit/:id`} element={<NotificationInstanceForm />} />

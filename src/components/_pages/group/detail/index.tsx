@@ -13,7 +13,7 @@ import { Container } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
-import EventsAssociationTable from 'components/_pages/notifications/events-settings/EventsAssociationTable';
+import EventsTable from 'components/_pages/notifications/events-settings/EventsTable';
 import TabLayout from 'components/Layout/TabLayout';
 
 export default function GroupDetail() {
@@ -142,7 +142,8 @@ export default function GroupDetail() {
                         content: (
                             <Widget>
                                 {group && (
-                                    <EventsAssociationTable
+                                    <EventsTable
+                                        mode="association"
                                         resource={Resource.Groups}
                                         resourceUuid={group.uuid}
                                         widgetLocks={[LockWidgetNameEnum.GroupDetails, LockWidgetNameEnum.EventSettings]}
