@@ -4,7 +4,6 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 import { getEnumLabel, selectors as enumSelectors } from 'ducks/enums';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { actions as settingsActions, selectors as settingsSelectors } from 'ducks/settings';
 import { actions as resourceActions, selectors as resourceSelectors } from 'ducks/resource';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useDispatch, useSelector } from 'react-redux';
@@ -178,8 +177,8 @@ const EventsAssociationTable = ({ resource, resourceUuid, widgetLocks }: Props) 
                 value: resourceEvent.event,
             },
             resource: {
-                label: getEnumLabel(resourceEnum, resourceEvent.producedResource || Resource.None),
-                value: resourceEvent.producedResource || Resource.None,
+                label: getEnumLabel(resourceEnum, resourceEvent.producedResource ?? Resource.None),
+                value: resourceEvent.producedResource ?? Resource.None,
             },
             triggerUuids: eventTriggerAssociation?.[resourceEvent.event] ?? [],
         };
@@ -256,13 +255,13 @@ const EventsAssociationTable = ({ resource, resourceUuid, widgetLocks }: Props) 
                                         <Button
                                             type="submit"
                                             color="primary"
-                                            disabled={submitting || !valid || areDefaultValuesSame(values)}
+                                            disabled={isBusy || submitting || !valid || areDefaultValuesSame(values)}
                                             onClick={handleSubmit}
                                         >
                                             Associate
                                         </Button>
 
-                                        <Button type="button" color="secondary" disabled={submitting} onClick={onClose}>
+                                        <Button type="button" color="secondary" disabled={isBusy || submitting} onClick={onClose}>
                                             Cancel
                                         </Button>
                                     </ButtonGroup>

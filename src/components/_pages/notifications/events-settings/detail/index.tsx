@@ -148,19 +148,21 @@ export default function EventDetail() {
     const triggerTableData: TableDataRow[] = useMemo(
         () =>
             triggers.length
-                ? ((eventSettings?.triggerUuids.map((uuid) => triggers.find((el) => el.uuid === uuid)) as TriggerDto[])?.map((trigger) => ({
-                      id: trigger.uuid,
-                      columns: [
-                          <Link key={trigger.uuid} to={`../../triggers/detail/${trigger.uuid}`}>
-                              {trigger.name}
-                          </Link>,
-                          getEnumLabel(triggerTypeEnum, trigger.type ?? ''),
-                          trigger.ignoreTrigger ? 'Yes' : 'No',
-                          getEnumLabel(resourceEventEnum, trigger.event ?? ''),
-                          getEnumLabel(resourceTypeEnum, trigger.resource ?? ''),
-                          trigger.description ?? '',
-                      ],
-                  })) ?? [])
+                ? ((eventSettings?.triggerUuids.map((uuid) => triggers.find((el) => el.uuid === uuid)) as TriggerDto[])
+                      ?.filter((el) => el)
+                      ?.map((trigger) => ({
+                          id: trigger.uuid,
+                          columns: [
+                              <Link key={trigger.uuid} to={`../../triggers/detail/${trigger.uuid}`}>
+                                  {trigger.name}
+                              </Link>,
+                              getEnumLabel(triggerTypeEnum, trigger.type ?? ''),
+                              trigger.ignoreTrigger ? 'Yes' : 'No',
+                              getEnumLabel(resourceEventEnum, trigger.event ?? ''),
+                              getEnumLabel(resourceTypeEnum, trigger.resource ?? ''),
+                              trigger.description ?? '',
+                          ],
+                      })) ?? [])
                 : [],
         [eventSettings, triggers, triggerTypeEnum, resourceTypeEnum, resourceEventEnum],
     );
