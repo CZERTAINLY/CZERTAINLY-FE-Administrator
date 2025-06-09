@@ -22,10 +22,10 @@ interface SelectChangeValue {
     label: string;
 }
 
-export interface actionFormValues {
+export interface ActionFormValues {
     name: string;
     selectedResource?: SelectChangeValue;
-    resource: Resource;
+    resource?: Resource;
     description?: string;
     executionsUuids: SelectChangeValue[];
 }
@@ -51,7 +51,11 @@ const ActionsForm = () => {
 
     useEffect(() => {
         if (!selectedResourceState) return;
-        dispatch(rulesActions.listExecutions({ resource: selectedResourceState.value as Resource }));
+        dispatch(
+            rulesActions.listExecutions({
+                resource: selectedResourceState.value as Resource,
+            }),
+        );
     }, [dispatch, selectedResourceState]);
 
     useEffect(() => {
@@ -60,10 +64,10 @@ const ActionsForm = () => {
         };
     }, [dispatch]);
 
-    const defaultValues: actionFormValues = useMemo(() => {
+    const defaultValues: ActionFormValues = useMemo(() => {
         return {
             name: '',
-            resource: Resource.None,
+            resource: undefined,
             selectedResource: undefined,
             description: undefined,
             executionsUuids: [],
@@ -78,8 +82,8 @@ const ActionsForm = () => {
     }, [navigate]);
 
     const onSubmit = useCallback(
-        (values: actionFormValues) => {
-            if (values.resource === Resource.None) return;
+        (values: ActionFormValues) => {
+            if (!values.resource) return;
             dispatch(
                 rulesActions.createAction({
                     action: {
@@ -95,7 +99,7 @@ const ActionsForm = () => {
     );
 
     const areDefaultValuesSame = useCallback(
-        (values: actionFormValues) => {
+        (values: ActionFormValues) => {
             const areValuesSame = isObjectSame(
                 values as unknown as Record<string, unknown>,
                 defaultValues as unknown as Record<string, unknown>,
@@ -107,7 +111,7 @@ const ActionsForm = () => {
 
     return (
         <Widget title={title} busy={isBusy}>
-            <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<actionFormValues>() }}>
+            <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<ActionFormValues>() }}>
                 {({ handleSubmit, pristine, submitting, values, valid, form }) => (
                     <BootstrapForm onSubmit={handleSubmit}>
                         <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}>
@@ -198,7 +202,7 @@ const ActionsForm = () => {
 
                                     <Select
                                         className="nodrag"
-                                        isDisabled={values.resource === Resource.None || !values.resource}
+                                        isDisabled={!values.resource}
                                         {...input}
                                         options={executionsOptions}
                                         isMulti
@@ -218,7 +222,6 @@ const ActionsForm = () => {
                                     inProgress={submitting}
                                     disabled={
                                         areDefaultValuesSame(values) ||
-                                        values.resource === Resource.None ||
                                         submitting ||
                                         !valid ||
                                         isBusy ||

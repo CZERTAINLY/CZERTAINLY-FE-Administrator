@@ -12,27 +12,27 @@
  */
 
 import type {
-    Resource,
     ResourceEvent,
 } from './';
 
 /**
+ * DTO representing settings of single event
  * @export
- * @interface ResourceEventDto
+ * @interface EventSettingsDto
  */
-export interface ResourceEventDto {
+export interface EventSettingsDto {
     /**
-     * Resource event code
+     * Resource event
      * @type {ResourceEvent}
-     * @memberof ResourceEventDto
+     * @memberof EventSettingsDto
      */
     event: ResourceEvent;
     /**
-     * Resource of objects that are subject of event
-     * @type {Resource}
-     * @memberof ResourceEventDto
+     * List of triggers associated with event
+     * @type {Array<string>}
+     * @memberof EventSettingsDto
      */
-    producedResource?: Resource;
+    triggerUuids: Array<string>;
 }
 
 

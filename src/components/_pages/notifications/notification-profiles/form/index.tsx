@@ -45,8 +45,8 @@ interface FormValues {
 }
 
 export default function NotificationProfileForm() {
-    const { uuid, version } = useParams();
-    const editMode = uuid !== undefined && version !== undefined;
+    const { id, version } = useParams();
+    const editMode = id !== undefined && version !== undefined;
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -75,28 +75,28 @@ export default function NotificationProfileForm() {
 
     useEffect(() => {
         dispatch(actions.resetState());
-        if (!uuid || !version) return;
-        dispatch(actions.getNotificationProfileDetail({ uuid, version: Number(version) }));
-    }, [dispatch, uuid, version]);
+        if (!id || !version) return;
+        dispatch(actions.getNotificationProfileDetail({ uuid: id, version: Number(version) }));
+    }, [dispatch, id, version]);
 
     const defaultValues: FormValues = useMemo(() => {
         if (editMode && notificationProfile) {
             return {
                 name: notificationProfile.name,
                 recipientType: {
-                    label: getEnumLabel(recipientTypeEnum, notificationProfile.recipient.type),
-                    value: notificationProfile.recipient.type,
+                    label: getEnumLabel(recipientTypeEnum, notificationProfile.recipientType),
+                    value: notificationProfile.recipientType,
                 },
                 internalNotification: notificationProfile.internalNotification,
                 description: notificationProfile.description,
                 frequency: notificationProfile.frequency ? getInputStringFromIso8601String(notificationProfile.frequency) : undefined,
                 repetitions: notificationProfile.repetitions,
-                ...(notificationProfile.recipient.uuid
+                ...(notificationProfile.recipients
                     ? {
-                          recipient: {
-                              label: notificationProfile.recipient.name!,
-                              value: notificationProfile.recipient.uuid,
-                          },
+                          recipients: notificationProfile.recipients.map((recipient) => ({
+                              label: recipient.name,
+                              value: recipient.uuid,
+                          })),
                       }
                     : {}),
                 ...(notificationProfile.notificationInstance
@@ -118,7 +118,6 @@ export default function NotificationProfileForm() {
             };
         }
     }, [editMode, notificationProfile, recipientTypeEnum]);
-    console.log(defaultValues);
 
     const onCancel = useCallback(() => {
         navigate(-1);
@@ -149,7 +148,7 @@ export default function NotificationProfileForm() {
             if (editMode) {
                 dispatch(
                     actions.updateNotificationProfile({
-                        uuid,
+                        uuid: id,
                         notificationProfileEditRequest: updateNotificationProfileRequest,
                     }),
                 );
@@ -164,7 +163,7 @@ export default function NotificationProfileForm() {
                 );
             }
         },
-        [dispatch, uuid, editMode],
+        [dispatch, id, editMode],
     );
 
     const areDefaultValuesSame = useCallback(

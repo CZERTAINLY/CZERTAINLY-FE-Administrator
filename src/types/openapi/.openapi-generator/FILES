@@ -229,6 +229,8 @@ models/EntityInstanceResponseDto.ts
 models/EntityInstanceUpdateRequestDto.ts
 models/EnumItemDto.ts
 models/ErrorMessageDto.ts
+models/EventSettingsDto.ts
+models/EventsSettingsDto.ts
 models/ExecutionDto.ts
 models/ExecutionItemDto.ts
 models/ExecutionItemRequestDto.ts
@@ -289,7 +291,6 @@ models/NotificationProfileRequestDto.ts
 models/NotificationProfileResponseDto.ts
 models/NotificationProfileUpdateRequestDto.ts
 models/NotificationResponseDto.ts
-models/NotificationSettingsDto.ts
 models/OAuth2ProviderSettingsDto.ts
 models/OAuth2ProviderSettingsResponseDto.ts
 models/OAuth2ProviderSettingsUpdateDto.ts
@@ -315,7 +316,6 @@ models/RandomDataRequestDto.ts
 models/RandomDataResponseDto.ts
 models/RangeAttributeConstraint.ts
 models/RangeAttributeConstraintData.ts
-models/RecipientDto.ts
 models/RecipientType.ts
 models/RegexpAttributeConstraint.ts
 models/RemoveCertificateDto.ts
@@ -323,6 +323,7 @@ models/RequestAttributeCallback.ts
 models/RequestAttributeDto.ts
 models/Resource.ts
 models/ResourceDto.ts
+models/ResourceEvent.ts
 models/ResourceEventDto.ts
 models/ResourceLoggingSettingsDto.ts
 models/ResourcePermissionsDto.ts
@@ -377,6 +378,7 @@ models/TokenProfileDto.ts
 models/TokenProfileKeyUsageRequestDto.ts
 models/TriggerDetailDto.ts
 models/TriggerDto.ts
+models/TriggerEventAssociationRequestDto.ts
 models/TriggerHistoryDto.ts
 models/TriggerHistoryObjectSummaryDto.ts
 models/TriggerHistoryObjectTriggerSummaryDto.ts

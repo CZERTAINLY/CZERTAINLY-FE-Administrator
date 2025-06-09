@@ -214,8 +214,15 @@ const FlowChartContent = ({
             dispatch(userInterfaceActions.clearReactFlowUI());
             return;
         }
-        // TODO : Implement another separate plotting function for already created flowchart
-        const layoutedElements = getLayoutedElements(flowChartNodes, flowChartEdges, flowDirection);
+        let layoutedElements: { nodes: CustomNode[]; edges: Edge[] } | undefined;
+        try {
+            // TODO : Implement another separate plotting function for already created flowchart
+            layoutedElements = getLayoutedElements(flowChartNodes, flowChartEdges, flowDirection);
+        } catch (e) {
+            // TODO: Prevent the const assignment error from happening
+            console.log(e);
+            layoutedElements = undefined;
+        }
 
         if (!layoutedElements) {
             // Handle the case where getLayoutedElements returns undefined

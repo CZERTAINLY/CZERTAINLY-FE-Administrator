@@ -18,6 +18,7 @@
  */
 export enum RecipientType {
     None = 'none',
+    Default = 'default',
     User = 'user',
     Group = 'group',
     Role = 'role',

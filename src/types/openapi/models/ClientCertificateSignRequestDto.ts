@@ -34,6 +34,12 @@ export interface ClientCertificateSignRequestDto {
      */
     signatureAttributes?: Array<RequestAttributeDto>;
     /**
+     * List of attributes to sign the alternative private key
+     * @type {Array<RequestAttributeDto>}
+     * @memberof ClientCertificateSignRequestDto
+     */
+    altSignatureAttributes?: Array<RequestAttributeDto>;
+    /**
      * Certificate signing request encoded as Base64 string
      * @type {string}
      * @memberof ClientCertificateSignRequestDto
@@ -57,6 +63,18 @@ export interface ClientCertificateSignRequestDto {
      * @memberof ClientCertificateSignRequestDto
      */
     keyUuid?: string;
+    /**
+     * Token Profile UUID for the alternative key.
+     * @type {string}
+     * @memberof ClientCertificateSignRequestDto
+     */
+    altTokenProfileUuid?: string;
+    /**
+     * Alternative Key UUID.
+     * @type {string}
+     * @memberof ClientCertificateSignRequestDto
+     */
+    altKeyUuid?: string;
     /**
      * List of RA Profile related Attributes to issue Certificate
      * @type {Array<RequestAttributeDto>}

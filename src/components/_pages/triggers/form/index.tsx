@@ -15,7 +15,7 @@ import { mutators } from 'utils/attributes/attributeEditorMutators';
 import ProgressButton from 'components/ProgressButton';
 import SwitchWidget from 'components/SwitchWidget';
 import Select from 'react-select';
-import { PlatformEnum, Resource, TriggerRequestDtoEventEnum, TriggerType } from 'types/openapi';
+import { PlatformEnum, Resource, ResourceEvent, TriggerType } from 'types/openapi';
 import { isObjectSame } from 'utils/common-utils';
 import { useResourceOptionsFromListWithFilters } from 'utils/rules';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
@@ -34,12 +34,11 @@ export interface TriggerFormValues {
     name: string;
     description?: string;
     selectedResource?: SelectChangeValue;
-    resource: Resource;
-    eventResource: Resource;
+    resource?: Resource;
     selectedTriggerResource?: SelectChangeValue;
     triggerType?: TriggerType;
     selectedTriggerType?: SelectChangeValue;
-    event?: TriggerRequestDtoEventEnum;
+    event?: ResourceEvent;
     selectedEvent?: SelectedEventValue;
     actionsUuids: SelectChangeValue[];
     rulesUuids: SelectChangeValue[];
@@ -57,23 +56,39 @@ const TriggerForm = () => {
     const resourceEvents = useSelector(resourceSelectors.resourceEvents);
     const rules = useSelector(rulesSelectors.rules);
     const isCreatingTrigger = useSelector(rulesSelectors.isCreatingTrigger);
-    const resourceEventEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ResourceEvent));
     const isBusy = useMemo(() => isCreatingTrigger, [isCreatingTrigger]);
-    const resourceslist = useSelector(resourceSelectors.resourceslist);
 
-    const resourceOptions = useResourceOptionsFromListWithFilters(resourceslist);
-    const resourceEventsOptions = useResourceOptionsFromListWithFilters(resourceslist, 'hasEvents');
+    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
+    const resourceEventEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ResourceEvent));
 
-    const resourceEventNameOptions = useMemo(() => {
-        if (resourceEvents === undefined) return [];
-        return resourceEvents.map((event) => {
-            return { value: event, label: getEnumLabel(resourceEventEnum, event.event) };
-        });
-    }, [resourceEvents, resourceEventEnum]);
+    const getResourceEventNameOptions = useCallback(
+        (resource?: Resource) => {
+            console.log(resource, resourceEvents);
+            if (resourceEvents === undefined) return [];
+            return resourceEvents
+                .filter((el) => resource === undefined || el.producedResource === resource)
+                .map((event) => {
+                    return { value: event, label: getEnumLabel(resourceEventEnum, event.event) };
+                });
+        },
+        [resourceEvents, resourceEventEnum],
+    );
 
     useEffect(() => {
-        dispatch(resourceActions.listResources());
+        if (!resourceEvents.length) {
+            dispatch(resourceActions.listAllResourceEvents());
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dispatch]);
+
+    const resourceOptions = useMemo(() => {
+        if (resourceEvents === undefined) return [];
+        const resourcesSet = new Set(resourceEvents.map((event) => event.producedResource).filter((el) => el));
+        return [...resourcesSet].map((resource) => ({
+            label: getEnumLabel(resourceEnum, resource as Resource),
+            value: resource as Resource,
+        }));
+    }, [resourceEvents, resourceEnum]);
 
     const actionsOptions = useMemo(() => {
         if (actionsList === undefined) return [];
@@ -92,13 +107,6 @@ const TriggerForm = () => {
     const ruleTriggerTypeOptions = useMemo(() => {
         return [{ value: TriggerType.Event, label: getEnumLabel(ruleTriggerTypeEnum, TriggerType.Event) }];
     }, [ruleTriggerTypeEnum]);
-
-    const fetchResourceEvents = useCallback(
-        (resource: Resource) => {
-            dispatch(resourceActions.listResourceEvents({ resource: resource }));
-        },
-        [dispatch],
-    );
 
     const fetchActions = useCallback(
         (resource: Resource) => {
@@ -122,7 +130,6 @@ const TriggerForm = () => {
             actionsUuids: [],
             rulesUuids: [],
             triggerType: undefined,
-            eventResource: Resource.None,
             event: undefined,
             ignoreTrigger: false,
         };
@@ -137,7 +144,7 @@ const TriggerForm = () => {
 
     const onSubmit = useCallback(
         (values: TriggerFormValues) => {
-            if (values.resource === Resource.None || values.eventResource === Resource.None || !values.triggerType) return;
+            if (!values.resource) return;
             dispatch(
                 rulesActions.createTrigger({
                     trigger: {
@@ -148,7 +155,6 @@ const TriggerForm = () => {
                         actionsUuids: values.actionsUuids.map((action) => action.value),
                         event: values?.event,
                         rulesUuids: values.rulesUuids.map((rule) => rule.value),
-                        eventResource: values.eventResource,
                         type: values.triggerType,
                     },
                 }),
@@ -176,7 +182,7 @@ const TriggerForm = () => {
                         <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}>
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="name">Trigger Name</Label>
+                                    <Label for="name">Trigger Name *</Label>
 
                                     <Input
                                         {...input}
@@ -210,72 +216,29 @@ const TriggerForm = () => {
                                 </FormGroup>
                             )}
                         </Field>
-                        <Field name="selectedTriggerType" validate={validateRequired()}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="triggerTypeSelect">Type</Label>
-
-                                    <Select
-                                        {...input}
-                                        inputId="triggerTypeSelect"
-                                        maxMenuHeight={140}
-                                        menuPlacement="auto"
-                                        options={ruleTriggerTypeOptions}
-                                        placeholder="Select Trigger Type"
-                                        isClearable
-                                        onChange={(event) => {
-                                            if (!event?.value) return;
-
-                                            input.onChange(event);
-                                            form.change('triggerType', event?.value);
-                                            form.change('eventResource', Resource.None);
-                                            form.change('selectedTriggerResource', undefined);
-                                            form.change('event', undefined);
-                                            form.change('selectedEvent', undefined);
-                                            form.change('resource', Resource.None);
-                                            form.change('selectedResource', undefined);
-                                            form.change('actionsUuids', []);
-                                            form.change('rulesUuids', []);
-                                        }}
-                                    />
-
-                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
-                                        {meta.error}
-                                    </div>
-                                </FormGroup>
-                            )}
-                        </Field>
 
                         <Field name="selectedTriggerResource" validate={validateRequired()}>
                             {({ input, meta }) => (
                                 <FormGroup>
-                                    <Label for="eventResourceSelect">Event Resource</Label>
+                                    <Label for="resourceSelect">Resource*</Label>
 
                                     <Select
                                         {...input}
-                                        inputId="eventResourceSelect"
+                                        inputId="resourceSelect"
                                         maxMenuHeight={140}
                                         menuPlacement="auto"
-                                        options={resourceEventsOptions}
-                                        placeholder="Select Event Resource"
-                                        isClearable
-                                        isDisabled={!values.triggerType}
+                                        options={resourceOptions}
+                                        placeholder="Select Resource"
                                         onChange={(event) => {
                                             if (!event?.value) return;
 
                                             input.onChange(event);
-                                            form.change('eventResource', event.value as Resource);
 
-                                            if (values.triggerType === TriggerType.Event) {
-                                                fetchResourceEvents(event.value as Resource);
-                                                form.change('selectedResource', undefined);
-                                                form.change('resource', Resource.None);
-                                            } else {
-                                                form.change('selectedResource', event);
-                                                form.change('resource', event.value as Resource);
-                                                fetchActions(event.value as Resource);
-                                                fetchRules(event.value as Resource);
-                                            }
+                                            form.change('selectedResource', event);
+                                            form.change('resource', event.value as Resource);
+                                            fetchActions(event.value as Resource);
+                                            fetchRules(event.value as Resource);
+
                                             form.change('event', undefined);
                                             form.change('selectedEvent', undefined);
                                             form.change('actionsUuids', []);
@@ -296,35 +259,54 @@ const TriggerForm = () => {
                             )}
                         </Field>
 
+                        <Field name="selectedTriggerType">
+                            {({ input, meta }) => (
+                                <FormGroup>
+                                    <Label for="triggerTypeSelect">Type</Label>
+
+                                    <Select
+                                        {...input}
+                                        inputId="triggerTypeSelect"
+                                        maxMenuHeight={140}
+                                        menuPlacement="auto"
+                                        options={ruleTriggerTypeOptions}
+                                        placeholder="Select Trigger Type"
+                                        isClearable
+                                        onChange={(event) => {
+                                            input.onChange(event);
+                                            form.change('triggerType', event?.value);
+                                            form.change('event', undefined);
+                                            form.change('selectedEvent', undefined);
+                                            form.change('actionsUuids', []);
+                                            form.change('rulesUuids', []);
+                                        }}
+                                    />
+
+                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
+                                        {meta.error}
+                                    </div>
+                                </FormGroup>
+                            )}
+                        </Field>
+
                         {values?.triggerType === TriggerType.Event && (
                             <Field name="selectedEvent" validate={validateRequired()}>
                                 {({ input, meta }) => (
                                     <FormGroup>
-                                        <Label for="eventSelect">Event</Label>
+                                        <Label for="eventSelect">Event*</Label>
 
                                         <Select
                                             {...input}
                                             inputId="eventSelect"
                                             maxMenuHeight={140}
                                             menuPlacement="auto"
-                                            options={resourceEventNameOptions || []}
+                                            options={getResourceEventNameOptions(values.resource) ?? []}
                                             placeholder="Select Event"
-                                            isClearable
                                             onChange={(event) => {
                                                 if (!event?.value) return;
 
                                                 input.onChange(event);
-                                                form.change('event', event?.value?.event as TriggerRequestDtoEventEnum);
-
-                                                if (event?.value?.producedResource) {
-                                                    const selectResource = resourceOptions.find(
-                                                        (resource) => resource.value === event?.value?.producedResource,
-                                                    );
-                                                    form.change('selectedResource', selectResource);
-                                                    form.change('resource', event?.value?.producedResource);
-                                                    fetchActions(event?.value?.producedResource);
-                                                    fetchRules(event?.value?.producedResource);
-                                                }
+                                                form.change('event', event?.value?.event as ResourceEvent);
                                             }}
                                         />
 
@@ -348,72 +330,46 @@ const TriggerForm = () => {
                                 }}
                             />
                         </div>
+                        {values.selectedResource && (
+                            <>
+                                <Field name="rulesUuids">
+                                    {({ input, meta }) => (
+                                        <FormGroup>
+                                            <Label for="ruleSelect">Rules</Label>
 
-                        <Field name="selectedResource">
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="resourceSelect">Resource</Label>
+                                            <Select
+                                                isDisabled={values.resource === Resource.None || !values.resource || !rulesOptions.length}
+                                                id="rules"
+                                                inputId="ruleSelect"
+                                                {...input}
+                                                options={rulesOptions}
+                                                isMulti
+                                                placeholder="Select Rule"
+                                                isClearable
+                                            />
+                                        </FormGroup>
+                                    )}
+                                </Field>
 
-                                    <Select
-                                        {...input}
-                                        id="resource"
-                                        inputId="resourceSelect"
-                                        maxMenuHeight={140}
-                                        menuPlacement="auto"
-                                        options={resourceOptions || []}
-                                        placeholder="Select Resource"
-                                        isDisabled={true}
-                                        styles={{
-                                            control: (provided) =>
-                                                meta.touched && meta.invalid
-                                                    ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
-                                                    : { ...provided },
-                                        }}
-                                    />
+                                <Field name="actionsUuids">
+                                    {({ input, meta }) => (
+                                        <FormGroup>
+                                            <Label for="actionsSelect">Actions</Label>
 
-                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
-                                        {meta.error}
-                                    </div>
-                                </FormGroup>
-                            )}
-                        </Field>
-
-                        <Field name="rulesUuids">
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="ruleSelect">Rules</Label>
-
-                                    <Select
-                                        isDisabled={values.resource === Resource.None || !values.resource}
-                                        id="rules"
-                                        inputId="ruleSelect"
-                                        {...input}
-                                        options={rulesOptions}
-                                        isMulti
-                                        placeholder="Select Rule"
-                                        isClearable
-                                    />
-                                </FormGroup>
-                            )}
-                        </Field>
-
-                        <Field name="actionsUuids">
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="actionsSelect">Actions</Label>
-
-                                    <Select
-                                        isDisabled={values.resource === Resource.None || !values.resource || values.ignoreTrigger}
-                                        {...input}
-                                        inputId="actionsSelect"
-                                        options={actionsOptions}
-                                        isMulti
-                                        placeholder="Select Actions"
-                                        isClearable
-                                    />
-                                </FormGroup>
-                            )}
-                        </Field>
+                                            <Select
+                                                isDisabled={values.resource === Resource.None || !values.resource || values.ignoreTrigger}
+                                                {...input}
+                                                inputId="actionsSelect"
+                                                options={actionsOptions}
+                                                isMulti
+                                                placeholder="Select Actions"
+                                                isClearable
+                                            />
+                                        </FormGroup>
+                                    )}
+                                </Field>
+                            </>
+                        )}
 
                         <div className="d-flex justify-content-end">
                             <ButtonGroup>

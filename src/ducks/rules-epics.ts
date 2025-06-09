@@ -8,7 +8,7 @@ import { actions as appRedirectActions } from './app-redirect';
 
 import * as slice from './rules';
 import {
-    tranformExecutionRequestModelToDto,
+    transformExecutionRequestModelToDto,
     transformActionDetailDtoToModel,
     transformActionDtoToModel,
     transformActionRequestModelToDto,
@@ -116,7 +116,7 @@ const listTriggers: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.listTriggers.match),
         switchMap((action) =>
-            deps.apiClients.triggers.listTriggers({ resource: action.payload.resource, eventResource: action.payload.eventResource }).pipe(
+            deps.apiClients.triggers.listTriggers({ resource: action.payload.resource }).pipe(
                 switchMap((triggers) =>
                     of(
                         slice.actions.listTriggersSuccess({
@@ -141,7 +141,7 @@ const createExecution: AppEpic = (action$, state, deps) => {
         switchMap((action) =>
             deps.apiClients.actions
                 .createExecution({
-                    executionRequestDto: tranformExecutionRequestModelToDto(action.payload.executionRequestModel),
+                    executionRequestDto: transformExecutionRequestModelToDto(action.payload.executionRequestModel),
                 })
                 .pipe(
                     switchMap((execution) =>

@@ -16,7 +16,7 @@ import { LockWidgetNameEnum } from 'types/user-interface';
 import { getInputStringFromIso8601String } from 'utils/duration';
 
 export default function NotificationProfileDetail() {
-    const { uuid, version } = useParams();
+    const { id, version } = useParams();
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -30,9 +30,9 @@ export default function NotificationProfileDetail() {
     const recipientTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.RecipientType));
 
     const getFreshData = useCallback(() => {
-        if (!uuid || !version) return;
-        dispatch(actions.getNotificationProfileDetail({ uuid, version: Number(version) }));
-    }, [dispatch, uuid, version]);
+        if (!id || !version) return;
+        dispatch(actions.getNotificationProfileDetail({ uuid: id, version: Number(version) }));
+    }, [dispatch, id, version]);
 
     useEffect(() => {
         getFreshData();
@@ -45,14 +45,14 @@ export default function NotificationProfileDetail() {
     }, [dispatch, notificationProfile]);
 
     const onEditNotificationProfile = useCallback(() => {
-        if (!uuid || !version) return;
-        navigate(`../notificationprofiles/edit/${uuid}/${version}`);
-    }, [navigate, uuid, version]);
+        if (!id || !version) return;
+        navigate(`../notificationprofiles/edit/${id}/${version}`);
+    }, [navigate, id, version]);
 
     const onDeleteNotificationProfile = useCallback(() => {
-        if (!uuid || !version) return;
-        dispatch(actions.deleteNotificationProfile({ uuid: uuid, redirect: '../notificationprofiles' }));
-    }, [dispatch, uuid, version]);
+        if (!id || !version) return;
+        dispatch(actions.deleteNotificationProfile({ uuid: id, redirect: '../notificationprofiles' }));
+    }, [dispatch, id, version]);
 
     const notificationProfileWidgetButtons: WidgetButtonProps[] = useMemo(
         () => [
@@ -116,13 +116,13 @@ export default function NotificationProfileDetail() {
                           columns: [
                               'Recipient Type',
                               <Badge key="recipientType" color="secondary">
-                                  {getEnumLabel(recipientTypeEnum, notificationProfile.recipient.type)}
+                                  {getEnumLabel(recipientTypeEnum, notificationProfile.recipientType)}
                               </Badge>,
                           ],
                       },
                       {
                           id: 'recipientUuid',
-                          columns: ['Recipient UUID', notificationProfile.recipient.uuid ?? ''],
+                          columns: ['Recipient UUID', notificationProfile.recipients?.[0].uuid ?? ''],
                       },
                       {
                           id: 'recipientName',
@@ -131,20 +131,21 @@ export default function NotificationProfileDetail() {
                               <Link
                                   key="notificationProviderName"
                                   to={(() => {
-                                      switch (notificationProfile.recipient.type) {
+                                      switch (notificationProfile.recipientType) {
                                           case RecipientType.User:
-                                              return `../../../users/detail/${notificationProfile.recipient.uuid}`;
+                                              return `../../../users/detail/${notificationProfile.recipients?.[0].uuid}`;
                                           case RecipientType.Group:
-                                              return `../../../groups/detail/${notificationProfile.recipient.uuid}`;
+                                              return `../../../groups/detail/${notificationProfile.recipients?.[0].uuid}`;
                                           case RecipientType.Role:
-                                              return `../../../roles/detail/${notificationProfile.recipient.uuid}`;
+                                              return `../../../roles/detail/${notificationProfile.recipients?.[0].uuid}`;
                                           case RecipientType.None:
                                           case RecipientType.Owner:
+                                          default:
                                               return '';
                                       }
                                   })()}
                               >
-                                  {notificationProfile.recipient.name}
+                                  {notificationProfile.recipients?.[0].name}
                               </Link>,
                           ],
                       },

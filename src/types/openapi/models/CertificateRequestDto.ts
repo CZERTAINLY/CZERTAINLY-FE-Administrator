@@ -47,6 +47,12 @@ export interface CertificateRequestDto {
      */
     signatureAlgorithm: string;
     /**
+     * Certificate alternative signature algorithm
+     * @type {string}
+     * @memberof CertificateRequestDto
+     */
+    altSignatureAlgorithm: string;
+    /**
      * Certificate request content
      * @type {string}
      * @memberof CertificateRequestDto
@@ -83,11 +89,23 @@ export interface CertificateRequestDto {
      */
     signatureAttributes?: Array<ResponseAttributeDto>;
     /**
+     * Alternative Signature Attributes
+     * @type {Array<ResponseAttributeDto>}
+     * @memberof CertificateRequestDto
+     */
+    altSignatureAttributes?: Array<ResponseAttributeDto>;
+    /**
      * UUID of the Key
      * @type {string}
      * @memberof CertificateRequestDto
      */
     keyUuid?: string;
+    /**
+     * UUID of the Alternative Key
+     * @type {string}
+     * @memberof CertificateRequestDto
+     */
+    altKeyUuid?: string;
 }
 
 
