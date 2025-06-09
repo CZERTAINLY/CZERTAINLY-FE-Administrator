@@ -53,7 +53,7 @@ const EventsTable = ({ mode, resource, resourceUuid, widgetLocks }: Props) => {
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const resourceEventEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ResourceEvent));
 
-    const [isAddAssociationOpen, setIsTriggersDialogOpen] = useState(false);
+    const [isTriggersDialogOpen, setIsTriggersDialogOpen] = useState(false);
     const [editedEvent, setEditedEvent] = useState<ResourceEvent | null>(null);
 
     const isBusy = useMemo(
@@ -302,7 +302,7 @@ const EventsTable = ({ mode, resource, resourceUuid, widgetLocks }: Props) => {
                 <CustomTable headers={headers} data={dataRows} />
             </Widget>
             <Dialog
-                isOpen={isAddAssociationOpen}
+                isOpen={isTriggersDialogOpen}
                 caption={textContent.dialogTitle}
                 size="xl"
                 body={
