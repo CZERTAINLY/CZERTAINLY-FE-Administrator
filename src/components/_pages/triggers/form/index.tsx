@@ -50,15 +50,16 @@ const TriggerForm = () => {
     const navigate = useNavigate();
     const title = 'Create Trigger';
 
-    const ruleTriggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.TriggerType));
     const actionsList = useSelector(rulesSelectors.actionsList);
     const allResourceEvents = useSelector(resourceSelectors.allResourceEvents);
     const rules = useSelector(rulesSelectors.rules);
     const isCreatingTrigger = useSelector(rulesSelectors.isCreatingTrigger);
-    const isBusy = useMemo(() => isCreatingTrigger, [isCreatingTrigger]);
 
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const resourceEventEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ResourceEvent));
+    const ruleTriggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.TriggerType));
+
+    const isBusy = useMemo(() => isCreatingTrigger, [isCreatingTrigger]);
 
     const getResourceEventNameOptions = useCallback(
         (resource?: Resource) => {
