@@ -12,7 +12,6 @@ import { Link } from 'react-router';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { useHasEventsResourceOptions } from 'utils/rules';
-import BooleanBadge from 'components/BooleanBadge/BooleanBadge';
 
 const EventsList = () => {
     const dispatch = useDispatch();

@@ -1,4 +1,4 @@
-import { combineLatest, iif, of } from 'rxjs';
+import { of } from 'rxjs';
 import { catchError, filter, switchMap } from 'rxjs/operators';
 
 import { AppEpic } from 'ducks';
@@ -8,7 +8,7 @@ import { actions as appRedirectActions } from './app-redirect';
 
 import * as slice from './rules';
 import {
-    tranformExecutionRequestModelToDto,
+    transformExecutionRequestModelToDto,
     transformActionDetailDtoToModel,
     transformActionDtoToModel,
     transformActionRequestModelToDto,
@@ -29,7 +29,6 @@ import {
     transformUpdateRuleRequestModelToDto,
     transformUpdateTriggerRequestModelToDto,
 } from './transform/rules';
-import { Resource } from 'types/openapi';
 
 const listRules: AppEpic = (action$, state, deps) => {
     return action$.pipe(
@@ -142,7 +141,7 @@ const createExecution: AppEpic = (action$, state, deps) => {
         switchMap((action) =>
             deps.apiClients.actions
                 .createExecution({
-                    executionRequestDto: tranformExecutionRequestModelToDto(action.payload.executionRequestModel),
+                    executionRequestDto: transformExecutionRequestModelToDto(action.payload.executionRequestModel),
                 })
                 .pipe(
                     switchMap((execution) =>

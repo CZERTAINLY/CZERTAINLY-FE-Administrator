@@ -300,7 +300,7 @@ const TriggerForm = () => {
                                             inputId="eventSelect"
                                             maxMenuHeight={140}
                                             menuPlacement="auto"
-                                            options={getResourceEventNameOptions(values.resource) || []}
+                                            options={getResourceEventNameOptions(values.resource) ?? []}
                                             placeholder="Select Event"
                                             onChange={(event) => {
                                                 if (!event?.value) return;

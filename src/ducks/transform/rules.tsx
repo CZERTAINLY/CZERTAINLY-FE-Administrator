@@ -101,7 +101,7 @@ export function transformUpdateExecutionRequestModelToDto(
     };
 }
 
-export function tranformExecutionRequestModelToDto(executionRequestModel: ExecutionRequestModel): ExecutionRequestDto {
+export function transformExecutionRequestModelToDto(executionRequestModel: ExecutionRequestModel): ExecutionRequestDto {
     return {
         ...executionRequestModel,
         items: executionRequestModel.items.map(transformExecutionItemRequestModelToDto),

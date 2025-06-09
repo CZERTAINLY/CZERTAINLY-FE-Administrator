@@ -15,7 +15,6 @@ import { Container } from 'reactstrap';
 import { PlatformEnum, ResourceEvent } from 'types/openapi';
 import { EventSettingsDto } from 'types/settings';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import BooleanBadge from 'components/BooleanBadge/BooleanBadge';
 import { TriggerDto } from 'types/rules';
 
 export default function EventDetail() {

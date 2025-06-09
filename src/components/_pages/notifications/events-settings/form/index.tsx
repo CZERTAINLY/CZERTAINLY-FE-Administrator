@@ -74,8 +74,8 @@ export default function EventForm() {
                 value: eventSettings.event,
             },
             resource: {
-                label: getEnumLabel(resourceEnum, resource || Resource.None),
-                value: resource || Resource.None,
+                label: getEnumLabel(resourceEnum, resource ?? Resource.None),
+                value: resource ?? Resource.None,
             },
 
             triggers: eventSettings.triggerUuids ?? [],
@@ -116,7 +116,7 @@ export default function EventForm() {
     return (
         <Widget title={'Edit Event'} busy={isBusy} widgetLockName={LockWidgetNameEnum.EventSettings}>
             <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
-                {({ handleSubmit, pristine, submitting, values, valid, form }) => {
+                {({ handleSubmit, submitting, values, form }) => {
                     return (
                         <BootstrapForm onSubmit={handleSubmit}>
                             <CustomSelect label="Event Name" id="name" isDisabled value={values.event} />

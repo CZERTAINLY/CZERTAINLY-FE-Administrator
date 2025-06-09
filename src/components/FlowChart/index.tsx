@@ -219,6 +219,8 @@ const FlowChartContent = ({
             // TODO : Implement another separate plotting function for already created flowchart
             layoutedElements = getLayoutedElements(flowChartNodes, flowChartEdges, flowDirection);
         } catch (e) {
+            // TODO: Prevent the const assignment error from happening
+            console.log(e);
             layoutedElements = undefined;
         }
 

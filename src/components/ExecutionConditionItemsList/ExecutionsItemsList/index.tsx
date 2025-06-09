@@ -98,7 +98,7 @@ const ExecutionsItemsList = ({
                       : '';
 
             return (
-                <Badge className={styles.groupConditionBadge} key={i}>
+                <Badge className={styles.groupConditionBadge} key={i.toString() + label + value}>
                     <>
                         <b>{f?.fieldSource && getEnumLabel(searchGroupEnum, f?.fieldSource)}&nbsp;</b>'{label}
                         '&nbsp;to&nbsp;
@@ -113,7 +113,7 @@ const ExecutionsItemsList = ({
         if (!executionItems) return null;
         return executionItems.map((f, i) => {
             return (
-                <Badge className={styles.groupConditionBadge} key={i}>
+                <Badge className={styles.groupConditionBadge} key={i.toString() + f.notificationProfileUuid}>
                     <span>Send notifications to:&nbsp;</span>
                     <b>{f.notificationProfileName}&nbsp;</b>
                 </Badge>
@@ -183,7 +183,7 @@ const ExecutionsItemsList = ({
                       : '';
 
             return (
-                <div key={i} className="mt-2 me-1">
+                <div key={i.toString() + label + value} className="mt-2 me-1">
                     <span className={styles.groupSmallerBadge}>
                         <b>{f?.fieldSource && getEnumLabel(searchGroupEnum, f?.fieldSource)}&nbsp;</b>'{label}
                         '&nbsp;to&nbsp;
