@@ -1,6 +1,6 @@
 import Spinner from 'components/Spinner';
 import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from 'ducks/utilsActuator';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button } from 'reactstrap';
 import { transformParseCertificateResponseDtoToAsn1String } from '../../../../ducks/transform/utilsCertificate';
@@ -29,10 +29,14 @@ export default function Asn1Dialog({ content, isCSR }: Props) {
 
     const health = useSelector(utilsActuatorSelectors.health);
 
-    useEffect(() => {
+    const resetParsedData = useCallback(() => {
         dispatch(utilsCertificateActions.reset());
         dispatch(utilsCertificateRequestActions.reset());
     }, [dispatch]);
+
+    useEffect(() => {
+        resetParsedData();
+    }, [resetParsedData]);
 
     useEffect(() => {
         if (!health) {
@@ -51,6 +55,11 @@ export default function Asn1Dialog({ content, isCSR }: Props) {
             setAsn1(transformParseRequestResponseDtoToCertificateResponseDetailModelToAsn1String(parsedCertificateRequest));
         }
     }, [parsedCertificateRequest, isCSR]);
+
+    const onClose = useCallback(() => {
+        resetParsedData();
+        setAsn1(undefined);
+    }, [resetParsedData]);
 
     return (
         <>
@@ -88,8 +97,8 @@ export default function Asn1Dialog({ content, isCSR }: Props) {
                 size={'lg'}
                 caption="ASN.1 Structure"
                 body={<pre>{asn1}</pre>}
-                toggle={() => setAsn1(undefined)}
-                buttons={[{ color: 'primary', onClick: () => setAsn1(undefined), body: 'Close' }]}
+                toggle={onClose}
+                buttons={[{ color: 'primary', onClick: onClose, body: 'Close' }]}
             />
         </>
     );
