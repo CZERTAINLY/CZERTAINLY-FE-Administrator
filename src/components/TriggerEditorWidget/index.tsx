@@ -10,6 +10,7 @@ import { Resource, TriggerDto, PlatformEnum, ResourceEvent } from 'types/openapi
 
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import { Button } from 'reactstrap';
+import BooleanBadge from 'components/BooleanBadge/BooleanBadge';
 
 type OptionType = {
     label: string;
@@ -53,6 +54,17 @@ export default function TriggerEditorWidget({ resource, event, selectedTriggers,
         dispatch(rulesActions.listTriggers({ resource }));
     }, [dispatch, resource]);
 
+    const sortTriggersByIgnoreTriggerValue = useCallback(
+        (selectedTriggers: string[]) =>
+            [...selectedTriggers].sort((a, b) => {
+                const triggerA = triggers.find((t) => t.uuid === a);
+                const triggerB = triggers.find((t) => t.uuid === b);
+                if (!triggerA || !triggerB) return 0;
+                if (triggerA.ignoreTrigger === triggerB.ignoreTrigger) return 0;
+                return triggerA.ignoreTrigger ? -1 : 1;
+            }),
+        [triggers],
+    );
     const onAddTrigger = useCallback(
         (newValues: OptionType[]) => {
             const previousTriggers = selectedTriggers;
@@ -63,16 +75,18 @@ export default function TriggerEditorWidget({ resource, event, selectedTriggers,
                     (el) => el?.uuid,
                 ),
             ];
-            onSelectedTriggersChange(allTriggers);
+            onSelectedTriggersChange(sortTriggersByIgnoreTriggerValue(allTriggers));
         },
-        [triggers, selectedTriggers, onSelectedTriggersChange],
+        [triggers, selectedTriggers, onSelectedTriggersChange, sortTriggersByIgnoreTriggerValue],
     );
 
     const onDeleteTrigger = useCallback(
         (trigger: TriggerDto) => {
-            onSelectedTriggersChange(selectedTriggers.filter((selectedTrigger) => selectedTrigger !== trigger.uuid));
+            onSelectedTriggersChange(
+                sortTriggersByIgnoreTriggerValue(selectedTriggers.filter((selectedTrigger) => selectedTrigger !== trigger.uuid)),
+            );
         },
-        [selectedTriggers, onSelectedTriggersChange],
+        [selectedTriggers, onSelectedTriggersChange, sortTriggersByIgnoreTriggerValue],
     );
     const onMoveTriggerUp = useCallback(
         (trigger: TriggerDto) => {
@@ -82,9 +96,9 @@ export default function TriggerEditorWidget({ resource, event, selectedTriggers,
             const temp = newSelectedTriggers[index];
             newSelectedTriggers[index] = newSelectedTriggers[index - 1];
             newSelectedTriggers[index - 1] = temp;
-            onSelectedTriggersChange(newSelectedTriggers);
+            onSelectedTriggersChange(sortTriggersByIgnoreTriggerValue(newSelectedTriggers));
         },
-        [selectedTriggers, onSelectedTriggersChange],
+        [selectedTriggers, onSelectedTriggersChange, sortTriggersByIgnoreTriggerValue],
     );
 
     const onMoveTriggerDown = useCallback(
@@ -95,9 +109,9 @@ export default function TriggerEditorWidget({ resource, event, selectedTriggers,
             const temp = newSelectedTriggers[index];
             newSelectedTriggers[index] = newSelectedTriggers[index + 1];
             newSelectedTriggers[index + 1] = temp;
-            onSelectedTriggersChange(newSelectedTriggers);
+            onSelectedTriggersChange(sortTriggersByIgnoreTriggerValue(newSelectedTriggers));
         },
-        [selectedTriggers, onSelectedTriggersChange],
+        [selectedTriggers, onSelectedTriggersChange, sortTriggersByIgnoreTriggerValue],
     );
 
     const triggerHeaders: TableHeader[] = [
@@ -108,6 +122,11 @@ export default function TriggerEditorWidget({ resource, event, selectedTriggers,
         {
             id: 'triggerType',
             content: 'Trigger Type',
+        },
+        {
+            id: 'ignoreTrigger',
+            content: 'Ignore Trigger',
+            align: 'center',
         },
         {
             id: 'eventName',
@@ -136,48 +155,58 @@ export default function TriggerEditorWidget({ resource, event, selectedTriggers,
                     selectedTriggers.findIndex((selectedTrigger) => selectedTrigger === b.uuid),
             );
 
-        return triggerDataListOrderedAsPerSelectedTriggers.map((trigger, i) => ({
-            id: trigger.uuid,
-            columns: [
-                <Link key="name" to={`../../triggers/detail/${trigger.uuid}`}>
-                    {trigger.name}
-                </Link>,
-                getEnumLabel(triggerTypeEnum, trigger.type ?? ''),
-                getEnumLabel(eventNameEnum, trigger.event ?? ''),
-                getEnumLabel(resourceTypeEnum, trigger.resource ?? ''),
-                trigger.description ?? '',
-                <div key="actions" className="d-flex">
-                    <Button
-                        className="btn btn-link text-danger"
-                        size="sm"
-                        color="danger"
-                        title="Delete Condition Group"
-                        onClick={() => onDeleteTrigger(trigger)}
-                    >
-                        <i className="fa fa-trash" />
-                    </Button>
-                    <Button
-                        className="btn btn-link"
-                        size="sm"
-                        title="Move Trigger Up"
-                        disabled={i === 0}
-                        onClick={() => onMoveTriggerUp(trigger)}
-                    >
-                        <i className="fa fa-arrow-up" />
-                    </Button>
+        const ignoreTriggerIndexTransition = triggerDataListOrderedAsPerSelectedTriggers.findIndex((el) => !el.ignoreTrigger) - 1;
 
-                    <Button
-                        className="btn btn-link"
-                        size="sm"
-                        title="Move Trigger Down"
-                        disabled={i === selectedTriggers.length - 1}
-                        onClick={() => onMoveTriggerDown(trigger)}
-                    >
-                        <i className="fa fa-arrow-down" />
-                    </Button>
-                </div>,
-            ],
-        }));
+        return triggerDataListOrderedAsPerSelectedTriggers.map((trigger, i, arr) => {
+            const moveUpDisabled = i === 0 || i === ignoreTriggerIndexTransition + 1;
+            const moveDownDisabled = i === arr.length - 1 || i === ignoreTriggerIndexTransition;
+            return {
+                id: trigger.uuid,
+                options: {
+                    useAccentBottomBorder: i === ignoreTriggerIndexTransition,
+                },
+                columns: [
+                    <Link key="name" to={`../../triggers/detail/${trigger.uuid}`}>
+                        {trigger.name}
+                    </Link>,
+                    getEnumLabel(triggerTypeEnum, trigger.type ?? ''),
+                    <BooleanBadge key="ignoreTrigger" value={trigger.ignoreTrigger} />,
+                    getEnumLabel(eventNameEnum, trigger.event ?? ''),
+                    getEnumLabel(resourceTypeEnum, trigger.resource ?? ''),
+                    trigger.description ?? '',
+                    <div key="actions" className="d-flex">
+                        <Button
+                            className="btn btn-link text-danger"
+                            size="sm"
+                            color="danger"
+                            title="Delete Condition Group"
+                            onClick={() => onDeleteTrigger(trigger)}
+                        >
+                            <i className="fa fa-trash" />
+                        </Button>
+                        <Button
+                            className="btn btn-link"
+                            size="sm"
+                            title="Move Trigger Up"
+                            disabled={moveUpDisabled}
+                            onClick={() => onMoveTriggerUp(trigger)}
+                        >
+                            <i className="fa fa-arrow-up" />
+                        </Button>
+
+                        <Button
+                            className="btn btn-link"
+                            size="sm"
+                            title="Move Trigger Down"
+                            disabled={moveDownDisabled}
+                            onClick={() => onMoveTriggerDown(trigger)}
+                        >
+                            <i className="fa fa-arrow-down" />
+                        </Button>
+                    </div>,
+                ],
+            };
+        }) as TableDataRow[];
     }, [selectedTriggers, triggers, eventNameEnum, resourceTypeEnum, triggerTypeEnum, onDeleteTrigger, onMoveTriggerUp, onMoveTriggerDown]);
 
     return (

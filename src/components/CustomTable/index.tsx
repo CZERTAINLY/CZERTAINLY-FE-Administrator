@@ -20,6 +20,9 @@ export interface TableDataRow {
     id: number | string;
     columns: (string | JSX.Element | JSX.Element[])[];
     detailColumns?: (string | JSX.Element | JSX.Element[])[];
+    options?: {
+        useAccentBottomBorder?: boolean;
+    };
 }
 
 interface Props {
@@ -384,6 +387,15 @@ function CustomTable({
         ));
     }, [tblHeaders, hasCheckboxes, hasDetails, onColumnSortClick, hasAllCheckBox, multiSelect, checkAllChecked, onCheckAllCheckboxClick]);
 
+    const getRowStyle = useCallback((row: TableDataRow) => {
+        if (!row.options) return undefined;
+        const style: React.CSSProperties = {};
+        if (row.options.useAccentBottomBorder) {
+            Object.assign(style, { borderBottom: '2px solid gray' } as React.CSSProperties);
+        }
+        return style;
+    }, []);
+
     const body = useMemo(
         () =>
             tblData
@@ -403,6 +415,7 @@ function CustomTable({
                                       },
                                   }
                                 : {})}
+                            style={getRowStyle(row)}
                             data-id={row.id}
                         >
                             {!hasDetails ? (
@@ -485,6 +498,7 @@ function CustomTable({
             hasDetails,
             expandedRow,
             tblHeaders,
+            getRowStyle,
         ],
     );
 

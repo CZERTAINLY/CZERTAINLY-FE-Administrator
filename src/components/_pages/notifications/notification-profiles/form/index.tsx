@@ -35,7 +35,7 @@ interface OptionType {
 
 interface FormValues {
     name?: string;
-    recipient?: OptionType;
+    recipients?: OptionType[];
     recipientType?: OptionType;
     internalNotification?: boolean;
     description?: string;
@@ -87,6 +87,7 @@ export default function NotificationProfileForm() {
                     label: getEnumLabel(recipientTypeEnum, notificationProfile.recipientType),
                     value: notificationProfile.recipientType,
                 },
+                recipients: [],
                 internalNotification: notificationProfile.internalNotification,
                 description: notificationProfile.description,
                 frequency: notificationProfile.frequency ? getInputStringFromIso8601String(notificationProfile.frequency) : undefined,
@@ -114,6 +115,7 @@ export default function NotificationProfileForm() {
                     label: getEnumLabel(recipientTypeEnum, RecipientType.None),
                     value: RecipientType.None,
                 },
+                recipients: [],
                 internalNotification: false,
             };
         }
@@ -125,14 +127,14 @@ export default function NotificationProfileForm() {
 
     const onSubmit = useCallback(
         (values: FormValues) => {
-            const recipient = {
+            const recipients = {
                 recipientType: (values.recipientType?.value as RecipientType) ?? RecipientType.None,
             };
             switch (values.recipientType?.value) {
                 case RecipientType.User:
                 case RecipientType.Group:
                 case RecipientType.Role:
-                    Object.assign(recipient, { recipientUuid: values.recipient?.value });
+                    Object.assign(recipients, { recipientUuids: values.recipients?.map((recipient) => recipient.value) });
                     break;
             }
             const updateNotificationProfileRequest: NotificationProfileUpdateRequestModel = {
@@ -141,7 +143,7 @@ export default function NotificationProfileForm() {
                 repetitions: values.repetitions,
                 internalNotification: values.internalNotification ?? false,
                 notificationInstanceUuid: values.notificationInstance?.value,
-                ...recipient,
+                ...recipients,
             };
 
             if (editMode) {
@@ -314,34 +316,36 @@ function RecipientTypeFields() {
             case RecipientType.User:
                 props = {
                     options: users.map((user) => ({ label: user.username, value: user.uuid })),
-                    description: 'Selected User will be receiving the notifications.',
-                    placeholder: 'Select User',
+                    description: 'Selected Users will be receiving the notifications.',
+                    placeholder: 'Select Users',
                 };
                 break;
             case RecipientType.Group:
                 props = {
                     options: groups.map((group) => ({ label: group.name, value: group.uuid })),
-                    description: 'Users in the selected Group will be receiving the notifications.',
-                    placeholder: 'Select Group',
+                    description: 'Users in the selected Groups will be receiving the notifications.',
+                    placeholder: 'Select Groups',
                 };
                 break;
             case RecipientType.Role:
                 props = {
                     options: roles.map((roles) => ({ label: roles.name, value: roles.uuid })),
-                    description: 'Users with the selected Role will be receiving the notifications.',
-                    placeholder: 'Select Role',
+                    description: 'Users with the selected Roles will be receiving the notifications.',
+                    placeholder: 'Select Roles',
                 };
                 break;
         }
         if (!props) return null;
         return (
-            <Field name="recipient" validate={validateRequired()}>
+            <Field name="recipients" validate={validateRequired()}>
                 {({ input, meta }) => (
                     <CustomSelect
                         {...input}
-                        label="Notification Recipient"
-                        onChange={(e) => form.change('recipient', e as OptionType)}
-                        error={meta.error && meta.touched && 'Recipient is required'}
+                        label="Notification Recipients"
+                        onChange={(e) => form.change('recipients', e as OptionType[])}
+                        error={meta.error && meta.touched && 'At least one recipient is required'}
+                        closeMenuOnSelect={false}
+                        isMulti
                         required
                         {...props}
                     />
@@ -361,6 +365,7 @@ function RecipientTypeFields() {
                 value={formState.values.recipientType}
                 onChange={(e) => {
                     form.change('recipientType', e as OptionType);
+                    form.change('recipients');
                     form.resetFieldState('notificationInstance');
                     switch ((e as OptionType).value) {
                         case RecipientType.None:
