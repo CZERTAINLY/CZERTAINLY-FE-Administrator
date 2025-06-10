@@ -1,5 +1,5 @@
 import { AppEpic } from 'ducks';
-import { of } from 'rxjs';
+import { iif, of } from 'rxjs';
 import { catchError, filter, map, switchMap } from 'rxjs/operators';
 import { extractError } from 'utils/net';
 import { slice } from './resource';
@@ -34,11 +34,15 @@ const listAllResourceEvents: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.listAllResourceEvents.match),
         switchMap(() =>
-            deps.apiClients.resources.listAllResourceEvents().pipe(
-                switchMap((mappedEvents) => of(slice.actions.listAllResourceEventsSuccess({ mappedEvents }))),
-                catchError((err) =>
-                    of(slice.actions.listAllResourceEventsFailure({ error: extractError(err, 'Failed to get resource events') })),
+            iif(
+                () => state.value.resource.allResourceEvents.length === 0,
+                deps.apiClients.resources.listAllResourceEvents().pipe(
+                    switchMap((mappedEvents) => of(slice.actions.listAllResourceEventsSuccess({ mappedEvents }))),
+                    catchError((err) =>
+                        of(slice.actions.listAllResourceEventsFailure({ error: extractError(err, 'Failed to get resource events') })),
+                    ),
                 ),
+                of(slice.actions.listAllResourceEventsSuccess({})),
             ),
         ),
     );

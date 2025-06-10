@@ -5,8 +5,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Container } from 'reactstrap';
 import { Resource } from 'types/openapi';
 import NotificationInstanceList from '../notifications-instances';
-import EventsList from 'components/_pages/notifications/events-settings/list';
 import { useEffect } from 'react';
+import EventsTable from 'components/_pages/notifications/events-settings/EventsTable';
+import { LockWidgetNameEnum } from 'types/user-interface';
 
 const EventsSettings = () => {
     const dispatch = useDispatch();
@@ -23,7 +24,7 @@ const EventsSettings = () => {
                     {
                         title: 'Events',
                         disabled: !profile?.permissions.allowedListings.includes(Resource.Settings),
-                        content: <EventsList />,
+                        content: <EventsTable mode="platform" widgetLocks={[LockWidgetNameEnum.EventSettings]} />,
                     },
                     {
                         title: 'Notification Instances',

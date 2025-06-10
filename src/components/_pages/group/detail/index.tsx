@@ -13,6 +13,8 @@ import { Container } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
+import EventsTable from 'components/_pages/notifications/events-settings/EventsTable';
+import TabLayout from 'components/Layout/TabLayout';
 
 export default function GroupDetail() {
     const dispatch = useDispatch();
@@ -108,18 +110,50 @@ export default function GroupDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget
-                title="Group Details"
-                busy={isFetchingDetail}
-                widgetButtons={buttons}
-                titleSize="large"
-                refreshAction={getFreshGroupDetails}
-                widgetLockName={LockWidgetNameEnum.GroupDetails}
-            >
-                <CustomTable headers={detailHeaders} data={detailData} />
-            </Widget>
+            <TabLayout
+                tabs={[
+                    {
+                        title: 'Details',
+                        content: (
+                            <Widget>
+                                <Widget
+                                    title="Group Details"
+                                    busy={isFetchingDetail}
+                                    widgetButtons={buttons}
+                                    titleSize="large"
+                                    refreshAction={getFreshGroupDetails}
+                                    widgetLockName={LockWidgetNameEnum.GroupDetails}
+                                >
+                                    <CustomTable headers={detailHeaders} data={detailData} />
+                                </Widget>
 
-            {group && <CustomAttributeWidget resource={Resource.Groups} resourceUuid={group.uuid} attributes={group.customAttributes} />}
+                                {group && (
+                                    <CustomAttributeWidget
+                                        resource={Resource.Groups}
+                                        resourceUuid={group.uuid}
+                                        attributes={group.customAttributes}
+                                    />
+                                )}
+                            </Widget>
+                        ),
+                    },
+                    {
+                        title: 'Events',
+                        content: (
+                            <Widget>
+                                {group && (
+                                    <EventsTable
+                                        mode="association"
+                                        resource={Resource.Groups}
+                                        resourceUuid={group.uuid}
+                                        widgetLocks={[LockWidgetNameEnum.GroupDetails, LockWidgetNameEnum.EventSettings]}
+                                    />
+                                )}
+                            </Widget>
+                        ),
+                    },
+                ]}
+            />
 
             <Dialog
                 isOpen={confirmDelete}

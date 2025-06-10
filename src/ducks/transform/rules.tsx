@@ -49,6 +49,8 @@ import {
     TriggerDetailDto,
     TriggerDetailModel,
     TriggerDto,
+    TriggerEventAssociationRequestDto,
+    TriggerEventAssociationRequestModel,
     TriggerHistoryDto,
     TriggerHistoryModel,
     TriggerHistoryObjectSummaryDto,
@@ -261,6 +263,14 @@ export function transformTriggerHistorySummaryDtoToModel(triggerHistorySummaryDt
     return {
         ...triggerHistorySummaryDto,
         objects: triggerHistorySummaryDto.objects.map(transformTriggerHistoryObjectSummaryDtoToModel),
+    };
+}
+
+export function transformTriggerEventAssociationRequestModelToDto(
+    triggerEventAssociationRequestModel: TriggerEventAssociationRequestModel,
+): TriggerEventAssociationRequestDto {
+    return {
+        ...triggerEventAssociationRequestModel,
     };
 }
 
