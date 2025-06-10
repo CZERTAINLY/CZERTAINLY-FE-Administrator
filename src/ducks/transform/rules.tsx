@@ -16,7 +16,7 @@ import Select from 'react-select';
 import { Edge, MarkerType } from 'reactflow';
 import { FormGroup, Label } from 'reactstrap';
 import { OtherProperties } from 'types/flowchart';
-import { PlatformEnum, Resource, UpdateTriggerRequestDtoEventEnum } from 'types/openapi';
+import { PlatformEnum, Resource } from 'types/openapi';
 import {
     ActionDetailDto,
     ActionDetailModel,
@@ -49,6 +49,8 @@ import {
     TriggerDetailDto,
     TriggerDetailModel,
     TriggerDto,
+    TriggerEventAssociationRequestDto,
+    TriggerEventAssociationRequestModel,
     TriggerHistoryDto,
     TriggerHistoryModel,
     TriggerHistoryObjectSummaryDto,
@@ -101,7 +103,7 @@ export function transformUpdateExecutionRequestModelToDto(
     };
 }
 
-export function tranformExecutionRequestModelToDto(executionRequestModel: ExecutionRequestModel): ExecutionRequestDto {
+export function transformExecutionRequestModelToDto(executionRequestModel: ExecutionRequestModel): ExecutionRequestDto {
     return {
         ...executionRequestModel,
         items: executionRequestModel.items.map(transformExecutionItemRequestModelToDto),
@@ -264,6 +266,14 @@ export function transformTriggerHistorySummaryDtoToModel(triggerHistorySummaryDt
     };
 }
 
+export function transformTriggerEventAssociationRequestModelToDto(
+    triggerEventAssociationRequestModel: TriggerEventAssociationRequestModel,
+): TriggerEventAssociationRequestDto {
+    return {
+        ...triggerEventAssociationRequestModel,
+    };
+}
+
 interface SelectChangeValue {
     value: string;
     label: string;
@@ -375,9 +385,8 @@ export function useTransformTriggerObjectToNodesAndEdges(
                                         ignoreTrigger: allActionsUuids.length === 0 ? true : false,
                                         resource: triggerDetails.resource,
                                         type: triggerDetails.type,
-                                        eventResource: triggerDetails.eventResource,
                                         description: triggerDetails.description || '',
-                                        event: (triggerDetails.event as unknown as UpdateTriggerRequestDtoEventEnum) || undefined,
+                                        event: triggerDetails.event || undefined,
                                     },
                                 }),
                             );
@@ -417,8 +426,7 @@ export function useTransformTriggerObjectToNodesAndEdges(
                                             resource: triggerDetails.resource,
                                             type: triggerDetails.type,
                                             actionsUuids: [],
-                                            eventResource: triggerDetails.eventResource,
-                                            event: (triggerDetails.event as unknown as UpdateTriggerRequestDtoEventEnum) || undefined,
+                                            event: triggerDetails.event || undefined,
                                         },
                                     }),
                                 );
@@ -429,24 +437,18 @@ export function useTransformTriggerObjectToNodesAndEdges(
             </div>
         ),
     });
-    // }
 
     otherPropertiesCurrentCertificate.push({
         propertyName: 'Resource',
         propertyValue: getEnumLabel(resourceTypeEnum, triggerDetails.resource),
     });
 
-    if (triggerDetails?.eventResource) {
+    if (triggerDetails?.type) {
         otherPropertiesCurrentCertificate.push({
-            propertyName: 'Event Resource',
-            propertyValue: getEnumLabel(resourceTypeEnum, triggerDetails.eventResource),
+            propertyName: 'Type',
+            propertyValue: getEnumLabel(triggerTypeEnum, triggerDetails.type),
         });
     }
-
-    otherPropertiesCurrentCertificate.push({
-        propertyName: 'Type',
-        propertyValue: getEnumLabel(triggerTypeEnum, triggerDetails.type),
-    });
 
     if (triggerDetails?.event) {
         otherPropertiesCurrentCertificate.push({
@@ -507,9 +509,8 @@ export function useTransformTriggerObjectToNodesAndEdges(
                                         resource: triggerDetails.resource,
                                         type: triggerDetails.type,
                                         actionsUuids: triggerDetails?.actions.map((action) => action.uuid) || [],
-                                        eventResource: triggerDetails.eventResource,
                                         description: triggerDetails.description || '',
-                                        event: (triggerDetails.event as unknown as UpdateTriggerRequestDtoEventEnum) || undefined,
+                                        event: triggerDetails.event || undefined,
                                     },
                                 }),
                             );
@@ -652,9 +653,8 @@ export function useTransformTriggerObjectToNodesAndEdges(
                                         resource: triggerDetails.resource,
                                         type: triggerDetails.type,
                                         rulesUuids: triggerDetails?.rules.map((rule) => rule.uuid) || [],
-                                        eventResource: triggerDetails.eventResource,
                                         description: triggerDetails.description || '',
-                                        event: (triggerDetails.event as unknown as UpdateTriggerRequestDtoEventEnum) || undefined,
+                                        event: triggerDetails.event || undefined,
                                     },
                                 }),
                             );
@@ -745,6 +745,7 @@ export function useTransformTriggerObjectToNodesAndEdges(
                                             executionItems={execution.items}
                                             key={execution.uuid}
                                             executionName={execution.name}
+                                            executionType={execution.type}
                                             executionUuid={execution.uuid}
                                             smallerBadges
                                         />

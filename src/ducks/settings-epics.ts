@@ -1,6 +1,6 @@
 import { AnyAction } from '@reduxjs/toolkit';
 import { AppEpic } from 'ducks';
-import { of } from 'rxjs';
+import { iif, of } from 'rxjs';
 import { catchError, filter, mergeMap, switchMap } from 'rxjs/operators';
 
 import { LockWidgetNameEnum } from 'types/user-interface';
@@ -67,18 +67,18 @@ const updatePlatformSettings: AppEpic = (action$, state$, deps) => {
     );
 };
 
-const getNotificationsSettings: AppEpic = (action$, state$, deps) => {
+const getEventsSettings: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
-        filter(slice.actions.getNotificationsSettings.match),
+        filter(slice.actions.getEventsSettings.match),
         switchMap(() =>
-            deps.apiClients.settings.getNotificationsSettings().pipe(
-                switchMap((notificationsSettings) => {
-                    return of(slice.actions.getNotificationsSettingsSuccess(notificationsSettings));
+            deps.apiClients.settings.getEventsSettings().pipe(
+                switchMap((eventsSettings) => {
+                    return of(slice.actions.getEventsSettingsSuccess(eventsSettings));
                 }),
                 catchError((err) =>
                     of(
-                        slice.actions.getNotificationsSettingsFailure({ error: extractError(err, 'Failed to get notifications settings') }),
-                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.NotificationSettings),
+                        slice.actions.getEventsSettingsFailure({ error: extractError(err, 'Failed to get events settings') }),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.EventSettings),
                     ),
                 ),
             ),
@@ -86,23 +86,31 @@ const getNotificationsSettings: AppEpic = (action$, state$, deps) => {
     );
 };
 
-const updateNotificationsSettings: AppEpic = (action$, state$, deps) => {
+const updateEventSettings: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
-        filter(slice.actions.updateNotificationsSettings.match),
+        filter(slice.actions.updateEventSettings.match),
         switchMap((action) =>
-            deps.apiClients.settings.updateNotificationsSettings({ notificationSettingsDto: action.payload }).pipe(
-                mergeMap(() => {
-                    return of(
-                        slice.actions.updateNotificationsSettingsSuccess(action.payload),
-                        alertActions.success('Notifications settings updated successfully.'),
-                    );
-                }),
+            deps.apiClients.settings.updateEventSettings({ eventSettingsDto: action.payload.eventSettings }).pipe(
+                mergeMap(() =>
+                    iif(
+                        () => !!action.payload.redirect,
+                        of(
+                            slice.actions.updateEventSettingsSuccess(action.payload),
+                            alertActions.success('Event settings updated successfully.'),
+                            appRedirectActions.redirect({ url: action.payload.redirect! }),
+                        ),
+                        of(
+                            slice.actions.updateEventSettingsSuccess(action.payload),
+                            alertActions.success('Event settings updated successfully.'),
+                        ),
+                    ),
+                ),
                 catchError((err) =>
                     of(
-                        slice.actions.updateNotificationsSettingsFailure({
-                            error: extractError(err, 'Failed to update notifications settings'),
+                        slice.actions.updateEventSettingsFailure({
+                            error: extractError(err, 'Failed to update event settings'),
                         }),
-                        appRedirectActions.fetchError({ error: err, message: 'Failed to update notifications settings' }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to update event settings' }),
                     ),
                 ),
             ),
@@ -165,8 +173,8 @@ const updateLoggingSettings: AppEpic = (action$, state$, deps) => {
 const epics = [
     getPlatformSettings,
     updatePlatformSettings,
-    getNotificationsSettings,
-    updateNotificationsSettings,
+    getEventsSettings,
+    updateEventSettings,
     getLoggingSettings,
     updateLoggingSettings,
 ];

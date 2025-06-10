@@ -13,7 +13,7 @@
 
 import type {
     NameAndUuidDto,
-    RecipientDto,
+    RecipientType,
 } from './';
 
 /**
@@ -46,11 +46,17 @@ export interface NotificationProfileDetailDto {
      */
     version: number;
     /**
-     * Recipient info
-     * @type {RecipientDto}
+     * Recipient type of notifications produced by profile
+     * @type {RecipientType}
      * @memberof NotificationProfileDetailDto
      */
-    recipient: RecipientDto;
+    recipientType: RecipientType;
+    /**
+     * Recipients info
+     * @type {Array<NameAndUuidDto>}
+     * @memberof NotificationProfileDetailDto
+     */
+    recipients?: Array<NameAndUuidDto>;
     /**
      * Notification instance info
      * @type {NameAndUuidDto}
@@ -76,3 +82,5 @@ export interface NotificationProfileDetailDto {
      */
     repetitions?: number;
 }
+
+

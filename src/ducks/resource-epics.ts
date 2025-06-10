@@ -1,5 +1,5 @@
 import { AppEpic } from 'ducks';
-import { of } from 'rxjs';
+import { iif, of } from 'rxjs';
 import { catchError, filter, map, switchMap } from 'rxjs/operators';
 import { extractError } from 'utils/net';
 import { slice } from './resource';
@@ -9,7 +9,7 @@ const listResources: AppEpic = (action$, state$, deps) => {
         filter(slice.actions.listResources.match),
         switchMap(() =>
             deps.apiClients.resources.listResources().pipe(
-                map((resources) => slice.actions.listResourcesSuccess({ resourceslist: resources })),
+                map((resources) => slice.actions.listResourcesSuccess({ resourcesList: resources })),
                 catchError((err) => of(slice.actions.listResourcesFailure({ error: extractError(err, 'Failed to get resources list') }))),
             ),
         ),
@@ -30,6 +30,24 @@ const listResourceEvents: AppEpic = (action$, state, deps) => {
     );
 };
 
-const epics = [listResources, listResourceEvents];
+const listAllResourceEvents: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.listAllResourceEvents.match),
+        switchMap(() =>
+            iif(
+                () => state.value.resource.allResourceEvents.length === 0,
+                deps.apiClients.resources.listAllResourceEvents().pipe(
+                    switchMap((mappedEvents) => of(slice.actions.listAllResourceEventsSuccess({ mappedEvents }))),
+                    catchError((err) =>
+                        of(slice.actions.listAllResourceEventsFailure({ error: extractError(err, 'Failed to get resource events') })),
+                    ),
+                ),
+                of(slice.actions.listAllResourceEventsSuccess({})),
+            ),
+        ),
+    );
+};
+
+const epics = [listResources, listResourceEvents, listAllResourceEvents];
 
 export default epics;

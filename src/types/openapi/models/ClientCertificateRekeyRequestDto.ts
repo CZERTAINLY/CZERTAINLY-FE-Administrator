@@ -52,11 +52,29 @@ export interface ClientCertificateRekeyRequestDto {
      */
     tokenProfileUuid?: string;
     /**
+     * Alternative Key UUID
+     * @type {string}
+     * @memberof ClientCertificateRekeyRequestDto
+     */
+    altKeyUuid?: string;
+    /**
+     * Token Profile UUID for the alternative key
+     * @type {string}
+     * @memberof ClientCertificateRekeyRequestDto
+     */
+    altTokenProfileUuid?: string;
+    /**
      * Signature Attributes. If not provided, existing attributes will be used to generate the new CSR
      * @type {Array<RequestAttributeDto>}
      * @memberof ClientCertificateRekeyRequestDto
      */
     signatureAttributes?: Array<RequestAttributeDto>;
+    /**
+     * Alternative Signature Attributes. If not provided, existing alternative attributes will be used to generate the new CSR
+     * @type {Array<RequestAttributeDto>}
+     * @memberof ClientCertificateRekeyRequestDto
+     */
+    altSignatureAttributes?: Array<RequestAttributeDto>;
 }
 
 

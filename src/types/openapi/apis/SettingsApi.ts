@@ -20,8 +20,9 @@ import type {
     AuthenticationSettingsDto,
     AuthenticationSettingsUpdateDto,
     ErrorMessageDto,
+    EventSettingsDto,
+    EventsSettingsDto,
     LoggingSettingsDto,
-    NotificationSettingsDto,
     OAuth2ProviderSettingsResponseDto,
     OAuth2ProviderSettingsUpdateDto,
     PlatformSettingsDto,
@@ -40,12 +41,16 @@ export interface UpdateAuthenticationSettingsRequest {
     authenticationSettingsUpdateDto: AuthenticationSettingsUpdateDto;
 }
 
-export interface UpdateLoggingSettingsRequest {
-    loggingSettingsDto: LoggingSettingsDto;
+export interface UpdateEventSettingsRequest {
+    eventSettingsDto: EventSettingsDto;
 }
 
-export interface UpdateNotificationsSettingsRequest {
-    notificationSettingsDto: NotificationSettingsDto;
+export interface UpdateEventsSettingsRequest {
+    eventsSettingsDto: EventsSettingsDto;
+}
+
+export interface UpdateLoggingSettingsRequest {
+    loggingSettingsDto: LoggingSettingsDto;
 }
 
 export interface UpdateOAuth2ProviderSettingsRequest {
@@ -75,6 +80,18 @@ export class SettingsApi extends BaseAPI {
     };
 
     /**
+     * Get events settings
+     */
+    getEventsSettings(): Observable<EventsSettingsDto>
+    getEventsSettings(opts?: OperationOpts): Observable<AjaxResponse<EventsSettingsDto>>
+    getEventsSettings(opts?: OperationOpts): Observable<EventsSettingsDto | AjaxResponse<EventsSettingsDto>> {
+        return this.request<EventsSettingsDto>({
+            url: '/v1/settings/events',
+            method: 'GET',
+        }, opts?.responseOpts);
+    };
+
+    /**
      * Get logging settings
      */
     getLoggingSettings(): Observable<LoggingSettingsDto>
@@ -82,18 +99,6 @@ export class SettingsApi extends BaseAPI {
     getLoggingSettings(opts?: OperationOpts): Observable<LoggingSettingsDto | AjaxResponse<LoggingSettingsDto>> {
         return this.request<LoggingSettingsDto>({
             url: '/v1/settings/logging',
-            method: 'GET',
-        }, opts?.responseOpts);
-    };
-
-    /**
-     * Get notification settings
-     */
-    getNotificationsSettings(): Observable<NotificationSettingsDto>
-    getNotificationsSettings(opts?: OperationOpts): Observable<AjaxResponse<NotificationSettingsDto>>
-    getNotificationsSettings(opts?: OperationOpts): Observable<NotificationSettingsDto | AjaxResponse<NotificationSettingsDto>> {
-        return this.request<NotificationSettingsDto>({
-            url: '/v1/settings/notifications',
             method: 'GET',
         }, opts?.responseOpts);
     };
@@ -159,7 +164,47 @@ export class SettingsApi extends BaseAPI {
     };
 
     /**
-     * Update logging setting
+     * Update single event settings
+     */
+    updateEventSettings({ eventSettingsDto }: UpdateEventSettingsRequest): Observable<void>
+    updateEventSettings({ eventSettingsDto }: UpdateEventSettingsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    updateEventSettings({ eventSettingsDto }: UpdateEventSettingsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(eventSettingsDto, 'eventSettingsDto', 'updateEventSettings');
+
+        const headers: HttpHeaders = {
+            'Content-Type': 'application/json',
+        };
+
+        return this.request<void>({
+            url: '/v1/settings/events',
+            method: 'PATCH',
+            headers,
+            body: eventSettingsDto,
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * Update multiple events settings
+     */
+    updateEventsSettings({ eventsSettingsDto }: UpdateEventsSettingsRequest): Observable<void>
+    updateEventsSettings({ eventsSettingsDto }: UpdateEventsSettingsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    updateEventsSettings({ eventsSettingsDto }: UpdateEventsSettingsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(eventsSettingsDto, 'eventsSettingsDto', 'updateEventsSettings');
+
+        const headers: HttpHeaders = {
+            'Content-Type': 'application/json',
+        };
+
+        return this.request<void>({
+            url: '/v1/settings/events',
+            method: 'PUT',
+            headers,
+            body: eventsSettingsDto,
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * Update logging settings
      */
     updateLoggingSettings({ loggingSettingsDto }: UpdateLoggingSettingsRequest): Observable<void>
     updateLoggingSettings({ loggingSettingsDto }: UpdateLoggingSettingsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
@@ -175,26 +220,6 @@ export class SettingsApi extends BaseAPI {
             method: 'PUT',
             headers,
             body: loggingSettingsDto,
-        }, opts?.responseOpts);
-    };
-
-    /**
-     * Update notifications setting
-     */
-    updateNotificationsSettings({ notificationSettingsDto }: UpdateNotificationsSettingsRequest): Observable<void>
-    updateNotificationsSettings({ notificationSettingsDto }: UpdateNotificationsSettingsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    updateNotificationsSettings({ notificationSettingsDto }: UpdateNotificationsSettingsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(notificationSettingsDto, 'notificationSettingsDto', 'updateNotificationsSettings');
-
-        const headers: HttpHeaders = {
-            'Content-Type': 'application/json',
-        };
-
-        return this.request<void>({
-            url: '/v1/settings/notifications',
-            method: 'PUT',
-            headers,
-            body: notificationSettingsDto,
         }, opts?.responseOpts);
     };
 
@@ -220,7 +245,7 @@ export class SettingsApi extends BaseAPI {
     };
 
     /**
-     * Update platform setting
+     * Update platform settings
      */
     updatePlatformSettings({ platformSettingsUpdateDto }: UpdatePlatformSettingsRequest): Observable<void>
     updatePlatformSettings({ platformSettingsUpdateDto }: UpdatePlatformSettingsRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>

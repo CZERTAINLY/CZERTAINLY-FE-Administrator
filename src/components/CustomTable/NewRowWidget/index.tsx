@@ -12,19 +12,19 @@ export interface NewRowWidgetProps {
     newItemsList: SelectChangeValue[];
     isBusy: boolean;
     onAddClick: (newValues: SelectChangeValue[]) => void;
-    immidiateAdd?: boolean;
+    immediateAdd?: boolean;
     selectHint?: string;
 }
 
-const NewRowWidget = ({ newItemsList, isBusy, onAddClick, immidiateAdd, selectHint }: NewRowWidgetProps) => {
+const NewRowWidget = ({ newItemsList, isBusy, onAddClick, immediateAdd, selectHint }: NewRowWidgetProps) => {
     const [selectedItems, setSelectedItems] = useState<SelectChangeValue[]>([]);
 
     useEffect(() => {
-        if (immidiateAdd && selectedItems.length) {
+        if (immediateAdd && selectedItems.length) {
             onAddClick(selectedItems);
             setSelectedItems([]);
         }
-    }, [immidiateAdd, selectedItems, onAddClick]);
+    }, [immediateAdd, selectedItems, onAddClick]);
 
     return (
         <div className="d-flex">
@@ -40,7 +40,7 @@ const NewRowWidget = ({ newItemsList, isBusy, onAddClick, immidiateAdd, selectHi
                 />
             </div>
             <div>
-                {selectedItems?.length && !immidiateAdd ? (
+                {selectedItems?.length && !immediateAdd ? (
                     <ButtonGroup>
                         <Button
                             disabled={isBusy}

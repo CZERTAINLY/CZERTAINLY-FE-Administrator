@@ -26,6 +26,7 @@ import TabLayout from 'components/Layout/TabLayout';
 import CertificateValidationDialogBody from 'components/_pages/ra-profiles/CertificateValidationDialogBody';
 import SwitchWidget from 'components/SwitchWidget';
 import { renderExpiringThresholdLabel, renderValidationFrequencyLabel } from 'utils/certificate-validation';
+import EventsTable from 'components/_pages/notifications/events-settings/EventsTable';
 
 interface DeassociateApprovalProfileDialogState {
     isDialogOpen: boolean;
@@ -1007,6 +1008,21 @@ export default function RaProfileDetail() {
                                 >
                                     <CustomTable headers={certificateValidationHeaders} data={certificateValidationData} />
                                 </Widget>
+                            </Widget>
+                        ),
+                    },
+                    {
+                        title: 'Events',
+                        content: (
+                            <Widget>
+                                {raProfile && (
+                                    <EventsTable
+                                        mode="association"
+                                        resource={Resource.RaProfiles}
+                                        resourceUuid={raProfile.uuid}
+                                        widgetLocks={[LockWidgetNameEnum.RaProfileDetails, LockWidgetNameEnum.EventSettings]}
+                                    />
+                                )}
                             </Widget>
                         ),
                     },

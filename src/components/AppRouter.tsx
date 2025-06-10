@@ -112,7 +112,7 @@ import UsersList from './_pages/users/list';
 import NotificationsList from './_pages/notifications/list';
 import NotificationInstanceDetail from './_pages/notifications/notification-instance-details';
 import NotificationInstanceForm from './_pages/notifications/notification-instance-form';
-import NotificationsSetting from './_pages/notifications/notifications-setting';
+import EventsSettings from './_pages/notifications/events-settings';
 
 import NotificationProfileDetail from './_pages/notifications/notification-profiles/detail';
 import NotificationProfileForm from './_pages/notifications/notification-profiles/form';
@@ -358,15 +358,15 @@ export default function AppRouter() {
                     <Route path={`/${Resource.Jobs.toLowerCase()}/detail/:id`} element={<SchedulerJobDetail />} />
 
                     <Route path={`/notifications`} element={<NotificationsList />} />
-                    <Route path={`/notificationssettings`} element={<NotificationsSetting />} />
+                    <Route path={`/events`} element={<EventsSettings />} />
                     <Route path={`/notificationinstances/detail/:id`} element={<NotificationInstanceDetail />} />
                     <Route path={`/notificationinstances/add`} element={<NotificationInstanceForm />} />
                     <Route path={`/notificationinstances/edit/:id`} element={<NotificationInstanceForm />} />
 
                     <Route path={`/notificationprofiles`} element={<NotificationProfilesList />} />
-                    <Route path={`/notificationprofiles/detail/:uuid/:version`} element={<NotificationProfileDetail />} />
+                    <Route path={`/notificationprofiles/detail/:id/:version`} element={<NotificationProfileDetail />} />
                     <Route path={`/notificationprofiles/add`} element={<NotificationProfileForm />} />
-                    <Route path={`/notificationprofiles/edit/:uuid/:version`} element={<NotificationProfileForm />} />
+                    <Route path={`/notificationprofiles/edit/:id/:version`} element={<NotificationProfileForm />} />
 
                     <Route path={`/loggingsettings`} element={<LoggingSettings />} />
 

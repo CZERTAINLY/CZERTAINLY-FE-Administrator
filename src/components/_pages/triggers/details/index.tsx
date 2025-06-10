@@ -15,7 +15,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 import { Edge } from 'reactflow';
 import { Button, ButtonGroup, Col, Container, Input, Row } from 'reactstrap';
-import { PlatformEnum, UpdateTriggerRequestDtoEventEnum } from 'types/openapi';
+import { PlatformEnum } from 'types/openapi';
 import { DeviceType, useDeviceType } from 'utils/common-hooks';
 import styles from './triggerDetails.module.scss';
 
@@ -127,8 +127,7 @@ const TriggerDetails = () => {
                         type: triggerDetails.type,
                         actionsUuids: triggerDetails?.actions.map((action) => action.uuid) || [],
                         rulesUuids: triggerDetails?.rules.map((rule) => rule.uuid) || [],
-                        eventResource: triggerDetails.eventResource,
-                        event: (triggerDetails.event as unknown as UpdateTriggerRequestDtoEventEnum) || undefined,
+                        event: triggerDetails.event,
                     },
                 }),
             );
@@ -153,9 +152,8 @@ const TriggerDetails = () => {
                         resource: triggerDetails.resource,
                         type: triggerDetails.type,
                         rulesUuids: triggerDetails?.rules.map((rule) => rule.uuid) || [],
-                        eventResource: triggerDetails.eventResource,
                         description: triggerDetails.description || '',
-                        event: (triggerDetails.event as unknown as UpdateTriggerRequestDtoEventEnum) || undefined,
+                        event: triggerDetails.event,
                     },
                 }),
             );
@@ -181,9 +179,8 @@ const TriggerDetails = () => {
                         resource: triggerDetails.resource,
                         type: triggerDetails.type,
                         actionsUuids: triggerDetails?.actions.map((action) => action.uuid) || [],
-                        eventResource: triggerDetails.eventResource,
                         description: triggerDetails.description || '',
-                        event: (triggerDetails.event as unknown as UpdateTriggerRequestDtoEventEnum) || undefined,
+                        event: triggerDetails.event,
                     },
                 }),
             );
@@ -206,8 +203,7 @@ const TriggerDetails = () => {
                         resource: triggerDetails.resource,
                         type: triggerDetails.type,
                         actionsUuids: updatedActionsUuid,
-                        eventResource: triggerDetails.eventResource,
-                        event: (triggerDetails.event as unknown as UpdateTriggerRequestDtoEventEnum) || undefined,
+                        event: triggerDetails.event,
                     },
                 }),
             );
@@ -231,8 +227,7 @@ const TriggerDetails = () => {
                         resource: triggerDetails.resource,
                         type: triggerDetails.type,
                         actionsUuids: triggerDetails?.actions.map((action) => action.uuid) || [],
-                        eventResource: triggerDetails.eventResource,
-                        event: (triggerDetails.event as unknown as UpdateTriggerRequestDtoEventEnum) || undefined,
+                        event: triggerDetails.event,
                     },
                 }),
             );
@@ -304,10 +299,7 @@ const TriggerDetails = () => {
                                                       resource: triggerDetails.resource,
                                                       type: triggerDetails.type,
                                                       actionsUuids: [],
-                                                      eventResource: triggerDetails.eventResource,
-                                                      event:
-                                                          (triggerDetails.event as unknown as UpdateTriggerRequestDtoEventEnum) ||
-                                                          undefined,
+                                                      event: triggerDetails.event,
                                                   },
                                               }),
                                           );
@@ -318,20 +310,12 @@ const TriggerDetails = () => {
                           ],
                       },
                       {
-                          id: 'eventResource',
-                          columns: [
-                              'Event Resource',
-                              triggerDetails?.eventResource ? getEnumLabel(resourceTypeEnum, triggerDetails.eventResource) : '',
-                              '',
-                          ],
-                      },
-                      {
                           id: 'triggerType',
-                          columns: ['Trigger Type', getEnumLabel(triggerTypeEnum, triggerDetails.type), ''],
+                          columns: ['Trigger Type', getEnumLabel(triggerTypeEnum, triggerDetails.type ?? ''), ''],
                       },
                       {
                           id: 'eventName',
-                          columns: ['Event Name', getEnumLabel(eventNameEnum, triggerDetails.event || ''), ''],
+                          columns: ['Event Name', getEnumLabel(eventNameEnum, triggerDetails.event ?? ''), ''],
                       },
                       {
                           id: 'resource',
@@ -348,7 +332,7 @@ const TriggerDetails = () => {
                                       placeholder="Enter Description"
                                   />
                               ) : (
-                                  triggerDetails.description || ''
+                                  (triggerDetails.description ?? '')
                               ),
                               <div>
                                   {updateDescriptionEditEnable ? (

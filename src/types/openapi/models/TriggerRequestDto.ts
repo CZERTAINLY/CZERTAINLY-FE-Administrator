@@ -13,6 +13,7 @@
 
 import type {
     Resource,
+    ResourceEvent,
     TriggerType,
 } from './';
 
@@ -53,10 +54,10 @@ export interface TriggerRequestDto {
     ignoreTrigger: boolean;
     /**
      * Event that trigger can be assigned to
-     * @type {string}
+     * @type {ResourceEvent}
      * @memberof TriggerRequestDto
      */
-    event?: TriggerRequestDtoEventEnum;
+    event?: ResourceEvent;
     /**
      * List of UUIDs of existing rules to add to the trigger
      * @type {Array<string>}
@@ -71,17 +72,4 @@ export interface TriggerRequestDto {
     actionsUuids?: Array<string>;
 }
 
-/**
- * @export
- * @enum {string}
- */
-export enum TriggerRequestDtoEventEnum {
-    CertificateStatusChanged = 'certificate_status_changed',
-    CertificateActionPerformed = 'certificate_action_performed',
-    CertificateDiscovered = 'certificate_discovered',
-    DiscoveryFinished = 'discovery_finished',
-    ApprovalRequested = 'approval_requested',
-    ApprovalClosed = 'approval_closed',
-    ScheduledJobFinished = 'scheduled_job_finished'
-}
 
