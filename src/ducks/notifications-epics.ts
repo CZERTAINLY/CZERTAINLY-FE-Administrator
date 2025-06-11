@@ -302,7 +302,7 @@ const deleteNotificationInstance: AppEpic = (action$, state$, deps) => {
                     of(
                         slice.actions.deleteNotificationInstanceSuccess({ uuid: action.payload.uuid }),
                         alertActions.success('Notifications Instance deleted successfully.'),
-                        appRedirectActions.redirect({ url: `../../../notificationssettings` }),
+                        appRedirectActions.redirect({ url: `../../../events` }),
                     ),
                 ),
                 catchError((err) =>
