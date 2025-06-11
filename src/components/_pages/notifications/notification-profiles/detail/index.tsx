@@ -6,7 +6,7 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions, selectors } from 'ducks/notification-profiles';
 import { actions as notificationActions, selectors as notificationSelectors } from 'ducks/notifications';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router';
 
@@ -14,6 +14,7 @@ import { Badge, Col, Container, Row } from 'reactstrap';
 import { PlatformEnum, RecipientType } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { getInputStringFromIso8601String } from 'utils/duration';
+import Dialog from 'components/Dialog';
 
 export default function NotificationProfileDetail() {
     const { id, version } = useParams();
@@ -28,6 +29,8 @@ export default function NotificationProfileDetail() {
     const isFetchingNotificationInstanceDetail = useSelector(notificationSelectors.isFetchingNotificationInstanceDetail);
 
     const recipientTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.RecipientType));
+
+    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
     const getFreshData = useCallback(() => {
         if (!id || !version) return;
@@ -50,8 +53,13 @@ export default function NotificationProfileDetail() {
     }, [navigate, id, version]);
 
     const onDeleteNotificationProfile = useCallback(() => {
+        setConfirmDelete(true);
+    }, []);
+
+    const onDeleteConfirmed = useCallback(() => {
         if (!id || !version) return;
         dispatch(actions.deleteNotificationProfile({ uuid: id, redirect: '../notificationprofiles' }));
+        setConfirmDelete(false);
     }, [dispatch, id, version]);
 
     const notificationProfileWidgetButtons: WidgetButtonProps[] = useMemo(
@@ -268,6 +276,16 @@ export default function NotificationProfileDetail() {
                     </Col>
                 </Row>
             )}
+            <Dialog
+                isOpen={confirmDelete}
+                caption="Delete Notification Profile"
+                body="You are about to delete a Notification Profile. Is this what you want to do?"
+                toggle={() => setConfirmDelete(false)}
+                buttons={[
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                ]}
+            />
         </Container>
     );
 }
