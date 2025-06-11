@@ -183,6 +183,7 @@ const deleteNotificationProfile: AppEpic = (action$, state$, deps) => {
                         slice.actions.deleteNotificationProfileFailure({
                             error: extractError(err, 'Failed to delete Notification Profile'),
                         }),
+                        alertActions.error(extractError(err, 'Failed to delete Notification Profile')),
                     ),
                 ),
             ),
