@@ -137,7 +137,6 @@ export default function NotificationProfileDetail() {
                               'Recipient Type',
                               <Badge key="recipientType" color="secondary">
                                   {getEnumLabel(recipientTypeEnum, notificationProfile.recipientType)}
-                                  {getEnumLabel(recipientTypeEnum, notificationProfile.recipientType)}
                               </Badge>,
                           ],
                       },
