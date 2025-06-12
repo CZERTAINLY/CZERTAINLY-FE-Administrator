@@ -240,7 +240,7 @@ export default function NotificationProfileForm() {
                                 disabled={type === RecipientType.Owner || type === RecipientType.None}
                             />
 
-                            <Field name="frequency" validate={validateDuration()}>
+                            <Field name="frequency" validate={validateDuration(['d', 'h'])}>
                                 {({ input, meta }) => {
                                     const isInvalid = !!meta.error && meta.touched;
                                     return (
@@ -252,10 +252,10 @@ export default function NotificationProfileForm() {
                                                     type="text"
                                                     valid={!meta.error && meta.touched}
                                                     invalid={isInvalid}
-                                                    placeholder="ex: 5d 45m"
+                                                    placeholder="ex: 5d 4h"
                                                 />
                                             </InputGroup>
-                                            {!isInvalid && <FormText>Enter duration in format: 0d 0h 0m 0s</FormText>}
+                                            {!isInvalid && <FormText>Enter duration in format: 0d 0h</FormText>}
                                             <FormFeedback className={isInvalid ? 'd-block' : ''}>{meta.error}</FormFeedback>
                                         </FormGroup>
                                     );
