@@ -416,7 +416,13 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
                                     )}
                                 </Field>
 
-                                {values.key && <SwitchField id="includeAltKey" label="Include Alternative Key" disabled />}
+                                {values.key && (
+                                    <SwitchField
+                                        id="includeAltKey"
+                                        label="Include Alternative Key"
+                                        disabled={!!defaultValues.altKey || !!defaultValues.altTokenProfile}
+                                    />
+                                )}
 
                                 {values.includeAltKey && (
                                     <>
