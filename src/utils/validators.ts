@@ -75,12 +75,16 @@ export const validateLength = (min: number, max: number) => (value: any) => {
         : `Value must be between ${min} and ${max} characters long`;
 };
 
-export const validateDuration = () => (value: string) => {
-    if (!value?.trim()) return undefined;
-    return /^(\d{1,10}\s*[dhms]\s*)+$/i.test(value.trim())
-        ? undefined
-        : 'Invalid duration. Should be formatted as: 0d 0h 0m 0s. eg. 1d 40m';
-};
+export const validateDuration =
+    (denominations: ('d' | 'h' | 'm' | 's')[] = ['d', 'h', 'm', 's']) =>
+    (value: string) => {
+        if (!value?.trim()) return undefined;
+        const regexPattern = `^(\\d{1,10}\\s*[${denominations.join('')}]\\s*)+$`;
+        const regex = new RegExp(regexPattern);
+        return regex.test(value.trim())
+            ? undefined
+            : `Invalid duration. Should be formatted as: ${denominations.map((d) => '0' + d).join(' ')}.`;
+    };
 
 export const validateQuartzCronExpression = (cronExpression: string | undefined) => (value: string) => {
     const validationInput = getValueFromObject(value);
