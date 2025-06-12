@@ -5,10 +5,9 @@ import Widget from 'components/Widget';
 
 import { actions as certificateActions, selectors as certificateSelectors } from 'ducks/certificates';
 import { actions as connectorActions } from 'ducks/connectors';
-import { actions as keyActions } from 'ducks/cryptographic-keys';
 import { selectors as cryptographyOperationSelectors } from 'ducks/cryptographic-operations';
 import { actions as raProfileActions, selectors as raProfileSelectors } from 'ducks/ra-profiles';
-import { actions as tokenProfileActions, selectors as tokenProfileSelectors } from 'ducks/token-profiles';
+import { actions as tokenProfileActions } from 'ducks/token-profiles';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Field, Form } from 'react-final-form';
 
@@ -24,14 +23,11 @@ import { TokenProfileResponseModel } from 'types/token-profiles';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 
-import CustomSelectComponent from 'components/CustomSelectComponent';
-import TokenProfileForm from 'components/_pages/token-profiles/form';
 import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from 'ducks/utilsActuator';
 import { ParseRequestRequestDtoParseTypeEnum } from 'types/openapi/utils';
 import { validateRequired } from 'utils/validators';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
 import { transformParseRequestResponseDtoToCertificateResponseDetailModel } from '../../../../ducks/transform/utilsCertificateRequest';
-import { actions as userInterfaceActions } from '../../../../ducks/user-interface';
 import {
     actions as utilsCertificateRequestActions,
     selectors as utilsCertificateRequestSelectors,
@@ -43,8 +39,7 @@ import FileUpload from '../../../Input/FileUpload/FileUpload';
 import TabLayout from '../../../Layout/TabLayout';
 import RenderRequestKey from './RenderRequestKey';
 import SwitchField from 'components/Input/SwitchField';
-import { BinaryOperatorToken } from 'typescript';
-import TextField from 'components/Input/TextField';
+import RenderTokenProfile from 'components/_pages/certificates/form/RenderTokenProfile';
 
 export interface FormValues {
     raProfile: SingleValue<{ label: string; value: RaProfileResponseModel }> | null;
@@ -68,8 +63,6 @@ export default function CertificateForm() {
     const csrAttributeDescriptors = useSelector(certificateSelectors.csrAttributeDescriptors);
     const signatureAttributeDescriptors = useSelector(cryptographyOperationSelectors.signatureAttributeDescriptors);
     const altSignatureAttributeDescriptors = useSelector(cryptographyOperationSelectors.altSignatureAttributeDescriptors);
-
-    const tokenProfiles = useSelector(tokenProfileSelectors.tokenProfiles);
 
     const issuingCertificate = useSelector(certificateSelectors.isIssuing);
 
@@ -173,14 +166,6 @@ export default function CertificateForm() {
         [dispatch],
     );
 
-    const onTokenProfileChange = useCallback(
-        (event: SingleValue<{ label: string; value: TokenProfileResponseModel }>, type: 'alt' | 'normal') => {
-            if (!event) return;
-            dispatch(keyActions.listCryptographicKeyPairs({ tokenProfileUuid: event.value.uuid, store: type }));
-        },
-        [dispatch],
-    );
-
     const onCancel = useCallback(() => {
         navigate(-1);
     }, [navigate]);
@@ -194,15 +179,6 @@ export default function CertificateForm() {
                     value: raProfile,
                 })),
         [raProfiles],
-    );
-
-    const tokenProfileOptions = useMemo(
-        () =>
-            tokenProfiles.map((tokenProfile) => ({
-                label: tokenProfile.name,
-                value: tokenProfile,
-            })),
-        [tokenProfiles],
     );
 
     const defaultValues: FormValues = useMemo(
@@ -308,95 +284,13 @@ export default function CertificateForm() {
 
                             {values.uploadCsr && !values.uploadCsr?.value && values.raProfile ? (
                                 <>
-                                    <Field name="tokenProfile" validate={validateRequired()}>
-                                        {({ input, meta, onChange }) => (
-                                            <FormGroup>
-                                                <Label for="tokenProfileSelect">Token Profile</Label>
-
-                                                <Select
-                                                    {...input}
-                                                    id="tokenProfile"
-                                                    inputId="tokenProfileSelect"
-                                                    maxMenuHeight={140}
-                                                    menuPlacement="auto"
-                                                    options={tokenProfileOptions}
-                                                    placeholder="Select Token Profile"
-                                                    onChange={(e) => {
-                                                        console.log(e, 'normal');
-                                                        onTokenProfileChange(e, 'normal');
-                                                        input.onChange(e);
-                                                    }}
-                                                    components={{
-                                                        Menu: (props) => (
-                                                            <CustomSelectComponent
-                                                                onAddNew={() => {
-                                                                    dispatch(
-                                                                        userInterfaceActions.showGlobalModal({
-                                                                            content: <TokenProfileForm usesGlobalModal />,
-                                                                            isOpen: true,
-                                                                            size: 'lg',
-                                                                            title: 'Add New Token Profile',
-                                                                        }),
-                                                                    );
-                                                                }}
-                                                                {...props}
-                                                            />
-                                                        ),
-                                                    }}
-                                                />
-
-                                                <FormFeedback>{meta.error}</FormFeedback>
-                                            </FormGroup>
-                                        )}
-                                    </Field>
+                                    <RenderTokenProfile type="normal" />
 
                                     <RenderRequestKey type="normal" values={values} />
 
                                     {values.key && <SwitchField id="includeAltKey" label="Include Alternative Key" />}
 
-                                    {values.includeAltKey && (
-                                        <Field name="altTokenProfile" validate={validateRequired()}>
-                                            {({ input, meta, onChange }) => (
-                                                <FormGroup>
-                                                    <Label for="altTokenProfileSelect">Alternative Token Profile</Label>
-
-                                                    <Select
-                                                        {...input}
-                                                        id="altTokenProfile"
-                                                        inputId="altTokenProfileSelect"
-                                                        maxMenuHeight={140}
-                                                        menuPlacement="auto"
-                                                        options={tokenProfileOptions}
-                                                        placeholder="Select Alternative Token Profile"
-                                                        onChange={(e) => {
-                                                            console.log(e, 'alt');
-                                                            onTokenProfileChange(e, 'alt');
-                                                            input.onChange(e);
-                                                        }}
-                                                        components={{
-                                                            Menu: (props) => (
-                                                                <CustomSelectComponent
-                                                                    onAddNew={() => {
-                                                                        dispatch(
-                                                                            userInterfaceActions.showGlobalModal({
-                                                                                content: <TokenProfileForm usesGlobalModal />,
-                                                                                isOpen: true,
-                                                                                size: 'lg',
-                                                                                title: 'Add New Token Profile',
-                                                                            }),
-                                                                        );
-                                                                    }}
-                                                                    {...props}
-                                                                />
-                                                            ),
-                                                        }}
-                                                    />
-
-                                                    <FormFeedback>{meta.error}</FormFeedback>
-                                                </FormGroup>
-                                            )}
-                                        </Field>
-                                    )}
+                                    {values.includeAltKey && <RenderTokenProfile type="alt" />}
 
                                     <RenderRequestKey type="alt" values={values} />
 

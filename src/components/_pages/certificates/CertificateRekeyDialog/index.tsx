@@ -211,8 +211,8 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
                 : null,
             tokenProfile: certificate?.key?.tokenProfileUuid
                 ? {
-                      label: certificate.key.tokenProfileName || '',
-                      value: certificate.key.tokenProfileUuid || '',
+                      label: certificate.key.tokenProfileName ?? '',
+                      value: certificate.key.tokenProfileUuid ?? '',
                   }
                 : null,
             altKey: certificate?.altKey
@@ -223,8 +223,8 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
                 : null,
             altTokenProfile: certificate?.altKey?.tokenProfileUuid
                 ? {
-                      label: certificate.altKey.tokenProfileName || '',
-                      value: certificate.altKey.tokenProfileUuid || '',
+                      label: certificate.altKey.tokenProfileName ?? '',
+                      value: certificate.altKey.tokenProfileUuid ?? '',
                   }
                 : null,
         }),

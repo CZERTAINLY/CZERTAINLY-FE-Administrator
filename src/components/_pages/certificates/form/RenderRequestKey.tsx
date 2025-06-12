@@ -5,7 +5,7 @@ import { actions as cryptographyOperationActions } from 'ducks/cryptographic-ope
 import { useCallback, useEffect, useMemo } from 'react';
 import { Field, useForm } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
-import Select, { SingleValue } from 'react-select';
+import Select, { GroupBase, MenuProps, SingleValue } from 'react-select';
 import { FormFeedback, FormGroup, Label } from 'reactstrap';
 import { CryptographicKeyPairResponseModel } from 'types/cryptographic-keys';
 import { validateRequired } from 'utils/validators';
@@ -65,6 +65,25 @@ const RenderRequestKey = ({ type, values }: { type: 'alt' | 'normal'; values: Fo
         }
     }, [initiateFormCallback, onKeyChange, formCallbackValue, dispatch, keyOptions, form, isAltKey]);
 
+    const renderKeySelectMenu = useCallback(
+        (props: MenuProps<any, false, GroupBase<any>>) => (
+            <CustomSelectComponent
+                onAddNew={() => {
+                    dispatch(
+                        userInterfaceActions.showGlobalModal({
+                            content: <CryptographicKeyForm usesGlobalModal />,
+                            isOpen: true,
+                            size: 'lg',
+                            title: 'Add New Key',
+                        }),
+                    );
+                }}
+                {...props}
+            />
+        ),
+        [dispatch],
+    );
+
     return (values.tokenProfile && !isAltKey) || (values.altTokenProfile && isAltKey) ? (
         <Field name={isAltKey ? 'altKey' : 'key'} validate={validateRequired()}>
             {({ input, meta }) => (
@@ -86,21 +105,7 @@ const RenderRequestKey = ({ type, values }: { type: 'alt' | 'normal'; values: Fo
                             input.onChange(e);
                         }}
                         components={{
-                            Menu: (props) => (
-                                <CustomSelectComponent
-                                    onAddNew={() => {
-                                        dispatch(
-                                            userInterfaceActions.showGlobalModal({
-                                                content: <CryptographicKeyForm usesGlobalModal />,
-                                                isOpen: true,
-                                                size: 'lg',
-                                                title: 'Add New Key',
-                                            }),
-                                        );
-                                    }}
-                                    {...props}
-                                />
-                            ),
+                            Menu: renderKeySelectMenu,
                         }}
                     />
 
