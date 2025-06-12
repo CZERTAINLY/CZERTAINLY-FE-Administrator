@@ -64,6 +64,7 @@ const listCryptographicKeyPairs: AppEpic = (action$, state$, deps) => {
                 map((list) =>
                     slice.actions.listCryptographicKeyPairSuccess({
                         cryptographicKeys: list.map(transformCryptographicKeyPairResponseDtoToModel),
+                        store: action.payload.store,
                     }),
                 ),
 

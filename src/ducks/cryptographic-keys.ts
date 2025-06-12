@@ -29,6 +29,7 @@ export type State = {
     cryptographicKey?: CryptographicKeyDetailResponseModel;
     cryptographicKeys: CryptographicKeyResponseModel[];
     cryptographicKeyPairs: CryptographicKeyPairResponseModel[];
+    altCryptographicKeyPairs: CryptographicKeyPairResponseModel[];
 
     isFetchingKeyPairs: boolean;
     isFetchingDetail: boolean;
@@ -65,6 +66,7 @@ export const initialState: State = {
 
     cryptographicKeys: [],
     cryptographicKeyPairs: [],
+    altCryptographicKeyPairs: [],
 
     isFetchingKeyPairs: false,
     isFetchingDetail: false,
@@ -127,13 +129,24 @@ export const slice = createSlice({
             state.cryptographicKeys = action.payload;
         },
 
-        listCryptographicKeyPairs: (state, action: PayloadAction<{ tokenProfileUuid?: string }>) => {
-            state.cryptographicKeyPairs = [];
+        listCryptographicKeyPairs: (state, action: PayloadAction<{ tokenProfileUuid?: string; store?: 'alt' | 'normal' }>) => {
+            if (action.payload.store === 'alt') {
+                state.altCryptographicKeyPairs = [];
+            } else {
+                state.cryptographicKeyPairs = [];
+            }
             state.isFetchingKeyPairs = true;
         },
 
-        listCryptographicKeyPairSuccess: (state, action: PayloadAction<{ cryptographicKeys: CryptographicKeyPairResponseModel[] }>) => {
-            state.cryptographicKeyPairs = action.payload.cryptographicKeys;
+        listCryptographicKeyPairSuccess: (
+            state,
+            action: PayloadAction<{ cryptographicKeys: CryptographicKeyPairResponseModel[]; store?: 'alt' | 'normal' }>,
+        ) => {
+            if (action.payload.store === 'alt') {
+                state.altCryptographicKeyPairs = action.payload.cryptographicKeys;
+            } else {
+                state.cryptographicKeyPairs = action.payload.cryptographicKeys;
+            }
             state.isFetchingKeyPairs = false;
         },
 
@@ -730,6 +743,7 @@ const state = createFeatureSelector<State>(slice.name);
 const cryptographicKey = createSelector(state, (state: State) => state.cryptographicKey);
 const cryptographicKeys = createSelector(state, (state: State) => state.cryptographicKeys);
 const cryptographicKeyPairs = createSelector(state, (state: State) => state.cryptographicKeyPairs);
+const altCryptographicKeyPairs = createSelector(state, (state: State) => state.altCryptographicKeyPairs);
 
 const isFetchingKeyPairs = createSelector(state, (state: State) => state.isFetchingKeyPairs);
 const isFetchingDetail = createSelector(state, (state: State) => state.isFetchingDetail);
@@ -763,6 +777,7 @@ export const selectors = {
     cryptographicKey,
     cryptographicKeys,
     cryptographicKeyPairs,
+    altCryptographicKeyPairs,
 
     isFetchingKeyPairs,
     isFetchingDetail,

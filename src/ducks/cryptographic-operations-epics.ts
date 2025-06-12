@@ -34,6 +34,7 @@ const getSignatureAttributesDescriptors: AppEpic = (action$, state, deps) => {
                         slice.actions.listSignatureAttributeDescriptorsSuccess({
                             uuid: action.payload.uuid,
                             attributeDescriptors: descriptors.map(transformAttributeDescriptorDtoToModel),
+                            store: action.payload.store,
                         }),
                     ),
 
