@@ -42,13 +42,19 @@ import CertificateAttributes from '../../../CertificateAttributes';
 import FileUpload from '../../../Input/FileUpload/FileUpload';
 import TabLayout from '../../../Layout/TabLayout';
 import RenderRequestKey from './RenderRequestKey';
+import SwitchField from 'components/Input/SwitchField';
+import { BinaryOperatorToken } from 'typescript';
+import TextField from 'components/Input/TextField';
 
 export interface FormValues {
     raProfile: SingleValue<{ label: string; value: RaProfileResponseModel }> | null;
     format?: CertificateRequestFormat;
     uploadCsr?: SingleValue<{ label: string; value: boolean }> | null;
     tokenProfile?: SingleValue<{ label: string; value: TokenProfileResponseModel }> | null;
+    altTokenProfile?: SingleValue<{ label: string; value: TokenProfileResponseModel }> | null;
+    includeAltKey?: boolean;
     key?: SingleValue<{ label: string; value: CryptographicKeyPairResponseModel }> | null;
+    altKey?: SingleValue<{ label: string; value: CryptographicKeyPairResponseModel }> | null;
 }
 
 export default function CertificateForm() {
@@ -61,6 +67,7 @@ export default function CertificateForm() {
     const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
     const csrAttributeDescriptors = useSelector(certificateSelectors.csrAttributeDescriptors);
     const signatureAttributeDescriptors = useSelector(cryptographyOperationSelectors.signatureAttributeDescriptors);
+    const altSignatureAttributeDescriptors = useSelector(cryptographyOperationSelectors.altSignatureAttributeDescriptors);
 
     const tokenProfiles = useSelector(tokenProfileSelectors.tokenProfiles);
 
@@ -71,6 +78,9 @@ export default function CertificateForm() {
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
     const [csrAttributesCallbackAttributes, setCsrAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
     const [signatureAttributesCallbackAttributes, setSignatureAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
+    const [altSignatureAttributesCallbackAttributes, setAltSignatureAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>(
+        [],
+    );
     const [fileContent, setFileContent] = useState<string>('');
 
     const [certificate, setCertificate] = useState<CertificateDetailResponseModel | undefined>();
@@ -117,6 +127,17 @@ export default function CertificateForm() {
                         keyUuid: values.key?.value.uuid,
                         tokenProfileUuid: values.tokenProfile?.value.uuid,
                         customAttributes: collectFormAttributes('customCertificate', resourceCustomAttributes, values),
+                        ...(values.includeAltKey
+                            ? {
+                                  altKeyUuid: values.altKey?.value.uuid,
+                                  altTokenProfileUuid: values.altTokenProfile?.value.uuid,
+                                  altSignatureAttributes: collectFormAttributes(
+                                      'altSignatureAttributes',
+                                      altSignatureAttributeDescriptors,
+                                      values,
+                                  ),
+                              }
+                            : {}),
                     },
                 }),
             );
@@ -128,6 +149,7 @@ export default function CertificateForm() {
             resourceCustomAttributes,
             csrAttributeDescriptors,
             signatureAttributeDescriptors,
+            altSignatureAttributeDescriptors,
             fileContent,
         ],
     );
@@ -152,9 +174,9 @@ export default function CertificateForm() {
     );
 
     const onTokenProfileChange = useCallback(
-        (event: SingleValue<{ label: string; value: TokenProfileResponseModel }>) => {
+        (event: SingleValue<{ label: string; value: TokenProfileResponseModel }>, type: 'alt' | 'normal') => {
             if (!event) return;
-            dispatch(keyActions.listCryptographicKeyPairs({ tokenProfileUuid: event.value.uuid }));
+            dispatch(keyActions.listCryptographicKeyPairs({ tokenProfileUuid: event.value.uuid, store: type }));
         },
         [dispatch],
     );
@@ -300,7 +322,8 @@ export default function CertificateForm() {
                                                     options={tokenProfileOptions}
                                                     placeholder="Select Token Profile"
                                                     onChange={(e) => {
-                                                        onTokenProfileChange(e);
+                                                        console.log(e, 'normal');
+                                                        onTokenProfileChange(e, 'normal');
                                                         input.onChange(e);
                                                     }}
                                                     components={{
@@ -327,7 +350,55 @@ export default function CertificateForm() {
                                         )}
                                     </Field>
 
-                                    <RenderRequestKey values={values} />
+                                    <RenderRequestKey type="normal" values={values} />
+
+                                    {values.key && <SwitchField id="includeAltKey" label="Include Alternative Key" />}
+
+                                    {values.includeAltKey && (
+                                        <Field name="altTokenProfile" validate={validateRequired()}>
+                                            {({ input, meta, onChange }) => (
+                                                <FormGroup>
+                                                    <Label for="altTokenProfileSelect">Alternative Token Profile</Label>
+
+                                                    <Select
+                                                        {...input}
+                                                        id="altTokenProfile"
+                                                        inputId="altTokenProfileSelect"
+                                                        maxMenuHeight={140}
+                                                        menuPlacement="auto"
+                                                        options={tokenProfileOptions}
+                                                        placeholder="Select Alternative Token Profile"
+                                                        onChange={(e) => {
+                                                            console.log(e, 'alt');
+                                                            onTokenProfileChange(e, 'alt');
+                                                            input.onChange(e);
+                                                        }}
+                                                        components={{
+                                                            Menu: (props) => (
+                                                                <CustomSelectComponent
+                                                                    onAddNew={() => {
+                                                                        dispatch(
+                                                                            userInterfaceActions.showGlobalModal({
+                                                                                content: <TokenProfileForm usesGlobalModal />,
+                                                                                isOpen: true,
+                                                                                size: 'lg',
+                                                                                title: 'Add New Token Profile',
+                                                                            }),
+                                                                        );
+                                                                    }}
+                                                                    {...props}
+                                                                />
+                                                            ),
+                                                        }}
+                                                    />
+
+                                                    <FormFeedback>{meta.error}</FormFeedback>
+                                                </FormGroup>
+                                            )}
+                                        </Field>
+                                    )}
+
+                                    <RenderRequestKey type="alt" values={values} />
 
                                     {values.tokenProfile && values.key ? (
                                         <TabLayout
@@ -337,7 +408,7 @@ export default function CertificateForm() {
                                                     content: (
                                                         <AttributeEditor
                                                             id="csrAttributes"
-                                                            attributeDescriptors={csrAttributeDescriptors || []}
+                                                            attributeDescriptors={csrAttributeDescriptors ?? []}
                                                             groupAttributesCallbackAttributes={csrAttributesCallbackAttributes}
                                                             setGroupAttributesCallbackAttributes={setCsrAttributesCallbackAttributes}
                                                         />
@@ -348,12 +419,31 @@ export default function CertificateForm() {
                                                     content: (
                                                         <AttributeEditor
                                                             id="signatureAttributes"
-                                                            attributeDescriptors={signatureAttributeDescriptors || []}
+                                                            attributeDescriptors={signatureAttributeDescriptors ?? []}
                                                             groupAttributesCallbackAttributes={signatureAttributesCallbackAttributes}
                                                             setGroupAttributesCallbackAttributes={setSignatureAttributesCallbackAttributes}
                                                         />
                                                     ),
                                                 },
+                                                ...(values.includeAltKey && values.altTokenProfile && values.altKey
+                                                    ? [
+                                                          {
+                                                              title: 'Alternative Signature Attributes',
+                                                              content: (
+                                                                  <AttributeEditor
+                                                                      id="altSignatureAttributes"
+                                                                      attributeDescriptors={altSignatureAttributeDescriptors ?? []}
+                                                                      groupAttributesCallbackAttributes={
+                                                                          altSignatureAttributesCallbackAttributes
+                                                                      }
+                                                                      setGroupAttributesCallbackAttributes={
+                                                                          setAltSignatureAttributesCallbackAttributes
+                                                                      }
+                                                                  />
+                                                              ),
+                                                          },
+                                                      ]
+                                                    : []),
                                             ]}
                                         />
                                     ) : (

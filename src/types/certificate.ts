@@ -83,6 +83,7 @@ export type CertificateSignRequestModel = Omit<
     customAttributes?: Array<AttributeRequestModel>;
     csrAttributes?: Array<AttributeRequestModel>;
     signatureAttributes?: Array<AttributeRequestModel>;
+    altSignatureAttributes?: Array<AttributeRequestModel>;
 };
 
 export type CertificateRevokeRequestDto = ClientCertificateRevocationDto;

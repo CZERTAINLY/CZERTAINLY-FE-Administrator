@@ -32,12 +32,18 @@ import {
 } from '../../../../ducks/utilsCertificateRequest';
 import CertificateAttributes from '../../../CertificateAttributes';
 import FileUpload from '../../../Input/FileUpload/FileUpload';
+import TabLayout from 'components/Layout/TabLayout';
+import SwitchField from 'components/Input/SwitchField';
+import { isObjectSame } from 'utils/common-utils';
 
 interface FormValues {
     pkcs10: File | null;
     uploadCsr?: SingleValue<{ label: string; value: boolean }> | null;
+    includeAltKey?: boolean;
     tokenProfile?: SingleValue<{ label: string; value: string }> | null;
+    altTokenProfile?: SingleValue<{ label: string; value: string }> | null;
     key?: SingleValue<{ label: string; value: CryptographicKeyPairResponseModel }> | null;
+    altKey?: SingleValue<{ label: string; value: CryptographicKeyPairResponseModel }> | null;
 }
 
 interface props {
@@ -51,16 +57,21 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
     const isFetchingCsrAttributes = useSelector(certificateSelectors.isFetchingIssuanceAttributes);
     const isFetchingSignatureAttributes = useSelector(cryptographyOperationSelectors.isFetchingSignatureAttributes);
     const signatureAttributeDescriptors = useSelector(cryptographyOperationSelectors.signatureAttributeDescriptors);
+    const altSignatureAttributeDescriptors = useSelector(cryptographyOperationSelectors.altSignatureAttributeDescriptors);
 
     const tokenProfiles = useSelector(tokenProfileSelectors.tokenProfiles);
 
     const keys = useSelector(keySelectors.cryptographicKeyPairs);
+    const altKeys = useSelector(keySelectors.altCryptographicKeyPairs);
 
     const rekeying = useSelector(certificateSelectors.isRekeying);
 
     const parsedCertificateRequest = useSelector(utilsCertificateRequestSelectors.parsedCertificateRequest);
 
     const [signatureAttributesCallbackAttributes, setSignatureAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
+    const [altSignatureAttributesCallbackAttributes, setAltSignatureAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>(
+        [],
+    );
     const [fileContent, setFileContent] = useState<string>('');
     const [certificateRequest, setCertificateRequest] = useState<CertificateDetailResponseModel | undefined>();
 
@@ -95,7 +106,12 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
             if (!values.uploadCsr?.value && !values.tokenProfile) return;
             if (!values.uploadCsr?.value && !values.key) return;
             if (!certificate.raProfile.authorityInstanceUuid) return;
-            if (!values.uploadCsr?.value && values.key?.value.uuid === certificate.key?.uuid) return;
+            if (
+                !values.uploadCsr?.value &&
+                values.key?.value.uuid === certificate.key?.uuid &&
+                values.altKey?.value.uuid === certificate.altKey?.uuid
+            )
+                return;
 
             dispatch(
                 certificateActions.rekeyCertificate({
@@ -108,29 +124,40 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
                         signatureAttributes: collectFormAttributes('signatureAttributes', signatureAttributeDescriptors, values),
                         keyUuid: values.key?.value.uuid || '',
                         tokenProfileUuid: values.tokenProfile?.value || '',
+                        ...(values.includeAltKey
+                            ? {
+                                  altKeyUuid: values.altKey?.value.uuid,
+                                  altTokenProfileUuid: values.altTokenProfile?.value,
+                                  altSignatureAttributes: collectFormAttributes(
+                                      'altSignatureAttributes',
+                                      altSignatureAttributeDescriptors,
+                                      values,
+                                  ),
+                              }
+                            : {}),
                     },
                 }),
             );
             onCancel();
         },
-        [dispatch, certificate, signatureAttributeDescriptors, onCancel, fileContent],
+        [certificate, dispatch, fileContent, signatureAttributeDescriptors, altSignatureAttributeDescriptors, onCancel],
     );
 
     const onTokenProfileChange = useCallback(
-        (event: SingleValue<{ label: string; value: string }>) => {
+        (event: SingleValue<{ label: string; value: string }>, type: 'alt' | 'normal') => {
             if (!event) return;
-            dispatch(keyActions.listCryptographicKeyPairs({ tokenProfileUuid: event.value }));
+            dispatch(keyActions.listCryptographicKeyPairs({ tokenProfileUuid: event.value, store: type }));
         },
         [dispatch],
     );
 
     const onKeyChange = useCallback(
-        (event: SingleValue<{ label: string; value: CryptographicKeyPairResponseModel }>) => {
+        (event: SingleValue<{ label: string; value: CryptographicKeyPairResponseModel }>, type: 'alt' | 'normal') => {
             if (!event) return;
             if (!event.value.tokenProfileUuid) return;
             if (!event.value.tokenInstanceUuid) return;
             if (event.value.items.filter((e) => e.type === KeyType.Private).length === 0) return;
-            dispatch(cryptographyOperationActions.clearSignatureAttributeDescriptors());
+            dispatch(cryptographyOperationActions.clearSignatureAttributeDescriptors(type));
             dispatch(
                 cryptographyOperationActions.listSignatureAttributeDescriptors({
                     uuid: event.value.uuid,
@@ -138,6 +165,7 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
                     tokenInstanceUuid: event.value.tokenInstanceUuid,
                     keyItemUuid: event.value.items.filter((e) => e.type === KeyType.Private)[0].uuid,
                     algorithm: event.value.items.filter((e) => e.type === KeyType.Private)[0].keyAlgorithm,
+                    store: type,
                 }),
             );
         },
@@ -162,9 +190,19 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
         [keys],
     );
 
+    const altKeyOptions = useMemo(
+        () =>
+            altKeys.map((key) => ({
+                label: key.name,
+                value: key,
+            })),
+        [altKeys],
+    );
+
     const defaultValues: FormValues = useMemo(
         () => ({
             pkcs10: null,
+            includeAltKey: !!certificate?.altKey,
             key: certificate?.key
                 ? {
                       label: certificate.key.name,
@@ -177,9 +215,30 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
                       value: certificate.key.tokenProfileUuid || '',
                   }
                 : null,
+            altKey: certificate?.altKey
+                ? {
+                      label: certificate.altKey.name,
+                      value: certificate.altKey,
+                  }
+                : null,
+            altTokenProfile: certificate?.altKey?.tokenProfileUuid
+                ? {
+                      label: certificate.altKey.tokenProfileName || '',
+                      value: certificate.altKey.tokenProfileUuid || '',
+                  }
+                : null,
         }),
-        [certificate?.key],
+        [certificate?.key, certificate?.altKey],
     );
+
+    useEffect(() => {
+        if (defaultValues.altTokenProfile) {
+            onTokenProfileChange(defaultValues.altTokenProfile, 'alt');
+        }
+        if (defaultValues.tokenProfile) {
+            onTokenProfileChange(defaultValues.tokenProfile, 'normal');
+        }
+    }, [defaultValues, onTokenProfileChange]);
 
     const inputOptions = useMemo(
         () => [
@@ -189,6 +248,66 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
         [],
     );
 
+    const isRekeyAllowed = useCallback(
+        (values: FormValues) => {
+            const areValuesSame =
+                !isObjectSame(values.key as unknown as Record<string, unknown>, defaultValues.key as unknown as Record<string, unknown>) ||
+                !isObjectSame(
+                    values.altKey as unknown as Record<string, unknown>,
+                    defaultValues.altKey as unknown as Record<string, unknown>,
+                );
+
+            return areValuesSame;
+        },
+        [defaultValues],
+    );
+
+    const getSignatureAttributesTabs = useCallback(
+        (values: FormValues) => {
+            return !values.uploadCsr?.value
+                ? [
+                      ...(values.key?.value.uuid !== certificate?.key?.uuid
+                          ? [
+                                {
+                                    title: 'Signature Attributes',
+                                    content: (
+                                        <AttributeEditor
+                                            id="signatureAttributes"
+                                            attributeDescriptors={signatureAttributeDescriptors || []}
+                                            groupAttributesCallbackAttributes={signatureAttributesCallbackAttributes}
+                                            setGroupAttributesCallbackAttributes={setSignatureAttributesCallbackAttributes}
+                                        />
+                                    ),
+                                },
+                            ]
+                          : []),
+                      ...(values.includeAltKey && values.altKey?.value.uuid !== certificate?.altKey?.uuid
+                          ? [
+                                {
+                                    title: 'Alternative Signature Attributes',
+                                    content: (
+                                        <AttributeEditor
+                                            id="altSignatureAttributes"
+                                            attributeDescriptors={altSignatureAttributeDescriptors ?? []}
+                                            groupAttributesCallbackAttributes={altSignatureAttributesCallbackAttributes}
+                                            setGroupAttributesCallbackAttributes={setAltSignatureAttributesCallbackAttributes}
+                                        />
+                                    ),
+                                },
+                            ]
+                          : []),
+                  ]
+                : [];
+        },
+        [
+            certificate?.altKey?.uuid,
+            certificate?.key?.uuid,
+            signatureAttributeDescriptors,
+            signatureAttributesCallbackAttributes,
+            altSignatureAttributeDescriptors,
+            altSignatureAttributesCallbackAttributes,
+        ],
+    );
     return (
         <Form initialValues={defaultValues} onSubmit={submitCallback} mutators={{ ...mutators<FormValues>() }}>
             {({ handleSubmit, valid, submitting, values, form }) => (
@@ -263,7 +382,7 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
                                                 options={tokenProfileOptions}
                                                 placeholder="Select Token Profile"
                                                 onChange={(e) => {
-                                                    onTokenProfileChange(e);
+                                                    onTokenProfileChange(e, 'normal');
                                                     input.onChange(e);
                                                 }}
                                             />
@@ -287,7 +406,7 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
                                                 options={keyOptions}
                                                 placeholder="Select Key"
                                                 onChange={(e) => {
-                                                    onKeyChange(e);
+                                                    onKeyChange(e, 'normal');
                                                     input.onChange(e);
                                                 }}
                                             />
@@ -297,15 +416,67 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
                                     )}
                                 </Field>
 
-                                {values.tokenProfile &&
-                                values.key &&
-                                !(!values.uploadCsr?.value && values.key?.value.uuid === certificate?.key?.uuid) ? (
-                                    <AttributeEditor
-                                        id="signatureAttributes"
-                                        attributeDescriptors={signatureAttributeDescriptors || []}
-                                        groupAttributesCallbackAttributes={signatureAttributesCallbackAttributes}
-                                        setGroupAttributesCallbackAttributes={setSignatureAttributesCallbackAttributes}
-                                    />
+                                {values.key && <SwitchField id="includeAltKey" label="Include Alternative Key" disabled />}
+
+                                {values.includeAltKey && (
+                                    <>
+                                        <Field name="altTokenProfile" validate={validateRequired()}>
+                                            {({ input, meta, onChange }) => (
+                                                <FormGroup>
+                                                    <Label for="altTokenProfileSelect">Alternative Token Profile</Label>
+
+                                                    <Select
+                                                        {...input}
+                                                        id="altTokenProfile"
+                                                        inputId="altTokenProfileSelect"
+                                                        maxMenuHeight={140}
+                                                        menuPlacement="auto"
+                                                        options={tokenProfileOptions}
+                                                        placeholder="Select Alternative Token Profile"
+                                                        onChange={(e) => {
+                                                            onTokenProfileChange(e, 'alt');
+                                                            input.onChange(e);
+                                                        }}
+                                                    />
+
+                                                    <FormFeedback>{meta.error}</FormFeedback>
+                                                </FormGroup>
+                                            )}
+                                        </Field>
+
+                                        <Field name="altKey" validate={validateRequired()}>
+                                            {({ input, meta, onChange }) => (
+                                                <FormGroup>
+                                                    <Label for="altKeySelect">Select Alternative Key</Label>
+
+                                                    <Select
+                                                        {...input}
+                                                        id="altKey"
+                                                        inputId="altKeySelect"
+                                                        maxMenuHeight={140}
+                                                        menuPlacement="auto"
+                                                        options={
+                                                            values.tokenProfile?.value === values.altTokenProfile?.value &&
+                                                            altKeyOptions.length === 0
+                                                                ? keyOptions
+                                                                : altKeyOptions
+                                                        }
+                                                        placeholder="Select Alternative Key"
+                                                        onChange={(e) => {
+                                                            onKeyChange(e, 'alt');
+                                                            input.onChange(e);
+                                                        }}
+                                                    />
+
+                                                    <FormFeedback>{meta.error}</FormFeedback>
+                                                </FormGroup>
+                                            )}
+                                        </Field>
+                                    </>
+                                )}
+
+                                {getSignatureAttributesTabs(values).length ? (
+                                    <TabLayout tabs={getSignatureAttributesTabs(values)} />
                                 ) : (
                                     <></>
                                 )}
@@ -320,7 +491,7 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
                                     title="Rekey"
                                     inProgressTitle="Rekeying..."
                                     inProgress={submitting || rekeying}
-                                    disabled={!valid || (!values.uploadCsr?.value && values.key?.value.uuid === certificate?.key?.uuid)}
+                                    disabled={!valid || !isRekeyAllowed(values)}
                                 />
 
                                 <Button color="default" onClick={onCancel} disabled={submitting}>
