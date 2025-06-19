@@ -185,6 +185,15 @@ function Dashboard() {
                                         },
                                     ];
                                 }
+                                if (labels[index] === 'Not Issued') {
+                                    return [
+                                        {
+                                            fieldSource: FilterFieldSource.Property,
+                                            condition: FilterConditionOperator.Empty,
+                                            fieldIdentifier: 'NOT_AFTER',
+                                        },
+                                    ];
+                                }
                                 if (labels[index] === '60' || labels[index] === '90') {
                                     return [
                                         {
