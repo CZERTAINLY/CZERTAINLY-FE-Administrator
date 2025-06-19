@@ -79,7 +79,7 @@ export default function DiscoveryForm() {
             dispatch(connectorActions.clearCallbackData());
             dispatch(discoveryActions.listDiscoveryProviders());
             dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Discoveries));
-            dispatch(rulesActions.listTriggers({ resource: Resource.Discoveries }));
+            dispatch(rulesActions.listTriggers({ resource: Resource.Certificates }));
         }
     }, [dispatch, init]);
 
@@ -227,10 +227,10 @@ export default function DiscoveryForm() {
                     </Widget>
 
                     <TriggerEditorWidget
-                        resource={Resource.Discoveries}
+                        resource={Resource.Certificates}
                         selectedTriggers={selectedTriggers}
                         onSelectedTriggersChange={setSelectedTriggers}
-                        noteText="Triggers will be executed on newly discovered certificate in displayed order"
+                        noteText="Triggers will be executed on newly discovered certificate when handling Certificate Discovered event"
                     />
 
                     <Widget title="Add discovery" busy={isBusy}>
