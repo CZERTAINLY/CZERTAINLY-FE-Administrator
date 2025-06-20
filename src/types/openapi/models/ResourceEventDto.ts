@@ -13,6 +13,7 @@
 
 import type {
     Resource,
+    ResourceEvent,
 } from './';
 
 /**
@@ -22,10 +23,10 @@ import type {
 export interface ResourceEventDto {
     /**
      * Resource event code
-     * @type {string}
+     * @type {ResourceEvent}
      * @memberof ResourceEventDto
      */
-    event: ResourceEventDtoEventEnum;
+    event: ResourceEvent;
     /**
      * Resource of objects that are subject of event
      * @type {Resource}
@@ -34,17 +35,4 @@ export interface ResourceEventDto {
     producedResource?: Resource;
 }
 
-/**
- * @export
- * @enum {string}
- */
-export enum ResourceEventDtoEventEnum {
-    CertificateStatusChanged = 'certificate_status_changed',
-    CertificateActionPerformed = 'certificate_action_performed',
-    CertificateDiscovered = 'certificate_discovered',
-    DiscoveryFinished = 'discovery_finished',
-    ApprovalRequested = 'approval_requested',
-    ApprovalClosed = 'approval_closed',
-    ScheduledJobFinished = 'scheduled_job_finished'
-}
 

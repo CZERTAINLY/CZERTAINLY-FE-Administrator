@@ -14,6 +14,7 @@
 import type {
     ActionDetailDto,
     Resource,
+    ResourceEvent,
     RuleDetailDto,
     TriggerType,
 } from './';
@@ -61,10 +62,10 @@ export interface TriggerDetailDto {
     ignoreTrigger: boolean;
     /**
      * Event that trigger can be assigned to
-     * @type {string}
+     * @type {ResourceEvent}
      * @memberof TriggerDetailDto
      */
-    event?: TriggerDetailDtoEventEnum;
+    event?: ResourceEvent;
     /**
      * List of Rules in the Rule Trigger
      * @type {Array<RuleDetailDto>}
@@ -79,17 +80,4 @@ export interface TriggerDetailDto {
     actions: Array<ActionDetailDto>;
 }
 
-/**
- * @export
- * @enum {string}
- */
-export enum TriggerDetailDtoEventEnum {
-    CertificateStatusChanged = 'certificate_status_changed',
-    CertificateActionPerformed = 'certificate_action_performed',
-    CertificateDiscovered = 'certificate_discovered',
-    DiscoveryFinished = 'discovery_finished',
-    ApprovalRequested = 'approval_requested',
-    ApprovalClosed = 'approval_closed',
-    ScheduledJobFinished = 'scheduled_job_finished'
-}
 

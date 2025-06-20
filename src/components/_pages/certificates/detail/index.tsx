@@ -1179,10 +1179,10 @@ export default function CertificateDetail() {
 
     const csrPropertiesData: TableDataRow[] = useMemo(() => {
         return certificate?.certificateRequest
-            ? [
+            ? ([
                   {
                       id: 'commonName',
-                      columns: ['Common Name', certificate?.certificateRequest?.commonName || ''],
+                      columns: ['Common Name', certificate?.certificateRequest?.commonName ?? ''],
                   },
                   {
                       id: 'certificateType',
@@ -1204,15 +1204,21 @@ export default function CertificateDetail() {
                   },
                   {
                       id: 'publicKeyAlgorithm',
-                      columns: ['Public Key Algorithm', certificate?.certificateRequest?.publicKeyAlgorithm || ''],
+                      columns: ['Public Key Algorithm', certificate?.certificateRequest?.publicKeyAlgorithm ?? ''],
                   },
                   {
                       id: 'signatureAlgorithm',
-                      columns: ['Signature Algorithm', certificate?.certificateRequest?.signatureAlgorithm || ''],
+                      columns: ['Signature Algorithm', certificate?.certificateRequest?.signatureAlgorithm ?? ''],
                   },
+                  certificate.hybridCertificate
+                      ? {
+                            id: 'altSignatureAlgorithm',
+                            columns: ['Alternative Signature Algorithm', certificate?.certificateRequest?.altSignatureAlgorithm ?? ''],
+                        }
+                      : null,
                   {
                       id: 'subjectDn',
-                      columns: ['Subject DN', certificate?.certificateRequest?.subjectDn || ''],
+                      columns: ['Subject DN', certificate?.certificateRequest?.subjectDn ?? ''],
                   },
                   {
                       id: 'asn1RequestStructure',
@@ -1225,9 +1231,9 @@ export default function CertificateDetail() {
                           ),
                       ],
                   },
-              ]
+              ].filter((el) => el !== null) as NonNullable<TableDataRow>[])
             : [];
-    }, [certificate?.certificateRequest, certificateRequestFormatEnum, certificateTypeEnum]);
+    }, [certificate?.certificateRequest, certificate?.hybridCertificate, certificateRequestFormatEnum, certificateTypeEnum]);
 
     const validationData: TableDataRow[] = useMemo(() => {
         let validationDataRows =
@@ -1315,7 +1321,7 @@ export default function CertificateDetail() {
     const detailData: TableDataRow[] = useMemo(() => {
         const certDetail = !certificate
             ? []
-            : [
+            : ([
                   {
                       id: 'commonName',
                       columns: [<span style={{ whiteSpace: 'nowrap' }}>Common Name</span>, certificate.commonName],
@@ -1331,6 +1337,19 @@ export default function CertificateDetail() {
                           certificate.key ? <Link to={`../keys/detail/${certificate.key.uuid}`}>{certificate.key.name}</Link> : '',
                       ],
                   },
+                  certificate.hybridCertificate
+                      ? {
+                            id: 'altKey',
+                            columns: [
+                                'Alternative Key',
+                                certificate.altKey ? (
+                                    <Link to={`../keys/detail/${certificate.altKey.uuid}`}>{certificate.altKey.name}</Link>
+                                ) : (
+                                    ''
+                                ),
+                            ],
+                        }
+                      : null,
                   {
                       id: 'issuerCommonName',
                       columns: [
@@ -1370,10 +1389,22 @@ export default function CertificateDetail() {
                       id: 'publicKeyAlgorithm',
                       columns: ['Public Key Algorithm', certificate.publicKeyAlgorithm],
                   },
+                  certificate.hybridCertificate
+                      ? {
+                            id: 'altPublicKeyAlgorithm',
+                            columns: ['Alternative Public Key Algorithm', certificate.altPublicKeyAlgorithm],
+                        }
+                      : null,
                   {
                       id: 'signatureAlgorithm',
                       columns: ['Signature Algorithm', certificate.signatureAlgorithm],
                   },
+                  certificate.hybridCertificate
+                      ? {
+                            id: 'altSignatureAlgorithm',
+                            columns: ['Alternative Signature Algorithm', certificate.altSignatureAlgorithm],
+                        }
+                      : null,
                   {
                       id: 'certState',
                       columns: ['State', <CertificateStatus status={certificate.state} />],
@@ -1405,6 +1436,12 @@ export default function CertificateDetail() {
                       id: 'keySize',
                       columns: ['Key Size', certificate.keySize.toString()],
                   },
+                  certificate.hybridCertificate
+                      ? {
+                            id: 'altKeySize',
+                            columns: ['Alternative Key Size', certificate.altKeySize.toString()],
+                        }
+                      : null,
                   {
                       id: 'keyUsage',
                       columns: [
@@ -1440,7 +1477,8 @@ export default function CertificateDetail() {
                           certificate.subjectType ? <CertificateStatus status={certificate.subjectType} /> : <>n/a</>,
                       ],
                   },
-              ];
+              ].filter((el) => el !== null) as NonNullable<TableDataRow>[]);
+
         if (certificate?.state !== CertStatus.Requested) {
             certDetail.push({
                 id: 'asn1structure',
@@ -1831,13 +1869,23 @@ export default function CertificateDetail() {
                                             />
                                         </Widget>
 
-                                        <Widget title="Signature attributes" titleSize="large">
+                                        <Widget title="Signature Attributes" titleSize="large">
                                             <br />
                                             <AttributeViewer
                                                 viewerType={ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE}
                                                 attributes={certificate?.certificateRequest?.signatureAttributes}
                                             />
                                         </Widget>
+
+                                        {certificate?.hybridCertificate && (
+                                            <Widget title="Alternative Signature Attributes" titleSize="large">
+                                                <br />
+                                                <AttributeViewer
+                                                    viewerType={ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE}
+                                                    attributes={certificate?.certificateRequest?.altSignatureAttributes}
+                                                />
+                                            </Widget>
+                                        )}
                                     </Col>
                                 </Row>
                             </Widget>

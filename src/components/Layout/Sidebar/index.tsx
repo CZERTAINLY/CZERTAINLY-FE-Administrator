@@ -137,10 +137,10 @@ const menuItemMappings: MenuItemMapping[] = [
             },
             { _key: '/globalmetadata', name: 'Global Metadata', link: '/globalmetadata', requiredResources: [Resource.Attributes] },
             {
-                _key: '/notificationsSettings',
-                name: 'Notifications',
-                link: '/notificationssettings',
-                requiredResources: [Resource.NotificationInstances],
+                _key: '/events',
+                name: 'Events',
+                link: '/events',
+                requiredResources: [Resource.NotificationInstances, Resource.Settings],
             },
             { _key: '/loggingSettings', name: 'Logging', link: '/loggingsettings', requiredResources: [Resource.Settings] },
             {
@@ -219,9 +219,9 @@ export default function Sidebar({ allowedResources }: Props) {
 
     function renderMenuItem(mapping: MenuItemMapping) {
         if ('children' in mapping) {
-            return <LinksGroup _key={mapping._key} header={mapping.header} childrenLinks={mapping.children} />;
+            return <LinksGroup key={mapping._key} header={mapping.header} childrenLinks={mapping.children} />;
         }
-        return <LinksGroup _key={mapping._key} header={mapping.header} headerLink={mapping.headerLink} />;
+        return <LinksGroup key={mapping._key} header={mapping.header} headerLink={mapping.headerLink} />;
     }
     return (
         <nav className={style.root}>

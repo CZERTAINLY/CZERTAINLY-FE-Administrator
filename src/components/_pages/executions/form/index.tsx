@@ -193,10 +193,10 @@ const ExecutionForm = () => {
                                             if (event?.value) {
                                                 form.change('type', event.value);
                                             }
-                                            form.change('resource', Resource.None);
+                                            form.change('resource', Resource.Any);
                                             form.change('selectedResource', {
-                                                value: Resource.None,
-                                                label: getEnumLabel(resourceEnum, Resource.None),
+                                                value: Resource.Any,
+                                                label: getEnumLabel(resourceEnum, Resource.Any),
                                             });
                                         }}
                                         styles={{

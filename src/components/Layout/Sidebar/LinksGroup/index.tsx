@@ -6,13 +6,11 @@ import { Collapse } from 'reactstrap';
 import style from './LinksGroup.module.scss';
 
 interface ChildrenLink {
-    _key: string;
     name: string;
     link: string;
 }
 
 interface Props {
-    _key: string;
     header: React.ReactNode;
     headerLink?: string;
     childrenLinks?: ChildrenLink[];
@@ -27,7 +25,7 @@ function LinksGroup(props: Props) {
 
     const createHeaderLink = () => {
         return (
-            <li key={props._key} className={cx(style.headerLink, props.className)}>
+            <li className={cx(style.headerLink, props.className)}>
                 <NavLink to={props.headerLink || ''} className={({ isActive }) => (isActive ? style.headerLinkActive : undefined)}>
                     <div>
                         <i className={props.glyph} />{' '}
@@ -45,7 +43,7 @@ function LinksGroup(props: Props) {
         const arrowClassName = cx('fa fa-angle-down arrow', style.arrow, { [style.arrowActive]: isOpen });
 
         return (
-            <li key={props._key} className={cx(style.headerLink, props.className)}>
+            <li className={cx(style.headerLink, props.className)}>
                 <a
                     href="#/"
                     className={matchClassName}

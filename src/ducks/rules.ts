@@ -6,12 +6,14 @@ import {
     ActionRequestModel,
     ConditionModel,
     ConditionRequestModel,
+    EventTriggerAssociationModel,
     ExecutionModel,
     ExecutionRequestModel,
     RuleDetailModel,
     RuleModel,
     RuleRequestModel,
     TriggerDetailModel,
+    TriggerEventAssociationRequestModel,
     TriggerHistoryModel,
     TriggerHistorySummaryModel,
     TriggerModel,
@@ -28,6 +30,7 @@ export type State = {
     rules: RuleModel[];
     triggerHistories: TriggerHistoryModel[];
     triggerHistorySummary?: TriggerHistorySummaryModel;
+    eventTriggerAssociation?: EventTriggerAssociationModel;
 
     ruleDetails?: RuleDetailModel;
     executions: ExecutionModel[];
@@ -65,6 +68,8 @@ export type State = {
     isUpdatingTrigger: boolean;
     isFetchingTriggerHistories: boolean;
     isFetchingTriggerHistorySummary: boolean;
+    isFetchingEventTriggersAssociation: boolean;
+    isUpdatingEventTriggersAssociation: boolean;
     isFetchingActions: boolean;
     isDeletingAction: boolean;
 };
@@ -103,6 +108,8 @@ export const initialState: State = {
     isDeletingRule: false,
     isFetchingTriggerHistories: false,
     isFetchingTriggerHistorySummary: false,
+    isFetchingEventTriggersAssociation: false,
+    isUpdatingEventTriggersAssociation: false,
     isFetchingActions: false,
     isFetchingActionDetails: false,
     isDeletingAction: false,
@@ -172,7 +179,7 @@ export const slice = createSlice({
             state.isFetchingConditions = false;
         },
 
-        listTriggers: (state, action: PayloadAction<{ resource?: Resource; eventResource?: Resource }>) => {
+        listTriggers: (state, action: PayloadAction<{ resource?: Resource }>) => {
             state.isFetchingTriggers = true;
         },
         listTriggersSuccess: (state, action: PayloadAction<{ triggers: TriggerModel[] }>) => {
@@ -475,6 +482,44 @@ export const slice = createSlice({
         getTriggerHistorySummaryFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingTriggerHistorySummary = false;
         },
+
+        getEventTriggersAssociations: (state, action: PayloadAction<{ resource: Resource; associationObjectUuid: string }>) => {
+            state.isFetchingEventTriggersAssociation = true;
+        },
+        getEventTriggersAssociationsSuccess: (state, action: PayloadAction<{ eventTriggerAssociation: EventTriggerAssociationModel }>) => {
+            state.eventTriggerAssociation = action.payload.eventTriggerAssociation;
+            state.isFetchingEventTriggersAssociation = false;
+        },
+        getEventTriggersAssociationsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingEventTriggersAssociation = false;
+        },
+
+        associateEventTriggers: (
+            state,
+            action: PayloadAction<{ triggerEventAssociationRequestModel: TriggerEventAssociationRequestModel }>,
+        ) => {
+            state.isFetchingEventTriggersAssociation = true;
+        },
+        associateEventTriggersSuccess: (
+            state,
+            action: PayloadAction<{ triggerEventAssociationRequestModel: TriggerEventAssociationRequestModel }>,
+        ) => {
+            state.isFetchingEventTriggersAssociation = false;
+            const { event, triggerUuids } = action.payload.triggerEventAssociationRequestModel;
+            if (state.eventTriggerAssociation) {
+                if (triggerUuids.length) {
+                    state.eventTriggerAssociation = {
+                        ...state.eventTriggerAssociation,
+                        [event]: triggerUuids,
+                    };
+                } else {
+                    delete state.eventTriggerAssociation[event];
+                }
+            }
+        },
+        associateEventTriggersFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingEventTriggersAssociation = false;
+        },
     },
 });
 
@@ -490,6 +535,7 @@ const triggerDetails = createSelector(state, (state) => state.triggerDetails);
 const triggers = createSelector(state, (state) => state.triggers);
 const triggerHistories = createSelector(state, (state) => state.triggerHistories);
 const triggerHistorySummary = createSelector(state, (state) => state.triggerHistorySummary);
+const eventTriggerAssociation = createSelector(state, (state) => state.eventTriggerAssociation);
 
 const actionsList = createSelector(state, (state) => state.actionsList);
 const actionDetails = createSelector(state, (state) => state.actionDetails);
@@ -501,6 +547,8 @@ const isCreatingCondition = createSelector(state, (state) => state.isCreatingCon
 const isUpdatingCondition = createSelector(state, (state) => state.isUpdatingCondition);
 
 const isFetchingTriggerHistorySummary = createSelector(state, (state) => state.isFetchingTriggerHistorySummary);
+const isFetchingEventTriggersAssociation = createSelector(state, (state) => state.isFetchingEventTriggersAssociation);
+const isUpdatingEventTriggersAssociation = createSelector(state, (state) => state.isUpdatingEventTriggersAssociation);
 const isFetchingTriggerHistories = createSelector(state, (state) => state.isFetchingTriggerHistories);
 const isCreatingRule = createSelector(state, (state) => state.isCreatingRule);
 const isUpdatingRule = createSelector(state, (state) => state.isUpdatingRule);
@@ -536,6 +584,7 @@ export const selectors = {
     actionDetails,
     actionsList,
     triggerHistorySummary,
+    eventTriggerAssociation,
 
     isCreatingAction,
     isFetchingActionDetails,
@@ -565,6 +614,8 @@ export const selectors = {
     isCreatingTrigger,
     isFetchingTriggerHistories,
     isFetchingTriggerHistorySummary,
+    isFetchingEventTriggersAssociation,
+    isUpdatingEventTriggersAssociation,
     isFetchingActions,
     isDeletingAction,
 };

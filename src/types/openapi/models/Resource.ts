@@ -18,6 +18,7 @@
  */
 export enum Resource {
     None = 'NONE',
+    Any = 'ANY',
     Dashboard = 'dashboard',
     Settings = 'settings',
     AuditLogs = 'auditLogs',

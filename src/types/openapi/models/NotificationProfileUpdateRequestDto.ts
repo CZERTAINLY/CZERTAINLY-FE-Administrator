@@ -33,11 +33,11 @@ export interface NotificationProfileUpdateRequestDto {
      */
     recipientType: RecipientType;
     /**
-     * Recipient UUID of notifications produced by profile
-     * @type {string}
+     * Recipient UUIDs of notifications produced by profile
+     * @type {Array<string>}
      * @memberof NotificationProfileUpdateRequestDto
      */
-    recipientUuid?: string;
+    recipientUuids?: Array<string>;
     /**
      * Notification instance UUID
      * @type {string}

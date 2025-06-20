@@ -89,17 +89,41 @@ export interface CertificateDetailDto {
      */
     publicKeyAlgorithm: string;
     /**
+     * Alternative Public key algorithm
+     * @type {string}
+     * @memberof CertificateDetailDto
+     */
+    altPublicKeyAlgorithm: string;
+    /**
      * Certificate signature algorithm
      * @type {string}
      * @memberof CertificateDetailDto
      */
     signatureAlgorithm: string;
     /**
+     * Certificate alternative signature algorithm
+     * @type {string}
+     * @memberof CertificateDetailDto
+     */
+    altSignatureAlgorithm: string;
+    /**
+     * Indicator whether the certificate is hybrid
+     * @type {boolean}
+     * @memberof CertificateDetailDto
+     */
+    hybridCertificate: boolean;
+    /**
      * Certificate key size
      * @type {number}
      * @memberof CertificateDetailDto
      */
     keySize: number;
+    /**
+     * Certificate key size of the alternative key
+     * @type {number}
+     * @memberof CertificateDetailDto
+     */
+    altKeySize: number;
     /**
      * State of the Certificate
      * @type {CertificateState}
@@ -238,6 +262,12 @@ export interface CertificateDetailDto {
      * @memberof CertificateDetailDto
      */
     key?: KeyDto;
+    /**
+     * Alternative Key Pair of the certificate
+     * @type {KeyDto}
+     * @memberof CertificateDetailDto
+     */
+    altKey?: KeyDto;
     /**
      * Certificate request data
      * @type {CertificateRequestDto}

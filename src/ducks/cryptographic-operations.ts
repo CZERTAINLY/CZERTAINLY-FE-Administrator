@@ -14,6 +14,7 @@ import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
     signatureAttributeDescriptors?: AttributeDescriptorModel[];
+    altSignatureAttributeDescriptors?: AttributeDescriptorModel[];
     cipherAttributeDescriptors?: AttributeDescriptorModel[];
     randomDataAttributeDescriptors?: AttributeDescriptorModel[];
 
@@ -31,6 +32,7 @@ export type State = {
 export const initialState: State = {
     cipherAttributeDescriptors: [],
     signatureAttributeDescriptors: [],
+    altSignatureAttributeDescriptors: [],
     randomDataAttributeDescriptors: [],
 
     isEncrypting: false,
@@ -58,8 +60,12 @@ export const slice = createSlice({
             Object.keys(initialState).forEach((key) => ((state as any)[key] = (initialState as any)[key]));
         },
 
-        clearSignatureAttributeDescriptors: (state, action: PayloadAction<void>) => {
-            state.signatureAttributeDescriptors = [];
+        clearSignatureAttributeDescriptors: (state, action: PayloadAction<'alt' | 'normal' | undefined>) => {
+            if (action.payload === 'alt') {
+                state.altSignatureAttributeDescriptors = [];
+            } else {
+                state.signatureAttributeDescriptors = [];
+            }
         },
 
         clearCipherAttributeDescriptors: (state, action: PayloadAction<void>) => {
@@ -78,6 +84,7 @@ export const slice = createSlice({
                 uuid: string;
                 keyItemUuid: string;
                 algorithm: KeyAlgorithm;
+                store?: 'alt' | 'normal';
             }>,
         ) => {
             state.isFetchingSignatureAttributes = true;
@@ -85,11 +92,14 @@ export const slice = createSlice({
 
         listSignatureAttributeDescriptorsSuccess: (
             state,
-            action: PayloadAction<{ uuid: string; attributeDescriptors: AttributeDescriptorModel[] }>,
+            action: PayloadAction<{ uuid: string; attributeDescriptors: AttributeDescriptorModel[]; store?: 'alt' | 'normal' }>,
         ) => {
             state.isFetchingSignatureAttributes = false;
-
-            state.signatureAttributeDescriptors = action.payload.attributeDescriptors;
+            if (action.payload.store === 'alt') {
+                state.altSignatureAttributeDescriptors = action.payload.attributeDescriptors;
+            } else {
+                state.signatureAttributeDescriptors = action.payload.attributeDescriptors;
+            }
         },
 
         listSignatureAttributesFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -207,6 +217,7 @@ export const slice = createSlice({
 const state = createFeatureSelector<State>(slice.name);
 
 const signatureAttributeDescriptors = createSelector(state, (state: State) => state.signatureAttributeDescriptors);
+const altSignatureAttributeDescriptors = createSelector(state, (state: State) => state.altSignatureAttributeDescriptors);
 const cipherAttributeDescriptors = createSelector(state, (state: State) => state.cipherAttributeDescriptors);
 const randomDataAttributeDescriptors = createSelector(state, (state: State) => state.randomDataAttributeDescriptors);
 
@@ -224,6 +235,7 @@ export const selectors = {
     state,
 
     signatureAttributeDescriptors,
+    altSignatureAttributeDescriptors,
     cipherAttributeDescriptors,
     randomDataAttributeDescriptors,
 

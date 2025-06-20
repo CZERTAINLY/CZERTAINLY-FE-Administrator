@@ -8,7 +8,7 @@ import { actions as appRedirectActions } from './app-redirect';
 
 import * as slice from './rules';
 import {
-    tranformExecutionRequestModelToDto,
+    transformExecutionRequestModelToDto,
     transformActionDetailDtoToModel,
     transformActionDtoToModel,
     transformActionRequestModelToDto,
@@ -20,6 +20,7 @@ import {
     transformRuleRequestModelToDto,
     transformTriggerDetailDtoToModel,
     transformTriggerDtoToModel,
+    transformTriggerEventAssociationRequestModelToDto,
     transformTriggerHistoryDtoToModel,
     transformTriggerHistorySummaryDtoToModel,
     transformTriggerRequestModelToDto,
@@ -116,7 +117,7 @@ const listTriggers: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.listTriggers.match),
         switchMap((action) =>
-            deps.apiClients.triggers.listTriggers({ resource: action.payload.resource, eventResource: action.payload.eventResource }).pipe(
+            deps.apiClients.triggers.listTriggers({ resource: action.payload.resource }).pipe(
                 switchMap((triggers) =>
                     of(
                         slice.actions.listTriggersSuccess({
@@ -141,7 +142,7 @@ const createExecution: AppEpic = (action$, state, deps) => {
         switchMap((action) =>
             deps.apiClients.actions
                 .createExecution({
-                    executionRequestDto: tranformExecutionRequestModelToDto(action.payload.executionRequestModel),
+                    executionRequestDto: transformExecutionRequestModelToDto(action.payload.executionRequestModel),
                 })
                 .pipe(
                     switchMap((execution) =>
@@ -643,6 +644,66 @@ const getTriggerHistorySummary: AppEpic = (action$, state, deps) => {
     );
 };
 
+const getEventTriggersAssociations: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.getEventTriggersAssociations.match),
+        switchMap((action) =>
+            deps.apiClients.triggers
+                .getEventTriggersAssociations({
+                    resource: action.payload.resource,
+                    associationObjectUuid: action.payload.associationObjectUuid,
+                })
+                .pipe(
+                    switchMap((eventTriggerAssociation) =>
+                        of(
+                            slice.actions.getEventTriggersAssociationsSuccess({
+                                eventTriggerAssociation,
+                            }),
+                        ),
+                    ),
+                    catchError((err) =>
+                        of(
+                            slice.actions.getEventTriggersAssociationsFailure({
+                                error: extractError(err, 'Failed to get event trigger associations'),
+                            }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
+const associateEventTriggers: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.associateEventTriggers.match),
+        switchMap((action) =>
+            deps.apiClients.triggers
+                .associateEventTriggers({
+                    triggerEventAssociationRequestDto: transformTriggerEventAssociationRequestModelToDto(
+                        action.payload.triggerEventAssociationRequestModel,
+                    ),
+                })
+                .pipe(
+                    switchMap(() =>
+                        of(
+                            slice.actions.associateEventTriggersSuccess({
+                                triggerEventAssociationRequestModel: action.payload.triggerEventAssociationRequestModel,
+                            }),
+                        ),
+                    ),
+                    catchError((err) =>
+                        of(
+                            slice.actions.associateEventTriggersFailure({
+                                error: extractError(err, 'Failed to update event trigger association'),
+                            }),
+                            alertActions.error(extractError(err, 'Failed to update event trigger association')),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
 const epics = [
     listRules,
     listExecutions,
@@ -671,6 +732,8 @@ const epics = [
     updateTrigger,
     getTriggerHistory,
     getTriggerHistorySummary,
+    getEventTriggersAssociations,
+    associateEventTriggers,
 ];
 
 export default epics;
