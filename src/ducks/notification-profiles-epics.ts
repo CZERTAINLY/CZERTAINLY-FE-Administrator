@@ -1,10 +1,13 @@
 import { AppEpic } from 'ducks';
+import { store } from '../App';
 import { iif, of } from 'rxjs';
 import { catchError, filter, mergeMap, switchMap } from 'rxjs/operators';
 import { extractError } from 'utils/net';
 import { actions as alertActions } from './alerts';
 import { actions as appRedirectActions } from './app-redirect';
 import { slice } from './notification-profiles';
+import { EntityType } from './filters';
+import { actions as pagingActions } from './paging';
 import { actions as userInterfaceActions } from './user-interface';
 
 import { LockWidgetNameEnum } from 'types/user-interface';
@@ -18,27 +21,32 @@ import {
 const listNotificationProfiles: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.listNotificationProfiles.match),
-        switchMap(() =>
-            deps.apiClients.notificationProfiles.listNotificationProfiles({}).pipe(
-                switchMap((list) =>
-                    of(
-                        slice.actions.listNotificationProfilesSuccess({
-                            notificationProfiles: list.notificationProfiles?.map(transformNotificationProfileDtoToModel) ?? [],
-                        }),
-                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfNotificationProfiles),
+        switchMap((action) => {
+            store.dispatch(pagingActions.list(EntityType.NOTIFICATION_PROFILES));
+            return deps.apiClients.notificationProfiles
+                .listNotificationProfiles({ itemsPerPage: action.payload.itemsPerPage, pageNumber: action.payload.pageNumber })
+                .pipe(
+                    switchMap((list) =>
+                        of(
+                            slice.actions.listNotificationProfilesSuccess({
+                                notificationProfiles: list.notificationProfiles?.map(transformNotificationProfileDtoToModel) ?? [],
+                            }),
+                            pagingActions.listSuccess({ entity: EntityType.NOTIFICATION_PROFILES, totalItems: list.totalItems }),
+                            userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfNotificationProfiles),
+                        ),
                     ),
-                ),
 
-                catchError((error) =>
-                    of(
-                        slice.actions.listNotificationProfilesFailure({
-                            error: extractError(error, 'Failed to get Notification Profiles list'),
-                        }),
-                        userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfNotificationProfiles),
+                    catchError((error) =>
+                        of(
+                            slice.actions.listNotificationProfilesFailure({
+                                error: extractError(error, 'Failed to get Notification Profiles list'),
+                            }),
+                            pagingActions.listFailure(EntityType.NOTIFICATION_PROFILES),
+                            userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfNotificationProfiles),
+                        ),
                     ),
-                ),
-            ),
-        ),
+                );
+        }),
     );
 };
 

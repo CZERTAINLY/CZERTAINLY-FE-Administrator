@@ -1,48 +1,28 @@
 import BooleanBadge from 'components/BooleanBadge/BooleanBadge';
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
-import Widget from 'components/Widget';
-import { WidgetButtonProps } from 'components/WidgetButtons';
+import { TableDataRow, TableHeader } from 'components/CustomTable';
+import PagedList from 'components/PagedList/PagedList';
 import { getEnumLabel, selectors as enumSelectors } from 'ducks/enums';
 import { actions, selectors } from 'ducks/notification-profiles';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router';
+import { Link } from 'react-router';
 import { Badge, Container } from 'reactstrap';
+import { EntityType } from 'ducks/filters';
+import { SearchRequestModel } from 'types/certificate';
 import { PlatformEnum } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 
 const NotificationProfilesList = () => {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const notificationProfiles = useSelector(selectors.notificationProfiles);
-    const isFetchingList = useSelector(selectors.isFetchingList);
 
     const recipientTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.RecipientType));
 
-    const getNotificationProfiles = useCallback(() => {
-        dispatch(actions.listNotificationProfiles());
-    }, [dispatch]);
-
-    useEffect(() => {
-        getNotificationProfiles();
-    }, [getNotificationProfiles]);
-
-    const isBusy = useMemo(() => isFetchingList, [isFetchingList]);
-
-    const providersButtons: WidgetButtonProps[] = useMemo(
-        () => [
-            {
-                icon: 'plus',
-                disabled: false,
-                tooltip: 'Create Notification Profile',
-                onClick: () => {
-                    navigate('./add');
-                },
-            },
-        ],
-        [navigate],
+    const onListCallback = useCallback(
+        (pagination: SearchRequestModel) => dispatch(actions.listNotificationProfiles(pagination)),
+        [dispatch],
     );
 
     const headers: TableHeader[] = useMemo(
@@ -100,18 +80,16 @@ const NotificationProfilesList = () => {
 
     return (
         <Container className="themed-container" fluid>
-            <Widget
+            <PagedList
+                entity={EntityType.NOTIFICATION_PROFILES}
+                onListCallback={onListCallback}
+                headers={headers}
+                data={dataRows}
                 title="List of Notification Profiles"
-                widgetButtons={providersButtons}
-                refreshAction={getNotificationProfiles}
-                titleSize="larger"
-                widgetLockName={LockWidgetNameEnum.ListOfNotificationProfiles}
-                lockSize="large"
-                busy={isBusy}
-            >
-                <br />
-                <CustomTable headers={headers} data={dataRows} canSearch={true} hasPagination={true} />
-            </Widget>
+                entityNameSingular="a Notification Profile"
+                entityNamePlural="Notification Profiles"
+                pageWidgetLockName={LockWidgetNameEnum.ListOfNotificationProfiles}
+            />
         </Container>
     );
 };
