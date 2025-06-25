@@ -6,8 +6,8 @@ import { actions as pagingActions } from 'ducks/paging';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { SearchRequestModel } from 'types/certificate';
-import '../../src/resources/styles/theme.scss';
-import { clickWait, componentLoadWait } from '../utils/constants';
+import '../../../src/resources/styles/theme.scss';
+import { clickWait, componentLoadWait } from '../../utils/constants';
 
 const testListRequest = createAction<SearchRequestModel>('test/pagedList/request');
 
