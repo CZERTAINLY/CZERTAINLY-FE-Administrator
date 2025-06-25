@@ -29,7 +29,7 @@ export function SendNotificationExecutionItems({ mode, isUpdating, notificationP
     const [selectedProfiles, setSelectedProfiles] = useState<SelectChangeValue[]>(notificationProfileItems ?? []);
 
     useEffect(() => {
-        dispatch(notificationProfileActions.listNotificationProfiles());
+        dispatch(notificationProfileActions.listNotificationProfiles({ itemsPerPage: 100 }));
     }, [dispatch]);
 
     const onAddProfileClick = useCallback(() => {

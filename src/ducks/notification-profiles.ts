@@ -1,4 +1,5 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { SearchRequestModel } from 'types/certificate';
 import {
     NotificationProfileDetailModel,
     NotificationProfileModel,
@@ -41,7 +42,7 @@ export const slice = createSlice({
             Object.keys(initialState).forEach((key) => ((state as Partial<State>)[key as keyof State] = (initialState as any)[key]));
         },
 
-        listNotificationProfiles: (state, action: PayloadAction<void>) => {
+        listNotificationProfiles: (state, action: PayloadAction<SearchRequestModel>) => {
             state.notificationProfiles = [];
             state.isFetchingList = true;
         },

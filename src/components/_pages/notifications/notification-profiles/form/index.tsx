@@ -197,7 +197,7 @@ export default function NotificationProfileForm() {
                 {({ handleSubmit, pristine, submitting, values, valid, form }) => {
                     const type = values.recipientType?.value;
                     const isNotificationInstanceRequired =
-                        type === RecipientType.Owner ||
+                        type === RecipientType.Default ||
                         type === RecipientType.None ||
                         ((type === RecipientType.User || type === RecipientType.Role || type === RecipientType.Group) &&
                             !values.internalNotification);
@@ -228,7 +228,7 @@ export default function NotificationProfileForm() {
                                         error={
                                             meta.error &&
                                             meta.touched &&
-                                            'Notification Instance is required if Recipient Type is Owner or None, or if the send internal notifications is false'
+                                            'Notification Instance is required if Recipient Type is Default or None, or if the send internal notifications is false'
                                         }
                                     />
                                 )}
@@ -237,7 +237,7 @@ export default function NotificationProfileForm() {
                             <SwitchField
                                 id="internalNotification"
                                 label="Send internal notifications"
-                                disabled={type === RecipientType.Owner || type === RecipientType.None}
+                                disabled={type === RecipientType.Default || type === RecipientType.None}
                             />
 
                             <Field name="frequency" validate={validateDuration(['d', 'h'])}>
@@ -369,7 +369,7 @@ function RecipientTypeFields() {
                     form.resetFieldState('notificationInstance');
                     switch ((e as OptionType).value) {
                         case RecipientType.None:
-                        case RecipientType.Owner:
+                        case RecipientType.Default:
                             form.change('internalNotification', false);
                     }
                 }}
