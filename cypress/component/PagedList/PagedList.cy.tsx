@@ -24,7 +24,7 @@ const PagedListTest = () => {
         <PagedList
             entity={EntityType.NOTIFICATION_PROFILES}
             headers={headers}
-            data={rows(10)}
+            data={rows(20)}
             title="Test List"
             entityNameSingular="item"
             entityNamePlural="items"
