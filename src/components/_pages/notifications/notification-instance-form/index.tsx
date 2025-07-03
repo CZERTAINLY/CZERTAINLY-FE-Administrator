@@ -255,7 +255,7 @@ const NotificationInstanceForm = () => {
 
     const renderAttributeEditor = useCallback(
         (kind: string | undefined) => {
-            if (!notificationProviderAttributesDescriptors || !selectedNotificationInstanceProvider) return <></>;
+            if (!notificationProviderAttributesDescriptors || !selectedNotificationInstanceProvider || !kind) return <></>;
 
             return (
                 <AttributeEditor
