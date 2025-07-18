@@ -69,7 +69,7 @@ export default function AttributeEditor({
     // data from callbacks
     const callbackData = useSelector(connectorSelectors.callbackData);
 
-    // used to check if descritors have changed
+    // used to check if descriptors have changed
     const [prevDescriptors, setPrevDescriptors] = useState<AttributeDescriptorModel[]>();
 
     // used to check if attributes have changed
@@ -89,6 +89,9 @@ export default function AttributeEditor({
     // used to store custom attributes which user has selected
     const [prevShownCustomAttributes, setPrevShownCustomAttributes] = useState<AttributeDescriptorModel[]>([]);
     const [shownCustomAttributes, setShownCustomAttributes] = useState<AttributeDescriptorModel[]>([]);
+
+    // used to set attributes value from state only on initial render
+    const callbackAttributesValueSetCountsRef = useRef<{ [attributeName: string]: number }>({});
 
     // workaround to be possible to set options from multiple places;
     // multiple effects can modify opts during single render call
@@ -342,22 +345,25 @@ export default function AttributeEditor({
             attribute: AttributeResponseModel | undefined,
             formAttributeName: string,
             setDefaultOnRequiredValuesOnly: boolean,
+            forceDefaultDescriptorValue: boolean,
         ) => {
             let formAttributeValue = undefined;
 
+            const appliedContent = forceDefaultDescriptorValue ? descriptor?.content : attribute?.content;
+
             function handleFileAttributeContentType() {
-                if (attribute?.content) {
+                if (appliedContent) {
                     form.mutators.setAttribute(
                         `${formAttributeName}.content`,
-                        (attribute.content as FileAttributeContentModel[])[0].reference,
+                        (appliedContent as FileAttributeContentModel[])[0].reference,
                     );
                     form.mutators.setAttribute(
                         `${formAttributeName}.fileName`,
-                        (attribute.content as FileAttributeContentModel[])[0].data.fileName || 'unknown',
+                        (appliedContent as FileAttributeContentModel[])[0].data.fileName || 'unknown',
                     );
                     form.mutators.setAttribute(
                         `${formAttributeName}.mimeType`,
-                        (attribute.content as FileAttributeContentModel[])[0].data.mimeType || 'unknown',
+                        (appliedContent as FileAttributeContentModel[])[0].data.mimeType || 'unknown',
                     );
                 } else if (descriptor.content) {
                     form.mutators.setAttribute(
@@ -381,8 +387,8 @@ export default function AttributeEditor({
             }
 
             function setMultiSelectListAttributeValue() {
-                if (Array.isArray(attribute?.content)) {
-                    formAttributeValue = attribute!.content.map((content) => ({
+                if (Array.isArray(appliedContent)) {
+                    formAttributeValue = appliedContent.map((content) => ({
                         label: content.reference
                             ? content.reference
                             : descriptor.contentType === AttributeContentType.Datetime
@@ -395,14 +401,14 @@ export default function AttributeEditor({
                 }
             }
             function setSelectListAttributeValue() {
-                if (attribute?.content) {
+                if (appliedContent) {
                     formAttributeValue = {
-                        label: attribute.content[0].reference
-                            ? attribute.content[0].reference
+                        label: appliedContent[0].reference
+                            ? appliedContent[0].reference
                             : descriptor.contentType === AttributeContentType.Datetime
-                              ? getFormattedDateTime(attribute.content[0].data.toString())
-                              : attribute.content[0].data.toString(),
-                        value: attribute.content[0],
+                              ? getFormattedDateTime(appliedContent[0].data.toString())
+                              : appliedContent[0].data.toString(),
+                        value: appliedContent[0],
                     };
                 } else {
                     formAttributeValue = undefined;
@@ -410,8 +416,8 @@ export default function AttributeEditor({
             }
 
             function setBooleanAttributeValue() {
-                if (attribute?.content?.[0]?.data !== undefined) {
-                    formAttributeValue = attribute.content[0].data;
+                if (appliedContent?.[0]?.data !== undefined) {
+                    formAttributeValue = appliedContent[0].data;
                 } else if (descriptor.properties.required) {
                     // set value to false, if attribute is required, has no value, and no default value are provided
                     // otherwise allow the value to be undefined
@@ -425,25 +431,28 @@ export default function AttributeEditor({
                 setMultiSelectListAttributeValue();
             } else if (descriptor.properties.list) {
                 setSelectListAttributeValue();
-            } else if (attribute?.content) {
-                formAttributeValue = attribute.content[0].reference ?? attribute.content[0].data;
+            } else if (appliedContent) {
+                formAttributeValue = appliedContent[0].reference ?? appliedContent[0].data;
             } else if (
                 descriptor.content &&
                 descriptor.content.length > 0 &&
                 (!setDefaultOnRequiredValuesOnly || descriptor.properties.required)
             ) {
+                // This acts as a fallback for the case when the attribute has no value, but has a default value in the descriptor
                 formAttributeValue = descriptor.content[0].reference ?? descriptor.content[0].data;
             }
 
-            if (
-                descriptor.contentType === AttributeContentType.Codeblock &&
-                formAttributeValue !== undefined &&
-                (formAttributeValue as CodeBlockAttributeContentDataModel).code !== undefined
-            ) {
-                formAttributeValue = {
-                    code: base64ToUtf8((formAttributeValue as CodeBlockAttributeContentDataModel).code),
-                    language: (formAttributeValue as CodeBlockAttributeContentDataModel).language,
-                };
+            if (descriptor.contentType === AttributeContentType.Codeblock && formAttributeValue !== undefined) {
+                if ((formAttributeValue as CodeBlockAttributeContentDataModel).code !== undefined) {
+                    formAttributeValue = {
+                        code: base64ToUtf8((formAttributeValue as CodeBlockAttributeContentDataModel).code),
+                        language: (formAttributeValue as CodeBlockAttributeContentDataModel).language,
+                    };
+                } else {
+                    formAttributeValue = {
+                        language: (formAttributeValue as CodeBlockAttributeContentDataModel).language,
+                    };
+                }
             }
             if (descriptor.contentType === AttributeContentType.Boolean) {
                 setBooleanAttributeValue();
@@ -521,9 +530,17 @@ export default function AttributeEditor({
                     ...getAttributeStaticOptions(descriptor, formAttributeName),
                 };
 
+                console.log('callbackAttributesValueSetCountsRef.current', callbackAttributesValueSetCountsRef.current);
                 // Set initial values from the attribute
                 if (isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
-                    setAttributeFormValue(descriptor, attribute, formAttributeName, true);
+                    setAttributeFormValue(
+                        descriptor,
+                        attribute,
+                        formAttributeName,
+                        true,
+                        // If the attribute has been set more than once, consider it not being initial update call, so set the default value instead (see Issue: #915)
+                        callbackAttributesValueSetCountsRef.current[formAttributeName] > 1,
+                    );
                 }
             }
         });
@@ -566,7 +583,7 @@ export default function AttributeEditor({
 
                 // Only set the value for attributes whose value was not yet modified
                 if (!getObjectPropertyValue(formState.values, formAttributeName)) {
-                    setAttributeFormValue(descriptor, attribute, formAttributeName, false);
+                    setAttributeFormValue(descriptor, attribute, formAttributeName, false, false);
                 }
             }
         });
@@ -688,15 +705,21 @@ export default function AttributeEditor({
             const groupCallbackAttributes: AttributeDescriptorModel[] = callbackData[callbackId].filter(isAttributeDescriptorModel);
 
             const descriptors = [...attributeDescriptors, ...groupAttributesCallbackAttributes];
-            const descriptor = descriptors.find((d) => `__attributes__${id}__.${d.name}` === callbackId);
+            const callbackDescriptor = descriptors.find((d) => `__attributes__${id}__.${d.name}` === callbackId);
 
-            if (descriptor) {
-                // Set groupAttributesCallbackAttributes inside the loop, to only run this if the callbackData fields have actually been changed.
-                const newGroupCallbackAttributes = Object.values(callbackData)
+            // Set groupAttributesCallbackDescriptors inside the loop, to only run this if the callbackData fields have actually been changed.
+            if (callbackDescriptor) {
+                const newGroupCallbackDescriptors = Object.values(callbackData)
                     .filter(Array.isArray)
                     .map((callbackDataArray) => callbackDataArray.filter(isAttributeDescriptorModel))
                     .reduce((acc, el) => [...acc, ...el], []);
-                setGroupAttributesCallbackAttributes(newGroupCallbackAttributes);
+                setGroupAttributesCallbackAttributes(newGroupCallbackDescriptors);
+
+                newGroupCallbackDescriptors.forEach((descriptor) => {
+                    const formAttributeName = `__attributes__${id}__.${descriptor.name}`;
+                    callbackAttributesValueSetCountsRef.current[formAttributeName] =
+                        (callbackAttributesValueSetCountsRef.current[formAttributeName] ?? 0) + 1;
+                });
             }
 
             const groupCallbackAttributesContentOpts = groupCallbackAttributes.reduce((acc, attr) => {
@@ -729,7 +752,7 @@ export default function AttributeEditor({
 
             setOptions({ ...options, ...opts });
 
-            if (descriptor && isDataAttributeModel(descriptor) && !descriptor.properties.list) {
+            if (callbackDescriptor && isDataAttributeModel(callbackDescriptor) && !callbackDescriptor.properties.list) {
                 form.mutators.setAttribute(callbackId, callbackData[callbackId][0].reference ?? callbackData[callbackId][0].data);
             }
         }
