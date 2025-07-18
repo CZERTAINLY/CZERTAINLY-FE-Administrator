@@ -394,6 +394,41 @@ describe('Group Callback Attributes: General Tests', () => {
         cySelectors.attributeSelectInput(getAttributeId('IntegerSelect')).input().should('exist');
     });
 
+    it(`When the same attribute is returned by the callback second time, default descriptor value should be displayed instead of attribute value.
+        `, () => {
+        cy.mount(
+            <CallbackVariationsAttributeEditorComponent
+                attributes={callbackVariationsAtributeEditorMockData.repeatCallbackSameDescriptorTest.attributes}
+                attributeDescriptors={callbackVariationsAtributeEditorMockData.repeatCallbackSameDescriptorTest.attributeDescriptors}
+            />,
+        ).wait(componentLoadWait);
+
+        cy.dispatchActions(
+            connectorActions.callbackSuccess({
+                callbackId: getAttributeId('group_DefaultTextOrIntegerSelect'),
+                data: callbackVariationsAtributeEditorMockData.repeatCallbackSameDescriptorTest.callbackResourceSuccess1,
+            }),
+        ).wait(reduxActionWait);
+
+        cySelectors.attributeInput(getAttributeId('DefaultText')).textarea().should('contain.text', 'non-default');
+
+        cy.expectActionAfter(
+            () => {
+                cySelectors.attributeSelectInput(getAttributeId('StringSelect')).selectOption('Option1').click().wait(callbackWait);
+            },
+            slice.actions.callbackConnector.match,
+            ({ payload }) => {
+                cy.dispatchActions(
+                    connectorActions.callbackSuccess({
+                        callbackId: payload.callbackId,
+                        data: callbackVariationsAtributeEditorMockData.repeatCallbackSameDescriptorTest.callbackResourceSuccess1,
+                    }),
+                ).wait(reduxActionWait);
+            },
+        );
+        cySelectors.attributeInput(getAttributeId('DefaultText')).textarea().should('contain.text', 'default-content');
+    });
+
     it(`Reset the redux state that was used`, () => {
         cy.dispatchActions(connectorActions.resetState());
     });

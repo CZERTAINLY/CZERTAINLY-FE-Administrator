@@ -530,7 +530,6 @@ export default function AttributeEditor({
                     ...getAttributeStaticOptions(descriptor, formAttributeName),
                 };
 
-                console.log('callbackAttributesValueSetCountsRef.current', callbackAttributesValueSetCountsRef.current);
                 // Set initial values from the attribute
                 if (isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
                     setAttributeFormValue(
