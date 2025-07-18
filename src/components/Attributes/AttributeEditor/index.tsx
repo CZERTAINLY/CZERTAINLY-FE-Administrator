@@ -137,14 +137,14 @@ export default function AttributeEditor({
 
     const mapAttributeContentToOptionValue = useCallback(
         (content: BaseAttributeContentModel, descriptor: DataAttributeModel | CustomAttributeModel) => {
+            const nonReferenceLabel =
+                descriptor.contentType === AttributeContentType.Date
+                    ? getFormattedDate(content?.data as unknown as string)?.toString()
+                    : descriptor.contentType === AttributeContentType.Datetime
+                      ? getFormattedDateTime(content?.data as unknown as string)?.toString()
+                      : (content?.data as unknown as string)?.toString();
             return {
-                label: content.reference
-                    ? content.reference
-                    : descriptor.contentType === AttributeContentType.Date
-                      ? getFormattedDate(content?.data as unknown as string)?.toString()
-                      : descriptor.contentType === AttributeContentType.Datetime
-                        ? getFormattedDateTime(content?.data as unknown as string)?.toString()
-                        : (content?.data as unknown as string)?.toString(),
+                label: content.reference ? content.reference : nonReferenceLabel,
                 value: content,
             };
         },
