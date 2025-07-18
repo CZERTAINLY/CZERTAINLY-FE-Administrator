@@ -10,6 +10,7 @@ import {
     AttributeCallbackMappingModel,
     AttributeDescriptorModel,
     AttributeResponseModel,
+    BaseAttributeContentModel,
     CodeBlockAttributeContentDataModel,
     CustomAttributeModel,
     DataAttributeModel,
@@ -25,7 +26,7 @@ import {
 import { CallbackAttributeModel } from 'types/connectors';
 import { AttributeContentType, AttributeValueTarget, FunctionGroupCode, Resource } from 'types/openapi';
 import { base64ToUtf8 } from 'utils/common-utils';
-import { getFormattedDateTime } from 'utils/dateUtil';
+import { getFormattedDate, getFormattedDateTime } from 'utils/dateUtil';
 import { Attribute } from './Attribute';
 import CustomAttributeAddSelect from 'components/Attributes/AttributeEditor/CustomAttributeAddSelect';
 
@@ -133,6 +134,23 @@ export default function AttributeEditor({
         for (const k in isRunningCallback) isRunningCb = isRunningCb || isRunningCallback[k];
         return isRunningCb;
     }, [isRunningCallback]);
+
+    const mapAttributeContentToOptionValue = useCallback(
+        (content: BaseAttributeContentModel, descriptor: DataAttributeModel | CustomAttributeModel) => {
+            return {
+                label: content.reference
+                    ? content.reference
+                    : descriptor.contentType === AttributeContentType.Date
+                      ? getFormattedDate(content?.data as unknown as string)?.toString()
+                      : descriptor.contentType === AttributeContentType.Datetime
+                        ? getFormattedDateTime(content?.data as unknown as string)?.toString()
+                        : (content?.data as unknown as string)?.toString(),
+                value: content,
+            };
+        },
+        [],
+    );
+
     /**
      * Gets the value of the attribute identified by the path (attributeName.propertyName.propertyName...)
      */
@@ -388,28 +406,15 @@ export default function AttributeEditor({
 
             function setMultiSelectListAttributeValue() {
                 if (Array.isArray(appliedContent)) {
-                    formAttributeValue = appliedContent.map((content) => ({
-                        label: content.reference
-                            ? content.reference
-                            : descriptor.contentType === AttributeContentType.Datetime
-                              ? getFormattedDateTime(content.data.toString())
-                              : content.data.toString(),
-                        value: content,
-                    }));
+                    formAttributeValue = appliedContent.map((content) => mapAttributeContentToOptionValue(content, descriptor));
                 } else {
                     formAttributeValue = undefined;
                 }
             }
+
             function setSelectListAttributeValue() {
                 if (appliedContent) {
-                    formAttributeValue = {
-                        label: appliedContent[0].reference
-                            ? appliedContent[0].reference
-                            : descriptor.contentType === AttributeContentType.Datetime
-                              ? getFormattedDateTime(appliedContent[0].data.toString())
-                              : appliedContent[0].data.toString(),
-                        value: appliedContent[0],
-                    };
+                    formAttributeValue = mapAttributeContentToOptionValue(appliedContent[0], descriptor);
                 } else {
                     formAttributeValue = undefined;
                 }
@@ -460,7 +465,7 @@ export default function AttributeEditor({
 
             form.mutators.setAttribute(formAttributeName, formAttributeValue);
         },
-        [form.mutators],
+        [form.mutators, mapAttributeContentToOptionValue],
     );
     const getAttributeStaticOptions = useCallback(
         (descriptor: DataAttributeModel | CustomAttributeModel | GroupAttributeModel, formAttributeName: string) => {
