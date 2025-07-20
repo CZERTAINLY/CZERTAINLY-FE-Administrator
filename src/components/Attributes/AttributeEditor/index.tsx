@@ -790,8 +790,12 @@ export default function AttributeEditor({
 
             setOptions({ ...options, ...opts });
 
-            if (callbackDescriptor && isDataAttributeModel(callbackDescriptor) && !callbackDescriptor.properties.list) {
-                form.mutators.setAttribute(callbackId, callbackData[callbackId][0].reference ?? callbackData[callbackId][0].data);
+            if (callbackDescriptor && isDataAttributeModel(callbackDescriptor)) {
+                if (!callbackDescriptor.properties.list) {
+                    form.mutators.setAttribute(callbackId, callbackData[callbackId][0].reference ?? callbackData[callbackId][0].data);
+                } else {
+                    form.mutators.setAttribute(callbackId, opts[callbackId][0]);
+                }
             }
         }
 
