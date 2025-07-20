@@ -92,7 +92,15 @@ export default function AttributeEditor({
     const [shownCustomAttributes, setShownCustomAttributes] = useState<AttributeDescriptorModel[]>([]);
 
     // used to set attributes value from state only on initial render
-    const callbackAttributesValueSetCountsRef = useRef<{ [attributeName: string]: number }>({});
+    const callbackAttributesCallContextRef = useRef<{
+        [attributeName: string]: {
+            // Amount of times the attribute's value has been set
+            setCount: number;
+            // When attributes value is set, this is set to true. When a callback is executed and a new descriptor is loaded, this is set to false.
+            // This is used to prevent increasing setCount, if the callback is loaded multiple times before actually writing the values to the form.
+            countIncremented: boolean;
+        };
+    }>({});
 
     // workaround to be possible to set options from multiple places;
     // multiple effects can modify opts during single render call
@@ -135,6 +143,30 @@ export default function AttributeEditor({
         return isRunningCb;
     }, [isRunningCallback]);
 
+    /**
+     * Updates the callback context for the given form attribute name
+     */
+    const updateCallbackContext = useCallback((formAttributeName: string, action: 'increment' | 'flushIncrement') => {
+        if (!callbackAttributesCallContextRef.current[formAttributeName]) {
+            callbackAttributesCallContextRef.current[formAttributeName] = {
+                setCount: 0,
+                countIncremented: false,
+            };
+        }
+
+        const callbackContext = callbackAttributesCallContextRef.current[formAttributeName];
+
+        if (action === 'increment') {
+            callbackContext.setCount = (callbackContext?.setCount ?? 0) + Number(!callbackContext.countIncremented);
+            callbackContext.countIncremented = true;
+        } else if (action === 'flushIncrement') {
+            callbackContext.countIncremented = false;
+        }
+    }, []);
+
+    /**
+     * Maps the attribute content to a selection option with a label and a value
+     */
     const mapAttributeContentToOptionValue = useCallback(
         (content: BaseAttributeContentModel, descriptor: DataAttributeModel | CustomAttributeModel) => {
             const nonReferenceLabel =
@@ -217,7 +249,7 @@ export default function AttributeEditor({
     );
 
     /**
-     * Builds mappingg of values taken from the form, attribute or attribute descriptor
+     * Builds mapping of values taken from the form, attribute or attribute descriptor
      * for the callback as defined by the API
      */
     const buildCallbackMappings = useCallback(
@@ -543,8 +575,10 @@ export default function AttributeEditor({
                         formAttributeName,
                         true,
                         // If the attribute has been set more than once, consider it not being initial update call, so set the default value instead (see Issue: #915)
-                        callbackAttributesValueSetCountsRef.current[formAttributeName] > 1,
+                        (callbackAttributesCallContextRef.current[formAttributeName]?.setCount ?? 0) > 1,
                     );
+
+                    updateCallbackContext(formAttributeName, 'flushIncrement');
                 }
             }
         });
@@ -719,10 +753,10 @@ export default function AttributeEditor({
                     .reduce((acc, el) => [...acc, ...el], []);
                 setGroupAttributesCallbackAttributes(newGroupCallbackDescriptors);
 
+                // Update callback context for each group callback descriptor that has been loaded
                 newGroupCallbackDescriptors.forEach((descriptor) => {
                     const formAttributeName = `__attributes__${id}__.${descriptor.name}`;
-                    callbackAttributesValueSetCountsRef.current[formAttributeName] =
-                        (callbackAttributesValueSetCountsRef.current[formAttributeName] ?? 0) + 1;
+                    updateCallbackContext(formAttributeName, 'increment');
                 });
             }
 
