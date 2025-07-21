@@ -34,9 +34,10 @@ interface Props {
     descriptor: DataAttributeModel | InfoAttributeModel | CustomAttributeModel | undefined;
     options?: { label: string; value: any }[];
     busy?: boolean;
+    userInteractedRef?: React.MutableRefObject<boolean>;
 }
 
-export function Attribute({ name, descriptor, options, busy = false }: Props): JSX.Element {
+export function Attribute({ name, descriptor, options, busy = false, userInteractedRef: userInteractionRef }: Props): JSX.Element {
     const form = useForm();
     const formState = useFormState();
     const [addNewAttributeValue, setIsAddNewAttributeValue] = useState<AddNewAttributeType | undefined>();
@@ -50,6 +51,14 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
             setIsAddNewAttributeValue(addNewAttributeValue);
         }
     }, [descriptor]);
+
+    const onUserInteraction = useCallback(() => {
+        if (userInteractionRef) {
+            userInteractionRef.current = true;
+        }
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [userInteractionRef, name]);
 
     const onFileLoaded = useCallback(
         (data: ProgressEvent<FileReader>, fileName: string) => {
@@ -212,6 +221,10 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                         {!addNewAttributeValue ? (
                             <Select
                                 {...input}
+                                onChange={(e) => {
+                                    input.onChange(e);
+                                    onUserInteraction();
+                                }}
                                 inputId={`${name}Select`}
                                 maxMenuHeight={140}
                                 menuPlacement="auto"
@@ -233,6 +246,10 @@ export function Attribute({ name, descriptor, options, busy = false }: Props): J
                         ) : (
                             <Select
                                 {...input}
+                                onChange={(e) => {
+                                    input.onChange(e);
+                                    onUserInteraction();
+                                }}
                                 inputId={`${name}Select`}
                                 maxMenuHeight={140}
                                 menuPlacement="auto"
