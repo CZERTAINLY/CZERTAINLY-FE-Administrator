@@ -91,7 +91,6 @@ export default function AttributeEditor({
     const [prevShownCustomAttributes, setPrevShownCustomAttributes] = useState<AttributeDescriptorModel[]>([]);
     const [shownCustomAttributes, setShownCustomAttributes] = useState<AttributeDescriptorModel[]>([]);
 
-    // used to set attributes value from state only on initial render
     const callbackAttributesCallContextRef = useRef<{
         [attributeName: string]: {
             // Amount of times the attribute's value has been set
@@ -99,6 +98,8 @@ export default function AttributeEditor({
             // When attributes value is set, this is set to true. When a callback is executed and a new descriptor is loaded, this is set to false.
             // This is used to prevent increasing setCount, if the callback is loaded multiple times before actually writing the values to the form.
             countIncremented: boolean;
+            // This is used to apply new default options as value to select dropdown attibutes, only when after the current value was shown.
+            currentOptionValueSelected: boolean;
         };
     }>({});
 
@@ -106,9 +107,51 @@ export default function AttributeEditor({
     // multiple effects can modify opts during single render call
     let opts: { [attributeName: string]: { label: string; value: any }[] } = {};
 
+    /**
+     * Updates the callback context for the given form attribute name
+     */
+    const updateCallbackContext = useCallback(
+        (formAttributeName: string, action: 'increment' | 'flushIncrement' | 'currentOptionSelect') => {
+            if (!callbackAttributesCallContextRef.current[formAttributeName]) {
+                callbackAttributesCallContextRef.current[formAttributeName] = {
+                    setCount: 0,
+                    countIncremented: false,
+                    currentOptionValueSelected: false,
+                };
+            }
+
+            const callbackContext = callbackAttributesCallContextRef.current[formAttributeName];
+
+            if (action === 'increment') {
+                callbackContext.setCount = (callbackContext?.setCount ?? 0) + Number(!callbackContext.countIncremented);
+                callbackContext.countIncremented = true;
+            } else if (action === 'flushIncrement') {
+                callbackContext.countIncremented = false;
+            } else if (action === 'currentOptionSelect') {
+                callbackContext.currentOptionValueSelected = true;
+            }
+        },
+        [],
+    );
+
     useEffect(() => {
         dispatch(connectorActions.resetState());
     }, [dispatch]);
+
+    /**
+     * Set the current option value state in the callback context
+     */
+    useEffect(() => {
+        attributes.forEach((attr) => {
+            const descriptor = attributeDescriptors.find((d) => d.name === attr.name);
+            const formAttributeName = `__attributes__${id}__.${attr.name}`;
+            if (!descriptor) return;
+            if (!isDataAttributeModel(descriptor)) return;
+            if (descriptor.properties.list && !descriptor.properties.multiSelect) {
+                updateCallbackContext(formAttributeName, 'currentOptionSelect');
+            }
+        });
+    }, [id, attributes, attributeDescriptors, updateCallbackContext]);
 
     /**
      * Gets the value from the object property identified by path
@@ -142,27 +185,6 @@ export default function AttributeEditor({
         for (const k in isRunningCallback) isRunningCb = isRunningCb || isRunningCallback[k];
         return isRunningCb;
     }, [isRunningCallback]);
-
-    /**
-     * Updates the callback context for the given form attribute name
-     */
-    const updateCallbackContext = useCallback((formAttributeName: string, action: 'increment' | 'flushIncrement') => {
-        if (!callbackAttributesCallContextRef.current[formAttributeName]) {
-            callbackAttributesCallContextRef.current[formAttributeName] = {
-                setCount: 0,
-                countIncremented: false,
-            };
-        }
-
-        const callbackContext = callbackAttributesCallContextRef.current[formAttributeName];
-
-        if (action === 'increment') {
-            callbackContext.setCount = (callbackContext?.setCount ?? 0) + Number(!callbackContext.countIncremented);
-            callbackContext.countIncremented = true;
-        } else if (action === 'flushIncrement') {
-            callbackContext.countIncremented = false;
-        }
-    }, []);
 
     /**
      * Maps the attribute content to a selection option with a label and a value
@@ -450,6 +472,7 @@ export default function AttributeEditor({
                 } else {
                     formAttributeValue = undefined;
                 }
+                updateCallbackContext(formAttributeName, 'currentOptionSelect');
             }
 
             function setBooleanAttributeValue() {
@@ -497,7 +520,7 @@ export default function AttributeEditor({
 
             form.mutators.setAttribute(formAttributeName, formAttributeValue);
         },
-        [form.mutators, mapAttributeContentToOptionValue],
+        [form.mutators, mapAttributeContentToOptionValue, updateCallbackContext],
     );
     const getAttributeStaticOptions = useCallback(
         (descriptor: DataAttributeModel | CustomAttributeModel | GroupAttributeModel, formAttributeName: string) => {
@@ -603,6 +626,7 @@ export default function AttributeEditor({
         buildCallbackMappings,
         setAttributeFormValue,
         getAttributeStaticOptions,
+        updateCallbackContext,
     ]);
 
     /**
@@ -736,6 +760,24 @@ export default function AttributeEditor({
     useEffect(() => {
         if (previousCallbackData === callbackData) return;
 
+        function updateValueFromCallbackData(
+            callbackId: string,
+            callbackDescriptor: AttributeDescriptorModel,
+            newOpts: { [attributeName: string]: { label: string; value: any }[] },
+        ) {
+            if (callbackDescriptor && isDataAttributeModel(callbackDescriptor)) {
+                if (!callbackDescriptor.properties.list) {
+                    form.mutators.setAttribute(callbackId, callbackData[callbackId][0].reference ?? callbackData[callbackId][0].data);
+                } else if (
+                    !callbackDescriptor.properties.multiSelect &&
+                    !callbackAttributesCallContextRef.current[callbackId].currentOptionValueSelected
+                ) {
+                    form.mutators.setAttribute(callbackId, newOpts[callbackId][0]);
+                    updateCallbackContext(callbackId, 'currentOptionSelect');
+                }
+            }
+        }
+
         for (const callbackId in callbackData) {
             if (callbackData[callbackId] === previousCallbackData[callbackId]) continue;
             if (!callbackData[callbackId]) continue;
@@ -744,21 +786,6 @@ export default function AttributeEditor({
 
             const descriptors = [...attributeDescriptors, ...groupAttributesCallbackAttributes];
             const callbackDescriptor = descriptors.find((d) => `__attributes__${id}__.${d.name}` === callbackId);
-
-            // Set groupAttributesCallbackDescriptors inside the loop, to only run this if the callbackData fields have actually been changed.
-            if (callbackDescriptor) {
-                const newGroupCallbackDescriptors = Object.values(callbackData)
-                    .filter(Array.isArray)
-                    .map((callbackDataArray) => callbackDataArray.filter(isAttributeDescriptorModel))
-                    .reduce((acc, el) => [...acc, ...el], []);
-                setGroupAttributesCallbackAttributes(newGroupCallbackDescriptors);
-
-                // Update callback context for each group callback descriptor that has been loaded
-                newGroupCallbackDescriptors.forEach((descriptor) => {
-                    const formAttributeName = `__attributes__${id}__.${descriptor.name}`;
-                    updateCallbackContext(formAttributeName, 'increment');
-                });
-            }
 
             const groupCallbackAttributesContentOpts = groupCallbackAttributes.reduce((acc, attr) => {
                 if (isDataAttributeModel(attr) || isInfoAttributeModel(attr)) {
@@ -790,17 +817,26 @@ export default function AttributeEditor({
 
             setOptions({ ...options, ...opts });
 
-            if (callbackDescriptor && isDataAttributeModel(callbackDescriptor)) {
-                if (!callbackDescriptor.properties.list) {
-                    form.mutators.setAttribute(callbackId, callbackData[callbackId][0].reference ?? callbackData[callbackId][0].data);
-                } else {
-                    form.mutators.setAttribute(callbackId, opts[callbackId][0]);
-                }
+            // Set groupAttributesCallbackDescriptors inside the loop, to only run this if the callbackData fields have actually been changed.
+            if (callbackDescriptor) {
+                const newGroupCallbackDescriptors = Object.values(callbackData)
+                    .filter(Array.isArray)
+                    .map((callbackDataArray) => callbackDataArray.filter(isAttributeDescriptorModel))
+                    .reduce((acc, el) => [...acc, ...el], []);
+                setGroupAttributesCallbackAttributes(newGroupCallbackDescriptors);
+
+                // Update callback context for each group callback descriptor that has been loaded
+                newGroupCallbackDescriptors.forEach((descriptor) => {
+                    const formAttributeName = `__attributes__${id}__.${descriptor.name}`;
+                    updateCallbackContext(formAttributeName, 'increment');
+                });
+
+                updateValueFromCallbackData(callbackId, callbackDescriptor, opts);
             }
         }
 
         setPreviousCallbackData(callbackData);
-    }, [callbackData, options, previousCallbackData]);
+    }, [callbackData, options, previousCallbackData, updateCallbackContext]);
 
     /*
       Attribute Form Rendering
