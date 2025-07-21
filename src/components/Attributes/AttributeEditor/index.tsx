@@ -24,7 +24,7 @@ import {
     isInfoAttributeModel,
 } from 'types/attributes';
 import { CallbackAttributeModel } from 'types/connectors';
-import { AttributeContentType, AttributeValueTarget, FunctionGroupCode, RequestAttributeCallback, Resource } from 'types/openapi';
+import { AttributeContentType, AttributeValueTarget, FunctionGroupCode, Resource } from 'types/openapi';
 import { base64ToUtf8 } from 'utils/common-utils';
 import { getFormattedDate, getFormattedDateTime } from 'utils/dateUtil';
 import { Attribute } from './Attribute';
