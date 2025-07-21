@@ -706,16 +706,12 @@ export default function AttributeEditor({
     useEffect(() => {
         if (previousCallbackData === callbackData) return;
 
-        function updateValueFromCallbackData(
-            callbackId: string,
-            callbackDescriptor: AttributeDescriptorModel,
-            newOpts: { [attributeName: string]: { label: string; value: any }[] },
-        ) {
+        function updateValueFromCallbackData(callbackId: string, callbackDescriptor: AttributeDescriptorModel) {
             if (callbackDescriptor && isDataAttributeModel(callbackDescriptor)) {
                 if (!callbackDescriptor.properties.list) {
                     form.mutators.setAttribute(callbackId, callbackData[callbackId][0].reference ?? callbackData[callbackId][0].data);
-                } else if (!callbackDescriptor.properties.multiSelect && userInteractedRef.current) {
-                    form.mutators.setAttribute(callbackId, newOpts[callbackId][0]);
+                } else if (userInteractedRef.current) {
+                    form.mutators.setAttribute(callbackId, undefined);
                 }
             }
         }
@@ -767,7 +763,7 @@ export default function AttributeEditor({
                     .reduce((acc, el) => [...acc, ...el], []);
 
                 setGroupAttributesCallbackAttributes(newGroupCallbackDescriptors);
-                updateValueFromCallbackData(callbackId, callbackDescriptor, opts);
+                updateValueFromCallbackData(callbackId, callbackDescriptor);
             }
         }
 
