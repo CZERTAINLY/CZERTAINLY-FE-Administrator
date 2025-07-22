@@ -34,6 +34,7 @@ export function getLockWidgetObject(error: AjaxError): WidgetLockErrorModel {
             lockTitle: 'Validation Error',
             lockText: 'There was a problem in validating the request',
             lockType: getLockEnumFromStatus(error.status),
+            lockDetails: !error.response || !Array.isArray(error.response) ? undefined : error.response.join(' '),
         };
     else if (error.status > 400 && error.status < 500)
         return {
