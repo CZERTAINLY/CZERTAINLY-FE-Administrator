@@ -10,6 +10,7 @@ import {
     AttributeCallbackMappingModel,
     AttributeDescriptorModel,
     AttributeResponseModel,
+    BaseAttributeContentModel,
     CodeBlockAttributeContentDataModel,
     CustomAttributeModel,
     DataAttributeModel,
@@ -25,7 +26,7 @@ import {
 import { CallbackAttributeModel } from 'types/connectors';
 import { AttributeContentType, AttributeValueTarget, FunctionGroupCode, Resource } from 'types/openapi';
 import { base64ToUtf8 } from 'utils/common-utils';
-import { getFormattedDateTime } from 'utils/dateUtil';
+import { getFormattedDate, getFormattedDateTime } from 'utils/dateUtil';
 import { Attribute } from './Attribute';
 import CustomAttributeAddSelect from 'components/Attributes/AttributeEditor/CustomAttributeAddSelect';
 
@@ -69,7 +70,7 @@ export default function AttributeEditor({
     // data from callbacks
     const callbackData = useSelector(connectorSelectors.callbackData);
 
-    // used to check if descritors have changed
+    // used to check if descriptors have changed
     const [prevDescriptors, setPrevDescriptors] = useState<AttributeDescriptorModel[]>();
 
     // used to check if attributes have changed
@@ -89,6 +90,8 @@ export default function AttributeEditor({
     // used to store custom attributes which user has selected
     const [prevShownCustomAttributes, setPrevShownCustomAttributes] = useState<AttributeDescriptorModel[]>([]);
     const [shownCustomAttributes, setShownCustomAttributes] = useState<AttributeDescriptorModel[]>([]);
+
+    const userInteractedRef = useRef<boolean>(false);
 
     // workaround to be possible to set options from multiple places;
     // multiple effects can modify opts during single render call
@@ -130,6 +133,26 @@ export default function AttributeEditor({
         for (const k in isRunningCallback) isRunningCb = isRunningCb || isRunningCallback[k];
         return isRunningCb;
     }, [isRunningCallback]);
+
+    /**
+     * Maps the attribute content to a selection option with a label and a value
+     */
+    const mapAttributeContentToOptionValue = useCallback(
+        (content: BaseAttributeContentModel, descriptor: DataAttributeModel | CustomAttributeModel) => {
+            const nonReferenceLabel =
+                descriptor.contentType === AttributeContentType.Date
+                    ? getFormattedDate(content?.data as unknown as string)?.toString()
+                    : descriptor.contentType === AttributeContentType.Datetime
+                      ? getFormattedDateTime(content?.data as unknown as string)?.toString()
+                      : (content?.data as unknown as string)?.toString();
+            return {
+                label: content.reference ? content.reference : nonReferenceLabel,
+                value: content,
+            };
+        },
+        [],
+    );
+
     /**
      * Gets the value of the attribute identified by the path (attributeName.propertyName.propertyName...)
      */
@@ -196,7 +219,7 @@ export default function AttributeEditor({
     );
 
     /**
-     * Builds mappingg of values taken from the form, attribute or attribute descriptor
+     * Builds mapping of values taken from the form, attribute or attribute descriptor
      * for the callback as defined by the API
      */
     const buildCallbackMappings = useCallback(
@@ -240,6 +263,7 @@ export default function AttributeEditor({
         (mappings: CallbackAttributeModel, descriptor: AttributeDescriptorModel, formAttributeName: string) => {
             mappings.name = descriptor.name;
             mappings.uuid = descriptor.uuid;
+
             dispatch(
                 callbackParentUuid && callbackResource
                     ? connectorActions.callbackResource({
@@ -342,22 +366,25 @@ export default function AttributeEditor({
             attribute: AttributeResponseModel | undefined,
             formAttributeName: string,
             setDefaultOnRequiredValuesOnly: boolean,
+            forceDefaultDescriptorValue: boolean,
         ) => {
             let formAttributeValue = undefined;
 
+            const appliedContent = forceDefaultDescriptorValue ? descriptor?.content : attribute?.content;
+
             function handleFileAttributeContentType() {
-                if (attribute?.content) {
+                if (appliedContent) {
                     form.mutators.setAttribute(
                         `${formAttributeName}.content`,
-                        (attribute.content as FileAttributeContentModel[])[0].reference,
+                        (appliedContent as FileAttributeContentModel[])[0].reference,
                     );
                     form.mutators.setAttribute(
                         `${formAttributeName}.fileName`,
-                        (attribute.content as FileAttributeContentModel[])[0].data.fileName || 'unknown',
+                        (appliedContent as FileAttributeContentModel[])[0].data.fileName || 'unknown',
                     );
                     form.mutators.setAttribute(
                         `${formAttributeName}.mimeType`,
-                        (attribute.content as FileAttributeContentModel[])[0].data.mimeType || 'unknown',
+                        (appliedContent as FileAttributeContentModel[])[0].data.mimeType || 'unknown',
                     );
                 } else if (descriptor.content) {
                     form.mutators.setAttribute(
@@ -381,37 +408,24 @@ export default function AttributeEditor({
             }
 
             function setMultiSelectListAttributeValue() {
-                if (Array.isArray(attribute?.content)) {
-                    formAttributeValue = attribute!.content.map((content) => ({
-                        label: content.reference
-                            ? content.reference
-                            : descriptor.contentType === AttributeContentType.Datetime
-                              ? getFormattedDateTime(content.data.toString())
-                              : content.data.toString(),
-                        value: content,
-                    }));
+                if (Array.isArray(appliedContent)) {
+                    formAttributeValue = appliedContent.map((content) => mapAttributeContentToOptionValue(content, descriptor));
                 } else {
                     formAttributeValue = undefined;
                 }
             }
+
             function setSelectListAttributeValue() {
-                if (attribute?.content) {
-                    formAttributeValue = {
-                        label: attribute.content[0].reference
-                            ? attribute.content[0].reference
-                            : descriptor.contentType === AttributeContentType.Datetime
-                              ? getFormattedDateTime(attribute.content[0].data.toString())
-                              : attribute.content[0].data.toString(),
-                        value: attribute.content[0],
-                    };
+                if (appliedContent) {
+                    formAttributeValue = mapAttributeContentToOptionValue(appliedContent[0], descriptor);
                 } else {
                     formAttributeValue = undefined;
                 }
             }
 
             function setBooleanAttributeValue() {
-                if (attribute?.content?.[0]?.data !== undefined) {
-                    formAttributeValue = attribute.content[0].data;
+                if (appliedContent?.[0]?.data !== undefined) {
+                    formAttributeValue = appliedContent[0].data;
                 } else if (descriptor.properties.required) {
                     // set value to false, if attribute is required, has no value, and no default value are provided
                     // otherwise allow the value to be undefined
@@ -425,25 +439,28 @@ export default function AttributeEditor({
                 setMultiSelectListAttributeValue();
             } else if (descriptor.properties.list) {
                 setSelectListAttributeValue();
-            } else if (attribute?.content) {
-                formAttributeValue = attribute.content[0].reference ?? attribute.content[0].data;
+            } else if (appliedContent) {
+                formAttributeValue = appliedContent[0].reference ?? appliedContent[0].data;
             } else if (
                 descriptor.content &&
                 descriptor.content.length > 0 &&
                 (!setDefaultOnRequiredValuesOnly || descriptor.properties.required)
             ) {
+                // This acts as a fallback for the case when the attribute has no value, but has a default value in the descriptor
                 formAttributeValue = descriptor.content[0].reference ?? descriptor.content[0].data;
             }
 
-            if (
-                descriptor.contentType === AttributeContentType.Codeblock &&
-                formAttributeValue !== undefined &&
-                (formAttributeValue as CodeBlockAttributeContentDataModel).code !== undefined
-            ) {
-                formAttributeValue = {
-                    code: base64ToUtf8((formAttributeValue as CodeBlockAttributeContentDataModel).code),
-                    language: (formAttributeValue as CodeBlockAttributeContentDataModel).language,
-                };
+            if (descriptor.contentType === AttributeContentType.Codeblock && formAttributeValue !== undefined) {
+                if ((formAttributeValue as CodeBlockAttributeContentDataModel).code !== undefined) {
+                    formAttributeValue = {
+                        code: base64ToUtf8((formAttributeValue as CodeBlockAttributeContentDataModel).code),
+                        language: (formAttributeValue as CodeBlockAttributeContentDataModel).language,
+                    };
+                } else {
+                    formAttributeValue = {
+                        language: (formAttributeValue as CodeBlockAttributeContentDataModel).language,
+                    };
+                }
             }
             if (descriptor.contentType === AttributeContentType.Boolean) {
                 setBooleanAttributeValue();
@@ -451,7 +468,7 @@ export default function AttributeEditor({
 
             form.mutators.setAttribute(formAttributeName, formAttributeValue);
         },
-        [form.mutators],
+        [form.mutators, mapAttributeContentToOptionValue],
     );
     const getAttributeStaticOptions = useCallback(
         (descriptor: DataAttributeModel | CustomAttributeModel | GroupAttributeModel, formAttributeName: string) => {
@@ -523,7 +540,14 @@ export default function AttributeEditor({
 
                 // Set initial values from the attribute
                 if (isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
-                    setAttributeFormValue(descriptor, attribute, formAttributeName, true);
+                    setAttributeFormValue(
+                        descriptor,
+                        attribute,
+                        formAttributeName,
+                        true,
+                        // If the attribute has been set more than once, consider it not being initial update call, so set the default value instead (see Issue: #915)
+                        userInteractedRef.current,
+                    );
                 }
             }
         });
@@ -566,13 +590,14 @@ export default function AttributeEditor({
 
                 // Only set the value for attributes whose value was not yet modified
                 if (!getObjectPropertyValue(formState.values, formAttributeName)) {
-                    setAttributeFormValue(descriptor, attribute, formAttributeName, false);
+                    setAttributeFormValue(descriptor, attribute, formAttributeName, false, false);
                 }
             }
         });
 
         setPreviousFormValues(formState.values);
     }, [id, formState.values, attributes, prevShownCustomAttributes, shownCustomAttributes, setAttributeFormValue, getObjectPropertyValue]);
+
     /**
      * Called on every form change
      * Evaluates changed attributes and eventually performs a callback whenever necessary
@@ -681,6 +706,16 @@ export default function AttributeEditor({
     useEffect(() => {
         if (previousCallbackData === callbackData) return;
 
+        function updateValueFromCallbackData(callbackId: string, callbackDescriptor: AttributeDescriptorModel) {
+            if (callbackDescriptor && isDataAttributeModel(callbackDescriptor)) {
+                if (!callbackDescriptor.properties.list) {
+                    form.mutators.setAttribute(callbackId, callbackData[callbackId][0].reference ?? callbackData[callbackId][0].data);
+                } else if (userInteractedRef.current) {
+                    form.mutators.setAttribute(callbackId, undefined);
+                }
+            }
+        }
+
         for (const callbackId in callbackData) {
             if (callbackData[callbackId] === previousCallbackData[callbackId]) continue;
             if (!callbackData[callbackId]) continue;
@@ -688,16 +723,7 @@ export default function AttributeEditor({
             const groupCallbackAttributes: AttributeDescriptorModel[] = callbackData[callbackId].filter(isAttributeDescriptorModel);
 
             const descriptors = [...attributeDescriptors, ...groupAttributesCallbackAttributes];
-            const descriptor = descriptors.find((d) => `__attributes__${id}__.${d.name}` === callbackId);
-
-            if (descriptor) {
-                // Set groupAttributesCallbackAttributes inside the loop, to only run this if the callbackData fields have actually been changed.
-                const newGroupCallbackAttributes = Object.values(callbackData)
-                    .filter(Array.isArray)
-                    .map((callbackDataArray) => callbackDataArray.filter(isAttributeDescriptorModel))
-                    .reduce((acc, el) => [...acc, ...el], []);
-                setGroupAttributesCallbackAttributes(newGroupCallbackAttributes);
-            }
+            const callbackDescriptor = descriptors.find((d) => `__attributes__${id}__.${d.name}` === callbackId);
 
             const groupCallbackAttributesContentOpts = groupCallbackAttributes.reduce((acc, attr) => {
                 if (isDataAttributeModel(attr) || isInfoAttributeModel(attr)) {
@@ -729,8 +755,15 @@ export default function AttributeEditor({
 
             setOptions({ ...options, ...opts });
 
-            if (descriptor && isDataAttributeModel(descriptor) && !descriptor.properties.list) {
-                form.mutators.setAttribute(callbackId, callbackData[callbackId][0].reference ?? callbackData[callbackId][0].data);
+            // Set groupAttributesCallbackDescriptors inside the loop, to only run this if the callbackData fields have actually been changed.
+            if (callbackDescriptor) {
+                const newGroupCallbackDescriptors = Object.values(callbackData)
+                    .filter(Array.isArray)
+                    .map((callbackDataArray) => callbackDataArray.filter(isAttributeDescriptorModel))
+                    .reduce((acc, el) => [...acc, ...el], []);
+
+                setGroupAttributesCallbackAttributes(newGroupCallbackDescriptors);
+                updateValueFromCallbackData(callbackId, callbackDescriptor);
             }
         }
 
@@ -770,6 +803,7 @@ export default function AttributeEditor({
                                 name={`__attributes__${id}__.${descriptor.name}`}
                                 descriptor={descriptor}
                                 options={options[`__attributes__${id}__.${descriptor.name}`]}
+                                userInteractedRef={userInteractedRef}
                             />
                         </div>
                     ))}

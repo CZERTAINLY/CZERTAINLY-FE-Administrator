@@ -1997,6 +1997,107 @@ export const callbackVariationsAtributeEditorMockData = {
             },
         ] as AttributeDescriptorModel[],
     },
+    repeatCallbackSameDescriptorTest: {
+        attributes: [
+            {
+                uuid: '69cfb71f-a161-4aa7-8b1f-726b477b3493',
+                name: 'StringSelect',
+                label: 'StringSelect',
+                contentType: AttributeContentType.String,
+                type: AttributeType.Data,
+                content: [
+                    {
+                        reference: 'Option1',
+                        data: 'Option1',
+                    },
+                ],
+            },
+            {
+                uuid: '1fcfb71f-a161-4aa7-8b1f-726b477b3494',
+                name: 'DefaultText',
+                label: 'DefaultText',
+                type: AttributeType.Data,
+                contentType: AttributeContentType.Text,
+                content: [{ data: 'non-default' }],
+            },
+        ] as AttributeResponseModel[],
+        attributeDescriptors: [
+            {
+                uuid: '69cfb71f-a161-4aa7-8b1f-726b477b3493',
+                name: 'StringSelect',
+                content: [
+                    {
+                        reference: 'Option1',
+                        data: 'Option1',
+                    },
+                    {
+                        reference: 'Option2',
+                        data: 'Option2',
+                    },
+                ],
+                type: AttributeType.Data,
+                contentType: AttributeContentType.String,
+                properties: {
+                    label: 'StringSelect',
+                    visible: true,
+                    required: true,
+                    readOnly: false,
+                    list: true,
+                    multiSelect: false,
+                },
+            },
+            {
+                uuid: '5fcfb71f-a161-4aa7-8b1f-726b477b3492',
+                name: 'group_DefaultTextOrIntegerSelect',
+                type: AttributeType.Group,
+                attributeCallback: {
+                    mappings: [
+                        {
+                            from: 'StringSelect',
+                            targets: ['pathVariable'],
+                        },
+                    ],
+                },
+            },
+        ] as AttributeDescriptorModel[],
+        callbackResourceSuccess1: [
+            {
+                uuid: '1fcfb71f-a161-4aa7-8b1f-726b477b3494',
+                name: 'DefaultText',
+                content: [{ data: 'default-content' }],
+                type: AttributeType.Data,
+                contentType: AttributeContentType.Text,
+                properties: {
+                    label: 'DefaultText',
+                    visible: true,
+                    required: true,
+                    readOnly: false,
+                    list: false,
+                    multiSelect: false,
+                },
+            },
+        ] as AttributeDescriptorModel[],
+        callbackResourceSuccess2: [
+            {
+                uuid: '2fcfb71f-a161-4aa7-8b1f-726b477b3494',
+                name: 'IntegerSelect',
+                content: [
+                    { reference: 'Integer1', data: 1 },
+                    { reference: 'Integer2', data: 2 },
+                ],
+                type: AttributeType.Data,
+                contentType: AttributeContentType.Integer,
+                properties: {
+                    label: 'IntegerSelect',
+                    visible: true,
+                    required: true,
+                    readOnly: false,
+                    list: true,
+                    multiSelect: false,
+                },
+            },
+        ] as AttributeDescriptorModel[],
+    },
 };
 export const constraintCheckAttributeEditorMockData = {
     attributeDescriptorDtoArray: [
