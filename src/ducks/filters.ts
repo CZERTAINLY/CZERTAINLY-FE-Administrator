@@ -19,6 +19,7 @@ export const enum EntityType {
     APPROVAL_PROFILES,
     CONDITIONS,
     ACTIONS,
+    OID,
 }
 
 export type Filter = {

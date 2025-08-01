@@ -19,6 +19,7 @@ apis/CredentialManagementApi.ts
 apis/CryptographicKeyManagementApi.ts
 apis/CryptographicOperationsControllerApi.ts
 apis/CustomAttributesApi.ts
+apis/CustomOIDManagementApi.ts
 apis/DiscoveryManagementApi.ts
 apis/EntityManagementApi.ts
 apis/EnumsApi.ts
@@ -201,6 +202,13 @@ models/CustomAttributeDefinitionDetailDto.ts
 models/CustomAttributeDefinitionDto.ts
 models/CustomAttributeProperties.ts
 models/CustomAttributeUpdateRequestDto.ts
+models/CustomOidEntryDetailResponseDto.ts
+models/CustomOidEntryDetailResponseDtoAdditionalProperties.ts
+models/CustomOidEntryListResponseDto.ts
+models/CustomOidEntryRequestDto.ts
+models/CustomOidEntryResponseDto.ts
+models/CustomOidEntryUpdateRequestDto.ts
+models/CustomOidEntryUpdateRequestDtoAdditionalProperties.ts
 models/DataAttribute.ts
 models/DataAttributeProperties.ts
 models/DatabaseInfoDto.ts
@@ -297,6 +305,7 @@ models/OAuth2ProviderSettingsUpdateDto.ts
 models/ObjectAttributeContent.ts
 models/ObjectPermissionsDto.ts
 models/ObjectPermissionsRequestDto.ts
+models/OidCategory.ts
 models/Operation.ts
 models/OperationResult.ts
 models/PlatformEnum.ts
@@ -316,6 +325,7 @@ models/RandomDataRequestDto.ts
 models/RandomDataResponseDto.ts
 models/RangeAttributeConstraint.ts
 models/RangeAttributeConstraintData.ts
+models/RdnAttributeTypeOidPropertiesDto.ts
 models/RecipientType.ts
 models/RegexpAttributeConstraint.ts
 models/RemoveCertificateDto.ts

@@ -33,6 +33,7 @@ import infoEpics from './info-epics';
 import locationsEpics from './locations-epics';
 import notificationsEpics from './notifications-epics';
 import notificationProfilesEpics from './notification-profiles-epics';
+import oidsEpics from './oid-epics';
 import raProfilesEpics from './ra-profiles-epics';
 import { reducers } from './reducers';
 import resourcesEpics from './resource-epics';
@@ -102,4 +103,5 @@ export const epics = combineEpics(
     ...utilsCertificateEpics,
     ...utilsCertificateRequestEpics,
     ...utilsActuatorEpics,
+    ...oidsEpics,
 );

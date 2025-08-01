@@ -50,6 +50,8 @@ import { slice as utilsActuatorSlice } from './utilsActuator';
 import { slice as utilsCertificateSlice } from './utilsCertificate';
 import { slice as utilsCertificateRequestSlice } from './utilsCertificateRequest';
 import { slice as utilsOidSlice } from './utilsOid';
+import { slice as oidsSlice } from './oids';
+
 export const reducers = combineReducers({
     [alertsSlice.name]: alertsSlice.reducer,
     [userInterfaceSlice.name]: userInterfaceSlice.reducer,
@@ -96,4 +98,5 @@ export const reducers = combineReducers({
     [utilsCertificateSlice.name]: utilsCertificateSlice.reducer,
     [utilsCertificateRequestSlice.name]: utilsCertificateRequestSlice.reducer,
     [utilsActuatorSlice.name]: utilsActuatorSlice.reducer,
+    [oidsSlice.name]: oidsSlice.reducer,
 });
