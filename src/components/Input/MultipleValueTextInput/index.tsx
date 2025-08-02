@@ -81,7 +81,16 @@ export default function MultipleValueTextInput({
     };
 
     return (
-        <div className={styles.container} onClick={() => inputRef.current?.focus()}>
+        <div
+            className={styles.container}
+            onClick={() => inputRef.current?.focus()}
+            onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    inputRef.current?.focus();
+                }
+            }}
+            tabIndex={0}
+        >
             {values.map((value) => (
                 <span key={value} className={styles.tag}>
                     {value}
