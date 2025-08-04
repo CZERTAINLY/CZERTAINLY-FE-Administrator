@@ -13,6 +13,7 @@ import { LockWidgetNameEnum } from 'types/user-interface';
 import { Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import BooleanBadge from 'components/BooleanBadge/BooleanBadge';
+import { createWidgetDetailHeaders } from 'utils/widget';
 
 export default function UserDetail() {
     const dispatch = useDispatch();
@@ -109,19 +110,7 @@ export default function UserDetail() {
         [role?.systemRole, onEditClick, onEditRoleUsersClick, onEditRolePermissionsClick],
     );
 
-    const detailHeaders: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'property',
-                content: 'Property',
-            },
-            {
-                id: 'value',
-                content: 'Value',
-            },
-        ],
-        [],
-    );
+    const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
 
     const detailData: TableDataRow[] = useMemo(
         () =>

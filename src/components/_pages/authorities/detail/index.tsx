@@ -13,7 +13,7 @@ import { Container, Label } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
-
+import { getEditAndDeleteWidgetButtons, createWidgetDetailHeaders } from 'utils/widget';
 export default function AuthorityDetail() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -59,41 +59,9 @@ export default function AuthorityDetail() {
         dispatch(actions.bulkForceDeleteAuthority({ uuids: [authority.uuid], redirect: `../authorities` }));
     }, [authority, dispatch]);
 
-    const buttons: WidgetButtonProps[] = useMemo(
-        () => [
-            {
-                icon: 'pencil',
-                disabled: false,
-                tooltip: 'Edit',
-                onClick: () => {
-                    onEditClick();
-                },
-            },
-            {
-                icon: 'trash',
-                disabled: false,
-                tooltip: 'Delete',
-                onClick: () => {
-                    setConfirmDelete(true);
-                },
-            },
-        ],
-        [onEditClick],
-    );
+    const buttons: WidgetButtonProps[] = useMemo(() => getEditAndDeleteWidgetButtons(onEditClick, setConfirmDelete), [onEditClick]);
 
-    const detailHeaders: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'property',
-                content: 'Property',
-            },
-            {
-                id: 'value',
-                content: 'Value',
-            },
-        ],
-        [],
-    );
+    const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
 
     const detailData: TableDataRow[] = useMemo(
         () =>

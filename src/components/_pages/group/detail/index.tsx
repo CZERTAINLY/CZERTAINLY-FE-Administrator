@@ -15,6 +15,7 @@ import { Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import EventsTable from 'components/_pages/notifications/events-settings/EventsTable';
 import TabLayout from 'components/Layout/TabLayout';
+import { getEditAndDeleteWidgetButtons, createWidgetDetailHeaders } from 'utils/widget';
 
 export default function GroupDetail() {
     const dispatch = useDispatch();
@@ -47,41 +48,9 @@ export default function GroupDetail() {
         setConfirmDelete(false);
     }, [group, dispatch]);
 
-    const buttons: WidgetButtonProps[] = useMemo(
-        () => [
-            {
-                icon: 'pencil',
-                disabled: false,
-                tooltip: 'Edit',
-                onClick: () => {
-                    onEditClick();
-                },
-            },
-            {
-                icon: 'trash',
-                disabled: false,
-                tooltip: 'Delete',
-                onClick: () => {
-                    setConfirmDelete(true);
-                },
-            },
-        ],
-        [onEditClick],
-    );
+    const buttons: WidgetButtonProps[] = useMemo(() => getEditAndDeleteWidgetButtons(onEditClick, setConfirmDelete), [onEditClick]);
 
-    const detailHeaders: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'property',
-                content: 'Property',
-            },
-            {
-                id: 'value',
-                content: 'Value',
-            },
-        ],
-        [],
-    );
+    const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
 
     const detailData: TableDataRow[] = useMemo(
         () =>

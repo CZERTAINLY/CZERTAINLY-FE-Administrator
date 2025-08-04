@@ -9,6 +9,7 @@ import { actions, selectors } from 'ducks/auth';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
+import { createWidgetDetailHeaders } from 'utils/widget';
 
 export default function UserProfileDetail() {
     const dispatch = useDispatch();
@@ -39,19 +40,7 @@ export default function UserProfileDetail() {
         [profile, onEditClick],
     );
 
-    const detailHeaders: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'property',
-                content: 'Property',
-            },
-            {
-                id: 'value',
-                content: 'Value',
-            },
-        ],
-        [],
-    );
+    const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
 
     const detailData: TableDataRow[] = useMemo(
         () =>

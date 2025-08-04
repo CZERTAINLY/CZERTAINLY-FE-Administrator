@@ -34,6 +34,7 @@ import CertificateStatusBadge from '../../../_pages/certificates/CertificateStat
 
 import cx from 'classnames';
 import style from './locationDetail.module.scss';
+import { createWidgetDetailHeaders } from 'utils/widget';
 
 export default function LocationDetail() {
     const dispatch = useDispatch();
@@ -330,19 +331,7 @@ export default function LocationDetail() {
         [certCheckedRows.length, location, onRenewClick, onSyncClick, selectedCertificateDetails?.state],
     );
 
-    const detailHeaders: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'property',
-                content: 'Property',
-            },
-            {
-                id: 'value',
-                content: 'Value',
-            },
-        ],
-        [],
-    );
+    const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
 
     const detailData: TableDataRow[] = useMemo(
         () =>

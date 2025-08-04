@@ -77,23 +77,12 @@ export default function MultipleValueTextInput({
         [value, onChange],
     );
 
-    const handleContainerClick = () => {
-        inputRef.current?.focus();
-    };
-
     return (
-        <div className={styles.container} onClick={handleContainerClick}>
+        <div className={styles.container}>
             {value.map((val) => (
                 <span key={val} className={styles.tag}>
                     {val}
-                    <button
-                        type="button"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            handleRemoveTag(val);
-                        }}
-                        className={styles.removeButton}
-                    >
+                    <button type="button" onClick={() => handleRemoveTag(val)} className={styles.removeButton}>
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
@@ -107,7 +96,6 @@ export default function MultipleValueTextInput({
                     </button>
                 </span>
             ))}
-
             <input
                 ref={inputRef}
                 id={id}

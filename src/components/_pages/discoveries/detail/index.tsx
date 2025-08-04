@@ -21,6 +21,7 @@ import { dateFormatter, durationFormatter } from 'utils/dateUtil';
 import { PlatformEnum, Resource } from '../../../../types/openapi';
 import DiscoveryStatus from '../DiscoveryStatus';
 import DiscoveryCertificates from './DiscoveryCertificates';
+import { createWidgetDetailHeaders } from 'utils/widget';
 
 export default function DiscoveryDetail() {
     const dispatch = useDispatch();
@@ -82,19 +83,7 @@ export default function DiscoveryDetail() {
         [],
     );
 
-    const detailHeaders: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'property',
-                content: 'Property',
-            },
-            {
-                id: 'value',
-                content: 'Value',
-            },
-        ],
-        [],
-    );
+    const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
 
     const detailData: TableDataRow[] = useMemo(
         () =>

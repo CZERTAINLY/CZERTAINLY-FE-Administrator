@@ -10,11 +10,8 @@ import { LockWidgetNameEnum } from 'types/user-interface';
 import { Container } from 'reactstrap';
 import { OidCategory, PlatformEnum } from 'types/openapi';
 import { selectors as enumSelectors } from 'ducks/enums';
-
-const createTableDataRow = (label: string, value: string | null | undefined): TableDataRow => ({
-    id: label.toLowerCase().replace(/[^a-z0-9]/g, ''),
-    columns: [label, value ?? ''],
-});
+import { createTableDataRow } from 'utils/widget';
+import { getEditAndDeleteWidgetButtons, createWidgetDetailHeaders } from 'utils/widget';
 
 export default function CustomOIDDetail() {
     const dispatch = useDispatch();
@@ -59,41 +56,9 @@ export default function CustomOIDDetail() {
         setConfirmDelete(false);
     }, [oid, dispatch]);
 
-    const buttons: WidgetButtonProps[] = useMemo(
-        () => [
-            {
-                icon: 'pencil',
-                disabled: false,
-                tooltip: 'Edit',
-                onClick: () => {
-                    onEditClick();
-                },
-            },
-            {
-                icon: 'trash',
-                disabled: false,
-                tooltip: 'Delete',
-                onClick: () => {
-                    setConfirmDelete(true);
-                },
-            },
-        ],
-        [onEditClick],
-    );
+    const buttons: WidgetButtonProps[] = useMemo(() => getEditAndDeleteWidgetButtons(onEditClick, setConfirmDelete), [onEditClick]);
 
-    const detailHeaders: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'property',
-                content: 'Property',
-            },
-            {
-                id: 'value',
-                content: 'Value',
-            },
-        ],
-        [],
-    );
+    const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
 
     const detailData: TableDataRow[] = useMemo(
         () =>

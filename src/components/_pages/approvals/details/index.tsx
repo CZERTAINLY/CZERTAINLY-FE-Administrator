@@ -13,6 +13,7 @@ import { ApproverType, ProfileApprovalStepModel } from 'types/approval-profiles'
 import { DetailApprovalStepModel } from 'types/approvals';
 import { ApprovalDetailDtoStatusEnum } from 'types/openapi';
 import { dateFormatter } from 'utils/dateUtil';
+import { createWidgetDetailHeaders } from 'utils/widget';
 
 export default function ApprovalDetails() {
     const dispatch = useDispatch();
@@ -97,19 +98,7 @@ export default function ApprovalDetails() {
         }
     };
 
-    const detailHeaders: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'property',
-                content: 'Property',
-            },
-            {
-                id: 'value',
-                content: 'Value',
-            },
-        ],
-        [],
-    );
+    const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
 
     const detailData: TableDataRow[] = useMemo(
         () =>

@@ -17,6 +17,7 @@ import { validateQuartzCronExpression, validateRequired } from 'utils/validators
 import TextField from 'components/Input/TextField';
 import { Form } from 'react-final-form';
 import SchedulerJobHistory from './SchedulerJobHistory';
+import { createWidgetDetailHeaders } from 'utils/widget';
 
 interface EditFormValues {
     cronExpression: string | undefined;
@@ -116,19 +117,7 @@ export default function SchedulerJobDetail() {
         [dispatch, schedulerJob, openEditCronModal],
     );
 
-    const detailHeaders: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'property',
-                content: 'Property',
-            },
-            {
-                id: 'value',
-                content: 'Value',
-            },
-        ],
-        [],
-    );
+    const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
 
     const detailData: TableDataRow[] = useMemo(
         () =>

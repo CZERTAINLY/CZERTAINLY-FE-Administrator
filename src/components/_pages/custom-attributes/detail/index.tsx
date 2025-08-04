@@ -15,6 +15,7 @@ import { LockWidgetNameEnum } from 'types/user-interface';
 import { getAttributeContent } from 'utils/attributes/attributes';
 import { useCopyToClipboard } from 'utils/common-hooks';
 import styles from './customAttribute.module.scss';
+import { createWidgetDetailHeaders } from 'utils/widget';
 
 export default function CustomAttributeDetail() {
     const dispatch = useDispatch();
@@ -85,19 +86,7 @@ export default function CustomAttributeDetail() {
         [onEditClick, customAttribute, dispatch, isDisabling, isEnabling],
     );
 
-    const detailHeaders: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'property',
-                content: 'Property',
-            },
-            {
-                id: 'value',
-                content: 'Value',
-            },
-        ],
-        [],
-    );
+    const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
 
     const getBadge = (property: boolean | undefined, label: string) =>
         property ? (

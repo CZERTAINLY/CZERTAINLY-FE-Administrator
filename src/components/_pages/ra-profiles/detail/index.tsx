@@ -27,6 +27,7 @@ import CertificateValidationDialogBody from 'components/_pages/ra-profiles/Certi
 import SwitchWidget from 'components/SwitchWidget';
 import { renderExpiringThresholdLabel, renderValidationFrequencyLabel } from 'utils/certificate-validation';
 import EventsTable from 'components/_pages/notifications/events-settings/EventsTable';
+import { createWidgetDetailHeaders } from 'utils/widget';
 
 interface DeassociateApprovalProfileDialogState {
     isDialogOpen: boolean;
@@ -481,19 +482,7 @@ export default function RaProfileDetail() {
         [associatedComplianceProfiles, onDissociateComplianceProfile],
     );
 
-    const detailHeaders: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'property',
-                content: 'Property',
-            },
-            {
-                id: 'value',
-                content: 'Value',
-            },
-        ],
-        [],
-    );
+    const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
 
     const detailData: TableDataRow[] = useMemo(() => {
         if (!raProfile) return [];

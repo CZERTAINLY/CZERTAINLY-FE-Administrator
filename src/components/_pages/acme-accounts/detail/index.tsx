@@ -15,6 +15,7 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 import { AccountStatus } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { acmeAccountStatus } from '../acmeAccountStatus';
+import { createWidgetDetailHeaders } from 'utils/widget';
 
 export default function AcmeAccountDetail() {
     const dispatch = useDispatch();
@@ -87,19 +88,7 @@ export default function AcmeAccountDetail() {
         [acmeAccount, onEnableClick, onDisableClick],
     );
 
-    const detailHeaders: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'property',
-                content: 'Property',
-            },
-            {
-                id: 'value',
-                content: 'Value',
-            },
-        ],
-        [],
-    );
+    const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
 
     const detailData: TableDataRow[] = useMemo(() => {
         if (!acmeAccount) return [];

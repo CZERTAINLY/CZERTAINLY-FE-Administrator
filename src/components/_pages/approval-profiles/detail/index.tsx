@@ -9,6 +9,7 @@ import { Link, useNavigate, useParams } from 'react-router';
 import { Col, Container, Row } from 'reactstrap';
 import { ApproverType, ProfileApprovalStepModel } from 'types/approval-profiles';
 import { LockWidgetNameEnum } from 'types/user-interface';
+import { createWidgetDetailHeaders } from 'utils/widget';
 
 const ApprovalProfileDetails = () => {
     const dispatch = useDispatch();
@@ -63,19 +64,7 @@ const ApprovalProfileDetails = () => {
         [onEditClick],
     );
 
-    const detailHeaders: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'property',
-                content: 'Property',
-            },
-            {
-                id: 'value',
-                content: 'Value',
-            },
-        ],
-        [],
-    );
+    const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
 
     const detailData: TableDataRow[] = useMemo(
         () =>

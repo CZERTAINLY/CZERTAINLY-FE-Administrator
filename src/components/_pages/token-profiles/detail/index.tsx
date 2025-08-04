@@ -18,6 +18,7 @@ import { Badge, Col, Container, Label, Row } from 'reactstrap';
 import { KeyUsage, PlatformEnum, Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
+import { createWidgetDetailHeaders } from 'utils/widget';
 
 export default function TokenProfileDetail() {
     const dispatch = useDispatch();
@@ -146,19 +147,7 @@ export default function TokenProfileDetail() {
         [tokenProfile, onEditClick, onDisableClick, onEnableClick],
     );
 
-    const detailHeaders: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'property',
-                content: 'Property',
-            },
-            {
-                id: 'value',
-                content: 'Value',
-            },
-        ],
-        [],
-    );
+    const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
 
     const detailData: TableDataRow[] = useMemo(
         () =>
