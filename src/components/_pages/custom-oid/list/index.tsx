@@ -9,6 +9,8 @@ import { ApiClients } from 'src/api';
 import { Link } from 'react-router';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { SearchRequestModel } from 'types/certificate';
+import { selectors as enumSelectors } from 'ducks/enums';
+import { OidCategory, PlatformEnum } from 'types/openapi';
 
 export default function CustomOIDList() {
     const dispatch = useDispatch();
@@ -20,6 +22,7 @@ export default function CustomOIDList() {
 
     const isBusy = isDeleting || isUpdating;
 
+    const oidCategoryEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.OidCategory));
     const oidsRowHeaders: TableHeader[] = useMemo(
         () => [
             {
@@ -63,9 +66,14 @@ export default function CustomOIDList() {
     const oidsList: TableDataRow[] = useMemo(() => {
         return oids.map((oid) => ({
             id: oid.oid,
-            columns: [<Link to={`./detail/${oid.oid}`}>{oid.oid}</Link>, oid.displayName || '', oid.description || '', oid.category || ''],
+            columns: [
+                <Link to={`./detail/${oid.oid}`}>{oid.oid}</Link>,
+                oid.displayName || '',
+                oid.description || '',
+                oidCategoryEnum[oid.category as OidCategory].label || '',
+            ],
         }));
-    }, [oids]);
+    }, [oids, oidCategoryEnum]);
 
     const onDeleteCallback = useCallback(
         (oids: string[]) => {

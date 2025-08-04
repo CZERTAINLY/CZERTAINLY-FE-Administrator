@@ -82,22 +82,17 @@ export default function CustomOIDForm() {
     }, [oidCategoryEnum]);
 
     const defaultValues: FormValues = useMemo(() => {
-        const categoryName = oid?.category
-            ? {
-                  value: oid.category,
-                  label: oid.category,
-              }
-            : undefined;
+        const categoryOption = oid?.category ? categoryList.find((c) => c.value === oid.category) : undefined;
 
         return {
             oid: editMode ? oid?.oid : undefined,
             displayName: editMode ? oid?.displayName : undefined,
             description: editMode ? oid?.description : undefined,
-            category: editMode ? categoryName : undefined,
+            category: editMode ? categoryOption : undefined,
             code: editMode ? oid?.additionalProperties?.code : undefined,
             alternativeCode: editMode ? oid?.additionalProperties?.altCodes : undefined,
         };
-    }, [oid, editMode]);
+    }, [oid, editMode, categoryList]);
 
     const onSubmit = useCallback(
         (values: FormValues, form: any) => {
@@ -106,7 +101,7 @@ export default function CustomOIDForm() {
                 displayName: values.displayName!,
                 description: values.description,
                 category: values.category?.value as OidCategory,
-                ...(values.category?.value === 'rdnAttributeType' && {
+                ...(values.category?.value === OidCategory.RdnAttributeType && {
                     additionalProperties: {
                         code: values.code,
                         altCodes: values.alternativeCode ? values.alternativeCode : undefined,
@@ -205,7 +200,7 @@ export default function CustomOIDForm() {
                                 </FormGroup>
                             )}
                         </Field>
-                        {values.category?.value === 'rdnAttributeType' && (
+                        {values.category?.value === OidCategory.RdnAttributeType && (
                             <>
                                 <Field name="code" validate={validateRequired()}>
                                     {({ input, meta }) => (
@@ -215,13 +210,13 @@ export default function CustomOIDForm() {
                                         </FormGroup>
                                     )}
                                 </Field>
-                                <Field name="alternativeCode" validate={validateRequired()}>
+                                <Field name="alternativeCode">
                                     {({ input, meta }) => (
                                         <FormGroup>
                                             <Label for="alternativeCode">Alternative Code</Label>
                                             <MultipleValueTextInput
                                                 id="alternativeCode"
-                                                initialValues={values.alternativeCode}
+                                                value={values.alternativeCode}
                                                 onChange={(values) => {
                                                     input.onChange(values);
                                                 }}

@@ -3,24 +3,19 @@ import styles from './MultipleValueTextInput.module.scss';
 
 type Props = {
     id?: string;
-    initialValues?: string[];
+    value?: string[];
     onChange?: (values: string[]) => void;
     placeholder?: string;
 };
 
 export default function MultipleValueTextInput({
     id,
-    initialValues = [],
+    value = [],
     onChange,
     placeholder = 'Add value and separate with comma or press enter...',
 }: Props) {
-    const [values, setValues] = useState<string[]>(initialValues);
     const [inputValue, setInputValue] = useState<string>('');
     const inputRef = useRef<HTMLInputElement>(null);
-
-    useEffect(() => {
-        setValues(initialValues);
-    }, [initialValues]);
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         const trimmedInput = inputValue.trim();
@@ -29,9 +24,8 @@ export default function MultipleValueTextInput({
 
         if ((isEnter || isComma) && trimmedInput.length > 0) {
             event.preventDefault();
-            if (!values.includes(trimmedInput)) {
-                const newValues = [...values, trimmedInput];
-                setValues(newValues);
+            if (!value.includes(trimmedInput)) {
+                const newValues = [...value, trimmedInput];
                 if (onChange) {
                     onChange(newValues);
                 }
@@ -41,8 +35,7 @@ export default function MultipleValueTextInput({
 
         if (event.key === 'Backspace' && trimmedInput.length === 0) {
             event.preventDefault();
-            const newValues = values.slice(0, -1);
-            setValues(newValues);
+            const newValues = value.slice(0, -1);
             if (onChange) {
                 onChange(newValues);
             }
@@ -56,9 +49,8 @@ export default function MultipleValueTextInput({
         const val = event.target.value;
         if (val.endsWith(',')) {
             const trimmedVal = val.slice(0, -1).trim();
-            if (trimmedVal.length > 0 && !values.includes(trimmedVal)) {
-                const newValues = [...values, trimmedVal];
-                setValues(newValues);
+            if (trimmedVal.length > 0 && !value.includes(trimmedVal)) {
+                const newValues = [...value, trimmedVal];
                 if (onChange) {
                     onChange(newValues);
                 }
@@ -70,8 +62,7 @@ export default function MultipleValueTextInput({
     };
 
     const handleRemoveTag = (valueToRemove: string) => {
-        const newValues = values.filter((value) => value !== valueToRemove);
-        setValues(newValues);
+        const newValues = value.filter((val) => val !== valueToRemove);
         if (onChange) {
             onChange(newValues);
         }
@@ -91,14 +82,14 @@ export default function MultipleValueTextInput({
             }}
             tabIndex={0}
         >
-            {values.map((value) => (
-                <span key={value} className={styles.tag}>
-                    {value}
+            {value.map((val) => (
+                <span key={val} className={styles.tag}>
+                    {val}
                     <button
                         type="button"
                         onClick={(e) => {
                             e.stopPropagation();
-                            handleRemoveTag(value);
+                            handleRemoveTag(val);
                         }}
                         className={styles.removeButton}
                     >
@@ -123,7 +114,7 @@ export default function MultipleValueTextInput({
                 value={inputValue}
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
-                placeholder={values.length === 0 ? placeholder : ''}
+                placeholder={value.length === 0 ? placeholder : ''}
                 className={styles.input}
             />
         </div>

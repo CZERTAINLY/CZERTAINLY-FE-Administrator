@@ -8,6 +8,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { Container } from 'reactstrap';
+import { OidCategory, PlatformEnum } from 'types/openapi';
+import { selectors as enumSelectors } from 'ducks/enums';
 
 export default function CustomOIDDetail() {
     const dispatch = useDispatch();
@@ -19,6 +21,7 @@ export default function CustomOIDDetail() {
 
     const isFetching = useSelector(selectors.isFetching);
     const isDeleting = useSelector(selectors.isDeleting);
+    const oidCategoryEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.OidCategory));
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
@@ -26,7 +29,7 @@ export default function CustomOIDDetail() {
 
     const showAdditionalProperties = useMemo(() => {
         if (!oid) return false;
-        return oid.category === 'rdnAttributeType';
+        return oid.category === OidCategory.RdnAttributeType;
     }, [oid]);
 
     const getFreshOIDDetails = useCallback(() => {
@@ -106,10 +109,10 @@ export default function CustomOIDDetail() {
                       },
                       {
                           id: 'category',
-                          columns: ['Category', oid.category],
+                          columns: ['Category', oidCategoryEnum[oid.category as OidCategory].label],
                       },
                   ],
-        [oid],
+        [oid, oidCategoryEnum],
     );
 
     const additionalPropertiesData: TableDataRow[] = useMemo<TableDataRow[]>(
