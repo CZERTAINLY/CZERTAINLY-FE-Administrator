@@ -11,6 +11,11 @@ import { Container } from 'reactstrap';
 import { OidCategory, PlatformEnum } from 'types/openapi';
 import { selectors as enumSelectors } from 'ducks/enums';
 
+const createTableDataRow = (label: string, value: string | null | undefined): TableDataRow => ({
+    id: label.toLowerCase().replace(/[^a-z0-9]/g, ''),
+    columns: [label, value ?? ''],
+});
+
 export default function CustomOIDDetail() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -95,22 +100,10 @@ export default function CustomOIDDetail() {
             !oid
                 ? []
                 : [
-                      {
-                          id: 'oid',
-                          columns: ['OID', oid.oid],
-                      },
-                      {
-                          id: 'name',
-                          columns: ['Display Name', oid.displayName],
-                      },
-                      {
-                          id: 'description',
-                          columns: ['Description', oid.description ?? ''],
-                      },
-                      {
-                          id: 'category',
-                          columns: ['Category', oidCategoryEnum[oid.category as OidCategory].label],
-                      },
+                      createTableDataRow('OID', oid.oid),
+                      createTableDataRow('Display Name', oid.displayName),
+                      createTableDataRow('Description', oid.description),
+                      createTableDataRow('Category', oidCategoryEnum[oid.category as OidCategory]?.label),
                   ],
         [oid, oidCategoryEnum],
     );
@@ -120,18 +113,11 @@ export default function CustomOIDDetail() {
             !oid
                 ? []
                 : [
-                      {
-                          id: 'code',
-                          columns: ['Code', oid.additionalProperties?.code ?? ''],
-                      },
-                      {
-                          id: 'altCodes',
-                          columns: ['Alternative Codes', oid.additionalProperties?.altCodes?.join(', ') ?? ''],
-                      },
+                      createTableDataRow('Code', oid.additionalProperties?.code),
+                      createTableDataRow('Alternative Codes', oid.additionalProperties?.altCodes?.join(', ')),
                   ],
         [oid],
     );
-
     return (
         <Container className="themed-container" fluid>
             <Widget

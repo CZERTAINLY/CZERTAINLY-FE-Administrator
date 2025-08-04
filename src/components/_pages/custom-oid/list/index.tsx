@@ -67,7 +67,9 @@ export default function CustomOIDList() {
         return oids.map((oid) => ({
             id: oid.oid,
             columns: [
-                <Link to={`./detail/${oid.oid}`}>{oid.oid}</Link>,
+                <Link key={oid.oid} to={`./detail/${oid.oid}`}>
+                    {oid.oid}
+                </Link>,
                 oid.displayName || '',
                 oid.description || '',
                 oidCategoryEnum[oid.category as OidCategory].label || '',

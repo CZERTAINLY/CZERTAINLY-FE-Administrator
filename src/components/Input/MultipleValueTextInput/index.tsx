@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import styles from './MultipleValueTextInput.module.scss';
 
 type Props = {
@@ -13,75 +13,76 @@ export default function MultipleValueTextInput({
     value = [],
     onChange,
     placeholder = 'Add value and separate with comma or press enter...',
-}: Props) {
+}: Readonly<Props>) {
     const [inputValue, setInputValue] = useState<string>('');
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        const trimmedInput = inputValue.trim();
-        const isEnter = event.key === 'Enter';
-        const isComma = event.key === ',';
+    const handleKeyDown = useCallback(
+        (event: React.KeyboardEvent<HTMLInputElement>) => {
+            const trimmedInput = inputValue.trim();
+            const isEnter = event.key === 'Enter';
+            const isComma = event.key === ',';
 
-        if ((isEnter || isComma) && trimmedInput.length > 0) {
-            event.preventDefault();
-            if (!value.includes(trimmedInput)) {
-                const newValues = [...value, trimmedInput];
+            if ((isEnter || isComma) && trimmedInput.length > 0) {
+                event.preventDefault();
+                if (!value.includes(trimmedInput)) {
+                    const newValues = [...value, trimmedInput];
+                    if (onChange) {
+                        onChange(newValues);
+                    }
+                }
+                setInputValue('');
+            }
+
+            if (event.key === 'Backspace' && trimmedInput.length === 0) {
+                event.preventDefault();
+                const newValues = value.slice(0, -1);
                 if (onChange) {
                     onChange(newValues);
                 }
             }
-            setInputValue('');
-        }
+        },
+        [inputValue, value, onChange],
+    );
 
-        if (event.key === 'Backspace' && trimmedInput.length === 0) {
-            event.preventDefault();
-            const newValues = value.slice(0, -1);
+    const handleInputChange = useCallback(
+        (event: React.ChangeEvent<HTMLInputElement>) => {
+            const val = event.target.value;
+            if (val.endsWith(',')) {
+                const trimmedVal = val.slice(0, -1).trim();
+                if (trimmedVal.length > 0 && !value.includes(trimmedVal)) {
+                    const newValues = [...value, trimmedVal];
+                    if (onChange) {
+                        onChange(newValues);
+                    }
+                }
+                setInputValue('');
+            } else {
+                setInputValue(val);
+            }
+        },
+        [value, onChange],
+    );
+
+    const handleRemoveTag = useCallback(
+        (valueToRemove: string) => {
+            const newValues = value.filter((val) => val !== valueToRemove);
             if (onChange) {
                 onChange(newValues);
             }
             if (inputRef.current) {
                 inputRef.current.focus();
             }
-        }
-    };
+        },
+        [value, onChange],
+    );
 
-    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const val = event.target.value;
-        if (val.endsWith(',')) {
-            const trimmedVal = val.slice(0, -1).trim();
-            if (trimmedVal.length > 0 && !value.includes(trimmedVal)) {
-                const newValues = [...value, trimmedVal];
-                if (onChange) {
-                    onChange(newValues);
-                }
-            }
-            setInputValue('');
-        } else {
-            setInputValue(val);
-        }
-    };
-
-    const handleRemoveTag = (valueToRemove: string) => {
-        const newValues = value.filter((val) => val !== valueToRemove);
-        if (onChange) {
-            onChange(newValues);
-        }
-        if (inputRef.current) {
-            inputRef.current.focus();
-        }
+    const handleContainerClick = () => {
+        inputRef.current?.focus();
     };
 
     return (
-        <div
-            className={styles.container}
-            onClick={() => inputRef.current?.focus()}
-            onKeyDown={(event) => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                    inputRef.current?.focus();
-                }
-            }}
-            tabIndex={0}
-        >
+        <div className={styles.container} onClick={handleContainerClick}>
             {value.map((val) => (
                 <span key={val} className={styles.tag}>
                     {val}

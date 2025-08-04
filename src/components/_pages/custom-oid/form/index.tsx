@@ -22,7 +22,7 @@ import MultipleValueTextInput from 'components/Input/MultipleValueTextInput';
 interface FormValues {
     oid: string | undefined;
     displayName: string | undefined;
-    description?: string | undefined;
+    description: string | undefined;
     category: { value: string; label: string } | undefined;
     code?: string;
     alternativeCode?: string[];
@@ -104,7 +104,7 @@ export default function CustomOIDForm() {
                 ...(values.category?.value === OidCategory.RdnAttributeType && {
                     additionalProperties: {
                         code: values.code,
-                        altCodes: values.alternativeCode ? values.alternativeCode : undefined,
+                        altCodes: values.alternativeCode ?? undefined,
                     } as CustomOidEntryUpdateRequestDtoAdditionalProperties,
                 }),
             };
@@ -205,7 +205,7 @@ export default function CustomOIDForm() {
                                 <Field name="code" validate={validateRequired()}>
                                     {({ input, meta }) => (
                                         <FormGroup>
-                                            <Label for="code">OID code</Label>
+                                            <Label for="code">OID code *</Label>
                                             <Input id="code" {...input} type="text" placeholder="Enter OID code" />
                                         </FormGroup>
                                     )}
