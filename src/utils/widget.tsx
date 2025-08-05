@@ -1,6 +1,4 @@
-import { TableDataRow } from 'components/CustomTable';
-
-import { TableHeader } from 'components/CustomTable';
+import { TableDataRow, TableHeader } from 'components/CustomTable';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 
 export function getEditAndDeleteWidgetButtons(

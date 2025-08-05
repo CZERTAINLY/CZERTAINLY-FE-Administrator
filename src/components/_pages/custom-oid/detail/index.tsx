@@ -10,8 +10,7 @@ import { LockWidgetNameEnum } from 'types/user-interface';
 import { Container } from 'reactstrap';
 import { OidCategory, PlatformEnum } from 'types/openapi';
 import { selectors as enumSelectors } from 'ducks/enums';
-import { createTableDataRow } from 'utils/widget';
-import { getEditAndDeleteWidgetButtons, createWidgetDetailHeaders } from 'utils/widget';
+import { getEditAndDeleteWidgetButtons, createWidgetDetailHeaders, createTableDataRow } from 'utils/widget';
 
 export default function CustomOIDDetail() {
     const dispatch = useDispatch();
