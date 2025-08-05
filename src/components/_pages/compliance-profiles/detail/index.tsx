@@ -24,6 +24,7 @@ import { Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import AddRuleWithAttributesDialogBody from '../form/AddRuleWithAttributesDialogBody/index.';
 import AssociateRaProfileDialogBody from '../form/AssociateRaProfileDialogBody/AssociateRaProfileDialogBody';
+import { createWidgetDetailHeaders } from 'utils/widget';
 
 export default function ComplianceProfileDetail() {
     const dispatch = useDispatch();
@@ -296,19 +297,7 @@ export default function ComplianceProfileDetail() {
         [],
     );
 
-    const detailHeaders: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'property',
-                content: 'Property',
-            },
-            {
-                id: 'value',
-                content: 'Value',
-            },
-        ],
-        [],
-    );
+    const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
 
     const detailData: TableDataRow[] = useMemo(
         () =>

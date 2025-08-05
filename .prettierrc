@@ -1,7 +1,7 @@
 {
     "tabWidth": 4,
     "printWidth": 140,
-    "endOfLine": "lf",
+    "endOfLine": "auto",
     "semi": true,
     "trailingComma": "all",
     "arrowParens": "always",

@@ -149,6 +149,7 @@ const menuItemMappings: MenuItemMapping[] = [
                 link: '/authenticationsettings',
                 requiredResources: [Resource.Settings],
             },
+            { _key: '/custom-oids', name: 'Custom OIDs', link: '/custom-oids', requiredResources: [Resource.Settings] },
         ],
     },
 

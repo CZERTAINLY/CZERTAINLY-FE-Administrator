@@ -48,6 +48,7 @@ import { initialState as initialUtilsActuatorState, slice as utilsActuatorSlice 
 import { initialState as initialUtilsCertificateState, slice as utilsCertificateSlice } from './utilsCertificate';
 import { initialState as initialUtilsCertificateRequestState, slice as utilsCertificateRequestSlice } from './utilsCertificateRequest';
 import { initialState as initialUtilsOidState, slice as utilsOidSlice } from './utilsOid';
+import { initialState as initialOidsState, slice as oidsSlice } from './oids';
 
 export const initialState = {
     [alertsSlice.name]: initialAlertsState,
@@ -92,4 +93,5 @@ export const initialState = {
     [utilsCertificateSlice.name]: initialUtilsCertificateState,
     [utilsCertificateRequestSlice.name]: initialUtilsCertificateRequestState,
     [utilsActuatorSlice.name]: initialUtilsActuatorState,
+    [oidsSlice.name]: initialOidsState,
 };

@@ -17,6 +17,7 @@ import { LockWidgetNameEnum } from 'types/user-interface';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import TokenActivationDialogBody from '../TokenActivationDialogBody';
 import RandomDataGeneration from './RandomDataGeneration';
+import { createWidgetDetailHeaders } from 'utils/widget';
 
 export default function TokenDetail() {
     const dispatch = useDispatch();
@@ -154,19 +155,7 @@ export default function TokenDetail() {
         [onEditClick, onReload, token?.status.status, onSync, setRandomDataGeneration],
     );
 
-    const detailHeaders: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'property',
-                content: 'Property',
-            },
-            {
-                id: 'value',
-                content: 'Value',
-            },
-        ],
-        [],
-    );
+    const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
 
     const detailData: TableDataRow[] = useMemo(
         () =>

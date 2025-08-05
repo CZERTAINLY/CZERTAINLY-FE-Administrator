@@ -13,6 +13,7 @@ import { Container } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
+import { createWidgetDetailHeaders } from 'utils/widget';
 
 function CredentialDetail() {
     const dispatch = useDispatch();
@@ -78,19 +79,7 @@ function CredentialDetail() {
         [onEditClick, setConfirmDelete],
     );
 
-    const detailHeaders: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'property',
-                content: 'Property',
-            },
-            {
-                id: 'value',
-                content: 'Value',
-            },
-        ],
-        [],
-    );
+    const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
 
     const detailData: TableDataRow[] = useMemo(
         () =>

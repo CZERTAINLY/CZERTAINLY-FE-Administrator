@@ -145,6 +145,9 @@ import Layout from './Layout';
 import Spinner from './Spinner';
 
 import { Resource } from 'types/openapi';
+import CustomOIDList from 'components/_pages/custom-oid/list';
+import CustomOIDDetail from 'components/_pages/custom-oid/detail';
+import CustomOIDForm from 'components/_pages/custom-oid/form';
 
 export default function AppRouter() {
     const profile = useSelector(selectors.profile);
@@ -389,6 +392,10 @@ export default function AppRouter() {
                     <Route path={`/triggers/detail/:id`} element={<TriggerDetails />} />
 
                     <Route path={`/approvals`} element={<ApprovalsList />} />
+                    <Route path={'/custom-oids'} element={<CustomOIDList />} />
+                    <Route path={'/custom-oids/detail/:id'} element={<CustomOIDDetail />} />
+                    <Route path={'/custom-oids/add'} element={<CustomOIDForm />} />
+                    <Route path={'/custom-oids/edit/:id'} element={<CustomOIDForm />} />
                 </Route>
 
                 {/*

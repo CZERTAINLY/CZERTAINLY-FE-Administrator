@@ -13,6 +13,7 @@ import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { Badge, Container } from 'reactstrap';
 import { PlatformEnum } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
+import { getEditAndDeleteWidgetButtons, createWidgetDetailHeaders } from 'utils/widget';
 
 export default function GlobalMetadataDetail() {
     const dispatch = useDispatch();
@@ -48,41 +49,9 @@ export default function GlobalMetadataDetail() {
         setConfirmDelete(false);
     }, [globalMetadata, dispatch]);
 
-    const buttons: WidgetButtonProps[] = useMemo(
-        () => [
-            {
-                icon: 'pencil',
-                disabled: false,
-                tooltip: 'Edit',
-                onClick: () => {
-                    onEditClick();
-                },
-            },
-            {
-                icon: 'trash',
-                disabled: false,
-                tooltip: 'Delete',
-                onClick: () => {
-                    setConfirmDelete(true);
-                },
-            },
-        ],
-        [onEditClick],
-    );
+    const buttons: WidgetButtonProps[] = useMemo(() => getEditAndDeleteWidgetButtons(onEditClick, setConfirmDelete), [onEditClick]);
 
-    const detailHeaders: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'property',
-                content: 'Property',
-            },
-            {
-                id: 'value',
-                content: 'Value',
-            },
-        ],
-        [],
-    );
+    const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
 
     const detailData: TableDataRow[] = useMemo(
         () =>

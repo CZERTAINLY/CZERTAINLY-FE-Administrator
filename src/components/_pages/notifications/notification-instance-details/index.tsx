@@ -9,6 +9,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router';
 import { Container, Label } from 'reactstrap';
+import { getEditAndDeleteWidgetButtons, createWidgetDetailHeaders } from 'utils/widget';
+
 const NotificationInstanceDetails = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
@@ -66,41 +68,9 @@ const NotificationInstanceDetails = () => {
         navigate(`../../../notificationinstances/edit/${id}`);
     }, [navigate, id]);
 
-    const buttons: WidgetButtonProps[] = useMemo(
-        () => [
-            {
-                icon: 'pencil',
-                disabled: false,
-                tooltip: 'Edit',
-                onClick: () => {
-                    onEditClick();
-                },
-            },
-            {
-                icon: 'trash',
-                disabled: false,
-                tooltip: 'Delete',
-                onClick: () => {
-                    setConfirmDelete(true);
-                },
-            },
-        ],
-        [onEditClick],
-    );
+    const buttons: WidgetButtonProps[] = useMemo(() => getEditAndDeleteWidgetButtons(onEditClick, setConfirmDelete), [onEditClick]);
 
-    const detailHeaders: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'property',
-                content: 'Property',
-            },
-            {
-                id: 'value',
-                content: 'Value',
-            },
-        ],
-        [],
-    );
+    const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
 
     const detailData: TableDataRow[] = useMemo(
         () =>

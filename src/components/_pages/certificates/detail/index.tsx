@@ -77,6 +77,7 @@ import { DeviceType, useCopyToClipboard, useDeviceType } from 'utils/common-hook
 import CertificateStatus from '../CertificateStatus';
 import CertificateDownloadForm from './CertificateDownloadForm';
 import styles from './certificateDetail.module.scss';
+import { createWidgetDetailHeaders } from 'utils/widget';
 
 interface ChainDownloadSwitchState {
     isDownloadTriggered: boolean;
@@ -808,19 +809,7 @@ export default function CertificateDetail() {
         [certificate?.state],
     );
 
-    const detailHeaders: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'property',
-                content: 'Property',
-            },
-            {
-                id: 'value',
-                content: 'Value',
-            },
-        ],
-        [],
-    );
+    const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
 
     const historyHeaders: TableHeader[] = useMemo(
         () => [
@@ -1439,7 +1428,7 @@ export default function CertificateDetail() {
                   certificate.hybridCertificate
                       ? {
                             id: 'altKeySize',
-                            columns: ['Alternative Key Size', certificate.altKeySize.toString()],
+                            columns: ['Alternative Key Size', certificate.altKeySize?.toString()],
                         }
                       : null,
                   {

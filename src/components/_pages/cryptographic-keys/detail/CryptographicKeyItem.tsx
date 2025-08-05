@@ -23,7 +23,7 @@ import SignVerifyData from './SignVerifyData';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
 import EditableTableCell from 'components/CustomTable/EditableTableCell';
 import { keyWithoutTokenInstanceActionNotes } from 'components/_pages/cryptographic-keys/detail';
-
+import { createWidgetDetailHeaders } from 'utils/widget';
 interface Props {
     keyUuid: string;
     tokenInstanceUuid?: string;
@@ -252,19 +252,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
         ],
     );
 
-    const detailHeaders: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'property',
-                content: 'Property',
-            },
-            {
-                id: 'value',
-                content: 'Value',
-            },
-        ],
-        [],
-    );
+    const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
 
     const detailDataSlice1: TableDataRow[] = useMemo(
         () =>

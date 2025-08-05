@@ -18,6 +18,7 @@ import {
     CryptographicKeyManagementApi,
     CryptographicOperationsControllerApi,
     CustomAttributesApi,
+    CustomOIDManagementApi,
     DiscoveryManagementApi,
     EntityManagementApi,
     EnumsApi,
@@ -98,6 +99,7 @@ export interface ApiClients {
     utilsActuator?: ActuatorApi;
     utilsCertificate?: CertificateUtilsAPIApi;
     utilsCertificateRequest?: CertificationRequestUtilsAPIApi;
+    oids: CustomOIDManagementApi;
 }
 
 export const backendClient: ApiClients = {
@@ -142,6 +144,7 @@ export const backendClient: ApiClients = {
     tokenProfiles: new TokenProfileManagementApi(configuration),
     cryptographicKeys: new CryptographicKeyManagementApi(configuration),
     cryptographicOperations: new CryptographicOperationsControllerApi(configuration),
+    oids: new CustomOIDManagementApi(configuration),
 };
 
 export const updateBackendUtilsClients = (url: string | undefined) => {
