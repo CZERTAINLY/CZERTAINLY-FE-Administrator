@@ -38,7 +38,6 @@ const listCertificates: AppEpic = (action$, state, deps) => {
         filter(slice.actions.listCertificates.match),
         switchMap((action) => {
             store.dispatch(pagingActions.list(EntityType.CERTIFICATE));
-            console.log({ payload: action.payload });
             return deps.apiClients.certificates
                 .listCertificates({ certificateSearchRequestDto: transformSearchRequestModelToDto(action.payload) })
                 .pipe(
@@ -1051,6 +1050,90 @@ const downloadCertificate: AppEpic = (action$, state$, deps) => {
     );
 };
 
+const archiveCertificate: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.archiveCertificate.match),
+        switchMap((action) =>
+            deps.apiClients.certificates.archiveCertificate(action.payload).pipe(
+                map(() => slice.actions.archiveCertificateSuccess(action.payload)),
+                catchError((error) =>
+                    of(
+                        slice.actions.archiveCertificateFailure({ error: extractError(error, 'Failed to archive certificate') }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to archive certificate' }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+const unarchiveCertificate: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.unarchiveCertificate.match),
+        switchMap((action) =>
+            deps.apiClients.certificates.unarchiveCertificate(action.payload).pipe(
+                map(() => slice.actions.unarchiveCertificateSuccess(action.payload)),
+                catchError((error) =>
+                    of(
+                        slice.actions.unarchiveCertificateFailure({ error: extractError(error, 'Failed to unarchive certificate') }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to unarchive certificate' }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+const bulkArchiveCertificates: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.bulkArchiveCertificate.match),
+        switchMap((action) =>
+            deps.apiClients.certificates.bulkArchiveCertificate({ requestBody: action.payload.uuids }).pipe(
+                mergeMap(() => {
+                    const currentState = state$.value;
+                    return of(
+                        slice.actions.bulkArchiveCertificateSuccess(action.payload),
+                        alertActions.success('Archive operation for selected certificates completed.'),
+                        slice.actions.listCertificates({ includeArchived: currentState.certificates.isIncludeArchived }),
+                    );
+                }),
+                catchError((error) =>
+                    of(
+                        slice.actions.bulkArchiveCertificateFailure({ error: extractError(error, 'Failed to bulk archive certificates') }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to bulk archive certificates' }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+const bulkUnarchiveCertificates: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.bulkUnarchiveCertificate.match),
+        switchMap((action) =>
+            deps.apiClients.certificates.bulkUnarchiveCertificate({ requestBody: action.payload.uuids }).pipe(
+                mergeMap(() => {
+                    const currentState = state$.value;
+                    return of(
+                        slice.actions.bulkUnarchiveCertificateSuccess(action.payload),
+                        alertActions.success('Unarchive operation for selected certificates completed.'),
+                        slice.actions.listCertificates({ includeArchived: currentState.certificates.isIncludeArchived }),
+                    );
+                }),
+                catchError((error) =>
+                    of(
+                        slice.actions.bulkUnarchiveCertificateFailure({
+                            error: extractError(error, 'Failed to bulk unarchive certificates'),
+                        }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to bulk unarchive certificates' }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
 const epics = [
     listCertificates,
     getCertificateDetail,
@@ -1087,6 +1170,10 @@ const epics = [
     getCertificateChain,
     downloadCertificateChain,
     downloadCertificate,
+    archiveCertificate,
+    unarchiveCertificate,
+    bulkArchiveCertificates,
+    bulkUnarchiveCertificates,
 ];
 
 export default epics;

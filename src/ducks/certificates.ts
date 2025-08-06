@@ -85,6 +85,9 @@ export type State = {
     isFetchingContents: boolean;
 
     isIncludeArchived: boolean;
+    isArchiving: boolean;
+    isBulkArchiving: boolean;
+    isBulkUnarchiving: boolean;
 };
 
 export const initialState: State = {
@@ -137,6 +140,9 @@ export const initialState: State = {
     isFetchingContents: false,
 
     isIncludeArchived: false,
+    isArchiving: false,
+    isBulkArchiving: false,
+    isBulkUnarchiving: false,
 };
 
 export const slice = createSlice({
@@ -763,6 +769,53 @@ export const slice = createSlice({
         downloadCertificateFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.certificateDownloadContent = undefined;
             state.isFetchingCertificateDownloadContent = false;
+        },
+        archiveCertificate: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isArchiving = true;
+        },
+
+        archiveCertificateSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isArchiving = false;
+        },
+
+        archiveCertificateFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isArchiving = false;
+        },
+
+        unarchiveCertificate: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isArchiving = true;
+        },
+
+        unarchiveCertificateSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isArchiving = false;
+        },
+
+        unarchiveCertificateFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isArchiving = false;
+        },
+
+        bulkArchiveCertificate: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.isBulkArchiving = true;
+        },
+
+        bulkArchiveCertificateSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.isBulkArchiving = false;
+        },
+
+        bulkArchiveCertificateFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isBulkArchiving = false;
+        },
+
+        bulkUnarchiveCertificate: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.isBulkUnarchiving = true;
+        },
+
+        bulkUnarchiveCertificateSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.isBulkUnarchiving = false;
+        },
+
+        bulkUnarchiveCertificateFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isBulkUnarchiving = false;
         },
     },
 });

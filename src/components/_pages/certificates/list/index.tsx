@@ -26,7 +26,7 @@ import CertificateOwnerDialog from '../CertificateOwnerDialog';
 import CertificateRAProfileDialog from '../CertificateRAProfileDialog';
 import CertificateStatus from '../CertificateStatus';
 import CertificateUploadDialog from '../CertificateUploadDialog';
-import CertificatesSwitch from 'components/CertificatesSwitch';
+import SwitchWidget from 'components/SwitchWidget';
 
 interface Props {
     selectCertsOnly?: boolean;
@@ -140,6 +140,14 @@ export default function CertificateList({
         [dispatch, checkedRows],
     );
 
+    const onArchiveClick = useCallback(() => {
+        dispatch(actions.bulkArchiveCertificate({ uuids: checkedRows }));
+    }, [dispatch, checkedRows]);
+
+    const onUnarchiveClick = useCallback(() => {
+        dispatch(actions.bulkUnarchiveCertificate({ uuids: checkedRows }));
+    }, [dispatch, checkedRows]);
+
     const buttons: WidgetButtonProps[] = useMemo(
         () =>
             selectCertsOnly
@@ -186,8 +194,20 @@ export default function CertificateList({
                           custom: downloadDropDown,
                           onClick: () => {},
                       },
+                      {
+                          icon: 'archive',
+                          disabled: checkedRows.length === 0,
+                          tooltip: 'Archive',
+                          onClick: onArchiveClick,
+                      },
+                      {
+                          icon: 'unarchive',
+                          disabled: checkedRows.length === 0,
+                          tooltip: 'Unarchive',
+                          onClick: onUnarchiveClick,
+                      },
                   ],
-        [checkedRows.length, downloadDropDown, selectCertsOnly, getUserList],
+        [checkedRows.length, downloadDropDown, selectCertsOnly, getUserList, onArchiveClick, onUnarchiveClick],
     );
 
     const certificatesRowHeaders: TableHeader[] = useMemo(
@@ -271,6 +291,11 @@ export default function CertificateList({
                 id: 'certificateType',
                 width: '15%',
             },
+            {
+                content: 'Archivation status',
+                id: 'archived',
+                width: '15%',
+            },
         ],
         [],
     );
@@ -318,8 +343,8 @@ export default function CertificateList({
                             (certificate.owner ?? 'Unassigned')
                         ),
                         certificate.serialNumber || '',
-                        certificate.signatureAlgorithm,
-                        certificate.publicKeyAlgorithm,
+                        certificate.signatureAlgorithm || '',
+                        certificate.publicKeyAlgorithm || '',
                         certificate.issuerCommonName && certificate?.issuerCertificateUuid ? (
                             <Link to={`./detail/${certificate.issuerCertificateUuid}`}>{certificate.issuerCommonName}</Link>
                         ) : (
@@ -332,6 +357,9 @@ export default function CertificateList({
                         ) : (
                             ''
                         ),
+                        <Badge color={certificate.archived ? 'danger' : 'success'}>
+                            {certificate.archived ? 'Archived' : 'Unarchived'}
+                        </Badge>,
                     ],
                 };
             }),
@@ -339,7 +367,6 @@ export default function CertificateList({
     );
     const onListCallback = useCallback(
         (filters: SearchRequestModel) => {
-            console.log({ filters: { ...filters, isIncludeArchived } });
             return dispatch(actions.listCertificates({ ...filters, includeArchived: isIncludeArchived }));
         },
         [dispatch, isIncludeArchived],
@@ -366,7 +393,15 @@ export default function CertificateList({
                 filterTitle="Certificate Inventory Filter"
                 multiSelect={multiSelect}
                 pageWidgetLockName={LockWidgetNameEnum.ListOfCertificates}
-                extraFilterComponent={<CertificatesSwitch />}
+                extraFilterComponent={
+                    <SwitchWidget
+                        label="Include archived"
+                        id="archived-switch"
+                        disabled={false}
+                        checked={isIncludeArchived}
+                        onClick={() => dispatch(actions.setIncludeArchived(!isIncludeArchived))}
+                    />
+                }
             />
 
             <Dialog

@@ -2,7 +2,7 @@ import { Col, Container, Row } from 'reactstrap';
 
 import Spinner from 'components/Spinner';
 import { selectors as enumSelectors } from 'ducks/enums';
-import { selectors as certificatesSelectors } from 'ducks/certificates';
+import { actions as certificatesActions, selectors as certificatesSelectors } from 'ducks/certificates';
 import { EntityType } from 'ducks/filters';
 import { actions, selectors } from 'ducks/statisticsDashboard';
 import { useEffect, useMemo } from 'react';
@@ -16,7 +16,7 @@ import {
 import { getDateInString } from 'utils/dateUtil';
 import CountBadge from './DashboardItem/CountBadge';
 import DonutChart from './DashboardItem/DonutChart';
-import CertificatesSwitch from 'components/CertificatesSwitch';
+import SwitchWidget from 'components/SwitchWidget';
 
 function Dashboard() {
     const dashboard = useSelector(selectors.statisticsDashboard);
@@ -58,7 +58,15 @@ function Dashboard() {
                         data={dashboard?.totalCertificates}
                         title="Certificates"
                         link="../certificates"
-                        extraComponent={<CertificatesSwitch />}
+                        extraComponent={
+                            <SwitchWidget
+                                label="Include archived"
+                                id="archived-switch"
+                                disabled={false}
+                                checked={isIncludeArchived}
+                                onClick={() => dispatch(certificatesActions.setIncludeArchived(!isIncludeArchived))}
+                            />
+                        }
                     />
                 </Col>
 
