@@ -87,7 +87,9 @@ export enum CertificateEventHistoryDtoEventEnum {
     UpdateOwner = 'Update Owner',
     UploadCertificate = 'Upload Certificate',
     CertificateDiscovered = 'Certificate Discovered',
-    UpdateLocation = 'Update Location'
+    UpdateLocation = 'Update Location',
+    ArchiveCertificate = 'Archive certificate',
+    UnarchiveCertificate = 'Unarchive certificate'
 }
 /**
  * @export

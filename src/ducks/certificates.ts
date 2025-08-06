@@ -83,6 +83,8 @@ export type State = {
     csrAttributeDescriptors: AttributeDescriptorModel[];
 
     isFetchingContents: boolean;
+
+    isIncludeArchived: boolean;
 };
 
 export const initialState: State = {
@@ -133,6 +135,8 @@ export const initialState: State = {
     csrAttributeDescriptors: [],
 
     isFetchingContents: false,
+
+    isIncludeArchived: false,
 };
 
 export const slice = createSlice({
@@ -155,6 +159,10 @@ export const slice = createSlice({
 
         clearCertificateDetail: (state, action: PayloadAction<void>) => {
             state.certificateDetail = undefined;
+        },
+
+        setIncludeArchived: (state, action: PayloadAction<boolean>) => {
+            state.isIncludeArchived = action.payload;
         },
 
         listCertificates: (state, action: PayloadAction<SearchRequestModel>) => {
@@ -814,6 +822,8 @@ const isFetchingCertificateChain = createSelector(state, (state) => state.isFetc
 const isFetchingCertificateDownloadContent = createSelector(state, (state) => state.isFetchingCertificateDownloadContent);
 const isFetchingCertificateChainDownloadContent = createSelector(state, (state) => state.isFetchingCertificateChainDownloadContent);
 
+const isIncludeArchived = createSelector(state, (state) => state.isIncludeArchived);
+
 export const selectors = {
     state,
     deleteErrorMessage,
@@ -855,6 +865,7 @@ export const selectors = {
     isFetchingContents,
     isFetchingApprovals,
     certificateChain,
+    isIncludeArchived,
 };
 
 export const actions = slice.actions;

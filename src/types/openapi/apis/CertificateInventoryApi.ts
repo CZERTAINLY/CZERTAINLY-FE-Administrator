@@ -30,6 +30,7 @@ import type {
     CertificateFormat,
     CertificateFormatEncoding,
     CertificateResponseDto,
+    CertificateSearchRequestDto,
     CertificateUpdateObjectsDto,
     CertificateValidationResultDto,
     ClientCertificateRequestDto,
@@ -38,13 +39,24 @@ import type {
     MultipleCertificateObjectUpdateDto,
     RemoveCertificateDto,
     SearchFieldDataByGroupDto,
-    SearchRequestDto,
     UploadCertificateRequestDto,
     UuidDto,
 } from '../models';
 
+export interface ArchiveCertificateRequest {
+    uuid: string;
+}
+
+export interface BulkArchiveCertificateRequest {
+    requestBody: Array<string>;
+}
+
 export interface BulkDeleteCertificateRequest {
     removeCertificateDto: RemoveCertificateDto;
+}
+
+export interface BulkUnarchiveCertificateRequest {
+    requestBody: Array<string>;
 }
 
 export interface BulkUpdateCertificateObjectsRequest {
@@ -104,11 +116,15 @@ export interface ListCertificateLocationsRequest {
 }
 
 export interface ListCertificatesRequest {
-    searchRequestDto: SearchRequestDto;
+    certificateSearchRequestDto: CertificateSearchRequestDto;
 }
 
 export interface SubmitCertificateRequestRequest {
     clientCertificateRequestDto: ClientCertificateRequestDto;
+}
+
+export interface UnarchiveCertificateRequest {
+    uuid: string;
 }
 
 export interface UpdateCertificateObjectsRequest {
@@ -124,6 +140,40 @@ export interface UploadRequest {
  * no description
  */
 export class CertificateInventoryApi extends BaseAPI {
+
+    /**
+     * Archive a certificate
+     */
+    archiveCertificate({ uuid }: ArchiveCertificateRequest): Observable<void>
+    archiveCertificate({ uuid }: ArchiveCertificateRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    archiveCertificate({ uuid }: ArchiveCertificateRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(uuid, 'uuid', 'archiveCertificate');
+
+        return this.request<void>({
+            url: '/v1/certificates/{uuid}/archive'.replace('{uuid}', encodeURI(uuid)),
+            method: 'PATCH',
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * Archive a list of certificates
+     */
+    bulkArchiveCertificate({ requestBody }: BulkArchiveCertificateRequest): Observable<void>
+    bulkArchiveCertificate({ requestBody }: BulkArchiveCertificateRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    bulkArchiveCertificate({ requestBody }: BulkArchiveCertificateRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkArchiveCertificate');
+
+        const headers: HttpHeaders = {
+            'Content-Type': 'application/json',
+        };
+
+        return this.request<void>({
+            url: '/v1/certificates/archive',
+            method: 'PATCH',
+            headers,
+            body: requestBody,
+        }, opts?.responseOpts);
+    };
 
     /**
      * In this operation, when the list of Certificate UUIDs are provided and the filter is left as null or undefined, then the change will be applied only to the list of Certificate UUIDs provided. When the filter is provided in the request, the list of UUIDs will be ignored and the change will be applied for the all the certificates that matches the filter criteria. To apply this change for all the Certificates in the inventory, provide an empty array \"[]\" for the value of \"filters\" in the request body
@@ -143,6 +193,26 @@ export class CertificateInventoryApi extends BaseAPI {
             method: 'POST',
             headers,
             body: removeCertificateDto,
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * Unarchive a list of certificates
+     */
+    bulkUnarchiveCertificate({ requestBody }: BulkUnarchiveCertificateRequest): Observable<void>
+    bulkUnarchiveCertificate({ requestBody }: BulkUnarchiveCertificateRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    bulkUnarchiveCertificate({ requestBody }: BulkUnarchiveCertificateRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(requestBody, 'requestBody', 'bulkUnarchiveCertificate');
+
+        const headers: HttpHeaders = {
+            'Content-Type': 'application/json',
+        };
+
+        return this.request<void>({
+            url: '/v1/certificates/unarchive',
+            method: 'PATCH',
+            headers,
+            body: requestBody,
         }, opts?.responseOpts);
     };
 
@@ -388,10 +458,10 @@ export class CertificateInventoryApi extends BaseAPI {
     /**
      * List Certificates
      */
-    listCertificates({ searchRequestDto }: ListCertificatesRequest): Observable<CertificateResponseDto>
-    listCertificates({ searchRequestDto }: ListCertificatesRequest, opts?: OperationOpts): Observable<AjaxResponse<CertificateResponseDto>>
-    listCertificates({ searchRequestDto }: ListCertificatesRequest, opts?: OperationOpts): Observable<CertificateResponseDto | AjaxResponse<CertificateResponseDto>> {
-        throwIfNullOrUndefined(searchRequestDto, 'searchRequestDto', 'listCertificates');
+    listCertificates({ certificateSearchRequestDto }: ListCertificatesRequest): Observable<CertificateResponseDto>
+    listCertificates({ certificateSearchRequestDto }: ListCertificatesRequest, opts?: OperationOpts): Observable<AjaxResponse<CertificateResponseDto>>
+    listCertificates({ certificateSearchRequestDto }: ListCertificatesRequest, opts?: OperationOpts): Observable<CertificateResponseDto | AjaxResponse<CertificateResponseDto>> {
+        throwIfNullOrUndefined(certificateSearchRequestDto, 'certificateSearchRequestDto', 'listCertificates');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
@@ -401,7 +471,7 @@ export class CertificateInventoryApi extends BaseAPI {
             url: '/v1/certificates',
             method: 'POST',
             headers,
-            body: searchRequestDto,
+            body: certificateSearchRequestDto,
         }, opts?.responseOpts);
     };
 
@@ -422,6 +492,20 @@ export class CertificateInventoryApi extends BaseAPI {
             method: 'POST',
             headers,
             body: clientCertificateRequestDto,
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * Unarchive a certificate
+     */
+    unarchiveCertificate({ uuid }: UnarchiveCertificateRequest): Observable<void>
+    unarchiveCertificate({ uuid }: UnarchiveCertificateRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    unarchiveCertificate({ uuid }: UnarchiveCertificateRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(uuid, 'uuid', 'unarchiveCertificate');
+
+        return this.request<void>({
+            url: '/v1/certificates/{uuid}/unarchive'.replace('{uuid}', encodeURI(uuid)),
+            method: 'PATCH',
         }, opts?.responseOpts);
     };
 

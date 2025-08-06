@@ -26,6 +26,7 @@ import CertificateOwnerDialog from '../CertificateOwnerDialog';
 import CertificateRAProfileDialog from '../CertificateRAProfileDialog';
 import CertificateStatus from '../CertificateStatus';
 import CertificateUploadDialog from '../CertificateUploadDialog';
+import CertificatesSwitch from 'components/CertificatesSwitch';
 
 interface Props {
     selectCertsOnly?: boolean;
@@ -59,6 +60,7 @@ export default function CertificateList({
     const isBulkUpdatingOwner = useSelector(selectors.isBulkUpdatingOwner);
     const isUploading = useSelector(selectors.isUploading);
     const certificateTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateType));
+    const isIncludeArchived = useSelector(selectors.isIncludeArchived);
 
     const [upload, setUpload] = useState<boolean>(false);
     const [updateGroup, setUpdateGroup] = useState<boolean>(false);
@@ -335,8 +337,13 @@ export default function CertificateList({
             }),
         [certificates, selectCertsOnly, certificateTypeEnum],
     );
-
-    const onListCallback = useCallback((filters: SearchRequestModel) => dispatch(actions.listCertificates(filters)), [dispatch]);
+    const onListCallback = useCallback(
+        (filters: SearchRequestModel) => {
+            console.log({ filters: { ...filters, isIncludeArchived } });
+            return dispatch(actions.listCertificates({ ...filters, includeArchived: isIncludeArchived }));
+        },
+        [dispatch, isIncludeArchived],
+    );
 
     return (
         <Container className="themed-container" fluid>
@@ -359,6 +366,7 @@ export default function CertificateList({
                 filterTitle="Certificate Inventory Filter"
                 multiSelect={multiSelect}
                 pageWidgetLockName={LockWidgetNameEnum.ListOfCertificates}
+                extraFilterComponent={<CertificatesSwitch />}
             />
 
             <Dialog

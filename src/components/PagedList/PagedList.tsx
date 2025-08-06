@@ -33,6 +33,7 @@ interface Props {
     hideWidgetButtons?: boolean;
     hasCheckboxes?: boolean;
     hasDetails?: boolean;
+    extraFilterComponent?: React.ReactNode;
 }
 
 function PagedList({
@@ -54,6 +55,7 @@ function PagedList({
     hideWidgetButtons = false,
     hasCheckboxes = true,
     hasDetails = false,
+    extraFilterComponent,
 }: Props) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -142,7 +144,12 @@ function PagedList({
     return (
         <>
             {getAvailableFiltersApi && filterTitle && (
-                <FilterWidget entity={entity} title={filterTitle} getAvailableFiltersApi={getAvailableFiltersApi} />
+                <FilterWidget
+                    entity={entity}
+                    title={filterTitle}
+                    getAvailableFiltersApi={getAvailableFiltersApi}
+                    extraFilterComponent={extraFilterComponent}
+                />
             )}
 
             <Widget

@@ -128,6 +128,7 @@ models/CertificateRequestDto.ts
 models/CertificateRequestFormat.ts
 models/CertificateResponseDto.ts
 models/CertificateRevocationReason.ts
+models/CertificateSearchRequestDto.ts
 models/CertificateSettingsDto.ts
 models/CertificateSettingsUpdateDto.ts
 models/CertificateState.ts

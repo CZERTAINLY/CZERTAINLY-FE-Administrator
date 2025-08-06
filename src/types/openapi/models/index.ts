@@ -81,6 +81,7 @@ export * from './CertificateRequestDto';
 export * from './CertificateRequestFormat';
 export * from './CertificateResponseDto';
 export * from './CertificateRevocationReason';
+export * from './CertificateSearchRequestDto';
 export * from './CertificateSettingsDto';
 export * from './CertificateSettingsUpdateDto';
 export * from './CertificateState';

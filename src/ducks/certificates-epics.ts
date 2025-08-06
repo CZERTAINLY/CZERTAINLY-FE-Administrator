@@ -38,8 +38,9 @@ const listCertificates: AppEpic = (action$, state, deps) => {
         filter(slice.actions.listCertificates.match),
         switchMap((action) => {
             store.dispatch(pagingActions.list(EntityType.CERTIFICATE));
+            console.log({ payload: action.payload });
             return deps.apiClients.certificates
-                .listCertificates({ searchRequestDto: transformSearchRequestModelToDto(action.payload) })
+                .listCertificates({ certificateSearchRequestDto: transformSearchRequestModelToDto(action.payload) })
                 .pipe(
                     mergeMap((list) =>
                         of(
