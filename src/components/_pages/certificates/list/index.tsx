@@ -357,7 +357,7 @@ export default function CertificateList({
                         ) : (
                             ''
                         ),
-                        <Badge color={certificate.archived ? 'danger' : 'success'}>
+                        <Badge key="archivationStatus" color={certificate.archived ? 'danger' : 'success'}>
                             {certificate.archived ? 'Archived' : 'Unarchived'}
                         </Badge>,
                     ],

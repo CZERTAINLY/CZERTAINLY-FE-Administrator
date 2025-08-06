@@ -1491,7 +1491,7 @@ export default function CertificateDetail() {
                       id: 'archivationStatus',
                       columns: [
                           'Archivation Status',
-                          <Badge color={isCertificateArchived ? 'danger' : 'success'}>
+                          <Badge key="archivationStatus" color={isCertificateArchived ? 'danger' : 'success'}>
                               {isCertificateArchived ? 'Archived' : 'Unarchived'}
                           </Badge>,
                       ],
