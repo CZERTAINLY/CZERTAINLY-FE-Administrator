@@ -59,13 +59,15 @@ function Dashboard() {
                         title="Certificates"
                         link="../certificates"
                         extraComponent={
-                            <SwitchWidget
-                                label="Include archived"
-                                id="archived-switch"
-                                disabled={false}
-                                checked={isIncludeArchived}
-                                onClick={() => dispatch(certificatesActions.setIncludeArchived(!isIncludeArchived))}
-                            />
+                            <div className="d-flex align-items-center">
+                                <SwitchWidget
+                                    label="Include archived"
+                                    id="archived-switch"
+                                    disabled={false}
+                                    checked={isIncludeArchived}
+                                    onClick={() => dispatch(certificatesActions.setIncludeArchived(!isIncludeArchived))}
+                                />
+                            </div>
                         }
                     />
                 </Col>

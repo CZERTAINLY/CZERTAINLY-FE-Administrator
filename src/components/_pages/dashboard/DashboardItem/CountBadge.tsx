@@ -12,11 +12,11 @@ interface Props {
 function CountBadge({ data, title, link, extraComponent }: Props) {
     return (
         <Widget titleLink={link} title={title} titleBoldness="bold">
-            <Row className={`justify-content-between mt-3 gx-0`}>
+            <Row className={`flex-column justify-content-between mt-3 gx-0`}>
                 <Col sm={8} className={'d-flex align-items-center'}>
                     <h3 className={'fw-semi-bold mb-0'}>{data}</h3>
                 </Col>
-                <Col>{extraComponent}</Col>
+                <Col className={'mt-3'}>{extraComponent}</Col>
             </Row>
         </Widget>
     );
