@@ -1055,7 +1055,12 @@ const archiveCertificate: AppEpic = (action$, state$, deps) => {
         filter(slice.actions.archiveCertificate.match),
         switchMap((action) =>
             deps.apiClients.certificates.archiveCertificate(action.payload).pipe(
-                map(() => slice.actions.archiveCertificateSuccess(action.payload)),
+                mergeMap(() => {
+                    return of(
+                        slice.actions.archiveCertificateSuccess(action.payload),
+                        alertActions.success('Archive operation for selected certificate completed.'),
+                    );
+                }),
                 catchError((error) =>
                     of(
                         slice.actions.archiveCertificateFailure({ error: extractError(error, 'Failed to archive certificate') }),
@@ -1072,7 +1077,12 @@ const unarchiveCertificate: AppEpic = (action$, state$, deps) => {
         filter(slice.actions.unarchiveCertificate.match),
         switchMap((action) =>
             deps.apiClients.certificates.unarchiveCertificate(action.payload).pipe(
-                map(() => slice.actions.unarchiveCertificateSuccess(action.payload)),
+                mergeMap(() => {
+                    return of(
+                        slice.actions.unarchiveCertificateSuccess(action.payload),
+                        alertActions.success('Unarchive operation for selected certificate completed.'),
+                    );
+                }),
                 catchError((error) =>
                     of(
                         slice.actions.unarchiveCertificateFailure({ error: extractError(error, 'Failed to unarchive certificate') }),
