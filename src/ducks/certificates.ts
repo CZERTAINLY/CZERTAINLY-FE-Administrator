@@ -776,6 +776,14 @@ export const slice = createSlice({
 
         archiveCertificateSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isArchiving = false;
+
+            if (state.certificateDetail?.uuid === action.payload.uuid) {
+                state.certificateDetail.archived = true;
+            }
+            const certificateIndex = state.certificates.findIndex((certificate) => certificate.uuid === action.payload.uuid);
+            if (certificateIndex >= 0) {
+                state.certificates[certificateIndex].archived = true;
+            }
         },
 
         archiveCertificateFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -788,13 +796,21 @@ export const slice = createSlice({
 
         unarchiveCertificateSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isArchiving = false;
+
+            if (state.certificateDetail?.uuid === action.payload.uuid) {
+                state.certificateDetail.archived = false;
+            }
+            const certificateIndex = state.certificates.findIndex((certificate) => certificate.uuid === action.payload.uuid);
+            if (certificateIndex >= 0) {
+                state.certificates[certificateIndex].archived = false;
+            }
         },
 
         unarchiveCertificateFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isArchiving = false;
         },
 
-        bulkArchiveCertificate: (state, action: PayloadAction<{ uuids: string[] }>) => {
+        bulkArchiveCertificate: (state, action: PayloadAction<{ uuids: string[]; filters: SearchRequestModel | undefined }>) => {
             state.isBulkArchiving = true;
         },
 
@@ -806,7 +822,7 @@ export const slice = createSlice({
             state.isBulkArchiving = false;
         },
 
-        bulkUnarchiveCertificate: (state, action: PayloadAction<{ uuids: string[] }>) => {
+        bulkUnarchiveCertificate: (state, action: PayloadAction<{ uuids: string[]; filters: SearchRequestModel | undefined }>) => {
             state.isBulkUnarchiving = true;
         },
 
@@ -876,6 +892,7 @@ const isFetchingCertificateDownloadContent = createSelector(state, (state) => st
 const isFetchingCertificateChainDownloadContent = createSelector(state, (state) => state.isFetchingCertificateChainDownloadContent);
 
 const isIncludeArchived = createSelector(state, (state) => state.isIncludeArchived);
+const isArchiving = createSelector(state, (state) => state.isArchiving);
 
 export const selectors = {
     state,
@@ -919,6 +936,7 @@ export const selectors = {
     isFetchingApprovals,
     certificateChain,
     isIncludeArchived,
+    isArchiving,
 };
 
 export const actions = slice.actions;

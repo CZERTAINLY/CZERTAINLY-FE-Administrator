@@ -1094,7 +1094,10 @@ const bulkArchiveCertificates: AppEpic = (action$, state$, deps) => {
                     return of(
                         slice.actions.bulkArchiveCertificateSuccess(action.payload),
                         alertActions.success('Archive operation for selected certificates completed.'),
-                        slice.actions.listCertificates({ includeArchived: currentState.certificates.isIncludeArchived }),
+                        slice.actions.listCertificates({
+                            includeArchived: currentState.certificates.isIncludeArchived,
+                            ...action.payload.filters,
+                        }),
                     );
                 }),
                 catchError((error) =>
@@ -1118,7 +1121,10 @@ const bulkUnarchiveCertificates: AppEpic = (action$, state$, deps) => {
                     return of(
                         slice.actions.bulkUnarchiveCertificateSuccess(action.payload),
                         alertActions.success('Unarchive operation for selected certificates completed.'),
-                        slice.actions.listCertificates({ includeArchived: currentState.certificates.isIncludeArchived }),
+                        slice.actions.listCertificates({
+                            includeArchived: currentState.certificates.isIncludeArchived,
+                            ...action.payload.filters,
+                        }),
                     );
                 }),
                 catchError((error) =>

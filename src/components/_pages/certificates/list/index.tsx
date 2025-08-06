@@ -27,7 +27,6 @@ import CertificateRAProfileDialog from '../CertificateRAProfileDialog';
 import CertificateStatus from '../CertificateStatus';
 import CertificateUploadDialog from '../CertificateUploadDialog';
 import SwitchWidget from 'components/SwitchWidget';
-
 interface Props {
     selectCertsOnly?: boolean;
     multiSelect?: boolean;
@@ -67,6 +66,7 @@ export default function CertificateList({
     const [updateOwner, setUpdateOwner] = useState<boolean>(false);
     const [updateEntity, setUpdateEntity] = useState<boolean>(false);
     const [updateRaProfile, setUpdateRaProfile] = useState<boolean>(false);
+    const [appliedFilters, setAppliedFilters] = useState<SearchRequestModel>();
 
     const isBusy =
         isIssuing ||
@@ -141,12 +141,12 @@ export default function CertificateList({
     );
 
     const onArchiveClick = useCallback(() => {
-        dispatch(actions.bulkArchiveCertificate({ uuids: checkedRows }));
-    }, [dispatch, checkedRows]);
+        dispatch(actions.bulkArchiveCertificate({ uuids: checkedRows, filters: appliedFilters }));
+    }, [dispatch, checkedRows, appliedFilters]);
 
     const onUnarchiveClick = useCallback(() => {
-        dispatch(actions.bulkUnarchiveCertificate({ uuids: checkedRows }));
-    }, [dispatch, checkedRows]);
+        dispatch(actions.bulkUnarchiveCertificate({ uuids: checkedRows, filters: appliedFilters }));
+    }, [dispatch, checkedRows, appliedFilters]);
 
     const buttons: WidgetButtonProps[] = useMemo(
         () =>
@@ -292,7 +292,7 @@ export default function CertificateList({
                 width: '15%',
             },
             {
-                content: 'Archivation status',
+                content: 'Archived',
                 id: 'archived',
                 width: '15%',
             },
@@ -357,16 +357,18 @@ export default function CertificateList({
                         ) : (
                             ''
                         ),
-                        <Badge key="archivationStatus" color={certificate.archived ? 'danger' : 'success'}>
-                            {certificate.archived ? 'Archived' : 'Unarchived'}
+                        <Badge key="archivationStatus" color={certificate.archived ? 'secondary' : 'success'}>
+                            {certificate.archived ? 'Yes' : 'No'}
                         </Badge>,
                     ],
                 };
             }),
         [certificates, selectCertsOnly, certificateTypeEnum],
     );
+
     const onListCallback = useCallback(
         (filters: SearchRequestModel) => {
+            setAppliedFilters(filters);
             return dispatch(actions.listCertificates({ ...filters, includeArchived: isIncludeArchived }));
         },
         [dispatch, isIncludeArchived],

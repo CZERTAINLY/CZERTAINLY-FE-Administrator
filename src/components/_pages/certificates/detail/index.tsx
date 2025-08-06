@@ -144,6 +144,7 @@ export default function CertificateDetail() {
     const isFetchingValidationResult = useSelector(selectors.isFetchingValidationResult);
     const isFetchingCertificateChain = useSelector(selectors.isFetchingCertificateChain);
     const isUpdatingTrustedStatus = useSelector(selectors.isUpdatingTrustedStatus);
+    const isArchiving = useSelector(selectors.isArchiving);
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [renew, setRenew] = useState<boolean>(false);
@@ -187,7 +188,8 @@ export default function CertificateDetail() {
             isRenewing ||
             isRekeying ||
             isFetchingCertificateChain ||
-            isFetchingApprovals,
+            isFetchingApprovals ||
+            isArchiving,
         [
             isFetching,
             isDeleting,
@@ -199,6 +201,7 @@ export default function CertificateDetail() {
             isRekeying,
             isFetchingCertificateChain,
             isFetchingApprovals,
+            isArchiving,
         ],
     );
 
@@ -651,7 +654,7 @@ export default function CertificateDetail() {
             },
             {
                 icon: 'archive',
-                disabled: isCertificateArchived,
+                disabled: isCertificateArchived || isArchiving,
                 tooltip: 'Archive',
                 onClick: () => {
                     dispatch(actions.archiveCertificate({ uuid: certificate?.uuid ?? '' }));
@@ -659,14 +662,14 @@ export default function CertificateDetail() {
             },
             {
                 icon: 'unarchive',
-                disabled: isCertificateArchived,
+                disabled: !isCertificateArchived || isArchiving,
                 tooltip: 'Unarchive',
                 onClick: () => {
                     dispatch(actions.unarchiveCertificate({ uuid: certificate?.uuid ?? '' }));
                 },
             },
         ],
-        [certificate, onComplianceCheck, dispatch, onDownloadClick, copyToClipboard, isCertificateArchived],
+        [certificate, onComplianceCheck, dispatch, onDownloadClick, copyToClipboard, isCertificateArchived, isArchiving],
     );
 
     const downloadCSRDropDown = useMemo(
@@ -1490,9 +1493,9 @@ export default function CertificateDetail() {
                   {
                       id: 'archivationStatus',
                       columns: [
-                          'Archivation Status',
-                          <Badge key="archivationStatus" color={isCertificateArchived ? 'danger' : 'success'}>
-                              {isCertificateArchived ? 'Archived' : 'Unarchived'}
+                          'Archived',
+                          <Badge key="archivationStatus" color={isCertificateArchived ? 'secondary' : 'success'}>
+                              {isCertificateArchived ? 'Yes' : 'No'}
                           </Badge>,
                       ],
                   },
