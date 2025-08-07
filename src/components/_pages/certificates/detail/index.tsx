@@ -301,7 +301,7 @@ export default function CertificateDetail() {
 
     const getFreshCertificateDetail = useCallback(() => {
         if (!id) return;
-        dispatch(actions.resetState());
+        dispatch(actions.clearCertificateDetail());
         dispatch(actions.getCertificateDetail({ uuid: id }));
         dispatch(actions.getCertificateHistory({ uuid: id }));
         getFreshApprovalList();
