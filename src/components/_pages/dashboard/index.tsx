@@ -2,6 +2,7 @@ import { Col, Container, Row } from 'reactstrap';
 
 import Spinner from 'components/Spinner';
 import { selectors as enumSelectors } from 'ducks/enums';
+import { actions as certificatesActions, selectors as certificatesSelectors } from 'ducks/certificates';
 import { EntityType } from 'ducks/filters';
 import { actions, selectors } from 'ducks/statisticsDashboard';
 import { useEffect, useMemo } from 'react';
@@ -15,17 +16,19 @@ import {
 import { getDateInString } from 'utils/dateUtil';
 import CountBadge from './DashboardItem/CountBadge';
 import DonutChart from './DashboardItem/DonutChart';
+import SwitchWidget from 'components/SwitchWidget';
 
 function Dashboard() {
     const dashboard = useSelector(selectors.statisticsDashboard);
     const isFetching = useSelector(selectors.isFetching);
     const platformEnums = useSelector(enumSelectors.platformEnums);
+    const isIncludeArchived = useSelector(certificatesSelectors.isIncludeArchived);
 
     const dispatch = useDispatch();
 
     useEffect(() => {
         dispatch(actions.getDashboard());
-    }, [dispatch]);
+    }, [dispatch, isIncludeArchived]);
 
     const certificatesStateColorOptions = useMemo(() => {
         return getCertificateDonutChartColors(dashboard?.certificateStatByState);
@@ -49,20 +52,35 @@ function Dashboard() {
 
     return (
         <Container className="themed-container" fluid={true}>
-            <Row>
-                <Col>
-                    <CountBadge data={dashboard?.totalCertificates} title="Certificates" link="../certificates" />
+            <Row className="align-items-stretch">
+                <Col className="d-flex">
+                    <CountBadge
+                        data={dashboard?.totalCertificates}
+                        title="Certificates"
+                        link="../certificates"
+                        extraComponent={
+                            <div className="d-flex align-items-center">
+                                <SwitchWidget
+                                    label="Include archived"
+                                    id="archived-switch"
+                                    disabled={false}
+                                    checked={isIncludeArchived}
+                                    onClick={() => dispatch(certificatesActions.setIncludeArchived(!isIncludeArchived))}
+                                />
+                            </div>
+                        }
+                    />
                 </Col>
 
-                <Col>
+                <Col className="d-flex">
                     <CountBadge data={dashboard?.totalGroups} title="Groups" link="../groups" />
                 </Col>
 
-                <Col>
+                <Col className="d-flex">
                     <CountBadge data={dashboard?.totalDiscoveries} title="Discoveries" link="../discoveries" />
                 </Col>
 
-                <Col>
+                <Col className="d-flex">
                     <CountBadge data={dashboard?.totalRaProfiles} title="RA Profiles" link="../raprofiles" />
                 </Col>
             </Row>

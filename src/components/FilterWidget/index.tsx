@@ -67,9 +67,18 @@ interface Props {
     onFilterUpdate?: (currentFilters: SearchFilterModel[]) => void;
     disableBadgeRemove?: boolean;
     busyBadges?: boolean;
+    extraFilterComponent?: React.ReactNode;
 }
 
-export default function FilterWidget({ onFilterUpdate, title, entity, getAvailableFiltersApi, disableBadgeRemove, busyBadges }: Props) {
+export default function FilterWidget({
+    onFilterUpdate,
+    title,
+    entity,
+    getAvailableFiltersApi,
+    disableBadgeRemove,
+    busyBadges,
+    extraFilterComponent,
+}: Props) {
     const dispatch = useDispatch();
 
     const searchGroupEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.FilterFieldSource));
@@ -649,6 +658,7 @@ export default function FilterWidget({ onFilterUpdate, title, entity, getAvailab
                     })}
                 </div>
                 {/* {appendInWidgetContent} */}
+                {extraFilterComponent}
             </Widget>
         </>
     );

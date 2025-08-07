@@ -144,6 +144,7 @@ export default function CertificateDetail() {
     const isFetchingValidationResult = useSelector(selectors.isFetchingValidationResult);
     const isFetchingCertificateChain = useSelector(selectors.isFetchingCertificateChain);
     const isUpdatingTrustedStatus = useSelector(selectors.isUpdatingTrustedStatus);
+    const isArchiving = useSelector(selectors.isArchiving);
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [renew, setRenew] = useState<boolean>(false);
@@ -187,7 +188,8 @@ export default function CertificateDetail() {
             isRenewing ||
             isRekeying ||
             isFetchingCertificateChain ||
-            isFetchingApprovals,
+            isFetchingApprovals ||
+            isArchiving,
         [
             isFetching,
             isDeleting,
@@ -199,8 +201,11 @@ export default function CertificateDetail() {
             isRekeying,
             isFetchingCertificateChain,
             isFetchingApprovals,
+            isArchiving,
         ],
     );
+
+    const isCertificateArchived = useMemo(() => certificate?.archived ?? false, [certificate?.archived]);
 
     const transformCertificate = useCallback(() => {
         const { nodes, edges } = transformCertificateObjectToNodesAndEdges(
@@ -296,7 +301,7 @@ export default function CertificateDetail() {
 
     const getFreshCertificateDetail = useCallback(() => {
         if (!id) return;
-        dispatch(actions.resetState());
+        dispatch(actions.clearCertificateDetail());
         dispatch(actions.getCertificateDetail({ uuid: id }));
         dispatch(actions.getCertificateHistory({ uuid: id }));
         getFreshApprovalList();
@@ -584,7 +589,7 @@ export default function CertificateDetail() {
             },
             {
                 icon: 'cubes',
-                disabled: !certificate?.raProfile || certificate?.state !== CertStatus.Requested,
+                disabled: !certificate?.raProfile || certificate?.state !== CertStatus.Requested || isCertificateArchived,
                 tooltip: 'Issue',
                 onClick: () => {
                     dispatch(
@@ -598,7 +603,7 @@ export default function CertificateDetail() {
             },
             {
                 icon: 'retweet',
-                disabled: !certificate?.raProfile || certificate?.state !== CertStatus.Issued,
+                disabled: !certificate?.raProfile || certificate?.state !== CertStatus.Issued || isCertificateArchived,
                 tooltip: 'Renew',
                 onClick: () => {
                     setRenew(true);
@@ -606,7 +611,7 @@ export default function CertificateDetail() {
             },
             {
                 icon: 'rekey',
-                disabled: !certificate?.raProfile || certificate?.state !== CertStatus.Issued,
+                disabled: !certificate?.raProfile || certificate?.state !== CertStatus.Issued || isCertificateArchived,
                 tooltip: 'Rekey',
                 onClick: () => {
                     setRekey(true);
@@ -614,7 +619,7 @@ export default function CertificateDetail() {
             },
             {
                 icon: 'minus-square',
-                disabled: !certificate?.raProfile || certificate?.state !== CertStatus.Issued,
+                disabled: !certificate?.raProfile || certificate?.state !== CertStatus.Issued || isCertificateArchived,
                 tooltip: 'Revoke',
                 onClick: () => {
                     setRevoke(true);
@@ -622,7 +627,7 @@ export default function CertificateDetail() {
             },
             {
                 icon: 'gavel',
-                disabled: !certificate?.raProfile || !certificate?.certificateContent,
+                disabled: !certificate?.raProfile || !certificate?.certificateContent || isCertificateArchived,
                 tooltip: 'Check Compliance',
                 onClick: () => {
                     onComplianceCheck();
@@ -647,8 +652,24 @@ export default function CertificateDetail() {
                     );
                 },
             },
+            {
+                icon: 'archive',
+                disabled: isCertificateArchived || isArchiving,
+                tooltip: 'Archive',
+                onClick: () => {
+                    dispatch(actions.archiveCertificate({ uuid: certificate?.uuid ?? '' }));
+                },
+            },
+            {
+                icon: 'unarchive',
+                disabled: !isCertificateArchived || isArchiving,
+                tooltip: 'Unarchive',
+                onClick: () => {
+                    dispatch(actions.unarchiveCertificate({ uuid: certificate?.uuid ?? '' }));
+                },
+            },
         ],
-        [certificate, onComplianceCheck, dispatch, onDownloadClick, copyToClipboard],
+        [certificate, onComplianceCheck, dispatch, onDownloadClick, copyToClipboard, isCertificateArchived, isArchiving],
     );
 
     const downloadCSRDropDown = useMemo(
@@ -718,7 +739,7 @@ export default function CertificateDetail() {
         () => [
             {
                 icon: 'plus',
-                disabled: false,
+                disabled: isCertificateArchived,
                 tooltip: 'Push to location',
                 onClick: () => {
                     setSelectLocationCheckedRows([]);
@@ -734,7 +755,7 @@ export default function CertificateDetail() {
                 },
             },
         ],
-        [locationsCheckedRows.length],
+        [locationsCheckedRows.length, isCertificateArchived],
     );
 
     const updateOwnerBody = useMemo(
@@ -1025,6 +1046,7 @@ export default function CertificateDetail() {
                           ),
                           <div className="d-flex">
                               <Button
+                                  disabled={isCertificateArchived}
                                   className="btn btn-link"
                                   size="sm"
                                   color="secondary"
@@ -1042,7 +1064,7 @@ export default function CertificateDetail() {
                                   className="btn btn-link"
                                   size="sm"
                                   color="secondary"
-                                  disabled={!certificate?.ownerUuid}
+                                  disabled={!certificate?.ownerUuid || isCertificateArchived}
                                   onClick={() => {
                                       if (!certificate?.ownerUuid || !id) return;
                                       dispatch(
@@ -1071,6 +1093,7 @@ export default function CertificateDetail() {
                               : 'Unassigned',
                           <div className="d-flex">
                               <Button
+                                  disabled={isCertificateArchived}
                                   className="btn btn-link"
                                   size="sm"
                                   color="secondary"
@@ -1086,7 +1109,7 @@ export default function CertificateDetail() {
                                   className="btn btn-link"
                                   size="sm"
                                   color="secondary"
-                                  disabled={!certificate?.groups?.length}
+                                  disabled={!certificate?.groups?.length || isCertificateArchived}
                                   onClick={() => {
                                       if (!id) return;
                                       dispatch(
@@ -1116,6 +1139,7 @@ export default function CertificateDetail() {
                           ),
                           <div className="d-flex">
                               <Button
+                                  disabled={isCertificateArchived}
                                   className="btn btn-link"
                                   size="sm"
                                   color="secondary"
@@ -1131,7 +1155,7 @@ export default function CertificateDetail() {
                                   className="btn btn-link"
                                   size="sm"
                                   color="secondary"
-                                  disabled={!certificate?.raProfile?.uuid}
+                                  disabled={!certificate?.raProfile?.uuid || isCertificateArchived}
                                   onClick={() => {
                                       if (!certificate?.raProfile?.authorityInstanceUuid || !id) return;
                                       dispatch(
@@ -1151,7 +1175,7 @@ export default function CertificateDetail() {
                       columns: ['Type', certificate.certificateType || '', ''],
                   },
               ];
-    }, [certificate, getGroupList, getRaProfileList, getUserList, dispatch, id]);
+    }, [certificate, getGroupList, getRaProfileList, getUserList, dispatch, id, isCertificateArchived]);
 
     const sanData: TableDataRow[] = useMemo(() => {
         let sanList: TableDataRow[] = [];
@@ -1466,6 +1490,15 @@ export default function CertificateDetail() {
                           certificate.subjectType ? <CertificateStatus status={certificate.subjectType} /> : <>n/a</>,
                       ],
                   },
+                  {
+                      id: 'archivationStatus',
+                      columns: [
+                          'Archived',
+                          <Badge key="archivationStatus" color={isCertificateArchived ? 'secondary' : 'success'}>
+                              {isCertificateArchived ? 'Yes' : 'No'}
+                          </Badge>,
+                      ],
+                  },
               ].filter((el) => el !== null) as NonNullable<TableDataRow>[]);
 
         if (certificate?.state !== CertStatus.Requested) {
@@ -1489,7 +1522,7 @@ export default function CertificateDetail() {
         }
 
         return certDetail;
-    }, [certificate, validationResult, isUpdatingTrustedStatus, switchCallback]);
+    }, [certificate, validationResult, isUpdatingTrustedStatus, switchCallback, isCertificateArchived]);
 
     const locationsHeaders: TableHeader[] = useMemo(
         () => [

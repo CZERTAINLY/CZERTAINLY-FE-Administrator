@@ -193,6 +193,12 @@ export interface CertificateDto {
      * @memberof CertificateDto
      */
     trustedCa?: boolean;
+    /**
+     * Certificate is archived
+     * @type {boolean}
+     * @memberof CertificateDto
+     */
+    archived?: boolean;
 }
 
 

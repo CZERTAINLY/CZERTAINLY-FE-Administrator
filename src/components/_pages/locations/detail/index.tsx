@@ -553,7 +553,6 @@ export default function LocationDetail() {
                     },
                 ]}
             />
-
             <Dialog
                 isOpen={confirmDelete}
                 caption="Delete Location"
@@ -564,7 +563,6 @@ export default function LocationDetail() {
                     { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
-
             <Dialog
                 isOpen={confirmRemoveDialog}
                 caption={`Remove ${certCheckedRows.length === 1 ? 'certificate' : 'certificates'} from the location`}
@@ -594,7 +592,6 @@ export default function LocationDetail() {
                     { color: 'secondary', onClick: () => setConfirmRemoveDialog(false), body: 'Cancel' },
                 ]}
             />
-
             <Dialog
                 isOpen={pushDialog}
                 caption="Push certificate to the location"
@@ -649,7 +646,6 @@ export default function LocationDetail() {
                     </>
                 }
             />
-
             <Dialog
                 isOpen={issueDialog}
                 caption="Issue certificate for the location"

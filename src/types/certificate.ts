@@ -12,6 +12,7 @@ import {
     CertificateDownloadResponseDto,
     CertificateDto,
     CertificateEventHistoryDto,
+    CertificateSearchRequestDto,
     CertificateUpdateObjectsDto,
     CertificateValidationCheck,
     CertificateValidationCheckDto,
@@ -47,7 +48,7 @@ export type ValidationCertificateResultModel = Omit<ValidationCertificateResultD
 export type SearchFilterDto = SearchFilterRequestDto;
 export type SearchFilterModel = SearchFilterDto;
 
-export type SearchRequestDto = SearchRequestDtoOpenApi;
+export type SearchRequestDto = CertificateSearchRequestDto;
 export type SearchRequestModel = Omit<SearchRequestDto, 'filters'> & { filters?: Array<SearchFilterModel> };
 
 export type RaProfileSimplifiedDto = SimplifiedRaProfileDto;

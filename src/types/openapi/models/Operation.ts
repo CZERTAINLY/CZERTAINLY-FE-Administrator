@@ -104,6 +104,8 @@ export enum Operation {
     UpdateAttributeContent = 'updateAttributeContent',
     DeleteAttributeContent = 'deleteAttributeContent',
     PromoteMetadata = 'promoteMetadata',
+    Archive = 'archive',
+    Unarchive = 'unarchive',
     ListCertificateProfiles = 'listCertificateProfiles',
     ListCas = 'listCas'
 }

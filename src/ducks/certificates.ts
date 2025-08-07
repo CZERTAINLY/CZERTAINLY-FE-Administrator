@@ -83,6 +83,11 @@ export type State = {
     csrAttributeDescriptors: AttributeDescriptorModel[];
 
     isFetchingContents: boolean;
+
+    isIncludeArchived: boolean;
+    isArchiving: boolean;
+    isBulkArchiving: boolean;
+    isBulkUnarchiving: boolean;
 };
 
 export const initialState: State = {
@@ -133,6 +138,11 @@ export const initialState: State = {
     csrAttributeDescriptors: [],
 
     isFetchingContents: false,
+
+    isIncludeArchived: false,
+    isArchiving: false,
+    isBulkArchiving: false,
+    isBulkUnarchiving: false,
 };
 
 export const slice = createSlice({
@@ -155,6 +165,10 @@ export const slice = createSlice({
 
         clearCertificateDetail: (state, action: PayloadAction<void>) => {
             state.certificateDetail = undefined;
+        },
+
+        setIncludeArchived: (state, action: PayloadAction<boolean>) => {
+            state.isIncludeArchived = action.payload;
         },
 
         listCertificates: (state, action: PayloadAction<SearchRequestModel>) => {
@@ -756,6 +770,69 @@ export const slice = createSlice({
             state.certificateDownloadContent = undefined;
             state.isFetchingCertificateDownloadContent = false;
         },
+        archiveCertificate: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isArchiving = true;
+        },
+
+        archiveCertificateSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isArchiving = false;
+
+            if (state.certificateDetail?.uuid === action.payload.uuid) {
+                state.certificateDetail.archived = true;
+            }
+            const certificateIndex = state.certificates.findIndex((certificate) => certificate.uuid === action.payload.uuid);
+            if (certificateIndex >= 0) {
+                state.certificates[certificateIndex].archived = true;
+            }
+        },
+
+        archiveCertificateFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isArchiving = false;
+        },
+
+        unarchiveCertificate: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isArchiving = true;
+        },
+
+        unarchiveCertificateSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isArchiving = false;
+
+            if (state.certificateDetail?.uuid === action.payload.uuid) {
+                state.certificateDetail.archived = false;
+            }
+            const certificateIndex = state.certificates.findIndex((certificate) => certificate.uuid === action.payload.uuid);
+            if (certificateIndex >= 0) {
+                state.certificates[certificateIndex].archived = false;
+            }
+        },
+
+        unarchiveCertificateFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isArchiving = false;
+        },
+
+        bulkArchiveCertificate: (state, action: PayloadAction<{ uuids: string[]; filters: SearchRequestModel | undefined }>) => {
+            state.isBulkArchiving = true;
+        },
+
+        bulkArchiveCertificateSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.isBulkArchiving = false;
+        },
+
+        bulkArchiveCertificateFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isBulkArchiving = false;
+        },
+
+        bulkUnarchiveCertificate: (state, action: PayloadAction<{ uuids: string[]; filters: SearchRequestModel | undefined }>) => {
+            state.isBulkUnarchiving = true;
+        },
+
+        bulkUnarchiveCertificateSuccess: (state, action: PayloadAction<{ uuids: string[] }>) => {
+            state.isBulkUnarchiving = false;
+        },
+
+        bulkUnarchiveCertificateFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isBulkUnarchiving = false;
+        },
     },
 });
 
@@ -814,6 +891,9 @@ const isFetchingCertificateChain = createSelector(state, (state) => state.isFetc
 const isFetchingCertificateDownloadContent = createSelector(state, (state) => state.isFetchingCertificateDownloadContent);
 const isFetchingCertificateChainDownloadContent = createSelector(state, (state) => state.isFetchingCertificateChainDownloadContent);
 
+const isIncludeArchived = createSelector(state, (state) => state.isIncludeArchived);
+const isArchiving = createSelector(state, (state) => state.isArchiving);
+
 export const selectors = {
     state,
     deleteErrorMessage,
@@ -855,6 +935,8 @@ export const selectors = {
     isFetchingContents,
     isFetchingApprovals,
     certificateChain,
+    isIncludeArchived,
+    isArchiving,
 };
 
 export const actions = slice.actions;

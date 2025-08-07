@@ -11,9 +11,8 @@ import { transformStatisticsDashboardDtoToModel } from './transform/statisticsDa
 const getDashboard: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.getDashboard.match),
-
         switchMap(() =>
-            deps.apiClients.statisticsDashboard.getStatistics().pipe(
+            deps.apiClients.statisticsDashboard.getStatistics({ includeArchived: state.value.certificates.isIncludeArchived }).pipe(
                 map((dashboard) =>
                     slice.actions.getDashboardSuccess({ statisticsDashboard: transformStatisticsDashboardDtoToModel(dashboard) }),
                 ),

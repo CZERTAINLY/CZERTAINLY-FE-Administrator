@@ -203,6 +203,12 @@ export interface CertificateDetailDto {
      */
     trustedCa?: boolean;
     /**
+     * Certificate is archived
+     * @type {boolean}
+     * @memberof CertificateDetailDto
+     */
+    archived?: boolean;
+    /**
      * Extended key usages
      * @type {Array<string>}
      * @memberof CertificateDetailDto
