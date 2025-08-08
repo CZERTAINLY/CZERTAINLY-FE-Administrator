@@ -320,7 +320,7 @@ export default function RaProfileDetail() {
         () => [
             {
                 icon: 'pencil',
-                disabled: authorityId === 'unknown' || false,
+                disabled: authorityId === 'unknown',
                 tooltip: 'Edit',
                 onClick: () => {
                     onEditClick();
@@ -336,7 +336,7 @@ export default function RaProfileDetail() {
             },
             {
                 icon: 'check',
-                disabled: raProfile?.enabled || false,
+                disabled: !!raProfile?.enabled,
                 tooltip: 'Enable',
                 onClick: () => {
                     onEnableClick();
@@ -344,7 +344,7 @@ export default function RaProfileDetail() {
             },
             {
                 icon: 'times',
-                disabled: !(raProfile?.enabled || false),
+                disabled: !raProfile?.enabled,
                 tooltip: 'Disable',
                 onClick: () => {
                     onDisableClick();
