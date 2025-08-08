@@ -12,7 +12,7 @@ import {
 } from 'types/openapi';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 import { Field, Form } from 'react-final-form';
-import { validateLength, composeValidators, validateRequired } from 'utils/validators';
+import { validateLength, composeValidators, validateRequired, validateOid, validateOidCode } from 'utils/validators';
 import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
 import Select from 'react-select';
 import ProgressButton from 'components/ProgressButton';
@@ -126,7 +126,7 @@ export default function CustomOIDForm() {
             <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
                 {({ handleSubmit, pristine, submitting, values, valid, form }) => (
                     <BootstrapForm onSubmit={handleSubmit}>
-                        <Field name="oid" validate={validateRequired()}>
+                        <Field name="oid" validate={composeValidators(validateRequired(), validateOid())}>
                             {({ input, meta }) => (
                                 <FormGroup>
                                     <Label for="oid">OID*</Label>
@@ -156,6 +156,7 @@ export default function CustomOIDForm() {
                                         type="text"
                                         placeholder="Enter the Display name"
                                     />
+                                    <FormFeedback>{meta.error}</FormFeedback>
                                 </FormGroup>
                             )}
                         </Field>
@@ -169,7 +170,10 @@ export default function CustomOIDForm() {
                                         type="textarea"
                                         className="form-control"
                                         placeholder="Enter Description / Comment"
+                                        valid={!meta.error && meta.touched}
+                                        invalid={!!meta.error && meta.touched}
                                     />
+                                    <FormFeedback>{meta.error}</FormFeedback>
                                 </FormGroup>
                             )}
                         </Field>
@@ -197,20 +201,33 @@ export default function CustomOIDForm() {
                                                     : { ...provided },
                                         }}
                                     />
+                                    {meta.touched && meta.error && (
+                                        <div className="invalid-feedback" style={{ display: 'block' }}>
+                                            {meta.error}
+                                        </div>
+                                    )}
                                 </FormGroup>
                             )}
                         </Field>
                         {values.category?.value === OidCategory.RdnAttributeType && (
                             <>
-                                <Field name="code" validate={validateRequired()}>
+                                <Field name="code" validate={composeValidators(validateRequired(), validateOidCode())}>
                                     {({ input, meta }) => (
                                         <FormGroup>
                                             <Label for="code">OID code *</Label>
-                                            <Input id="code" {...input} type="text" placeholder="Enter OID code" />
+                                            <Input
+                                                id="code"
+                                                {...input}
+                                                type="text"
+                                                placeholder="Enter OID code"
+                                                valid={!meta.error && meta.touched}
+                                                invalid={!!meta.error && meta.touched}
+                                            />
+                                            <FormFeedback>{meta.error}</FormFeedback>
                                         </FormGroup>
                                     )}
                                 </Field>
-                                <Field name="alternativeCode">
+                                <Field name="alternativeCode" validate={composeValidators(validateOidCode())}>
                                     {({ input, meta }) => (
                                         <FormGroup>
                                             <Label for="alternativeCode">Alternative Code</Label>
@@ -220,7 +237,11 @@ export default function CustomOIDForm() {
                                                 onChange={(values) => {
                                                     input.onChange(values);
                                                 }}
+                                                onBlur={input.onBlur}
+                                                isValid={!meta.error && meta.touched}
+                                                isInvalid={!!meta.error && meta.touched}
                                             />
+                                            {meta.error && meta.touched && <FormFeedback>{meta.error}</FormFeedback>}
                                         </FormGroup>
                                     )}
                                 </Field>

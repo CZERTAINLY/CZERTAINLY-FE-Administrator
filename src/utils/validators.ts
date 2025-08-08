@@ -108,3 +108,7 @@ export const validateQuartzCronExpression = (cronExpression: string | undefined)
         return 'Unknown error, please check the cron expression.';
     }
 };
+
+export const validateOid = () => validatePattern(/^[0-2](\.(0|[1-9]\d*)){1,50}$/, 'Value must be a valid OID');
+
+export const validateOidCode = () => validatePattern(/^[A-Za-z][A-Za-z0-9-]*$/, 'Value must be a valid OID code');
