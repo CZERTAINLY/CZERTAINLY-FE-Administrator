@@ -807,6 +807,58 @@ const disassociateRAProfileFromApprovalProfile: AppEpic = (action$, state$, deps
     );
 };
 
+const getRaProfileWithoutAuthority: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.getRaProfileWithoutAuthority.match),
+        switchMap((action) =>
+            deps.apiClients.raProfiles.getRaProfileWithoutAuthority({ raProfileUuid: action.payload.uuid }).pipe(
+                switchMap((raProfile) =>
+                    of(
+                        slice.actions.getRaProfileWithoutAuthoritySuccess({ raProfile: transformRaProfileResponseDtoToModel(raProfile) }),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.RaProfileDetails),
+                    ),
+                ),
+
+                catchError((err) =>
+                    of(
+                        slice.actions.getRaProfileWithoutAuthorityFailure({
+                            error: extractError(err, 'Failed to get RA Profile without authority'),
+                        }),
+                        userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.RaProfileDetails),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+const deleteRaProfileWithoutAuthority: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.deleteRaProfileWithoutAuthority.match),
+        switchMap((action) =>
+            deps.apiClients.raProfiles.deleteRaProfileWithoutAuthority({ raProfileUuid: action.payload.uuid }).pipe(
+                mergeMap(() =>
+                    iif(
+                        () => !!action.payload.redirect,
+                        of(
+                            slice.actions.deleteRaProfileWithoutAuthoritySuccess({ uuid: action.payload.uuid }),
+                            appRedirectActions.redirect({ url: action.payload.redirect! }),
+                        ),
+                        of(slice.actions.deleteRaProfileWithoutAuthoritySuccess({ uuid: action.payload.uuid })),
+                    ),
+                ),
+                catchError((err) =>
+                    of(
+                        slice.actions.deleteRaProfileWithoutAuthorityFailure({
+                            error: extractError(err, 'Failed to delete RA Profile without authority'),
+                        }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
 const epics = [
     listRaProfiles,
     getRaProfileDetail,
@@ -837,6 +889,8 @@ const epics = [
     getAssociatedApprovalProfiles,
     associateRAProfileWithApprovalProfile,
     disassociateRAProfileFromApprovalProfile,
+    getRaProfileWithoutAuthority,
+    deleteRaProfileWithoutAuthority,
 ];
 
 export default epics;

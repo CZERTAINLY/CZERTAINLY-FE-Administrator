@@ -130,8 +130,14 @@ export default function RaProfileDetail() {
     );
 
     const getFreshRaProfileDetail = useCallback(() => {
-        if (!id || !authorityId) return;
-        dispatch(raProfilesActions.getRaProfileDetail({ authorityUuid: authorityId, uuid: id }));
+        if (!id || !authorityId) {
+            return;
+        }
+        if (authorityId === 'unknown') {
+            dispatch(raProfilesActions.getRaProfileWithoutAuthority({ uuid: id }));
+        } else {
+            dispatch(raProfilesActions.getRaProfileDetail({ authorityUuid: authorityId, uuid: id }));
+        }
     }, [id, dispatch, authorityId]);
 
     const getFreshComplianceRaProfileDetail = useCallback(() => {
@@ -183,13 +189,16 @@ export default function RaProfileDetail() {
     }, [dispatch, platformSettings]);
 
     useEffect(() => {
-        if (!id || !authorityId) return;
+        if (!id || !authorityId || authorityId === 'undefined') {
+            return;
+        }
 
-        dispatch(raProfilesActions.getRaProfileDetail({ authorityUuid: authorityId, uuid: id }));
-
-        if (authorityId === 'unknown' || authorityId === 'undefined') return;
-
-        dispatch(raProfilesActions.getComplianceProfilesForRaProfile({ authorityUuid: authorityId, uuid: id }));
+        if (authorityId === 'unknown') {
+            dispatch(raProfilesActions.getRaProfileWithoutAuthority({ uuid: id }));
+        } else {
+            dispatch(raProfilesActions.getRaProfileDetail({ authorityUuid: authorityId, uuid: id }));
+            dispatch(raProfilesActions.getComplianceProfilesForRaProfile({ authorityUuid: authorityId, uuid: id }));
+        }
     }, [id, dispatch, authorityId]);
 
     // use effect to clear the ra profile detail when the component is unmounted
@@ -206,25 +215,42 @@ export default function RaProfileDetail() {
 
     const onEnableClick = useCallback(() => {
         if (!raProfile) return;
-        dispatch(raProfilesActions.enableRaProfile({ authorityUuid: raProfile.authorityInstanceUuid ?? 'unknown', uuid: raProfile.uuid }));
-    }, [dispatch, raProfile]);
+        if (authorityId === 'unknown') {
+            dispatch(raProfilesActions.bulkEnableRaProfiles({ uuids: [raProfile.uuid] }));
+        } else {
+            dispatch(
+                raProfilesActions.enableRaProfile({ authorityUuid: raProfile.authorityInstanceUuid ?? 'unknown', uuid: raProfile.uuid }),
+            );
+        }
+    }, [dispatch, raProfile, authorityId]);
 
     const onDisableClick = useCallback(() => {
         if (!raProfile) return;
-        dispatch(raProfilesActions.disableRaProfile({ authorityUuid: raProfile.authorityInstanceUuid ?? 'unknown', uuid: raProfile.uuid }));
-    }, [dispatch, raProfile]);
+        if (authorityId === 'unknown') {
+            dispatch(raProfilesActions.bulkDisableRaProfiles({ uuids: [raProfile.uuid] }));
+        } else {
+            dispatch(
+                raProfilesActions.disableRaProfile({ authorityUuid: raProfile.authorityInstanceUuid ?? 'unknown', uuid: raProfile.uuid }),
+            );
+        }
+    }, [dispatch, raProfile, authorityId]);
 
     const onDeleteConfirmed = useCallback(() => {
         if (!raProfile) return;
-        dispatch(
-            raProfilesActions.deleteRaProfile({
-                authorityUuid: raProfile.authorityInstanceUuid ?? 'unknown',
-                uuid: raProfile.uuid,
-                redirect: '../../../raprofiles',
-            }),
-        );
+        if (authorityId === 'unknown') {
+            dispatch(raProfilesActions.deleteRaProfileWithoutAuthority({ uuid: raProfile.uuid, redirect: '../../../raprofiles' }));
+        } else {
+            dispatch(
+                raProfilesActions.deleteRaProfile({
+                    authorityUuid: raProfile.authorityInstanceUuid ?? 'unknown',
+                    uuid: raProfile.uuid,
+                    redirect: '../../../raprofiles',
+                }),
+            );
+        }
+
         setConfirmDelete(false);
-    }, [dispatch, raProfile]);
+    }, [dispatch, raProfile, authorityId]);
 
     const onDeactivateAcmeConfirmed = useCallback(() => {
         if (!raProfile) return;
@@ -294,7 +320,7 @@ export default function RaProfileDetail() {
         () => [
             {
                 icon: 'pencil',
-                disabled: false,
+                disabled: authorityId === 'unknown',
                 tooltip: 'Edit',
                 onClick: () => {
                     onEditClick();
@@ -310,7 +336,7 @@ export default function RaProfileDetail() {
             },
             {
                 icon: 'check',
-                disabled: !raProfile?.authorityInstanceUuid || raProfile?.enabled || false,
+                disabled: !!raProfile?.enabled,
                 tooltip: 'Enable',
                 onClick: () => {
                     onEnableClick();
@@ -318,7 +344,7 @@ export default function RaProfileDetail() {
             },
             {
                 icon: 'times',
-                disabled: !raProfile?.authorityInstanceUuid || !(raProfile?.enabled || false),
+                disabled: !raProfile?.enabled,
                 tooltip: 'Disable',
                 onClick: () => {
                     onDisableClick();
@@ -333,7 +359,7 @@ export default function RaProfileDetail() {
                 },
             },
         ],
-        [raProfile, onEditClick, onDisableClick, onEnableClick],
+        [raProfile, onEditClick, onDisableClick, onEnableClick, authorityId],
     );
 
     const complianceProfileButtons: WidgetButtonProps[] = useMemo(
