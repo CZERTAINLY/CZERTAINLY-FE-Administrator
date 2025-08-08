@@ -656,6 +656,32 @@ export const slice = createSlice({
         disassociateRAProfileFromApprovalProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isDissociatingApprovalProfile = false;
         },
+
+        getRaProfileWithoutAuthority: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.raProfile = undefined;
+            state.isFetchingDetail = true;
+        },
+
+        getRaProfileWithoutAuthoritySuccess: (state, action: PayloadAction<{ raProfile: RaProfileResponseModel }>) => {
+            state.isFetchingDetail = false;
+            state.raProfile = action.payload.raProfile;
+        },
+
+        getRaProfileWithoutAuthorityFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingDetail = false;
+        },
+
+        deleteRaProfileWithoutAuthority: (state, action: PayloadAction<{ uuid: string; redirect?: string }>) => {
+            state.isDeleting = true;
+        },
+
+        deleteRaProfileWithoutAuthoritySuccess: (state, action: PayloadAction<{ uuid: string; redirect?: string }>) => {
+            state.isDeleting = false;
+        },
+
+        deleteRaProfileWithoutAuthorityFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isDeleting = false;
+        },
     },
 });
 
