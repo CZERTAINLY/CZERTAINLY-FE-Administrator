@@ -227,7 +227,7 @@ export default function CustomOIDForm() {
                                         </FormGroup>
                                     )}
                                 </Field>
-                                <Field name="alternativeCode" validate={composeValidators(validateOidCode())}>
+                                <Field name="alternativeCode" validate={validateOidCode()}>
                                     {({ input, meta }) => (
                                         <FormGroup>
                                             <Label for="alternativeCode">Alternative Code</Label>
