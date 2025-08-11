@@ -11,6 +11,14 @@
     background-color: #ffffff;
     min-height: 44px;
     outline: none;
+
+    &.is-invalid {
+        border-color: #dc3545;
+    }
+
+    &.is-valid {
+        border-color: #28a745;
+    }
 }
 
 .container:focus-within {
