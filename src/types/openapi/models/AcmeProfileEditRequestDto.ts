@@ -12,6 +12,7 @@
  */
 
 import type {
+    ProtocolCertificateAssociationsDto,
     RequestAttributeDto,
 } from './';
 
@@ -110,4 +111,10 @@ export interface AcmeProfileEditRequestDto {
      * @memberof AcmeProfileEditRequestDto
      */
     customAttributes?: Array<RequestAttributeDto>;
+    /**
+     * Associations to set for certificates issued by the protocol
+     * @type {ProtocolCertificateAssociationsDto}
+     * @memberof AcmeProfileEditRequestDto
+     */
+    certificateAssociations?: ProtocolCertificateAssociationsDto;
 }

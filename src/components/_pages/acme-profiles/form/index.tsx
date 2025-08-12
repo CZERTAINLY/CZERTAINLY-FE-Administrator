@@ -35,8 +35,6 @@ import {
     validateRequired,
 } from 'utils/validators';
 import { Resource } from '../../../../types/openapi';
-import AttributeViewer from 'components/Attributes/AttributeViewer';
-import CustomAttributeWidget from 'components/Attributes/CustomAttributeWidget';
 
 interface FormValues {
     name: string;
@@ -52,6 +50,8 @@ interface FormValues {
     requireTermsOfService: boolean;
     requireContact: boolean;
     raProfile: { value: string; label: string } | undefined;
+    owner: { value: string; label: string } | undefined;
+    groups: { value: string; label: string }[];
 }
 
 export default function AcmeProfileForm() {
@@ -66,9 +66,8 @@ export default function AcmeProfileForm() {
     const raProfiles = useSelector(raProfileSelectors.raProfiles);
     const raProfileIssuanceAttrDescs = useSelector(raProfileSelectors.issuanceAttributes);
     const raProfileRevocationAttrDescs = useSelector(raProfileSelectors.revocationAttributes);
-    const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
     const multipleResourceCustomAttributes = useSelector(
-        customAttributesSelectors.multipleResourceCustomAttributes([Resource.Certificates]),
+        customAttributesSelectors.multipleResourceCustomAttributes([Resource.Certificates, Resource.AcmeProfiles]),
     );
 
     const isFetchingDetail = useSelector(acmeProfileSelectors.isFetchingDetail);
@@ -93,13 +92,6 @@ export default function AcmeProfileForm() {
 
     const [userOptions, setUserOptions] = useState<{ value: string; label: string }[]>([]);
     const [groupOptions, setGroupOptions] = useState<{ value: string; label: string }[]>([]);
-
-    console.log({
-        users,
-        groups,
-        resourceCustomAttributes,
-        multipleResourceCustomAttributes: multipleResourceCustomAttributes[Resource.Certificates],
-    });
 
     useEffect(() => {
         dispatch(userAction.list());
@@ -132,7 +124,12 @@ export default function AcmeProfileForm() {
     }, [groups]);
 
     useEffect(() => {
-        dispatch(customAttributesActions.loadMultipleResourceCustomAttributes([{ resource: Resource.Certificates, customAttributes: [] }]));
+        dispatch(
+            customAttributesActions.loadMultipleResourceCustomAttributes([
+                { resource: Resource.AcmeProfiles, customAttributes: [] },
+                { resource: Resource.Certificates, customAttributes: [] },
+            ]),
+        );
     }, [dispatch]);
 
     useEffect(() => {
@@ -147,7 +144,7 @@ export default function AcmeProfileForm() {
     }, [dispatch, id, editMode, acmeProfileSelector]);
 
     useEffect(() => {
-        dispatch(customAttributesActions.listResourceCustomAttributes(Resource.AcmeProfiles));
+        /* dispatch(customAttributesActions.listResourceCustomAttributes(Resource.AcmeProfiles)); */
         dispatch(raProfileActions.listRaProfiles());
     }, [dispatch]);
 
@@ -167,13 +164,6 @@ export default function AcmeProfileForm() {
 
     const onSubmit = useCallback(
         (values: FormValues) => {
-            const testCustomAttributes = collectFormAttributes('customAcmeProfile', resourceCustomAttributes, values);
-            const testCertificateAttributes = collectFormAttributes(
-                'certificateAssociatedAttributes',
-                multipleResourceCustomAttributes[Resource.Certificates],
-                values,
-            );
-            console.log({ values, testCustomAttributes, testCertificateAttributes });
             const request: AcmeProfileEditRequestModel | AcmeProfileAddRequestModel = {
                 ...values,
                 dnsResolverIp: values.dnsIpAddress,
@@ -194,10 +184,14 @@ export default function AcmeProfileForm() {
                     [...(raProfileRevocationAttrDescs ?? []), ...revokeGroupAttributesCallbackAttributes],
                     values,
                 ),
-                customAttributes: collectFormAttributes('customAcmeProfile', resourceCustomAttributes, values),
+                customAttributes: collectFormAttributes(
+                    'customAcmeProfile',
+                    multipleResourceCustomAttributes[Resource.AcmeProfiles],
+                    values,
+                ),
                 certificateAssociations: {
-                    owner: values.owner,
-                    groups: values.groups,
+                    ownerUuid: values.owner?.value,
+                    groupUuids: values.groups.map((group) => group.value),
                     customAttributes: collectFormAttributes(
                         'certificateAssociatedAttributes',
                         multipleResourceCustomAttributes[Resource.Certificates],
@@ -205,26 +199,24 @@ export default function AcmeProfileForm() {
                     ),
                 },
             };
-            console.log({ request });
-            /*   if (values.raProfile) {
+            if (values.raProfile) {
                 request.raProfileUuid = values.raProfile.value;
             }
             if (editMode) {
                 dispatch(acmeProfileActions.updateAcmeProfile({ uuid: id!, updateAcmeRequest: request }));
             } else {
                 dispatch(acmeProfileActions.createAcmeProfile(request as AcmeProfileAddRequestModel));
-            } */
+            }
         },
         [
-            dispatch,
-            editMode,
-            id,
-            raProfileIssuanceAttrDescs,
-            raProfileRevocationAttrDescs,
-            issueGroupAttributesCallbackAttributes,
-            revokeGroupAttributesCallbackAttributes,
-            resourceCustomAttributes,
             multipleResourceCustomAttributes,
+            raProfileIssuanceAttrDescs,
+            issueGroupAttributesCallbackAttributes,
+            raProfileRevocationAttrDescs,
+            revokeGroupAttributesCallbackAttributes,
+            editMode,
+            dispatch,
+            id,
         ],
     );
 
@@ -267,6 +259,24 @@ export default function AcmeProfileForm() {
         [raProfiles],
     );
 
+    const optionsForUsers = useMemo(
+        () =>
+            editMode && acmeProfile?.certificateAssociations?.ownerUuid
+                ? userOptions.find((user) => user.value === acmeProfile.certificateAssociations?.ownerUuid)
+                : undefined,
+        [editMode, acmeProfile, userOptions],
+    );
+
+    const optionsForGroups = useMemo(
+        () =>
+            editMode && acmeProfile?.certificateAssociations?.groupUuids
+                ? acmeProfile.certificateAssociations.groupUuids
+                      .map((groupId) => groupOptions.find((group) => group.value === groupId))
+                      .filter((group): group is { value: string; label: string } => group !== undefined)
+                : [],
+        [editMode, acmeProfile, groupOptions],
+    );
+
     const defaultValues: FormValues = useMemo(
         () => ({
             name: editMode ? acmeProfile?.name || '' : '',
@@ -286,8 +296,10 @@ export default function AcmeProfileForm() {
                     ? optionsForRaProfiles.find((raProfile) => raProfile.value === acmeProfile.raProfile?.uuid)
                     : undefined
                 : undefined,
+            owner: optionsForUsers,
+            groups: optionsForGroups,
         }),
-        [editMode, acmeProfile, optionsForRaProfiles],
+        [editMode, acmeProfile, optionsForRaProfiles, optionsForUsers, optionsForGroups],
     );
 
     const title = useMemo(() => (editMode ? 'Edit ACME Profile' : 'Create ACME Profile'), [editMode]);
@@ -297,15 +309,26 @@ export default function AcmeProfileForm() {
         return (
             <AttributeEditor
                 id="customAcmeProfile"
-                attributeDescriptors={resourceCustomAttributes}
+                attributeDescriptors={multipleResourceCustomAttributes[Resource.AcmeProfiles] || []}
                 attributes={acmeProfile?.customAttributes}
             />
         );
-    }, [isBusy, resourceCustomAttributes, acmeProfile?.customAttributes]);
+    }, [isBusy, multipleResourceCustomAttributes, acmeProfile?.customAttributes]);
+
+    const renderCertificateAssociatedAttributesEditor = useMemo(() => {
+        if (isBusy) return <></>;
+        return (
+            <AttributeEditor
+                id="certificateAssociatedAttributes"
+                attributeDescriptors={multipleResourceCustomAttributes[Resource.Certificates] || []}
+                attributes={acmeProfile?.certificateAssociations?.customAttributes}
+            />
+        );
+    }, [isBusy, multipleResourceCustomAttributes, acmeProfile?.certificateAssociations?.customAttributes]);
 
     return (
         <Widget title={title} busy={isBusy}>
-            <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
+            <Form keepDirtyOnReinitialize initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
                 {({ handleSubmit, pristine, submitting, valid, form }) => (
                     <BootstrapForm onSubmit={handleSubmit}>
                         <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithoutAccents())}>
@@ -371,40 +394,7 @@ export default function AcmeProfileForm() {
                                     </FormGroup>
                                 )}
                             </Field>
-                            <AttributeEditor
-                                id="certificateAssociatedAttributes"
-                                attributeDescriptors={multipleResourceCustomAttributes[Resource.Certificates] || []}
-                                attributes={acmeProfile?.customAttributes}
-                            />
-
-                            {/* <CustomAttributeWidget
-                                resource={Resource.Certificates}
-                                resourceUuid={''}
-                                attributes={multipleResourceCustomAttributes[Resource.Certificates] || []}
-                            /> */}
-
-                            {/* // Convert CustomAttributeModel to AttributeResponseModel format
-                const attributeResponses: AttributeResponseModel[] = customAttributes.map((attr) => ({
-                    ...attr,
-                    label: attr.name, // Add the missing label property
-                }));
-
-                // Find existing entry or create new one
-                const existingIndex = state.resourceCustomAttributesContents.findIndex(
-                    (c) => c.resource === resource && c.resourceUuid === '',
-                );
-
-                if (existingIndex === -1) {
-                    // Create new entry
-                    state.resourceCustomAttributesContents.push({
-                        resource,
-                        resourceUuid: '',
-                        customAttributes: attributeResponses,
-                    });
-                } else {
-                    // Update existing entry
-                    state.resourceCustomAttributesContents[existingIndex].customAttributes = attributeResponses;
-                } */}
+                            <Widget title="Certificate Associated Attributes">{renderCertificateAssociatedAttributesEditor}</Widget>
                         </Widget>
 
                         <Widget title="Challenge Configuration">

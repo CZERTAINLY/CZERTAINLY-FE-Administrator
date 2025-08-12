@@ -293,6 +293,30 @@ export default function ScepProfileDetail() {
         [raProfileDetailData],
     );
 
+    const defaultCertificateAssociationsData: TableDataRow[] = useMemo(() => {
+        if (!scepProfile) return [];
+        return [
+            {
+                id: 'owner',
+                columns: [
+                    'Owner',
+                    <Link to={`../../users/detail/${scepProfile.certificateAssociations?.ownerUuid}`}>
+                        {scepProfile.certificateAssociations?.ownerUuid || 'N/A'}
+                    </Link>,
+                ],
+            },
+            {
+                id: 'groups',
+                columns: [
+                    'Groups',
+                    <Link to={`../../groups/detail/${scepProfile.certificateAssociations?.groupUuids?.join(', ')}`}>
+                        {scepProfile.certificateAssociations?.groupUuids?.join(', ') || 'N/A'}
+                    </Link>,
+                ],
+            },
+        ];
+    }, [scepProfile]);
+
     return (
         <Container className="themed-container" fluid>
             <Widget
@@ -346,6 +370,13 @@ export default function ScepProfileDetail() {
                         )}
                     </>
                 )}
+            </Widget>
+
+            <Widget title="Default Certificate associations" busy={isBusy} titleSize="large">
+                <CustomTable headers={tableHeader} data={defaultCertificateAssociationsData} />
+                <Widget title="Certificate Associated Attributes" busy={isBusy}>
+                    <AttributeViewer attributes={scepProfile?.certificateAssociations?.customAttributes} />
+                </Widget>
             </Widget>
 
             <Dialog

@@ -28,6 +28,8 @@ import { collectFormAttributes } from 'utils/attributes/attributes';
 import { validateAlphaNumericWithoutAccents, validateInteger, validateLength, validateRequired } from 'utils/validators';
 import { KeyAlgorithm, Resource } from '../../../../types/openapi';
 import CertificateField from '../CertificateField';
+import { actions as groupsActions, selectors as groupsSelectors } from 'ducks/certificateGroups';
+import { actions as userAction, selectors as userSelectors } from 'ducks/users';
 
 interface FormValues {
     name: string;
@@ -42,6 +44,8 @@ interface FormValues {
     intuneApplicationKey: string;
     raProfile: { value: string; label: string } | undefined;
     certificate: { value: string; label: string } | undefined;
+    owner: { value: string; label: string } | undefined;
+    groups: { value: string; label: string }[];
 }
 
 export default function ScepProfileForm() {
@@ -56,7 +60,7 @@ export default function ScepProfileForm() {
 
     const raProfiles = useSelector(raProfileSelectors.raProfiles);
     const raProfileIssuanceAttrDescs = useSelector(raProfileSelectors.issuanceAttributes);
-    const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
+    /* const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes); */
     const certificates = useSelector(scepProfileSelectors.caCertificates);
 
     const isFetchingDetail = useSelector(scepProfileSelectors.isFetchingDetail);
@@ -67,6 +71,14 @@ export default function ScepProfileForm() {
     const isFetchingIssuanceAttributes = useSelector(raProfileSelectors.isFetchingIssuanceAttributes);
     const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
 
+    const multipleResourceCustomAttributes = useSelector(
+        customAttributesSelectors.multipleResourceCustomAttributes([Resource.CmpProfiles, Resource.Certificates]),
+    );
+    const users = useSelector(userSelectors.users);
+    const groups = useSelector(groupsSelectors.certificateGroups);
+
+    const [userOptions, setUserOptions] = useState<{ value: string; label: string }[]>([]);
+    const [groupOptions, setGroupOptions] = useState<{ value: string; label: string }[]>([]);
     const [issueGroupAttributesCallbackAttributes, setIssueGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 
     const [scepProfile, setScepProfile] = useState<ScepProfileResponseModel>();
@@ -88,7 +100,45 @@ export default function ScepProfileForm() {
     }, [dispatch, id, editMode, scepProfileSelector]);
 
     useEffect(() => {
-        dispatch(customAttributesActions.listResourceCustomAttributes(Resource.ScepProfiles));
+        dispatch(userAction.list());
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (users.length > 0) {
+            setUserOptions(
+                users.map((user) => ({
+                    value: user.uuid,
+                    label: `${user.firstName ? user.firstName + ' ' : ''}${user.lastName ? (user.lastName ? user.lastName + ' ' : '') : ''}(${user.username})`,
+                })),
+            );
+        }
+    }, [users]);
+
+    useEffect(() => {
+        dispatch(groupsActions.listGroups());
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (groups.length > 0) {
+            setGroupOptions(
+                groups.map((group) => ({
+                    value: group.uuid,
+                    label: group.name,
+                })),
+            );
+        }
+    }, [groups]);
+
+    useEffect(() => {
+        dispatch(
+            customAttributesActions.loadMultipleResourceCustomAttributes([
+                { resource: Resource.CmpProfiles, customAttributes: [] },
+                { resource: Resource.Certificates, customAttributes: [] },
+            ]),
+        );
+    }, [dispatch]);
+
+    useEffect(() => {
         dispatch(raProfileActions.listRaProfiles());
     }, [dispatch]);
 
@@ -114,7 +164,20 @@ export default function ScepProfileForm() {
                     [...(raProfileIssuanceAttrDescs ?? []), ...issueGroupAttributesCallbackAttributes],
                     values,
                 ),
-                customAttributes: collectFormAttributes('customScepProfile', resourceCustomAttributes, values),
+                customAttributes: collectFormAttributes(
+                    'customScepProfile',
+                    multipleResourceCustomAttributes[Resource.ScepProfiles],
+                    values,
+                ),
+                certificateAssociations: {
+                    ownerUuid: values.owner?.value,
+                    groupUuids: values.groups.map((group) => group.value),
+                    customAttributes: collectFormAttributes(
+                        'certificateAssociatedAttributes',
+                        multipleResourceCustomAttributes[Resource.Certificates],
+                        values,
+                    ),
+                },
             };
             if (values.raProfile) {
                 scepRequest.raProfileUuid = values.raProfile.value;
@@ -130,7 +193,7 @@ export default function ScepProfileForm() {
                 dispatch(scepProfileActions.createScepProfile(scepRequest as ScepProfileAddRequestModel));
             }
         },
-        [dispatch, editMode, id, raProfileIssuanceAttrDescs, issueGroupAttributesCallbackAttributes, resourceCustomAttributes],
+        [dispatch, editMode, id, raProfileIssuanceAttrDescs, issueGroupAttributesCallbackAttributes, multipleResourceCustomAttributes],
     );
 
     const onCancelClick = useCallback(() => navigate(-1), [navigate]);
@@ -191,15 +254,35 @@ export default function ScepProfileForm() {
                           value: scepProfileSelector.caCertificate.uuid,
                       }
                     : undefined,
+            owner: scepProfileSelector?.certificateAssociations?.ownerUuid
+                ? userOptions.find((user) => user.value === scepProfileSelector.certificateAssociations?.ownerUuid)
+                : undefined,
+            groups: scepProfileSelector?.certificateAssociations?.groupUuids
+                ? scepProfileSelector?.certificateAssociations?.groupUuids
+                      .map((groupId) => groupOptions.find((group) => group.value === groupId))
+                      .filter((group): group is { value: string; label: string } => group !== undefined)
+                : [],
         }),
-        [editMode, scepProfileSelector, optionsForRaProfiles],
+        [editMode, scepProfileSelector, optionsForRaProfiles, userOptions, groupOptions],
     );
 
     const title = useMemo(() => (editMode ? 'Edit SCEP Profile' : 'Create SCEP Profile'), [editMode]);
 
+    const renderCertificateAssociatedAttributesEditor = useMemo(() => {
+        if (isBusy) return <></>;
+        return (
+            <AttributeEditor
+                id="certificateAssociatedAttributes"
+                attributeDescriptors={multipleResourceCustomAttributes[Resource.Certificates] || []}
+                attributes={scepProfileSelector?.certificateAssociations?.customAttributes}
+            />
+        );
+    }, [isBusy, multipleResourceCustomAttributes, scepProfileSelector?.certificateAssociations?.customAttributes]);
+
     return (
         <Widget title={title} busy={isBusy}>
             <Form
+                keepDirtyOnReinitialize
                 initialValues={defaultValues}
                 onSubmit={onSubmit}
                 mutators={{ ...mutators<FormValues>() }}
@@ -306,7 +389,7 @@ export default function ScepProfileForm() {
                                         content: (
                                             <AttributeEditor
                                                 id="customScepProfile"
-                                                attributeDescriptors={resourceCustomAttributes}
+                                                attributeDescriptors={multipleResourceCustomAttributes[Resource.ScepProfiles] || []}
                                                 attributes={scepProfile?.customAttributes}
                                             />
                                         ),
@@ -314,6 +397,32 @@ export default function ScepProfileForm() {
                                 ]}
                             />
                             {}
+                        </Widget>
+                        <Widget title="Certificate associations">
+                            <Field name="owner">
+                                {({ input, meta }) => (
+                                    <FormGroup>
+                                        <Label for="owner">Owner</Label>
+                                        <Select {...input} id="owner" options={userOptions} placeholder="Select Owner" isClearable={true} />
+                                    </FormGroup>
+                                )}
+                            </Field>
+                            <Field name="groups">
+                                {({ input, meta }) => (
+                                    <FormGroup>
+                                        <Label for="groups">Groups</Label>
+                                        <Select
+                                            {...input}
+                                            id="groups"
+                                            options={groupOptions}
+                                            placeholder="Select Groups"
+                                            isClearable={true}
+                                            isMulti
+                                        />
+                                    </FormGroup>
+                                )}
+                            </Field>
+                            <Widget title="Certificate Associated Attributes">{renderCertificateAssociatedAttributesEditor}</Widget>
                         </Widget>
 
                         <div className="d-flex justify-content-end">

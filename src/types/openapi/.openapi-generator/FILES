@@ -314,6 +314,7 @@ models/PlatformSettingsDto.ts
 models/PlatformSettingsUpdateDto.ts
 models/ProgrammingLanguageEnum.ts
 models/ProtectionMethod.ts
+models/ProtocolCertificateAssociationsDto.ts
 models/PushToLocationRequestDto.ts
 models/RaProfileAcmeDetailResponseDto.ts
 models/RaProfileAssociationRequestDto.ts

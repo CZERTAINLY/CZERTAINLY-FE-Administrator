@@ -14,6 +14,7 @@
 import type {
     CertificateDto,
     ProtectionMethod,
+    ProtocolCertificateAssociationsDto,
     ResponseAttributeDto,
     SimplifiedRaProfileDto,
 } from './';
@@ -65,6 +66,12 @@ export interface CmpProfileDetailDto {
      * @memberof CmpProfileDetailDto
      */
     cmpUrl?: string;
+    /**
+     * Associations to set for certificates issued by the protocol
+     * @type {ProtocolCertificateAssociationsDto}
+     * @memberof CmpProfileDetailDto
+     */
+    certificateAssociations?: ProtocolCertificateAssociationsDto;
     /**
      * List of Attributes to issue a Certificate for the associated RA Profile
      * @type {Array<ResponseAttributeDto>}

@@ -28,6 +28,8 @@ import { mutators } from 'utils/attributes/attributeEditorMutators';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 import { isObjectSame } from 'utils/common-utils';
 import { composeValidators, validateAlphaNumericWithoutAccents, validateLength, validateRequired } from 'utils/validators';
+import { actions as groupsActions, selectors as groupsSelectors } from 'ducks/certificateGroups';
+import { actions as userAction, selectors as userSelectors } from 'ducks/users';
 import styles from './cmpForm.module.scss';
 
 interface SelectChangeValue {
@@ -46,6 +48,8 @@ interface FormValues extends CmpProfileRequestModel {
     selectedSigningCertificate?: SelectChangeValue | undefined;
     selectedRequestProtectionMethod?: SelectChangeValue | undefined;
     selectedResponseProtectionMethod?: SelectChangeValue | undefined;
+    owner: { value: string; label: string } | undefined;
+    groups: { value: string; label: string }[];
 }
 export default function CmpProfileForm() {
     const { id } = useParams();
@@ -58,10 +62,8 @@ export default function CmpProfileForm() {
 
     const cmpProfile = useSelector(cmpProfileSelectors.cmpProfile);
     const cmpSigningCertificates = useSelector(cmpProfileSelectors.cmpSigningCertificates);
-    const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
     const raProfileIssuanceAttrDescs = useSelector(raProfileSelectors.issuanceAttributes);
     const raProfileRevocationAttrDescs = useSelector(raProfileSelectors.revocationAttributes);
-    // const raProfile = useSelector(raProfileSelectors.raProfile);
     const raProfiles = useSelector(raProfileSelectors.raProfiles);
 
     const isFetchingCmpCertificates = useSelector(cmpProfileSelectors.isFetchingCertificates);
@@ -74,6 +76,14 @@ export default function CmpProfileForm() {
     const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
     const protectionMethodEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ProtectionMethod));
     const cmpCmpProfileVariantEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CmpProfileVariant));
+    const multipleResourceCustomAttributes = useSelector(
+        customAttributesSelectors.multipleResourceCustomAttributes([Resource.CmpProfiles, Resource.Certificates]),
+    );
+    const users = useSelector(userSelectors.users);
+    const groups = useSelector(groupsSelectors.certificateGroups);
+
+    const [userOptions, setUserOptions] = useState<{ value: string; label: string }[]>([]);
+    const [groupOptions, setGroupOptions] = useState<{ value: string; label: string }[]>([]);
 
     const [issueGroupAttributesCallbackAttributes, setIssueGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
     const [revokeGroupAttributesCallbackAttributes, setRevokeGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
@@ -122,9 +132,46 @@ export default function CmpProfileForm() {
     );
 
     useEffect(() => {
-        dispatch(customAttributesActions.listResourceCustomAttributes(Resource.CmpProfiles));
+        dispatch(userAction.list());
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (users.length > 0) {
+            setUserOptions(
+                users.map((user) => ({
+                    value: user.uuid,
+                    label: `${user.firstName ? user.firstName + ' ' : ''}${user.lastName ? (user.lastName ? user.lastName + ' ' : '') : ''}(${user.username})`,
+                })),
+            );
+        }
+    }, [users]);
+
+    useEffect(() => {
+        dispatch(groupsActions.listGroups());
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (groups.length > 0) {
+            setGroupOptions(
+                groups.map((group) => ({
+                    value: group.uuid,
+                    label: group.name,
+                })),
+            );
+        }
+    }, [groups]);
+
+    useEffect(() => {
+        dispatch(
+            customAttributesActions.loadMultipleResourceCustomAttributes([
+                { resource: Resource.CmpProfiles, customAttributes: [] },
+                { resource: Resource.Certificates, customAttributes: [] },
+            ]),
+        );
+    }, [dispatch]);
+
+    useEffect(() => {
         dispatch(raProfileActions.listRaProfiles());
-        // dispatch(cmpProfileActions.listCmpSigningCertificates());
     }, [dispatch]);
 
     const title = useMemo(() => (editMode ? 'Edit CMP Profile' : 'Create CMP Profile'), [editMode]);
@@ -165,7 +212,20 @@ export default function CmpProfileForm() {
                         [...(raProfileRevocationAttrDescs ?? []), ...revokeGroupAttributesCallbackAttributes],
                         values,
                     ),
-                    customAttributes: collectFormAttributes('customCmpProfile', resourceCustomAttributes, values),
+                    customAttributes: collectFormAttributes(
+                        'customCmpProfile',
+                        multipleResourceCustomAttributes[Resource.CmpProfiles],
+                        values,
+                    ),
+                    certificateAssociations: {
+                        ownerUuid: values.owner?.value,
+                        groupUuids: values.groups.map((group) => group.value),
+                        customAttributes: collectFormAttributes(
+                            'certificateAssociatedAttributes',
+                            multipleResourceCustomAttributes[Resource.Certificates],
+                            values,
+                        ),
+                    },
                 };
                 dispatch(cmpProfileActions.updateCmpProfile({ uuid: cmpProfile.uuid, updateCmpRequest: valuesToSubmit }));
             } else {
@@ -193,9 +253,21 @@ export default function CmpProfileForm() {
                         [...(raProfileRevocationAttrDescs ?? []), ...revokeGroupAttributesCallbackAttributes],
                         values,
                     ),
-                    customAttributes: collectFormAttributes('customCmpProfile', resourceCustomAttributes, values),
+                    customAttributes: collectFormAttributes(
+                        'customCmpProfile',
+                        multipleResourceCustomAttributes[Resource.CmpProfiles],
+                        values,
+                    ),
+                    certificateAssociations: {
+                        ownerUuid: values.owner?.value,
+                        groupUuids: values.groups.map((group) => group.value),
+                        customAttributes: collectFormAttributes(
+                            'certificateAssociatedAttributes',
+                            multipleResourceCustomAttributes[Resource.Certificates],
+                            values,
+                        ),
+                    },
                 };
-
                 dispatch(cmpProfileActions.createCmpProfile(valuesToSubmit));
             }
         },
@@ -207,7 +279,7 @@ export default function CmpProfileForm() {
             issueGroupAttributesCallbackAttributes,
             raProfileIssuanceAttrDescs,
             raProfileRevocationAttrDescs,
-            resourceCustomAttributes,
+            multipleResourceCustomAttributes,
             revokeGroupAttributesCallbackAttributes,
         ],
     );
@@ -274,6 +346,14 @@ export default function CmpProfileForm() {
                       }
                     : undefined,
                 variant: (cmpProfile?.variant as unknown as CmpProfileRequestDtoVariantEnum) || (undefined as any),
+                owner: cmpProfile?.certificateAssociations?.ownerUuid
+                    ? userOptions.find((user) => user.value === cmpProfile.certificateAssociations?.ownerUuid)
+                    : undefined,
+                groups: cmpProfile?.certificateAssociations?.groupUuids
+                    ? cmpProfile?.certificateAssociations?.groupUuids
+                          .map((groupId) => groupOptions.find((group) => group.value === groupId))
+                          .filter((group): group is { value: string; label: string } => group !== undefined)
+                    : [],
             };
         } else {
             return {
@@ -293,9 +373,11 @@ export default function CmpProfileForm() {
                 sharedSecret: undefined,
                 selectedVariant: undefined,
                 variant: undefined as any,
+                owner: undefined,
+                groups: [],
             };
         }
-    }, [editMode, cmpProfile, cmpCmpProfileVariantEnum, protectionMethodEnum]);
+    }, [editMode, cmpProfile, protectionMethodEnum, cmpCmpProfileVariantEnum, userOptions, groupOptions]);
 
     const onRaProfileChange = useCallback(
         (form: FormApi<FormValues>, value?: string) => {
@@ -338,11 +420,11 @@ export default function CmpProfileForm() {
         return (
             <AttributeEditor
                 id="customCmpProfile"
-                attributeDescriptors={resourceCustomAttributes}
+                attributeDescriptors={multipleResourceCustomAttributes[Resource.CmpProfiles] || []}
                 attributes={cmpProfile?.customAttributes}
             />
         );
-    }, [resourceCustomAttributes, cmpProfile?.customAttributes]);
+    }, [multipleResourceCustomAttributes, cmpProfile?.customAttributes]);
 
     const renderIssuanceAttributes = useMemo(() => {
         // if (isBusy || !raProfileIssuanceAttrDescs) return <></>;
@@ -360,6 +442,17 @@ export default function CmpProfileForm() {
         );
     }, [raProfileIssuanceAttrDescs, cmpProfile?.issueCertificateAttributes, issueGroupAttributesCallbackAttributes]);
 
+    const renderCertificateAssociatedAttributesEditor = useMemo(() => {
+        if (isBusy) return <></>;
+        return (
+            <AttributeEditor
+                id="certificateAssociatedAttributes"
+                attributeDescriptors={multipleResourceCustomAttributes[Resource.Certificates] || []}
+                attributes={cmpProfile?.certificateAssociations?.customAttributes}
+            />
+        );
+    }, [isBusy, multipleResourceCustomAttributes, cmpProfile?.certificateAssociations?.customAttributes]);
+
     const areDefaultValuesSame = useCallback(
         (values: FormValues) => {
             const areValuesSame = isObjectSame(
@@ -375,7 +468,7 @@ export default function CmpProfileForm() {
     return (
         <Widget title={title} busy={isBusy}>
             {!isFetchingDetail && (
-                <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
+                <Form keepDirtyOnReinitialize initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
                     {({ handleSubmit, pristine, submitting, valid, form, values }) => {
                         return (
                             <BootstrapForm onSubmit={handleSubmit}>
@@ -405,6 +498,38 @@ export default function CmpProfileForm() {
                                         </FormGroup>
                                     )}
                                 </Field>
+                                <Widget title="Certificate associations">
+                                    <Field name="owner">
+                                        {({ input, meta }) => (
+                                            <FormGroup>
+                                                <Label for="owner">Owner</Label>
+                                                <Select
+                                                    {...input}
+                                                    id="owner"
+                                                    options={userOptions}
+                                                    placeholder="Select Owner"
+                                                    isClearable={true}
+                                                />
+                                            </FormGroup>
+                                        )}
+                                    </Field>
+                                    <Field name="groups">
+                                        {({ input, meta }) => (
+                                            <FormGroup>
+                                                <Label for="groups">Groups</Label>
+                                                <Select
+                                                    {...input}
+                                                    id="groups"
+                                                    options={groupOptions}
+                                                    placeholder="Select Groups"
+                                                    isClearable={true}
+                                                    isMulti
+                                                />
+                                            </FormGroup>
+                                        )}
+                                    </Field>
+                                    <Widget title="Certificate Associated Attributes">{renderCertificateAssociatedAttributesEditor}</Widget>
+                                </Widget>
                                 <Widget title="CMP Variant Configuration">
                                     <Field name="selectedVariant" validate={composeValidators(validateRequired())} type="radio">
                                         {({ input, meta }) => (

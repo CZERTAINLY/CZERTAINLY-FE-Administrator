@@ -267,6 +267,7 @@ export * from './PlatformSettingsDto';
 export * from './PlatformSettingsUpdateDto';
 export * from './ProgrammingLanguageEnum';
 export * from './ProtectionMethod';
+export * from './ProtocolCertificateAssociationsDto';
 export * from './PushToLocationRequestDto';
 export * from './RaProfileAcmeDetailResponseDto';
 export * from './RaProfileAssociationRequestDto';

@@ -3,7 +3,6 @@ import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import StatusBadge from 'components/StatusBadge';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-// import { Link, useParams } from 'react-router';
 
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
@@ -235,6 +234,30 @@ export default function AdministratorDetail() {
         [raProfileDetailData],
     );
 
+    const defaultCertificateAssociationsData: TableDataRow[] = useMemo(() => {
+        if (!cmpProfile) return [];
+        return [
+            {
+                id: 'owner',
+                columns: [
+                    'Owner',
+                    <Link to={`../../users/detail/${cmpProfile.certificateAssociations?.ownerUuid}`}>
+                        {cmpProfile.certificateAssociations?.ownerUuid || 'N/A'}
+                    </Link>,
+                ],
+            },
+            {
+                id: 'groups',
+                columns: [
+                    'Groups',
+                    <Link to={`../../groups/detail/${cmpProfile.certificateAssociations?.groupUuids?.join(', ')}`}>
+                        {cmpProfile.certificateAssociations?.groupUuids?.join(', ') || 'N/A'}
+                    </Link>,
+                ],
+            },
+        ];
+    }, [cmpProfile]);
+
     return (
         <Container className="themed-container" fluid>
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
@@ -273,7 +296,6 @@ export default function AdministratorDetail() {
                     </Widget>
                 </Col>
             </Row>
-            {/* <Widget title={raProfileText} busy={isBusy}> */}
             {raProfileDetailData.length === 0 ? (
                 <></>
             ) : (
@@ -307,7 +329,12 @@ export default function AdministratorDetail() {
                     </Row>
                 </>
             )}
-            {/* </Widget> */}
+            <Widget title="Default Certificate associations" busy={isBusy} titleSize="large">
+                <CustomTable headers={tableHeader} data={defaultCertificateAssociationsData} />
+                <Widget title="Certificate Associated Attributes" busy={isBusy}>
+                    <AttributeViewer attributes={cmpProfile?.certificateAssociations?.customAttributes} />
+                </Widget>
+            </Widget>
 
             <Dialog
                 isOpen={confirmDelete}

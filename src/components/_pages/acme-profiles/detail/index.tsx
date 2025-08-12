@@ -259,6 +259,32 @@ export default function AdministratorDetail() {
         [raProfileDetailData],
     );
 
+    const defaultCertificateAssociationsData: TableDataRow[] = useMemo(() => {
+        if (!acmeProfile) return [];
+        return [
+            {
+                id: 'owner',
+                columns: [
+                    'Owner',
+                    <Link to={`../../users/detail/${acmeProfile.certificateAssociations?.ownerUuid}`}>
+                        {acmeProfile.certificateAssociations?.ownerUuid || 'N/A'}
+                    </Link>,
+                ],
+            },
+            {
+                id: 'groups',
+                columns: [
+                    'Groups',
+                    <Link to={`../../groups/detail/${acmeProfile.certificateAssociations?.groupUuids?.join(', ')}`}>
+                        {acmeProfile.certificateAssociations?.groupUuids?.join(', ') || 'N/A'}
+                    </Link>,
+                ],
+            },
+        ];
+    }, [acmeProfile]);
+
+    console.log({ acmeProfile });
+
     return (
         <Container className="themed-container" fluid>
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
@@ -286,7 +312,6 @@ export default function AdministratorDetail() {
                     </Widget>
                 </Col>
             </Row>
-
             {acmeProfile && (
                 <CustomAttributeWidget
                     resource={Resource.AcmeProfiles}
@@ -294,7 +319,6 @@ export default function AdministratorDetail() {
                     attributes={acmeProfile.customAttributes}
                 />
             )}
-
             <Widget title={raProfileText} busy={isBusy} titleSize="large">
                 {raProfileDetailData.length === 0 ? (
                     <></>
@@ -328,7 +352,12 @@ export default function AdministratorDetail() {
                     </>
                 )}
             </Widget>
-
+            <Widget title="Default Certificate associations" busy={isBusy} titleSize="large">
+                <CustomTable headers={tableHeader} data={defaultCertificateAssociationsData} />
+                <Widget title="Certificate Associated Attributes" busy={isBusy}>
+                    <AttributeViewer attributes={acmeProfile?.certificateAssociations?.customAttributes} />
+                </Widget>
+            </Widget>
             <Dialog
                 isOpen={confirmDelete}
                 caption="Delete ACME Profile"
@@ -340,7 +369,6 @@ export default function AdministratorDetail() {
                     { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
-
             <Dialog
                 isOpen={deleteErrorMessage.length > 0}
                 caption="Delete ACME Profile"

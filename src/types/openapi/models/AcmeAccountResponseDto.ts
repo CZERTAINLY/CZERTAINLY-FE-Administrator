@@ -13,6 +13,7 @@
 
 import type {
     AccountStatus,
+    ProtocolCertificateAssociationsDto,
     SimplifiedRaProfileDto,
 } from './';
 
@@ -111,6 +112,12 @@ export interface AcmeAccountResponseDto {
      * @memberof AcmeAccountResponseDto
      */
     acmeProfileUuid?: string;
+    /**
+     * Associations to set for certificates issued by the protocol
+     * @type {ProtocolCertificateAssociationsDto}
+     * @memberof AcmeAccountResponseDto
+     */
+    certificateAssociations?: ProtocolCertificateAssociationsDto;
 }
 
 
