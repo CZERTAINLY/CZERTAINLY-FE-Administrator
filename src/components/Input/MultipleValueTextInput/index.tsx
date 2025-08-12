@@ -5,14 +5,21 @@ type Props = {
     id?: string;
     value?: string[];
     onChange?: (values: string[]) => void;
+    onBlur?: () => void;
     placeholder?: string;
+    isValid?: boolean;
+    isInvalid?: boolean;
 };
+import cx from 'classnames';
 
 export default function MultipleValueTextInput({
     id,
     value = [],
     onChange,
     placeholder = 'Add value and separate with comma or press enter...',
+    isValid,
+    isInvalid,
+    onBlur,
 }: Readonly<Props>) {
     const [inputValue, setInputValue] = useState<string>('');
     const inputRef = useRef<HTMLInputElement>(null);
@@ -77,8 +84,16 @@ export default function MultipleValueTextInput({
         [value, onChange],
     );
 
+    const containerClass = cx(
+        styles.container,
+        { 'is-valid': isValid },
+        { 'is-invalid': isInvalid },
+        { [styles['is-valid']]: isValid },
+        { [styles['is-invalid']]: isInvalid },
+    );
+
     return (
-        <div className={styles.container}>
+        <div className={containerClass}>
             {value.map((val) => (
                 <span key={val} className={styles.tag}>
                     {val}
@@ -102,6 +117,7 @@ export default function MultipleValueTextInput({
                 type="text"
                 value={inputValue}
                 onChange={handleInputChange}
+                onBlur={onBlur}
                 onKeyDown={handleKeyDown}
                 placeholder={value.length === 0 ? placeholder : ''}
                 className={styles.input}
