@@ -502,7 +502,7 @@ export default function CmpProfileForm() {
                                             </FormGroup>
                                         )}
                                     </Field>
-                                    <Widget title="Certificate Associated Attributes">{renderCertificateAssociatedAttributesEditor}</Widget>
+                                    <Widget title="Custom Attributes">{renderCertificateAssociatedAttributesEditor}</Widget>
                                 </Widget>
                                 <Widget title="CMP Variant Configuration">
                                     <Field name="selectedVariant" validate={composeValidators(validateRequired())} type="radio">

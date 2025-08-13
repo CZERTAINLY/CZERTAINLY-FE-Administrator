@@ -370,7 +370,7 @@ export default function AcmeProfileForm() {
                                     </FormGroup>
                                 )}
                             </Field>
-                            <Widget title="Certificate Associated Attributes">{renderCertificateAssociatedAttributesEditor}</Widget>
+                            <Widget title="Custom Attributes">{renderCertificateAssociatedAttributesEditor}</Widget>
                         </Widget>
 
                         <Widget title="Challenge Configuration">

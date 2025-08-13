@@ -393,7 +393,7 @@ export default function ScepProfileDetail() {
 
             <Widget title="Default Certificate associations" busy={isBusy} titleSize="large">
                 <CustomTable headers={tableHeader} data={defaultCertificateAssociationsData} />
-                <Widget title="Certificate Associated Attributes" busy={isBusy}>
+                <Widget title="Custom Attributes" busy={isBusy}>
                     <AttributeViewer attributes={scepProfile?.certificateAssociations?.customAttributes} />
                 </Widget>
             </Widget>

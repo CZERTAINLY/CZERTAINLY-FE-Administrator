@@ -408,7 +408,7 @@ export default function ScepProfileForm() {
                                     </FormGroup>
                                 )}
                             </Field>
-                            <Widget title="Certificate Associated Attributes">{renderCertificateAssociatedAttributesEditor}</Widget>
+                            <Widget title="Custom Attributes">{renderCertificateAssociatedAttributesEditor}</Widget>
                         </Widget>
 
                         <div className="d-flex justify-content-end">
