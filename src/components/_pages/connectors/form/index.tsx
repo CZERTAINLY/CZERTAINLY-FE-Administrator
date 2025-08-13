@@ -72,6 +72,7 @@ export default function ConnectorForm() {
 
     const [connector, setConnector] = useState<ConnectorResponseModel>();
 
+    const connectorUuid = useMemo(() => connectorSelector?.uuid, [connectorSelector?.uuid]);
     const [selectedAuthType, setSelectedAuthType] = useState<{ label: string; value: AuthType }>(
         editMode ? optionsForAuth.find((opt) => opt.value === connector?.authType) || optionsForAuth[0] : optionsForAuth[0],
     );
@@ -83,18 +84,24 @@ export default function ConnectorForm() {
 
     useEffect(() => {
         dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Connectors));
+    }, [dispatch]);
 
-        if (id && (!connectorSelector || connectorSelector.uuid !== id) && !isFetching) {
+    useEffect(() => {
+        if (id && (!connectorUuid || connectorUuid !== id) && !isFetching) {
             dispatch(connectorActions.getConnectorDetail({ uuid: id }));
         }
+    }, [id, connectorUuid, isFetching, dispatch]);
 
-        if (id && connectorSelector && connectorSelector.uuid === id && !isFetching) {
+    useEffect(() => {
+        if (id && connectorUuid === id && !isFetching) {
             dispatch(connectorActions.reconnectConnector({ uuid: id }));
         }
+    }, [id, connectorUuid, isFetching, dispatch]);
 
-        if (id && connectorSelector?.uuid === id) {
+    useEffect(() => {
+        if (id && connectorUuid === id && connectorSelector) {
             setConnector(connectorSelector);
-        } else {
+        } else if (!id) {
             dispatch(connectorActions.clearConnectionDetails());
             dispatch(connectorActions.clearCallbackData());
 
@@ -107,7 +114,17 @@ export default function ConnectorForm() {
                 functionGroups: [],
             });
         }
-    }, [editMode, id, connectorSelector, isFetching, dispatch]);
+    }, [id, connectorUuid, connectorSelector, dispatch]);
+
+    useEffect(() => {
+        if (connector && editMode) {
+            const authOption = optionsForAuth.find((opt) => opt.value === connector.authType);
+            if (authOption) {
+                setSelectedAuthType(authOption);
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [connector?.authType, editMode, optionsForAuth]);
 
     const onSubmit = useCallback(
         (values: FormValues) => {
