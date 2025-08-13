@@ -31,6 +31,7 @@ import { composeValidators, validateAlphaNumericWithoutAccents, validateLength, 
 import { actions as groupsActions, selectors as groupsSelectors } from 'ducks/certificateGroups';
 import { actions as userAction, selectors as userSelectors } from 'ducks/users';
 import styles from './cmpForm.module.scss';
+import useAttributeEditor, { buildGroups, buildOwner, buildSelectedOption, buildUserOption } from 'utils/widget';
 
 interface SelectChangeValue {
     value: string;
@@ -137,12 +138,7 @@ export default function CmpProfileForm() {
 
     useEffect(() => {
         if (users.length > 0) {
-            setUserOptions(
-                users.map((user) => ({
-                    value: user.uuid,
-                    label: `${user.firstName ? user.firstName + ' ' : ''}${user.lastName ? (user.lastName ? user.lastName + ' ' : '') : ''}(${user.username})`,
-                })),
-            );
+            setUserOptions(users.map((user) => buildUserOption(user)));
         }
     }, [users]);
 
@@ -306,56 +302,7 @@ export default function CmpProfileForm() {
     }, [dispatch, cmpProfile]);
 
     const defaultValues: FormValues = useMemo(() => {
-        if (editMode && cmpProfile) {
-            return {
-                name: cmpProfile?.name || '',
-                description: cmpProfile?.description || '',
-                selectedRaProfile: cmpProfile?.raProfile
-                    ? {
-                          label: cmpProfile.raProfile.name,
-                          value: cmpProfile.raProfile,
-                      }
-                    : undefined,
-                raProfileUuid: cmpProfile?.raProfile?.uuid,
-                selectedSigningCertificate: cmpProfile?.signingCertificate
-                    ? {
-                          label: `${cmpProfile.signingCertificate.commonName} (${cmpProfile.signingCertificate.serialNumber})`,
-                          value: cmpProfile.signingCertificate.uuid,
-                      }
-                    : undefined,
-                signingCertificateUuid: cmpProfile?.signingCertificate?.uuid,
-                selectedRequestProtectionMethod: cmpProfile?.requestProtectionMethod
-                    ? {
-                          value: cmpProfile?.requestProtectionMethod,
-                          label: getEnumLabel(protectionMethodEnum, cmpProfile?.requestProtectionMethod),
-                      }
-                    : undefined,
-                requestProtectionMethod: cmpProfile?.requestProtectionMethod || (undefined as any),
-                selectedResponseProtectionMethod: cmpProfile?.responseProtectionMethod
-                    ? {
-                          value: cmpProfile?.responseProtectionMethod,
-                          label: getEnumLabel(protectionMethodEnum, cmpProfile?.responseProtectionMethod),
-                      }
-                    : undefined,
-                responseProtectionMethod: cmpProfile?.responseProtectionMethod || (undefined as any),
-                sharedSecret: undefined,
-                selectedVariant: cmpProfile?.variant
-                    ? {
-                          value: cmpProfile?.variant,
-                          label: getEnumLabel(cmpCmpProfileVariantEnum, cmpProfile.variant),
-                      }
-                    : undefined,
-                variant: (cmpProfile?.variant as unknown as CmpProfileRequestDtoVariantEnum) || (undefined as any),
-                owner: cmpProfile?.certificateAssociations?.ownerUuid
-                    ? userOptions.find((user) => user.value === cmpProfile.certificateAssociations?.ownerUuid)
-                    : undefined,
-                groups: cmpProfile?.certificateAssociations?.groupUuids
-                    ? cmpProfile?.certificateAssociations?.groupUuids
-                          .map((groupId) => groupOptions.find((group) => group.value === groupId))
-                          .filter((group): group is { value: string; label: string } => group !== undefined)
-                    : [],
-            };
-        } else {
+        if (!(editMode && cmpProfile)) {
             return {
                 name: '',
                 description: undefined,
@@ -377,6 +324,36 @@ export default function CmpProfileForm() {
                 groups: [],
             };
         }
+
+        const { raProfile, signingCertificate, requestProtectionMethod, responseProtectionMethod, variant, certificateAssociations } =
+            cmpProfile;
+
+        return {
+            name: cmpProfile?.name || '',
+            description: cmpProfile?.description || '',
+            selectedRaProfile: buildSelectedOption(raProfile, raProfile?.name ?? ''),
+            raProfileUuid: raProfile?.uuid,
+            selectedSigningCertificate: buildSelectedOption(
+                signingCertificate?.uuid,
+                `${signingCertificate?.commonName} (${signingCertificate?.serialNumber})`,
+            ),
+            signingCertificateUuid: signingCertificate?.uuid,
+            selectedRequestProtectionMethod: buildSelectedOption(
+                requestProtectionMethod,
+                getEnumLabel(protectionMethodEnum, requestProtectionMethod),
+            ),
+            requestProtectionMethod: requestProtectionMethod || (undefined as any),
+            selectedResponseProtectionMethod: buildSelectedOption(
+                responseProtectionMethod,
+                getEnumLabel(protectionMethodEnum, responseProtectionMethod),
+            ),
+            responseProtectionMethod: responseProtectionMethod || (undefined as any),
+            sharedSecret: undefined,
+            selectedVariant: buildSelectedOption(variant, getEnumLabel(cmpCmpProfileVariantEnum, variant)),
+            variant: (variant as unknown as CmpProfileRequestDtoVariantEnum) || (undefined as any),
+            owner: buildOwner(userOptions, certificateAssociations?.ownerUuid),
+            groups: buildGroups(groupOptions, certificateAssociations?.groupUuids),
+        };
     }, [editMode, cmpProfile, protectionMethodEnum, cmpCmpProfileVariantEnum, userOptions, groupOptions]);
 
     const onRaProfileChange = useCallback(
@@ -442,16 +419,13 @@ export default function CmpProfileForm() {
         );
     }, [raProfileIssuanceAttrDescs, cmpProfile?.issueCertificateAttributes, issueGroupAttributesCallbackAttributes]);
 
-    const renderCertificateAssociatedAttributesEditor = useMemo(() => {
-        if (isBusy) return <></>;
-        return (
-            <AttributeEditor
-                id="certificateAssociatedAttributes"
-                attributeDescriptors={multipleResourceCustomAttributes[Resource.Certificates] || []}
-                attributes={cmpProfile?.certificateAssociations?.customAttributes}
-            />
-        );
-    }, [isBusy, multipleResourceCustomAttributes, cmpProfile?.certificateAssociations?.customAttributes]);
+    const renderCertificateAssociatedAttributesEditor = useAttributeEditor({
+        isBusy,
+        id: 'certificateAssociatedAttributes',
+        resourceKey: Resource.Certificates,
+        attributes: cmpProfile?.certificateAssociations?.customAttributes,
+        multipleResourceCustomAttributes,
+    });
 
     const areDefaultValuesSame = useCallback(
         (values: FormValues) => {

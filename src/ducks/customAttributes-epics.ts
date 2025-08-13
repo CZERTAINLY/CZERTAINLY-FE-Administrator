@@ -121,7 +121,7 @@ const loadMultipleResourceCustomAttributes: AppEpic = (action$, state$, deps) =>
             );
 
             return forkJoin(resourceObservables).pipe(
-                map((results) => slice.actions.receiveMultipleResourceCustomAttributes(results as any)),
+                map((results) => slice.actions.receiveMultipleResourceCustomAttributes(results)),
                 catchError((err) =>
                     of(
                         slice.actions.listResourceCustomAttributesFailure({

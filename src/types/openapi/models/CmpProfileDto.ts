@@ -12,7 +12,6 @@
  */
 
 import type {
-    ProtocolCertificateAssociationsDto,
     SimplifiedRaProfileDto,
 } from './';
 
@@ -63,12 +62,6 @@ export interface CmpProfileDto {
      * @memberof CmpProfileDto
      */
     cmpUrl?: string;
-    /**
-     * Properties to set for certificates associated with protocol
-     * @type {ProtocolCertificateAssociationsDto}
-     * @memberof CmpProfileDto
-     */
-    certificateAssociations?: ProtocolCertificateAssociationsDto;
 }
 
 /**

@@ -17,6 +17,7 @@ import { Link, useNavigate, useParams } from 'react-router';
 import { Container } from 'reactstrap';
 import { Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
+import { createWidgetDetailHeaders } from 'utils/widget';
 
 export default function ScepProfileDetail() {
     const dispatch = useDispatch();
@@ -111,19 +112,7 @@ export default function ScepProfileDetail() {
         [scepProfile, onEditClick, onDisableClick, onEnableClick],
     );
 
-    const tableHeader: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'property',
-                content: 'Property',
-            },
-            {
-                id: 'value',
-                content: 'Value',
-            },
-        ],
-        [],
-    );
+    const tableHeader: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
 
     const scepProfileDetailData: TableDataRow[] = useMemo(
         () =>
@@ -300,7 +289,7 @@ export default function ScepProfileDetail() {
                 id: 'owner',
                 columns: [
                     'Owner',
-                    <Link to={`../../users/detail/${scepProfile.certificateAssociations?.ownerUuid}`}>
+                    <Link key="owner" to={`../../users/detail/${scepProfile.certificateAssociations?.ownerUuid}`}>
                         {scepProfile.certificateAssociations?.ownerUuid || 'N/A'}
                     </Link>,
                 ],
@@ -309,7 +298,7 @@ export default function ScepProfileDetail() {
                 id: 'groups',
                 columns: [
                     'Groups',
-                    <Link to={`../../groups/detail/${scepProfile.certificateAssociations?.groupUuids?.join(', ')}`}>
+                    <Link key="groups" to={`../../groups/detail/${scepProfile.certificateAssociations?.groupUuids?.join(', ')}`}>
                         {scepProfile.certificateAssociations?.groupUuids?.join(', ') || 'N/A'}
                     </Link>,
                 ],

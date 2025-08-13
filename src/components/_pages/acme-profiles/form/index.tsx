@@ -35,6 +35,7 @@ import {
     validateRequired,
 } from 'utils/validators';
 import { Resource } from '../../../../types/openapi';
+import useAttributeEditor, { buildGroups, buildOwner, buildUserOption } from 'utils/widget';
 
 interface FormValues {
     name: string;
@@ -99,12 +100,7 @@ export default function AcmeProfileForm() {
 
     useEffect(() => {
         if (users.length > 0) {
-            setUserOptions(
-                users.map((user) => ({
-                    value: user.uuid,
-                    label: `${user.firstName ? user.firstName + ' ' : ''}${user.lastName ? (user.lastName ? user.lastName + ' ' : '') : ''}(${user.username})`,
-                })),
-            );
+            setUserOptions(users.map((user) => buildUserOption(user)));
         }
     }, [users]);
 
@@ -144,7 +140,6 @@ export default function AcmeProfileForm() {
     }, [dispatch, id, editMode, acmeProfileSelector]);
 
     useEffect(() => {
-        /* dispatch(customAttributesActions.listResourceCustomAttributes(Resource.AcmeProfiles)); */
         dispatch(raProfileActions.listRaProfiles());
     }, [dispatch]);
 
@@ -259,24 +254,6 @@ export default function AcmeProfileForm() {
         [raProfiles],
     );
 
-    const optionsForUsers = useMemo(
-        () =>
-            editMode && acmeProfile?.certificateAssociations?.ownerUuid
-                ? userOptions.find((user) => user.value === acmeProfile.certificateAssociations?.ownerUuid)
-                : undefined,
-        [editMode, acmeProfile, userOptions],
-    );
-
-    const optionsForGroups = useMemo(
-        () =>
-            editMode && acmeProfile?.certificateAssociations?.groupUuids
-                ? acmeProfile.certificateAssociations.groupUuids
-                      .map((groupId) => groupOptions.find((group) => group.value === groupId))
-                      .filter((group): group is { value: string; label: string } => group !== undefined)
-                : [],
-        [editMode, acmeProfile, groupOptions],
-    );
-
     const defaultValues: FormValues = useMemo(
         () => ({
             name: editMode ? acmeProfile?.name || '' : '',
@@ -296,35 +273,29 @@ export default function AcmeProfileForm() {
                     ? optionsForRaProfiles.find((raProfile) => raProfile.value === acmeProfile.raProfile?.uuid)
                     : undefined
                 : undefined,
-            owner: optionsForUsers,
-            groups: optionsForGroups,
+            owner: editMode ? buildOwner(userOptions, acmeProfile?.certificateAssociations?.ownerUuid) : undefined,
+            groups: editMode ? buildGroups(groupOptions, acmeProfile?.certificateAssociations?.groupUuids) : [],
         }),
-        [editMode, acmeProfile, optionsForRaProfiles, optionsForUsers, optionsForGroups],
+        [editMode, acmeProfile, optionsForRaProfiles, userOptions, groupOptions],
     );
 
     const title = useMemo(() => (editMode ? 'Edit ACME Profile' : 'Create ACME Profile'), [editMode]);
 
-    const renderCustomAttributeEditor = useMemo(() => {
-        if (isBusy) return <></>;
-        return (
-            <AttributeEditor
-                id="customAcmeProfile"
-                attributeDescriptors={multipleResourceCustomAttributes[Resource.AcmeProfiles] || []}
-                attributes={acmeProfile?.customAttributes}
-            />
-        );
-    }, [isBusy, multipleResourceCustomAttributes, acmeProfile?.customAttributes]);
+    const renderCustomAttributeEditor = useAttributeEditor({
+        isBusy,
+        id: 'customAcmeProfile',
+        resourceKey: Resource.AcmeProfiles,
+        attributes: acmeProfile?.customAttributes,
+        multipleResourceCustomAttributes,
+    });
 
-    const renderCertificateAssociatedAttributesEditor = useMemo(() => {
-        if (isBusy) return <></>;
-        return (
-            <AttributeEditor
-                id="certificateAssociatedAttributes"
-                attributeDescriptors={multipleResourceCustomAttributes[Resource.Certificates] || []}
-                attributes={acmeProfile?.certificateAssociations?.customAttributes}
-            />
-        );
-    }, [isBusy, multipleResourceCustomAttributes, acmeProfile?.certificateAssociations?.customAttributes]);
+    const renderCertificateAssociatedAttributesEditor = useAttributeEditor({
+        isBusy,
+        id: 'certificateAssociatedAttributes',
+        resourceKey: Resource.Certificates,
+        attributes: acmeProfile?.certificateAssociations?.customAttributes,
+        multipleResourceCustomAttributes,
+    });
 
     return (
         <Widget title={title} busy={isBusy}>

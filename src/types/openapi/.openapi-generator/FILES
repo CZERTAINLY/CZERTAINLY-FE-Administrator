@@ -122,6 +122,7 @@ models/CertificateEventHistoryDto.ts
 models/CertificateFormat.ts
 models/CertificateFormatEncoding.ts
 models/CertificateInLocationDto.ts
+models/CertificateKeyUsage.ts
 models/CertificateProtocol.ts
 models/CertificateProtocolDto.ts
 models/CertificateRequestDto.ts
@@ -315,6 +316,7 @@ models/PlatformSettingsUpdateDto.ts
 models/ProgrammingLanguageEnum.ts
 models/ProtectionMethod.ts
 models/ProtocolCertificateAssociationsDto.ts
+models/ProtocolCertificateAssociationsRequestDto.ts
 models/PushToLocationRequestDto.ts
 models/RaProfileAcmeDetailResponseDto.ts
 models/RaProfileAssociationRequestDto.ts

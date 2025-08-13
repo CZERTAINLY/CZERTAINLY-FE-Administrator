@@ -67,12 +67,6 @@ export interface CmpProfileDetailDto {
      */
     cmpUrl?: string;
     /**
-     * Associations to set for certificates issued by the protocol
-     * @type {ProtocolCertificateAssociationsDto}
-     * @memberof CmpProfileDetailDto
-     */
-    certificateAssociations?: ProtocolCertificateAssociationsDto;
-    /**
      * List of Attributes to issue a Certificate for the associated RA Profile
      * @type {Array<ResponseAttributeDto>}
      * @memberof CmpProfileDetailDto
@@ -108,6 +102,12 @@ export interface CmpProfileDetailDto {
      * @memberof CmpProfileDetailDto
      */
     signingCertificate?: CertificateDto;
+    /**
+     * Associations to set for certificates issued by the protocol
+     * @type {ProtocolCertificateAssociationsDto}
+     * @memberof CmpProfileDetailDto
+     */
+    certificateAssociations?: ProtocolCertificateAssociationsDto;
 }
 
 /**

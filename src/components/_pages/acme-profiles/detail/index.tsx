@@ -14,6 +14,7 @@ import { Col, Container, Row } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
+import { createWidgetDetailHeaders } from 'utils/widget';
 
 export default function AdministratorDetail() {
     const dispatch = useDispatch();
@@ -108,19 +109,7 @@ export default function AdministratorDetail() {
         [acmeProfile, onEditClick, onDisableClick, onEnableClick],
     );
 
-    const tableHeader: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'property',
-                content: 'Property',
-            },
-            {
-                id: 'value',
-                content: 'Value',
-            },
-        ],
-        [],
-    );
+    const tableHeader: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
 
     const acmeProfileDetailData: TableDataRow[] = useMemo(
         () =>
@@ -282,8 +271,6 @@ export default function AdministratorDetail() {
             },
         ];
     }, [acmeProfile]);
-
-    console.log({ acmeProfile });
 
     return (
         <Container className="themed-container" fluid>

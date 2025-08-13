@@ -12,7 +12,7 @@
  */
 
 import type {
-    ProtocolCertificateAssociationsDto,
+    ProtocolCertificateAssociationsRequestDto,
     RequestAttributeDto,
 } from './';
 
@@ -101,10 +101,10 @@ export interface ScepProfileRequestDto {
     intuneApplicationKey?: string;
     /**
      * Associations to set for certificates issued by the protocol
-     * @type {ProtocolCertificateAssociationsDto}
+     * @type {ProtocolCertificateAssociationsRequestDto}
      * @memberof ScepProfileRequestDto
      */
-    certificateAssociations?: ProtocolCertificateAssociationsDto;
+    certificateAssociations?: ProtocolCertificateAssociationsRequestDto;
     /**
      * Name of the SCEP Profile
      * @type {string}

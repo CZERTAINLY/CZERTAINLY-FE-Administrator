@@ -15,6 +15,7 @@ import { Badge, Col, Container, Row } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { PlatformEnum, Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
+import { createWidgetDetailHeaders } from 'utils/widget';
 
 export default function AdministratorDetail() {
     const dispatch = useDispatch();
@@ -111,19 +112,7 @@ export default function AdministratorDetail() {
         [cmpProfile, onEditClick, onDisableClick, onEnableClick],
     );
 
-    const tableHeader: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'property',
-                content: 'Property',
-            },
-            {
-                id: 'value',
-                content: 'Value',
-            },
-        ],
-        [],
-    );
+    const tableHeader: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
 
     const cmpProfileDetailData: TableDataRow[] = useMemo(
         () =>
@@ -241,7 +230,7 @@ export default function AdministratorDetail() {
                 id: 'owner',
                 columns: [
                     'Owner',
-                    <Link to={`../../users/detail/${cmpProfile.certificateAssociations?.ownerUuid}`}>
+                    <Link key="owner" to={`../../users/detail/${cmpProfile.certificateAssociations?.ownerUuid}`}>
                         {cmpProfile.certificateAssociations?.ownerUuid || 'N/A'}
                     </Link>,
                 ],
@@ -250,7 +239,7 @@ export default function AdministratorDetail() {
                 id: 'groups',
                 columns: [
                     'Groups',
-                    <Link to={`../../groups/detail/${cmpProfile.certificateAssociations?.groupUuids?.join(', ')}`}>
+                    <Link key="groups" to={`../../groups/detail/${cmpProfile.certificateAssociations?.groupUuids?.join(', ')}`}>
                         {cmpProfile.certificateAssociations?.groupUuids?.join(', ') || 'N/A'}
                     </Link>,
                 ],

@@ -30,6 +30,7 @@ import { KeyAlgorithm, Resource } from '../../../../types/openapi';
 import CertificateField from '../CertificateField';
 import { actions as groupsActions, selectors as groupsSelectors } from 'ducks/certificateGroups';
 import { actions as userAction, selectors as userSelectors } from 'ducks/users';
+import useAttributeEditor, { buildGroups, buildOwner, buildUserOption } from 'utils/widget';
 
 interface FormValues {
     name: string;
@@ -60,7 +61,6 @@ export default function ScepProfileForm() {
 
     const raProfiles = useSelector(raProfileSelectors.raProfiles);
     const raProfileIssuanceAttrDescs = useSelector(raProfileSelectors.issuanceAttributes);
-    /* const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes); */
     const certificates = useSelector(scepProfileSelectors.caCertificates);
 
     const isFetchingDetail = useSelector(scepProfileSelectors.isFetchingDetail);
@@ -105,12 +105,7 @@ export default function ScepProfileForm() {
 
     useEffect(() => {
         if (users.length > 0) {
-            setUserOptions(
-                users.map((user) => ({
-                    value: user.uuid,
-                    label: `${user.firstName ? user.firstName + ' ' : ''}${user.lastName ? (user.lastName ? user.lastName + ' ' : '') : ''}(${user.username})`,
-                })),
-            );
+            setUserOptions(users.map((user) => buildUserOption(user)));
         }
     }, [users]);
 
@@ -254,30 +249,21 @@ export default function ScepProfileForm() {
                           value: scepProfileSelector.caCertificate.uuid,
                       }
                     : undefined,
-            owner: scepProfileSelector?.certificateAssociations?.ownerUuid
-                ? userOptions.find((user) => user.value === scepProfileSelector.certificateAssociations?.ownerUuid)
-                : undefined,
-            groups: scepProfileSelector?.certificateAssociations?.groupUuids
-                ? scepProfileSelector?.certificateAssociations?.groupUuids
-                      .map((groupId) => groupOptions.find((group) => group.value === groupId))
-                      .filter((group): group is { value: string; label: string } => group !== undefined)
-                : [],
+            owner: editMode ? buildOwner(userOptions, scepProfileSelector?.certificateAssociations?.ownerUuid) : undefined,
+            groups: editMode ? buildGroups(groupOptions, scepProfileSelector?.certificateAssociations?.groupUuids) : [],
         }),
         [editMode, scepProfileSelector, optionsForRaProfiles, userOptions, groupOptions],
     );
 
     const title = useMemo(() => (editMode ? 'Edit SCEP Profile' : 'Create SCEP Profile'), [editMode]);
 
-    const renderCertificateAssociatedAttributesEditor = useMemo(() => {
-        if (isBusy) return <></>;
-        return (
-            <AttributeEditor
-                id="certificateAssociatedAttributes"
-                attributeDescriptors={multipleResourceCustomAttributes[Resource.Certificates] || []}
-                attributes={scepProfileSelector?.certificateAssociations?.customAttributes}
-            />
-        );
-    }, [isBusy, multipleResourceCustomAttributes, scepProfileSelector?.certificateAssociations?.customAttributes]);
+    const renderCertificateAssociatedAttributesEditor = useAttributeEditor({
+        isBusy,
+        id: 'certificateAssociatedAttributes',
+        resourceKey: Resource.Certificates,
+        attributes: scepProfileSelector?.certificateAssociations?.customAttributes,
+        multipleResourceCustomAttributes,
+    });
 
     return (
         <Widget title={title} busy={isBusy}>

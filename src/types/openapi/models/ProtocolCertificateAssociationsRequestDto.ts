@@ -12,30 +12,30 @@
  */
 
 import type {
-    ResponseAttributeDto,
+    RequestAttributeDto,
 } from './';
 
 /**
  * @export
- * @interface ProtocolCertificateAssociationsDto
+ * @interface ProtocolCertificateAssociationsRequestDto
  */
-export interface ProtocolCertificateAssociationsDto {
+export interface ProtocolCertificateAssociationsRequestDto {
     /**
      * UUID of the user to be associated with certificate by protocol
      * @type {string}
-     * @memberof ProtocolCertificateAssociationsDto
+     * @memberof ProtocolCertificateAssociationsRequestDto
      */
     ownerUuid?: string;
     /**
      * UUIDs of the groups to be associated with certificate by protocol
      * @type {Array<string>}
-     * @memberof ProtocolCertificateAssociationsDto
+     * @memberof ProtocolCertificateAssociationsRequestDto
      */
     groupUuids?: Array<string>;
     /**
      * Custom Attributes to be associated with certificate by protocol
-     * @type {Array<ResponseAttributeDto>}
-     * @memberof ProtocolCertificateAssociationsDto
+     * @type {Array<RequestAttributeDto>}
+     * @memberof ProtocolCertificateAssociationsRequestDto
      */
-    customAttributes?: Array<ResponseAttributeDto>;
+    customAttributes?: Array<RequestAttributeDto>;
 }
