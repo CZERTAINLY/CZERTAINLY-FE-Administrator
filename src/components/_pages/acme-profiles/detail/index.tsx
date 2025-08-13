@@ -14,7 +14,9 @@ import { Col, Container, Row } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
-import { createWidgetDetailHeaders } from 'utils/widget';
+import { createWidgetDetailHeaders, getGroupNames, getOwnerName } from 'utils/widget';
+import { actions as groupsActions, selectors as groupsSelectors } from 'ducks/certificateGroups';
+import { actions as userAction, selectors as userSelectors } from 'ducks/users';
 
 export default function AdministratorDetail() {
     const dispatch = useDispatch();
@@ -26,6 +28,8 @@ export default function AdministratorDetail() {
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
     const isDisabling = useSelector(selectors.isDisabling);
     const isEnabling = useSelector(selectors.isEnabling);
+    const users = useSelector(userSelectors.users);
+    const groups = useSelector(groupsSelectors.certificateGroups);
 
     const deleteErrorMessage = useSelector(selectors.deleteErrorMessage);
 
@@ -41,6 +45,13 @@ export default function AdministratorDetail() {
     useEffect(() => {
         getFreshAcmeProfile();
     }, [id, getFreshAcmeProfile]);
+
+    useEffect(() => {
+        dispatch(userAction.list());
+    }, [dispatch]);
+    useEffect(() => {
+        dispatch(groupsActions.listGroups());
+    }, [dispatch]);
 
     const onEditClick = useCallback(() => {
         navigate(`../../acmeprofiles/edit/${acmeProfile?.uuid}`);
@@ -248,6 +259,12 @@ export default function AdministratorDetail() {
         [raProfileDetailData],
     );
 
+    const ownerName = useMemo(() => getOwnerName(acmeProfile?.certificateAssociations?.ownerUuid, users), [acmeProfile, users]);
+
+    const groupNames = useMemo(() => {
+        return getGroupNames(acmeProfile?.certificateAssociations?.groupUuids, groups);
+    }, [acmeProfile, groups]);
+
     const defaultCertificateAssociationsData: TableDataRow[] = useMemo(() => {
         if (!acmeProfile) return [];
         return [
@@ -256,7 +273,7 @@ export default function AdministratorDetail() {
                 columns: [
                     'Owner',
                     <Link key="owner" to={`../../users/detail/${acmeProfile.certificateAssociations?.ownerUuid}`}>
-                        {acmeProfile.certificateAssociations?.ownerUuid || 'N/A'}
+                        {ownerName}
                     </Link>,
                 ],
             },
@@ -264,13 +281,22 @@ export default function AdministratorDetail() {
                 id: 'groups',
                 columns: [
                     'Groups',
-                    <Link key="groups" to={`../../groups/detail/${acmeProfile.certificateAssociations?.groupUuids?.join(', ')}`}>
-                        {acmeProfile.certificateAssociations?.groupUuids?.join(', ') || 'N/A'}
-                    </Link>,
+                    <>
+                        {acmeProfile.certificateAssociations?.groupUuids?.map((groupUuid, index) => {
+                            return (
+                                <>
+                                    <Link key={groupUuid} to={`../../groups/detail/${groupUuid}`}>
+                                        {groupNames?.[index] ?? 'N/A'}
+                                    </Link>
+                                    <br />
+                                </>
+                            );
+                        })}
+                    </>,
                 ],
             },
         ];
-    }, [acmeProfile]);
+    }, [acmeProfile, ownerName, groupNames]);
 
     return (
         <Container className="themed-container" fluid>

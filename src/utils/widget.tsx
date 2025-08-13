@@ -3,7 +3,8 @@ import { TableDataRow, TableHeader } from 'components/CustomTable';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { useMemo } from 'react';
 import { CustomAttributeModel } from 'types/attributes';
-import { Resource } from 'types/openapi';
+import { CertificateGroupResponseModel } from 'types/certificateGroups';
+import { Resource, UserDto } from 'types/openapi';
 
 export function getEditAndDeleteWidgetButtons(
     onEditClick: (event: React.MouseEvent) => void,
@@ -96,3 +97,19 @@ function useAttributeEditor({
 }
 
 export default useAttributeEditor;
+
+export const getOwnerName = (ownerUuid: string | undefined, users: UserDto[]): string => {
+    if (!ownerUuid) return 'N/A';
+    const user = users.find((user) => user.uuid === ownerUuid);
+    return user ? user.username : 'N/A';
+};
+
+export const getGroupNames = (groupUuids: string[] | undefined, groups: CertificateGroupResponseModel[]): string[] | 'N/A' => {
+    if (!groupUuids) return 'N/A';
+    return (
+        groupUuids.map((groupUuid) => {
+            const group = groups.find((group) => group.uuid === groupUuid);
+            return group ? group.name : 'N/A';
+        }) ?? 'N/A'
+    );
+};
