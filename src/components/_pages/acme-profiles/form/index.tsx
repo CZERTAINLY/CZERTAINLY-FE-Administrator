@@ -254,30 +254,35 @@ export default function AcmeProfileForm() {
         [raProfiles],
     );
 
-    const defaultValues: FormValues = useMemo(
-        () => ({
-            name: editMode ? acmeProfile?.name || '' : '',
-            description: editMode ? acmeProfile?.description || '' : '',
-            dnsIpAddress: editMode ? acmeProfile?.dnsResolverIp || '' : '',
-            dnsPort: editMode ? acmeProfile?.dnsResolverPort || '' : '',
-            retryInterval: editMode ? acmeProfile?.retryInterval?.toString() || '30' : '30',
-            orderValidity: editMode ? acmeProfile?.validity?.toString() || '36000' : '36000',
-            termsUrl: editMode ? acmeProfile?.termsOfServiceUrl || '' : '',
-            webSite: editMode ? acmeProfile?.websiteUrl || '' : '',
-            termsChangeUrl: editMode ? acmeProfile?.termsOfServiceChangeUrl || '' : '',
-            disableOrders: editMode ? acmeProfile?.termsOfServiceChangeDisable || false : false,
-            requireTermsOfService: editMode ? acmeProfile?.requireTermsOfService || false : false,
-            requireContact: editMode ? acmeProfile?.requireContact || false : false,
-            raProfile: editMode
-                ? acmeProfile?.raProfile
-                    ? optionsForRaProfiles.find((raProfile) => raProfile.value === acmeProfile.raProfile?.uuid)
-                    : undefined
-                : undefined,
+    const getValue = useCallback(
+        <T,>(value: T | undefined | null, fallback: T): T => {
+            return editMode ? (value ?? fallback) : fallback;
+        },
+        [editMode],
+    );
+
+    const defaultValues: FormValues = useMemo(() => {
+        return {
+            name: getValue(acmeProfile?.name, ''),
+            description: getValue(acmeProfile?.description, ''),
+            dnsIpAddress: getValue(acmeProfile?.dnsResolverIp, ''),
+            dnsPort: getValue(acmeProfile?.dnsResolverPort, ''),
+            retryInterval: getValue(acmeProfile?.retryInterval?.toString(), '30'),
+            orderValidity: getValue(acmeProfile?.validity?.toString(), '36000'),
+            termsUrl: getValue(acmeProfile?.termsOfServiceUrl, ''),
+            webSite: getValue(acmeProfile?.websiteUrl, ''),
+            termsChangeUrl: getValue(acmeProfile?.termsOfServiceChangeUrl, ''),
+            disableOrders: getValue(acmeProfile?.termsOfServiceChangeDisable, false),
+            requireTermsOfService: getValue(acmeProfile?.requireTermsOfService, false),
+            requireContact: getValue(acmeProfile?.requireContact, false),
+            raProfile:
+                editMode && acmeProfile?.raProfile
+                    ? optionsForRaProfiles.find((ra) => ra.value === acmeProfile.raProfile?.uuid)
+                    : undefined,
             owner: editMode ? buildOwner(userOptions, acmeProfile?.certificateAssociations?.ownerUuid) : undefined,
             groups: editMode ? buildGroups(groupOptions, acmeProfile?.certificateAssociations?.groupUuids) : [],
-        }),
-        [editMode, acmeProfile, optionsForRaProfiles, userOptions, groupOptions],
-    );
+        };
+    }, [editMode, acmeProfile, optionsForRaProfiles, userOptions, groupOptions, getValue]);
 
     const title = useMemo(() => (editMode ? 'Edit ACME Profile' : 'Create ACME Profile'), [editMode]);
 

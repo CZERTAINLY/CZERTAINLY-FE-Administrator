@@ -255,7 +255,7 @@ export default function AdministratorDetail() {
                 id: 'owner',
                 columns: [
                     'Owner',
-                    <Link to={`../../users/detail/${acmeProfile.certificateAssociations?.ownerUuid}`}>
+                    <Link key="owner" to={`../../users/detail/${acmeProfile.certificateAssociations?.ownerUuid}`}>
                         {acmeProfile.certificateAssociations?.ownerUuid || 'N/A'}
                     </Link>,
                 ],
@@ -264,7 +264,7 @@ export default function AdministratorDetail() {
                 id: 'groups',
                 columns: [
                     'Groups',
-                    <Link to={`../../groups/detail/${acmeProfile.certificateAssociations?.groupUuids?.join(', ')}`}>
+                    <Link key="groups" to={`../../groups/detail/${acmeProfile.certificateAssociations?.groupUuids?.join(', ')}`}>
                         {acmeProfile.certificateAssociations?.groupUuids?.join(', ') || 'N/A'}
                     </Link>,
                 ],
