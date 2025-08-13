@@ -68,7 +68,7 @@ export default function AcmeProfileForm() {
     const raProfileIssuanceAttrDescs = useSelector(raProfileSelectors.issuanceAttributes);
     const raProfileRevocationAttrDescs = useSelector(raProfileSelectors.revocationAttributes);
     const multipleResourceCustomAttributes = useSelector(
-        customAttributesSelectors.multipleResourceCustomAttributes([Resource.Certificates, Resource.AcmeProfiles]),
+        customAttributesSelectors.multipleResourceCustomAttributes([Resource.AcmeProfiles, Resource.Certificates]),
     );
 
     const isFetchingDetail = useSelector(acmeProfileSelectors.isFetchingDetail);

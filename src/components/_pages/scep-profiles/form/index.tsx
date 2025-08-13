@@ -72,7 +72,7 @@ export default function ScepProfileForm() {
     const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
 
     const multipleResourceCustomAttributes = useSelector(
-        customAttributesSelectors.multipleResourceCustomAttributes([Resource.CmpProfiles, Resource.Certificates]),
+        customAttributesSelectors.multipleResourceCustomAttributes([Resource.ScepProfiles, Resource.Certificates]),
     );
     const users = useSelector(userSelectors.users);
     const groups = useSelector(groupsSelectors.certificateGroups);
@@ -127,7 +127,7 @@ export default function ScepProfileForm() {
     useEffect(() => {
         dispatch(
             customAttributesActions.loadMultipleResourceCustomAttributes([
-                { resource: Resource.CmpProfiles, customAttributes: [] },
+                { resource: Resource.ScepProfiles, customAttributes: [] },
                 { resource: Resource.Certificates, customAttributes: [] },
             ]),
         );

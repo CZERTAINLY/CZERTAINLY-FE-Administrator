@@ -272,9 +272,13 @@ export default function AdministratorDetail() {
                 id: 'owner',
                 columns: [
                     'Owner',
-                    <Link key="owner" to={`../../users/detail/${acmeProfile.certificateAssociations?.ownerUuid}`}>
-                        {ownerName}
-                    </Link>,
+                    acmeProfile.certificateAssociations?.ownerUuid ? (
+                        <Link key="owner" to={`../../users/detail/${acmeProfile.certificateAssociations?.ownerUuid}`}>
+                            {ownerName}
+                        </Link>
+                    ) : (
+                        ownerName
+                    ),
                 ],
             },
             {

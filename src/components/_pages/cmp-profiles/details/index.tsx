@@ -247,9 +247,13 @@ export default function AdministratorDetail() {
                 id: 'owner',
                 columns: [
                     'Owner',
-                    <Link key="owner" to={`../../users/detail/${cmpProfile.certificateAssociations?.ownerUuid}`}>
-                        {ownerName}
-                    </Link>,
+                    cmpProfile.certificateAssociations?.ownerUuid ? (
+                        <Link key="owner" to={`../../users/detail/${cmpProfile.certificateAssociations?.ownerUuid}`}>
+                            {ownerName}
+                        </Link>
+                    ) : (
+                        ownerName
+                    ),
                 ],
             },
             {

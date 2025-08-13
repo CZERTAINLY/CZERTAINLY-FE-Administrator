@@ -4,7 +4,7 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 import { useMemo } from 'react';
 import { CustomAttributeModel } from 'types/attributes';
 import { CertificateGroupResponseModel } from 'types/certificateGroups';
-import { Resource, UserDto } from 'types/openapi';
+import { Resource, ResponseAttributeDto, UserDto } from 'types/openapi';
 
 export function getEditAndDeleteWidgetButtons(
     onEditClick: (event: React.MouseEvent) => void,
@@ -85,7 +85,7 @@ function useAttributeEditor({
     isBusy: boolean;
     id: string;
     resourceKey: Resource;
-    attributes: any;
+    attributes: ResponseAttributeDto[] | undefined;
     multipleResourceCustomAttributes: Record<string, CustomAttributeModel[]>;
 }) {
     return useMemo(() => {
@@ -106,10 +106,8 @@ export const getOwnerName = (ownerUuid: string | undefined, users: UserDto[]): s
 
 export const getGroupNames = (groupUuids: string[] | undefined, groups: CertificateGroupResponseModel[]): string[] | 'N/A' => {
     if (!groupUuids) return 'N/A';
-    return (
-        groupUuids.map((groupUuid) => {
-            const group = groups.find((group) => group.uuid === groupUuid);
-            return group ? group.name : 'N/A';
-        }) ?? 'N/A'
-    );
+    return groupUuids.map((groupUuid) => {
+        const group = groups.find((group) => group.uuid === groupUuid);
+        return group ? group.name : 'N/A';
+    });
 };

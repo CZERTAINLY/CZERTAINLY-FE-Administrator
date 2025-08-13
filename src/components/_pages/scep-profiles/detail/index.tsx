@@ -306,9 +306,13 @@ export default function ScepProfileDetail() {
                 id: 'owner',
                 columns: [
                     'Owner',
-                    <Link key="owner" to={`../../users/detail/${scepProfile.certificateAssociations?.ownerUuid}`}>
-                        {ownerName}
-                    </Link>,
+                    scepProfile.certificateAssociations?.ownerUuid ? (
+                        <Link key="owner" to={`../../users/detail/${scepProfile.certificateAssociations?.ownerUuid}`}>
+                            {ownerName}
+                        </Link>
+                    ) : (
+                        ownerName
+                    ),
                 ],
             },
             {
