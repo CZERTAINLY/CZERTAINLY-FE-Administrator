@@ -1,8 +1,9 @@
 name: Sonar
 on:
   workflow_run:
-    workflows: ["Build"]
-    types: [completed]
+    workflows: [ "Check PR" ]
+    types:
+      - completed
 
 jobs:
   sonar:
@@ -124,7 +125,7 @@ jobs:
               status: "completed",
               conclusion,
               output: {
-                title: "Test Charts Result",
+                title: "SonarQube Analysis Result",
                 summary: `✅ SonarQube analysis concluded with status: **${conclusion}**`,
               }
             });
