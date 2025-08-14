@@ -28,10 +28,9 @@ import { mutators } from 'utils/attributes/attributeEditorMutators';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 import { isObjectSame } from 'utils/common-utils';
 import { composeValidators, validateAlphaNumericWithoutAccents, validateLength, validateRequired } from 'utils/validators';
-import { actions as groupsActions, selectors as groupsSelectors } from 'ducks/certificateGroups';
-import { actions as userAction, selectors as userSelectors } from 'ducks/users';
 import styles from './cmpForm.module.scss';
-import useAttributeEditor, { buildGroups, buildOwner, buildSelectedOption, buildUserOption } from 'utils/widget';
+import useAttributeEditor, { buildGroups, buildOwner, buildSelectedOption } from 'utils/widget';
+import CertificateAssociationsFormWidget from 'components/CertificateAssociationsFormWidget/CertificateAssociationsFormWidget';
 
 interface SelectChangeValue {
     value: string;
@@ -80,8 +79,6 @@ export default function CmpProfileForm() {
     const multipleResourceCustomAttributes = useSelector(
         customAttributesSelectors.multipleResourceCustomAttributes([Resource.CmpProfiles, Resource.Certificates]),
     );
-    const users = useSelector(userSelectors.users);
-    const groups = useSelector(groupsSelectors.certificateGroups);
 
     const [userOptions, setUserOptions] = useState<{ value: string; label: string }[]>([]);
     const [groupOptions, setGroupOptions] = useState<{ value: string; label: string }[]>([]);
@@ -131,31 +128,6 @@ export default function CmpProfileForm() {
             })),
         [cmpSigningCertificates],
     );
-
-    useEffect(() => {
-        dispatch(userAction.list());
-    }, [dispatch]);
-
-    useEffect(() => {
-        if (users.length > 0) {
-            setUserOptions(users.map((user) => buildUserOption(user)));
-        }
-    }, [users]);
-
-    useEffect(() => {
-        dispatch(groupsActions.listGroups());
-    }, [dispatch]);
-
-    useEffect(() => {
-        if (groups.length > 0) {
-            setGroupOptions(
-                groups.map((group) => ({
-                    value: group.uuid,
-                    label: group.name,
-                })),
-            );
-        }
-    }, [groups]);
 
     useEffect(() => {
         dispatch(
@@ -472,7 +444,14 @@ export default function CmpProfileForm() {
                                         </FormGroup>
                                     )}
                                 </Field>
-                                <Widget title="Certificate associations">
+                                <CertificateAssociationsFormWidget
+                                    renderCustomAttributes={renderCertificateAssociatedAttributesEditor}
+                                    userOptions={userOptions}
+                                    groupOptions={groupOptions}
+                                    setUserOptions={setUserOptions}
+                                    setGroupOptions={setGroupOptions}
+                                />
+                                {/* <Widget title="Certificate associations">
                                     <Field name="owner">
                                         {({ input, meta }) => (
                                             <FormGroup>
@@ -503,7 +482,7 @@ export default function CmpProfileForm() {
                                         )}
                                     </Field>
                                     <Widget title="Custom Attributes">{renderCertificateAssociatedAttributesEditor}</Widget>
-                                </Widget>
+                                </Widget> */}
                                 <Widget title="CMP Variant Configuration">
                                     <Field name="selectedVariant" validate={composeValidators(validateRequired())} type="radio">
                                         {({ input, meta }) => (

@@ -8,8 +8,6 @@ import { actions as acmeProfileActions, selectors as acmeProfileSelectors } from
 import { actions as connectorActions } from 'ducks/connectors';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { actions as raProfileActions, selectors as raProfileSelectors } from 'ducks/ra-profiles';
-import { actions as groupsActions, selectors as groupsSelectors } from 'ducks/certificateGroups';
-import { actions as userAction, selectors as userSelectors } from 'ducks/users';
 
 import { FormApi } from 'final-form';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -35,7 +33,8 @@ import {
     validateRequired,
 } from 'utils/validators';
 import { Resource } from '../../../../types/openapi';
-import useAttributeEditor, { buildGroups, buildOwner, buildUserOption } from 'utils/widget';
+import useAttributeEditor, { buildGroups, buildOwner } from 'utils/widget';
+import CertificateAssociationsFormWidget from 'components/CertificateAssociationsFormWidget/CertificateAssociationsFormWidget';
 
 interface FormValues {
     name: string;
@@ -88,36 +87,8 @@ export default function AcmeProfileForm() {
 
     const isBusy = useMemo(() => isFetchingDetail || isCreating || isUpdating, [isFetchingDetail, isCreating, isUpdating]);
 
-    const users = useSelector(userSelectors.users);
-    const groups = useSelector(groupsSelectors.certificateGroups);
-
     const [userOptions, setUserOptions] = useState<{ value: string; label: string }[]>([]);
     const [groupOptions, setGroupOptions] = useState<{ value: string; label: string }[]>([]);
-
-    useEffect(() => {
-        dispatch(userAction.list());
-    }, [dispatch]);
-
-    useEffect(() => {
-        if (users.length > 0) {
-            setUserOptions(users.map((user) => buildUserOption(user)));
-        }
-    }, [users]);
-
-    useEffect(() => {
-        dispatch(groupsActions.listGroups());
-    }, [dispatch]);
-
-    useEffect(() => {
-        if (groups.length > 0) {
-            setGroupOptions(
-                groups.map((group) => ({
-                    value: group.uuid,
-                    label: group.name,
-                })),
-            );
-        }
-    }, [groups]);
 
     useEffect(() => {
         dispatch(
@@ -346,32 +317,13 @@ export default function AcmeProfileForm() {
                             )}
                         </Field>
 
-                        <Widget title="Certificate associations">
-                            <Field name="owner">
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Label for="owner">Owner</Label>
-                                        <Select {...input} id="owner" options={userOptions} placeholder="Select Owner" isClearable={true} />
-                                    </FormGroup>
-                                )}
-                            </Field>
-                            <Field name="groups">
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Label for="groups">Groups</Label>
-                                        <Select
-                                            {...input}
-                                            id="groups"
-                                            options={groupOptions}
-                                            placeholder="Select Groups"
-                                            isClearable={true}
-                                            isMulti
-                                        />
-                                    </FormGroup>
-                                )}
-                            </Field>
-                            <Widget title="Custom Attributes">{renderCertificateAssociatedAttributesEditor}</Widget>
-                        </Widget>
+                        <CertificateAssociationsFormWidget
+                            renderCustomAttributes={renderCertificateAssociatedAttributesEditor}
+                            userOptions={userOptions}
+                            groupOptions={groupOptions}
+                            setUserOptions={setUserOptions}
+                            setGroupOptions={setGroupOptions}
+                        />
 
                         <Widget title="Challenge Configuration">
                             <Row xs="1" sm="1" md="2" lg="2" xl="2">
