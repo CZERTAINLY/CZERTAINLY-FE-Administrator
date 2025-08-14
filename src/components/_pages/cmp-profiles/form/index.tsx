@@ -155,6 +155,20 @@ export default function CmpProfileForm() {
 
     const onSubmit = useCallback(
         (values: FormValues) => {
+            const customAttributes = collectFormAttributes(
+                'customCmpProfile',
+                multipleResourceCustomAttributes[Resource.CmpProfiles],
+                values,
+            );
+            const certificateAssociations = {
+                ownerUuid: values.owner?.value,
+                groupUuids: values.groups.map((group) => group.value),
+                customAttributes: collectFormAttributes(
+                    'certificateAssociatedAttributes',
+                    multipleResourceCustomAttributes[Resource.Certificates],
+                    values,
+                ),
+            };
             if (editMode && cmpProfile && cmpProfile?.uuid === id) {
                 const valuesToSubmit: CmpProfileEditRequestModel = {
                     name: values.name,
@@ -180,20 +194,8 @@ export default function CmpProfileForm() {
                         [...(raProfileRevocationAttrDescs ?? []), ...revokeGroupAttributesCallbackAttributes],
                         values,
                     ),
-                    customAttributes: collectFormAttributes(
-                        'customCmpProfile',
-                        multipleResourceCustomAttributes[Resource.CmpProfiles],
-                        values,
-                    ),
-                    certificateAssociations: {
-                        ownerUuid: values.owner?.value,
-                        groupUuids: values.groups.map((group) => group.value),
-                        customAttributes: collectFormAttributes(
-                            'certificateAssociatedAttributes',
-                            multipleResourceCustomAttributes[Resource.Certificates],
-                            values,
-                        ),
-                    },
+                    customAttributes,
+                    certificateAssociations,
                 };
                 dispatch(cmpProfileActions.updateCmpProfile({ uuid: cmpProfile.uuid, updateCmpRequest: valuesToSubmit }));
             } else {
@@ -221,20 +223,8 @@ export default function CmpProfileForm() {
                         [...(raProfileRevocationAttrDescs ?? []), ...revokeGroupAttributesCallbackAttributes],
                         values,
                     ),
-                    customAttributes: collectFormAttributes(
-                        'customCmpProfile',
-                        multipleResourceCustomAttributes[Resource.CmpProfiles],
-                        values,
-                    ),
-                    certificateAssociations: {
-                        ownerUuid: values.owner?.value,
-                        groupUuids: values.groups.map((group) => group.value),
-                        customAttributes: collectFormAttributes(
-                            'certificateAssociatedAttributes',
-                            multipleResourceCustomAttributes[Resource.Certificates],
-                            values,
-                        ),
-                    },
+                    customAttributes,
+                    certificateAssociations,
                 };
                 dispatch(cmpProfileActions.createCmpProfile(valuesToSubmit));
             }
@@ -451,38 +441,6 @@ export default function CmpProfileForm() {
                                     setUserOptions={setUserOptions}
                                     setGroupOptions={setGroupOptions}
                                 />
-                                {/* <Widget title="Certificate associations">
-                                    <Field name="owner">
-                                        {({ input, meta }) => (
-                                            <FormGroup>
-                                                <Label for="owner">Owner</Label>
-                                                <Select
-                                                    {...input}
-                                                    id="owner"
-                                                    options={userOptions}
-                                                    placeholder="Select Owner"
-                                                    isClearable={true}
-                                                />
-                                            </FormGroup>
-                                        )}
-                                    </Field>
-                                    <Field name="groups">
-                                        {({ input, meta }) => (
-                                            <FormGroup>
-                                                <Label for="groups">Groups</Label>
-                                                <Select
-                                                    {...input}
-                                                    id="groups"
-                                                    options={groupOptions}
-                                                    placeholder="Select Groups"
-                                                    isClearable={true}
-                                                    isMulti
-                                                />
-                                            </FormGroup>
-                                        )}
-                                    </Field>
-                                    <Widget title="Custom Attributes">{renderCertificateAssociatedAttributesEditor}</Widget>
-                                </Widget> */}
                                 <Widget title="CMP Variant Configuration">
                                     <Field name="selectedVariant" validate={composeValidators(validateRequired())} type="radio">
                                         {({ input, meta }) => (

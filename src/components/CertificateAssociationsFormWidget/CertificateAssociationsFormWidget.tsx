@@ -7,7 +7,6 @@ import { actions as userAction, selectors as userSelectors } from 'ducks/users';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { buildUserOption } from 'utils/widget';
-import { useState } from 'react';
 
 interface Props {
     userOptions: { value: string; label: string }[];
