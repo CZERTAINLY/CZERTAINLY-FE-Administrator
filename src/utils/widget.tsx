@@ -71,7 +71,7 @@ export function buildUserOption(user: { uuid: string; firstName?: string; lastNa
     const last = user.lastName ? user.lastName + ' ' : '';
     return {
         value: user.uuid,
-        label: `${first}${last}(${user.username})`,
+        label: `${first}${last} (${user.username})`,
     };
 }
 

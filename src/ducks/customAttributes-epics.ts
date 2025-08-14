@@ -110,11 +110,7 @@ const loadMultipleResourceCustomAttributes: AppEpic = (action$, state$, deps) =>
                         resource,
                         customAttributes: list.map(transformCustomAttributeDtoToModel),
                     })),
-                    catchError((err) => {
-                        appRedirectActions.fetchError({
-                            error: err,
-                            message: `Failed to get custom attributes for resource ${resource}:`,
-                        });
+                    catchError(() => {
                         return of({
                             resource,
                             customAttributes: [],
