@@ -15,29 +15,54 @@ jobs:
     if: github.event.workflow_run.conclusion == 'success'
 
     steps:
-      # Resolve SHA & PR number robustly
-      - name: Resolve head SHA and PR (if any)
+      - name: Resolve head SHA and PR (handles forks)
         id: ctx
         uses: actions/github-script@v7
         with:
           script: |
             const wr = context.payload.workflow_run;
-            const headSha = wr.head_sha; // reliable
-            core.setOutput('head_sha', headSha);
-
-            // Try to take PR number from the payload first
-            let prNumber = wr.pull_requests && wr.pull_requests[0]?.number ? wr.pull_requests[0].number : '';
-
-            // If not present, try to find a PR associated with this commit
+            
+            // Always reliable for workflow_run
+            core.setOutput('head_sha', wr.head_sha);
+            
+            // 1) If GitHub provided the PR on the payload, use it
+            let prNumber = wr.pull_requests?.[0]?.number;
+            
+            // 2) Try to find by commit (works when the commit is in the base repo history)
             if (!prNumber) {
-              const prs = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+              const { data: prsBySha } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                commit_sha: headSha,
+                commit_sha: wr.head_sha,
               });
-              prNumber = prs.data[0]?.number || '';
+              prNumber = prsBySha[0]?.number;
             }
-            core.setOutput('pr_number', prNumber);
+            
+            // 3) Fork PR fallback: find by "head=owner:branch"
+            if (!prNumber) {
+              const headOwner = wr.head_repository?.owner?.login;
+              const headBranch = wr.head_branch;
+              if (headOwner && headBranch) {
+                const { data: prsByHead } = await github.rest.pulls.list({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  state: 'open',
+                  head: `${headOwner}:${headBranch}`,
+                });
+                prNumber = prsByHead[0]?.number;
+              }
+            }
+            
+            core.setOutput('pr_number', prNumber ?? '');
+
+      - name: Debug PR context
+        run: |
+          echo "event=${{ github.event.workflow_run.event }}"
+          echo "head_owner=${{ github.event.workflow_run.head_repository.owner.login }}"
+          echo "head_branch=${{ github.event.workflow_run.head_branch }}"
+          echo "pull_requests_json=${{ toJson(github.event.workflow_run.pull_requests) }}"
+          echo "Resolved PR_NUMBER=$PR_NUMBER"
+          echo "Resolved HEAD_SHA=$HEAD_SHA"
 
       - name: Export env
         run: |
