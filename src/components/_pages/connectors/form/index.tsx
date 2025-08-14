@@ -123,8 +123,7 @@ export default function ConnectorForm() {
                 setSelectedAuthType(authOption);
             }
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [connector?.authType, editMode, optionsForAuth]);
+    }, [connector, editMode, optionsForAuth]);
 
     const onSubmit = useCallback(
         (values: FormValues) => {
