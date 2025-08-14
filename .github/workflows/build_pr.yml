@@ -6,7 +6,7 @@ on:
 # Needed so this workflow can start another workflow
 permissions:
   contents: read
-  workflows: write
+  actions: write
 
 jobs:
   build:
