@@ -37,8 +37,8 @@ jobs:
         id: app_token
         uses: tibdex/github-app-token@v1
         with:
-          app_id: ${{ secrets.GH_APP_ID }}
-          private_key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+          app_id: ${{ secrets.SONAR_GH_APP_ID }}
+          private_key: ${{ secrets.SONAR_GH_APP_PRIVATE_KEY }}
 
       - name: Create GitHub Check (in_progress)
         id: create_check
