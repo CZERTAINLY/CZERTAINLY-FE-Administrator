@@ -235,6 +235,37 @@ export const slice = createSlice({
             return state;
         },
 
+        loadMultipleResourceCustomAttributes: (
+            state,
+            action: PayloadAction<{ resource: Resource; customAttributes: CustomAttributeModel[] }[]>,
+        ) => {
+            // This action is just a trigger - no state update here
+        },
+        receiveMultipleResourceCustomAttributes: (
+            state,
+            action: PayloadAction<{ resource: Resource; customAttributes: CustomAttributeModel[] }[]>,
+        ) => {
+            action.payload.forEach(({ resource, customAttributes }) => {
+                const index = state.resourceCustomAttributesContents.findIndex((r) => r.resource === resource && r.resourceUuid === '');
+
+                if (index === -1) {
+                    state.resourceCustomAttributesContents.push({
+                        resource,
+                        resourceUuid: '',
+                        customAttributes: customAttributes.map((attr) => ({
+                            ...attr,
+                            label: attr.name,
+                        })),
+                    });
+                } else {
+                    state.resourceCustomAttributesContents[index].customAttributes = customAttributes.map((attr) => ({
+                        ...attr,
+                        label: attr.name,
+                    }));
+                }
+            });
+        },
+
         getCustomAttribute: (state, action: PayloadAction<string>) => {
             state.customAttribute = undefined;
             state.isFetchingDetail = true;
@@ -384,6 +415,18 @@ const resourceCustomAttributesContents = (resource: Resource, resourceUuid: stri
                 ?.customAttributes,
     );
 
+const multipleResourceCustomAttributes = (resources: Resource[]) =>
+    createSelector(state, (state: State) => {
+        const result: { [key: string]: CustomAttributeModel[] } = {};
+        resources.forEach((resource) => {
+            const found = state.resourceCustomAttributesContents.find((c) => c.resource === resource && c.resourceUuid === '');
+            if (found) {
+                result[resource] = found.customAttributes as unknown as CustomAttributeModel[];
+            }
+        });
+        return result;
+    });
+
 const isFetchingList = createSelector(state, (state: State) => state.isFetchingList);
 const isFetchingDetail = createSelector(state, (state: State) => state.isFetchingDetail);
 const isFetchingResources = createSelector(state, (state: State) => state.isFetchingResources);
@@ -413,6 +456,7 @@ export const selectors = {
     resourceCustomAttributes,
     secondaryResourceCustomAttributes,
     resourceCustomAttributesContents,
+    multipleResourceCustomAttributes,
 
     isCreating,
     isFetchingList,

@@ -17,6 +17,9 @@ import { Link, useNavigate, useParams } from 'react-router';
 import { Container } from 'reactstrap';
 import { Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
+import { createWidgetDetailHeaders, getGroupNames, getOwnerName } from 'utils/widget';
+import { actions as groupsActions, selectors as groupsSelectors } from 'ducks/certificateGroups';
+import { actions as userAction, selectors as userSelectors } from 'ducks/users';
 
 export default function ScepProfileDetail() {
     const dispatch = useDispatch();
@@ -28,6 +31,8 @@ export default function ScepProfileDetail() {
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
     const isDisabling = useSelector(selectors.isDisabling);
     const isEnabling = useSelector(selectors.isEnabling);
+    const users = useSelector(userSelectors.users);
+    const groups = useSelector(groupsSelectors.certificateGroups);
 
     const deleteErrorMessage = useSelector(selectors.deleteErrorMessage);
 
@@ -43,6 +48,13 @@ export default function ScepProfileDetail() {
     useEffect(() => {
         getFreshScepProfile();
     }, [id, getFreshScepProfile]);
+
+    useEffect(() => {
+        dispatch(userAction.list());
+    }, [dispatch]);
+    useEffect(() => {
+        dispatch(groupsActions.listGroups());
+    }, [dispatch]);
 
     const onEditClick = useCallback(() => {
         navigate(`../../scepprofiles/edit/${scepProfile?.uuid}`);
@@ -111,19 +123,7 @@ export default function ScepProfileDetail() {
         [scepProfile, onEditClick, onDisableClick, onEnableClick],
     );
 
-    const tableHeader: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'property',
-                content: 'Property',
-            },
-            {
-                id: 'value',
-                content: 'Value',
-            },
-        ],
-        [],
-    );
+    const tableHeader: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
 
     const scepProfileDetailData: TableDataRow[] = useMemo(
         () =>
@@ -293,6 +293,49 @@ export default function ScepProfileDetail() {
         [raProfileDetailData],
     );
 
+    const ownerName = useMemo(() => getOwnerName(scepProfile?.certificateAssociations?.ownerUuid, users), [scepProfile, users]);
+
+    const groupNames = useMemo(() => {
+        return getGroupNames(scepProfile?.certificateAssociations?.groupUuids, groups);
+    }, [scepProfile, groups]);
+
+    const defaultCertificateAssociationsData: TableDataRow[] = useMemo(() => {
+        if (!scepProfile) return [];
+        return [
+            {
+                id: 'owner',
+                columns: [
+                    'Owner',
+                    scepProfile.certificateAssociations?.ownerUuid ? (
+                        <Link key="owner" to={`../../users/detail/${scepProfile.certificateAssociations?.ownerUuid}`}>
+                            {ownerName}
+                        </Link>
+                    ) : (
+                        ownerName
+                    ),
+                ],
+            },
+            {
+                id: 'groups',
+                columns: [
+                    'Groups',
+                    <>
+                        {scepProfile.certificateAssociations?.groupUuids?.map((groupUuid, index) => {
+                            return (
+                                <>
+                                    <Link key={groupUuid} to={`../../groups/detail/${groupUuid}`}>
+                                        {groupNames?.[index] ?? 'N/A'}
+                                    </Link>
+                                    <br />
+                                </>
+                            );
+                        })}
+                    </>,
+                ],
+            },
+        ];
+    }, [scepProfile, ownerName, groupNames]);
+
     return (
         <Container className="themed-container" fluid>
             <Widget
@@ -346,6 +389,13 @@ export default function ScepProfileDetail() {
                         )}
                     </>
                 )}
+            </Widget>
+
+            <Widget title="Default Certificate associations" busy={isBusy} titleSize="large">
+                <CustomTable headers={tableHeader} data={defaultCertificateAssociationsData} />
+                <Widget title="Custom Attributes" busy={isBusy}>
+                    <AttributeViewer attributes={scepProfile?.certificateAssociations?.customAttributes} />
+                </Widget>
             </Widget>
 
             <Dialog

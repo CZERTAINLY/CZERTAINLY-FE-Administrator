@@ -14,6 +14,7 @@
 import type {
     CertificateComplianceResultDto,
     CertificateDto,
+    CertificateKeyUsage,
     CertificateProtocolDto,
     CertificateRequestDto,
     CertificateState,
@@ -216,10 +217,10 @@ export interface CertificateDetailDto {
     extendedKeyUsage?: Array<string>;
     /**
      * Key usages
-     * @type {Array<string>}
+     * @type {Array<CertificateKeyUsage>}
      * @memberof CertificateDetailDto
      */
-    keyUsage?: Array<string>;
+    keyUsage?: Array<CertificateKeyUsage>;
     /**
      * Certificate subject type
      * @type {CertificateSubjectType}
