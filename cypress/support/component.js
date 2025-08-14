@@ -22,3 +22,5 @@ import './commands';
 
 // Example use:
 // cy.mount(<MyComponent />)
+
+import '@cypress/code-coverage/support';
