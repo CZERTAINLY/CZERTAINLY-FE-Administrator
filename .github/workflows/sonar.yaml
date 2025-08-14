@@ -8,42 +8,71 @@ jobs:
   sonar:
     name: Sonar
     runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success'
+
     steps:
-      # Download the PR number artifact
-      - name: Download PR number
-        uses: actions/download-artifact@v4
+      - name: Get PR context
+        id: pr
+        run: |
+          echo "PR_NUMBER=${{ github.event.workflow_run.pull_requests[0].number }}" >> $GITHUB_ENV
+          echo "HEAD_SHA=${{ github.event.workflow_run.pull_requests[0].head.sha }}" >> $GITHUB_ENV
+
+      - name: Generate token
+        id: app_token
+        uses: tibdex/github-app-token@v1
         with:
-          name: pr-number
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ github.event.workflow_run.id }}
-          path: .
-      # Read the PR number from the file and store it in 'steps.pr_number.outputs.content'
-      - name: Read PR number from file
-        id: pr_number
-        run: echo "content=$(cat pr-number.txt)" >> $GITHUB_OUTPUT
+          app_id: ${{ secrets.SONAR_GH_APP_ID }}
+          private_key: ${{ secrets.SONAR_GH_APP_PRIVATE_KEY }}
+
+      - name: Create GitHub Check (in_progress)
+        id: create_check
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ steps.app_token.outputs.token }}
+          script: |
+            const check = await github.rest.checks.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: "SonarQube Analysis",
+              head_sha: process.env.HEAD_SHA,
+              status: "in_progress"
+            });
+            core.setOutput("check_id", check.data.id);
+
       # Request GitHub API for PR data
       - name: Request GitHub API for PR data
         if: github.event.workflow_run.event == 'pull_request'
         uses: octokit/request-action@v2.x
         id: get_pr_data
         with:
-          route: GET /repos/${{ github.event.repository.full_name }}/pulls/${{ steps.pr_number.outputs.content }}
+          route: GET /repos/${{ github.event.repository.full_name }}/pulls/${{ github.event.workflow_run.pull_requests[0].number }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Set environment vars for base and head branches
+      - name: Set branch vars
+        id: set_branches
+        run: |
+          echo "BASE_BRANCH=$(echo '${{ fromJson(steps.get_pr_data.outputs.data).base.ref }}')" >> $GITHUB_ENV
+          echo "PR_BRANCH=$(echo '${{ fromJson(steps.get_pr_data.outputs.data).head.ref }}')" >> $GITHUB_ENV
+          echo "📌 BASE_BRANCH: ${{ fromJson(steps.get_pr_data.outputs.data).base.ref }}"
+          echo "📌 PR_BRANCH: ${{ fromJson(steps.get_pr_data.outputs.data).head.ref }}"
+
       # Checkout the PR branch
       - uses: actions/checkout@v4
         with:
           repository: ${{ github.event.workflow_run.head_repository.full_name }}
           ref: ${{ github.event.workflow_run.head_branch }}
           fetch-depth: 0
+
       # Checkout the base branch to keep the information about the new lines of code
       - name: Checkout base branch
         if: github.event.workflow_run.event == 'pull_request'
         run: |
           git remote add upstream ${{ github.event.repository.clone_url }}
           git fetch upstream
-          git checkout -B ${{ fromJson(steps.get_pr_data.outputs.data).base.ref }} upstream/${{ fromJson(steps.get_pr_data.outputs.data).base.ref }}
-          git checkout ${{ github.event.workflow_run.head_branch }}
+          git checkout -B "$BASE_BRANCH" upstream/"$BASE_BRANCH"
+          git checkout "$PR_BRANCH"
           git clean -ffdx && git reset --hard HEAD
 
       - uses: actions/setup-node@v4
@@ -52,8 +81,11 @@ jobs:
       - name: Test build
         run: |
           npm install
+          npm run lint
+          npm run build
           npx cypress run --component
           npx nyc report --reporter=lcov --report-dir=coverage
+
       # SonarCloud Scan analysis and push
       - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@v4
@@ -68,3 +100,31 @@ jobs:
             -Dsonar.pullrequest.key=${{ fromJson(steps.get_pr_data.outputs.data).number }}
             -Dsonar.pullrequest.branch=${{ fromJson(steps.get_pr_data.outputs.data).head.ref }}
             -Dsonar.pullrequest.base=${{ fromJson(steps.get_pr_data.outputs.data).base.ref }}
+
+      - name: Finalize GitHub Check
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ steps.app_token.outputs.token }}
+          script: |
+            const checkId = "${{ steps.create_check.outputs.check_id }}";
+            const status = "${{ job.status }}";
+            const conclusions = {
+              success: "success",
+              failure: "failure",
+              cancelled: "cancelled"
+            };
+            const conclusion = conclusions[status] || "failure";
+
+            await github.rest.checks.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              check_run_id: checkId,
+              completed_at: new Date().toISOString(),
+              status: "completed",
+              conclusion,
+              output: {
+                title: "Test Charts Result",
+                summary: `✅ SonarQube analysis concluded with status: **${conclusion}**`,
+              }
+            });
