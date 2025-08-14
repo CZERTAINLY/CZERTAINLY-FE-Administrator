@@ -1,8 +1,28 @@
 name: Sonar
 on:
-  workflow_run:
-    workflows: [ "Check PR" ]
-    types: [ completed ]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "PR number"
+        required: true
+      head_sha:
+        description: "Head commit SHA from PR"
+        required: true
+      head_repo:
+        description: "Fork repo full_name (e.g., alice/my-fork)"
+        required: true
+      head_branch:
+        description: "Fork branch name"
+        required: true
+      base_ref:
+        description: "Base branch name in target repo (e.g., main)"
+        required: true
+
+# What shows in the Actions run list
+run-name: >-
+  Sonar • PR #${{ inputs.pr_number }}
+  • ${{ inputs.head_repo }}@${{ inputs.head_branch }}
+  • ${{ inputs.head_sha }}
 
 permissions:
   contents: read
@@ -11,67 +31,17 @@ permissions:
 
 jobs:
   sonar:
+    name: Sonar • PR #${{ inputs.pr_number }}
     runs-on: ubuntu-latest
-    if: github.event.workflow_run.conclusion == 'success'
 
     steps:
-      - name: Resolve head SHA and PR (handles forks)
-        id: ctx
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const wr = context.payload.workflow_run;
-            
-            // Always reliable for workflow_run
-            core.setOutput('head_sha', wr.head_sha);
-            
-            // 1) If GitHub provided the PR on the payload, use it
-            let prNumber = wr.pull_requests?.[0]?.number;
-            
-            // 2) Try to find by commit (works when the commit is in the base repo history)
-            if (!prNumber) {
-              const { data: prsBySha } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                commit_sha: wr.head_sha,
-              });
-              prNumber = prsBySha[0]?.number;
-            }
-            
-            // 3) Fork PR fallback: find by "head=owner:branch"
-            if (!prNumber) {
-              const headOwner = wr.head_repository?.owner?.login;
-              const headBranch = wr.head_branch;
-              if (headOwner && headBranch) {
-                const { data: prsByHead } = await github.rest.pulls.list({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  state: 'open',
-                  head: `${headOwner}:${headBranch}`,
-                });
-                prNumber = prsByHead[0]?.number;
-              }
-            }
-            
-            core.setOutput('pr_number', prNumber ?? '');
-
-      - name: Debug PR context
+      - name: Export context
         run: |
-          echo "event=${{ github.event.workflow_run.event }}"
-          echo "head_owner=${{ github.event.workflow_run.head_repository.owner.login }}"
-          echo "head_branch=${{ github.event.workflow_run.head_branch }}"
-          echo "pull_requests_json=${{ toJson(github.event.workflow_run.pull_requests) }}"
-          echo "Resolved PR_NUMBER=$PR_NUMBER"
-          echo "Resolved HEAD_SHA=$HEAD_SHA"
-
-      - name: Export env
-        run: |
-          echo "HEAD_SHA=${{ steps.ctx.outputs.head_sha }}" >> $GITHUB_ENV
-          echo "PR_NUMBER=${{ steps.ctx.outputs.pr_number }}" >> $GITHUB_ENV
-          echo "event=${{ github.event.workflow_run.event }}"
-          echo "pull_requests_json=${{ toJson(github.event.workflow_run.pull_requests) }}"
-          echo "Resolved PR_NUMBER=$PR_NUMBER"
-          echo "Resolved HEAD_SHA=$HEAD_SHA"
+          echo "PR_NUMBER=${{ inputs.pr_number }}" >> $GITHUB_ENV
+          echo "HEAD_SHA=${{ inputs.head_sha }}" >> $GITHUB_ENV
+          echo "BASE_BRANCH=${{ inputs.base_ref }}" >> $GITHUB_ENV
+          echo "PR_BRANCH=${{ inputs.head_branch }}" >> $GITHUB_ENV
+          echo "HEAD_REPO=${{ inputs.head_repo }}" >> $GITHUB_ENV
 
       - name: Generate token
         id: app_token
@@ -89,42 +59,25 @@ jobs:
             const check = await github.rest.checks.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              name: "SonarQube Analysis",
-              head_sha: process.env.HEAD_SHA, // now always set
+              name: `SonarQube Analysis • PR #${process.env.PR_NUMBER}`,
+              head_sha: process.env.HEAD_SHA,
               status: "in_progress"
             });
             core.setOutput("check_id", check.data.id);
 
-      # Only fetch PR data when we actually have a PR number
-      - name: Request GitHub API for PR data
-        if: env.PR_NUMBER != ''
-        uses: octokit/request-action@v2.x
-        id: get_pr_data
-        with:
-          route: GET /repos/${{ github.event.repository.full_name }}/pulls/${{ env.PR_NUMBER }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Set branch vars
-        if: steps.get_pr_data.outputs.data
-        run: |
-          echo "BASE_BRANCH=$(echo '${{ fromJson(steps.get_pr_data.outputs.data).base.ref }}')" >> $GITHUB_ENV
-          echo "PR_BRANCH=$(echo '${{ fromJson(steps.get_pr_data.outputs.data).head.ref }}')" >> $GITHUB_ENV
-          echo "📌 BASE_BRANCH: ${{ fromJson(steps.get_pr_data.outputs.data).base.ref }}"
-          echo "📌 PR_BRANCH: ${{ fromJson(steps.get_pr_data.outputs.data).head.ref }}"
-
+      # Checkout the PR branch from the fork
       - uses: actions/checkout@v4
         with:
-          repository: ${{ github.event.workflow_run.head_repository.full_name }}
-          ref: ${{ github.event.workflow_run.head_branch }}
+          repository: ${{ env.HEAD_REPO }}   # e.g., alice/fork-repo
+          ref: ${{ env.PR_BRANCH }}          # fork branch
           fetch-depth: 0
 
+      # Also fetch the base branch from the target repo to let Sonar detect new code
       - name: Checkout base branch
-        if: env.PR_NUMBER != ''
         run: |
           git remote add upstream ${{ github.event.repository.clone_url }}
-          git fetch upstream
-          git checkout -B "$BASE_BRANCH" upstream/"$BASE_BRANCH"
+          git fetch upstream $BASE_BRANCH
+          git checkout -B "$BASE_BRANCH" "upstream/$BASE_BRANCH"
           git checkout "$PR_BRANCH"
           git clean -ffdx && git reset --hard HEAD
 
@@ -134,7 +87,7 @@ jobs:
 
       - name: Test build
         run: |
-          npm install
+          npm ci
           npm run lint
           npm run build
           npx cypress run --component
@@ -147,10 +100,10 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-            -Dsonar.scm.revision=${{ steps.ctx.outputs.head_sha }}
-            ${{ env.PR_NUMBER != '' && format('-Dsonar.pullrequest.key={0}', env.PR_NUMBER) || '' }}
-            ${{ steps.get_pr_data.outputs.data && format('-Dsonar.pullrequest.branch={0}', fromJson(steps.get_pr_data.outputs.data).head.ref) || '' }}
-            ${{ steps.get_pr_data.outputs.data && format('-Dsonar.pullrequest.base={0}', fromJson(steps.get_pr_data.outputs.data).base.ref) || '' }}
+            -Dsonar.scm.revision=${{ env.HEAD_SHA }}
+            -Dsonar.pullrequest.key=${{ env.PR_NUMBER }}
+            -Dsonar.pullrequest.branch=${{ env.PR_BRANCH }}
+            -Dsonar.pullrequest.base=${{ env.BASE_BRANCH }}
 
       - name: Finalize GitHub Check
         if: always()
