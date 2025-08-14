@@ -49,7 +49,7 @@ jobs:
             const check = await github.rest.checks.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              name: `SonarQube Analysis,
+              name: `SonarQube Analysis`,
               head_sha: process.env.HEAD_SHA,
               status: "in_progress"
             });
