@@ -2,6 +2,7 @@ import path from 'path';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import eslint from 'vite-plugin-eslint';
+import istanbul from 'vite-plugin-istanbul';
 
 async function loadProxyConfig() {
     try {
@@ -45,6 +46,12 @@ export default defineConfig(async () => {
             react(),
             eslint({
                 failOnWarning: true,
+            }),
+            istanbul({
+                cypress: true, // enable during Cypress runs
+                requireEnv: false, // or set via env var
+                include: ['src/**/*'],
+                exclude: ['cypress/**/*', 'node_modules/**/*'],
             }),
         ],
     };

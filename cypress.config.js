@@ -1,5 +1,6 @@
 import { defineConfig } from 'cypress';
 import vitePreprocessor from 'cypress-vite';
+import codeCoverageTask from '@cypress/code-coverage/task';
 import fs from 'fs';
 import path from 'path';
 
@@ -29,6 +30,11 @@ export default defineConfig({
         devServer: {
             framework: 'react',
             bundler: 'vite',
+        },
+        setupNodeEvents(on, config) {
+            // Code coverage task for CT runs
+            codeCoverageTask(on, config);
+            return config;
         },
     },
     ...(useMtls
