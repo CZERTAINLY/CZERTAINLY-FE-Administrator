@@ -83,7 +83,7 @@ function Widget({
     const renderRefreshButton = () =>
         refreshAction ? (
             <div className="ms-2 mb-1 me-auto">
-                <i onClick={refreshAction} className={cx(style.refreshIcon, 'fa fa-refresh ')} data-cy="refresh-icon" />
+                <i onClick={refreshAction} className={cx(style.refreshIcon, 'fa fa-refresh ')} id-test="refresh-icon" />
             </div>
         ) : null;
 
