@@ -29,6 +29,8 @@ import { collectFormAttributes } from 'utils/attributes/attributes';
 import { isObjectSame } from 'utils/common-utils';
 import { composeValidators, validateAlphaNumericWithoutAccents, validateLength, validateRequired } from 'utils/validators';
 import styles from './cmpForm.module.scss';
+import useAttributeEditor, { buildGroups, buildOwner, buildSelectedOption } from 'utils/widget';
+import CertificateAssociationsFormWidget from 'components/CertificateAssociationsFormWidget/CertificateAssociationsFormWidget';
 
 interface SelectChangeValue {
     value: string;
@@ -46,6 +48,8 @@ interface FormValues extends CmpProfileRequestModel {
     selectedSigningCertificate?: SelectChangeValue | undefined;
     selectedRequestProtectionMethod?: SelectChangeValue | undefined;
     selectedResponseProtectionMethod?: SelectChangeValue | undefined;
+    owner: { value: string; label: string } | undefined;
+    groups: { value: string; label: string }[];
 }
 export default function CmpProfileForm() {
     const { id } = useParams();
@@ -58,10 +62,8 @@ export default function CmpProfileForm() {
 
     const cmpProfile = useSelector(cmpProfileSelectors.cmpProfile);
     const cmpSigningCertificates = useSelector(cmpProfileSelectors.cmpSigningCertificates);
-    const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
     const raProfileIssuanceAttrDescs = useSelector(raProfileSelectors.issuanceAttributes);
     const raProfileRevocationAttrDescs = useSelector(raProfileSelectors.revocationAttributes);
-    // const raProfile = useSelector(raProfileSelectors.raProfile);
     const raProfiles = useSelector(raProfileSelectors.raProfiles);
 
     const isFetchingCmpCertificates = useSelector(cmpProfileSelectors.isFetchingCertificates);
@@ -74,6 +76,12 @@ export default function CmpProfileForm() {
     const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
     const protectionMethodEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ProtectionMethod));
     const cmpCmpProfileVariantEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CmpProfileVariant));
+    const multipleResourceCustomAttributes = useSelector(
+        customAttributesSelectors.multipleResourceCustomAttributes([Resource.CmpProfiles, Resource.Certificates]),
+    );
+
+    const [userOptions, setUserOptions] = useState<{ value: string; label: string }[]>([]);
+    const [groupOptions, setGroupOptions] = useState<{ value: string; label: string }[]>([]);
 
     const [issueGroupAttributesCallbackAttributes, setIssueGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
     const [revokeGroupAttributesCallbackAttributes, setRevokeGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
@@ -122,9 +130,16 @@ export default function CmpProfileForm() {
     );
 
     useEffect(() => {
-        dispatch(customAttributesActions.listResourceCustomAttributes(Resource.CmpProfiles));
+        dispatch(
+            customAttributesActions.loadMultipleResourceCustomAttributes([
+                { resource: Resource.CmpProfiles, customAttributes: [] },
+                { resource: Resource.Certificates, customAttributes: [] },
+            ]),
+        );
+    }, [dispatch]);
+
+    useEffect(() => {
         dispatch(raProfileActions.listRaProfiles());
-        // dispatch(cmpProfileActions.listCmpSigningCertificates());
     }, [dispatch]);
 
     const title = useMemo(() => (editMode ? 'Edit CMP Profile' : 'Create CMP Profile'), [editMode]);
@@ -140,6 +155,20 @@ export default function CmpProfileForm() {
 
     const onSubmit = useCallback(
         (values: FormValues) => {
+            const customAttributes = collectFormAttributes(
+                'customCmpProfile',
+                multipleResourceCustomAttributes[Resource.CmpProfiles],
+                values,
+            );
+            const certificateAssociations = {
+                ownerUuid: values.owner?.value,
+                groupUuids: values.groups.map((group) => group.value),
+                customAttributes: collectFormAttributes(
+                    'certificateAssociatedAttributes',
+                    multipleResourceCustomAttributes[Resource.Certificates],
+                    values,
+                ),
+            };
             if (editMode && cmpProfile && cmpProfile?.uuid === id) {
                 const valuesToSubmit: CmpProfileEditRequestModel = {
                     name: values.name,
@@ -165,7 +194,8 @@ export default function CmpProfileForm() {
                         [...(raProfileRevocationAttrDescs ?? []), ...revokeGroupAttributesCallbackAttributes],
                         values,
                     ),
-                    customAttributes: collectFormAttributes('customCmpProfile', resourceCustomAttributes, values),
+                    customAttributes,
+                    certificateAssociations,
                 };
                 dispatch(cmpProfileActions.updateCmpProfile({ uuid: cmpProfile.uuid, updateCmpRequest: valuesToSubmit }));
             } else {
@@ -193,9 +223,9 @@ export default function CmpProfileForm() {
                         [...(raProfileRevocationAttrDescs ?? []), ...revokeGroupAttributesCallbackAttributes],
                         values,
                     ),
-                    customAttributes: collectFormAttributes('customCmpProfile', resourceCustomAttributes, values),
+                    customAttributes,
+                    certificateAssociations,
                 };
-
                 dispatch(cmpProfileActions.createCmpProfile(valuesToSubmit));
             }
         },
@@ -207,7 +237,7 @@ export default function CmpProfileForm() {
             issueGroupAttributesCallbackAttributes,
             raProfileIssuanceAttrDescs,
             raProfileRevocationAttrDescs,
-            resourceCustomAttributes,
+            multipleResourceCustomAttributes,
             revokeGroupAttributesCallbackAttributes,
         ],
     );
@@ -234,48 +264,7 @@ export default function CmpProfileForm() {
     }, [dispatch, cmpProfile]);
 
     const defaultValues: FormValues = useMemo(() => {
-        if (editMode && cmpProfile) {
-            return {
-                name: cmpProfile?.name || '',
-                description: cmpProfile?.description || '',
-                selectedRaProfile: cmpProfile?.raProfile
-                    ? {
-                          label: cmpProfile.raProfile.name,
-                          value: cmpProfile.raProfile,
-                      }
-                    : undefined,
-                raProfileUuid: cmpProfile?.raProfile?.uuid,
-                selectedSigningCertificate: cmpProfile?.signingCertificate
-                    ? {
-                          label: `${cmpProfile.signingCertificate.commonName} (${cmpProfile.signingCertificate.serialNumber})`,
-                          value: cmpProfile.signingCertificate.uuid,
-                      }
-                    : undefined,
-                signingCertificateUuid: cmpProfile?.signingCertificate?.uuid,
-                selectedRequestProtectionMethod: cmpProfile?.requestProtectionMethod
-                    ? {
-                          value: cmpProfile?.requestProtectionMethod,
-                          label: getEnumLabel(protectionMethodEnum, cmpProfile?.requestProtectionMethod),
-                      }
-                    : undefined,
-                requestProtectionMethod: cmpProfile?.requestProtectionMethod || (undefined as any),
-                selectedResponseProtectionMethod: cmpProfile?.responseProtectionMethod
-                    ? {
-                          value: cmpProfile?.responseProtectionMethod,
-                          label: getEnumLabel(protectionMethodEnum, cmpProfile?.responseProtectionMethod),
-                      }
-                    : undefined,
-                responseProtectionMethod: cmpProfile?.responseProtectionMethod || (undefined as any),
-                sharedSecret: undefined,
-                selectedVariant: cmpProfile?.variant
-                    ? {
-                          value: cmpProfile?.variant,
-                          label: getEnumLabel(cmpCmpProfileVariantEnum, cmpProfile.variant),
-                      }
-                    : undefined,
-                variant: (cmpProfile?.variant as unknown as CmpProfileRequestDtoVariantEnum) || (undefined as any),
-            };
-        } else {
+        if (!(editMode && cmpProfile)) {
             return {
                 name: '',
                 description: undefined,
@@ -293,9 +282,41 @@ export default function CmpProfileForm() {
                 sharedSecret: undefined,
                 selectedVariant: undefined,
                 variant: undefined as any,
+                owner: undefined,
+                groups: [],
             };
         }
-    }, [editMode, cmpProfile, cmpCmpProfileVariantEnum, protectionMethodEnum]);
+
+        const { raProfile, signingCertificate, requestProtectionMethod, responseProtectionMethod, variant, certificateAssociations } =
+            cmpProfile;
+
+        return {
+            name: cmpProfile?.name || '',
+            description: cmpProfile?.description || '',
+            selectedRaProfile: buildSelectedOption(raProfile, raProfile?.name ?? ''),
+            raProfileUuid: raProfile?.uuid,
+            selectedSigningCertificate: buildSelectedOption(
+                signingCertificate?.uuid,
+                `${signingCertificate?.commonName} (${signingCertificate?.serialNumber})`,
+            ),
+            signingCertificateUuid: signingCertificate?.uuid,
+            selectedRequestProtectionMethod: buildSelectedOption(
+                requestProtectionMethod,
+                getEnumLabel(protectionMethodEnum, requestProtectionMethod),
+            ),
+            requestProtectionMethod: requestProtectionMethod || (undefined as any),
+            selectedResponseProtectionMethod: buildSelectedOption(
+                responseProtectionMethod,
+                getEnumLabel(protectionMethodEnum, responseProtectionMethod),
+            ),
+            responseProtectionMethod: responseProtectionMethod || (undefined as any),
+            sharedSecret: undefined,
+            selectedVariant: buildSelectedOption(variant, getEnumLabel(cmpCmpProfileVariantEnum, variant)),
+            variant: (variant as unknown as CmpProfileRequestDtoVariantEnum) || (undefined as any),
+            owner: buildOwner(userOptions, certificateAssociations?.ownerUuid),
+            groups: buildGroups(groupOptions, certificateAssociations?.groupUuids),
+        };
+    }, [editMode, cmpProfile, protectionMethodEnum, cmpCmpProfileVariantEnum, userOptions, groupOptions]);
 
     const onRaProfileChange = useCallback(
         (form: FormApi<FormValues>, value?: string) => {
@@ -338,11 +359,11 @@ export default function CmpProfileForm() {
         return (
             <AttributeEditor
                 id="customCmpProfile"
-                attributeDescriptors={resourceCustomAttributes}
+                attributeDescriptors={multipleResourceCustomAttributes[Resource.CmpProfiles] || []}
                 attributes={cmpProfile?.customAttributes}
             />
         );
-    }, [resourceCustomAttributes, cmpProfile?.customAttributes]);
+    }, [multipleResourceCustomAttributes, cmpProfile?.customAttributes]);
 
     const renderIssuanceAttributes = useMemo(() => {
         // if (isBusy || !raProfileIssuanceAttrDescs) return <></>;
@@ -360,6 +381,14 @@ export default function CmpProfileForm() {
         );
     }, [raProfileIssuanceAttrDescs, cmpProfile?.issueCertificateAttributes, issueGroupAttributesCallbackAttributes]);
 
+    const renderCertificateAssociatedAttributesEditor = useAttributeEditor({
+        isBusy,
+        id: 'certificateAssociatedAttributes',
+        resourceKey: Resource.Certificates,
+        attributes: cmpProfile?.certificateAssociations?.customAttributes,
+        multipleResourceCustomAttributes,
+    });
+
     const areDefaultValuesSame = useCallback(
         (values: FormValues) => {
             const areValuesSame = isObjectSame(
@@ -375,7 +404,7 @@ export default function CmpProfileForm() {
     return (
         <Widget title={title} busy={isBusy}>
             {!isFetchingDetail && (
-                <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
+                <Form keepDirtyOnReinitialize initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
                     {({ handleSubmit, pristine, submitting, valid, form, values }) => {
                         return (
                             <BootstrapForm onSubmit={handleSubmit}>
@@ -405,6 +434,13 @@ export default function CmpProfileForm() {
                                         </FormGroup>
                                     )}
                                 </Field>
+                                <CertificateAssociationsFormWidget
+                                    renderCustomAttributes={renderCertificateAssociatedAttributesEditor}
+                                    userOptions={userOptions}
+                                    groupOptions={groupOptions}
+                                    setUserOptions={setUserOptions}
+                                    setGroupOptions={setGroupOptions}
+                                />
                                 <Widget title="CMP Variant Configuration">
                                     <Field name="selectedVariant" validate={composeValidators(validateRequired())} type="radio">
                                         {({ input, meta }) => (

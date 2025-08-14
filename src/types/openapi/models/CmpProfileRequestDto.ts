@@ -13,6 +13,7 @@
 
 import type {
     ProtectionMethod,
+    ProtocolCertificateAssociationsRequestDto,
     RequestAttributeDto,
 } from './';
 
@@ -75,6 +76,12 @@ export interface CmpProfileRequestDto {
      * @memberof CmpProfileRequestDto
      */
     signingCertificateUuid?: string;
+    /**
+     * Associations to set for certificates issued by the protocol
+     * @type {ProtocolCertificateAssociationsRequestDto}
+     * @memberof CmpProfileRequestDto
+     */
+    certificateAssociations?: ProtocolCertificateAssociationsRequestDto;
     /**
      * Name of the CMP Profile
      * @type {string}

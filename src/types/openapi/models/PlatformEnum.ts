@@ -38,6 +38,7 @@ export enum PlatformEnum {
     DiscoveryStatus = 'DiscoveryStatus',
     CertificateProtocol = 'CertificateProtocol',
     CertificateSubjectType = 'CertificateSubjectType',
+    CertificateKeyUsage = 'CertificateKeyUsage',
     OidCategory = 'OidCategory',
     KeyAlgorithm = 'KeyAlgorithm',
     KeyFormat = 'KeyFormat',
