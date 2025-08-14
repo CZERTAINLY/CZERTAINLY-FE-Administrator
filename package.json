@@ -74,9 +74,11 @@
         ]
     },
     "devDependencies": {
+        "@cypress/code-coverage": "^3.14.5",
         "@typescript-eslint/parser": "^8.26.1",
         "@vitejs/plugin-react": "^4.3.4",
-        "cypress": "^14.2.0",
+        "babel-plugin-istanbul": "^7.0.0",
+        "cypress": "^14.5.4",
         "cypress-file-upload": "^5.0.8",
         "cypress-vite": "^1.6.0",
         "eslint": "^9.22.0",
@@ -85,9 +87,11 @@
         "eslint-plugin-prettier": "^5.2.3",
         "eslint-plugin-react-hooks": "^5.2.0",
         "husky": "^9.0.0",
+        "nyc": "^17.1.0",
         "prettier": "^3.5.3",
         "vite": "^6.2.2",
-        "vite-plugin-eslint": "^1.8.1"
+        "vite-plugin-eslint": "^1.8.1",
+        "vite-plugin-istanbul": "^7.1.0"
     },
     "overrides": {
         "typescript": "^5.8.2"
