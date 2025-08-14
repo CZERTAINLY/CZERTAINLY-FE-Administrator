@@ -3,7 +3,6 @@ import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import StatusBadge from 'components/StatusBadge';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-// import { Link, useParams } from 'react-router';
 
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
@@ -16,6 +15,9 @@ import { Badge, Col, Container, Row } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { PlatformEnum, Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
+import { createWidgetDetailHeaders, getGroupNames, getOwnerName } from 'utils/widget';
+import { actions as groupsActions, selectors as groupsSelectors } from 'ducks/certificateGroups';
+import { actions as userAction, selectors as userSelectors } from 'ducks/users';
 
 export default function AdministratorDetail() {
     const dispatch = useDispatch();
@@ -31,6 +33,8 @@ export default function AdministratorDetail() {
     const protectionMethodEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ProtectionMethod));
 
     const deleteErrorMessage = useSelector(selectors.deleteErrorMessage);
+    const users = useSelector(userSelectors.users);
+    const groups = useSelector(groupsSelectors.certificateGroups);
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
@@ -44,6 +48,13 @@ export default function AdministratorDetail() {
     useEffect(() => {
         getFreshCmpProfile();
     }, [id, getFreshCmpProfile]);
+
+    useEffect(() => {
+        dispatch(userAction.list());
+    }, [dispatch]);
+    useEffect(() => {
+        dispatch(groupsActions.listGroups());
+    }, [dispatch]);
 
     const onEditClick = useCallback(() => {
         navigate(`../../cmpprofiles/edit/${cmpProfile?.uuid}`);
@@ -112,19 +123,7 @@ export default function AdministratorDetail() {
         [cmpProfile, onEditClick, onDisableClick, onEnableClick],
     );
 
-    const tableHeader: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'property',
-                content: 'Property',
-            },
-            {
-                id: 'value',
-                content: 'Value',
-            },
-        ],
-        [],
-    );
+    const tableHeader: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
 
     const cmpProfileDetailData: TableDataRow[] = useMemo(
         () =>
@@ -235,6 +234,49 @@ export default function AdministratorDetail() {
         [raProfileDetailData],
     );
 
+    const ownerName = useMemo(() => getOwnerName(cmpProfile?.certificateAssociations?.ownerUuid, users), [cmpProfile, users]);
+
+    const groupNames = useMemo(() => {
+        return getGroupNames(cmpProfile?.certificateAssociations?.groupUuids, groups);
+    }, [cmpProfile, groups]);
+
+    const defaultCertificateAssociationsData: TableDataRow[] = useMemo(() => {
+        if (!cmpProfile) return [];
+        return [
+            {
+                id: 'owner',
+                columns: [
+                    'Owner',
+                    cmpProfile.certificateAssociations?.ownerUuid ? (
+                        <Link key="owner" to={`../../users/detail/${cmpProfile.certificateAssociations?.ownerUuid}`}>
+                            {ownerName}
+                        </Link>
+                    ) : (
+                        ownerName
+                    ),
+                ],
+            },
+            {
+                id: 'groups',
+                columns: [
+                    'Groups',
+                    <>
+                        {cmpProfile.certificateAssociations?.groupUuids?.map((groupUuid, index) => {
+                            return (
+                                <>
+                                    <Link key={groupUuid} to={`../../groups/detail/${groupUuid}`}>
+                                        {groupNames?.[index] ?? 'N/A'}
+                                    </Link>
+                                    <br />
+                                </>
+                            );
+                        })}
+                    </>,
+                ],
+            },
+        ];
+    }, [cmpProfile, ownerName, groupNames]);
+
     return (
         <Container className="themed-container" fluid>
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
@@ -273,7 +315,6 @@ export default function AdministratorDetail() {
                     </Widget>
                 </Col>
             </Row>
-            {/* <Widget title={raProfileText} busy={isBusy}> */}
             {raProfileDetailData.length === 0 ? (
                 <></>
             ) : (
@@ -307,7 +348,12 @@ export default function AdministratorDetail() {
                     </Row>
                 </>
             )}
-            {/* </Widget> */}
+            <Widget title="Default Certificate associations" busy={isBusy} titleSize="large">
+                <CustomTable headers={tableHeader} data={defaultCertificateAssociationsData} />
+                <Widget title="Custom Attributes" busy={isBusy}>
+                    <AttributeViewer attributes={cmpProfile?.certificateAssociations?.customAttributes} />
+                </Widget>
+            </Widget>
 
             <Dialog
                 isOpen={confirmDelete}

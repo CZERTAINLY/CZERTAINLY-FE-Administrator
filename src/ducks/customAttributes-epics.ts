@@ -1,5 +1,5 @@
 import { AppEpic } from 'ducks';
-import { of } from 'rxjs';
+import { of, forkJoin } from 'rxjs';
 import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
 
 import { extractError } from 'utils/net';
@@ -97,6 +97,40 @@ const listSecondaryResourceCustomAttributes: AppEpic = (action$, state$, deps) =
                 ),
             ),
         ),
+    );
+};
+
+const loadMultipleResourceCustomAttributes: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.loadMultipleResourceCustomAttributes.match),
+        switchMap((action) => {
+            const resourceObservables = action.payload.map(({ resource }) =>
+                deps.apiClients.customAttributes.getResourceCustomAttributes({ resource }).pipe(
+                    map((list) => ({
+                        resource,
+                        customAttributes: list.map(transformCustomAttributeDtoToModel),
+                    })),
+                    catchError(() => {
+                        return of({
+                            resource,
+                            customAttributes: [],
+                        });
+                    }),
+                ),
+            );
+
+            return forkJoin(resourceObservables).pipe(
+                map((results) => slice.actions.receiveMultipleResourceCustomAttributes(results)),
+                catchError((err) =>
+                    of(
+                        slice.actions.listResourceCustomAttributesFailure({
+                            error: extractError(err, 'Failed to get multiple resources custom attributes'),
+                        }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to get multiple resources custom attributes' }),
+                    ),
+                ),
+            );
+        }),
     );
 };
 
@@ -364,6 +398,7 @@ const epics = [
     listResources,
     listResourceCustomAttributes,
     listSecondaryResourceCustomAttributes,
+    loadMultipleResourceCustomAttributes,
     createCustomAttribute,
     updateCustomAttribute,
     getCustomAttribute,

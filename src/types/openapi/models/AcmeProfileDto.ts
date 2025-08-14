@@ -12,6 +12,7 @@
  */
 
 import type {
+    ProtocolCertificateAssociationsDto,
     ResponseAttributeDto,
     SimplifiedRaProfileDto,
 } from './';
@@ -135,4 +136,10 @@ export interface AcmeProfileDto {
      * @memberof AcmeProfileDto
      */
     customAttributes?: Array<ResponseAttributeDto>;
+    /**
+     * Associations to set for certificates issued by the protocol
+     * @type {ProtocolCertificateAssociationsDto}
+     * @memberof AcmeProfileDto
+     */
+    certificateAssociations?: ProtocolCertificateAssociationsDto;
 }

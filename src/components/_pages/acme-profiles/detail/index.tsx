@@ -14,6 +14,9 @@ import { Col, Container, Row } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
+import { createWidgetDetailHeaders, getGroupNames, getOwnerName } from 'utils/widget';
+import { actions as groupsActions, selectors as groupsSelectors } from 'ducks/certificateGroups';
+import { actions as userAction, selectors as userSelectors } from 'ducks/users';
 
 export default function AdministratorDetail() {
     const dispatch = useDispatch();
@@ -25,6 +28,8 @@ export default function AdministratorDetail() {
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
     const isDisabling = useSelector(selectors.isDisabling);
     const isEnabling = useSelector(selectors.isEnabling);
+    const users = useSelector(userSelectors.users);
+    const groups = useSelector(groupsSelectors.certificateGroups);
 
     const deleteErrorMessage = useSelector(selectors.deleteErrorMessage);
 
@@ -40,6 +45,13 @@ export default function AdministratorDetail() {
     useEffect(() => {
         getFreshAcmeProfile();
     }, [id, getFreshAcmeProfile]);
+
+    useEffect(() => {
+        dispatch(userAction.list());
+    }, [dispatch]);
+    useEffect(() => {
+        dispatch(groupsActions.listGroups());
+    }, [dispatch]);
 
     const onEditClick = useCallback(() => {
         navigate(`../../acmeprofiles/edit/${acmeProfile?.uuid}`);
@@ -108,19 +120,7 @@ export default function AdministratorDetail() {
         [acmeProfile, onEditClick, onDisableClick, onEnableClick],
     );
 
-    const tableHeader: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'property',
-                content: 'Property',
-            },
-            {
-                id: 'value',
-                content: 'Value',
-            },
-        ],
-        [],
-    );
+    const tableHeader: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
 
     const acmeProfileDetailData: TableDataRow[] = useMemo(
         () =>
@@ -259,6 +259,49 @@ export default function AdministratorDetail() {
         [raProfileDetailData],
     );
 
+    const ownerName = useMemo(() => getOwnerName(acmeProfile?.certificateAssociations?.ownerUuid, users), [acmeProfile, users]);
+
+    const groupNames = useMemo(() => {
+        return getGroupNames(acmeProfile?.certificateAssociations?.groupUuids, groups);
+    }, [acmeProfile, groups]);
+
+    const defaultCertificateAssociationsData: TableDataRow[] = useMemo(() => {
+        if (!acmeProfile) return [];
+        return [
+            {
+                id: 'owner',
+                columns: [
+                    'Owner',
+                    acmeProfile.certificateAssociations?.ownerUuid ? (
+                        <Link key="owner" to={`../../users/detail/${acmeProfile.certificateAssociations?.ownerUuid}`}>
+                            {ownerName}
+                        </Link>
+                    ) : (
+                        ownerName
+                    ),
+                ],
+            },
+            {
+                id: 'groups',
+                columns: [
+                    'Groups',
+                    <>
+                        {acmeProfile.certificateAssociations?.groupUuids?.map((groupUuid, index) => {
+                            return (
+                                <>
+                                    <Link key={groupUuid} to={`../../groups/detail/${groupUuid}`}>
+                                        {groupNames?.[index] ?? 'N/A'}
+                                    </Link>
+                                    <br />
+                                </>
+                            );
+                        })}
+                    </>,
+                ],
+            },
+        ];
+    }, [acmeProfile, ownerName, groupNames]);
+
     return (
         <Container className="themed-container" fluid>
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
@@ -286,7 +329,6 @@ export default function AdministratorDetail() {
                     </Widget>
                 </Col>
             </Row>
-
             {acmeProfile && (
                 <CustomAttributeWidget
                     resource={Resource.AcmeProfiles}
@@ -294,7 +336,6 @@ export default function AdministratorDetail() {
                     attributes={acmeProfile.customAttributes}
                 />
             )}
-
             <Widget title={raProfileText} busy={isBusy} titleSize="large">
                 {raProfileDetailData.length === 0 ? (
                     <></>
@@ -328,7 +369,12 @@ export default function AdministratorDetail() {
                     </>
                 )}
             </Widget>
-
+            <Widget title="Default Certificate associations" busy={isBusy} titleSize="large">
+                <CustomTable headers={tableHeader} data={defaultCertificateAssociationsData} />
+                <Widget title="Custom Attributes" busy={isBusy}>
+                    <AttributeViewer attributes={acmeProfile?.certificateAssociations?.customAttributes} />
+                </Widget>
+            </Widget>
             <Dialog
                 isOpen={confirmDelete}
                 caption="Delete ACME Profile"
@@ -340,7 +386,6 @@ export default function AdministratorDetail() {
                     { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
-
             <Dialog
                 isOpen={deleteErrorMessage.length > 0}
                 caption="Delete ACME Profile"

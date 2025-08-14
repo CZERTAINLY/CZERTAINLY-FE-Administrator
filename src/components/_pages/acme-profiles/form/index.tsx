@@ -33,6 +33,8 @@ import {
     validateRequired,
 } from 'utils/validators';
 import { Resource } from '../../../../types/openapi';
+import useAttributeEditor, { buildGroups, buildOwner } from 'utils/widget';
+import CertificateAssociationsFormWidget from 'components/CertificateAssociationsFormWidget/CertificateAssociationsFormWidget';
 
 interface FormValues {
     name: string;
@@ -48,6 +50,8 @@ interface FormValues {
     requireTermsOfService: boolean;
     requireContact: boolean;
     raProfile: { value: string; label: string } | undefined;
+    owner: { value: string; label: string } | undefined;
+    groups: { value: string; label: string }[];
 }
 
 export default function AcmeProfileForm() {
@@ -62,7 +66,9 @@ export default function AcmeProfileForm() {
     const raProfiles = useSelector(raProfileSelectors.raProfiles);
     const raProfileIssuanceAttrDescs = useSelector(raProfileSelectors.issuanceAttributes);
     const raProfileRevocationAttrDescs = useSelector(raProfileSelectors.revocationAttributes);
-    const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
+    const multipleResourceCustomAttributes = useSelector(
+        customAttributesSelectors.multipleResourceCustomAttributes([Resource.AcmeProfiles, Resource.Certificates]),
+    );
 
     const isFetchingDetail = useSelector(acmeProfileSelectors.isFetchingDetail);
     const isCreating = useSelector(acmeProfileSelectors.isCreating);
@@ -81,6 +87,18 @@ export default function AcmeProfileForm() {
 
     const isBusy = useMemo(() => isFetchingDetail || isCreating || isUpdating, [isFetchingDetail, isCreating, isUpdating]);
 
+    const [userOptions, setUserOptions] = useState<{ value: string; label: string }[]>([]);
+    const [groupOptions, setGroupOptions] = useState<{ value: string; label: string }[]>([]);
+
+    useEffect(() => {
+        dispatch(
+            customAttributesActions.loadMultipleResourceCustomAttributes([
+                { resource: Resource.AcmeProfiles, customAttributes: [] },
+                { resource: Resource.Certificates, customAttributes: [] },
+            ]),
+        );
+    }, [dispatch]);
+
     useEffect(() => {
         if (editMode && (!acmeProfileSelector || acmeProfileSelector.uuid !== id)) {
             dispatch(acmeProfileActions.getAcmeProfile({ uuid: id! }));
@@ -93,7 +111,6 @@ export default function AcmeProfileForm() {
     }, [dispatch, id, editMode, acmeProfileSelector]);
 
     useEffect(() => {
-        dispatch(customAttributesActions.listResourceCustomAttributes(Resource.AcmeProfiles));
         dispatch(raProfileActions.listRaProfiles());
     }, [dispatch]);
 
@@ -133,7 +150,20 @@ export default function AcmeProfileForm() {
                     [...(raProfileRevocationAttrDescs ?? []), ...revokeGroupAttributesCallbackAttributes],
                     values,
                 ),
-                customAttributes: collectFormAttributes('customAcmeProfile', resourceCustomAttributes, values),
+                customAttributes: collectFormAttributes(
+                    'customAcmeProfile',
+                    multipleResourceCustomAttributes[Resource.AcmeProfiles],
+                    values,
+                ),
+                certificateAssociations: {
+                    ownerUuid: values.owner?.value,
+                    groupUuids: values.groups.map((group) => group.value),
+                    customAttributes: collectFormAttributes(
+                        'certificateAssociatedAttributes',
+                        multipleResourceCustomAttributes[Resource.Certificates],
+                        values,
+                    ),
+                },
             };
             if (values.raProfile) {
                 request.raProfileUuid = values.raProfile.value;
@@ -145,14 +175,14 @@ export default function AcmeProfileForm() {
             }
         },
         [
-            dispatch,
-            editMode,
-            id,
+            multipleResourceCustomAttributes,
             raProfileIssuanceAttrDescs,
-            raProfileRevocationAttrDescs,
             issueGroupAttributesCallbackAttributes,
+            raProfileRevocationAttrDescs,
             revokeGroupAttributesCallbackAttributes,
-            resourceCustomAttributes,
+            editMode,
+            dispatch,
+            id,
         ],
     );
 
@@ -195,45 +225,57 @@ export default function AcmeProfileForm() {
         [raProfiles],
     );
 
-    const defaultValues: FormValues = useMemo(
-        () => ({
-            name: editMode ? acmeProfile?.name || '' : '',
-            description: editMode ? acmeProfile?.description || '' : '',
-            dnsIpAddress: editMode ? acmeProfile?.dnsResolverIp || '' : '',
-            dnsPort: editMode ? acmeProfile?.dnsResolverPort || '' : '',
-            retryInterval: editMode ? acmeProfile?.retryInterval?.toString() || '30' : '30',
-            orderValidity: editMode ? acmeProfile?.validity?.toString() || '36000' : '36000',
-            termsUrl: editMode ? acmeProfile?.termsOfServiceUrl || '' : '',
-            webSite: editMode ? acmeProfile?.websiteUrl || '' : '',
-            termsChangeUrl: editMode ? acmeProfile?.termsOfServiceChangeUrl || '' : '',
-            disableOrders: editMode ? acmeProfile?.termsOfServiceChangeDisable || false : false,
-            requireTermsOfService: editMode ? acmeProfile?.requireTermsOfService || false : false,
-            requireContact: editMode ? acmeProfile?.requireContact || false : false,
-            raProfile: editMode
-                ? acmeProfile?.raProfile
-                    ? optionsForRaProfiles.find((raProfile) => raProfile.value === acmeProfile.raProfile?.uuid)
-                    : undefined
-                : undefined,
-        }),
-        [editMode, acmeProfile, optionsForRaProfiles],
+    const getValue = useCallback(
+        <T,>(value: T | undefined | null, fallback: T): T => {
+            return editMode ? (value ?? fallback) : fallback;
+        },
+        [editMode],
     );
+
+    const defaultValues: FormValues = useMemo(() => {
+        return {
+            name: getValue(acmeProfile?.name, ''),
+            description: getValue(acmeProfile?.description, ''),
+            dnsIpAddress: getValue(acmeProfile?.dnsResolverIp, ''),
+            dnsPort: getValue(acmeProfile?.dnsResolverPort, ''),
+            retryInterval: getValue(acmeProfile?.retryInterval?.toString(), '30'),
+            orderValidity: getValue(acmeProfile?.validity?.toString(), '36000'),
+            termsUrl: getValue(acmeProfile?.termsOfServiceUrl, ''),
+            webSite: getValue(acmeProfile?.websiteUrl, ''),
+            termsChangeUrl: getValue(acmeProfile?.termsOfServiceChangeUrl, ''),
+            disableOrders: getValue(acmeProfile?.termsOfServiceChangeDisable, false),
+            requireTermsOfService: getValue(acmeProfile?.requireTermsOfService, false),
+            requireContact: getValue(acmeProfile?.requireContact, false),
+            raProfile:
+                editMode && acmeProfile?.raProfile
+                    ? optionsForRaProfiles.find((ra) => ra.value === acmeProfile.raProfile?.uuid)
+                    : undefined,
+            owner: editMode ? buildOwner(userOptions, acmeProfile?.certificateAssociations?.ownerUuid) : undefined,
+            groups: editMode ? buildGroups(groupOptions, acmeProfile?.certificateAssociations?.groupUuids) : [],
+        };
+    }, [editMode, acmeProfile, optionsForRaProfiles, userOptions, groupOptions, getValue]);
 
     const title = useMemo(() => (editMode ? 'Edit ACME Profile' : 'Create ACME Profile'), [editMode]);
 
-    const renderCustomAttributeEditor = useMemo(() => {
-        if (isBusy) return <></>;
-        return (
-            <AttributeEditor
-                id="customAcmeProfile"
-                attributeDescriptors={resourceCustomAttributes}
-                attributes={acmeProfile?.customAttributes}
-            />
-        );
-    }, [isBusy, resourceCustomAttributes, acmeProfile?.customAttributes]);
+    const renderCustomAttributeEditor = useAttributeEditor({
+        isBusy,
+        id: 'customAcmeProfile',
+        resourceKey: Resource.AcmeProfiles,
+        attributes: acmeProfile?.customAttributes,
+        multipleResourceCustomAttributes,
+    });
+
+    const renderCertificateAssociatedAttributesEditor = useAttributeEditor({
+        isBusy,
+        id: 'certificateAssociatedAttributes',
+        resourceKey: Resource.Certificates,
+        attributes: acmeProfile?.certificateAssociations?.customAttributes,
+        multipleResourceCustomAttributes,
+    });
 
     return (
         <Widget title={title} busy={isBusy}>
-            <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
+            <Form keepDirtyOnReinitialize initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
                 {({ handleSubmit, pristine, submitting, valid, form }) => (
                     <BootstrapForm onSubmit={handleSubmit}>
                         <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithoutAccents())}>
@@ -274,6 +316,14 @@ export default function AcmeProfileForm() {
                                 </FormGroup>
                             )}
                         </Field>
+
+                        <CertificateAssociationsFormWidget
+                            renderCustomAttributes={renderCertificateAssociatedAttributesEditor}
+                            userOptions={userOptions}
+                            groupOptions={groupOptions}
+                            setUserOptions={setUserOptions}
+                            setGroupOptions={setGroupOptions}
+                        />
 
                         <Widget title="Challenge Configuration">
                             <Row xs="1" sm="1" md="2" lg="2" xl="2">
