@@ -99,9 +99,9 @@ function useAttributeEditor({
 export default useAttributeEditor;
 
 export const getOwnerName = (ownerUuid: string | undefined, users: UserDto[]): string => {
-    if (!ownerUuid) return 'N/A';
+    if (!ownerUuid) return 'Unassigned';
     const user = users.find((user) => user.uuid === ownerUuid);
-    return user ? user.username : 'N/A';
+    return user ? user.username : 'Unassigned';
 };
 
 export const getGroupNames = (groupUuids: string[] | undefined, groups: CertificateGroupResponseModel[]): string[] | 'N/A' => {
