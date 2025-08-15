@@ -24,6 +24,7 @@ import { selectors as settingSelectors } from 'ducks/settings';
 import {
     CertificateState as CertStatus,
     CertificateFormatEncoding,
+    CertificateKeyUsage,
     CertificateProtocol,
     CertificateRequestFormat,
     CertificateRevocationReason,
@@ -125,6 +126,7 @@ export default function CertificateDetail() {
     const [certificateRevokeReasonOptions, setCertificateRevokeReasonOptions] = useState<{ label: string; value: string }[]>([]);
     const raProfileSelected = useSelector(raProfilesSelectors.raProfile);
     const certificateRequestFormatEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateFormat));
+    const certificateKeyUsageEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateKeyUsage));
 
     const certificateTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateType));
     const certificateRevocationReason = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateRevocationReason));
@@ -1462,7 +1464,7 @@ export default function CertificateDetail() {
                           certificate?.keyUsage?.map(function (name) {
                               return (
                                   <div key={name} style={{ margin: '1px' }}>
-                                      <Badge>{name}</Badge>
+                                      <Badge>{getEnumLabel(certificateKeyUsageEnum, name)}</Badge>
                                       &nbsp;
                                   </div>
                               );
@@ -1522,7 +1524,14 @@ export default function CertificateDetail() {
         }
 
         return certDetail;
-    }, [certificate, validationResult, isUpdatingTrustedStatus, switchCallback, isCertificateArchived]);
+    }, [
+        certificate,
+        validationResult?.resultStatus,
+        isCertificateArchived,
+        certificateKeyUsageEnum,
+        isUpdatingTrustedStatus,
+        switchCallback,
+    ]);
 
     const locationsHeaders: TableHeader[] = useMemo(
         () => [
