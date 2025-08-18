@@ -65,7 +65,7 @@ describe('template spec', () => {
                 expect(response?.statusCode).to.eq(200);
             });
 
-            cy.get('._refreshIcon_12h17_50').click();
+            cy.get('[data-test-id="refresh-icon"]').click();
             cy.get(`tr[data-id="${certId}"]`).should('not.exist');
         });
     });
