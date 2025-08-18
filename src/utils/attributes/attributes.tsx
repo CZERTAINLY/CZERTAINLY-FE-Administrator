@@ -147,6 +147,7 @@ export function collectFormAttributes(
     if (!descriptors || !values[`__attributes__${id}__`]) return [];
 
     const attributes = values[`__attributes__${id}__`];
+    const deletedAttributes = values[`deletedAttributes_${id}`] || [];
 
     const attrs: AttributeRequestModel[] = [];
 
@@ -156,6 +157,11 @@ export function collectFormAttributes(
         const info = attribute.split(':');
 
         const attributeName = info[0];
+
+        // Skip if this attribute was deleted
+        if (deletedAttributes.includes(attributeName)) {
+            continue;
+        }
 
         const descriptor = descriptors?.find((d) => d.name === attributeName);
 

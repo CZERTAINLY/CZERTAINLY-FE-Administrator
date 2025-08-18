@@ -111,8 +111,11 @@ export default function AttributeEditor({
      */
     const handleDeleteAttribute = useCallback(
         (attributeName: string) => {
-            // Add to deletedAttributes in form state
-            form.mutators.setAttribute('deletedAttributes', [...(formState.values.deletedAttributes || []), attributeName]);
+            // Create a unique key for this AttributeEditor instance
+            const deletedAttributesKey = `deletedAttributes_${id}`;
+
+            // Add to deletedAttributes in form state using the unique key
+            form.mutators.setAttribute(deletedAttributesKey, [...(formState.values[deletedAttributesKey] || []), attributeName]);
 
             // Remove from form values
             form.mutators.setAttribute(`__attributes__${id}__.${attributeName}`, undefined);
@@ -133,14 +136,7 @@ export default function AttributeEditor({
             // Add to deleted attributes set to filter it out from rendering
             setDeletedAttributes((prev) => [...prev, attributeName]);
         },
-        [
-            form.mutators,
-            formState.values.deletedAttributes,
-            id,
-            options,
-            groupAttributesCallbackAttributes,
-            setGroupAttributesCallbackAttributes,
-        ],
+        [form.mutators, formState.values, id, options, groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes],
     );
 
     /**
@@ -409,6 +405,29 @@ export default function AttributeEditor({
         dispatch(connectorActions.clearCallbackData());
     }, [attributeDescriptors, attributes, dispatch, form.mutators, id]);
 
+    /**
+     * Synchronize local deletedAttributes state with form state after clearAttributes
+     */
+    useEffect(() => {
+        // After clearAttributes, ensure deletedAttributes are preserved in form state
+        if (deletedAttributes.length > 0) {
+            form.mutators.setAttribute(`deletedAttributes_${id}`, deletedAttributes);
+        }
+    }, [deletedAttributes, form.mutators, id]);
+
+    /**
+     * Synchronize local deletedAttributes state with form state to maintain consistency
+     */
+    useEffect(() => {
+        const formDeletedAttributes = formState.values[`deletedAttributes_${id}`] || [];
+        if (
+            formDeletedAttributes.length !== deletedAttributes.length ||
+            !formDeletedAttributes.every((attr: string) => deletedAttributes.includes(attr))
+        ) {
+            setDeletedAttributes(formDeletedAttributes);
+        }
+    }, [formState.values, deletedAttributes, id]);
+
     const setAttributeFormValue = useCallback(
         (
             descriptor: DataAttributeModel | CustomAttributeModel,
@@ -579,6 +598,11 @@ export default function AttributeEditor({
             if (isDataAttributeModel(descriptor) || isGroupAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
                 const formAttributeName = `__attributes__${id}__.${descriptor.name}`;
 
+                // Skip if this attribute was deleted
+                if (deletedAttributes.includes(descriptor.name)) {
+                    return;
+                }
+
                 const attribute = attributes.find((a) => a.name === descriptor.name);
 
                 // Build "static" options from the descriptor
@@ -621,6 +645,7 @@ export default function AttributeEditor({
         buildCallbackMappings,
         setAttributeFormValue,
         getAttributeStaticOptions,
+        deletedAttributes,
     ]);
 
     /**
@@ -860,8 +885,8 @@ export default function AttributeEditor({
             attrs.push(
                 <Widget key={group} title={group === '__' ? '' : group} busy={isRunningCb}>
                     {groupedAttributesDescriptors[group].map((descriptor) => (
-                        <div key={descriptor.name} style={{ position: 'relative', display: 'flex', alignItems: 'start' }}>
-                            <div style={{ flex: 1 }}>
+                        <div key={descriptor.name} className={style.attributeWrapper}>
+                            <div className={style.attributeContent}>
                                 <Attribute
                                     busy={isRunningCb}
                                     name={`__attributes__${id}__.${descriptor.name}`}

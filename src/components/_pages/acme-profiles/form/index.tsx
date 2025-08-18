@@ -166,7 +166,6 @@ export default function AcmeProfileForm() {
                     ),
                 },
             };
-
             if (values.raProfile) {
                 request.raProfileUuid = values.raProfile.value;
             }

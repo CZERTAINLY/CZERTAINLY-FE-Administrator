@@ -16,3 +16,12 @@
     background-color: #dc3545;
     color: white;
 }
+
+.attributeWrapper {
+    position: relative;
+    display: flex;
+    align-items: start;
+}
+.attributeContent {
+    flex: 1;
+}
