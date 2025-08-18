@@ -110,7 +110,7 @@ export default function AttributeEditor({
      * Handles deletion of an attribute from the grouped attributes
      */
     const handleDeleteAttribute = useCallback(
-        (attributeName: string, groupName: string) => {
+        (attributeName: string) => {
             // Add to deletedAttributes in form state
             form.mutators.setAttribute('deletedAttributes', [...(formState.values.deletedAttributes || []), attributeName]);
 
@@ -407,9 +407,6 @@ export default function AttributeEditor({
         form.mutators.clearAttributes(id, attributeDescriptors, attributes);
         // setGroupAttributesCallbackAttributes(emptyGroupAttributesCallbackAttributes);
         dispatch(connectorActions.clearCallbackData());
-
-        // Reset deleted attributes when descriptors change
-        /*  setDeletedAttributes(new Set()); */
     }, [attributeDescriptors, attributes, dispatch, form.mutators, id]);
 
     const setAttributeFormValue = useCallback(
@@ -826,6 +823,20 @@ export default function AttributeEditor({
       Attribute Form Rendering
     */
 
+    const deleteButton = useCallback(
+        (descriptor: AttributeDescriptorModel) => (
+            <button
+                type="button"
+                onClick={() => handleDeleteAttribute(descriptor.name)}
+                className={style.deleteButton}
+                title={`Delete ${descriptor.name}`}
+            >
+                X
+            </button>
+        ),
+        [handleDeleteAttribute],
+    );
+
     const attrs = useMemo(() => {
         const attrs: JSX.Element[] = [];
 
@@ -859,16 +870,7 @@ export default function AttributeEditor({
                                     userInteractedRef={userInteractedRef}
                                 />
                             </div>
-                            {withRemoveAction && (
-                                <button
-                                    type="button"
-                                    onClick={() => handleDeleteAttribute(descriptor.name, group)}
-                                    className={style.deleteButton}
-                                    title={`Delete ${descriptor.name}`}
-                                >
-                                    X
-                                </button>
-                            )}
+                            {withRemoveAction && deleteButton(descriptor)}
                         </div>
                     ))}
                     {i === arr.length - 1 && notYetShownCustomAttributeDescriptors.length > 0 && attributeSelector}
@@ -876,15 +878,7 @@ export default function AttributeEditor({
             );
         });
         return attrs;
-    }, [
-        notYetShownCustomAttributeDescriptors,
-        groupedAttributesDescriptors,
-        isRunningCb,
-        id,
-        options,
-        withRemoveAction,
-        handleDeleteAttribute,
-    ]);
+    }, [notYetShownCustomAttributeDescriptors, groupedAttributesDescriptors, isRunningCb, id, options, withRemoveAction, deleteButton]);
 
     return <>{attrs}</>;
 }
