@@ -81,19 +81,26 @@ function useAttributeEditor({
     resourceKey,
     attributes,
     multipleResourceCustomAttributes,
+    withRemoveAction = false,
 }: {
     isBusy: boolean;
     id: string;
     resourceKey: Resource;
     attributes: ResponseAttributeDto[] | undefined;
     multipleResourceCustomAttributes: Record<string, CustomAttributeModel[]>;
+    withRemoveAction?: boolean;
 }) {
     return useMemo(() => {
         if (isBusy) return <></>;
         return (
-            <AttributeEditor id={id} attributeDescriptors={multipleResourceCustomAttributes[resourceKey] || []} attributes={attributes} />
+            <AttributeEditor
+                id={id}
+                attributeDescriptors={multipleResourceCustomAttributes[resourceKey] || []}
+                attributes={attributes}
+                withRemoveAction={withRemoveAction}
+            />
         );
-    }, [isBusy, id, resourceKey, attributes, multipleResourceCustomAttributes]);
+    }, [isBusy, id, resourceKey, attributes, multipleResourceCustomAttributes, withRemoveAction]);
 }
 
 export default useAttributeEditor;

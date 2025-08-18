@@ -50,6 +50,7 @@ interface FormValues extends CmpProfileRequestModel {
     selectedResponseProtectionMethod?: SelectChangeValue | undefined;
     owner: { value: string; label: string } | undefined;
     groups: { value: string; label: string }[];
+    deletedAttributes: string[];
 }
 export default function CmpProfileForm() {
     const { id } = useParams();
@@ -284,6 +285,7 @@ export default function CmpProfileForm() {
                 variant: undefined as any,
                 owner: undefined,
                 groups: [],
+                deletedAttributes: [],
             };
         }
 
@@ -315,6 +317,7 @@ export default function CmpProfileForm() {
             variant: (variant as unknown as CmpProfileRequestDtoVariantEnum) || (undefined as any),
             owner: buildOwner(userOptions, certificateAssociations?.ownerUuid),
             groups: buildGroups(groupOptions, certificateAssociations?.groupUuids),
+            deletedAttributes: [],
         };
     }, [editMode, cmpProfile, protectionMethodEnum, cmpCmpProfileVariantEnum, userOptions, groupOptions]);
 
@@ -387,6 +390,7 @@ export default function CmpProfileForm() {
         resourceKey: Resource.Certificates,
         attributes: cmpProfile?.certificateAssociations?.customAttributes,
         multipleResourceCustomAttributes,
+        withRemoveAction: true,
     });
 
     const areDefaultValuesSame = useCallback(
@@ -406,6 +410,7 @@ export default function CmpProfileForm() {
             {!isFetchingDetail && (
                 <Form keepDirtyOnReinitialize initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
                     {({ handleSubmit, pristine, submitting, valid, form, values }) => {
+                        const isAttributesChanged = form.getState().values.deletedAttributes.length > 0;
                         return (
                             <BootstrapForm onSubmit={handleSubmit}>
                                 <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithoutAccents())}>
@@ -434,13 +439,7 @@ export default function CmpProfileForm() {
                                         </FormGroup>
                                     )}
                                 </Field>
-                                <CertificateAssociationsFormWidget
-                                    renderCustomAttributes={renderCertificateAssociatedAttributesEditor}
-                                    userOptions={userOptions}
-                                    groupOptions={groupOptions}
-                                    setUserOptions={setUserOptions}
-                                    setGroupOptions={setGroupOptions}
-                                />
+
                                 <Widget title="CMP Variant Configuration">
                                     <Field name="selectedVariant" validate={composeValidators(validateRequired())} type="radio">
                                         {({ input, meta }) => (
@@ -646,6 +645,13 @@ export default function CmpProfileForm() {
                                         ]}
                                     />
                                 </Widget>
+                                <CertificateAssociationsFormWidget
+                                    renderCustomAttributes={renderCertificateAssociatedAttributesEditor}
+                                    userOptions={userOptions}
+                                    groupOptions={groupOptions}
+                                    setUserOptions={setUserOptions}
+                                    setGroupOptions={setGroupOptions}
+                                />
                                 <div className="d-flex justify-content-end">
                                     <ButtonGroup>
                                         <ProgressButton
@@ -653,7 +659,7 @@ export default function CmpProfileForm() {
                                             inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
                                             inProgress={submitting}
                                             disabled={
-                                                pristine ||
+                                                (!isAttributesChanged && pristine) ||
                                                 submitting ||
                                                 !valid ||
                                                 isBusy ||

@@ -166,10 +166,6 @@ export default function AcmeProfileForm() {
                     ),
                 },
             };
-            console.log({
-                request,
-                values,
-            });
 
             if (values.raProfile) {
                 request.raProfileUuid = values.raProfile.value;
@@ -278,15 +274,15 @@ export default function AcmeProfileForm() {
         resourceKey: Resource.Certificates,
         attributes: acmeProfile?.certificateAssociations?.customAttributes,
         multipleResourceCustomAttributes,
+        withRemoveAction: true,
     });
-
-    console.log('acmeProfile', acmeProfile);
 
     return (
         <Widget title={title} busy={isBusy}>
             <Form keepDirtyOnReinitialize initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
                 {({ handleSubmit, pristine, submitting, valid, form }) => {
-                    console.log({ pristine, submitting, valid });
+                    const isAttributesChanged = form.getState().values.deletedAttributes.length > 0;
+
                     return (
                         <BootstrapForm onSubmit={handleSubmit}>
                             <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithoutAccents())}>
@@ -627,7 +623,7 @@ export default function AcmeProfileForm() {
                                         title={editMode ? 'Update' : 'Create'}
                                         inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
                                         inProgress={submitting}
-                                        disabled={pristine || submitting || !valid}
+                                        disabled={submitting || !valid || (!isAttributesChanged && pristine)}
                                     />
 
                                     <Button color="default" onClick={onCancelClick} disabled={submitting}>

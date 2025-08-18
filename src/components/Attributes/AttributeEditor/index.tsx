@@ -29,6 +29,7 @@ import { base64ToUtf8 } from 'utils/common-utils';
 import { getFormattedDate, getFormattedDateTime } from 'utils/dateUtil';
 import { Attribute } from './Attribute';
 import CustomAttributeAddSelect from 'components/Attributes/AttributeEditor/CustomAttributeAddSelect';
+import style from './AttributeEditor.module.scss';
 
 // same empty array is used to prevent re-rendering of the component
 // !!! never modify the attributes field inside of the component !!!
@@ -46,6 +47,7 @@ export interface Props {
     kind?: string;
     callbackResource?: Resource;
     callbackParentUuid?: string;
+    withRemoveAction?: boolean;
 }
 
 export default function AttributeEditor({
@@ -59,13 +61,12 @@ export default function AttributeEditor({
     callbackParentUuid,
     groupAttributesCallbackAttributes = emptyGroupAttributesCallbackAttributes,
     setGroupAttributesCallbackAttributes = () => emptyGroupAttributesCallbackAttributes,
+    withRemoveAction = false,
 }: Props) {
     const dispatch = useDispatch();
 
     const form = useForm();
     const formState = useFormState();
-
-    console.log('formState', { formState, form });
 
     const isRunningCallback = useSelector(connectorSelectors.isRunningCallback);
     const initiateAttributeCallback = useSelector(userInterfaceSelectors.selectInitiateAttributeCallback);
@@ -95,7 +96,6 @@ export default function AttributeEditor({
 
     // State to track deleted attributes
     const [deletedAttributes, setDeletedAttributes] = useState<string[]>([]);
-    console.log('deletedAttributes', deletedAttributes);
     const userInteractedRef = useRef<boolean>(false);
 
     // workaround to be possible to set options from multiple places;
@@ -133,7 +133,14 @@ export default function AttributeEditor({
             // Add to deleted attributes set to filter it out from rendering
             setDeletedAttributes((prev) => [...prev, attributeName]);
         },
-        [form.mutators, id, options, groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes, formState.values],
+        [
+            form.mutators,
+            formState.values.deletedAttributes,
+            id,
+            options,
+            groupAttributesCallbackAttributes,
+            setGroupAttributesCallbackAttributes,
+        ],
     );
 
     /**
@@ -210,7 +217,6 @@ export default function AttributeEditor({
     const getCurrentFromMappingValue = useCallback(
         (mapping: AttributeCallbackMappingModel): any => {
             const attributeFromValue = getAttributeValue(attributes, mapping.from);
-
             const formAttributes = !formState.values[`__attributes__${id}__`] ? undefined : formState.values[`__attributes__${id}__`];
             const formMappingName = mapping.from ? (mapping.from.includes('.') ? mapping.from.split('.')[0] : mapping.from) : '';
             const formAttribute = formAttributes
@@ -843,7 +849,7 @@ export default function AttributeEditor({
             attrs.push(
                 <Widget key={group} title={group === '__' ? '' : group} busy={isRunningCb}>
                     {groupedAttributesDescriptors[group].map((descriptor) => (
-                        <div key={descriptor.name} style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                        <div key={descriptor.name} style={{ position: 'relative', display: 'flex', alignItems: 'start' }}>
                             <div style={{ flex: 1 }}>
                                 <Attribute
                                     busy={isRunningCb}
@@ -853,24 +859,16 @@ export default function AttributeEditor({
                                     userInteractedRef={userInteractedRef}
                                 />
                             </div>
-                            <button
-                                type="button"
-                                onClick={() => handleDeleteAttribute(descriptor.name, group)}
-                                style={{
-                                    marginLeft: '8px',
-                                    padding: '4px 8px',
-                                    backgroundColor: '#dc3545',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '4px',
-                                    cursor: 'pointer',
-                                    fontSize: '12px',
-                                    minWidth: '60px',
-                                }}
-                                title={`Delete ${descriptor.name}`}
-                            >
-                                Delete
-                            </button>
+                            {withRemoveAction && (
+                                <button
+                                    type="button"
+                                    onClick={() => handleDeleteAttribute(descriptor.name, group)}
+                                    className={style.deleteButton}
+                                    title={`Delete ${descriptor.name}`}
+                                >
+                                    X
+                                </button>
+                            )}
                         </div>
                     ))}
                     {i === arr.length - 1 && notYetShownCustomAttributeDescriptors.length > 0 && attributeSelector}
@@ -878,7 +876,15 @@ export default function AttributeEditor({
             );
         });
         return attrs;
-    }, [notYetShownCustomAttributeDescriptors, groupedAttributesDescriptors, isRunningCb, id, options, handleDeleteAttribute]);
+    }, [
+        notYetShownCustomAttributeDescriptors,
+        groupedAttributesDescriptors,
+        isRunningCb,
+        id,
+        options,
+        withRemoveAction,
+        handleDeleteAttribute,
+    ]);
 
     return <>{attrs}</>;
 }
