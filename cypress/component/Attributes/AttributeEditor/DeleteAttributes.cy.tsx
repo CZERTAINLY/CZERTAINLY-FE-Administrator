@@ -161,10 +161,12 @@ describe('AttributeEditor Delete Attributes Tests', () => {
             });
         });
 
-        it('should display X as button text', () => {
+        it('should display trash icon as button content', () => {
             const firstAttributeName = customAttributeEditorMockData.attributeDescriptors[0].name;
 
-            cy.get(`[title="Delete ${firstAttributeName}"]`).should('contain.text', 'X');
+            // Check that the button contains a trash icon
+            cy.get(`[title="Delete ${firstAttributeName}"]`).find('.fa-trash').should('exist');
+            cy.get(`[title="Delete ${firstAttributeName}"]`).find('.fa-trash').should('have.class', 'text-danger');
         });
     });
 

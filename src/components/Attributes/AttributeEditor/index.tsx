@@ -856,7 +856,7 @@ export default function AttributeEditor({
                 className={style.deleteButton}
                 title={`Delete ${descriptor.name}`}
             >
-                X
+                <i className="fa fa-trash text-danger" />
             </button>
         ),
         [handleDeleteAttribute],
