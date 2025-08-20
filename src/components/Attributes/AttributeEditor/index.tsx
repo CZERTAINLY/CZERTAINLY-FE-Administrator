@@ -30,6 +30,7 @@ import { getFormattedDate, getFormattedDateTime } from 'utils/dateUtil';
 import { Attribute } from './Attribute';
 import CustomAttributeAddSelect from 'components/Attributes/AttributeEditor/CustomAttributeAddSelect';
 import style from './AttributeEditor.module.scss';
+import { mapAttributeContentToOptionValue } from 'utils/attributes/attributes';
 
 // same empty array is used to prevent re-rendering of the component
 // !!! never modify the attributes field inside of the component !!!
@@ -105,7 +106,6 @@ export default function AttributeEditor({
     useEffect(() => {
         dispatch(connectorActions.resetState());
     }, [dispatch]);
-
     /**
      * Handles deletion of an attribute from the grouped attributes
      */
@@ -171,25 +171,6 @@ export default function AttributeEditor({
         for (const k in isRunningCallback) isRunningCb = isRunningCb || isRunningCallback[k];
         return isRunningCb;
     }, [isRunningCallback]);
-
-    /**
-     * Maps the attribute content to a selection option with a label and a value
-     */
-    const mapAttributeContentToOptionValue = useCallback(
-        (content: BaseAttributeContentModel, descriptor: DataAttributeModel | CustomAttributeModel) => {
-            const nonReferenceLabel =
-                descriptor.contentType === AttributeContentType.Date
-                    ? getFormattedDate(content?.data as unknown as string)?.toString()
-                    : descriptor.contentType === AttributeContentType.Datetime
-                      ? getFormattedDateTime(content?.data as unknown as string)?.toString()
-                      : (content?.data as unknown as string)?.toString();
-            return {
-                label: content.reference ? content.reference : nonReferenceLabel,
-                value: content,
-            };
-        },
-        [],
-    );
 
     /**
      * Gets the value of the attribute identified by the path (attributeName.propertyName.propertyName...)
@@ -536,7 +517,7 @@ export default function AttributeEditor({
 
             form.mutators.setAttribute(formAttributeName, formAttributeValue);
         },
-        [form.mutators, mapAttributeContentToOptionValue],
+        [form.mutators],
     );
     const getAttributeStaticOptions = useCallback(
         (descriptor: DataAttributeModel | CustomAttributeModel | GroupAttributeModel, formAttributeName: string) => {
@@ -624,7 +605,6 @@ export default function AttributeEditor({
                 }
             }
         });
-
         // multiple effects can modify opts during single render call
         // eslint-disable-next-line react-hooks/exhaustive-deps
         opts = { ...opts, ...newOptions };
@@ -893,9 +873,9 @@ export default function AttributeEditor({
                                     descriptor={descriptor}
                                     options={options[`__attributes__${id}__.${descriptor.name}`]}
                                     userInteractedRef={userInteractedRef}
+                                    deleteButton={withRemoveAction ? deleteButton(descriptor) : undefined}
                                 />
                             </div>
-                            {withRemoveAction && deleteButton(descriptor)}
                         </div>
                     ))}
                     {i === arr.length - 1 && notYetShownCustomAttributeDescriptors.length > 0 && attributeSelector}

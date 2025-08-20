@@ -35,9 +35,17 @@ interface Props {
     options?: { label: string; value: any }[];
     busy?: boolean;
     userInteractedRef?: React.MutableRefObject<boolean>;
+    deleteButton?: JSX.Element;
 }
 
-export function Attribute({ name, descriptor, options, busy = false, userInteractedRef: userInteractionRef }: Props): JSX.Element {
+export function Attribute({
+    name,
+    descriptor,
+    options,
+    busy = false,
+    userInteractedRef: userInteractionRef,
+    deleteButton,
+}: Props): JSX.Element {
     const form = useForm();
     const formState = useFormState();
     const [addNewAttributeValue, setIsAddNewAttributeValue] = useState<AddNewAttributeType | undefined>();
@@ -217,75 +225,82 @@ export function Attribute({ name, descriptor, options, busy = false, userInterac
                         ) : (
                             <></>
                         )}
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                            {!addNewAttributeValue ? (
+                                <Select
+                                    {...input}
+                                    onChange={(e) => {
+                                        input.onChange(e);
+                                        onUserInteraction();
+                                    }}
+                                    inputId={`${name}Select`}
+                                    maxMenuHeight={140}
+                                    menuPlacement="auto"
+                                    options={getUpdatedOptionsForEditSelect(input.value, options)}
+                                    placeholder={`Select ${descriptor.properties.label}`}
+                                    styles={{
+                                        control: (provided) => ({
+                                            ...provided,
+                                            width: '100%',
+                                            ...(meta.touched && meta.invalid ? errorStyles : {}),
+                                        }),
+                                        container: (provided) => ({
+                                            ...provided,
+                                            width: '100%',
+                                        }),
+                                    }}
+                                    isDisabled={descriptor.properties.readOnly || busy}
+                                    isMulti={descriptor.properties.multiSelect}
+                                    isClearable={!descriptor.properties.required}
+                                />
+                            ) : (
+                                <Select
+                                    {...input}
+                                    onChange={(e) => {
+                                        input.onChange(e);
+                                        onUserInteraction();
+                                    }}
+                                    inputId={`${name}Select`}
+                                    maxMenuHeight={140}
+                                    menuPlacement="auto"
+                                    options={options}
+                                    placeholder={`Select ${descriptor.properties.label}`}
+                                    styles={{
+                                        control: (provided) => ({
+                                            ...provided,
+                                            width: '100%',
+                                            ...(meta.touched && meta.invalid ? errorStyles : {}),
+                                        }),
+                                        container: (provided) => ({
+                                            ...provided,
+                                            width: '100%',
+                                        }),
+                                    }}
+                                    isDisabled={descriptor.properties.readOnly}
+                                    isMulti={descriptor.properties.multiSelect}
+                                    isClearable={!descriptor.properties.required}
+                                    components={{
+                                        Menu: (props) => (
+                                            <CustomSelectComponent
+                                                onAddNew={() => {
+                                                    dispatch(
+                                                        userInterfaceActions.showGlobalModal({
+                                                            content: addNewAttributeValue.content,
+                                                            isOpen: true,
+                                                            size: 'lg',
+                                                            title: `Add New ${addNewAttributeValue.name}`,
+                                                        }),
+                                                    );
+                                                }}
+                                                {...props}
+                                            />
+                                        ),
+                                    }}
+                                />
+                            )}
+                            {deleteButton}
+                        </div>
 
-                        {!addNewAttributeValue ? (
-                            <Select
-                                {...input}
-                                onChange={(e) => {
-                                    input.onChange(e);
-                                    onUserInteraction();
-                                }}
-                                inputId={`${name}Select`}
-                                maxMenuHeight={140}
-                                menuPlacement="auto"
-                                options={getUpdatedOptionsForEditSelect(input.value, options)}
-                                placeholder={`Select ${descriptor.properties.label}`}
-                                styles={{
-                                    control: (provided) =>
-                                        meta.touched && meta.invalid
-                                            ? {
-                                                  ...provided,
-                                                  ...errorStyles,
-                                              }
-                                            : { ...provided },
-                                }}
-                                isDisabled={descriptor.properties.readOnly || busy}
-                                isMulti={descriptor.properties.multiSelect}
-                                isClearable={!descriptor.properties.required}
-                            />
-                        ) : (
-                            <Select
-                                {...input}
-                                onChange={(e) => {
-                                    input.onChange(e);
-                                    onUserInteraction();
-                                }}
-                                inputId={`${name}Select`}
-                                maxMenuHeight={140}
-                                menuPlacement="auto"
-                                options={options}
-                                placeholder={`Select ${descriptor.properties.label}`}
-                                styles={{
-                                    control: (provided) =>
-                                        meta.touched && meta.invalid
-                                            ? {
-                                                  ...provided,
-                                                  ...errorStyles,
-                                              }
-                                            : { ...provided },
-                                }}
-                                isDisabled={descriptor.properties.readOnly}
-                                isMulti={descriptor.properties.multiSelect}
-                                isClearable={!descriptor.properties.required}
-                                components={{
-                                    Menu: (props) => (
-                                        <CustomSelectComponent
-                                            onAddNew={() => {
-                                                dispatch(
-                                                    userInterfaceActions.showGlobalModal({
-                                                        content: addNewAttributeValue.content,
-                                                        isOpen: true,
-                                                        size: 'lg',
-                                                        title: `Add New ${addNewAttributeValue.name}`,
-                                                    }),
-                                                );
-                                            }}
-                                            {...props}
-                                        />
-                                    ),
-                                }}
-                            />
-                        )}
                         {descriptor.properties.visible ? (
                             <>
                                 <FormText style={{ marginTop: '0.2em' }}>{descriptor.description}</FormText>
@@ -468,18 +483,22 @@ export function Attribute({ name, descriptor, options, busy = false, userInterac
                         ) : (
                             <></>
                         )}
-
-                        <Input
-                            {...input}
-                            id={name}
-                            valid={!meta.error && meta.touched}
-                            invalid={!!meta.error && meta.touched}
-                            type={descriptor.properties.visible ? getFormTypeFromAttributeContentType(descriptor.contentType) : 'hidden'}
-                            placeholder={`Enter ${descriptor.properties.label}`}
-                            disabled={descriptor.properties.readOnly || busy}
-                            step={getStepValue(descriptor.contentType)}
-                            value={transformInputValue(input.value)}
-                        />
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <Input
+                                {...input}
+                                id={name}
+                                valid={!meta.error && meta.touched}
+                                invalid={!!meta.error && meta.touched}
+                                type={
+                                    descriptor.properties.visible ? getFormTypeFromAttributeContentType(descriptor.contentType) : 'hidden'
+                                }
+                                placeholder={`Enter ${descriptor.properties.label}`}
+                                disabled={descriptor.properties.readOnly || busy}
+                                step={getStepValue(descriptor.contentType)}
+                                value={transformInputValue(input.value)}
+                            />
+                            {deleteButton}
+                        </div>
 
                         {descriptor.properties.visible && descriptor.contentType === AttributeContentType.Boolean ? (
                             <>
@@ -492,7 +511,6 @@ export function Attribute({ name, descriptor, options, busy = false, userInterac
                         ) : (
                             <></>
                         )}
-
                         {descriptor.properties.visible ? (
                             <>
                                 <FormText

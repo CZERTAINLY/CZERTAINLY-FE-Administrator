@@ -1,14 +1,18 @@
 import {
     AttributeDescriptorModel,
     AttributeRequestModel,
+    AttributeResponseModel,
     BaseAttributeContentModel,
+    CodeBlockAttributeContentDataModel,
     CodeBlockAttributeContentModel,
+    CustomAttributeModel,
+    DataAttributeModel,
     isCustomAttributeModel,
     isDataAttributeModel,
 } from 'types/attributes';
 import { AttributeContentType, CodeBlockAttributeContent, FileAttributeContentData, SecretAttributeContent } from 'types/openapi';
 import { base64ToUtf8, utf8ToBase64 } from 'utils/common-utils';
-import { getFormattedDateTime } from 'utils/dateUtil';
+import { getFormattedDate, getFormattedDateTime } from 'utils/dateUtil';
 import CodeBlock from '../../components/Attributes/CodeBlock';
 
 export const attributeFieldNameTransform: { [name: string]: string } = {
@@ -164,7 +168,6 @@ export function collectFormAttributes(
         }
 
         const descriptor = descriptors?.find((d) => d.name === attributeName);
-
         if (!descriptor) continue;
         if (attributes[attribute] === undefined || attributes[attribute] === null) continue;
 
@@ -191,3 +194,122 @@ export function collectFormAttributes(
     }
     return attrs;
 }
+
+type InputItem = {
+    formAttributeName: string;
+    formAttributeValue: any;
+};
+
+export function transformAttributes(data: InputItem[]): Record<string, any> {
+    const result: Record<string, any> = {};
+
+    data.forEach(({ formAttributeName, formAttributeValue }) => {
+        // split by the last dot
+        const lastDotIndex = formAttributeName.lastIndexOf('.');
+        if (lastDotIndex === -1) {
+            // no dot found, just assign
+            result[formAttributeName] = formAttributeValue;
+        } else {
+            const parentKey = formAttributeName.slice(0, lastDotIndex);
+            const childKey = formAttributeName.slice(lastDotIndex + 1);
+
+            if (!result[parentKey]) {
+                result[parentKey] = {};
+            }
+            result[parentKey][childKey] = formAttributeValue;
+        }
+    });
+
+    return result;
+}
+
+/**
+ * Maps the attribute content to a selection option with a label and a value
+ */
+export const mapAttributeContentToOptionValue = (
+    content: BaseAttributeContentModel,
+    descriptor: DataAttributeModel | CustomAttributeModel,
+) => {
+    const nonReferenceLabel =
+        descriptor.contentType === AttributeContentType.Date
+            ? getFormattedDate(content?.data as unknown as string)?.toString()
+            : descriptor.contentType === AttributeContentType.Datetime
+              ? getFormattedDateTime(content?.data as unknown as string)?.toString()
+              : (content?.data as unknown as string)?.toString();
+    return {
+        label: content.reference ? content.reference : nonReferenceLabel,
+        value: content,
+    };
+};
+
+export const testAttributeSetFunction = (
+    descriptor: DataAttributeModel | CustomAttributeModel,
+    attribute: AttributeResponseModel | undefined,
+    formAttributeName: string,
+    setDefaultOnRequiredValuesOnly: boolean,
+    forceDefaultDescriptorValue: boolean,
+) => {
+    let formAttributeValue = undefined;
+
+    const appliedContent = forceDefaultDescriptorValue ? descriptor?.content : attribute?.content;
+
+    function setMultiSelectListAttributeValue() {
+        if (Array.isArray(appliedContent)) {
+            formAttributeValue = appliedContent.map((content) => mapAttributeContentToOptionValue(content, descriptor));
+        } else {
+            formAttributeValue = undefined;
+        }
+    }
+
+    function setSelectListAttributeValue() {
+        if (appliedContent) {
+            formAttributeValue = mapAttributeContentToOptionValue(appliedContent[0], descriptor);
+        } else {
+            formAttributeValue = undefined;
+        }
+    }
+
+    function setBooleanAttributeValue() {
+        if (appliedContent?.[0]?.data !== undefined) {
+            formAttributeValue = appliedContent[0].data;
+        } else if (descriptor.properties.required) {
+            // set value to false, if attribute is required, has no value, and no default value are provided
+            // otherwise allow the value to be undefined
+            formAttributeValue = descriptor.content?.[0]?.data ?? false;
+        } else {
+            formAttributeValue = descriptor.content?.[0]?.data;
+        }
+    }
+
+    if (descriptor.properties?.list && descriptor.properties?.multiSelect) {
+        setMultiSelectListAttributeValue();
+    } else if (descriptor.properties?.list) {
+        setSelectListAttributeValue();
+    } else if (appliedContent) {
+        formAttributeValue = appliedContent[0].reference ?? appliedContent[0].data;
+    } else if (descriptor.content && descriptor.content.length > 0 && (!setDefaultOnRequiredValuesOnly || descriptor.properties.required)) {
+        // This acts as a fallback for the case when the attribute has no value, but has a default value in the descriptor
+        formAttributeValue = descriptor.content[0].reference ?? descriptor.content[0].data;
+    }
+
+    if (descriptor.contentType === AttributeContentType.Codeblock && formAttributeValue !== undefined) {
+        if ((formAttributeValue as CodeBlockAttributeContentDataModel).code !== undefined) {
+            formAttributeValue = {
+                code: base64ToUtf8((formAttributeValue as CodeBlockAttributeContentDataModel).code),
+                language: (formAttributeValue as CodeBlockAttributeContentDataModel).language,
+            };
+        } else {
+            formAttributeValue = {
+                language: (formAttributeValue as CodeBlockAttributeContentDataModel).language,
+            };
+        }
+    }
+    if (descriptor.contentType === AttributeContentType.Boolean) {
+        setBooleanAttributeValue();
+    }
+
+    return {
+        formAttributeName,
+        formAttributeValue,
+    };
+};

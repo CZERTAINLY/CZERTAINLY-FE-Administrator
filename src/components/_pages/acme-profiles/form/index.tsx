@@ -35,6 +35,8 @@ import {
 import { Resource } from '../../../../types/openapi';
 import useAttributeEditor, { buildGroups, buildOwner } from 'utils/widget';
 import CertificateAssociationsFormWidget from 'components/CertificateAssociationsFormWidget/CertificateAssociationsFormWidget';
+import { testAttributeSetFunction, transformAttributes } from 'utils/attributes/attributes';
+import { deepEqual } from 'utils/deep-equal';
 
 interface FormValues {
     name: string;
@@ -132,7 +134,10 @@ export default function AcmeProfileForm() {
     const onSubmit = useCallback(
         (values: FormValues) => {
             const request: AcmeProfileEditRequestModel | AcmeProfileAddRequestModel = {
-                ...values,
+                name: values.name,
+                description: values.description,
+                requireContact: values.requireContact,
+                requireTermsOfService: values.requireTermsOfService,
                 dnsResolverIp: values.dnsIpAddress,
                 dnsResolverPort: values.dnsPort,
                 retryInterval: parseInt(values.retryInterval),
@@ -166,6 +171,9 @@ export default function AcmeProfileForm() {
                     ),
                 },
             };
+            console.log({
+                request,
+            });
             if (values.raProfile) {
                 request.raProfileUuid = values.raProfile.value;
             }
@@ -232,8 +240,30 @@ export default function AcmeProfileForm() {
         },
         [editMode],
     );
-
     const defaultValues: FormValues = useMemo(() => {
+        const initialAssociatedAttributes = acmeProfile?.certificateAssociations?.customAttributes
+            ?.map((attr) => {
+                const matched = multipleResourceCustomAttributes[Resource.Certificates]?.find((x) => x.uuid === attr.uuid);
+                if (!matched) {
+                    return null;
+                }
+                return testAttributeSetFunction(matched, attr, `__attributes__certificateAssociatedAttributes__.${attr.name}`, true, false);
+            })
+            .filter((x) => x !== null);
+
+        const initialCustomAttributes = acmeProfile?.customAttributes
+            ?.map((attr) => {
+                const matched = multipleResourceCustomAttributes[Resource.AcmeProfiles]?.find((x) => x.uuid === attr.uuid);
+                if (!matched) {
+                    return null;
+                }
+                return testAttributeSetFunction(matched, attr, `__attributes__customAcmeProfile__.${attr.name}`, true, false);
+            })
+            .filter((x) => x !== null);
+
+        const transformedInitialAssociatedAttributes = transformAttributes(initialAssociatedAttributes ?? []);
+        const transformedInitialCustomAttributes = transformAttributes(initialCustomAttributes ?? []);
+
         return {
             name: getValue(acmeProfile?.name, ''),
             description: getValue(acmeProfile?.description, ''),
@@ -254,8 +284,10 @@ export default function AcmeProfileForm() {
             owner: editMode ? buildOwner(userOptions, acmeProfile?.certificateAssociations?.ownerUuid) : undefined,
             groups: editMode ? buildGroups(groupOptions, acmeProfile?.certificateAssociations?.groupUuids) : [],
             deletedAttributes: [],
+            ...transformedInitialAssociatedAttributes,
+            ...transformedInitialCustomAttributes,
         };
-    }, [editMode, acmeProfile, optionsForRaProfiles, userOptions, groupOptions, getValue]);
+    }, [editMode, acmeProfile, optionsForRaProfiles, userOptions, groupOptions, getValue, multipleResourceCustomAttributes]);
 
     const title = useMemo(() => (editMode ? 'Edit ACME Profile' : 'Create ACME Profile'), [editMode]);
 
@@ -265,6 +297,7 @@ export default function AcmeProfileForm() {
         resourceKey: Resource.AcmeProfiles,
         attributes: acmeProfile?.customAttributes,
         multipleResourceCustomAttributes,
+        withRemoveAction: true,
     });
 
     const renderCertificateAssociatedAttributesEditor = useAttributeEditor({
@@ -278,9 +311,12 @@ export default function AcmeProfileForm() {
 
     return (
         <Widget title={title} busy={isBusy}>
-            <Form keepDirtyOnReinitialize initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
-                {({ handleSubmit, pristine, submitting, valid, form }) => {
-                    const isAttributesChanged = form.getState().values.deletedAttributes.length > 0;
+            <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
+                {({ handleSubmit, pristine, submitting, valid, form, values }) => {
+                    console.log({ defaultValues, formValues: values });
+
+                    const isEquals = deepEqual(defaultValues, values);
+                    console.log({ isEquals });
 
                     return (
                         <BootstrapForm onSubmit={handleSubmit}>
@@ -622,7 +658,8 @@ export default function AcmeProfileForm() {
                                         title={editMode ? 'Update' : 'Create'}
                                         inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
                                         inProgress={submitting}
-                                        disabled={submitting || !valid || (!isAttributesChanged && pristine)}
+                                        disabled={submitting || !valid || isEquals}
+                                        /* disabled={submitting || !valid || (!isAttributesChanged && pristine)} */
                                     />
 
                                     <Button color="default" onClick={onCancelClick} disabled={submitting}>
