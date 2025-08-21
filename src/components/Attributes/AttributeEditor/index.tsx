@@ -10,7 +10,6 @@ import {
     AttributeCallbackMappingModel,
     AttributeDescriptorModel,
     AttributeResponseModel,
-    BaseAttributeContentModel,
     CodeBlockAttributeContentDataModel,
     CustomAttributeModel,
     DataAttributeModel,
@@ -26,7 +25,6 @@ import {
 import { CallbackAttributeModel } from 'types/connectors';
 import { AttributeContentType, AttributeValueTarget, FunctionGroupCode, Resource } from 'types/openapi';
 import { base64ToUtf8 } from 'utils/common-utils';
-import { getFormattedDate, getFormattedDateTime } from 'utils/dateUtil';
 import { Attribute } from './Attribute';
 import CustomAttributeAddSelect from 'components/Attributes/AttributeEditor/CustomAttributeAddSelect';
 import style from './AttributeEditor.module.scss';
@@ -554,6 +552,7 @@ export default function AttributeEditor({
         },
         [form.mutators],
     );
+
     const getAttributeStaticOptions = useCallback(
         (descriptor: DataAttributeModel | CustomAttributeModel | GroupAttributeModel, formAttributeName: string) => {
             let newOptions = {};
@@ -966,7 +965,11 @@ export default function AttributeEditor({
                                     descriptor={descriptor}
                                     options={options[`__attributes__${id}__.${descriptor.name}`]}
                                     userInteractedRef={userInteractedRef}
-                                    deleteButton={withRemoveAction ? deleteButton(descriptor) : undefined}
+                                    deleteButton={
+                                        withRemoveAction && isCustomAttributeModel(descriptor) && !descriptor.properties.required
+                                            ? deleteButton(descriptor)
+                                            : undefined
+                                    }
                                 />
                             </div>
                         </div>
