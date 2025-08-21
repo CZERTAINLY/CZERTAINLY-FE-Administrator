@@ -416,6 +416,7 @@ export function Attribute({
                         <div className="text-muted" style={{ textAlign: 'center', flexBasis: '100%', marginTop: '1rem' }}>
                             Select or Drag &amp; Drop file to Drop Zone.
                         </div>
+                        {deleteButton}
                     </div>
                 )}
             </>
@@ -435,29 +436,33 @@ export function Attribute({
                         <span style={{ fontStyle: 'italic' }}> ({language})</span>
                     </Label>
                     &nbsp;
-                    <Field name={`${name}.code`} type={getFormTypeFromAttributeContentType(descriptor.contentType)}>
-                        {({ input }) => {
-                            return (
-                                <Editor
-                                    {...input}
-                                    textareaId={`${name}.codeTextArea`}
-                                    id={`${name}.code`}
-                                    value={input.value}
-                                    onValueChange={(code) => {
-                                        form.change(`${name}.code`, code);
-                                    }}
-                                    highlight={(code) => getHighLightedCode(code, language)}
-                                    padding={10}
-                                    style={{
-                                        fontFamily: '"Fira code", "Fira Mono", monospace',
-                                        fontSize: 14,
-                                        border: 'solid 1px #ccc',
-                                        borderRadius: '0.375rem',
-                                    }}
-                                />
-                            );
-                        }}
-                    </Field>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <Field name={`${name}.code`} type={getFormTypeFromAttributeContentType(descriptor.contentType)}>
+                            {({ input }) => {
+                                return (
+                                    <Editor
+                                        {...input}
+                                        textareaId={`${name}.codeTextArea`}
+                                        id={`${name}.code`}
+                                        value={input.value}
+                                        onValueChange={(code) => {
+                                            form.change(`${name}.code`, code);
+                                        }}
+                                        highlight={(code) => getHighLightedCode(code, language)}
+                                        padding={10}
+                                        style={{
+                                            fontFamily: '"Fira code", "Fira Mono", monospace',
+                                            fontSize: 14,
+                                            border: 'solid 1px #ccc',
+                                            borderRadius: '0.375rem',
+                                            width: '100%',
+                                        }}
+                                    />
+                                );
+                            }}
+                        </Field>
+                        {deleteButton}
+                    </div>
                 </>
             );
         }
