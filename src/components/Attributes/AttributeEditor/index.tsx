@@ -10,7 +10,6 @@ import {
     AttributeCallbackMappingModel,
     AttributeDescriptorModel,
     AttributeResponseModel,
-    BaseAttributeContentModel,
     CodeBlockAttributeContentDataModel,
     CustomAttributeModel,
     DataAttributeModel,
@@ -26,9 +25,10 @@ import {
 import { CallbackAttributeModel } from 'types/connectors';
 import { AttributeContentType, AttributeValueTarget, FunctionGroupCode, Resource } from 'types/openapi';
 import { base64ToUtf8 } from 'utils/common-utils';
-import { getFormattedDate, getFormattedDateTime } from 'utils/dateUtil';
 import { Attribute } from './Attribute';
 import CustomAttributeAddSelect from 'components/Attributes/AttributeEditor/CustomAttributeAddSelect';
+import style from './AttributeEditor.module.scss';
+import { mapAttributeContentToOptionValue } from 'utils/attributes/attributes';
 
 // same empty array is used to prevent re-rendering of the component
 // !!! never modify the attributes field inside of the component !!!
@@ -46,6 +46,7 @@ export interface Props {
     kind?: string;
     callbackResource?: Resource;
     callbackParentUuid?: string;
+    withRemoveAction?: boolean;
 }
 
 export default function AttributeEditor({
@@ -59,6 +60,7 @@ export default function AttributeEditor({
     callbackParentUuid,
     groupAttributesCallbackAttributes = emptyGroupAttributesCallbackAttributes,
     setGroupAttributesCallbackAttributes = () => emptyGroupAttributesCallbackAttributes,
+    withRemoveAction = true,
 }: Props) {
     const dispatch = useDispatch();
 
@@ -91,6 +93,10 @@ export default function AttributeEditor({
     const [prevShownCustomAttributes, setPrevShownCustomAttributes] = useState<AttributeDescriptorModel[]>([]);
     const [shownCustomAttributes, setShownCustomAttributes] = useState<AttributeDescriptorModel[]>([]);
 
+    // State to track deleted attributes
+    const [deletedAttributes, setDeletedAttributes] = useState<string[]>([]);
+    // State to track attributes that were deleted and re-added in this session (to prevent using old backend values)
+    const [reAddedAttributes, setReAddedAttributes] = useState<string[]>([]);
     const userInteractedRef = useRef<boolean>(false);
 
     // workaround to be possible to set options from multiple places;
@@ -100,6 +106,39 @@ export default function AttributeEditor({
     useEffect(() => {
         dispatch(connectorActions.resetState());
     }, [dispatch]);
+    /**
+     * Handles deletion of an attribute from the grouped attributes
+     */
+    const handleDeleteAttribute = useCallback(
+        (attributeName: string) => {
+            // Create a unique key for this AttributeEditor instance
+            const deletedAttributesKey = `deletedAttributes_${id}`;
+
+            // Add to deletedAttributes in form state using the unique key
+            form.mutators.setAttribute(deletedAttributesKey, [...(formState.values[deletedAttributesKey] || []), attributeName]);
+
+            // Remove from form values
+            form.mutators.setAttribute(`__attributes__${id}__.${attributeName}`, undefined);
+
+            // Remove from options
+            const newOptions = { ...options };
+            delete newOptions[`__attributes__${id}__.${attributeName}`];
+            setOptions(newOptions);
+
+            // Remove from shown custom attributes if it's a custom attribute
+            setShownCustomAttributes((prev) => prev.filter((attr) => attr.name !== attributeName));
+
+            // Remove from group attributes callback attributes if it exists there
+            if (groupAttributesCallbackAttributes.some((attr) => attr.name === attributeName)) {
+                setGroupAttributesCallbackAttributes((prev) => prev.filter((attr) => attr.name !== attributeName));
+            }
+
+            // Add to deletedAttributes to filter them out from rendering
+            // Custom attributes will still be available for re-adding through notYetShownCustomAttributeDescriptors
+            setDeletedAttributes((prev) => [...prev, attributeName]);
+        },
+        [form.mutators, formState.values, id, options, groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes],
+    );
 
     /**
      * Gets the value from the object property identified by path
@@ -135,25 +174,6 @@ export default function AttributeEditor({
     }, [isRunningCallback]);
 
     /**
-     * Maps the attribute content to a selection option with a label and a value
-     */
-    const mapAttributeContentToOptionValue = useCallback(
-        (content: BaseAttributeContentModel, descriptor: DataAttributeModel | CustomAttributeModel) => {
-            const nonReferenceLabel =
-                descriptor.contentType === AttributeContentType.Date
-                    ? getFormattedDate(content?.data as unknown as string)?.toString()
-                    : descriptor.contentType === AttributeContentType.Datetime
-                      ? getFormattedDateTime(content?.data as unknown as string)?.toString()
-                      : (content?.data as unknown as string)?.toString();
-            return {
-                label: content.reference ? content.reference : nonReferenceLabel,
-                value: content,
-            };
-        },
-        [],
-    );
-
-    /**
      * Gets the value of the attribute identified by the path (attributeName.propertyName.propertyName...)
      */
     const getAttributeValue = useCallback(
@@ -175,7 +195,6 @@ export default function AttributeEditor({
     const getCurrentFromMappingValue = useCallback(
         (mapping: AttributeCallbackMappingModel): any => {
             const attributeFromValue = getAttributeValue(attributes, mapping.from);
-
             const formAttributes = !formState.values[`__attributes__${id}__`] ? undefined : formState.values[`__attributes__${id}__`];
             const formMappingName = mapping.from ? (mapping.from.includes('.') ? mapping.from.split('.')[0] : mapping.from) : '';
             const formAttribute = formAttributes
@@ -304,27 +323,55 @@ export default function AttributeEditor({
     );
 
     /*
-     * Get non-required custom attributes which weren't shown by user
+     * Get all non-required custom attributes that can be added (including deleted ones)
+     */
+    const availableCustomAttributeDescriptors = useMemo(
+        () =>
+            attributeDescriptors
+                .filter((descriptor) => {
+                    if (isCustomAttributeModel(descriptor)) {
+                        return !descriptor.properties.required;
+                    }
+                    return false;
+                })
+                .filter((descriptor) => !shownCustomAttributes.find((el) => el.uuid === descriptor.uuid)),
+        [attributeDescriptors, shownCustomAttributes],
+    );
+
+    /*
+     * Get non-required custom attributes which weren't shown by user or were deleted and can be re-added
      */
     const notYetShownCustomAttributeDescriptors = useMemo(
         () =>
-            initiallyHiddenCustomAttributeDescriptors.filter(
-                (descriptor) => !shownCustomAttributes.find((el) => el.uuid === descriptor.uuid),
-            ),
-        [initiallyHiddenCustomAttributeDescriptors, shownCustomAttributes],
+            availableCustomAttributeDescriptors
+                .filter((descriptor) => !shownCustomAttributes.find((el) => el.uuid === descriptor.uuid))
+                .filter((descriptor) => {
+                    // For custom attributes, allow them to be re-added even if deleted
+                    // For non-custom attributes, filter out deleted ones
+                    if (isCustomAttributeModel(descriptor)) {
+                        return true; // Always allow custom attributes to be re-added
+                    }
+                    return !deletedAttributes.includes(descriptor.name);
+                }),
+        [availableCustomAttributeDescriptors, shownCustomAttributes, deletedAttributes],
     );
 
     /*
      * Filter and order custom attributes which should be rendered
      */
     const orderedAttributeDescriptors = useMemo(() => {
-        const initiallyShownDescriptors = [...attributeDescriptors, ...groupAttributesCallbackAttributes].filter(
-            (descriptor) => !initiallyHiddenCustomAttributeDescriptors.find((el) => el.uuid === descriptor.uuid),
-        );
+        const initiallyShownDescriptors = [...attributeDescriptors, ...groupAttributesCallbackAttributes]
+            .filter((descriptor) => !initiallyHiddenCustomAttributeDescriptors.find((el) => el.uuid === descriptor.uuid))
+            .filter((descriptor) => {
+                // For all attributes (including custom ones), filter out deleted ones from rendering
+                return !deletedAttributes.includes(descriptor.name);
+            });
+
         const ordered = [
             ...initiallyShownDescriptors,
             ...initiallyHiddenCustomAttributeDescriptors
                 .filter((descriptor) => shownCustomAttributes.find((el) => el.uuid === descriptor.uuid))
+                .filter((descriptor) => !deletedAttributes.includes(descriptor.name)) // Also filter out deleted ones from shown custom attributes
                 .sort(
                     (a, b) =>
                         shownCustomAttributes.findIndex((el) => el.uuid === a.uuid) -
@@ -332,7 +379,13 @@ export default function AttributeEditor({
                 ),
         ];
         return ordered;
-    }, [initiallyHiddenCustomAttributeDescriptors, shownCustomAttributes, groupAttributesCallbackAttributes, attributeDescriptors]);
+    }, [
+        initiallyHiddenCustomAttributeDescriptors,
+        shownCustomAttributes,
+        groupAttributesCallbackAttributes,
+        attributeDescriptors,
+        deletedAttributes,
+    ]);
 
     /**
      * Groups attributes for rendering according to the attribute descriptor group property
@@ -349,7 +402,6 @@ export default function AttributeEditor({
             });
             return grouped;
         }, [orderedAttributeDescriptors]);
-
     /**
      * Clean form attributes, callback data and previous form state whenever passed attribute descriptors or attributes changed
      */
@@ -360,6 +412,29 @@ export default function AttributeEditor({
         dispatch(connectorActions.clearCallbackData());
     }, [attributeDescriptors, attributes, dispatch, form.mutators, id]);
 
+    /**
+     * Synchronize local deletedAttributes state with form state after clearAttributes
+     */
+    useEffect(() => {
+        // After clearAttributes, ensure deletedAttributes are preserved in form state
+        if (deletedAttributes.length > 0) {
+            form.mutators.setAttribute(`deletedAttributes_${id}`, deletedAttributes);
+        }
+    }, [deletedAttributes, form.mutators, id]);
+
+    /**
+     * Synchronize local deletedAttributes state with form state to maintain consistency
+     */
+    useEffect(() => {
+        const formDeletedAttributes = formState.values[`deletedAttributes_${id}`] || [];
+        if (
+            formDeletedAttributes.length !== deletedAttributes.length ||
+            !formDeletedAttributes.every((attr: string) => deletedAttributes.includes(attr))
+        ) {
+            setDeletedAttributes(formDeletedAttributes);
+        }
+    }, [formState.values, deletedAttributes, id]);
+
     const setAttributeFormValue = useCallback(
         (
             descriptor: DataAttributeModel | CustomAttributeModel,
@@ -367,10 +442,17 @@ export default function AttributeEditor({
             formAttributeName: string,
             setDefaultOnRequiredValuesOnly: boolean,
             forceDefaultDescriptorValue: boolean,
+            wasDeletedLocally: boolean = false,
         ) => {
             let formAttributeValue = undefined;
-
-            const appliedContent = forceDefaultDescriptorValue ? descriptor?.content : attribute?.content;
+            // For re-added attributes, we want empty values but still need access to descriptor options for selects
+            // So we use a separate flag for value setting vs options access
+            const shouldUseAttributeValues = !wasDeletedLocally;
+            const appliedContent = shouldUseAttributeValues
+                ? forceDefaultDescriptorValue
+                    ? descriptor?.content
+                    : attribute?.content
+                : undefined;
 
             function handleFileAttributeContentType() {
                 if (appliedContent) {
@@ -468,8 +550,9 @@ export default function AttributeEditor({
 
             form.mutators.setAttribute(formAttributeName, formAttributeValue);
         },
-        [form.mutators, mapAttributeContentToOptionValue],
+        [form.mutators],
     );
+
     const getAttributeStaticOptions = useCallback(
         (descriptor: DataAttributeModel | CustomAttributeModel | GroupAttributeModel, formAttributeName: string) => {
             let newOptions = {};
@@ -525,10 +608,20 @@ export default function AttributeEditor({
         setPrevGroupDescriptors(groupAttributesCallbackAttributes);
         setPrevDescriptors(attributeDescriptors);
         setPrevAttributes(attributes);
+        setShownCustomAttributes(
+            attributeDescriptors.filter(
+                (descriptor) => isCustomAttributeModel(descriptor) && attributes.some((attr) => attr.uuid === descriptor.uuid),
+            ),
+        );
 
         descriptorsToLoad.forEach((descriptor) => {
             if (isDataAttributeModel(descriptor) || isGroupAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
                 const formAttributeName = `__attributes__${id}__.${descriptor.name}`;
+
+                // Skip if this attribute was deleted
+                if (deletedAttributes.includes(descriptor.name)) {
+                    return;
+                }
 
                 const attribute = attributes.find((a) => a.name === descriptor.name);
 
@@ -547,11 +640,12 @@ export default function AttributeEditor({
                         true,
                         // If the attribute has been set more than once, consider it not being initial update call, so set the default value instead (see Issue: #915)
                         userInteractedRef.current,
+                        // Check if this attribute was deleted locally
+                        reAddedAttributes.includes(descriptor.name),
                     );
                 }
             }
         });
-
         // multiple effects can modify opts during single render call
         // eslint-disable-next-line react-hooks/exhaustive-deps
         opts = { ...opts, ...newOptions };
@@ -572,6 +666,8 @@ export default function AttributeEditor({
         buildCallbackMappings,
         setAttributeFormValue,
         getAttributeStaticOptions,
+        deletedAttributes,
+        reAddedAttributes,
     ]);
 
     /**
@@ -583,20 +679,51 @@ export default function AttributeEditor({
 
         setPrevShownCustomAttributes(shownCustomAttributes);
 
+        let newOptions: { [attributeName: string]: { label: string; value: any }[] } = {};
+
         shownCustomAttributes.forEach((descriptor) => {
             if (isCustomAttributeModel(descriptor)) {
                 const formAttributeName = `__attributes__${id}__.${descriptor.name}`;
                 const attribute = attributes.find((a) => a.name === descriptor.name);
 
+                // Set up options for select fields (always needed for re-added attributes)
+                newOptions = {
+                    ...newOptions,
+                    ...getAttributeStaticOptions(descriptor, formAttributeName),
+                };
+
                 // Only set the value for attributes whose value was not yet modified
                 if (!getObjectPropertyValue(formState.values, formAttributeName)) {
-                    setAttributeFormValue(descriptor, attribute, formAttributeName, false, false);
+                    setAttributeFormValue(
+                        descriptor,
+                        attribute,
+                        formAttributeName,
+                        false,
+                        false,
+                        reAddedAttributes.includes(descriptor.name),
+                    );
                 }
             }
         });
 
+        // Update options if we added any new ones
+        if (Object.keys(newOptions).length > 0) {
+            setOptions((prevOptions) => ({ ...prevOptions, ...newOptions }));
+        }
+
         setPreviousFormValues(formState.values);
-    }, [id, formState.values, attributes, prevShownCustomAttributes, shownCustomAttributes, setAttributeFormValue, getObjectPropertyValue]);
+    }, [
+        id,
+        formState.values,
+        attributes,
+        prevShownCustomAttributes,
+        shownCustomAttributes,
+        setAttributeFormValue,
+        getObjectPropertyValue,
+        deletedAttributes,
+        reAddedAttributes,
+        getAttributeStaticOptions,
+    ]);
 
     /**
      * Called on every form change
@@ -774,6 +901,20 @@ export default function AttributeEditor({
       Attribute Form Rendering
     */
 
+    const deleteButton = useCallback(
+        (descriptor: AttributeDescriptorModel) => (
+            <button
+                type="button"
+                onClick={() => handleDeleteAttribute(descriptor.name)}
+                className={style.deleteButton}
+                title={`Delete ${descriptor.name}`}
+            >
+                <i className="fa fa-trash text-danger" />
+            </button>
+        ),
+        [handleDeleteAttribute],
+    );
+
     const attrs = useMemo(() => {
         const attrs: JSX.Element[] = [];
 
@@ -781,6 +922,25 @@ export default function AttributeEditor({
             <CustomAttributeAddSelect
                 onAdd={(attribute) => {
                     setShownCustomAttributes((state) => [...state, attribute]);
+
+                    // Check if this attribute was previously deleted
+                    const wasPreviouslyDeleted = deletedAttributes.includes(attribute.name);
+
+                    // Remove from deletedAttributes when re-adding
+                    setDeletedAttributes((prev) => prev.filter((name) => name !== attribute.name));
+
+                    // If it was previously deleted, add it to reAddedAttributes to prevent using old backend values
+                    if (wasPreviouslyDeleted) {
+                        setReAddedAttributes((prev) => [...prev, attribute.name]);
+                    }
+
+                    // Also remove from form state
+                    const deletedAttributesKey = `deletedAttributes_${id}`;
+                    const currentDeleted = formState.values[deletedAttributesKey] || [];
+                    form.mutators.setAttribute(
+                        deletedAttributesKey,
+                        currentDeleted.filter((name: string) => name !== attribute.name),
+                    );
                 }}
                 attributeDescriptors={notYetShownCustomAttributeDescriptors}
             />
@@ -797,14 +957,21 @@ export default function AttributeEditor({
             attrs.push(
                 <Widget key={group} title={group === '__' ? '' : group} busy={isRunningCb}>
                     {groupedAttributesDescriptors[group].map((descriptor) => (
-                        <div key={descriptor.name}>
-                            <Attribute
-                                busy={isRunningCb}
-                                name={`__attributes__${id}__.${descriptor.name}`}
-                                descriptor={descriptor}
-                                options={options[`__attributes__${id}__.${descriptor.name}`]}
-                                userInteractedRef={userInteractedRef}
-                            />
+                        <div key={descriptor.name} className={style.attributeWrapper}>
+                            <div className={style.attributeContent}>
+                                <Attribute
+                                    busy={isRunningCb}
+                                    name={`__attributes__${id}__.${descriptor.name}`}
+                                    descriptor={descriptor}
+                                    options={options[`__attributes__${id}__.${descriptor.name}`]}
+                                    userInteractedRef={userInteractedRef}
+                                    deleteButton={
+                                        withRemoveAction && isCustomAttributeModel(descriptor) && !descriptor.properties.required
+                                            ? deleteButton(descriptor)
+                                            : undefined
+                                    }
+                                />
+                            </div>
                         </div>
                     ))}
                     {i === arr.length - 1 && notYetShownCustomAttributeDescriptors.length > 0 && attributeSelector}
@@ -812,7 +979,18 @@ export default function AttributeEditor({
             );
         });
         return attrs;
-    }, [groupedAttributesDescriptors, isRunningCb, id, options, notYetShownCustomAttributeDescriptors]);
+    }, [
+        notYetShownCustomAttributeDescriptors,
+        groupedAttributesDescriptors,
+        isRunningCb,
+        id,
+        options,
+        withRemoveAction,
+        deleteButton,
+        form.mutators,
+        formState.values,
+        deletedAttributes,
+    ]);
 
     return <>{attrs}</>;
 }

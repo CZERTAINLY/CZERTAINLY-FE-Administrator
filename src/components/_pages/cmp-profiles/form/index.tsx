@@ -25,12 +25,13 @@ import {
 } from 'types/openapi';
 import { RaProfileSimplifiedModel } from 'types/ra-profiles';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
-import { collectFormAttributes } from 'utils/attributes/attributes';
+import { collectFormAttributes, mapProfileAttribute, transformAttributes } from 'utils/attributes/attributes';
 import { isObjectSame } from 'utils/common-utils';
 import { composeValidators, validateAlphaNumericWithoutAccents, validateLength, validateRequired } from 'utils/validators';
 import styles from './cmpForm.module.scss';
 import useAttributeEditor, { buildGroups, buildOwner, buildSelectedOption } from 'utils/widget';
 import CertificateAssociationsFormWidget from 'components/CertificateAssociationsFormWidget/CertificateAssociationsFormWidget';
+import { deepEqual } from 'utils/deep-equal';
 
 interface SelectChangeValue {
     value: string;
@@ -50,6 +51,7 @@ interface FormValues extends CmpProfileRequestModel {
     selectedResponseProtectionMethod?: SelectChangeValue | undefined;
     owner: { value: string; label: string } | undefined;
     groups: { value: string; label: string }[];
+    deletedAttributes: string[];
 }
 export default function CmpProfileForm() {
     const { id } = useParams();
@@ -264,6 +266,25 @@ export default function CmpProfileForm() {
     }, [dispatch, cmpProfile]);
 
     const defaultValues: FormValues = useMemo(() => {
+        const initialAssociatedAttributes = mapProfileAttribute(
+            cmpProfile,
+            multipleResourceCustomAttributes,
+            Resource.Certificates,
+            'certificateAssociations.customAttributes',
+            '__attributes__certificateAssociatedAttributes__',
+        );
+
+        const initialCustomAttributes = mapProfileAttribute(
+            cmpProfile,
+            multipleResourceCustomAttributes,
+            Resource.CmpProfiles,
+            'customAttributes',
+            '__attributes__customCmpProfile__',
+        );
+
+        const transformedInitialAssociatedAttributes = transformAttributes(initialAssociatedAttributes ?? []);
+        const transformedInitialCustomAttributes = transformAttributes(initialCustomAttributes ?? []);
+
         if (!(editMode && cmpProfile)) {
             return {
                 name: '',
@@ -284,6 +305,9 @@ export default function CmpProfileForm() {
                 variant: undefined as any,
                 owner: undefined,
                 groups: [],
+                deletedAttributes: [],
+                ...transformedInitialAssociatedAttributes,
+                ...transformedInitialCustomAttributes,
             };
         }
 
@@ -315,8 +339,11 @@ export default function CmpProfileForm() {
             variant: (variant as unknown as CmpProfileRequestDtoVariantEnum) || (undefined as any),
             owner: buildOwner(userOptions, certificateAssociations?.ownerUuid),
             groups: buildGroups(groupOptions, certificateAssociations?.groupUuids),
+            deletedAttributes: [],
+            ...transformedInitialAssociatedAttributes,
+            ...transformedInitialCustomAttributes,
         };
-    }, [editMode, cmpProfile, protectionMethodEnum, cmpCmpProfileVariantEnum, userOptions, groupOptions]);
+    }, [cmpProfile, multipleResourceCustomAttributes, editMode, protectionMethodEnum, cmpCmpProfileVariantEnum, userOptions, groupOptions]);
 
     const onRaProfileChange = useCallback(
         (form: FormApi<FormValues>, value?: string) => {
@@ -387,6 +414,7 @@ export default function CmpProfileForm() {
         resourceKey: Resource.Certificates,
         attributes: cmpProfile?.certificateAssociations?.customAttributes,
         multipleResourceCustomAttributes,
+        withRemoveAction: true,
     });
 
     const areDefaultValuesSame = useCallback(
@@ -406,6 +434,7 @@ export default function CmpProfileForm() {
             {!isFetchingDetail && (
                 <Form keepDirtyOnReinitialize initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
                     {({ handleSubmit, pristine, submitting, valid, form, values }) => {
+                        const isEqual = deepEqual(defaultValues, values);
                         return (
                             <BootstrapForm onSubmit={handleSubmit}>
                                 <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithoutAccents())}>
@@ -434,13 +463,7 @@ export default function CmpProfileForm() {
                                         </FormGroup>
                                     )}
                                 </Field>
-                                <CertificateAssociationsFormWidget
-                                    renderCustomAttributes={renderCertificateAssociatedAttributesEditor}
-                                    userOptions={userOptions}
-                                    groupOptions={groupOptions}
-                                    setUserOptions={setUserOptions}
-                                    setGroupOptions={setGroupOptions}
-                                />
+
                                 <Widget title="CMP Variant Configuration">
                                     <Field name="selectedVariant" validate={composeValidators(validateRequired())} type="radio">
                                         {({ input, meta }) => (
@@ -646,6 +669,13 @@ export default function CmpProfileForm() {
                                         ]}
                                     />
                                 </Widget>
+                                <CertificateAssociationsFormWidget
+                                    renderCustomAttributes={renderCertificateAssociatedAttributesEditor}
+                                    userOptions={userOptions}
+                                    groupOptions={groupOptions}
+                                    setUserOptions={setUserOptions}
+                                    setGroupOptions={setGroupOptions}
+                                />
                                 <div className="d-flex justify-content-end">
                                     <ButtonGroup>
                                         <ProgressButton
@@ -653,7 +683,7 @@ export default function CmpProfileForm() {
                                             inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
                                             inProgress={submitting}
                                             disabled={
-                                                pristine ||
+                                                isEqual ||
                                                 submitting ||
                                                 !valid ||
                                                 isBusy ||

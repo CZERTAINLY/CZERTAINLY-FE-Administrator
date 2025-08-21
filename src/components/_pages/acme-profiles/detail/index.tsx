@@ -286,16 +286,22 @@ export default function AdministratorDetail() {
                 columns: [
                     'Groups',
                     <>
-                        {acmeProfile.certificateAssociations?.groupUuids?.map((groupUuid, index) => {
-                            return (
-                                <>
-                                    <Link key={groupUuid} to={`../../groups/detail/${groupUuid}`}>
-                                        {groupNames?.[index] ?? 'N/A'}
-                                    </Link>
-                                    <br />
-                                </>
-                            );
-                        })}
+                        {acmeProfile.certificateAssociations?.groupUuids?.length === 0 ? (
+                            <span>Unassigned</span>
+                        ) : (
+                            <>
+                                {acmeProfile.certificateAssociations?.groupUuids?.map((groupUuid, index) => {
+                                    return (
+                                        <>
+                                            <Link key={groupUuid} to={`../../groups/detail/${groupUuid}`}>
+                                                {groupNames?.[index] ?? 'N/A'}
+                                            </Link>
+                                            <br />
+                                        </>
+                                    );
+                                })}
+                            </>
+                        )}
                     </>,
                 ],
             },

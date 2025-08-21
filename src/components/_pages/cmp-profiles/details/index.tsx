@@ -261,16 +261,22 @@ export default function AdministratorDetail() {
                 columns: [
                     'Groups',
                     <>
-                        {cmpProfile.certificateAssociations?.groupUuids?.map((groupUuid, index) => {
-                            return (
-                                <>
-                                    <Link key={groupUuid} to={`../../groups/detail/${groupUuid}`}>
-                                        {groupNames?.[index] ?? 'N/A'}
-                                    </Link>
-                                    <br />
-                                </>
-                            );
-                        })}
+                        {cmpProfile.certificateAssociations?.groupUuids?.length === 0 ? (
+                            <span>Unassigned</span>
+                        ) : (
+                            <>
+                                {cmpProfile.certificateAssociations?.groupUuids?.map((groupUuid, index) => {
+                                    return (
+                                        <>
+                                            <Link key={groupUuid} to={`../../groups/detail/${groupUuid}`}>
+                                                {groupNames?.[index] ?? 'N/A'}
+                                            </Link>
+                                            <br />
+                                        </>
+                                    );
+                                })}
+                            </>
+                        )}
                     </>,
                 ],
             },

@@ -23,13 +23,14 @@ import { RaProfileSimplifiedModel } from 'types/ra-profiles';
 import { ScepProfileAddRequestModel, ScepProfileEditRequestModel, ScepProfileResponseModel } from 'types/scep-profiles';
 
 import { mutators } from 'utils/attributes/attributeEditorMutators';
-import { collectFormAttributes } from 'utils/attributes/attributes';
+import { collectFormAttributes, mapProfileAttribute, transformAttributes } from 'utils/attributes/attributes';
 
 import { validateAlphaNumericWithoutAccents, validateInteger, validateLength, validateRequired } from 'utils/validators';
 import { KeyAlgorithm, Resource } from '../../../../types/openapi';
 import CertificateField from '../CertificateField';
 import useAttributeEditor, { buildGroups, buildOwner } from 'utils/widget';
 import CertificateAssociationsFormWidget from 'components/CertificateAssociationsFormWidget/CertificateAssociationsFormWidget';
+import { deepEqual } from 'utils/deep-equal';
 
 interface FormValues {
     name: string;
@@ -46,6 +47,7 @@ interface FormValues {
     certificate: { value: string; label: string } | undefined;
     owner: { value: string; label: string } | undefined;
     groups: { value: string; label: string }[];
+    deletedAttributes: string[];
 }
 
 export default function ScepProfileForm() {
@@ -197,8 +199,26 @@ export default function ScepProfileForm() {
         [raProfiles],
     );
 
-    const defaultValues = useMemo(
-        () => ({
+    const defaultValues = useMemo(() => {
+        const initialAssociatedAttributes = mapProfileAttribute(
+            scepProfile,
+            multipleResourceCustomAttributes,
+            Resource.Certificates,
+            'certificateAssociations.customAttributes',
+            '__attributes__certificateAssociatedAttributes__',
+        );
+        const initialCustomAttributes = mapProfileAttribute(
+            scepProfile,
+            multipleResourceCustomAttributes,
+            Resource.ScepProfiles,
+            'customAttributes',
+            '__attributes__customScepProfile__',
+        );
+
+        const transformedInitialAssociatedAttributes = transformAttributes(initialAssociatedAttributes ?? []);
+        const transformedInitialCustomAttributes = transformAttributes(initialCustomAttributes ?? []);
+
+        return {
             name: editMode ? scepProfileSelector?.name || '' : '',
             description: editMode ? scepProfileSelector?.description || '' : '',
             renewalThreshold: editMode ? scepProfileSelector?.renewThreshold || 0 : 0,
@@ -222,9 +242,11 @@ export default function ScepProfileForm() {
                     : undefined,
             owner: editMode ? buildOwner(userOptions, scepProfileSelector?.certificateAssociations?.ownerUuid) : undefined,
             groups: editMode ? buildGroups(groupOptions, scepProfileSelector?.certificateAssociations?.groupUuids) : [],
-        }),
-        [editMode, scepProfileSelector, optionsForRaProfiles, userOptions, groupOptions],
-    );
+            deletedAttributes: [] as string[],
+            ...transformedInitialAssociatedAttributes,
+            ...transformedInitialCustomAttributes,
+        };
+    }, [editMode, scepProfileSelector, optionsForRaProfiles, userOptions, groupOptions, multipleResourceCustomAttributes, scepProfile]);
 
     const title = useMemo(() => (editMode ? 'Edit SCEP Profile' : 'Create SCEP Profile'), [editMode]);
 
@@ -234,6 +256,7 @@ export default function ScepProfileForm() {
         resourceKey: Resource.Certificates,
         attributes: scepProfileSelector?.certificateAssociations?.customAttributes,
         multipleResourceCustomAttributes,
+        withRemoveAction: true,
     });
 
     return (
@@ -270,115 +293,119 @@ export default function ScepProfileForm() {
                     return errors;
                 }}
             >
-                {({ handleSubmit, pristine, submitting, valid, form }) => (
-                    <BootstrapForm onSubmit={handleSubmit}>
-                        <TextField
-                            id="name"
-                            label="SCEP Profile Name"
-                            validators={[validateRequired(), validateAlphaNumericWithoutAccents()]}
-                            disabled={editMode}
-                        />
-                        <TextField id="description" label="Description" validators={[validateLength(0, 300)]} />
-                        <TextField id="challengePassword" label="Challenge Password" inputType={'password'} validators={[]} />
-                        <TextField
-                            id="renewalThreshold"
-                            label="Renewal Threshold"
-                            description="Minimum expiry days to allow renewal of certificate."
-                            validators={[validateInteger()]}
-                        />
-                        <SwitchField id="includeCaCertificate" label="Include CA Certificate" />
-                        <SwitchField id="includeCaCertificateChain" label="Include CA Certificate Chain" />
-                        <SwitchField id="enableIntune" label="Enable Intune" onChange={(e) => setIntune(e)} />
-                        <TextField id="intuneTenant" label="Intune Tenant" validators={[]} disabled={!intune} />
-                        <TextField id="intuneApplicationId" label="Intune Application ID" validators={[]} disabled={!intune} />
-                        <TextField id="intuneApplicationKey" label="Intune Application Key" validators={[]} disabled={!intune} />
+                {({ handleSubmit, pristine, submitting, valid, form, values }) => {
+                    const isEqual = deepEqual(defaultValues, values);
 
-                        <CertificateField certificates={certificates} />
-
-                        <Widget
-                            title="RA Profile Configuration"
-                            busy={isFetchingRaProfilesList || isFetchingIssuanceAttributes || isFetchingResourceCustomAttributes}
-                        >
-                            <Field name="raProfile">
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Label for="raProfileSelect">Default RA Profile</Label>
-
-                                        <Select
-                                            {...input}
-                                            id="raProfile"
-                                            inputId="raProfileSelect"
-                                            maxMenuHeight={140}
-                                            menuPlacement="auto"
-                                            options={optionsForRaProfiles}
-                                            placeholder="Select to change RA Profile if needed"
-                                            isClearable={true}
-                                            onChange={(event: any) => {
-                                                onRaProfileChange(form, event ? event.value : undefined);
-                                                input.onChange(event);
-                                            }}
-                                        />
-                                    </FormGroup>
-                                )}
-                            </Field>
-
-                            <TabLayout
-                                tabs={[
-                                    {
-                                        title: 'Issue Attributes',
-                                        content:
-                                            !raProfile || !raProfileIssuanceAttrDescs || raProfileIssuanceAttrDescs.length === 0 ? (
-                                                <></>
-                                            ) : (
-                                                <FormGroup>
-                                                    <AttributeEditor
-                                                        id="issuanceAttributes"
-                                                        attributeDescriptors={raProfileIssuanceAttrDescs}
-                                                        attributes={scepProfile?.issueCertificateAttributes}
-                                                        groupAttributesCallbackAttributes={issueGroupAttributesCallbackAttributes}
-                                                        setGroupAttributesCallbackAttributes={setIssueGroupAttributesCallbackAttributes}
-                                                    />
-                                                </FormGroup>
-                                            ),
-                                    },
-                                    {
-                                        title: 'Custom Attributes',
-                                        content: (
-                                            <AttributeEditor
-                                                id="customScepProfile"
-                                                attributeDescriptors={multipleResourceCustomAttributes[Resource.ScepProfiles] || []}
-                                                attributes={scepProfile?.customAttributes}
-                                            />
-                                        ),
-                                    },
-                                ]}
+                    return (
+                        <BootstrapForm onSubmit={handleSubmit}>
+                            <TextField
+                                id="name"
+                                label="SCEP Profile Name"
+                                validators={[validateRequired(), validateAlphaNumericWithoutAccents()]}
+                                disabled={editMode}
                             />
-                            {}
-                        </Widget>
-                        <CertificateAssociationsFormWidget
-                            userOptions={userOptions}
-                            groupOptions={groupOptions}
-                            setUserOptions={setUserOptions}
-                            setGroupOptions={setGroupOptions}
-                            renderCustomAttributes={renderCertificateAssociatedAttributesEditor}
-                        />
+                            <TextField id="description" label="Description" validators={[validateLength(0, 300)]} />
+                            <TextField id="challengePassword" label="Challenge Password" inputType={'password'} validators={[]} />
+                            <TextField
+                                id="renewalThreshold"
+                                label="Renewal Threshold"
+                                description="Minimum expiry days to allow renewal of certificate."
+                                validators={[validateInteger()]}
+                            />
+                            <SwitchField id="includeCaCertificate" label="Include CA Certificate" />
+                            <SwitchField id="includeCaCertificateChain" label="Include CA Certificate Chain" />
+                            <SwitchField id="enableIntune" label="Enable Intune" onChange={(e) => setIntune(e)} />
+                            <TextField id="intuneTenant" label="Intune Tenant" validators={[]} disabled={!intune} />
+                            <TextField id="intuneApplicationId" label="Intune Application ID" validators={[]} disabled={!intune} />
+                            <TextField id="intuneApplicationKey" label="Intune Application Key" validators={[]} disabled={!intune} />
 
-                        <div className="d-flex justify-content-end">
-                            <ButtonGroup>
-                                <ProgressButton
-                                    title={editMode ? 'Update' : 'Create'}
-                                    inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
-                                    inProgress={submitting}
-                                    disabled={pristine || submitting || !valid}
+                            <CertificateField certificates={certificates} />
+
+                            <Widget
+                                title="RA Profile Configuration"
+                                busy={isFetchingRaProfilesList || isFetchingIssuanceAttributes || isFetchingResourceCustomAttributes}
+                            >
+                                <Field name="raProfile">
+                                    {({ input, meta }) => (
+                                        <FormGroup>
+                                            <Label for="raProfileSelect">Default RA Profile</Label>
+
+                                            <Select
+                                                {...input}
+                                                id="raProfile"
+                                                inputId="raProfileSelect"
+                                                maxMenuHeight={140}
+                                                menuPlacement="auto"
+                                                options={optionsForRaProfiles}
+                                                placeholder="Select to change RA Profile if needed"
+                                                isClearable={true}
+                                                onChange={(event: any) => {
+                                                    onRaProfileChange(form, event ? event.value : undefined);
+                                                    input.onChange(event);
+                                                }}
+                                            />
+                                        </FormGroup>
+                                    )}
+                                </Field>
+
+                                <TabLayout
+                                    tabs={[
+                                        {
+                                            title: 'Issue Attributes',
+                                            content:
+                                                !raProfile || !raProfileIssuanceAttrDescs || raProfileIssuanceAttrDescs.length === 0 ? (
+                                                    <></>
+                                                ) : (
+                                                    <FormGroup>
+                                                        <AttributeEditor
+                                                            id="issuanceAttributes"
+                                                            attributeDescriptors={raProfileIssuanceAttrDescs}
+                                                            attributes={scepProfile?.issueCertificateAttributes}
+                                                            groupAttributesCallbackAttributes={issueGroupAttributesCallbackAttributes}
+                                                            setGroupAttributesCallbackAttributes={setIssueGroupAttributesCallbackAttributes}
+                                                        />
+                                                    </FormGroup>
+                                                ),
+                                        },
+                                        {
+                                            title: 'Custom Attributes',
+                                            content: (
+                                                <AttributeEditor
+                                                    id="customScepProfile"
+                                                    attributeDescriptors={multipleResourceCustomAttributes[Resource.ScepProfiles] || []}
+                                                    attributes={scepProfile?.customAttributes}
+                                                />
+                                            ),
+                                        },
+                                    ]}
                                 />
+                                {}
+                            </Widget>
+                            <CertificateAssociationsFormWidget
+                                userOptions={userOptions}
+                                groupOptions={groupOptions}
+                                setUserOptions={setUserOptions}
+                                setGroupOptions={setGroupOptions}
+                                renderCustomAttributes={renderCertificateAssociatedAttributesEditor}
+                            />
 
-                                <Button color="default" onClick={onCancelClick} disabled={submitting}>
-                                    Cancel
-                                </Button>
-                            </ButtonGroup>
-                        </div>
-                    </BootstrapForm>
-                )}
+                            <div className="d-flex justify-content-end">
+                                <ButtonGroup>
+                                    <ProgressButton
+                                        title={editMode ? 'Update' : 'Create'}
+                                        inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
+                                        inProgress={submitting}
+                                        disabled={isEqual || submitting || !valid}
+                                    />
+
+                                    <Button color="default" onClick={onCancelClick} disabled={submitting}>
+                                        Cancel
+                                    </Button>
+                                </ButtonGroup>
+                            </div>
+                        </BootstrapForm>
+                    );
+                }}
             </Form>
         </Widget>
     );

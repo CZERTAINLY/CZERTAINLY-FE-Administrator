@@ -320,16 +320,22 @@ export default function ScepProfileDetail() {
                 columns: [
                     'Groups',
                     <>
-                        {scepProfile.certificateAssociations?.groupUuids?.map((groupUuid, index) => {
-                            return (
-                                <>
-                                    <Link key={groupUuid} to={`../../groups/detail/${groupUuid}`}>
-                                        {groupNames?.[index] ?? 'N/A'}
-                                    </Link>
-                                    <br />
-                                </>
-                            );
-                        })}
+                        {scepProfile.certificateAssociations?.groupUuids?.length === 0 ? (
+                            <span>Unassigned</span>
+                        ) : (
+                            <>
+                                {scepProfile.certificateAssociations?.groupUuids?.map((groupUuid, index) => {
+                                    return (
+                                        <>
+                                            <Link key={groupUuid} to={`../../groups/detail/${groupUuid}`}>
+                                                {groupNames?.[index] ?? 'N/A'}
+                                            </Link>
+                                            <br />
+                                        </>
+                                    );
+                                })}
+                            </>
+                        )}
                     </>,
                 ],
             },

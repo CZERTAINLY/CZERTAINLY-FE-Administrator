@@ -35,6 +35,8 @@ import {
 import { Resource } from '../../../../types/openapi';
 import useAttributeEditor, { buildGroups, buildOwner } from 'utils/widget';
 import CertificateAssociationsFormWidget from 'components/CertificateAssociationsFormWidget/CertificateAssociationsFormWidget';
+import { transformAttributes, mapProfileAttribute } from 'utils/attributes/attributes';
+import { deepEqual } from 'utils/deep-equal';
 
 interface FormValues {
     name: string;
@@ -52,6 +54,7 @@ interface FormValues {
     raProfile: { value: string; label: string } | undefined;
     owner: { value: string; label: string } | undefined;
     groups: { value: string; label: string }[];
+    deletedAttributes: string[];
 }
 
 export default function AcmeProfileForm() {
@@ -131,7 +134,10 @@ export default function AcmeProfileForm() {
     const onSubmit = useCallback(
         (values: FormValues) => {
             const request: AcmeProfileEditRequestModel | AcmeProfileAddRequestModel = {
-                ...values,
+                name: values.name,
+                description: values.description,
+                requireContact: values.requireContact,
+                requireTermsOfService: values.requireTermsOfService,
                 dnsResolverIp: values.dnsIpAddress,
                 dnsResolverPort: values.dnsPort,
                 retryInterval: parseInt(values.retryInterval),
@@ -175,14 +181,14 @@ export default function AcmeProfileForm() {
             }
         },
         [
+            dispatch,
+            editMode,
+            id,
+            issueGroupAttributesCallbackAttributes,
             multipleResourceCustomAttributes,
             raProfileIssuanceAttrDescs,
-            issueGroupAttributesCallbackAttributes,
             raProfileRevocationAttrDescs,
             revokeGroupAttributesCallbackAttributes,
-            editMode,
-            dispatch,
-            id,
         ],
     );
 
@@ -231,8 +237,26 @@ export default function AcmeProfileForm() {
         },
         [editMode],
     );
-
     const defaultValues: FormValues = useMemo(() => {
+        const initialAssociatedAttributes = mapProfileAttribute(
+            acmeProfile,
+            multipleResourceCustomAttributes,
+            Resource.Certificates,
+            'certificateAssociations.customAttributes',
+            '__attributes__certificateAssociatedAttributes__',
+        );
+
+        const initialCustomAttributes = mapProfileAttribute(
+            acmeProfile,
+            multipleResourceCustomAttributes,
+            Resource.AcmeProfiles,
+            'customAttributes',
+            '__attributes__customAcmeProfile__',
+        );
+
+        const transformedInitialAssociatedAttributes = transformAttributes(initialAssociatedAttributes ?? []);
+        const transformedInitialCustomAttributes = transformAttributes(initialCustomAttributes ?? []);
+
         return {
             name: getValue(acmeProfile?.name, ''),
             description: getValue(acmeProfile?.description, ''),
@@ -252,8 +276,11 @@ export default function AcmeProfileForm() {
                     : undefined,
             owner: editMode ? buildOwner(userOptions, acmeProfile?.certificateAssociations?.ownerUuid) : undefined,
             groups: editMode ? buildGroups(groupOptions, acmeProfile?.certificateAssociations?.groupUuids) : [],
+            deletedAttributes: [],
+            ...transformedInitialAssociatedAttributes,
+            ...transformedInitialCustomAttributes,
         };
-    }, [editMode, acmeProfile, optionsForRaProfiles, userOptions, groupOptions, getValue]);
+    }, [editMode, acmeProfile, optionsForRaProfiles, userOptions, groupOptions, getValue, multipleResourceCustomAttributes]);
 
     const title = useMemo(() => (editMode ? 'Edit ACME Profile' : 'Create ACME Profile'), [editMode]);
 
@@ -263,6 +290,7 @@ export default function AcmeProfileForm() {
         resourceKey: Resource.AcmeProfiles,
         attributes: acmeProfile?.customAttributes,
         multipleResourceCustomAttributes,
+        withRemoveAction: true,
     });
 
     const renderCertificateAssociatedAttributesEditor = useAttributeEditor({
@@ -271,214 +299,68 @@ export default function AcmeProfileForm() {
         resourceKey: Resource.Certificates,
         attributes: acmeProfile?.certificateAssociations?.customAttributes,
         multipleResourceCustomAttributes,
+        withRemoveAction: true,
     });
 
     return (
         <Widget title={title} busy={isBusy}>
-            <Form keepDirtyOnReinitialize initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
-                {({ handleSubmit, pristine, submitting, valid, form }) => (
-                    <BootstrapForm onSubmit={handleSubmit}>
-                        <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithoutAccents())}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="name">ACME Profile Name</Label>
+            <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
+                {({ handleSubmit, pristine, submitting, valid, form, values }) => {
+                    const isEqual = deepEqual(defaultValues, values);
+                    return (
+                        <BootstrapForm onSubmit={handleSubmit}>
+                            <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithoutAccents())}>
+                                {({ input, meta }) => (
+                                    <FormGroup>
+                                        <Label for="name">ACME Profile Name</Label>
 
-                                    <Input
-                                        {...input}
-                                        id="name"
-                                        type="text"
-                                        placeholder="ACME Profile Name"
-                                        valid={!meta.error && meta.touched}
-                                        invalid={!!meta.error && meta.touched}
-                                        disabled={editMode}
-                                    />
+                                        <Input
+                                            {...input}
+                                            id="name"
+                                            type="text"
+                                            placeholder="ACME Profile Name"
+                                            valid={!meta.error && meta.touched}
+                                            invalid={!!meta.error && meta.touched}
+                                            disabled={editMode}
+                                        />
 
-                                    <FormFeedback>{meta.error}</FormFeedback>
-                                </FormGroup>
-                            )}
-                        </Field>
+                                        <FormFeedback>{meta.error}</FormFeedback>
+                                    </FormGroup>
+                                )}
+                            </Field>
 
-                        <Field name="description" validate={composeValidators(validateLength(0, 300))}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="description">Description</Label>
+                            <Field name="description" validate={composeValidators(validateLength(0, 300))}>
+                                {({ input, meta }) => (
+                                    <FormGroup>
+                                        <Label for="description">Description</Label>
 
-                                    <Input
-                                        {...input}
-                                        id="description"
-                                        type="textarea"
-                                        placeholder="Enter Description / Comment"
-                                        valid={!meta.error && meta.touched}
-                                        invalid={!!meta.error && meta.touched}
-                                    />
+                                        <Input
+                                            {...input}
+                                            id="description"
+                                            type="textarea"
+                                            placeholder="Enter Description / Comment"
+                                            valid={!meta.error && meta.touched}
+                                            invalid={!!meta.error && meta.touched}
+                                        />
 
-                                    <FormFeedback>{meta.error}</FormFeedback>
-                                </FormGroup>
-                            )}
-                        </Field>
+                                        <FormFeedback>{meta.error}</FormFeedback>
+                                    </FormGroup>
+                                )}
+                            </Field>
 
-                        <CertificateAssociationsFormWidget
-                            renderCustomAttributes={renderCertificateAssociatedAttributesEditor}
-                            userOptions={userOptions}
-                            groupOptions={groupOptions}
-                            setUserOptions={setUserOptions}
-                            setGroupOptions={setGroupOptions}
-                        />
-
-                        <Widget title="Challenge Configuration">
-                            <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                                <Col>
-                                    <Field name="dnsIpAddress" validate={composeValidators((value: string) => validateCustomIp(value))}>
-                                        {({ input, meta }) => (
-                                            <FormGroup>
-                                                <Label for="dnsIpAddress">DNS Resolver IP address</Label>
-
-                                                <Input
-                                                    {...input}
-                                                    id="dnsIpAddress"
-                                                    type="text"
-                                                    placeholder="Enter DNS Resolver IP address. If not provided system default will be used"
-                                                    valid={!meta.error && meta.touched}
-                                                    invalid={!!meta.error && meta.touched}
-                                                />
-
-                                                <FormFeedback>{meta.error}</FormFeedback>
-                                            </FormGroup>
-                                        )}
-                                    </Field>
-                                </Col>
-
-                                <Col>
-                                    <Field name="dnsPort" validate={composeValidators(validateInteger())}>
-                                        {({ input, meta }) => (
-                                            <FormGroup>
-                                                <Label for="dnsPort">DNS Resolver port number</Label>
-
-                                                <Input
-                                                    {...input}
-                                                    id="dnsPort"
-                                                    type="number"
-                                                    placeholder="Enter DNS Resolver port number"
-                                                    valid={!meta.error && meta.touched}
-                                                    invalid={!!meta.error && meta.touched}
-                                                />
-
-                                                <FormFeedback>{meta.error}</FormFeedback>
-                                            </FormGroup>
-                                        )}
-                                    </Field>
-                                </Col>
-                            </Row>
-
-                            <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                                <Col>
-                                    <Field name="retryInterval" validate={composeValidators(validateInteger())}>
-                                        {({ input, meta }) => (
-                                            <FormGroup>
-                                                <Label for="retryInterval">Retry Interval (In seconds)</Label>
-
-                                                <Input
-                                                    {...input}
-                                                    id="retryInterval"
-                                                    type="number"
-                                                    placeholder="Enter Retry Interval"
-                                                    valid={!meta.error && meta.touched}
-                                                    invalid={!!meta.error && meta.touched}
-                                                />
-
-                                                <FormFeedback>{meta.error}</FormFeedback>
-                                            </FormGroup>
-                                        )}
-                                    </Field>
-                                </Col>
-
-                                <Col>
-                                    <Field name="orderValidity" validate={composeValidators(validateInteger())}>
-                                        {({ input, meta }) => (
-                                            <FormGroup>
-                                                <Label for="orderValidity">Order Validity (In seconds)</Label>
-
-                                                <Input
-                                                    {...input}
-                                                    id="orderValidity"
-                                                    type="number"
-                                                    placeholder="Enter Order Validity"
-                                                    valid={!meta.error && meta.touched}
-                                                    invalid={!!meta.error && meta.touched}
-                                                />
-
-                                                <FormFeedback>{meta.error}</FormFeedback>
-                                            </FormGroup>
-                                        )}
-                                    </Field>
-                                </Col>
-                            </Row>
-                        </Widget>
-
-                        <Widget title="Terms of Service Configuration">
-                            <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                                <Col>
-                                    <Field name="termsUrl" validate={composeValidators((value: string) => validateUrlWithRoute(value))}>
-                                        {({ input, meta }) => (
-                                            <FormGroup>
-                                                <Label for="termsUrl">Terms of Service URL</Label>
-
-                                                <Input
-                                                    {...input}
-                                                    id="termsUrl"
-                                                    type="text"
-                                                    placeholder="Enter Terms of Service URL"
-                                                    valid={!meta.error && meta.touched}
-                                                    invalid={!!meta.error && meta.touched}
-                                                />
-
-                                                <FormFeedback>{meta.error}</FormFeedback>
-                                            </FormGroup>
-                                        )}
-                                    </Field>
-                                </Col>
-
-                                <Col>
-                                    <Field name="webSite" validate={composeValidators((value: string) => validateUrlWithRoute(value))}>
-                                        {({ input, meta }) => (
-                                            <FormGroup>
-                                                <Label for="websiteUrl">Website URL</Label>
-
-                                                <Input
-                                                    {...input}
-                                                    id="websiteUrl"
-                                                    type="text"
-                                                    placeholder="Enter Website URL"
-                                                    valid={!meta.error && meta.touched}
-                                                    invalid={!!meta.error && meta.touched}
-                                                />
-
-                                                <FormFeedback>{meta.error}</FormFeedback>
-                                            </FormGroup>
-                                        )}
-                                    </Field>
-                                </Col>
-                            </Row>
-
-                            {!editMode ? (
-                                <></>
-                            ) : (
+                            <Widget title="Challenge Configuration">
                                 <Row xs="1" sm="1" md="2" lg="2" xl="2">
                                     <Col>
-                                        <Field
-                                            name="termsChangeUrl"
-                                            validate={composeValidators((value: string) => validateUrlWithRoute(value))}
-                                        >
+                                        <Field name="dnsIpAddress" validate={composeValidators((value: string) => validateCustomIp(value))}>
                                             {({ input, meta }) => (
                                                 <FormGroup>
-                                                    <Label for="termsChangeUrl">Changes of Terms of Service URL</Label>
+                                                    <Label for="dnsIpAddress">DNS Resolver IP address</Label>
 
                                                     <Input
                                                         {...input}
-                                                        id="termsChangeUrl"
+                                                        id="dnsIpAddress"
                                                         type="text"
-                                                        name="termsOfServiceChangeUrl"
-                                                        placeholder="Enter Changes of Terms of Service URL"
+                                                        placeholder="Enter DNS Resolver IP address. If not provided system default will be used"
                                                         valid={!meta.error && meta.touched}
                                                         invalid={!!meta.error && meta.touched}
                                                     />
@@ -489,139 +371,293 @@ export default function AcmeProfileForm() {
                                         </Field>
                                     </Col>
 
-                                    <Col className="align-items-center">
-                                        <Field name="disableOrders" type="checkbox">
+                                    <Col>
+                                        <Field name="dnsPort" validate={composeValidators(validateInteger())}>
                                             {({ input, meta }) => (
                                                 <FormGroup>
-                                                    <br />
-                                                    <br />
+                                                    <Label for="dnsPort">DNS Resolver port number</Label>
 
-                                                    <Input {...input} id="disableOrders" type="checkbox" />
+                                                    <Input
+                                                        {...input}
+                                                        id="dnsPort"
+                                                        type="number"
+                                                        placeholder="Enter DNS Resolver port number"
+                                                        valid={!meta.error && meta.touched}
+                                                        invalid={!!meta.error && meta.touched}
+                                                    />
 
-                                                    <Label for="disableOrders">
-                                                        &nbsp;Disable new Orders (Changes in Terms of Service)
-                                                    </Label>
+                                                    <FormFeedback>{meta.error}</FormFeedback>
                                                 </FormGroup>
                                             )}
                                         </Field>
                                     </Col>
                                 </Row>
-                            )}
 
-                            <Field name="requireTermsOfService" type="checkbox">
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Input {...input} id="requireTermsOfService" type="checkbox" />
-
-                                        <Label for="requireTermsOfService">&nbsp;Require agree on Terms Of Service for new account</Label>
-                                    </FormGroup>
-                                )}
-                            </Field>
-
-                            <Field name="requireContact" type="checkbox">
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Input {...input} id="requireContact" type="checkbox" />
-
-                                        <Label for="requireContact">&nbsp;Require contact information for new Accounts</Label>
-                                    </FormGroup>
-                                )}
-                            </Field>
-                        </Widget>
-
-                        <Widget
-                            title="RA Profile Configuration"
-                            busy={
-                                isFetchingRaProfilesList ||
-                                isFetchingIssuanceAttributes ||
-                                isFetchingRevocationAttributes ||
-                                isFetchingResourceCustomAttributes
-                            }
-                        >
-                            <Field name="raProfile">
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Label for="raProfileSelect">Default RA Profile</Label>
-
-                                        <Select
-                                            {...input}
-                                            id="raProfile"
-                                            inputId="raProfileSelect"
-                                            maxMenuHeight={140}
-                                            menuPlacement="auto"
-                                            options={optionsForRaProfiles}
-                                            placeholder="Select to change RA Profile if needed"
-                                            isClearable={true}
-                                            onChange={(event: any) => {
-                                                onRaProfileChange(form, event ? event.value : undefined);
-                                                input.onChange(event);
-                                            }}
-                                        />
-                                    </FormGroup>
-                                )}
-                            </Field>
-
-                            <TabLayout
-                                tabs={[
-                                    {
-                                        title: 'Issue Attributes',
-                                        content:
-                                            !raProfile || !raProfileIssuanceAttrDescs || raProfileIssuanceAttrDescs.length === 0 ? (
-                                                <></>
-                                            ) : (
+                                <Row xs="1" sm="1" md="2" lg="2" xl="2">
+                                    <Col>
+                                        <Field name="retryInterval" validate={composeValidators(validateInteger())}>
+                                            {({ input, meta }) => (
                                                 <FormGroup>
-                                                    <AttributeEditor
-                                                        id="issuanceAttributes"
-                                                        attributeDescriptors={raProfileIssuanceAttrDescs}
-                                                        attributes={acmeProfile?.issueCertificateAttributes}
-                                                        groupAttributesCallbackAttributes={issueGroupAttributesCallbackAttributes}
-                                                        setGroupAttributesCallbackAttributes={setIssueGroupAttributesCallbackAttributes}
-                                                    />
-                                                </FormGroup>
-                                            ),
-                                    },
-                                    {
-                                        title: 'Revocation Attributes',
-                                        content:
-                                            !raProfile || !raProfileRevocationAttrDescs || raProfileRevocationAttrDescs.length === 0 ? (
-                                                <></>
-                                            ) : (
-                                                <FormGroup>
-                                                    <AttributeEditor
-                                                        id="revocationAttributes"
-                                                        attributeDescriptors={raProfileRevocationAttrDescs}
-                                                        attributes={acmeProfile?.revokeCertificateAttributes}
-                                                        groupAttributesCallbackAttributes={revokeGroupAttributesCallbackAttributes}
-                                                        setGroupAttributesCallbackAttributes={setRevokeGroupAttributesCallbackAttributes}
-                                                    />
-                                                </FormGroup>
-                                            ),
-                                    },
-                                    {
-                                        title: 'Custom Attributes',
-                                        content: renderCustomAttributeEditor,
-                                    },
-                                ]}
-                            />
-                            {}
-                        </Widget>
+                                                    <Label for="retryInterval">Retry Interval (In seconds)</Label>
 
-                        <div className="d-flex justify-content-end">
-                            <ButtonGroup>
-                                <ProgressButton
-                                    title={editMode ? 'Update' : 'Create'}
-                                    inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
-                                    inProgress={submitting}
-                                    disabled={pristine || submitting || !valid}
+                                                    <Input
+                                                        {...input}
+                                                        id="retryInterval"
+                                                        type="number"
+                                                        placeholder="Enter Retry Interval"
+                                                        valid={!meta.error && meta.touched}
+                                                        invalid={!!meta.error && meta.touched}
+                                                    />
+
+                                                    <FormFeedback>{meta.error}</FormFeedback>
+                                                </FormGroup>
+                                            )}
+                                        </Field>
+                                    </Col>
+
+                                    <Col>
+                                        <Field name="orderValidity" validate={composeValidators(validateInteger())}>
+                                            {({ input, meta }) => (
+                                                <FormGroup>
+                                                    <Label for="orderValidity">Order Validity (In seconds)</Label>
+
+                                                    <Input
+                                                        {...input}
+                                                        id="orderValidity"
+                                                        type="number"
+                                                        placeholder="Enter Order Validity"
+                                                        valid={!meta.error && meta.touched}
+                                                        invalid={!!meta.error && meta.touched}
+                                                    />
+
+                                                    <FormFeedback>{meta.error}</FormFeedback>
+                                                </FormGroup>
+                                            )}
+                                        </Field>
+                                    </Col>
+                                </Row>
+                            </Widget>
+
+                            <Widget title="Terms of Service Configuration">
+                                <Row xs="1" sm="1" md="2" lg="2" xl="2">
+                                    <Col>
+                                        <Field name="termsUrl" validate={composeValidators((value: string) => validateUrlWithRoute(value))}>
+                                            {({ input, meta }) => (
+                                                <FormGroup>
+                                                    <Label for="termsUrl">Terms of Service URL</Label>
+
+                                                    <Input
+                                                        {...input}
+                                                        id="termsUrl"
+                                                        type="text"
+                                                        placeholder="Enter Terms of Service URL"
+                                                        valid={!meta.error && meta.touched}
+                                                        invalid={!!meta.error && meta.touched}
+                                                    />
+
+                                                    <FormFeedback>{meta.error}</FormFeedback>
+                                                </FormGroup>
+                                            )}
+                                        </Field>
+                                    </Col>
+
+                                    <Col>
+                                        <Field name="webSite" validate={composeValidators((value: string) => validateUrlWithRoute(value))}>
+                                            {({ input, meta }) => (
+                                                <FormGroup>
+                                                    <Label for="websiteUrl">Website URL</Label>
+
+                                                    <Input
+                                                        {...input}
+                                                        id="websiteUrl"
+                                                        type="text"
+                                                        placeholder="Enter Website URL"
+                                                        valid={!meta.error && meta.touched}
+                                                        invalid={!!meta.error && meta.touched}
+                                                    />
+
+                                                    <FormFeedback>{meta.error}</FormFeedback>
+                                                </FormGroup>
+                                            )}
+                                        </Field>
+                                    </Col>
+                                </Row>
+
+                                {!editMode ? (
+                                    <></>
+                                ) : (
+                                    <Row xs="1" sm="1" md="2" lg="2" xl="2">
+                                        <Col>
+                                            <Field
+                                                name="termsChangeUrl"
+                                                validate={composeValidators((value: string) => validateUrlWithRoute(value))}
+                                            >
+                                                {({ input, meta }) => (
+                                                    <FormGroup>
+                                                        <Label for="termsChangeUrl">Changes of Terms of Service URL</Label>
+
+                                                        <Input
+                                                            {...input}
+                                                            id="termsChangeUrl"
+                                                            type="text"
+                                                            name="termsOfServiceChangeUrl"
+                                                            placeholder="Enter Changes of Terms of Service URL"
+                                                            valid={!meta.error && meta.touched}
+                                                            invalid={!!meta.error && meta.touched}
+                                                        />
+
+                                                        <FormFeedback>{meta.error}</FormFeedback>
+                                                    </FormGroup>
+                                                )}
+                                            </Field>
+                                        </Col>
+
+                                        <Col className="align-items-center">
+                                            <Field name="disableOrders" type="checkbox">
+                                                {({ input, meta }) => (
+                                                    <FormGroup>
+                                                        <br />
+                                                        <br />
+
+                                                        <Input {...input} id="disableOrders" type="checkbox" />
+
+                                                        <Label for="disableOrders">
+                                                            &nbsp;Disable new Orders (Changes in Terms of Service)
+                                                        </Label>
+                                                    </FormGroup>
+                                                )}
+                                            </Field>
+                                        </Col>
+                                    </Row>
+                                )}
+
+                                <Field name="requireTermsOfService" type="checkbox">
+                                    {({ input, meta }) => (
+                                        <FormGroup>
+                                            <Input {...input} id="requireTermsOfService" type="checkbox" />
+
+                                            <Label for="requireTermsOfService">
+                                                &nbsp;Require agree on Terms Of Service for new account
+                                            </Label>
+                                        </FormGroup>
+                                    )}
+                                </Field>
+
+                                <Field name="requireContact" type="checkbox">
+                                    {({ input, meta }) => (
+                                        <FormGroup>
+                                            <Input {...input} id="requireContact" type="checkbox" />
+
+                                            <Label for="requireContact">&nbsp;Require contact information for new Accounts</Label>
+                                        </FormGroup>
+                                    )}
+                                </Field>
+                            </Widget>
+
+                            <Widget
+                                title="RA Profile Configuration"
+                                busy={
+                                    isFetchingRaProfilesList ||
+                                    isFetchingIssuanceAttributes ||
+                                    isFetchingRevocationAttributes ||
+                                    isFetchingResourceCustomAttributes
+                                }
+                            >
+                                <Field name="raProfile">
+                                    {({ input, meta }) => (
+                                        <FormGroup>
+                                            <Label for="raProfileSelect">Default RA Profile</Label>
+
+                                            <Select
+                                                {...input}
+                                                id="raProfile"
+                                                inputId="raProfileSelect"
+                                                maxMenuHeight={140}
+                                                menuPlacement="auto"
+                                                options={optionsForRaProfiles}
+                                                placeholder="Select to change RA Profile if needed"
+                                                isClearable={true}
+                                                onChange={(event: any) => {
+                                                    onRaProfileChange(form, event ? event.value : undefined);
+                                                    input.onChange(event);
+                                                }}
+                                            />
+                                        </FormGroup>
+                                    )}
+                                </Field>
+
+                                <TabLayout
+                                    tabs={[
+                                        {
+                                            title: 'Issue Attributes',
+                                            content:
+                                                !raProfile || !raProfileIssuanceAttrDescs || raProfileIssuanceAttrDescs.length === 0 ? (
+                                                    <></>
+                                                ) : (
+                                                    <FormGroup>
+                                                        <AttributeEditor
+                                                            id="issuanceAttributes"
+                                                            attributeDescriptors={raProfileIssuanceAttrDescs}
+                                                            attributes={acmeProfile?.issueCertificateAttributes}
+                                                            groupAttributesCallbackAttributes={issueGroupAttributesCallbackAttributes}
+                                                            setGroupAttributesCallbackAttributes={setIssueGroupAttributesCallbackAttributes}
+                                                        />
+                                                    </FormGroup>
+                                                ),
+                                        },
+                                        {
+                                            title: 'Revocation Attributes',
+                                            content:
+                                                !raProfile || !raProfileRevocationAttrDescs || raProfileRevocationAttrDescs.length === 0 ? (
+                                                    <></>
+                                                ) : (
+                                                    <FormGroup>
+                                                        <AttributeEditor
+                                                            id="revocationAttributes"
+                                                            attributeDescriptors={raProfileRevocationAttrDescs}
+                                                            attributes={acmeProfile?.revokeCertificateAttributes}
+                                                            groupAttributesCallbackAttributes={revokeGroupAttributesCallbackAttributes}
+                                                            setGroupAttributesCallbackAttributes={
+                                                                setRevokeGroupAttributesCallbackAttributes
+                                                            }
+                                                        />
+                                                    </FormGroup>
+                                                ),
+                                        },
+                                        {
+                                            title: 'Custom Attributes',
+                                            content: renderCustomAttributeEditor,
+                                        },
+                                    ]}
                                 />
+                                {}
+                            </Widget>
 
-                                <Button color="default" onClick={onCancelClick} disabled={submitting}>
-                                    Cancel
-                                </Button>
-                            </ButtonGroup>
-                        </div>
-                    </BootstrapForm>
-                )}
+                            <CertificateAssociationsFormWidget
+                                renderCustomAttributes={renderCertificateAssociatedAttributesEditor}
+                                userOptions={userOptions}
+                                groupOptions={groupOptions}
+                                setUserOptions={setUserOptions}
+                                setGroupOptions={setGroupOptions}
+                            />
+
+                            <div className="d-flex justify-content-end">
+                                <ButtonGroup>
+                                    <ProgressButton
+                                        title={editMode ? 'Update' : 'Create'}
+                                        inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
+                                        inProgress={submitting}
+                                        disabled={submitting || !valid || isEqual}
+                                    />
+
+                                    <Button color="default" onClick={onCancelClick} disabled={submitting}>
+                                        Cancel
+                                    </Button>
+                                </ButtonGroup>
+                            </div>
+                        </BootstrapForm>
+                    );
+                }}
             </Form>
         </Widget>
     );

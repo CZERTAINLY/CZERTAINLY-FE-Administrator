@@ -81,27 +81,34 @@ function useAttributeEditor({
     resourceKey,
     attributes,
     multipleResourceCustomAttributes,
+    withRemoveAction = false,
 }: {
     isBusy: boolean;
     id: string;
     resourceKey: Resource;
     attributes: ResponseAttributeDto[] | undefined;
     multipleResourceCustomAttributes: Record<string, CustomAttributeModel[]>;
+    withRemoveAction?: boolean;
 }) {
     return useMemo(() => {
         if (isBusy) return <></>;
         return (
-            <AttributeEditor id={id} attributeDescriptors={multipleResourceCustomAttributes[resourceKey] || []} attributes={attributes} />
+            <AttributeEditor
+                id={id}
+                attributeDescriptors={multipleResourceCustomAttributes[resourceKey] || []}
+                attributes={attributes}
+                withRemoveAction={withRemoveAction}
+            />
         );
-    }, [isBusy, id, resourceKey, attributes, multipleResourceCustomAttributes]);
+    }, [isBusy, id, resourceKey, attributes, multipleResourceCustomAttributes, withRemoveAction]);
 }
 
 export default useAttributeEditor;
 
 export const getOwnerName = (ownerUuid: string | undefined, users: UserDto[]): string => {
-    if (!ownerUuid) return 'N/A';
+    if (!ownerUuid) return 'Unassigned';
     const user = users.find((user) => user.uuid === ownerUuid);
-    return user ? user.username : 'N/A';
+    return user ? user.username : 'Unassigned';
 };
 
 export const getGroupNames = (groupUuids: string[] | undefined, groups: CertificateGroupResponseModel[]): string[] | 'N/A' => {
