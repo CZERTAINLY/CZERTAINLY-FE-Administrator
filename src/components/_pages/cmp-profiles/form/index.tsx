@@ -25,12 +25,13 @@ import {
 } from 'types/openapi';
 import { RaProfileSimplifiedModel } from 'types/ra-profiles';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
-import { collectFormAttributes } from 'utils/attributes/attributes';
+import { collectFormAttributes, mapProfileAttribute, transformAttributes } from 'utils/attributes/attributes';
 import { isObjectSame } from 'utils/common-utils';
 import { composeValidators, validateAlphaNumericWithoutAccents, validateLength, validateRequired } from 'utils/validators';
 import styles from './cmpForm.module.scss';
 import useAttributeEditor, { buildGroups, buildOwner, buildSelectedOption } from 'utils/widget';
 import CertificateAssociationsFormWidget from 'components/CertificateAssociationsFormWidget/CertificateAssociationsFormWidget';
+import { deepEqual } from 'utils/deep-equal';
 
 interface SelectChangeValue {
     value: string;
@@ -265,6 +266,25 @@ export default function CmpProfileForm() {
     }, [dispatch, cmpProfile]);
 
     const defaultValues: FormValues = useMemo(() => {
+        const initialAssociatedAttributes = mapProfileAttribute(
+            cmpProfile,
+            multipleResourceCustomAttributes,
+            Resource.Certificates,
+            'certificateAssociations.customAttributes',
+            '__attributes__certificateAssociatedAttributes__',
+        );
+
+        const initialCustomAttributes = mapProfileAttribute(
+            cmpProfile,
+            multipleResourceCustomAttributes,
+            Resource.CmpProfiles,
+            'customAttributes',
+            '__attributes__customCmpProfile__',
+        );
+
+        const transformedInitialAssociatedAttributes = transformAttributes(initialAssociatedAttributes ?? []);
+        const transformedInitialCustomAttributes = transformAttributes(initialCustomAttributes ?? []);
+
         if (!(editMode && cmpProfile)) {
             return {
                 name: '',
@@ -286,6 +306,8 @@ export default function CmpProfileForm() {
                 owner: undefined,
                 groups: [],
                 deletedAttributes: [],
+                ...transformedInitialAssociatedAttributes,
+                ...transformedInitialCustomAttributes,
             };
         }
 
@@ -318,8 +340,10 @@ export default function CmpProfileForm() {
             owner: buildOwner(userOptions, certificateAssociations?.ownerUuid),
             groups: buildGroups(groupOptions, certificateAssociations?.groupUuids),
             deletedAttributes: [],
+            ...transformedInitialAssociatedAttributes,
+            ...transformedInitialCustomAttributes,
         };
-    }, [editMode, cmpProfile, protectionMethodEnum, cmpCmpProfileVariantEnum, userOptions, groupOptions]);
+    }, [cmpProfile, multipleResourceCustomAttributes, editMode, protectionMethodEnum, cmpCmpProfileVariantEnum, userOptions, groupOptions]);
 
     const onRaProfileChange = useCallback(
         (form: FormApi<FormValues>, value?: string) => {
@@ -410,7 +434,7 @@ export default function CmpProfileForm() {
             {!isFetchingDetail && (
                 <Form keepDirtyOnReinitialize initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
                     {({ handleSubmit, pristine, submitting, valid, form, values }) => {
-                        const isAttributesChanged = form.getState().values.deletedAttributes.length > 0;
+                        const isEqual = deepEqual(defaultValues, values);
                         return (
                             <BootstrapForm onSubmit={handleSubmit}>
                                 <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithoutAccents())}>
@@ -659,7 +683,7 @@ export default function CmpProfileForm() {
                                             inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
                                             inProgress={submitting}
                                             disabled={
-                                                (!isAttributesChanged && pristine) ||
+                                                isEqual ||
                                                 submitting ||
                                                 !valid ||
                                                 isBusy ||

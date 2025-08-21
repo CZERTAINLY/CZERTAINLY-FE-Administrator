@@ -23,13 +23,14 @@ import { RaProfileSimplifiedModel } from 'types/ra-profiles';
 import { ScepProfileAddRequestModel, ScepProfileEditRequestModel, ScepProfileResponseModel } from 'types/scep-profiles';
 
 import { mutators } from 'utils/attributes/attributeEditorMutators';
-import { collectFormAttributes } from 'utils/attributes/attributes';
+import { collectFormAttributes, mapProfileAttribute, transformAttributes } from 'utils/attributes/attributes';
 
 import { validateAlphaNumericWithoutAccents, validateInteger, validateLength, validateRequired } from 'utils/validators';
 import { KeyAlgorithm, Resource } from '../../../../types/openapi';
 import CertificateField from '../CertificateField';
 import useAttributeEditor, { buildGroups, buildOwner } from 'utils/widget';
 import CertificateAssociationsFormWidget from 'components/CertificateAssociationsFormWidget/CertificateAssociationsFormWidget';
+import { deepEqual } from 'utils/deep-equal';
 
 interface FormValues {
     name: string;
@@ -198,8 +199,26 @@ export default function ScepProfileForm() {
         [raProfiles],
     );
 
-    const defaultValues = useMemo(
-        () => ({
+    const defaultValues = useMemo(() => {
+        const initialAssociatedAttributes = mapProfileAttribute(
+            scepProfile,
+            multipleResourceCustomAttributes,
+            Resource.Certificates,
+            'certificateAssociations.customAttributes',
+            '__attributes__certificateAssociatedAttributes__',
+        );
+        const initialCustomAttributes = mapProfileAttribute(
+            scepProfile,
+            multipleResourceCustomAttributes,
+            Resource.ScepProfiles,
+            'customAttributes',
+            '__attributes__customScepProfile__',
+        );
+
+        const transformedInitialAssociatedAttributes = transformAttributes(initialAssociatedAttributes ?? []);
+        const transformedInitialCustomAttributes = transformAttributes(initialCustomAttributes ?? []);
+
+        return {
             name: editMode ? scepProfileSelector?.name || '' : '',
             description: editMode ? scepProfileSelector?.description || '' : '',
             renewalThreshold: editMode ? scepProfileSelector?.renewThreshold || 0 : 0,
@@ -223,10 +242,11 @@ export default function ScepProfileForm() {
                     : undefined,
             owner: editMode ? buildOwner(userOptions, scepProfileSelector?.certificateAssociations?.ownerUuid) : undefined,
             groups: editMode ? buildGroups(groupOptions, scepProfileSelector?.certificateAssociations?.groupUuids) : [],
-            deletedAttributes: [],
-        }),
-        [editMode, scepProfileSelector, optionsForRaProfiles, userOptions, groupOptions],
-    );
+            deletedAttributes: [] as string[],
+            ...transformedInitialAssociatedAttributes,
+            ...transformedInitialCustomAttributes,
+        };
+    }, [editMode, scepProfileSelector, optionsForRaProfiles, userOptions, groupOptions, multipleResourceCustomAttributes, scepProfile]);
 
     const title = useMemo(() => (editMode ? 'Edit SCEP Profile' : 'Create SCEP Profile'), [editMode]);
 
@@ -273,8 +293,9 @@ export default function ScepProfileForm() {
                     return errors;
                 }}
             >
-                {({ handleSubmit, pristine, submitting, valid, form }) => {
-                    const isAttributesChanged = form.getState().values.deletedAttributes.length > 0;
+                {({ handleSubmit, pristine, submitting, valid, form, values }) => {
+                    const isEqual = deepEqual(defaultValues, values);
+
                     return (
                         <BootstrapForm onSubmit={handleSubmit}>
                             <TextField
@@ -374,7 +395,7 @@ export default function ScepProfileForm() {
                                         title={editMode ? 'Update' : 'Create'}
                                         inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
                                         inProgress={submitting}
-                                        disabled={(!isAttributesChanged && pristine) || submitting || !valid}
+                                        disabled={isEqual || submitting || !valid}
                                     />
 
                                     <Button color="default" onClick={onCancelClick} disabled={submitting}>

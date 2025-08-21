@@ -119,7 +119,6 @@ const getAttributeFormValue = (contentType: AttributeContentType, item: any) => 
         return returnVal;
     }
     if (contentType === AttributeContentType.Date) {
-        console.log('inside date =>item', item);
         const returnVal = item?.value?.data
             ? { data: new Date(item.value.data).toISOString().slice(0, 10) }
             : typeof item === 'string'
@@ -312,4 +311,30 @@ export const testAttributeSetFunction = (
         formAttributeName,
         formAttributeValue,
     };
+};
+
+export const mapProfileAttribute = <T extends Record<string, any>>(
+    profile: T | undefined,
+    multipleResourceCustomAttributes: Record<string, CustomAttributeModel[]>,
+    resourceType: string,
+    attributePath: string,
+    formAttributePrefix: string,
+) => {
+    const getNestedValue = (obj: any, path: string) => {
+        return path.split('.').reduce((current, key) => current?.[key], obj);
+    };
+
+    const attributes = getNestedValue(profile, attributePath);
+
+    return (
+        attributes
+            ?.map((attr: any) => {
+                const matched = multipleResourceCustomAttributes[resourceType]?.find((x) => x.uuid === attr.uuid);
+                if (!matched) {
+                    return null;
+                }
+                return testAttributeSetFunction(matched, attr, `${formAttributePrefix}.${attr.name}`, true, false);
+            })
+            .filter((x: any) => x !== null) ?? []
+    );
 };

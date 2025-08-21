@@ -35,7 +35,7 @@ import {
 import { Resource } from '../../../../types/openapi';
 import useAttributeEditor, { buildGroups, buildOwner } from 'utils/widget';
 import CertificateAssociationsFormWidget from 'components/CertificateAssociationsFormWidget/CertificateAssociationsFormWidget';
-import { testAttributeSetFunction, transformAttributes } from 'utils/attributes/attributes';
+import { transformAttributes, mapProfileAttribute } from 'utils/attributes/attributes';
 import { deepEqual } from 'utils/deep-equal';
 
 interface FormValues {
@@ -171,9 +171,6 @@ export default function AcmeProfileForm() {
                     ),
                 },
             };
-            console.log({
-                request,
-            });
             if (values.raProfile) {
                 request.raProfileUuid = values.raProfile.value;
             }
@@ -241,25 +238,21 @@ export default function AcmeProfileForm() {
         [editMode],
     );
     const defaultValues: FormValues = useMemo(() => {
-        const initialAssociatedAttributes = acmeProfile?.certificateAssociations?.customAttributes
-            ?.map((attr) => {
-                const matched = multipleResourceCustomAttributes[Resource.Certificates]?.find((x) => x.uuid === attr.uuid);
-                if (!matched) {
-                    return null;
-                }
-                return testAttributeSetFunction(matched, attr, `__attributes__certificateAssociatedAttributes__.${attr.name}`, true, false);
-            })
-            .filter((x) => x !== null);
+        const initialAssociatedAttributes = mapProfileAttribute(
+            acmeProfile,
+            multipleResourceCustomAttributes,
+            Resource.Certificates,
+            'certificateAssociations.customAttributes',
+            '__attributes__certificateAssociatedAttributes__',
+        );
 
-        const initialCustomAttributes = acmeProfile?.customAttributes
-            ?.map((attr) => {
-                const matched = multipleResourceCustomAttributes[Resource.AcmeProfiles]?.find((x) => x.uuid === attr.uuid);
-                if (!matched) {
-                    return null;
-                }
-                return testAttributeSetFunction(matched, attr, `__attributes__customAcmeProfile__.${attr.name}`, true, false);
-            })
-            .filter((x) => x !== null);
+        const initialCustomAttributes = mapProfileAttribute(
+            acmeProfile,
+            multipleResourceCustomAttributes,
+            Resource.AcmeProfiles,
+            'customAttributes',
+            '__attributes__customAcmeProfile__',
+        );
 
         const transformedInitialAssociatedAttributes = transformAttributes(initialAssociatedAttributes ?? []);
         const transformedInitialCustomAttributes = transformAttributes(initialCustomAttributes ?? []);
@@ -313,11 +306,7 @@ export default function AcmeProfileForm() {
         <Widget title={title} busy={isBusy}>
             <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
                 {({ handleSubmit, pristine, submitting, valid, form, values }) => {
-                    console.log({ defaultValues, formValues: values });
-
-                    const isEquals = deepEqual(defaultValues, values);
-                    console.log({ isEquals });
-
+                    const isEqual = deepEqual(defaultValues, values);
                     return (
                         <BootstrapForm onSubmit={handleSubmit}>
                             <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithoutAccents())}>
@@ -658,8 +647,7 @@ export default function AcmeProfileForm() {
                                         title={editMode ? 'Update' : 'Create'}
                                         inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
                                         inProgress={submitting}
-                                        disabled={submitting || !valid || isEquals}
-                                        /* disabled={submitting || !valid || (!isAttributesChanged && pristine)} */
+                                        disabled={submitting || !valid || isEqual}
                                     />
 
                                     <Button color="default" onClick={onCancelClick} disabled={submitting}>

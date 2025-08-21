@@ -64,7 +64,6 @@ export default function AttributeEditor({
     setGroupAttributesCallbackAttributes = () => emptyGroupAttributesCallbackAttributes,
     withRemoveAction = true,
 }: Props) {
-    console.log({ attributes, attributeDescriptors });
     const dispatch = useDispatch();
 
     const form = useForm();
@@ -447,10 +446,6 @@ export default function AttributeEditor({
             forceDefaultDescriptorValue: boolean,
             wasDeletedLocally: boolean = false,
         ) => {
-            console.log({ descriptor, attribute, formAttributeName, setDefaultOnRequiredValuesOnly, forceDefaultDescriptorValue });
-
-            //need to add check here, iform values doesnt include attributem we need to be appliedContent as []s
-
             let formAttributeValue = undefined;
             // For re-added attributes, we want empty values but still need access to descriptor options for selects
             // So we use a separate flag for value setting vs options access
@@ -538,7 +533,6 @@ export default function AttributeEditor({
                 // This acts as a fallback for the case when the attribute has no value, but has a default value in the descriptor
                 formAttributeValue = descriptor.content[0].reference ?? descriptor.content[0].data;
             }
-            console.log({ appliedContent, formAttributeValue });
 
             if (descriptor.contentType === AttributeContentType.Codeblock && formAttributeValue !== undefined) {
                 if ((formAttributeValue as CodeBlockAttributeContentDataModel).code !== undefined) {
@@ -928,8 +922,6 @@ export default function AttributeEditor({
         const attributeSelector = (
             <CustomAttributeAddSelect
                 onAdd={(attribute) => {
-                    console.log({ attribute });
-
                     setShownCustomAttributes((state) => [...state, attribute]);
 
                     // Check if this attribute was previously deleted
