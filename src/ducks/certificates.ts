@@ -22,7 +22,13 @@ import {
     ValidationCertificateResultModel,
 } from 'types/certificate';
 import { LocationResponseModel } from 'types/locations';
-import { ApprovalDto, DownloadCertificateChainRequest, DownloadCertificateRequest, ListCertificateApprovalsRequest } from 'types/openapi';
+import {
+    ApprovalDto,
+    CertificateRelationsDto,
+    DownloadCertificateChainRequest,
+    DownloadCertificateRequest,
+    ListCertificateApprovalsRequest,
+} from 'types/openapi';
 import { RaProfileResponseModel } from 'types/ra-profiles';
 import { UserResponseModel } from 'types/users';
 import { downloadFileZip } from 'utils/download';
@@ -34,6 +40,7 @@ export type State = {
     certificates: CertificateListResponseModel[];
 
     certificateDetail?: CertificateDetailResponseModel;
+    certificateRelations?: CertificateRelationsDto;
     certificateHistory?: CertificateHistoryModel[];
     certificateLocations?: LocationResponseModel[];
     issuanceAttributes: { [raProfileId: string]: AttributeDescriptorModel[] };
@@ -47,6 +54,9 @@ export type State = {
     isFetchingValidationResult: boolean;
 
     isFetchingDetail: boolean;
+    isFetchingRelations: boolean;
+    isAssociating: boolean;
+    isDeassociating: boolean;
     isFetchingHistory: boolean;
     isFetchingLocations: boolean;
     isFetchingApprovals: boolean;
@@ -105,6 +115,9 @@ export const initialState: State = {
     isFetchingDetail: false,
     isFetchingHistory: false,
     isFetchingLocations: false,
+    isFetchingRelations: false,
+    isAssociating: false,
+    isDeassociating: false,
     isFetchingCertificateChain: false,
     isFetchingCertificateDownloadContent: false,
     isFetchingCertificateChainDownloadContent: false,
@@ -191,6 +204,44 @@ export const slice = createSlice({
 
         getCertificateDetailFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingDetail = false;
+        },
+
+        getCertificateRelations: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.certificateRelations = undefined;
+            state.isFetchingRelations = true;
+        },
+
+        getCertificateRelationsSuccess: (state, action: PayloadAction<{ certificateRelations: CertificateRelationsDto }>) => {
+            state.isFetchingRelations = false;
+            state.certificateRelations = action.payload.certificateRelations;
+        },
+
+        getCertificateRelationsFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingRelations = false;
+        },
+
+        associateCertificate: (state, action: PayloadAction<{ uuid: string; certificateUuid: string }>) => {
+            state.isAssociating = true;
+        },
+
+        associateCertificateSuccess: (state, action: PayloadAction<{ uuid: string; certificateUuid: string }>) => {
+            state.isAssociating = false;
+        },
+
+        associateCertificateFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isAssociating = false;
+        },
+
+        deassociateCertificate: (state, action: PayloadAction<{ uuid: string; certificateUuid: string }>) => {
+            state.isDeassociating = true;
+        },
+
+        deassociateCertificateSuccess: (state, action: PayloadAction<{ uuid: string; certificateUuid: string }>) => {
+            state.isDeassociating = false;
+        },
+
+        deassociateCertificateFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isDeassociating = false;
         },
 
         getCertificateValidationResult: (state, action: PayloadAction<{ uuid: string }>) => {
@@ -844,6 +895,7 @@ const certificates = createSelector(state, (state) => state.certificates);
 const certificateChain = createSelector(state, (state) => state.certificateChain);
 
 const certificateDetail = createSelector(state, (state) => state.certificateDetail);
+const certificateRelations = createSelector(state, (state) => state.certificateRelations);
 const certificateChainDownloadContent = createSelector(state, (state) => state.certificateChainDownloadContent);
 const certificateDownloadContent = createSelector(state, (state) => state.certificateDownloadContent);
 const certificateHistory = createSelector(state, (state) => state.certificateHistory);
@@ -888,6 +940,10 @@ const csrAttributeDescriptors = createSelector(state, (state) => state.csrAttrib
 const isFetchingContents = createSelector(state, (state) => state.isFetchingContents);
 const isFetchingCertificateChain = createSelector(state, (state) => state.isFetchingCertificateChain);
 
+const isFetchingRelations = createSelector(state, (state) => state.isFetchingRelations);
+const isAssociating = createSelector(state, (state) => state.isAssociating);
+const isDeassociating = createSelector(state, (state) => state.isDeassociating);
+
 const isFetchingCertificateDownloadContent = createSelector(state, (state) => state.isFetchingCertificateDownloadContent);
 const isFetchingCertificateChainDownloadContent = createSelector(state, (state) => state.isFetchingCertificateChainDownloadContent);
 
@@ -899,6 +955,10 @@ export const selectors = {
     deleteErrorMessage,
     certificates,
     certificateDetail,
+    certificateRelations,
+    isFetchingRelations,
+    isAssociating,
+    isDeassociating,
     certificateChainDownloadContent,
     isFetchingCertificateDownloadContent,
     isFetchingCertificateChainDownloadContent,

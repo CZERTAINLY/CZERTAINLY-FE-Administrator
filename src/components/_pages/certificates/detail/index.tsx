@@ -24,10 +24,10 @@ import { selectors as settingSelectors } from 'ducks/settings';
 import {
     CertificateState as CertStatus,
     CertificateFormatEncoding,
-    CertificateKeyUsage,
     CertificateProtocol,
     CertificateRequestFormat,
     CertificateRevocationReason,
+    CertificateSimpleDto,
     CertificateSubjectType,
     CertificateValidationStatus,
 } from '../../../../types/openapi';
@@ -79,6 +79,7 @@ import CertificateStatus from '../CertificateStatus';
 import CertificateDownloadForm from './CertificateDownloadForm';
 import styles from './certificateDetail.module.scss';
 import { createWidgetDetailHeaders } from 'utils/widget';
+import CertificateList from 'components/_pages/certificates/list';
 
 interface ChainDownloadSwitchState {
     isDownloadTriggered: boolean;
@@ -97,6 +98,7 @@ export default function CertificateDetail() {
 
     const copyToClipboard = useCopyToClipboard();
     const certificate = useSelector(selectors.certificateDetail);
+    const certificateRelations = useSelector(selectors.certificateRelations);
     const certificateChain = useSelector(selectors.certificateChain);
     const certificateChainDownloadContent = useSelector(selectors.certificateChainDownloadContent);
     const certificateDownloadContent = useSelector(selectors.certificateDownloadContent);
@@ -148,6 +150,10 @@ export default function CertificateDetail() {
     const isUpdatingTrustedStatus = useSelector(selectors.isUpdatingTrustedStatus);
     const isArchiving = useSelector(selectors.isArchiving);
 
+    const isDeassociating = useSelector(selectors.isDeassociating);
+    const isAssociating = useSelector(selectors.isAssociating);
+    const isFetchingRelations = useSelector(selectors.isFetchingRelations);
+
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [renew, setRenew] = useState<boolean>(false);
     const [rekey, setRekey] = useState<boolean>(false);
@@ -173,6 +179,12 @@ export default function CertificateDetail() {
 
     const [addCertToLocation, setAddCertToLocation] = useState<boolean>(false);
     const [confirmRemove, setConfirmRemove] = useState<boolean>(false);
+
+    const [isAddingRelatedCertificate, setIsAddingRelatedCertificate] = useState<boolean>(false);
+    const [selectedCertificate, setSelectedCertificate] = useState<string | undefined>();
+    const [confirmDeleteRelatedCertificate, setConfirmDeleteRelatedCertificate] = useState<boolean>(false);
+    const [relatedCertificateCheckedRows, setRelatedCertificateCheckedRows] = useState<string[]>([]);
+    const [isAlreadyRelatedError, setIsAlreadyRelatedError] = useState<boolean>(false);
 
     const isRemovingCertificate = useSelector(locationSelectors.isRemovingCertificate);
     const isPushingCertificate = useSelector(locationSelectors.isPushingCertificate);
@@ -301,11 +313,17 @@ export default function CertificateDetail() {
         getFreshCertificateLocations();
     }, [getFreshCertificateLocations]);
 
+    useEffect(() => {
+        if (!id) return;
+        dispatch(actions.getCertificateRelations({ uuid: id }));
+    }, [dispatch, id]);
+
     const getFreshCertificateDetail = useCallback(() => {
         if (!id) return;
         dispatch(actions.clearCertificateDetail());
         dispatch(actions.getCertificateDetail({ uuid: id }));
         dispatch(actions.getCertificateHistory({ uuid: id }));
+        dispatch(actions.getCertificateRelations({ uuid: id }));
         getFreshApprovalList();
         getFreshCertificateLocations();
     }, [dispatch, id, getFreshApprovalList, getFreshCertificateLocations]);
@@ -967,21 +985,14 @@ export default function CertificateDetail() {
                 content: 'Common Name',
             },
             {
-                id: 'serial',
-                content: 'Serial Number',
+                id: 'relation',
+                content: 'Relation',
             },
-            {
-                id: 'valid',
-                content: 'Valid From',
-            },
-            {
-                id: 'expires',
-                content: 'Expires At',
-            },
-            {
-                id: 'status',
-                content: 'Status',
-            },
+            { id: 'relationType', content: 'Relation Type' },
+            { id: 'state', content: 'State' },
+            { id: 'serialNumber', content: 'Serial Number' },
+            { id: 'valid', content: 'Valid From' },
+            { id: 'expires', content: 'Expires At' },
         ],
         [],
     );
@@ -1022,20 +1033,6 @@ export default function CertificateDetail() {
                   {
                       id: 'uuid',
                       columns: ['UUID', certificate.uuid, ''],
-                  },
-                  {
-                      id: 'sourceCertificateUuid',
-                      columns: [
-                          'Source Certificate UUID',
-                          certificate.sourceCertificateUuid ? (
-                              <Link to={`../certificates/detail/${certificate.sourceCertificateUuid}`}>
-                                  {certificate.sourceCertificateUuid}
-                              </Link>
-                          ) : (
-                              ''
-                          ),
-                          '',
-                      ],
                   },
                   {
                       id: 'owner',
@@ -1291,22 +1288,99 @@ export default function CertificateDetail() {
         return validationDataRows;
     }, [certificate, validationResult, certificateValidationCheck]);
 
-    const relatedCertificatesData: TableDataRow[] = useMemo(
-        () =>
-            !certificate?.relatedCertificates
-                ? []
-                : certificate.relatedCertificates.map((c) => ({
-                      id: c.uuid,
-                      columns: [
-                          <Link to={`../certificates/detail/${c.uuid}`}>{c.commonName}</Link>,
-                          c.serialNumber ?? '',
-                          c.notBefore ? <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(c.notBefore)}</span> : '',
-                          c.notAfter ? <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(c.notAfter)}</span> : '',
-                          <CertificateStatus status={c.state} />,
-                      ],
-                  })),
-        [certificate?.relatedCertificates],
+    const setRelatedCertificatesRelation = (relatedCertificates: CertificateSimpleDto[], type: 'predecessor' | 'successor') => {
+        const withRelationType = relatedCertificates.map((c) => ({
+            ...c,
+            relation: type,
+        }));
+        return withRelationType;
+    };
+
+    const relatedCertificates = useMemo(() => {
+        if (!certificateRelations) return [];
+        return [
+            ...setRelatedCertificatesRelation(certificateRelations?.predecessorCertificates!, 'predecessor'),
+            ...setRelatedCertificatesRelation(certificateRelations?.successorCertificates!, 'successor'),
+        ];
+    }, [certificateRelations]);
+
+    const getCertificateIsAlreadyRelated = useCallback(
+        (associateId: string | undefined) => {
+            if (!relatedCertificates || !associateId) return false;
+            return relatedCertificates.some((c) => c.uuid === associateId);
+        },
+        [relatedCertificates],
     );
+
+    const onCertificateAssociate = useCallback(
+        (certificateId: string | undefined, associateId: string | undefined) => {
+            if (!certificateId || !associateId) return;
+            setIsAddingRelatedCertificate(false);
+
+            dispatch(actions.associateCertificate({ uuid: certificateId, certificateUuid: associateId }));
+            setSelectedCertificate(undefined);
+        },
+        [dispatch],
+    );
+
+    const getRelatedCertificateName = useCallback(
+        (uuid: string) => {
+            if (!relatedCertificates) return '';
+            return relatedCertificates.find((c) => c.uuid === uuid)?.commonName;
+        },
+        [relatedCertificates],
+    );
+
+    const relatedCertificatesData: TableDataRow[] = useMemo(() => {
+        if (!relatedCertificates) return [];
+
+        return relatedCertificates.map((c) => ({
+            id: c.uuid,
+            columns: [
+                c.commonName || '',
+                c.relation || '',
+                c.relationType || '',
+                c.state || '',
+                c.serialNumber || '',
+                c.notBefore ? <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(c.notBefore)}</span> : '',
+                c.notAfter ? <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(c.notAfter)}</span> : '',
+            ],
+        }));
+    }, [relatedCertificates]);
+
+    const onDeleteRelatedCertificate = useCallback(() => {
+        if (relatedCertificateCheckedRows.length === 0 || !id) return;
+        dispatch(actions.deassociateCertificate({ uuid: id, certificateUuid: relatedCertificateCheckedRows[0] }));
+        setConfirmDeleteRelatedCertificate(false);
+    }, [dispatch, relatedCertificateCheckedRows, id]);
+
+    const relatedCertificatesButtons: WidgetButtonProps[] = useMemo(() => {
+        return [
+            {
+                icon: 'plus',
+                disabled: isCertificateArchived,
+                tooltip: 'Add related certificate',
+                onClick: () => {
+                    setRelatedCertificateCheckedRows([]);
+                    setIsAddingRelatedCertificate(true);
+                },
+            },
+            {
+                icon: 'trash',
+                disabled: relatedCertificateCheckedRows.length === 0,
+                tooltip: 'Remove',
+                onClick: () => {
+                    setConfirmDeleteRelatedCertificate(true);
+                },
+            },
+        ];
+    }, [isCertificateArchived, relatedCertificateCheckedRows]);
+
+    useEffect(() => {
+        if (!selectedCertificate) return;
+        const isAlreadyRelated = getCertificateIsAlreadyRelated(selectedCertificate);
+        setIsAlreadyRelatedError(isAlreadyRelated);
+    }, [selectedCertificate, getCertificateIsAlreadyRelated]);
 
     const switchCallback = useCallback(() => {
         if (!certificate) return;
@@ -2070,11 +2144,20 @@ export default function CertificateDetail() {
                             <Widget>
                                 <Widget
                                     title="Related Certificates"
+                                    busy={isDeassociating || isAssociating || isFetchingRelations}
                                     titleSize="large"
                                     widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}
+                                    widgetButtons={relatedCertificatesButtons}
                                 >
                                     <br />
-                                    <CustomTable headers={relatedCertificatesHeaders} data={relatedCertificatesData} />
+                                    <CustomTable
+                                        headers={relatedCertificatesHeaders}
+                                        data={relatedCertificatesData}
+                                        hasCheckboxes={true}
+                                        hasPagination={true}
+                                        onCheckedRowsChanged={(rows) => setRelatedCertificateCheckedRows(rows as string[])}
+                                        multiSelect={false}
+                                    />
                                 </Widget>
                             </Widget>
                         ),
@@ -2170,6 +2253,76 @@ export default function CertificateDetail() {
             />
 
             <Dialog
+                size="xl"
+                isOpen={isAddingRelatedCertificate}
+                caption={`Add Related Certificate`}
+                toggle={() => setIsAddingRelatedCertificate(false)}
+                buttons={[]}
+                body={
+                    <>
+                        <Form
+                            onSubmit={() => {
+                                onCertificateAssociate(id, selectedCertificate);
+                            }}
+                        >
+                            {({ handleSubmit, submitting, valid }) => (
+                                <BootstrapForm onSubmit={handleSubmit}>
+                                    <CertificateList
+                                        hideAdditionalButtons={true}
+                                        hideWidgetButtons={true}
+                                        multiSelect={false}
+                                        onCheckedRowsChanged={(rows) => {
+                                            setSelectedCertificate(rows[0] as string);
+                                        }}
+                                    />
+                                    <div className="d-flex align-items-center" style={{ padding: '0 30px' }}>
+                                        <ButtonGroup>
+                                            <ProgressButton
+                                                title="Add"
+                                                inProgressTitle="Adding..."
+                                                inProgress={submitting}
+                                                disabled={!selectedCertificate || !valid || isAlreadyRelatedError}
+                                            />
+
+                                            <Button
+                                                color="default"
+                                                onClick={() => setIsAddingRelatedCertificate(false)}
+                                                disabled={submitting}
+                                            >
+                                                Cancel
+                                            </Button>
+                                        </ButtonGroup>
+                                        {isAlreadyRelatedError ? <span className="text-danger">Certificate is already related</span> : null}
+                                    </div>
+                                </BootstrapForm>
+                            )}
+                        </Form>
+                    </>
+                }
+            />
+
+            <Dialog
+                isOpen={confirmDeleteRelatedCertificate}
+                caption="Delete Related Certificate"
+                body={
+                    <>
+                        You are about to delete a{' '}
+                        <span style={{ fontWeight: 'bold' }}>{getRelatedCertificateName(relatedCertificateCheckedRows[0] ?? '')} </span>
+                        Related Certificate.
+                        <br />
+                        <br />
+                        Is this what you want to do?
+                    </>
+                }
+                toggle={() => setConfirmDeleteRelatedCertificate(false)}
+                buttons={[
+                    { color: 'danger', onClick: () => onDeleteRelatedCertificate(), body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setConfirmDeleteRelatedCertificate(false), body: 'Cancel' },
+                ]}
+            />
+
+            <Dialog
+                size="xl"
                 isOpen={addCertToLocation}
                 caption={`Push certificate to the Location`}
                 toggle={() => setAddCertToLocation(false)}
