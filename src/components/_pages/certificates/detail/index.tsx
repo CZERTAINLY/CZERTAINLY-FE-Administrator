@@ -1357,6 +1357,7 @@ export default function CertificateDetail() {
     const relatedCertificatesButtons: WidgetButtonProps[] = useMemo(() => {
         return [
             {
+                id: 'add_related_certificate',
                 icon: 'plus',
                 disabled: isCertificateArchived,
                 tooltip: 'Add related certificate',
@@ -1366,6 +1367,7 @@ export default function CertificateDetail() {
                 },
             },
             {
+                id: 'remove_related_certificate',
                 icon: 'trash',
                 disabled: relatedCertificateCheckedRows.length === 0,
                 tooltip: 'Remove',
