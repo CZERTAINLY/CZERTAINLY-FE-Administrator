@@ -125,6 +125,8 @@ models/CertificateInLocationDto.ts
 models/CertificateKeyUsage.ts
 models/CertificateProtocol.ts
 models/CertificateProtocolDto.ts
+models/CertificateRelationType.ts
+models/CertificateRelationsDto.ts
 models/CertificateRequestDto.ts
 models/CertificateRequestFormat.ts
 models/CertificateResponseDto.ts
@@ -132,6 +134,7 @@ models/CertificateRevocationReason.ts
 models/CertificateSearchRequestDto.ts
 models/CertificateSettingsDto.ts
 models/CertificateSettingsUpdateDto.ts
+models/CertificateSimpleDto.ts
 models/CertificateState.ts
 models/CertificateSubjectType.ts
 models/CertificateType.ts

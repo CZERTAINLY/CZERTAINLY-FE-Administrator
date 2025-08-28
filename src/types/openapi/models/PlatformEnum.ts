@@ -39,6 +39,7 @@ export enum PlatformEnum {
     CertificateProtocol = 'CertificateProtocol',
     CertificateSubjectType = 'CertificateSubjectType',
     CertificateKeyUsage = 'CertificateKeyUsage',
+    CertificateRelationType = 'CertificateRelationType',
     OidCategory = 'OidCategory',
     KeyAlgorithm = 'KeyAlgorithm',
     KeyFormat = 'KeyFormat',

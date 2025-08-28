@@ -32,6 +32,7 @@ interface Props {
     multiSelect?: boolean;
     onCheckedRowsChanged?: (checkedRows: (string | number)[]) => void;
     hideWidgetButtons?: boolean;
+    hideAdditionalButtons?: boolean;
 }
 
 export default function CertificateList({
@@ -39,6 +40,7 @@ export default function CertificateList({
     selectCertsOnly = false,
     multiSelect = true,
     onCheckedRowsChanged,
+    hideAdditionalButtons = false,
 }: Props) {
     const dispatch = useDispatch();
 
@@ -385,7 +387,7 @@ export default function CertificateList({
                     (apiClients: ApiClients) => apiClients.certificates.getSearchableFieldInformation4(),
                     [],
                 )}
-                additionalButtons={buttons}
+                additionalButtons={hideAdditionalButtons ? [] : buttons}
                 headers={certificatesRowHeaders}
                 data={certificateList}
                 isBusy={isBusy}

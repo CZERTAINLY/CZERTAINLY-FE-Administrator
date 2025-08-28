@@ -29,6 +29,7 @@ import type {
     CertificateEventHistoryDto,
     CertificateFormat,
     CertificateFormatEncoding,
+    CertificateRelationsDto,
     CertificateResponseDto,
     CertificateSearchRequestDto,
     CertificateUpdateObjectsDto,
@@ -45,6 +46,11 @@ import type {
 
 export interface ArchiveCertificateRequest {
     uuid: string;
+}
+
+export interface AssociateCertificatesRequest {
+    uuid: string;
+    certificateUuid: string;
 }
 
 export interface BulkArchiveCertificateRequest {
@@ -101,6 +107,10 @@ export interface GetCertificateEventHistoryRequest {
     uuid: string;
 }
 
+export interface GetCertificateRelationsRequest {
+    uuid: string;
+}
+
 export interface GetCertificateValidationResultRequest {
     uuid: string;
 }
@@ -117,6 +127,11 @@ export interface ListCertificateLocationsRequest {
 
 export interface ListCertificatesRequest {
     certificateSearchRequestDto: CertificateSearchRequestDto;
+}
+
+export interface RemoveCertificateAssociationRequest {
+    uuid: string;
+    certificateUuid: string;
 }
 
 export interface SubmitCertificateRequestRequest {
@@ -151,6 +166,21 @@ export class CertificateInventoryApi extends BaseAPI {
 
         return this.request<void>({
             url: '/v1/certificates/{uuid}/archive'.replace('{uuid}', encodeURI(uuid)),
+            method: 'PATCH',
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * Associate a source certificate to the given certificate
+     */
+    associateCertificates({ uuid, certificateUuid }: AssociateCertificatesRequest): Observable<void>
+    associateCertificates({ uuid, certificateUuid }: AssociateCertificatesRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    associateCertificates({ uuid, certificateUuid }: AssociateCertificatesRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(uuid, 'uuid', 'associateCertificates');
+        throwIfNullOrUndefined(certificateUuid, 'certificateUuid', 'associateCertificates');
+
+        return this.request<void>({
+            url: '/v1/certificates/{uuid}/relations/{certificateUuid}'.replace('{uuid}', encodeURI(uuid)).replace('{certificateUuid}', encodeURI(certificateUuid)),
             method: 'PATCH',
         }, opts?.responseOpts);
     };
@@ -384,6 +414,20 @@ export class CertificateInventoryApi extends BaseAPI {
     };
 
     /**
+     * Get relations for a certificate
+     */
+    getCertificateRelations({ uuid }: GetCertificateRelationsRequest): Observable<CertificateRelationsDto>
+    getCertificateRelations({ uuid }: GetCertificateRelationsRequest, opts?: OperationOpts): Observable<AjaxResponse<CertificateRelationsDto>>
+    getCertificateRelations({ uuid }: GetCertificateRelationsRequest, opts?: OperationOpts): Observable<CertificateRelationsDto | AjaxResponse<CertificateRelationsDto>> {
+        throwIfNullOrUndefined(uuid, 'uuid', 'getCertificateRelations');
+
+        return this.request<CertificateRelationsDto>({
+            url: '/v1/certificates/{uuid}/relations'.replace('{uuid}', encodeURI(uuid)),
+            method: 'GET',
+        }, opts?.responseOpts);
+    };
+
+    /**
      * Get Certificate Validation Result
      */
     getCertificateValidationResult({ uuid }: GetCertificateValidationResultRequest): Observable<CertificateValidationResultDto>
@@ -472,6 +516,21 @@ export class CertificateInventoryApi extends BaseAPI {
             method: 'POST',
             headers,
             body: certificateSearchRequestDto,
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * Remove a source certificate association from the given certificate
+     */
+    removeCertificateAssociation({ uuid, certificateUuid }: RemoveCertificateAssociationRequest): Observable<void>
+    removeCertificateAssociation({ uuid, certificateUuid }: RemoveCertificateAssociationRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    removeCertificateAssociation({ uuid, certificateUuid }: RemoveCertificateAssociationRequest, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(uuid, 'uuid', 'removeCertificateAssociation');
+        throwIfNullOrUndefined(certificateUuid, 'certificateUuid', 'removeCertificateAssociation');
+
+        return this.request<void>({
+            url: '/v1/certificates/{uuid}/relations/{certificateUuid}'.replace('{uuid}', encodeURI(uuid)).replace('{certificateUuid}', encodeURI(certificateUuid)),
+            method: 'DELETE',
         }, opts?.responseOpts);
     };
 

@@ -84,6 +84,70 @@ const getCertificateDetail: AppEpic = (action$, state, deps) => {
     );
 };
 
+const getCertificateRelations: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.getCertificateRelations.match),
+        switchMap((action) =>
+            deps.apiClients.certificates.getCertificateRelations({ uuid: action.payload.uuid }).pipe(
+                map((response) => slice.actions.getCertificateRelationsSuccess({ certificateRelations: response })),
+                catchError((error) =>
+                    of(
+                        slice.actions.getCertificateRelationsFailure({ error: extractError(error, 'Failed to get certificate relations') }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to get certificate relations' }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+const associateCertificate: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.associateCertificate.match),
+        switchMap((action) =>
+            deps.apiClients.certificates.associateCertificates(action.payload).pipe(
+                mergeMap(() => of(slice.actions.associateCertificateSuccess(action.payload))),
+                catchError((err) =>
+                    of(
+                        slice.actions.associateCertificateFailure({ error: extractError(err, 'Failed to associate certificate') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to associate certificate' }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+const handleAssociateCertificateSuccess: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.associateCertificateSuccess.match),
+        map((action) => slice.actions.getCertificateRelations({ uuid: action.payload.uuid })),
+    );
+};
+
+const deassociateCertificate: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.deassociateCertificate.match),
+        switchMap((action) =>
+            deps.apiClients.certificates
+                .removeCertificateAssociation({ uuid: action.payload.uuid, certificateUuid: action.payload.certificateUuid })
+                .pipe(
+                    mergeMap(() => of(slice.actions.deassociateCertificateSuccess(action.payload))),
+                    catchError((err) =>
+                        of(slice.actions.deassociateCertificateFailure({ error: extractError(err, 'Failed to deassociate certificate') })),
+                    ),
+                ),
+        ),
+    );
+};
+
+const handleDeassociateCertificateSuccess: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.deassociateCertificateSuccess.match),
+        map((action) => slice.actions.getCertificateRelations({ uuid: action.payload.uuid })),
+    );
+};
+
 const getCertificateValidationResult: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.getCertificateValidationResult.match),
@@ -1153,6 +1217,11 @@ const bulkUnarchiveCertificates: AppEpic = (action$, state$, deps) => {
 const epics = [
     listCertificates,
     getCertificateDetail,
+    getCertificateRelations,
+    associateCertificate,
+    deassociateCertificate,
+    handleAssociateCertificateSuccess,
+    handleDeassociateCertificateSuccess,
     getCertificateValidationResult,
     issueCertificate,
     issueCertificateNew,

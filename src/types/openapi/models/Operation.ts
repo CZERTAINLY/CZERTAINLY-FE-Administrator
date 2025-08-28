@@ -106,6 +106,7 @@ export enum Operation {
     PromoteMetadata = 'promoteMetadata',
     Archive = 'archive',
     Unarchive = 'unarchive',
+    GetAssociations = 'getAssociations',
     ListCertificateProfiles = 'listCertificateProfiles',
     ListCas = 'listCas'
 }
