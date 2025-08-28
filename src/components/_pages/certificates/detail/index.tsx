@@ -20,6 +20,7 @@ import { actions as connectorActions } from 'ducks/connectors';
 import { actions as locationActions, selectors as locationSelectors } from 'ducks/locations';
 import { actions as raProfileAction, selectors as raProfileSelectors } from 'ducks/ra-profiles';
 import { selectors as settingSelectors } from 'ducks/settings';
+import { actions as filterActions } from 'ducks/filters';
 
 import {
     CertificateState as CertStatus,
@@ -80,6 +81,8 @@ import CertificateDownloadForm from './CertificateDownloadForm';
 import styles from './certificateDetail.module.scss';
 import { createWidgetDetailHeaders } from 'utils/widget';
 import CertificateList from 'components/_pages/certificates/list';
+import { EntityType } from 'ducks/filters';
+import { capitalize } from 'utils/common-utils';
 
 interface ChainDownloadSwitchState {
     isDownloadTriggered: boolean;
@@ -286,6 +289,11 @@ export default function CertificateDetail() {
         if (!id) return;
         dispatch(actions.getCertificateHistory({ uuid: id }));
     }, [dispatch, id]);
+
+    const getFreshRelatedCertificates = useCallback(() => {
+        if (!id || isDeassociating || isAssociating) return;
+        dispatch(actions.getCertificateRelations({ uuid: id }));
+    }, [dispatch, id, isDeassociating, isAssociating]);
 
     const getFreshCertificateLocations = useCallback(() => {
         if (!id || isPushingCertificate || isRemovingCertificate) return;
@@ -1299,8 +1307,8 @@ export default function CertificateDetail() {
     const relatedCertificates = useMemo(() => {
         if (!certificateRelations) return [];
         return [
-            ...setRelatedCertificatesRelation(certificateRelations?.predecessorCertificates!, 'predecessor'),
-            ...setRelatedCertificatesRelation(certificateRelations?.successorCertificates!, 'successor'),
+            ...setRelatedCertificatesRelation(certificateRelations?.predecessorCertificates ?? [], 'predecessor'),
+            ...setRelatedCertificatesRelation(certificateRelations?.successorCertificates ?? [], 'successor'),
         ];
     }, [certificateRelations]);
 
@@ -1316,7 +1324,7 @@ export default function CertificateDetail() {
         (certificateId: string | undefined, associateId: string | undefined) => {
             if (!certificateId || !associateId) return;
             setIsAddingRelatedCertificate(false);
-
+            setIsAlreadyRelatedError(false);
             dispatch(actions.associateCertificate({ uuid: certificateId, certificateUuid: associateId }));
             setSelectedCertificate(undefined);
         },
@@ -1337,10 +1345,17 @@ export default function CertificateDetail() {
         return relatedCertificates.map((c) => ({
             id: c.uuid,
             columns: [
-                c.commonName || '',
-                c.relation || '',
-                c.relationType || '',
-                c.state || '',
+                capitalize(c.commonName) || '',
+                <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    {c.relation === 'successor' && <span>{capitalize(c.relation)}</span>}
+                    <i
+                        className="fa-solid fa-arrow-right"
+                        style={{ transform: c.relation === 'predecessor' ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                    ></i>
+                    {c.relation === 'predecessor' && <span>{capitalize(c.relation)}</span>}
+                </div>,
+                <Badge color="success">{capitalize(c.relationType)}</Badge>,
+                <CertificateStatus status={c.state} />,
                 c.serialNumber || '',
                 c.notBefore ? <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(c.notBefore)}</span> : '',
                 c.notAfter ? <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(c.notAfter)}</span> : '',
@@ -1363,6 +1378,7 @@ export default function CertificateDetail() {
                 tooltip: 'Add related certificate',
                 onClick: () => {
                     setRelatedCertificateCheckedRows([]);
+                    setIsAlreadyRelatedError(false);
                     setIsAddingRelatedCertificate(true);
                 },
             },
@@ -1379,10 +1395,22 @@ export default function CertificateDetail() {
     }, [isCertificateArchived, relatedCertificateCheckedRows]);
 
     useEffect(() => {
-        if (!selectedCertificate) return;
+        if (!selectedCertificate) {
+            setIsAlreadyRelatedError(false);
+        }
         const isAlreadyRelated = getCertificateIsAlreadyRelated(selectedCertificate);
+
         setIsAlreadyRelatedError(isAlreadyRelated);
     }, [selectedCertificate, getCertificateIsAlreadyRelated]);
+
+    const clearRelatedCertificatesFilters = useCallback(() => {
+        dispatch(filterActions.setCurrentFilters({ entity: EntityType.CERTIFICATE, currentFilters: [] }));
+    }, [dispatch]);
+
+    useEffect(() => {
+        //clear filters for related certificates when component is mounted
+        clearRelatedCertificatesFilters();
+    }, [clearRelatedCertificatesFilters]);
 
     const switchCallback = useCallback(() => {
         if (!certificate) return;
@@ -2141,7 +2169,6 @@ export default function CertificateDetail() {
                     },
                     {
                         title: 'Related Certificates',
-                        hidden: !certificate?.relatedCertificates?.length,
                         content: (
                             <Widget>
                                 <Widget
@@ -2150,6 +2177,7 @@ export default function CertificateDetail() {
                                     titleSize="large"
                                     widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}
                                     widgetButtons={relatedCertificatesButtons}
+                                    refreshAction={getFreshRelatedCertificates}
                                 >
                                     <br />
                                     <CustomTable
@@ -2261,45 +2289,39 @@ export default function CertificateDetail() {
                 toggle={() => setIsAddingRelatedCertificate(false)}
                 buttons={[]}
                 body={
-                    <>
-                        <Form
-                            onSubmit={() => {
-                                onCertificateAssociate(id, selectedCertificate);
-                            }}
-                        >
-                            {({ handleSubmit, submitting, valid }) => (
-                                <BootstrapForm onSubmit={handleSubmit}>
-                                    <CertificateList
-                                        hideAdditionalButtons={true}
-                                        hideWidgetButtons={true}
-                                        multiSelect={false}
-                                        onCheckedRowsChanged={(rows) => {
-                                            setSelectedCertificate(rows[0] as string);
-                                        }}
-                                    />
-                                    <div className="d-flex align-items-center" style={{ padding: '0 30px' }}>
-                                        <ButtonGroup>
-                                            <ProgressButton
-                                                title="Add"
-                                                inProgressTitle="Adding..."
-                                                inProgress={submitting}
-                                                disabled={!selectedCertificate || !valid || isAlreadyRelatedError}
-                                            />
+                    <Form
+                        onSubmit={() => {
+                            onCertificateAssociate(id, selectedCertificate);
+                        }}
+                    >
+                        {({ handleSubmit, submitting, valid }) => (
+                            <BootstrapForm onSubmit={handleSubmit}>
+                                <CertificateList
+                                    hideAdditionalButtons={true}
+                                    hideWidgetButtons={true}
+                                    multiSelect={false}
+                                    onCheckedRowsChanged={(rows) => {
+                                        setSelectedCertificate(rows[0] as string);
+                                    }}
+                                />
+                                <div className="d-flex align-items-center" style={{ padding: '0 30px' }}>
+                                    <ButtonGroup>
+                                        <ProgressButton
+                                            title="Add"
+                                            inProgressTitle="Adding..."
+                                            inProgress={submitting}
+                                            disabled={!selectedCertificate || !valid || isAlreadyRelatedError}
+                                        />
 
-                                            <Button
-                                                color="default"
-                                                onClick={() => setIsAddingRelatedCertificate(false)}
-                                                disabled={submitting}
-                                            >
-                                                Cancel
-                                            </Button>
-                                        </ButtonGroup>
-                                        {isAlreadyRelatedError ? <span className="text-danger">Certificate is already related</span> : null}
-                                    </div>
-                                </BootstrapForm>
-                            )}
-                        </Form>
-                    </>
+                                        <Button color="default" onClick={() => setIsAddingRelatedCertificate(false)} disabled={submitting}>
+                                            Cancel
+                                        </Button>
+                                    </ButtonGroup>
+                                    {isAlreadyRelatedError ? <span className="text-danger">Certificate is already related</span> : null}
+                                </div>
+                            </BootstrapForm>
+                        )}
+                    </Form>
                 }
             />
 

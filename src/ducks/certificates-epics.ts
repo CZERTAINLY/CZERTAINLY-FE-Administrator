@@ -108,7 +108,10 @@ const associateCertificate: AppEpic = (action$, state, deps) => {
             deps.apiClients.certificates.associateCertificates(action.payload).pipe(
                 mergeMap(() => of(slice.actions.associateCertificateSuccess(action.payload))),
                 catchError((err) =>
-                    of(slice.actions.associateCertificateFailure({ error: extractError(err, 'Failed to associate certificate') })),
+                    of(
+                        slice.actions.associateCertificateFailure({ error: extractError(err, 'Failed to associate certificate') }),
+                        appRedirectActions.fetchError({ error: err, message: 'Failed to associate certificate' }),
+                    ),
                 ),
             ),
         ),
