@@ -20,7 +20,7 @@ import { actions as connectorActions } from 'ducks/connectors';
 import { actions as locationActions, selectors as locationSelectors } from 'ducks/locations';
 import { actions as raProfileAction, selectors as raProfileSelectors } from 'ducks/ra-profiles';
 import { selectors as settingSelectors } from 'ducks/settings';
-import { actions as filterActions } from 'ducks/filters';
+import { EntityType, actions as filterActions } from 'ducks/filters';
 
 import {
     CertificateState as CertStatus,
@@ -81,7 +81,6 @@ import CertificateDownloadForm from './CertificateDownloadForm';
 import styles from './certificateDetail.module.scss';
 import { createWidgetDetailHeaders } from 'utils/widget';
 import CertificateList from 'components/_pages/certificates/list';
-import { EntityType } from 'ducks/filters';
 import { capitalize } from 'utils/common-utils';
 
 interface ChainDownloadSwitchState {
@@ -1346,7 +1345,7 @@ export default function CertificateDetail() {
             id: c.uuid,
             columns: [
                 capitalize(c.commonName) || '',
-                <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <div key={`${c.uuid}-relation`} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                     {c.relation === 'successor' && <span>{capitalize(c.relation)}</span>}
                     <i
                         className="fa-solid fa-arrow-right"
@@ -1354,7 +1353,9 @@ export default function CertificateDetail() {
                     ></i>
                     {c.relation === 'predecessor' && <span>{capitalize(c.relation)}</span>}
                 </div>,
-                <Badge color="success">{capitalize(c.relationType)}</Badge>,
+                <Badge key={`${c.uuid}-type`} color="success">
+                    {capitalize(c.relationType)}
+                </Badge>,
                 <CertificateStatus status={c.state} />,
                 c.serialNumber || '',
                 c.notBefore ? <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(c.notBefore)}</span> : '',
