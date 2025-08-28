@@ -1344,7 +1344,7 @@ export default function CertificateDetail() {
         return relatedCertificates.map((c) => ({
             id: c.uuid,
             columns: [
-                capitalize(c.commonName) || '',
+                <Link to={`../../certificates/detail/${c.uuid}`}>{c.commonName}</Link>,
                 <div key={`${c.uuid}-relation`} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                     {c.relation === 'successor' && <span>{capitalize(c.relation)}</span>}
                     <i
