@@ -47,6 +47,8 @@ const noValue: { [condition in FilterConditionOperator]: boolean } = {
     [FilterConditionOperator.EndsWith]: false,
     [FilterConditionOperator.InNext]: false,
     [FilterConditionOperator.InPast]: false,
+    [FilterConditionOperator.Matches]: false,
+    [FilterConditionOperator.NotMatches]: false,
     [FilterConditionOperator.Empty]: true,
     [FilterConditionOperator.NotEmpty]: true,
     [FilterConditionOperator.Success]: true,
@@ -488,6 +490,44 @@ export default function FilterWidget({
                 />
             );
         }
+        function renderNumberInput() {
+            const numericValue = Number(filterValue);
+            const displayValue = isNaN(numericValue) ? '' : numericValue;
+
+            return (
+                <Input
+                    id="valueSelect"
+                    type="number"
+                    step="1"
+                    value={displayValue}
+                    onChange={(e) => {
+                        const value = e.target.value;
+                        // Only allow integer values
+                        if (value === '' || /^\d+$/.test(value)) {
+                            setFilterValue(JSON.parse(JSON.stringify(Number(value) || '')));
+                        }
+                    }}
+                    onKeyDown={(e) => {
+                        // Prevent decimal point, minus, and other non-integer characters
+                        if (['.', '-', 'e', 'E'].includes(e.key)) {
+                            e.preventDefault();
+                        }
+                    }}
+                    placeholder="Enter filter value"
+                />
+            );
+        }
+
+        const filterConditionsRequiredNumberInput = [
+            FilterConditionOperatorEnum?.COUNT_LESS_THAN.code,
+            FilterConditionOperatorEnum?.COUNT_GREATER_THAN.code,
+            FilterConditionOperatorEnum?.COUNT_EQUAL.code,
+            FilterConditionOperatorEnum?.COUNT_NOT_EQUAL.code,
+        ];
+
+        if (filterConditionsRequiredNumberInput.includes(filterCondition?.value as string)) {
+            return renderNumberInput();
+        }
         if (checkIfFieldOperatorIsInterval(filterCondition?.value) && checkIfFieldTypeIsDate(currentField?.type)) {
             return renderDurationInput();
         }
@@ -503,8 +543,9 @@ export default function FilterWidget({
         if (currentField?.type === FilterFieldType.Boolean) {
             return renderBooleanInput();
         }
+
         return renderDefaultInput();
-    }, [booleanOptions, currentField, filterCondition, filterField, filterValue, objectValueOptions]);
+    }, [FilterConditionOperatorEnum, booleanOptions, currentField, filterCondition, filterField, filterValue, objectValueOptions]);
     return (
         <>
             <Widget title={title} busy={isFetchingAvailableFilters} titleSize="larger">
