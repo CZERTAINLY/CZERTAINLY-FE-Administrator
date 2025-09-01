@@ -157,7 +157,7 @@ export default function AttributeViewer({
             if ('sourceObjects' in attribute && attribute.sourceObjects.length > 0 && resource) {
                 return (
                     <Button
-                        data-cy="source-button"
+                        data-testid="source-button"
                         className="btn btn-link p-0 ms-2"
                         color="white"
                         title="Source objects"
