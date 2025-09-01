@@ -102,6 +102,7 @@ export default function FilterWidget({
         | object
         | SingleValue<object | object[] | { label: string; value: object }>
         | MultiValue<object | object[] | { label: string; value: object }>
+        | number
         | undefined
     >(undefined);
 
@@ -250,7 +251,9 @@ export default function FilterWidget({
 
         let value = undefined;
         if (filterValue) {
-            if (typeof filterValue === 'string') {
+            if (typeof filterValue === 'number') {
+                value = filterValue;
+            } else if (typeof filterValue === 'string') {
                 if (field?.type && checkIfFieldTypeIsDate(field.type) && checkIfFieldOperatorIsInterval(filterCondition.value)) {
                     value = getIso8601StringFromDurationString(filterValue);
                 } else if (field?.attributeContentType && checkIfFieldAttributeTypeIsDate(field)) {
@@ -504,7 +507,7 @@ export default function FilterWidget({
                         const value = e.target.value;
                         // Only allow integer values
                         if (value === '' || /^\d+$/.test(value)) {
-                            setFilterValue(JSON.parse(JSON.stringify(Number(value) || '')));
+                            setFilterValue(value === '' ? undefined : Number(value));
                         }
                     }}
                     onKeyDown={(e) => {
