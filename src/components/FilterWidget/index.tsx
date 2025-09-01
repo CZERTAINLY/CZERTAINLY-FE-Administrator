@@ -114,6 +114,16 @@ export default function FilterWidget({
         [],
     );
 
+    const filterConditionsRequiredNumberInput = useMemo(
+        () => [
+            FilterConditionOperatorEnum?.COUNT_LESS_THAN.code,
+            FilterConditionOperatorEnum?.COUNT_GREATER_THAN.code,
+            FilterConditionOperatorEnum?.COUNT_EQUAL.code,
+            FilterConditionOperatorEnum?.COUNT_NOT_EQUAL.code,
+        ],
+        [FilterConditionOperatorEnum],
+    );
+
     useEffect(() => {
         dispatch(actions.getAvailableFilters({ entity, getAvailableFiltersApi }));
     }, [dispatch, entity, getAvailableFiltersApi]);
@@ -146,6 +156,11 @@ export default function FilterWidget({
             label: getEnumLabel(FilterConditionOperatorEnum, currentFilters[selectedFilter].condition),
             value: currentFilters[selectedFilter].condition,
         });
+
+        if (filterConditionsRequiredNumberInput.includes(currentFilters[selectedFilter].condition)) {
+            setFilterValue(currentFilters[selectedFilter].value);
+            return;
+        }
 
         if (checkIfFieldAttributeTypeIsDate(field)) {
             if (field.attributeContentType === AttributeContentType.Date) {
@@ -224,7 +239,16 @@ export default function FilterWidget({
 
             setFilterValue(newFilterValue);
         }
-    }, [availableFilters, currentFilters, selectedFilter, booleanOptions, platformEnums, FilterConditionOperatorEnum, searchGroupEnum]);
+    }, [
+        availableFilters,
+        currentFilters,
+        selectedFilter,
+        booleanOptions,
+        platformEnums,
+        FilterConditionOperatorEnum,
+        searchGroupEnum,
+        filterConditionsRequiredNumberInput,
+    ]);
 
     const onUnselectFiltersClick = useCallback(
         (e: React.MouseEvent<HTMLDivElement>) => {
@@ -520,13 +544,6 @@ export default function FilterWidget({
             );
         }
 
-        const filterConditionsRequiredNumberInput = [
-            FilterConditionOperatorEnum?.COUNT_LESS_THAN.code,
-            FilterConditionOperatorEnum?.COUNT_GREATER_THAN.code,
-            FilterConditionOperatorEnum?.COUNT_EQUAL.code,
-            FilterConditionOperatorEnum?.COUNT_NOT_EQUAL.code,
-        ];
-
         if (filterConditionsRequiredNumberInput.includes(filterCondition?.value as string)) {
             return renderNumberInput();
         }
@@ -547,7 +564,7 @@ export default function FilterWidget({
         }
 
         return renderDefaultInput();
-    }, [FilterConditionOperatorEnum, booleanOptions, currentField, filterCondition, filterField, filterValue, objectValueOptions]);
+    }, [booleanOptions, currentField, filterCondition, filterConditionsRequiredNumberInput, filterField, filterValue, objectValueOptions]);
     return (
         <>
             <Widget title={title} busy={isFetchingAvailableFilters} titleSize="larger">
