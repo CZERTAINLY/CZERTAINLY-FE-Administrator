@@ -402,7 +402,6 @@ export default function FilterWidget({
     const getBadgeContent = useCallback(
         (itemNumber: number, fieldSource: string, fieldCondition: string, label: string, value: string) => {
             if (isFetchingAvailableFilters || busyBadges) return <></>;
-
             return (
                 <React.Fragment key={itemNumber}>
                     <b>{getEnumLabel(searchGroupEnum, fieldSource)}&nbsp;</b>'{label}'&nbsp;
@@ -664,24 +663,32 @@ export default function FilterWidget({
                         }
 
                         function mapValue() {
-                            if (!f.value) return '';
-                            if (field?.type && checkIfFieldTypeIsDate(field.type) && checkIfFieldOperatorIsInterval(f.condition))
+                            if (!f.value) {
+                                return '';
+                            }
+                            if (typeof f.value === 'number') {
+                                return f.value;
+                            }
+                            if (field?.type && checkIfFieldTypeIsDate(field.type) && checkIfFieldOperatorIsInterval(f.condition)) {
                                 return getDurationStringFromIso8601String(f.value as unknown as string);
-                            if (field?.platformEnum) return platformEnums[field.platformEnum][f.value as unknown as string]?.label;
+                            }
+                            if (field?.platformEnum) {
+                                return platformEnums[field.platformEnum][f.value as unknown as string]?.label;
+                            }
                             if (
                                 (field && field?.attributeContentType === AttributeContentType.Date) ||
                                 (field?.type === FilterFieldType.Date && field?.attributeContentType !== AttributeContentType.Datetime)
-                            )
+                            ) {
                                 return getFormattedDate(f.value as unknown as string);
+                            }
                             if (
                                 (field && field?.attributeContentType === AttributeContentType.Datetime) ||
                                 field?.type === FilterFieldType.Datetime
-                            )
+                            ) {
                                 return getFormattedDateTime(f.value as unknown as string);
-
+                            }
                             return f.value;
                         }
-
                         if (field && field.type === FilterFieldType.Boolean) {
                             value = `'${booleanOptions.find((b) => !!f.value === b.value)?.label}'`;
                         } else if (Array.isArray(f.value)) {
