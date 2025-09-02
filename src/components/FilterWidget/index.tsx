@@ -6,7 +6,7 @@ import { ApiClients } from '../../api';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { EntityType, actions, selectors } from 'ducks/filters';
 import { useDispatch, useSelector } from 'react-redux';
-import Select, { MultiValue, SingleValue } from 'react-select';
+import Select, { components, MultiValue, SingleValue } from 'react-select';
 import { Badge, Button, Col, FormGroup, FormText, Input, Label, Row } from 'reactstrap';
 import { Observable } from 'rxjs';
 import { SearchFieldListModel, SearchFilterModel } from 'types/certificate';
@@ -370,7 +370,7 @@ export default function FilterWidget({
     );
 
     const currentFields = useMemo(
-        () => availableFilters.find((f) => f.filterFieldSource === filterGroup?.value)?.searchFieldData,
+        () => availableFilters?.find((f) => f.filterFieldSource === filterGroup?.value)?.searchFieldData,
         [availableFilters, filterGroup],
     );
 
@@ -432,7 +432,11 @@ export default function FilterWidget({
                     {getEnumLabel(FilterConditionOperatorEnum, fieldCondition)}&nbsp;
                     {value}
                     {!disableBadgeRemove && (
-                        <span className={styles.filterBadgeSpan} onClick={() => onRemoveFilterClick(itemNumber)}>
+                        <span
+                            data-testid="filter-badge-span"
+                            className={styles.filterBadgeSpan}
+                            onClick={() => onRemoveFilterClick(itemNumber)}
+                        >
                             &times;
                         </span>
                     )}
@@ -497,6 +501,11 @@ export default function FilterWidget({
                         setFilterValue(e);
                     }}
                     isDisabled={!filterField || !filterCondition || noValue[filterCondition.value]}
+                    components={{
+                        Menu: (props) => (
+                            <components.Menu {...props} innerProps={{ ...props.innerProps, 'data-testid': 'value-menu' } as any} />
+                        ),
+                    }}
                 />
             );
         }
@@ -513,6 +522,11 @@ export default function FilterWidget({
                     isMulti={currentField?.multiValue}
                     isClearable={true}
                     isDisabled={!filterField || !filterCondition || noValue[filterCondition.value]}
+                    components={{
+                        Menu: (props) => (
+                            <components.Menu {...props} innerProps={{ ...props.innerProps, 'data-testid': 'value-menu' } as any} />
+                        ),
+                    }}
                 />
             );
         }
@@ -589,6 +603,20 @@ export default function FilterWidget({
                                         }}
                                         value={filterGroup || null}
                                         isClearable={true}
+                                        components={{
+                                            Menu: (props) => (
+                                                <components.Menu
+                                                    {...props}
+                                                    innerProps={{ ...props.innerProps, 'data-testid': 'group-menu' } as any}
+                                                />
+                                            ),
+                                            Control: (props) => (
+                                                <components.Control
+                                                    {...props}
+                                                    innerProps={{ ...props.innerProps, 'data-testid': 'group-control' } as any}
+                                                />
+                                            ),
+                                        }}
                                     />
                                 </FormGroup>
                             </Col>
@@ -608,6 +636,20 @@ export default function FilterWidget({
                                         value={filterField || null}
                                         isDisabled={!filterGroup}
                                         isClearable={true}
+                                        components={{
+                                            Menu: (props) => (
+                                                <components.Menu
+                                                    {...props}
+                                                    innerProps={{ ...props.innerProps, 'data-testid': 'field-menu' } as any}
+                                                />
+                                            ),
+                                            Control: (props) => (
+                                                <components.Control
+                                                    {...props}
+                                                    innerProps={{ ...props.innerProps, 'data-testid': 'field-control' } as any}
+                                                />
+                                            ),
+                                        }}
                                     />
                                 </FormGroup>
                             </Col>
@@ -632,6 +674,20 @@ export default function FilterWidget({
                                         }}
                                         value={filterCondition || null}
                                         isDisabled={!filterField}
+                                        components={{
+                                            Menu: (props) => (
+                                                <components.Menu
+                                                    {...props}
+                                                    innerProps={{ ...props.innerProps, 'data-testid': 'condition-menu' } as any}
+                                                />
+                                            ),
+                                            Control: (props) => (
+                                                <components.Control
+                                                    {...props}
+                                                    innerProps={{ ...props.innerProps, 'data-testid': 'condition-control' } as any}
+                                                />
+                                            ),
+                                        }}
                                     />
                                 </FormGroup>
                             </Col>
@@ -645,6 +701,7 @@ export default function FilterWidget({
 
                             <Col md="auto">
                                 <Button
+                                    id="addFilter"
                                     style={{ width: '7em', marginTop: '2em' }}
                                     color="primary"
                                     disabled={
@@ -715,6 +772,7 @@ export default function FilterWidget({
                         }
                         return (
                             <Badge
+                                data-testid="filter-badge"
                                 className={styles.filterBadge}
                                 key={f.fieldIdentifier + i}
                                 onClick={() => toggleFilter(i)}
