@@ -317,7 +317,6 @@ function CryptographicKeyList() {
                 entityNamePlural="Keys"
                 filterTitle="Key Inventory Filter"
             />
-
             <Dialog
                 isOpen={confirmCompromise}
                 caption={`Compromise ${checkedRows.length > 1 ? 'Keys' : 'Key'}`}
@@ -341,7 +340,6 @@ function CryptographicKeyList() {
                     { color: 'secondary', onClick: () => setConfirmCompromise(false), body: 'Cancel' },
                 ]}
             />
-
             <Dialog
                 isOpen={confirmDestroy}
                 caption={`Destroy ${checkedRows.length > 1 ? 'Keys' : 'Key'}`}
@@ -352,7 +350,6 @@ function CryptographicKeyList() {
                     { color: 'secondary', onClick: () => setConfirmDestroy(false), body: 'Cancel' },
                 ]}
             />
-
             <Dialog
                 isOpen={keyUsageUpdate}
                 caption={`Update Key Usage`}

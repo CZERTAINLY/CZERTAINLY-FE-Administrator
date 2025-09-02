@@ -18,6 +18,7 @@ import { Button, ButtonGroup, Col, Container, Input, Row } from 'reactstrap';
 import { PlatformEnum } from 'types/openapi';
 import { DeviceType, useDeviceType } from 'utils/common-hooks';
 import styles from './triggerDetails.module.scss';
+import GoBackButton from 'components/GoBackButton';
 
 interface SelectChangeValue {
     value: string;
@@ -496,6 +497,7 @@ const TriggerDetails = () => {
 
     return (
         <Container className="themed-container" fluid>
+            <GoBackButton style={{ marginBottom: '10px' }} arbitryPath="/triggers" children="Back to the list" />
             <TabLayout
                 tabs={[
                     {

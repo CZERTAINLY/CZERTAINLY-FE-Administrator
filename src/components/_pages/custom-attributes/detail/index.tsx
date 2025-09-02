@@ -16,6 +16,7 @@ import { getAttributeContent } from 'utils/attributes/attributes';
 import { useCopyToClipboard } from 'utils/common-hooks';
 import styles from './customAttribute.module.scss';
 import { createWidgetDetailHeaders } from 'utils/widget';
+import GoBackButton from 'components/GoBackButton';
 
 export default function CustomAttributeDetail() {
     const dispatch = useDispatch();
@@ -184,6 +185,7 @@ export default function CustomAttributeDetail() {
 
     return (
         <Container className="themed-container" fluid>
+            <GoBackButton style={{ marginBottom: '10px' }} arbitryPath="/customattributes" children="Back to the list" />
             <Widget
                 title="Custom Attribute Details"
                 busy={isFetchingDetail || isEnabling || isDisabling}

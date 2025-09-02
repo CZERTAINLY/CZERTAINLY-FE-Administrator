@@ -18,6 +18,7 @@ import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import TokenActivationDialogBody from '../TokenActivationDialogBody';
 import RandomDataGeneration from './RandomDataGeneration';
 import { createWidgetDetailHeaders } from 'utils/widget';
+import GoBackButton from 'components/GoBackButton';
 
 export default function TokenDetail() {
     const dispatch = useDispatch();
@@ -203,6 +204,7 @@ export default function TokenDetail() {
 
     return (
         <Container className="themed-container" fluid>
+            <GoBackButton style={{ marginBottom: '10px' }} arbitryPath="/tokens" children="Back to the list" />
             <Widget
                 title="Token Details"
                 busy={isBusy}

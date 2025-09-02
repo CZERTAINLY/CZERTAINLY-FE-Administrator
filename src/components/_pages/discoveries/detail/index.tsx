@@ -22,6 +22,7 @@ import { PlatformEnum, Resource } from '../../../../types/openapi';
 import DiscoveryStatus from '../DiscoveryStatus';
 import DiscoveryCertificates from './DiscoveryCertificates';
 import { createWidgetDetailHeaders } from 'utils/widget';
+import GoBackButton from 'components/GoBackButton';
 
 export default function DiscoveryDetail() {
     const dispatch = useDispatch();
@@ -227,6 +228,7 @@ export default function DiscoveryDetail() {
 
     return (
         <Container className="themed-container" fluid>
+            <GoBackButton style={{ marginBottom: '10px' }} arbitryPath="/discoveries" children="Back to the list" />
             <TabLayout
                 tabs={[
                     {

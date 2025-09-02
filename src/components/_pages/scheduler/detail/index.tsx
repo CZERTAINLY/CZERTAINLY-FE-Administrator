@@ -18,6 +18,7 @@ import TextField from 'components/Input/TextField';
 import { Form } from 'react-final-form';
 import SchedulerJobHistory from './SchedulerJobHistory';
 import { createWidgetDetailHeaders } from 'utils/widget';
+import GoBackButton from 'components/GoBackButton';
 
 interface EditFormValues {
     cronExpression: string | undefined;
@@ -181,6 +182,7 @@ export default function SchedulerJobDetail() {
 
     return (
         <Container className="themed-container" fluid>
+            <GoBackButton style={{ marginBottom: '10px' }} arbitryPath="/jobs" children="Back to the list" />
             <Widget
                 title="Scheduled Job Details"
                 busy={isBusy}

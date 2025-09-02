@@ -17,6 +17,7 @@ import { LockWidgetNameEnum } from 'types/user-interface';
 import { Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import { createWidgetDetailHeaders } from 'utils/widget';
+import GoBackButton from 'components/GoBackButton';
 
 export default function UserDetail() {
     const dispatch = useDispatch();
@@ -186,6 +187,7 @@ export default function UserDetail() {
 
     return (
         <Container className="themed-container" fluid>
+            <GoBackButton style={{ marginBottom: '10px' }} arbitryPath="/users" children="Back to the list" />
             <Widget
                 title="User Details"
                 busy={isFetchingDetail || isFetchingRoles || isEnabling || isDisabling}

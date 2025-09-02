@@ -11,6 +11,7 @@ import { Container } from 'reactstrap';
 import { OidCategory, PlatformEnum } from 'types/openapi';
 import { selectors as enumSelectors } from 'ducks/enums';
 import { getEditAndDeleteWidgetButtons, createWidgetDetailHeaders, createTableDataRow } from 'utils/widget';
+import GoBackButton from 'components/GoBackButton';
 
 export default function CustomOIDDetail() {
     const dispatch = useDispatch();
@@ -84,6 +85,7 @@ export default function CustomOIDDetail() {
     );
     return (
         <Container className="themed-container" fluid>
+            <GoBackButton style={{ marginBottom: '10px' }} arbitryPath="/custom-oids" children="Back to the list" />
             <Widget
                 title="OID Details"
                 busy={isBusy}

@@ -82,6 +82,7 @@ import styles from './certificateDetail.module.scss';
 import { createWidgetDetailHeaders } from 'utils/widget';
 import CertificateList from 'components/_pages/certificates/list';
 import { capitalize } from 'utils/common-utils';
+import GoBackButton from 'components/GoBackButton';
 
 interface ChainDownloadSwitchState {
     isDownloadTriggered: boolean;
@@ -1934,6 +1935,7 @@ export default function CertificateDetail() {
 
     return (
         <Container className={cx('themed-container', styles.certificateContainer)} fluid>
+            <GoBackButton style={{ marginBottom: '10px' }} arbitryPath="/certificates" children="Back to the list" />
             <TabLayout
                 tabs={[
                     {
