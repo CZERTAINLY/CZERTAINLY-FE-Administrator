@@ -162,7 +162,7 @@ function WidgetButtons({ buttons, justify = 'center' }: Props) {
         return button.custom ? (
             <span key={key}>{button.custom}</span>
         ) : (
-            <Button data-cy={`${button.id}-button`} key={key} {...btnProps} title={button.tooltip} hidden={button.hidden}>
+            <Button data-testid={`${button.id}-button`} key={key} {...btnProps} title={button.tooltip} hidden={button.hidden}>
                 <i className={classNames[button.icon]} style={style} />
                 {toolTip}
             </Button>

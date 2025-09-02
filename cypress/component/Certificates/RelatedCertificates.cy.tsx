@@ -79,11 +79,11 @@ describe('Related Certificates Component', () => {
 
     it('should show add and remove buttons', () => {
         cy.get('[title="Add related certificate"]').should('be.visible');
-        cy.get('[data-cy="remove_related_certificate-button"]').should('be.visible');
+        cy.get('[data-testid="remove_related_certificate-button"]').should('be.visible');
     });
 
     it('should disable remove button when no certificates are selected', () => {
-        cy.get('[data-cy="remove_related_certificate-button"]').should('be.disabled');
+        cy.get('[data-testid="remove_related_certificate-button"]').should('be.disabled');
     });
 
     it('should enable remove button when certificate is selected', () => {
@@ -111,16 +111,16 @@ describe('Related Certificates Component', () => {
         // Select a 1st certificate
         cy.get('#ebcd4e0f-a3a2-4080-beac-6c9ea3972768__checkbox__').check();
         // Verify remove button is enabled
-        cy.get('[data-cy="remove_related_certificate-button"]').should('not.be.disabled');
+        cy.get('[data-testid="remove_related_certificate-button"]').should('not.be.disabled');
     });
 
     it('should open add dialog when plus button is clicked', () => {
-        cy.get('[data-cy="add_related_certificate-button"]').click();
+        cy.get('[data-testid="add_related_certificate-button"]').click();
         cy.contains('h5', 'Add Related Certificate').should('be.visible');
     });
 
     it('should close add dialog when cancel is clicked', () => {
-        cy.get('[data-cy="add_related_certificate-button"]').click();
+        cy.get('[data-testid="add_related_certificate-button"]').click();
         cy.contains('Add Related Certificate').should('be.visible');
 
         cy.contains('Cancel').click();
@@ -157,7 +157,7 @@ describe('Related Certificates Component', () => {
         cy.get('#ebcd4e0f-a3a2-4080-beac-6c9ea3972768__checkbox__').check();
 
         // Click remove button
-        cy.get('[data-cy="remove_related_certificate-button"]').click();
+        cy.get('[data-testid="remove_related_certificate-button"]').click();
 
         // Verify confirmation dialog is shown
         cy.contains('Delete Related Certificate').should('be.visible');
@@ -193,7 +193,7 @@ describe('Related Certificates Component', () => {
         cy.get('#ebcd4e0f-a3a2-4080-beac-6c9ea3972768__checkbox__').check();
 
         // Click remove button
-        cy.get('[data-cy="remove_related_certificate-button"]').click();
+        cy.get('[data-testid="remove_related_certificate-button"]').click();
 
         // Verify confirmation dialog is shown
         cy.contains('Delete Related Certificate').should('be.visible');

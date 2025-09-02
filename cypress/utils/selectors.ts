@@ -219,7 +219,7 @@ export const cySelectors: ElementSelectors = {
         const selectors: ReturnType<ElementSelectors['input']> = createAllWrapper({
             input: () => cy.get(`input[id="${inputId}"]`),
             textarea: () => cy.get(`textarea[id="${inputId}"]`),
-            groupButton: (action: string) => root().find(`[data-cy="${action}-button"]`),
+            groupButton: (action: string) => root().find(`[data-testid="${action}-button"]`),
         });
 
         return selectors;
@@ -234,7 +234,7 @@ export const cySelectors: ElementSelectors = {
             control: () => root().find('[class*="control"]'),
             options: () => cy.get('[class*="option"]'),
             placeholder: () => root().find('[class*="placeholder"]'),
-            groupButton: (action: string) => root().parents('div[class*="input-group"]').first().find(`[data-cy="${action}-button"]`),
+            groupButton: (action: string) => root().parents('div[class*="input-group"]').first().find(`[data-testid="${action}-button"]`),
         };
 
         commonSelectors.amendCommonSelectInputSelectors(selectors, root, type as T);
@@ -271,7 +271,7 @@ export const cySelectors: ElementSelectors = {
                         if (type === undefined) {
                             return row().find('td').eq(3);
                         }
-                        return row().find(`[data-cy*=${type}-button]`);
+                        return row().find(`[data-testid*=${type}-button]`);
                     },
                 };
             },

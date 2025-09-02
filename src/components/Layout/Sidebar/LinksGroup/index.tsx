@@ -29,7 +29,7 @@ function LinksGroup(props: Props) {
                 <NavLink to={props.headerLink || ''} className={({ isActive }) => (isActive ? style.headerLinkActive : undefined)}>
                     <div>
                         <i className={props.glyph} />{' '}
-                        <span className={style.menuLabel} data-cy={typeof props.header === 'string' ? props.header : undefined}>
+                        <span className={style.menuLabel} data-testid={typeof props.header === 'string' ? props.header : undefined}>
                             {props.header}
                         </span>
                     </div>
@@ -54,7 +54,7 @@ function LinksGroup(props: Props) {
                 >
                     <div>
                         <i className={props.glyph} />{' '}
-                        <span className={style.menuLabel} data-cy={typeof props.header === 'string' ? props.header : undefined}>
+                        <span className={style.menuLabel} data-testid={typeof props.header === 'string' ? props.header : undefined}>
                             {props.header}
                         </span>
                     </div>
@@ -69,7 +69,7 @@ function LinksGroup(props: Props) {
                                 <NavLink to={child.link} className={({ isActive }) => (isActive ? style.headerLinkActive : undefined)}>
                                     <div>
                                         <i className={props.glyph} />{' '}
-                                        <span className={style.menuLabel} data-cy={child.name}>
+                                        <span className={style.menuLabel} data-testid={child.name}>
                                             {child.name}
                                         </span>
                                     </div>
