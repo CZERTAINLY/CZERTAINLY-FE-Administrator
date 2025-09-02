@@ -96,7 +96,7 @@ export default function EntityDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <GoBackButton style={{ marginBottom: '10px' }} arbitryPath="/entities" children="Back to the list" />
+            <GoBackButton style={{ marginBottom: '10px' }} arbitryPath="/entities" text="Back to the list" />
             <Widget
                 title="Entity Details"
                 busy={isBusy}

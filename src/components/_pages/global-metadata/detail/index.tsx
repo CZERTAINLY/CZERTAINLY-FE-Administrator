@@ -96,7 +96,7 @@ export default function GlobalMetadataDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <GoBackButton style={{ marginBottom: '10px' }} arbitryPath="/globalmetadata" children="Back to the list" />
+            <GoBackButton style={{ marginBottom: '10px' }} arbitryPath="/globalmetadata" text="Back to the list" />
             <Widget
                 title="Global Metadata Details"
                 busy={isFetchingDetail}

@@ -15,7 +15,7 @@ describe('<GoBackButton />', () => {
 
     it('calls custom onClick when provided', () => {
         const onClick = cy.stub().as('onClick');
-        cy.mount(<GoBackButton onClick={onClick}>Back</GoBackButton>).wait(componentLoadWait);
+        cy.mount(<GoBackButton onClick={onClick} text="Back" />).wait(componentLoadWait);
         cy.contains('Back').click().wait(clickWait);
         cy.get('@onClick').should('have.been.calledOnce');
     });

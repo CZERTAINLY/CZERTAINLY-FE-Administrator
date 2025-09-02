@@ -1935,7 +1935,7 @@ export default function CertificateDetail() {
 
     return (
         <Container className={cx('themed-container', styles.certificateContainer)} fluid>
-            <GoBackButton style={{ marginBottom: '10px' }} arbitryPath="/certificates" children="Back to the list" />
+            <GoBackButton style={{ marginBottom: '10px' }} arbitryPath="/certificates" text="Back to the list" />
             <TabLayout
                 tabs={[
                     {

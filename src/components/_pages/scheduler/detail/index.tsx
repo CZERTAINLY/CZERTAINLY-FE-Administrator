@@ -182,7 +182,7 @@ export default function SchedulerJobDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <GoBackButton style={{ marginBottom: '10px' }} arbitryPath="/jobs" children="Back to the list" />
+            <GoBackButton style={{ marginBottom: '10px' }} arbitryPath="/jobs" text="Back to the list" />
             <Widget
                 title="Scheduled Job Details"
                 busy={isBusy}

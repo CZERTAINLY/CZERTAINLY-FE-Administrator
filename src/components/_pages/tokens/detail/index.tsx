@@ -204,7 +204,7 @@ export default function TokenDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <GoBackButton style={{ marginBottom: '10px' }} arbitryPath="/tokens" children="Back to the list" />
+            <GoBackButton style={{ marginBottom: '10px' }} arbitryPath="/tokens" text="Back to the list" />
             <Widget
                 title="Token Details"
                 busy={isBusy}

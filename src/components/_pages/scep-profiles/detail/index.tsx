@@ -345,7 +345,7 @@ export default function ScepProfileDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <GoBackButton style={{ marginBottom: '10px' }} arbitryPath="/scepprofiles" children="Back to the list" />
+            <GoBackButton style={{ marginBottom: '10px' }} arbitryPath="/scepprofiles" text="Back to the list" />
             <Widget
                 title="SCEP Profile Details"
                 busy={isBusy}

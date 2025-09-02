@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from 'reactstrap';
-import { useLocation, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 import styles from './GoBackButton.module.scss';
 
 interface GoBackButtonProps {
@@ -8,7 +8,7 @@ interface GoBackButtonProps {
     color?: string;
     size?: string;
     disabled?: boolean;
-    children?: React.ReactNode;
+    text?: string;
     onClick?: () => void;
     fallbackPath?: string;
     style?: React.CSSProperties;
@@ -20,7 +20,7 @@ function GoBackButton({
     color = 'secondary',
     size,
     disabled = false,
-    children = 'Go Back',
+    text = 'Go Back',
     onClick,
     fallbackPath,
     arbitryPath,
@@ -30,18 +30,14 @@ function GoBackButton({
     const handleClick = () => {
         if (onClick) {
             onClick();
+        } else if (arbitryPath) {
+            navigate(arbitryPath);
+        } else if (window.history.length > 1) {
+            navigate(-1);
+        } else if (fallbackPath) {
+            navigate(fallbackPath);
         } else {
-            if (arbitryPath) {
-                navigate(arbitryPath);
-            } else if (window.history.length > 1) {
-                navigate(-1);
-            } else if (fallbackPath) {
-                // Fallback to specified path if no history
-                navigate(fallbackPath);
-            } else {
-                // Default fallback to dashboard
-                navigate('/');
-            }
+            navigate('/');
         }
     };
 
@@ -55,7 +51,7 @@ function GoBackButton({
             onClick={handleClick}
         >
             <i className={`fa fa-arrow-left me-2 ${styles.icon}`} aria-hidden="true" />
-            {children}
+            {text}
         </Button>
     );
 }
