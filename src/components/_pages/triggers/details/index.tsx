@@ -497,7 +497,7 @@ const TriggerDetails = () => {
 
     return (
         <Container className="themed-container" fluid>
-            <GoBackButton style={{ marginBottom: '10px' }} arbitryPath="/triggers" text="Back to the list" />
+            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/triggers" text="Back to the list" />
             <TabLayout
                 tabs={[
                     {

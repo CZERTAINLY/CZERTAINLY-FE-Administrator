@@ -12,7 +12,7 @@ interface GoBackButtonProps {
     onClick?: () => void;
     fallbackPath?: string;
     style?: React.CSSProperties;
-    arbitryPath?: string;
+    forcedPath?: string;
 }
 
 function GoBackButton({
@@ -23,15 +23,15 @@ function GoBackButton({
     text = 'Go Back',
     onClick,
     fallbackPath,
-    arbitryPath,
+    forcedPath,
     style,
 }: GoBackButtonProps) {
     const navigate = useNavigate();
     const handleClick = () => {
         if (onClick) {
             onClick();
-        } else if (arbitryPath) {
-            navigate(arbitryPath);
+        } else if (forcedPath) {
+            navigate(forcedPath);
         } else if (window.history.length > 1) {
             navigate(-1);
         } else if (fallbackPath) {

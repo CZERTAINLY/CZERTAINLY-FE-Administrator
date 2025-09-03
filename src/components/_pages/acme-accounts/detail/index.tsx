@@ -195,7 +195,7 @@ export default function AcmeAccountDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <GoBackButton style={{ marginBottom: '10px' }} arbitryPath="/acmeaccounts" text="Back to the list" />
+            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/acmeaccounts" text="Back to the list" />
             <Widget
                 title="ACME Account Details"
                 busy={isFetchingDetail || isEnabling || isDisabling || isRevoking}

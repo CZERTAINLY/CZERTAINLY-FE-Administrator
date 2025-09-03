@@ -185,7 +185,7 @@ export default function CustomAttributeDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <GoBackButton style={{ marginBottom: '10px' }} arbitryPath="/customattributes" text="Back to the list" />
+            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/customattributes" text="Back to the list" />
             <Widget
                 title="Custom Attribute Details"
                 busy={isFetchingDetail || isEnabling || isDisabling}

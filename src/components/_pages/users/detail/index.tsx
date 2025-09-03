@@ -187,7 +187,7 @@ export default function UserDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <GoBackButton style={{ marginBottom: '10px' }} arbitryPath="/users" text="Back to the list" />
+            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/users" text="Back to the list" />
             <Widget
                 title="User Details"
                 busy={isFetchingDetail || isFetchingRoles || isEnabling || isDisabling}

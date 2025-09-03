@@ -476,7 +476,7 @@ export default function LocationDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <GoBackButton style={{ marginBottom: '10px' }} arbitryPath="/locations" text="Back to the list" />
+            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/locations" text="Back to the list" />
             <TabLayout
                 tabs={[
                     {

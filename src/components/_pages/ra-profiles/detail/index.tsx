@@ -903,7 +903,7 @@ export default function RaProfileDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <GoBackButton style={{ marginBottom: '10px' }} arbitryPath="/raprofiles" text="Back to the list" />
+            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/raprofiles" text="Back to the list" />
             <TabLayout
                 tabs={[
                     {

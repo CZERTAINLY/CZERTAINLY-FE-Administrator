@@ -20,10 +20,10 @@ describe('<GoBackButton />', () => {
         cy.get('@onClick').should('have.been.calledOnce');
     });
 
-    it('navigates to arbitryPath when provided', () => {
+    it('navigates to forcedPath when provided', () => {
         const TestComponent = () => (
             <Routes>
-                <Route path="/start" element={<GoBackButton arbitryPath="/target" />} />
+                <Route path="/start" element={<GoBackButton forcedPath="/target" />} />
                 <Route path="/target" element={<div data-testid="target">Target page</div>} />
             </Routes>
         );

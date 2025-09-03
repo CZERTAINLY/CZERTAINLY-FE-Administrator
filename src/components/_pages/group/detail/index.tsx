@@ -80,7 +80,7 @@ export default function GroupDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <GoBackButton style={{ marginBottom: '10px' }} arbitryPath="/groups" text="Back to the list" />
+            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/groups" text="Back to the list" />
             <TabLayout
                 tabs={[
                     {
