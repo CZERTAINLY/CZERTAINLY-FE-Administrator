@@ -15,6 +15,7 @@ import { LockWidgetNameEnum } from 'types/user-interface';
 import { Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import { getEditAndDeleteWidgetButtons, createWidgetDetailHeaders } from 'utils/widget';
+import GoBackButton from 'components/GoBackButton';
 
 export default function EntityDetail() {
     const dispatch = useDispatch();
@@ -95,6 +96,7 @@ export default function EntityDetail() {
 
     return (
         <Container className="themed-container" fluid>
+            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/entities" text="Inventory" />
             <Widget
                 title="Entity Details"
                 busy={isBusy}

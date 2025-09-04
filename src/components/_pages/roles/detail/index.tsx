@@ -14,6 +14,7 @@ import { Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import BooleanBadge from 'components/BooleanBadge/BooleanBadge';
 import { createWidgetDetailHeaders } from 'utils/widget';
+import GoBackButton from 'components/GoBackButton';
 
 export default function UserDetail() {
     const dispatch = useDispatch();
@@ -248,6 +249,7 @@ export default function UserDetail() {
 
     return (
         <Container className="themed-container" fluid>
+            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/roles" text="Inventory" />
             <Widget
                 title="Role Details"
                 busy={isFetchingDetail}

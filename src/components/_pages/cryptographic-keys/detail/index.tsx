@@ -21,6 +21,7 @@ import { dateFormatter } from 'utils/dateUtil';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import CryptographicKeyItem from './CryptographicKeyItem';
 import { createWidgetDetailHeaders } from 'utils/widget';
+import GoBackButton from 'components/GoBackButton';
 
 export const keyWithoutTokenInstanceActionNotes = {
     delete: 'Note that no token instance is associated with the Key. The key record will be removed from the platform, but will not be deleted in external key storage service.',
@@ -363,6 +364,7 @@ export default function CryptographicKeyDetail() {
 
     return (
         <Container className="themed-container" fluid>
+            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/keys" text="Inventory" />
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
                 <Col>
                     <Widget

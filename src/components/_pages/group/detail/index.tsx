@@ -16,6 +16,7 @@ import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import EventsTable from 'components/_pages/notifications/events-settings/EventsTable';
 import TabLayout from 'components/Layout/TabLayout';
 import { getEditAndDeleteWidgetButtons, createWidgetDetailHeaders } from 'utils/widget';
+import GoBackButton from 'components/GoBackButton';
 
 export default function GroupDetail() {
     const dispatch = useDispatch();
@@ -79,6 +80,7 @@ export default function GroupDetail() {
 
     return (
         <Container className="themed-container" fluid>
+            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/groups" text="Inventory" />
             <TabLayout
                 tabs={[
                     {

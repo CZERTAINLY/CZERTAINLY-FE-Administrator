@@ -28,6 +28,7 @@ import SwitchWidget from 'components/SwitchWidget';
 import { renderExpiringThresholdLabel, renderValidationFrequencyLabel } from 'utils/certificate-validation';
 import EventsTable from 'components/_pages/notifications/events-settings/EventsTable';
 import { createWidgetDetailHeaders } from 'utils/widget';
+import GoBackButton from 'components/GoBackButton';
 
 interface DeassociateApprovalProfileDialogState {
     isDialogOpen: boolean;
@@ -902,6 +903,7 @@ export default function RaProfileDetail() {
 
     return (
         <Container className="themed-container" fluid>
+            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/raprofiles" text="Inventory" />
             <TabLayout
                 tabs={[
                     {

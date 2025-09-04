@@ -14,6 +14,7 @@ import { LockWidgetNameEnum } from 'types/user-interface';
 import { Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import { createWidgetDetailHeaders } from 'utils/widget';
+import GoBackButton from 'components/GoBackButton';
 
 function CredentialDetail() {
     const dispatch = useDispatch();
@@ -119,6 +120,7 @@ function CredentialDetail() {
 
     return (
         <Container className="themed-container" fluid>
+            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/credentials" text="Inventory" />
             <Widget
                 title="Credential Details"
                 busy={isFetching || isDeleting}

@@ -20,6 +20,7 @@ import { LockWidgetNameEnum } from 'types/user-interface';
 import { createWidgetDetailHeaders, getGroupNames, getOwnerName } from 'utils/widget';
 import { actions as groupsActions, selectors as groupsSelectors } from 'ducks/certificateGroups';
 import { actions as userAction, selectors as userSelectors } from 'ducks/users';
+import GoBackButton from 'components/GoBackButton';
 
 export default function ScepProfileDetail() {
     const dispatch = useDispatch();
@@ -344,6 +345,7 @@ export default function ScepProfileDetail() {
 
     return (
         <Container className="themed-container" fluid>
+            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/scepprofiles" text="Inventory" />
             <Widget
                 title="SCEP Profile Details"
                 busy={isBusy}

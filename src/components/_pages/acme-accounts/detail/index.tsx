@@ -16,6 +16,7 @@ import { AccountStatus } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { acmeAccountStatus } from '../acmeAccountStatus';
 import { createWidgetDetailHeaders } from 'utils/widget';
+import GoBackButton from 'components/GoBackButton';
 
 export default function AcmeAccountDetail() {
     const dispatch = useDispatch();
@@ -194,6 +195,7 @@ export default function AcmeAccountDetail() {
 
     return (
         <Container className="themed-container" fluid>
+            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/acmeaccounts" text="Inventory" />
             <Widget
                 title="ACME Account Details"
                 busy={isFetchingDetail || isEnabling || isDisabling || isRevoking}

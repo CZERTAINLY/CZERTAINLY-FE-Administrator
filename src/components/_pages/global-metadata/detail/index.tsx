@@ -14,6 +14,7 @@ import { Badge, Container } from 'reactstrap';
 import { PlatformEnum } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { getEditAndDeleteWidgetButtons, createWidgetDetailHeaders } from 'utils/widget';
+import GoBackButton from 'components/GoBackButton';
 
 export default function GlobalMetadataDetail() {
     const dispatch = useDispatch();
@@ -95,6 +96,7 @@ export default function GlobalMetadataDetail() {
 
     return (
         <Container className="themed-container" fluid>
+            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/globalmetadata" text="Inventory" />
             <Widget
                 title="Global Metadata Details"
                 busy={isFetchingDetail}

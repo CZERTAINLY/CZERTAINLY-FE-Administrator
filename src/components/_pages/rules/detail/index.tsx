@@ -2,6 +2,7 @@ import { ApiClients } from '../../../../api';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import ConditionsExecutionsList from 'components/ExecutionConditionItemsList';
+import GoBackButton from 'components/GoBackButton';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
@@ -315,6 +316,7 @@ const RuleDetails = () => {
 
     return (
         <Container className="themed-container" fluid>
+            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/rules" text="Inventory" />
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
                 <Col>
                     <Widget refreshAction={getFreshDetails} busy={isBusy} title="Rule Details" titleSize="large" widgetButtons={buttons}>

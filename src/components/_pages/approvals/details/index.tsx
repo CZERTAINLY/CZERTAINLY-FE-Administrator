@@ -1,5 +1,6 @@
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
+import GoBackButton from 'components/GoBackButton';
 import StatusBadge from 'components/StatusBadge';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
@@ -283,6 +284,7 @@ export default function ApprovalDetails() {
 
     return (
         <Container className="themed-container" fluid>
+            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/approvals" text="Inventory" />
             <Row>
                 <Col>
                     <Widget title="Approval Details" busy={isBusy} titleSize="large" widgetButtons={buttons} refreshAction={getFreshData}>

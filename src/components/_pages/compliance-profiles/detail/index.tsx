@@ -25,6 +25,7 @@ import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import AddRuleWithAttributesDialogBody from '../form/AddRuleWithAttributesDialogBody/index.';
 import AssociateRaProfileDialogBody from '../form/AssociateRaProfileDialogBody/AssociateRaProfileDialogBody';
 import { createWidgetDetailHeaders } from 'utils/widget';
+import GoBackButton from 'components/GoBackButton';
 
 export default function ComplianceProfileDetail() {
     const dispatch = useDispatch();
@@ -781,6 +782,7 @@ export default function ComplianceProfileDetail() {
 
     return (
         <Container className="themed-container" fluid>
+            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/complianceprofiles" text="Inventory" />
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
                 <Col>
                     <Widget

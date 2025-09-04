@@ -14,6 +14,7 @@ import { LockWidgetNameEnum } from 'types/user-interface';
 import { Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import { getEditAndDeleteWidgetButtons, createWidgetDetailHeaders } from 'utils/widget';
+import GoBackButton from 'components/GoBackButton';
 export default function AuthorityDetail() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -101,6 +102,7 @@ export default function AuthorityDetail() {
 
     return (
         <Container className="themed-container" fluid>
+            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/authorities" text="Inventory" />
             <Widget
                 title="Certification Authority Details"
                 busy={isBusy}
