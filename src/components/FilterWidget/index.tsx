@@ -6,7 +6,7 @@ import { ApiClients } from '../../api';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { EntityType, actions, selectors } from 'ducks/filters';
 import { useDispatch, useSelector } from 'react-redux';
-import Select, { MultiValue, SingleValue } from 'react-select';
+import Select, { components, MultiValue, SingleValue } from 'react-select';
 import { Badge, Button, Col, FormGroup, FormText, Input, Label, Row } from 'reactstrap';
 import { Observable } from 'rxjs';
 import { SearchFieldListModel, SearchFilterModel } from 'types/certificate';
@@ -47,6 +47,8 @@ const noValue: { [condition in FilterConditionOperator]: boolean } = {
     [FilterConditionOperator.EndsWith]: false,
     [FilterConditionOperator.InNext]: false,
     [FilterConditionOperator.InPast]: false,
+    [FilterConditionOperator.Matches]: false,
+    [FilterConditionOperator.NotMatches]: false,
     [FilterConditionOperator.Empty]: true,
     [FilterConditionOperator.NotEmpty]: true,
     [FilterConditionOperator.Success]: true,
@@ -100,6 +102,7 @@ export default function FilterWidget({
         | object
         | SingleValue<object | object[] | { label: string; value: object }>
         | MultiValue<object | object[] | { label: string; value: object }>
+        | number
         | undefined
     >(undefined);
 
@@ -109,6 +112,16 @@ export default function FilterWidget({
             { label: 'False', value: false },
         ],
         [],
+    );
+
+    const filterConditionsRequiredNumberInput = useMemo(
+        () => [
+            FilterConditionOperatorEnum?.COUNT_LESS_THAN.code,
+            FilterConditionOperatorEnum?.COUNT_GREATER_THAN.code,
+            FilterConditionOperatorEnum?.COUNT_EQUAL.code,
+            FilterConditionOperatorEnum?.COUNT_NOT_EQUAL.code,
+        ],
+        [FilterConditionOperatorEnum],
     );
 
     useEffect(() => {
@@ -143,6 +156,11 @@ export default function FilterWidget({
             label: getEnumLabel(FilterConditionOperatorEnum, currentFilters[selectedFilter].condition),
             value: currentFilters[selectedFilter].condition,
         });
+
+        if (filterConditionsRequiredNumberInput.includes(currentFilters[selectedFilter].condition)) {
+            setFilterValue(currentFilters[selectedFilter].value);
+            return;
+        }
 
         if (checkIfFieldAttributeTypeIsDate(field)) {
             if (field.attributeContentType === AttributeContentType.Date) {
@@ -221,7 +239,16 @@ export default function FilterWidget({
 
             setFilterValue(newFilterValue);
         }
-    }, [availableFilters, currentFilters, selectedFilter, booleanOptions, platformEnums, FilterConditionOperatorEnum, searchGroupEnum]);
+    }, [
+        availableFilters,
+        currentFilters,
+        selectedFilter,
+        booleanOptions,
+        platformEnums,
+        FilterConditionOperatorEnum,
+        searchGroupEnum,
+        filterConditionsRequiredNumberInput,
+    ]);
 
     const onUnselectFiltersClick = useCallback(
         (e: React.MouseEvent<HTMLDivElement>) => {
@@ -248,7 +275,9 @@ export default function FilterWidget({
 
         let value = undefined;
         if (filterValue) {
-            if (typeof filterValue === 'string') {
+            if (typeof filterValue === 'number') {
+                value = filterValue;
+            } else if (typeof filterValue === 'string') {
                 if (field?.type && checkIfFieldTypeIsDate(field.type) && checkIfFieldOperatorIsInterval(filterCondition.value)) {
                     value = getIso8601StringFromDurationString(filterValue);
                 } else if (field?.attributeContentType && checkIfFieldAttributeTypeIsDate(field)) {
@@ -341,7 +370,7 @@ export default function FilterWidget({
     );
 
     const currentFields = useMemo(
-        () => availableFilters.find((f) => f.filterFieldSource === filterGroup?.value)?.searchFieldData,
+        () => availableFilters?.find((f) => f.filterFieldSource === filterGroup?.value)?.searchFieldData,
         [availableFilters, filterGroup],
     );
 
@@ -397,14 +426,17 @@ export default function FilterWidget({
     const getBadgeContent = useCallback(
         (itemNumber: number, fieldSource: string, fieldCondition: string, label: string, value: string) => {
             if (isFetchingAvailableFilters || busyBadges) return <></>;
-
             return (
                 <React.Fragment key={itemNumber}>
                     <b>{getEnumLabel(searchGroupEnum, fieldSource)}&nbsp;</b>'{label}'&nbsp;
                     {getEnumLabel(FilterConditionOperatorEnum, fieldCondition)}&nbsp;
                     {value}
                     {!disableBadgeRemove && (
-                        <span className={styles.filterBadgeSpan} onClick={() => onRemoveFilterClick(itemNumber)}>
+                        <span
+                            data-testid="filter-badge-span"
+                            className={styles.filterBadgeSpan}
+                            onClick={() => onRemoveFilterClick(itemNumber)}
+                        >
                             &times;
                         </span>
                     )}
@@ -469,6 +501,11 @@ export default function FilterWidget({
                         setFilterValue(e);
                     }}
                     isDisabled={!filterField || !filterCondition || noValue[filterCondition.value]}
+                    components={{
+                        Menu: (props) => (
+                            <components.Menu {...props} innerProps={{ ...props.innerProps, 'data-testid': 'value-menu' } as any} />
+                        ),
+                    }}
                 />
             );
         }
@@ -485,8 +522,44 @@ export default function FilterWidget({
                     isMulti={currentField?.multiValue}
                     isClearable={true}
                     isDisabled={!filterField || !filterCondition || noValue[filterCondition.value]}
+                    components={{
+                        Menu: (props) => (
+                            <components.Menu {...props} innerProps={{ ...props.innerProps, 'data-testid': 'value-menu' } as any} />
+                        ),
+                    }}
                 />
             );
+        }
+        function renderNumberInput() {
+            const numericValue = Number(filterValue);
+            const displayValue = isNaN(numericValue) ? '' : numericValue;
+
+            return (
+                <Input
+                    id="valueSelect"
+                    type="number"
+                    step="1"
+                    value={displayValue}
+                    onChange={(e) => {
+                        const value = e.target.value;
+                        // Only allow integer values
+                        if (value === '' || /^\d+$/.test(value)) {
+                            setFilterValue(value === '' ? undefined : Number(value));
+                        }
+                    }}
+                    onKeyDown={(e) => {
+                        // Prevent decimal point, minus, and other non-integer characters
+                        if (['.', '-', 'e', 'E'].includes(e.key)) {
+                            e.preventDefault();
+                        }
+                    }}
+                    placeholder="Enter filter value"
+                />
+            );
+        }
+
+        if (filterConditionsRequiredNumberInput.includes(filterCondition?.value as string)) {
+            return renderNumberInput();
         }
         if (checkIfFieldOperatorIsInterval(filterCondition?.value) && checkIfFieldTypeIsDate(currentField?.type)) {
             return renderDurationInput();
@@ -503,8 +576,9 @@ export default function FilterWidget({
         if (currentField?.type === FilterFieldType.Boolean) {
             return renderBooleanInput();
         }
+
         return renderDefaultInput();
-    }, [booleanOptions, currentField, filterCondition, filterField, filterValue, objectValueOptions]);
+    }, [booleanOptions, currentField, filterCondition, filterConditionsRequiredNumberInput, filterField, filterValue, objectValueOptions]);
     return (
         <>
             <Widget title={title} busy={isFetchingAvailableFilters} titleSize="larger">
@@ -529,6 +603,20 @@ export default function FilterWidget({
                                         }}
                                         value={filterGroup || null}
                                         isClearable={true}
+                                        components={{
+                                            Menu: (props) => (
+                                                <components.Menu
+                                                    {...props}
+                                                    innerProps={{ ...props.innerProps, 'data-testid': 'group-menu' } as any}
+                                                />
+                                            ),
+                                            Control: (props) => (
+                                                <components.Control
+                                                    {...props}
+                                                    innerProps={{ ...props.innerProps, 'data-testid': 'group-control' } as any}
+                                                />
+                                            ),
+                                        }}
                                     />
                                 </FormGroup>
                             </Col>
@@ -548,6 +636,20 @@ export default function FilterWidget({
                                         value={filterField || null}
                                         isDisabled={!filterGroup}
                                         isClearable={true}
+                                        components={{
+                                            Menu: (props) => (
+                                                <components.Menu
+                                                    {...props}
+                                                    innerProps={{ ...props.innerProps, 'data-testid': 'field-menu' } as any}
+                                                />
+                                            ),
+                                            Control: (props) => (
+                                                <components.Control
+                                                    {...props}
+                                                    innerProps={{ ...props.innerProps, 'data-testid': 'field-control' } as any}
+                                                />
+                                            ),
+                                        }}
                                     />
                                 </FormGroup>
                             </Col>
@@ -572,6 +674,20 @@ export default function FilterWidget({
                                         }}
                                         value={filterCondition || null}
                                         isDisabled={!filterField}
+                                        components={{
+                                            Menu: (props) => (
+                                                <components.Menu
+                                                    {...props}
+                                                    innerProps={{ ...props.innerProps, 'data-testid': 'condition-menu' } as any}
+                                                />
+                                            ),
+                                            Control: (props) => (
+                                                <components.Control
+                                                    {...props}
+                                                    innerProps={{ ...props.innerProps, 'data-testid': 'condition-control' } as any}
+                                                />
+                                            ),
+                                        }}
                                     />
                                 </FormGroup>
                             </Col>
@@ -585,6 +701,7 @@ export default function FilterWidget({
 
                             <Col md="auto">
                                 <Button
+                                    id="addFilter"
                                     style={{ width: '7em', marginTop: '2em' }}
                                     color="primary"
                                     disabled={
@@ -620,24 +737,32 @@ export default function FilterWidget({
                         }
 
                         function mapValue() {
-                            if (!f.value) return '';
-                            if (field?.type && checkIfFieldTypeIsDate(field.type) && checkIfFieldOperatorIsInterval(f.condition))
+                            if (!f.value) {
+                                return '';
+                            }
+                            if (typeof f.value === 'number') {
+                                return f.value;
+                            }
+                            if (field?.type && checkIfFieldTypeIsDate(field.type) && checkIfFieldOperatorIsInterval(f.condition)) {
                                 return getDurationStringFromIso8601String(f.value as unknown as string);
-                            if (field?.platformEnum) return platformEnums[field.platformEnum][f.value as unknown as string]?.label;
+                            }
+                            if (field?.platformEnum) {
+                                return platformEnums[field.platformEnum][f.value as unknown as string]?.label;
+                            }
                             if (
                                 (field && field?.attributeContentType === AttributeContentType.Date) ||
                                 (field?.type === FilterFieldType.Date && field?.attributeContentType !== AttributeContentType.Datetime)
-                            )
+                            ) {
                                 return getFormattedDate(f.value as unknown as string);
+                            }
                             if (
                                 (field && field?.attributeContentType === AttributeContentType.Datetime) ||
                                 field?.type === FilterFieldType.Datetime
-                            )
+                            ) {
                                 return getFormattedDateTime(f.value as unknown as string);
-
+                            }
                             return f.value;
                         }
-
                         if (field && field.type === FilterFieldType.Boolean) {
                             value = `'${booleanOptions.find((b) => !!f.value === b.value)?.label}'`;
                         } else if (Array.isArray(f.value)) {
@@ -647,6 +772,7 @@ export default function FilterWidget({
                         }
                         return (
                             <Badge
+                                data-testid="filter-badge"
                                 className={styles.filterBadge}
                                 key={f.fieldIdentifier + i}
                                 onClick={() => toggleFilter(i)}
