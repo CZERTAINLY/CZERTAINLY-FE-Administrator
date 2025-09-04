@@ -1,15 +1,23 @@
 .goBackButton {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 8px;
     transition: all 0.2s ease-in-out;
+    color: #1f2937;
+    background-color: transparent;
+    border: none;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
 
     &:hover {
-        transform: translateX(-2px);
+        background-color: #f3f4f6;
     }
 
     &:disabled {
-        transform: none;
+        color: #d1d5db;
+        background-color: transparent;
         cursor: not-allowed;
     }
 }
@@ -18,7 +26,6 @@
     font-size: 0.875rem;
 }
 
-// Responsive adjustments
 @media (max-width: 768px) {
     .goBackButton {
         font-size: 0.875rem;

@@ -228,7 +228,7 @@ export default function DiscoveryDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/discoveries" text="Back to the list" />
+            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/discoveries" text="Inventory" />
             <TabLayout
                 tabs={[
                     {

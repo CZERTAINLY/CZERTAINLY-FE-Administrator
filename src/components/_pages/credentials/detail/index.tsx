@@ -120,7 +120,7 @@ function CredentialDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/credentials" text="Back to the list" />
+            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/credentials" text="Inventory" />
             <Widget
                 title="Credential Details"
                 busy={isFetching || isDeleting}

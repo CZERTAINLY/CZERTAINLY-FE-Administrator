@@ -239,7 +239,7 @@ export default function TokenProfileDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/tokenprofiles" text="Back to the list" />
+            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/tokenprofiles" text="Inventory" />
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
                 <Col>
                     <Widget

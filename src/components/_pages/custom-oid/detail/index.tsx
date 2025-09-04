@@ -85,7 +85,7 @@ export default function CustomOIDDetail() {
     );
     return (
         <Container className="themed-container" fluid>
-            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/custom-oids" text="Back to the list" />
+            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/custom-oids" text="Inventory" />
             <Widget
                 title="OID Details"
                 busy={isBusy}

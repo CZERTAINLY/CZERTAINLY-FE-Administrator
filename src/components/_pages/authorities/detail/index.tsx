@@ -102,7 +102,7 @@ export default function AuthorityDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/authorities" text="Back to the list" />
+            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/authorities" text="Inventory" />
             <Widget
                 title="Certification Authority Details"
                 busy={isBusy}

@@ -316,7 +316,7 @@ const RuleDetails = () => {
 
     return (
         <Container className="themed-container" fluid>
-            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/rules" text="Back to the list" />
+            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/rules" text="Inventory" />
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
                 <Col>
                     <Widget refreshAction={getFreshDetails} busy={isBusy} title="Rule Details" titleSize="large" widgetButtons={buttons}>

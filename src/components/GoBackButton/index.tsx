@@ -1,12 +1,9 @@
 import React from 'react';
-import { Button } from 'reactstrap';
 import { useNavigate } from 'react-router';
 import styles from './GoBackButton.module.scss';
 
 interface GoBackButtonProps {
     className?: string;
-    color?: string;
-    size?: string;
     disabled?: boolean;
     text?: string;
     onClick?: () => void;
@@ -15,17 +12,7 @@ interface GoBackButtonProps {
     forcedPath?: string;
 }
 
-function GoBackButton({
-    className = 'btn btn-secondary',
-    color = 'secondary',
-    size,
-    disabled = false,
-    text = 'Go Back',
-    onClick,
-    fallbackPath,
-    forcedPath,
-    style,
-}: GoBackButtonProps) {
+function GoBackButton({ className = '', disabled = false, text = 'Go Back', onClick, fallbackPath, forcedPath, style }: GoBackButtonProps) {
     const navigate = useNavigate();
     const handleClick = () => {
         if (onClick) {
@@ -42,17 +29,10 @@ function GoBackButton({
     };
 
     return (
-        <Button
-            style={style}
-            className={`${className} ${styles.goBackButton}`}
-            color={color}
-            size={size}
-            disabled={disabled}
-            onClick={handleClick}
-        >
+        <button style={style} className={`${className} ${styles.goBackButton}`} disabled={disabled} onClick={handleClick}>
             <i className={`fa fa-arrow-left me-2 ${styles.icon}`} aria-hidden="true" />
             {text}
-        </Button>
+        </button>
     );
 }
 
