@@ -11,12 +11,12 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 import { Button, ButtonGroup, Col, Container, Input, Row } from 'reactstrap';
-import { ExecutionType, PlatformEnum } from 'types/openapi';
+import { ExecutionType, PlatformEnum, Resource } from 'types/openapi';
 
 const ExecutionDetails = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
-    const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
+    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const executionTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ExecutionType));
     const executionDetails = useSelector(rulesSelectors.executionDetails);
     const isFetchingDetails = useSelector(rulesSelectors.isFetchingExecutionDetails);
@@ -129,7 +129,7 @@ const ExecutionDetails = () => {
                       },
                       {
                           id: 'resource',
-                          columns: ['Resource', getEnumLabel(resourceTypeEnum, executionDetails.resource), ''],
+                          columns: ['Resource', getEnumLabel(resourceEnum, executionDetails.resource), ''],
                       },
                       {
                           id: 'description',
@@ -195,7 +195,7 @@ const ExecutionDetails = () => {
         [
             executionDetails,
             executionTypeEnum,
-            resourceTypeEnum,
+            resourceEnum,
             setUpdateDescription,
             updateDescriptionEditEnable,
             onUpdateDescriptionConfirmed,
@@ -236,7 +236,11 @@ const ExecutionDetails = () => {
 
     return (
         <Container className="themed-container" fluid>
-            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/actions" text="Inventory" />
+            <GoBackButton
+                style={{ marginBottom: '10px' }}
+                forcedPath="/actions"
+                text={`${getEnumLabel(resourceEnum, Resource.Actions)} Inventory`}
+            />
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
                 <Col>
                     <Widget

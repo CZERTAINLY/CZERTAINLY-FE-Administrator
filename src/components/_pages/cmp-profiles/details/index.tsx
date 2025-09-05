@@ -32,7 +32,7 @@ export default function AdministratorDetail() {
     const isEnabling = useSelector(selectors.isEnabling);
     const cmpCmpProfileVariantEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CmpProfileVariant));
     const protectionMethodEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ProtectionMethod));
-
+    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const deleteErrorMessage = useSelector(selectors.deleteErrorMessage);
     const users = useSelector(userSelectors.users);
     const groups = useSelector(groupsSelectors.certificateGroups);
@@ -286,7 +286,11 @@ export default function AdministratorDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/cmpprofiles" text="Inventory" />
+            <GoBackButton
+                style={{ marginBottom: '10px' }}
+                forcedPath="/cmpprofiles"
+                text={`${getEnumLabel(resourceEnum, Resource.CmpProfiles)} Inventory`}
+            />
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
                 <Col>
                     <Widget

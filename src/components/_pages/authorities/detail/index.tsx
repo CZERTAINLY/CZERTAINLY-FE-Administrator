@@ -11,10 +11,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router';
 import { Container, Label } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { Resource } from '../../../../types/openapi';
+import { PlatformEnum, Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import { getEditAndDeleteWidgetButtons, createWidgetDetailHeaders } from 'utils/widget';
 import GoBackButton from 'components/GoBackButton';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 export default function AuthorityDetail() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -27,7 +28,7 @@ export default function AuthorityDetail() {
     const isDeleting = useSelector(selectors.isDeleting);
 
     const deleteErrorMessage = useSelector(selectors.deleteErrorMessage);
-
+    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
     const isBusy = useMemo(() => isFetching || isDeleting, [isFetching, isDeleting]);
@@ -102,7 +103,11 @@ export default function AuthorityDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/authorities" text="Inventory" />
+            <GoBackButton
+                style={{ marginBottom: '10px' }}
+                forcedPath="/authorities"
+                text={`${getEnumLabel(resourceEnum, Resource.Authorities)} Inventory`}
+            />
             <Widget
                 title="Certification Authority Details"
                 busy={isBusy}

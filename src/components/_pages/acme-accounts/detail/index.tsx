@@ -12,11 +12,12 @@ import StatusCircle from 'components/StatusCircle';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 
-import { AccountStatus } from 'types/openapi';
+import { AccountStatus, PlatformEnum, Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { acmeAccountStatus } from '../acmeAccountStatus';
 import { createWidgetDetailHeaders } from 'utils/widget';
 import GoBackButton from 'components/GoBackButton';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 
 export default function AcmeAccountDetail() {
     const dispatch = useDispatch();
@@ -28,6 +29,7 @@ export default function AcmeAccountDetail() {
     const isDisabling = useSelector(selectors.isDisabling);
     const isEnabling = useSelector(selectors.isEnabling);
     const isRevoking = useSelector(selectors.isRevoking);
+    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
 
     const [confirmRevoke, setConfirmRevoke] = useState<boolean>(false);
 
@@ -195,7 +197,11 @@ export default function AcmeAccountDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/acmeaccounts" text="Inventory" />
+            <GoBackButton
+                style={{ marginBottom: '10px' }}
+                forcedPath="/acmeaccounts"
+                text={`${getEnumLabel(resourceEnum, Resource.AcmeAccounts)} Inventory`}
+            />
             <Widget
                 title="ACME Account Details"
                 busy={isFetchingDetail || isEnabling || isDisabling || isRevoking}

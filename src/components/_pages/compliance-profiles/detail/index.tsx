@@ -20,12 +20,13 @@ import {
     ComplianceProfileRuleListResponseRuleModel,
 } from 'types/complianceProfiles';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { Resource } from '../../../../types/openapi';
+import { PlatformEnum, Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import AddRuleWithAttributesDialogBody from '../form/AddRuleWithAttributesDialogBody/index.';
 import AssociateRaProfileDialogBody from '../form/AssociateRaProfileDialogBody/AssociateRaProfileDialogBody';
 import { createWidgetDetailHeaders } from 'utils/widget';
 import GoBackButton from 'components/GoBackButton';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 
 export default function ComplianceProfileDetail() {
     const dispatch = useDispatch();
@@ -39,7 +40,7 @@ export default function ComplianceProfileDetail() {
     const rules = useSelector(selectors.rules);
 
     const groups = useSelector(selectors.groups);
-
+    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
     const deleteErrorMessage = useSelector(selectors.deleteErrorMessage);
@@ -782,7 +783,11 @@ export default function ComplianceProfileDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/complianceprofiles" text="Inventory" />
+            <GoBackButton
+                style={{ marginBottom: '10px' }}
+                forcedPath="/complianceprofiles"
+                text={`${getEnumLabel(resourceEnum, Resource.ComplianceProfiles)} Inventory`}
+            />
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
                 <Col>
                     <Widget
