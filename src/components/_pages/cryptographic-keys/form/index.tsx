@@ -247,6 +247,7 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                             attributeDescriptors={cryptographicKeyAttributeDescriptors || []}
                             groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
                             setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                            removeUnknownOption={form.getFieldState('type')?.value?.value === KeyRequestType.KeyPair && !editMode}
                         />
                     ),
                 },
@@ -366,7 +367,11 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                                             styles={{
                                                 control: (provided) =>
                                                     meta.touched && meta.invalid
-                                                        ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
+                                                        ? {
+                                                              ...provided,
+                                                              border: 'solid 1px red',
+                                                              '&:hover': { border: 'solid 1px red' },
+                                                          }
                                                         : { ...provided },
                                             }}
                                         />
@@ -485,7 +490,11 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                                             styles={{
                                                 control: (provided) =>
                                                     meta.touched && meta.invalid
-                                                        ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
+                                                        ? {
+                                                              ...provided,
+                                                              border: 'solid 1px red',
+                                                              '&:hover': { border: 'solid 1px red' },
+                                                          }
                                                         : { ...provided },
                                             }}
                                         />

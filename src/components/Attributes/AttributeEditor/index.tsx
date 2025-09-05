@@ -47,6 +47,7 @@ export interface Props {
     callbackResource?: Resource;
     callbackParentUuid?: string;
     withRemoveAction?: boolean;
+    removeUnknownOption?: boolean;
 }
 
 export default function AttributeEditor({
@@ -61,6 +62,7 @@ export default function AttributeEditor({
     groupAttributesCallbackAttributes = emptyGroupAttributesCallbackAttributes,
     setGroupAttributesCallbackAttributes = () => emptyGroupAttributesCallbackAttributes,
     withRemoveAction = true,
+    removeUnknownOption = false,
 }: Props) {
     const dispatch = useDispatch();
 
@@ -956,24 +958,33 @@ export default function AttributeEditor({
         groupedAttributesDescriptorsKeys.forEach((group, i, arr) => {
             attrs.push(
                 <Widget key={group} title={group === '__' ? '' : group} busy={isRunningCb}>
-                    {groupedAttributesDescriptors[group].map((descriptor) => (
-                        <div key={descriptor.name} className={style.attributeWrapper}>
-                            <div className={style.attributeContent}>
-                                <Attribute
-                                    busy={isRunningCb}
-                                    name={`__attributes__${id}__.${descriptor.name}`}
-                                    descriptor={descriptor}
-                                    options={options[`__attributes__${id}__.${descriptor.name}`]}
-                                    userInteractedRef={userInteractedRef}
-                                    deleteButton={
-                                        withRemoveAction && isCustomAttributeModel(descriptor) && !descriptor.properties.required
-                                            ? deleteButton(descriptor)
-                                            : undefined
-                                    }
-                                />
+                    {groupedAttributesDescriptors[group].map((descriptor) => {
+                        console.log({ descriptor });
+                        console.log({ attributeOptios: options[`__attributes__${id}__.${descriptor.name}`] });
+
+                        let selectOptions = removeUnknownOption
+                            ? options[`__attributes__${id}__.${descriptor.name}`]?.filter((option) => option.label !== 'Unknown')
+                            : (options[`__attributes__${id}__.${descriptor.name}`] ?? []);
+
+                        return (
+                            <div key={descriptor.name} className={style.attributeWrapper}>
+                                <div className={style.attributeContent}>
+                                    <Attribute
+                                        busy={isRunningCb}
+                                        name={`__attributes__${id}__.${descriptor.name}`}
+                                        descriptor={descriptor}
+                                        options={selectOptions}
+                                        userInteractedRef={userInteractedRef}
+                                        deleteButton={
+                                            withRemoveAction && isCustomAttributeModel(descriptor) && !descriptor.properties.required
+                                                ? deleteButton(descriptor)
+                                                : undefined
+                                        }
+                                    />
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                     {i === arr.length - 1 && notYetShownCustomAttributeDescriptors.length > 0 && attributeSelector}
                 </Widget>,
             );
@@ -990,6 +1001,7 @@ export default function AttributeEditor({
         form.mutators,
         formState.values,
         deletedAttributes,
+        removeUnknownOption,
     ]);
 
     return <>{attrs}</>;
