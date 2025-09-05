@@ -278,7 +278,7 @@ function Dashboard() {
                             data={dashboard?.raProfileStatByCertificateCount}
                             entity={EntityType.CERTIFICATE}
                             onSetFilter={(index, labels) =>
-                                labels[index] === 'Unknown'
+                                labels[index] === 'Unknown' || labels[index] === 'Unassigned'
                                     ? [
                                           {
                                               fieldSource: FilterFieldSource.Property,
