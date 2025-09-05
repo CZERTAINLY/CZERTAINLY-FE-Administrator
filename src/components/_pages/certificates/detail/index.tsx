@@ -33,7 +33,6 @@ import {
     CertificateValidationStatus,
 } from '../../../../types/openapi';
 
-import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -56,12 +55,12 @@ import {
     UncontrolledButtonDropdown,
 } from 'reactstrap';
 import { AttributeDescriptorModel } from 'types/attributes';
-import { ComplianceStatus, Resource } from 'types/openapi';
+import { ComplianceStatus, PlatformEnum, Resource } from 'types/openapi';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 import { downloadFile, formatPEM } from 'utils/certificate';
 
-import { PlatformEnum } from 'types/openapi';
 import { dateFormatter } from 'utils/dateUtil';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import TabLayout from '../../../Layout/TabLayout';
@@ -109,7 +108,7 @@ export default function CertificateDetail() {
     const groupsList = useSelector(groupSelectors.certificateGroups);
     const raProfiles = useSelector(raProfileSelectors.raProfiles);
     const users = useSelector(userSelectors.users);
-
+    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const eventHistory = useSelector(selectors.certificateHistory);
     const certLocations = useSelector(selectors.certificateLocations);
     const approvals = useSelector(selectors.approvals);
@@ -1935,7 +1934,11 @@ export default function CertificateDetail() {
 
     return (
         <Container className={cx('themed-container', styles.certificateContainer)} fluid>
-            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/certificates" text="Inventory" />
+            <GoBackButton
+                style={{ marginBottom: '10px' }}
+                forcedPath="/certificates"
+                text={`${getEnumLabel(resourceEnum, Resource.Certificates)} Inventory`}
+            />
             <TabLayout
                 tabs={[
                     {
