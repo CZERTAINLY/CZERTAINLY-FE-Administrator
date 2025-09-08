@@ -959,9 +959,6 @@ export default function AttributeEditor({
             attrs.push(
                 <Widget key={group} title={group === '__' ? '' : group} busy={isRunningCb}>
                     {groupedAttributesDescriptors[group].map((descriptor) => {
-                        console.log({ descriptor });
-                        console.log({ attributeOptios: options[`__attributes__${id}__.${descriptor.name}`] });
-
                         let selectOptions = removeUnknownOption
                             ? options[`__attributes__${id}__.${descriptor.name}`]?.filter((option) => option.label !== 'Unknown')
                             : (options[`__attributes__${id}__.${descriptor.name}`] ?? []);
