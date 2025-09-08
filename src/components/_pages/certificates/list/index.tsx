@@ -33,6 +33,7 @@ interface Props {
     onCheckedRowsChanged?: (checkedRows: (string | number)[]) => void;
     hideWidgetButtons?: boolean;
     hideAdditionalButtons?: boolean;
+    isLinkDisabled?: boolean;
 }
 
 export default function CertificateList({
@@ -41,6 +42,7 @@ export default function CertificateList({
     multiSelect = true,
     onCheckedRowsChanged,
     hideAdditionalButtons = false,
+    isLinkDisabled = false,
 }: Props) {
     const dispatch = useDispatch();
 
@@ -313,7 +315,7 @@ export default function CertificateList({
                         certificate.complianceStatus ? <CertificateStatus status={certificate.complianceStatus} asIcon={true} /> : '',
 
                         certificate.privateKeyAvailability ? <i className="fa fa-key" aria-hidden="true"></i> : '',
-                        selectCertsOnly ? (
+                        selectCertsOnly || isLinkDisabled ? (
                             certificate.commonName || '(empty)'
                         ) : (
                             <Link to={`./detail/${certificate.uuid}`}>{certificate.commonName || '(empty)'}</Link>
@@ -323,24 +325,32 @@ export default function CertificateList({
                         certificate?.groups?.length
                             ? certificate?.groups.map((group, i) => (
                                   <React.Fragment key={group.uuid}>
-                                      <Link to={`../../groups/detail/${group.uuid}`}>{group.name}</Link>
+                                      {isLinkDisabled ? group.name : <Link to={`../../groups/detail/${group.uuid}`}>{group.name}</Link>}
                                       {certificate?.groups?.length && i !== certificate.groups.length - 1 ? `, ` : ``}
                                   </React.Fragment>
                               ))
                             : 'Unassigned',
                         <span style={{ whiteSpace: 'nowrap' }}>
                             {certificate.raProfile ? (
-                                <Link
-                                    to={`../raprofiles/detail/${certificate?.raProfile.authorityInstanceUuid}/${certificate?.raProfile.uuid}`}
-                                >
-                                    {certificate.raProfile.name ?? 'Unassigned'}
-                                </Link>
+                                isLinkDisabled ? (
+                                    (certificate.raProfile.name ?? 'Unassigned')
+                                ) : (
+                                    <Link
+                                        to={`../raprofiles/detail/${certificate?.raProfile.authorityInstanceUuid}/${certificate?.raProfile.uuid}`}
+                                    >
+                                        {certificate.raProfile.name ?? 'Unassigned'}
+                                    </Link>
+                                )
                             ) : (
                                 (certificate.raProfile ?? 'Unassigned')
                             )}
                         </span>,
                         certificate?.ownerUuid ? (
-                            <Link to={`../users/detail/${certificate?.ownerUuid}`}>{certificate.owner ?? 'Unassigned'}</Link>
+                            isLinkDisabled ? (
+                                (certificate.owner ?? 'Unassigned')
+                            ) : (
+                                <Link to={`../users/detail/${certificate?.ownerUuid}`}>{certificate.owner ?? 'Unassigned'}</Link>
+                            )
                         ) : (
                             (certificate.owner ?? 'Unassigned')
                         ),
@@ -348,7 +358,11 @@ export default function CertificateList({
                         certificate.signatureAlgorithm || '',
                         certificate.publicKeyAlgorithm || '',
                         certificate.issuerCommonName && certificate?.issuerCertificateUuid ? (
-                            <Link to={`./detail/${certificate.issuerCertificateUuid}`}>{certificate.issuerCommonName}</Link>
+                            isLinkDisabled ? (
+                                certificate.issuerCommonName
+                            ) : (
+                                <Link to={`./detail/${certificate.issuerCertificateUuid}`}>{certificate.issuerCommonName}</Link>
+                            )
                         ) : (
                             certificate.issuerCommonName || ''
                         ),
@@ -365,7 +379,7 @@ export default function CertificateList({
                     ],
                 };
             }),
-        [certificates, selectCertsOnly, certificateTypeEnum],
+        [certificates, selectCertsOnly, certificateTypeEnum, isLinkDisabled],
     );
 
     const onListCallback = useCallback(

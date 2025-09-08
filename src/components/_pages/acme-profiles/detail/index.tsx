@@ -288,7 +288,7 @@ export default function AdministratorDetail() {
                 columns: [
                     'Groups',
                     <>
-                        {acmeProfile.certificateAssociations?.groupUuids?.length === 0 ? (
+                        {!acmeProfile.certificateAssociations || acmeProfile.certificateAssociations?.groupUuids?.length === 0 ? (
                             <span>Unassigned</span>
                         ) : (
                             <>
