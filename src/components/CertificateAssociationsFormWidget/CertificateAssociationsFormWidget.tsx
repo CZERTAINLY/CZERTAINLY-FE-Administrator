@@ -1,6 +1,6 @@
 import { Field } from 'react-final-form';
 import { FormGroup, Label } from 'reactstrap';
-import Select from 'react-select';
+import Select, { components } from 'react-select';
 import Widget from 'components/Widget';
 import { actions as groupsActions, selectors as groupsSelectors } from 'ducks/certificateGroups';
 import { actions as userAction, selectors as userSelectors } from 'ducks/users';
@@ -58,7 +58,39 @@ export default function CertificateAssociationsFormWidget({
                 {({ input }) => (
                     <FormGroup>
                         <Label for="owner">Owner</Label>
-                        <Select {...input} id="owner" options={userOptions} placeholder="Select Owner" isClearable />
+                        <Select
+                            {...input}
+                            id="owner"
+                            instanceId="owner"
+                            options={userOptions}
+                            placeholder="Select Owner"
+                            isClearable
+                            components={{
+                                Menu: (props) => (
+                                    <components.Menu
+                                        {...props}
+                                        innerProps={{ ...props.innerProps, 'data-testid': 'certificate-associations-owner-menu' } as any}
+                                    />
+                                ),
+                                Control: (props) => (
+                                    <components.Control
+                                        {...props}
+                                        innerProps={{ ...props.innerProps, 'data-testid': 'certificate-associations-owner-control' } as any}
+                                    />
+                                ),
+                                ClearIndicator: (props) => (
+                                    <components.ClearIndicator
+                                        {...props}
+                                        innerProps={
+                                            {
+                                                ...props.innerProps,
+                                                'data-testid': 'certificate-associations-owner-clear-button',
+                                            } as any
+                                        }
+                                    />
+                                ),
+                            }}
+                        />
                     </FormGroup>
                 )}
             </Field>
@@ -67,7 +99,40 @@ export default function CertificateAssociationsFormWidget({
                 {({ input }) => (
                     <FormGroup>
                         <Label for="groups">Groups</Label>
-                        <Select {...input} id="groups" options={groupOptions} placeholder="Select Groups" isClearable isMulti />
+                        <Select
+                            {...input}
+                            id="groups"
+                            instanceId="groups"
+                            options={groupOptions}
+                            placeholder="Select Groups"
+                            isClearable
+                            isMulti
+                            components={{
+                                Menu: (props) => (
+                                    <components.Menu
+                                        {...props}
+                                        innerProps={{ ...props.innerProps, 'data-testid': 'certificate-associations-group-menu' } as any}
+                                    />
+                                ),
+                                Control: (props) => (
+                                    <components.Control
+                                        {...props}
+                                        innerProps={{ ...props.innerProps, 'data-testid': 'certificate-associations-group-control' } as any}
+                                    />
+                                ),
+                                ClearIndicator: (props) => (
+                                    <components.ClearIndicator
+                                        {...props}
+                                        innerProps={
+                                            {
+                                                ...props.innerProps,
+                                                'data-testid': 'certificate-associations-group-clear-button',
+                                            } as any
+                                        }
+                                    />
+                                ),
+                            }}
+                        />
                     </FormGroup>
                 )}
             </Field>
