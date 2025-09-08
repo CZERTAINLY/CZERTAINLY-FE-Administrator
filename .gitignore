@@ -33,3 +33,4 @@ src/setupProxy.js
 
 # Cypress
 cypress.env.json
+.nyc_output/
