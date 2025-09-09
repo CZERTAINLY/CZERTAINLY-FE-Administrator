@@ -322,7 +322,7 @@ export default function ScepProfileDetail() {
                 columns: [
                     'Groups',
                     <>
-                        {scepProfile.certificateAssociations?.groupUuids?.length === 0 ? (
+                        {!scepProfile.certificateAssociations || scepProfile.certificateAssociations?.groupUuids?.length === 0 ? (
                             <span>Unassigned</span>
                         ) : (
                             <>

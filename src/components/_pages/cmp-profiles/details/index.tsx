@@ -262,7 +262,7 @@ export default function AdministratorDetail() {
                 columns: [
                     'Groups',
                     <>
-                        {cmpProfile.certificateAssociations?.groupUuids?.length === 0 ? (
+                        {!cmpProfile.certificateAssociations || cmpProfile.certificateAssociations?.groupUuids?.length === 0 ? (
                             <span>Unassigned</span>
                         ) : (
                             <>
