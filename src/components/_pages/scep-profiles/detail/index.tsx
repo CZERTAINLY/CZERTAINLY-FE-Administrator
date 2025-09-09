@@ -15,12 +15,13 @@ import { Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router';
 import { Container } from 'reactstrap';
-import { Resource } from 'types/openapi';
+import { PlatformEnum, Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { createWidgetDetailHeaders, getGroupNames, getOwnerName } from 'utils/widget';
 import { actions as groupsActions, selectors as groupsSelectors } from 'ducks/certificateGroups';
 import { actions as userAction, selectors as userSelectors } from 'ducks/users';
 import GoBackButton from 'components/GoBackButton';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 
 export default function ScepProfileDetail() {
     const dispatch = useDispatch();
@@ -34,7 +35,7 @@ export default function ScepProfileDetail() {
     const isEnabling = useSelector(selectors.isEnabling);
     const users = useSelector(userSelectors.users);
     const groups = useSelector(groupsSelectors.certificateGroups);
-
+    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const deleteErrorMessage = useSelector(selectors.deleteErrorMessage);
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
@@ -345,7 +346,11 @@ export default function ScepProfileDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/scepprofiles" text="Inventory" />
+            <GoBackButton
+                style={{ marginBottom: '10px' }}
+                forcedPath="/scepprofiles"
+                text={`${getEnumLabel(resourceEnum, Resource.ScepProfiles)} Inventory`}
+            />
             <Widget
                 title="SCEP Profile Details"
                 busy={isBusy}

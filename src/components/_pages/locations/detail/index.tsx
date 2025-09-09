@@ -27,7 +27,7 @@ import { actions as customAttributesActions, selectors as customAttributesSelect
 
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { validateRequired } from 'utils/validators';
-import { CertificateState, Resource } from '../../../../types/openapi';
+import { CertificateState, PlatformEnum, Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import TabLayout from '../../../Layout/TabLayout';
 import CertificateStatusBadge from '../../../_pages/certificates/CertificateStatus';
@@ -36,8 +36,10 @@ import cx from 'classnames';
 import style from './locationDetail.module.scss';
 import { createWidgetDetailHeaders } from 'utils/widget';
 import GoBackButton from 'components/GoBackButton';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 
 export default function LocationDetail() {
+    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -476,7 +478,11 @@ export default function LocationDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/locations" text="Inventory" />
+            <GoBackButton
+                style={{ marginBottom: '10px' }}
+                forcedPath="/locations"
+                text={`${getEnumLabel(resourceEnum, Resource.Locations)} Inventory`}
+            />
             <TabLayout
                 tabs={[
                     {

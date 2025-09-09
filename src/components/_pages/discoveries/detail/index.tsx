@@ -7,6 +7,7 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions, selectors } from 'ducks/discoveries';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { PlatformEnum, Resource } from 'types/openapi';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
@@ -18,7 +19,6 @@ import TabLayout from 'components/Layout/TabLayout';
 import { actions as rulesActions, selectors as ruleSelectors } from 'ducks/rules';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { dateFormatter, durationFormatter } from 'utils/dateUtil';
-import { PlatformEnum, Resource } from '../../../../types/openapi';
 import DiscoveryStatus from '../DiscoveryStatus';
 import DiscoveryCertificates from './DiscoveryCertificates';
 import { createWidgetDetailHeaders } from 'utils/widget';
@@ -44,6 +44,7 @@ export default function DiscoveryDetail() {
         () => isFetching || isDeleting || isFetchingRuleTriggerHistories,
         [isFetching, isDeleting, isFetchingRuleTriggerHistories],
     );
+    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.TriggerType));
 
@@ -228,7 +229,11 @@ export default function DiscoveryDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/discoveries" text="Inventory" />
+            <GoBackButton
+                style={{ marginBottom: '10px' }}
+                forcedPath="/discoveries"
+                text={`${getEnumLabel(resourceEnum, Resource.Discoveries)} Inventory`}
+            />
             <TabLayout
                 tabs={[
                     {

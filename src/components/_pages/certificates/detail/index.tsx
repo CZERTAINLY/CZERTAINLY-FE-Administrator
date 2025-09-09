@@ -33,7 +33,6 @@ import {
     CertificateValidationStatus,
 } from '../../../../types/openapi';
 
-import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -56,12 +55,12 @@ import {
     UncontrolledButtonDropdown,
 } from 'reactstrap';
 import { AttributeDescriptorModel } from 'types/attributes';
-import { ComplianceStatus, Resource } from 'types/openapi';
+import { ComplianceStatus, PlatformEnum, Resource } from 'types/openapi';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 import { downloadFile, formatPEM } from 'utils/certificate';
 
-import { PlatformEnum } from 'types/openapi';
 import { dateFormatter } from 'utils/dateUtil';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import TabLayout from '../../../Layout/TabLayout';
@@ -109,7 +108,7 @@ export default function CertificateDetail() {
     const groupsList = useSelector(groupSelectors.certificateGroups);
     const raProfiles = useSelector(raProfileSelectors.raProfiles);
     const users = useSelector(userSelectors.users);
-
+    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const eventHistory = useSelector(selectors.certificateHistory);
     const certLocations = useSelector(selectors.certificateLocations);
     const approvals = useSelector(selectors.approvals);
@@ -1343,9 +1342,11 @@ export default function CertificateDetail() {
         if (!relatedCertificates) return [];
 
         return relatedCertificates.map((c) => ({
-            id: c.uuid,
+            id: `${c.uuid}-${c.relation}`,
             columns: [
-                <Link to={`../../certificates/detail/${c.uuid}`}>{c.commonName}</Link>,
+                <Link key={`${c.uuid}-name`} to={`../../certificates/detail/${c.uuid}`}>
+                    {c.commonName}
+                </Link>,
                 <div key={`${c.uuid}-relation`} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                     {c.relation === 'successor' && <span>{capitalize(c.relation)}</span>}
                     <i
@@ -1371,6 +1372,10 @@ export default function CertificateDetail() {
         setConfirmDeleteRelatedCertificate(false);
     }, [dispatch, relatedCertificateCheckedRows, id]);
 
+    const clearRelatedCertificatesFilters = useCallback(() => {
+        dispatch(filterActions.setCurrentFilters({ entity: EntityType.CERTIFICATE, currentFilters: [] }));
+    }, [dispatch]);
+
     const relatedCertificatesButtons: WidgetButtonProps[] = useMemo(() => {
         return [
             {
@@ -1381,6 +1386,7 @@ export default function CertificateDetail() {
                 onClick: () => {
                     setRelatedCertificateCheckedRows([]);
                     setIsAlreadyRelatedError(false);
+                    clearRelatedCertificatesFilters();
                     setIsAddingRelatedCertificate(true);
                 },
             },
@@ -1394,7 +1400,7 @@ export default function CertificateDetail() {
                 },
             },
         ];
-    }, [isCertificateArchived, relatedCertificateCheckedRows]);
+    }, [isCertificateArchived, relatedCertificateCheckedRows, clearRelatedCertificatesFilters]);
 
     useEffect(() => {
         if (!selectedCertificate) {
@@ -1404,15 +1410,6 @@ export default function CertificateDetail() {
 
         setIsAlreadyRelatedError(isAlreadyRelated);
     }, [selectedCertificate, getCertificateIsAlreadyRelated]);
-
-    const clearRelatedCertificatesFilters = useCallback(() => {
-        dispatch(filterActions.setCurrentFilters({ entity: EntityType.CERTIFICATE, currentFilters: [] }));
-    }, [dispatch]);
-
-    useEffect(() => {
-        //clear filters for related certificates when component is mounted
-        clearRelatedCertificatesFilters();
-    }, [clearRelatedCertificatesFilters]);
 
     const switchCallback = useCallback(() => {
         if (!certificate) return;
@@ -1935,7 +1932,11 @@ export default function CertificateDetail() {
 
     return (
         <Container className={cx('themed-container', styles.certificateContainer)} fluid>
-            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/certificates" text="Inventory" />
+            <GoBackButton
+                style={{ marginBottom: '10px' }}
+                forcedPath="/certificates"
+                text={`${getEnumLabel(resourceEnum, Resource.Certificates)} Inventory`}
+            />
             <TabLayout
                 tabs={[
                     {
@@ -2298,31 +2299,38 @@ export default function CertificateDetail() {
                         }}
                     >
                         {({ handleSubmit, submitting, valid }) => (
-                            <BootstrapForm onSubmit={handleSubmit}>
-                                <CertificateList
-                                    hideAdditionalButtons={true}
-                                    hideWidgetButtons={true}
-                                    multiSelect={false}
-                                    onCheckedRowsChanged={(rows) => {
-                                        setSelectedCertificate(rows[0] as string);
-                                    }}
-                                />
-                                <div className="d-flex align-items-center" style={{ padding: '0 30px' }}>
-                                    <ButtonGroup>
-                                        <ProgressButton
-                                            title="Add"
-                                            inProgressTitle="Adding..."
-                                            inProgress={submitting}
-                                            disabled={!selectedCertificate || !valid || isAlreadyRelatedError}
-                                        />
+                            <>
+                                <BootstrapForm onSubmit={handleSubmit}>
+                                    <CertificateList
+                                        hideAdditionalButtons={true}
+                                        hideWidgetButtons={true}
+                                        multiSelect={false}
+                                        isLinkDisabled={true}
+                                        onCheckedRowsChanged={(rows) => {
+                                            setSelectedCertificate(rows[0] as string);
+                                        }}
+                                    />
+                                    <div className="d-flex align-items-center" style={{ padding: '0 30px' }}>
+                                        <ButtonGroup>
+                                            <ProgressButton
+                                                title="Add"
+                                                inProgressTitle="Adding..."
+                                                inProgress={submitting}
+                                                disabled={!selectedCertificate || !valid || isAlreadyRelatedError}
+                                            />
 
-                                        <Button color="default" onClick={() => setIsAddingRelatedCertificate(false)} disabled={submitting}>
-                                            Cancel
-                                        </Button>
-                                    </ButtonGroup>
-                                    {isAlreadyRelatedError ? <span className="text-danger">Certificate is already related</span> : null}
-                                </div>
-                            </BootstrapForm>
+                                            <Button
+                                                color="default"
+                                                onClick={() => setIsAddingRelatedCertificate(false)}
+                                                disabled={submitting}
+                                            >
+                                                Cancel
+                                            </Button>
+                                        </ButtonGroup>
+                                        {isAlreadyRelatedError ? <span className="text-danger">Certificate is already related</span> : null}
+                                    </div>
+                                </BootstrapForm>
+                            </>
                         )}
                     </Form>
                 }

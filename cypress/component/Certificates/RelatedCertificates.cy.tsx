@@ -109,7 +109,7 @@ describe('Related Certificates Component', () => {
         });
 
         // Select a 1st certificate
-        cy.get('#ebcd4e0f-a3a2-4080-beac-6c9ea3972768__checkbox__').check();
+        cy.get('[data-testid="table-checkbox"]').check();
         // Verify remove button is enabled
         cy.get('[data-testid="remove_related_certificate-button"]').should('not.be.disabled');
     });
@@ -154,7 +154,7 @@ describe('Related Certificates Component', () => {
         });
 
         // Select a 1st certificate
-        cy.get('#ebcd4e0f-a3a2-4080-beac-6c9ea3972768__checkbox__').check();
+        cy.get('[data-testid="table-checkbox"]').check();
 
         // Click remove button
         cy.get('[data-testid="remove_related_certificate-button"]').click();
@@ -190,7 +190,7 @@ describe('Related Certificates Component', () => {
         });
 
         // Select a 1st certificate
-        cy.get('#ebcd4e0f-a3a2-4080-beac-6c9ea3972768__checkbox__').check();
+        cy.get('[data-testid="table-checkbox"]').check();
 
         // Click remove button
         cy.get('[data-testid="remove_related_certificate-button"]').click();

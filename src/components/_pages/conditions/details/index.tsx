@@ -10,7 +10,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 import { Button, ButtonGroup, Col, Container, Input, Row } from 'reactstrap';
-import { PlatformEnum } from 'types/openapi';
+import { PlatformEnum, Resource } from 'types/openapi';
 
 const ConditionDetails = () => {
     const { id } = useParams();
@@ -190,7 +190,11 @@ const ConditionDetails = () => {
 
     return (
         <Container className="themed-container" fluid>
-            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/rules" text="Inventory" />
+            <GoBackButton
+                style={{ marginBottom: '10px' }}
+                forcedPath="/rules"
+                text={`${getEnumLabel(resourceTypeEnum, Resource.Conditions)} Inventory`}
+            />
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
                 <Col>
                     <Widget
