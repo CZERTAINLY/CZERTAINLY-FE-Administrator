@@ -15,7 +15,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router';
 import { Col, Container, Row } from 'reactstrap';
-import { Resource } from '../../../../types/openapi';
+import { PlatformEnum, Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 
 import { LockWidgetNameEnum } from 'types/user-interface';
@@ -28,6 +28,8 @@ import SwitchWidget from 'components/SwitchWidget';
 import { renderExpiringThresholdLabel, renderValidationFrequencyLabel } from 'utils/certificate-validation';
 import EventsTable from 'components/_pages/notifications/events-settings/EventsTable';
 import { createWidgetDetailHeaders } from 'utils/widget';
+import GoBackButton from 'components/GoBackButton';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 
 interface DeassociateApprovalProfileDialogState {
     isDialogOpen: boolean;
@@ -47,7 +49,7 @@ export default function RaProfileDetail() {
     const cmpDetails = useSelector(raProfilesSelectors.cmpDetails);
     const associatedComplianceProfiles = useSelector(raProfilesSelectors.associatedComplianceProfiles);
     const associatedApprovalProfiles = useSelector(raProfilesSelectors.associatedApprovalProfiles);
-
+    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const isDissociatingApprovalProfile = useSelector(raProfilesSelectors.isDissociatingApprovalProfile);
     const isFetchingApprovalProfiles = useSelector(raProfilesSelectors.isFetchingApprovalProfiles);
     const isFetchingProfile = useSelector(raProfilesSelectors.isFetchingDetail);
@@ -902,6 +904,11 @@ export default function RaProfileDetail() {
 
     return (
         <Container className="themed-container" fluid>
+            <GoBackButton
+                style={{ marginBottom: '10px' }}
+                forcedPath="/raprofiles"
+                text={`${getEnumLabel(resourceEnum, Resource.RaProfiles)} Inventory`}
+            />
             <TabLayout
                 tabs={[
                     {

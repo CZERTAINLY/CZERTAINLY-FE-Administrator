@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 import { Badge, Container } from 'reactstrap';
 import SwitchField from 'components/Input/SwitchField';
-import { PlatformEnum, SchedulerJobExecutionStatus } from 'types/openapi';
+import { PlatformEnum, Resource, SchedulerJobExecutionStatus } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { getStrongFromCronExpression } from 'utils/dateUtil';
 import Cron from 'react-cron-generator';
@@ -18,6 +18,7 @@ import TextField from 'components/Input/TextField';
 import { Form } from 'react-final-form';
 import SchedulerJobHistory from './SchedulerJobHistory';
 import { createWidgetDetailHeaders } from 'utils/widget';
+import GoBackButton from 'components/GoBackButton';
 
 interface EditFormValues {
     cronExpression: string | undefined;
@@ -33,7 +34,7 @@ export default function SchedulerJobDetail() {
     const isUpdatingCron = useSelector(selectors.isUpdatingCron);
     const [originalCronExpression, setOriginalCronExpression] = useState<string>('');
     const schedulerJobExecutionStatusEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.SchedulerJobExecutionStatus));
-
+    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [editCronOpen, setEditCronOpen] = useState(false);
     const [newCronExpression, setNewCronExpression] = useState('');
@@ -181,6 +182,11 @@ export default function SchedulerJobDetail() {
 
     return (
         <Container className="themed-container" fluid>
+            <GoBackButton
+                style={{ marginBottom: '10px' }}
+                forcedPath="/jobs"
+                text={`${getEnumLabel(resourceEnum, Resource.Jobs)} Inventory`}
+            />
             <Widget
                 title="Scheduled Job Details"
                 busy={isBusy}

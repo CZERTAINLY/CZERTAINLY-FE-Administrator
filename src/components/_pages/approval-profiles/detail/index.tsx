@@ -1,13 +1,16 @@
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
+import GoBackButton from 'components/GoBackButton';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as profileApprovalActions, selectors as profileApprovalSelectors } from 'ducks/approval-profiles';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router';
 import { Col, Container, Row } from 'reactstrap';
 import { ApproverType, ProfileApprovalStepModel } from 'types/approval-profiles';
+import { PlatformEnum, Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { createWidgetDetailHeaders } from 'utils/widget';
 
@@ -20,7 +23,7 @@ const ApprovalProfileDetails = () => {
     const isFetchingDetail = useSelector(profileApprovalSelectors.isFetchingDetail);
     const deleteErrorMessage = useSelector(profileApprovalSelectors.deleteErrorMessage);
     const isDeleting = useSelector(profileApprovalSelectors.isDeleting);
-
+    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const isBusy = useMemo(() => isFetchingDetail || isDeleting, [isFetchingDetail, isDeleting]);
 
@@ -175,6 +178,11 @@ const ApprovalProfileDetails = () => {
 
     return (
         <Container className="themed-container" fluid>
+            <GoBackButton
+                style={{ marginBottom: '10px' }}
+                forcedPath="/approvalprofiles"
+                text={`${getEnumLabel(resourceEnum, Resource.ApprovalProfiles)} Inventory`}
+            />
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
                 <Col>
                     <Widget

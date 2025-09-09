@@ -8,9 +8,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { Container } from 'reactstrap';
-import { OidCategory, PlatformEnum } from 'types/openapi';
-import { selectors as enumSelectors } from 'ducks/enums';
+import { OidCategory, PlatformEnum, Resource } from 'types/openapi';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { getEditAndDeleteWidgetButtons, createWidgetDetailHeaders, createTableDataRow } from 'utils/widget';
+import GoBackButton from 'components/GoBackButton';
 
 export default function CustomOIDDetail() {
     const dispatch = useDispatch();
@@ -23,6 +24,7 @@ export default function CustomOIDDetail() {
     const isFetching = useSelector(selectors.isFetching);
     const isDeleting = useSelector(selectors.isDeleting);
     const oidCategoryEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.OidCategory));
+    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
@@ -84,6 +86,11 @@ export default function CustomOIDDetail() {
     );
     return (
         <Container className="themed-container" fluid>
+            <GoBackButton
+                style={{ marginBottom: '10px' }}
+                forcedPath="/custom-oids"
+                text={`${getEnumLabel(resourceEnum, Resource.Oids)} Inventory`}
+            />
             <Widget
                 title="OID Details"
                 busy={isBusy}

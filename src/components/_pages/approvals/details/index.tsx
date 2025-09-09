@@ -1,9 +1,11 @@
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
+import GoBackButton from 'components/GoBackButton';
 import StatusBadge from 'components/StatusBadge';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as approvalActions, selectors as approvalSelectors } from 'ducks/approvals';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -11,7 +13,7 @@ import { Link, useNavigate, useParams } from 'react-router';
 import { Button, Col, Container, Input, Row } from 'reactstrap';
 import { ApproverType, ProfileApprovalStepModel } from 'types/approval-profiles';
 import { DetailApprovalStepModel } from 'types/approvals';
-import { ApprovalDetailDtoStatusEnum } from 'types/openapi';
+import { ApprovalDetailDtoStatusEnum, PlatformEnum, Resource } from 'types/openapi';
 import { dateFormatter } from 'utils/dateUtil';
 import { createWidgetDetailHeaders } from 'utils/widget';
 
@@ -22,7 +24,7 @@ export default function ApprovalDetails() {
 
     const approvalDetails = useSelector(approvalSelectors.approvalDetails);
     const isFetchingDetail = useSelector(approvalSelectors.isFetchingDetail);
-
+    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [recipientApproveDialog, setRecipientApproveDialog] = useState(false);
     const [recipientRejectDialog, setRecipientRejectDialog] = useState(false);
     const [comment, setcomment] = useState<string>();
@@ -283,6 +285,11 @@ export default function ApprovalDetails() {
 
     return (
         <Container className="themed-container" fluid>
+            <GoBackButton
+                style={{ marginBottom: '10px' }}
+                forcedPath="/approvals"
+                text={`${getEnumLabel(resourceEnum, Resource.Approvals)} Inventory`}
+            />
             <Row>
                 <Col>
                     <Widget title="Approval Details" busy={isBusy} titleSize="large" widgetButtons={buttons} refreshAction={getFreshData}>

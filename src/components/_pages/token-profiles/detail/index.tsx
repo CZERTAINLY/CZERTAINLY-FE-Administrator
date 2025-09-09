@@ -19,6 +19,7 @@ import { KeyUsage, PlatformEnum, Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import { createWidgetDetailHeaders } from 'utils/widget';
+import GoBackButton from 'components/GoBackButton';
 
 export default function TokenProfileDetail() {
     const dispatch = useDispatch();
@@ -41,7 +42,7 @@ export default function TokenProfileDetail() {
 
     const keyUsageEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.KeyUsage));
     const [keyUsages, setKeyUsages] = useState<KeyUsage[]>([]);
-
+    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const isBusy = useMemo(
         () => isFetchingProfile || isDeleting || isEnabling || isDisabling || isUpdatingKeyUsage,
         [isFetchingProfile, isDeleting, isEnabling, isDisabling, isUpdatingKeyUsage],
@@ -238,6 +239,11 @@ export default function TokenProfileDetail() {
 
     return (
         <Container className="themed-container" fluid>
+            <GoBackButton
+                style={{ marginBottom: '10px' }}
+                forcedPath="/tokenprofiles"
+                text={`${getEnumLabel(resourceEnum, Resource.TokenProfiles)} Inventory`}
+            />
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
                 <Col>
                     <Widget

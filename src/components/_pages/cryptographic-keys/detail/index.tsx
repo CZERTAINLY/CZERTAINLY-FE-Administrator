@@ -21,6 +21,7 @@ import { dateFormatter } from 'utils/dateUtil';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import CryptographicKeyItem from './CryptographicKeyItem';
 import { createWidgetDetailHeaders } from 'utils/widget';
+import GoBackButton from 'components/GoBackButton';
 
 export const keyWithoutTokenInstanceActionNotes = {
     delete: 'Note that no token instance is associated with the Key. The key record will be removed from the platform, but will not be deleted in external key storage service.',
@@ -55,6 +56,7 @@ export default function CryptographicKeyDetail() {
     const [compromiseReason, setCompromiseReason] = useState<KeyCompromiseReason>();
     const keyCompromiseReasonEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.KeyCompromiseReason));
     const keyTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.KeyType));
+    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
 
     const isBusy = useMemo(
         () => state.isFetchingDetail || isDeleting || isEnabling || isDisabling || isUpdatingKeyUsage || isCompromising || isDestroying,
@@ -363,6 +365,11 @@ export default function CryptographicKeyDetail() {
 
     return (
         <Container className="themed-container" fluid>
+            <GoBackButton
+                style={{ marginBottom: '10px' }}
+                forcedPath="/keys"
+                text={`${getEnumLabel(resourceEnum, Resource.Keys)} Inventory`}
+            />
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
                 <Col>
                     <Widget
@@ -396,15 +403,12 @@ export default function CryptographicKeyDetail() {
                     )}
                 </Col>
             </Row>
-
             {itemTabs.tabs.length > 0 && <TabLayout tabs={itemTabs.tabs} selectedTab={selectedTab} />}
-
             <Widget title="Key Associations" busy={isBusy} titleSize="large">
                 <br />
 
                 <CustomTable headers={associationHeaders} data={associationBody} />
             </Widget>
-
             <Dialog
                 isOpen={confirmDelete}
                 caption="Delete Key"
@@ -420,7 +424,6 @@ export default function CryptographicKeyDetail() {
                     { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
-
             <Dialog
                 isOpen={confirmCompromise}
                 caption={`Compromise Key`}
@@ -444,7 +447,6 @@ export default function CryptographicKeyDetail() {
                     { color: 'secondary', onClick: () => setConfirmCompromise(false), body: 'Cancel' },
                 ]}
             />
-
             <Dialog
                 isOpen={confirmDestroy}
                 caption={`Destroy Key`}

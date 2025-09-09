@@ -354,6 +354,7 @@ function CustomTable({
                                 type="checkbox"
                                 checked={checkAllChecked}
                                 onChange={onCheckAllCheckboxClick}
+                                data-testid="table-checkbox"
                             />
                         ) : (
                             <>&nbsp;</>
@@ -441,6 +442,7 @@ function CustomTable({
                                         checked={tblCheckedRows.includes(row.id)}
                                         onChange={onRowCheckboxClick}
                                         data-id={row.id}
+                                        data-testid="table-checkbox"
                                     />
                                 </td>
                             )}

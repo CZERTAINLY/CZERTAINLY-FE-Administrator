@@ -11,11 +11,13 @@ import { useNavigate, useParams } from 'react-router';
 
 import { Container } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { Resource } from '../../../../types/openapi';
+import { PlatformEnum, Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import EventsTable from 'components/_pages/notifications/events-settings/EventsTable';
 import TabLayout from 'components/Layout/TabLayout';
 import { getEditAndDeleteWidgetButtons, createWidgetDetailHeaders } from 'utils/widget';
+import GoBackButton from 'components/GoBackButton';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 
 export default function GroupDetail() {
     const dispatch = useDispatch();
@@ -25,7 +27,7 @@ export default function GroupDetail() {
 
     const group = useSelector(selectors.certificateGroup);
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
-
+    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
     const getFreshGroupDetails = useCallback(() => {
@@ -79,6 +81,11 @@ export default function GroupDetail() {
 
     return (
         <Container className="themed-container" fluid>
+            <GoBackButton
+                style={{ marginBottom: '10px' }}
+                forcedPath="/groups"
+                text={`${getEnumLabel(resourceEnum, Resource.Groups)} Inventory`}
+            />
             <TabLayout
                 tabs={[
                     {

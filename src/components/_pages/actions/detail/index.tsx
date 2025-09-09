@@ -2,6 +2,7 @@ import { ApiClients } from '../../../../api';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import ConditionsExecutionsList from 'components/ExecutionConditionItemsList';
+import GoBackButton from 'components/GoBackButton';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
@@ -10,7 +11,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 import { Button, ButtonGroup, Col, Container, Input, Row } from 'reactstrap';
-import { PlatformEnum } from 'types/openapi';
+import { PlatformEnum, Resource } from 'types/openapi';
 interface SelectChangeValue {
     value: string;
     label: string;
@@ -318,6 +319,11 @@ const RuleDetails = () => {
 
     return (
         <Container className="themed-container" fluid>
+            <GoBackButton
+                style={{ marginBottom: '10px' }}
+                forcedPath="/actions"
+                text={`${getEnumLabel(resourceTypeEnum, Resource.Actions)} Inventory`}
+            />
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
                 <Col>
                     <Widget refreshAction={getFreshDetails} busy={isBusy} title="Action Details" titleSize="large" widgetButtons={buttons}>

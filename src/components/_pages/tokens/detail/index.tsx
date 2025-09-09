@@ -12,12 +12,14 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router';
 import { Container, Label } from 'reactstrap';
-import { Resource, TokenInstanceStatus } from 'types/openapi';
+import { PlatformEnum, Resource, TokenInstanceStatus } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import TokenActivationDialogBody from '../TokenActivationDialogBody';
 import RandomDataGeneration from './RandomDataGeneration';
 import { createWidgetDetailHeaders } from 'utils/widget';
+import GoBackButton from 'components/GoBackButton';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 
 export default function TokenDetail() {
     const dispatch = useDispatch();
@@ -26,7 +28,7 @@ export default function TokenDetail() {
     const { id } = useParams();
 
     const token = useSelector(selectors.token);
-
+    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const isFetching = useSelector(selectors.isFetchingDetail);
     const isDeleting = useSelector(selectors.isDeleting);
     const isActivating = useSelector(selectors.isActivating);
@@ -203,6 +205,11 @@ export default function TokenDetail() {
 
     return (
         <Container className="themed-container" fluid>
+            <GoBackButton
+                style={{ marginBottom: '10px' }}
+                forcedPath="/tokens"
+                text={`${getEnumLabel(resourceEnum, Resource.Tokens)} Inventory`}
+            />
             <Widget
                 title="Token Details"
                 busy={isBusy}

@@ -11,9 +11,10 @@ import { useNavigate, useParams } from 'react-router';
 
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { Badge, Container } from 'reactstrap';
-import { PlatformEnum } from 'types/openapi';
+import { PlatformEnum, Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { getEditAndDeleteWidgetButtons, createWidgetDetailHeaders } from 'utils/widget';
+import GoBackButton from 'components/GoBackButton';
 
 export default function GlobalMetadataDetail() {
     const dispatch = useDispatch();
@@ -24,7 +25,7 @@ export default function GlobalMetadataDetail() {
     const globalMetadata = useSelector(selectors.globalMetadata);
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
     const attributeContentTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AttributeContentType));
-
+    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
     const getFreshGlobalMetadata = useCallback(() => {
@@ -95,6 +96,11 @@ export default function GlobalMetadataDetail() {
 
     return (
         <Container className="themed-container" fluid>
+            <GoBackButton
+                style={{ marginBottom: '10px' }}
+                forcedPath="/globalmetadata"
+                text={`${getEnumLabel(resourceEnum, Resource.GlobalMetadata)} Inventory`}
+            />
             <Widget
                 title="Global Metadata Details"
                 busy={isFetchingDetail}

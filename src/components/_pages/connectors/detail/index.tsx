@@ -23,6 +23,7 @@ import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 
 import { LockWidgetNameEnum } from 'types/user-interface';
 import styles from './connectorDetails.module.scss';
+import GoBackButton from 'components/GoBackButton';
 
 export default function ConnectorDetail() {
     const dispatch = useDispatch();
@@ -42,7 +43,7 @@ export default function ConnectorDetail() {
     const isReconnecting = useSelector(selectors.isReconnecting);
     const isBulkReconnecting = useSelector(selectors.isBulkReconnecting);
     const isAuthorizing = useSelector(selectors.isAuthorizing);
-
+    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const deleteErrorMessage = useSelector(selectors.deleteErrorMessage);
 
     const [currentFunctionGroup, setFunctionGroup] = useState<FunctionGroupModel | undefined>();
@@ -345,6 +346,11 @@ export default function ConnectorDetail() {
 
     return (
         <Container className="themed-container" fluid>
+            <GoBackButton
+                style={{ marginBottom: '10px' }}
+                forcedPath="/connectors"
+                text={`${getEnumLabel(resourceEnum, Resource.Connectors)} Inventory`}
+            />
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
                 <Col>
                     <Widget

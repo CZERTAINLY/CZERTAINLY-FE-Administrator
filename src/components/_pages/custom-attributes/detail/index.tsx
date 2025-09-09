@@ -10,12 +10,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 import { Badge, Container } from 'reactstrap';
-import { PlatformEnum } from 'types/openapi';
+import { PlatformEnum, Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { getAttributeContent } from 'utils/attributes/attributes';
 import { useCopyToClipboard } from 'utils/common-hooks';
 import styles from './customAttribute.module.scss';
 import { createWidgetDetailHeaders } from 'utils/widget';
+import GoBackButton from 'components/GoBackButton';
 
 export default function CustomAttributeDetail() {
     const dispatch = useDispatch();
@@ -184,6 +185,11 @@ export default function CustomAttributeDetail() {
 
     return (
         <Container className="themed-container" fluid>
+            <GoBackButton
+                style={{ marginBottom: '10px' }}
+                forcedPath="/customattributes"
+                text={`${getEnumLabel(resourceEnum, Resource.CustomAttributes)} Inventory`}
+            />
             <Widget
                 title="Custom Attribute Details"
                 busy={isFetchingDetail || isEnabling || isDisabling}

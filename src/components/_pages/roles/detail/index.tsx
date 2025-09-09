@@ -10,10 +10,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 import { Badge, Container } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { Resource } from '../../../../types/openapi';
+import { PlatformEnum, Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import BooleanBadge from 'components/BooleanBadge/BooleanBadge';
 import { createWidgetDetailHeaders } from 'utils/widget';
+import GoBackButton from 'components/GoBackButton';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 
 export default function UserDetail() {
     const dispatch = useDispatch();
@@ -26,7 +28,7 @@ export default function UserDetail() {
 
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
     const isFetchingPermissions = useSelector(selectors.isFetchingPermissions);
-
+    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
     const memoizedRole = useMemo(() => role, [role]);
@@ -248,6 +250,11 @@ export default function UserDetail() {
 
     return (
         <Container className="themed-container" fluid>
+            <GoBackButton
+                style={{ marginBottom: '10px' }}
+                forcedPath="/roles"
+                text={`${getEnumLabel(resourceEnum, Resource.Roles)} Inventory`}
+            />
             <Widget
                 title="Role Details"
                 busy={isFetchingDetail}

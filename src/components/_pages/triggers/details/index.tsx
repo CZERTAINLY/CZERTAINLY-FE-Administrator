@@ -15,9 +15,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 import { Edge } from 'reactflow';
 import { Button, ButtonGroup, Col, Container, Input, Row } from 'reactstrap';
-import { PlatformEnum } from 'types/openapi';
+import { PlatformEnum, Resource } from 'types/openapi';
 import { DeviceType, useDeviceType } from 'utils/common-hooks';
 import styles from './triggerDetails.module.scss';
+import GoBackButton from 'components/GoBackButton';
 
 interface SelectChangeValue {
     value: string;
@@ -39,7 +40,7 @@ const TriggerDetails = () => {
     const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.TriggerType));
     const [highlight, setHighlight] = useState(false);
     const deviceType = useDeviceType();
-
+    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [triggerNodes, setTriggerNodes] = useState<CustomNode[]>([]);
     const [triggerEdges, setTriggerEdges] = useState<Edge[]>([]);
 
@@ -496,6 +497,11 @@ const TriggerDetails = () => {
 
     return (
         <Container className="themed-container" fluid>
+            <GoBackButton
+                style={{ marginBottom: '10px' }}
+                forcedPath="/triggers"
+                text={`${getEnumLabel(resourceEnum, Resource.Triggers)} Inventory`}
+            />
             <TabLayout
                 tabs={[
                     {
