@@ -1341,13 +1341,13 @@ export default function CertificateDetail() {
     const relatedCertificatesData: TableDataRow[] = useMemo(() => {
         if (!relatedCertificates) return [];
 
-        return relatedCertificates.map((c, index) => ({
-            id: `${c.uuid}-${index}`,
+        return relatedCertificates.map((c) => ({
+            id: `${c.uuid}-${c.relation}`,
             columns: [
-                <Link key={`${c.uuid}-name-${index}`} to={`../../certificates/detail/${c.uuid}`}>
+                <Link key={`${c.uuid}-name`} to={`../../certificates/detail/${c.uuid}`}>
                     {c.commonName}
                 </Link>,
-                <div key={`${c.uuid}-relation-${index}`} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <div key={`${c.uuid}-relation`} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                     {c.relation === 'successor' && <span>{capitalize(c.relation)}</span>}
                     <i
                         className="fa-solid fa-arrow-right"
@@ -1355,7 +1355,7 @@ export default function CertificateDetail() {
                     ></i>
                     {c.relation === 'predecessor' && <span>{capitalize(c.relation)}</span>}
                 </div>,
-                <Badge key={`${c.uuid}-type-${index}`} color="success">
+                <Badge key={`${c.uuid}-type`} color="success">
                     {capitalize(c.relationType)}
                 </Badge>,
                 <CertificateStatus status={c.state} />,
