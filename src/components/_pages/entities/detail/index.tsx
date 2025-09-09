@@ -12,10 +12,11 @@ import { Link, useNavigate, useParams } from 'react-router';
 
 import { Container, Label } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { Resource } from '../../../../types/openapi';
+import { PlatformEnum, Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import { getEditAndDeleteWidgetButtons, createWidgetDetailHeaders } from 'utils/widget';
 import GoBackButton from 'components/GoBackButton';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 
 export default function EntityDetail() {
     const dispatch = useDispatch();
@@ -27,7 +28,7 @@ export default function EntityDetail() {
 
     const isFetching = useSelector(selectors.isFetchingDetail);
     const isDeleting = useSelector(selectors.isDeleting);
-
+    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
     const isBusy = useMemo(() => isFetching || isDeleting, [isFetching, isDeleting]);
@@ -96,7 +97,11 @@ export default function EntityDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/entities" text="Inventory" />
+            <GoBackButton
+                style={{ marginBottom: '10px' }}
+                forcedPath="/entities"
+                text={`${getEnumLabel(resourceEnum, Resource.Entities)} Inventory`}
+            />
             <Widget
                 title="Entity Details"
                 busy={isBusy}

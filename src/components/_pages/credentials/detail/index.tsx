@@ -11,10 +11,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router';
 import { Container } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { Resource } from '../../../../types/openapi';
+import { PlatformEnum, Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import { createWidgetDetailHeaders } from 'utils/widget';
 import GoBackButton from 'components/GoBackButton';
+import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 
 function CredentialDetail() {
     const dispatch = useDispatch();
@@ -28,7 +29,7 @@ function CredentialDetail() {
     const isDeleting = useSelector(selectors.isDeleting);
 
     const deleteErrorMessage = useSelector(selectors.deleteErrorMessage);
-
+    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
     const getFreshCredentialDetails = useCallback(() => {
@@ -120,7 +121,11 @@ function CredentialDetail() {
 
     return (
         <Container className="themed-container" fluid>
-            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/credentials" text="Inventory" />
+            <GoBackButton
+                style={{ marginBottom: '10px' }}
+                forcedPath="/credentials"
+                text={`${getEnumLabel(resourceEnum, Resource.Credentials)} Inventory`}
+            />
             <Widget
                 title="Credential Details"
                 busy={isFetching || isDeleting}
