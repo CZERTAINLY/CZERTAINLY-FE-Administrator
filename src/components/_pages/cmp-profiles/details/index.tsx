@@ -262,7 +262,7 @@ export default function AdministratorDetail() {
                 columns: [
                     'Groups',
                     <>
-                        {cmpProfile.certificateAssociations?.groupUuids?.length === 0 ? (
+                        {!cmpProfile.certificateAssociations || cmpProfile.certificateAssociations?.groupUuids?.length === 0 ? (
                             <span>Unassigned</span>
                         ) : (
                             <>
@@ -291,6 +291,7 @@ export default function AdministratorDetail() {
                 forcedPath="/cmpprofiles"
                 text={`${getEnumLabel(resourceEnum, Resource.CmpProfiles)} Inventory`}
             />
+
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
                 <Col>
                     <Widget
@@ -315,6 +316,7 @@ export default function AdministratorDetail() {
                     )}
                 </Col>
             </Row>
+
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
                 <Col>
                     <Widget title="Request Configuration">
@@ -327,6 +329,7 @@ export default function AdministratorDetail() {
                     </Widget>
                 </Col>
             </Row>
+
             {raProfileDetailData.length === 0 ? (
                 <></>
             ) : (
@@ -360,6 +363,7 @@ export default function AdministratorDetail() {
                     </Row>
                 </>
             )}
+
             <Widget title="Default Certificate associations" busy={isBusy} titleSize="large">
                 <CustomTable headers={tableHeader} data={defaultCertificateAssociationsData} />
                 <Widget title="Custom Attributes" busy={isBusy}>
