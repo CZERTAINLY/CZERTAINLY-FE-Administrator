@@ -18,37 +18,31 @@ import type {
 
 /**
  * @export
- * @interface ComplianceProfileRequestDto
+ * @interface ComplianceProfileUpdateRequestDto
  */
-export interface ComplianceProfileRequestDto {
+export interface ComplianceProfileUpdateRequestDto {
     /**
      * Description of the Compliance Profile
      * @type {string}
-     * @memberof ComplianceProfileRequestDto
+     * @memberof ComplianceProfileUpdateRequestDto
      */
     description?: string;
     /**
      * UUIDs of internal rules to be associated with the Compliance Profile. Profiles can be created without rules and can be added later.
      * @type {Array<string>}
-     * @memberof ComplianceProfileRequestDto
+     * @memberof ComplianceProfileUpdateRequestDto
      */
     internalRules?: Array<string>;
     /**
      * Provider rules to be associated with the Compliance Profile. Profiles can be created without rules and can be added later.
      * @type {Array<ProviderComplianceRulesRequestDto>}
-     * @memberof ComplianceProfileRequestDto
+     * @memberof ComplianceProfileUpdateRequestDto
      */
     providerRules?: Array<ProviderComplianceRulesRequestDto>;
     /**
      * List of Custom Attributes
      * @type {Array<RequestAttributeDto>}
-     * @memberof ComplianceProfileRequestDto
+     * @memberof ComplianceProfileUpdateRequestDto
      */
     customAttributes?: Array<RequestAttributeDto>;
-    /**
-     * Name of the Compliance Profile
-     * @type {string}
-     * @memberof ComplianceProfileRequestDto
-     */
-    name: string;
 }

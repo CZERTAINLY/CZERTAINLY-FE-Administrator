@@ -34,13 +34,22 @@ export default function ComplianceProfileDetail() {
     const { id } = useParams();
 
     const profile = useSelector(selectors.complianceProfile);
+    console.log({ profile });
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
-    const isFetchingGroups = useSelector(selectors.isFetchingGroups);
+    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
+
+    //TODO: delete
+    useEffect(() => {
+        if (!id) return;
+        dispatch(actions.getComplianceProfile({ uuid: id }));
+    }, [dispatch, id]);
+
+    /*     const isFetchingGroups = useSelector(selectors.isFetchingGroups);
     const isFetchingRules = useSelector(selectors.isFetchingRules);
     const rules = useSelector(selectors.rules);
 
     const groups = useSelector(selectors.groups);
-    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
+    
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
     const deleteErrorMessage = useSelector(selectors.deleteErrorMessage);
@@ -299,28 +308,7 @@ export default function ComplianceProfileDetail() {
         [],
     );
 
-    const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
-
-    const detailData: TableDataRow[] = useMemo(
-        () =>
-            !profile
-                ? []
-                : [
-                      {
-                          id: 'uuid',
-                          columns: ['UUID', profile.uuid],
-                      },
-                      {
-                          id: 'name',
-                          columns: ['Name', profile.name],
-                      },
-                      {
-                          id: 'description',
-                          columns: ['Description', profile.description || ''],
-                      },
-                  ],
-        [profile],
-    );
+    
 
     const getRuleMoreData = useCallback((rule: ComplianceProfileRuleListResponseRuleModel, connectorName: string, kind: string) => {
         return [
@@ -445,10 +433,8 @@ export default function ComplianceProfileDetail() {
                 id: 'raProfileName',
                 content: 'Name',
             },
-            {
-                id: 'status',
-                content: 'Status',
-            },
+            { id: 'resource', content: 'Resource' },
+            { id: 'object', content: 'Object' },
             {
                 id: 'action',
                 content: 'Action',
@@ -779,7 +765,30 @@ export default function ComplianceProfileDetail() {
             value: input,
         })) || [];
 
-    const optionFilterData = ['Groups & Rules', 'Rules', 'Groups'].map((input) => ({ label: input, value: input })) || [];
+    const optionFilterData = ['Groups & Rules', 'Rules', 'Groups'].map((input) => ({ label: input, value: input })) || []; */
+
+    const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
+
+    const detailData: TableDataRow[] = useMemo(
+        () =>
+            !profile
+                ? []
+                : [
+                      {
+                          id: 'uuid',
+                          columns: ['UUID', profile.uuid],
+                      },
+                      {
+                          id: 'name',
+                          columns: ['Name', profile.name],
+                      },
+                      {
+                          id: 'description',
+                          columns: ['Description', profile.description || ''],
+                      },
+                  ],
+        [profile],
+    );
 
     return (
         <Container className="themed-container" fluid>
@@ -793,9 +802,9 @@ export default function ComplianceProfileDetail() {
                     <Widget
                         title="Compliance Profile Details"
                         busy={isFetchingDetail}
-                        widgetButtons={buttons}
+                        /*  widgetButtons={buttons} */
                         titleSize="large"
-                        refreshAction={getFreshComplianceProfileDetails}
+                        /* refreshAction={getFreshComplianceProfileDetails} */
                         widgetLockName={LockWidgetNameEnum.ComplianceProfileDetails}
                         lockSize="large"
                     >
@@ -803,9 +812,9 @@ export default function ComplianceProfileDetail() {
                     </Widget>
                 </Col>
 
-                <Col>
+                {/* <Col>
                     <Widget
-                        title="Associated RA Profiles"
+                        title="Associations"
                         busy={isFetchingDetail}
                         widgetButtons={raProfileButtons}
                         titleSize="large"
@@ -822,10 +831,10 @@ export default function ComplianceProfileDetail() {
                             attributes={profile.customAttributes}
                         />
                     )}
-                </Col>
+                </Col> */}
             </Row>
 
-            <Widget
+            {/*  <Widget
                 title="Rules & Groups"
                 busy={isFetchingGroups || isFetchingRules}
                 titleSize="large"
@@ -857,9 +866,9 @@ export default function ComplianceProfileDetail() {
                 <hr />
 
                 <CustomTable headers={ruleGroupHeader} data={ruleGroupData} hasPagination={true} hasDetails={true} canSearch={true} />
-            </Widget>
+            </Widget> */}
 
-            <Dialog
+            {/* <Dialog
                 isOpen={currentGroupUuidForDisplay !== undefined}
                 caption="Rules"
                 size="lg"
@@ -938,7 +947,7 @@ export default function ComplianceProfileDetail() {
                     { color: 'primary', onClick: onComplianceCheck, body: 'Yes' },
                     { color: 'secondary', onClick: () => setComplianceCheck(false), body: 'Cancel' },
                 ]}
-            />
+            /> */}
         </Container>
     );
 }

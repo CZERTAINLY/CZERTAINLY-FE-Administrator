@@ -16,11 +16,9 @@
  * @export
  * @enum {string}
  */
-export enum ComplianceStatus {
-    NotChecked = 'not_checked',
-    Ok = 'ok',
-    Nok = 'nok',
-    Na = 'na',
-    NotAvailable = 'not_available'
+export enum ComplianceRuleAvailabilityStatus {
+    Available = 'available',
+    NotAvailable = 'not_available',
+    Updated = 'updated'
 }
 

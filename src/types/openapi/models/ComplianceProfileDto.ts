@@ -12,10 +12,9 @@
  */
 
 import type {
-    ComplianceConnectorAndGroupsDto,
-    ComplianceConnectorAndRulesDto,
+    ComplianceRuleDto,
+    ProviderComplianceRulesDto,
     ResponseAttributeDto,
-    SimplifiedRaProfileDto,
 } from './';
 
 /**
@@ -24,13 +23,13 @@ import type {
  */
 export interface ComplianceProfileDto {
     /**
-     * Object identifier
+     * Compliance profile UUID
      * @type {string}
      * @memberof ComplianceProfileDto
      */
     uuid: string;
     /**
-     * Object Name
+     * Compliance profile name
      * @type {string}
      * @memberof ComplianceProfileDto
      */
@@ -42,23 +41,17 @@ export interface ComplianceProfileDto {
      */
     description?: string;
     /**
-     * List of rules
-     * @type {Array<ComplianceConnectorAndRulesDto>}
+     * List of internal rules
+     * @type {Array<ComplianceRuleDto>}
      * @memberof ComplianceProfileDto
      */
-    rules: Array<ComplianceConnectorAndRulesDto>;
+    internalRules: Array<ComplianceRuleDto>;
     /**
      * List of groups
-     * @type {Array<ComplianceConnectorAndGroupsDto>}
+     * @type {Array<ProviderComplianceRulesDto>}
      * @memberof ComplianceProfileDto
      */
-    groups: Array<ComplianceConnectorAndGroupsDto>;
-    /**
-     * List of associated RA Profiles
-     * @type {Array<SimplifiedRaProfileDto>}
-     * @memberof ComplianceProfileDto
-     */
-    raProfiles?: Array<SimplifiedRaProfileDto>;
+    providerRules: Array<ProviderComplianceRulesDto>;
     /**
      * List of Custom Attributes
      * @type {Array<ResponseAttributeDto>}

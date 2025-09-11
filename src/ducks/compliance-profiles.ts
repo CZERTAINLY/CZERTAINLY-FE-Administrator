@@ -12,6 +12,16 @@ import {
     ComplianceProfileRuleListResponseModel,
 } from 'types/complianceProfiles';
 import { BulkActionModel } from 'types/connectors';
+import {
+    ComplianceGroupListDto,
+    ComplianceProfileDto,
+    ComplianceProfileGroupsPatchRequestDto,
+    ComplianceProfileListDto,
+    ComplianceProfileRulesPatchRequestDto,
+    ComplianceRuleListDto,
+    Resource,
+    ResourceObjectDto,
+} from 'types/openapi';
 import { createFeatureSelector } from 'utils/ducks';
 
 export type State = {
@@ -20,27 +30,32 @@ export type State = {
     deleteErrorMessage: string;
     bulkDeleteErrorMessages: BulkActionModel[];
 
-    complianceProfile?: ComplianceProfileResponseModel;
+    complianceProfile?: ComplianceProfileDto;
     complianceProfiles: ComplianceProfileListModel[];
 
-    rules: ComplianceProfileRuleListResponseModel[];
-    groups: ComplianceProfileGroupListResponseModel[];
-
+    rules: ComplianceRuleListDto[];
+    groups: ComplianceGroupListDto[];
+    groupRules: ComplianceRuleListDto[];
+    associationsOfComplianceProfile: ResourceObjectDto[];
+    isFetchingAssociationsOfComplianceProfile: boolean;
     isFetchingList: boolean;
     isFetchingDetail: boolean;
     isCreating: boolean;
     isDeleting: boolean;
     isAddingRule: boolean;
+    isUpdatingRule: boolean;
     isDeletingRule: boolean;
     isAddingGroup: boolean;
+    isUpdatingGroup: boolean;
     isDeletingGroup: boolean;
     isBulkDeleting: boolean;
     isBulkForceDeleting: boolean;
-    isFetchingRaProfile: boolean;
+    isFetchingComplianceProfile: boolean;
     isFetchingRules: boolean;
     isFetchingGroups: boolean;
-    isAssociatingRaProfile: boolean;
-    isDissociatingRaProfile: boolean;
+    isFetchingGroupRules: boolean;
+    isAssociatingComplianceProfile: boolean;
+    isDissociatingComplianceProfile: boolean;
     isCheckingCompliance: boolean;
 };
 
@@ -54,22 +69,27 @@ export const initialState: State = {
 
     rules: [],
     groups: [],
-
+    groupRules: [],
+    associationsOfComplianceProfile: [],
     isFetchingList: false,
     isFetchingDetail: false,
     isCreating: false,
     isDeleting: false,
     isAddingRule: false,
+    isUpdatingRule: false,
     isDeletingRule: false,
     isAddingGroup: false,
+    isUpdatingGroup: false,
     isDeletingGroup: false,
     isBulkDeleting: false,
     isBulkForceDeleting: false,
-    isFetchingRaProfile: false,
+    isFetchingComplianceProfile: false,
+    isFetchingAssociationsOfComplianceProfile: false,
     isFetchingRules: false,
     isFetchingGroups: false,
-    isAssociatingRaProfile: false,
-    isDissociatingRaProfile: false,
+    isFetchingGroupRules: false,
+    isAssociatingComplianceProfile: false,
+    isDissociatingComplianceProfile: false,
     isCheckingCompliance: false,
 };
 
@@ -96,33 +116,18 @@ export const slice = createSlice({
             state.bulkDeleteErrorMessages = [];
         },
 
-        listComplianceProfiles: (state, action: PayloadAction<void>) => {
-            state.isFetchingList = true;
-        },
-
-        listComplianceProfilesSuccess: (state, action: PayloadAction<{ complianceProfileList: ComplianceProfileListModel[] }>) => {
-            state.complianceProfiles = action.payload.complianceProfileList;
-            state.isFetchingList = false;
-        },
-
-        listComplianceProfilesFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isFetchingList = false;
-        },
-
+        ///////////////////////////////
         getComplianceProfile: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isFetchingDetail = true;
         },
-
-        getComplianceProfileSuccess: (state, action: PayloadAction<{ complianceProfile: ComplianceProfileResponseModel }>) => {
+        getComplianceProfileSuccess: (state, action: PayloadAction<{ complianceProfile: ComplianceProfileDto }>) => {
             state.isFetchingDetail = false;
-
             state.complianceProfile = action.payload.complianceProfile;
         },
-
         getComplianceProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingDetail = false;
         },
-
+        ///////////////////////////////
         createComplianceProfile: (state, action: PayloadAction<ComplianceProfileRequestModel>) => {
             state.isCreating = true;
         },
@@ -134,7 +139,7 @@ export const slice = createSlice({
         createComplianceProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isCreating = false;
         },
-
+        ///////////////////////////////
         deleteComplianceProfile: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isDeleting = true;
             state.deleteErrorMessage = '';
@@ -154,7 +159,7 @@ export const slice = createSlice({
             state.isDeleting = false;
             state.deleteErrorMessage = action.payload.error || 'Unknown error';
         },
-
+        ///////////////////////////////
         bulkDeleteComplianceProfiles: (state, action: PayloadAction<{ uuids: string[] }>) => {
             state.bulkDeleteErrorMessages = [];
 
@@ -179,7 +184,7 @@ export const slice = createSlice({
         bulkDeleteComplianceProfilesFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isBulkDeleting = false;
         },
-
+        ///////////////////////////////
         bulkForceDeleteComplianceProfiles: (state, action: PayloadAction<{ uuids: string[]; redirect?: string }>) => {
             state.isBulkForceDeleting = true;
         },
@@ -199,223 +204,51 @@ export const slice = createSlice({
             state.isBulkForceDeleting = false;
         },
 
-        addRule: (state, action: PayloadAction<{ uuid: string; addRequest: ComplianceProfileRuleAddRequestModel }>) => {
-            state.isAddingRule = true;
+        ///////////////////////////////
+        getListComplianceProfiles: (state, action: PayloadAction<void>) => {
+            state.isFetchingList = true;
         },
 
-        addRuleSuccess: (
+        getListComplianceProfilesSuccess: (state, action: PayloadAction<{ complianceProfileList: ComplianceProfileListDto[] }>) => {
+            state.complianceProfiles = action.payload.complianceProfileList;
+            state.isFetchingList = false;
+        },
+
+        getListComplianceProfilesFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingList = false;
+        },
+        //////////////////////////////
+        associateComplianceProfile: (state, action: PayloadAction<{ uuid: string; resource: Resource; associationObjectUuid: string }>) => {
+            state.isAssociatingComplianceProfile = true;
+        },
+
+        associateComplianceProfileSuccess: (
             state,
-            action: PayloadAction<{
-                connectorUuid: string;
-                connectorName: string;
-                kind: string;
-                rule: ComplianceProfileRuleAddResponseModel;
-            }>,
+            action: PayloadAction<{ uuid: string; resource: Resource; associationObjectUuid: string }>,
         ) => {
-            state.isAddingRule = false;
-            let found = false;
-            if (!state.complianceProfile) return;
+            state.isAssociatingComplianceProfile = false;
 
-            if (state.complianceProfile?.rules === undefined) {
-                state.complianceProfile.rules = [
-                    {
-                        connectorUuid: action.payload.connectorUuid,
-                        kind: action.payload.kind,
-                        connectorName: action.payload.connectorName,
-                        rules: [
-                            {
-                                uuid: action.payload.rule.uuid,
-                                name: action.payload.rule.name,
-                                description: action.payload.rule.description,
-                                // groupUuid: action.payload.rule.groupUuid,
-                                attributes: action.payload.rule.attributes,
-                                certificateType: action.payload.rule.certificateType,
-                            },
-                        ],
-                    },
-                ];
-            } else {
-                for (let connector of state.complianceProfile.rules || []) {
-                    if (connector.connectorUuid === action.payload.connectorUuid && connector.kind === action.payload.kind) {
-                        found = true;
-                        connector.rules?.push({
-                            uuid: action.payload.rule.uuid,
-                            name: action.payload.rule.name,
-                            description: action.payload.rule.description,
-                            // groupUuid: action.payload.rule.groupUuid,
-                            attributes: action.payload.rule.attributes,
-                            certificateType: action.payload.rule.certificateType,
-                        });
-                    }
-                }
-
-                if (!found) {
-                    state.complianceProfile?.rules.push({
-                        connectorUuid: action.payload.connectorUuid,
-                        kind: action.payload.kind,
-                        connectorName: action.payload.connectorName,
-                        rules: [
-                            {
-                                uuid: action.payload.rule.uuid,
-                                name: action.payload.rule.name,
-                                description: action.payload.rule.description,
-                                // groupUuid: action.payload.rule.groupUuid,
-                                attributes: action.payload.rule.attributes,
-                                certificateType: action.payload.rule.certificateType,
-                            },
-                        ],
-                    });
-                }
-            }
+            /*  if (!state.complianceProfile) return; */
         },
 
-        addRuleFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isAddingRule = false;
+        associateComplianceProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isAssociatingComplianceProfile = false;
         },
-
-        deleteRule: (state, action: PayloadAction<{ uuid: string; deleteRequest: ComplianceProfileRuleDeleteRequestModel }>) => {
-            state.isDeletingRule = true;
-        },
-
-        deleteRuleSuccess: (state, action: PayloadAction<{ connectorUuid: string; kind: string; ruleUuid: string }>) => {
-            state.isDeletingRule = false;
-            if (!state.complianceProfile) return;
-
-            for (let connector of state.complianceProfile.rules || []) {
-                if (connector.connectorUuid === action.payload.connectorUuid && connector.kind === action.payload.kind) {
-                    const ruleIndex = connector.rules?.findIndex((rule) => rule.uuid === action.payload.ruleUuid) ?? -1;
-                    if (ruleIndex >= 0) connector.rules!.splice(ruleIndex, 1);
-                }
-            }
-        },
-
-        deleteRuleFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isDeletingRule = false;
-        },
-
-        addGroup: (
+        //////////////////////////////
+        dissociateComplianceProfile: (
             state,
-            action: PayloadAction<{
-                uuid: string;
-                connectorUuid: string;
-                connectorName: string;
-                kind: string;
-                groupUuid: string;
-                groupName: string;
-                description: string;
-                addRequest: ComplianceProfileGroupRequestModel;
-            }>,
+            action: PayloadAction<{ uuid: string; resource: Resource; associationObjectUuid: string }>,
         ) => {
-            state.isAddingGroup = true;
+            state.isDissociatingComplianceProfile = true;
         },
 
-        addGroupSuccess: (
+        dissociateComplianceProfileSuccess: (
             state,
-            action: PayloadAction<{
-                uuid: string;
-                connectorUuid: string;
-                connectorName: string;
-                kind: string;
-                groupUuid: string;
-                groupName: string;
-                description: string;
-            }>,
+            action: PayloadAction<{ uuid: string; resource: Resource; associationObjectUuid: string }>,
         ) => {
-            state.isAddingGroup = false;
-            let found = false;
-            if (!state.complianceProfile) return;
+            state.isDissociatingComplianceProfile = false;
 
-            if (state.complianceProfile?.groups === undefined) {
-                state.complianceProfile.groups = [
-                    {
-                        connectorUuid: action.payload.connectorUuid,
-                        kind: action.payload.kind,
-                        connectorName: action.payload.connectorName,
-                        groups: [
-                            {
-                                uuid: action.payload.groupUuid,
-                                name: action.payload.groupName,
-                                description: action.payload.description,
-                            },
-                        ],
-                    },
-                ];
-            } else {
-                for (let connector of state.complianceProfile.groups || []) {
-                    if (connector.connectorUuid === action.payload.connectorUuid && connector.kind === action.payload.kind) {
-                        found = true;
-                        connector.groups?.push({
-                            uuid: action.payload.groupUuid,
-                            name: action.payload.groupName,
-                            description: action.payload.description,
-                        });
-                    }
-                }
-                if (!found) {
-                    state.complianceProfile?.groups.push({
-                        connectorUuid: action.payload.connectorUuid,
-                        kind: action.payload.kind,
-                        connectorName: action.payload.connectorName,
-                        groups: [
-                            {
-                                uuid: action.payload.groupUuid,
-                                name: action.payload.groupName,
-                                description: action.payload.description,
-                            },
-                        ],
-                    });
-                }
-            }
-        },
-
-        addGroupFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isAddingGroup = false;
-        },
-
-        deleteGroup: (state, action: PayloadAction<{ uuid: string; deleteRequest: ComplianceProfileGroupRequestModel }>) => {
-            state.isDeletingGroup = true;
-        },
-
-        deleteGroupSuccess: (state, action: PayloadAction<{ connectorUuid: string; kind: string; groupUuid: string }>) => {
-            state.isDeletingGroup = false;
-            if (!state.complianceProfile) return;
-
-            for (let connector of state.complianceProfile.groups || []) {
-                if (connector.connectorUuid === action.payload.connectorUuid && connector.kind === action.payload.kind) {
-                    const groupIndex = connector.groups?.findIndex((group) => group.uuid === action.payload.groupUuid) ?? -1;
-                    if (groupIndex >= 0) connector.groups!.splice(groupIndex, 1);
-                }
-            }
-        },
-
-        deleteGroupFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isDeletingGroup = false;
-        },
-
-        associateRaProfile: (state, action: PayloadAction<{ uuid: string; raProfileUuids: RaProfileSimplifiedModel[] }>) => {
-            state.isAssociatingRaProfile = true;
-        },
-
-        associateRaProfileSuccess: (state, action: PayloadAction<{ uuid: string; raProfileUuids: RaProfileSimplifiedModel[] }>) => {
-            state.isAssociatingRaProfile = false;
-
-            if (!state.complianceProfile) return;
-
-            state.complianceProfile.raProfiles = state.complianceProfile.raProfiles?.concat(action.payload.raProfileUuids);
-        },
-
-        associateRaProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isAssociatingRaProfile = false;
-        },
-
-        dissociateRaProfile: (state, action: PayloadAction<{ uuid: string; raProfileUuids: string[] }>) => {
-            state.isDissociatingRaProfile = true;
-        },
-
-        dissociateRaProfileSuccess: (state, action: PayloadAction<{ uuid: string; raProfileUuids: string[] }>) => {
-            state.isDissociatingRaProfile = false;
-
-            if (!state.complianceProfile) return;
+            /*  if (!state.complianceProfile) return;
 
             for (let profile of state.complianceProfile.raProfiles || []) {
                 for (let requestUuid of action.payload.raProfileUuids) {
@@ -425,62 +258,172 @@ export const slice = createSlice({
                         if (raProfileIndex >= 0) state.complianceProfile.raProfiles!.splice(raProfileIndex, 1);
                     }
                 }
-            }
+            } */
         },
 
-        dissociateRaProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isDissociatingRaProfile = false;
+        dissociateComplianceProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isDissociatingComplianceProfile = false;
+        },
+        //////////////////////////////
+        getAssociatedComplianceProfiles: (state, action: PayloadAction<{ resource: Resource; associationObjectUuid: string }>) => {
+            state.isFetchingComplianceProfile = true;
         },
 
-        getAssociatedRaProfiles: (state, action: PayloadAction<{ uuid: string }>) => {
-            state.isFetchingRaProfile = true;
+        getAssociatedComplianceProfilesSuccess: (state, action: PayloadAction<{ complianceProfiles: ComplianceProfileListDto[] }>) => {
+            state.isFetchingComplianceProfile = false;
+            /* state.complianceProfile!.raProfiles = action.payload.raProfiles; */
         },
 
-        getAssociatedRaProfilesSuccess: (state, action: PayloadAction<{ raProfiles: RaProfileSimplifiedModel[] }>) => {
-            state.isFetchingRaProfile = false;
-            state.complianceProfile!.raProfiles = action.payload.raProfiles;
+        getAssociatedComplianceProfilesFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingComplianceProfile = false;
         },
-
-        getAssociatedRaProfilesFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isFetchingRaProfile = false;
-        },
-
-        listComplianceRules: (state, action: PayloadAction<void>) => {
+        //////////////////////////////
+        getListComplianceRules: (
+            state,
+            action: PayloadAction<{ resource: Resource; connectorUuid?: string; kind?: string; type?: string; format?: string }>,
+        ) => {
             state.isFetchingRules = true;
         },
 
-        listComplianceRulesSuccess: (state, action: PayloadAction<ComplianceProfileRuleListResponseModel[]>) => {
+        getListComplianceRulesSuccess: (state, action: PayloadAction<{ rules: ComplianceRuleListDto[] }>) => {
             state.isFetchingRules = false;
-            state.rules = action.payload;
+            state.rules = action.payload.rules;
         },
 
-        listComplianceRulesFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+        getListComplianceRulesFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingRules = false;
         },
-
-        listComplianceGroups: (state, action: PayloadAction<void>) => {
+        //////////////////////////////
+        getListComplianceGroups: (state, action: PayloadAction<{ connectorUuid: string; kind: string; resource?: Resource }>) => {
             state.isFetchingGroups = true;
         },
 
-        listComplianceGroupsSuccess: (state, action: PayloadAction<ComplianceProfileGroupListResponseModel[]>) => {
+        getListComplianceGroupsSuccess: (state, action: PayloadAction<{ groups: ComplianceGroupListDto[] }>) => {
             state.isFetchingGroups = false;
-            state.groups = action.payload;
+            state.groups = action.payload.groups;
         },
 
-        listComplianceGroupsFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+        getListComplianceGroupsFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingGroups = false;
         },
+        //////////////////////////////
+        getListComplianceGroupRules: (state, action: PayloadAction<{ groupUuid: string; connectorUuid: string; kind: string }>) => {
+            state.isFetchingGroupRules = true;
+        },
 
-        checkCompliance: (state, action: PayloadAction<{ uuids: string[] }>) => {
+        getListComplianceGroupRulesSuccess: (state, action: PayloadAction<{ rules: ComplianceRuleListDto[] }>) => {
+            state.isFetchingGroupRules = false;
+            state.groupRules = action.payload.rules;
+        },
+
+        getListComplianceGroupRulesFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingGroupRules = false;
+        },
+
+        //////////////////////////////
+
+        getAssociationsOfComplianceProfile: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isFetchingAssociationsOfComplianceProfile = true;
+        },
+
+        getAssociationsOfComplianceProfileSuccess: (state, action: PayloadAction<{ associations: ResourceObjectDto[] }>) => {
+            state.isFetchingAssociationsOfComplianceProfile = false;
+            state.associationsOfComplianceProfile = action.payload.associations;
+        },
+
+        getAssociationsOfComplianceProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingAssociationsOfComplianceProfile = false;
+        },
+
+        //////////////////////////////
+
+        checkComplianceForProfiles: (state, action: PayloadAction<{ requestBody: string[]; resource?: Resource; type?: string }>) => {
             state.isCheckingCompliance = true;
         },
 
-        checkComplianceSuccess: (state, action: PayloadAction<void>) => {
+        checkComplianceForProfilesSuccess: (state, action: PayloadAction<void>) => {
             state.isCheckingCompliance = false;
         },
 
-        checkComplianceFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+        checkComplianceForProfilesFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isCheckingCompliance = false;
+        },
+
+        //////////////////////////////
+
+        checkComplianceForResourceObjects: (state, action: PayloadAction<{ resource: Resource; requestBody: string[] }>) => {
+            state.isCheckingCompliance = true;
+        },
+
+        checkComplianceForResourceObjectsSuccess: (state, action: PayloadAction<void>) => {
+            state.isCheckingCompliance = false;
+        },
+
+        checkComplianceForResourceObjectsFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isCheckingCompliance = false;
+        },
+
+        //////////////////////////////
+
+        updateRule: (
+            state,
+            action: PayloadAction<{ uuid: string; complianceProfileRulesPatchRequestDto: ComplianceProfileRulesPatchRequestDto }>,
+        ) => {
+            state.isUpdatingRule = true;
+        },
+        updateRuleSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isUpdatingRule = false;
+        },
+        updateRuleFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isUpdatingRule = false;
+        },
+
+        /*  addRule: (
+            state,
+            action: PayloadAction<{ uuid: string; complianceProfileRulesPatchRequestDto: ComplianceProfileRulesPatchRequestDto }>,
+        ) => {
+            state.isAddingRule = true;
+        },
+
+        addRuleSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isAddingRule = false;
+        },
+        addRuleFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isAddingRule = false;
+        },
+
+        //////////////////////////////
+
+        deleteRule: (
+            state,
+            action: PayloadAction<{ uuid: string; complianceProfileRulesPatchRequestDto: ComplianceProfileRulesPatchRequestDto }>,
+        ) => {
+            state.isDeletingRule = true;
+        },
+
+        deleteRuleSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isDeletingRule = false;
+        },
+        deleteRuleFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isDeletingRule = false;
+        }, */
+
+        //////////////////////////////
+
+        updateGroup: (
+            state,
+            action: PayloadAction<{
+                uuid: string;
+                complianceProfileGroupsPatchRequestDto: ComplianceProfileGroupsPatchRequestDto;
+            }>,
+        ) => {
+            state.isUpdatingGroup = true;
+        },
+        updateGroupSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isUpdatingGroup = false;
+        },
+        updateGroupFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isUpdatingGroup = false;
         },
     },
 });
@@ -501,18 +444,25 @@ const isCreating = createSelector(state, (state) => state.isCreating);
 const isDeleting = createSelector(state, (state) => state.isDeleting);
 const isFetchingRules = createSelector(state, (state) => state.isFetchingRules);
 const isFetchingGroups = createSelector(state, (state) => state.isFetchingGroups);
+const isFetchingGroupRules = createSelector(state, (state) => state.isFetchingGroupRules);
 
 const isAddingRule = createSelector(state, (state) => state.isAddingRule);
 const isDeletingRule = createSelector(state, (state) => state.isDeletingRule);
 const isAddingGroup = createSelector(state, (state) => state.isAddingGroup);
 const isDeletingGroup = createSelector(state, (state) => state.isDeletingGroup);
-const isAssociatingRaProfile = createSelector(state, (state) => state.isAssociatingRaProfile);
-const isDissociatingRaProfile = createSelector(state, (state) => state.isDissociatingRaProfile);
-const isFetchingRaProfile = createSelector(state, (state) => state.isFetchingRaProfile);
+const isAssociatingComplianceProfile = createSelector(state, (state) => state.isAssociatingComplianceProfile);
+const isDissociatingComplianceProfile = createSelector(state, (state) => state.isDissociatingComplianceProfile);
+const isFetchingComplianceProfile = createSelector(state, (state) => state.isFetchingComplianceProfile);
 const isBulkDeleting = createSelector(state, (state) => state.isBulkDeleting);
 const isBulkForceDeleting = createSelector(state, (state) => state.isBulkForceDeleting);
 const rules = createSelector(state, (state) => state.rules);
 const groups = createSelector(state, (state) => state.groups);
+const associationsOfComplianceProfile = createSelector(state, (state) => state.associationsOfComplianceProfile);
+const isFetchingAssociationsOfComplianceProfile = createSelector(state, (state) => state.isFetchingAssociationsOfComplianceProfile);
+const groupRules = createSelector(state, (state) => state.groupRules);
+
+const isUpdatingRule = createSelector(state, (state) => state.isUpdatingRule);
+const isUpdatingGroup = createSelector(state, (state) => state.isUpdatingGroup);
 
 export const selectors = {
     state,
@@ -531,20 +481,25 @@ export const selectors = {
     isDeleting,
     isFetchingRules,
     isFetchingGroups,
-
+    isFetchingGroupRules,
+    isFetchingAssociationsOfComplianceProfile,
     isAddingRule,
     isDeletingRule,
     isAddingGroup,
     isDeletingGroup,
-    isAssociatingRaProfile,
-    isDissociatingRaProfile,
-    isFetchingRaProfile,
+    isAssociatingComplianceProfile,
+    isDissociatingComplianceProfile,
+    isFetchingComplianceProfile,
 
     isBulkDeleting,
     isBulkForceDeleting,
 
     rules,
     groups,
+    associationsOfComplianceProfile,
+    groupRules,
+    isUpdatingRule,
+    isUpdatingGroup,
 };
 
 export const actions = slice.actions;

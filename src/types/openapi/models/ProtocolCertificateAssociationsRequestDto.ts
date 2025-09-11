@@ -38,4 +38,9 @@ export interface ProtocolCertificateAssociationsRequestDto {
      * @memberof ProtocolCertificateAssociationsRequestDto
      */
     customAttributes?: Array<RequestAttributeDto>;
+    /**
+     * @type {boolean}
+     * @memberof ProtocolCertificateAssociationsRequestDto
+     */
+    empty?: boolean;
 }

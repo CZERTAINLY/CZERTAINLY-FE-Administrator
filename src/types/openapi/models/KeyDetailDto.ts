@@ -12,6 +12,7 @@
  */
 
 import type {
+    ComplianceStatus,
     GroupDto,
     KeyAssociationDto,
     KeyItemDetailDto,
@@ -113,4 +114,12 @@ export interface KeyDetailDto {
      * @memberof KeyDetailDto
      */
     associations?: Array<KeyAssociationDto>;
+    /**
+     * Key compliance status
+     * @type {ComplianceStatus}
+     * @memberof KeyDetailDto
+     */
+    complianceStatus: ComplianceStatus;
 }
+
+
