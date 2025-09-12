@@ -19,10 +19,10 @@ import type {
     AuthenticationServiceExceptionDto,
     BulkActionMessageDto,
     ComplianceGroupListDto,
-    ComplianceProfileDto,
+    ComplianceProfileDtoV2,
     ComplianceProfileGroupsPatchRequestDto,
     ComplianceProfileListDto,
-    ComplianceProfileRequestDto,
+    ComplianceProfileRequestDtoV2,
     ComplianceProfileRulesPatchRequestDto,
     ComplianceProfileUpdateRequestDto,
     ComplianceRuleListDto,
@@ -42,7 +42,7 @@ export interface BulkDeleteComplianceProfilesV2Request {
 }
 
 export interface CreateComplianceProfileV2Request {
-    complianceProfileRequestDto: ComplianceProfileRequestDto;
+    complianceProfileRequestDtoV2: ComplianceProfileRequestDtoV2;
 }
 
 export interface DeleteComplianceProfileV2Request {
@@ -92,12 +92,12 @@ export interface GetComplianceRulesV2Request {
     format?: string;
 }
 
-export interface PatchComplianceProfileGroupV2Request {
+export interface PatchComplianceProfileGroupsV2Request {
     uuid: string;
     complianceProfileGroupsPatchRequestDto: ComplianceProfileGroupsPatchRequestDto;
 }
 
-export interface PatchComplianceProfileRuleV2Request {
+export interface PatchComplianceProfileRulesV2Request {
     uuid: string;
     complianceProfileRulesPatchRequestDto: ComplianceProfileRulesPatchRequestDto;
 }
@@ -151,20 +151,20 @@ export class ComplianceProfileManagementV2Api extends BaseAPI {
     /**
      * Add Compliance Profile
      */
-    createComplianceProfileV2({ complianceProfileRequestDto }: CreateComplianceProfileV2Request): Observable<ComplianceProfileDto>
-    createComplianceProfileV2({ complianceProfileRequestDto }: CreateComplianceProfileV2Request, opts?: OperationOpts): Observable<AjaxResponse<ComplianceProfileDto>>
-    createComplianceProfileV2({ complianceProfileRequestDto }: CreateComplianceProfileV2Request, opts?: OperationOpts): Observable<ComplianceProfileDto | AjaxResponse<ComplianceProfileDto>> {
-        throwIfNullOrUndefined(complianceProfileRequestDto, 'complianceProfileRequestDto', 'createComplianceProfileV2');
+    createComplianceProfileV2({ complianceProfileRequestDtoV2 }: CreateComplianceProfileV2Request): Observable<ComplianceProfileDtoV2>
+    createComplianceProfileV2({ complianceProfileRequestDtoV2 }: CreateComplianceProfileV2Request, opts?: OperationOpts): Observable<AjaxResponse<ComplianceProfileDtoV2>>
+    createComplianceProfileV2({ complianceProfileRequestDtoV2 }: CreateComplianceProfileV2Request, opts?: OperationOpts): Observable<ComplianceProfileDtoV2 | AjaxResponse<ComplianceProfileDtoV2>> {
+        throwIfNullOrUndefined(complianceProfileRequestDtoV2, 'complianceProfileRequestDtoV2', 'createComplianceProfileV2');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
         };
 
-        return this.request<ComplianceProfileDto>({
+        return this.request<ComplianceProfileDtoV2>({
             url: '/v2/complianceProfiles',
             method: 'POST',
             headers,
-            body: complianceProfileRequestDto,
+            body: complianceProfileRequestDtoV2,
         }, opts?.responseOpts);
     };
 
@@ -295,12 +295,12 @@ export class ComplianceProfileManagementV2Api extends BaseAPI {
     /**
      * Details of a Compliance Profile
      */
-    getComplianceProfileV2({ uuid }: GetComplianceProfileV2Request): Observable<ComplianceProfileDto>
-    getComplianceProfileV2({ uuid }: GetComplianceProfileV2Request, opts?: OperationOpts): Observable<AjaxResponse<ComplianceProfileDto>>
-    getComplianceProfileV2({ uuid }: GetComplianceProfileV2Request, opts?: OperationOpts): Observable<ComplianceProfileDto | AjaxResponse<ComplianceProfileDto>> {
+    getComplianceProfileV2({ uuid }: GetComplianceProfileV2Request): Observable<ComplianceProfileDtoV2>
+    getComplianceProfileV2({ uuid }: GetComplianceProfileV2Request, opts?: OperationOpts): Observable<AjaxResponse<ComplianceProfileDtoV2>>
+    getComplianceProfileV2({ uuid }: GetComplianceProfileV2Request, opts?: OperationOpts): Observable<ComplianceProfileDtoV2 | AjaxResponse<ComplianceProfileDtoV2>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'getComplianceProfileV2');
 
-        return this.request<ComplianceProfileDto>({
+        return this.request<ComplianceProfileDtoV2>({
             url: '/v2/complianceProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
             method: 'GET',
         }, opts?.responseOpts);
@@ -346,11 +346,11 @@ export class ComplianceProfileManagementV2Api extends BaseAPI {
     /**
      * Add/remove group to/from Compliance Profile
      */
-    patchComplianceProfileGroupV2({ uuid, complianceProfileGroupsPatchRequestDto }: PatchComplianceProfileGroupV2Request): Observable<void>
-    patchComplianceProfileGroupV2({ uuid, complianceProfileGroupsPatchRequestDto }: PatchComplianceProfileGroupV2Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    patchComplianceProfileGroupV2({ uuid, complianceProfileGroupsPatchRequestDto }: PatchComplianceProfileGroupV2Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(uuid, 'uuid', 'patchComplianceProfileGroupV2');
-        throwIfNullOrUndefined(complianceProfileGroupsPatchRequestDto, 'complianceProfileGroupsPatchRequestDto', 'patchComplianceProfileGroupV2');
+    patchComplianceProfileGroupsV2({ uuid, complianceProfileGroupsPatchRequestDto }: PatchComplianceProfileGroupsV2Request): Observable<void>
+    patchComplianceProfileGroupsV2({ uuid, complianceProfileGroupsPatchRequestDto }: PatchComplianceProfileGroupsV2Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    patchComplianceProfileGroupsV2({ uuid, complianceProfileGroupsPatchRequestDto }: PatchComplianceProfileGroupsV2Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(uuid, 'uuid', 'patchComplianceProfileGroupsV2');
+        throwIfNullOrUndefined(complianceProfileGroupsPatchRequestDto, 'complianceProfileGroupsPatchRequestDto', 'patchComplianceProfileGroupsV2');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
@@ -368,11 +368,11 @@ export class ComplianceProfileManagementV2Api extends BaseAPI {
      * If provider UUID is sent (also kind is required) then provider rules is handled, otherwise handling internal rule
      * Add/remove compliance rule to/from Compliance Profile
      */
-    patchComplianceProfileRuleV2({ uuid, complianceProfileRulesPatchRequestDto }: PatchComplianceProfileRuleV2Request): Observable<void>
-    patchComplianceProfileRuleV2({ uuid, complianceProfileRulesPatchRequestDto }: PatchComplianceProfileRuleV2Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
-    patchComplianceProfileRuleV2({ uuid, complianceProfileRulesPatchRequestDto }: PatchComplianceProfileRuleV2Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
-        throwIfNullOrUndefined(uuid, 'uuid', 'patchComplianceProfileRuleV2');
-        throwIfNullOrUndefined(complianceProfileRulesPatchRequestDto, 'complianceProfileRulesPatchRequestDto', 'patchComplianceProfileRuleV2');
+    patchComplianceProfileRulesV2({ uuid, complianceProfileRulesPatchRequestDto }: PatchComplianceProfileRulesV2Request): Observable<void>
+    patchComplianceProfileRulesV2({ uuid, complianceProfileRulesPatchRequestDto }: PatchComplianceProfileRulesV2Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    patchComplianceProfileRulesV2({ uuid, complianceProfileRulesPatchRequestDto }: PatchComplianceProfileRulesV2Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(uuid, 'uuid', 'patchComplianceProfileRulesV2');
+        throwIfNullOrUndefined(complianceProfileRulesPatchRequestDto, 'complianceProfileRulesPatchRequestDto', 'patchComplianceProfileRulesV2');
 
         const headers: HttpHeaders = {
             'Content-Type': 'application/json',
@@ -389,9 +389,9 @@ export class ComplianceProfileManagementV2Api extends BaseAPI {
     /**
      * Update Compliance Profile
      */
-    updateComplianceProfileV2({ uuid, complianceProfileUpdateRequestDto }: UpdateComplianceProfileV2Request): Observable<ComplianceProfileDto>
-    updateComplianceProfileV2({ uuid, complianceProfileUpdateRequestDto }: UpdateComplianceProfileV2Request, opts?: OperationOpts): Observable<AjaxResponse<ComplianceProfileDto>>
-    updateComplianceProfileV2({ uuid, complianceProfileUpdateRequestDto }: UpdateComplianceProfileV2Request, opts?: OperationOpts): Observable<ComplianceProfileDto | AjaxResponse<ComplianceProfileDto>> {
+    updateComplianceProfileV2({ uuid, complianceProfileUpdateRequestDto }: UpdateComplianceProfileV2Request): Observable<ComplianceProfileDtoV2>
+    updateComplianceProfileV2({ uuid, complianceProfileUpdateRequestDto }: UpdateComplianceProfileV2Request, opts?: OperationOpts): Observable<AjaxResponse<ComplianceProfileDtoV2>>
+    updateComplianceProfileV2({ uuid, complianceProfileUpdateRequestDto }: UpdateComplianceProfileV2Request, opts?: OperationOpts): Observable<ComplianceProfileDtoV2 | AjaxResponse<ComplianceProfileDtoV2>> {
         throwIfNullOrUndefined(uuid, 'uuid', 'updateComplianceProfileV2');
         throwIfNullOrUndefined(complianceProfileUpdateRequestDto, 'complianceProfileUpdateRequestDto', 'updateComplianceProfileV2');
 
@@ -399,7 +399,7 @@ export class ComplianceProfileManagementV2Api extends BaseAPI {
             'Content-Type': 'application/json',
         };
 
-        return this.request<ComplianceProfileDto>({
+        return this.request<ComplianceProfileDtoV2>({
             url: '/v2/complianceProfiles/{uuid}'.replace('{uuid}', encodeURI(uuid)),
             method: 'PUT',
             headers,

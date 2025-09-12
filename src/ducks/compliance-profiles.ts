@@ -15,8 +15,10 @@ import { BulkActionModel } from 'types/connectors';
 import {
     ComplianceGroupListDto,
     ComplianceProfileDto,
+    ComplianceProfileDtoV2,
     ComplianceProfileGroupsPatchRequestDto,
     ComplianceProfileListDto,
+    ComplianceProfileRequestDtoV2,
     ComplianceProfileRulesPatchRequestDto,
     ComplianceRuleListDto,
     Resource,
@@ -30,7 +32,7 @@ export type State = {
     deleteErrorMessage: string;
     bulkDeleteErrorMessages: BulkActionModel[];
 
-    complianceProfile?: ComplianceProfileDto;
+    complianceProfile?: ComplianceProfileDtoV2;
     complianceProfiles: ComplianceProfileListModel[];
 
     rules: ComplianceRuleListDto[];
@@ -120,7 +122,7 @@ export const slice = createSlice({
         getComplianceProfile: (state, action: PayloadAction<{ uuid: string }>) => {
             state.isFetchingDetail = true;
         },
-        getComplianceProfileSuccess: (state, action: PayloadAction<{ complianceProfile: ComplianceProfileDto }>) => {
+        getComplianceProfileSuccess: (state, action: PayloadAction<{ complianceProfile: ComplianceProfileDtoV2 }>) => {
             state.isFetchingDetail = false;
             state.complianceProfile = action.payload.complianceProfile;
         },
@@ -128,7 +130,7 @@ export const slice = createSlice({
             state.isFetchingDetail = false;
         },
         ///////////////////////////////
-        createComplianceProfile: (state, action: PayloadAction<ComplianceProfileRequestModel>) => {
+        createComplianceProfile: (state, action: PayloadAction<ComplianceProfileRequestDtoV2>) => {
             state.isCreating = true;
         },
 

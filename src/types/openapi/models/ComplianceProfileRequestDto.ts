@@ -12,7 +12,7 @@
  */
 
 import type {
-    ProviderComplianceRulesRequestDto,
+    ComplianceProfileRulesRequestDto,
     RequestAttributeDto,
 } from './';
 
@@ -22,33 +22,27 @@ import type {
  */
 export interface ComplianceProfileRequestDto {
     /**
+     * Name of the Compliance Profile
+     * @type {string}
+     * @memberof ComplianceProfileRequestDto
+     */
+    name: string;
+    /**
      * Description of the Compliance Profile
      * @type {string}
      * @memberof ComplianceProfileRequestDto
      */
     description?: string;
     /**
-     * UUIDs of internal rules to be associated with the Compliance Profile. Profiles can be created without rules and can be added later.
-     * @type {Array<string>}
+     * Rules to be associated with the Compliance Profile. Profiles can be created without rules and can be added later
+     * @type {Array<ComplianceProfileRulesRequestDto>}
      * @memberof ComplianceProfileRequestDto
      */
-    internalRules?: Array<string>;
-    /**
-     * Provider rules to be associated with the Compliance Profile. Profiles can be created without rules and can be added later.
-     * @type {Array<ProviderComplianceRulesRequestDto>}
-     * @memberof ComplianceProfileRequestDto
-     */
-    providerRules?: Array<ProviderComplianceRulesRequestDto>;
+    rules?: Array<ComplianceProfileRulesRequestDto>;
     /**
      * List of Custom Attributes
      * @type {Array<RequestAttributeDto>}
      * @memberof ComplianceProfileRequestDto
      */
     customAttributes?: Array<RequestAttributeDto>;
-    /**
-     * Name of the Compliance Profile
-     * @type {string}
-     * @memberof ComplianceProfileRequestDto
-     */
-    name: string;
 }

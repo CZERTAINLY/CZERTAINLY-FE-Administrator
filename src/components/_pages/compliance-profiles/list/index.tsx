@@ -35,7 +35,7 @@ export default function AdministratorsList() {
 
     const getFreshData = useCallback(() => {
         dispatch(actions.setCheckedRows({ checkedRows: [] }));
-        dispatch(actions.listComplianceProfiles());
+        dispatch(actions.getListComplianceProfiles());
     }, [dispatch]);
 
     useEffect(() => {
@@ -56,7 +56,7 @@ export default function AdministratorsList() {
     }, [checkedRows, dispatch]);
 
     const onComplianceCheckConfirmed = useCallback(() => {
-        dispatch(actions.checkCompliance({ uuids: checkedRows }));
+        dispatch(actions.checkComplianceForProfiles({ requestBody: checkedRows }));
         setComplianceCheck(false);
     }, [checkedRows, dispatch]);
 
@@ -194,12 +194,14 @@ export default function AdministratorsList() {
 
                     complianceProfile.description || '',
 
-                    <>{getComplianceItems(complianceProfile.rules, 'rules')}</>,
+                    {
+                        /* <>{getComplianceItems(complianceProfile.rules, 'rules')}</>,
 
-                    <>{getComplianceItems(complianceProfile.rules, 'groups')}</>,
+                    <>{getComplianceItems(complianceProfile.rules, 'groups')}</>, */
+                    },
                 ],
             })),
-        [complianceProfiles, getComplianceItems],
+        [complianceProfiles],
     );
 
     return (

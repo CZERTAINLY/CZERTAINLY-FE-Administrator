@@ -29,7 +29,7 @@ const getComplianceProfileDetail: AppEpic = (action$, state$, deps) => {
                 switchMap((detail) =>
                     of(
                         slice.actions.getComplianceProfileSuccess({
-                            complianceProfile: transformComplianceProfileResponseDtoToModel(detail),
+                            complianceProfile: detail,
                         }),
                         userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ComplianceProfileDetails),
                     ),
@@ -54,7 +54,7 @@ const createComplianceProfile: AppEpic = (action$, state$, deps) => {
 
         switchMap((action) =>
             deps.apiClients.complianceProfile
-                .createComplianceProfileV2({ complianceProfileRequestDto: transformComplianceProfileRequestModelToDto(action.payload) })
+                .createComplianceProfileV2({ complianceProfileRequestDtoV2: transformComplianceProfileRequestModelToDto(action.payload) })
                 .pipe(
                     mergeMap((obj) =>
                         of(
@@ -432,7 +432,7 @@ const updateRule: AppEpic = (action$, state$, deps) => {
         filter(slice.actions.updateRule.match),
         switchMap((action) =>
             deps.apiClients.complianceProfile
-                .patchComplianceProfileRuleV2({
+                .patchComplianceProfileRulesV2({
                     uuid: action.payload.uuid,
                     complianceProfileRulesPatchRequestDto: action.payload.complianceProfileRulesPatchRequestDto,
                 })
@@ -503,7 +503,7 @@ const updateGroup: AppEpic = (action$, state$, deps) => {
         filter(slice.actions.updateGroup.match),
         switchMap((action) =>
             deps.apiClients.complianceProfile
-                .patchComplianceProfileGroupV2({
+                .patchComplianceProfileGroupsV2({
                     uuid: action.payload.uuid,
                     complianceProfileGroupsPatchRequestDto: action.payload.complianceProfileGroupsPatchRequestDto,
                 })
