@@ -2322,6 +2322,7 @@ export default function CertificateDetail() {
                                         onCheckedRowsChanged={(rows) => {
                                             setSelectedCertificate(rows[0] as string);
                                         }}
+                                        withPreservedFilters={false}
                                     />
                                     <div className="d-flex align-items-center" style={{ padding: '0 30px' }}>
                                         <ButtonGroup>
