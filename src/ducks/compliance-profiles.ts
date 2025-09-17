@@ -220,17 +220,27 @@ export const slice = createSlice({
             state.isFetchingList = false;
         },
         //////////////////////////////
-        associateComplianceProfile: (state, action: PayloadAction<{ uuid: string; resource: Resource; associationObjectUuid: string }>) => {
+        associateComplianceProfile: (
+            state,
+            action: PayloadAction<{ uuid: string; resource: Resource; associationObjectUuid: string; associationObjectName: string }>,
+        ) => {
             state.isAssociatingComplianceProfile = true;
         },
 
         associateComplianceProfileSuccess: (
             state,
-            action: PayloadAction<{ uuid: string; resource: Resource; associationObjectUuid: string }>,
+            action: PayloadAction<{ uuid: string; resource: Resource; associationObjectUuid: string; associationObjectName: string }>,
         ) => {
             state.isAssociatingComplianceProfile = false;
+            if (!state.complianceProfile) return;
 
-            /*  if (!state.complianceProfile) return; */
+            state.associationsOfComplianceProfile = state.associationsOfComplianceProfile?.concat([
+                {
+                    objectUuid: action.payload.associationObjectUuid,
+                    resource: action.payload.resource,
+                    name: action.payload.associationObjectName,
+                },
+            ]);
         },
 
         associateComplianceProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -250,17 +260,10 @@ export const slice = createSlice({
         ) => {
             state.isDissociatingComplianceProfile = false;
 
-            /*  if (!state.complianceProfile) return;
-
-            for (let profile of state.complianceProfile.raProfiles || []) {
-                for (let requestUuid of action.payload.raProfileUuids) {
-                    if (profile.uuid === requestUuid) {
-                        const raProfileIndex =
-                            state.complianceProfile.raProfiles?.findIndex((raProfile) => raProfile.uuid === requestUuid) ?? -1;
-                        if (raProfileIndex >= 0) state.complianceProfile.raProfiles!.splice(raProfileIndex, 1);
-                    }
-                }
-            } */
+            // Remove the association from the list
+            state.associationsOfComplianceProfile = state.associationsOfComplianceProfile.filter(
+                (association) => association.objectUuid !== action.payload.associationObjectUuid,
+            );
         },
 
         dissociateComplianceProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {

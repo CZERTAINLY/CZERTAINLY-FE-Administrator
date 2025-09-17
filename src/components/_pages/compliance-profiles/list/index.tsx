@@ -9,7 +9,6 @@ import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
-import { ComplianceProfileListRuleModel } from 'types/complianceProfiles';
 import { LockWidgetNameEnum } from 'types/user-interface';
 
 export default function AdministratorsList() {
@@ -102,30 +101,6 @@ export default function AdministratorsList() {
         [checkedRows, onAddClick],
     );
 
-    const getComplianceItems = useCallback((complianceItems: ComplianceProfileListRuleModel[], lookingFor: string) => {
-        if (lookingFor === 'groups') {
-            let sum = complianceItems.map((item) => item.numberOfGroups || 0).reduce((a, b) => a + b, 0);
-
-            return (
-                <div>
-                    <Badge color="secondary" searchvalue={sum}>
-                        {sum || 0}
-                    </Badge>
-                </div>
-            );
-        } else {
-            let sum = complianceItems.map((item) => item.numberOfRules || 0).reduce((a, b) => a + b, 0);
-
-            return (
-                <div>
-                    <Badge color="secondary" searchvalue={sum}>
-                        {sum || 0}
-                    </Badge>
-                </div>
-            );
-        }
-    }, []);
-
     const forceDeleteBody = useMemo(
         () => (
             <div>
@@ -173,12 +148,20 @@ export default function AdministratorsList() {
                 content: 'Description',
             },
             {
-                id: 'totalRules',
-                content: 'Total Rules',
+                id: 'providerTotalRules',
+                content: 'ProviderTotal Rules',
             },
             {
-                id: 'totalGroups',
-                content: 'Total Groups',
+                id: 'providerTotalGroups',
+                content: 'Provider Total Groups',
+            },
+            {
+                id: 'internalTotalRules',
+                content: 'Internal Total Rules',
+            },
+            {
+                id: 'associations',
+                content: 'Associations',
             },
         ],
         [],
@@ -191,14 +174,19 @@ export default function AdministratorsList() {
 
                 columns: [
                     <Link to={`./detail/${complianceProfile.uuid}`}>{complianceProfile.name}</Link>,
-
                     complianceProfile.description || '',
-
-                    {
-                        /* <>{getComplianceItems(complianceProfile.rules, 'rules')}</>,
-
-                    <>{getComplianceItems(complianceProfile.rules, 'groups')}</>, */
-                    },
+                    <Badge color="secondary" searchvalue={complianceProfile.providerRulesCount}>
+                        {complianceProfile.providerRulesCount.toString()}
+                    </Badge>,
+                    <Badge color="secondary" searchvalue={complianceProfile.providerGroupsCount}>
+                        {complianceProfile.providerGroupsCount.toString()}
+                    </Badge>,
+                    <Badge color="secondary" searchvalue={complianceProfile.internalRulesCount}>
+                        {complianceProfile.internalRulesCount.toString()}
+                    </Badge>,
+                    <Badge color="secondary" searchvalue={complianceProfile.associations}>
+                        {complianceProfile.associations.toString()}
+                    </Badge>,
                 ],
             })),
         [complianceProfiles],

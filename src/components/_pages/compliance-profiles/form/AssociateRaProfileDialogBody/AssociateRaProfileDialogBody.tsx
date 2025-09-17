@@ -13,6 +13,7 @@ import Spinner from 'components/Spinner';
 
 import { actions } from 'ducks/compliance-profiles';
 import { actions as raActions, selectors as raSelectors } from 'ducks/ra-profiles';
+import { Resource } from 'types/openapi';
 
 interface Props {
     complianceProfileUuid?: string;
@@ -56,16 +57,11 @@ export default function AssociateRaProfileDialogBody({ complianceProfileUuid, av
             if (!complianceProfileUuid) return;
 
             dispatch(
-                actions.associateRaProfile({
+                actions.associateComplianceProfile({
                     uuid: complianceProfileUuid,
-                    raProfileUuids: [
-                        {
-                            uuid: values.raProfiles.value.uuid,
-                            name: values.raProfiles.value.name,
-                            enabled: values.raProfiles.value.enabled,
-                            authorityInstanceUuid: values.raProfiles.value.authorityInstanceUuid,
-                        },
-                    ],
+                    resource: Resource.RaProfiles,
+                    associationObjectUuid: values.raProfiles.value.uuid,
+                    associationObjectName: values.raProfiles.value.name,
                 }),
             );
 

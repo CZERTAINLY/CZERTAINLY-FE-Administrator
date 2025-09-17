@@ -204,6 +204,7 @@ const associateComplianceProfile: AppEpic = (action$, state$, deps) => {
                             uuid: action.payload.uuid,
                             resource: action.payload.resource,
                             associationObjectUuid: action.payload.associationObjectUuid,
+                            associationObjectName: action.payload.associationObjectName,
                         }),
                     ),
                     catchError((error) =>
@@ -219,7 +220,7 @@ const associateComplianceProfile: AppEpic = (action$, state$, deps) => {
     );
 };
 
-const dissociateRaProfile: AppEpic = (action$, state$, deps) => {
+const dissociateComplianceProfile: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.dissociateComplianceProfile.match),
         switchMap((action) =>
@@ -437,7 +438,13 @@ const updateRule: AppEpic = (action$, state$, deps) => {
                     complianceProfileRulesPatchRequestDto: action.payload.complianceProfileRulesPatchRequestDto,
                 })
                 .pipe(
-                    map(() => slice.actions.updateRuleSuccess({ uuid: action.payload.uuid })),
+                    mergeMap(() =>
+                        of(
+                            slice.actions.updateRuleSuccess({ uuid: action.payload.uuid }),
+                            // Refetch detail to refresh assigned rules/groups in UI after add/remove
+                            slice.actions.getComplianceProfile({ uuid: action.payload.uuid }),
+                        ),
+                    ),
                     catchError((error) =>
                         of(
                             slice.actions.updateRuleFailed({
@@ -531,7 +538,7 @@ const epics = [
     updateRule,
     updateGroup,
     associateComplianceProfile,
-    dissociateRaProfile,
+    dissociateComplianceProfile,
     getAssociatedRaProfiles,
     getComplianceRules,
     getComplianceGroups,
