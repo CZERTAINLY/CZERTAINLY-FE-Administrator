@@ -33,10 +33,10 @@ import {
     CertificateValidationStatus,
 } from '../../../../types/openapi';
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useParams } from 'react-router';
+import { Link, useNavigate, useParams } from 'react-router';
 import Select from 'react-select';
 
 import { actions as raProfilesActions, selectors as raProfilesSelectors } from 'ducks/ra-profiles';
@@ -97,6 +97,7 @@ interface SelectChangeValue {
 export default function CertificateDetail() {
     const dispatch = useDispatch();
     const { id } = useParams();
+    const navigate = useNavigate();
 
     const copyToClipboard = useCopyToClipboard();
     const certificate = useSelector(selectors.certificateDetail);
@@ -187,6 +188,8 @@ export default function CertificateDetail() {
     const [confirmDeleteRelatedCertificate, setConfirmDeleteRelatedCertificate] = useState<boolean>(false);
     const [relatedCertificateCheckedRows, setRelatedCertificateCheckedRows] = useState<string[]>([]);
     const [isAlreadyRelatedError, setIsAlreadyRelatedError] = useState<boolean>(false);
+
+    const isFirstAddRelatedCertificateClick = useRef<boolean>(true);
 
     const isRemovingCertificate = useSelector(locationSelectors.isRemovingCertificate);
     const isPushingCertificate = useSelector(locationSelectors.isPushingCertificate);
@@ -291,6 +294,7 @@ export default function CertificateDetail() {
 
     const getFreshRelatedCertificates = useCallback(() => {
         if (!id || isDeassociating || isAssociating) return;
+        setRelatedCertificateCheckedRows([]);
         dispatch(actions.getCertificateRelations({ uuid: id }));
     }, [dispatch, id, isDeassociating, isAssociating]);
 
@@ -1342,7 +1346,7 @@ export default function CertificateDetail() {
         if (!relatedCertificates) return [];
 
         return relatedCertificates.map((c) => ({
-            id: `${c.uuid}-${c.relation}`,
+            id: `${c.uuid}`,
             columns: [
                 <Link key={`${c.uuid}-name`} to={`../../certificates/detail/${c.uuid}`}>
                     {c.commonName}
@@ -1368,9 +1372,10 @@ export default function CertificateDetail() {
 
     const onDeleteRelatedCertificate = useCallback(() => {
         if (relatedCertificateCheckedRows.length === 0 || !id) return;
+
         dispatch(actions.deassociateCertificate({ uuid: id, certificateUuid: relatedCertificateCheckedRows[0] }));
         setConfirmDeleteRelatedCertificate(false);
-    }, [dispatch, relatedCertificateCheckedRows, id]);
+    }, [relatedCertificateCheckedRows, id, dispatch]);
 
     const clearRelatedCertificatesFilters = useCallback(() => {
         dispatch(filterActions.setCurrentFilters({ entity: EntityType.CERTIFICATE, currentFilters: [] }));
@@ -1384,9 +1389,12 @@ export default function CertificateDetail() {
                 disabled: isCertificateArchived,
                 tooltip: 'Add related certificate',
                 onClick: () => {
+                    if (isFirstAddRelatedCertificateClick.current) {
+                        clearRelatedCertificatesFilters();
+                        isFirstAddRelatedCertificateClick.current = false;
+                    }
                     setRelatedCertificateCheckedRows([]);
                     setIsAlreadyRelatedError(false);
-                    clearRelatedCertificatesFilters();
                     setIsAddingRelatedCertificate(true);
                 },
             },
@@ -1934,8 +1942,13 @@ export default function CertificateDetail() {
         <Container className={cx('themed-container', styles.certificateContainer)} fluid>
             <GoBackButton
                 style={{ marginBottom: '10px' }}
-                forcedPath="/certificates"
                 text={`${getEnumLabel(resourceEnum, Resource.Certificates)} Inventory`}
+                onClick={() => {
+                    if (!isFirstAddRelatedCertificateClick.current) {
+                        clearRelatedCertificatesFilters();
+                    }
+                    navigate('/certificates');
+                }}
             />
             <TabLayout
                 tabs={[
