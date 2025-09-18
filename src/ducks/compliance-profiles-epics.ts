@@ -441,7 +441,6 @@ const updateRule: AppEpic = (action$, state$, deps) => {
                     mergeMap(() =>
                         of(
                             slice.actions.updateRuleSuccess({ uuid: action.payload.uuid }),
-                            // Refetch detail to refresh assigned rules/groups in UI after add/remove
                             slice.actions.getComplianceProfile({ uuid: action.payload.uuid }),
                         ),
                     ),
@@ -515,7 +514,12 @@ const updateGroup: AppEpic = (action$, state$, deps) => {
                     complianceProfileGroupsPatchRequestDto: action.payload.complianceProfileGroupsPatchRequestDto,
                 })
                 .pipe(
-                    map(() => slice.actions.updateGroupSuccess({ uuid: action.payload.uuid })),
+                    mergeMap(() =>
+                        of(
+                            slice.actions.updateGroupSuccess({ uuid: action.payload.uuid }),
+                            slice.actions.getComplianceProfile({ uuid: action.payload.uuid }),
+                        ),
+                    ),
                     catchError((error) =>
                         of(
                             slice.actions.updateGroupFailed({ error: extractError(error, 'Failed to update group in Compliance Profile') }),

@@ -30,6 +30,8 @@ import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { capitalize } from 'utils/common-utils';
 import TabLayout from 'components/Layout/TabLayout';
 import AttributeViewer from 'components/Attributes/AttributeViewer';
+import { AttributeDescriptorModel, AttributeResponseModel } from 'types/attributes';
+import AssignedRulesAndGroup from 'components/_pages/compliance-profiles/detail/AssignedRulesAndGroup/AssignedRulesAndGroup';
 
 const prof = {
     uuid: '6db02cd3-71c0-4b3f-be98-97d4bbd8320c',
@@ -255,6 +257,47 @@ export default function ComplianceProfileDetail() {
     const groups = useSelector(selectors.groups);
     const isFetchingGroups = useSelector(selectors.isFetchingGroups);
     const isFetchingRules = useSelector(selectors.isFetchingRules);
+    const isFetchingGroupRules = useSelector(selectors.isFetchingGroupRules);
+
+    const test = [
+        {
+            uuid: '40f0853b-ddc1-11ec-9eb7-34cff65c6ee3',
+            name: 'e_international_dns_name_not_nfc',
+            description: 'Internationalized DNSNames must be normalized by Unicode normalization form C',
+            connectorUuid: '8d8a6610-9623-40d2-b113-444fe59579dd',
+            kind: 'x509',
+            groupUuid: 'e1d0af6e-ddb3-11ec-9d64-0242ac120002',
+            resource: 'certificates',
+            attributes: [
+                {
+                    uuid: '7ed00782-e706-11ec-8fea-0242ac120002',
+                    name: 'condition',
+                    label: 'Condition',
+                    type: 'data',
+                    contentType: 'string',
+                    content: [
+                        {
+                            data: 'Greater',
+                        },
+                    ],
+                },
+                {
+                    uuid: '7ed00886-e706-11ec-8fea-0242ac120002',
+                    name: 'length',
+                    label: 'Key Length',
+                    type: 'data',
+                    contentType: 'integer',
+                    content: [
+                        {
+                            data: '2048',
+                        },
+                    ],
+                },
+            ],
+        },
+    ];
+
+    const groupRules = /* test; */ useSelector(selectors.groupRules);
 
     const [addRaProfile, setAddRaProfile] = useState<boolean>(false);
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
@@ -271,11 +314,14 @@ export default function ComplianceProfileDetail() {
     const [selectedAssignedProvider, setSelectedAssignedProvider] = useState<string | null>(null);
     const [assignedKindsList, setAssignedKindsList] = useState<{ label: string; value: string }[]>([]);
     const [selectedAssignedKind, setSelectedAssignedKind] = useState<string | null>(null);
-    const [assignedListOfGroupsUuids, setAssignedListOfGroupsUuids] = useState<string[]>([]);
-
     //for assigned rules and groups ==========================//
+
     const [isEntityDetailMenuOpen, setIsEntityDetailMenuOpen] = useState(false);
     const [selectedEntityDetails, setSelectedEntityDetails] = useState<any>(null);
+    const [groupRuleAttributeData, setGroupRuleAttributeData] = useState<{
+        ruleName: string;
+        attributes: AttributeResponseModel[];
+    } | null>(null);
 
     //TODO: delete
     useEffect(() => {
@@ -355,12 +401,8 @@ export default function ComplianceProfileDetail() {
     const assignedRulesAndGroupsData = useMemo(
         () =>
             filteredAssignedRulesAndGroupList.map((ruleOrGroup) => {
-                const isDisabled =
-                    ruleOrGroup.entityDetails?.entityType === 'rule' ? assignedListOfGroupsUuids.includes(ruleOrGroup.groupUuid) : false;
-                if (ruleOrGroup.entityDetails?.entityType === 'rule') {
-                    console.log(ruleOrGroup.groupUuid, {
-                        assignedListOfGroupsUuids,
-                    });
+                if (ruleOrGroup.entityDetails?.entityType === 'group') {
+                    console.log({ ruleOrGroup });
                 }
                 return {
                     id: ruleOrGroup.uuid,
@@ -388,7 +430,7 @@ export default function ComplianceProfileDetail() {
                             buttons={[
                                 {
                                     icon: 'minus-square',
-                                    disabled: isDisabled,
+                                    disabled: false,
                                     tooltip: 'Remove',
                                     onClick: () => {
                                         if (!id) return;
@@ -411,9 +453,9 @@ export default function ComplianceProfileDetail() {
                                                     uuid: id,
                                                     complianceProfileGroupsPatchRequestDto: {
                                                         removal: true,
-                                                        groupUuid: ruleOrGroup.groupUuid,
-                                                        connectorUuid: ruleOrGroup?.connectorUuid ?? undefined,
-                                                        kind: ruleOrGroup?.kind ?? undefined,
+                                                        groupUuid: ruleOrGroup.uuid,
+                                                        connectorUuid: ruleOrGroup.entityDetails.connectorUuid ?? undefined,
+                                                        kind: ruleOrGroup.entityDetails.kind ?? undefined,
                                                     },
                                                 }),
                                             );
@@ -425,7 +467,7 @@ export default function ComplianceProfileDetail() {
                     ],
                 };
             }),
-        [assignedListOfGroupsUuids, dispatch, filteredAssignedRulesAndGroupList, id],
+        [dispatch, filteredAssignedRulesAndGroupList, id],
     );
 
     const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
@@ -533,38 +575,6 @@ export default function ComplianceProfileDetail() {
         ],
         [],
     );
-
-    const entityDetailHeaders: TableHeader[] = useMemo(() => {
-        return [
-            { id: 'Property', content: 'Property' },
-            { id: 'Value', content: 'Value' },
-        ];
-    }, []);
-
-    const entityDetailData: TableDataRow[] = useMemo(() => {
-        return [
-            { id: 'uuid', columns: ['UUID', selectedEntityDetails?.uuid] },
-            { id: 'name', columns: ['Name', selectedEntityDetails?.name] },
-            { id: 'description', columns: ['Description', selectedEntityDetails?.description] },
-            {
-                id: 'status',
-                columns: [
-                    'Status',
-                    <Badge
-                        key={selectedEntityDetails?.uuid}
-                        color={selectedEntityDetails?.availabilityStatus === 'available' ? 'success' : 'danger'}
-                    >
-                        {capitalize(selectedEntityDetails?.availabilityStatus || '')}
-                    </Badge>,
-                ],
-            },
-            { id: 'type', columns: ['Type', capitalize(selectedEntityDetails?.type || '')] },
-            { id: 'resource', columns: ['Resource', getEnumLabel(resourceEnum, selectedEntityDetails?.resource) || ''] },
-            { id: 'format', columns: ['Format', selectedEntityDetails?.format || ''] },
-            { id: 'provider', columns: ['Provider', selectedEntityDetails?.entityDetails?.connectorName || ''] },
-            { id: 'kind', columns: ['Kind', selectedEntityDetails?.entityDetails?.kind || ''] },
-        ];
-    }, [selectedEntityDetails, resourceEnum]);
 
     const onDeleteConfirmed = useCallback(() => {
         if (!profile) return;
@@ -1243,12 +1253,6 @@ export default function ComplianceProfileDetail() {
         return profile?.providerRules.map((providerRule) => providerRule.groups.map((group) => group.uuid)).flat();
     }, [profile]);
 
-    useEffect(() => {
-        if (!profile) return;
-        setAssignedListOfGroupsUuids(getGroupsUuids() || []);
-    }, [getGroupsUuids, profile]);
-    console.log({ assignedListOfGroupsUuids });
-
     const getInitialListOfGroupsAndRules = useCallback(
         (resource?: Resource) => {
             if (!profile) return [];
@@ -1341,18 +1345,118 @@ export default function ComplianceProfileDetail() {
         }
     }, [assignedRulesSource, getListOfKinds]);
 
+    const entityDetailHeaders: TableHeader[] = useMemo(() => {
+        return [
+            { id: 'property', content: 'Property' },
+            { id: 'value', content: 'Value' },
+        ];
+    }, []);
+
+    const ruleDetailData: TableDataRow[] = useMemo(() => {
+        return [
+            { id: 'uuid', columns: ['UUID', selectedEntityDetails?.uuid] },
+            { id: 'name', columns: ['Name', selectedEntityDetails?.name] },
+            { id: 'description', columns: ['Description', selectedEntityDetails?.description] },
+            {
+                id: 'status',
+                columns: [
+                    'Status',
+                    <Badge
+                        key={selectedEntityDetails?.uuid}
+                        color={selectedEntityDetails?.availabilityStatus === 'available' ? 'success' : 'danger'}
+                    >
+                        {capitalize(selectedEntityDetails?.availabilityStatus || '')}
+                    </Badge>,
+                ],
+            },
+            { id: 'type', columns: ['Type', capitalize(selectedEntityDetails?.type || '')] },
+            { id: 'resource', columns: ['Resource', getEnumLabel(resourceEnum, selectedEntityDetails?.resource) || ''] },
+            { id: 'format', columns: ['Format', selectedEntityDetails?.format || ''] },
+            { id: 'provider', columns: ['Provider', selectedEntityDetails?.entityDetails?.connectorName || ''] },
+            { id: 'kind', columns: ['Kind', selectedEntityDetails?.entityDetails?.kind || ''] },
+        ];
+    }, [selectedEntityDetails, resourceEnum]);
+
+    const groupDetailData: TableDataRow[] = useMemo(() => {
+        return [
+            { id: 'uuid', columns: ['UUID', selectedEntityDetails?.uuid] },
+            { id: 'name', columns: ['Name', selectedEntityDetails?.name] },
+            { id: 'description', columns: ['Description', selectedEntityDetails?.description] },
+            {
+                id: 'status',
+                columns: [
+                    'Status',
+                    <Badge
+                        key={selectedEntityDetails?.uuid}
+                        color={selectedEntityDetails?.availabilityStatus === 'available' ? 'success' : 'danger'}
+                    >
+                        {capitalize(selectedEntityDetails?.availabilityStatus || '')}
+                    </Badge>,
+                ],
+            },
+            { id: 'resource', columns: ['Resource', getEnumLabel(resourceEnum, selectedEntityDetails?.resource) || ''] },
+        ];
+    }, [selectedEntityDetails, resourceEnum]);
+
+    const groupRulesDetailHeaders: TableHeader[] = useMemo(() => {
+        return [
+            { id: 'name', content: 'Name', width: '30%' },
+            { id: 'description', content: 'Description', width: '70%' },
+        ];
+    }, []);
+
+    const groupRulesDetailData: TableDataRow[] = useMemo(() => {
+        return groupRules.map((rule) => {
+            const ruleDetailData = [
+                { id: 'uuid', columns: ['UUID', rule?.uuid || ''] },
+                { id: 'name', columns: ['Name', rule?.name || ''] },
+                { id: 'description', columns: ['Description', rule?.description || ''] },
+
+                { id: 'type', columns: ['Type', capitalize(rule?.type || '')] },
+                { id: 'resource', columns: ['Resource', getEnumLabel(resourceEnum, rule?.resource) || ''] },
+                { id: 'format', columns: ['Format', rule?.format || ''] },
+                { id: 'kind', columns: ['Kind', rule?.kind || ''] },
+                {
+                    id: 'attributes',
+                    columns: [
+                        'Attributes',
+                        rule.attributes?.length ? (
+                            <Button
+                                className="btn btn-link"
+                                color="white"
+                                title="Rules"
+                                onClick={() => {
+                                    setGroupRuleAttributeData({
+                                        ruleName: rule.name,
+                                        attributes: (rule.attributes as AttributeResponseModel[]) ?? [],
+                                    });
+                                }}
+                            >
+                                <i className="fa fa-info" style={{ color: 'auto' }} />
+                            </Button>
+                        ) : (
+                            'No attributes'
+                        ),
+                    ],
+                },
+            ];
+            return {
+                id: rule.uuid,
+                columns: ['Name', rule.name || ''],
+                detailColumns: [<></>, <></>, <CustomTable data={ruleDetailData} headers={entityDetailHeaders} />],
+            };
+        });
+    }, [groupRules, resourceEnum, entityDetailHeaders]);
+
     const EntityDetailMenu = useCallback(() => {
         return (
-            <Widget
-                /* title={`${capitalize(selectedEntityDetails?.entityDetails?.entityType)}: ${selectedEntityDetails?.name}`} */
-                titleSize="large"
-            >
+            <Widget titleSize="larger" busy={selectedEntityDetails?.entityDetails?.entityType === 'group' ? isFetchingGroupRules : false}>
                 {selectedEntityDetails?.entityDetails?.entityType === 'rule' && (
                     <TabLayout
                         tabs={[
                             {
                                 title: 'Details',
-                                content: <CustomTable headers={entityDetailHeaders} data={entityDetailData} />,
+                                content: <CustomTable headers={entityDetailHeaders} data={ruleDetailData} />,
                             },
                             {
                                 title: 'Attributes',
@@ -1362,13 +1466,46 @@ export default function ComplianceProfileDetail() {
                     />
                 )}
                 {selectedEntityDetails?.entityDetails?.entityType === 'group' && (
-                    <div>
-                        <Label>Group Details</Label>
-                    </div>
+                    <TabLayout
+                        tabs={[
+                            {
+                                title: 'Details',
+                                content: <CustomTable headers={entityDetailHeaders} data={groupDetailData} />,
+                            },
+                            {
+                                title: 'Rules',
+                                content: (
+                                    <CustomTable headers={groupRulesDetailHeaders} data={groupRulesDetailData} hasDetails hasPagination />
+                                ),
+                            },
+                        ]}
+                    />
                 )}
             </Widget>
         );
-    }, [entityDetailHeaders, selectedEntityDetails, entityDetailData]);
+    }, [
+        entityDetailHeaders,
+        selectedEntityDetails,
+        groupDetailData,
+        ruleDetailData,
+        isFetchingGroupRules,
+        groupRulesDetailData,
+        groupRulesDetailHeaders,
+    ]);
+
+    useEffect(() => {
+        if (selectedEntityDetails?.entityDetails?.entityType === 'group') {
+            dispatch(
+                actions.getListComplianceGroupRules({
+                    groupUuid: selectedEntityDetails?.uuid,
+                    connectorUuid: selectedEntityDetails?.entityDetails?.connectorUuid,
+                    kind: selectedEntityDetails?.entityDetails?.kind,
+                }),
+            );
+        }
+    }, [selectedEntityDetails, dispatch]);
+
+    console.log({ groupRules });
 
     return (
         <Container className="themed-container" fluid>
@@ -1472,7 +1609,7 @@ export default function ComplianceProfileDetail() {
                                 </Col>
                             </Row>
                         )}
-                        <div style={{ display: 'flex', flexWrap: 'wrap', padding: '10px 0 10px 0' }}>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', padding: '0 0 10px 0' }}>
                             {assignedRulesAndGroupsResources.map((resource) => (
                                 <Badge
                                     color={assignedResourceType === resource ? 'primary' : 'light'}
@@ -1539,13 +1676,29 @@ export default function ComplianceProfileDetail() {
             <Dialog
                 isOpen={isEntityDetailMenuOpen}
                 caption={
-                    selectedEntityDetails
-                        ? `${capitalize(selectedEntityDetails?.entityDetails?.entityType)}: ${selectedEntityDetails?.name}`
-                        : 'Entity Details'
+                    <p style={{ fontWeight: 'bold' }}>
+                        {selectedEntityDetails
+                            ? `${capitalize(selectedEntityDetails?.entityDetails?.entityType)}: (${selectedEntityDetails?.name})`
+                            : 'Entity Details'}
+                    </p>
                 }
                 body={<EntityDetailMenu />}
                 toggle={() => setIsEntityDetailMenuOpen(false)}
                 buttons={[]}
+                size="lg"
+            />
+
+            <Dialog
+                isOpen={!!groupRuleAttributeData}
+                caption={
+                    <p>
+                        Rule <span style={{ fontWeight: 'bold' }}>{groupRuleAttributeData?.ruleName}</span> attributes
+                    </p>
+                }
+                body={<AttributeViewer attributes={groupRuleAttributeData?.attributes ?? []} />}
+                toggle={() => setGroupRuleAttributeData(null)}
+                buttons={[]}
+                size="lg"
             />
 
             {/*  <Widget
