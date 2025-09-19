@@ -20,7 +20,7 @@ import { actions as connectorActions } from 'ducks/connectors';
 import { actions as locationActions, selectors as locationSelectors } from 'ducks/locations';
 import { actions as raProfileAction, selectors as raProfileSelectors } from 'ducks/ra-profiles';
 import { selectors as settingSelectors } from 'ducks/settings';
-import { EntityType, actions as filterActions } from 'ducks/filters';
+import { EntityType, actions as filterActions, selectors as filterSelectors } from 'ducks/filters';
 
 import {
     CertificateState as CertStatus,
@@ -31,6 +31,9 @@ import {
     CertificateSimpleDto,
     CertificateSubjectType,
     CertificateValidationStatus,
+    FilterConditionOperator,
+    FilterFieldSource,
+    SearchFilterRequestDto,
 } from '../../../../types/openapi';
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -113,6 +116,7 @@ export default function CertificateDetail() {
     const eventHistory = useSelector(selectors.certificateHistory);
     const certLocations = useSelector(selectors.certificateLocations);
     const approvals = useSelector(selectors.approvals);
+    const currentFilters = useSelector(filterSelectors.currentFilters(EntityType.CERTIFICATE));
 
     const validationResult = useSelector(selectors.validationResult);
 
@@ -1378,8 +1382,57 @@ export default function CertificateDetail() {
     }, [relatedCertificateCheckedRows, id, dispatch]);
 
     const clearRelatedCertificatesFilters = useCallback(() => {
-        dispatch(filterActions.setCurrentFilters({ entity: EntityType.CERTIFICATE, currentFilters: [] }));
+        dispatch(
+            filterActions.setCurrentFilters({
+                entity: EntityType.CERTIFICATE,
+                currentFilters: [],
+            }),
+        );
     }, [dispatch]);
+
+    const removeDuplicateFilters = useCallback((filters: SearchFilterRequestDto[]): SearchFilterRequestDto[] => {
+        const seen = new Set<string>();
+        const result = filters.filter((filter) => {
+            // Create a unique key based on the filter properties
+            const key = `${filter.fieldSource}-${filter.fieldIdentifier}-${filter.condition}-${JSON.stringify(filter.value)}`;
+            if (seen.has(key)) {
+                return false;
+            }
+            seen.add(key);
+            return true;
+        });
+
+        return result;
+    }, []);
+
+    const setRelatedCertificatesFilters = useCallback(() => {
+        const newFilters = certificate?.subjectType
+            ? [
+                  ...currentFilters,
+                  {
+                      fieldSource: FilterFieldSource.Property,
+                      fieldIdentifier: 'SUBJECT_TYPE',
+                      condition: FilterConditionOperator.Equals,
+                      value: [certificate?.subjectType ?? ''],
+                  },
+              ]
+            : currentFilters;
+        const deduplicatedFilters = removeDuplicateFilters(newFilters);
+
+        dispatch(
+            filterActions.setCurrentFilters({
+                entity: EntityType.CERTIFICATE,
+                currentFilters: deduplicatedFilters,
+            }),
+        );
+    }, [certificate?.subjectType, dispatch, currentFilters, removeDuplicateFilters]);
+
+    useEffect(() => {
+        if (isFirstAddRelatedCertificateClick.current) {
+            clearRelatedCertificatesFilters();
+            isFirstAddRelatedCertificateClick.current = false;
+        }
+    }, [clearRelatedCertificatesFilters]);
 
     const relatedCertificatesButtons: WidgetButtonProps[] = useMemo(() => {
         return [
@@ -1389,10 +1442,7 @@ export default function CertificateDetail() {
                 disabled: isCertificateArchived,
                 tooltip: 'Add related certificate',
                 onClick: () => {
-                    if (isFirstAddRelatedCertificateClick.current) {
-                        clearRelatedCertificatesFilters();
-                        isFirstAddRelatedCertificateClick.current = false;
-                    }
+                    setRelatedCertificatesFilters();
                     setRelatedCertificateCheckedRows([]);
                     setIsAlreadyRelatedError(false);
                     setIsAddingRelatedCertificate(true);
@@ -1408,7 +1458,7 @@ export default function CertificateDetail() {
                 },
             },
         ];
-    }, [isCertificateArchived, relatedCertificateCheckedRows, clearRelatedCertificatesFilters]);
+    }, [isCertificateArchived, relatedCertificateCheckedRows.length, setRelatedCertificatesFilters]);
 
     useEffect(() => {
         if (!selectedCertificate) {
