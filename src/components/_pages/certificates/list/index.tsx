@@ -16,6 +16,7 @@ import { Badge, Container, DropdownItem, DropdownMenu, DropdownToggle, Uncontrol
 import { ApiClients } from '../../../../api';
 import PagedList from 'components/PagedList/PagedList';
 import { actions as userAction, selectors as userSelectors } from 'ducks/users';
+import { actions as filterActions, selectors as filterSelectors } from 'ducks/filters';
 import { SearchRequestModel } from 'types/certificate';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { dateFormatter } from 'utils/dateUtil';
@@ -34,6 +35,7 @@ interface Props {
     hideWidgetButtons?: boolean;
     hideAdditionalButtons?: boolean;
     isLinkDisabled?: boolean;
+    withPreservedFilters?: boolean;
 }
 
 export default function CertificateList({
@@ -43,6 +45,7 @@ export default function CertificateList({
     onCheckedRowsChanged,
     hideAdditionalButtons = false,
     isLinkDisabled = false,
+    withPreservedFilters = true,
 }: Props) {
     const dispatch = useDispatch();
 
@@ -64,7 +67,8 @@ export default function CertificateList({
     const isUploading = useSelector(selectors.isUploading);
     const certificateTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateType));
     const isIncludeArchived = useSelector(selectors.isIncludeArchived);
-
+    const currentFilters = useSelector(filterSelectors.currentFilters(EntityType.CERTIFICATE));
+    const preservedFilters = useSelector(filterSelectors.preservedFilters(EntityType.CERTIFICATE));
     const [upload, setUpload] = useState<boolean>(false);
     const [updateGroup, setUpdateGroup] = useState<boolean>(false);
     const [updateOwner, setUpdateOwner] = useState<boolean>(false);
@@ -318,7 +322,19 @@ export default function CertificateList({
                         selectCertsOnly || isLinkDisabled ? (
                             certificate.commonName || '(empty)'
                         ) : (
-                            <Link to={`./detail/${certificate.uuid}`}>{certificate.commonName || '(empty)'}</Link>
+                            <Link
+                                onClick={() =>
+                                    dispatch(
+                                        filterActions.setPreservedFilters({
+                                            entity: EntityType.CERTIFICATE,
+                                            preservedFilters: currentFilters,
+                                        }),
+                                    )
+                                }
+                                to={`./detail/${certificate.uuid}`}
+                            >
+                                {certificate.commonName || '(empty)'}
+                            </Link>
                         ),
                         certificate.notBefore ? <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(certificate.notBefore)}</span> : '',
                         certificate.notAfter ? <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(certificate.notAfter)}</span> : '',
@@ -379,7 +395,7 @@ export default function CertificateList({
                     ],
                 };
             }),
-        [certificates, selectCertsOnly, certificateTypeEnum, isLinkDisabled],
+        [certificates, selectCertsOnly, isLinkDisabled, certificateTypeEnum, dispatch, currentFilters],
     );
 
     const onListCallback = useCallback(
@@ -389,6 +405,12 @@ export default function CertificateList({
         },
         [dispatch, isIncludeArchived],
     );
+
+    useEffect(() => {
+        if (withPreservedFilters && preservedFilters.length > 0) {
+            dispatch(filterActions.setCurrentFilters({ entity: EntityType.CERTIFICATE, currentFilters: preservedFilters }));
+        }
+    }, [preservedFilters, dispatch, withPreservedFilters]);
 
     return (
         <Container className="themed-container" fluid>

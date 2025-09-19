@@ -30,6 +30,7 @@ export type Filter = {
 type FilterObject = {
     availableFilters: SearchFieldListModel[];
     currentFilters: SearchFilterModel[];
+    preservedFilters: SearchFilterModel[];
     isFetchingFilters: boolean;
 };
 
@@ -40,6 +41,7 @@ export type State = {
 const EMPTY_FILTER: FilterObject = {
     availableFilters: [],
     currentFilters: [],
+    preservedFilters: [],
     isFetchingFilters: false,
 };
 
@@ -66,6 +68,12 @@ export const slice = createSlice({
         setCurrentFilters: (state, action: PayloadAction<{ entity: EntityType; currentFilters: SearchFilterModel[] }>) => {
             updateFilterState(state, action.payload.entity, (filter) => {
                 filter.currentFilters = action.payload.currentFilters;
+            });
+        },
+
+        setPreservedFilters: (state, action: PayloadAction<{ entity: EntityType; preservedFilters: SearchFilterModel[] }>) => {
+            updateFilterState(state, action.payload.entity, (filter) => {
+                filter.preservedFilters = action.payload.preservedFilters;
             });
         },
 
@@ -103,6 +111,8 @@ const availableFilters = (entity: EntityType) =>
     createSelector(state, (state) => (state.filters.find((f) => f.entity === entity)?.filter ?? EMPTY_FILTER).availableFilters);
 const currentFilters = (entity: EntityType) =>
     createSelector(state, (state) => (state.filters.find((f) => f.entity === entity)?.filter ?? EMPTY_FILTER).currentFilters);
+const preservedFilters = (entity: EntityType) =>
+    createSelector(state, (state) => (state.filters.find((f) => f.entity === entity)?.filter ?? EMPTY_FILTER).preservedFilters);
 const isFetchingFilters = (entity: EntityType) =>
     createSelector(state, (state) => (state.filters.find((f) => f.entity === entity)?.filter ?? EMPTY_FILTER).isFetchingFilters);
 
@@ -111,6 +121,7 @@ export const selectors = {
 
     availableFilters,
     currentFilters,
+    preservedFilters,
     isFetchingFilters,
 };
 
