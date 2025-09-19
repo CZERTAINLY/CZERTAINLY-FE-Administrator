@@ -33,6 +33,7 @@ import {
     getIso8601StringFromInputString as getIso8601StringFromDurationString,
 } from 'utils/duration';
 import { validateDuration } from 'utils/validators';
+import { parse } from 'regexp-tree';
 
 const noValue: { [condition in FilterConditionOperator]: boolean } = {
     [FilterConditionOperator.Equals]: false,
@@ -111,25 +112,53 @@ export default function FilterWidget({
         if (!value) return '';
 
         try {
-            new RegExp(value);
+            parse(`/${value}/`);
         } catch {
             return 'Invalid regex pattern';
         }
 
-        // Custom checks for incomplete constructs
-        const incompletePatterns = [
-            /\{$/, // ends with "{"
-            /\($/, // ends with "("
-            /\[$/, // ends with "["
-            /\\$/, // ends with "\"
-        ];
-
-        if (incompletePatterns.some((pattern) => pattern.test(value))) {
+        if (hasUnclosedConstructs(value)) {
             return 'Incomplete regex pattern';
+        }
+
+        if (hasIncompleteQuantifier(value)) {
+            return 'Incomplete quantifier in regex';
         }
 
         return '';
     }, []);
+
+    function hasIncompleteQuantifier(regex: string): boolean {
+        const quantifierPattern = /\{(\d*,?\d*)?$/;
+        return quantifierPattern.test(regex);
+    }
+
+    function hasUnclosedConstructs(regex: string): boolean {
+        const stack: string[] = [];
+        for (let i = 0; i < regex.length; i++) {
+            const char = regex[i];
+
+            if (char === '\\') {
+                i++;
+                continue;
+            }
+
+            if (char === '(' || char === '[' || char === '{') {
+                stack.push(char);
+            } else if (char === ')' || char === ']' || char === '}') {
+                const last = stack.pop();
+                if (!last) return true; // closing without opening
+                if ((char === ')' && last !== '(') || (char === ']' && last !== '[') || (char === '}' && last !== '{')) {
+                    return true; // mismatched closing
+                }
+            }
+        }
+
+        // Trailing unclosed backslash
+        if (regex.endsWith('\\')) return true;
+
+        return stack.length > 0; // unclosed openings
+    }
 
     const booleanOptions = useMemo(
         () => [
