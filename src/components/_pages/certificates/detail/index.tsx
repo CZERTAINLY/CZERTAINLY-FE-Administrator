@@ -117,6 +117,7 @@ export default function CertificateDetail() {
     const certLocations = useSelector(selectors.certificateLocations);
     const approvals = useSelector(selectors.approvals);
     const currentFilters = useSelector(filterSelectors.currentFilters(EntityType.CERTIFICATE));
+    const preservedFilters = useSelector(filterSelectors.preservedFilters(EntityType.CERTIFICATE));
 
     const validationResult = useSelector(selectors.validationResult);
 
@@ -1406,17 +1407,34 @@ export default function CertificateDetail() {
     }, []);
 
     const setRelatedCertificatesFilters = useCallback(() => {
-        const newFilters = certificate?.subjectType
-            ? [
-                  ...currentFilters,
-                  {
-                      fieldSource: FilterFieldSource.Property,
-                      fieldIdentifier: 'SUBJECT_TYPE',
-                      condition: FilterConditionOperator.Equals,
-                      value: [certificate?.subjectType ?? ''],
-                  },
-              ]
-            : currentFilters;
+        let newFilters = [];
+        if (
+            certificate?.subjectType === CertificateSubjectType.EndEntity ||
+            certificate?.subjectType === CertificateSubjectType.SelfSignedEndEntity
+        ) {
+            newFilters = [
+                ...currentFilters,
+                {
+                    fieldSource: FilterFieldSource.Property,
+                    fieldIdentifier: 'SUBJECT_TYPE',
+                    condition: FilterConditionOperator.Equals,
+                    value: [CertificateSubjectType.EndEntity, CertificateSubjectType.SelfSignedEndEntity],
+                },
+            ];
+        } else {
+            newFilters = certificate?.subjectType
+                ? [
+                      ...currentFilters,
+                      {
+                          fieldSource: FilterFieldSource.Property,
+                          fieldIdentifier: 'SUBJECT_TYPE',
+                          condition: FilterConditionOperator.Equals,
+                          value: [certificate?.subjectType ?? ''],
+                      },
+                  ]
+                : currentFilters;
+        }
+
         const deduplicatedFilters = removeDuplicateFilters(newFilters);
 
         dispatch(
