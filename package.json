@@ -40,6 +40,7 @@
         "reactflow": "^11.11.4",
         "reactstrap": "^9.2.3",
         "redux-observable": "^3.0.0-rc.2",
+        "regexp-tree": "^0.1.27",
         "rxjs": "^7.8.2",
         "sass": "^1.85.1",
         "typescript": "^5.8.2",
