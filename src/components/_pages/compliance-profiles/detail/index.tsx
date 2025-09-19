@@ -2,7 +2,7 @@ import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 
 import Widget from 'components/Widget';
-import WidgetButtons, { WidgetButtonProps } from 'components/WidgetButtons';
+import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions, selectors } from 'ducks/compliance-profiles';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -13,7 +13,6 @@ import { Badge, Button, Col, Container, Row } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { PlatformEnum, Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
-import AssociateRaProfileDialogBody from '../form/AssociateRaProfileDialogBody/AssociateRaProfileDialogBody';
 import { createWidgetDetailHeaders } from 'utils/widget';
 import GoBackButton from 'components/GoBackButton';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
@@ -24,229 +23,16 @@ import { AttributeResponseModel } from 'types/attributes';
 import AssignedRulesAndGroup from 'components/_pages/compliance-profiles/detail/AssignedRulesAndGroup/AssignedRulesAndGroup';
 import AvailableRulesAndGroups from 'components/_pages/compliance-profiles/detail/AvailableRulesAndGroups/AvailableRulesAndGroups';
 import { getComplianceProfileStatusColor } from 'utils/compliance-profile';
-
-const prof = {
-    uuid: '6db02cd3-71c0-4b3f-be98-97d4bbd8320c',
-    name: 'test',
-    description: 'test',
-    internalRules: [
-        {
-            uuid: '095be615-a8ad-4c33-8e9c-c7612fbf6c9f',
-            name: 'string',
-            description: 'Sample rule description',
-            groupUuid: '166b5cf52-63f2-11ec-90d6-0242ac120003',
-            availabilityStatus: 'available',
-            updatedReason: 'string',
-            resource: 'NONE',
-            type: 'X.509',
-            format: 'pkcs7',
-            attributes: [],
-        },
-        {
-            uuid: '2095be615-a8ad-4c33-8e9c-c7612fbf6c9f',
-            name: 'string2',
-            description: 'Sample rule description',
-            groupUuid: '166b5cf52-63f2-11ec-90d6-0242ac120003',
-            availabilityStatus: 'available',
-            updatedReason: 'string',
-            resource: 'authorities',
-            type: 'X.509',
-            format: 'pkcs7',
-            attributes: [],
-        },
-    ],
-    providerRules: [
-        {
-            connectorUuid: '8d8a6610-9623-40d2-b113-444fe59579dd',
-            connectorName: 'X509-Compliance-Provider',
-            kind: 'x520',
-            rules: [
-                {
-                    uuid: '40f084cc-ddc1-11ec-9d7f-34cff65c6ee3',
-                    name: 'e_algorithm_identifier_improper_encoding',
-                    description:
-                        'Encoded AlgorithmObjectIdentifier objects inside a SubjectPublicKeyInfo field MUST comply with specified byte sequences.',
-                    groupUuid: '5235104e-ddb2-11ec-9d64-0242ac120002',
-                    availabilityStatus: 'not_available',
-                    resource: 'authorities',
-                    type: 'X.509',
-                    attributes: [],
-                },
-                {
-                    uuid: '40f084cd-ddc1-11ec-82b0-34cff65c6ee3',
-                    name: 'e_basic_constraints_not_critical',
-                    description: 'basicConstraints MUST appear as a critical extension',
-                    groupUuid: '523513dc-ddb2-11ec-9d64-0242ac120002',
-                    availabilityStatus: 'available',
-                    resource: 'certificates',
-                    type: 'X.509',
-                    attributes: [],
-                },
-                {
-                    uuid: '40f084cf-ddc1-11ec-b4e7-34cff65c6ee3',
-                    name: 'e_ca_common_name_missing',
-                    description: 'CA Certificates common name MUST be included.',
-                    groupUuid: '5235104e-ddb2-11ec-9d64-0242ac120002',
-                    availabilityStatus: 'available',
-                    resource: 'certificates',
-                    type: 'X.509',
-                    attributes: [],
-                },
-                {
-                    uuid: '40f084d1-ddc1-11ec-97de-34cff65c6ee3',
-                    name: 'e_ca_country_name_missing',
-                    description: 'Root and Subordinate CA certificates MUST have a countryName present in subject information',
-                    groupUuid: '5235104e-ddb2-11ec-9d64-0242ac120002',
-                    availabilityStatus: 'available',
-                    resource: 'certificates',
-                    type: 'X.509',
-                    attributes: [],
-                },
-            ],
-            groups: [
-                {
-                    uuid: '523513dc-ddb2-11ec-9d64-0242ac120002',
-                    name: 'RFC 5280',
-                    description: 'https://datatracker.ietf.org/doc/html/rfc5280',
-                    availabilityStatus: 'available',
-                    resource: 'certificates',
-                },
-                {
-                    uuid: 'e1d0af6e-ddb3-11ec-9d64-0242ac120002',
-                    name: 'RFC 5891',
-                    description: 'https://datatracker.ietf.org/doc/html/rfc5891',
-                    availabilityStatus: 'available',
-                    resource: 'certificates',
-                },
-                {
-                    uuid: 'e1d0ad66-ddb3-11ec-9d64-0242ac120002',
-                    name: 'RFC 5480',
-                    description: 'https://datatracker.ietf.org/doc/html/rfc5480',
-                    availabilityStatus: 'available',
-                    resource: 'certificates',
-                },
-            ],
-        },
-        {
-            connectorUuid: '8d8a6610-9623-40d2-b113-444fe59579dd22',
-            connectorName: 'test-X509-Compliance-Provider',
-            kind: 'x509',
-            rules: [
-                {
-                    uuid: '240f084cc-ddc1-11ec-9d7f-34cff65c6ee3',
-                    name: 'e_algorithm_identifier_improper_encoding',
-                    description:
-                        'Encoded AlgorithmObjectIdentifier objects inside a SubjectPublicKeyInfo field MUST comply with specified byte sequences.',
-                    groupUuid: '5235104e-ddb2-11ec-9d64-0242ac120002',
-                    availabilityStatus: 'updated',
-                    updatedReason:
-                        'some updated reasonsome updated reasonsome updated reasonsome updated reasonsome updated reasonsome updated reasonsome updated reasonsome updated reasonsome updated reasonsome updated reasonsome updated reasonsome updated reasonsome updated reasonsome updated reasonsome updated reasonsome updated reasonsome updated reasonsome updated reason ',
-                    resource: 'certificates',
-                    type: 'X.509',
-                    attributes: [],
-                },
-            ],
-            groups: [
-                {
-                    uuid: '2523513dc-ddb2-11ec-9d64-0242ac120002',
-                    name: 'RFC 5280',
-                    description: 'https://datatracker.ietf.org/doc/html/rfc5280',
-                    availabilityStatus: 'available',
-                    resource: 'certificates',
-                },
-            ],
-        },
-    ],
-    customAttributes: [
-        {
-            uuid: '92de3778-d990-4d31-9b87-b0086882e2b2',
-            name: 'textCustomAttrExecution',
-            label: 'textCustomAttrExecution',
-            type: 'custom',
-            contentType: 'text',
-            content: [
-                {
-                    data: 't1',
-                },
-            ],
-        },
-    ],
-};
-
-const resourcesList = [
-    'dashboard',
-    'settings',
-    'auditLogs',
-    'credentials',
-    'connectors',
-    'attributes',
-    'jobs',
-    'users',
-    'roles',
-    'acmeAccounts',
-    'acmeProfiles',
-    'scepProfiles',
-    'cmpProfiles',
-    'authorities',
-    'raProfiles',
-    'certificates',
-    'certificateRequests',
-    'groups',
-    'complianceProfiles',
-    'discoveries',
-    'oids',
-    'entities',
-    'locations',
-    'tokenProfiles',
-    'tokens',
-    'keys',
-    'approvalProfiles',
-    'approvals',
-    'notificationProfiles',
-    'notificationInstances',
-    'rules',
-    'actions',
-    'triggers',
-    'resources',
-    'resourceEvents',
-    'searchFilters',
-    'keyItems',
-    'platformEnums',
-    'notifications',
-    'conditions',
-    'executions',
-    'complianceRules',
-    'complianceGroups',
-    'customAttributes',
-    'globalMetadata',
-    'acmeOrders',
-    'acmeAuthorizations',
-    'acmeChallenges',
-    'cmpTransactions',
-    'endEntityProfiles',
-    'authenticationProviders',
-];
-
-const assignedRulesSourceOptions = [
-    {
-        label: 'Provider',
-        value: 'Provider',
-    },
-    {
-        label: 'Internal',
-        value: 'Internal',
-    },
-];
+import ProfileAssociations from 'components/_pages/compliance-profiles/detail/ProfileAssociations/ProfileAssociations';
 
 export default function ComplianceProfileDetail() {
     const dispatch = useDispatch();
 
     const { id } = useParams();
 
-    const profile = /*  prof; */ useSelector(selectors.complianceProfile);
+    const profile = useSelector(selectors.complianceProfile);
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
-    const associationsOfComplianceProfile = useSelector(selectors.associationsOfComplianceProfile);
     const isFetchingGroupRules = useSelector(selectors.isFetchingGroupRules);
 
     const test = [
@@ -287,9 +73,8 @@ export default function ComplianceProfileDetail() {
         },
     ];
 
-    const groupRules = /* test; */ useSelector(selectors.groupRules);
+    const groupRules = useSelector(selectors.groupRules);
 
-    const [addRaProfile, setAddRaProfile] = useState<boolean>(false);
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [complianceCheck, setComplianceCheck] = useState<boolean>(false);
 
@@ -317,23 +102,6 @@ export default function ComplianceProfileDetail() {
         getFreshComplianceProfileDetails();
     }, [id, getFreshComplianceProfileDetails]);
 
-    console.log({ profile });
-
-    const onDissociateRaProfile = useCallback(
-        (resource: Resource, associatedProfileUuid: string) => {
-            if (!profile) return;
-
-            dispatch(
-                actions.dissociateComplianceProfile({
-                    uuid: profile.uuid,
-                    resource: resource,
-                    associationObjectUuid: associatedProfileUuid,
-                }),
-            );
-        },
-        [profile, dispatch],
-    );
-
     const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
 
     const detailData: TableDataRow[] = useMemo(
@@ -355,67 +123,6 @@ export default function ComplianceProfileDetail() {
                       },
                   ],
         [profile],
-    );
-
-    const raProfileHeaders: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'raProfileName',
-                content: 'Name',
-            },
-            { id: 'resource', content: 'Resource' },
-            { id: 'object', content: 'Object' },
-            {
-                id: 'action',
-                content: 'Action',
-            },
-        ],
-        [],
-    );
-
-    const raProfileData: TableDataRow[] = useMemo(
-        () =>
-            !associationsOfComplianceProfile || !profile
-                ? []
-                : associationsOfComplianceProfile.map((associatedProfile) => ({
-                      id: associatedProfile.objectUuid,
-                      columns: [
-                          <Link to={`../../raprofiles/detail/${profile.uuid}/${associatedProfile.objectUuid}`}>
-                              {associatedProfile!.name}
-                          </Link>,
-
-                          associatedProfile.resource,
-                          associatedProfile.objectUuid,
-                          <WidgetButtons
-                              justify="start"
-                              buttons={[
-                                  {
-                                      icon: 'minus-square',
-                                      disabled: false,
-                                      tooltip: 'Remove',
-                                      onClick: () => {
-                                          onDissociateRaProfile(associatedProfile.resource, associatedProfile.objectUuid);
-                                      },
-                                  },
-                              ]}
-                          />,
-                      ],
-                  })),
-        [associationsOfComplianceProfile, profile, onDissociateRaProfile],
-    );
-
-    const raProfileButtons: WidgetButtonProps[] = useMemo(
-        () => [
-            {
-                icon: 'plus',
-                disabled: false,
-                tooltip: 'Associate RA Profile',
-                onClick: () => {
-                    setAddRaProfile(true);
-                },
-            },
-        ],
-        [],
     );
 
     const buttons: WidgetButtonProps[] = useMemo(
@@ -663,17 +370,7 @@ export default function ComplianceProfileDetail() {
                 </Col>
 
                 <Col>
-                    <Widget
-                        title="Associations"
-                        busy={isFetchingDetail}
-                        widgetButtons={raProfileButtons}
-                        titleSize="large"
-                        widgetLockName={LockWidgetNameEnum.ComplianceProfileDetails}
-                        lockSize="large"
-                    >
-                        <CustomTable headers={raProfileHeaders} data={raProfileData} />
-                    </Widget>
-
+                    <ProfileAssociations profile={profile} />
                     {profile && (
                         <CustomAttributeWidget
                             resource={Resource.ComplianceProfiles}
@@ -700,19 +397,6 @@ export default function ComplianceProfileDetail() {
                     />
                 </Col>
             </Row>
-
-            <Dialog
-                isOpen={addRaProfile}
-                caption="Associate RA Profile"
-                body={AssociateRaProfileDialogBody({
-                    visible: addRaProfile,
-                    onClose: () => setAddRaProfile(false),
-                    complianceProfileUuid: profile?.uuid,
-                    availableRaProfileUuids: associationsOfComplianceProfile?.map((e) => e.objectUuid),
-                })}
-                toggle={() => setAddRaProfile(false)}
-                buttons={[]}
-            />
 
             <Dialog
                 isOpen={confirmDelete}
@@ -762,30 +446,6 @@ export default function ComplianceProfileDetail() {
                 buttons={[]}
                 size="lg"
             />
-
-            {/*  
-            
-
-            <Dialog
-                isOpen={addRuleWithAttributes}
-                caption="Attributes"
-                body={AddRuleWithAttributesDialogBody({
-                    onClose: () => setAddRuleWithAttributes(false),
-                    complianceProfileUuid: profile?.uuid,
-                    connectorUuid: addAttributeRuleDetails?.connectorUuid,
-                    connectorName: addAttributeRuleDetails?.connectorName,
-                    kind: addAttributeRuleDetails?.kind,
-                    ruleUuid: addAttributeRuleDetails?.rule.uuid,
-                    ruleName: addAttributeRuleDetails?.rule.name,
-                    ruleDescription: addAttributeRuleDetails?.rule?.description,
-                    groupUuid: addAttributeRuleDetails?.rule?.groupUuid,
-                    attributes: addAttributeRuleDetails?.rule?.attributes,
-                })}
-                toggle={() => setAddRuleWithAttributes(false)}
-                buttons={[]}
-            />
-
-            */}
         </Container>
     );
 }

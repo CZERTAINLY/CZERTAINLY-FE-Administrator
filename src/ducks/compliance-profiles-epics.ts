@@ -457,50 +457,6 @@ const updateRule: AppEpic = (action$, state$, deps) => {
     );
 };
 
-/* const addRule: AppEpic = (action$, state$, deps) => {
-    return action$.pipe(
-        filter(slice.actions.updateRule.match),
-        switchMap((action) =>
-            deps.apiClients.complianceProfile
-                .patchComplianceProfileRuleV2({
-                    uuid: action.payload.uuid,
-                    complianceProfileRulesPatchRequestDto: { ...action.payload.complianceProfileRulesPatchRequestDto, removal: false },
-                })
-                .pipe(
-                    map(() => slice.actions.updateRuleSuccess({ uuid: action.payload.uuid })),
-                    catchError((error) =>
-                        of(
-                            slice.actions.updateRuleFailed({ error: extractError(error, 'Failed to add rule to Compliance Profile') }),
-                            appRedirectActions.fetchError({ error, message: 'Failed to add rule to Compliance Profile' }),
-                        ),
-                    ),
-                ),
-        ),
-    );
-};
-
-const deleteRule: AppEpic = (action$, state$, deps) => {
-    return action$.pipe(
-        filter(slice.actions.updateRule.match),
-        switchMap((action) =>
-            deps.apiClients.complianceProfile
-                .patchComplianceProfileRuleV2({
-                    uuid: action.payload.uuid,
-                    complianceProfileRulesPatchRequestDto: { ...action.payload.complianceProfileRulesPatchRequestDto, removal: true },
-                })
-                .pipe(
-                    map(() => slice.actions.updateRuleSuccess({ uuid: action.payload.uuid })),
-                    catchError((error) =>
-                        of(
-                            slice.actions.updateRuleFailed({ error: extractError(error, 'Failed to delete rule from Compliance Profile') }),
-                            appRedirectActions.fetchError({ error, message: 'Failed to delete rule from Compliance Profile' }),
-                        ),
-                    ),
-                ),
-        ),
-    );
-}; */
-
 const updateGroup: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.updateGroup.match),

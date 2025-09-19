@@ -389,36 +389,6 @@ export const slice = createSlice({
             state.isUpdatingRule = false;
         },
 
-        /*  addRule: (
-            state,
-            action: PayloadAction<{ uuid: string; complianceProfileRulesPatchRequestDto: ComplianceProfileRulesPatchRequestDto }>,
-        ) => {
-            state.isAddingRule = true;
-        },
-
-        addRuleSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
-            state.isAddingRule = false;
-        },
-        addRuleFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isAddingRule = false;
-        },
-
-        //////////////////////////////
-
-        deleteRule: (
-            state,
-            action: PayloadAction<{ uuid: string; complianceProfileRulesPatchRequestDto: ComplianceProfileRulesPatchRequestDto }>,
-        ) => {
-            state.isDeletingRule = true;
-        },
-
-        deleteRuleSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
-            state.isDeletingRule = false;
-        },
-        deleteRuleFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isDeletingRule = false;
-        }, */
-
         //////////////////////////////
 
         updateGroup: (

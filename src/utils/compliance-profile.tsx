@@ -125,3 +125,12 @@ export const getListOfResources = (rulesAndGroupsList: any[]) => {
     const list = Array.from(new Set(rulesAndGroupsList.map((ruleOrGroup) => ruleOrGroup.resource)));
     return ['All', ...list];
 };
+
+export function makeOptions<T extends { uuid: string; name: string }>(profiles: T[], associations: { objectUuid: string }[]) {
+    return profiles
+        .filter((profile) => !associations.some((a) => a.objectUuid === profile.uuid))
+        .map((profile) => ({
+            value: profile,
+            label: profile.name,
+        }));
+}
