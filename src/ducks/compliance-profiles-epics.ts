@@ -290,10 +290,7 @@ const getComplianceRules: AppEpic = (action$, state$, deps) => {
                     format: action.payload.format,
                 })
                 .pipe(
-                    map(
-                        (rules) => slice.actions.getListComplianceRulesSuccess({ rules }),
-                        /* slice.actions.getlistComplianceRulesSuccess(rules.map(transformComplianceProfileRuleListResponseDtoToModel)), */
-                    ),
+                    map((rules) => slice.actions.getListComplianceRulesSuccess({ rules })),
 
                     catchError((error) =>
                         of(

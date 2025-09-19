@@ -1,7 +1,5 @@
-import ComplianceRuleAttributeViewer from 'components/Attributes/ComplianceRuleAttributeViewer';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
-import StatusBadge from 'components/StatusBadge';
 
 import Widget from 'components/Widget';
 import WidgetButtons, { WidgetButtonProps } from 'components/WidgetButtons';
@@ -10,19 +8,11 @@ import { actions, selectors } from 'ducks/compliance-profiles';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
-import Select from 'react-select';
 
-import { Badge, Button, Col, Container, Label, Row } from 'reactstrap';
-import {
-    ComplianceProfileGroupListResponseGroupModel,
-    ComplianceProfileResponseGroupGroupModel,
-    ComplianceProfileResponseRuleRuleModel,
-    ComplianceProfileRuleListResponseRuleModel,
-} from 'types/complianceProfiles';
+import { Badge, Button, Col, Container, Row } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { PlatformEnum, Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
-import AddRuleWithAttributesDialogBody from '../form/AddRuleWithAttributesDialogBody/index.';
 import AssociateRaProfileDialogBody from '../form/AssociateRaProfileDialogBody/AssociateRaProfileDialogBody';
 import { createWidgetDetailHeaders } from 'utils/widget';
 import GoBackButton from 'components/GoBackButton';
@@ -30,8 +20,10 @@ import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { capitalize } from 'utils/common-utils';
 import TabLayout from 'components/Layout/TabLayout';
 import AttributeViewer from 'components/Attributes/AttributeViewer';
-import { AttributeDescriptorModel, AttributeResponseModel } from 'types/attributes';
+import { AttributeResponseModel } from 'types/attributes';
 import AssignedRulesAndGroup from 'components/_pages/compliance-profiles/detail/AssignedRulesAndGroup/AssignedRulesAndGroup';
+import AvailableRulesAndGroups from 'components/_pages/compliance-profiles/detail/AvailableRulesAndGroups/AvailableRulesAndGroups';
+import { getComplianceProfileStatusColor } from 'utils/compliance-profile';
 
 const prof = {
     uuid: '6db02cd3-71c0-4b3f-be98-97d4bbd8320c',
@@ -75,7 +67,7 @@ const prof = {
                     description:
                         'Encoded AlgorithmObjectIdentifier objects inside a SubjectPublicKeyInfo field MUST comply with specified byte sequences.',
                     groupUuid: '5235104e-ddb2-11ec-9d64-0242ac120002',
-                    availabilityStatus: 'available',
+                    availabilityStatus: 'not_available',
                     resource: 'authorities',
                     type: 'X.509',
                     attributes: [],
@@ -146,7 +138,9 @@ const prof = {
                     description:
                         'Encoded AlgorithmObjectIdentifier objects inside a SubjectPublicKeyInfo field MUST comply with specified byte sequences.',
                     groupUuid: '5235104e-ddb2-11ec-9d64-0242ac120002',
-                    availabilityStatus: 'available',
+                    availabilityStatus: 'updated',
+                    updatedReason:
+                        'some updated reasonsome updated reasonsome updated reasonsome updated reasonsome updated reasonsome updated reasonsome updated reasonsome updated reasonsome updated reasonsome updated reasonsome updated reasonsome updated reasonsome updated reasonsome updated reasonsome updated reasonsome updated reasonsome updated reasonsome updated reason ',
                     resource: 'certificates',
                     type: 'X.509',
                     attributes: [],
@@ -249,14 +243,10 @@ export default function ComplianceProfileDetail() {
 
     const { id } = useParams();
 
-    const profile = /* prof;  */ useSelector(selectors.complianceProfile);
+    const profile = /*  prof; */ useSelector(selectors.complianceProfile);
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const associationsOfComplianceProfile = useSelector(selectors.associationsOfComplianceProfile);
-    const rules = useSelector(selectors.rules);
-    const groups = useSelector(selectors.groups);
-    const isFetchingGroups = useSelector(selectors.isFetchingGroups);
-    const isFetchingRules = useSelector(selectors.isFetchingRules);
     const isFetchingGroupRules = useSelector(selectors.isFetchingGroupRules);
 
     const test = [
@@ -303,19 +293,6 @@ export default function ComplianceProfileDetail() {
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [complianceCheck, setComplianceCheck] = useState<boolean>(false);
 
-    // ==========================for assigned rules and groups
-    const [assignedRulesSource, setAssignedRulesSource] = useState<'Internal' | 'Provider' | null>(null);
-    const [assignedResourceType, setAssignedResourceType] = useState<string | null>('All');
-
-    const [assignedRulesAndGroupsList, setAssignedRulesAndGroupsList] = useState<any[]>([]);
-    const [assignedRulesAndGroupsResources, setAssignedRulesAndGroupsResources] = useState<any[]>(['All']);
-    const [filteredAssignedRulesAndGroupList, setFilteredAssignedRulesAndGroupList] = useState<any[]>([]);
-    const [assignedProvidersList, setAssignedProvidersList] = useState<{ label: string; value: string }[]>([]);
-    const [selectedAssignedProvider, setSelectedAssignedProvider] = useState<string | null>(null);
-    const [assignedKindsList, setAssignedKindsList] = useState<{ label: string; value: string }[]>([]);
-    const [selectedAssignedKind, setSelectedAssignedKind] = useState<string | null>(null);
-    //for assigned rules and groups ==========================//
-
     const [isEntityDetailMenuOpen, setIsEntityDetailMenuOpen] = useState(false);
     const [selectedEntityDetails, setSelectedEntityDetails] = useState<any>(null);
     const [groupRuleAttributeData, setGroupRuleAttributeData] = useState<{
@@ -323,7 +300,6 @@ export default function ComplianceProfileDetail() {
         attributes: AttributeResponseModel[];
     } | null>(null);
 
-    //TODO: delete
     useEffect(() => {
         if (!id) return;
         dispatch(actions.getComplianceProfile({ uuid: id }));
@@ -332,12 +308,9 @@ export default function ComplianceProfileDetail() {
 
     const getFreshComplianceProfileDetails = useCallback(() => {
         if (!id) return;
-
         dispatch(actions.resetState());
         dispatch(actions.getComplianceProfile({ uuid: id }));
-        /* dispatch(actions.getListComplianceGroupRules({ uuid: id })); */
-        /*  dispatch(actions.getListComplianceRules({ resource: Resource.ComplianceProfiles }));
-        dispatch(actions.getListComplianceGroups({ connectorUuid: '', kind: '', resource: Resource.ComplianceProfiles })); */
+        dispatch(actions.getAssociationsOfComplianceProfile({ uuid: id }));
     }, [id, dispatch]);
 
     useEffect(() => {
@@ -345,9 +318,6 @@ export default function ComplianceProfileDetail() {
     }, [id, getFreshComplianceProfileDetails]);
 
     console.log({ profile });
-
-    /* console.log({ associationsOfComplianceProfile, rules, groups }); */
-    console.log({ filteredAssignedRulesAndGroupList });
 
     const onDissociateRaProfile = useCallback(
         (resource: Resource, associatedProfileUuid: string) => {
@@ -362,112 +332,6 @@ export default function ComplianceProfileDetail() {
             );
         },
         [profile, dispatch],
-    );
-
-    const assignedRulesAndGroupsHeaders = useMemo(
-        () => [
-            {
-                id: 'name',
-                content: 'Name',
-                width: '20%',
-                sortable: true,
-            },
-            {
-                id: 'resource',
-                content: 'Resource',
-                width: '20%',
-                sortable: true,
-            },
-            {
-                id: 'type',
-                content: 'Type',
-                width: '20%',
-                sortable: true,
-            },
-            /* {
-                id: 'description',
-                content: 'Description',
-                width: '50%',
-            }, */
-            {
-                id: 'action',
-                content: 'Action',
-                width: '10%',
-            },
-        ],
-        [],
-    );
-
-    const assignedRulesAndGroupsData = useMemo(
-        () =>
-            filteredAssignedRulesAndGroupList.map((ruleOrGroup) => {
-                if (ruleOrGroup.entityDetails?.entityType === 'group') {
-                    console.log({ ruleOrGroup });
-                }
-                return {
-                    id: ruleOrGroup.uuid,
-                    columns: [
-                        ruleOrGroup.name,
-                        ruleOrGroup.resource,
-                        <div>
-                            <Badge color="secondary">{capitalize(ruleOrGroup?.entityDetails?.entityType)} </Badge>
-                            <Button
-                                className="btn btn-link"
-                                color="white"
-                                title="Rules"
-                                onClick={() => {
-                                    setSelectedEntityDetails(ruleOrGroup);
-                                    setIsEntityDetailMenuOpen(true);
-                                }}
-                            >
-                                <i className="fa fa-info" style={{ color: 'auto' }} />
-                            </Button>
-                        </div>,
-
-                        /* ruleOrGroup.description, */
-                        <WidgetButtons
-                            justify="start"
-                            buttons={[
-                                {
-                                    icon: 'minus-square',
-                                    disabled: false,
-                                    tooltip: 'Remove',
-                                    onClick: () => {
-                                        if (!id) return;
-                                        if (ruleOrGroup.entityDetails?.entityType === 'rule') {
-                                            dispatch(
-                                                actions.updateRule({
-                                                    uuid: id,
-                                                    complianceProfileRulesPatchRequestDto: {
-                                                        removal: true,
-                                                        ruleUuid: ruleOrGroup.uuid,
-                                                        connectorUuid: ruleOrGroup?.connectorUuid ?? undefined,
-                                                        kind: ruleOrGroup?.kind ?? undefined,
-                                                    },
-                                                }),
-                                            );
-                                        }
-                                        if (ruleOrGroup.entityDetails?.entityType === 'group') {
-                                            dispatch(
-                                                actions.updateGroup({
-                                                    uuid: id,
-                                                    complianceProfileGroupsPatchRequestDto: {
-                                                        removal: true,
-                                                        groupUuid: ruleOrGroup.uuid,
-                                                        connectorUuid: ruleOrGroup.entityDetails.connectorUuid ?? undefined,
-                                                        kind: ruleOrGroup.entityDetails.kind ?? undefined,
-                                                    },
-                                                }),
-                                            );
-                                        }
-                                    },
-                                },
-                            ]}
-                        />,
-                    ],
-                };
-            }),
-        [dispatch, filteredAssignedRulesAndGroupList, id],
     );
 
     const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
@@ -592,759 +456,6 @@ export default function ComplianceProfileDetail() {
         dispatch(actions.checkComplianceForProfiles({ requestBody: [profile.uuid] }));
     }, [dispatch, profile]);
 
-    /*    
-    const deleteErrorMessage = useSelector(selectors.deleteErrorMessage);
-
-    
-    const [addRuleWithAttributes, setAddRuleWithAttributes] = useState<boolean>(false);
-    const [addAttributeRuleDetails, setAddAttributeRuleDetails] = useState<any>();
-
-    const [alreadyAssociatedRuleUuids, setAlreadyAssociatedRuleUuids] = useState<string[]>([]);
-    const [alreadyAssociatedGroupUuids, setAlreadyAssociatedGroupUuids] = useState<string[]>([]);
-
-    
-
-    const [groupRuleMapping, setGroupRuleMapping] = useState<{ [key: string]: ComplianceProfileRuleListResponseRuleModel[] }>();
-
-    const [currentGroupUuidForDisplay, setCurrentGroupUuidForDisplay] = useState<string>();
-
-    const [selectionFilter, setSelectionFilter] = useState<string>('Selected');
-    const [objectFilter, setObjectFilter] = useState<string>('Groups & Rules');
-
-    
-
-    const getComplianceRulesAndGroups = useCallback(() => {
-        dispatch(actions.listComplianceRules());
-        dispatch(actions.listComplianceGroups());
-    }, [dispatch]);
-
-    
-
-    useEffect(() => {
-        if (!id) return;
-
-        let groupRuleMapping: { [key: string]: ComplianceProfileRuleListResponseRuleModel[] } = {};
-
-        for (let connector of rules) {
-            for (let rule of connector.rules) {
-                const keyString =
-                    (rule.groupUuid || 'unknown') + ':#' + connector.connectorUuid + ':#' + connector.kind + ':#' + connector.connectorName;
-
-                if (groupRuleMapping[keyString]) {
-                    groupRuleMapping[keyString].push(rule);
-                } else {
-                    groupRuleMapping[keyString] = [rule];
-                }
-            }
-        }
-
-        setGroupRuleMapping(groupRuleMapping);
-    }, [rules, groups, id]);
-
-    useEffect(() => {
-        if (!id) return;
-
-        let alreadyAssociatedRuleUuidsLcl: string[] = [];
-        let alreadyAssociatedGroupUuidsLcl: string[] = [];
-
-        for (let connector of profile?.rules || []) {
-            if (connector.rules) {
-                for (let rule of connector.rules) {
-                    alreadyAssociatedRuleUuidsLcl.push(rule.uuid + ':#' + connector.connectorUuid + ':#' + connector.kind);
-                }
-            }
-        }
-
-        for (let connector of profile?.groups || []) {
-            if (connector.groups) {
-                for (let group of connector.groups) {
-                    alreadyAssociatedGroupUuidsLcl.push(group.uuid + ':#' + connector.connectorUuid + ':#' + connector.kind);
-                }
-            }
-        }
-
-        setAlreadyAssociatedRuleUuids(alreadyAssociatedRuleUuidsLcl);
-        setAlreadyAssociatedGroupUuids(alreadyAssociatedGroupUuidsLcl);
-    }, [profile, id]);
-
-    const onCloseGroupRuleDetail = useCallback(() => {
-        setCurrentGroupUuidForDisplay(undefined);
-    }, []);
-
-    
-
-    const onForceDeleteComplianceProfile = useCallback(() => {
-        if (!profile) return;
-
-        dispatch(actions.bulkForceDeleteComplianceProfiles({ uuids: [profile.uuid], redirect: `../complianceprofiles` }));
-    }, [profile, dispatch]);
-
-    const onAddRule = useCallback(
-        (connectorUuid: string, kind: string, rule: ComplianceProfileRuleListResponseRuleModel, attributes?: any) => {
-            if (!profile) return;
-
-            dispatch(
-                actions.addRule({
-                    uuid: profile.uuid,
-                    addRequest: {
-                        connectorUuid: connectorUuid,
-                        kind: kind,
-                        ruleUuid: rule.uuid,
-                        attributes: attributes,
-                    },
-                }),
-            );
-        },
-        [profile, dispatch],
-    );
-
-    const onAddGroup = useCallback(
-        (connectorUuid: string, connectorName: string, kind: string, group: ComplianceProfileGroupListResponseGroupModel) => {
-            if (!profile) return;
-
-            dispatch(
-                actions.addGroup({
-                    uuid: profile.uuid,
-                    connectorName: connectorName,
-                    connectorUuid: connectorUuid,
-                    kind: kind,
-                    groupUuid: group.uuid,
-                    groupName: group.name,
-                    description: group.description || '',
-                    addRequest: { groupUuid: group.uuid, connectorUuid: connectorUuid, kind: kind },
-                }),
-            );
-        },
-        [profile, dispatch],
-    );
-
-    const onDeleteRule = useCallback(
-        (connectorUuid: string, kind: string, rule: ComplianceProfileResponseRuleRuleModel) => {
-            if (!profile) return;
-
-            dispatch(
-                actions.deleteRule({
-                    uuid: profile.uuid,
-                    deleteRequest: { connectorUuid: connectorUuid, kind: kind, ruleUuid: rule.uuid },
-                }),
-            );
-        },
-        [profile, dispatch],
-    );
-
-    const onDeleteGroup = useCallback(
-        (connectorUuid: string, kind: string, group: ComplianceProfileResponseGroupGroupModel) => {
-            if (!profile) return;
-
-            dispatch(
-                actions.deleteGroup({
-                    uuid: profile.uuid,
-                    deleteRequest: { connectorUuid: connectorUuid, kind: kind, groupUuid: group.uuid },
-                }),
-            );
-        },
-        [profile, dispatch],
-    );
-
-    const onAddRuleWithAttributes = useCallback(
-        (connectorUuid: string, connectorName: string, kind: string, rule: ComplianceProfileRuleListResponseRuleModel) => {
-            setAddAttributeRuleDetails({
-                connectorUuid: connectorUuid,
-                connectorName: connectorName,
-                kind: kind,
-                rule: rule,
-            });
-
-            setAddRuleWithAttributes(true);
-        },
-        [],
-    );
-
-    const ruleGroupHeader: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'type',
-                content: 'Type',
-                width: '10%',
-            },
-            {
-                id: 'action',
-                content: 'Action',
-                width: '10%',
-            },
-            {
-                id: 'description',
-                content: 'Description',
-                width: '50%',
-            },
-        ],
-        [],
-    );
-
-    
-
-    const getRuleMoreData = useCallback((rule: ComplianceProfileRuleListResponseRuleModel, connectorName: string, kind: string) => {
-        return [
-            {
-                id: 'connectorName',
-                columns: ['Connector Name', connectorName],
-            },
-            {
-                id: 'connectorKind',
-                columns: ['Kind', kind],
-            },
-            {
-                id: 'uuid',
-                columns: ['UUID', rule.uuid],
-            },
-            {
-                id: 'name',
-                columns: ['Name', rule.name],
-            },
-            {
-                id: 'description',
-                columns: ['Description', rule.description || ''],
-            },
-            {
-                id: 'groupUuid',
-                columns: ['Group UUID', rule.groupUuid || ''],
-            },
-            {
-                id: 'certificateType',
-                columns: ['Certificate Type', rule.certificateType || ''],
-            },
-            {
-                id: 'attributes',
-                columns: [
-                    'Attributes',
-                    rule.attributes ? <ComplianceRuleAttributeViewer descriptorAttributes={rule.attributes} /> : <>No attributes</>,
-                ],
-            },
-        ];
-    }, []);
-
-    const getRuleMoreDataRule = useCallback((rule: ComplianceProfileResponseRuleRuleModel, connectorName: string, kind: string) => {
-        return [
-            {
-                id: 'connectorName',
-                columns: ['Connector Name', connectorName],
-            },
-            {
-                id: 'connectorKind',
-                columns: ['Kind', kind],
-            },
-            {
-                id: 'uuid',
-                columns: ['UUID', rule.uuid],
-            },
-            {
-                id: 'name',
-                columns: ['Name', rule.name],
-            },
-            {
-                id: 'description',
-                columns: ['Description', rule.description || ''],
-            },
-            {
-                id: 'groupUuid',
-                columns: ['Group UUID', ''],
-            },
-            {
-                id: 'certificateType',
-                columns: ['Certificate Type', rule.certificateType || ''],
-            },
-            {
-                id: 'attributes',
-                columns: [
-                    'Attributes',
-                    rule.attributes ? <ComplianceRuleAttributeViewer attributes={rule.attributes} /> : <>No attributes</>,
-                ],
-            },
-        ];
-    }, []);
-
-    const ruleHeader: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'name',
-                content: 'Name',
-            },
-            {
-                id: 'description',
-                content: 'Description',
-            },
-        ],
-        [],
-    );
-
-    const ruleData: TableDataRow[] = useMemo(() => {
-        if (!profile) return [];
-        if (!profile.rules) return [];
-        if (!currentGroupUuidForDisplay) return [];
-
-        let data: TableDataRow[] = [];
-        let dataSplit = currentGroupUuidForDisplay.split(':#');
-
-        for (const rule of (groupRuleMapping && groupRuleMapping[currentGroupUuidForDisplay || '']) ?? []) {
-            data.push({
-                id: `${rule.uuid}-${dataSplit[1]}`,
-                columns: [rule.name, rule.description || ''],
-                detailColumns: [
-                    <></>,
-                    <></>,
-                    <CustomTable data={getRuleMoreData(rule, dataSplit[3], dataSplit[2])} headers={detailHeaders} />,
-                ],
-            });
-        }
-
-        return data;
-    }, [profile, currentGroupUuidForDisplay, groupRuleMapping, getRuleMoreData, detailHeaders]);
-
-    
-
-    const getGroupMoreData = useCallback((group: ComplianceProfileResponseGroupGroupModel, connectorName: string, kind: string) => {
-        return [
-            {
-                id: 'connectorName',
-                columns: ['Connector Name', connectorName],
-            },
-            {
-                id: 'connectorKind',
-                columns: ['Kind', kind],
-            },
-            {
-                id: 'uuid',
-                columns: ['UUID', group.uuid],
-            },
-            {
-                id: 'name',
-                columns: ['Name', group.name],
-            },
-            {
-                id: 'description',
-                columns: ['Description', group.description || ''],
-            },
-        ];
-    }, []);
-
-    const ruleGroupData: TableDataRow[] = useMemo(() => {
-        if (!profile) return [];
-        if (!profile.rules) return [];
-
-        let data: TableDataRow[] = [];
-
-        if (['Selected', 'All'].includes(selectionFilter) && ['Groups & Rules', 'Groups'].includes(objectFilter)) {
-            for (const connector of profile.groups) {
-                if (connector.groups && connector.connectorUuid && connector.kind && connector.connectorName) {
-                    for (const group of connector.groups) {
-                        const keyString =
-                            group.uuid + ':#' + connector.connectorUuid + ':#' + connector.kind + ':#' + connector.connectorName;
-
-                        data.push({
-                            id: `${group.uuid}-${connector.connectorUuid}`,
-
-                            columns: [
-                                <Badge color="secondary">Group</Badge>,
-
-                                <div>
-                                    <Button
-                                        className="btn btn-link p-0"
-                                        color="white"
-                                        title="Remove"
-                                        onClick={() => {
-                                            onDeleteGroup(connector.connectorUuid!, connector.kind!, group);
-                                        }}
-                                    >
-                                        <i className="fa fa-times" style={{ color: 'red' }} />
-                                    </Button>
-                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                    <Button
-                                        className="btn btn-link p-0"
-                                        color="white"
-                                        title="Edit"
-                                        onClick={() => {
-                                            setCurrentGroupUuidForDisplay(keyString);
-                                        }}
-                                    >
-                                        <i className="fa fa-info" style={{ color: 'auto' }} />
-                                    </Button>
-                                </div>,
-
-                                group.name,
-                            ],
-
-                            detailColumns: [
-                                <></>,
-
-                                <></>,
-
-                                <></>,
-
-                                <CustomTable
-                                    data={getGroupMoreData(group, connector.connectorName!, connector.kind)}
-                                    headers={detailHeaders}
-                                />,
-                            ],
-                        });
-                    }
-                }
-            }
-        }
-
-        if (['Selected', 'All'].includes(selectionFilter) && ['Groups & Rules', 'Rules'].includes(objectFilter)) {
-            for (const connector of profile.rules) {
-                if (connector.rules && connector.connectorUuid && connector.kind && connector.connectorName) {
-                    for (const rule of connector.rules) {
-                        data.push({
-                            id: `${rule.uuid}-${connector.connectorUuid}`,
-
-                            columns: [
-                                <Badge color="secondary">Rule</Badge>,
-
-                                <>
-                                    <Button
-                                        className="btn btn-link p-0"
-                                        color="white"
-                                        title="Remove"
-                                        onClick={() => {
-                                            onDeleteRule(connector.connectorUuid!, connector.kind!, rule);
-                                        }}
-                                    >
-                                        <i className="fa fa-times" style={{ color: 'red' }} />
-                                    </Button>
-                                </>,
-                                rule.description || rule.name,
-                            ],
-
-                            detailColumns: [
-                                <></>,
-                                <></>,
-                                <></>,
-                                <CustomTable
-                                    data={getRuleMoreDataRule(rule, connector.connectorName, connector.kind)}
-                                    headers={detailHeaders}
-                                />,
-                            ],
-                        });
-                    }
-                }
-            }
-
-            for (const connector of profile.groups) {
-                if (connector.groups && connector.connectorName && connector.kind) {
-                    for (const group of connector.groups) {
-                        const keyString =
-                            group.uuid + ':#' + connector.connectorUuid + ':#' + connector.kind + ':#' + connector.connectorName;
-
-                        if (!groupRuleMapping) continue;
-
-                        for (const rule of groupRuleMapping[keyString] || []) {
-                            data.push({
-                                id: `${rule.uuid}-${connector.connectorUuid}`,
-
-                                columns: [
-                                    <Badge color="secondary">Rule</Badge>,
-
-                                    <>
-                                        <Button
-                                            className="btn btn-link p-0"
-                                            color="white"
-                                            title={`Rule is part of the group '${group.name}' and cannot be removed separately`}
-                                        >
-                                            <i className="fa fa-times" style={{ color: 'grey' }} />
-                                        </Button>
-                                    </>,
-
-                                    rule.description || rule.name,
-                                ],
-
-                                detailColumns: [
-                                    <></>,
-                                    <></>,
-                                    <></>,
-                                    <CustomTable
-                                        data={getRuleMoreData(rule, connector.connectorName, connector.kind)}
-                                        headers={detailHeaders}
-                                    />,
-                                ],
-                            });
-                        }
-                    }
-                }
-            }
-        }
-
-        if (['Unselected', 'All'].includes(selectionFilter) && ['Groups & Rules', 'Groups'].includes(objectFilter)) {
-            for (const connector of groups) {
-                for (const group of connector.groups) {
-                    if (alreadyAssociatedGroupUuids.includes(group.uuid + ':#' + connector.connectorUuid + ':#' + connector.kind)) continue;
-
-                    const keyString = group.uuid + ':#' + connector.connectorUuid + ':#' + connector.kind + ':#' + connector.connectorName;
-
-                    data.push({
-                        id: `${group.uuid}-${connector.connectorUuid}`,
-
-                        columns: [
-                            <Badge color="secondary">Group</Badge>,
-
-                            <div>
-                                <Button
-                                    className="btn btn-link p-0"
-                                    color="white"
-                                    title="Add"
-                                    onClick={() => {
-                                        onAddGroup(connector.connectorUuid, connector.connectorName, connector.kind, group);
-                                    }}
-                                >
-                                    <i className="fa fa-plus" style={{ color: 'auto' }} />
-                                </Button>
-                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                <Button
-                                    className="btn btn-link p-0"
-                                    color="white"
-                                    title="Rules"
-                                    onClick={() => {
-                                        setCurrentGroupUuidForDisplay(keyString);
-                                    }}
-                                >
-                                    <i className="fa fa-info" style={{ color: 'auto' }} />
-                                </Button>
-                            </div>,
-
-                            group.name,
-                        ],
-
-                        detailColumns: [
-                            <></>,
-                            <></>,
-                            <></>,
-                            <CustomTable data={getGroupMoreData(group, connector.connectorName, connector.kind)} headers={detailHeaders} />,
-                        ],
-                    });
-                }
-            }
-        }
-
-        if (['Unselected', 'All'].includes(selectionFilter) && ['Groups & Rules', 'Rules'].includes(objectFilter)) {
-            for (const connector of rules) {
-                for (const rule of connector.rules) {
-                    if (alreadyAssociatedRuleUuids.includes(rule.uuid + ':#' + connector.connectorUuid + ':#' + connector.kind)) continue;
-
-                    data.push({
-                        id: `${rule.uuid}-${connector.connectorUuid}`,
-                        columns: [
-                            <Badge color="secondary">Rule</Badge>,
-
-                            <>
-                                <Button
-                                    className="btn btn-link p-0"
-                                    color="white"
-                                    title="Add"
-                                    onClick={() => {
-                                        rule.attributes
-                                            ? onAddRuleWithAttributes(
-                                                  connector.connectorUuid,
-                                                  connector.connectorName,
-                                                  connector.kind,
-                                                  rule,
-                                              )
-                                            : onAddRule(connector.connectorUuid, connector.kind, rule);
-                                    }}
-                                >
-                                    <i className="fa fa-plus" style={{ color: 'auto' }} />
-                                </Button>
-                            </>,
-                            rule.description || rule.name,
-                        ],
-                        detailColumns: [
-                            <></>,
-                            <></>,
-                            <></>,
-                            <CustomTable data={getRuleMoreData(rule, connector.connectorName, connector.kind)} headers={detailHeaders} />,
-                        ],
-                    });
-                }
-            }
-        }
-
-        return data;
-    }, [
-        profile,
-        selectionFilter,
-        objectFilter,
-        getGroupMoreData,
-        detailHeaders,
-        onDeleteGroup,
-        getRuleMoreDataRule,
-        onDeleteRule,
-        groupRuleMapping,
-        getRuleMoreData,
-        groups,
-        alreadyAssociatedGroupUuids,
-        onAddGroup,
-        rules,
-        alreadyAssociatedRuleUuids,
-        onAddRuleWithAttributes,
-        onAddRule,
-    ]);
-
-    const selectionFilterData =
-        ['Selected', 'All', 'Unselected'].map((input) => ({
-            label: input,
-            value: input,
-        })) || [];
-
-    const optionFilterData = ['Groups & Rules', 'Rules', 'Groups'].map((input) => ({ label: input, value: input })) || []; */
-
-    const getInternalListOfGroupsAndRules = useCallback(
-        (resource?: Resource) => {
-            if (!profile) return [];
-            const internalRules = profile.internalRules
-                .filter((rule) => (resource ? rule.resource === resource : true))
-                .map((rule) => ({
-                    ...rule,
-                    entityDetails: {
-                        entityType: 'rule',
-                    },
-                }));
-            return internalRules;
-        },
-        [profile],
-    );
-
-    const getProviderListOfGroupsAndRules = useCallback(
-        (resource?: Resource, providerUuid?: string | null) => {
-            if (!profile) return [];
-            const providerRulesAndGroupsList = profile.providerRules
-                .filter((providerRule) => (providerUuid ? providerRule.connectorUuid === providerUuid : true))
-                .map((providerRule) => {
-                    return [
-                        ...providerRule.rules
-                            .filter((rule) => (resource ? rule.resource === resource : true))
-                            .map((rule) => ({
-                                ...rule,
-                                entityDetails: {
-                                    connectorUuid: providerRule.connectorUuid,
-                                    connectorName: providerRule.connectorName,
-                                    kind: providerRule.kind,
-                                    entityType: 'rule',
-                                },
-                            })),
-                        ...providerRule.groups
-                            .filter((group) => (resource ? group.resource === resource : true))
-                            .map((group) => ({
-                                ...group,
-                                entityDetails: {
-                                    connectorUuid: providerRule.connectorUuid,
-                                    connectorName: providerRule.connectorName,
-                                    kind: providerRule.kind,
-                                    entityType: 'group',
-                                },
-                            })),
-                    ];
-                })
-                .flat();
-            return providerRulesAndGroupsList;
-        },
-        [profile],
-    );
-
-    const getGroupsUuids = useCallback(() => {
-        return profile?.providerRules.map((providerRule) => providerRule.groups.map((group) => group.uuid)).flat();
-    }, [profile]);
-
-    const getInitialListOfGroupsAndRules = useCallback(
-        (resource?: Resource) => {
-            if (!profile) return [];
-
-            return [...getInternalListOfGroupsAndRules(resource), ...getProviderListOfGroupsAndRules(resource)];
-        },
-        [getInternalListOfGroupsAndRules, getProviderListOfGroupsAndRules, profile],
-    );
-
-    const getListOfResources = useCallback(
-        (rulesAndGroupsList: any[]) => {
-            if (!profile) return [];
-            const resourcesList = Array.from(new Set(rulesAndGroupsList.map((ruleOrGroup) => ruleOrGroup.resource)));
-            return ['All', ...resourcesList];
-        },
-        [profile],
-    );
-
-    const filterRulesAndGroupsList = useCallback(() => {
-        let filteredRulesAndGroupsList = [];
-        let resourcesList = [];
-        if (assignedRulesSource === 'Internal') {
-            filteredRulesAndGroupsList = getInternalListOfGroupsAndRules(
-                assignedResourceType === 'All' || assignedResourceType === null ? undefined : (assignedResourceType as Resource),
-            );
-            resourcesList = getListOfResources(getInternalListOfGroupsAndRules());
-        } else if (assignedRulesSource === 'Provider') {
-            filteredRulesAndGroupsList = getProviderListOfGroupsAndRules(
-                assignedResourceType === 'All' || assignedResourceType === null ? undefined : (assignedResourceType as Resource),
-                selectedAssignedProvider,
-            );
-            resourcesList = getListOfResources(getProviderListOfGroupsAndRules(undefined, selectedAssignedProvider));
-        } else {
-            filteredRulesAndGroupsList = getInitialListOfGroupsAndRules(
-                assignedResourceType === 'All' || assignedResourceType === null ? undefined : (assignedResourceType as Resource),
-            );
-            resourcesList = getListOfResources(getInitialListOfGroupsAndRules());
-        }
-        setFilteredAssignedRulesAndGroupList(filteredRulesAndGroupsList);
-        setAssignedRulesAndGroupsResources(resourcesList);
-    }, [
-        assignedRulesSource,
-        getInternalListOfGroupsAndRules,
-        assignedResourceType,
-        getListOfResources,
-        getProviderListOfGroupsAndRules,
-        selectedAssignedProvider,
-        getInitialListOfGroupsAndRules,
-    ]);
-
-    useEffect(() => {
-        setAssignedRulesAndGroupsList(getInitialListOfGroupsAndRules());
-    }, [getInitialListOfGroupsAndRules]);
-
-    useEffect(() => {
-        setAssignedRulesAndGroupsResources(getListOfResources(assignedRulesAndGroupsList));
-    }, [assignedRulesAndGroupsList, getListOfResources]);
-
-    useEffect(() => {
-        filterRulesAndGroupsList();
-    }, [assignedRulesSource, assignedResourceType, filterRulesAndGroupsList]);
-
-    const getListOfProviders = useCallback(() => {
-        return profile?.providerRules
-            .filter((providerRule) => (selectedAssignedKind ? providerRule.kind === selectedAssignedKind : true))
-            .map((providerRule) => ({
-                label: providerRule.connectorName,
-                value: providerRule.connectorUuid,
-            }));
-    }, [profile, selectedAssignedKind]);
-
-    useEffect(() => {
-        if (assignedRulesSource === 'Provider') {
-            setAssignedProvidersList(getListOfProviders() || []);
-        }
-    }, [assignedRulesSource, getListOfProviders]);
-
-    const getListOfKinds = useCallback(() => {
-        return profile?.providerRules
-            .filter((providerRule) => (selectedAssignedProvider ? providerRule.connectorUuid === selectedAssignedProvider : true))
-            .map((providerRule) => ({
-                label: providerRule.kind,
-                value: providerRule.kind,
-            }));
-    }, [profile, selectedAssignedProvider]);
-
-    useEffect(() => {
-        if (assignedRulesSource === 'Provider') {
-            setAssignedKindsList(getListOfKinds() || []);
-        }
-    }, [assignedRulesSource, getListOfKinds]);
-
     const entityDetailHeaders: TableHeader[] = useMemo(() => {
         return [
             { id: 'property', content: 'Property' },
@@ -1353,6 +464,7 @@ export default function ComplianceProfileDetail() {
     }, []);
 
     const ruleDetailData: TableDataRow[] = useMemo(() => {
+        const statusColor = getComplianceProfileStatusColor(selectedEntityDetails?.availabilityStatus);
         return [
             { id: 'uuid', columns: ['UUID', selectedEntityDetails?.uuid] },
             { id: 'name', columns: ['Name', selectedEntityDetails?.name] },
@@ -1361,19 +473,42 @@ export default function ComplianceProfileDetail() {
                 id: 'status',
                 columns: [
                     'Status',
-                    <Badge
-                        key={selectedEntityDetails?.uuid}
-                        color={selectedEntityDetails?.availabilityStatus === 'available' ? 'success' : 'danger'}
-                    >
+                    <Badge key={selectedEntityDetails?.uuid} color={statusColor} style={{ background: statusColor }}>
                         {capitalize(selectedEntityDetails?.availabilityStatus || '')}
                     </Badge>,
                 ],
             },
+            ...(selectedEntityDetails?.updatedReason
+                ? [{ id: 'updatedReason', columns: ['Updated Reason', selectedEntityDetails?.updatedReason] }]
+                : []),
             { id: 'type', columns: ['Type', capitalize(selectedEntityDetails?.type || '')] },
-            { id: 'resource', columns: ['Resource', getEnumLabel(resourceEnum, selectedEntityDetails?.resource) || ''] },
+            {
+                id: 'resource',
+                columns: [
+                    'Resource',
+                    <Link to={`../../${selectedEntityDetails?.resource}`}>
+                        {getEnumLabel(resourceEnum, selectedEntityDetails?.resource) || ''}
+                    </Link>,
+                ],
+            },
             { id: 'format', columns: ['Format', selectedEntityDetails?.format || ''] },
-            { id: 'provider', columns: ['Provider', selectedEntityDetails?.entityDetails?.connectorName || ''] },
-            { id: 'kind', columns: ['Kind', selectedEntityDetails?.entityDetails?.kind || ''] },
+
+            ...(selectedEntityDetails?.entityDetails?.connectorName && selectedEntityDetails?.entityDetails?.connectorUuid
+                ? [
+                      {
+                          id: 'provider',
+                          columns: [
+                              'Provider',
+                              <Link to={`../../connectors/detail/${selectedEntityDetails?.entityDetails?.connectorUuid}`}>
+                                  {selectedEntityDetails?.entityDetails?.connectorName}
+                              </Link>,
+                          ],
+                      },
+                  ]
+                : []),
+            ...(selectedEntityDetails?.entityDetails?.kind
+                ? [{ id: 'kind', columns: ['Kind', selectedEntityDetails?.entityDetails?.kind || ''] }]
+                : []),
         ];
     }, [selectedEntityDetails, resourceEnum]);
 
@@ -1498,14 +633,12 @@ export default function ComplianceProfileDetail() {
             dispatch(
                 actions.getListComplianceGroupRules({
                     groupUuid: selectedEntityDetails?.uuid,
-                    connectorUuid: selectedEntityDetails?.entityDetails?.connectorUuid,
-                    kind: selectedEntityDetails?.entityDetails?.kind,
+                    connectorUuid: selectedEntityDetails?.entityDetails?.connectorUuid || selectedEntityDetails?.connectorUuid,
+                    kind: selectedEntityDetails?.entityDetails?.kind || selectedEntityDetails?.kind,
                 }),
             );
         }
     }, [selectedEntityDetails, dispatch]);
-
-    console.log({ groupRules });
 
     return (
         <Container className="themed-container" fluid>
@@ -1553,89 +686,18 @@ export default function ComplianceProfileDetail() {
 
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
                 <Col>
-                    <Widget title="Assigned Rules & Groups" busy={isFetchingRules} titleSize="large">
-                        <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                            <Col>
-                                <Label for="assignedRulesSource">Rules Source</Label>
-                                <Select
-                                    id="assignedRulesSource"
-                                    inputId="assignedRulesSource"
-                                    placeholder="Select..."
-                                    maxMenuHeight={140}
-                                    options={assignedRulesSourceOptions}
-                                    value={assignedRulesSourceOptions.find((opt) => opt.value === assignedRulesSource) || null}
-                                    menuPlacement="auto"
-                                    onChange={(event) => {
-                                        setAssignedResourceType('All');
-                                        setAssignedRulesSource((event?.value as 'Internal' | 'Provider') || null);
-                                    }}
-                                    isClearable
-                                />
-                            </Col>
-                        </Row>
-                        {assignedRulesSource === 'Provider' && (
-                            <Row xs="1" sm="1" md="2" lg="2" xl="2" style={{ marginTop: '10px' }}>
-                                <Col>
-                                    <Label for="assignedProvider">Provider</Label>
-                                    <Select
-                                        id="assignedProvider"
-                                        inputId="assignedProvider"
-                                        placeholder="Select..."
-                                        maxMenuHeight={140}
-                                        options={assignedProvidersList}
-                                        value={assignedProvidersList.find((opt) => opt.value === selectedAssignedProvider) || null}
-                                        menuPlacement="auto"
-                                        onChange={(event) => {
-                                            setSelectedAssignedProvider(event?.value || null);
-                                        }}
-                                        isClearable
-                                    />
-                                </Col>
-                                <Col>
-                                    <Label for="assignedKind">Kind</Label>
-                                    <Select
-                                        id="assignedKind"
-                                        inputId="assignedKind"
-                                        placeholder="Select..."
-                                        maxMenuHeight={140}
-                                        options={assignedKindsList}
-                                        value={assignedKindsList.find((opt) => opt.value === selectedAssignedKind) || null}
-                                        onChange={(event) => {
-                                            setSelectedAssignedKind(event?.value || null);
-                                        }}
-                                        menuPlacement="auto"
-                                        isClearable
-                                    />
-                                </Col>
-                            </Row>
-                        )}
-                        <div style={{ display: 'flex', flexWrap: 'wrap', padding: '0 0 10px 0' }}>
-                            {assignedRulesAndGroupsResources.map((resource) => (
-                                <Badge
-                                    color={assignedResourceType === resource ? 'primary' : 'light'}
-                                    onClick={() => setAssignedResourceType(resource)}
-                                    style={{ cursor: 'pointer', margin: '10px 4px 0 4px', fontSize: '14px' }}
-                                >
-                                    {getEnumLabel(resourceEnum, resource)}
-                                </Badge>
-                            ))}
-                        </div>
-                        <Widget titleSize="large">
-                            <CustomTable
-                                headers={assignedRulesAndGroupsHeaders}
-                                data={assignedRulesAndGroupsData}
-                                hasPagination={true}
-                                hasDetails={true}
-                                canSearch={true}
-                            />
-                        </Widget>
-                    </Widget>
+                    <AssignedRulesAndGroup
+                        profile={profile}
+                        setSelectedEntityDetails={setSelectedEntityDetails}
+                        setIsEntityDetailMenuOpen={setIsEntityDetailMenuOpen}
+                    />
                 </Col>
                 <Col>
-                    {' '}
-                    <Widget title="Available Rules & Groups" busy={isFetchingGroups} titleSize="large">
-                        {/*  <CustomTable headers={groupHeaders} data={groupData} /> */}
-                    </Widget>
+                    <AvailableRulesAndGroups
+                        profile={profile}
+                        setSelectedEntityDetails={setSelectedEntityDetails}
+                        setIsEntityDetailMenuOpen={setIsEntityDetailMenuOpen}
+                    />
                 </Col>
             </Row>
 
@@ -1701,69 +763,7 @@ export default function ComplianceProfileDetail() {
                 size="lg"
             />
 
-            {/*  <Widget
-                title="Rules & Groups"
-                busy={isFetchingGroups || isFetchingRules}
-                titleSize="large"
-                refreshAction={profile && getComplianceRulesAndGroups}
-                widgetLockName={LockWidgetNameEnum.ComplianceProfileDetails}
-            >
-                <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                    <Col>
-                        <Label>Filter by Selection</Label>
-                        <Select
-                            maxMenuHeight={140}
-                            options={selectionFilterData}
-                            value={{ label: selectionFilter || 'Selected', value: selectionFilter || 'Selected' }}
-                            menuPlacement="auto"
-                            onChange={(event) => setSelectionFilter(event?.value || '')}
-                        />
-                    </Col>
-                    <Col>
-                        <Label>Filter by Object</Label>
-                        <Select
-                            maxMenuHeight={140}
-                            options={optionFilterData}
-                            value={{ label: objectFilter || 'Groups & Rules', value: objectFilter || 'Groups & Rules' }}
-                            menuPlacement="auto"
-                            onChange={(event) => setObjectFilter(event?.value || '')}
-                        />
-                    </Col>
-                </Row>
-                <hr />
-
-                <CustomTable headers={ruleGroupHeader} data={ruleGroupData} hasPagination={true} hasDetails={true} canSearch={true} />
-            </Widget> */}
-
-            {/* <Dialog
-                isOpen={currentGroupUuidForDisplay !== undefined}
-                caption="Rules"
-                size="lg"
-                body={<CustomTable headers={ruleHeader} data={ruleData} hasPagination={true} hasDetails={true} />}
-                toggle={onCloseGroupRuleDetail}
-                buttons={[{ color: 'secondary', onClick: () => onCloseGroupRuleDetail(), body: 'Cancel' }]}
-            />
-
-            
-
-            <Dialog
-                isOpen={deleteErrorMessage.length > 0}
-                caption="Delete Compliance Profile"
-                body={
-                    <>
-                        Failed to delete the Compliance Profile that has dependent objects. Please find the details below:
-                        <br />
-                        <br />
-                        {deleteErrorMessage}
-                    </>
-                }
-                toggle={() => dispatch(actions.clearDeleteErrorMessages())}
-                buttons={[
-                    { color: 'danger', onClick: onForceDeleteComplianceProfile, body: 'Force' },
-                    { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
-                ]}
-            />
-
+            {/*  
             
 
             <Dialog

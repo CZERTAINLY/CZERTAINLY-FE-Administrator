@@ -2,31 +2,33 @@ import Widget from 'components/Widget';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import Select from 'react-select';
-import { Badge, Button, Col, Label, Row } from 'reactstrap';
+import { Badge, Button, Col, Label, Row, Tooltip, UncontrolledTooltip } from 'reactstrap';
 import { actions, selectors } from 'ducks/compliance-profiles';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { ComplianceProfileDtoV2, PlatformEnum, Resource } from 'types/openapi';
 import CustomTable from 'components/CustomTable';
-import { capitalize } from 'cypress/types/lodash';
 import WidgetButtons from 'components/WidgetButtons';
 import { useParams } from 'react-router';
 import { useDispatch } from 'react-redux';
+import { capitalize } from 'utils/common-utils';
+import {
+    getAssignedInternalListOfGroupsAndRules,
+    getAssignedProviderListOfGroupsAndRules,
+    getComplianceProfileStatusColor,
+    getRulesAndGroupsTableHeaders,
+    getListOfResources as getListOfResourcesUtil,
+    truncateText,
+    rulesSourceOptions,
+} from 'utils/compliance-profile';
+import { ResourceBadges } from 'components/_pages/compliance-profiles/detail/Components/ResourceBadges';
 
 interface Props {
-    profile: ComplianceProfileDtoV2;
-    selectedEntityDetails: any;
+    profile: ComplianceProfileDtoV2 | undefined;
     setSelectedEntityDetails: (entityDetails: any) => void;
-    isEntityDetailMenuOpen: boolean;
     setIsEntityDetailMenuOpen: (isEntityDetailMenuOpen: boolean) => void;
 }
 
-export default function AssignedRulesAndGroup({
-    profile,
-    selectedEntityDetails,
-    setSelectedEntityDetails,
-    isEntityDetailMenuOpen,
-    setIsEntityDetailMenuOpen,
-}: Props) {
+export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetails, setIsEntityDetailMenuOpen }: Props) {
     const { id } = useParams();
     const dispatch = useDispatch();
 
@@ -44,63 +46,35 @@ export default function AssignedRulesAndGroup({
     const [assignedKindsList, setAssignedKindsList] = useState<{ label: string; value: string }[]>([]);
     const [selectedAssignedKind, setSelectedAssignedKind] = useState<string | null>(null);
 
-    const assignedRulesSourceOptions = [
-        {
-            label: 'Provider',
-            value: 'Provider',
-        },
-        {
-            label: 'Internal',
-            value: 'Internal',
-        },
-    ];
+    const tableHeadersAssignedRulesAndGroups = useMemo(() => {
+        return getRulesAndGroupsTableHeaders('assigned');
+    }, []);
 
-    const assignedRulesAndGroupsHeaders = useMemo(
-        () => [
-            {
-                id: 'name',
-                content: 'Name',
-                width: '20%',
-                sortable: true,
-            },
-            {
-                id: 'resource',
-                content: 'Resource',
-                width: '20%',
-                sortable: true,
-            },
-            {
-                id: 'type',
-                content: 'Type',
-                width: '20%',
-                sortable: true,
-            },
-            /* {
-                id: 'description',
-                content: 'Description',
-                width: '50%',
-            }, */
-            {
-                id: 'action',
-                content: 'Action',
-                width: '10%',
-            },
-        ],
-        [],
-    );
-
-    const assignedRulesAndGroupsData = useMemo(
+    const tableDataAssignedRulesAndGroups = useMemo(
         () =>
             filteredAssignedRulesAndGroupList.map((ruleOrGroup) => {
-                if (ruleOrGroup.entityDetails?.entityType === 'group') {
-                    console.log({ ruleOrGroup });
-                }
+                const statusColor = getComplianceProfileStatusColor(ruleOrGroup.availabilityStatus);
                 return {
                     id: ruleOrGroup.uuid,
                     columns: [
+                        <div>
+                            <Badge
+                                id={`status-${ruleOrGroup.uuid.replace(/-/g, '_')}`}
+                                color={statusColor}
+                                style={{ background: statusColor }}
+                            >
+                                {capitalize(ruleOrGroup.availabilityStatus)}
+                            </Badge>
+                            {ruleOrGroup.updatedReason && (
+                                <UncontrolledTooltip target={`status-${ruleOrGroup.uuid.replace(/-/g, '_')}`}>
+                                    {truncateText(capitalize(ruleOrGroup.updatedReason), 100)}
+                                </UncontrolledTooltip>
+                            )}
+                        </div>,
+
                         ruleOrGroup.name,
                         ruleOrGroup.resource,
-                        <div>
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
                             <Badge color="secondary">{capitalize(ruleOrGroup?.entityDetails?.entityType)} </Badge>
                             <Button
                                 className="btn btn-link"
@@ -114,8 +88,6 @@ export default function AssignedRulesAndGroup({
                                 <i className="fa fa-info" style={{ color: 'auto' }} />
                             </Button>
                         </div>,
-
-                        /* ruleOrGroup.description, */
                         <WidgetButtons
                             justify="start"
                             buttons={[
@@ -126,17 +98,18 @@ export default function AssignedRulesAndGroup({
                                     onClick: () => {
                                         if (!id) return;
                                         if (ruleOrGroup.entityDetails?.entityType === 'rule') {
-                                            dispatch(
-                                                actions.updateRule({
-                                                    uuid: id,
-                                                    complianceProfileRulesPatchRequestDto: {
-                                                        removal: true,
-                                                        ruleUuid: ruleOrGroup.uuid,
-                                                        connectorUuid: ruleOrGroup?.connectorUuid ?? undefined,
-                                                        kind: ruleOrGroup?.kind ?? undefined,
-                                                    },
-                                                }),
-                                            );
+                                            const rulePayload = {
+                                                uuid: id,
+                                                complianceProfileRulesPatchRequestDto: {
+                                                    removal: true,
+                                                    ruleUuid: ruleOrGroup.uuid,
+                                                    connectorUuid: ruleOrGroup?.entityDetails?.connectorUuid ?? undefined,
+                                                    kind: ruleOrGroup?.entityDetails?.kind ?? undefined,
+                                                },
+                                            };
+                                            console.log(rulePayload);
+
+                                            dispatch(actions.updateRule(rulePayload));
                                         }
                                         if (ruleOrGroup.entityDetails?.entityType === 'group') {
                                             dispatch(
@@ -164,52 +137,15 @@ export default function AssignedRulesAndGroup({
     const getInternalListOfGroupsAndRules = useCallback(
         (resource?: Resource) => {
             if (!profile) return [];
-            const internalRules = profile.internalRules
-                .filter((rule) => (resource ? rule.resource === resource : true))
-                .map((rule) => ({
-                    ...rule,
-                    entityDetails: {
-                        entityType: 'rule',
-                    },
-                }));
-            return internalRules;
+            return getAssignedInternalListOfGroupsAndRules(profile, resource);
         },
         [profile],
     );
 
     const getProviderListOfGroupsAndRules = useCallback(
-        (resource?: Resource, providerUuid?: string | null) => {
+        (resource?: Resource, providerUuid?: string | null, kind?: string | null) => {
             if (!profile) return [];
-            const providerRulesAndGroupsList = profile.providerRules
-                .filter((providerRule) => (providerUuid ? providerRule.connectorUuid === providerUuid : true))
-                .map((providerRule) => {
-                    return [
-                        ...providerRule.rules
-                            .filter((rule) => (resource ? rule.resource === resource : true))
-                            .map((rule) => ({
-                                ...rule,
-                                entityDetails: {
-                                    connectorUuid: providerRule.connectorUuid,
-                                    connectorName: providerRule.connectorName,
-                                    kind: providerRule.kind,
-                                    entityType: 'rule',
-                                },
-                            })),
-                        ...providerRule.groups
-                            .filter((group) => (resource ? group.resource === resource : true))
-                            .map((group) => ({
-                                ...group,
-                                entityDetails: {
-                                    connectorUuid: providerRule.connectorUuid,
-                                    connectorName: providerRule.connectorName,
-                                    kind: providerRule.kind,
-                                    entityType: 'group',
-                                },
-                            })),
-                    ];
-                })
-                .flat();
-            return providerRulesAndGroupsList;
+            return getAssignedProviderListOfGroupsAndRules(profile, resource, providerUuid, kind);
         },
         [profile],
     );
@@ -224,10 +160,9 @@ export default function AssignedRulesAndGroup({
     );
 
     const getListOfResources = useCallback(
-        (rulesAndGroupsList: any[]) => {
+        (rulesAndGroupsList: any[]): string[] => {
             if (!profile) return [];
-            const resourcesList = Array.from(new Set(rulesAndGroupsList.map((ruleOrGroup) => ruleOrGroup.resource)));
-            return ['All', ...resourcesList];
+            return getListOfResourcesUtil(rulesAndGroupsList);
         },
         [profile],
     );
@@ -244,6 +179,7 @@ export default function AssignedRulesAndGroup({
             filteredRulesAndGroupsList = getProviderListOfGroupsAndRules(
                 assignedResourceType === 'All' || assignedResourceType === null ? undefined : (assignedResourceType as Resource),
                 selectedAssignedProvider,
+                selectedAssignedKind,
             );
             resourcesList = getListOfResources(getProviderListOfGroupsAndRules(undefined, selectedAssignedProvider));
         } else {
@@ -262,6 +198,7 @@ export default function AssignedRulesAndGroup({
         getProviderListOfGroupsAndRules,
         selectedAssignedProvider,
         getInitialListOfGroupsAndRules,
+        selectedAssignedKind,
     ]);
 
     useEffect(() => {
@@ -316,8 +253,8 @@ export default function AssignedRulesAndGroup({
                         inputId="assignedRulesSource"
                         placeholder="Select..."
                         maxMenuHeight={140}
-                        options={assignedRulesSourceOptions}
-                        value={assignedRulesSourceOptions.find((opt) => opt.value === assignedRulesSource) || null}
+                        options={rulesSourceOptions}
+                        value={rulesSourceOptions.find((opt) => opt.value === assignedRulesSource) || null}
                         menuPlacement="auto"
                         onChange={(event) => {
                             setAssignedResourceType('All');
@@ -363,21 +300,16 @@ export default function AssignedRulesAndGroup({
                     </Col>
                 </Row>
             )}
-            <div style={{ display: 'flex', flexWrap: 'wrap', padding: '0 0 10px 0' }}>
-                {assignedRulesAndGroupsResources.map((resource) => (
-                    <Badge
-                        color={assignedResourceType === resource ? 'primary' : 'light'}
-                        onClick={() => setAssignedResourceType(resource)}
-                        style={{ cursor: 'pointer', margin: '10px 4px 0 4px', fontSize: '14px' }}
-                    >
-                        {getEnumLabel(resourceEnum, resource)}
-                    </Badge>
-                ))}
-            </div>
-            <Widget titleSize="large">
+            <ResourceBadges
+                resources={assignedRulesAndGroupsResources}
+                selected={assignedResourceType}
+                onSelect={setAssignedResourceType}
+                getLabel={(resource) => getEnumLabel(resourceEnum, resource)}
+            />
+            <Widget titleSize="large" busy={isFetchingRules}>
                 <CustomTable
-                    headers={assignedRulesAndGroupsHeaders}
-                    data={assignedRulesAndGroupsData}
+                    headers={tableHeadersAssignedRulesAndGroups}
+                    data={tableDataAssignedRulesAndGroups}
                     hasPagination={true}
                     hasDetails={true}
                     canSearch={true}

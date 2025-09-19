@@ -298,6 +298,9 @@ export const slice = createSlice({
         getListComplianceRulesFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingRules = false;
         },
+        clearRules: (state, action: PayloadAction<void>) => {
+            state.rules = [];
+        },
         //////////////////////////////
         getListComplianceGroups: (state, action: PayloadAction<{ connectorUuid: string; kind: string; resource?: Resource }>) => {
             state.isFetchingGroups = true;
@@ -310,6 +313,9 @@ export const slice = createSlice({
 
         getListComplianceGroupsFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isFetchingGroups = false;
+        },
+        clearGroups: (state, action: PayloadAction<void>) => {
+            state.groups = [];
         },
         //////////////////////////////
         getListComplianceGroupRules: (state, action: PayloadAction<{ groupUuid: string; connectorUuid: string; kind: string }>) => {
