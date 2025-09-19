@@ -129,7 +129,9 @@ export default function FilterWidget({
             const char = regex[i];
 
             if (char === '\\') {
-                i++;
+                if (i < regex.length - 1) {
+                    i++;
+                }
                 continue;
             }
 
