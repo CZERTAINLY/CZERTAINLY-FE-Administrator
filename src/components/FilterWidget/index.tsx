@@ -120,18 +120,8 @@ export default function FilterWidget({
         if (hasUnclosedConstructs(value)) {
             return 'Incomplete regex pattern';
         }
-
-        if (hasIncompleteQuantifier(value)) {
-            return 'Incomplete quantifier in regex';
-        }
-
         return '';
     }, []);
-
-    function hasIncompleteQuantifier(regex: string): boolean {
-        const quantifierPattern = /\{(\d*,?\d*)?$/;
-        return quantifierPattern.test(regex);
-    }
 
     function hasUnclosedConstructs(regex: string): boolean {
         const stack: string[] = [];
