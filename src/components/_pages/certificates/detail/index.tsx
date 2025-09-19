@@ -1393,47 +1393,46 @@ export default function CertificateDetail() {
 
     const removeDuplicateFilters = useCallback((filters: SearchFilterRequestDto[]): SearchFilterRequestDto[] => {
         const seen = new Set<string>();
-        const result = filters.filter((filter) => {
-            // Create a unique key based on the filter properties
-            const key = `${filter.fieldSource}-${filter.fieldIdentifier}-${filter.condition}-${JSON.stringify(filter.value)}`;
+        return filters.filter((filter) => {
+            const normalizedValue = Array.isArray(filter.value) ? [...new Set(filter.value)].sort() : filter.value;
+
+            const key = `${filter.fieldSource}-${filter.fieldIdentifier}-${filter.condition}-${JSON.stringify(normalizedValue)}`;
+
             if (seen.has(key)) {
                 return false;
             }
             seen.add(key);
             return true;
         });
-
-        return result;
     }, []);
 
     const setRelatedCertificatesFilters = useCallback(() => {
-        let newFilters = [];
+        const filtersWithoutSubjectType = currentFilters.filter(
+            (f) => !(f.fieldSource === FilterFieldSource.Property && f.fieldIdentifier === 'SUBJECT_TYPE'),
+        );
+
+        let subjectTypeFilter: SearchFilterRequestDto | null = null;
+
         if (
             certificate?.subjectType === CertificateSubjectType.EndEntity ||
             certificate?.subjectType === CertificateSubjectType.SelfSignedEndEntity
         ) {
-            newFilters = [
-                ...currentFilters,
-                {
-                    fieldSource: FilterFieldSource.Property,
-                    fieldIdentifier: 'SUBJECT_TYPE',
-                    condition: FilterConditionOperator.Equals,
-                    value: [CertificateSubjectType.EndEntity, CertificateSubjectType.SelfSignedEndEntity],
-                },
-            ];
-        } else {
-            newFilters = certificate?.subjectType
-                ? [
-                      ...currentFilters,
-                      {
-                          fieldSource: FilterFieldSource.Property,
-                          fieldIdentifier: 'SUBJECT_TYPE',
-                          condition: FilterConditionOperator.Equals,
-                          value: [certificate?.subjectType ?? ''],
-                      },
-                  ]
-                : currentFilters;
+            subjectTypeFilter = {
+                fieldSource: FilterFieldSource.Property,
+                fieldIdentifier: 'SUBJECT_TYPE',
+                condition: FilterConditionOperator.Equals,
+                value: [CertificateSubjectType.EndEntity, CertificateSubjectType.SelfSignedEndEntity],
+            };
+        } else if (certificate?.subjectType) {
+            subjectTypeFilter = {
+                fieldSource: FilterFieldSource.Property,
+                fieldIdentifier: 'SUBJECT_TYPE',
+                condition: FilterConditionOperator.Equals,
+                value: [certificate.subjectType],
+            };
         }
+
+        const newFilters = subjectTypeFilter ? [...filtersWithoutSubjectType, subjectTypeFilter] : filtersWithoutSubjectType;
 
         const deduplicatedFilters = removeDuplicateFilters(newFilters);
 
@@ -1443,7 +1442,8 @@ export default function CertificateDetail() {
                 currentFilters: deduplicatedFilters,
             }),
         );
-    }, [certificate?.subjectType, dispatch, currentFilters, removeDuplicateFilters]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [certificate?.subjectType, currentFilters, removeDuplicateFilters]);
 
     useEffect(() => {
         if (isFirstAddRelatedCertificateClick.current) {
