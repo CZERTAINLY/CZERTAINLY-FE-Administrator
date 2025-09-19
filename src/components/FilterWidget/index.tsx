@@ -105,6 +105,32 @@ export default function FilterWidget({
         | number
         | undefined
     >(undefined);
+    const [regexError, setRegexError] = useState<string>('');
+
+    const validateRegex = useCallback((value: string): string => {
+        if (!value) return '';
+
+        try {
+            new RegExp(value);
+        } catch {
+            return 'Invalid regex pattern';
+        }
+
+        // Custom checks for incomplete constructs
+        const incompletePatterns = [
+            /^\{$/, // only "{"
+            /\{$/, // ends with "{"
+            /\($/, // ends with "("
+            /\[$/, // ends with "["
+            /\\$/, // ends with "\"
+        ];
+
+        if (incompletePatterns.some((pattern) => pattern.test(value))) {
+            return 'Incomplete regex pattern';
+        }
+
+        return '';
+    }, []);
 
     const booleanOptions = useMemo(
         () => [
@@ -378,8 +404,15 @@ export default function FilterWidget({
 
     const isValidValue = useMemo(() => {
         if (checkIfFieldOperatorIsInterval(filterCondition?.value)) return !validateDuration()(filterValue as unknown as string);
+
+        // Check regex validation for COMMON_NAME MATCHES condition
+        const isRegex = filterField?.value === 'COMMON_NAME' && filterCondition?.value === 'MATCHES';
+        if (isRegex && filterValue) {
+            return !regexError;
+        }
+
         return true;
-    }, [filterCondition, filterValue]);
+    }, [filterCondition, filterValue, filterField, regexError]);
 
     const objectValueOptions: ObjectValueOptions[] = useMemo(
         () => {
@@ -464,30 +497,47 @@ export default function FilterWidget({
             );
         }
         function renderTextOrDateInput() {
+            const isRegex = filterField?.value === 'COMMON_NAME' && filterCondition?.value === 'MATCHES';
             return (
-                <Input
-                    id="valueSelect"
-                    type={
-                        currentField?.attributeContentType && checkIfFieldAttributeTypeIsDate(currentField)
-                            ? getFormTypeFromAttributeContentType(currentField?.attributeContentType)
-                            : currentField?.type
-                              ? getFormTypeFromFilterFieldType(currentField?.type)
-                              : 'text'
-                    }
-                    step={
-                        currentField?.attributeContentType
-                            ? getStepValue(currentField?.attributeContentType)
-                            : currentField?.type
-                              ? getStepValue(currentField?.type)
-                              : undefined
-                    }
-                    value={filterValue?.toString() ?? ''}
-                    onChange={(e) => {
-                        setFilterValue(JSON.parse(JSON.stringify(e.target.value)));
-                    }}
-                    placeholder="Enter filter value"
-                    disabled={!filterField || !filterCondition || noValue[filterCondition.value]}
-                />
+                <>
+                    <Input
+                        id="valueSelect"
+                        type={
+                            currentField?.attributeContentType && checkIfFieldAttributeTypeIsDate(currentField)
+                                ? getFormTypeFromAttributeContentType(currentField?.attributeContentType)
+                                : currentField?.type
+                                  ? getFormTypeFromFilterFieldType(currentField?.type)
+                                  : 'text'
+                        }
+                        step={
+                            currentField?.attributeContentType
+                                ? getStepValue(currentField?.attributeContentType)
+                                : currentField?.type
+                                  ? getStepValue(currentField?.type)
+                                  : undefined
+                        }
+                        value={filterValue?.toString() ?? ''}
+                        onChange={(e) => {
+                            const value = e.target.value;
+                            setFilterValue(JSON.parse(JSON.stringify(value)));
+
+                            if (isRegex) {
+                                const error = validateRegex(value);
+                                setRegexError(error);
+                            } else {
+                                setRegexError('');
+                            }
+                        }}
+                        placeholder={isRegex ? 'Enter regex value' : 'Enter filter value'}
+                        disabled={!filterField || !filterCondition || noValue[filterCondition.value]}
+                        invalid={isRegex && !!regexError}
+                    />
+                    {isRegex && regexError && (
+                        <FormText color="danger" style={{ fontSize: '0.875rem', marginTop: '0.25rem' }}>
+                            {regexError}
+                        </FormText>
+                    )}
+                </>
             );
         }
         function renderBooleanInput() {
@@ -578,7 +628,17 @@ export default function FilterWidget({
         }
 
         return renderDefaultInput();
-    }, [booleanOptions, currentField, filterCondition, filterConditionsRequiredNumberInput, filterField, filterValue, objectValueOptions]);
+    }, [
+        booleanOptions,
+        currentField,
+        filterCondition,
+        filterConditionsRequiredNumberInput,
+        filterField,
+        filterValue,
+        objectValueOptions,
+        regexError,
+        validateRegex,
+    ]);
     return (
         <>
             <Widget title={title} busy={isFetchingAvailableFilters} titleSize="larger">
@@ -600,6 +660,7 @@ export default function FilterWidget({
                                             setFilterField(undefined);
                                             setFilterCondition(undefined);
                                             setFilterValue(undefined);
+                                            setRegexError('');
                                         }}
                                         value={filterGroup || null}
                                         isClearable={true}
@@ -632,6 +693,7 @@ export default function FilterWidget({
                                             setFilterField(e);
                                             setFilterCondition(undefined);
                                             setFilterValue(undefined);
+                                            setRegexError('');
                                         }}
                                         value={filterField || null}
                                         isDisabled={!filterGroup}
@@ -671,6 +733,7 @@ export default function FilterWidget({
                                         onChange={(e) => {
                                             setFilterCondition(e);
                                             setFilterValue(undefined);
+                                            setRegexError('');
                                         }}
                                         value={filterCondition || null}
                                         isDisabled={!filterField}
