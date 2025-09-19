@@ -304,7 +304,7 @@ export default function AcmeProfileForm() {
 
     return (
         <Widget title={title} busy={isBusy}>
-            <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
+            <Form keepDirtyOnReinitialize initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
                 {({ handleSubmit, pristine, submitting, valid, form, values }) => {
                     const isEqual = deepEqual(defaultValues, values);
                     return (
