@@ -118,7 +118,6 @@ export default function FilterWidget({
 
         // Custom checks for incomplete constructs
         const incompletePatterns = [
-            /^\{$/, // only "{"
             /\{$/, // ends with "{"
             /\($/, // ends with "("
             /\[$/, // ends with "["
@@ -407,7 +406,7 @@ export default function FilterWidget({
 
         // Check regex validation for COMMON_NAME MATCHES condition
         const isRegex = filterField?.value === 'COMMON_NAME' && filterCondition?.value === 'MATCHES';
-        if (isRegex && filterValue) {
+        if (isRegex) {
             return !regexError;
         }
 
