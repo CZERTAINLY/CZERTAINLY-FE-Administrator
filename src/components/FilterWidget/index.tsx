@@ -425,14 +425,14 @@ export default function FilterWidget({
     const isValidValue = useMemo(() => {
         if (checkIfFieldOperatorIsInterval(filterCondition?.value)) return !validateDuration()(filterValue as unknown as string);
 
-        // Check regex validation for COMMON_NAME MATCHES condition
-        const isRegex = filterField?.value === 'COMMON_NAME' && filterCondition?.value === 'MATCHES';
+        // Check regex validation for MATCHES or NOT_MATCHES condition
+        const isRegex = filterCondition?.value === 'MATCHES' || filterCondition?.value === 'NOT_MATCHES';
         if (isRegex) {
             return !regexError;
         }
 
         return true;
-    }, [filterCondition, filterValue, filterField, regexError]);
+    }, [filterCondition, filterValue, regexError]);
 
     const objectValueOptions: ObjectValueOptions[] = useMemo(
         () => {
@@ -517,7 +517,7 @@ export default function FilterWidget({
             );
         }
         function renderTextOrDateInput() {
-            const isRegex = filterField?.value === 'COMMON_NAME' && filterCondition?.value === 'MATCHES';
+            const isRegex = filterCondition?.value === 'MATCHES' || filterCondition?.value === 'NOT_MATCHES';
             return (
                 <>
                     <Input
