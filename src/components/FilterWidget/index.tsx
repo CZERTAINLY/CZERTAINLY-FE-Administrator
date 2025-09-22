@@ -33,6 +33,7 @@ import {
     getIso8601StringFromInputString as getIso8601StringFromDurationString,
 } from 'utils/duration';
 import { validateDuration } from 'utils/validators';
+import { parse } from 'regexp-tree';
 
 const noValue: { [condition in FilterConditionOperator]: boolean } = {
     [FilterConditionOperator.Equals]: false,
@@ -105,6 +106,51 @@ export default function FilterWidget({
         | number
         | undefined
     >(undefined);
+    const [regexError, setRegexError] = useState<string>('');
+
+    const validateRegex = useCallback((value: string): string => {
+        if (!value) return '';
+
+        try {
+            parse(`/${value}/`);
+        } catch {
+            return 'Invalid regex pattern';
+        }
+
+        if (hasUnclosedConstructs(value)) {
+            return 'Incomplete regex pattern';
+        }
+        return '';
+    }, []);
+
+    function hasUnclosedConstructs(regex: string): boolean {
+        const stack: string[] = [];
+        for (let i = 0; i < regex.length; i++) {
+            const char = regex[i];
+
+            if (char === '\\') {
+                if (i < regex.length - 1) {
+                    i++;
+                }
+                continue;
+            }
+
+            if (char === '(' || char === '[' || char === '{') {
+                stack.push(char);
+            } else if (char === ')' || char === ']' || char === '}') {
+                const last = stack.pop();
+                if (!last) return true; // closing without opening
+                if ((char === ')' && last !== '(') || (char === ']' && last !== '[') || (char === '}' && last !== '{')) {
+                    return true; // mismatched closing
+                }
+            }
+        }
+
+        // Trailing unclosed backslash
+        if (regex.endsWith('\\')) return true;
+
+        return stack.length > 0; // unclosed openings
+    }
 
     const booleanOptions = useMemo(
         () => [
@@ -378,8 +424,15 @@ export default function FilterWidget({
 
     const isValidValue = useMemo(() => {
         if (checkIfFieldOperatorIsInterval(filterCondition?.value)) return !validateDuration()(filterValue as unknown as string);
+
+        // Check regex validation for MATCHES or NOT_MATCHES condition
+        const isRegex = filterCondition?.value === 'MATCHES' || filterCondition?.value === 'NOT_MATCHES';
+        if (isRegex) {
+            return !regexError;
+        }
+
         return true;
-    }, [filterCondition, filterValue]);
+    }, [filterCondition, filterValue, regexError]);
 
     const objectValueOptions: ObjectValueOptions[] = useMemo(
         () => {
@@ -464,30 +517,47 @@ export default function FilterWidget({
             );
         }
         function renderTextOrDateInput() {
+            const isRegex = filterCondition?.value === 'MATCHES' || filterCondition?.value === 'NOT_MATCHES';
             return (
-                <Input
-                    id="valueSelect"
-                    type={
-                        currentField?.attributeContentType && checkIfFieldAttributeTypeIsDate(currentField)
-                            ? getFormTypeFromAttributeContentType(currentField?.attributeContentType)
-                            : currentField?.type
-                              ? getFormTypeFromFilterFieldType(currentField?.type)
-                              : 'text'
-                    }
-                    step={
-                        currentField?.attributeContentType
-                            ? getStepValue(currentField?.attributeContentType)
-                            : currentField?.type
-                              ? getStepValue(currentField?.type)
-                              : undefined
-                    }
-                    value={filterValue?.toString() ?? ''}
-                    onChange={(e) => {
-                        setFilterValue(JSON.parse(JSON.stringify(e.target.value)));
-                    }}
-                    placeholder="Enter filter value"
-                    disabled={!filterField || !filterCondition || noValue[filterCondition.value]}
-                />
+                <>
+                    <Input
+                        id="valueSelect"
+                        type={
+                            currentField?.attributeContentType && checkIfFieldAttributeTypeIsDate(currentField)
+                                ? getFormTypeFromAttributeContentType(currentField?.attributeContentType)
+                                : currentField?.type
+                                  ? getFormTypeFromFilterFieldType(currentField?.type)
+                                  : 'text'
+                        }
+                        step={
+                            currentField?.attributeContentType
+                                ? getStepValue(currentField?.attributeContentType)
+                                : currentField?.type
+                                  ? getStepValue(currentField?.type)
+                                  : undefined
+                        }
+                        value={filterValue?.toString() ?? ''}
+                        onChange={(e) => {
+                            const value = e.target.value;
+                            setFilterValue(JSON.parse(JSON.stringify(value)));
+
+                            if (isRegex) {
+                                const error = validateRegex(value);
+                                setRegexError(error);
+                            } else {
+                                setRegexError('');
+                            }
+                        }}
+                        placeholder={isRegex ? 'Enter regex value' : 'Enter filter value'}
+                        disabled={!filterField || !filterCondition || noValue[filterCondition.value]}
+                        invalid={isRegex && !!regexError}
+                    />
+                    {isRegex && regexError && (
+                        <FormText color="danger" style={{ fontSize: '0.875rem', marginTop: '0.25rem' }}>
+                            {regexError}
+                        </FormText>
+                    )}
+                </>
             );
         }
         function renderBooleanInput() {
@@ -578,7 +648,17 @@ export default function FilterWidget({
         }
 
         return renderDefaultInput();
-    }, [booleanOptions, currentField, filterCondition, filterConditionsRequiredNumberInput, filterField, filterValue, objectValueOptions]);
+    }, [
+        booleanOptions,
+        currentField,
+        filterCondition,
+        filterConditionsRequiredNumberInput,
+        filterField,
+        filterValue,
+        objectValueOptions,
+        regexError,
+        validateRegex,
+    ]);
     return (
         <>
             <Widget title={title} busy={isFetchingAvailableFilters} titleSize="larger">
@@ -600,6 +680,7 @@ export default function FilterWidget({
                                             setFilterField(undefined);
                                             setFilterCondition(undefined);
                                             setFilterValue(undefined);
+                                            setRegexError('');
                                         }}
                                         value={filterGroup || null}
                                         isClearable={true}
@@ -632,6 +713,7 @@ export default function FilterWidget({
                                             setFilterField(e);
                                             setFilterCondition(undefined);
                                             setFilterValue(undefined);
+                                            setRegexError('');
                                         }}
                                         value={filterField || null}
                                         isDisabled={!filterGroup}
@@ -671,6 +753,7 @@ export default function FilterWidget({
                                         onChange={(e) => {
                                             setFilterCondition(e);
                                             setFilterValue(undefined);
+                                            setRegexError('');
                                         }}
                                         value={filterCondition || null}
                                         isDisabled={!filterField}
