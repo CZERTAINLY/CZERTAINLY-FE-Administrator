@@ -19,6 +19,7 @@ import type {
     AuthenticationServiceExceptionDto,
     BulkActionMessageDto,
     ComplianceGroupListDto,
+    ComplianceInternalRuleRequestDto,
     ComplianceProfileDtoV2,
     ComplianceProfileGroupsPatchRequestDto,
     ComplianceProfileListDto,
@@ -41,8 +42,16 @@ export interface BulkDeleteComplianceProfilesV2Request {
     requestBody: Array<string>;
 }
 
+export interface CreateComplianceInternalRuleV2Request {
+    complianceInternalRuleRequestDto: ComplianceInternalRuleRequestDto;
+}
+
 export interface CreateComplianceProfileV2Request {
     complianceProfileRequestDtoV2: ComplianceProfileRequestDtoV2;
+}
+
+export interface DeleteComplianceInternalRuleV2Request {
+    internalRuleUuid: string;
 }
 
 export interface DeleteComplianceProfileV2Request {
@@ -85,9 +94,9 @@ export interface GetComplianceProfileV2Request {
 }
 
 export interface GetComplianceRulesV2Request {
-    resource: Resource;
     connectorUuid?: string;
     kind?: string;
+    resource?: Resource;
     type?: string;
     format?: string;
 }
@@ -100,6 +109,11 @@ export interface PatchComplianceProfileGroupsV2Request {
 export interface PatchComplianceProfileRulesV2Request {
     uuid: string;
     complianceProfileRulesPatchRequestDto: ComplianceProfileRulesPatchRequestDto;
+}
+
+export interface UpdateComplianceInternalRuleV2Request {
+    internalRuleUuid: string;
+    complianceInternalRuleRequestDto: ComplianceInternalRuleRequestDto;
 }
 
 export interface UpdateComplianceProfileV2Request {
@@ -149,6 +163,26 @@ export class ComplianceProfileManagementV2Api extends BaseAPI {
     };
 
     /**
+     * Create Compliance internal rule
+     */
+    createComplianceInternalRuleV2({ complianceInternalRuleRequestDto }: CreateComplianceInternalRuleV2Request): Observable<ComplianceRuleListDto>
+    createComplianceInternalRuleV2({ complianceInternalRuleRequestDto }: CreateComplianceInternalRuleV2Request, opts?: OperationOpts): Observable<AjaxResponse<ComplianceRuleListDto>>
+    createComplianceInternalRuleV2({ complianceInternalRuleRequestDto }: CreateComplianceInternalRuleV2Request, opts?: OperationOpts): Observable<ComplianceRuleListDto | AjaxResponse<ComplianceRuleListDto>> {
+        throwIfNullOrUndefined(complianceInternalRuleRequestDto, 'complianceInternalRuleRequestDto', 'createComplianceInternalRuleV2');
+
+        const headers: HttpHeaders = {
+            'Content-Type': 'application/json',
+        };
+
+        return this.request<ComplianceRuleListDto>({
+            url: '/v2/complianceProfiles/rules',
+            method: 'POST',
+            headers,
+            body: complianceInternalRuleRequestDto,
+        }, opts?.responseOpts);
+    };
+
+    /**
      * Add Compliance Profile
      */
     createComplianceProfileV2({ complianceProfileRequestDtoV2 }: CreateComplianceProfileV2Request): Observable<ComplianceProfileDtoV2>
@@ -165,6 +199,20 @@ export class ComplianceProfileManagementV2Api extends BaseAPI {
             method: 'POST',
             headers,
             body: complianceProfileRequestDtoV2,
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * Delete Compliance internal rule
+     */
+    deleteComplianceInternalRuleV2({ internalRuleUuid }: DeleteComplianceInternalRuleV2Request): Observable<void>
+    deleteComplianceInternalRuleV2({ internalRuleUuid }: DeleteComplianceInternalRuleV2Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    deleteComplianceInternalRuleV2({ internalRuleUuid }: DeleteComplianceInternalRuleV2Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(internalRuleUuid, 'internalRuleUuid', 'deleteComplianceInternalRuleV2');
+
+        return this.request<void>({
+            url: '/v2/complianceProfiles/rules/{internalRuleUuid}'.replace('{internalRuleUuid}', encodeURI(internalRuleUuid)),
+            method: 'DELETE',
         }, opts?.responseOpts);
     };
 
@@ -310,17 +358,15 @@ export class ComplianceProfileManagementV2Api extends BaseAPI {
      * Lists compliance rules. If provider UUID is sent (also kind is required) then provider rules are listed, otherwise lists internal rules
      * Get Compliance rules
      */
-    getComplianceRulesV2({ resource, connectorUuid, kind, type, format }: GetComplianceRulesV2Request): Observable<Array<ComplianceRuleListDto>>
-    getComplianceRulesV2({ resource, connectorUuid, kind, type, format }: GetComplianceRulesV2Request, opts?: OperationOpts): Observable<AjaxResponse<Array<ComplianceRuleListDto>>>
-    getComplianceRulesV2({ resource, connectorUuid, kind, type, format }: GetComplianceRulesV2Request, opts?: OperationOpts): Observable<Array<ComplianceRuleListDto> | AjaxResponse<Array<ComplianceRuleListDto>>> {
-        throwIfNullOrUndefined(resource, 'resource', 'getComplianceRulesV2');
+    getComplianceRulesV2({ connectorUuid, kind, resource, type, format }: GetComplianceRulesV2Request): Observable<Array<ComplianceRuleListDto>>
+    getComplianceRulesV2({ connectorUuid, kind, resource, type, format }: GetComplianceRulesV2Request, opts?: OperationOpts): Observable<AjaxResponse<Array<ComplianceRuleListDto>>>
+    getComplianceRulesV2({ connectorUuid, kind, resource, type, format }: GetComplianceRulesV2Request, opts?: OperationOpts): Observable<Array<ComplianceRuleListDto> | AjaxResponse<Array<ComplianceRuleListDto>>> {
 
-        const query: HttpQuery = { // required parameters are used directly since they are already checked by throwIfNullOrUndefined
-            'resource': resource,
-        };
+        const query: HttpQuery = {};
 
         if (connectorUuid != null) { query['connectorUuid'] = connectorUuid; }
         if (kind != null) { query['kind'] = kind; }
+        if (resource != null) { query['resource'] = resource; }
         if (type != null) { query['type'] = type; }
         if (format != null) { query['format'] = format; }
 
@@ -383,6 +429,27 @@ export class ComplianceProfileManagementV2Api extends BaseAPI {
             method: 'PATCH',
             headers,
             body: complianceProfileRulesPatchRequestDto,
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * Update Compliance internal rule
+     */
+    updateComplianceInternalRuleV2({ internalRuleUuid, complianceInternalRuleRequestDto }: UpdateComplianceInternalRuleV2Request): Observable<ComplianceRuleListDto>
+    updateComplianceInternalRuleV2({ internalRuleUuid, complianceInternalRuleRequestDto }: UpdateComplianceInternalRuleV2Request, opts?: OperationOpts): Observable<AjaxResponse<ComplianceRuleListDto>>
+    updateComplianceInternalRuleV2({ internalRuleUuid, complianceInternalRuleRequestDto }: UpdateComplianceInternalRuleV2Request, opts?: OperationOpts): Observable<ComplianceRuleListDto | AjaxResponse<ComplianceRuleListDto>> {
+        throwIfNullOrUndefined(internalRuleUuid, 'internalRuleUuid', 'updateComplianceInternalRuleV2');
+        throwIfNullOrUndefined(complianceInternalRuleRequestDto, 'complianceInternalRuleRequestDto', 'updateComplianceInternalRuleV2');
+
+        const headers: HttpHeaders = {
+            'Content-Type': 'application/json',
+        };
+
+        return this.request<ComplianceRuleListDto>({
+            url: '/v2/complianceProfiles/rules/{internalRuleUuid}'.replace('{internalRuleUuid}', encodeURI(internalRuleUuid)),
+            method: 'PUT',
+            headers,
+            body: complianceInternalRuleRequestDto,
         }, opts?.responseOpts);
     };
 

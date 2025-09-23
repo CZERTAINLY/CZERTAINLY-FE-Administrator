@@ -13,6 +13,7 @@
 
 import type {
     BaseAttributeDto,
+    ConditionItemDto,
     Resource,
 } from './';
 
@@ -81,6 +82,12 @@ export interface ComplianceRuleListDto {
      * @memberof ComplianceRuleListDto
      */
     attributes?: Array<BaseAttributeDto>;
+    /**
+     * List of the compliance internal rule condition items
+     * @type {Array<ConditionItemDto>}
+     * @memberof ComplianceRuleListDto
+     */
+    conditionItems?: Array<ConditionItemDto>;
 }
 
 

@@ -123,6 +123,7 @@ export * from './ComplianceGroupRequestDto';
 export * from './ComplianceGroupsDto';
 export * from './ComplianceGroupsListResponseDto';
 export * from './ComplianceGroupsResponseDto';
+export * from './ComplianceInternalRuleRequestDto';
 export * from './ComplianceProfileDto';
 export * from './ComplianceProfileDtoV2';
 export * from './ComplianceProfileGroupsPatchRequestDto';

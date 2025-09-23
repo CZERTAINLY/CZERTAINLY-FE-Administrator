@@ -172,6 +172,7 @@ models/ComplianceGroupRequestDto.ts
 models/ComplianceGroupsDto.ts
 models/ComplianceGroupsListResponseDto.ts
 models/ComplianceGroupsResponseDto.ts
+models/ComplianceInternalRuleRequestDto.ts
 models/ComplianceProfileDto.ts
 models/ComplianceProfileDtoV2.ts
 models/ComplianceProfileGroupsPatchRequestDto.ts
