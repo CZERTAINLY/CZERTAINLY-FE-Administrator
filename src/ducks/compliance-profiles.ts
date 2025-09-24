@@ -1,19 +1,9 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { RaProfileSimplifiedModel } from 'types/certificate';
-import {
-    ComplianceProfileGroupListResponseModel,
-    ComplianceProfileGroupRequestModel,
-    ComplianceProfileListModel,
-    ComplianceProfileRequestModel,
-    ComplianceProfileResponseModel,
-    ComplianceProfileRuleAddRequestModel,
-    ComplianceProfileRuleAddResponseModel,
-    ComplianceProfileRuleDeleteRequestModel,
-    ComplianceProfileRuleListResponseModel,
-} from 'types/complianceProfiles';
+import { ComplianceProfileListModel } from 'types/complianceProfiles';
 import { BulkActionModel } from 'types/connectors';
 import {
     ComplianceGroupListDto,
+    ComplianceInternalRuleRequestDto,
     ComplianceProfileDto,
     ComplianceProfileDtoV2,
     ComplianceProfileGroupsPatchRequestDto,
@@ -59,6 +49,9 @@ export type State = {
     isAssociatingComplianceProfile: boolean;
     isDissociatingComplianceProfile: boolean;
     isCheckingCompliance: boolean;
+    isCreatingComplienceInternalRule: boolean;
+    isUpdatingComplienceInternalRule: boolean;
+    isDeletingComplienceInternalRule: boolean;
 };
 
 export const initialState: State = {
@@ -93,6 +86,9 @@ export const initialState: State = {
     isAssociatingComplianceProfile: false,
     isDissociatingComplianceProfile: false,
     isCheckingCompliance: false,
+    isCreatingComplienceInternalRule: false,
+    isUpdatingComplienceInternalRule: false,
+    isDeletingComplienceInternalRule: false,
 };
 
 export const slice = createSlice({
@@ -285,7 +281,7 @@ export const slice = createSlice({
         //////////////////////////////
         getListComplianceRules: (
             state,
-            action: PayloadAction<{ resource: Resource; connectorUuid?: string; kind?: string; type?: string; format?: string }>,
+            action: PayloadAction<{ resource?: Resource; connectorUuid?: string; kind?: string; type?: string; format?: string }>,
         ) => {
             state.isFetchingRules = true;
         },
@@ -406,6 +402,42 @@ export const slice = createSlice({
         updateGroupFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isUpdatingGroup = false;
         },
+
+        createComplienceInternalRule: (
+            state,
+            action: PayloadAction<{ complianceInternalRuleRequestDto: ComplianceInternalRuleRequestDto }>,
+        ) => {
+            state.isCreatingComplienceInternalRule = true;
+        },
+        createComplienceInternalRuleSuccess: (state, action: PayloadAction<void>) => {
+            state.isCreatingComplienceInternalRule = false;
+        },
+        createComplienceInternalRuleFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isCreatingComplienceInternalRule = false;
+        },
+
+        updateComplienceInternalRule: (
+            state,
+            action: PayloadAction<{ internalRuleUuid: string; complianceInternalRuleRequestDto: ComplianceInternalRuleRequestDto }>,
+        ) => {
+            state.isUpdatingComplienceInternalRule = true;
+        },
+        updateComplienceInternalRuleSuccess: (state, action: PayloadAction<void>) => {
+            state.isUpdatingComplienceInternalRule = false;
+        },
+        updateComplienceInternalRuleFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isUpdatingComplienceInternalRule = false;
+        },
+
+        deleteComplienceInternalRule: (state, action: PayloadAction<{ internalRuleUuid: string }>) => {
+            state.isDeletingComplienceInternalRule = true;
+        },
+        deleteComplienceInternalRuleSuccess: (state, action: PayloadAction<{ uuid: string }>) => {
+            state.isDeletingComplienceInternalRule = false;
+        },
+        deleteComplienceInternalRuleFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isDeletingComplienceInternalRule = false;
+        },
     },
 });
 
@@ -445,6 +477,10 @@ const groupRules = createSelector(state, (state) => state.groupRules);
 const isUpdatingRule = createSelector(state, (state) => state.isUpdatingRule);
 const isUpdatingGroup = createSelector(state, (state) => state.isUpdatingGroup);
 
+const isCreatingComplienceInternalRule = createSelector(state, (state) => state.isCreatingComplienceInternalRule);
+const isUpdatingComplienceInternalRule = createSelector(state, (state) => state.isUpdatingComplienceInternalRule);
+const isDeletingComplienceInternalRule = createSelector(state, (state) => state.isDeletingComplienceInternalRule);
+
 export const selectors = {
     state,
 
@@ -481,6 +517,9 @@ export const selectors = {
     groupRules,
     isUpdatingRule,
     isUpdatingGroup,
+    isCreatingComplienceInternalRule,
+    isUpdatingComplienceInternalRule,
+    isDeletingComplienceInternalRule,
 };
 
 export const actions = slice.actions;

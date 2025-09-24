@@ -8,17 +8,6 @@ import { actions as userInterfaceActions } from './user-interface';
 
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { slice } from './compliance-profiles';
-import {
-    transformComplianceProfileGroupListResponseDtoToModel,
-    transformComplianceProfileGroupRequestModelToDto,
-    transformComplianceProfileListModelToDto,
-    transformComplianceProfileRequestModelToDto,
-    transformComplianceProfileResponseDtoToModel,
-    transformComplianceProfileRuleAddRequestModelToDto,
-    transformComplianceProfileRuleAddResponseDtoToModel,
-    transformComplianceProfileRuleDeleteRequestModelToDto,
-    transformComplianceProfileRuleListResponseDtoToModel,
-} from './transform/compliance-profiles';
 
 const getComplianceProfileDetail: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -53,25 +42,23 @@ const createComplianceProfile: AppEpic = (action$, state$, deps) => {
         filter(slice.actions.createComplianceProfile.match),
 
         switchMap((action) =>
-            deps.apiClients.complianceProfile
-                .createComplianceProfileV2({ complianceProfileRequestDtoV2: transformComplianceProfileRequestModelToDto(action.payload) })
-                .pipe(
-                    mergeMap((obj) =>
-                        of(
-                            slice.actions.createComplianceProfileSuccess({ uuid: obj.uuid }),
-                            appRedirectActions.redirect({ url: `../complianceprofiles/detail/${obj.uuid}` }),
-                        ),
-                    ),
-
-                    catchError((error) =>
-                        of(
-                            slice.actions.createComplianceProfileFailed({
-                                error: extractError(error, 'Failed to create Compliance Profile'),
-                            }),
-                            appRedirectActions.fetchError({ error, message: 'Failed to create Compliance Profile' }),
-                        ),
+            deps.apiClients.complianceProfile.createComplianceProfileV2({ complianceProfileRequestDtoV2: action.payload }).pipe(
+                mergeMap((obj) =>
+                    of(
+                        slice.actions.createComplianceProfileSuccess({ uuid: obj.uuid }),
+                        appRedirectActions.redirect({ url: `../complianceprofiles/detail/${obj.uuid}` }),
                     ),
                 ),
+
+                catchError((error) =>
+                    of(
+                        slice.actions.createComplianceProfileFailed({
+                            error: extractError(error, 'Failed to create Compliance Profile'),
+                        }),
+                        appRedirectActions.fetchError({ error, message: 'Failed to create Compliance Profile' }),
+                    ),
+                ),
+            ),
         ),
     );
 };
@@ -252,7 +239,7 @@ const dissociateComplianceProfile: AppEpic = (action$, state$, deps) => {
     );
 };
 
-const getAssociatedRaProfiles: AppEpic = (action$, state$, deps) => {
+const getAssociatedComplianceProfiles: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.getAssociatedComplianceProfiles.match),
         switchMap((action) =>
@@ -262,7 +249,7 @@ const getAssociatedRaProfiles: AppEpic = (action$, state$, deps) => {
                     associationObjectUuid: action.payload.associationObjectUuid,
                 })
                 .pipe(
-                    map((raProfiles) => slice.actions.getAssociatedComplianceProfilesSuccess({ complianceProfiles: raProfiles })),
+                    map((complianceProfiles) => slice.actions.getAssociatedComplianceProfilesSuccess({ complianceProfiles })),
 
                     catchError((error) =>
                         of(
@@ -270,6 +257,7 @@ const getAssociatedRaProfiles: AppEpic = (action$, state$, deps) => {
                                 error: extractError(error, 'Failed to get associated Compliance Profiles'),
                             }),
                             appRedirectActions.fetchError({ error, message: 'Failed to get associated Compliance Profiles' }),
+                            userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ComplianceProfileAssociations),
                         ),
                     ),
                 ),
@@ -294,8 +282,10 @@ const getComplianceRules: AppEpic = (action$, state$, deps) => {
 
                     catchError((error) =>
                         of(
-                            slice.actions.getListComplianceRulesFailed({ error: extractError(error, 'Failed to get compliance rules') }),
-                            userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ComplianceProfileDetails),
+                            slice.actions.getListComplianceRulesFailed({
+                                error: extractError(error, 'Failed to get compliance rules'),
+                            }),
+                            userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfAvailableRulesAndGroups),
                         ),
                     ),
                 ),
@@ -317,8 +307,10 @@ const getComplianceGroups: AppEpic = (action$, state$, deps) => {
                     map((groups) => slice.actions.getListComplianceGroupsSuccess({ groups })),
                     catchError((error) =>
                         of(
-                            slice.actions.getListComplianceGroupsFailed({ error: extractError(error, 'Failed to get compliance groups') }),
-                            userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ComplianceProfileDetails),
+                            slice.actions.getListComplianceGroupsFailed({
+                                error: extractError(error, 'Failed to get compliance groups'),
+                            }),
+                            userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ListOfAvailableRulesAndGroups),
                         ),
                     ),
                 ),
@@ -343,7 +335,6 @@ const getComplianceGroupRules: AppEpic = (action$, state$, deps) => {
                             slice.actions.getListComplianceGroupRulesFailed({
                                 error: extractError(error, 'Failed to get compliance group rules'),
                             }),
-                            userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ComplianceProfileDetails),
                         ),
                     ),
                 ),
@@ -484,6 +475,82 @@ const updateGroup: AppEpic = (action$, state$, deps) => {
     );
 };
 
+const createComplienceInternalRule: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.createComplienceInternalRule.match),
+        switchMap((action) =>
+            deps.apiClients.complianceProfile
+                .createComplianceInternalRuleV2({
+                    complianceInternalRuleRequestDto: action.payload.complianceInternalRuleRequestDto,
+                })
+                .pipe(
+                    mergeMap(() => of(slice.actions.createComplienceInternalRuleSuccess(), slice.actions.getListComplianceRules({}))),
+                    catchError((error) =>
+                        of(
+                            slice.actions.createComplienceInternalRuleFailed({
+                                error: extractError(error, 'Failed to create compliance internal rule'),
+                            }),
+                            appRedirectActions.fetchError({ error, message: 'Failed to create compliance internal rule' }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
+const updateComplienceInternalRule: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.updateComplienceInternalRule.match),
+        switchMap((action) =>
+            deps.apiClients.complianceProfile
+                .updateComplianceInternalRuleV2({
+                    internalRuleUuid: action.payload.internalRuleUuid,
+                    complianceInternalRuleRequestDto: action.payload.complianceInternalRuleRequestDto,
+                })
+                .pipe(
+                    mergeMap(() => of(slice.actions.updateComplienceInternalRuleSuccess(), slice.actions.getListComplianceRules({}))),
+                    catchError((error) =>
+                        of(
+                            slice.actions.updateComplienceInternalRuleFailed({
+                                error: extractError(error, 'Failed to update compliance internal rule'),
+                            }),
+                            appRedirectActions.fetchError({ error, message: 'Failed to update compliance internal rule' }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
+const deleteComplienceInternalRule: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.deleteComplienceInternalRule.match),
+        switchMap((action) =>
+            deps.apiClients.complianceProfile.deleteComplianceInternalRuleV2({ internalRuleUuid: action.payload.internalRuleUuid }).pipe(
+                mergeMap(() =>
+                    of(
+                        slice.actions.deleteComplienceInternalRuleSuccess({
+                            uuid: action.payload.internalRuleUuid,
+                        }),
+                        slice.actions.getListComplianceRules({}),
+                    ),
+                ),
+                catchError((error) =>
+                    of(
+                        slice.actions.deleteComplienceInternalRuleFailed({
+                            error: extractError(error, 'Failed to delete compliance internal rule'),
+                        }),
+                        appRedirectActions.fetchError({
+                            error,
+                            message: 'Failed to delete compliance internal rule',
+                        }),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
 const epics = [
     getComplianceProfileDetail,
     getListComplianceProfiles,
@@ -496,13 +563,16 @@ const epics = [
     updateGroup,
     associateComplianceProfile,
     dissociateComplianceProfile,
-    getAssociatedRaProfiles,
+    getAssociatedComplianceProfiles,
     getComplianceRules,
     getComplianceGroups,
     getComplianceGroupRules,
     getAssociationsOfComplianceProfile,
     checkComplianceForProfiles,
     checkComplianceForResourceObjects,
+    createComplienceInternalRule,
+    updateComplienceInternalRule,
+    deleteComplienceInternalRule,
 ];
 
 export default epics;

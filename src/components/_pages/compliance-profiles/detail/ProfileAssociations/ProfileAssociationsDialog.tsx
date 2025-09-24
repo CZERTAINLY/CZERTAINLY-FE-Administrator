@@ -65,7 +65,6 @@ export default function ProfileAssociationsDialog({ isOpen, onClose, profile, as
     const onSubmit = useCallback(
         (values: any) => {
             if (!profile || !selectedResourse) return;
-            console.log(values);
             dispatch(
                 actions.associateComplianceProfile({
                     uuid: profile.uuid,

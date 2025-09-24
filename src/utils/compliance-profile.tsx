@@ -1,4 +1,4 @@
-import { Badge } from 'reactstrap';
+import { TRuleGroupType } from 'components/_pages/compliance-profiles/detail/AvailableRulesAndGroups/AvailableRulesAndGroups';
 import { ComplianceGroupListDto, ComplianceProfileDtoV2, ComplianceRuleListDto, Resource } from 'types/openapi';
 import { ComplianceRuleAvailabilityStatus } from 'types/openapi/models/ComplianceRuleAvailabilityStatus';
 
@@ -31,7 +31,7 @@ export const rulesSourceOptions = [
 
 export function getRulesAndGroupsTableHeaders(type: 'assigned' | 'available') {
     return [
-        ...(type === 'assigned' ? [{ id: 'status', content: 'Status', width: '20%', sortable: true }] : []),
+        ...(type === 'assigned' ? [{ id: 'status', content: 'Status', sortable: true }] : []),
         {
             id: 'name',
             content: 'Name',
@@ -64,7 +64,7 @@ export const getAssignedInternalListOfGroupsAndRules = (profile: ComplianceProfi
                 entityType: 'rule',
             },
         }));
-    return internalRules;
+    return internalRules as TRuleGroupType[];
 };
 
 export const getAssignedProviderListOfGroupsAndRules = (
@@ -104,7 +104,7 @@ export const getAssignedProviderListOfGroupsAndRules = (
             ];
         })
         .flat();
-    return providerRulesAndGroupsList;
+    return providerRulesAndGroupsList as TRuleGroupType[];
 };
 
 export const formatAvailableRulesAndGroups = (

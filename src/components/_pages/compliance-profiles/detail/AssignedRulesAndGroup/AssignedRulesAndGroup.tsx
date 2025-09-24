@@ -2,10 +2,10 @@ import Widget from 'components/Widget';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import Select from 'react-select';
-import { Badge, Button, Col, Label, Row, Tooltip, UncontrolledTooltip } from 'reactstrap';
+import { Badge, Button, Col, Label, Row, UncontrolledTooltip } from 'reactstrap';
 import { actions, selectors } from 'ducks/compliance-profiles';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import { ComplianceProfileDtoV2, PlatformEnum, Resource } from 'types/openapi';
+import { ComplianceProfileDtoV2, ComplianceRuleAvailabilityStatus, PlatformEnum, Resource } from 'types/openapi';
 import CustomTable from 'components/CustomTable';
 import WidgetButtons from 'components/WidgetButtons';
 import { useParams } from 'react-router';
@@ -21,6 +21,8 @@ import {
     rulesSourceOptions,
 } from 'utils/compliance-profile';
 import { ResourceBadges } from 'components/_pages/compliance-profiles/detail/Components/ResourceBadges';
+import { TRuleGroupType } from 'components/_pages/compliance-profiles/detail/AvailableRulesAndGroups/AvailableRulesAndGroups';
+import { LockWidgetNameEnum } from 'types/user-interface';
 
 interface Props {
     profile: ComplianceProfileDtoV2 | undefined;
@@ -38,9 +40,9 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
     const [assignedRulesSource, setAssignedRulesSource] = useState<'Internal' | 'Provider' | null>(null);
     const [assignedResourceType, setAssignedResourceType] = useState<string | null>('All');
 
-    const [assignedRulesAndGroupsList, setAssignedRulesAndGroupsList] = useState<any[]>([]);
-    const [assignedRulesAndGroupsResources, setAssignedRulesAndGroupsResources] = useState<any[]>(['All']);
-    const [filteredAssignedRulesAndGroupList, setFilteredAssignedRulesAndGroupList] = useState<any[]>([]);
+    const [assignedRulesAndGroupsList, setAssignedRulesAndGroupsList] = useState<TRuleGroupType[]>([]);
+    const [assignedRulesAndGroupsResources, setAssignedRulesAndGroupsResources] = useState<(Resource | 'All')[]>(['All']);
+    const [filteredAssignedRulesAndGroupList, setFilteredAssignedRulesAndGroupList] = useState<TRuleGroupType[]>([]);
     const [assignedProvidersList, setAssignedProvidersList] = useState<{ label: string; value: string }[]>([]);
     const [selectedAssignedProvider, setSelectedAssignedProvider] = useState<string | null>(null);
     const [assignedKindsList, setAssignedKindsList] = useState<{ label: string; value: string }[]>([]);
@@ -53,7 +55,7 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
     const tableDataAssignedRulesAndGroups = useMemo(
         () =>
             filteredAssignedRulesAndGroupList.map((ruleOrGroup) => {
-                const statusColor = getComplianceProfileStatusColor(ruleOrGroup.availabilityStatus);
+                const statusColor = getComplianceProfileStatusColor(ruleOrGroup.availabilityStatus as ComplianceRuleAvailabilityStatus);
                 return {
                     id: ruleOrGroup.uuid,
                     columns: [
@@ -63,7 +65,7 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
                                 color={statusColor}
                                 style={{ background: statusColor }}
                             >
-                                {capitalize(ruleOrGroup.availabilityStatus)}
+                                {capitalize(ruleOrGroup.availabilityStatus as ComplianceRuleAvailabilityStatus)}
                             </Badge>
                             {ruleOrGroup.updatedReason && (
                                 <UncontrolledTooltip target={`status-${ruleOrGroup.uuid.replace(/-/g, '_')}`}>
@@ -73,7 +75,7 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
                         </div>,
 
                         ruleOrGroup.name,
-                        ruleOrGroup.resource,
+                        getEnumLabel(resourceEnum, ruleOrGroup.resource),
                         <div style={{ display: 'flex', alignItems: 'center' }}>
                             <Badge color="secondary">{capitalize(ruleOrGroup?.entityDetails?.entityType)} </Badge>
                             <Button
@@ -107,8 +109,6 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
                                                     kind: ruleOrGroup?.entityDetails?.kind ?? undefined,
                                                 },
                                             };
-                                            console.log(rulePayload);
-
                                             dispatch(actions.updateRule(rulePayload));
                                         }
                                         if (ruleOrGroup.entityDetails?.entityType === 'group') {
@@ -118,8 +118,8 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
                                                     complianceProfileGroupsPatchRequestDto: {
                                                         removal: true,
                                                         groupUuid: ruleOrGroup.uuid,
-                                                        connectorUuid: ruleOrGroup.entityDetails.connectorUuid ?? undefined,
-                                                        kind: ruleOrGroup.entityDetails.kind ?? undefined,
+                                                        connectorUuid: ruleOrGroup.entityDetails.connectorUuid!,
+                                                        kind: ruleOrGroup.entityDetails.kind!,
                                                     },
                                                 }),
                                             );
@@ -131,7 +131,7 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
                     ],
                 };
             }),
-        [dispatch, filteredAssignedRulesAndGroupList, id, setIsEntityDetailMenuOpen, setSelectedEntityDetails],
+        [dispatch, filteredAssignedRulesAndGroupList, id, resourceEnum, setIsEntityDetailMenuOpen, setSelectedEntityDetails],
     );
 
     const getInternalListOfGroupsAndRules = useCallback(
@@ -160,7 +160,7 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
     );
 
     const getListOfResources = useCallback(
-        (rulesAndGroupsList: any[]): string[] => {
+        (rulesAndGroupsList: TRuleGroupType[]): (Resource | 'All')[] => {
             if (!profile) return [];
             return getListOfResourcesUtil(rulesAndGroupsList);
         },
@@ -168,8 +168,8 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
     );
 
     const filterRulesAndGroupsList = useCallback(() => {
-        let filteredRulesAndGroupsList = [];
-        let resourcesList = [];
+        let filteredRulesAndGroupsList: TRuleGroupType[] = [];
+        let resourcesList: (Resource | 'All')[] = [];
         if (assignedRulesSource === 'Internal') {
             filteredRulesAndGroupsList = getInternalListOfGroupsAndRules(
                 assignedResourceType === 'All' || assignedResourceType === null ? undefined : (assignedResourceType as Resource),
@@ -244,9 +244,15 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
     }, [assignedRulesSource, getListOfKinds]);
 
     return (
-        <Widget title="Assigned Rules & Groups" busy={isFetchingRules} titleSize="large">
+        <Widget
+            title="Assigned Rules & Groups"
+            busy={isFetchingRules}
+            titleSize="large"
+            widgetLockName={LockWidgetNameEnum.ComplianceProfileDetails}
+            lockSize="large"
+        >
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                <Col>
+                <Col style={{ width: '100%' }}>
                     <Label for="assignedRulesSource">Rules Source</Label>
                     <Select
                         id="assignedRulesSource"

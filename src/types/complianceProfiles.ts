@@ -9,7 +9,6 @@ import {
     ComplianceProfileListDto as ComplianceProfileListDtoOpenApi,
     ComplianceProfileRequestDto as ComplianceProfileRequestDtoOpenApi,
     ComplianceProfileRuleDto,
-    ComplianceProfilesListDto,
     ComplianceProviderSummaryDto,
     ComplianceRuleAdditionRequestDto,
     ComplianceRuleDeletionRequestDto,
@@ -22,9 +21,7 @@ export type ComplianceProfileListRuleDto = ComplianceProviderSummaryDto;
 export type ComplianceProfileListRuleModel = ComplianceProfileListRuleDto;
 
 export type ComplianceProfileListDto = ComplianceProfileListDtoOpenApi;
-export type ComplianceProfileListModel =
-    ComplianceProfileListDto; /* Omit<ComplianceProfileListDto, 'rules'> & { rules: Array<ComplianceProfileListRuleModel> };
- */
+export type ComplianceProfileListModel = ComplianceProfileListDto;
 //---
 export type ComplianceProfileResponseRuleRuleDto = ComplianceRuleDto;
 export type ComplianceProfileResponseRuleRuleModel = Omit<ComplianceProfileResponseRuleRuleDto, 'attributes'> & {

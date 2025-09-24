@@ -58,7 +58,6 @@ export interface ApiClients {
     auth: AuthenticationManagementApi;
     users: UserManagementApi;
     roles: RoleManagementApi;
-    // rules: RulesManagementApi;
     actions: WorkflowActionsManagementApi;
     rules: WorkflowRulesManagementApi;
     triggers: WorkflowTriggersManagementApi;
@@ -108,7 +107,6 @@ export const backendClient: ApiClients = {
     auth: new AuthenticationManagementApi(configuration),
     users: new UserManagementApi(configuration),
     roles: new RoleManagementApi(configuration),
-    // rules: new RulesManagementApi(configuration),
     actions: new WorkflowActionsManagementApi(configuration),
     rules: new WorkflowRulesManagementApi(configuration),
     triggers: new WorkflowTriggersManagementApi(configuration),

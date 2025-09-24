@@ -3,9 +3,9 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import Select from 'react-select';
 import { Form as BootstrapForm, Badge, Button, Col, Label, Row, ButtonGroup } from 'reactstrap';
 import {
-    BaseAttributeDto,
     ComplianceProfileDtoV2,
-    ComplianceProfileRulesPatchRequestDto,
+    ComplianceRuleAvailabilityStatus,
+    ComplianceRuleListDto,
     FunctionGroupCode,
     PlatformEnum,
     Resource,
@@ -27,16 +27,17 @@ import {
 } from 'utils/compliance-profile';
 import { capitalize } from 'utils/common-utils';
 import WidgetButtons from 'components/WidgetButtons';
+import type { WidgetButtonProps } from 'components/WidgetButtons';
 import { ResourceBadges } from 'components/_pages/compliance-profiles/detail/Components/ResourceBadges';
-import AttributeViewer from 'components/Attributes/AttributeViewer';
 import Dialog from 'components/Dialog';
 import AttributeEditor from 'components/Attributes/AttributeEditor';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
-import { Field, Form } from 'react-final-form';
+import { Form } from 'react-final-form';
 import ProgressButton from 'components/ProgressButton';
-import { selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 import { AttributeDescriptorModel, AttributeRequestModel } from 'types/attributes';
+import InternalRuleForm from 'components/_pages/compliance-profiles/detail/InternalRuleForm/InternalRuleForm';
+import { LockWidgetNameEnum } from 'types/user-interface';
 
 interface Props {
     profile: ComplianceProfileDtoV2 | undefined;
@@ -44,17 +45,15 @@ interface Props {
     setIsEntityDetailMenuOpen: (isEntityDetailMenuOpen: boolean) => void;
 }
 
-type TRuleGroupType = {
-    uuid: string;
-    name: string;
-    description?: string;
-    connectorUuid?: string;
-    kind?: string;
-    resource: string;
+export type TRuleGroupType = ComplianceRuleListDto & {
     entityDetails: {
         entityType: string;
+        connectorUuid?: string;
+        connectorName?: string;
+        kind?: string;
     };
-    attributes?: AttributeDescriptorModel[];
+    availabilityStatus?: ComplianceRuleAvailabilityStatus;
+    updatedReason?: string;
 };
 
 export default function AvailableRulesAndGroups({ profile, setSelectedEntityDetails, setIsEntityDetailMenuOpen }: Props) {
@@ -68,7 +67,6 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
     const groups = useSelector(selectors.groups);
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const connectors = useSelector(connectorsSelectors.connectors);
-    const resourceCustomAttributes = useSelector(customAttributesSelectors.resourceCustomAttributes);
 
     const [availableSelectedRulesSource, setAvailableSelectedRulesSource] = useState<'Internal' | 'Provider' | null>(null);
     const [selectedAvailableResourceType, setSelectedAvailableResourceType] = useState<string | null>('All');
@@ -80,27 +78,20 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
     const [filteredAvailableRulesAndGroupsList, setFilteredAvailableRulesAndGroupsList] = useState<TRuleGroupType[]>([]);
     const [alreadyAssignedRulesandGroupUuidList, setAlreadyAssignedRulesandGroupUuidList] = useState<string[]>([]);
     const [isAddingRuleHasAttribute, setIsAddingRuleHasAttribute] = useState(false);
-    const [addingRule, setAddingRule] = useState<TRuleGroupType | null>(null);
+    const [isAssigningRule, setIsAssigningRule] = useState<TRuleGroupType | null>(null);
+    const [isAddingInternalRule, setIsAddingInternalRule] = useState(false);
+    const [deletingInternalRuleId, setDeletingInternalRuleId] = useState<string | null>(null);
+    const [editingInternalRule, setEditingInternalRule] = useState<TRuleGroupType | null>(null);
 
     const handleClearInput = () => {
         dispatch(complianceActions.clearRules());
         dispatch(complianceActions.clearGroups());
     };
 
-    const getAvailableRulesAndGroupsWithoutAlreadyAssigned = useCallback(() => {
-        if (!groups || !rules) return [];
-        const withoutAssignedRulesandGroups = [
-            ...formatAvailableRulesAndGroups('group', groups),
-            ...formatAvailableRulesAndGroups('rule', rules),
-        ].filter((ruleOrGroup) => !alreadyAssignedRulesandGroupUuidList.includes(ruleOrGroup.uuid));
-        return withoutAssignedRulesandGroups as TRuleGroupType[];
-    }, [groups, rules, alreadyAssignedRulesandGroupUuidList]);
-
     //get internal rules or provider data
     useEffect(() => {
-        //TODO: change to 'All' when backend is updated
         if (availableSelectedRulesSource === 'Internal') {
-            dispatch(actions.getListComplianceRules({ resource: Resource.ComplianceProfiles }));
+            dispatch(actions.getListComplianceRules({}));
         }
         if (availableSelectedRulesSource === 'Provider') {
             dispatch(connectorsActions.listConnectorsMerge({ functionGroup: FunctionGroupCode.ComplianceProvider }));
@@ -131,14 +122,12 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
         if (availableSelectedRulesSource === 'Provider' && selectedAvailableProvider && selectedAvailableKind) {
             dispatch(
                 actions.getListComplianceRules({
-                    resource: Resource.Certificates,
                     connectorUuid: selectedAvailableProvider,
                     kind: selectedAvailableKind,
                 }),
             );
             dispatch(
                 actions.getListComplianceGroups({
-                    resource: Resource.Certificates,
                     connectorUuid: selectedAvailableProvider,
                     kind: selectedAvailableKind,
                 }),
@@ -155,14 +144,21 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
         setAlreadyAssignedRulesandGroupUuidList(alreadyAssignedRulesandGroups.map((ruleOrGroup) => ruleOrGroup.uuid));
     }, [profile]);
 
+    const getAvailableRulesAndGroupsWithoutAlreadyAssigned = useCallback(() => {
+        if (!groups || !rules) return [];
+        const withoutAssignedRulesandGroups = [
+            ...formatAvailableRulesAndGroups('group', groups),
+            ...formatAvailableRulesAndGroups('rule', rules),
+        ].filter((ruleOrGroup) => !alreadyAssignedRulesandGroupUuidList.includes(ruleOrGroup.uuid));
+        return withoutAssignedRulesandGroups as TRuleGroupType[];
+    }, [groups, rules, alreadyAssignedRulesandGroupUuidList]);
+
     //get initial available rules and groups list
     useEffect(() => {
-        if (!groups || !rules) return;
-
         const withoutAssignedRulesandGroups = getAvailableRulesAndGroupsWithoutAlreadyAssigned();
         setFilteredAvailableRulesAndGroupsList(withoutAssignedRulesandGroups);
         setAvailableRulesAndGroupsResources(getListOfResources(withoutAssignedRulesandGroups));
-    }, [groups, rules, alreadyAssignedRulesandGroupUuidList, getAvailableRulesAndGroupsWithoutAlreadyAssigned]);
+    }, [alreadyAssignedRulesandGroupUuidList, getAvailableRulesAndGroupsWithoutAlreadyAssigned]);
 
     //get filtered by resource type
     useEffect(() => {
@@ -171,6 +167,55 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
         );
         setFilteredAvailableRulesAndGroupsList(filtered);
     }, [getAvailableRulesAndGroupsWithoutAlreadyAssigned, selectedAvailableResourceType]);
+
+    const onRuleAssign = useCallback(
+        (ruleOrGroup: TRuleGroupType) => {
+            if (!id) return;
+            if (ruleOrGroup?.attributes?.length && ruleOrGroup?.attributes?.length > 0) {
+                setIsAddingRuleHasAttribute(true);
+                setIsAssigningRule(ruleOrGroup);
+            } else {
+                const rulePayload = {
+                    uuid: id,
+                    complianceProfileRulesPatchRequestDto: {
+                        removal: false,
+                        ruleUuid: ruleOrGroup.uuid,
+                        connectorUuid: ruleOrGroup?.connectorUuid ?? undefined,
+                        kind: ruleOrGroup?.kind ?? undefined,
+                        attributes: (ruleOrGroup?.attributes as AttributeRequestModel[]) ?? undefined,
+                    },
+                };
+                dispatch(actions.updateRule(rulePayload));
+            }
+        },
+        [dispatch, id],
+    );
+
+    const onGroupAssign = useCallback(
+        (ruleOrGroup: TRuleGroupType) => {
+            if (!id) return;
+            const groupPayload = {
+                uuid: id,
+                complianceProfileGroupsPatchRequestDto: {
+                    removal: false,
+                    groupUuid: ruleOrGroup.uuid,
+                    connectorUuid: ruleOrGroup.connectorUuid!,
+                    kind: ruleOrGroup.kind!,
+                },
+            };
+            dispatch(actions.updateGroup(groupPayload));
+        },
+        [dispatch, id],
+    );
+
+    const deleteInternalRule = useCallback(
+        (id: string) => {
+            if (!id) return;
+            dispatch(actions.deleteComplienceInternalRule({ internalRuleUuid: id }));
+            setDeletingInternalRuleId(null);
+        },
+        [dispatch],
+    );
 
     const tableHeadersAvailableRulesAndGroups = useMemo(() => {
         return getRulesAndGroupsTableHeaders('available');
@@ -183,7 +228,7 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
                     id: ruleOrGroup.uuid,
                     columns: [
                         ruleOrGroup.name,
-                        ruleOrGroup.resource,
+                        getEnumLabel(resourceEnum, ruleOrGroup.resource),
                         <div style={{ display: 'flex', alignItems: 'center' }}>
                             <Badge color="secondary">{capitalize(ruleOrGroup?.entityDetails?.entityType)} </Badge>
                             <Button
@@ -206,92 +251,117 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
                                     disabled: false,
                                     tooltip: 'Add',
                                     onClick: () => {
-                                        if (!id) return;
                                         if (ruleOrGroup.entityDetails?.entityType === 'rule') {
-                                            if (ruleOrGroup?.attributes?.length && ruleOrGroup?.attributes?.length > 0) {
-                                                console.log({ ruleOrGroup });
-
-                                                setIsAddingRuleHasAttribute(true);
-                                                setAddingRule(ruleOrGroup);
-                                            } else {
-                                                const rulePayload = {
-                                                    uuid: id,
-                                                    complianceProfileRulesPatchRequestDto: {
-                                                        removal: false,
-                                                        ruleUuid: ruleOrGroup.uuid,
-                                                        connectorUuid: ruleOrGroup?.connectorUuid ?? undefined,
-                                                        kind: ruleOrGroup?.kind ?? undefined,
-                                                        attributes: (ruleOrGroup?.attributes as AttributeRequestModel[]) ?? undefined,
-                                                    },
-                                                };
-                                                console.log(rulePayload);
-
-                                                dispatch(actions.updateRule(rulePayload));
-                                            }
+                                            onRuleAssign(ruleOrGroup);
                                         }
                                         if (ruleOrGroup.entityDetails?.entityType === 'group') {
-                                            const groupPayload = {
-                                                uuid: id,
-                                                complianceProfileGroupsPatchRequestDto: {
-                                                    removal: false,
-                                                    groupUuid: ruleOrGroup.uuid,
-                                                    connectorUuid: ruleOrGroup.connectorUuid!,
-                                                    kind: ruleOrGroup.kind!,
-                                                },
-                                            };
-                                            console.log(groupPayload);
-
-                                            dispatch(actions.updateGroup(groupPayload));
+                                            onGroupAssign(ruleOrGroup);
                                         }
                                     },
                                 },
+                                ...(availableSelectedRulesSource === 'Internal'
+                                    ? ([
+                                          {
+                                              icon: 'minus-square',
+                                              disabled: false,
+                                              tooltip: 'Delete',
+                                              onClick: () => {
+                                                  setDeletingInternalRuleId(ruleOrGroup.uuid);
+                                              },
+                                          },
+                                          {
+                                              icon: 'pencil',
+                                              disabled: false,
+                                              tooltip: 'Edit',
+                                              onClick: () => {
+                                                  setEditingInternalRule(ruleOrGroup);
+                                              },
+                                          },
+                                      ] as WidgetButtonProps[])
+                                    : ([] as WidgetButtonProps[])),
                             ]}
                         />,
                     ],
                 };
             }),
-        [dispatch, filteredAvailableRulesAndGroupsList, id, setIsEntityDetailMenuOpen, setSelectedEntityDetails],
+
+        [
+            filteredAvailableRulesAndGroupsList,
+            resourceEnum,
+            availableSelectedRulesSource,
+            setSelectedEntityDetails,
+            setIsEntityDetailMenuOpen,
+            onRuleAssign,
+            onGroupAssign,
+        ],
     );
 
-    function onSubmit(values: any) {
-        if (!addingRule || !id) return;
-        const attributes = collectFormAttributes('rule-attributes', addingRule?.attributes ?? [], values);
-        const rulePayload = {
-            uuid: id,
-            complianceProfileRulesPatchRequestDto: {
-                removal: false,
-                ruleUuid: addingRule.uuid,
-                connectorUuid: addingRule?.connectorUuid ?? undefined,
-                kind: addingRule?.kind ?? undefined,
-                attributes: attributes,
-            },
-        };
-        dispatch(actions.updateRule(rulePayload));
-        setIsAddingRuleHasAttribute(false);
-        setAddingRule(null);
-    }
+    const onSubmit = useCallback(
+        (values: any) => {
+            if (!isAssigningRule || !id) return;
+            const attributes = collectFormAttributes(
+                'rule-attributes',
+                (isAssigningRule?.attributes ?? []) as AttributeDescriptorModel[],
+                values,
+            );
+            const rulePayload = {
+                uuid: id,
+                complianceProfileRulesPatchRequestDto: {
+                    removal: false,
+                    ruleUuid: isAssigningRule.uuid,
+                    connectorUuid: isAssigningRule?.connectorUuid ?? undefined,
+                    kind: isAssigningRule?.kind ?? undefined,
+                    attributes: attributes,
+                },
+            };
+            dispatch(actions.updateRule(rulePayload));
+            setIsAddingRuleHasAttribute(false);
+            setIsAssigningRule(null);
+        },
+        [dispatch, id, isAssigningRule],
+    );
 
     return (
         <>
-            <Widget title="Available Rules & Groups" titleSize="large">
+            <Widget
+                title="Available Rules & Groups"
+                titleSize="large"
+                widgetLockName={LockWidgetNameEnum.ListOfAvailableRulesAndGroups}
+                lockSize="large"
+            >
                 <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                    <Col>
+                    <Col style={{ width: '100%' }}>
                         <Label for="availableRulesSource">Rules Source</Label>
-                        <Select
-                            id="availableRulesSource"
-                            inputId="availableRulesSource"
-                            placeholder="Select..."
-                            maxMenuHeight={140}
-                            options={rulesSourceOptions}
-                            value={rulesSourceOptions.find((opt) => opt.value === availableSelectedRulesSource) || null}
-                            menuPlacement="auto"
-                            onChange={(event) => {
-                                setSelectedAvailableResourceType('All');
-                                handleClearInput();
-                                setAvailableSelectedRulesSource((event?.value as 'Internal' | 'Provider') || null);
-                            }}
-                            isClearable
-                        />
+                        <div style={{ display: 'flex', alignItems: 'center', width: '100%', gap: '10px' }}>
+                            <Select
+                                id="availableRulesSource"
+                                inputId="availableRulesSource"
+                                placeholder="Select..."
+                                maxMenuHeight={140}
+                                options={rulesSourceOptions}
+                                value={rulesSourceOptions.find((opt) => opt.value === availableSelectedRulesSource) || null}
+                                menuPlacement="auto"
+                                onChange={(event) => {
+                                    setSelectedAvailableResourceType('All');
+                                    handleClearInput();
+                                    setAvailableSelectedRulesSource((event?.value as 'Internal' | 'Provider') || null);
+                                }}
+                                isClearable
+                                styles={{
+                                    container: (base) => ({
+                                        ...base,
+                                        flex: 1,
+                                        width: '100%',
+                                    }),
+                                }}
+                            />
+
+                            {availableSelectedRulesSource === 'Internal' && (
+                                <Button className="btn btn-link" color="white" onClick={() => setIsAddingInternalRule(true)}>
+                                    <i className="fa fa-plus" />
+                                </Button>
+                            )}
+                        </div>
                     </Col>
                 </Row>
                 {availableSelectedRulesSource === 'Provider' && (
@@ -309,9 +379,9 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
                                 onChange={(event) => {
                                     if (!event) {
                                         setSelectedAvailableKind(null);
-                                        handleClearInput();
                                     }
                                     setSelectedAvailableProvider(event?.value || null);
+                                    handleClearInput();
                                 }}
                                 isClearable
                             />
@@ -360,7 +430,10 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
                     <Form onSubmit={onSubmit} mutators={{ ...mutators() }}>
                         {({ handleSubmit, pristine, submitting, valid, form }) => (
                             <BootstrapForm onSubmit={handleSubmit}>
-                                <AttributeEditor id="rule-attributes" attributeDescriptors={addingRule?.attributes ?? []} />
+                                <AttributeEditor
+                                    id="rule-attributes"
+                                    attributeDescriptors={(isAssigningRule?.attributes ?? []) as AttributeDescriptorModel[]}
+                                />
                                 <div className="d-flex justify-content-end">
                                     <ButtonGroup>
                                         <ProgressButton
@@ -369,12 +442,11 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
                                             inProgress={submitting}
                                             disabled={pristine || submitting || !valid}
                                         />
-
                                         <Button
                                             color="default"
                                             onClick={() => {
                                                 setIsAddingRuleHasAttribute(false);
-                                                setAddingRule(null);
+                                                setIsAssigningRule(null);
                                             }}
                                             disabled={submitting}
                                         >
@@ -388,6 +460,35 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
                 }
                 toggle={() => setIsAddingRuleHasAttribute(false)}
                 buttons={[]}
+            />
+
+            <Dialog
+                size="xl"
+                isOpen={isAddingInternalRule}
+                caption="Create Internal Rule"
+                body={<InternalRuleForm onCancel={() => setIsAddingInternalRule(false)} />}
+                toggle={() => setIsAddingInternalRule(false)}
+                buttons={[]}
+            />
+            <Dialog
+                size="xl"
+                isOpen={editingInternalRule !== null}
+                caption="Edit Internal Rule"
+                body={
+                    <InternalRuleForm rule={editingInternalRule as ComplianceRuleListDto} onCancel={() => setEditingInternalRule(null)} />
+                }
+                toggle={() => setEditingInternalRule(null)}
+                buttons={[]}
+            />
+            <Dialog
+                isOpen={deletingInternalRuleId !== null}
+                caption="Delete Internal Rule"
+                body="You are about to delete a Internal Rule. Is this what you want to do?"
+                toggle={() => setDeletingInternalRuleId(null)}
+                buttons={[
+                    { color: 'danger', onClick: () => deleteInternalRule(deletingInternalRuleId!), body: 'Yes, delete' },
+                    { color: 'secondary', onClick: () => setDeletingInternalRuleId(null), body: 'Cancel' },
+                ]}
             />
         </>
     );

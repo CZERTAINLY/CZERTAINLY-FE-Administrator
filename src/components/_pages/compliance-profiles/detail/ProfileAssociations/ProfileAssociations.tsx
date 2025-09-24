@@ -4,7 +4,7 @@ import WidgetButtons, { WidgetButtonProps } from 'components/WidgetButtons';
 import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
-import { ComplianceProfileDtoV2, Resource, ResourceObjectDto } from 'types/openapi/models';
+import { ComplianceProfileDtoV2, Resource } from 'types/openapi/models';
 import { LockWidgetNameEnum } from 'types/user-interface';
 
 import { actions, selectors } from 'ducks/compliance-profiles';
@@ -20,7 +20,7 @@ export default function ProfileAssociations({ profile }: Props) {
     const associationsOfComplianceProfile = useSelector(selectors.associationsOfComplianceProfile);
     const [isAssociateFrofileModalOpen, setIsAssociateFrofileModalOpen] = useState(false);
 
-    const raProfileHeaders: TableHeader[] = useMemo(
+    const associationHeaders: TableHeader[] = useMemo(
         () => [
             {
                 id: 'raProfileName',
@@ -51,7 +51,7 @@ export default function ProfileAssociations({ profile }: Props) {
         [profile, dispatch],
     );
 
-    const raProfileData: TableDataRow[] = useMemo(
+    const associationData: TableDataRow[] = useMemo(
         () =>
             !associationsOfComplianceProfile || !profile
                 ? []
@@ -82,7 +82,7 @@ export default function ProfileAssociations({ profile }: Props) {
         [associationsOfComplianceProfile, profile, onDissociateRaProfile],
     );
 
-    const raProfileButtons: WidgetButtonProps[] = useMemo(
+    const associationButtons: WidgetButtonProps[] = useMemo(
         () => [
             {
                 icon: 'plus',
@@ -101,12 +101,12 @@ export default function ProfileAssociations({ profile }: Props) {
             <Widget
                 title="Associations"
                 busy={isFetchingDetail}
-                widgetButtons={raProfileButtons}
+                widgetButtons={associationButtons}
                 titleSize="large"
-                widgetLockName={LockWidgetNameEnum.ComplianceProfileDetails}
+                widgetLockName={LockWidgetNameEnum.ComplianceProfileAssociations}
                 lockSize="large"
             >
-                <CustomTable headers={raProfileHeaders} data={raProfileData} />
+                <CustomTable headers={associationHeaders} data={associationData} />
             </Widget>
             <ProfileAssociationsDialog
                 isOpen={isAssociateFrofileModalOpen}

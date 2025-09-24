@@ -24,6 +24,8 @@ import AssignedRulesAndGroup from 'components/_pages/compliance-profiles/detail/
 import AvailableRulesAndGroups from 'components/_pages/compliance-profiles/detail/AvailableRulesAndGroups/AvailableRulesAndGroups';
 import { getComplianceProfileStatusColor } from 'utils/compliance-profile';
 import ProfileAssociations from 'components/_pages/compliance-profiles/detail/ProfileAssociations/ProfileAssociations';
+import { EntityType, selectors as filtersSelectors } from 'ducks/filters';
+import { renderConditionItems } from 'utils/condition-badges';
 
 export default function ComplianceProfileDetail() {
     const dispatch = useDispatch();
@@ -34,50 +36,15 @@ export default function ComplianceProfileDetail() {
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const isFetchingGroupRules = useSelector(selectors.isFetchingGroupRules);
-
-    const test = [
-        {
-            uuid: '40f0853b-ddc1-11ec-9eb7-34cff65c6ee3',
-            name: 'e_international_dns_name_not_nfc',
-            description: 'Internationalized DNSNames must be normalized by Unicode normalization form C',
-            connectorUuid: '8d8a6610-9623-40d2-b113-444fe59579dd',
-            kind: 'x509',
-            groupUuid: 'e1d0af6e-ddb3-11ec-9d64-0242ac120002',
-            resource: 'certificates',
-            attributes: [
-                {
-                    uuid: '7ed00782-e706-11ec-8fea-0242ac120002',
-                    name: 'condition',
-                    label: 'Condition',
-                    type: 'data',
-                    contentType: 'string',
-                    content: [
-                        {
-                            data: 'Greater',
-                        },
-                    ],
-                },
-                {
-                    uuid: '7ed00886-e706-11ec-8fea-0242ac120002',
-                    name: 'length',
-                    label: 'Key Length',
-                    type: 'data',
-                    contentType: 'integer',
-                    content: [
-                        {
-                            data: '2048',
-                        },
-                    ],
-                },
-            ],
-        },
-    ];
-
     const groupRules = useSelector(selectors.groupRules);
+
+    const platformEnums = useSelector(enumSelectors.platformEnums);
+    const searchGroupEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.FilterFieldSource));
+    const FilterConditionOperatorEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.FilterConditionOperator));
+    const availableFilters = useSelector(filtersSelectors.availableFilters(EntityType.CONDITIONS));
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [complianceCheck, setComplianceCheck] = useState<boolean>(false);
-
     const [isEntityDetailMenuOpen, setIsEntityDetailMenuOpen] = useState(false);
     const [selectedEntityDetails, setSelectedEntityDetails] = useState<any>(null);
     const [groupRuleAttributeData, setGroupRuleAttributeData] = useState<{
@@ -298,7 +265,26 @@ export default function ComplianceProfileDetail() {
                         tabs={[
                             {
                                 title: 'Details',
-                                content: <CustomTable headers={entityDetailHeaders} data={ruleDetailData} />,
+                                content: (
+                                    <>
+                                        <CustomTable headers={entityDetailHeaders} data={ruleDetailData} />
+                                        {selectedEntityDetails?.conditionItems && selectedEntityDetails?.conditionItems?.length > 0 && (
+                                            <>
+                                                <p style={{ margin: '0 0 0 5px', fontWeight: '500', fontSize: '16px' }}>Condition Items</p>
+                                                {renderConditionItems(
+                                                    selectedEntityDetails?.conditionItems,
+                                                    availableFilters,
+                                                    platformEnums,
+                                                    searchGroupEnum,
+                                                    FilterConditionOperatorEnum,
+                                                    '',
+                                                    'badge',
+                                                    { margin: '5px' },
+                                                )}
+                                            </>
+                                        )}
+                                    </>
+                                ),
                             },
                             {
                                 title: 'Attributes',
@@ -326,15 +312,20 @@ export default function ComplianceProfileDetail() {
             </Widget>
         );
     }, [
-        entityDetailHeaders,
         selectedEntityDetails,
-        groupDetailData,
-        ruleDetailData,
         isFetchingGroupRules,
-        groupRulesDetailData,
+        entityDetailHeaders,
+        ruleDetailData,
+        availableFilters,
+        platformEnums,
+        searchGroupEnum,
+        FilterConditionOperatorEnum,
+        groupDetailData,
         groupRulesDetailHeaders,
+        groupRulesDetailData,
     ]);
 
+    //get list of rules for group detail page
     useEffect(() => {
         if (selectedEntityDetails?.entityDetails?.entityType === 'group') {
             dispatch(
