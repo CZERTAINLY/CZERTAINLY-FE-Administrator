@@ -134,7 +134,12 @@ const deassociateCertificate: AppEpic = (action$, state, deps) => {
                 .pipe(
                     mergeMap(() => of(slice.actions.deassociateCertificateSuccess(action.payload))),
                     catchError((err) =>
-                        of(slice.actions.deassociateCertificateFailure({ error: extractError(err, 'Failed to deassociate certificate') })),
+                        of(
+                            slice.actions.deassociateCertificateFailure({
+                                error: extractError(err, 'Failed to deassociate certificate'),
+                            }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to deassociate certificate' }),
+                        ),
                     ),
                 ),
         ),

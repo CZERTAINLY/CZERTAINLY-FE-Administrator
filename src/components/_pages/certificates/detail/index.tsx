@@ -20,7 +20,7 @@ import { actions as connectorActions } from 'ducks/connectors';
 import { actions as locationActions, selectors as locationSelectors } from 'ducks/locations';
 import { actions as raProfileAction, selectors as raProfileSelectors } from 'ducks/ra-profiles';
 import { selectors as settingSelectors } from 'ducks/settings';
-import { EntityType, actions as filterActions } from 'ducks/filters';
+import { EntityType, actions as filterActions, selectors as filterSelectors } from 'ducks/filters';
 
 import {
     CertificateState as CertStatus,
@@ -31,12 +31,15 @@ import {
     CertificateSimpleDto,
     CertificateSubjectType,
     CertificateValidationStatus,
+    FilterConditionOperator,
+    FilterFieldSource,
+    SearchFilterRequestDto,
 } from '../../../../types/openapi';
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useParams } from 'react-router';
+import { Link, useNavigate, useParams } from 'react-router';
 import Select from 'react-select';
 
 import { actions as raProfilesActions, selectors as raProfilesSelectors } from 'ducks/ra-profiles';
@@ -97,6 +100,7 @@ interface SelectChangeValue {
 export default function CertificateDetail() {
     const dispatch = useDispatch();
     const { id } = useParams();
+    const navigate = useNavigate();
 
     const copyToClipboard = useCopyToClipboard();
     const certificate = useSelector(selectors.certificateDetail);
@@ -112,6 +116,8 @@ export default function CertificateDetail() {
     const eventHistory = useSelector(selectors.certificateHistory);
     const certLocations = useSelector(selectors.certificateLocations);
     const approvals = useSelector(selectors.approvals);
+    const currentFilters = useSelector(filterSelectors.currentFilters(EntityType.CERTIFICATE));
+    const preservedFilters = useSelector(filterSelectors.preservedFilters(EntityType.CERTIFICATE));
 
     const validationResult = useSelector(selectors.validationResult);
 
@@ -187,6 +193,8 @@ export default function CertificateDetail() {
     const [confirmDeleteRelatedCertificate, setConfirmDeleteRelatedCertificate] = useState<boolean>(false);
     const [relatedCertificateCheckedRows, setRelatedCertificateCheckedRows] = useState<string[]>([]);
     const [isAlreadyRelatedError, setIsAlreadyRelatedError] = useState<boolean>(false);
+
+    const isFirstAddRelatedCertificateClick = useRef<boolean>(true);
 
     const isRemovingCertificate = useSelector(locationSelectors.isRemovingCertificate);
     const isPushingCertificate = useSelector(locationSelectors.isPushingCertificate);
@@ -291,6 +299,7 @@ export default function CertificateDetail() {
 
     const getFreshRelatedCertificates = useCallback(() => {
         if (!id || isDeassociating || isAssociating) return;
+        setRelatedCertificateCheckedRows([]);
         dispatch(actions.getCertificateRelations({ uuid: id }));
     }, [dispatch, id, isDeassociating, isAssociating]);
 
@@ -1342,7 +1351,7 @@ export default function CertificateDetail() {
         if (!relatedCertificates) return [];
 
         return relatedCertificates.map((c) => ({
-            id: `${c.uuid}-${c.relation}`,
+            id: `${c.uuid}`,
             columns: [
                 <Link key={`${c.uuid}-name`} to={`../../certificates/detail/${c.uuid}`}>
                     {c.commonName}
@@ -1368,13 +1377,80 @@ export default function CertificateDetail() {
 
     const onDeleteRelatedCertificate = useCallback(() => {
         if (relatedCertificateCheckedRows.length === 0 || !id) return;
+
         dispatch(actions.deassociateCertificate({ uuid: id, certificateUuid: relatedCertificateCheckedRows[0] }));
         setConfirmDeleteRelatedCertificate(false);
-    }, [dispatch, relatedCertificateCheckedRows, id]);
+    }, [relatedCertificateCheckedRows, id, dispatch]);
 
     const clearRelatedCertificatesFilters = useCallback(() => {
-        dispatch(filterActions.setCurrentFilters({ entity: EntityType.CERTIFICATE, currentFilters: [] }));
+        dispatch(
+            filterActions.setCurrentFilters({
+                entity: EntityType.CERTIFICATE,
+                currentFilters: [],
+            }),
+        );
     }, [dispatch]);
+
+    const removeDuplicateFilters = useCallback((filters: SearchFilterRequestDto[]): SearchFilterRequestDto[] => {
+        const seen = new Set<string>();
+        return filters.filter((filter) => {
+            const normalizedValue = Array.isArray(filter.value) ? [...new Set(filter.value)].sort() : filter.value;
+
+            const key = `${filter.fieldSource}-${filter.fieldIdentifier}-${filter.condition}-${JSON.stringify(normalizedValue)}`;
+
+            if (seen.has(key)) {
+                return false;
+            }
+            seen.add(key);
+            return true;
+        });
+    }, []);
+
+    const setRelatedCertificatesFilters = useCallback(() => {
+        const filtersWithoutSubjectType = currentFilters.filter(
+            (f) => !(f.fieldSource === FilterFieldSource.Property && f.fieldIdentifier === 'SUBJECT_TYPE'),
+        );
+
+        let subjectTypeFilter: SearchFilterRequestDto | null = null;
+
+        if (
+            certificate?.subjectType === CertificateSubjectType.EndEntity ||
+            certificate?.subjectType === CertificateSubjectType.SelfSignedEndEntity
+        ) {
+            subjectTypeFilter = {
+                fieldSource: FilterFieldSource.Property,
+                fieldIdentifier: 'SUBJECT_TYPE',
+                condition: FilterConditionOperator.Equals,
+                value: [CertificateSubjectType.EndEntity, CertificateSubjectType.SelfSignedEndEntity],
+            };
+        } else if (certificate?.subjectType) {
+            subjectTypeFilter = {
+                fieldSource: FilterFieldSource.Property,
+                fieldIdentifier: 'SUBJECT_TYPE',
+                condition: FilterConditionOperator.Equals,
+                value: [certificate.subjectType],
+            };
+        }
+
+        const newFilters = subjectTypeFilter ? [...filtersWithoutSubjectType, subjectTypeFilter] : filtersWithoutSubjectType;
+
+        const deduplicatedFilters = removeDuplicateFilters(newFilters);
+
+        dispatch(
+            filterActions.setCurrentFilters({
+                entity: EntityType.CERTIFICATE,
+                currentFilters: deduplicatedFilters,
+            }),
+        );
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [certificate?.subjectType, currentFilters, removeDuplicateFilters]);
+
+    useEffect(() => {
+        if (isFirstAddRelatedCertificateClick.current) {
+            clearRelatedCertificatesFilters();
+            isFirstAddRelatedCertificateClick.current = false;
+        }
+    }, [clearRelatedCertificatesFilters]);
 
     const relatedCertificatesButtons: WidgetButtonProps[] = useMemo(() => {
         return [
@@ -1384,9 +1460,9 @@ export default function CertificateDetail() {
                 disabled: isCertificateArchived,
                 tooltip: 'Add related certificate',
                 onClick: () => {
+                    setRelatedCertificatesFilters();
                     setRelatedCertificateCheckedRows([]);
                     setIsAlreadyRelatedError(false);
-                    clearRelatedCertificatesFilters();
                     setIsAddingRelatedCertificate(true);
                 },
             },
@@ -1400,7 +1476,7 @@ export default function CertificateDetail() {
                 },
             },
         ];
-    }, [isCertificateArchived, relatedCertificateCheckedRows, clearRelatedCertificatesFilters]);
+    }, [isCertificateArchived, relatedCertificateCheckedRows.length, setRelatedCertificatesFilters]);
 
     useEffect(() => {
         if (!selectedCertificate) {
@@ -1934,8 +2010,13 @@ export default function CertificateDetail() {
         <Container className={cx('themed-container', styles.certificateContainer)} fluid>
             <GoBackButton
                 style={{ marginBottom: '10px' }}
-                forcedPath="/certificates"
                 text={`${getEnumLabel(resourceEnum, Resource.Certificates)} Inventory`}
+                onClick={() => {
+                    if (!isFirstAddRelatedCertificateClick.current) {
+                        clearRelatedCertificatesFilters();
+                    }
+                    navigate('/certificates');
+                }}
             />
             <TabLayout
                 tabs={[
@@ -2309,6 +2390,7 @@ export default function CertificateDetail() {
                                         onCheckedRowsChanged={(rows) => {
                                             setSelectedCertificate(rows[0] as string);
                                         }}
+                                        withPreservedFilters={false}
                                     />
                                     <div className="d-flex align-items-center" style={{ padding: '0 30px' }}>
                                         <ButtonGroup>
