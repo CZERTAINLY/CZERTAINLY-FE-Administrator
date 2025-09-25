@@ -1,15 +1,14 @@
 import Widget from 'components/Widget';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import Select from 'react-select';
-import { Badge, Button, Col, Label, Row, UncontrolledTooltip } from 'reactstrap';
+import { Badge, Col, Label, Row, UncontrolledTooltip } from 'reactstrap';
 import { actions, selectors } from 'ducks/compliance-profiles';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { ComplianceProfileDtoV2, ComplianceRuleAvailabilityStatus, PlatformEnum, Resource } from 'types/openapi';
 import CustomTable from 'components/CustomTable';
 import WidgetButtons from 'components/WidgetButtons';
 import { useParams } from 'react-router';
-import { useDispatch } from 'react-redux';
 import { capitalize } from 'utils/common-utils';
 import {
     getAssignedInternalListOfGroupsAndRules,
@@ -19,18 +18,20 @@ import {
     getListOfResources as getListOfResourcesUtil,
     truncateText,
     rulesSourceOptions,
+    getTypeTableColumn,
 } from 'utils/compliance-profile';
 import { ResourceBadges } from 'components/_pages/compliance-profiles/detail/Components/ResourceBadges';
-import { TRuleGroupType } from 'components/_pages/compliance-profiles/detail/AvailableRulesAndGroups/AvailableRulesAndGroups';
 import { LockWidgetNameEnum } from 'types/user-interface';
+import { TRuleGroupType } from 'types/complianceProfiles';
 
 interface Props {
     profile: ComplianceProfileDtoV2 | undefined;
     setSelectedEntityDetails: (entityDetails: any) => void;
     setIsEntityDetailMenuOpen: (isEntityDetailMenuOpen: boolean) => void;
+    onReset?: (resetFn: () => void) => void;
 }
 
-export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetails, setIsEntityDetailMenuOpen }: Props) {
+export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetails, setIsEntityDetailMenuOpen, onReset }: Props) {
     const { id } = useParams();
     const dispatch = useDispatch();
 
@@ -48,6 +49,20 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
     const [assignedKindsList, setAssignedKindsList] = useState<{ label: string; value: string }[]>([]);
     const [selectedAssignedKind, setSelectedAssignedKind] = useState<string | null>(null);
 
+    const resetSelectValues = useCallback(() => {
+        setAssignedRulesSource(null);
+        setAssignedResourceType('All');
+        setSelectedAssignedProvider(null);
+        setSelectedAssignedKind(null);
+    }, []);
+
+    // Expose reset function to parent component
+    useEffect(() => {
+        if (onReset) {
+            onReset(resetSelectValues);
+        }
+    }, [onReset, resetSelectValues]);
+
     const tableHeadersAssignedRulesAndGroups = useMemo(() => {
         return getRulesAndGroupsTableHeaders('assigned');
     }, []);
@@ -59,7 +74,7 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
                 return {
                     id: ruleOrGroup.uuid,
                     columns: [
-                        <div>
+                        <div key={ruleOrGroup.uuid}>
                             <Badge
                                 id={`status-${ruleOrGroup.uuid.replace(/-/g, '_')}`}
                                 color={statusColor}
@@ -73,24 +88,11 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
                                 </UncontrolledTooltip>
                             )}
                         </div>,
-
+                        getTypeTableColumn(ruleOrGroup, setSelectedEntityDetails, setIsEntityDetailMenuOpen),
                         ruleOrGroup.name,
                         getEnumLabel(resourceEnum, ruleOrGroup.resource),
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <Badge color="secondary">{capitalize(ruleOrGroup?.entityDetails?.entityType)} </Badge>
-                            <Button
-                                className="btn btn-link"
-                                color="white"
-                                title="Rules"
-                                onClick={() => {
-                                    setSelectedEntityDetails(ruleOrGroup);
-                                    setIsEntityDetailMenuOpen(true);
-                                }}
-                            >
-                                <i className="fa fa-info" style={{ color: 'auto' }} />
-                            </Button>
-                        </div>,
                         <WidgetButtons
+                            key={ruleOrGroup.uuid}
                             justify="start"
                             buttons={[
                                 {

@@ -173,18 +173,20 @@ export default function AdministratorsList() {
                 id: complianceProfile.uuid,
 
                 columns: [
-                    <Link to={`./detail/${complianceProfile.uuid}`}>{complianceProfile.name}</Link>,
+                    <Link key={complianceProfile.uuid} to={`./detail/${complianceProfile.uuid}`}>
+                        {complianceProfile.name}
+                    </Link>,
                     complianceProfile.description || '',
-                    <Badge color="secondary" searchvalue={complianceProfile.providerRulesCount}>
+                    <Badge key={complianceProfile.uuid} color="secondary" searchvalue={complianceProfile.providerRulesCount}>
                         {complianceProfile.providerRulesCount.toString()}
                     </Badge>,
-                    <Badge color="secondary" searchvalue={complianceProfile.providerGroupsCount}>
+                    <Badge key={complianceProfile.uuid} color="secondary" searchvalue={complianceProfile.providerGroupsCount}>
                         {complianceProfile.providerGroupsCount.toString()}
                     </Badge>,
-                    <Badge color="secondary" searchvalue={complianceProfile.internalRulesCount}>
+                    <Badge key={complianceProfile.uuid} color="secondary" searchvalue={complianceProfile.internalRulesCount}>
                         {complianceProfile.internalRulesCount.toString()}
                     </Badge>,
-                    <Badge color="secondary" searchvalue={complianceProfile.associations}>
+                    <Badge key={complianceProfile.uuid} color="secondary" searchvalue={complianceProfile.associations}>
                         {complianceProfile.associations.toString()}
                     </Badge>,
                 ],

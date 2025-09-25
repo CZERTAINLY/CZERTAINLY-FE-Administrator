@@ -475,19 +475,19 @@ const updateGroup: AppEpic = (action$, state$, deps) => {
     );
 };
 
-const createComplienceInternalRule: AppEpic = (action$, state$, deps) => {
+const createComplianceInternalRule: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
-        filter(slice.actions.createComplienceInternalRule.match),
+        filter(slice.actions.createComplianceInternalRule.match),
         switchMap((action) =>
             deps.apiClients.complianceProfile
                 .createComplianceInternalRuleV2({
                     complianceInternalRuleRequestDto: action.payload.complianceInternalRuleRequestDto,
                 })
                 .pipe(
-                    mergeMap(() => of(slice.actions.createComplienceInternalRuleSuccess(), slice.actions.getListComplianceRules({}))),
+                    mergeMap(() => of(slice.actions.createComplianceInternalRuleSuccess(), slice.actions.getListComplianceRules({}))),
                     catchError((error) =>
                         of(
-                            slice.actions.createComplienceInternalRuleFailed({
+                            slice.actions.createComplianceInternalRuleFailed({
                                 error: extractError(error, 'Failed to create compliance internal rule'),
                             }),
                             appRedirectActions.fetchError({ error, message: 'Failed to create compliance internal rule' }),
@@ -570,7 +570,7 @@ const epics = [
     getAssociationsOfComplianceProfile,
     checkComplianceForProfiles,
     checkComplianceForResourceObjects,
-    createComplienceInternalRule,
+    createComplianceInternalRule,
     updateComplienceInternalRule,
     deleteComplienceInternalRule,
 ];

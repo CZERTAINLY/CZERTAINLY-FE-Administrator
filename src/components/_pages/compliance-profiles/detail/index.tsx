@@ -1,6 +1,6 @@
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
-
+import { ApiClients } from '../../../../api';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 
@@ -24,7 +24,7 @@ import AssignedRulesAndGroup from 'components/_pages/compliance-profiles/detail/
 import AvailableRulesAndGroups from 'components/_pages/compliance-profiles/detail/AvailableRulesAndGroups/AvailableRulesAndGroups';
 import { getComplianceProfileStatusColor } from 'utils/compliance-profile';
 import ProfileAssociations from 'components/_pages/compliance-profiles/detail/ProfileAssociations/ProfileAssociations';
-import { EntityType, selectors as filtersSelectors } from 'ducks/filters';
+import { EntityType, selectors as filtersSelectors, actions as filterActions } from 'ducks/filters';
 import { renderConditionItems } from 'utils/condition-badges';
 
 export default function ComplianceProfileDetail() {
@@ -37,6 +37,7 @@ export default function ComplianceProfileDetail() {
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const isFetchingGroupRules = useSelector(selectors.isFetchingGroupRules);
     const groupRules = useSelector(selectors.groupRules);
+    const deleteErrorMessage = useSelector(selectors.deleteErrorMessage);
 
     const platformEnums = useSelector(enumSelectors.platformEnums);
     const searchGroupEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.FilterFieldSource));
@@ -51,6 +52,8 @@ export default function ComplianceProfileDetail() {
         ruleName: string;
         attributes: AttributeResponseModel[];
     } | null>(null);
+    const [availableRulesResetFunction, setAvailableRulesResetFunction] = useState<(() => void) | null>(null);
+    const [assignedRulesResetFunction, setAssignedRulesResetFunction] = useState<(() => void) | null>(null);
 
     useEffect(() => {
         if (!id) return;
@@ -63,7 +66,15 @@ export default function ComplianceProfileDetail() {
         dispatch(actions.resetState());
         dispatch(actions.getComplianceProfile({ uuid: id }));
         dispatch(actions.getAssociationsOfComplianceProfile({ uuid: id }));
-    }, [id, dispatch]);
+        // Reset the AvailableRulesAndGroups select values
+        if (availableRulesResetFunction) {
+            availableRulesResetFunction();
+        }
+        // Reset the AssignedRulesAndGroup select values
+        if (assignedRulesResetFunction) {
+            assignedRulesResetFunction();
+        }
+    }, [id, dispatch, availableRulesResetFunction, assignedRulesResetFunction]);
 
     useEffect(() => {
         getFreshComplianceProfileDetails();
@@ -160,7 +171,7 @@ export default function ComplianceProfileDetail() {
                 id: 'resource',
                 columns: [
                     'Resource',
-                    <Link to={`../../${selectedEntityDetails?.resource}`}>
+                    <Link key={selectedEntityDetails?.uuid} to={`../../${selectedEntityDetails?.resource}`}>
                         {getEnumLabel(resourceEnum, selectedEntityDetails?.resource) || ''}
                     </Link>,
                 ],
@@ -173,7 +184,10 @@ export default function ComplianceProfileDetail() {
                           id: 'provider',
                           columns: [
                               'Provider',
-                              <Link to={`../../connectors/detail/${selectedEntityDetails?.entityDetails?.connectorUuid}`}>
+                              <Link
+                                  key={selectedEntityDetails?.entityDetails?.connectorUuid}
+                                  to={`../../connectors/detail/${selectedEntityDetails?.entityDetails?.connectorUuid}`}
+                              >
                                   {selectedEntityDetails?.entityDetails?.connectorName}
                               </Link>,
                           ],
@@ -286,10 +300,14 @@ export default function ComplianceProfileDetail() {
                                     </>
                                 ),
                             },
-                            {
-                                title: 'Attributes',
-                                content: <AttributeViewer attributes={selectedEntityDetails?.attributes} />,
-                            },
+                            ...(selectedEntityDetails?.attributes?.length > 0
+                                ? [
+                                      {
+                                          title: 'Attributes',
+                                          content: <AttributeViewer attributes={selectedEntityDetails?.attributes} />,
+                                      },
+                                  ]
+                                : []),
                         ]}
                     />
                 )}
@@ -336,7 +354,23 @@ export default function ComplianceProfileDetail() {
                 }),
             );
         }
+        if (selectedEntityDetails?.entityDetails?.entityType === 'rule') {
+            dispatch(
+                filterActions.getAvailableFilters({
+                    entity: EntityType.CONDITIONS,
+                    getAvailableFiltersApi: (apiClients: ApiClients) =>
+                        apiClients.resources.listResourceRuleFilterFields({
+                            resource: selectedEntityDetails?.resource,
+                        }),
+                }),
+            );
+        }
     }, [selectedEntityDetails, dispatch]);
+
+    const onForceDeleteComplianceProfile = useCallback(() => {
+        if (!profile) return;
+        dispatch(actions.bulkForceDeleteComplianceProfiles({ uuids: [profile.uuid], redirect: `../../complianceprofiles` }));
+    }, [profile, dispatch]);
 
     return (
         <Container className="themed-container" fluid>
@@ -378,6 +412,7 @@ export default function ComplianceProfileDetail() {
                         profile={profile}
                         setSelectedEntityDetails={setSelectedEntityDetails}
                         setIsEntityDetailMenuOpen={setIsEntityDetailMenuOpen}
+                        onReset={(resetFn) => setAssignedRulesResetFunction(() => resetFn)}
                     />
                 </Col>
                 <Col>
@@ -385,6 +420,7 @@ export default function ComplianceProfileDetail() {
                         profile={profile}
                         setSelectedEntityDetails={setSelectedEntityDetails}
                         setIsEntityDetailMenuOpen={setIsEntityDetailMenuOpen}
+                        onReset={(resetFn) => setAvailableRulesResetFunction(() => resetFn)}
                     />
                 </Col>
             </Row>
@@ -436,6 +472,23 @@ export default function ComplianceProfileDetail() {
                 toggle={() => setGroupRuleAttributeData(null)}
                 buttons={[]}
                 size="lg"
+            />
+            <Dialog
+                isOpen={deleteErrorMessage.length > 0}
+                caption="Delete Compliance Profile"
+                body={
+                    <>
+                        Failed to delete the Compliance Profile that has dependent objects. Please find the details below:
+                        <br />
+                        <br />
+                        {deleteErrorMessage}
+                    </>
+                }
+                toggle={() => dispatch(actions.clearDeleteErrorMessages())}
+                buttons={[
+                    { color: 'danger', onClick: onForceDeleteComplianceProfile, body: 'Force' },
+                    { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
+                ]}
             />
         </Container>
     );

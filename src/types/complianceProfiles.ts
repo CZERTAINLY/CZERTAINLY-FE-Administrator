@@ -11,8 +11,10 @@ import {
     ComplianceProfileRuleDto,
     ComplianceProviderSummaryDto,
     ComplianceRuleAdditionRequestDto,
+    ComplianceRuleAvailabilityStatus,
     ComplianceRuleDeletionRequestDto,
     ComplianceRuleDto,
+    ComplianceRuleListDto,
     ComplianceRulesListResponseDto,
     ComplianceRulesResponseDto,
 } from './openapi';
@@ -105,4 +107,15 @@ export type ComplianceProfileGroupListResponseGroupModel = ComplianceProfileGrou
 export type ComplianceProfileGroupListResponseDto = ComplianceGroupsListResponseDto;
 export type ComplianceProfileGroupListResponseModel = Omit<ComplianceProfileGroupListResponseDto, 'groups'> & {
     groups: Array<ComplianceProfileGroupListResponseGroupModel>;
+};
+
+export type TRuleGroupType = ComplianceRuleListDto & {
+    entityDetails: {
+        entityType: string;
+        connectorUuid?: string;
+        connectorName?: string;
+        kind?: string;
+    };
+    availabilityStatus?: ComplianceRuleAvailabilityStatus;
+    updatedReason?: string;
 };

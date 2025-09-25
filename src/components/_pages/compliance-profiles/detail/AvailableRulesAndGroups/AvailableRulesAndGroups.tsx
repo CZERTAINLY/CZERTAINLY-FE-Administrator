@@ -1,7 +1,7 @@
 import Widget from 'components/Widget';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Select from 'react-select';
-import { Form as BootstrapForm, Badge, Button, Col, Label, Row, ButtonGroup } from 'reactstrap';
+import { Form as BootstrapForm, Button, Col, Label, Row, ButtonGroup } from 'reactstrap';
 import {
     ComplianceProfileDtoV2,
     ComplianceRuleAvailabilityStatus,
@@ -12,10 +12,9 @@ import {
 } from 'types/openapi';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
-import { actions, selectors } from 'ducks/compliance-profiles';
+import { actions, selectors, actions as complianceActions } from 'ducks/compliance-profiles';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions as connectorsActions, selectors as connectorsSelectors } from 'ducks/connectors';
-import { actions as complianceActions } from 'ducks/compliance-profiles';
 import CustomTable from 'components/CustomTable';
 import {
     getAssignedInternalListOfGroupsAndRules,
@@ -24,8 +23,8 @@ import {
     formatAvailableRulesAndGroups,
     getListOfResources,
     rulesSourceOptions,
+    getTypeTableColumn,
 } from 'utils/compliance-profile';
-import { capitalize } from 'utils/common-utils';
 import WidgetButtons from 'components/WidgetButtons';
 import type { WidgetButtonProps } from 'components/WidgetButtons';
 import { ResourceBadges } from 'components/_pages/compliance-profiles/detail/Components/ResourceBadges';
@@ -38,25 +37,16 @@ import { collectFormAttributes } from 'utils/attributes/attributes';
 import { AttributeDescriptorModel, AttributeRequestModel } from 'types/attributes';
 import InternalRuleForm from 'components/_pages/compliance-profiles/detail/InternalRuleForm/InternalRuleForm';
 import { LockWidgetNameEnum } from 'types/user-interface';
+import { TRuleGroupType } from 'types/complianceProfiles';
 
 interface Props {
     profile: ComplianceProfileDtoV2 | undefined;
     setSelectedEntityDetails: (entityDetails: any) => void;
     setIsEntityDetailMenuOpen: (isEntityDetailMenuOpen: boolean) => void;
+    onReset?: (resetFn: () => void) => void;
 }
 
-export type TRuleGroupType = ComplianceRuleListDto & {
-    entityDetails: {
-        entityType: string;
-        connectorUuid?: string;
-        connectorName?: string;
-        kind?: string;
-    };
-    availabilityStatus?: ComplianceRuleAvailabilityStatus;
-    updatedReason?: string;
-};
-
-export default function AvailableRulesAndGroups({ profile, setSelectedEntityDetails, setIsEntityDetailMenuOpen }: Props) {
+export default function AvailableRulesAndGroups({ profile, setSelectedEntityDetails, setIsEntityDetailMenuOpen, onReset }: Props) {
     const { id } = useParams();
     const dispatch = useDispatch();
 
@@ -83,10 +73,25 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
     const [deletingInternalRuleId, setDeletingInternalRuleId] = useState<string | null>(null);
     const [editingInternalRule, setEditingInternalRule] = useState<TRuleGroupType | null>(null);
 
-    const handleClearInput = () => {
+    const handleClearInput = useCallback(() => {
         dispatch(complianceActions.clearRules());
         dispatch(complianceActions.clearGroups());
-    };
+    }, [dispatch]);
+
+    const resetSelectValues = useCallback(() => {
+        setAvailableSelectedRulesSource(null);
+        setSelectedAvailableResourceType('All');
+        setSelectedAvailableProvider(null);
+        setSelectedAvailableKind(null);
+        handleClearInput();
+    }, [handleClearInput]);
+
+    // Expose reset function to parent component
+    useEffect(() => {
+        if (onReset) {
+            onReset(resetSelectValues);
+        }
+    }, [onReset, resetSelectValues]);
 
     //get internal rules or provider data
     useEffect(() => {
@@ -109,7 +114,7 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
     //get kind options
     useEffect(() => {
         if (availableSelectedRulesSource === 'Provider' && selectedAvailableProvider) {
-            const allKinds = (connectors.find((connector) => connector.uuid === selectedAvailableProvider)?.functionGroups || []).flatMap(
+            const allKinds = (connectors.find((connector) => connector.uuid === selectedAvailableProvider)?.functionGroups ?? []).flatMap(
                 (fg) => fg.kinds || [],
             );
             const kindOptions = Array.from(new Set(allKinds)).map((kind) => ({ label: kind, value: kind }));
@@ -227,23 +232,11 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
                 return {
                     id: ruleOrGroup.uuid,
                     columns: [
+                        getTypeTableColumn(ruleOrGroup, setSelectedEntityDetails, setIsEntityDetailMenuOpen),
                         ruleOrGroup.name,
                         getEnumLabel(resourceEnum, ruleOrGroup.resource),
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <Badge color="secondary">{capitalize(ruleOrGroup?.entityDetails?.entityType)} </Badge>
-                            <Button
-                                className="btn btn-link"
-                                color="white"
-                                title="Rules"
-                                onClick={() => {
-                                    setSelectedEntityDetails(ruleOrGroup);
-                                    setIsEntityDetailMenuOpen(true);
-                                }}
-                            >
-                                <i className="fa fa-info" style={{ color: 'auto' }} />
-                            </Button>
-                        </div>,
                         <WidgetButtons
+                            key={ruleOrGroup.uuid}
                             justify="start"
                             buttons={[
                                 {
@@ -262,7 +255,7 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
                                 ...(availableSelectedRulesSource === 'Internal'
                                     ? ([
                                           {
-                                              icon: 'minus-square',
+                                              icon: 'trash',
                                               disabled: false,
                                               tooltip: 'Delete',
                                               onClick: () => {

@@ -1,6 +1,8 @@
-import { TRuleGroupType } from 'components/_pages/compliance-profiles/detail/AvailableRulesAndGroups/AvailableRulesAndGroups';
+import { Badge, Button } from 'reactstrap';
+import { TRuleGroupType } from 'types/complianceProfiles';
 import { ComplianceGroupListDto, ComplianceProfileDtoV2, ComplianceRuleListDto, Resource } from 'types/openapi';
 import { ComplianceRuleAvailabilityStatus } from 'types/openapi/models/ComplianceRuleAvailabilityStatus';
+import { capitalize } from 'utils/common-utils';
 
 export const getComplianceProfileStatusColor = (status: ComplianceRuleAvailabilityStatus) => {
     switch (status) {
@@ -33,6 +35,11 @@ export function getRulesAndGroupsTableHeaders(type: 'assigned' | 'available') {
     return [
         ...(type === 'assigned' ? [{ id: 'status', content: 'Status', sortable: true }] : []),
         {
+            id: 'type',
+            content: 'Type',
+            sortable: true,
+        },
+        {
             id: 'name',
             content: 'Name',
             sortable: true,
@@ -40,11 +47,6 @@ export function getRulesAndGroupsTableHeaders(type: 'assigned' | 'available') {
         {
             id: 'resource',
             content: 'Resource',
-            sortable: true,
-        },
-        {
-            id: 'type',
-            content: 'Type',
             sortable: true,
         },
         {
@@ -134,3 +136,26 @@ export function makeOptions<T extends { uuid: string; name: string }>(profiles: 
             label: profile.name,
         }));
 }
+
+export const getTypeTableColumn = (
+    ruleOrGroup: TRuleGroupType,
+    setSelectedEntityDetails: (entityDetails: any) => void,
+    setIsEntityDetailMenuOpen: (isEntityDetailMenuOpen: boolean) => void,
+) => {
+    return (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <Badge color="secondary">{capitalize(ruleOrGroup?.entityDetails?.entityType)} </Badge>
+            <Button
+                className="btn btn-link"
+                color="white"
+                title="Rules"
+                onClick={() => {
+                    setSelectedEntityDetails(ruleOrGroup);
+                    setIsEntityDetailMenuOpen(true);
+                }}
+            >
+                <i className="fa fa-info" style={{ color: 'auto' }} />
+            </Button>
+        </div>
+    );
+};

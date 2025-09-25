@@ -13,7 +13,7 @@ import ConditionFormFilter from 'components/ConditionFormFilter';
 import { actions as complianceActions, selectors as complianceSelectors } from 'ducks/compliance-profiles';
 
 type Props = {
-    rule?: ComplianceRuleListDto | undefined;
+    rule?: ComplianceRuleListDto;
     onCancel: () => void;
 };
 
@@ -63,7 +63,7 @@ export default function InternalRuleForm({ rule, onCancel }: Props) {
                 );
             } else {
                 dispatch(
-                    complianceActions.createComplienceInternalRule({
+                    complianceActions.createComplianceInternalRule({
                         complianceInternalRuleRequestDto: {
                             name: values.name,
                             description: values.description,

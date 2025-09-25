@@ -4,7 +4,6 @@ import { BulkActionModel } from 'types/connectors';
 import {
     ComplianceGroupListDto,
     ComplianceInternalRuleRequestDto,
-    ComplianceProfileDto,
     ComplianceProfileDtoV2,
     ComplianceProfileGroupsPatchRequestDto,
     ComplianceProfileListDto,
@@ -189,7 +188,7 @@ export const slice = createSlice({
 
         bulkForceDeleteComplianceProfilesSuccess: (state, action: PayloadAction<{ uuids: string[]; redirect?: string }>) => {
             state.isBulkForceDeleting = false;
-
+            state.deleteErrorMessage = '';
             action.payload.uuids.forEach((uuid) => {
                 const profileIndex = state.complianceProfiles.findIndex((profile) => profile.uuid === uuid);
                 if (profileIndex >= 0) state.complianceProfiles.splice(profileIndex, 1);
@@ -272,7 +271,6 @@ export const slice = createSlice({
 
         getAssociatedComplianceProfilesSuccess: (state, action: PayloadAction<{ complianceProfiles: ComplianceProfileListDto[] }>) => {
             state.isFetchingComplianceProfile = false;
-            /* state.complianceProfile!.raProfiles = action.payload.raProfiles; */
         },
 
         getAssociatedComplianceProfilesFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -403,16 +401,16 @@ export const slice = createSlice({
             state.isUpdatingGroup = false;
         },
 
-        createComplienceInternalRule: (
+        createComplianceInternalRule: (
             state,
             action: PayloadAction<{ complianceInternalRuleRequestDto: ComplianceInternalRuleRequestDto }>,
         ) => {
             state.isCreatingComplienceInternalRule = true;
         },
-        createComplienceInternalRuleSuccess: (state, action: PayloadAction<void>) => {
+        createComplianceInternalRuleSuccess: (state, action: PayloadAction<void>) => {
             state.isCreatingComplienceInternalRule = false;
         },
-        createComplienceInternalRuleFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+        createComplianceInternalRuleFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isCreatingComplienceInternalRule = false;
         },
 
