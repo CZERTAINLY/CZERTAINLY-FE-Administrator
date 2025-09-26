@@ -144,7 +144,9 @@ export const getTypeTableColumn = (
 ) => {
     return (
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <Badge color="secondary">{capitalize(ruleOrGroup?.entityDetails?.entityType)} </Badge>
+            <Badge data-testid="compliance-table-type-badge" color="secondary">
+                {capitalize(ruleOrGroup?.entityDetails?.entityType)}{' '}
+            </Badge>
             <Button
                 className="btn btn-link"
                 color="white"

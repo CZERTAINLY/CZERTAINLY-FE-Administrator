@@ -1,7 +1,7 @@
 import Widget from 'components/Widget';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import Select from 'react-select';
+import Select, { components } from 'react-select';
 import { Badge, Col, Label, Row, UncontrolledTooltip } from 'reactstrap';
 import { actions, selectors } from 'ducks/compliance-profiles';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
@@ -76,6 +76,7 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
                     columns: [
                         <div key={ruleOrGroup.uuid}>
                             <Badge
+                                data-testid="status-badge"
                                 id={`status-${ruleOrGroup.uuid.replace(/-/g, '_')}`}
                                 color={statusColor}
                                 style={{ background: statusColor }}
@@ -269,6 +270,14 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
                             setAssignedRulesSource((event?.value as 'Internal' | 'Provider') || null);
                         }}
                         isClearable
+                        components={{
+                            ClearIndicator: (props) => (
+                                <components.ClearIndicator
+                                    {...props}
+                                    innerProps={{ ...props.innerProps, 'data-testid': 'assigned-rules-source-clear-button' } as any}
+                                />
+                            ),
+                        }}
                     />
                 </Col>
             </Row>
@@ -319,7 +328,6 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
                     headers={tableHeadersAssignedRulesAndGroups}
                     data={tableDataAssignedRulesAndGroups}
                     hasPagination={true}
-                    hasDetails={true}
                     canSearch={true}
                 />
             </Widget>

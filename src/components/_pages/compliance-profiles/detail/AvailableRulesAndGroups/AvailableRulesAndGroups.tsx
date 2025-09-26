@@ -2,14 +2,7 @@ import Widget from 'components/Widget';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Select from 'react-select';
 import { Form as BootstrapForm, Button, Col, Label, Row, ButtonGroup } from 'reactstrap';
-import {
-    ComplianceProfileDtoV2,
-    ComplianceRuleAvailabilityStatus,
-    ComplianceRuleListDto,
-    FunctionGroupCode,
-    PlatformEnum,
-    Resource,
-} from 'types/openapi';
+import { ComplianceProfileDtoV2, ComplianceRuleListDto, FunctionGroupCode, PlatformEnum, Resource } from 'types/openapi';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 import { actions, selectors, actions as complianceActions } from 'ducks/compliance-profiles';
@@ -315,7 +308,7 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
     );
 
     return (
-        <>
+        <div>
             <Widget
                 title="Available Rules & Groups"
                 titleSize="large"
@@ -350,7 +343,12 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
                             />
 
                             {availableSelectedRulesSource === 'Internal' && (
-                                <Button className="btn btn-link" color="white" onClick={() => setIsAddingInternalRule(true)}>
+                                <Button
+                                    data-testid="add-internal-rule-button"
+                                    className="btn btn-link"
+                                    color="white"
+                                    onClick={() => setIsAddingInternalRule(true)}
+                                >
                                     <i className="fa fa-plus" />
                                 </Button>
                             )}
@@ -411,7 +409,6 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
                         headers={tableHeadersAvailableRulesAndGroups}
                         data={tableDataAvailableRulesAndGroups}
                         hasPagination={true}
-                        hasDetails={true}
                         canSearch={true}
                     />
                 </Widget>
@@ -420,36 +417,38 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
                 isOpen={isAddingRuleHasAttribute}
                 caption="Attributes"
                 body={
-                    <Form onSubmit={onSubmit} mutators={{ ...mutators() }}>
-                        {({ handleSubmit, pristine, submitting, valid, form }) => (
-                            <BootstrapForm onSubmit={handleSubmit}>
-                                <AttributeEditor
-                                    id="rule-attributes"
-                                    attributeDescriptors={(isAssigningRule?.attributes ?? []) as AttributeDescriptorModel[]}
-                                />
-                                <div className="d-flex justify-content-end">
-                                    <ButtonGroup>
-                                        <ProgressButton
-                                            title={'Add rule'}
-                                            inProgressTitle={'Adding...'}
-                                            inProgress={submitting}
-                                            disabled={pristine || submitting || !valid}
-                                        />
-                                        <Button
-                                            color="default"
-                                            onClick={() => {
-                                                setIsAddingRuleHasAttribute(false);
-                                                setIsAssigningRule(null);
-                                            }}
-                                            disabled={submitting}
-                                        >
-                                            Cancel
-                                        </Button>
-                                    </ButtonGroup>
-                                </div>
-                            </BootstrapForm>
-                        )}
-                    </Form>
+                    <div data-testid="attribute-editor-dialog">
+                        <Form onSubmit={onSubmit} mutators={{ ...mutators() }}>
+                            {({ handleSubmit, pristine, submitting, valid, form }) => (
+                                <BootstrapForm onSubmit={handleSubmit}>
+                                    <AttributeEditor
+                                        id="rule-attributes"
+                                        attributeDescriptors={(isAssigningRule?.attributes ?? []) as AttributeDescriptorModel[]}
+                                    />
+                                    <div className="d-flex justify-content-end">
+                                        <ButtonGroup>
+                                            <ProgressButton
+                                                title={'Add rule'}
+                                                inProgressTitle={'Adding...'}
+                                                inProgress={submitting}
+                                                disabled={pristine || submitting || !valid}
+                                            />
+                                            <Button
+                                                color="default"
+                                                onClick={() => {
+                                                    setIsAddingRuleHasAttribute(false);
+                                                    setIsAssigningRule(null);
+                                                }}
+                                                disabled={submitting}
+                                            >
+                                                Cancel
+                                            </Button>
+                                        </ButtonGroup>
+                                    </div>
+                                </BootstrapForm>
+                            )}
+                        </Form>
+                    </div>
                 }
                 toggle={() => setIsAddingRuleHasAttribute(false)}
                 buttons={[]}
@@ -483,6 +482,6 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
                     { color: 'secondary', onClick: () => setDeletingInternalRuleId(null), body: 'Cancel' },
                 ]}
             />
-        </>
+        </div>
     );
 }

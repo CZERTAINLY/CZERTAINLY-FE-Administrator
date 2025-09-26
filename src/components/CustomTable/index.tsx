@@ -529,7 +529,7 @@ function CustomTable({
     ) : undefined;
 
     return (
-        <div className={styles.customTable}>
+        <div className={styles.customTable} data-testid="custom-table">
             {canSearch ? (
                 <>
                     <div className="fa-pull-right mt-n-xs">

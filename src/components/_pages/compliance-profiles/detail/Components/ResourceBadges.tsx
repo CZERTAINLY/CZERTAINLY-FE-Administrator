@@ -10,6 +10,7 @@ type ResourceBadgesProps<T extends string> = {
 export function ResourceBadges<T extends string>({ resources, selected, onSelect, getLabel }: ResourceBadgesProps<T>) {
     return (
         <div
+            data-testid="resource-badges"
             style={{
                 display: 'flex',
                 flexWrap: 'wrap',

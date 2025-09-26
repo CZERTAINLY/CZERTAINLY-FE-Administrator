@@ -22,6 +22,21 @@ export default function ProfileAssociations({ profile }: Props) {
     const [isAssociateProfileModalOpen, setIsAssociateFrofileModalOpen] = useState(false);
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
 
+    const onDissociateRaProfile = useCallback(
+        (resource: Resource, associatedProfileUuid: string) => {
+            if (!profile) return;
+
+            dispatch(
+                actions.dissociateComplianceProfile({
+                    uuid: profile.uuid,
+                    resource: resource,
+                    associationObjectUuid: associatedProfileUuid,
+                }),
+            );
+        },
+        [profile, dispatch],
+    );
+
     const associationHeaders: TableHeader[] = useMemo(
         () => [
             {
@@ -36,21 +51,6 @@ export default function ProfileAssociations({ profile }: Props) {
             },
         ],
         [],
-    );
-
-    const onDissociateRaProfile = useCallback(
-        (resource: Resource, associatedProfileUuid: string) => {
-            if (!profile) return;
-
-            dispatch(
-                actions.dissociateComplianceProfile({
-                    uuid: profile.uuid,
-                    resource: resource,
-                    associationObjectUuid: associatedProfileUuid,
-                }),
-            );
-        },
-        [profile, dispatch],
     );
 
     const associationData: TableDataRow[] = useMemo(
@@ -97,6 +97,7 @@ export default function ProfileAssociations({ profile }: Props) {
                 onClick: () => {
                     setIsAssociateFrofileModalOpen(true);
                 },
+                dataTestId: 'add-association-button',
             },
         ],
         [],
@@ -105,6 +106,7 @@ export default function ProfileAssociations({ profile }: Props) {
     return (
         <>
             <Widget
+                id="compliance-profile-associations"
                 title="Associations"
                 busy={isFetchingDetail}
                 widgetButtons={associationButtons}

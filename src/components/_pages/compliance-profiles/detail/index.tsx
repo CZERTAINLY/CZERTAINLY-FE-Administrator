@@ -41,7 +41,7 @@ export default function ComplianceProfileDetail() {
 
     const platformEnums = useSelector(enumSelectors.platformEnums);
     const searchGroupEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.FilterFieldSource));
-    const FilterConditionOperatorEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.FilterConditionOperator));
+    const filterConditionOperatorEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.FilterConditionOperator));
     const availableFilters = useSelector(filtersSelectors.availableFilters(EntityType.CONDITIONS));
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
@@ -290,7 +290,7 @@ export default function ComplianceProfileDetail() {
                                                     availableFilters,
                                                     platformEnums,
                                                     searchGroupEnum,
-                                                    FilterConditionOperatorEnum,
+                                                    filterConditionOperatorEnum,
                                                     '',
                                                     'badge',
                                                     { margin: '5px' },
@@ -337,7 +337,7 @@ export default function ComplianceProfileDetail() {
         availableFilters,
         platformEnums,
         searchGroupEnum,
-        FilterConditionOperatorEnum,
+        filterConditionOperatorEnum,
         groupDetailData,
         groupRulesDetailHeaders,
         groupRulesDetailData,
