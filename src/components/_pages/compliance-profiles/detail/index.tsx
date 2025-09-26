@@ -266,7 +266,7 @@ export default function ComplianceProfileDetail() {
             return {
                 id: rule.uuid,
                 columns: ['Name', rule.name || ''],
-                detailColumns: [<></>, <></>, <CustomTable data={ruleDetailData} headers={entityDetailHeaders} />],
+                detailColumns: [<></>, <></>, <CustomTable key={rule.uuid} data={ruleDetailData} headers={entityDetailHeaders} />],
             };
         });
     }, [groupRules, resourceEnum, entityDetailHeaders]);
