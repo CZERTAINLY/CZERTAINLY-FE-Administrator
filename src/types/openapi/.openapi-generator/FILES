@@ -363,6 +363,7 @@ models/ResourceEvent.ts
 models/ResourceEventDto.ts
 models/ResourceLoggingSettingsDto.ts
 models/ResourceObjectDto.ts
+models/ResourceObjectIdentity.ts
 models/ResourcePermissionsDto.ts
 models/ResourcePermissionsRequestDto.ts
 models/ResourceRecord.ts

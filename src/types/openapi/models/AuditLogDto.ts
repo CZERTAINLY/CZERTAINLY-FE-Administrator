@@ -44,6 +44,12 @@ export interface AuditLogDto {
      */
     loggedAt: string;
     /**
+     * Time when the audit log has been created
+     * @type {string}
+     * @memberof AuditLogDto
+     */
+    timestamp: string;
+    /**
      * Module of platform where log occurred
      * @type {Module}
      * @memberof AuditLogDto

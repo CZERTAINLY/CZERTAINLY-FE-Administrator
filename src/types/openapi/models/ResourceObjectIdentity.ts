@@ -11,26 +11,19 @@
  * Do not edit the class manually.
  */
 
-import type {
-    Resource,
-    ResourceObjectIdentity,
-} from './';
-
 /**
  * @export
- * @interface ResourceRecord
+ * @interface ResourceObjectIdentity
  */
-export interface ResourceRecord {
+export interface ResourceObjectIdentity {
     /**
-     * @type {Resource}
-     * @memberof ResourceRecord
+     * @type {string}
+     * @memberof ResourceObjectIdentity
      */
-    type: Resource;
+    name?: string;
     /**
-     * @type {Array<ResourceObjectIdentity>}
-     * @memberof ResourceRecord
+     * @type {string}
+     * @memberof ResourceObjectIdentity
      */
-    objects?: Array<ResourceObjectIdentity>;
+    uuid?: string;
 }
-
-

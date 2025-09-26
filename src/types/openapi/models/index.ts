@@ -314,6 +314,7 @@ export * from './ResourceEvent';
 export * from './ResourceEventDto';
 export * from './ResourceLoggingSettingsDto';
 export * from './ResourceObjectDto';
+export * from './ResourceObjectIdentity';
 export * from './ResourcePermissionsDto';
 export * from './ResourcePermissionsRequestDto';
 export * from './ResourceRecord';
