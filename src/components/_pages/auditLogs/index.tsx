@@ -79,32 +79,47 @@ function AuditLogs() {
     const createAuditLogDetailData = useCallback(
         (auditLog: AuditLogItemModel): AuditLogDetailItem[] => [
             {
+                property: 'Timestamp',
+                propertyValue: auditLog.timestamp,
+            },
+            {
+                property: 'Logged at',
+                propertyValue: auditLog.loggedAt,
+            },
+            {
                 property: 'Resource',
                 propertyValue: getEnumLabel(resourceEnum, auditLog.resource.type),
             },
             {
                 property: 'Resource objects',
                 propertyValue: auditLog.resource.objects?.map((object, index) => {
-                    if (object.uuid) {
-                        return (
-                            <Link
-                                onClick={() => {
-                                    dispatch(userInterfaceActions.hideGlobalModal());
-                                }}
-                                key={index}
-                                to={`../${auditLog.resource.type}/detail/${object.uuid}`}
-                            >
-                                {object.name ?? object.uuid ?? ''}
-                            </Link>
-                        );
-                    } else return <span key={index}>{object.name ?? ''}</span>;
+                    const element = object.uuid ? (
+                        <Link
+                            onClick={() => {
+                                dispatch(userInterfaceActions.hideGlobalModal());
+                            }}
+                            key={index}
+                            to={`../${auditLog.resource.type}/detail/${object.uuid}`}
+                        >
+                            {object.name ?? object.uuid ?? ''}
+                        </Link>
+                    ) : (
+                        <span key={index}>{object.name ?? ''}</span>
+                    );
+
+                    return (
+                        <span key={index}>
+                            {index > 0 && ', '}
+                            {element}
+                        </span>
+                    );
                 }),
             },
             {
                 property: 'Affiliated resource objects',
                 propertyValue: auditLog.affiliatedResource?.objects?.map((object, index) => {
-                    if (object.uuid && auditLog.affiliatedResource) {
-                        return (
+                    const element =
+                        object.uuid && auditLog.affiliatedResource ? (
                             <Link
                                 onClick={() => {
                                     dispatch(userInterfaceActions.hideGlobalModal());
@@ -114,9 +129,21 @@ function AuditLogs() {
                             >
                                 {object.name ?? object.uuid ?? ''}
                             </Link>
+                        ) : (
+                            <span key={index}>{object.name ?? ''}</span>
                         );
-                    } else return <span key={index}>{object.name ?? ''}</span>;
+
+                    return (
+                        <span key={index}>
+                            {index > 0 && ', '}
+                            {element}
+                        </span>
+                    );
                 }),
+            },
+            {
+                property: 'Affiliated resource',
+                propertyValue: auditLog.affiliatedResource ? getEnumLabel(resourceEnum, auditLog.affiliatedResource.type) : '',
             },
             {
                 property: 'Request method',
@@ -141,14 +168,6 @@ function AuditLogs() {
             {
                 property: 'Additional data',
                 propertyValue: JSON.stringify(auditLog.additionalData, null, 3),
-            },
-            {
-                property: 'Timestamp',
-                propertyValue: auditLog.timestamp,
-            },
-            {
-                property: 'Logged at',
-                propertyValue: auditLog.loggedAt,
             },
         ],
         [dispatch, resourceEnum],
@@ -185,9 +204,9 @@ function AuditLogs() {
                 width: '5%',
             },
             {
-                content: 'Logged at',
+                content: 'Timestamp',
                 align: 'left',
-                id: 'loggedAt',
+                id: 'timestamp',
                 width: '5%',
             },
             {
@@ -276,7 +295,7 @@ function AuditLogs() {
                             {getEnumLabel(resourceEnum, log.resource.type)}
                             {log.resource.objects &&
                             log.resource.objects.length > 0 &&
-                            log.resource.objects.map((object) => object.uuid).length > 0 ? (
+                            log.resource.objects.some((object) => object.uuid) ? (
                                 <Link to={`../${log.resource.type}/detail/${log.resource.objects[0].uuid}`}>
                                     {' '}
                                     {log.resource.objects[0].name}
@@ -304,7 +323,7 @@ function AuditLogs() {
                             {log.affiliatedResource &&
                             log.affiliatedResource.objects &&
                             log.affiliatedResource.objects.length > 0 &&
-                            log.affiliatedResource.objects.map((object) => object.uuid).length > 0 ? (
+                            log.affiliatedResource.objects.some((object) => object.uuid) ? (
                                 <Link to={`../${log.affiliatedResource.type}/detail/${log.affiliatedResource.objects[0].uuid}`}>
                                     {' '}
                                     {log.affiliatedResource.objects[0].name}

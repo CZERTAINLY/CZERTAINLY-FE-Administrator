@@ -293,9 +293,7 @@ const LoggingSetting = () => {
                                     </FormGroup>
                                 )}
                             </Widget>
-                            <Widget title="Verbose">
-                                <SwitchField id="verbose" label="Verbose" />
-                            </Widget>
+
                             {formType === 'audit' && (
                                 <FormGroup>
                                     <Label for="output">Audit Logs Output Destination</Label>
@@ -307,6 +305,7 @@ const LoggingSetting = () => {
                                     />
                                 </FormGroup>
                             )}
+                            <SwitchField id="verbose" label="Verbose" />
                             <div className="d-flex justify-content-end">
                                 <ButtonGroup>
                                     <ProgressButton
