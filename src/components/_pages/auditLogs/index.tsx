@@ -224,7 +224,7 @@ function AuditLogs() {
 
                     columns: [
                         '' + log.id,
-                        <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(log.loggedAt)}</span>,
+                        <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(log.timestamp)}</span>,
                         getEnumLabel(moduleEnum, log.module),
                         <span style={{ whiteSpace: 'nowrap' }}>
                             {getEnumLabel(actorEnum, log.actor.type)}
