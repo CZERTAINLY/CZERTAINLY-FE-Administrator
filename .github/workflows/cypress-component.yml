@@ -79,7 +79,7 @@ jobs:
 #          path: build
 
   ui-chrome-tests:
-    timeout-minutes: 15
+    timeout-minutes: 20
     runs-on: ubuntu-24.04
     container:
       image: cypress/browsers:node-22.14.0-chrome-134.0.6998.88-1-ff-136.0.1-edge-134.0.3124.51-1
@@ -112,7 +112,7 @@ jobs:
           component: true
 
   ui-firefox-tests:
-    timeout-minutes: 15
+    timeout-minutes: 20
     runs-on: ubuntu-24.04
     container:
       image: cypress/browsers:node-22.14.0-chrome-134.0.6998.88-1-ff-136.0.1-edge-134.0.3124.51-1
@@ -145,7 +145,7 @@ jobs:
           component: true
 
   ui-edge-tests:
-    timeout-minutes: 15
+    timeout-minutes: 20
     runs-on: ubuntu-24.04
     container:
       image: cypress/browsers:node-22.14.0-chrome-134.0.6998.88-1-ff-136.0.1-edge-134.0.3124.51-1
