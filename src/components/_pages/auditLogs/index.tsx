@@ -4,6 +4,7 @@ import { EntityType, selectors as filterSelectors } from 'ducks/filters';
 import { actions as userInterfaceActions } from '../../../ducks/user-interface';
 
 import { useCallback, useMemo } from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router';
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -23,7 +24,7 @@ import { AuditLogItemModel } from 'types/auditLogs';
 
 type AuditLogDetailItem = {
     property: string;
-    propertyValue: string;
+    propertyValue: string | React.ReactNode;
 };
 
 function AuditLogs() {
@@ -82,24 +83,40 @@ function AuditLogs() {
                 propertyValue: getEnumLabel(resourceEnum, auditLog.resource.type),
             },
             {
-                property: 'Resource UUIDs',
-                propertyValue: auditLog.resource.uuids?.join(', ') ?? '',
+                property: 'Resource objects',
+                propertyValue: auditLog.resource.objects?.map((object, index) => {
+                    if (object.uuid) {
+                        return (
+                            <Link
+                                onClick={() => {
+                                    dispatch(userInterfaceActions.hideGlobalModal());
+                                }}
+                                key={index}
+                                to={`../${auditLog.resource.type}/detail/${object.uuid}`}
+                            >
+                                {object.name ?? object.uuid ?? ''}
+                            </Link>
+                        );
+                    } else return <span key={index}>{object.name ?? ''}</span>;
+                }),
             },
             {
-                property: 'Resource names',
-                propertyValue: auditLog.resource.names?.join(', ') ?? '',
-            },
-            {
-                property: 'Affiliated resource',
-                propertyValue: auditLog.affiliatedResource ? getEnumLabel(resourceEnum, auditLog.affiliatedResource.type) : '',
-            },
-            {
-                property: 'Affiliated resource UUIDs',
-                propertyValue: auditLog.affiliatedResource?.uuids?.join(', ') ?? '',
-            },
-            {
-                property: 'Affiliated resource names',
-                propertyValue: auditLog.affiliatedResource?.names?.join(', ') ?? '',
+                property: 'Affiliated resource objects',
+                propertyValue: auditLog.affiliatedResource?.objects?.map((object, index) => {
+                    if (object.uuid && auditLog.affiliatedResource) {
+                        return (
+                            <Link
+                                onClick={() => {
+                                    dispatch(userInterfaceActions.hideGlobalModal());
+                                }}
+                                key={index}
+                                to={`../${auditLog.affiliatedResource.type}/detail/${object.uuid}`}
+                            >
+                                {object.name ?? object.uuid ?? ''}
+                            </Link>
+                        );
+                    } else return <span key={index}>{object.name ?? ''}</span>;
+                }),
             },
             {
                 property: 'Request method',
@@ -125,8 +142,16 @@ function AuditLogs() {
                 property: 'Additional data',
                 propertyValue: JSON.stringify(auditLog.additionalData, null, 3),
             },
+            {
+                property: 'Timestamp',
+                propertyValue: auditLog.timestamp,
+            },
+            {
+                property: 'Logged at',
+                propertyValue: auditLog.loggedAt,
+            },
         ],
-        [resourceEnum],
+        [dispatch, resourceEnum],
     );
 
     const createAuditLogDetailRows = (a: AuditLogDetailItem) => ({
@@ -249,15 +274,22 @@ function AuditLogs() {
                         getEnumLabel(authMethodEnum, log.actor.authMethod),
                         <span style={{ whiteSpace: 'nowrap' }}>
                             {getEnumLabel(resourceEnum, log.resource.type)}
-                            {log.resource.uuids && log.resource.uuids.length > 0 && log.resource.names && log.resource.names.length > 0 ? (
-                                <Link to={`../${log.resource.type}/detail/${log.resource.uuids[0]}`}> {log.resource.names[0]}</Link>
-                            ) : log.resource.uuids && log.resource.uuids.length > 0 ? (
+                            {log.resource.objects &&
+                            log.resource.objects.length > 0 &&
+                            log.resource.objects.map((object) => object.uuid).length > 0 ? (
+                                <Link to={`../${log.resource.type}/detail/${log.resource.objects[0].uuid}`}>
+                                    {' '}
+                                    {log.resource.objects[0].name}
+                                </Link>
+                            ) : log.resource.objects && log.resource.objects.length > 0 ? (
                                 <Button
                                     color="white"
                                     size="sm"
                                     className="p-0 ms-1"
                                     onClick={() => {
-                                        navigate(`../${log.resource.type}/detail/${log.resource.uuids ? log.resource.uuids[0] : ''}`);
+                                        navigate(
+                                            `../${log.resource.type}/detail/${log.resource.objects ? log.resource.objects[0].uuid : ''}`,
+                                        );
                                     }}
                                 >
                                     {' '}
@@ -270,22 +302,21 @@ function AuditLogs() {
                         <span style={{ whiteSpace: 'nowrap' }}>
                             {log.affiliatedResource ? getEnumLabel(resourceEnum, log.affiliatedResource.type) : ''}
                             {log.affiliatedResource &&
-                            log.affiliatedResource.uuids &&
-                            log.affiliatedResource.uuids.length > 0 &&
-                            log.affiliatedResource.names &&
-                            log.affiliatedResource.names.length > 0 ? (
-                                <Link to={`../${log.affiliatedResource.type}/detail/${log.affiliatedResource.uuids[0]}`}>
+                            log.affiliatedResource.objects &&
+                            log.affiliatedResource.objects.length > 0 &&
+                            log.affiliatedResource.objects.map((object) => object.uuid).length > 0 ? (
+                                <Link to={`../${log.affiliatedResource.type}/detail/${log.affiliatedResource.objects[0].uuid}`}>
                                     {' '}
-                                    {log.affiliatedResource.names[0]}
+                                    {log.affiliatedResource.objects[0].name}
                                 </Link>
-                            ) : log.affiliatedResource && log.affiliatedResource.uuids && log.affiliatedResource.uuids.length > 0 ? (
+                            ) : log.affiliatedResource && log.affiliatedResource.objects && log.affiliatedResource.objects.length > 0 ? (
                                 <Button
                                     color="white"
                                     size="sm"
                                     className="p-0 ms-1"
                                     onClick={() => {
                                         navigate(
-                                            `../${log.affiliatedResource ? log.affiliatedResource.type : ''}/detail/${log.affiliatedResource && log.affiliatedResource.uuids ? log.affiliatedResource.uuids[0] : ''}`,
+                                            `../${log.affiliatedResource ? log.affiliatedResource.type : ''}/detail/${log.affiliatedResource && log.affiliatedResource.objects ? log.affiliatedResource.objects[0].uuid : ''}`,
                                         );
                                     }}
                                 >

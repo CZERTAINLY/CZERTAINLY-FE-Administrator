@@ -28,6 +28,7 @@ type CommonFormValues = {
         label: string;
         value: AuditLoggingSettingsDtoOutputEnum;
     };
+    verbose?: boolean;
 };
 type AuditFormValues = Omit<CommonFormValues, 'output'> & {
     output: {
@@ -116,6 +117,7 @@ const LoggingSetting = () => {
                         loggedModules: values.loggedModules?.map((el) => el.value),
                         loggedResources: values.loggedResources?.map((el) => el.value),
                         output: values.output.value,
+                        verbose: values.verbose,
                     },
                 }),
             );
@@ -290,6 +292,9 @@ const LoggingSetting = () => {
                                         />
                                     </FormGroup>
                                 )}
+                            </Widget>
+                            <Widget title="Verbose">
+                                <SwitchField id="verbose" label="Verbose" />
                             </Widget>
                             {formType === 'audit' && (
                                 <FormGroup>
