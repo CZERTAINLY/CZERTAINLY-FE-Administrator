@@ -28,6 +28,7 @@ type CommonFormValues = {
         label: string;
         value: AuditLoggingSettingsDtoOutputEnum;
     };
+    verbose?: boolean;
 };
 type AuditFormValues = Omit<CommonFormValues, 'output'> & {
     output: {
@@ -116,6 +117,7 @@ const LoggingSetting = () => {
                         loggedModules: values.loggedModules?.map((el) => el.value),
                         loggedResources: values.loggedResources?.map((el) => el.value),
                         output: values.output.value,
+                        verbose: values.verbose,
                     },
                 }),
             );
@@ -291,6 +293,7 @@ const LoggingSetting = () => {
                                     </FormGroup>
                                 )}
                             </Widget>
+
                             {formType === 'audit' && (
                                 <FormGroup>
                                     <Label for="output">Audit Logs Output Destination</Label>
@@ -302,6 +305,7 @@ const LoggingSetting = () => {
                                     />
                                 </FormGroup>
                             )}
+                            <SwitchField id="verbose" label="Verbose" />
                             <div className="d-flex justify-content-end">
                                 <ButtonGroup>
                                     <ProgressButton

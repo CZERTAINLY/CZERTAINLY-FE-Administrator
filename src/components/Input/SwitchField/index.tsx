@@ -17,7 +17,7 @@ export default function SwitchField({ id, label, onChange = undefined, disabled 
     return !viewOnly ? (
         <Field name={id} type={'checkbox'}>
             {({ input }) => (
-                <FormGroup switch>
+                <FormGroup switch style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <Input
                         {...input}
                         type="switch"
@@ -30,7 +30,9 @@ export default function SwitchField({ id, label, onChange = undefined, disabled 
                             }
                         }}
                     />
-                    <Label for={id}>{label}</Label>
+                    <Label for={id} style={{ marginBottom: '0' }}>
+                        {label}
+                    </Label>
                 </FormGroup>
             )}
         </Field>

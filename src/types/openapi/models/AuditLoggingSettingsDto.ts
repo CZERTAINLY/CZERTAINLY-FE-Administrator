@@ -63,6 +63,12 @@ export interface AuditLoggingSettingsDto {
      * @memberof AuditLoggingSettingsDto
      */
     output: AuditLoggingSettingsDtoOutputEnum;
+    /**
+     * Additional data should be logged
+     * @type {boolean}
+     * @memberof AuditLoggingSettingsDto
+     */
+    verbose?: boolean;
 }
 
 /**
