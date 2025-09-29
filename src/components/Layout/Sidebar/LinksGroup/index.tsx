@@ -26,7 +26,11 @@ function LinksGroup(props: Props) {
     const createHeaderLink = () => {
         return (
             <li className={cx(style.headerLink, props.className)}>
-                <NavLink to={props.headerLink || ''} className={({ isActive }) => (isActive ? style.headerLinkActive : undefined)}>
+                <NavLink
+                    id={`${props.header}-link`}
+                    to={props.headerLink || ''}
+                    className={({ isActive }) => (isActive ? style.headerLinkActive : undefined)}
+                >
                     <div>
                         <i className={props.glyph} />{' '}
                         <span className={style.menuLabel} data-testid={typeof props.header === 'string' ? props.header : undefined}>

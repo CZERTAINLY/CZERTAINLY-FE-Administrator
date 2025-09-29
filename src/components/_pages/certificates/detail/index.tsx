@@ -1380,6 +1380,7 @@ export default function CertificateDetail() {
 
         dispatch(actions.deassociateCertificate({ uuid: id, certificateUuid: relatedCertificateCheckedRows[0] }));
         setConfirmDeleteRelatedCertificate(false);
+        setRelatedCertificateCheckedRows([]);
     }, [relatedCertificateCheckedRows, id, dispatch]);
 
     const clearRelatedCertificatesFilters = useCallback(() => {
@@ -2006,15 +2007,30 @@ export default function CertificateDetail() {
         [deviceType],
     );
 
+    const handleClick = useCallback(() => {
+        if (!isFirstAddRelatedCertificateClick.current) {
+            clearRelatedCertificatesFilters();
+        }
+    }, [clearRelatedCertificatesFilters, isFirstAddRelatedCertificateClick]);
+
+    useEffect(() => {
+        const certificateLink = document.getElementById('Certificates-link');
+        if (!certificateLink) return;
+
+        certificateLink.addEventListener('click', handleClick);
+
+        return () => {
+            certificateLink.removeEventListener('click', handleClick);
+        };
+    }, [clearRelatedCertificatesFilters, handleClick, isFirstAddRelatedCertificateClick]);
+
     return (
         <Container className={cx('themed-container', styles.certificateContainer)} fluid>
             <GoBackButton
                 style={{ marginBottom: '10px' }}
                 text={`${getEnumLabel(resourceEnum, Resource.Certificates)} Inventory`}
                 onClick={() => {
-                    if (!isFirstAddRelatedCertificateClick.current) {
-                        clearRelatedCertificatesFilters();
-                    }
+                    handleClick();
                     navigate('/certificates');
                 }}
             />
