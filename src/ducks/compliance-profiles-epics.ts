@@ -21,6 +21,9 @@ const getComplianceProfileDetail: AppEpic = (action$, state$, deps) => {
                             complianceProfile: detail,
                         }),
                         userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ComplianceProfileDetails),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ListOfAvailableRulesAndGroups),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ComplianceProfileAssociations),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.CustomAttributeWidget),
                     ),
                 ),
 

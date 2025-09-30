@@ -529,7 +529,7 @@ export default function AttributeEditor({
                 (!setDefaultOnRequiredValuesOnly || descriptor.properties.required)
             ) {
                 // This acts as a fallback for the case when the attribute has no value, but has a default value in the descriptor
-                formAttributeValue = descriptor.content[0].reference ?? descriptor.content[0].data;
+                formAttributeValue = descriptor.content[0].data ?? descriptor.content[0].reference;
             }
 
             if (descriptor.contentType === AttributeContentType.Codeblock && formAttributeValue !== undefined) {

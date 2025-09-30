@@ -331,6 +331,8 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
                                     setSelectedAvailableResourceType('All');
                                     handleClearInput();
                                     setAvailableSelectedRulesSource((event?.value as 'Internal' | 'Provider') || null);
+                                    setSelectedAvailableProvider(null);
+                                    setSelectedAvailableKind(null);
                                 }}
                                 isClearable
                                 styles={{
@@ -368,9 +370,7 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
                                 value={availableProviderOptions.find((opt) => opt.value === selectedAvailableProvider) || null}
                                 menuPlacement="auto"
                                 onChange={(event) => {
-                                    if (!event) {
-                                        setSelectedAvailableKind(null);
-                                    }
+                                    setSelectedAvailableKind(null);
                                     setSelectedAvailableProvider(event?.value || null);
                                     handleClearInput();
                                 }}
