@@ -304,7 +304,7 @@ export default function RaProfileDetail() {
 
         if (!raProfile?.uuid) return;
 
-        dispatch(raProfilesActions.checkCompliance({ uuids: [raProfile.uuid] }));
+        dispatch(raProfilesActions.checkCompliance({ resource: Resource.RaProfiles, uuids: [raProfile.uuid] }));
     }, [dispatch, raProfile]);
 
     const onDissociateComplianceProfile = useCallback(

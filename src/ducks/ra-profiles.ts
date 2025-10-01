@@ -2,6 +2,7 @@ import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ProfileApprovalModel } from 'types/approval-profiles';
 import { AttributeDescriptorModel } from 'types/attributes';
 import { BulkActionModel } from 'types/connectors';
+import { Resource } from 'types/openapi';
 import {
     ComplianceProfileSimplifiedModel,
     RaProfileAcmeDetailResponseModel,
@@ -518,7 +519,7 @@ export const slice = createSlice({
             state.isFetchingRevocationAttributes = false;
         },
 
-        checkCompliance: (state, action: PayloadAction<{ uuids: string[] }>) => {
+        checkCompliance: (state, action: PayloadAction<{ resource: Resource; uuids: string[] }>) => {
             state.isCheckingCompliance = true;
         },
 

@@ -2,6 +2,7 @@ import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ComplianceProfileListModel } from 'types/complianceProfiles';
 import { BulkActionModel } from 'types/connectors';
 import {
+    ComplianceCheckResultDto,
     ComplianceGroupListDto,
     ComplianceInternalRuleRequestDto,
     ComplianceProfileDtoV2,
@@ -28,6 +29,7 @@ export type State = {
     groups: ComplianceGroupListDto[];
     groupRules: ComplianceRuleListDto[];
     associationsOfComplianceProfile: ResourceObjectDto[];
+    complianceCheckResult?: ComplianceCheckResultDto;
     isFetchingAssociationsOfComplianceProfile: boolean;
     isFetchingList: boolean;
     isFetchingDetail: boolean;
@@ -51,6 +53,7 @@ export type State = {
     isCreatingComplienceInternalRule: boolean;
     isUpdatingComplienceInternalRule: boolean;
     isDeletingComplienceInternalRule: boolean;
+    isFetchingComplianceCheckResult: boolean;
 };
 
 export const initialState: State = {
@@ -88,6 +91,7 @@ export const initialState: State = {
     isCreatingComplienceInternalRule: false,
     isUpdatingComplienceInternalRule: false,
     isDeletingComplienceInternalRule: false,
+    isFetchingComplianceCheckResult: false,
 };
 
 export const slice = createSlice({
@@ -342,34 +346,6 @@ export const slice = createSlice({
 
         //////////////////////////////
 
-        checkComplianceForProfiles: (state, action: PayloadAction<{ requestBody: string[]; resource?: Resource; type?: string }>) => {
-            state.isCheckingCompliance = true;
-        },
-
-        checkComplianceForProfilesSuccess: (state, action: PayloadAction<void>) => {
-            state.isCheckingCompliance = false;
-        },
-
-        checkComplianceForProfilesFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isCheckingCompliance = false;
-        },
-
-        //////////////////////////////
-
-        checkComplianceForResourceObjects: (state, action: PayloadAction<{ resource: Resource; requestBody: string[] }>) => {
-            state.isCheckingCompliance = true;
-        },
-
-        checkComplianceForResourceObjectsSuccess: (state, action: PayloadAction<void>) => {
-            state.isCheckingCompliance = false;
-        },
-
-        checkComplianceForResourceObjectsFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isCheckingCompliance = false;
-        },
-
-        //////////////////////////////
-
         updateRule: (
             state,
             action: PayloadAction<{ uuid: string; complianceProfileRulesPatchRequestDto: ComplianceProfileRulesPatchRequestDto }>,
@@ -436,6 +412,63 @@ export const slice = createSlice({
         deleteComplienceInternalRuleFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isDeletingComplienceInternalRule = false;
         },
+
+        //////////////////////////////
+
+        checkComplianceForProfiles: (state, action: PayloadAction<{ requestBody: string[]; resource?: Resource; type?: string }>) => {
+            state.isCheckingCompliance = true;
+        },
+
+        checkComplianceForProfilesSuccess: (state, action: PayloadAction<void>) => {
+            state.isCheckingCompliance = false;
+        },
+
+        checkComplianceForProfilesFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isCheckingCompliance = false;
+        },
+
+        //////////////////////////////
+
+        checkComplianceForResourceObjects: (state, action: PayloadAction<{ resource: Resource; requestBody: string[] }>) => {
+            state.isCheckingCompliance = true;
+        },
+
+        checkComplianceForResourceObjectsSuccess: (state, action: PayloadAction<void>) => {
+            state.isCheckingCompliance = false;
+        },
+
+        checkComplianceForResourceObjectsFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isCheckingCompliance = false;
+        },
+
+        //////////////////////////////
+
+        checkResourceObjectCompliance: (state, action: PayloadAction<{ resource: Resource; objectUuid: string }>) => {
+            state.isCheckingCompliance = true;
+        },
+
+        checkResourceObjectComplianceSuccess: (state, action: PayloadAction<void>) => {
+            state.isCheckingCompliance = false;
+        },
+
+        checkResourceObjectComplianceFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isCheckingCompliance = false;
+        },
+
+        //////////////////////////////
+
+        getComplianceCheckResult: (state, action: PayloadAction<{ resource: Resource; objectUuid: string }>) => {
+            state.isFetchingComplianceCheckResult = true;
+        },
+
+        getComplianceCheckResultSuccess: (state, action: PayloadAction<{ complianceCheckResult: ComplianceCheckResultDto }>) => {
+            state.isFetchingComplianceCheckResult = false;
+            state.complianceCheckResult = action.payload.complianceCheckResult;
+        },
+
+        getComplianceCheckResultFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
+            state.isFetchingComplianceCheckResult = false;
+        },
     },
 });
 
@@ -478,6 +511,8 @@ const isUpdatingGroup = createSelector(state, (state) => state.isUpdatingGroup);
 const isCreatingComplienceInternalRule = createSelector(state, (state) => state.isCreatingComplienceInternalRule);
 const isUpdatingComplienceInternalRule = createSelector(state, (state) => state.isUpdatingComplienceInternalRule);
 const isDeletingComplienceInternalRule = createSelector(state, (state) => state.isDeletingComplienceInternalRule);
+const isFetchingComplianceCheckResult = createSelector(state, (state) => state.isFetchingComplianceCheckResult);
+const complianceCheckResult = createSelector(state, (state) => state.complianceCheckResult);
 
 export const selectors = {
     state,
@@ -518,6 +553,8 @@ export const selectors = {
     isCreatingComplienceInternalRule,
     isUpdatingComplienceInternalRule,
     isDeletingComplienceInternalRule,
+    isFetchingComplianceCheckResult,
+    complianceCheckResult,
 };
 
 export const actions = slice.actions;

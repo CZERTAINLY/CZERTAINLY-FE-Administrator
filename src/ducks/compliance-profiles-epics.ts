@@ -364,61 +364,6 @@ const getAssociationsOfComplianceProfile: AppEpic = (action$, state$, deps) => {
     );
 };
 
-const checkComplianceForProfiles: AppEpic = (action$, state$, deps) => {
-    return action$.pipe(
-        filter(slice.actions.checkComplianceForProfiles.match),
-        switchMap((action) =>
-            deps.apiClients.complianceManagement
-                .checkComplianceV2({
-                    requestBody: action.payload.requestBody,
-                    resource: action.payload.resource,
-                    type: action.payload.type,
-                })
-                .pipe(
-                    mergeMap(() =>
-                        of(
-                            slice.actions.checkComplianceForProfilesSuccess(),
-                            alertActions.success('Compliance Check for the certificates initiated'),
-                        ),
-                    ),
-
-                    catchError((error) =>
-                        of(
-                            slice.actions.checkComplianceForProfilesFailed({ error: extractError(error, 'Failed to check compliance') }),
-                            appRedirectActions.fetchError({ error, message: 'Failed to check compliance' }),
-                        ),
-                    ),
-                ),
-        ),
-    );
-};
-
-const checkComplianceForResourceObjects: AppEpic = (action$, state$, deps) => {
-    return action$.pipe(
-        filter(slice.actions.checkComplianceForResourceObjects.match),
-        switchMap((action) =>
-            deps.apiClients.complianceManagement
-                .checkResourceObjectsComplianceV2({ resource: action.payload.resource, requestBody: action.payload.requestBody })
-                .pipe(
-                    mergeMap(() =>
-                        of(
-                            slice.actions.checkComplianceForResourceObjectsSuccess(),
-                            alertActions.success('Compliance Check for the certificates initiated'),
-                        ),
-                    ),
-                    catchError((error) =>
-                        of(
-                            slice.actions.checkComplianceForResourceObjectsFailed({
-                                error: extractError(error, 'Failed to check compliance'),
-                            }),
-                            appRedirectActions.fetchError({ error, message: 'Failed to check compliance' }),
-                        ),
-                    ),
-                ),
-        ),
-    );
-};
-
 const updateRule: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.updateRule.match),
@@ -554,6 +499,114 @@ const deleteComplienceInternalRule: AppEpic = (action$, state$, deps) => {
     );
 };
 
+const checkComplianceForProfiles: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.checkComplianceForProfiles.match),
+        switchMap((action) =>
+            deps.apiClients.complianceManagement
+                .checkComplianceV2({
+                    requestBody: action.payload.requestBody,
+                    resource: action.payload.resource,
+                    type: action.payload.type,
+                })
+                .pipe(
+                    mergeMap(() =>
+                        of(
+                            slice.actions.checkComplianceForProfilesSuccess(),
+                            alertActions.success('Compliance Check for the certificates initiated'),
+                        ),
+                    ),
+
+                    catchError((error) =>
+                        of(
+                            slice.actions.checkComplianceForProfilesFailed({ error: extractError(error, 'Failed to check compliance') }),
+                            appRedirectActions.fetchError({ error, message: 'Failed to check compliance' }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
+const checkComplianceForResourceObjects: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.checkComplianceForResourceObjects.match),
+        switchMap((action) =>
+            deps.apiClients.complianceManagement
+                .checkResourceObjectsComplianceV2({ resource: action.payload.resource, requestBody: action.payload.requestBody })
+                .pipe(
+                    mergeMap(() =>
+                        of(
+                            slice.actions.checkComplianceForResourceObjectsSuccess(),
+                            alertActions.success('Compliance Check for the certificates initiated'),
+                        ),
+                    ),
+                    catchError((error) =>
+                        of(
+                            slice.actions.checkComplianceForResourceObjectsFailed({
+                                error: extractError(error, 'Failed to check compliance'),
+                            }),
+                            appRedirectActions.fetchError({ error, message: 'Failed to check compliance' }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
+const checkResourceObjectCompliance: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.checkResourceObjectCompliance.match),
+        switchMap((action) =>
+            deps.apiClients.complianceManagement
+                .checkResourceObjectComplianceV2({
+                    resource: action.payload.resource,
+                    objectUuid: action.payload.objectUuid,
+                })
+                .pipe(
+                    mergeMap(() =>
+                        of(
+                            slice.actions.checkResourceObjectComplianceSuccess(),
+                            alertActions.success('Compliance Check for the certificates initiated'),
+                        ),
+                    ),
+                    catchError((error) =>
+                        of(slice.actions.checkResourceObjectComplianceFailed({ error: extractError(error, 'Failed to check compliance') })),
+                    ),
+                ),
+        ),
+    );
+};
+
+const getComplianceCheckResult: AppEpic = (action$, state$, deps) => {
+    return action$.pipe(
+        filter(slice.actions.getComplianceCheckResult.match),
+        switchMap((action) =>
+            deps.apiClients.complianceManagement
+                .getComplianceCheckResultV2({
+                    resource: action.payload.resource,
+                    objectUuid: action.payload.objectUuid,
+                })
+                .pipe(
+                    mergeMap((complianceCheckResult) =>
+                        of(
+                            slice.actions.getComplianceCheckResultSuccess({
+                                complianceCheckResult,
+                            }),
+                        ),
+                    ),
+                    catchError((error) =>
+                        of(
+                            slice.actions.getComplianceCheckResultFailed({
+                                error: extractError(error, 'Failed to get compliance check result'),
+                            }),
+                        ),
+                    ),
+                ),
+        ),
+    );
+};
+
 const epics = [
     getComplianceProfileDetail,
     getListComplianceProfiles,
@@ -571,11 +624,13 @@ const epics = [
     getComplianceGroups,
     getComplianceGroupRules,
     getAssociationsOfComplianceProfile,
-    checkComplianceForProfiles,
-    checkComplianceForResourceObjects,
     createComplianceInternalRule,
     updateComplienceInternalRule,
     deleteComplienceInternalRule,
+    checkComplianceForProfiles,
+    checkComplianceForResourceObjects,
+    checkResourceObjectCompliance,
+    getComplianceCheckResult,
 ];
 
 export default epics;

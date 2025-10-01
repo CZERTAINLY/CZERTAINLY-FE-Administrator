@@ -23,6 +23,7 @@ import {
     transformRaProfileResponseDtoToModel,
     transformRaProfileScepDetailResponseDtoToModel,
 } from './transform/ra-profiles';
+import { Resource } from 'types/openapi/models/Resource';
 
 const listRaProfiles: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
@@ -605,18 +606,20 @@ const checkCompliance: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.checkCompliance.match),
         switchMap((action) =>
-            deps.apiClients.raProfiles.checkRaProfileCompliance({ requestBody: action.payload.uuids }).pipe(
-                mergeMap(() =>
-                    of(slice.actions.checkComplianceSuccess(), alertActions.success('Compliance Check for the certificates initiated')),
-                ),
+            deps.apiClients.complianceManagement
+                .checkResourceObjectsComplianceV2({ resource: Resource.RaProfiles, requestBody: action.payload.uuids })
+                .pipe(
+                    mergeMap(() =>
+                        of(slice.actions.checkComplianceSuccess(), alertActions.success('Compliance Check for the certificates initiated')),
+                    ),
 
-                catchError((err) =>
-                    of(
-                        slice.actions.checkComplianceFailed({ error: extractError(err, 'Failed to start compliance check') }),
-                        appRedirectActions.fetchError({ error: err, message: 'Failed to start compliance check' }),
+                    catchError((err) =>
+                        of(
+                            slice.actions.checkComplianceFailed({ error: extractError(err, 'Failed to start compliance check') }),
+                            appRedirectActions.fetchError({ error: err, message: 'Failed to start compliance check' }),
+                        ),
                     ),
                 ),
-            ),
         ),
     );
 };

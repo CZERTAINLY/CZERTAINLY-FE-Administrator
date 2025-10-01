@@ -31,6 +31,7 @@ import {
     CertificateSimpleDto,
     CertificateSubjectType,
     CertificateValidationStatus,
+    ComplianceRuleStatus,
     FilterConditionOperator,
     FilterFieldSource,
     SearchFilterRequestDto,
@@ -57,9 +58,10 @@ import {
     Row,
     UncontrolledButtonDropdown,
 } from 'reactstrap';
-import { AttributeDescriptorModel } from 'types/attributes';
+import { AttributeDescriptorModel, AttributeResponseModel } from 'types/attributes';
 import { ComplianceStatus, PlatformEnum, Resource } from 'types/openapi';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { selectors as complianceProfilesSelectors, actions as complianceProfilesActions } from 'ducks/compliance-profiles';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 import { downloadFile, formatPEM } from 'utils/certificate';
@@ -117,7 +119,6 @@ export default function CertificateDetail() {
     const certLocations = useSelector(selectors.certificateLocations);
     const approvals = useSelector(selectors.approvals);
     const currentFilters = useSelector(filterSelectors.currentFilters(EntityType.CERTIFICATE));
-    const preservedFilters = useSelector(filterSelectors.preservedFilters(EntityType.CERTIFICATE));
 
     const validationResult = useSelector(selectors.validationResult);
 
@@ -157,6 +158,8 @@ export default function CertificateDetail() {
     const isFetchingCertificateChain = useSelector(selectors.isFetchingCertificateChain);
     const isUpdatingTrustedStatus = useSelector(selectors.isUpdatingTrustedStatus);
     const isArchiving = useSelector(selectors.isArchiving);
+    const isFetchingComplianceCheckResult = useSelector(complianceProfilesSelectors.isFetchingComplianceCheckResult);
+    const complianceCheckResult = useSelector(complianceProfilesSelectors.complianceCheckResult);
 
     const isDeassociating = useSelector(selectors.isDeassociating);
     const isAssociating = useSelector(selectors.isAssociating);
@@ -193,6 +196,7 @@ export default function CertificateDetail() {
     const [confirmDeleteRelatedCertificate, setConfirmDeleteRelatedCertificate] = useState<boolean>(false);
     const [relatedCertificateCheckedRows, setRelatedCertificateCheckedRows] = useState<string[]>([]);
     const [isAlreadyRelatedError, setIsAlreadyRelatedError] = useState<boolean>(false);
+    const [selectedAttributesInfo, setSelectedAttributesInfo] = useState<AttributeResponseModel[] | null>(null);
 
     const isFirstAddRelatedCertificateClick = useRef<boolean>(true);
 
@@ -358,6 +362,15 @@ export default function CertificateDetail() {
     useEffect(() => {
         getFreshCertificateValidations();
     }, [getFreshCertificateValidations]);
+
+    const getFreshComplianceCheckResult = useCallback(() => {
+        if (!certificate) return;
+        dispatch(complianceProfilesActions.getComplianceCheckResult({ resource: Resource.Certificates, objectUuid: certificate.uuid }));
+    }, [dispatch, certificate]);
+
+    useEffect(() => {
+        getFreshComplianceCheckResult();
+    }, [getFreshComplianceCheckResult]);
 
     useEffect(() => {
         if (!certificate || !locations || locations.length === 0) return;
@@ -994,6 +1007,49 @@ export default function CertificateDetail() {
         [],
     );
 
+    const complianceHeaders: TableHeader[] = useMemo(
+        () => [
+            { id: 'name', content: 'Name' },
+            { id: 'description', content: 'Description' },
+            {
+                id: 'status',
+                content: 'Status',
+            },
+            { id: 'provider', content: 'Provider' },
+            { id: 'kind', content: 'Kind' },
+            { id: 'attributes', content: 'Attributes' },
+        ],
+        [],
+    );
+
+    const complianceData: TableDataRow[] = useMemo(() => {
+        if (!complianceCheckResult) return [];
+        return complianceCheckResult.failedRules.map((rule) => ({
+            id: rule.uuid,
+            columns: [
+                rule.name || '',
+                rule.description || '',
+                <CertificateStatus status={(rule.status as ComplianceRuleStatus) || ''} />,
+                rule.connectorName || '',
+                rule.kind || '',
+                rule.attributes?.length ? (
+                    <Button
+                        className="btn btn-link"
+                        color="white"
+                        title="Attributes"
+                        onClick={() => {
+                            setSelectedAttributesInfo((rule.attributes || []) as AttributeResponseModel[]);
+                        }}
+                    >
+                        <i className="fa fa-info" style={{ color: 'auto' }} />
+                    </Button>
+                ) : (
+                    ''
+                ),
+            ],
+        }));
+    }, [complianceCheckResult]);
+
     const relatedCertificatesHeaders: TableHeader[] = useMemo(
         () => [
             {
@@ -1011,35 +1067,6 @@ export default function CertificateDetail() {
             { id: 'expires', content: 'Expires At' },
         ],
         [],
-    );
-
-    const complianceHeaders: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'status',
-                content: 'Status',
-            },
-            {
-                id: 'ruleDescription',
-                content: 'Rule Description',
-            },
-        ],
-        [],
-    );
-
-    const complianceData: TableDataRow[] = useMemo(
-        () =>
-            !certificate
-                ? []
-                : (certificate.nonCompliantRules || []).map((e) => ({
-                      id: e.ruleDescription,
-                      columns: [<CertificateStatus status={e.status} />, e.ruleDescription],
-                      detailColumns:
-                          !e.attributes || e.attributes.length === 0
-                              ? undefined
-                              : [<></>, <></>, <ComplianceRuleAttributeViewer attributes={e.attributes} hasHeader={false} />],
-                  })),
-        [certificate],
     );
 
     const propertiesData: TableDataRow[] = useMemo(() => {
@@ -2006,6 +2033,42 @@ export default function CertificateDetail() {
         [deviceType],
     );
 
+    const renderComplianceCheckResultWidget = useMemo(() => {
+        return (
+            <Widget
+                title="Compliance Status"
+                busy={isFetchingComplianceCheckResult}
+                titleSize="large"
+                lockSize="normal"
+                widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}
+                refreshAction={certificate && getFreshComplianceCheckResult}
+            >
+                <br />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <span>Status:</span>
+                        <span>
+                            <CertificateStatus status={(complianceCheckResult?.status as ComplianceStatus) || ''} />
+                        </span>
+                    </div>
+                    <div style={{ width: '1px', height: '10px', backgroundColor: '#6c757d' }} />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <span>Cheked:</span>
+                        <span>{complianceCheckResult?.timestamp || ''}</span>
+                    </div>
+                </div>
+                <CustomTable headers={complianceHeaders} data={complianceData} hasPagination={true} />
+            </Widget>
+        );
+    }, [
+        complianceHeaders,
+        complianceData,
+        isFetchingComplianceCheckResult,
+        complianceCheckResult,
+        certificate,
+        getFreshComplianceCheckResult,
+    ]);
+
     return (
         <Container className={cx('themed-container', styles.certificateContainer)} fluid>
             <GoBackButton
@@ -2108,6 +2171,9 @@ export default function CertificateDetail() {
                                         )}
                                     </Col>
                                 </Row>
+                                <Row xs="1" sm="1" md="2" lg="2" xl="2">
+                                    <Col style={{ width: '100%' }}>{renderComplianceCheckResultWidget}</Col>
+                                </Row>
                             </Widget>
                         ),
                     },
@@ -2163,16 +2229,7 @@ export default function CertificateDetail() {
                                     <br />
                                     <CustomTable headers={validationHeaders} data={validationData} />
                                 </Widget>
-                                <Widget
-                                    title="Compliance Status"
-                                    busy={isFetching}
-                                    titleSize="large"
-                                    lockSize="normal"
-                                    widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}
-                                >
-                                    <br />
-                                    <CustomTable headers={complianceHeaders} data={complianceData} hasDetails={true} />
-                                </Widget>
+                                {renderComplianceCheckResultWidget}
                             </Widget>
                         ),
                     },
@@ -2365,6 +2422,14 @@ export default function CertificateDetail() {
                 toggle={() => setCurrentInfoId('')}
                 buttons={[]}
                 size="lg"
+            />
+
+            <Dialog
+                isOpen={!!selectedAttributesInfo}
+                caption="Attributes Info"
+                body={<AttributeViewer attributes={selectedAttributesInfo ?? []} />}
+                toggle={() => setSelectedAttributesInfo(null)}
+                buttons={[]}
             />
 
             <Dialog
