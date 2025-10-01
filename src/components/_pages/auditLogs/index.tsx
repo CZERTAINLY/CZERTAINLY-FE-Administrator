@@ -13,7 +13,7 @@ import { Container } from 'reactstrap';
 
 import { ApiClients } from '../../../api';
 import { WidgetButtonProps } from 'components/WidgetButtons';
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import CustomTable, { TableDataRow } from 'components/CustomTable';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { SearchRequestModel } from 'types/certificate';
 import PagedList from 'components/PagedList/PagedList';

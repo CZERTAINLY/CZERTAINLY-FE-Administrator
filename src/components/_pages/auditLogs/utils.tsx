@@ -34,19 +34,19 @@ export const createAuditLogDetailData = (
                     object.uuid && auditLogsTypeMapping[auditLog.resource.type] ? (
                         <Link
                             onClick={onLinkClick}
-                            key={index}
+                            key={object.uuid}
                             to={`../${auditLogsTypeMapping[auditLog.resource.type]}/detail/${object.uuid}`}
                         >
                             {object.name ?? object.uuid ?? ''}
                         </Link>
                     ) : (
-                        <span key={index}>
+                        <span key={object.uuid}>
                             {object.name ?? ''} {object.uuid ? `(${object.uuid})` : ''}
                         </span>
                     );
 
                 return (
-                    <span key={index}>
+                    <span key={object.uuid}>
                         {index > 0 && ', '}
                         {element}
                     </span>
@@ -60,19 +60,19 @@ export const createAuditLogDetailData = (
                     object.uuid && auditLog.affiliatedResource && auditLogsTypeMapping[auditLog.affiliatedResource.type] ? (
                         <Link
                             onClick={onLinkClick}
-                            key={index}
+                            key={object.uuid}
                             to={`../${auditLogsTypeMapping[auditLog.affiliatedResource.type]}/detail/${object.uuid}`}
                         >
                             {object.name ?? object.uuid ?? ''}
                         </Link>
                     ) : (
-                        <span key={index}>
+                        <span key={object.uuid}>
                             {object.name ?? ''} {object.uuid ? `(${object.uuid})` : ''}
                         </span>
                     );
 
                 return (
-                    <span key={index}>
+                    <span key={object.uuid}>
                         {index > 0 && ', '}
                         {element}
                     </span>
@@ -142,9 +142,11 @@ export const createAuditLogsList = (
 
                 columns: [
                     '' + log.id,
-                    <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(log.timestamp)}</span>,
+                    <span key={log.id} style={{ whiteSpace: 'nowrap' }}>
+                        {dateFormatter(log.timestamp)}
+                    </span>,
                     getEnumLabel(moduleEnum, log.module),
-                    <span style={{ whiteSpace: 'nowrap' }}>
+                    <span key={log.id} style={{ whiteSpace: 'nowrap' }}>
                         {getEnumLabel(actorEnum, log.actor.type)}
                         {log.actor.uuid && log.actor.name ? (
                             <Link to={`../users/detail/${log.actor.uuid}`}> {log.actor.name}</Link>
@@ -165,7 +167,7 @@ export const createAuditLogsList = (
                         )}
                     </span>,
                     getEnumLabel(authMethodEnum, log.actor.authMethod),
-                    <span style={{ whiteSpace: 'nowrap' }}>
+                    <span key={log.id} style={{ whiteSpace: 'nowrap' }}>
                         {getEnumLabel(resourceEnum, log.resource.type)}
                         {!auditLogsTypeMapping[log.resource.type] && log.resource.objects && log.resource.objects[0]?.name && (
                             <span style={{ marginLeft: '5px' }}>{log.resource.objects[0]?.name ?? ''}</span>
@@ -201,7 +203,7 @@ export const createAuditLogsList = (
                             ''
                         )}
                     </span>,
-                    <span style={{ whiteSpace: 'nowrap' }}>
+                    <span key={log.id} style={{ whiteSpace: 'nowrap' }}>
                         {log.affiliatedResource ? getEnumLabel(resourceEnum, log.affiliatedResource.type) : ''}
                         {log.affiliatedResource &&
                             log.affiliatedResource.objects &&

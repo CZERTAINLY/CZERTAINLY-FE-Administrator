@@ -117,7 +117,6 @@ export default function CertificateDetail() {
     const certLocations = useSelector(selectors.certificateLocations);
     const approvals = useSelector(selectors.approvals);
     const currentFilters = useSelector(filterSelectors.currentFilters(EntityType.CERTIFICATE));
-    const preservedFilters = useSelector(filterSelectors.preservedFilters(EntityType.CERTIFICATE));
 
     const validationResult = useSelector(selectors.validationResult);
 
@@ -2014,15 +2013,10 @@ export default function CertificateDetail() {
     }, [clearRelatedCertificatesFilters, isFirstAddRelatedCertificateClick]);
 
     useEffect(() => {
-        const certificateLink = document.getElementById('Certificates-link');
-        if (!certificateLink) return;
-
-        certificateLink.addEventListener('click', handleClick);
-
         return () => {
-            certificateLink.removeEventListener('click', handleClick);
+            handleClick();
         };
-    }, [clearRelatedCertificatesFilters, handleClick, isFirstAddRelatedCertificateClick]);
+    }, [handleClick]);
 
     return (
         <Container className={cx('themed-container', styles.certificateContainer)} fluid>
