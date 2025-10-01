@@ -12,7 +12,6 @@
  */
 
 import type {
-    ComplianceCheckResultDto,
     ComplianceStatus,
     KeyAlgorithm,
     KeyCompromiseReason,
@@ -112,12 +111,6 @@ export interface KeyItemDetailDto {
      * @memberof KeyItemDetailDto
      */
     complianceStatus: ComplianceStatus;
-    /**
-     * Key compliance check result
-     * @type {ComplianceCheckResultDto}
-     * @memberof KeyItemDetailDto
-     */
-    complianceResult?: ComplianceCheckResultDto;
 }
 
 

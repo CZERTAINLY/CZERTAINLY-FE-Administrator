@@ -21,7 +21,6 @@ import type {
     CertificateSubjectType,
     CertificateType,
     CertificateValidationStatus,
-    ComplianceCheckResultDto,
     ComplianceStatus,
     GroupDto,
     KeyDto,
@@ -258,12 +257,6 @@ export interface CertificateDetailDto {
      * @memberof CertificateDetailDto
      */
     nonCompliantRules?: Array<CertificateComplianceResultDto>;
-    /**
-     * Certificate compliance check result
-     * @type {ComplianceCheckResultDto}
-     * @memberof CertificateDetailDto
-     */
-    complianceResult?: ComplianceCheckResultDto;
     /**
      * List of Custom Attributes
      * @type {Array<ResponseAttributeDto>}

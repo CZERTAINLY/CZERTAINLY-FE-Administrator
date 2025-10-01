@@ -14,7 +14,6 @@
 import type {
     CertificateRequestFormat,
     CertificateType,
-    ComplianceCheckResultDto,
     ComplianceStatus,
     ResponseAttributeDto,
 } from './';
@@ -114,12 +113,6 @@ export interface CertificateRequestDto {
      * @memberof CertificateRequestDto
      */
     complianceStatus: ComplianceStatus;
-    /**
-     * Certificate request compliance check result
-     * @type {ComplianceCheckResultDto}
-     * @memberof CertificateRequestDto
-     */
-    complianceResult?: ComplianceCheckResultDto;
 }
 
 

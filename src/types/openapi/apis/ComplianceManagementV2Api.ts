@@ -17,6 +17,7 @@ import { BaseAPI, throwIfNullOrUndefined, encodeURI } from '../runtime';
 import type { OperationOpts, HttpHeaders, HttpQuery } from '../runtime';
 import type {
     AuthenticationServiceExceptionDto,
+    ComplianceCheckResultDto,
     ErrorMessageDto,
     Resource,
 } from '../models';
@@ -27,9 +28,19 @@ export interface CheckComplianceV2Request {
     type?: string;
 }
 
+export interface CheckResourceObjectComplianceV2Request {
+    resource: Resource;
+    objectUuid: string;
+}
+
 export interface CheckResourceObjectsComplianceV2Request {
     resource: Resource;
     requestBody: Array<string>;
+}
+
+export interface GetComplianceCheckResultV2Request {
+    resource: Resource;
+    objectUuid: string;
 }
 
 /**
@@ -64,6 +75,21 @@ export class ComplianceManagementV2Api extends BaseAPI {
     };
 
     /**
+     * Initiate compliance Check for requested resource object
+     */
+    checkResourceObjectComplianceV2({ resource, objectUuid }: CheckResourceObjectComplianceV2Request): Observable<void>
+    checkResourceObjectComplianceV2({ resource, objectUuid }: CheckResourceObjectComplianceV2Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>>
+    checkResourceObjectComplianceV2({ resource, objectUuid }: CheckResourceObjectComplianceV2Request, opts?: OperationOpts): Observable<void | AjaxResponse<void>> {
+        throwIfNullOrUndefined(resource, 'resource', 'checkResourceObjectComplianceV2');
+        throwIfNullOrUndefined(objectUuid, 'objectUuid', 'checkResourceObjectComplianceV2');
+
+        return this.request<void>({
+            url: '/v2/compliance/{resource}/{objectUuid}'.replace('{resource}', encodeURI(resource)).replace('{objectUuid}', encodeURI(objectUuid)),
+            method: 'POST',
+        }, opts?.responseOpts);
+    };
+
+    /**
      * Initiate compliance Check for requested resource objects
      */
     checkResourceObjectsComplianceV2({ resource, requestBody }: CheckResourceObjectsComplianceV2Request): Observable<void>
@@ -81,6 +107,21 @@ export class ComplianceManagementV2Api extends BaseAPI {
             method: 'POST',
             headers,
             body: requestBody,
+        }, opts?.responseOpts);
+    };
+
+    /**
+     * Get the latest compliance check result for the specified resource object
+     */
+    getComplianceCheckResultV2({ resource, objectUuid }: GetComplianceCheckResultV2Request): Observable<ComplianceCheckResultDto>
+    getComplianceCheckResultV2({ resource, objectUuid }: GetComplianceCheckResultV2Request, opts?: OperationOpts): Observable<AjaxResponse<ComplianceCheckResultDto>>
+    getComplianceCheckResultV2({ resource, objectUuid }: GetComplianceCheckResultV2Request, opts?: OperationOpts): Observable<ComplianceCheckResultDto | AjaxResponse<ComplianceCheckResultDto>> {
+        throwIfNullOrUndefined(resource, 'resource', 'getComplianceCheckResultV2');
+        throwIfNullOrUndefined(objectUuid, 'objectUuid', 'getComplianceCheckResultV2');
+
+        return this.request<ComplianceCheckResultDto>({
+            url: '/v2/compliance/{resource}/{objectUuid}'.replace('{resource}', encodeURI(resource)).replace('{objectUuid}', encodeURI(objectUuid)),
+            method: 'GET',
         }, opts?.responseOpts);
     };
 

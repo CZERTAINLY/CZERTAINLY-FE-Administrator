@@ -34,6 +34,12 @@ export interface ComplianceCheckResultDto {
      */
     timestamp?: string;
     /**
+     * Overall compliance check result message
+     * @type {string}
+     * @memberof ComplianceCheckResultDto
+     */
+    message?: string;
+    /**
      * Compliance rules that didn\'t pass compliance check
      * @type {Array<ComplianceCheckRuleDto>}
      * @memberof ComplianceCheckResultDto
