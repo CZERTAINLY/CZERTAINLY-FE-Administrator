@@ -110,6 +110,75 @@ export const createAuditLogDetailData = (
     ];
 };
 
+const renderActor = (actor: AuditLogDto['actor'], actorEnum: Record<string, EnumItemDto>, navigate: (path: string) => void) => {
+    const typeLabel = getEnumLabel(actorEnum, actor.type);
+
+    let additional: JSX.Element | string = '';
+
+    if (actor.uuid) {
+        const path = `../users/detail/${actor.uuid}`;
+        if (actor.name) {
+            additional = <Link to={path}> {actor.name}</Link>;
+        } else {
+            additional = (
+                <Button color="white" size="sm" className="p-0 ms-1" onClick={() => navigate(path)}>
+                    {' '}
+                    <i className="fa fa-circle-arrow-right"></i>
+                </Button>
+            );
+        }
+    }
+
+    return (
+        <span style={{ whiteSpace: 'nowrap' }}>
+            {typeLabel}
+            {additional}
+        </span>
+    );
+};
+
+const renderResource = (
+    resource: AuditLogDto['resource'] | AuditLogDto['affiliatedResource'],
+    resourceEnum: Record<string, EnumItemDto>,
+    navigate: (path: string) => void,
+) => {
+    if (!resource) {
+        return <span style={{ whiteSpace: 'nowrap' }} />;
+    }
+
+    const typeLabel = getEnumLabel(resourceEnum, resource.type);
+
+    let additional: JSX.Element | string = '';
+
+    const obj = resource.objects?.[0];
+
+    if (obj) {
+        const mappingType = auditLogsTypeMapping[resource.type];
+        if (mappingType && obj.uuid) {
+            const path = `../${mappingType}/detail/${obj.uuid}`;
+            if (obj.name) {
+                additional = <Link to={path}> {obj.name}</Link>;
+            } else {
+                additional = (
+                    <Button title="Go to details" color="white" size="sm" className="p-0 ms-1" onClick={() => navigate(path)}>
+                        {' '}
+                        <i className="fa fa-circle-arrow-right"></i>
+                    </Button>
+                );
+            }
+        } else if (!mappingType && obj.name) {
+            additional = <span style={{ marginLeft: '5px' }}>{obj.name}</span>;
+        }
+    }
+
+    return (
+        <span style={{ whiteSpace: 'nowrap' }}>
+            {typeLabel}
+            {additional}
+        </span>
+    );
+};
+
 export const createAuditLogsList = (
     auditLogs: AuditLogDto[],
     resourceEnum: {
@@ -136,132 +205,23 @@ export const createAuditLogsList = (
     if (auditLogs.length === 0) {
         return [];
     } else {
-        return auditLogs.map((log) => {
-            return {
-                id: log.id,
-
-                columns: [
-                    '' + log.id,
-                    <span key={log.id} style={{ whiteSpace: 'nowrap' }}>
-                        {dateFormatter(log.timestamp)}
-                    </span>,
-                    getEnumLabel(moduleEnum, log.module),
-                    <span key={log.id} style={{ whiteSpace: 'nowrap' }}>
-                        {getEnumLabel(actorEnum, log.actor.type)}
-                        {log.actor.uuid && log.actor.name ? (
-                            <Link to={`../users/detail/${log.actor.uuid}`}> {log.actor.name}</Link>
-                        ) : log.actor.uuid ? (
-                            <Button
-                                color="white"
-                                size="sm"
-                                className="p-0 ms-1"
-                                onClick={() => {
-                                    navigate(`../users/detail/${log.actor.uuid}`);
-                                }}
-                            >
-                                {' '}
-                                <i className="fa fa-circle-arrow-right"></i>
-                            </Button>
-                        ) : (
-                            ''
-                        )}
-                    </span>,
-                    getEnumLabel(authMethodEnum, log.actor.authMethod),
-                    <span key={log.id} style={{ whiteSpace: 'nowrap' }}>
-                        {getEnumLabel(resourceEnum, log.resource.type)}
-                        {!auditLogsTypeMapping[log.resource.type] && log.resource.objects && log.resource.objects[0]?.name && (
-                            <span style={{ marginLeft: '5px' }}>{log.resource.objects[0]?.name ?? ''}</span>
-                        )}
-                        {log.resource.objects &&
-                        log.resource.objects.length > 0 &&
-                        log.resource.objects[0]?.uuid &&
-                        log.resource.objects[0]?.name &&
-                        auditLogsTypeMapping[log.resource.type] ? (
-                            <Link to={`../${auditLogsTypeMapping[log.resource.type]}/detail/${log.resource.objects[0].uuid}`}>
-                                {' '}
-                                {log.resource.objects[0].name}
-                            </Link>
-                        ) : log.resource.objects &&
-                          log.resource.objects.length > 0 &&
-                          log.resource.objects[0]?.uuid &&
-                          auditLogsTypeMapping[log.resource.type] ? (
-                            <Button
-                                title="Go to details"
-                                color="white"
-                                size="sm"
-                                className="p-0 ms-1"
-                                onClick={() => {
-                                    navigate(
-                                        `../${auditLogsTypeMapping[log.resource.type]}/detail/${log.resource.objects ? log.resource.objects[0].uuid : ''}`,
-                                    );
-                                }}
-                            >
-                                {' '}
-                                <i className="fa fa-circle-arrow-right"></i>
-                            </Button>
-                        ) : (
-                            ''
-                        )}
-                    </span>,
-                    <span key={log.id} style={{ whiteSpace: 'nowrap' }}>
-                        {log.affiliatedResource ? getEnumLabel(resourceEnum, log.affiliatedResource.type) : ''}
-                        {log.affiliatedResource &&
-                            log.affiliatedResource.objects &&
-                            log.affiliatedResource.objects[0]?.name &&
-                            !auditLogsTypeMapping[log.affiliatedResource.type] && (
-                                <span style={{ marginLeft: '5px' }}>{log.affiliatedResource.objects[0]?.name ?? ''}</span>
-                            )}
-                        {log.affiliatedResource &&
-                        log.affiliatedResource.objects &&
-                        log.affiliatedResource.objects.length > 0 &&
-                        log.affiliatedResource.objects[0]?.uuid &&
-                        log.affiliatedResource.objects[0]?.name &&
-                        auditLogsTypeMapping[log.affiliatedResource.type] ? (
-                            <Link
-                                to={`../${auditLogsTypeMapping[log.affiliatedResource.type]}/detail/${log.affiliatedResource.objects[0].uuid}`}
-                            >
-                                {' '}
-                                {log.affiliatedResource.objects[0].name}
-                            </Link>
-                        ) : log.affiliatedResource &&
-                          auditLogsTypeMapping[log.affiliatedResource.type] &&
-                          log.affiliatedResource.objects &&
-                          log.affiliatedResource.objects.length > 0 &&
-                          log.affiliatedResource.objects[0]?.uuid ? (
-                            <Button
-                                title="Go to details"
-                                color="white"
-                                size="sm"
-                                className="p-0 ms-1"
-                                onClick={() => {
-                                    navigate(
-                                        `../${log.affiliatedResource ? auditLogsTypeMapping[log.affiliatedResource.type] : ''}/detail/${log.affiliatedResource && log.affiliatedResource.objects ? log.affiliatedResource.objects[0].uuid : ''}`,
-                                    );
-                                }}
-                            >
-                                {' '}
-                                <i className="fa fa-circle-arrow-right"></i>
-                            </Button>
-                        ) : (
-                            ''
-                        )}
-                    </span>,
-                    getEnumLabel(operationEnum, log.operation),
-                    getEnumLabel(operationResultEnum, log.operationResult),
-                    <Button
-                        className="btn btn-link p-0 ms-2"
-                        color="white"
-                        title="Detail"
-                        key={`detail${log.id}`}
-                        onClick={() => {
-                            onInfoClick(log);
-                        }}
-                    >
-                        <i className="fa fa-info" style={{ color: 'auto', marginBottom: '9.5px', marginLeft: '4px', fontSize: '14px' }} />
-                    </Button>,
-                ],
-            };
-        });
+        return auditLogs.map((log) => ({
+            id: log.id,
+            columns: [
+                '' + log.id,
+                <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(log.timestamp)}</span>,
+                getEnumLabel(moduleEnum, log.module),
+                renderActor(log.actor, actorEnum, navigate),
+                getEnumLabel(authMethodEnum, log.actor.authMethod),
+                renderResource(log.resource, resourceEnum, navigate),
+                renderResource(log.affiliatedResource, resourceEnum, navigate),
+                getEnumLabel(operationEnum, log.operation),
+                getEnumLabel(operationResultEnum, log.operationResult),
+                <Button className="btn btn-link p-0 ms-2" color="white" title="Detail" onClick={() => onInfoClick(log)}>
+                    <i className="fa fa-info" style={{ color: 'auto', marginBottom: '9.5px', marginLeft: '4px', fontSize: '14px' }} />
+                </Button>,
+            ],
+        }));
     }
 };
 
