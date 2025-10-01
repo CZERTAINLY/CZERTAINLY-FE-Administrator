@@ -189,13 +189,20 @@ const associateComplianceProfile: AppEpic = (action$, state$, deps) => {
                     associationObjectUuid: action.payload.associationObjectUuid,
                 })
                 .pipe(
-                    map(() =>
-                        slice.actions.associateComplianceProfileSuccess({
-                            uuid: action.payload.uuid,
-                            resource: action.payload.resource,
-                            associationObjectUuid: action.payload.associationObjectUuid,
-                            associationObjectName: action.payload.associationObjectName,
-                        }),
+                    mergeMap(() =>
+                        of(
+                            slice.actions.associateComplianceProfileSuccess({
+                                uuid: action.payload.uuid,
+                                resource: action.payload.resource,
+                                associationObjectUuid: action.payload.associationObjectUuid,
+                                associationObjectName: action.payload.associationObjectName,
+                            }),
+                            // Refresh the associated compliance profiles list
+                            slice.actions.getAssociatedComplianceProfiles({
+                                resource: action.payload.resource,
+                                associationObjectUuid: action.payload.associationObjectUuid,
+                            }),
+                        ),
                     ),
                     catchError((error) =>
                         of(
@@ -221,12 +228,19 @@ const dissociateComplianceProfile: AppEpic = (action$, state$, deps) => {
                     associationObjectUuid: action.payload.associationObjectUuid,
                 })
                 .pipe(
-                    map(() =>
-                        slice.actions.dissociateComplianceProfileSuccess({
-                            uuid: action.payload.uuid,
-                            resource: action.payload.resource,
-                            associationObjectUuid: action.payload.associationObjectUuid,
-                        }),
+                    mergeMap(() =>
+                        of(
+                            slice.actions.dissociateComplianceProfileSuccess({
+                                uuid: action.payload.uuid,
+                                resource: action.payload.resource,
+                                associationObjectUuid: action.payload.associationObjectUuid,
+                            }),
+                            // Refresh the associated compliance profiles list
+                            slice.actions.getAssociatedComplianceProfiles({
+                                resource: action.payload.resource,
+                                associationObjectUuid: action.payload.associationObjectUuid,
+                            }),
+                        ),
                     ),
 
                     catchError((error) =>

@@ -62,7 +62,7 @@ export default function ProfileAssociations({ profile }: Props) {
                       columns: [
                           <Link
                               key={associatedProfile.objectUuid}
-                              to={`../../raprofiles/detail/${profile.uuid}/${associatedProfile.objectUuid}`}
+                              to={`../../${associatedProfile.resource.toLowerCase()}/detail/${profile.uuid}/${associatedProfile.objectUuid}`}
                           >
                               {associatedProfile.name}
                           </Link>,
