@@ -2006,7 +2006,7 @@ export default function CertificateDetail() {
         [deviceType],
     );
 
-    const handleClick = useCallback(() => {
+    const handleRelatedFiltersClear = useCallback(() => {
         if (!isFirstAddRelatedCertificateClick.current) {
             clearRelatedCertificatesFilters();
         }
@@ -2014,9 +2014,9 @@ export default function CertificateDetail() {
 
     useEffect(() => {
         return () => {
-            handleClick();
+            handleRelatedFiltersClear();
         };
-    }, [handleClick]);
+    }, [handleRelatedFiltersClear]);
 
     return (
         <Container className={cx('themed-container', styles.certificateContainer)} fluid>
@@ -2024,7 +2024,7 @@ export default function CertificateDetail() {
                 style={{ marginBottom: '10px' }}
                 text={`${getEnumLabel(resourceEnum, Resource.Certificates)} Inventory`}
                 onClick={() => {
-                    handleClick();
+                    handleRelatedFiltersClear();
                     navigate('/certificates');
                 }}
             />

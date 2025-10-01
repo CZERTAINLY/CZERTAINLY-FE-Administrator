@@ -85,6 +85,8 @@ function AuditLogs() {
 
     const onInfoClick = useCallback(
         (log: AuditLogDto) => {
+            console.log('log', log);
+
             dispatch(
                 userInterfaceActions.showGlobalModal({
                     content: (

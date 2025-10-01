@@ -427,3 +427,35 @@ describe('TestAuditLogDetailComponentCase4', () => {
         });
     });
 });
+
+const TestAuditLogDetailComponentCase5 = () => {
+    const log = mockAuditLogs[4] as unknown as AuditLogDto;
+    const resourceEnum = mockResourceEnum;
+    return (
+        <CustomTable
+            headers={auditLogsDetailRowHeaders}
+            data={createAuditLogDetailData(log, resourceEnum, onLinkClick).map(createAuditLogDetailRows) as unknown as TableDataRow[]}
+        />
+    );
+};
+
+describe('TestAuditLogDetailComponentCase5', () => {
+    beforeEach(() => {
+        cy.mount(<TestAuditLogDetailComponentCase5 />).wait(componentLoadWait);
+    });
+    it('renders resource objects as string with name', () => {
+        cy.contains('tr', 'Resource objects').within(() => {
+            cy.contains('Resource objects').should('exist');
+            cy.contains('test (6db02cd3-71c0-4b3f-be98-97d4bbd8320c)').should('exist');
+        });
+    });
+
+    it('renders affiliated resource objects as string with name', () => {
+        cy.contains('tr', 'Affiliated resource objects').within(() => {
+            cy.contains('Affiliated resource objects').should('exist');
+            cy.contains('Custom').should('exist');
+            cy.get('a[href*="/complianceprofiles/detail/"]').should('exist');
+            cy.get('a[href*="/complianceprofiles/detail/"]').contains('Custom').should('exist');
+        });
+    });
+});

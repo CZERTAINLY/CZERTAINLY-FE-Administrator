@@ -34,19 +34,19 @@ export const createAuditLogDetailData = (
                     object.uuid && auditLogsTypeMapping[auditLog.resource.type] ? (
                         <Link
                             onClick={onLinkClick}
-                            key={object.uuid}
+                            key={`${object.uuid}-resource-link`}
                             to={`../${auditLogsTypeMapping[auditLog.resource.type]}/detail/${object.uuid}`}
                         >
                             {object.name ?? object.uuid ?? ''}
                         </Link>
                     ) : (
-                        <span key={object.uuid}>
+                        <span key={`${object.uuid}-resource-span`}>
                             {object.name ?? ''} {object.uuid ? `(${object.uuid})` : ''}
                         </span>
                     );
 
                 return (
-                    <span key={object.uuid}>
+                    <span key={`${object.uuid}-resource-element-wrapper`}>
                         {index > 0 && ', '}
                         {element}
                     </span>
@@ -60,19 +60,19 @@ export const createAuditLogDetailData = (
                     object.uuid && auditLog.affiliatedResource && auditLogsTypeMapping[auditLog.affiliatedResource.type] ? (
                         <Link
                             onClick={onLinkClick}
-                            key={object.uuid}
+                            key={`${object.uuid}-affiliated-link`}
                             to={`../${auditLogsTypeMapping[auditLog.affiliatedResource.type]}/detail/${object.uuid}`}
                         >
                             {object.name ?? object.uuid ?? ''}
                         </Link>
                     ) : (
-                        <span key={object.uuid}>
+                        <span key={`${object.uuid}-affiliated-span`}>
                             {object.name ?? ''} {object.uuid ? `(${object.uuid})` : ''}
                         </span>
                     );
 
                 return (
-                    <span key={object.uuid}>
+                    <span key={`${object.uuid}-affiliated-element-wrapper`}>
                         {index > 0 && ', '}
                         {element}
                     </span>
@@ -127,6 +127,9 @@ const renderActor = (actor: AuditLogDto['actor'], actorEnum: Record<string, Enum
                 </Button>
             );
         }
+    }
+    if (actor.name && !actor.uuid) {
+        additional = <span style={{ marginLeft: '5px' }}>{actor.name}</span>;
     }
 
     return (
