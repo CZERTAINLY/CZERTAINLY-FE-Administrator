@@ -15,6 +15,7 @@ interface Props {
     body?: string | JSX.Element;
     buttons?: DialogButton[];
     size?: 'sm' | 'lg' | 'xl';
+    dataTestId?: string;
 }
 
 export default function Dialog(props: Props) {
@@ -25,6 +26,7 @@ export default function Dialog(props: Props) {
             toggle={() => {
                 if (props.toggle) props.toggle();
             }}
+            data-testid={props.dataTestId}
         >
             <ModalHeader
                 toggle={() => {
