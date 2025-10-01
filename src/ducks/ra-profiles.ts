@@ -543,16 +543,6 @@ export const slice = createSlice({
             action: PayloadAction<{ uuid: string; complianceProfileUuid: string; complianceProfileName: string; description?: string }>,
         ) => {
             state.isAssociatingComplianceProfile = false;
-
-            if (!state.raProfile) return;
-
-            state.associatedComplianceProfiles = (state.associatedComplianceProfiles || []).concat([
-                {
-                    uuid: action.payload.complianceProfileUuid,
-                    name: action.payload.complianceProfileName,
-                    description: action.payload.description,
-                },
-            ]);
         },
 
         associateRaProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
@@ -571,34 +561,10 @@ export const slice = createSlice({
             action: PayloadAction<{ uuid: string; complianceProfileUuid: string; complianceProfileName: string; description?: string }>,
         ) => {
             state.isDissociatingComplianceProfile = false;
-
-            if (!state.raProfile) return;
-            if (!state.associatedComplianceProfiles) return;
-            const raProfileIndex = state.associatedComplianceProfiles.findIndex(
-                (profile) => profile.uuid === action.payload.complianceProfileUuid,
-            );
-            if (raProfileIndex >= 0) state.associatedComplianceProfiles.splice(raProfileIndex, 1);
         },
 
         dissociateRaProfileFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
             state.isDissociatingComplianceProfile = false;
-        },
-
-        getComplianceProfilesForRaProfile: (state, action: PayloadAction<{ authorityUuid: string; uuid: string }>) => {
-            state.associatedComplianceProfiles = [];
-            state.isFetchingAssociatedComplianceProfiles = true;
-        },
-
-        getComplianceProfilesForRaProfileSuccess: (
-            state,
-            action: PayloadAction<{ complianceProfiles: ComplianceProfileSimplifiedModel[] }>,
-        ) => {
-            state.isFetchingAssociatedComplianceProfiles = false;
-            state.associatedComplianceProfiles = action.payload.complianceProfiles;
-        },
-
-        getComplianceProfilesForRaProfileFailure: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isFetchingAssociatedComplianceProfiles = false;
         },
 
         getAssociatedApprovalProfiles: (state, action: PayloadAction<{ authorityUuid: string; raProfileUuid: string }>) => {

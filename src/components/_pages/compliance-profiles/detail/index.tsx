@@ -112,6 +112,7 @@ export default function ComplianceProfileDetail() {
                 onClick: () => {
                     setComplianceCheck(true);
                 },
+                id: 'check-compliance',
             },
             {
                 icon: 'trash',
@@ -120,6 +121,7 @@ export default function ComplianceProfileDetail() {
                 onClick: () => {
                     setConfirmDelete(true);
                 },
+                id: 'delete-compliance-profile',
             },
         ],
         [],

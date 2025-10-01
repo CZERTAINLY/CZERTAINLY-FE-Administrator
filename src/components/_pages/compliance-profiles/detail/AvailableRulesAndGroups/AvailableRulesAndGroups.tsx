@@ -314,6 +314,7 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
                 titleSize="large"
                 widgetLockName={LockWidgetNameEnum.ListOfAvailableRulesAndGroups}
                 lockSize="large"
+                dataTestId="available-rules-and-groups-widget"
             >
                 <Row xs="1" sm="1" md="2" lg="2" xl="2">
                     <Col style={{ width: '100%' }}>

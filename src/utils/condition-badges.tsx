@@ -1,6 +1,6 @@
 import { getEnumLabel } from 'ducks/enums';
 import { Badge } from 'reactstrap';
-import { SearchFieldListModel } from 'types/certificate';
+import { SearchFieldListModel, SearchFieldModel } from 'types/certificate';
 import { EnumItemDto } from 'types/enums';
 import { AttributeContentType, ConditionItemDto, FilterFieldType } from 'types/openapi';
 import { getFormattedDate, getFormattedDateTime } from 'utils/dateUtil';
@@ -17,10 +17,53 @@ export const renderConditionItems = (
     variant: RenderVariant = 'badge',
     style?: React.CSSProperties,
 ) => {
-    const booleanOptions = [
-        { label: 'True', value: true },
-        { label: 'False', value: false },
-    ];
+    const formatSingleValue = (
+        v: any,
+        field: SearchFieldModel | undefined,
+        platformEnums: Record<string, Record<string, { label: string }>>,
+    ): string => {
+        if (field?.platformEnum) {
+            return platformEnums[field.platformEnum][v]?.label ?? v;
+        }
+
+        if (field?.attributeContentType === AttributeContentType.Date) {
+            return getFormattedDate(v as string);
+        }
+
+        if (field?.attributeContentType === AttributeContentType.Datetime) {
+            return getFormattedDateTime(v as string);
+        }
+
+        if (typeof v === 'object' && v?.name) {
+            return v.name;
+        }
+
+        return String(v);
+    };
+
+    const getConditionValue = (
+        condition: ConditionItemDto,
+        field: SearchFieldModel | undefined,
+        platformEnums: Record<string, Record<string, { label: string }>>,
+    ): string => {
+        const booleanOptions = [
+            { label: 'True', value: true },
+            { label: 'False', value: false },
+        ];
+
+        if (field?.type === FilterFieldType.Boolean) {
+            return `'${booleanOptions.find((b) => !!condition.value === b.value)?.label}'`;
+        }
+
+        if (Array.isArray(condition.value)) {
+            return condition.value.map((v) => `'${formatSingleValue(v, field, platformEnums)}'`).join(' OR ');
+        }
+
+        if (condition.value) {
+            return `'${formatSingleValue(condition.value, field, platformEnums)}'`;
+        }
+        return '';
+    };
 
     return conditionItems.map((condition, i) => {
         const field = availableFilters
@@ -28,40 +71,7 @@ export const renderConditionItems = (
             ?.searchFieldData?.find((s) => s.fieldIdentifier === condition.fieldIdentifier);
 
         const label = field ? field.fieldLabel : condition.fieldIdentifier;
-
-        let value = '';
-
-        value =
-            field && field.type === FilterFieldType.Boolean
-                ? `'${booleanOptions.find((b) => !!condition.value === b.value)?.label}'`
-                : Array.isArray(condition.value)
-                  ? `${condition.value
-                        .map(
-                            (v) =>
-                                `'${
-                                    field?.platformEnum
-                                        ? platformEnums[field.platformEnum][v]?.label
-                                        : v?.name
-                                          ? v.name
-                                          : field && field.attributeContentType === AttributeContentType.Date
-                                            ? getFormattedDate(v as unknown as string)
-                                            : field && field.attributeContentType === AttributeContentType.Datetime
-                                              ? getFormattedDateTime(v as unknown as string)
-                                              : v
-                                }'`,
-                        )
-                        .join(' OR ')}`
-                  : condition.value
-                    ? `'${
-                          field?.platformEnum
-                              ? platformEnums[field.platformEnum][condition.value as unknown as string]?.label
-                              : field && field.attributeContentType === AttributeContentType.Date
-                                ? getFormattedDate(condition.value as unknown as string)
-                                : field && field.attributeContentType === AttributeContentType.Datetime
-                                  ? getFormattedDateTime(condition.value as unknown as string)
-                                  : condition.value
-                      }'`
-                    : '';
+        const value = getConditionValue(condition, field, platformEnums);
 
         const title = `${getEnumLabel(searchGroupEnum, condition.fieldSource)} ${label} ${getEnumLabel(
             filterConditionOperatorEnum,
@@ -70,7 +80,7 @@ export const renderConditionItems = (
 
         if (variant === 'badge') {
             return (
-                <Badge key={i} title={title} className={className} style={style}>
+                <Badge key={condition.fieldIdentifier} title={title} className={className} style={style}>
                     <b>{getEnumLabel(searchGroupEnum, condition.fieldSource)}&nbsp;</b>'{label}'&nbsp;
                     {getEnumLabel(filterConditionOperatorEnum, condition.operator)}&nbsp;
                     {value}
@@ -78,9 +88,8 @@ export const renderConditionItems = (
             );
         }
 
-        // small variant
         return (
-            <div key={i} className="mt-2 me-1" style={style}>
+            <div key={condition.fieldIdentifier} className="mt-2 me-1" style={style}>
                 <span title={title} className={className}>
                     <b>{getEnumLabel(searchGroupEnum, condition.fieldSource)}&nbsp;</b>'{label}'&nbsp;
                     {getEnumLabel(filterConditionOperatorEnum, condition.operator)}&nbsp;

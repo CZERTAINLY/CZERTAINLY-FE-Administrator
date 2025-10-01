@@ -11,7 +11,6 @@ import { actions as userInterfaceActions } from './user-interface';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { transformProfileApprovalDtoToModel } from './transform/approval-profiles';
 import {
-    transformComplianceProfileSimplifiedDtoToModel,
     transformRaProfileAcmeDetailResponseDtoToModel,
     transformRaProfileActivateAcmeRequestModelToDto,
     transformRaProfileActivateCmpRequestModelToDto,
@@ -624,102 +623,6 @@ const checkCompliance: AppEpic = (action$, state$, deps) => {
     );
 };
 
-const associateRaProfile: AppEpic = (action$, state$, deps) => {
-    return action$.pipe(
-        filter(slice.actions.associateRaProfile.match),
-        switchMap((action) =>
-            deps.apiClients.complianceProfile
-                .associateProfiles({
-                    uuid: action.payload.complianceProfileUuid,
-                    raProfileAssociationRequestDto: { raProfileUuids: [action.payload.uuid] },
-                })
-                .pipe(
-                    map(() =>
-                        slice.actions.associateRaProfileSuccess({
-                            uuid: action.payload.uuid,
-                            complianceProfileUuid: action.payload.complianceProfileUuid,
-                            complianceProfileName: action.payload.complianceProfileName,
-                            description: action.payload.description,
-                        }),
-                    ),
-
-                    catchError((err) =>
-                        of(
-                            slice.actions.associateRaProfileFailed({
-                                error: extractError(err, 'Failed to associate RA Profile to Compliance Profile'),
-                            }),
-                            appRedirectActions.fetchError({ error: err, message: 'Failed to associate RA Profile to Compliance Profile' }),
-                        ),
-                    ),
-                ),
-        ),
-    );
-};
-
-const dissociateRaProfile: AppEpic = (action$, state$, deps) => {
-    return action$.pipe(
-        filter(slice.actions.dissociateRaProfile.match),
-        switchMap((action) =>
-            deps.apiClients.complianceProfile
-                .disassociateProfiles({
-                    uuid: action.payload.complianceProfileUuid,
-                    raProfileAssociationRequestDto: { raProfileUuids: [action.payload.uuid] },
-                })
-                .pipe(
-                    map(() =>
-                        slice.actions.dissociateRaProfileSuccess({
-                            uuid: action.payload.uuid,
-                            complianceProfileUuid: action.payload.complianceProfileUuid,
-                            complianceProfileName: action.payload.complianceProfileName,
-                            description: action.payload.description,
-                        }),
-                    ),
-
-                    catchError((err) =>
-                        of(
-                            slice.actions.dissociateRaProfileFailed({
-                                error: extractError(err, 'Failed to dissociate RA Profile from Compliance Profile'),
-                            }),
-                            appRedirectActions.fetchError({
-                                error: err,
-                                message: 'Failed to dissociate RA Profile from Compliance Profile',
-                            }),
-                        ),
-                    ),
-                ),
-        ),
-    );
-};
-
-const getComplianceProfilesForRaProfile: AppEpic = (action$, state$, deps) => {
-    return action$.pipe(
-        filter(slice.actions.getComplianceProfilesForRaProfile.match),
-        switchMap((action) =>
-            deps.apiClients.raProfiles
-                .getAssociatedComplianceProfiles({ authorityUuid: action.payload.authorityUuid, raProfileUuid: action.payload.uuid })
-                .pipe(
-                    switchMap((profileDto) =>
-                        of(
-                            slice.actions.getComplianceProfilesForRaProfileSuccess({
-                                complianceProfiles: profileDto.map(transformComplianceProfileSimplifiedDtoToModel),
-                            }),
-                            userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.RaProfileComplianceDetails),
-                        ),
-                    ),
-
-                    catchError((err) =>
-                        of(
-                            slice.actions.getComplianceProfilesForRaProfileFailure({
-                                error: extractError(err, 'Failed to get associated Compliance Profiles'),
-                            }),
-                            userInterfaceActions.insertWidgetLock(err, LockWidgetNameEnum.RaProfileComplianceDetails),
-                        ),
-                    ),
-                ),
-        ),
-    );
-};
-
 const getAssociatedApprovalProfiles: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.getAssociatedApprovalProfiles.match),
@@ -886,9 +789,6 @@ const epics = [
     bulkDisableProfiles,
     bulkDeleteProfiles,
     checkCompliance,
-    associateRaProfile,
-    dissociateRaProfile,
-    getComplianceProfilesForRaProfile,
     getAssociatedApprovalProfiles,
     associateRAProfileWithApprovalProfile,
     disassociateRAProfileFromApprovalProfile,

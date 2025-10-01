@@ -29,7 +29,13 @@ function GoBackButton({ className = '', disabled = false, text = 'Go Back', onCl
     };
 
     return (
-        <button style={style} className={`${className} ${styles.goBackButton}`} disabled={disabled} onClick={handleClick}>
+        <button
+            data-testid="go-back-button"
+            style={style}
+            className={`${className} ${styles.goBackButton}`}
+            disabled={disabled}
+            onClick={handleClick}
+        >
             <i className={`fa fa-arrow-left me-2 ${styles.icon}`} aria-hidden="true" />
             {text}
         </button>

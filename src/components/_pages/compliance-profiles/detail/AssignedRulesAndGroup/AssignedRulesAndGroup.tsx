@@ -77,14 +77,14 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
                         <div key={ruleOrGroup.uuid}>
                             <Badge
                                 data-testid="status-badge"
-                                id={`status-${ruleOrGroup.uuid.replace(/-/g, '_')}`}
+                                id={`status-${ruleOrGroup.uuid.replaceAll(/-/g, '_')}`}
                                 color={statusColor}
                                 style={{ background: statusColor }}
                             >
                                 {capitalize(ruleOrGroup.availabilityStatus as ComplianceRuleAvailabilityStatus)}
                             </Badge>
                             {ruleOrGroup.updatedReason && (
-                                <UncontrolledTooltip target={`status-${ruleOrGroup.uuid.replace(/-/g, '_')}`}>
+                                <UncontrolledTooltip target={`status-${ruleOrGroup.uuid.replaceAll(/-/g, '_')}`}>
                                     {truncateText(capitalize(ruleOrGroup.updatedReason), 100)}
                                 </UncontrolledTooltip>
                             )}
@@ -253,6 +253,7 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
             titleSize="large"
             widgetLockName={LockWidgetNameEnum.ComplianceProfileDetails}
             lockSize="large"
+            dataTestId="assigned-rules-and-group-widget"
         >
             <Row xs="1" sm="1" md="2" lg="2" xl="2">
                 <Col style={{ width: '100%' }}>

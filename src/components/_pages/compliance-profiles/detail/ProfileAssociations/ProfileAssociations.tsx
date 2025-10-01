@@ -19,7 +19,7 @@ export default function ProfileAssociations({ profile }: Props) {
     const dispatch = useDispatch();
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
     const associationsOfComplianceProfile = useSelector(selectors.associationsOfComplianceProfile);
-    const [isAssociateProfileModalOpen, setIsAssociateFrofileModalOpen] = useState(false);
+    const [isAssociateProfileModalOpen, setIsAssociateProfileModalOpen] = useState(false);
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
 
     const onDissociateRaProfile = useCallback(
@@ -95,7 +95,7 @@ export default function ProfileAssociations({ profile }: Props) {
                 disabled: false,
                 tooltip: 'Associate Profile',
                 onClick: () => {
-                    setIsAssociateFrofileModalOpen(true);
+                    setIsAssociateProfileModalOpen(true);
                 },
                 dataTestId: 'add-association-button',
             },
@@ -113,12 +113,13 @@ export default function ProfileAssociations({ profile }: Props) {
                 titleSize="large"
                 widgetLockName={LockWidgetNameEnum.ComplianceProfileAssociations}
                 lockSize="large"
+                dataTestId="profile-associations-widget"
             >
                 <CustomTable headers={associationHeaders} data={associationData} />
             </Widget>
             <ProfileAssociationsDialog
                 isOpen={isAssociateProfileModalOpen}
-                onClose={() => setIsAssociateFrofileModalOpen(false)}
+                onClose={() => setIsAssociateProfileModalOpen(false)}
                 profile={profile}
                 associationsOfComplianceProfile={associationsOfComplianceProfile}
             />

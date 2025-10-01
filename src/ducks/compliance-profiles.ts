@@ -24,6 +24,7 @@ export type State = {
 
     complianceProfile?: ComplianceProfileDtoV2;
     complianceProfiles: ComplianceProfileListModel[];
+    associatedComplianceProfiles: ComplianceProfileListModel[];
 
     rules: ComplianceRuleListDto[];
     groups: ComplianceGroupListDto[];
@@ -31,6 +32,7 @@ export type State = {
     associationsOfComplianceProfile: ResourceObjectDto[];
     complianceCheckResult?: ComplianceCheckResultDto;
     isFetchingAssociationsOfComplianceProfile: boolean;
+    isFetchingAssociatedComplianceProfiles: boolean;
     isFetchingList: boolean;
     isFetchingDetail: boolean;
     isCreating: boolean;
@@ -60,7 +62,7 @@ export const initialState: State = {
     checkedRows: [],
 
     complianceProfiles: [],
-
+    associatedComplianceProfiles: [],
     deleteErrorMessage: '',
     bulkDeleteErrorMessages: [],
 
@@ -82,6 +84,7 @@ export const initialState: State = {
     isBulkForceDeleting: false,
     isFetchingComplianceProfile: false,
     isFetchingAssociationsOfComplianceProfile: false,
+    isFetchingAssociatedComplianceProfiles: false,
     isFetchingRules: false,
     isFetchingGroups: false,
     isFetchingGroupRules: false,
@@ -270,15 +273,16 @@ export const slice = createSlice({
         },
         //////////////////////////////
         getAssociatedComplianceProfiles: (state, action: PayloadAction<{ resource: Resource; associationObjectUuid: string }>) => {
-            state.isFetchingComplianceProfile = true;
+            state.isFetchingAssociatedComplianceProfiles = true;
         },
 
         getAssociatedComplianceProfilesSuccess: (state, action: PayloadAction<{ complianceProfiles: ComplianceProfileListDto[] }>) => {
-            state.isFetchingComplianceProfile = false;
+            state.isFetchingAssociatedComplianceProfiles = false;
+            state.associatedComplianceProfiles = action.payload.complianceProfiles;
         },
 
         getAssociatedComplianceProfilesFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isFetchingComplianceProfile = false;
+            state.isFetchingAssociatedComplianceProfiles = false;
         },
         //////////////////////////////
         getListComplianceRules: (
@@ -513,6 +517,8 @@ const isUpdatingComplienceInternalRule = createSelector(state, (state) => state.
 const isDeletingComplienceInternalRule = createSelector(state, (state) => state.isDeletingComplienceInternalRule);
 const isFetchingComplianceCheckResult = createSelector(state, (state) => state.isFetchingComplianceCheckResult);
 const complianceCheckResult = createSelector(state, (state) => state.complianceCheckResult);
+const isFetchingAssociatedComplianceProfiles = createSelector(state, (state) => state.isFetchingAssociatedComplianceProfiles);
+const associatedComplianceProfiles = createSelector(state, (state) => state.associatedComplianceProfiles);
 
 export const selectors = {
     state,
@@ -540,7 +546,7 @@ export const selectors = {
     isAssociatingComplianceProfile,
     isDissociatingComplianceProfile,
     isFetchingComplianceProfile,
-
+    isFetchingAssociatedComplianceProfiles,
     isBulkDeleting,
     isBulkForceDeleting,
 
@@ -555,6 +561,7 @@ export const selectors = {
     isDeletingComplienceInternalRule,
     isFetchingComplianceCheckResult,
     complianceCheckResult,
+    associatedComplianceProfiles,
 };
 
 export const actions = slice.actions;
