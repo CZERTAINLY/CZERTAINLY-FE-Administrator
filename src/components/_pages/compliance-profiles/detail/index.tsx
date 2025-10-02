@@ -332,7 +332,9 @@ export default function ComplianceProfileDetail() {
             </Widget>
         );
     }, [
-        selectedEntityDetails,
+        selectedEntityDetails?.entityDetails?.entityType,
+        selectedEntityDetails?.conditionItems,
+        selectedEntityDetails?.attributes,
         isFetchingGroupRules,
         entityDetailHeaders,
         ruleDetailData,
@@ -391,6 +393,7 @@ export default function ComplianceProfileDetail() {
                         refreshAction={getFreshComplianceProfileDetails}
                         widgetLockName={LockWidgetNameEnum.ComplianceProfileDetails}
                         lockSize="large"
+                        dataTestId="compliance-profile-details-widget"
                     >
                         <CustomTable headers={detailHeaders} data={detailData} />
                     </Widget>
@@ -436,6 +439,7 @@ export default function ComplianceProfileDetail() {
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
                     { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
+                dataTestId="delete-confirmation-dialog"
             />
             <Dialog
                 isOpen={complianceCheck}
@@ -446,6 +450,7 @@ export default function ComplianceProfileDetail() {
                     { color: 'primary', onClick: onComplianceCheck, body: 'Yes' },
                     { color: 'secondary', onClick: () => setComplianceCheck(false), body: 'Cancel' },
                 ]}
+                dataTestId="compliance-check-dialog"
             />
 
             <Dialog
@@ -461,6 +466,7 @@ export default function ComplianceProfileDetail() {
                 toggle={() => setIsEntityDetailMenuOpen(false)}
                 buttons={[]}
                 size="lg"
+                dataTestId="entity-detail-menu"
             />
 
             <Dialog
@@ -474,6 +480,7 @@ export default function ComplianceProfileDetail() {
                 toggle={() => setGroupRuleAttributeData(null)}
                 buttons={[]}
                 size="lg"
+                dataTestId="group-rule-attribute-dialog"
             />
             <Dialog
                 isOpen={deleteErrorMessage.length > 0}
@@ -491,6 +498,7 @@ export default function ComplianceProfileDetail() {
                     { color: 'danger', onClick: onForceDeleteComplianceProfile, body: 'Force' },
                     { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
                 ]}
+                dataTestId="delete-error-dialog"
             />
         </Container>
     );

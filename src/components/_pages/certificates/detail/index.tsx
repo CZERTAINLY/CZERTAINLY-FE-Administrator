@@ -2053,10 +2053,17 @@ export default function CertificateDetail() {
                     </div>
                     <div style={{ width: '1px', height: '10px', backgroundColor: '#6c757d' }} />
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <span>Cheked:</span>
-                        <span>{complianceCheckResult?.timestamp || ''}</span>
+                        <span>Checked:</span>
+                        <span>{dateFormatter(complianceCheckResult?.timestamp || '')}</span>
                     </div>
                 </div>
+                {complianceCheckResult?.message && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <span>Message:</span>
+                        <span>{complianceCheckResult?.message}</span>
+                    </div>
+                )}
+                <br />
                 <CustomTable headers={complianceHeaders} data={complianceData} hasPagination={true} />
             </Widget>
         );
