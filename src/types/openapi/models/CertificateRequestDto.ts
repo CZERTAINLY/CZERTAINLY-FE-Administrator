@@ -24,6 +24,12 @@ import type {
  */
 export interface CertificateRequestDto {
     /**
+     * UUID of the Certificate Request
+     * @type {string}
+     * @memberof CertificateRequestDto
+     */
+    uuid: string;
+    /**
      * Certificate type
      * @type {CertificateType}
      * @memberof CertificateRequestDto
