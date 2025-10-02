@@ -250,3 +250,32 @@ export const mockResourceOptionsWithComplianceProfile = [
         label: 'Key',
     },
 ];
+
+export const mockComplianceProfiles = [
+    {
+        uuid: '5431a4da-8332-479e-8dc9-74a07aebf5c0',
+        name: 'test-cmp-01',
+        description: 'test-cmp-01',
+        providerRulesCount: 2,
+        providerGroupsCount: 3,
+        internalRulesCount: 0,
+        associations: 4,
+    },
+    {
+        uuid: '6db02cd3-71c0-4b3f-be98-97d4bbd8320c',
+        name: 'test',
+        description: 'test',
+        providerRulesCount: 4,
+        providerGroupsCount: 2,
+        internalRulesCount: 3,
+        associations: 5,
+    },
+    {
+        uuid: '906729b1-cb4d-4c47-bee5-fe8999c8c716',
+        name: 'archived',
+        providerRulesCount: 0,
+        providerGroupsCount: 1,
+        internalRulesCount: 0,
+        associations: 1,
+    },
+];
