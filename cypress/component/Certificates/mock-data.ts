@@ -1,4 +1,5 @@
-import { CertificateDetailResponseModel } from 'types/certificate';
+import { CertificateDetailResponseModel, ValidationCertificateResultModel } from 'types/certificate';
+import { EnumItemDto } from 'types/enums';
 import {
     CertificateState,
     CertificateType,
@@ -11,6 +12,10 @@ import {
     CertificateRelationsDto,
     CertificateRelationType,
     CertificateDto,
+    ComplianceCheckResultDto,
+    ComplianceRuleStatus,
+    Resource,
+    CertificateValidationCheck,
 } from 'types/openapi';
 
 export const mockCertificate: CertificateDetailResponseModel = {
@@ -189,3 +194,142 @@ export const mockCertificates: CertificateDto[] = [
         archived: false,
     },
 ];
+
+export const mockComplianceCheckResult: ComplianceCheckResultDto = {
+    status: ComplianceStatus.Nok,
+    timestamp: '2025-10-01T17:11:20.05Z',
+    failedRules: [
+        {
+            uuid: '7ed00480-e706-11ec-8fea-0242ac120002',
+            name: 'cus_key_length',
+            description: 'Public Key length of the certificate should be',
+            status: ComplianceRuleStatus.Nok,
+            connectorUuid: '8d8a6610-9623-40d2-b113-444fe59579dd',
+            connectorName: 'X509-Compliance-Provider',
+            kind: 'x509',
+            resource: Resource.Certificates,
+            attributes: [
+                {
+                    uuid: '7ed00782-e706-11ec-8fea-0242ac120002',
+                    name: 'condition',
+                    label: 'Condition',
+                    type: AttributeType.Data,
+                    contentType: AttributeContentType.String,
+                    content: [
+                        {
+                            data: 'Equals',
+                        },
+                    ],
+                },
+                {
+                    uuid: '7ed00886-e706-11ec-8fea-0242ac120002',
+                    name: 'length',
+                    label: 'Key Length',
+                    type: AttributeType.Data,
+                    contentType: AttributeContentType.Integer,
+                    content: [
+                        {
+                            data: '1',
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            uuid: '40f0ac10-ddc1-11ec-b1bf-34cff65c6ee3',
+            name: 'e_subject_organizational_unit_name_max_length',
+            description: "The 'Organizational Unit Name' field of the subject MUST be less than 65 characters",
+            status: ComplianceRuleStatus.NotAvailable,
+            connectorUuid: '8d8a6610-9623-40d2-b113-444fe59579dd',
+            connectorName: 'X509-Compliance-Provider',
+            kind: 'x509',
+            resource: Resource.Certificates,
+        },
+        {
+            uuid: '40f0850d-ddc1-11ec-93a4-34cff65c6ee3',
+            name: 'e_ext_ian_no_entries',
+            description: 'If present, the IAN extension must contain at least one entry',
+            status: ComplianceRuleStatus.Na,
+            connectorUuid: '8d8a6610-9623-40d2-b113-444fe59579dd',
+            connectorName: 'X509-Compliance-Provider',
+            kind: 'x509',
+            resource: Resource.Certificates,
+        },
+    ],
+};
+
+export const mockValidationResult: ValidationCertificateResultModel = {
+    resultStatus: CertificateValidationStatus.NotChecked,
+    validationChecks: {
+        certificate_chain: {
+            validationCheck: CertificateValidationCheck.CertificateChain,
+            status: CertificateValidationStatus.Valid,
+            message: 'Certificate chain is complete.',
+        },
+        signature: {
+            validationCheck: CertificateValidationCheck.Signature,
+            status: CertificateValidationStatus.Valid,
+            message: 'Signature verification successful.',
+        },
+        certificate_validity: {
+            validationCheck: CertificateValidationCheck.CertificateValidity,
+            status: CertificateValidationStatus.Valid,
+            message: 'Certificate is valid.',
+        },
+        ocsp_verification: {
+            validationCheck: CertificateValidationCheck.OcspVerification,
+            status: CertificateValidationStatus.NotChecked,
+            message: 'Certificate does not contain AIA extension or OCSP URL is not present',
+        },
+        crl_verification: {
+            validationCheck: CertificateValidationCheck.CrlVerification,
+            status: CertificateValidationStatus.NotChecked,
+            message: 'No available working CRL URL found in cRLDistributionPoints extension.',
+        },
+        basic_constraints: {
+            validationCheck: CertificateValidationCheck.BasicConstraints,
+            status: CertificateValidationStatus.Valid,
+            message: 'Certificate basic constraints verification successful.',
+        },
+        key_usage: {
+            validationCheck: CertificateValidationCheck.KeyUsage,
+            status: CertificateValidationStatus.NotChecked,
+            message: 'Certificate is not CA.',
+        },
+    },
+    message: 'Validation of certificates in RA Profile ejbca-webserver is disabled.',
+    validationTimestamp: '2025-09-25T20:50:00Z',
+};
+
+export const mockCertificateValidationCheck: {
+    [key: string]: EnumItemDto;
+} = {
+    certificate_validity: {
+        code: 'certificate_validity',
+        label: 'Certificate Validity',
+    },
+    key_usage: {
+        code: 'key_usage',
+        label: 'Certificate Key Usage',
+    },
+    signature: {
+        code: 'signature',
+        label: 'Signature Verification',
+    },
+    ocsp_verification: {
+        code: 'ocsp_verification',
+        label: 'OCSP Verification',
+    },
+    crl_verification: {
+        code: 'crl_verification',
+        label: 'CRL Verification',
+    },
+    basic_constraints: {
+        code: 'basic_constraints',
+        label: 'Basic Constraints',
+    },
+    certificate_chain: {
+        code: 'certificate_chain',
+        label: 'Certificate chain',
+    },
+};
