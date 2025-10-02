@@ -108,7 +108,7 @@ describe('Certificate Validation Component', () => {
         cy.mount(<CertificateValidationComplianceStatusTest />).wait(componentLoadWait);
     });
 
-    /* it('should render compliance status widget with data', () => {
+    it('should render compliance status widget with data', () => {
         cy.get('[data-testid="compliance-status-widget"]').should('be.visible');
         cy.contains('Compliance Status').should('be.visible');
 
@@ -296,7 +296,7 @@ describe('Certificate Validation Component', () => {
         cy.get('.fa-refresh').should('be.visible');
         cy.get('.fa-refresh').click().wait(clickWait);
         cy.get('[data-testid="compliance-status-widget"]').should('be.visible');
-    }); */
+    });
 });
 
 const CertificateValidationStatusTest = ({ emptyCase = false }) => {
