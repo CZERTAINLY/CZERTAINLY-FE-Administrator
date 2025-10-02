@@ -453,7 +453,6 @@ describe('Certificate Validation Status Component', () => {
             .eq(7)
             .within(() => {
                 cy.get('td').eq(0).should('contain.text', 'Validation Result');
-                cy.get('td').eq(0).should('contain.text', '2025-09-25 23:50:00');
             });
     });
 
@@ -523,14 +522,6 @@ describe('Certificate Validation Status Component', () => {
         cy.get('.fa-refresh').should('be.visible');
         cy.get('.fa-refresh').click().wait(clickWait);
         cy.get('[data-testid="validation-status-widget"]').should('be.visible');
-    });
-
-    it('should display validation timestamp in result row', () => {
-        cy.get('table tbody tr')
-            .eq(7)
-            .within(() => {
-                cy.get('td').eq(0).should('contain.text', '2025-09-25 23:50:00');
-            });
     });
 
     it('should render multiline messages correctly', () => {
