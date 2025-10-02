@@ -291,6 +291,156 @@ export const mockGroupRules = [
     },
 ];
 
+export const mockInternalRules = [
+    {
+        uuid: '481cef16-38d3-4852-be50-cccbd7007097ewqeqwes',
+        name: 'test3',
+        description: 'test3',
+        resource: 'keys',
+        conditionItems: [
+            {
+                fieldSource: 'property',
+                fieldIdentifier: 'CKI_NAME',
+                operator: 'CONTAINS',
+                value: 'test',
+            },
+        ],
+    },
+    {
+        uuid: 'd0e4f96e-bc69-444c-b115-afcbfb81d96b',
+        name: 'test5',
+        description: 'test5',
+        resource: 'certificates',
+        conditionItems: [
+            {
+                fieldSource: 'property',
+                fieldIdentifier: 'CKI_NAME',
+                operator: 'CONTAINS',
+                value: 'test',
+            },
+        ],
+    },
+];
+
+export const mockProviderRules = [
+    {
+        uuid: '7ed00480-e706-11ec-8fea-0242ac120002wewq',
+        name: 'cus_key_length',
+        description: 'Public Key length of the certificate should be',
+        connectorUuid: '8d8a6610-9623-40d2-b113-444fe59579dd',
+        kind: 'x509',
+        resource: 'certificates',
+        attributes: [
+            {
+                version: 2,
+                uuid: '7ed00782-e706-11ec-8fea-0242ac120002',
+                name: 'condition',
+                description: 'Select the condition to apply',
+                content: [
+                    {
+                        data: 'Equals',
+                    },
+                    {
+                        data: 'NotEquals',
+                    },
+                    {
+                        data: 'Greater',
+                    },
+                    {
+                        data: 'Lesser',
+                    },
+                ],
+                type: 'data',
+                contentType: 'string',
+                properties: {
+                    label: 'Condition',
+                    visible: true,
+                    required: true,
+                    readOnly: false,
+                    list: true,
+                    multiSelect: false,
+                },
+            },
+            {
+                version: 2,
+                uuid: '7ed00886-e706-11ec-8fea-0242ac120002',
+                name: 'length',
+                description: 'Enter the key size of the certificate to be checked',
+                type: 'data',
+                contentType: 'integer',
+                properties: {
+                    label: 'Key Length',
+                    visible: true,
+                    required: true,
+                    readOnly: false,
+                    list: false,
+                    multiSelect: false,
+                },
+            },
+        ],
+    },
+];
+
+export const mockProviderGroups = [
+    {
+        uuid: '52350996-ddb2-11ec-9d64-0242ac120002dsdsadsa',
+        name: "Apple's CT Policy",
+        description: 'some description',
+        connectorUuid: '8d8a6610-9623-40d2-b113-444fe59579dd',
+        kind: 'x509',
+        resource: 'certificates',
+    },
+];
+
+export const mockConnectors = [
+    {
+        uuid: '8d8a6610-9623-40d2-b113-444fe59579dd',
+        name: 'X509-Compliance-Provider',
+        functionGroups: [
+            {
+                functionGroupCode: 'complianceProvider',
+                kinds: ['x509'],
+                endPoints: [
+                    {
+                        uuid: '7bd77d90-e7d7-11ec-8fea-0242ac120002',
+                        name: 'listRules',
+                        context: '/v1/complianceProvider/{kind}/rules',
+                        method: 'GET',
+                        required: true,
+                    },
+                    {
+                        uuid: '7bd77f34-e7d7-11ec-8fea-0242ac120002',
+                        name: 'listGroups',
+                        context: '/v1/complianceProvider/{kind}/groups',
+                        method: 'GET',
+                        required: true,
+                    },
+                    {
+                        uuid: '7bd78038-e7d7-11ec-8fea-0242ac120002',
+                        name: 'listGroupDetails',
+                        context: '/v1/complianceProvider/{kind}/groups/{uuid}',
+                        method: 'GET',
+                        required: true,
+                    },
+                    {
+                        uuid: '7bd7811e-e7d7-11ec-8fea-0242ac120002',
+                        name: 'checkCompliance',
+                        context: '/v1/complianceProvider/{kind}/compliance',
+                        method: 'POST',
+                        required: true,
+                    },
+                ],
+                uuid: '7bd77d90-f7d7-11ec-8fea-0242ac120002',
+                name: 'complianceProvider',
+            },
+        ],
+        url: 'http://x509-compliance-provider-service:8080',
+        authType: 'none',
+        authAttributes: [],
+        status: 'connected',
+    },
+];
+
 export const mockSearchGroupEnum = {
     data: {
         code: 'data',

@@ -1,486 +1,64 @@
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
-import Dialog from 'components/Dialog';
-import Widget from 'components/Widget';
-import { WidgetButtonProps } from 'components/WidgetButtons';
-
-import { actions, selectors } from 'ducks/compliance-profiles';
-import { actions as enumActions } from 'ducks/enums';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Link, useParams } from 'react-router';
-
-import { Badge, Button, Col, Container, Row } from 'reactstrap';
-import { ComplianceProfileDtoV2, ComplianceRuleListDto, PlatformEnum, Resource } from 'types/openapi';
-import { LockWidgetNameEnum } from 'types/user-interface';
-import CustomAttributeWidget from 'components/Attributes/CustomAttributeWidget';
-import { createWidgetDetailHeaders } from 'utils/widget';
-import GoBackButton from 'components/GoBackButton';
-import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import AttributeViewer from 'components/Attributes/AttributeViewer';
-import { AttributeResponseModel } from 'types/attributes';
-import AssignedRulesAndGroup from 'components/_pages/compliance-profiles/detail/AssignedRulesAndGroup/AssignedRulesAndGroup';
-import AvailableRulesAndGroups from 'components/_pages/compliance-profiles/detail/AvailableRulesAndGroups/AvailableRulesAndGroups';
-import '../../../src/resources/styles/theme.scss';
-import ProfileAssociations from 'components/_pages/compliance-profiles/detail/ProfileAssociations/ProfileAssociations';
-
+import ComplianceProfileDetail from 'components/_pages/compliance-profiles/detail';
 import { clickWait, componentLoadWait } from '../../utils/constants';
-import { complianceProfileDetailMockData, mockGroupRules, mockResourceEnum } from './mock-data';
-import { capitalize } from 'utils/common-utils';
-import { getComplianceProfileStatusColor } from 'utils/compliance-profile';
-import TabLayout from 'components/Layout/TabLayout';
+import '../../../src/resources/styles/theme.scss';
+import { complianceProfileDetailMockData, mockGroupRules, mockPlatformEnums, mockAssociations } from './mock-data';
+import { ComplianceProfileDtoV2, ComplianceRuleListDto, EnumItemDto, ResourceObjectDto } from 'types/openapi';
+import { actions } from 'ducks/compliance-profiles';
+import { actions as enumActions } from 'ducks/enums';
+import { actions as filterActions, EntityType } from 'ducks/filters';
+import { Routes, Route } from 'react-router';
 
-export default function ComplianceProfileDetailTest() {
-    const dispatch = useDispatch();
-
-    const { id } = useParams();
-
-    const profile = useSelector(selectors.complianceProfile);
-    const isFetchingDetail = false;
-    const isFetchingGroupRules = false;
-    const deleteErrorMessage = useSelector(selectors.deleteErrorMessage);
-    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
-    const groupRules = useSelector(selectors.groupRules);
-    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
-    const [complianceCheck, setComplianceCheck] = useState<boolean>(false);
-    const [isEntityDetailMenuOpen, setIsEntityDetailMenuOpen] = useState(false);
-    const [selectedEntityDetails, setSelectedEntityDetails] = useState<any>(null);
-    const [groupRuleAttributeData, setGroupRuleAttributeData] = useState<{
-        ruleName: string;
-        attributes: AttributeResponseModel[];
-    } | null>(null);
-    const [availableRulesResetFunction, setAvailableRulesResetFunction] = useState<(() => void) | null>(null);
-    const [assignedRulesResetFunction, setAssignedRulesResetFunction] = useState<(() => void) | null>(null);
-
-    useEffect(() => {
-        if (!id) return;
-        dispatch(actions.getComplianceProfile({ uuid: id }));
-        dispatch(actions.getAssociationsOfComplianceProfile({ uuid: id }));
-    }, [dispatch, id]);
-
-    const getFreshComplianceProfileDetails = useCallback(() => {
-        if (!id) return;
-        dispatch(actions.resetState());
-        dispatch(actions.getComplianceProfile({ uuid: id }));
-        dispatch(actions.getAssociationsOfComplianceProfile({ uuid: id }));
-        // Reset the AvailableRulesAndGroups select values
-        if (availableRulesResetFunction) {
-            availableRulesResetFunction();
-        }
-        // Reset the AssignedRulesAndGroup select values
-        if (assignedRulesResetFunction) {
-            assignedRulesResetFunction();
-        }
-    }, [id, dispatch, availableRulesResetFunction, assignedRulesResetFunction]);
-
-    useEffect(() => {
-        getFreshComplianceProfileDetails();
-    }, [id, getFreshComplianceProfileDetails]);
-
-    const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
-
-    const detailData: TableDataRow[] = useMemo(
-        () =>
-            !profile
-                ? []
-                : [
-                      {
-                          id: 'uuid',
-                          columns: ['UUID', profile.uuid],
-                      },
-                      {
-                          id: 'name',
-                          columns: ['Name', profile.name],
-                      },
-                      {
-                          id: 'description',
-                          columns: ['Description', profile.description || ''],
-                      },
-                  ],
-        [profile],
-    );
-
-    const buttons: WidgetButtonProps[] = useMemo(
-        () => [
-            {
-                icon: 'gavel',
-                disabled: false,
-                tooltip: 'Check Compliance',
-                onClick: () => {
-                    setComplianceCheck(true);
-                },
-                id: 'check-compliance',
-            },
-            {
-                icon: 'trash',
-                disabled: false,
-                tooltip: 'Delete',
-                onClick: () => {
-                    setConfirmDelete(true);
-                },
-                id: 'delete-compliance-profile',
-            },
-        ],
-        [],
-    );
-
-    const onDeleteConfirmed = useCallback(() => {
-        if (!profile) return;
-
-        dispatch(actions.deleteComplianceProfile({ uuid: profile.uuid }));
-
-        setConfirmDelete(false);
-    }, [profile, dispatch]);
-
-    const onComplianceCheck = useCallback(() => {
-        setComplianceCheck(false);
-
-        if (!profile?.uuid) return;
-
-        dispatch(actions.checkComplianceForProfiles({ requestBody: [profile.uuid] }));
-    }, [dispatch, profile]);
-
-    const onForceDeleteComplianceProfile = useCallback(() => {
-        if (!profile) return;
-        dispatch(actions.bulkForceDeleteComplianceProfiles({ uuids: [profile.uuid], redirect: `../../complianceprofiles` }));
-    }, [profile, dispatch]);
-
-    const entityDetailHeaders: TableHeader[] = useMemo(() => {
-        return [
-            { id: 'property', content: 'Property' },
-            { id: 'value', content: 'Value' },
-        ];
-    }, []);
-
-    const ruleDetailData: TableDataRow[] = useMemo(() => {
-        const statusColor = getComplianceProfileStatusColor(selectedEntityDetails?.availabilityStatus);
-        return [
-            { id: 'uuid', columns: ['UUID', selectedEntityDetails?.uuid] },
-            { id: 'name', columns: ['Name', selectedEntityDetails?.name] },
-            { id: 'description', columns: ['Description', selectedEntityDetails?.description] },
-            {
-                id: 'status',
-                columns: [
-                    'Status',
-                    <Badge key={selectedEntityDetails?.uuid} color={statusColor} style={{ background: statusColor }}>
-                        {capitalize(selectedEntityDetails?.availabilityStatus || '')}
-                    </Badge>,
-                ],
-            },
-            ...(selectedEntityDetails?.updatedReason
-                ? [{ id: 'updatedReason', columns: ['Updated Reason', selectedEntityDetails?.updatedReason] }]
-                : []),
-            { id: 'type', columns: ['Type', capitalize(selectedEntityDetails?.type || '')] },
-            {
-                id: 'resource',
-                columns: [
-                    'Resource',
-                    <Link key={selectedEntityDetails?.uuid} to={`../../${selectedEntityDetails?.resource}`}>
-                        {getEnumLabel(resourceEnum, selectedEntityDetails?.resource) || ''}
-                    </Link>,
-                ],
-            },
-            { id: 'format', columns: ['Format', selectedEntityDetails?.format || ''] },
-
-            ...(selectedEntityDetails?.entityDetails?.connectorName && selectedEntityDetails?.entityDetails?.connectorUuid
-                ? [
-                      {
-                          id: 'provider',
-                          columns: [
-                              'Provider',
-                              <Link
-                                  key={selectedEntityDetails?.entityDetails?.connectorUuid}
-                                  to={`../../connectors/detail/${selectedEntityDetails?.entityDetails?.connectorUuid}`}
-                              >
-                                  {selectedEntityDetails?.entityDetails?.connectorName}
-                              </Link>,
-                          ],
-                      },
-                  ]
-                : []),
-            ...(selectedEntityDetails?.entityDetails?.kind
-                ? [{ id: 'kind', columns: ['Kind', selectedEntityDetails?.entityDetails?.kind || ''] }]
-                : []),
-        ];
-    }, [selectedEntityDetails, resourceEnum]);
-
-    const groupDetailData: TableDataRow[] = useMemo(() => {
-        return [
-            { id: 'uuid', columns: ['UUID', selectedEntityDetails?.uuid] },
-            { id: 'name', columns: ['Name', selectedEntityDetails?.name] },
-            { id: 'description', columns: ['Description', selectedEntityDetails?.description] },
-            {
-                id: 'status',
-                columns: [
-                    'Status',
-                    <Badge
-                        key={selectedEntityDetails?.uuid}
-                        color={selectedEntityDetails?.availabilityStatus === 'available' ? 'success' : 'danger'}
-                    >
-                        {capitalize(selectedEntityDetails?.availabilityStatus || '')}
-                    </Badge>,
-                ],
-            },
-            { id: 'resource', columns: ['Resource', getEnumLabel(resourceEnum, selectedEntityDetails?.resource) || ''] },
-        ];
-    }, [selectedEntityDetails, resourceEnum]);
-
-    const groupRulesDetailHeaders: TableHeader[] = useMemo(() => {
-        return [
-            { id: 'name', content: 'Name', width: '30%' },
-            { id: 'description', content: 'Description', width: '70%' },
-        ];
-    }, []);
-
-    const groupRulesDetailData: TableDataRow[] = useMemo(() => {
-        return groupRules.map((rule) => {
-            const ruleDetailData = [
-                { id: 'uuid', columns: ['UUID', rule?.uuid || ''] },
-                { id: 'name', columns: ['Name', rule?.name || ''] },
-                { id: 'description', columns: ['Description', rule?.description || ''] },
-
-                { id: 'type', columns: ['Type', capitalize(rule?.type || '')] },
-                { id: 'resource', columns: ['Resource', getEnumLabel(resourceEnum, rule?.resource) || ''] },
-                { id: 'format', columns: ['Format', rule?.format || ''] },
-                { id: 'kind', columns: ['Kind', rule?.kind || ''] },
-                {
-                    id: 'attributes',
-                    columns: [
-                        'Attributes',
-                        rule.attributes?.length ? (
-                            <Button
-                                className="btn btn-link"
-                                color="white"
-                                title="Rules"
-                                onClick={() => {
-                                    setGroupRuleAttributeData({
-                                        ruleName: rule.name,
-                                        attributes: (rule.attributes as AttributeResponseModel[]) ?? [],
-                                    });
-                                }}
-                            >
-                                <i className="fa fa-info" style={{ color: 'auto' }} />
-                            </Button>
-                        ) : (
-                            'No attributes'
-                        ),
-                    ],
-                },
-            ];
-            return {
-                id: rule.uuid,
-                columns: ['Name', rule.name || ''],
-                detailColumns: [<></>, <></>, <CustomTable key={rule.uuid} data={ruleDetailData} headers={entityDetailHeaders} />],
-            };
-        });
-    }, [groupRules, resourceEnum, entityDetailHeaders]);
-
-    const EntityDetailMenu = useCallback(() => {
-        return (
-            <Widget
-                titleSize="larger"
-                busy={selectedEntityDetails?.entityDetails?.entityType === 'group' ? isFetchingGroupRules : false}
-                dataTestId="entity-detail-menu"
-            >
-                {selectedEntityDetails?.entityDetails?.entityType === 'rule' && (
-                    <TabLayout
-                        tabs={[
-                            {
-                                title: 'Details',
-                                content: (
-                                    <>
-                                        <CustomTable headers={entityDetailHeaders} data={ruleDetailData} />
-                                    </>
-                                ),
-                            },
-                            ...(selectedEntityDetails?.attributes?.length > 0
-                                ? [
-                                      {
-                                          title: 'Attributes',
-                                          content: <AttributeViewer attributes={selectedEntityDetails?.attributes} />,
-                                      },
-                                  ]
-                                : []),
-                        ]}
-                    />
-                )}
-                {selectedEntityDetails?.entityDetails?.entityType === 'group' && (
-                    <TabLayout
-                        tabs={[
-                            {
-                                title: 'Details',
-                                content: <CustomTable headers={entityDetailHeaders} data={groupDetailData} />,
-                            },
-                            {
-                                title: 'Rules',
-                                content: (
-                                    <CustomTable headers={groupRulesDetailHeaders} data={groupRulesDetailData} hasDetails hasPagination />
-                                ),
-                            },
-                        ]}
-                    />
-                )}
-            </Widget>
-        );
-    }, [
-        selectedEntityDetails,
-        isFetchingGroupRules,
-        entityDetailHeaders,
-        ruleDetailData,
-        groupDetailData,
-        groupRulesDetailHeaders,
-        groupRulesDetailData,
-    ]);
-
-    //get list of rules for group detail page
-    useEffect(() => {
-        if (selectedEntityDetails?.entityDetails?.entityType === 'group') {
-            dispatch(
-                actions.getListComplianceGroupRules({
-                    groupUuid: selectedEntityDetails?.uuid,
-                    connectorUuid: selectedEntityDetails?.entityDetails?.connectorUuid || selectedEntityDetails?.connectorUuid,
-                    kind: selectedEntityDetails?.entityDetails?.kind || selectedEntityDetails?.kind,
-                }),
-            );
-        }
-    }, [selectedEntityDetails, dispatch]);
-
+const ComplianceProfileDetailPage2Test = () => {
     return (
-        <Container className="themed-container" fluid>
-            <GoBackButton style={{ marginBottom: '10px' }} forcedPath="/complianceprofiles" text={`Compliance Profile Inventory`} />
-            <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                <Col>
-                    <Widget
-                        title="Compliance Profile Details"
-                        busy={isFetchingDetail}
-                        widgetButtons={buttons}
-                        titleSize="large"
-                        refreshAction={getFreshComplianceProfileDetails}
-                        widgetLockName={LockWidgetNameEnum.ComplianceProfileDetails}
-                        lockSize="large"
-                        dataTestId="compliance-profile-details-widget"
-                    >
-                        <CustomTable headers={detailHeaders} data={detailData} />
-                    </Widget>
-                </Col>
-
-                <Col>
-                    <ProfileAssociations profile={profile} />
-                    {profile && (
-                        <CustomAttributeWidget
-                            resource={Resource.ComplianceProfiles}
-                            resourceUuid={profile.uuid}
-                            attributes={profile.customAttributes}
-                        />
-                    )}
-                </Col>
-            </Row>
-
-            <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                <Col>
-                    <AssignedRulesAndGroup
-                        profile={profile}
-                        setSelectedEntityDetails={setSelectedEntityDetails}
-                        setIsEntityDetailMenuOpen={setIsEntityDetailMenuOpen}
-                        onReset={(resetFn) => setAssignedRulesResetFunction(() => resetFn)}
-                    />
-                </Col>
-                <Col>
-                    <AvailableRulesAndGroups
-                        profile={profile}
-                        setSelectedEntityDetails={setSelectedEntityDetails}
-                        setIsEntityDetailMenuOpen={setIsEntityDetailMenuOpen}
-                        onReset={(resetFn) => setAvailableRulesResetFunction(() => resetFn)}
-                    />
-                </Col>
-            </Row>
-
-            <Dialog
-                isOpen={isEntityDetailMenuOpen}
-                caption={
-                    <p style={{ fontWeight: 'bold' }}>
-                        {selectedEntityDetails
-                            ? `${capitalize(selectedEntityDetails?.entityDetails?.entityType)}: (${selectedEntityDetails?.name})`
-                            : 'Entity Details'}
-                    </p>
-                }
-                body={<EntityDetailMenu />}
-                toggle={() => setIsEntityDetailMenuOpen(false)}
-                buttons={[]}
-                size="lg"
-            />
-
-            <Dialog
-                isOpen={confirmDelete}
-                caption="Delete Compliance Profile"
-                body="You are about to delete a Compliance Profile. Is this what you want to do?"
-                toggle={() => setConfirmDelete(false)}
-                buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
-                ]}
-                dataTestId="delete-confirmation-dialog"
-            />
-            <Dialog
-                isOpen={complianceCheck}
-                caption={`Initiate Compliance Check`}
-                body={'Initiate the compliance check for the Compliance Profile?'}
-                toggle={() => setComplianceCheck(false)}
-                buttons={[
-                    { color: 'primary', onClick: onComplianceCheck, body: 'Yes' },
-                    { color: 'secondary', onClick: () => setComplianceCheck(false), body: 'Cancel' },
-                ]}
-                dataTestId="compliance-check-dialog"
-            />
-
-            <Dialog
-                isOpen={!!groupRuleAttributeData}
-                caption={
-                    <p>
-                        Rule <span style={{ fontWeight: 'bold' }}>{groupRuleAttributeData?.ruleName}</span> attributes
-                    </p>
-                }
-                body={<AttributeViewer attributes={groupRuleAttributeData?.attributes ?? []} />}
-                toggle={() => setGroupRuleAttributeData(null)}
-                buttons={[]}
-                size="lg"
-                dataTestId="group-rule-attribute-dialog"
-            />
-            <Dialog
-                isOpen={deleteErrorMessage.length > 0}
-                caption="Delete Compliance Profile"
-                body={
-                    <>
-                        Failed to delete the Compliance Profile that has dependent objects. Please find the details below:
-                        <br />
-                        <br />
-                        {deleteErrorMessage}
-                    </>
-                }
-                toggle={() => dispatch(actions.clearDeleteErrorMessages())}
-                buttons={[
-                    { color: 'danger', onClick: onForceDeleteComplianceProfile, body: 'Force' },
-                    { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
-                ]}
-                dataTestId="delete-error-dialog"
-            />
-        </Container>
+        <Routes>
+            <Route path="/complianceprofiles/detail/:id" element={<ComplianceProfileDetail />} />
+        </Routes>
     );
-}
+};
 
 describe('Compliance Profile Detail Page', () => {
     beforeEach(() => {
-        cy.mount(<ComplianceProfileDetailTest />).wait(componentLoadWait);
+        cy.mount(<ComplianceProfileDetailPage2Test />, {}, `/complianceprofiles/detail/${complianceProfileDetailMockData.uuid}`).wait(
+            componentLoadWait,
+        );
         cy.dispatchActions(
+            // Set compliance profile data
             actions.getComplianceProfileSuccess({
                 complianceProfile: complianceProfileDetailMockData as unknown as ComplianceProfileDtoV2,
             }),
+            // Set platform enums data
             enumActions.getPlatformEnumsSuccess({
-                platformEnums: mockResourceEnum,
+                ...mockPlatformEnums,
             }),
+            // Set group rules data
             actions.getListComplianceGroupRulesSuccess({
                 rules: mockGroupRules as unknown as ComplianceRuleListDto[],
             }),
+            // Set associations data
+            actions.getAssociationsOfComplianceProfileSuccess({
+                associations: mockAssociations as unknown as ResourceObjectDto[],
+            }),
+            // Set available filters for conditions
+            filterActions.getAvailableFiltersSuccess({
+                entity: EntityType.CONDITIONS,
+                availableFilters: [],
+            }),
         );
+
+        // Set up action listener to automatically complete group rules requests
+        cy.window().then((win) => {
+            win.registerReduxActionListener(
+                (action) => action.type === actions.getListComplianceGroupRules.type,
+                () => {
+                    // Automatically dispatch success action when group rules request is made
+                    win.store.dispatch(
+                        actions.getListComplianceGroupRulesSuccess({
+                            rules: mockGroupRules as unknown as ComplianceRuleListDto[],
+                        }),
+                    );
+                },
+            );
+        });
     });
 
     describe('Group Detail menu', () => {
@@ -489,7 +67,7 @@ describe('Compliance Profile Detail Page', () => {
                 cy.get('table tbody tr')
                     .eq(6)
                     .within(() => {
-                        cy.get('button[title="Rules"]').click().wait(clickWait);
+                        cy.get('button[title="Rules"]').click().wait(500);
                     });
             });
         });
@@ -502,7 +80,7 @@ describe('Compliance Profile Detail Page', () => {
 
         it('Should change tab to rules', () => {
             cy.get('[data-testid="entity-detail-menu"]').within(() => {
-                cy.contains('a.nav-link', 'Rules').click();
+                cy.contains('a.nav-link', 'Rules').click().wait(clickWait);
             });
             cy.get('[data-testid="entity-detail-menu"]').within(() => {
                 cy.contains('a.active.nav-link', 'Rules').should('exist');
@@ -545,7 +123,7 @@ describe('Compliance Profile Detail Page', () => {
                 cy.get('table tbody tr').contains('Available').should('exist');
                 cy.get('.badge').should('contain', 'Available');
                 cy.get('table tbody tr').contains('Resource').should('exist');
-                cy.get('table tbody tr').contains('certificates').should('exist');
+                cy.get('table tbody tr').contains('Certificate').should('exist');
             });
         });
 
@@ -611,7 +189,7 @@ describe('Compliance Profile Detail Page', () => {
 
                             cy.get('tbody tr[data-id="resource"]').within(() => {
                                 cy.get('td').eq(0).should('contain', 'Resource');
-                                cy.get('td').eq(1).should('contain', 'certificates');
+                                cy.get('td').eq(1).should('contain', 'Certificate');
                             });
 
                             cy.get('tbody tr[data-id="format"]').within(() => {
@@ -678,7 +256,7 @@ describe('Compliance Profile Detail Page', () => {
             cy.get('.badge').should('contain', 'Available');
             cy.get('table tbody tr').contains('Type').should('exist');
             cy.get('table tbody tr').contains('Resource').should('exist');
-            cy.get('table tbody tr').contains('certificates').should('exist');
+            cy.get('table tbody tr').contains('Certificate').should('exist');
             cy.get('a[href*="/certificates"]').should('exist');
             cy.get('table tbody tr').contains('Format').should('exist');
         });
@@ -747,7 +325,7 @@ describe('Compliance Profile Detail Page', () => {
                 cy.get('table tbody tr').contains('Type').should('exist');
                 cy.get('table tbody tr').contains('X.509').should('exist');
                 cy.get('table tbody tr').contains('Resource').should('exist');
-                cy.get('table tbody tr').contains('certificates').should('exist');
+                cy.get('table tbody tr').contains('Certificate').should('exist');
                 cy.get('a[href*="/certificates"]').should('exist');
                 cy.get('table tbody tr').contains('Format').should('exist');
                 cy.get('table tbody tr').contains('Kind').should('exist');

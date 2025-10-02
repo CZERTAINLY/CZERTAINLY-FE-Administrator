@@ -7,6 +7,7 @@ import { ComplianceProfileDtoV2, PlatformEnum } from 'types/openapi/models';
 import AssignedRulesAndGroup from 'components/_pages/compliance-profiles/detail/AssignedRulesAndGroup/AssignedRulesAndGroup';
 import { EnumItemDto } from 'types/enums';
 import { clickWait, componentLoadWait } from '../../utils/constants';
+import '../../../src/resources/styles/theme.scss';
 
 // Mock the router since we're testing component in isolation
 const MockRouter = ({ children }: { children: React.ReactNode }) => <div data-testid="mock-router">{children}</div>;

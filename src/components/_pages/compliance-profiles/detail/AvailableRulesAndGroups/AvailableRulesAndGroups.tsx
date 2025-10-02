@@ -462,6 +462,7 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
                 body={<InternalRuleForm onCancel={() => setIsAddingInternalRule(false)} />}
                 toggle={() => setIsAddingInternalRule(false)}
                 buttons={[]}
+                dataTestId="create-internal-rule-dialog"
             />
             <Dialog
                 size="xl"
@@ -472,6 +473,7 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
                 }
                 toggle={() => setEditingInternalRule(null)}
                 buttons={[]}
+                dataTestId="edit-internal-rule-dialog"
             />
             <Dialog
                 isOpen={deletingInternalRuleId !== null}
@@ -482,6 +484,7 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
                     { color: 'danger', onClick: () => deleteInternalRule(deletingInternalRuleId!), body: 'Yes, delete' },
                     { color: 'secondary', onClick: () => setDeletingInternalRuleId(null), body: 'Cancel' },
                 ]}
+                dataTestId="delete-internal-rule-dialog"
             />
         </div>
     );
