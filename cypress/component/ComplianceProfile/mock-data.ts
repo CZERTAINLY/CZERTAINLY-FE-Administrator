@@ -122,8 +122,7 @@ export const complianceProfileDetailMockData = {
                 {
                     uuid: '52350996-ddb2-11ec-9d64-0242ac120002',
                     name: "Apple's CT Policy",
-                    description:
-                        "https://support.apple.com/en-us/HT205280#:~:text=Apple's%20policy%20requires%20at%20least,extension%20or%20OCSP%20Stapling%3B%20or",
+                    description: 'some description',
                     availabilityStatus: ComplianceRuleAvailabilityStatus.Available,
                     resource: Resource.Certificates,
                 },
@@ -277,5 +276,232 @@ export const mockComplianceProfiles = [
         providerGroupsCount: 1,
         internalRulesCount: 0,
         associations: 1,
+    },
+];
+
+export const mockResourceEnum = {
+    connectors: {
+        code: 'connectors',
+        label: 'Connector',
+    },
+    raProfiles: {
+        code: 'raProfiles',
+        label: 'RA Profile',
+    },
+    keyItems: {
+        code: 'keyItems',
+        label: 'Key item',
+    },
+    rules: {
+        code: 'rules',
+        label: 'Rule',
+    },
+    resourceEvents: {
+        code: 'resourceEvents',
+        label: 'Resource Event',
+    },
+    cmpProfiles: {
+        code: 'cmpProfiles',
+        label: 'CMP Profile',
+    },
+    notificationProfiles: {
+        code: 'notificationProfiles',
+        label: 'Notification profile',
+    },
+    approvals: {
+        code: 'approvals',
+        label: 'Approval',
+    },
+    complianceGroups: {
+        code: 'complianceGroups',
+        label: 'Compliance Group',
+    },
+    NONE: {
+        code: 'NONE',
+        label: 'None',
+    },
+    dashboard: {
+        code: 'dashboard',
+        label: 'Dashboard',
+    },
+    settings: {
+        code: 'settings',
+        label: 'Settings',
+    },
+    globalMetadata: {
+        code: 'globalMetadata',
+        label: 'Global Metadata',
+    },
+    notificationInstances: {
+        code: 'notificationInstances',
+        label: 'Notification instance',
+    },
+    approvalProfiles: {
+        code: 'approvalProfiles',
+        label: 'Approval profile',
+    },
+    triggers: {
+        code: 'triggers',
+        label: 'Trigger',
+    },
+    endEntityProfiles: {
+        code: 'endEntityProfiles',
+        label: 'End entity profile',
+    },
+    users: {
+        code: 'users',
+        label: 'User',
+    },
+    authorities: {
+        code: 'authorities',
+        label: 'Authority',
+    },
+    certificateRequests: {
+        code: 'certificateRequests',
+        label: 'Certificate Request',
+    },
+    certificates: {
+        code: 'certificates',
+        label: 'Certificate',
+    },
+    complianceProfiles: {
+        code: 'complianceProfiles',
+        label: 'Compliance Profile',
+    },
+    searchFilters: {
+        code: 'searchFilters',
+        label: 'Search Filter',
+    },
+    conditions: {
+        code: 'conditions',
+        label: 'Condition',
+    },
+    acmeAccounts: {
+        code: 'acmeAccounts',
+        label: 'ACME Account',
+    },
+    actions: {
+        code: 'actions',
+        label: 'Action',
+    },
+    notifications: {
+        code: 'notifications',
+        label: 'Notification',
+    },
+    customAttributes: {
+        code: 'customAttributes',
+        label: 'Custom Attribute',
+    },
+    scepProfiles: {
+        code: 'scepProfiles',
+        label: 'SCEP Profile',
+    },
+    credentials: {
+        code: 'credentials',
+        label: 'Credential',
+    },
+    keys: {
+        code: 'keys',
+        label: 'Key',
+    },
+    roles: {
+        code: 'roles',
+        label: 'Role',
+    },
+    acmeAuthorizations: {
+        code: 'acmeAuthorizations',
+        label: 'ACME Authorization',
+    },
+    ANY: {
+        code: 'ANY',
+        label: 'Any',
+    },
+    auditLogs: {
+        code: 'auditLogs',
+        label: 'Audit logs',
+    },
+    acmeChallenges: {
+        code: 'acmeChallenges',
+        label: 'ACME Challenge',
+    },
+    authenticationProviders: {
+        code: 'authenticationProviders',
+        label: 'Authentication Provider',
+    },
+    tokens: {
+        code: 'tokens',
+        label: 'Token',
+    },
+    cmpTransactions: {
+        code: 'cmpTransactions',
+        label: 'CMP Transaction',
+    },
+    oids: {
+        code: 'oids',
+        label: 'OID',
+    },
+    acmeProfiles: {
+        code: 'acmeProfiles',
+        label: 'ACME Profile',
+    },
+    jobs: {
+        code: 'jobs',
+        label: 'Scheduled job',
+    },
+    groups: {
+        code: 'groups',
+        label: 'Group',
+    },
+    resources: {
+        code: 'resources',
+        label: 'Resource',
+    },
+    complianceRules: {
+        code: 'complianceRules',
+        label: 'Compliance Rule',
+    },
+    executions: {
+        code: 'executions',
+        label: 'Execution',
+    },
+    discoveries: {
+        code: 'discoveries',
+        label: 'Discovery',
+    },
+    entities: {
+        code: 'entities',
+        label: 'Entity',
+    },
+    tokenProfiles: {
+        code: 'tokenProfiles',
+        label: 'Token Profile',
+    },
+    attributes: {
+        code: 'attributes',
+        label: 'Attribute',
+    },
+    locations: {
+        code: 'locations',
+        label: 'Location',
+    },
+    acmeOrders: {
+        code: 'acmeOrders',
+        label: 'ACME Order',
+    },
+    platformEnums: {
+        code: 'platformEnums',
+        label: 'Platform enumerator',
+    },
+};
+
+export const mockGroupRules = [
+    {
+        uuid: '40f084cd-ddc1-11ec-82b0-34cff65c6ee3',
+        name: 'e_basic_constraints_not_critical',
+        description: 'basicConstraints MUST appear as a critical extension',
+        connectorUuid: '8d8a6610-9623-40d2-b113-444fe59579dd',
+        kind: 'x509',
+        groupUuid: '523513dc-ddb2-11ec-9d64-0242ac120002',
+        resource: 'certificates',
     },
 ];
