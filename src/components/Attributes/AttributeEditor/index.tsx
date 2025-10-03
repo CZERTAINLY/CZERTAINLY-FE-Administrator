@@ -47,7 +47,6 @@ export interface Props {
     callbackResource?: Resource;
     callbackParentUuid?: string;
     withRemoveAction?: boolean;
-    onValidateAttributes?: (validationFn: (values: any) => { [key: string]: string }) => void;
 }
 
 export default function AttributeEditor({
@@ -62,65 +61,11 @@ export default function AttributeEditor({
     groupAttributesCallbackAttributes = emptyGroupAttributesCallbackAttributes,
     setGroupAttributesCallbackAttributes = () => emptyGroupAttributesCallbackAttributes,
     withRemoveAction = true,
-    onValidateAttributes,
 }: Props) {
     const dispatch = useDispatch();
 
     const form = useForm();
     const formState = useFormState();
-
-    // Create validation function for attributes
-    const validateAttributes = useCallback(
-        (values: any) => {
-            if (!values || typeof values !== 'object') {
-                return {} as { [key: string]: string };
-            }
-
-            const isAttributeValueEmpty = (fieldValue: any): boolean => {
-                if (fieldValue === null || fieldValue === undefined) return true;
-                if (Array.isArray(fieldValue)) return fieldValue.length === 0;
-                if (typeof fieldValue === 'string') return fieldValue.trim() === '';
-                if (typeof fieldValue === 'object') {
-                    if ('code' in fieldValue || 'language' in fieldValue) {
-                        const codeVal = (fieldValue as any).code;
-                        const isCodeEmpty = codeVal === null || codeVal === undefined;
-                        const isCodeStringEmpty = typeof codeVal === 'string' && codeVal.trim() === '';
-                        return isCodeEmpty || isCodeStringEmpty;
-                    }
-                    if ('value' in fieldValue || 'label' in fieldValue) {
-                        const v = (fieldValue as any).value;
-                        return v === null || v === undefined;
-                    }
-                    return Object.keys(fieldValue).length === 0;
-                }
-                return false;
-            };
-
-            const errors: { [key: string]: string } = {};
-            const attributeValues = (values && (values as any)[`__attributes__${id}__`]) || {};
-
-            const allDescriptors = [...attributeDescriptors, ...groupAttributesCallbackAttributes];
-            allDescriptors.forEach((descriptor) => {
-                if ((isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) && descriptor.properties.required) {
-                    const fieldKey = `__attributes__${id}__.${descriptor.name}`;
-                    const fieldValue = attributeValues[descriptor.name];
-                    if (isAttributeValueEmpty(fieldValue)) {
-                        errors[fieldKey] = 'Required Field';
-                    }
-                }
-            });
-
-            return errors;
-        },
-        [id, attributeDescriptors, groupAttributesCallbackAttributes],
-    );
-
-    // Expose validation function to parent
-    useEffect(() => {
-        if (onValidateAttributes) {
-            onValidateAttributes(validateAttributes);
-        }
-    }, [onValidateAttributes, validateAttributes]);
 
     const isRunningCallback = useSelector(connectorSelectors.isRunningCallback);
     const initiateAttributeCallback = useSelector(userInterfaceSelectors.selectInitiateAttributeCallback);

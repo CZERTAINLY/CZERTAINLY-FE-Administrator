@@ -35,6 +35,7 @@ interface Props {
     lockSize?: 'small' | 'normal' | 'large';
     widgetInfoCard?: WidgetInfoCard;
     innerContainerProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
+    dataTestId?: string;
 }
 
 function Widget({
@@ -54,6 +55,7 @@ function Widget({
     lockSize = 'normal',
     widgetInfoCard,
     innerContainerProps,
+    dataTestId,
 }: Props) {
     const widgetLock = useSelector(selectors.selectWidgetLocks).find(
         (lock) => lock.widgetName === widgetLockName || (Array.isArray(widgetLockName) && widgetLockName.includes(lock.widgetName)),
@@ -108,7 +110,7 @@ function Widget({
     }, [widgetButtons, hideWidgetButtons, widgetLock, widgetInfoCard, showWidgetInfo]);
 
     return (
-        <section className={cx(style.widget, className)} id={id}>
+        <section data-testid={dataTestId} className={cx(style.widget, className)} id={id}>
             <div className="d-flex align-items-center">
                 <div>{renderTitle()}</div>
                 {renderRefreshButton()}
