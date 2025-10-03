@@ -290,3 +290,40 @@ export const mockNotificationProviderAttributesDescriptors = [
 ];
 
 export const mockMappingAttributes = [];
+
+export const mockNotificationInstanceDetail = {
+    uuid: '25020599-667b-4b25-8cc8-629ea05e7601',
+    name: 'test',
+    description: 'test',
+    connectorUuid: '4a3d3ec6-83bf-4075-97f2-8077ed96bffb',
+    connectorName: 'Webhook-Notification-Provider',
+    kind: 'WEBHOOK',
+    attributes: [
+        {
+            uuid: '3b8a11b3-a59d-427c-9491-56c8ce27cee7',
+            name: 'data_webhookUrl',
+            label: 'Webhook URL',
+            type: 'data',
+            contentType: 'string',
+            content: [
+                {
+                    data: 'https://example.com/webhook',
+                },
+            ],
+        },
+        {
+            uuid: 'b104d74d-8a54-4aa3-9e00-9c535f8bb80c',
+            name: 'data_contentType',
+            label: 'Content type',
+            type: 'data',
+            contentType: 'string',
+            content: [
+                {
+                    reference: 'raw_json',
+                    data: 'RAW_JSON',
+                },
+            ],
+        },
+    ],
+    attributeMappings: [],
+};

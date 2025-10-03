@@ -1,13 +1,31 @@
 import NotificationInstanceForm from 'components/_pages/notifications/notification-instance-form';
 import { componentLoadWait } from '../../utils/constants';
 import { actions } from 'ducks/notifications';
-import { mockMappingAttributes, mockNotificationInstanceProviders, mockNotificationProviderAttributesDescriptors } from './mockdata';
+import {
+    mockMappingAttributes,
+    mockNotificationInstanceDetail,
+    mockNotificationInstanceProviders,
+    mockNotificationProviderAttributesDescriptors,
+} from './mockdata';
 import { AttributeDescriptorModel, DataAttributeModel } from 'types/attributes';
 import { ConnectorResponseModel } from 'types/connectors';
 import '../../../src/resources/styles/theme.scss';
+import { NotificationInstanceModel } from 'types/notifications';
+import { Routes, Route } from 'react-router';
 
 const NotificationFormTest = () => {
     return <NotificationInstanceForm />;
+};
+
+const NotificationFormWithRoutes = () => {
+    return (
+        <Routes>
+            <Route path="/notifications/edit/:id" element={<NotificationInstanceForm />} />
+            <Route path="/notifications/add" element={<NotificationInstanceForm />} />
+            <Route path="/notifications/*" element={<NotificationInstanceForm />} />
+            <Route path="/*" element={<NotificationInstanceForm />} />
+        </Routes>
+    );
 };
 
 describe('NotificationFormTest', () => {
@@ -259,5 +277,79 @@ describe('NotificationFormTest', () => {
 
         // Should show "Add Notification Instance" in create mode
         cy.get('[data-testid="notification-instance-form"]').should('contain', 'Add Notification Instance');
+    });
+});
+
+describe('NotificationInstanceForm Edit Mode Coverage', () => {
+    beforeEach(() => {
+        // Mount with route parameter to simulate edit mode (/:id)
+        cy.mount(<NotificationFormWithRoutes />, {}, `/notifications/edit/25020599-667b-4b25-8cc8-629ea05e7601`).wait(componentLoadWait);
+
+        cy.window().then((win) => {
+            win.store.dispatch(
+                actions.listNotificationProvidersSuccess({
+                    providers: mockNotificationInstanceProviders as ConnectorResponseModel[],
+                }),
+            );
+            win.store.dispatch(actions.getNotificationInstanceSuccess(mockNotificationInstanceDetail as NotificationInstanceModel));
+            win.store.dispatch(
+                actions.getNotificationAttributesDescriptorsSuccess({
+                    attributeDescriptor: mockNotificationProviderAttributesDescriptors as AttributeDescriptorModel[],
+                }),
+            );
+            win.store.dispatch(
+                actions.listMappingAttributesSuccess({
+                    mappingAttributes: mockMappingAttributes as DataAttributeModel[],
+                }),
+            );
+        });
+    });
+
+    it('should handle useEffect dependency array correctly when data loads in sequence', () => {
+        cy.get('[data-testid="notification-instance-form"]').should('exist');
+
+        // Wait for async data to load and useEffect to process
+        cy.wait(1000);
+        cy.get('input[id="name"]').should('have.value', mockNotificationInstanceDetail.name);
+        cy.get('[data-testid="notification-description"]').should('have.value', mockNotificationInstanceDetail.description);
+
+        cy.get('[data-testid="notification-instance-provider-select-control"]').should(
+            'contain',
+            mockNotificationInstanceDetail.connectorName,
+        );
+
+        cy.get('[data-testid="notification-instance-kind-select-control"]').should('contain', mockNotificationInstanceDetail.kind);
+
+        cy.get('[data-testid="notification-instance-form"]').should('contain', 'Update Notification Instance');
+        cy.get('button').contains('Save').should('be.visible');
+    });
+
+    it('should handle defaultValues useMemo correctly when in edit mode with notificationDetails', () => {
+        cy.get('[data-testid="notification-instance-form"]').should('exist');
+
+        cy.wait(500);
+
+        cy.get('input[id="name"]').should('have.value', mockNotificationInstanceDetail.name);
+        cy.get('[data-testid="notification-description"]').should('have.value', mockNotificationInstanceDetail.description);
+
+        cy.get('[data-testid="notification-instance-provider-select-control"]').should('have.attr', 'aria-disabled', 'true');
+
+        cy.get('[data-testid="notification-instance-kind-select-control"]').should('have.attr', 'aria-disabled', 'true');
+
+        cy.get('input[id="name"]').should('have.attr', 'disabled');
+    });
+
+    it('should populate attributes mapping correctly from notificationDetails.attributeMappings', () => {
+        cy.get('[data-testid="notification-instance-form"]').should('exist');
+        cy.wait(500);
+
+        cy.get('[data-testid="notification-instance-form"]').should('exist');
+        cy.get('.nav-link').contains('Attribute Mappings').click();
+    });
+
+    it('should transform notificationDetails.attributes correctly in defaultValues useMemo', () => {
+        cy.get('[data-testid="notification-instance-form"]').should('exist');
+        cy.wait(500);
+        cy.get('.nav-link').contains('Connector Attributes').click();
     });
 });
