@@ -167,4 +167,97 @@ describe('NotificationFormTest', () => {
         cy.get('button').contains('Create').should('be.enabled');
         cy.get('button').contains('Create').click();
     });
+
+    it('should validate required fields', () => {
+        cy.get('[data-testid="notification-instance-form"]').should('exist');
+
+        // Try to submit without filling required fields
+        cy.get('button').contains('Create').should('be.disabled');
+        // Test name validation - required field
+        cy.get('input[id="name"]').click().blur();
+        cy.get('.invalid-feedback').should('exist');
+        // Test with invalid characters in name
+        cy.get('input[id="name"]').type('test@name');
+        cy.get('.invalid-feedback').should('exist');
+
+        // Test with valid characters
+        cy.get('input[id="name"]').clear().type('validName123');
+        cy.get('.invalid-feedback').should('be.empty');
+
+        // Test description length validation (max 300 characters)
+        cy.get('[data-testid="notification-description"]').type('a'.repeat(301));
+        cy.get('[data-testid="notification-description"]').blur();
+        cy.get('[data-testid="notification-description"]').next('.invalid-feedback').should('exist');
+
+        // Test with valid description length
+        cy.get('[data-testid="notification-description"]').clear().type('Valid description');
+        cy.get('[data-testid="notification-description"]').next('.invalid-feedback').should('be.empty');
+    });
+
+    it('should show and hide tabs correctly', () => {
+        cy.get('[data-testid="notification-instance-form"]').should('exist');
+        cy.get('input[id="name"]').type('testNotificationInstance');
+        cy.get('input').should('have.value', 'testNotificationInstance');
+
+        cy.get('[data-testid="notification-instance-form"]').should('exist');
+        cy.get('[data-testid="notification-description"]').type('testDescription');
+        cy.get('[data-testid="notification-description"]').should('have.value', 'testDescription');
+
+        // Intercept the action that gets dispatched when provider and kind are selected
+        cy.window().then((win) => {
+            const originalDispatch = win.store.dispatch;
+            win.store.dispatch = (action: any) => {
+                // If it's the action that clears descriptors, immediately populate them again
+                if (action.type === 'notifications/getNotificationAttributesDescriptors') {
+                    originalDispatch(action);
+                    // Dispatch success action to populate descriptors
+                    setTimeout(() => {
+                        originalDispatch(
+                            actions.getNotificationAttributesDescriptorsSuccess({
+                                attributeDescriptor: mockNotificationProviderAttributesDescriptors as AttributeDescriptorModel[],
+                            }),
+                        );
+                    }, 100);
+                    return;
+                }
+                return originalDispatch(action);
+            };
+        });
+
+        cy.get('[data-testid="notification-instance-form"]').should('be.visible');
+        cy.get('[data-testid="notification-instance-provider-select-control"]').should('be.visible').click();
+        cy.get('[data-testid="notification-instance-provider-select-menu"]').should('be.visible').eq(0).click();
+
+        cy.get('[data-testid="notification-instance-kind-select-control"]').should('be.visible').click();
+        cy.get('[data-testid="notification-instance-kind-select-menu"]').should('be.visible').eq(0).click().wait(1000);
+        cy.get('[data-testid="notification-instance-form"]').should('exist');
+
+        // Tabs should be visible
+        cy.get('.nav-tabs .nav-link').should('have.length', 2);
+        cy.get('.nav-tabs .nav-link').contains('Connector Attributes').should('be.visible');
+        cy.get('.nav-tabs .nav-link').contains('Attribute Mappings').should('be.visible');
+
+        // Now connector attributes should have content
+        cy.get('.nav-tabs .nav-link').contains('Connector Attributes').click();
+        cy.get('.form-label').should('be.visible');
+
+        // Attribute mappings tab should remain empty (no mapping attributes in mock data)
+        cy.get('.nav-tabs .nav-link').contains('Attribute Mappings').click();
+    });
+
+    it('should handle cancel button functionality', () => {
+        cy.get('[data-testid="notification-instance-form"]').should('exist');
+
+        cy.get('input[id="name"]').type('testNotificationInstance');
+        cy.get('[data-testid="notification-description"]').type('testDescription');
+        cy.get('button').contains('Cancel').should('be.enabled');
+        cy.get('button').contains('Cancel').click();
+    });
+
+    it('should show widget title correctly', () => {
+        cy.get('[data-testid="notification-instance-form"]').should('exist');
+
+        // Should show "Add Notification Instance" in create mode
+        cy.get('[data-testid="notification-instance-form"]').should('contain', 'Add Notification Instance');
+    });
 });
