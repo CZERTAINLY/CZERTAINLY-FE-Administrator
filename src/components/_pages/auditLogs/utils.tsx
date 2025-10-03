@@ -7,6 +7,50 @@ import { EnumItemDto } from 'types/enums';
 import { AuditLogDto } from 'types/openapi';
 import { dateFormatter } from 'utils/dateUtil';
 
+/** Shared small renderer used by both actor/resource to avoid duplicate blocks */
+const renderTypeWithOptionalNav = (
+    typeLabel: string,
+    opts: {
+        name?: string;
+        uuid?: string;
+        path?: string; // full relative path to details, if navigable
+        navigate?: (path: string) => void;
+        buttonTitle?: string;
+    } = {},
+) => {
+    const { name, uuid, path, navigate, buttonTitle } = opts;
+
+    let additional: JSX.Element | string = '';
+
+    if (path && uuid) {
+        if (name) {
+            additional = <Link to={path}> {name}</Link>;
+        } else {
+            additional = (
+                <Button
+                    title={buttonTitle ?? 'Go to details'}
+                    color="white"
+                    size="sm"
+                    className="p-0 ms-1"
+                    onClick={() => navigate?.(path)}
+                >
+                    {' '}
+                    <i className="fa fa-circle-arrow-right"></i>
+                </Button>
+            );
+        }
+    } else if (name && !uuid) {
+        additional = <span style={{ marginLeft: '5px' }}>{name}</span>;
+    }
+
+    return (
+        <span style={{ whiteSpace: 'nowrap' }}>
+            {typeLabel}
+            {additional}
+        </span>
+    );
+};
+
 /** Helper to render the list of (affiliated) resource objects without duplication */
 const renderObjectList = (
     source: AuditLogDto['resource'] | AuditLogDto['affiliatedResource'],
@@ -96,32 +140,14 @@ export const createAuditLogDetailData = (
 
 const renderActor = (actor: AuditLogDto['actor'], actorEnum: Record<string, EnumItemDto>, navigate: (path: string) => void) => {
     const typeLabel = getEnumLabel(actorEnum, actor.type);
-    let additional: JSX.Element | string = '';
+    const path = actor.uuid ? `../users/detail/${actor.uuid}` : undefined;
 
-    if (actor.uuid) {
-        const path = `../users/detail/${actor.uuid}`;
-        if (actor.name) {
-            additional = <Link to={path}> {actor.name}</Link>;
-        } else {
-            additional = (
-                <Button color="white" size="sm" className="p-0 ms-1" onClick={() => navigate(path)}>
-                    {' '}
-                    <i className="fa fa-circle-arrow-right"></i>
-                </Button>
-            );
-        }
-    }
-
-    if (actor.name && !actor.uuid) {
-        additional = <span style={{ marginLeft: '5px' }}>{actor.name}</span>;
-    }
-
-    return (
-        <span style={{ whiteSpace: 'nowrap' }}>
-            {typeLabel}
-            {additional}
-        </span>
-    );
+    return renderTypeWithOptionalNav(typeLabel, {
+        name: actor.name,
+        uuid: actor.uuid,
+        path,
+        navigate,
+    });
 };
 
 const renderResource = (
@@ -129,39 +155,21 @@ const renderResource = (
     resourceEnum: Record<string, EnumItemDto>,
     navigate: (path: string) => void,
 ) => {
-    if (!resource) {
-        return <span style={{ whiteSpace: 'nowrap' }} />;
-    }
+    if (!resource) return <span style={{ whiteSpace: 'nowrap' }} />;
 
     const typeLabel = getEnumLabel(resourceEnum, resource.type);
-    let additional: JSX.Element | string = '';
     const obj = resource.objects?.[0];
 
-    if (obj) {
-        const mappingType = auditLogsTypeMapping[resource.type];
-        if (mappingType && obj.uuid) {
-            const path = `../${mappingType}/detail/${obj.uuid}`;
-            if (obj.name) {
-                additional = <Link to={path}> {obj.name}</Link>;
-            } else {
-                additional = (
-                    <Button title="Go to details" color="white" size="sm" className="p-0 ms-1" onClick={() => navigate(path)}>
-                        {' '}
-                        <i className="fa fa-circle-arrow-right"></i>
-                    </Button>
-                );
-            }
-        } else if (!mappingType && obj.name) {
-            additional = <span style={{ marginLeft: '5px' }}>{obj.name}</span>;
-        }
-    }
+    const mappingType = obj?.uuid ? auditLogsTypeMapping[resource.type] : undefined;
+    const path = mappingType && obj?.uuid ? `../${mappingType}/detail/${obj.uuid}` : undefined;
 
-    return (
-        <span style={{ whiteSpace: 'nowrap' }}>
-            {typeLabel}
-            {additional}
-        </span>
-    );
+    return renderTypeWithOptionalNav(typeLabel, {
+        name: obj?.name,
+        uuid: obj?.uuid,
+        path,
+        navigate,
+        buttonTitle: 'Go to details',
+    });
 };
 
 export const createAuditLogsList = (
@@ -189,107 +197,53 @@ export const createAuditLogsList = (
 ) => {
     if (auditLogs.length === 0) {
         return [];
-    } else {
-        return auditLogs.map((log) => ({
-            id: log.id,
-            columns: [
-                '' + log.id,
-                <span key={`${log.id}-timestamp`} style={{ whiteSpace: 'nowrap' }}>
-                    {dateFormatter(log.timestamp)}
-                </span>,
-                getEnumLabel(moduleEnum, log.module),
-                renderActor(log.actor, actorEnum, navigate),
-                getEnumLabel(authMethodEnum, log.actor.authMethod),
-                renderResource(log.resource, resourceEnum, navigate),
-                renderResource(log.affiliatedResource, resourceEnum, navigate),
-                getEnumLabel(operationEnum, log.operation),
-                getEnumLabel(operationResultEnum, log.operationResult),
-                <Button
-                    key={`${log.id}-info-button`}
-                    className="btn btn-link p-0 ms-2"
-                    color="white"
-                    title="Detail"
-                    onClick={() => onInfoClick(log)}
-                >
-                    <i className="fa fa-info" style={{ color: 'auto', marginBottom: '9.5px', marginLeft: '4px', fontSize: '14px' }} />
-                </Button>,
-            ],
-        }));
     }
+    return auditLogs.map((log) => ({
+        id: log.id,
+        columns: [
+            '' + log.id,
+            <span key={`${log.id}-timestamp`} style={{ whiteSpace: 'nowrap' }}>
+                {dateFormatter(log.timestamp)}
+            </span>,
+            getEnumLabel(moduleEnum, log.module),
+            renderActor(log.actor, actorEnum, navigate),
+            getEnumLabel(authMethodEnum, log.actor.authMethod),
+            renderResource(log.resource, resourceEnum, navigate),
+            renderResource(log.affiliatedResource, resourceEnum, navigate),
+            getEnumLabel(operationEnum, log.operation),
+            getEnumLabel(operationResultEnum, log.operationResult),
+            <Button
+                key={`${log.id}-info-button`}
+                className="btn btn-link p-0 ms-2"
+                color="white"
+                title="Detail"
+                onClick={() => onInfoClick(log)}
+            >
+                <i className="fa fa-info" style={{ color: 'auto', marginBottom: '9.5px', marginLeft: '4px', fontSize: '14px' }} />
+            </Button>,
+        ],
+    }));
 };
 
+/** Small helper to avoid duplicated object literals */
+const hdr = (content: string, id: string, width?: string, align: 'left' | 'center' | 'right' = 'left'): TableHeader => ({
+    content,
+    id,
+    width,
+    align,
+});
+
 export const auditLogsRowHeaders: TableHeader[] = [
-    {
-        content: 'Id',
-        align: 'left',
-        id: 'id',
-        width: '5%',
-    },
-    {
-        content: 'Timestamp',
-        align: 'left',
-        id: 'timestamp',
-        width: '5%',
-    },
-    {
-        content: 'Module',
-        align: 'left',
-        id: 'module',
-        width: '5%',
-    },
-    {
-        content: 'Actor',
-        align: 'left',
-        id: 'actor',
-        width: '10%',
-    },
-    {
-        content: 'Auth method',
-        align: 'left',
-        id: 'authMethod',
-        width: '5%',
-    },
-    {
-        content: 'Resource',
-        align: 'left',
-        id: 'resource',
-        width: '10%',
-    },
-    {
-        content: 'Affiliated resource',
-        align: 'left',
-        id: 'affiliatedResource',
-        width: '10%',
-    },
-    {
-        content: 'Operation',
-        align: 'center',
-        id: 'operation',
-        width: '5%',
-    },
-    {
-        content: 'Operation result',
-        align: 'center',
-        id: 'operationResult',
-        width: '5%',
-    },
-    {
-        content: '',
-        id: 'moreInfo',
-        width: '2%',
-    },
+    hdr('Id', 'id', '5%'),
+    hdr('Timestamp', 'timestamp', '5%'),
+    hdr('Module', 'module', '5%'),
+    hdr('Actor', 'actor', '10%'),
+    hdr('Auth method', 'authMethod', '5%'),
+    hdr('Resource', 'resource', '10%'),
+    hdr('Affiliated resource', 'affiliatedResource', '10%'),
+    hdr('Operation', 'operation', '5%', 'center'),
+    hdr('Operation result', 'operationResult', '5%', 'center'),
+    hdr('', 'moreInfo', '2%'),
 ];
 
-export const auditLogsDetailRowHeaders: TableHeader[] = [
-    {
-        content: 'Property',
-        align: 'left',
-        id: 'property',
-        width: '25%',
-    },
-    {
-        content: 'Value',
-        align: 'left',
-        id: 'value',
-    },
-];
+export const auditLogsDetailRowHeaders: TableHeader[] = [hdr('Property', 'property', '25%'), hdr('Value', 'value')];
