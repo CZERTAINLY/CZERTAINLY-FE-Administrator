@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 import Select from 'react-select';
 import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
-import { AttributeDescriptorModel, AttributeMappingModel } from 'types/attributes';
+import { AttributeDescriptorModel, AttributeMappingModel, isDataAttributeModel, isCustomAttributeModel } from 'types/attributes';
 import { NotificationInstanceRequestModel } from 'types/notifications';
 import { AttributeContentType, FunctionGroupCode } from 'types/openapi';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
@@ -281,7 +281,100 @@ const NotificationInstanceForm = () => {
 
     return (
         <Widget title={widgetTitle} busy={isBusy}>
-            <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<NotificationInstanceRequestModel>() }}>
+            <Form
+                initialValues={defaultValues}
+                onSubmit={onSubmit}
+                mutators={{ ...mutators<NotificationInstanceRequestModel>() }}
+                validate={(values) => {
+                    const errors: { [key: string]: string } = {};
+
+                    // Check for required fields in AttributeEditor
+                    if (notificationProviderAttributesDescriptors && selectedNotificationInstanceProvider && selectedKind?.value) {
+                        const attributeValues = (values as any)[`__attributes__notification__`] || {};
+                        // Check notification provider attributes
+                        notificationProviderAttributesDescriptors.forEach((descriptor) => {
+                            if (isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
+                                if (descriptor.properties.required) {
+                                    const fieldKey = `__attributes__notification__.${descriptor.name}`;
+                                    const fieldValue = attributeValues[descriptor.name];
+
+                                    let isEmpty = false;
+
+                                    if (fieldValue === null || fieldValue === undefined) {
+                                        isEmpty = true;
+                                    } else if (Array.isArray(fieldValue) && fieldValue.length === 0) {
+                                        isEmpty = true;
+                                    } else if (typeof fieldValue === 'string' && fieldValue.trim() === '') {
+                                        isEmpty = true;
+                                    } else if (typeof fieldValue === 'object' && fieldValue !== null) {
+                                        // Distinguish known object-shaped attribute types
+                                        if ('code' in fieldValue || 'language' in fieldValue) {
+                                            // Codeblock-like objects must have a non-empty code
+                                            const codeVal = (fieldValue as any).code;
+                                            isEmpty =
+                                                codeVal === null ||
+                                                codeVal === undefined ||
+                                                (typeof codeVal === 'string' && codeVal.trim() === '');
+                                        } else if ('value' in fieldValue || 'label' in fieldValue) {
+                                            // Select-like objects must have a value
+                                            const v = (fieldValue as any).value;
+                                            isEmpty = v === null || v === undefined;
+                                        } else {
+                                            isEmpty = Object.keys(fieldValue).length === 0;
+                                        }
+                                    }
+
+                                    if (isEmpty) {
+                                        errors[fieldKey] = 'Required Field';
+                                    }
+                                }
+                            }
+                        });
+
+                        // Check group attributes callback attributes
+                        groupAttributesCallbackAttributes.forEach((descriptor) => {
+                            if (isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
+                                if (descriptor.properties.required) {
+                                    const fieldKey = `__attributes__notification__.${descriptor.name}`;
+                                    const fieldValue = attributeValues[descriptor.name];
+
+                                    let isEmpty = false;
+
+                                    if (fieldValue === null || fieldValue === undefined) {
+                                        isEmpty = true;
+                                    } else if (Array.isArray(fieldValue) && fieldValue.length === 0) {
+                                        isEmpty = true;
+                                    } else if (typeof fieldValue === 'string' && fieldValue.trim() === '') {
+                                        isEmpty = true;
+                                    } else if (typeof fieldValue === 'object' && fieldValue !== null) {
+                                        // Distinguish known object-shaped attribute types
+                                        if ('code' in fieldValue || 'language' in fieldValue) {
+                                            // Codeblock-like objects must have a non-empty code
+                                            const codeVal = (fieldValue as any).code;
+                                            isEmpty =
+                                                codeVal === null ||
+                                                codeVal === undefined ||
+                                                (typeof codeVal === 'string' && codeVal.trim() === '');
+                                        } else if ('value' in fieldValue || 'label' in fieldValue) {
+                                            // Select-like objects must have a value
+                                            const v = (fieldValue as any).value;
+                                            isEmpty = v === null || v === undefined;
+                                        } else {
+                                            isEmpty = Object.keys(fieldValue).length === 0;
+                                        }
+                                    }
+
+                                    if (isEmpty) {
+                                        errors[fieldKey] = 'Required Field';
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                    return errors;
+                }}
+            >
                 {({ handleSubmit, pristine, submitting, valid, form, values }) => (
                     <BootstrapForm onSubmit={handleSubmit}>
                         <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithoutAccents())}>
