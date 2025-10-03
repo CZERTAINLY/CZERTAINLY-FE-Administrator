@@ -27,7 +27,7 @@ function LinksGroup(props: Props) {
         return (
             <li className={cx(style.headerLink, props.className)}>
                 <NavLink
-                    id={`${props.header}-link`}
+                    id={`${typeof props.header === 'string' ? props.header : 'header'}-link`}
                     to={props.headerLink || ''}
                     className={({ isActive }) => (isActive ? style.headerLinkActive : undefined)}
                 >

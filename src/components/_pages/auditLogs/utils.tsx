@@ -212,7 +212,9 @@ export const createAuditLogsList = (
             id: log.id,
             columns: [
                 '' + log.id,
-                <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(log.timestamp)}</span>,
+                <span key={`${log.id}-timestamp`} style={{ whiteSpace: 'nowrap' }}>
+                    {dateFormatter(log.timestamp)}
+                </span>,
                 getEnumLabel(moduleEnum, log.module),
                 renderActor(log.actor, actorEnum, navigate),
                 getEnumLabel(authMethodEnum, log.actor.authMethod),
@@ -220,7 +222,13 @@ export const createAuditLogsList = (
                 renderResource(log.affiliatedResource, resourceEnum, navigate),
                 getEnumLabel(operationEnum, log.operation),
                 getEnumLabel(operationResultEnum, log.operationResult),
-                <Button className="btn btn-link p-0 ms-2" color="white" title="Detail" onClick={() => onInfoClick(log)}>
+                <Button
+                    key={`${log.id}-info-button`}
+                    className="btn btn-link p-0 ms-2"
+                    color="white"
+                    title="Detail"
+                    onClick={() => onInfoClick(log)}
+                >
                     <i className="fa fa-info" style={{ color: 'auto', marginBottom: '9.5px', marginLeft: '4px', fontSize: '14px' }} />
                 </Button>,
             ],
