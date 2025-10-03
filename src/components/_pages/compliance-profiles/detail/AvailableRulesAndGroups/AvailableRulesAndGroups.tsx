@@ -155,7 +155,7 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
     useEffect(() => {
         const withoutAssignedRulesandGroups = getAvailableRulesAndGroupsWithoutAlreadyAssigned();
         setFilteredAvailableRulesAndGroupsList(withoutAssignedRulesandGroups);
-        setAvailableRulesAndGroupsResources(getListOfResources(withoutAssignedRulesandGroups));
+        setAvailableRulesAndGroupsResources(getListOfResources(withoutAssignedRulesandGroups) as (Resource | 'All')[]);
     }, [alreadyAssignedRulesandGroupUuidList, getAvailableRulesAndGroupsWithoutAlreadyAssigned]);
 
     //get filtered by resource type

@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ComplianceProfileDtoV2, PlatformEnum, Resource, ResourceObjectDto } from 'types/openapi';
 import { Button, ButtonGroup, Form as BootstrapForm, FormGroup, Label } from 'reactstrap';
 import { Field, Form } from 'react-final-form';
-import Select, { components, MenuProps, ControlProps } from 'react-select';
+import Select from 'react-select';
 import { useDispatch, useSelector } from 'react-redux';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 import { validateRequired } from 'utils/validators';
@@ -13,6 +13,7 @@ import { actions as raActions, selectors as raSelectors } from 'ducks/ra-profile
 import { actions as tokenProfileActions, selectors as tokenProfileSelectors } from 'ducks/token-profiles';
 import { actions } from 'ducks/compliance-profiles';
 import { makeOptions } from 'utils/compliance-profile';
+import { TestableControl, TestableMenu } from 'utils/HOC/withDataTestId';
 
 type Props = {
     isOpen: boolean;
@@ -86,23 +87,6 @@ export default function ProfileAssociationsDialog({ isOpen, onClose, profile, as
         return makeOptions(tokenProfiles, associationsOfComplianceProfile);
     }, [associationsOfComplianceProfile, tokenProfiles]);
 
-    type TestableMenuProps = MenuProps<any, false> & { 'data-testid'?: string };
-    type TestableControlProps = ControlProps<any, false> & { 'data-testid'?: string };
-
-    const TestableMenu = useCallback(
-        (props: TestableMenuProps) => (
-            <components.Menu {...props} innerProps={{ ...props.innerProps, 'data-testid': props['data-testid'] } as any} />
-        ),
-        [],
-    );
-
-    const TestableControl = useCallback(
-        (props: TestableControlProps) => (
-            <components.Control {...props} innerProps={{ ...props.innerProps, 'data-testid': props['data-testid'] } as any} />
-        ),
-        [],
-    );
-
     const getControlStyles = (meta: any) => ({
         control: (provided: any) =>
             meta.touched && meta.invalid
@@ -143,12 +127,8 @@ export default function ProfileAssociationsDialog({ isOpen, onClose, profile, as
                                             placeholder="Select the resource to be associated"
                                             styles={getControlStyles(meta)}
                                             components={{
-                                                Menu: (props) => (
-                                                    <TestableMenu {...props} data-testid="associate-profile-resource-select-menu" />
-                                                ),
-                                                Control: (props) => (
-                                                    <TestableControl {...props} data-testid="associate-profile-resource-select-control" />
-                                                ),
+                                                Menu: TestableMenu('associate-profile-resource-select-menu'),
+                                                Control: TestableControl('associate-profile-resource-select-control'),
                                             }}
                                         />
                                         <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
@@ -176,18 +156,8 @@ export default function ProfileAssociationsDialog({ isOpen, onClose, profile, as
                                                     placeholder={`Select ${getEnumLabel(resourceEnum, selectedResource)} to be associated`}
                                                     styles={getControlStyles(meta)}
                                                     components={{
-                                                        Menu: (props) => (
-                                                            <TestableMenu
-                                                                {...props}
-                                                                data-testid="associate-profile-resource-profiles-select-menu"
-                                                            />
-                                                        ),
-                                                        Control: (props) => (
-                                                            <TestableControl
-                                                                {...props}
-                                                                data-testid="associate-profile-resource-profiles-select-control"
-                                                            />
-                                                        ),
+                                                        Menu: TestableMenu('associate-profile-resource-profiles-select-menu'),
+                                                        Control: TestableControl('associate-profile-resource-profiles-select-control'),
                                                     }}
                                                 />
 
@@ -224,17 +194,7 @@ export default function ProfileAssociationsDialog({ isOpen, onClose, profile, as
                 </Form>
             </div>
         ),
-        [
-            onSubmit,
-            selectedResource,
-            onCancel,
-            optionsForResources,
-            resourceEnum,
-            TestableMenu,
-            TestableControl,
-            optionsForRaProfiles,
-            optionsForTokenProfiles,
-        ],
+        [onSubmit, selectedResource, onCancel, optionsForResources, resourceEnum, optionsForRaProfiles, optionsForTokenProfiles],
     );
 
     return <Dialog isOpen={isOpen} caption="Associate Profile" body={dialogBody} toggle={onCancel} buttons={[]} />;

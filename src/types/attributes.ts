@@ -70,7 +70,6 @@ export type CodeBlockAttributeContentDataModel = CodeBlockAttributeContentDataDt
 export type CodeBlockAttributeContentDto = CodeBlockAttributeContent;
 export type CodeBlockAttributeContentModel = Omit<CodeBlockAttributeContentDto, 'data'> & {
     data: CodeBlockAttributeContentDataModel;
-    reference: string;
 };
 
 export type FloatAttributeContentDto = FloatAttributeContent;

@@ -165,7 +165,7 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
     const getListOfResources = useCallback(
         (rulesAndGroupsList: TRuleGroupType[]): (Resource | 'All')[] => {
             if (!profile) return [];
-            return getListOfResourcesUtil(rulesAndGroupsList);
+            return getListOfResourcesUtil(rulesAndGroupsList) as (Resource | 'All')[];
         },
         [profile],
     );

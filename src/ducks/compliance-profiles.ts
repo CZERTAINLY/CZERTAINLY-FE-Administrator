@@ -15,6 +15,7 @@ import {
     ResourceObjectDto,
 } from 'types/openapi';
 import { createFeatureSelector } from 'utils/ducks';
+import { AppState } from 'ducks';
 
 export type State = {
     checkedRows: string[];
@@ -527,14 +528,14 @@ const isCreatingComplienceInternalRule = createSelector(state, (state) => state.
 const isUpdatingComplienceInternalRule = createSelector(state, (state) => state.isUpdatingComplienceInternalRule);
 const isDeletingComplienceInternalRule = createSelector(state, (state) => state.isDeletingComplienceInternalRule);
 // Parameterized selectors for keyed compliance results
-const isFetchingComplianceCheckResultBy = (root: any, resource: Resource, objectUuid: string) => {
-    const s = (root as any)[slice.name] as State;
+const isFetchingComplianceCheckResultBy = (rootState: AppState, resource: Resource, objectUuid: string): boolean => {
+    const s = rootState[slice.name] as State;
     const key = `${resource}:${objectUuid}`;
     return !!s.isFetchingComplianceCheckResultByKey[key];
 };
 
-const complianceCheckResultBy = (root: any, resource: Resource, objectUuid: string) => {
-    const s = (root as any)[slice.name] as State;
+const complianceCheckResultBy = (rootState: AppState, resource: Resource, objectUuid: string): ComplianceCheckResultDto | undefined => {
+    const s = rootState[slice.name] as State;
     const key = `${resource}:${objectUuid}`;
     return s.complianceCheckResultByKey[key];
 };

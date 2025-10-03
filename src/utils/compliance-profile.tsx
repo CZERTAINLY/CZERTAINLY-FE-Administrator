@@ -123,7 +123,7 @@ export const formatAvailableRulesAndGroups = (
     });
 };
 
-export const getListOfResources = (rulesAndGroupsList: any[]) => {
+export const getListOfResources = (rulesAndGroupsList: TRuleGroupType[]) => {
     const list = Array.from(new Set(rulesAndGroupsList.map((ruleOrGroup) => ruleOrGroup.resource)));
     return ['All', ...list];
 };

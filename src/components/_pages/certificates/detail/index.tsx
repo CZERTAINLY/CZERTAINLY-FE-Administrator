@@ -1,7 +1,6 @@
 import { Buffer } from 'buffer';
 import AttributeEditor from 'components/Attributes/AttributeEditor';
 import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from 'components/Attributes/AttributeViewer';
-import ComplianceRuleAttributeViewer from 'components/Attributes/ComplianceRuleAttributeViewer';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import ProgressButton from 'components/ProgressButton';
@@ -31,7 +30,6 @@ import {
     CertificateSimpleDto,
     CertificateSubjectType,
     CertificateValidationStatus,
-    ComplianceRuleStatus,
     FilterConditionOperator,
     FilterFieldSource,
     SearchFilterRequestDto,
@@ -61,7 +59,6 @@ import {
 import { AttributeDescriptorModel, AttributeResponseModel } from 'types/attributes';
 import { ComplianceStatus, PlatformEnum, Resource } from 'types/openapi';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import { selectors as complianceProfilesSelectors, actions as complianceProfilesActions } from 'ducks/compliance-profiles';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 import { downloadFile, formatPEM } from 'utils/certificate';

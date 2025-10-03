@@ -2,6 +2,7 @@ import CertificateStatus from 'components/_pages/certificates/CertificateStatus'
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Widget from 'components/Widget';
 import { useDispatch, useSelector } from 'react-redux';
+import { AppState } from 'ducks';
 import { dateFormatter } from 'utils/dateUtil';
 import { selectors as complianceProfilesSelectors, actions as complianceProfilesActions } from 'ducks/compliance-profiles';
 import { LockWidgetNameEnum } from 'types/user-interface';
@@ -19,12 +20,13 @@ type Props = {
 
 export default function ComplianceCheckResultWidget({ widgetLockName, objectUuid, setSelectedAttributesInfo, resource }: Props) {
     const dispatch = useDispatch();
-    const complianceCheckResult = useSelector((s) => complianceProfilesSelectors.complianceCheckResultBy(s, resource, objectUuid));
-
-    const isFetchingComplianceCheckResult = useSelector((s) =>
-        complianceProfilesSelectors.isFetchingComplianceCheckResultBy(s, resource, objectUuid),
+    const complianceCheckResult = useSelector((s: AppState) =>
+        complianceProfilesSelectors.complianceCheckResultBy(s, resource, objectUuid),
     );
 
+    const isFetchingComplianceCheckResult = useSelector((s: AppState) =>
+        complianceProfilesSelectors.isFetchingComplianceCheckResultBy(s, resource, objectUuid),
+    );
     const getFreshComplianceCheckResult = useCallback(() => {
         dispatch(complianceProfilesActions.getComplianceCheckResult({ resource: resource, objectUuid: objectUuid }));
     }, [dispatch, objectUuid, resource]);
@@ -84,6 +86,7 @@ export default function ComplianceCheckResultWidget({ widgetLockName, objectUuid
             lockSize="normal"
             widgetLockName={widgetLockName}
             refreshAction={getFreshComplianceCheckResult}
+            dataTestId="compliance-status-widget"
         >
             <br />
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
