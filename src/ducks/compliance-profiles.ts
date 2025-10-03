@@ -30,7 +30,8 @@ export type State = {
     groups: ComplianceGroupListDto[];
     groupRules: ComplianceRuleListDto[];
     associationsOfComplianceProfile: ResourceObjectDto[];
-    complianceCheckResult?: ComplianceCheckResultDto;
+    // Keyed by `${resource}:${objectUuid}` to support multiple concurrent widgets
+    complianceCheckResultByKey: { [key: string]: ComplianceCheckResultDto | undefined };
     isFetchingAssociationsOfComplianceProfile: boolean;
     isFetchingAssociatedComplianceProfiles: boolean;
     isFetchingList: boolean;
@@ -55,7 +56,7 @@ export type State = {
     isCreatingComplienceInternalRule: boolean;
     isUpdatingComplienceInternalRule: boolean;
     isDeletingComplienceInternalRule: boolean;
-    isFetchingComplianceCheckResult: boolean;
+    isFetchingComplianceCheckResultByKey: { [key: string]: boolean };
 };
 
 export const initialState: State = {
@@ -94,7 +95,8 @@ export const initialState: State = {
     isCreatingComplienceInternalRule: false,
     isUpdatingComplienceInternalRule: false,
     isDeletingComplienceInternalRule: false,
-    isFetchingComplianceCheckResult: false,
+    complianceCheckResultByKey: {},
+    isFetchingComplianceCheckResultByKey: {},
 };
 
 export const slice = createSlice({
@@ -462,16 +464,25 @@ export const slice = createSlice({
         //////////////////////////////
 
         getComplianceCheckResult: (state, action: PayloadAction<{ resource: Resource; objectUuid: string }>) => {
-            state.isFetchingComplianceCheckResult = true;
+            const key = `${action.payload.resource}:${action.payload.objectUuid}`;
+            state.isFetchingComplianceCheckResultByKey[key] = true;
         },
 
-        getComplianceCheckResultSuccess: (state, action: PayloadAction<{ complianceCheckResult: ComplianceCheckResultDto }>) => {
-            state.isFetchingComplianceCheckResult = false;
-            state.complianceCheckResult = action.payload.complianceCheckResult;
+        getComplianceCheckResultSuccess: (
+            state,
+            action: PayloadAction<{ resource: Resource; objectUuid: string; complianceCheckResult: ComplianceCheckResultDto }>,
+        ) => {
+            const key = `${action.payload.resource}:${action.payload.objectUuid}`;
+            state.isFetchingComplianceCheckResultByKey[key] = false;
+            state.complianceCheckResultByKey[key] = action.payload.complianceCheckResult;
         },
 
-        getComplianceCheckResultFailed: (state, action: PayloadAction<{ error: string | undefined }>) => {
-            state.isFetchingComplianceCheckResult = false;
+        getComplianceCheckResultFailed: (
+            state,
+            action: PayloadAction<{ resource: Resource; objectUuid: string; error: string | undefined }>,
+        ) => {
+            const key = `${action.payload.resource}:${action.payload.objectUuid}`;
+            state.isFetchingComplianceCheckResultByKey[key] = false;
         },
     },
 });
@@ -515,8 +526,18 @@ const isUpdatingGroup = createSelector(state, (state) => state.isUpdatingGroup);
 const isCreatingComplienceInternalRule = createSelector(state, (state) => state.isCreatingComplienceInternalRule);
 const isUpdatingComplienceInternalRule = createSelector(state, (state) => state.isUpdatingComplienceInternalRule);
 const isDeletingComplienceInternalRule = createSelector(state, (state) => state.isDeletingComplienceInternalRule);
-const isFetchingComplianceCheckResult = createSelector(state, (state) => state.isFetchingComplianceCheckResult);
-const complianceCheckResult = createSelector(state, (state) => state.complianceCheckResult);
+// Parameterized selectors for keyed compliance results
+const isFetchingComplianceCheckResultBy = (root: any, resource: Resource, objectUuid: string) => {
+    const s = (root as any)[slice.name] as State;
+    const key = `${resource}:${objectUuid}`;
+    return !!s.isFetchingComplianceCheckResultByKey[key];
+};
+
+const complianceCheckResultBy = (root: any, resource: Resource, objectUuid: string) => {
+    const s = (root as any)[slice.name] as State;
+    const key = `${resource}:${objectUuid}`;
+    return s.complianceCheckResultByKey[key];
+};
 const isFetchingAssociatedComplianceProfiles = createSelector(state, (state) => state.isFetchingAssociatedComplianceProfiles);
 const associatedComplianceProfiles = createSelector(state, (state) => state.associatedComplianceProfiles);
 
@@ -559,8 +580,8 @@ export const selectors = {
     isCreatingComplienceInternalRule,
     isUpdatingComplienceInternalRule,
     isDeletingComplienceInternalRule,
-    isFetchingComplianceCheckResult,
-    complianceCheckResult,
+    isFetchingComplianceCheckResultBy,
+    complianceCheckResultBy,
     associatedComplianceProfiles,
 };
 

@@ -595,7 +595,7 @@ const checkResourceObjectCompliance: AppEpic = (action$, state$, deps) => {
 const getComplianceCheckResult: AppEpic = (action$, state$, deps) => {
     return action$.pipe(
         filter(slice.actions.getComplianceCheckResult.match),
-        switchMap((action) =>
+        mergeMap((action) =>
             deps.apiClients.complianceManagement
                 .getComplianceCheckResultV2({
                     resource: action.payload.resource,
@@ -605,6 +605,8 @@ const getComplianceCheckResult: AppEpic = (action$, state$, deps) => {
                     mergeMap((complianceCheckResult) =>
                         of(
                             slice.actions.getComplianceCheckResultSuccess({
+                                resource: action.payload.resource,
+                                objectUuid: action.payload.objectUuid,
                                 complianceCheckResult,
                             }),
                         ),
@@ -612,6 +614,8 @@ const getComplianceCheckResult: AppEpic = (action$, state$, deps) => {
                     catchError((error) =>
                         of(
                             slice.actions.getComplianceCheckResultFailed({
+                                resource: action.payload.resource,
+                                objectUuid: action.payload.objectUuid,
                                 error: extractError(error, 'Failed to get compliance check result'),
                             }),
                         ),
