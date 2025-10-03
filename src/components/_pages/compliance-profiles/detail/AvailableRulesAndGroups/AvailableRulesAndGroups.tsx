@@ -99,14 +99,14 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
 
     //get provider options
     useEffect(() => {
-        if (availableSelectedRulesSource === 'Provider') {
+        if (availableSelectedRulesSource === 'Provider' && connectors.length > 0) {
             setAvailableProviderOptions(connectors.map((connector) => ({ label: connector.name, value: connector.uuid })));
         }
     }, [availableSelectedRulesSource, connectors]);
 
     //get kind options
     useEffect(() => {
-        if (availableSelectedRulesSource === 'Provider' && selectedAvailableProvider) {
+        if (availableSelectedRulesSource === 'Provider' && selectedAvailableProvider && connectors.length > 0) {
             const allKinds = (connectors.find((connector) => connector.uuid === selectedAvailableProvider)?.functionGroups ?? []).flatMap(
                 (fg) => fg.kinds || [],
             );
