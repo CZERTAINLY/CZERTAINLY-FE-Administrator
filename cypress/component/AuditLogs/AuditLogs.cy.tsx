@@ -1,96 +1,76 @@
-import { EntityType } from 'ducks/filters';
-import { useNavigate } from 'react-router';
-import {
-    mockActorEnum,
-    mockAuditLogs,
-    mockAuthMethodEnum,
-    mockModuleEnum,
-    mockOperationEnum,
-    mockOperationResultEnum,
-    mockResourceEnum,
-} from './mockdata';
-import { WidgetButtonProps } from 'components/WidgetButtons';
-
-import CustomTable, { TableDataRow } from 'components/CustomTable';
-import {
-    auditLogsDetailRowHeaders,
-    auditLogsRowHeaders,
-    createAuditLogDetailData,
-    createAuditLogsList,
-} from 'components/_pages/auditLogs/utils';
-import { AuditLogDto } from 'types/openapi';
-import { Container } from 'reactstrap';
-import PagedList from 'components/PagedList/PagedList';
+import AuditLogs from 'components/_pages/auditLogs';
+import GlobalModal from 'components/GlobalModal';
 import { clickWait, componentLoadWait } from '../../utils/constants';
+import { actions as enumActions } from 'ducks/enums';
+import { mockPlatformEnums } from './mockdata';
+import { actions as auditLogsActions } from 'ducks/auditLogs';
+import { mockAuditLogs, mockAvailableFilters } from './mockdata';
+import { actions as filterActions, EntityType } from 'ducks/filters';
+import { AuditLogDto } from 'types/openapi';
+import '../../../src/resources/styles/theme.scss';
 
 const TestAuditLogsComponent = () => {
-    const auditLogs = mockAuditLogs as unknown as AuditLogDto[];
-    const moduleEnum = mockModuleEnum;
-    const actorEnum = mockActorEnum;
-    const authMethodEnum = mockAuthMethodEnum;
-    const resourceEnum = mockResourceEnum;
-    const operationEnum = mockOperationEnum;
-    const operationResultEnum = mockOperationResultEnum;
-    const isBusy = false;
-    const navigate = useNavigate();
-
-    const buttons: WidgetButtonProps[] = [
-        {
-            icon: 'download',
-            disabled: false,
-            tooltip: 'Export Audit logs',
-            onClick: () => {
-                console.log('export button click');
-            },
-        },
-        {
-            icon: 'trash',
-            disabled: false,
-            tooltip: 'Purge Audit logs',
-            onClick: () => {
-                console.log('purge button click');
-            },
-        },
-    ];
-    const onInfoClick = (log: AuditLogDto) => {
-        console.log('onInfoClick', log);
-    };
-    const auditLogsList: TableDataRow[] = createAuditLogsList(
-        auditLogs,
-        resourceEnum,
-        moduleEnum,
-        actorEnum,
-        authMethodEnum,
-        operationEnum,
-        operationResultEnum,
-        navigate,
-        onInfoClick,
-    );
-
     return (
-        <Container className="themed-container" fluid>
-            <PagedList
-                onListCallback={() => {}}
-                entity={EntityType.AUDIT_LOG}
-                addHidden={true}
-                hasCheckboxes={false}
-                additionalButtons={buttons}
-                headers={auditLogsRowHeaders}
-                data={auditLogsList}
-                hasDetails={false}
-                isBusy={isBusy}
-                title="Audit logs"
-                entityNameSingular="an Audit log"
-                entityNamePlural="Audit logs"
-                filterTitle="Audit logs Filter"
-            />
-        </Container>
+        <>
+            <AuditLogs />
+            <GlobalModal />
+        </>
     );
 };
 
 describe('TestAuditLogsComponent', () => {
     beforeEach(() => {
+        // Mount the component after setting up interceptors
         cy.mount(<TestAuditLogsComponent />).wait(componentLoadWait);
+
+        cy.dispatchActions(
+            enumActions.getPlatformEnumsSuccess({
+                ...mockPlatformEnums,
+            }),
+            auditLogsActions.listAuditLogsSuccess(mockAuditLogs as unknown as AuditLogDto[]),
+            filterActions.getAvailableFiltersSuccess({
+                entity: EntityType.AUDIT_LOG,
+                availableFilters: mockAvailableFilters,
+            }),
+        );
+        // Set up Redux action interceptors before mounting the component
+        cy.window().then((win) => {
+            // Intercept getPlatformEnums action
+            win.registerReduxActionListener(
+                (action) => action.type === enumActions.getPlatformEnums.type,
+                () => {
+                    win.store.dispatch(
+                        enumActions.getPlatformEnumsSuccess({
+                            ...mockPlatformEnums,
+                        }),
+                    );
+                },
+            );
+            // Intercept listAuditLogs action
+            win.registerReduxActionListener(
+                (action) => action.type === auditLogsActions.listAuditLogs.type,
+                () => {
+                    win.store.dispatch(
+                        auditLogsActions.listAuditLogsSuccess({
+                            ...(mockAuditLogs as unknown as AuditLogDto[]),
+                        }),
+                    );
+                },
+            );
+
+            // Intercept getAvailableFilters action
+            win.registerReduxActionListener(
+                (action) => action.type === filterActions.getAvailableFilters.type,
+                () => {
+                    win.store.dispatch(
+                        filterActions.getAvailableFiltersSuccess({
+                            entity: EntityType.AUDIT_LOG,
+                            availableFilters: mockAvailableFilters,
+                        }),
+                    );
+                },
+            );
+        });
     });
 
     it('renders title and table headers', () => {
@@ -187,275 +167,195 @@ describe('TestAuditLogsComponent', () => {
             });
     });
 
-    it('should trigger function when clicking info button', () => {
-        cy.window().then((win) => {
-            cy.spy(win.console, 'log').as('consoleLog');
-        });
+    it('should open modal when clicking info button', () => {
         cy.get('button[title="Detail"]').first().click().wait(clickWait);
-        cy.get('@consoleLog').should('be.calledWithMatch', 'onInfoClick');
+        cy.get('.modal-content').should('be.visible');
+        cy.get('button').contains('Close').click().wait(clickWait);
+        cy.get('.modal-content').should('not.exist');
     });
 
-    it('should trigger function when clicking on download button', () => {
-        cy.window().then((win) => {
-            cy.spy(win.console, 'log').as('consoleLog');
+    describe('case 1 log testing', () => {
+        beforeEach(() => {
+            cy.get('button[title="Detail"]').first().click().wait(clickWait);
+            cy.get('.modal-content').should('be.visible');
         });
-        cy.get('button[title="Export Audit logs"]').click().wait(clickWait);
-        cy.get('@consoleLog').should('be.calledWithMatch', 'export button click');
-    });
 
-    it('should trigger function when clicking on purge button', () => {
-        cy.window().then((win) => {
-            cy.spy(win.console, 'log').as('consoleLog');
+        it('renders table headers', () => {
+            cy.contains('th', 'Property').should('exist');
+            cy.contains('th', 'Value').should('exist');
         });
-        cy.get('button[title="Purge Audit logs"]').click().wait(clickWait);
-        cy.get('@consoleLog').should('be.calledWithMatch', 'purge button click');
-    });
-});
 
-type AuditLogDetailItem = {
-    property: string;
-    propertyValue: string | React.ReactNode;
-};
-const createAuditLogDetailRows = (a: AuditLogDetailItem) => ({
-    id: a.property,
-    columns: [a.property, a.propertyValue],
-});
-const resourceEnum = mockResourceEnum;
-const onLinkClick = () => {
-    console.log('onLinkClick');
-};
-
-const TestAuditLogDetailComponentCase1 = () => {
-    const log = mockAuditLogs[0] as unknown as AuditLogDto;
-
-    return (
-        <CustomTable
-            headers={auditLogsDetailRowHeaders}
-            data={createAuditLogDetailData(log, resourceEnum, onLinkClick).map(createAuditLogDetailRows) as unknown as TableDataRow[]}
-        />
-    );
-};
-
-describe('TestAuditLogDetailComponentCase1', () => {
-    beforeEach(() => {
-        cy.mount(<TestAuditLogDetailComponentCase1 />).wait(componentLoadWait);
-    });
-
-    it('renders table headers', () => {
-        cy.contains('th', 'Property').should('exist');
-        cy.contains('th', 'Value').should('exist');
-    });
-
-    it('renders timestamp', () => {
-        cy.contains('tr', 'Timestamp').within(() => {
-            cy.contains('Timestamp').should('exist');
-            cy.contains('2025-09-29T08:46:19.567Z').should('exist');
-        });
-    });
-
-    it('renders logged at', () => {
-        cy.contains('tr', 'Logged at').within(() => {
-            cy.contains('Logged at').should('exist');
-            cy.contains('2025-09-29T08:46:19.572062Z').should('exist');
-        });
-    });
-
-    it('renders resource', () => {
-        cy.contains('tr', 'Resource').within(() => {
-            cy.contains('Resource').should('exist');
-            cy.contains('Compliance Profile').should('exist');
-        });
-    });
-
-    it('renders resource objects as a link with name', () => {
-        cy.contains('tr', 'Resource objects').within(() => {
-            cy.contains('Resource objects').should('exist');
-            cy.get('a[href*="/complianceprofiles/detail/"]').should('exist');
-            cy.get('a[href*="/complianceprofiles/detail/"]').contains('test').should('exist');
-        });
-    });
-
-    it('renders affiliated resource objects as a link with name', () => {
-        cy.contains('tr', 'Affiliated resource objects').within(() => {
-            cy.contains('Affiliated resource objects').should('exist');
-            cy.get('a[href*="/complianceprofiles/detail/"]').should('exist');
-            cy.get('a[href*="/complianceprofiles/detail/"]').contains('Custom').should('exist');
-        });
-    });
-
-    it('renders affiliated resource label', () => {
-        cy.contains('td', /^Affiliated resource$/) // regex for exact match
-            .within(() => {
-                cy.contains('Affiliated resource').should('exist');
+        it('renders timestamp', () => {
+            cy.get('tr[data-id="Timestamp"]').within(() => {
+                cy.contains('Timestamp').should('exist');
+                cy.contains('2025-09-29T08:46:19.567Z').should('exist');
             });
-        cy.contains('td', /^Affiliated resource$/)
-            .parent()
-            .should('contain', 'Compliance Profile');
-    });
+        });
 
-    it('renders request method', () => {
-        cy.contains('tr', 'Request method').within(() => {
-            cy.contains('Request method').should('exist');
-            cy.contains('DELETE').should('exist');
+        it('renders logged at', () => {
+            cy.contains('tr', 'Logged at').within(() => {
+                cy.contains('Logged at').should('exist');
+                cy.contains('2025-09-29T08:46:19.572062Z').should('exist');
+            });
+        });
+
+        it('renders resource', () => {
+            cy.get('tr[data-id="Resource"]').within(() => {
+                cy.contains('Resource').should('exist');
+                cy.contains('Compliance Profile').should('exist');
+            });
+        });
+
+        it('renders resource objects as a link with name', () => {
+            cy.contains('tr', 'Resource objects').within(() => {
+                cy.contains('Resource objects').should('exist');
+                cy.get('a[href*="/complianceprofiles/detail/"]').should('exist');
+                cy.get('a[href*="/complianceprofiles/detail/"]').contains('test').should('exist');
+            });
+        });
+
+        it('renders affiliated resource objects as a link with name', () => {
+            cy.contains('tr', 'Affiliated resource objects').within(() => {
+                cy.contains('Affiliated resource objects').should('exist');
+                cy.get('a[href*="/complianceprofiles/detail/"]').should('exist');
+                cy.get('a[href*="/complianceprofiles/detail/"]').contains('Custom').should('exist');
+            });
+        });
+
+        it('renders affiliated resource label', () => {
+            cy.contains('td', /^Affiliated resource$/) // regex for exact match
+                .within(() => {
+                    cy.contains('Affiliated resource').should('exist');
+                });
+            cy.contains('td', /^Affiliated resource$/)
+                .parent()
+                .should('contain', 'Compliance Profile');
+        });
+
+        it('renders request method', () => {
+            cy.contains('tr', 'Request method').within(() => {
+                cy.contains('Request method').should('exist');
+                cy.contains('DELETE').should('exist');
+            });
+        });
+
+        it('renders request path', () => {
+            cy.contains('tr', 'Request path').within(() => {
+                cy.contains('Request path').should('exist');
+                cy.contains(
+                    '/api/v2/complianceProfiles/6db02cd3-71c0-4b3f-be98-97d4bbd8320c/associations/raProfiles/c08e64f5-a98b-49df-908d-b3b26f50c145',
+                ).should('exist');
+            });
+        });
+
+        it('renders request IP address', () => {
+            cy.contains('tr', 'Request IP address').within(() => {
+                cy.contains('Request IP address').should('exist');
+                cy.contains('31.42.175.148').should('exist');
+            });
+        });
+
+        it('renders message', () => {
+            cy.contains('tr', 'Message').within(() => {
+                cy.contains('Message').should('exist');
+            });
+        });
+
+        it('renders operation data', () => {
+            cy.contains('tr', 'Operation data').within(() => {
+                cy.contains('Operation data').should('exist');
+            });
+        });
+
+        it('shows additional data JSON', () => {
+            cy.contains('td', 'Additional data')
+                .parent()
+                .should('contain', 'associationObjectUuid')
+                .and('contain', 'c08e64f5-a98b-49df-908d-b3b26f50c145');
         });
     });
 
-    it('renders request path', () => {
-        cy.contains('tr', 'Request path').within(() => {
-            cy.contains('Request path').should('exist');
-            cy.contains(
-                '/api/v2/complianceProfiles/6db02cd3-71c0-4b3f-be98-97d4bbd8320c/associations/raProfiles/c08e64f5-a98b-49df-908d-b3b26f50c145',
-            ).should('exist');
+    describe('case 2 log testing', () => {
+        beforeEach(() => {
+            cy.get('button[title="Detail"]').eq(1).click().wait(clickWait);
+            cy.get('.modal-content').should('be.visible');
+        });
+        it('renders resource objects as empty string', () => {
+            cy.contains('tr', 'Resource objects').within(() => {
+                cy.contains('Resource objects').should('exist');
+                cy.get('a[href*="/complianceprofiles/detail/"]').should('not.exist');
+            });
+        });
+
+        it('renders affiliated resource objects as empty string', () => {
+            cy.contains('tr', 'Affiliated resource objects').within(() => {
+                cy.contains('Affiliated resource objects').should('exist');
+                cy.get('a[href*="/complianceprofiles/detail/"]').should('not.exist');
+            });
         });
     });
 
-    it('renders request IP address', () => {
-        cy.contains('tr', 'Request IP address').within(() => {
-            cy.contains('Request IP address').should('exist');
-            cy.contains('31.42.175.148').should('exist');
+    describe('case 3 log testing', () => {
+        beforeEach(() => {
+            cy.get('button[title="Detail"]').eq(2).click().wait(clickWait);
+            cy.get('.modal-content').should('be.visible');
+        });
+        it('renders resource objects as a link with uuid', () => {
+            cy.contains('tr', 'Resource objects').within(() => {
+                cy.contains('Resource objects').should('exist');
+                cy.get('a[href*="/complianceprofiles/detail/"]').should('exist');
+                cy.get('a[href*="/complianceprofiles/detail/"]').contains('6db02cd3-71c0-4b3f-be98-97d4bbd8320c').should('exist');
+            });
+        });
+
+        it('renders affiliated resource objects as a link with link to detail page', () => {
+            cy.contains('tr', 'Affiliated resource objects').within(() => {
+                cy.contains('Affiliated resource objects').should('exist');
+                cy.get('a[href*="/complianceprofiles/detail/"]').should('exist');
+                cy.get('a[href*="/complianceprofiles/detail/"]').contains('c08e64f5-a98b-49df-908d-b3b26f50c145').should('exist');
+            });
         });
     });
 
-    it('renders message', () => {
-        cy.contains('tr', 'Message').within(() => {
-            cy.contains('Message').should('exist');
+    describe('case 4 log testing', () => {
+        beforeEach(() => {
+            cy.get('button[title="Detail"]').eq(3).click().wait(clickWait);
+            cy.get('.modal-content').should('be.visible');
+        });
+        it('renders resource objects as string with name', () => {
+            cy.contains('tr', 'Resource objects').within(() => {
+                cy.contains('Resource objects').should('exist');
+                cy.contains('test').should('exist');
+            });
+        });
+
+        it('renders affiliated resource objects as string with name', () => {
+            cy.contains('tr', 'Affiliated resource objects').within(() => {
+                cy.contains('Affiliated resource objects').should('exist');
+                cy.contains('test').should('exist');
+            });
         });
     });
 
-    it('renders operation data', () => {
-        cy.contains('tr', 'Operation data').within(() => {
-            cy.contains('Operation data').should('exist');
+    describe('case 5 log testing', () => {
+        beforeEach(() => {
+            cy.get('button[title="Detail"]').eq(4).click().wait(clickWait);
+            cy.get('.modal-content').should('be.visible');
         });
-    });
-
-    it('shows additional data JSON', () => {
-        cy.contains('td', 'Additional data')
-            .parent()
-            .should('contain', 'associationObjectUuid')
-            .and('contain', 'c08e64f5-a98b-49df-908d-b3b26f50c145');
-    });
-});
-
-const TestAuditLogDetailComponentCase2 = () => {
-    const log = mockAuditLogs[1] as unknown as AuditLogDto;
-
-    return (
-        <CustomTable
-            headers={auditLogsDetailRowHeaders}
-            data={createAuditLogDetailData(log, resourceEnum, onLinkClick).map(createAuditLogDetailRows) as unknown as TableDataRow[]}
-        />
-    );
-};
-describe('TestAuditLogDetailComponentCase2', () => {
-    beforeEach(() => {
-        cy.mount(<TestAuditLogDetailComponentCase2 />).wait(componentLoadWait);
-    });
-
-    it('renders resource objects as empty string', () => {
-        cy.contains('tr', 'Resource objects').within(() => {
-            cy.contains('Resource objects').should('exist');
-            cy.get('a[href*="/complianceprofiles/detail/"]').should('not.exist');
+        it('renders resource objects as string with name', () => {
+            cy.contains('tr', 'Resource objects').within(() => {
+                cy.contains('Resource objects').should('exist');
+                cy.contains('test (6db02cd3-71c0-4b3f-be98-97d4bbd8320c)').should('exist');
+            });
         });
-    });
 
-    it('renders affiliated resource objects as empty string', () => {
-        cy.contains('tr', 'Affiliated resource objects').within(() => {
-            cy.contains('Affiliated resource objects').should('exist');
-            cy.get('a[href*="/complianceprofiles/detail/"]').should('not.exist');
-        });
-    });
-});
-
-const TestAuditLogDetailComponentCase3 = () => {
-    const log = mockAuditLogs[2] as unknown as AuditLogDto;
-    return (
-        <CustomTable
-            headers={auditLogsDetailRowHeaders}
-            data={createAuditLogDetailData(log, resourceEnum, onLinkClick).map(createAuditLogDetailRows) as unknown as TableDataRow[]}
-        />
-    );
-};
-
-describe('TestAuditLogDetailComponentCase3', () => {
-    beforeEach(() => {
-        cy.mount(<TestAuditLogDetailComponentCase3 />).wait(componentLoadWait);
-    });
-
-    it('renders resource objects as a link with uuid', () => {
-        cy.contains('tr', 'Resource objects').within(() => {
-            cy.contains('Resource objects').should('exist');
-            cy.get('a[href*="/complianceprofiles/detail/"]').should('exist');
-            cy.get('a[href*="/complianceprofiles/detail/"]').contains('6db02cd3-71c0-4b3f-be98-97d4bbd8320c').should('exist');
-        });
-    });
-
-    it('renders affiliated resource objects as a link with link to detail page', () => {
-        cy.contains('tr', 'Affiliated resource objects').within(() => {
-            cy.contains('Affiliated resource objects').should('exist');
-            cy.get('a[href*="/complianceprofiles/detail/"]').should('exist');
-            cy.get('a[href*="/complianceprofiles/detail/"]').contains('c08e64f5-a98b-49df-908d-b3b26f50c145').should('exist');
-        });
-    });
-});
-
-const TestAuditLogDetailComponentCase4 = () => {
-    const log = mockAuditLogs[3] as unknown as AuditLogDto;
-    const resourceEnum = mockResourceEnum;
-    return (
-        <CustomTable
-            headers={auditLogsDetailRowHeaders}
-            data={createAuditLogDetailData(log, resourceEnum, onLinkClick).map(createAuditLogDetailRows) as unknown as TableDataRow[]}
-        />
-    );
-};
-
-describe('TestAuditLogDetailComponentCase4', () => {
-    beforeEach(() => {
-        cy.mount(<TestAuditLogDetailComponentCase4 />).wait(componentLoadWait);
-    });
-    it('renders resource objects as string with name', () => {
-        cy.contains('tr', 'Resource objects').within(() => {
-            cy.contains('Resource objects').should('exist');
-            cy.contains('test').should('exist');
-        });
-    });
-
-    it('renders affiliated resource objects as string with name', () => {
-        cy.contains('tr', 'Affiliated resource objects').within(() => {
-            cy.contains('Affiliated resource objects').should('exist');
-            cy.contains('test').should('exist');
-        });
-    });
-});
-
-const TestAuditLogDetailComponentCase5 = () => {
-    const log = mockAuditLogs[4] as unknown as AuditLogDto;
-    const resourceEnum = mockResourceEnum;
-    return (
-        <CustomTable
-            headers={auditLogsDetailRowHeaders}
-            data={createAuditLogDetailData(log, resourceEnum, onLinkClick).map(createAuditLogDetailRows) as unknown as TableDataRow[]}
-        />
-    );
-};
-
-describe('TestAuditLogDetailComponentCase5', () => {
-    beforeEach(() => {
-        cy.mount(<TestAuditLogDetailComponentCase5 />).wait(componentLoadWait);
-    });
-    it('renders resource objects as string with name', () => {
-        cy.contains('tr', 'Resource objects').within(() => {
-            cy.contains('Resource objects').should('exist');
-            cy.contains('test (6db02cd3-71c0-4b3f-be98-97d4bbd8320c)').should('exist');
-        });
-    });
-
-    it('renders affiliated resource objects as string with name', () => {
-        cy.contains('tr', 'Affiliated resource objects').within(() => {
-            cy.contains('Affiliated resource objects').should('exist');
-            cy.contains('Custom').should('exist');
-            cy.get('a[href*="/complianceprofiles/detail/"]').should('exist');
-            cy.get('a[href*="/complianceprofiles/detail/"]').contains('Custom').should('exist');
+        it('renders affiliated resource objects as string with name', () => {
+            cy.contains('tr', 'Affiliated resource objects').within(() => {
+                cy.contains('Affiliated resource objects').should('exist');
+                cy.contains('Custom').should('exist');
+                cy.get('a[href*="/complianceprofiles/detail/"]').should('exist');
+                cy.get('a[href*="/complianceprofiles/detail/"]').contains('Custom').should('exist');
+            });
         });
     });
 });
