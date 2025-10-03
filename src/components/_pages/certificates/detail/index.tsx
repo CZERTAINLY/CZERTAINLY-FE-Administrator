@@ -117,7 +117,6 @@ export default function CertificateDetail() {
     const certLocations = useSelector(selectors.certificateLocations);
     const approvals = useSelector(selectors.approvals);
     const currentFilters = useSelector(filterSelectors.currentFilters(EntityType.CERTIFICATE));
-    const preservedFilters = useSelector(filterSelectors.preservedFilters(EntityType.CERTIFICATE));
 
     const validationResult = useSelector(selectors.validationResult);
 
@@ -1380,6 +1379,7 @@ export default function CertificateDetail() {
 
         dispatch(actions.deassociateCertificate({ uuid: id, certificateUuid: relatedCertificateCheckedRows[0] }));
         setConfirmDeleteRelatedCertificate(false);
+        setRelatedCertificateCheckedRows([]);
     }, [relatedCertificateCheckedRows, id, dispatch]);
 
     const clearRelatedCertificatesFilters = useCallback(() => {
@@ -2006,15 +2006,25 @@ export default function CertificateDetail() {
         [deviceType],
     );
 
+    const handleRelatedFiltersClear = useCallback(() => {
+        if (!isFirstAddRelatedCertificateClick.current) {
+            clearRelatedCertificatesFilters();
+        }
+    }, [clearRelatedCertificatesFilters, isFirstAddRelatedCertificateClick]);
+
+    useEffect(() => {
+        return () => {
+            handleRelatedFiltersClear();
+        };
+    }, [handleRelatedFiltersClear]);
+
     return (
         <Container className={cx('themed-container', styles.certificateContainer)} fluid>
             <GoBackButton
                 style={{ marginBottom: '10px' }}
                 text={`${getEnumLabel(resourceEnum, Resource.Certificates)} Inventory`}
                 onClick={() => {
-                    if (!isFirstAddRelatedCertificateClick.current) {
-                        clearRelatedCertificatesFilters();
-                    }
+                    handleRelatedFiltersClear();
                     navigate('/certificates');
                 }}
             />
