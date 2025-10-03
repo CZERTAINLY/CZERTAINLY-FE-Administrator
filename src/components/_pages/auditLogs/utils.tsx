@@ -7,6 +7,34 @@ import { EnumItemDto } from 'types/enums';
 import { AuditLogDto } from 'types/openapi';
 import { dateFormatter } from 'utils/dateUtil';
 
+/** Helper to render the list of (affiliated) resource objects without duplication */
+const renderObjectList = (
+    source: AuditLogDto['resource'] | AuditLogDto['affiliatedResource'],
+    onLinkClick: () => void,
+    keyPrefix: string,
+) =>
+    source?.objects?.map((object, index) => {
+        const mappingType = source?.type ? auditLogsTypeMapping[source.type] : undefined;
+
+        const element =
+            object.uuid && mappingType ? (
+                <Link onClick={onLinkClick} key={`${object.uuid}-${keyPrefix}-link`} to={`../${mappingType}/detail/${object.uuid}`}>
+                    {object.name ?? object.uuid ?? ''}
+                </Link>
+            ) : (
+                <span key={`${object.uuid}-${keyPrefix}-span`}>
+                    {object.name ?? ''} {object.uuid ? `(${object.uuid})` : ''}
+                </span>
+            );
+
+        return (
+            <span key={`${object.uuid}-${keyPrefix}-wrapper`}>
+                {index > 0 && ', '}
+                {element}
+            </span>
+        );
+    });
+
 export const createAuditLogDetailData = (
     auditLog: AuditLogDto,
     resourceEnum: {
@@ -29,55 +57,11 @@ export const createAuditLogDetailData = (
         },
         {
             property: 'Resource objects',
-            propertyValue: auditLog.resource.objects?.map((object, index) => {
-                const element =
-                    object.uuid && auditLogsTypeMapping[auditLog.resource.type] ? (
-                        <Link
-                            onClick={onLinkClick}
-                            key={`${object.uuid}-resource-link`}
-                            to={`../${auditLogsTypeMapping[auditLog.resource.type]}/detail/${object.uuid}`}
-                        >
-                            {object.name ?? object.uuid ?? ''}
-                        </Link>
-                    ) : (
-                        <span key={`${object.uuid}-resource-span`}>
-                            {object.name ?? ''} {object.uuid ? `(${object.uuid})` : ''}
-                        </span>
-                    );
-
-                return (
-                    <span key={`${object.uuid}-resource-element-wrapper`}>
-                        {index > 0 && ', '}
-                        {element}
-                    </span>
-                );
-            }),
+            propertyValue: renderObjectList(auditLog.resource, onLinkClick, 'resource'),
         },
         {
             property: 'Affiliated resource objects',
-            propertyValue: auditLog.affiliatedResource?.objects?.map((object, index) => {
-                const element =
-                    object.uuid && auditLog.affiliatedResource && auditLogsTypeMapping[auditLog.affiliatedResource.type] ? (
-                        <Link
-                            onClick={onLinkClick}
-                            key={`${object.uuid}-affiliated-link`}
-                            to={`../${auditLogsTypeMapping[auditLog.affiliatedResource.type]}/detail/${object.uuid}`}
-                        >
-                            {object.name ?? object.uuid ?? ''}
-                        </Link>
-                    ) : (
-                        <span key={`${object.uuid}-affiliated-span`}>
-                            {object.name ?? ''} {object.uuid ? `(${object.uuid})` : ''}
-                        </span>
-                    );
-
-                return (
-                    <span key={`${object.uuid}-affiliated-element-wrapper`}>
-                        {index > 0 && ', '}
-                        {element}
-                    </span>
-                );
-            }),
+            propertyValue: renderObjectList(auditLog.affiliatedResource, onLinkClick, 'affiliated'),
         },
         {
             property: 'Affiliated resource',
@@ -112,7 +96,6 @@ export const createAuditLogDetailData = (
 
 const renderActor = (actor: AuditLogDto['actor'], actorEnum: Record<string, EnumItemDto>, navigate: (path: string) => void) => {
     const typeLabel = getEnumLabel(actorEnum, actor.type);
-
     let additional: JSX.Element | string = '';
 
     if (actor.uuid) {
@@ -128,6 +111,7 @@ const renderActor = (actor: AuditLogDto['actor'], actorEnum: Record<string, Enum
             );
         }
     }
+
     if (actor.name && !actor.uuid) {
         additional = <span style={{ marginLeft: '5px' }}>{actor.name}</span>;
     }
@@ -150,9 +134,7 @@ const renderResource = (
     }
 
     const typeLabel = getEnumLabel(resourceEnum, resource.type);
-
     let additional: JSX.Element | string = '';
-
     const obj = resource.objects?.[0];
 
     if (obj) {
