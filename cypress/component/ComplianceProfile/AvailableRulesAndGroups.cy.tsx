@@ -1,7 +1,9 @@
 import AvailableRulesAndGroups from 'components/_pages/compliance-profiles/detail/AvailableRulesAndGroups/AvailableRulesAndGroups';
 import {
     complianceProfileDetailMockData,
+    mockAssociations,
     mockConnectors,
+    mockGroupRules,
     mockInternalRules,
     mockPlatformEnums,
     mockProviderGroups,
@@ -9,10 +11,12 @@ import {
 } from './mock-data';
 import { clickWait, componentLoadWait } from '../../utils/constants';
 import { useState } from 'react';
-import { ComplianceGroupListDto, ComplianceProfileDtoV2, ComplianceRuleListDto } from 'types/openapi';
+import { Routes, Route } from 'react-router';
+import { ComplianceGroupListDto, ComplianceProfileDtoV2, ComplianceRuleListDto, ResourceObjectDto } from 'types/openapi';
 import { actions as enumActions } from 'ducks/enums';
 import { actions } from 'ducks/compliance-profiles';
 import { actions as connectorsActions } from 'ducks/connectors';
+import { actions as filterActions, EntityType } from 'ducks/filters';
 import { ConnectorResponseModel } from 'types/connectors';
 import '../../../src/resources/styles/theme.scss';
 import { capitalize } from 'utils/common-utils';
@@ -29,12 +33,19 @@ const AvailableRulesAndGroups2 = () => {
 
     return (
         <>
-            <AvailableRulesAndGroups
-                profile={complianceProfileDetailMockData as unknown as ComplianceProfileDtoV2}
-                setSelectedEntityDetails={setSelectedEntityDetails}
-                setIsEntityDetailMenuOpen={setIsEntityDetailMenuOpen}
-                onReset={handleReset}
-            />
+            <Routes>
+                <Route
+                    path="/complianceprofiles/detail/:id"
+                    element={
+                        <AvailableRulesAndGroups
+                            profile={complianceProfileDetailMockData as unknown as ComplianceProfileDtoV2}
+                            setSelectedEntityDetails={setSelectedEntityDetails}
+                            setIsEntityDetailMenuOpen={setIsEntityDetailMenuOpen}
+                            onReset={handleReset}
+                        />
+                    }
+                />
+            </Routes>
             {isEntityDetailMenuOpen && selectedEntityDetails && (
                 <Dialog
                     isOpen={isEntityDetailMenuOpen}
@@ -378,11 +389,20 @@ describe('Available Rules And Groups (Provider Rules Case)', () => {
             componentLoadWait,
         );
         cy.dispatchActions(
+            actions.getComplianceProfileSuccess({
+                complianceProfile: complianceProfileDetailMockData as unknown as ComplianceProfileDtoV2,
+            }),
             actions.getListComplianceRulesSuccess({
                 rules: [],
             }),
             actions.getListComplianceGroupsSuccess({
                 groups: [],
+            }),
+            actions.getListComplianceGroupRulesSuccess({
+                rules: mockGroupRules as unknown as ComplianceRuleListDto[],
+            }),
+            actions.getAssociationsOfComplianceProfileSuccess({
+                associations: mockAssociations as unknown as ResourceObjectDto[],
             }),
             // Set platform enums data
             enumActions.getPlatformEnumsSuccess({
@@ -390,6 +410,10 @@ describe('Available Rules And Groups (Provider Rules Case)', () => {
             }),
             connectorsActions.listConnectorsSuccess({
                 connectorList: mockConnectors as unknown as ConnectorResponseModel[],
+            }),
+            filterActions.getAvailableFiltersSuccess({
+                entity: EntityType.CONDITIONS,
+                availableFilters: [],
             }),
         );
         // Set up action listener to automatically complete rules and groups requests
@@ -591,12 +615,81 @@ describe('Available Rules And Groups (Provider Rules Case)', () => {
                     });
                 });
             });
+
             it('should show add provider rule button for each rule/group', () => {
                 cy.get('table tbody tr').each(($row) => {
                     cy.wrap($row).within(() => {
                         cy.get('button').find('.fa-plus').should('exist');
                     });
                 });
+            });
+
+            it('should open attribute modal window if rule has attributes', () => {
+                cy.get('[data-testid="available-rules-and-groups-widget"]').should('not.have.class', 'busy');
+                cy.get('table tbody tr').should('have.length.greaterThan', 0);
+                cy.get('table tbody tr')
+                    .eq(1)
+                    .within(() => {
+                        cy.get('button').find('.fa-plus').should('exist').click().wait(clickWait);
+                    });
+                cy.get('[data-testid="attribute-editor-dialog"]').should('be.visible');
+                cy.get('[data-testid="attribute-editor-dialog"]').should('contain', 'Attributes');
+            });
+
+            it('should close attribute modal window when cancel button is clicked', () => {
+                cy.get('[data-testid="available-rules-and-groups-widget"]').should('not.have.class', 'busy');
+                cy.get('table tbody tr').should('have.length.greaterThan', 0);
+                cy.get('table tbody tr')
+                    .eq(1)
+                    .within(() => {
+                        cy.get('button').find('.fa-plus').should('exist').click().wait(clickWait);
+                    });
+                cy.get('[data-testid="attribute-editor-dialog"]').should('be.visible');
+                cy.get('[data-testid="attribute-editor-dialog"]').should('contain', 'Attributes');
+                // Click cancel button
+                cy.get('[data-testid="attribute-editor-dialog"]')
+                    .first()
+                    .within(() => {
+                        cy.get('button').contains('Cancel').click().wait(clickWait);
+                    });
+                // Verify modal closes
+                cy.get('[data-testid="attribute-editor-dialog"]').should('not.exist');
+            });
+
+            it('should submit attribute modal with form data', () => {
+                cy.get('[data-testid="available-rules-and-groups-widget"]').should('not.have.class', 'busy');
+
+                cy.get('table tbody tr').should('have.length.greaterThan', 0);
+                cy.get('table tbody tr')
+                    .eq(1)
+                    .within(() => {
+                        cy.get('button').find('.fa-plus').should('exist').click().wait(clickWait);
+                    });
+
+                cy.get('[data-testid="attribute-editor-dialog"]').should('be.visible');
+                cy.get('[data-testid="attribute-editor-dialog"]').should('contain', 'Attributes');
+
+                // Fill in the form fields
+                cy.get('[data-testid="attribute-editor-dialog"]')
+                    .first()
+                    .within(() => {
+                        cy.get('.css-fyq6mk-container').click();
+                        cy.wait(300);
+                        cy.get('[class*="option"]').first().click();
+
+                        cy.get('input[type="text"], input[type="number"]')
+                            .eq(1)
+                            .then(($input) => {
+                                if ($input.length > 0) {
+                                    cy.wrap($input).clear().type('1');
+                                }
+                            });
+
+                        // Submit the form
+                        cy.get('button').contains('Add rule').click().wait(clickWait);
+                    });
+
+                cy.get('[data-testid="attribute-editor-dialog"]').should('not.exist');
             });
         });
     });

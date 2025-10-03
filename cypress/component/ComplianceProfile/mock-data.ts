@@ -1,3 +1,4 @@
+import { getEnumLabel } from 'ducks/enums';
 import { Resource, ComplianceRuleAvailabilityStatus } from 'types/openapi/models';
 
 export const complianceProfileDetailMockData = {
@@ -2866,3 +2867,60 @@ export const mockPlatformEnums = {
         },
     },
 };
+export const mockResourceList = [
+    { resource: getEnumLabel(mockResourceEnum, 'raProfiles'), hasComplianceProfiles: true },
+    { resource: getEnumLabel(mockResourceEnum, 'tokenProfiles'), hasComplianceProfiles: true },
+];
+
+export const mockRaProfilesList = [
+    {
+        uuid: '0be45e19-7392-4edf-9ac7-ecd0f9a7c7c0',
+        name: 'SemikACME',
+        description: '',
+        authorityInstanceUuid: 'd1392319-f68e-4cd9-aad1-06ef6f10d6aa',
+        authorityInstanceName: 'ejbca.3key.company',
+        enabled: true,
+        attributes: [],
+        enabledProtocols: ['ACME'],
+        certificateValidationSettings: {
+            usePlatformSettings: true,
+            enabled: false,
+        },
+    },
+    {
+        uuid: 'c08e64f5-a98b-49df-908d-b3b26f50c145',
+        name: 'Custom',
+        description: '',
+        authorityInstanceName: 'adcs-lab02',
+        enabled: false,
+        attributes: [],
+        enabledProtocols: ['ACME'],
+        certificateValidationSettings: {
+            usePlatformSettings: true,
+            enabled: false,
+        },
+    },
+];
+
+export const mockTokenProfilesList = [
+    {
+        uuid: '0f442b85-a97c-41de-9ebe-75bae7176984',
+        name: 'new-token-profile-from-2-15',
+        description: '',
+        tokenInstanceUuid: '94a09e50-b103-4077-9967-4582ca60e732',
+        tokenInstanceName: 'test-token-1',
+        tokenInstanceStatus: 'Deactivated',
+        enabled: false,
+        usages: [],
+    },
+    {
+        uuid: '2f3cbd30-92f6-496b-aff7-c563e0364a9d',
+        name: 'TestPQCTokenProfile',
+        description: '',
+        tokenInstanceUuid: '284f7065-669b-434d-9109-61319a52d2cb',
+        tokenInstanceName: 'TestPQCToken',
+        tokenInstanceStatus: 'Activated',
+        enabled: true,
+        usages: ['sign', 'verify', 'encrypt', 'decrypt', 'wrap', 'unwrap'],
+    },
+];

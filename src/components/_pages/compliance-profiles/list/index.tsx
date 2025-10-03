@@ -80,6 +80,7 @@ export default function AdministratorsList() {
                 onClick: () => {
                     onAddClick();
                 },
+                id: 'create-compliance-profile',
             },
             {
                 icon: 'gavel',
@@ -88,6 +89,7 @@ export default function AdministratorsList() {
                 onClick: () => {
                     setComplianceCheck(true);
                 },
+                id: 'check-compliance',
             },
             {
                 icon: 'trash',
@@ -96,6 +98,7 @@ export default function AdministratorsList() {
                 onClick: () => {
                     setConfirmDelete(true);
                 },
+                id: 'delete-compliance-profile',
             },
         ],
         [checkedRows, onAddClick],
@@ -203,6 +206,7 @@ export default function AdministratorsList() {
                 widgetButtons={buttons}
                 titleSize="large"
                 refreshAction={getFreshData}
+                dataTestId="compliance-profile-list"
             >
                 <br />
                 <CustomTable
@@ -227,6 +231,7 @@ export default function AdministratorsList() {
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
                     { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
+                dataTestId="delete-compliance-profile-dialog"
             />
 
             <Dialog
@@ -238,6 +243,7 @@ export default function AdministratorsList() {
                     { color: 'danger', onClick: onForceDeleteConfirmed, body: 'Force delete' },
                     { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
                 ]}
+                dataTestId="force-delete-compliance-profile-dialog"
             />
 
             <Dialog
@@ -249,6 +255,7 @@ export default function AdministratorsList() {
                     { color: 'primary', onClick: onComplianceCheckConfirmed, body: 'Yes' },
                     { color: 'secondary', onClick: () => setComplianceCheck(false), body: 'Cancel' },
                 ]}
+                dataTestId="compliance-check-dialog"
             />
         </Container>
     );

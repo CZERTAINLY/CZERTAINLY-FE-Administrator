@@ -1,156 +1,46 @@
-import React, { useMemo, useState } from 'react';
-import { Provider } from 'react-redux';
-import { configureStore } from '@reduxjs/toolkit';
-import { reducers } from 'ducks/reducers';
-import { complianceProfileDetailMockData, mockAssociations, mockRaProfiles, mockTokenProfiles } from './mock-data';
-import { ComplianceProfileDtoV2, PlatformEnum, ResourceObjectDto } from 'types/openapi/models';
-import Widget from 'components/Widget';
-import ProfileAssociationsDialog from 'components/_pages/compliance-profiles/detail/ProfileAssociations/ProfileAssociationsDialog';
-import WidgetButtons, { WidgetButtonProps } from 'components/WidgetButtons';
-import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
-import { Link } from 'react-router';
-import { getEnumLabel } from 'ducks/enums';
-import { EnumItemDto } from 'types/enums';
+import ProfileAssociations from 'components/_pages/compliance-profiles/detail/ProfileAssociations/ProfileAssociations';
+import { complianceProfileDetailMockData, mockAssociations, mockPlatformEnums, mockResourceList, mockTokenProfilesList } from './mock-data';
+import { ComplianceProfileDtoV2, ResourceObjectDto } from 'types/openapi/models';
+import '../../../src/resources/styles/theme.scss';
+import { actions as enumActions } from 'ducks/enums';
+import { actions } from 'ducks/compliance-profiles';
+import { actions as resourceActions } from 'ducks/resource';
+import { ResourceModel } from 'types/resource';
+import { TokenProfileResponseModel } from 'types/token-profiles';
+import { actions as tokenProfileActions } from 'ducks/token-profiles';
+import { clickWait } from '../../utils/constants';
 
-// Mock the router since we're testing component in isolation
-const MockRouter = ({ children }: { children: React.ReactNode }) => <div data-testid="mock-router">{children}</div>;
-
-const ComplianceProfileAssociationsTest = () => {
-    const resourceEnum: { [key: string]: EnumItemDto } = useMemo(
-        () => ({
-            raProfiles: { code: 'raProfiles', label: 'RA Profile' },
-            tokenProfiles: { code: 'tokenProfiles', label: 'Token Profile' },
-        }),
-        [],
-    );
-    const store = configureStore({
-        reducer: reducers,
-        preloadedState: {
-            raProfiles: {
-                optionsForRaProfiles: mockRaProfiles.map((profile) => ({
-                    value: profile.uuid,
-                    label: profile.name,
-                })),
-                raProfiles: mockRaProfiles,
-                isFetchingList: false,
-                isFetchingDetail: false,
-            } as any,
-            tokenProfiles: {
-                optionsForTokenProfiles: mockTokenProfiles.map((profile) => ({
-                    value: profile.uuid,
-                    label: profile.name,
-                })),
-                tokenProfiles: mockTokenProfiles,
-                isFetchingList: false,
-                isFetchingDetail: false,
-            } as any,
-            enums: {
-                platformEnums: resourceEnum,
-            } as any,
-            resource: {
-                resourcesList: [
-                    { resource: getEnumLabel(resourceEnum, 'raProfiles'), hasComplianceProfiles: true },
-                    { resource: getEnumLabel(resourceEnum, 'tokenProfiles'), hasComplianceProfiles: true },
-                ],
-                resourcesWithComplianceProfiles: [{ resource: 'raProfiles' }, { resource: 'tokenProfiles' }],
-                isFetchingResourcesList: false,
-            } as any,
-        },
-    });
-
-    const [isAssociateProfileModalOpen, setIsAssociateProfileModalOpen] = useState(false);
-
-    const associationButtons: WidgetButtonProps[] = useMemo(
-        () => [
-            {
-                icon: 'plus',
-                disabled: false,
-                tooltip: 'Associate Profile',
-                onClick: () => {
-                    setIsAssociateProfileModalOpen(true);
-                },
-                dataTestId: 'add-association-button',
-            },
-        ],
-        [],
-    );
-
-    const associationHeaders: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'raProfileName',
-                content: 'Name',
-            },
-            { id: 'resource', content: 'Resource' },
-            { id: 'object', content: 'Object' },
-            {
-                id: 'action',
-                content: 'Action',
-            },
-        ],
-        [],
-    );
-
-    const associationData: TableDataRow[] = useMemo(
-        () =>
-            mockAssociations.map((associatedProfile) => ({
-                id: associatedProfile.objectUuid,
-                columns: [
-                    <Link
-                        key={associatedProfile.objectUuid}
-                        to={`../../raprofiles/detail/${complianceProfileDetailMockData.uuid}/${associatedProfile.objectUuid}`}
-                    >
-                        {associatedProfile.name}
-                    </Link>,
-
-                    getEnumLabel(resourceEnum, associatedProfile.resource),
-                    associatedProfile.objectUuid,
-                    <WidgetButtons
-                        key={associatedProfile.objectUuid}
-                        justify="start"
-                        buttons={[
-                            {
-                                icon: 'minus-square',
-                                disabled: false,
-                                tooltip: 'Remove',
-                                onClick: () => {
-                                    console.log('Remove');
-                                },
-                            },
-                        ]}
-                    />,
-                ],
-            })),
-        [resourceEnum],
-    );
-
-    return (
-        <Provider store={store}>
-            <MockRouter>
-                <Widget
-                    id="compliance-profile-associations"
-                    title="Associations"
-                    busy={false}
-                    widgetButtons={associationButtons}
-                    titleSize="large"
-                    lockSize="large"
-                >
-                    <CustomTable headers={associationHeaders} data={associationData} />
-                </Widget>
-                <ProfileAssociationsDialog
-                    isOpen={isAssociateProfileModalOpen}
-                    onClose={() => setIsAssociateProfileModalOpen(false)}
-                    profile={complianceProfileDetailMockData as unknown as ComplianceProfileDtoV2}
-                    associationsOfComplianceProfile={mockAssociations as unknown as ResourceObjectDto[]}
-                />
-            </MockRouter>
-        </Provider>
-    );
+const ComplianceProfileAssociations = () => {
+    return <ProfileAssociations profile={complianceProfileDetailMockData as unknown as ComplianceProfileDtoV2} />;
 };
 
-describe('ComplianceProfileAssociations', () => {
+describe('Compliance Profile Associations functionality', () => {
     beforeEach(() => {
-        cy.mount(<ComplianceProfileAssociationsTest />);
+        cy.mount(<ComplianceProfileAssociations />);
+        cy.dispatchActions(
+            enumActions.getPlatformEnumsSuccess({
+                ...mockPlatformEnums,
+            }),
+            actions.getAssociationsOfComplianceProfileSuccess({
+                associations: mockAssociations as unknown as ResourceObjectDto[],
+            }),
+            resourceActions.listResourcesSuccess({
+                resourcesList: mockResourceList as unknown as ResourceModel[],
+            }),
+        );
+
+        cy.window().then((win) => {
+            win.registerReduxActionListener(
+                (action) => action.type === actions.getAssociationsOfComplianceProfile.type,
+                () => {
+                    win.store.dispatch(
+                        actions.getAssociationsOfComplianceProfileSuccess({
+                            associations: mockAssociations as unknown as ResourceObjectDto[],
+                        }),
+                    );
+                },
+            );
+        });
     });
 
     it('should render the associations widget with correct title', () => {
@@ -254,10 +144,24 @@ describe('ComplianceProfileAssociations', () => {
         cy.get('[data-testid="associate-profile-resource-profiles-select-control"]').should('exist');
     });
 
-    it('associate button should be disabled if resource is not selected', () => {
+    it('should show profiles options in dialog and able to select a profile and submit form', () => {
         cy.get('button[title="Associate Profile"]').click();
         cy.get('[data-testid="add-profile-association-dialog"]').should('be.visible');
-        cy.get('button').contains('Associate').should('be.disabled');
+        cy.get('[data-testid="associate-profile-resource-select-control"]').click();
+        cy.get('[data-testid="associate-profile-resource-select-menu"]').contains('Token Profile').click();
+        cy.window().then((win) => {
+            win.store.dispatch(
+                tokenProfileActions.listTokenProfilesSuccess({
+                    tokenProfiles: mockTokenProfilesList as unknown as TokenProfileResponseModel[],
+                }),
+            );
+        });
+        cy.get('[data-testid="associate-profile-resource-profiles-select-control"]').should('exist');
+        cy.get('[data-testid="associate-profile-resource-profiles-select-control"]').click();
+        cy.get('[data-testid="associate-profile-resource-profiles-select-menu"]').contains('TestPQCTokenProfile').click().wait(clickWait);
+        cy.get('button').contains('Associate').should('be.enabled');
+        cy.get('button').contains('Associate').click();
+        cy.get('[data-testid="add-profile-association-dialog"]').should('not.exist');
     });
 
     it('should close dialog when cancel button is clicked', () => {
@@ -265,5 +169,10 @@ describe('ComplianceProfileAssociations', () => {
         cy.get('[data-testid="add-profile-association-dialog"]').should('be.visible');
         cy.get('button').contains('Cancel').click();
         cy.get('[data-testid="add-profile-association-dialog"]').should('not.exist');
+    });
+    it('associate button should be disabled if resource is not selected', () => {
+        cy.get('button[title="Associate Profile"]').click();
+        cy.get('[data-testid="add-profile-association-dialog"]').should('be.visible');
+        cy.get('button').contains('Associate').should('be.disabled');
     });
 });

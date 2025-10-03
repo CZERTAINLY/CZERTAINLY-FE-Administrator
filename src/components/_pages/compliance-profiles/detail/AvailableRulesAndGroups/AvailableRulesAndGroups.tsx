@@ -453,6 +453,7 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
                 }
                 toggle={() => setIsAddingRuleHasAttribute(false)}
                 buttons={[]}
+                dataTestId="attribute-editor-dialog"
             />
 
             <Dialog

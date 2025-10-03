@@ -8,7 +8,7 @@ import { actions as enumActions } from 'ducks/enums';
 import { actions as filterActions, EntityType } from 'ducks/filters';
 import { Routes, Route } from 'react-router';
 
-const ComplianceProfileDetailPage2Test = () => {
+const ComplianceProfileDetailPageTest = () => {
     return (
         <Routes>
             <Route path="/complianceprofiles/detail/:id" element={<ComplianceProfileDetail />} />
@@ -18,7 +18,7 @@ const ComplianceProfileDetailPage2Test = () => {
 
 describe('Compliance Profile Detail Page', () => {
     beforeEach(() => {
-        cy.mount(<ComplianceProfileDetailPage2Test />, {}, `/complianceprofiles/detail/${complianceProfileDetailMockData.uuid}`).wait(
+        cy.mount(<ComplianceProfileDetailPageTest />, {}, `/complianceprofiles/detail/${complianceProfileDetailMockData.uuid}`).wait(
             componentLoadWait,
         );
         cy.dispatchActions(
