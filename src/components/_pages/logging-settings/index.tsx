@@ -105,7 +105,6 @@ const LoggingSetting = () => {
     const onAuditFormSubmit = useCallback(
         (values: AuditFormValues) => {
             if (!values || !loggingSettings) return;
-
             dispatch(
                 actions.updateLoggingSettings({
                     eventLogs: loggingSettings.eventLogs,
@@ -150,6 +149,7 @@ const LoggingSetting = () => {
                 label: loggingSettings.auditLogs.output,
                 value: loggingSettings.auditLogs.output,
             },
+            verbose: loggingSettings.auditLogs.verbose,
         } as AuditFormValues;
     }, [loggingSettings, moduleEnum, resourceEnum]);
 
@@ -305,7 +305,7 @@ const LoggingSetting = () => {
                                     />
                                 </FormGroup>
                             )}
-                            <SwitchField id="verbose" label="Verbose" />
+                            {formType === 'audit' && <SwitchField id="verbose" label="Verbose" />}
                             <div className="d-flex justify-content-end">
                                 <ButtonGroup>
                                     <ProgressButton
