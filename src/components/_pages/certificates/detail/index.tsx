@@ -1029,7 +1029,7 @@ export default function CertificateDetail() {
             columns: [
                 rule.name || '',
                 rule.description || '',
-                <CertificateStatus status={(rule.status as ComplianceRuleStatus) || ''} />,
+                <CertificateStatus key={rule.uuid} status={(rule.status as ComplianceRuleStatus) || ''} />,
                 rule.connectorName || '',
                 rule.kind || '',
                 rule.attributes?.length ? (

@@ -1,7 +1,7 @@
 import Widget from 'components/Widget';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import Select, { components } from 'react-select';
+import Select, { ClearIndicatorProps, components } from 'react-select';
 import { Badge, Col, Label, Row, UncontrolledTooltip } from 'reactstrap';
 import { actions, selectors } from 'ducks/compliance-profiles';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
@@ -77,14 +77,14 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
                         <div key={ruleOrGroup.uuid}>
                             <Badge
                                 data-testid="status-badge"
-                                id={`status-${ruleOrGroup.uuid.replaceAll(/-/g, '_')}`}
+                                id={`status-${ruleOrGroup.uuid.replaceAll('-', '_')}`}
                                 color={statusColor}
                                 style={{ background: statusColor }}
                             >
                                 {capitalize(ruleOrGroup.availabilityStatus as ComplianceRuleAvailabilityStatus)}
                             </Badge>
                             {ruleOrGroup.updatedReason && (
-                                <UncontrolledTooltip target={`status-${ruleOrGroup.uuid.replaceAll(/-/g, '_')}`}>
+                                <UncontrolledTooltip target={`status-${ruleOrGroup.uuid.replaceAll('-', '_')}`}>
                                     {truncateText(capitalize(ruleOrGroup.updatedReason), 100)}
                                 </UncontrolledTooltip>
                             )}
@@ -246,6 +246,17 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
         }
     }, [assignedRulesSource, getListOfKinds]);
 
+    type AssignedRulesSourceClearProps = ClearIndicatorProps<any, false>;
+    const AssignedRulesSourceClear = useCallback(
+        (props: AssignedRulesSourceClearProps) => (
+            <components.ClearIndicator
+                {...props}
+                innerProps={{ ...props.innerProps, 'data-testid': 'assigned-rules-source-clear-button' } as any}
+            />
+        ),
+        [],
+    );
+
     return (
         <Widget
             title="Assigned Rules & Groups"
@@ -272,12 +283,7 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
                         }}
                         isClearable
                         components={{
-                            ClearIndicator: (props) => (
-                                <components.ClearIndicator
-                                    {...props}
-                                    innerProps={{ ...props.innerProps, 'data-testid': 'assigned-rules-source-clear-button' } as any}
-                                />
-                            ),
+                            ClearIndicator: AssignedRulesSourceClear,
                         }}
                     />
                 </Col>
