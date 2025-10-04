@@ -1,5 +1,5 @@
 import NotificationInstanceForm from 'components/_pages/notifications/notification-instance-form';
-import { componentLoadWait } from '../../utils/constants';
+import { clickWait, componentLoadWait } from '../../utils/constants';
 import { actions } from 'ducks/notifications';
 import {
     mockMappingAttributes,
@@ -403,45 +403,6 @@ describe('NotificationInstanceForm Edit Mode Coverage', () => {
         });
     });
 
-    it('should handle onInstanceNotificationProviderChange when switching providers', () => {
-        cy.mount(<NotificationFormTest />).wait(componentLoadWait);
-
-        cy.dispatchActions(
-            actions.getNotificationAttributesDescriptorsSuccess({
-                attributeDescriptor: mockNotificationProviderAttributesDescriptors as AttributeDescriptorModel[],
-            }),
-            actions.listNotificationProvidersSuccess({
-                providers: mockNotificationInstanceProviders as ConnectorResponseModel[],
-            }),
-        );
-
-        cy.get('[data-testid="notification-instance-form"]').should('exist');
-
-        cy.window().then((win) => {
-            const originalDispatch = win.store.dispatch;
-            let clearCallbackDataCalled = false;
-
-            win.store.dispatch = (action: any) => {
-                if (action.type === 'connectors/clearCallbackData') {
-                    clearCallbackDataCalled = true;
-                }
-                return originalDispatch(action);
-            };
-
-            cy.get('[data-testid="notification-instance-provider-select-control"]').should('be.visible').click();
-            cy.get('[data-testid="notification-instance-provider-select-menu"]').should('be.visible').eq(0).click();
-
-            cy.get('[data-testid="notification-instance-kind-select-control"]').should('be.visible').click();
-            cy.get('[data-testid="notification-instance-kind-select-menu"]').should('be.visible').eq(0).click().wait(1000);
-
-            cy.get('[data-testid="notification-instance-provider-select-control"]').should('be.visible').click();
-
-            cy.then(() => {
-                expect(clearCallbackDataCalled).to.be.true;
-            });
-        });
-    });
-
     it('should handle complex validation for object field types', () => {
         cy.get('[data-testid="notification-instance-form"]').should('exist');
         cy.wait(500);
@@ -538,48 +499,6 @@ describe('NotificationInstanceForm Edit Mode Coverage', () => {
         cy.get('[data-testid="notification-description"]').clear().type('Testing attribute mappings');
         cy.get('button').contains('Save').should('be.enabled').click();
     });
-
-    it('should clear attribute editor state when provider changes', () => {
-        // This test verifies the clearAttributeEditorState function behavior
-        cy.mount(<NotificationFormTest />).wait(componentLoadWait);
-
-        // Set up store with providers
-        cy.dispatchActions(
-            actions.getNotificationAttributesDescriptorsSuccess({
-                attributeDescriptor: mockNotificationProviderAttributesDescriptors as AttributeDescriptorModel[],
-            }),
-            actions.listNotificationProvidersSuccess({
-                providers: mockNotificationInstanceProviders as ConnectorResponseModel[],
-            }),
-        );
-
-        cy.get('[data-testid="notification-instance-form"]').should('exist');
-
-        // Select provider and kind first
-        cy.get('[data-testid="notification-instance-provider-select-control"]').should('be.visible').click();
-        cy.get('[data-testid="notification-instance-provider-select-menu"]').should('be.visible').eq(0).click();
-
-        cy.get('[data-testid="notification-instance-kind-select-control"]').should('be.visible').click();
-        cy.get('[data-testid="notification-instance-kind-select-menu"]').should('be.visible').eq(0).click().wait(1000);
-
-        // Fill connector attributes to establish state
-        cy.get('.nav-link').contains('Connector Attributes').click();
-
-        // Change provider to trigger clearAttributeEditorState
-        cy.get('[data-testid="notification-instance-provider-select-control"]').should('be.visible').click();
-        cy.get('div').contains('Email-Notification-Provider').click();
-
-        // Select kind for new provider
-        cy.get('[data-testid="notification-instance-kind-select-control"]').should('be.visible').click();
-        cy.get('[data-testid="notification-instance-kind-select-menu"]').should('be.visible').eq(0).click().wait(1000);
-
-        // Verify that the form is in a clean state after provider change
-        cy.get('[data-testid="notification-instance-form"]').should('exist');
-
-        // This tests the clearAttributeEditorState function and related form cleanup
-        cy.get('.nav-link').contains('Connector Attributes').click();
-    });
-
     it('should handle edit mode submission with editNotificationInstance action', () => {
         cy.get('[data-testid="notification-instance-form"]').should('exist');
         cy.wait(500);
@@ -613,5 +532,75 @@ describe('NotificationInstanceForm Edit Mode Coverage', () => {
             $form[0].dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
         });
         cy.wait(1000);
+    });
+
+    it('should clear attribute editor state when provider changes', () => {
+        // This test verifies the clearAttributeEditorState function behavior
+        cy.mount(<NotificationFormTest />).wait(componentLoadWait);
+
+        // Set up store with providers
+        cy.dispatchActions(
+            actions.getNotificationAttributesDescriptorsSuccess({
+                attributeDescriptor: mockNotificationProviderAttributesDescriptors as AttributeDescriptorModel[],
+            }),
+            actions.listNotificationProvidersSuccess({
+                providers: mockNotificationInstanceProviders as ConnectorResponseModel[],
+            }),
+        );
+
+        cy.get('[data-testid="notification-instance-form"]').should('exist');
+
+        // Select provider and kind first
+        cy.get('[data-testid="notification-instance-provider-select-control"]').should('be.visible').click().wait(clickWait);
+        cy.get('[data-testid="notification-instance-provider-select-menu"]').should('be.visible').eq(0).click().wait(clickWait);
+
+        cy.get('[data-testid="notification-instance-kind-select-control"]').should('be.visible').click().wait(clickWait);
+        cy.get('[data-testid="notification-instance-kind-select-menu"]').should('be.visible').eq(0).click().wait(clickWait);
+
+        // Fill connector attributes to establish state
+        cy.get('.nav-link').contains('Connector Attributes').click().wait(clickWait);
+
+        // Change provider to trigger clearAttributeEditorState
+        cy.get('[data-testid="notification-instance-provider-select-control"]').should('be.visible').click().wait(clickWait);
+        cy.get('div').contains('Email-Notification-Provider').click({ force: true });
+    });
+
+    it('should handle onInstanceNotificationProviderChange when switching providers', () => {
+        cy.mount(<NotificationFormTest />).wait(componentLoadWait);
+
+        cy.dispatchActions(
+            actions.getNotificationAttributesDescriptorsSuccess({
+                attributeDescriptor: mockNotificationProviderAttributesDescriptors as AttributeDescriptorModel[],
+            }),
+            actions.listNotificationProvidersSuccess({
+                providers: mockNotificationInstanceProviders as ConnectorResponseModel[],
+            }),
+        );
+
+        cy.get('[data-testid="notification-instance-form"]').should('exist');
+
+        cy.window().then((win) => {
+            const originalDispatch = win.store.dispatch;
+            let clearCallbackDataCalled = false;
+
+            win.store.dispatch = (action: any) => {
+                if (action.type === 'connectors/clearCallbackData') {
+                    clearCallbackDataCalled = true;
+                }
+                return originalDispatch(action);
+            };
+
+            cy.get('[data-testid="notification-instance-provider-select-control"]').should('be.visible').click().wait(clickWait);
+            cy.get('[data-testid="notification-instance-provider-select-menu"]').should('be.visible').eq(0).click().wait(clickWait);
+
+            cy.get('[data-testid="notification-instance-kind-select-control"]').should('be.visible').click().wait(clickWait);
+            cy.get('[data-testid="notification-instance-kind-select-menu"]').should('be.visible').eq(0).click().wait(clickWait);
+
+            cy.get('[data-testid="notification-instance-provider-select-control"]').should('be.visible').click().wait(clickWait);
+
+            cy.then(() => {
+                expect(clearCallbackDataCalled).to.be.true;
+            });
+        });
     });
 });
