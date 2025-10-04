@@ -289,8 +289,6 @@ export const mockNotificationProviderAttributesDescriptors = [
     },
 ];
 
-export const mockMappingAttributes = [];
-
 export const mockNotificationInstanceDetail = {
     uuid: '25020599-667b-4b25-8cc8-629ea05e7601',
     name: 'test',
@@ -325,5 +323,45 @@ export const mockNotificationInstanceDetail = {
             ],
         },
     ],
-    attributeMappings: [],
+    attributeMappings: [
+        {
+            customAttributeLabel: 'Test Custom String',
+            customAttributeUuid: 'custom-string-uuid-123',
+            mappingAttributeUuid: '166b5cf52-63f2-11ec-90d6-0242ac120003',
+            mappingAttributeName: 'userAttribute',
+        },
+        {
+            customAttributeLabel: 'Test Custom Number',
+            customAttributeUuid: 'custom-number-uuid-456',
+            mappingAttributeUuid: '266b5cf52-63f2-11ec-90d6-0242ac120004',
+            mappingAttributeName: 'urgencyAttribute',
+        },
+    ],
 };
+
+export const mockMappingAttributes = [
+    {
+        version: '2',
+        uuid: '166b5cf52-63f2-11ec-90d6-0242ac120003',
+        name: 'userAttribute',
+        description: 'User-specific attribute mapping for notification processing',
+        content: [],
+        type: 'data',
+        contentType: 'string',
+        properties: {},
+        constraints: [],
+        attributeCallback: {},
+    },
+    {
+        version: '2',
+        uuid: '266b5cf52-63f2-11ec-90d6-0242ac120004',
+        name: 'urgencyAttribute',
+        description: 'Urgency level attribute for notification classification',
+        content: [],
+        type: 'data',
+        contentType: 'integer',
+        properties: {},
+        constraints: [],
+        attributeCallback: {},
+    },
+];

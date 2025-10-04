@@ -50,11 +50,6 @@ describe('NotificationFormTest', () => {
                     attributeDescriptor: mockNotificationProviderAttributesDescriptors as AttributeDescriptorModel[],
                 }),
             );
-            win.store.dispatch(
-                actions.listMappingAttributesSuccess({
-                    mappingAttributes: mockMappingAttributes as DataAttributeModel[],
-                }),
-            );
         });
     });
 
@@ -299,7 +294,7 @@ describe('NotificationInstanceForm Edit Mode Coverage', () => {
             );
             win.store.dispatch(
                 actions.listMappingAttributesSuccess({
-                    mappingAttributes: mockMappingAttributes as DataAttributeModel[],
+                    mappingAttributes: mockMappingAttributes as unknown as DataAttributeModel[],
                 }),
             );
         });
@@ -351,5 +346,38 @@ describe('NotificationInstanceForm Edit Mode Coverage', () => {
         cy.get('[data-testid="notification-instance-form"]').should('exist');
         cy.wait(500);
         cy.get('.nav-link').contains('Connector Attributes').click();
+    });
+
+    it('name should be disabled in edit mode', () => {
+        cy.get('[data-testid="notification-instance-form"]').should('exist');
+        cy.wait(500);
+        cy.get('input[id="name"]').should('have.attr', 'disabled');
+    });
+
+    it('notification Notification Instance Provider should be selected in edit mode', () => {
+        cy.get('[data-testid="notification-instance-provider-select-control"]').should('have.attr', 'aria-disabled', 'true');
+        cy.contains('div', 'Webhook-Notification-Provider').should('be.visible');
+    });
+
+    it('notification Notification Instance Kind should be selected in edit mode', () => {
+        cy.get('[data-testid="notification-instance-kind-select-control"]').should('have.attr', 'aria-disabled', 'true');
+        cy.contains('div', 'WEBHOOK').should('be.visible');
+    });
+
+    it('should display attribute mappings correctly in edit mode', () => {
+        cy.get('[data-testid="notification-instance-form"]').should('exist');
+        cy.wait(500);
+
+        // Navigate to Attribute Mappings tab
+        cy.get('.nav-link').contains('Attribute Mappings').click();
+
+        // Check that mapping attributes are displayed
+        cy.get('.nav-link').contains('Attribute Mappings').should('have.class', 'active');
+
+        // Verify that mapping attributes are rendered
+        cy.get('section').should('contain', 'userAttribute (string)');
+        cy.get('div').should('contain', 'Test Custom String');
+        cy.get('section').should('contain', 'urgencyAttribute (integer)');
+        cy.get('div').should('contain', 'Test Custom Number');
     });
 });

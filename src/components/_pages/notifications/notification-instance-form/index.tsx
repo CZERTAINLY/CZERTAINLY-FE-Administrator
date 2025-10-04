@@ -45,6 +45,8 @@ const NotificationInstanceForm = () => {
     const isEditingNotificationInstance = useSelector(notificationSelectors.isEditingNotificationInstance);
     const isCreatingNotificationInstance = useSelector(notificationSelectors.isCreatingNotificationInstance);
 
+    console.log({});
+
     const editMode = useMemo(() => !!id, [id]);
     const submitTitle = useMemo(() => (editMode ? 'Save' : 'Create'), [editMode]);
 
@@ -472,7 +474,7 @@ const NotificationInstanceForm = () => {
                                                             </Label>
                                                             <Select
                                                                 {...input}
-                                                                id={`attributeMappings[i].${mappingAttribute.name}`}
+                                                                id={`attributeMappings[${i}].${mappingAttribute.name}`}
                                                                 maxMenuHeight={140}
                                                                 menuPlacement="auto"
                                                                 options={
