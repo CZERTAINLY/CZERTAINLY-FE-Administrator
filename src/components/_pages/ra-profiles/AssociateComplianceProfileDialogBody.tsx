@@ -13,6 +13,7 @@ import Spinner from 'components/Spinner';
 import { actions, selectors } from 'ducks/compliance-profiles';
 import { RaProfileResponseModel } from 'types/ra-profiles';
 import { Resource } from 'types/openapi/models/Resource';
+import { TestableControl, TestableMenu } from 'utils/HOC/withDataTestId';
 
 interface Props {
     raProfile?: RaProfileResponseModel;
@@ -33,7 +34,6 @@ export default function AssociateComplianceProfileDialogBody({ raProfile, availa
     useEffect(
         () => {
             if (!visible) return;
-
             dispatch(actions.getListComplianceProfiles());
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -92,6 +92,11 @@ export default function AssociateComplianceProfileDialogBody({ raProfile, availa
                                                 meta.touched && meta.invalid
                                                     ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
                                                     : { ...provided },
+                                        }}
+                                        id="associate-compliance-profile-select"
+                                        components={{
+                                            Menu: TestableMenu('associate-compliance-profile-select-menu'),
+                                            Control: TestableControl('associate-compliance-profile-select-control'),
                                         }}
                                     />
 

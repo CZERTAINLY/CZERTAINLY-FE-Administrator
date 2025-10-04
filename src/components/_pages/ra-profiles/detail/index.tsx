@@ -71,7 +71,6 @@ export default function RaProfileDetail() {
 
     const platformSettings = useSelector(settingsSelectors.platformSettings);
     const isFetchingPlatform = useSelector(settingsSelectors.isFetchingPlatform);
-
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
     const [activateAcmeDialog, setActivateAcmeDialog] = useState(false);
@@ -381,6 +380,7 @@ export default function RaProfileDetail() {
                 onClick: () => {
                     setAssociateComplianceProfile(true);
                 },
+                id: 'associate-compliance-profile',
             },
         ],
         [],
@@ -948,6 +948,7 @@ export default function RaProfileDetail() {
                                             refreshAction={getFreshComplianceRaProfileDetail}
                                             widgetLockName={LockWidgetNameEnum.RaProfileComplianceDetails}
                                             lockSize="large"
+                                            dataTestId="compliance-profile-widget"
                                         >
                                             <CustomTable headers={complianceProfileHeaders} data={complianceProfileData} />
                                         </Widget>
@@ -1083,6 +1084,7 @@ export default function RaProfileDetail() {
                 })}
                 toggle={() => setAssociateComplianceProfile(false)}
                 buttons={[]}
+                dataTestId="associate-compliance-profile-dialog"
             />
 
             <Dialog
