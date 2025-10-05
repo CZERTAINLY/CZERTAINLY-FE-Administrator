@@ -275,6 +275,95 @@ describe('NotificationFormTest', () => {
         // Should show "Add Notification Instance" in create mode
         cy.get('[data-testid="notification-instance-form"]').should('contain', 'Add Notification Instance');
     });
+
+    it('should validate code/language object values for required attribute', () => {
+        cy.get('[data-testid="notification-instance-form"]').should('exist');
+
+        // Keep descriptors available after provider/kind selections
+        cy.window().then((win) => {
+            const originalDispatch = win.store.dispatch;
+            win.store.dispatch = (action: any) => {
+                if (action.type === 'notifications/getNotificationAttributesDescriptors') {
+                    originalDispatch(action);
+                    setTimeout(() => {
+                        originalDispatch(
+                            actions.getNotificationAttributesDescriptorsSuccess({
+                                attributeDescriptor: mockNotificationProviderAttributesDescriptors as AttributeDescriptorModel[],
+                            }),
+                        );
+                    }, 50);
+                    return;
+                }
+                return originalDispatch(action);
+            };
+        });
+
+        // Fill minimal required base fields
+        cy.get('input[id="name"]').type('codeBranchTest');
+        cy.get('[data-testid="notification-description"]').type('desc');
+
+        // Select provider and kind so attribute editor renders required attributes
+        cy.get('[data-testid="notification-instance-provider-select-control"]').click();
+        cy.get('[data-testid="notification-instance-provider-select-menu"]').first().click();
+        cy.get('[data-testid="notification-instance-kind-select-control"]').click();
+        cy.get('[data-testid="notification-instance-kind-select-menu"]').first().click();
+
+        cy.wait(300);
+
+        // Access Final Form API
+        cy.window().then((win) => {
+            const formElement = win.document.querySelector('form');
+            let form: any = null;
+            if (formElement) {
+                form =
+                    (formElement as any)?._reactInternalFiber?.memoizedProps?.form ||
+                    (formElement as any)?._reactInternalFiber?.child?.memoizedProps?.form ||
+                    (formElement as any)?._reactInternalInstance?.memoizedProps?.form ||
+                    (formElement as any)?._reactInternalInstance?.child?.memoizedProps?.form;
+                if (!form) {
+                    const reactKey = Object.keys(formElement).find(
+                        (k) => k.startsWith('__reactInternalInstance') || k.startsWith('_reactInternalFiber'),
+                    );
+                    if (reactKey) {
+                        const inst = (formElement as any)[reactKey];
+                        form = inst?.memoizedProps?.form || inst?.child?.memoizedProps?.form;
+                    }
+                }
+            }
+
+            if (!form) {
+                cy.log('Form API not accessible');
+                return;
+            }
+
+            const fieldName = '__attributes__notification__.data_webhookUrl'; // required descriptor from mocks
+
+            // code: null -> invalid
+            form.change(fieldName, { code: null });
+            cy.get(`[name="${fieldName}"]`).blur();
+            cy.get(`[name="${fieldName}"]`).should('have.class', 'is-invalid');
+
+            // code: '' -> invalid
+            form.change(fieldName, { code: '' });
+            cy.get(`[name="${fieldName}"]`).blur();
+            cy.get(`[name="${fieldName}"]`).should('have.class', 'is-invalid');
+
+            // code: '   ' -> invalid
+            form.change(fieldName, { code: '   ' });
+            cy.get(`[name="${fieldName}"]`).blur();
+            cy.get(`[name="${fieldName}"]`).should('have.class', 'is-invalid');
+
+            // code: 'ok' -> valid
+            form.change(fieldName, { code: 'ok' });
+            cy.get(`[name="${fieldName}"]`).blur();
+            cy.get(`[name="${fieldName}"]`).should('not.have.class', 'is-invalid');
+
+            // language without code -> invalid (branch still checks code)
+            form.change(fieldName, { language: 'javascript' });
+            cy.get(`[name="${fieldName}"]`).blur();
+            cy.get(`[name="${fieldName}"]`).should('have.class', 'is-invalid');
+        });
+    });
 });
 
 describe('NotificationInstanceForm Edit Mode Coverage', () => {
