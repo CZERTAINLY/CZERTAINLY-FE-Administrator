@@ -364,6 +364,100 @@ describe('NotificationFormTest', () => {
             cy.get(`[name="${fieldName}"]`).should('have.class', 'is-invalid');
         });
     });
+
+    it('should validate isAttributeValueEmpty across types for required attribute', () => {
+        cy.get('[data-testid="notification-instance-form"]').should('exist');
+
+        // Keep descriptors available after provider/kind selections
+        cy.window().then((win) => {
+            const originalDispatch = win.store.dispatch;
+            win.store.dispatch = (action: any) => {
+                if (action.type === 'notifications/getNotificationAttributesDescriptors') {
+                    originalDispatch(action);
+                    setTimeout(() => {
+                        originalDispatch(
+                            actions.getNotificationAttributesDescriptorsSuccess({
+                                attributeDescriptor: mockNotificationProviderAttributesDescriptors as AttributeDescriptorModel[],
+                            }),
+                        );
+                    }, 50);
+                    return;
+                }
+                return originalDispatch(action);
+            };
+        });
+
+        // Fill minimal required base fields
+        cy.get('input[id="name"]').type('isEmptyBranchTest');
+        cy.get('[data-testid="notification-description"]').type('desc');
+
+        // Select provider and kind so attribute editor renders required attributes
+        cy.get('[data-testid="notification-instance-provider-select-control"]').click();
+        cy.get('[data-testid="notification-instance-provider-select-menu"]').first().click();
+        cy.get('[data-testid="notification-instance-kind-select-control"]').click();
+        cy.get('[data-testid="notification-instance-kind-select-menu"]').first().click();
+
+        cy.wait(300);
+
+        // Access Final Form API
+        cy.window().then((win) => {
+            const formElement = win.document.querySelector('form');
+            let form: any = null;
+            if (formElement) {
+                form =
+                    (formElement as any)?._reactInternalFiber?.memoizedProps?.form ||
+                    (formElement as any)?._reactInternalFiber?.child?.memoizedProps?.form ||
+                    (formElement as any)?._reactInternalInstance?.memoizedProps?.form ||
+                    (formElement as any)?._reactInternalInstance?.child?.memoizedProps?.form;
+                if (!form) {
+                    const reactKey = Object.keys(formElement).find(
+                        (k) => k.startsWith('__reactInternalInstance') || k.startsWith('_reactInternalFiber'),
+                    );
+                    if (reactKey) {
+                        const inst = (formElement as any)[reactKey];
+                        form = inst?.memoizedProps?.form || inst?.child?.memoizedProps?.form;
+                    }
+                }
+            }
+
+            if (!form) {
+                cy.log('Form API not accessible');
+                return;
+            }
+
+            const fieldName = '__attributes__notification__.data_webhookUrl'; // required descriptor from mocks
+
+            const cases: { value: any; invalid: boolean; note: string }[] = [
+                { value: null, invalid: true, note: 'null' },
+                { value: undefined, invalid: true, note: 'undefined' },
+                { value: [], invalid: true, note: 'empty array' },
+                { value: ['x'], invalid: false, note: 'non-empty array' },
+                { value: '', invalid: true, note: 'empty string' },
+                { value: '   ', invalid: true, note: 'whitespace string' },
+                { value: 'abc', invalid: false, note: 'non-empty string' },
+                { value: { code: null }, invalid: true, note: 'object code null' },
+                { value: { code: '' }, invalid: true, note: 'object code empty' },
+                { value: { code: ' ok ' }, invalid: false, note: 'object code non-empty' },
+                { value: { language: 'js' }, invalid: true, note: 'object language only (code missing)' },
+                { value: { value: null }, invalid: true, note: 'object value null' },
+                { value: { value: undefined }, invalid: true, note: 'object value undefined' },
+                { value: { value: 0 }, invalid: false, note: 'object value present (zero)' },
+                { value: {}, invalid: true, note: 'empty object' },
+                { value: { any: 1 }, invalid: false, note: 'non-empty object' },
+            ];
+
+            cases.forEach(({ value, invalid, note }) => {
+                cy.log(`Case: ${note}`);
+                form.change(fieldName, value);
+                cy.get(`[name="${fieldName}"]`).blur();
+                if (invalid) {
+                    cy.get(`[name="${fieldName}"]`).should('have.class', 'is-invalid');
+                } else {
+                    cy.get(`[name="${fieldName}"]`).should('not.have.class', 'is-invalid');
+                }
+            });
+        });
+    });
 });
 
 describe('NotificationInstanceForm Edit Mode Coverage', () => {
