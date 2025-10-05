@@ -14,6 +14,7 @@
 import type {
     CertificateRequestFormat,
     CertificateType,
+    ComplianceStatus,
     ResponseAttributeDto,
 } from './';
 
@@ -22,6 +23,12 @@ import type {
  * @interface CertificateRequestDto
  */
 export interface CertificateRequestDto {
+    /**
+     * UUID of the Certificate Request
+     * @type {string}
+     * @memberof CertificateRequestDto
+     */
+    uuid: string;
     /**
      * Certificate type
      * @type {CertificateType}
@@ -106,6 +113,12 @@ export interface CertificateRequestDto {
      * @memberof CertificateRequestDto
      */
     altKeyUuid?: string;
+    /**
+     * Certificate request compliance status
+     * @type {ComplianceStatus}
+     * @memberof CertificateRequestDto
+     */
+    complianceStatus: ComplianceStatus;
 }
 
 

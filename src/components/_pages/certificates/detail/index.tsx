@@ -1,7 +1,6 @@
 import { Buffer } from 'buffer';
 import AttributeEditor from 'components/Attributes/AttributeEditor';
 import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from 'components/Attributes/AttributeViewer';
-import ComplianceRuleAttributeViewer from 'components/Attributes/ComplianceRuleAttributeViewer';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import ProgressButton from 'components/ProgressButton';
@@ -57,7 +56,7 @@ import {
     Row,
     UncontrolledButtonDropdown,
 } from 'reactstrap';
-import { AttributeDescriptorModel } from 'types/attributes';
+import { AttributeDescriptorModel, AttributeResponseModel } from 'types/attributes';
 import { ComplianceStatus, PlatformEnum, Resource } from 'types/openapi';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
@@ -85,6 +84,7 @@ import { createWidgetDetailHeaders } from 'utils/widget';
 import CertificateList from 'components/_pages/certificates/list';
 import { capitalize } from 'utils/common-utils';
 import GoBackButton from 'components/GoBackButton';
+import ComplianceCheckResultWidget from 'components/_pages/certificates/ComplianceCheckResultWidget/ComplianceCheckResultWidget';
 
 interface ChainDownloadSwitchState {
     isDownloadTriggered: boolean;
@@ -192,6 +192,7 @@ export default function CertificateDetail() {
     const [confirmDeleteRelatedCertificate, setConfirmDeleteRelatedCertificate] = useState<boolean>(false);
     const [relatedCertificateCheckedRows, setRelatedCertificateCheckedRows] = useState<string[]>([]);
     const [isAlreadyRelatedError, setIsAlreadyRelatedError] = useState<boolean>(false);
+    const [selectedAttributesInfo, setSelectedAttributesInfo] = useState<AttributeResponseModel[] | null>(null);
 
     const isFirstAddRelatedCertificateClick = useRef<boolean>(true);
 
@@ -1010,35 +1011,6 @@ export default function CertificateDetail() {
             { id: 'expires', content: 'Expires At' },
         ],
         [],
-    );
-
-    const complianceHeaders: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'status',
-                content: 'Status',
-            },
-            {
-                id: 'ruleDescription',
-                content: 'Rule Description',
-            },
-        ],
-        [],
-    );
-
-    const complianceData: TableDataRow[] = useMemo(
-        () =>
-            !certificate
-                ? []
-                : (certificate.nonCompliantRules || []).map((e) => ({
-                      id: e.ruleDescription,
-                      columns: [<CertificateStatus status={e.status} />, e.ruleDescription],
-                      detailColumns:
-                          !e.attributes || e.attributes.length === 0
-                              ? undefined
-                              : [<></>, <></>, <ComplianceRuleAttributeViewer attributes={e.attributes} hasHeader={false} />],
-                  })),
-        [certificate],
     );
 
     const propertiesData: TableDataRow[] = useMemo(() => {
@@ -2118,6 +2090,16 @@ export default function CertificateDetail() {
                                         )}
                                     </Col>
                                 </Row>
+                                <Row xs="1" sm="1" md="2" lg="2" xl="2">
+                                    <Col style={{ width: '100%' }}>
+                                        <ComplianceCheckResultWidget
+                                            resource={Resource.CertificateRequests}
+                                            widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}
+                                            objectUuid={certificate?.certificateRequest?.uuid ?? ''}
+                                            setSelectedAttributesInfo={setSelectedAttributesInfo}
+                                        />
+                                    </Col>
+                                </Row>
                             </Widget>
                         ),
                     },
@@ -2173,16 +2155,12 @@ export default function CertificateDetail() {
                                     <br />
                                     <CustomTable headers={validationHeaders} data={validationData} />
                                 </Widget>
-                                <Widget
-                                    title="Compliance Status"
-                                    busy={isFetching}
-                                    titleSize="large"
-                                    lockSize="normal"
+                                <ComplianceCheckResultWidget
+                                    resource={Resource.Certificates}
                                     widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}
-                                >
-                                    <br />
-                                    <CustomTable headers={complianceHeaders} data={complianceData} hasDetails={true} />
-                                </Widget>
+                                    objectUuid={certificate?.uuid ?? ''}
+                                    setSelectedAttributesInfo={setSelectedAttributesInfo}
+                                />
                             </Widget>
                         ),
                     },
@@ -2375,6 +2353,14 @@ export default function CertificateDetail() {
                 toggle={() => setCurrentInfoId('')}
                 buttons={[]}
                 size="lg"
+            />
+
+            <Dialog
+                isOpen={!!selectedAttributesInfo}
+                caption="Attributes Info"
+                body={<AttributeViewer attributes={selectedAttributesInfo ?? []} />}
+                toggle={() => setSelectedAttributesInfo(null)}
+                buttons={[]}
             />
 
             <Dialog

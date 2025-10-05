@@ -7,7 +7,7 @@ import WidgetLock from 'components/WidgetLock';
 import { selectors } from 'ducks/user-interface';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router';
-import { Card, CardBody, CardHeader, Collapse } from 'reactstrap';
+import { Button, Card, CardBody, CardHeader, Collapse } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import style from './Widget.module.scss';
 
@@ -35,6 +35,7 @@ interface Props {
     lockSize?: 'small' | 'normal' | 'large';
     widgetInfoCard?: WidgetInfoCard;
     innerContainerProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
+    dataTestId?: string;
 }
 
 function Widget({
@@ -54,6 +55,7 @@ function Widget({
     lockSize = 'normal',
     widgetInfoCard,
     innerContainerProps,
+    dataTestId,
 }: Props) {
     const widgetLock = useSelector(selectors.selectWidgetLocks).find(
         (lock) => lock.widgetName === widgetLockName || (Array.isArray(widgetLockName) && widgetLockName.includes(lock.widgetName)),
@@ -83,7 +85,13 @@ function Widget({
     const renderRefreshButton = () =>
         refreshAction ? (
             <div className="ms-2 mb-1 me-auto">
-                <i onClick={refreshAction} className={cx(style.refreshIcon, 'fa fa-refresh ')} data-testid="refresh-icon" />
+                <Button
+                    onClick={refreshAction}
+                    data-testid="refresh-icon"
+                    style={{ backgroundColor: 'transparent', border: 'none', padding: '1px 5px' }}
+                >
+                    <i className={cx(style.refreshIcon, 'fa fa-refresh ')} />
+                </Button>
             </div>
         ) : null;
 
@@ -108,7 +116,7 @@ function Widget({
     }, [widgetButtons, hideWidgetButtons, widgetLock, widgetInfoCard, showWidgetInfo]);
 
     return (
-        <section className={cx(style.widget, className)} id={id}>
+        <section data-testid={dataTestId} className={cx(style.widget, className)} id={id}>
             <div className="d-flex align-items-center">
                 <div>{renderTitle()}</div>
                 {renderRefreshButton()}

@@ -107,7 +107,7 @@ export const slice = createSlice({
             state.callbackData = {};
         },
 
-        listConnectors: (state, action: PayloadAction<void>) => {
+        listConnectors: (state, action: PayloadAction<{ functionGroup?: FunctionGroupCode }>) => {
             state.checkedRows = [];
             state.connectors = [];
             state.isFetchingList = true;
@@ -119,6 +119,23 @@ export const slice = createSlice({
         },
 
         listConnectorsFailure: (state, action: PayloadAction<void>) => {
+            state.isFetchingList = false;
+        },
+
+        // New: concurrent, merge-capable listing that does not clear existing connectors
+        listConnectorsMerge: (state, action: PayloadAction<{ functionGroup?: FunctionGroupCode }>) => {
+            state.isFetchingList = true;
+        },
+
+        listConnectorsMergeSuccess: (state, action: PayloadAction<{ connectorList: ConnectorResponseModel[] }>) => {
+            state.isFetchingList = false;
+            const existingByUuid: { [uuid: string]: ConnectorResponseModel } = {};
+            state.connectors.forEach((c) => (existingByUuid[c.uuid] = c));
+            action.payload.connectorList.forEach((c) => (existingByUuid[c.uuid] = c));
+            state.connectors = Object.values(existingByUuid);
+        },
+
+        listConnectorsMergeFailure: (state, action: PayloadAction<void>) => {
             state.isFetchingList = false;
         },
 

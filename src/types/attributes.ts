@@ -68,7 +68,9 @@ export type CodeBlockAttributeContentDataDto = CodeBlockAttributeContentData;
 export type CodeBlockAttributeContentDataModel = CodeBlockAttributeContentDataDto;
 
 export type CodeBlockAttributeContentDto = CodeBlockAttributeContent;
-export type CodeBlockAttributeContentModel = Omit<CodeBlockAttributeContentDto, 'data'> & { data: CodeBlockAttributeContentDataModel };
+export type CodeBlockAttributeContentModel = Omit<CodeBlockAttributeContentDto, 'data'> & {
+    data: CodeBlockAttributeContentDataModel;
+};
 
 export type FloatAttributeContentDto = FloatAttributeContent;
 export type FloatAttributeContentModel = FloatAttributeContentDto;

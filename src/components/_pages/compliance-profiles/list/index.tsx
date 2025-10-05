@@ -9,7 +9,6 @@ import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
-import { ComplianceProfileListRuleModel } from 'types/complianceProfiles';
 import { LockWidgetNameEnum } from 'types/user-interface';
 
 export default function AdministratorsList() {
@@ -35,7 +34,7 @@ export default function AdministratorsList() {
 
     const getFreshData = useCallback(() => {
         dispatch(actions.setCheckedRows({ checkedRows: [] }));
-        dispatch(actions.listComplianceProfiles());
+        dispatch(actions.getListComplianceProfiles());
     }, [dispatch]);
 
     useEffect(() => {
@@ -56,7 +55,7 @@ export default function AdministratorsList() {
     }, [checkedRows, dispatch]);
 
     const onComplianceCheckConfirmed = useCallback(() => {
-        dispatch(actions.checkCompliance({ uuids: checkedRows }));
+        dispatch(actions.checkComplianceForProfiles({ requestBody: checkedRows }));
         setComplianceCheck(false);
     }, [checkedRows, dispatch]);
 
@@ -81,6 +80,7 @@ export default function AdministratorsList() {
                 onClick: () => {
                     onAddClick();
                 },
+                id: 'create-compliance-profile',
             },
             {
                 icon: 'gavel',
@@ -89,6 +89,7 @@ export default function AdministratorsList() {
                 onClick: () => {
                     setComplianceCheck(true);
                 },
+                id: 'check-compliance',
             },
             {
                 icon: 'trash',
@@ -97,34 +98,11 @@ export default function AdministratorsList() {
                 onClick: () => {
                     setConfirmDelete(true);
                 },
+                id: 'delete-compliance-profile',
             },
         ],
         [checkedRows, onAddClick],
     );
-
-    const getComplianceItems = useCallback((complianceItems: ComplianceProfileListRuleModel[], lookingFor: string) => {
-        if (lookingFor === 'groups') {
-            let sum = complianceItems.map((item) => item.numberOfGroups || 0).reduce((a, b) => a + b, 0);
-
-            return (
-                <div>
-                    <Badge color="secondary" searchvalue={sum}>
-                        {sum || 0}
-                    </Badge>
-                </div>
-            );
-        } else {
-            let sum = complianceItems.map((item) => item.numberOfRules || 0).reduce((a, b) => a + b, 0);
-
-            return (
-                <div>
-                    <Badge color="secondary" searchvalue={sum}>
-                        {sum || 0}
-                    </Badge>
-                </div>
-            );
-        }
-    }, []);
 
     const forceDeleteBody = useMemo(
         () => (
@@ -173,12 +151,20 @@ export default function AdministratorsList() {
                 content: 'Description',
             },
             {
-                id: 'totalRules',
-                content: 'Total Rules',
+                id: 'providerTotalRules',
+                content: 'Provider Total Rules',
             },
             {
-                id: 'totalGroups',
-                content: 'Total Groups',
+                id: 'providerTotalGroups',
+                content: 'Provider Total Groups',
+            },
+            {
+                id: 'internalTotalRules',
+                content: 'Internal Total Rules',
+            },
+            {
+                id: 'associations',
+                content: 'Associations',
             },
         ],
         [],
@@ -190,16 +176,25 @@ export default function AdministratorsList() {
                 id: complianceProfile.uuid,
 
                 columns: [
-                    <Link to={`./detail/${complianceProfile.uuid}`}>{complianceProfile.name}</Link>,
-
+                    <Link key={complianceProfile.uuid} to={`./detail/${complianceProfile.uuid}`}>
+                        {complianceProfile.name}
+                    </Link>,
                     complianceProfile.description || '',
-
-                    <>{getComplianceItems(complianceProfile.rules, 'rules')}</>,
-
-                    <>{getComplianceItems(complianceProfile.rules, 'groups')}</>,
+                    <Badge key={complianceProfile.uuid} color="secondary" searchvalue={complianceProfile.providerRulesCount}>
+                        {complianceProfile.providerRulesCount.toString()}
+                    </Badge>,
+                    <Badge key={complianceProfile.uuid} color="secondary" searchvalue={complianceProfile.providerGroupsCount}>
+                        {complianceProfile.providerGroupsCount.toString()}
+                    </Badge>,
+                    <Badge key={complianceProfile.uuid} color="secondary" searchvalue={complianceProfile.internalRulesCount}>
+                        {complianceProfile.internalRulesCount.toString()}
+                    </Badge>,
+                    <Badge key={complianceProfile.uuid} color="secondary" searchvalue={complianceProfile.associations}>
+                        {complianceProfile.associations.toString()}
+                    </Badge>,
                 ],
             })),
-        [complianceProfiles, getComplianceItems],
+        [complianceProfiles],
     );
 
     return (
@@ -211,6 +206,7 @@ export default function AdministratorsList() {
                 widgetButtons={buttons}
                 titleSize="large"
                 refreshAction={getFreshData}
+                dataTestId="compliance-profile-list"
             >
                 <br />
                 <CustomTable
@@ -235,6 +231,7 @@ export default function AdministratorsList() {
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
                     { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
+                dataTestId="delete-compliance-profile-dialog"
             />
 
             <Dialog
@@ -246,6 +243,7 @@ export default function AdministratorsList() {
                     { color: 'danger', onClick: onForceDeleteConfirmed, body: 'Force delete' },
                     { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
                 ]}
+                dataTestId="force-delete-compliance-profile-dialog"
             />
 
             <Dialog
@@ -257,6 +255,7 @@ export default function AdministratorsList() {
                     { color: 'primary', onClick: onComplianceCheckConfirmed, body: 'Yes' },
                     { color: 'secondary', onClick: () => setComplianceCheck(false), body: 'Cancel' },
                 ]}
+                dataTestId="compliance-check-dialog"
             />
         </Container>
     );

@@ -37,6 +37,8 @@ export enum Operation {
     Disassociate = 'disassociate',
     History = 'history',
     Summary = 'summary',
+    ListRules = 'listRules',
+    GetComplianceResult = 'getComplianceResult',
     CheckCompliance = 'checkCompliance',
     CheckValidation = 'checkValidation',
     Issue = 'issue',
