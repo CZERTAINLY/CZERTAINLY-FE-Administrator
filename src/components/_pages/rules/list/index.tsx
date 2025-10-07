@@ -20,6 +20,7 @@ const RulesList = () => {
             <>
                 <TabLayout
                     selectedTab={activeTab}
+                    onlyActiveTabContent
                     tabs={[
                         {
                             title: 'Rules',
