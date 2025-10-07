@@ -55,26 +55,24 @@ export default function ComplianceProfileDetail() {
     const [availableRulesResetFunction, setAvailableRulesResetFunction] = useState<(() => void) | null>(null);
     const [assignedRulesResetFunction, setAssignedRulesResetFunction] = useState<(() => void) | null>(null);
 
-    useEffect(() => {
-        if (!id) return;
-        dispatch(actions.getComplianceProfile({ uuid: id }));
-        dispatch(actions.getAssociationsOfComplianceProfile({ uuid: id }));
-    }, [dispatch, id]);
-
     const getFreshComplianceProfileDetails = useCallback(() => {
         if (!id) return;
         dispatch(actions.resetState());
         dispatch(actions.getComplianceProfile({ uuid: id }));
         dispatch(actions.getAssociationsOfComplianceProfile({ uuid: id }));
-        // Reset the AvailableRulesAndGroups select values
+    }, [id, dispatch]);
+
+    useEffect(() => {
         if (availableRulesResetFunction) {
             availableRulesResetFunction();
         }
-        // Reset the AssignedRulesAndGroup select values
+    }, [availableRulesResetFunction]);
+
+    useEffect(() => {
         if (assignedRulesResetFunction) {
             assignedRulesResetFunction();
         }
-    }, [id, dispatch, availableRulesResetFunction, assignedRulesResetFunction]);
+    }, [assignedRulesResetFunction]);
 
     useEffect(() => {
         getFreshComplianceProfileDetails();
