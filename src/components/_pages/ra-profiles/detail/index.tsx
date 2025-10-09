@@ -132,7 +132,7 @@ export default function RaProfileDetail() {
     );
 
     const getFreshRaProfileDetail = useCallback(() => {
-        if (!id || !authorityId) {
+        if (!id || !authorityId || authorityId === 'undefined') {
             return;
         }
         if (authorityId === 'unknown') {
@@ -188,23 +188,6 @@ export default function RaProfileDetail() {
 
         dispatch(settingsActions.getPlatformSettings());
     }, [dispatch, platformSettings]);
-
-    useEffect(() => {
-        if (!id || !authorityId || authorityId === 'undefined') {
-            return;
-        }
-
-        if (authorityId === 'unknown') {
-            dispatch(raProfilesActions.getRaProfileWithoutAuthority({ uuid: id }));
-        } else {
-            dispatch(raProfilesActions.getRaProfileDetail({ authorityUuid: authorityId, uuid: id }));
-        }
-    }, [id, dispatch, authorityId]);
-
-    useEffect(() => {
-        if (!id) return;
-        dispatch(complianceProfileActions.getAssociatedComplianceProfiles({ resource: Resource.RaProfiles, associationObjectUuid: id }));
-    }, [id, dispatch]);
 
     // use effect to clear the ra profile detail when the component is unmounted
     useEffect(() => {

@@ -325,24 +325,15 @@ export default function CertificateDetail() {
         getCertificateChainDetails();
     }, [isFlowTabOpened, id, getCertificateChainDetails]);
 
-    useEffect(() => {
-        getFreshCertificateLocations();
-    }, [getFreshCertificateLocations]);
-
-    useEffect(() => {
-        if (!id) return;
-        dispatch(actions.getCertificateRelations({ uuid: id }));
-    }, [dispatch, id]);
-
     const getFreshCertificateDetail = useCallback(() => {
         if (!id) return;
         dispatch(actions.clearCertificateDetail());
         dispatch(actions.getCertificateDetail({ uuid: id }));
         dispatch(actions.getCertificateHistory({ uuid: id }));
-        dispatch(actions.getCertificateRelations({ uuid: id }));
+        getFreshRelatedCertificates();
         getFreshApprovalList();
         getFreshCertificateLocations();
-    }, [dispatch, id, getFreshApprovalList, getFreshCertificateLocations]);
+    }, [dispatch, id, getFreshApprovalList, getFreshCertificateLocations, getFreshRelatedCertificates]);
 
     useEffect(() => {
         getFreshCertificateDetail();
