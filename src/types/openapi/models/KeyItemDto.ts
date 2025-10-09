@@ -12,6 +12,7 @@
  */
 
 import type {
+    ComplianceStatus,
     GroupDto,
     KeyAlgorithm,
     KeyFormat,
@@ -151,6 +152,12 @@ export interface KeyItemDto {
      * @memberof KeyItemDto
      */
     state: KeyState;
+    /**
+     * Key compliance status
+     * @type {ComplianceStatus}
+     * @memberof KeyItemDto
+     */
+    complianceStatus: ComplianceStatus;
 }
 
 

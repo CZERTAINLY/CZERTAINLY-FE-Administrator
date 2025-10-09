@@ -252,7 +252,7 @@ export interface CertificateDetailDto {
      */
     locations?: Array<LocationDto>;
     /**
-     * Certificate compliance check result
+     * Certificate compliance check result. Deprecated, use `complianceResult` property instead.
      * @type {Array<CertificateComplianceResultDto>}
      * @memberof CertificateDetailDto
      */

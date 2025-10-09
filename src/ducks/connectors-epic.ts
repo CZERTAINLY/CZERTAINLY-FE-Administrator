@@ -28,8 +28,8 @@ import {
 const listConnectors: AppEpic = (action$, state, deps) => {
     return action$.pipe(
         filter(slice.actions.listConnectors.match),
-        switchMap(() =>
-            deps.apiClients.connectors.listConnectors({}).pipe(
+        switchMap((action) =>
+            deps.apiClients.connectors.listConnectors({ functionGroup: action.payload?.functionGroup }).pipe(
                 mergeMap((list) =>
                     of(
                         slice.actions.listConnectorsSuccess({
@@ -42,6 +42,31 @@ const listConnectors: AppEpic = (action$, state, deps) => {
                 catchError((error) =>
                     of(
                         slice.actions.listConnectorsFailure(),
+                        userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ConnectorStore),
+                    ),
+                ),
+            ),
+        ),
+    );
+};
+
+const listConnectorsMerge: AppEpic = (action$, state, deps) => {
+    return action$.pipe(
+        filter(slice.actions.listConnectorsMerge.match),
+        mergeMap((action) =>
+            deps.apiClients.connectors.listConnectors({ functionGroup: action.payload?.functionGroup }).pipe(
+                mergeMap((list) =>
+                    of(
+                        slice.actions.listConnectorsMergeSuccess({
+                            connectorList: list.map(transformConnectorResponseDtoToModel),
+                        }),
+                        userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ConnectorStore),
+                    ),
+                ),
+
+                catchError((error) =>
+                    of(
+                        slice.actions.listConnectorsMergeFailure(),
                         userInterfaceActions.insertWidgetLock(error, LockWidgetNameEnum.ConnectorStore),
                     ),
                 ),
@@ -355,7 +380,7 @@ const bulkAuthorizeConnectors: AppEpic = (action$, state, deps) => {
         switchMap((action) =>
             deps.apiClients.connectors.bulkApprove({ requestBody: action.payload.uuids }).pipe(
                 mergeMap(() =>
-                    of(slice.actions.bulkAuthorizeConnectorsSuccess({ uuids: action.payload.uuids }), slice.actions.listConnectors()),
+                    of(slice.actions.bulkAuthorizeConnectorsSuccess({ uuids: action.payload.uuids }), slice.actions.listConnectors({})),
                 ),
 
                 catchError((error) =>
@@ -474,6 +499,7 @@ const callbackResource: AppEpic = (action$, state, deps) => {
 
 const epics = [
     listConnectors,
+    listConnectorsMerge,
     getConnectorDetail,
     getConnectorAttributesDescriptors,
     getConnectorAllAttributesDescriptors,

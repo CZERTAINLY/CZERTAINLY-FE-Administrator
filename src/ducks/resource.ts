@@ -82,12 +82,14 @@ export const slice = createSlice({
 const state = createFeatureSelector<State>(slice.name);
 
 const resourcesList = createSelector(state, (state) => state.resourcesList);
+const resourcesWithComplianceProfiles = createSelector(resourcesList, (list) => list.filter((r) => r.hasComplianceProfiles === true));
 const resourceEvents = createSelector(state, (state) => state.resourceEvents);
 const allResourceEvents = createSelector(state, (state) => state.allResourceEvents);
 const isFetchingResourcesList = createSelector(state, (state) => state.isFetchingResourcesList);
 
 export const selectors = {
     resourcesList,
+    resourcesWithComplianceProfiles,
     resourceEvents,
     allResourceEvents,
     isFetchingResourcesList,

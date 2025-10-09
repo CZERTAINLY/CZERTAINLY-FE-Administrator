@@ -252,6 +252,7 @@ export function Attribute({
                                     isDisabled={descriptor.properties.readOnly || busy}
                                     isMulti={descriptor.properties.multiSelect}
                                     isClearable={!descriptor.properties.required}
+                                    id={`${name}Select`}
                                 />
                             ) : (
                                 <Select
@@ -261,6 +262,7 @@ export function Attribute({
                                         onUserInteraction();
                                     }}
                                     inputId={`${name}Select`}
+                                    id={`${name}Select`}
                                     maxMenuHeight={140}
                                     menuPlacement="auto"
                                     options={options}

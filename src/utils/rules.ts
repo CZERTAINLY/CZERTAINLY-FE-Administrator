@@ -74,6 +74,27 @@ export const useRuleEvaluatorResourceOptions = () => {
     return { resourceOptionsWithRuleEvaluator, isFetchingResourcesList };
 };
 
+export const useComplianceProfileResourceOptions = () => {
+    const resourceList = useSelector(resourceSelectors.resourcesList);
+    const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
+    const isFetchingResourcesList = useSelector(resourceSelectors.isFetchingResourcesList);
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(resourceActions.listResources());
+    }, [dispatch]);
+
+    const resourceOptionsWithComplianceProfile = useMemo(() => {
+        if (!resourceList.length) return [];
+        const resourceListWithComplianceProfile = resourceList.filter((resource) => resource.complianceSubject);
+        return resourceListWithComplianceProfile.map((resource) => {
+            return { value: resource.resource, label: getEnumLabel(resourceTypeEnum, resource.resource) };
+        });
+    }, [resourceList, resourceTypeEnum]);
+
+    return { resourceOptionsWithComplianceProfile, isFetchingResourcesList };
+};
+
 export const useHasEventsResourceOptions = () => {
     const resourceList = useSelector(resourceSelectors.resourcesList);
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));

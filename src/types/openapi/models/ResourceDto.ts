@@ -62,6 +62,18 @@ export interface ResourceDto {
      * @memberof ResourceDto
      */
     hasRuleEvaluator: boolean;
+    /**
+     * Is resource subject of compliance check and can compliance be run on objects of this resource
+     * @type {boolean}
+     * @memberof ResourceDto
+     */
+    complianceSubject: boolean;
+    /**
+     * Can compliance profiles be assigned to objects of this resource
+     * @type {boolean}
+     * @memberof ResourceDto
+     */
+    hasComplianceProfiles: boolean;
 }
 
 

@@ -11,8 +11,9 @@ import { validateRequired } from 'utils/validators';
 import Spinner from 'components/Spinner';
 
 import { actions, selectors } from 'ducks/compliance-profiles';
-import { actions as raActions } from 'ducks/ra-profiles';
 import { RaProfileResponseModel } from 'types/ra-profiles';
+import { Resource } from 'types/openapi/models/Resource';
+import { TestableControl, TestableMenu } from 'utils/HOC/withDataTestId';
 
 interface Props {
     raProfile?: RaProfileResponseModel;
@@ -33,8 +34,7 @@ export default function AssociateComplianceProfileDialogBody({ raProfile, availa
     useEffect(
         () => {
             if (!visible) return;
-
-            dispatch(actions.listComplianceProfiles());
+            dispatch(actions.getListComplianceProfiles());
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [visible],
@@ -56,11 +56,11 @@ export default function AssociateComplianceProfileDialogBody({ raProfile, availa
             if (!raProfile) return;
 
             dispatch(
-                raActions.associateRaProfile({
-                    uuid: raProfile.uuid,
-                    complianceProfileUuid: values.complianceProfiles.value.uuid,
-                    complianceProfileName: values.complianceProfiles.value.name,
-                    description: values.complianceProfiles.value.description,
+                actions.associateComplianceProfile({
+                    uuid: values.complianceProfiles.value.uuid as string,
+                    resource: Resource.RaProfiles,
+                    associationObjectUuid: raProfile.uuid,
+                    associationObjectName: raProfile.name,
                 }),
             );
 
@@ -92,6 +92,11 @@ export default function AssociateComplianceProfileDialogBody({ raProfile, availa
                                                 meta.touched && meta.invalid
                                                     ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
                                                     : { ...provided },
+                                        }}
+                                        id="associate-compliance-profile-select"
+                                        components={{
+                                            Menu: TestableMenu('associate-compliance-profile-select-menu'),
+                                            Control: TestableControl('associate-compliance-profile-select-control'),
                                         }}
                                     />
 

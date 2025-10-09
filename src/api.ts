@@ -11,7 +11,8 @@ import {
     CertificateInventoryApi,
     CertificateKeyGroupApi,
     ClientOperationsV2Api,
-    ComplianceProfileManagementApi,
+    ComplianceManagementV2Api,
+    ComplianceProfileManagementV2Api,
     Configuration,
     ConnectorManagementApi,
     CredentialManagementApi,
@@ -57,7 +58,6 @@ export interface ApiClients {
     auth: AuthenticationManagementApi;
     users: UserManagementApi;
     roles: RoleManagementApi;
-    // rules: RulesManagementApi;
     actions: WorkflowActionsManagementApi;
     rules: WorkflowRulesManagementApi;
     triggers: WorkflowTriggersManagementApi;
@@ -80,7 +80,8 @@ export interface ApiClients {
     certificateGroups: CertificateKeyGroupApi;
     clientOperations: ClientOperationsV2Api;
     discoveries: DiscoveryManagementApi;
-    complianceProfile: ComplianceProfileManagementApi;
+    complianceProfile: ComplianceProfileManagementV2Api;
+    complianceManagement: ComplianceManagementV2Api;
     customAttributes: CustomAttributesApi;
     globalMetadata: GlobalMetadataApi;
     settings: SettingsApi;
@@ -106,7 +107,6 @@ export const backendClient: ApiClients = {
     auth: new AuthenticationManagementApi(configuration),
     users: new UserManagementApi(configuration),
     roles: new RoleManagementApi(configuration),
-    // rules: new RulesManagementApi(configuration),
     actions: new WorkflowActionsManagementApi(configuration),
     rules: new WorkflowRulesManagementApi(configuration),
     triggers: new WorkflowTriggersManagementApi(configuration),
@@ -129,7 +129,8 @@ export const backendClient: ApiClients = {
     certificateGroups: new CertificateKeyGroupApi(configuration),
     clientOperations: new ClientOperationsV2Api(configuration),
     discoveries: new DiscoveryManagementApi(configuration),
-    complianceProfile: new ComplianceProfileManagementApi(configuration),
+    complianceProfile: new ComplianceProfileManagementV2Api(configuration),
+    complianceManagement: new ComplianceManagementV2Api(configuration),
     customAttributes: new CustomAttributesApi(configuration),
     globalMetadata: new GlobalMetadataApi(configuration),
     settings: new SettingsApi(configuration),

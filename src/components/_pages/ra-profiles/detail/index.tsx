@@ -10,6 +10,7 @@ import WidgetButtons, { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as approvalProfileActions } from 'ducks/approval-profiles';
 import { actions as raProfilesActions, selectors as raProfilesSelectors } from 'ducks/ra-profiles';
 import { actions as settingsActions, selectors as settingsSelectors } from 'ducks/settings';
+import { actions as complianceProfileActions, selectors as complianceProfileSelectors } from 'ducks/compliance-profiles';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -47,7 +48,7 @@ export default function RaProfileDetail() {
     const acmeDetails = useSelector(raProfilesSelectors.acmeDetails);
     const scepDetails = useSelector(raProfilesSelectors.scepDetails);
     const cmpDetails = useSelector(raProfilesSelectors.cmpDetails);
-    const associatedComplianceProfiles = useSelector(raProfilesSelectors.associatedComplianceProfiles);
+    const associatedComplianceProfiles = useSelector(complianceProfileSelectors.associatedComplianceProfiles);
     const associatedApprovalProfiles = useSelector(raProfilesSelectors.associatedApprovalProfiles);
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const isDissociatingApprovalProfile = useSelector(raProfilesSelectors.isDissociatingApprovalProfile);
@@ -66,11 +67,10 @@ export default function RaProfileDetail() {
     const isDeactivatingCmp = useSelector(raProfilesSelectors.isDeactivatingCmp);
     const isActivatingScep = useSelector(raProfilesSelectors.isActivatingScep);
     const isDeactivatingScep = useSelector(raProfilesSelectors.isDeactivatingScep);
-    const isFetchingAssociatedComplianceProfiles = useSelector(raProfilesSelectors.isFetchingAssociatedComplianceProfiles);
+    const isFetchingAssociatedComplianceProfiles = useSelector(complianceProfileSelectors.isFetchingAssociatedComplianceProfiles);
 
     const platformSettings = useSelector(settingsSelectors.platformSettings);
     const isFetchingPlatform = useSelector(settingsSelectors.isFetchingPlatform);
-
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
     const [activateAcmeDialog, setActivateAcmeDialog] = useState(false);
@@ -132,7 +132,7 @@ export default function RaProfileDetail() {
     );
 
     const getFreshRaProfileDetail = useCallback(() => {
-        if (!id || !authorityId) {
+        if (!id || !authorityId || authorityId === 'undefined') {
             return;
         }
         if (authorityId === 'unknown') {
@@ -143,10 +143,9 @@ export default function RaProfileDetail() {
     }, [id, dispatch, authorityId]);
 
     const getFreshComplianceRaProfileDetail = useCallback(() => {
-        if (!id || !authorityId) return;
-        if (authorityId === 'unknown' || authorityId === 'undefined') return;
-        dispatch(raProfilesActions.getComplianceProfilesForRaProfile({ authorityUuid: authorityId, uuid: id }));
-    }, [id, dispatch, authorityId]);
+        if (!id) return;
+        dispatch(complianceProfileActions.getAssociatedComplianceProfiles({ resource: Resource.RaProfiles, associationObjectUuid: id }));
+    }, [id, dispatch]);
 
     const getFreshAvailableProtocols = useCallback(() => {
         if (!id || !authorityId) return;
@@ -189,19 +188,6 @@ export default function RaProfileDetail() {
 
         dispatch(settingsActions.getPlatformSettings());
     }, [dispatch, platformSettings]);
-
-    useEffect(() => {
-        if (!id || !authorityId || authorityId === 'undefined') {
-            return;
-        }
-
-        if (authorityId === 'unknown') {
-            dispatch(raProfilesActions.getRaProfileWithoutAuthority({ uuid: id }));
-        } else {
-            dispatch(raProfilesActions.getRaProfileDetail({ authorityUuid: authorityId, uuid: id }));
-            dispatch(raProfilesActions.getComplianceProfilesForRaProfile({ authorityUuid: authorityId, uuid: id }));
-        }
-    }, [id, dispatch, authorityId]);
 
     // use effect to clear the ra profile detail when the component is unmounted
     useEffect(() => {
@@ -304,7 +290,7 @@ export default function RaProfileDetail() {
 
         if (!raProfile?.uuid) return;
 
-        dispatch(raProfilesActions.checkCompliance({ uuids: [raProfile.uuid] }));
+        dispatch(raProfilesActions.checkCompliance({ resource: Resource.RaProfiles, uuids: [raProfile.uuid] }));
     }, [dispatch, raProfile]);
 
     const onDissociateComplianceProfile = useCallback(
@@ -312,7 +298,11 @@ export default function RaProfileDetail() {
             if (!raProfile) return;
 
             dispatch(
-                raProfilesActions.dissociateRaProfile({ uuid: raProfile.uuid, complianceProfileUuid: uuid, complianceProfileName: '' }),
+                complianceProfileActions.dissociateComplianceProfile({
+                    uuid: uuid,
+                    resource: Resource.RaProfiles,
+                    associationObjectUuid: raProfile.uuid,
+                }),
             );
         },
         [raProfile, dispatch],
@@ -373,6 +363,7 @@ export default function RaProfileDetail() {
                 onClick: () => {
                     setAssociateComplianceProfile(true);
                 },
+                id: 'associate-compliance-profile',
             },
         ],
         [],
@@ -940,6 +931,7 @@ export default function RaProfileDetail() {
                                             refreshAction={getFreshComplianceRaProfileDetail}
                                             widgetLockName={LockWidgetNameEnum.RaProfileComplianceDetails}
                                             lockSize="large"
+                                            dataTestId="compliance-profile-widget"
                                         >
                                             <CustomTable headers={complianceProfileHeaders} data={complianceProfileData} />
                                         </Widget>
@@ -1075,6 +1067,7 @@ export default function RaProfileDetail() {
                 })}
                 toggle={() => setAssociateComplianceProfile(false)}
                 buttons={[]}
+                dataTestId="associate-compliance-profile-dialog"
             />
 
             <Dialog

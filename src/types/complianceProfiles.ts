@@ -1,22 +1,20 @@
 import { AttributeDescriptorModel, AttributeRequestModel, AttributeResponseModel } from './attributes';
 import { RaProfileSimplifiedModel } from './certificate';
 import {
-    ComplianceConnectorAndGroupsDto,
-    ComplianceConnectorAndRulesDto,
+    ComplianceGroupDto,
     ComplianceGroupRequestDto,
-    ComplianceGroupsDto,
     ComplianceGroupsListResponseDto,
     ComplianceGroupsResponseDto,
     ComplianceProfileDto,
+    ComplianceProfileListDto as ComplianceProfileListDtoOpenApi,
     ComplianceProfileRequestDto as ComplianceProfileRequestDtoOpenApi,
     ComplianceProfileRuleDto,
-    ComplianceProfileRulesRequestDto,
-    ComplianceProfilesListDto,
     ComplianceProviderSummaryDto,
-    ComplianceRequestRulesDto,
     ComplianceRuleAdditionRequestDto,
+    ComplianceRuleAvailabilityStatus,
     ComplianceRuleDeletionRequestDto,
-    ComplianceRulesDto,
+    ComplianceRuleDto,
+    ComplianceRuleListDto,
     ComplianceRulesListResponseDto,
     ComplianceRulesResponseDto,
 } from './openapi';
@@ -24,24 +22,23 @@ import {
 export type ComplianceProfileListRuleDto = ComplianceProviderSummaryDto;
 export type ComplianceProfileListRuleModel = ComplianceProfileListRuleDto;
 
-export type ComplianceProfileListDto = ComplianceProfilesListDto;
-export type ComplianceProfileListModel = Omit<ComplianceProfileListDto, 'rules'> & { rules: Array<ComplianceProfileListRuleModel> };
-
+export type ComplianceProfileListDto = ComplianceProfileListDtoOpenApi;
+export type ComplianceProfileListModel = ComplianceProfileListDto;
 //---
-export type ComplianceProfileResponseRuleRuleDto = ComplianceRulesDto;
+export type ComplianceProfileResponseRuleRuleDto = ComplianceRuleDto;
 export type ComplianceProfileResponseRuleRuleModel = Omit<ComplianceProfileResponseRuleRuleDto, 'attributes'> & {
     attributes?: Array<AttributeResponseModel>;
 };
 
-export type ComplianceProfileResponseRuleDto = ComplianceConnectorAndRulesDto;
+export type ComplianceProfileResponseRuleDto = ComplianceRuleDto;
 export type ComplianceProfileResponseRuleModel = Omit<ComplianceProfileResponseRuleDto, 'rules'> & {
     rules?: Array<ComplianceProfileResponseRuleRuleModel>;
 };
 //-
-export type ComplianceProfileResponseGroupGroupDto = ComplianceGroupsDto;
+export type ComplianceProfileResponseGroupGroupDto = ComplianceGroupDto;
 export type ComplianceProfileResponseGroupGroupModel = ComplianceProfileResponseGroupGroupDto;
 
-export type ComplianceProfileResponseGroupDto = ComplianceConnectorAndGroupsDto;
+export type ComplianceProfileResponseGroupDto = ComplianceGroupDto;
 export type ComplianceProfileResponseGroupModel = Omit<ComplianceProfileResponseGroupDto, 'groups'> & {
     groups?: Array<ComplianceProfileResponseGroupGroupModel>;
 };
@@ -55,12 +52,12 @@ export type ComplianceProfileResponseModel = Omit<ComplianceProfileResponseDto, 
 };
 //---
 
-export type ComplianceProfileRequestRuleRuleDto = ComplianceRequestRulesDto;
+export type ComplianceProfileRequestRuleRuleDto = ComplianceRuleDto;
 export type ComplianceProfileRequestRuleRuleModel = Omit<ComplianceProfileRequestRuleRuleDto, 'attributes'> & {
     attributes?: Array<AttributeRequestModel>;
 };
 
-export type ComplianceProfileRequestRuleDto = ComplianceProfileRulesRequestDto;
+export type ComplianceProfileRequestRuleDto = ComplianceRuleDto;
 export type ComplianceProfileRequestRuleModel = Omit<ComplianceProfileRequestRuleDto, 'rules'> & {
     rules?: Array<ComplianceProfileRequestRuleRuleModel>;
 };
@@ -110,4 +107,15 @@ export type ComplianceProfileGroupListResponseGroupModel = ComplianceProfileGrou
 export type ComplianceProfileGroupListResponseDto = ComplianceGroupsListResponseDto;
 export type ComplianceProfileGroupListResponseModel = Omit<ComplianceProfileGroupListResponseDto, 'groups'> & {
     groups: Array<ComplianceProfileGroupListResponseGroupModel>;
+};
+
+export type TRuleGroupType = ComplianceRuleListDto & {
+    entityDetails: {
+        entityType: string;
+        connectorUuid?: string;
+        connectorName?: string;
+        kind?: string;
+    };
+    availabilityStatus?: ComplianceRuleAvailabilityStatus;
+    updatedReason?: string;
 };
