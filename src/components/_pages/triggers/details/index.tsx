@@ -616,7 +616,7 @@ const TriggerDetails = () => {
             <Dialog
                 isOpen={confirmIgnoreTrigger}
                 caption={`Ignore Trigger`}
-                body={`You are about to ignore this trigger. This will remove all actions from the trigger. Is this what you want to do?`}
+                body={`You are about to mark this trigger as ignore trigger. This will remove all actions from the trigger. Is this what you want to do?`}
                 toggle={() => setConfirmIgnoreTrigger(false)}
                 buttons={[
                     { color: 'warning', onClick: onIgnoreTriggerConfirmed, body: 'Ignore & remove actions' },
