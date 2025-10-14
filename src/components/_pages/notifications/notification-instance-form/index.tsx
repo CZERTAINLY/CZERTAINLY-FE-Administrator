@@ -3,20 +3,22 @@ import TabLayout from 'components/Layout/TabLayout';
 import ProgressButton from 'components/ProgressButton';
 import Widget from 'components/Widget';
 import { selectors as customAttributesSelectors } from 'ducks/customAttributes';
+import { actions as connectorActions } from 'ducks/connectors';
 import { selectors as notificationSelectors, actions as notificationsActions } from 'ducks/notifications';
 import { FormApi } from 'final-form';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Field, Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
-import Select from 'react-select';
+import Select, { components, MenuProps, ControlProps } from 'react-select';
 import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
-import { AttributeDescriptorModel, AttributeMappingModel } from 'types/attributes';
+import { AttributeDescriptorModel, AttributeMappingModel, isCustomAttributeModel, isDataAttributeModel } from 'types/attributes';
 import { NotificationInstanceRequestModel } from 'types/notifications';
 import { AttributeContentType, FunctionGroupCode } from 'types/openapi';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 import { composeValidators, validateAlphaNumericWithoutAccents, validateLength, validateRequired } from 'utils/validators';
+import { TestableControl, TestableMenu } from 'utils/HOC/withDataTestId';
 
 interface SelectChangeValue {
     value: string;
@@ -29,10 +31,11 @@ const NotificationInstanceForm = () => {
     const { id } = useParams();
 
     const notificationInstanceProviders = useSelector(notificationSelectors.notificationInstanceProviders);
+    const notificationProviderAttributesDescriptors = useSelector(notificationSelectors.notificationProviderAttributesDescriptors);
     const [selectedNotificationInstanceProvider, setSelectedNotificationInstanceProvider] = useState<SelectChangeValue | null>(null);
     const [selectedKind, setSelectedKind] = useState<SelectChangeValue | null>(null);
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
-    const notificationProviderAttributesDescriptors = useSelector(notificationSelectors.notificationProviderAttributesDescriptors);
+
     const notificationDetails = useSelector(notificationSelectors.notificationInstanceDetail);
     const customAttributes = useSelector(customAttributesSelectors.customAttributes);
     const mappingAttributes = useSelector(notificationSelectors.mappingAttributes);
@@ -41,6 +44,8 @@ const NotificationInstanceForm = () => {
     const isFetchingNotificationInstanceDetail = useSelector(notificationSelectors.isFetchingNotificationInstanceDetail);
     const isEditingNotificationInstance = useSelector(notificationSelectors.isEditingNotificationInstance);
     const isCreatingNotificationInstance = useSelector(notificationSelectors.isCreatingNotificationInstance);
+
+    console.log({});
 
     const editMode = useMemo(() => !!id, [id]);
     const submitTitle = useMemo(() => (editMode ? 'Save' : 'Create'), [editMode]);
@@ -152,6 +157,18 @@ const NotificationInstanceForm = () => {
         return kindOptions;
     }, [selectedNotificationInstanceProvider, notificationInstanceProviders]);
 
+    const clearAttributeEditorState = useCallback(
+        (form: FormApi<NotificationInstanceRequestModel>) => {
+            dispatch(connectorActions.clearCallbackData());
+            setGroupAttributesCallbackAttributes([]);
+            const values = form.getState().values as any;
+            Object.keys(values || {})
+                .filter((k) => k.startsWith('__attributes__notification__.'))
+                .forEach((k) => (form as any).mutators.setAttribute(k, undefined));
+        },
+        [dispatch],
+    );
+
     const onInstanceNotificationProviderChange = (
         changedValue: SelectChangeValue | null,
         form: FormApi<NotificationInstanceRequestModel>,
@@ -159,6 +176,7 @@ const NotificationInstanceForm = () => {
         if (changedValue?.value === selectedNotificationInstanceProvider?.value) {
             return;
         }
+        clearAttributeEditorState(form);
         form.change('connectorUuid', changedValue?.value);
         setSelectedNotificationInstanceProvider(changedValue);
         setSelectedKind(null);
@@ -166,6 +184,7 @@ const NotificationInstanceForm = () => {
 
     const onNotificationInstanceKindChange = (changedValue: SelectChangeValue | null, form: FormApi<NotificationInstanceRequestModel>) => {
         if (!changedValue?.value) return;
+        clearAttributeEditorState(form);
         setSelectedKind(changedValue);
         form.change('kind', changedValue?.value);
     };
@@ -179,6 +198,14 @@ const NotificationInstanceForm = () => {
             }),
         );
     }, [selectedKind, selectedNotificationInstanceProvider, dispatch]);
+
+    // On unmount, clear any leftover callback data to avoid leaking dynamic fields
+    useEffect(() => {
+        return () => {
+            dispatch(connectorActions.clearCallbackData());
+            setGroupAttributesCallbackAttributes([]);
+        };
+    }, [dispatch]);
 
     useEffect(() => {
         if (!editMode || !notificationDetails || !optionsForNotificationProviders || !kindOptions) return;
@@ -280,8 +307,56 @@ const NotificationInstanceForm = () => {
     );
 
     return (
-        <Widget title={widgetTitle} busy={isBusy}>
-            <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<NotificationInstanceRequestModel>() }}>
+        <Widget title={widgetTitle} busy={isBusy} dataTestId="notification-instance-form">
+            <Form
+                initialValues={defaultValues}
+                onSubmit={onSubmit}
+                mutators={{ ...mutators<NotificationInstanceRequestModel>() }}
+                validate={(values) => {
+                    const errors: { [key: string]: string } = {};
+
+                    if (notificationProviderAttributesDescriptors && selectedNotificationInstanceProvider && selectedKind?.value) {
+                        const attributeValues = (values as any)[`__attributes__notification__`] || {};
+
+                        const isAttributeValueEmpty = (fieldValue: unknown): boolean => {
+                            if (fieldValue === null || fieldValue === undefined) return true;
+                            if (Array.isArray(fieldValue)) return fieldValue.length === 0;
+                            if (typeof fieldValue === 'string') return fieldValue.trim() === '';
+                            if (typeof fieldValue === 'object') {
+                                if ('code' in fieldValue || 'language' in fieldValue) {
+                                    const codeVal = (fieldValue as any).code;
+                                    const isCodeEmpty = codeVal === null || codeVal === undefined;
+                                    const isCodeStringEmpty = typeof codeVal === 'string' && codeVal.trim() === '';
+                                    return isCodeEmpty || isCodeStringEmpty;
+                                }
+                                if ('value' in fieldValue || 'label' in fieldValue) {
+                                    const v = (fieldValue as any).value;
+                                    return v === null || v === undefined;
+                                }
+                                return Object.keys(fieldValue).length === 0;
+                            }
+                            return false;
+                        };
+
+                        const allDescriptors = [...notificationProviderAttributesDescriptors, ...groupAttributesCallbackAttributes];
+
+                        allDescriptors.forEach((descriptor) => {
+                            if (
+                                (isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) &&
+                                (descriptor as any).properties?.required
+                            ) {
+                                const fieldKey = `__attributes__notification__.${descriptor.name}`;
+                                const fieldValue = attributeValues[descriptor.name];
+                                if (isAttributeValueEmpty(fieldValue)) {
+                                    errors[fieldKey] = 'Required Field';
+                                }
+                            }
+                        });
+                    }
+
+                    return errors;
+                }}
+            >
                 {({ handleSubmit, pristine, submitting, valid, form, values }) => (
                     <BootstrapForm onSubmit={handleSubmit}>
                         <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithoutAccents())}>
@@ -316,6 +391,7 @@ const NotificationInstanceForm = () => {
                                         placeholder="Enter Description / Comment"
                                         valid={!meta.error && meta.touched}
                                         invalid={!!meta.error && meta.touched}
+                                        data-testid="notification-description"
                                     />
 
                                     <FormFeedback>{meta.error}</FormFeedback>
@@ -329,6 +405,7 @@ const NotificationInstanceForm = () => {
 
                                     <Select
                                         {...input}
+                                        id="notificationInstanceProviderSelect"
                                         inputId="notificationInstanceProviderSelect"
                                         maxMenuHeight={140}
                                         menuPlacement="auto"
@@ -342,6 +419,10 @@ const NotificationInstanceForm = () => {
                                         }}
                                         isDisabled={editMode}
                                         value={selectedNotificationInstanceProvider}
+                                        components={{
+                                            Menu: TestableMenu('notification-instance-provider-select-menu'),
+                                            Control: TestableControl('notification-instance-provider-select-control'),
+                                        }}
                                     />
                                 </FormGroup>
                             )}
@@ -366,6 +447,10 @@ const NotificationInstanceForm = () => {
                                         }}
                                         isDisabled={editMode}
                                         value={selectedKind}
+                                        components={{
+                                            Menu: TestableMenu('notification-instance-kind-select-menu'),
+                                            Control: TestableControl('notification-instance-kind-select-control'),
+                                        }}
                                     />
                                 </FormGroup>
                             )}
@@ -389,7 +474,7 @@ const NotificationInstanceForm = () => {
                                                             </Label>
                                                             <Select
                                                                 {...input}
-                                                                id={`attributeMappings[i].${mappingAttribute.name}`}
+                                                                id={`attributeMappings[${i}].${mappingAttribute.name}`}
                                                                 maxMenuHeight={140}
                                                                 menuPlacement="auto"
                                                                 options={

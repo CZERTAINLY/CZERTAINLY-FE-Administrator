@@ -1,0 +1,367 @@
+export const mockNotificationInstanceProviders = [
+    {
+        uuid: '0d4a13db-3366-420a-a8cb-2f7f9c3cbf72',
+        name: 'Email-Notification-Provider',
+        functionGroups: [
+            {
+                functionGroupCode: 'notificationProvider',
+                kinds: ['EMAIL'],
+                endPoints: [
+                    {
+                        uuid: '85b5e134-07ff-4ea2-a939-1f5936ec80ac',
+                        name: 'listNotificationInstances',
+                        context: '/v1/notificationProvider/notifications',
+                        method: 'GET',
+                        required: true,
+                    },
+                    {
+                        uuid: '995801fd-cef2-4470-9fc6-1e13d21bc72a',
+                        name: 'listSupportedFunctions',
+                        context: '/v1',
+                        method: 'GET',
+                        required: false,
+                    },
+                    {
+                        uuid: '91fc5a07-f6b5-43f4-947b-7b2596305ee2',
+                        name: 'healthCheck',
+                        context: '/v1/health',
+                        method: 'GET',
+                        required: false,
+                    },
+                    {
+                        uuid: 'd1d809d1-2534-44e2-921e-7588c2855540',
+                        name: 'listAttributeDefinitions',
+                        context: '/v1/notificationProvider/{kind}/attributes',
+                        method: 'GET',
+                        required: true,
+                    },
+                    {
+                        uuid: 'f9581e8f-70d7-4f09-9c7c-c47000719fef',
+                        name: 'validateAttributes',
+                        context: '/v1/notificationProvider/{kind}/attributes/validate',
+                        method: 'POST',
+                        required: true,
+                    },
+                    {
+                        uuid: '989f80bf-7223-4cf3-a1ee-336cc158cad0',
+                        name: 'listMappingAttributes',
+                        context: '/v1/notificationProvider/{kind}/attributes/mapping',
+                        method: 'GET',
+                        required: true,
+                    },
+                    {
+                        uuid: 'c6a3e340-baf8-435d-88b9-4be7f628e4c7',
+                        name: 'getNotificationInstance',
+                        context: '/v1/notificationProvider/notifications/{uuid}',
+                        method: 'GET',
+                        required: true,
+                    },
+                    {
+                        uuid: '0a265bf3-f0f9-47ad-a1c6-5f50722f7ab5',
+                        name: 'createNotificationInstance',
+                        context: '/v1/notificationProvider/notifications',
+                        method: 'POST',
+                        required: true,
+                    },
+                    {
+                        uuid: 'e3578a7e-8f4d-4d4a-8b79-0589235b0e07',
+                        name: 'updateNotificationInstance',
+                        context: '/v1/notificationProvider/notifications/{uuid}',
+                        method: 'PUT',
+                        required: true,
+                    },
+                    {
+                        uuid: 'e2a999e5-821a-4a66-922b-0da30251fb09',
+                        name: 'removeNotificationInstance',
+                        context: '/v1/notificationProvider/notifications/{uuid}',
+                        method: 'DELETE',
+                        required: true,
+                    },
+                    {
+                        uuid: '59d58d7a-3a82-42b9-8cb1-fcc14ba27b94',
+                        name: 'sendNotification',
+                        context: '/v1/notificationProvider/notifications/{uuid}/notify',
+                        method: 'POST',
+                        required: true,
+                    },
+                ],
+                uuid: '159fde5a-7438-44ed-97ad-028094ab083f',
+                name: 'notificationProvider',
+            },
+        ],
+        url: 'http://email-notification-provider-service:8080',
+        authType: 'none',
+        authAttributes: [],
+        status: 'connected',
+    },
+    {
+        uuid: '4a3d3ec6-83bf-4075-97f2-8077ed96bffb',
+        name: 'Webhook-Notification-Provider',
+        functionGroups: [
+            {
+                functionGroupCode: 'notificationProvider',
+                kinds: ['WEBHOOK'],
+                endPoints: [
+                    {
+                        uuid: '85b5e134-07ff-4ea2-a939-1f5936ec80ac',
+                        name: 'listNotificationInstances',
+                        context: '/v1/notificationProvider/notifications',
+                        method: 'GET',
+                        required: true,
+                    },
+                    {
+                        uuid: '995801fd-cef2-4470-9fc6-1e13d21bc72a',
+                        name: 'listSupportedFunctions',
+                        context: '/v1',
+                        method: 'GET',
+                        required: false,
+                    },
+                    {
+                        uuid: '91fc5a07-f6b5-43f4-947b-7b2596305ee2',
+                        name: 'healthCheck',
+                        context: '/v1/health',
+                        method: 'GET',
+                        required: false,
+                    },
+                    {
+                        uuid: 'd1d809d1-2534-44e2-921e-7588c2855540',
+                        name: 'listAttributeDefinitions',
+                        context: '/v1/notificationProvider/{kind}/attributes',
+                        method: 'GET',
+                        required: true,
+                    },
+                    {
+                        uuid: 'f9581e8f-70d7-4f09-9c7c-c47000719fef',
+                        name: 'validateAttributes',
+                        context: '/v1/notificationProvider/{kind}/attributes/validate',
+                        method: 'POST',
+                        required: true,
+                    },
+                    {
+                        uuid: '989f80bf-7223-4cf3-a1ee-336cc158cad0',
+                        name: 'listMappingAttributes',
+                        context: '/v1/notificationProvider/{kind}/attributes/mapping',
+                        method: 'GET',
+                        required: true,
+                    },
+                    {
+                        uuid: 'c6a3e340-baf8-435d-88b9-4be7f628e4c7',
+                        name: 'getNotificationInstance',
+                        context: '/v1/notificationProvider/notifications/{uuid}',
+                        method: 'GET',
+                        required: true,
+                    },
+                    {
+                        uuid: '0a265bf3-f0f9-47ad-a1c6-5f50722f7ab5',
+                        name: 'createNotificationInstance',
+                        context: '/v1/notificationProvider/notifications',
+                        method: 'POST',
+                        required: true,
+                    },
+                    {
+                        uuid: 'e3578a7e-8f4d-4d4a-8b79-0589235b0e07',
+                        name: 'updateNotificationInstance',
+                        context: '/v1/notificationProvider/notifications/{uuid}',
+                        method: 'PUT',
+                        required: true,
+                    },
+                    {
+                        uuid: 'e2a999e5-821a-4a66-922b-0da30251fb09',
+                        name: 'removeNotificationInstance',
+                        context: '/v1/notificationProvider/notifications/{uuid}',
+                        method: 'DELETE',
+                        required: true,
+                    },
+                    {
+                        uuid: '59d58d7a-3a82-42b9-8cb1-fcc14ba27b94',
+                        name: 'sendNotification',
+                        context: '/v1/notificationProvider/notifications/{uuid}/notify',
+                        method: 'POST',
+                        required: true,
+                    },
+                ],
+                uuid: '159fde5a-7438-44ed-97ad-028094ab083f',
+                name: 'notificationProvider',
+            },
+        ],
+        url: 'http://webhook-notification-provider-service:8080',
+        authType: 'none',
+        authAttributes: [],
+        status: 'connected',
+    },
+];
+
+export const mockNotificationProviderAttributesDescriptors = [
+    {
+        version: 2,
+        uuid: '3b8a11b3-a59d-427c-9491-56c8ce27cee7',
+        name: 'data_webhookUrl',
+        description: 'Webhook URL to send the event data to',
+        content: [
+            {
+                reference: 'https://example.com/webhook',
+                data: 'https://example.com/webhook',
+            },
+        ],
+        type: 'data',
+        contentType: 'string',
+        properties: {
+            label: 'Webhook URL',
+            visible: true,
+            required: true,
+            readOnly: false,
+            list: false,
+            multiSelect: false,
+        },
+        constraints: [
+            {
+                description: 'Webhook URL',
+                errorMessage: 'Invalid webhook URL format',
+                type: 'regExp',
+                data: 'https?://.*',
+            },
+        ],
+    },
+    {
+        version: 2,
+        uuid: '5f2ef01f-4cc3-441e-be78-5dfdf2c4c2d9',
+        name: 'info_contentType',
+        description: 'Information about the content type',
+        content: [
+            {
+                data: 'The content type of the data to be sent to the webhook. The following content types are supported:\n- `RAW_JSON` - will send the data as raw JSON to the specified webhook URL\n- `JSON` - prepares the data in JSON format according to the specified template\n- `XML` - prepares the data in XML format according to the specified template\n\nThe template support FreeMarker syntax with variables that can be used to build the content dynamically.\n',
+            },
+        ],
+        type: 'info',
+        contentType: 'text',
+        properties: {
+            label: 'Content type information',
+            visible: true,
+        },
+    },
+    {
+        version: 2,
+        uuid: 'b104d74d-8a54-4aa3-9e00-9c535f8bb80c',
+        name: 'data_contentType',
+        description: 'Content type of the data to be sent',
+        content: [
+            {
+                reference: 'raw_json',
+                data: 'RAW_JSON',
+            },
+            {
+                reference: 'json',
+                data: 'JSON',
+            },
+            {
+                reference: 'xml',
+                data: 'XML',
+            },
+        ],
+        type: 'data',
+        contentType: 'string',
+        properties: {
+            label: 'Content type',
+            visible: true,
+            required: true,
+            readOnly: false,
+            list: true,
+            multiSelect: false,
+        },
+    },
+    {
+        version: 2,
+        uuid: 'f3b9ae81-279b-4886-a097-a8e08c2c356b',
+        name: 'group_contentTemplate',
+        description: 'Content template for the webhook to be sent in selected type',
+        type: 'group',
+        attributeCallback: {
+            callbackContext: '/v1/notificationProvider/callbacks/template/{contentType}/attributes',
+            callbackMethod: 'GET',
+            mappings: [
+                {
+                    from: 'data_contentType.data',
+                    to: 'contentType',
+                    targets: ['pathVariable'],
+                },
+            ],
+        },
+    },
+];
+
+export const mockNotificationInstanceDetail = {
+    uuid: '25020599-667b-4b25-8cc8-629ea05e7601',
+    name: 'test',
+    description: 'test',
+    connectorUuid: '4a3d3ec6-83bf-4075-97f2-8077ed96bffb',
+    connectorName: 'Webhook-Notification-Provider',
+    kind: 'WEBHOOK',
+    attributes: [
+        {
+            uuid: '3b8a11b3-a59d-427c-9491-56c8ce27cee7',
+            name: 'data_webhookUrl',
+            label: 'Webhook URL',
+            type: 'data',
+            contentType: 'string',
+            content: [
+                {
+                    data: 'https://example.com/webhook',
+                },
+            ],
+        },
+        {
+            uuid: 'b104d74d-8a54-4aa3-9e00-9c535f8bb80c',
+            name: 'data_contentType',
+            label: 'Content type',
+            type: 'data',
+            contentType: 'string',
+            content: [
+                {
+                    reference: 'raw_json',
+                    data: 'RAW_JSON',
+                },
+            ],
+        },
+    ],
+    attributeMappings: [
+        {
+            customAttributeLabel: 'Test Custom String',
+            customAttributeUuid: 'custom-string-uuid-123',
+            mappingAttributeUuid: '166b5cf52-63f2-11ec-90d6-0242ac120003',
+            mappingAttributeName: 'userAttribute',
+        },
+        {
+            customAttributeLabel: 'Test Custom Number',
+            customAttributeUuid: 'custom-number-uuid-456',
+            mappingAttributeUuid: '266b5cf52-63f2-11ec-90d6-0242ac120004',
+            mappingAttributeName: 'urgencyAttribute',
+        },
+    ],
+};
+
+export const mockMappingAttributes = [
+    {
+        version: '2',
+        uuid: '166b5cf52-63f2-11ec-90d6-0242ac120003',
+        name: 'userAttribute',
+        description: 'User-specific attribute mapping for notification processing',
+        content: [],
+        type: 'data',
+        contentType: 'string',
+        properties: {},
+        constraints: [],
+        attributeCallback: {},
+    },
+    {
+        version: '2',
+        uuid: '266b5cf52-63f2-11ec-90d6-0242ac120004',
+        name: 'urgencyAttribute',
+        description: 'Urgency level attribute for notification classification',
+        content: [],
+        type: 'data',
+        contentType: 'integer',
+        properties: {},
+        constraints: [],
+        attributeCallback: {},
+    },
+];
