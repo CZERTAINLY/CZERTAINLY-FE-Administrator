@@ -35,6 +35,7 @@ const TriggerDetails = () => {
     const actions = useSelector(rulesSelectors.actionsList);
     const rules = useSelector(rulesSelectors.rules);
     const [confirmDelete, setConfirmDelete] = useState(false);
+    const [confirmIgnoreTrigger, setConfirmIgnoreTrigger] = useState(false);
     const [updateDescriptionEditEnable, setUpdateDescription] = useState<boolean>(false);
     const [updatedDescription, setUpdatedDescription] = useState('');
     const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.TriggerType));
@@ -113,6 +114,25 @@ const TriggerDetails = () => {
         dispatch(rulesActions.deleteTrigger({ triggerUuid: id }));
         setConfirmDelete(false);
     }, [dispatch, id]);
+
+    const onIgnoreTriggerConfirmed = useCallback(() => {
+        if (!triggerDetails) return;
+        dispatch(
+            rulesActions.updateTrigger({
+                triggerUuid: triggerDetails.uuid,
+                trigger: {
+                    ignoreTrigger: true,
+                    description: triggerDetails.description || '',
+                    rulesUuids: triggerDetails?.rules.map((rule) => rule.uuid) || [],
+                    resource: triggerDetails.resource,
+                    type: triggerDetails.type,
+                    actionsUuids: [],
+                    event: triggerDetails.event,
+                },
+            }),
+        );
+        setConfirmIgnoreTrigger(false);
+    }, [dispatch, triggerDetails]);
 
     const onUpdateDescriptionConfirmed = useCallback(() => {
         if (!id || !triggerDetails || !updateDescriptionEditEnable) return;
@@ -290,20 +310,7 @@ const TriggerDetails = () => {
                                           dispatch(alertActions.info('Please add actions from the actions table'));
                                           triggerHighlight();
                                       } else {
-                                          dispatch(
-                                              rulesActions.updateTrigger({
-                                                  triggerUuid: triggerDetails.uuid,
-                                                  trigger: {
-                                                      ignoreTrigger: true,
-                                                      description: triggerDetails.description || '',
-                                                      rulesUuids: triggerDetails?.rules.map((rule) => rule.uuid) || [],
-                                                      resource: triggerDetails.resource,
-                                                      type: triggerDetails.type,
-                                                      actionsUuids: [],
-                                                      event: triggerDetails.event,
-                                                  },
-                                              }),
-                                          );
+                                          setConfirmIgnoreTrigger(true);
                                       }
                                   }}
                               />,
@@ -603,6 +610,17 @@ const TriggerDetails = () => {
                 buttons={[
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
                     { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                ]}
+            />
+
+            <Dialog
+                isOpen={confirmIgnoreTrigger}
+                caption={`Ignore Trigger`}
+                body={`You are about to mark this trigger as ignore trigger. This will remove all actions from the trigger. Is this what you want to do?`}
+                toggle={() => setConfirmIgnoreTrigger(false)}
+                buttons={[
+                    { color: 'warning', onClick: onIgnoreTriggerConfirmed, body: 'Ignore & remove actions' },
+                    { color: 'secondary', onClick: () => setConfirmIgnoreTrigger(false), body: 'Cancel' },
                 ]}
             />
         </Container>
