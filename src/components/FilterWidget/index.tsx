@@ -113,44 +113,12 @@ export default function FilterWidget({
 
         try {
             parse(`/${value}/`);
-        } catch {
-            return 'Invalid regex pattern';
+        } catch (error: any) {
+            return `Invalid regex pattern: ${error?.message ?? error}`;
         }
 
-        if (hasUnclosedConstructs(value)) {
-            return 'Incomplete regex pattern';
-        }
         return '';
     }, []);
-
-    function hasUnclosedConstructs(regex: string): boolean {
-        const stack: string[] = [];
-        for (let i = 0; i < regex.length; i++) {
-            const char = regex[i];
-
-            if (char === '\\') {
-                if (i < regex.length - 1) {
-                    i++;
-                }
-                continue;
-            }
-
-            if (char === '(' || char === '[' || char === '{') {
-                stack.push(char);
-            } else if (char === ')' || char === ']' || char === '}') {
-                const last = stack.pop();
-                if (!last) return true; // closing without opening
-                if ((char === ')' && last !== '(') || (char === ']' && last !== '[') || (char === '}' && last !== '{')) {
-                    return true; // mismatched closing
-                }
-            }
-        }
-
-        // Trailing unclosed backslash
-        if (regex.endsWith('\\')) return true;
-
-        return stack.length > 0; // unclosed openings
-    }
 
     const booleanOptions = useMemo(
         () => [
