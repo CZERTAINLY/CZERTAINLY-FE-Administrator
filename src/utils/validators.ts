@@ -195,6 +195,18 @@ const POSIX_CLASSES = new Set([
     'xdigit',
 ]);
 
+const hasUnescapedSequence = (haystack: string, seq: string): boolean => {
+    for (let i = 0; i <= haystack.length - seq.length; i++) {
+        if (haystack.slice(i, i + seq.length) !== seq) continue;
+        let bs = 0;
+        for (let j = i - 1; j >= 0 && haystack[j] === '\\'; j--) bs++;
+        if (bs % 2 === 0) {
+            return true;
+        }
+    }
+    return false;
+};
+
 export const validatePostgresPosixRegex = (value: string): string => {
     if (!value) return '';
 
@@ -208,8 +220,16 @@ export const validatePostgresPosixRegex = (value: string): string => {
 
     // 1) Forbid known non-POSIX/PCRE tokens outright
     for (const tok of FORBIDDEN_TOKENS) {
-        if (value.includes(tok)) {
-            return `Unsupported regex token for PostgreSQL POSIX: "${tok}"`;
+        // tokens starting with '\' must respect escape parity
+        if (tok.startsWith('\\')) {
+            if (hasUnescapedSequence(value, tok)) {
+                return `Unsupported regex token for PostgreSQL POSIX: "${tok}"`;
+            }
+        } else {
+            // for tokens like '(?=' treat them as unescaped if not preceded by a backslash
+            if (hasUnescapedSequence(value, tok)) {
+                return `Unsupported regex token for PostgreSQL POSIX: "${tok}"`;
+            }
         }
     }
 
