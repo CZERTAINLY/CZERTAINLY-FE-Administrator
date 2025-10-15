@@ -312,10 +312,32 @@ export const validatePostgresPosixRegex = (value: string): string => {
 
     // 4) Backreferences \1..\9 are allowed in ARE only if that many groups exist
     //    (basic check; not 100% perfect but helpful)
-    const groupCount = (value.match(/(?<!\\)\(/g) || []).length;
-    const backrefs = value.match(/(^|[^\\])\\([1-9])/g) || [];
-    for (const m of backrefs) {
-        const d = Number(m.slice(-1));
+    let groupCount = 0;
+    for (let i = 0; i < value.length; i++) {
+        if (value[i] === '\\') {
+            i++;
+            continue;
+        }
+        if (value[i] === '(') groupCount++;
+    }
+
+    //    Find unescaped backreferences \1..\9 (again via backslash parity):
+    const backrefs: number[] = [];
+    for (let i = 0; i < value.length - 1; i++) {
+        if (value[i] !== '\\') continue;
+
+        // count consecutive backslashes ending at position i
+        let bs = 1;
+        for (let j = i - 1; j >= 0 && value[j] === '\\'; j--) bs++;
+
+        // odd => this '\' is unescaped
+        if (bs % 2 === 1) {
+            const d = value.charCodeAt(i + 1) - 48; // '1'..'9' -> 1..9
+            if (d >= 1 && d <= 9) backrefs.push(d);
+        }
+    }
+
+    for (const d of backrefs) {
         if (d > groupCount) {
             return `Backreference \\${d} refers to non-existent capturing group.`;
         }
