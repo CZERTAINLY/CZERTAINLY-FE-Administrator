@@ -242,6 +242,18 @@ describe('FilterWidget Component', () => {
         cy.get('#addFilter').should('be.disabled');
     });
 
+    it('shows "Incomplete regex pattern" for unclosed constructs', () => {
+        cy.get('[data-testid="group-control"]').click();
+        cy.get('[data-testid="group-menu"]').contains('Property').click();
+        cy.get('[data-testid="field-control"]').click();
+        cy.get('[data-testid="field-menu"]').contains('Common Name').click();
+        cy.get('[data-testid="condition-control"]').click();
+        cy.get('[data-testid="condition-menu"]').contains('Matches').click();
+        cy.get('#valueSelect').clear().type('a{2');
+        cy.contains('Unterminated quantifier').should('exist');
+        cy.get('#addFilter').should('be.disabled');
+    });
+
     it('accepts valid regex and enables Add button', () => {
         // use a valid regex; escape backslash sequence for digit shorthand
         cy.get('[data-testid="group-control"]').click();

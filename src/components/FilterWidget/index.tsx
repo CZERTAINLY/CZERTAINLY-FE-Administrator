@@ -32,8 +32,7 @@ import {
     getInputStringFromIso8601String as getDurationStringFromIso8601String,
     getIso8601StringFromInputString as getIso8601StringFromDurationString,
 } from 'utils/duration';
-import { validateDuration } from 'utils/validators';
-import { parse } from 'regexp-tree';
+import { validateDuration, validatePostgresPosixRegex } from 'utils/validators';
 
 const noValue: { [condition in FilterConditionOperator]: boolean } = {
     [FilterConditionOperator.Equals]: false,
@@ -107,18 +106,6 @@ export default function FilterWidget({
         | undefined
     >(undefined);
     const [regexError, setRegexError] = useState<string>('');
-
-    const validateRegex = useCallback((value: string): string => {
-        if (!value) return '';
-
-        try {
-            parse(`/${value}/`);
-        } catch (error: any) {
-            return `Invalid regex pattern: ${error?.message ?? error}`;
-        }
-
-        return '';
-    }, []);
 
     const booleanOptions = useMemo(
         () => [
@@ -510,7 +497,7 @@ export default function FilterWidget({
                             setFilterValue(JSON.parse(JSON.stringify(value)));
 
                             if (isRegex) {
-                                const error = validateRegex(value);
+                                const error = validatePostgresPosixRegex(value);
                                 setRegexError(error);
                             } else {
                                 setRegexError('');
@@ -625,7 +612,6 @@ export default function FilterWidget({
         filterValue,
         objectValueOptions,
         regexError,
-        validateRegex,
     ]);
     return (
         <>
