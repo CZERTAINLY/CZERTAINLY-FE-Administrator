@@ -221,15 +221,8 @@ export const validatePostgresPosixRegex = (value: string): string => {
     // 1) Forbid known non-POSIX/PCRE tokens outright
     for (const tok of FORBIDDEN_TOKENS) {
         // tokens starting with '\' must respect escape parity
-        if (tok.startsWith('\\')) {
-            if (hasUnescapedSequence(value, tok)) {
-                return `Unsupported regex token for PostgreSQL POSIX: "${tok}"`;
-            }
-        } else {
-            // for tokens like '(?=' treat them as unescaped if not preceded by a backslash
-            if (hasUnescapedSequence(value, tok)) {
-                return `Unsupported regex token for PostgreSQL POSIX: "${tok}"`;
-            }
+        if (hasUnescapedSequence(value, tok)) {
+            return `Unsupported regex token for PostgreSQL POSIX: "${tok}"`;
         }
     }
 
