@@ -250,7 +250,7 @@ describe('FilterWidget Component', () => {
         cy.get('[data-testid="condition-control"]').click();
         cy.get('[data-testid="condition-menu"]').contains('Matches').click();
         cy.get('#valueSelect').clear().type('a{2');
-        cy.contains('Incomplete regex pattern').should('exist');
+        cy.contains('Unterminated quantifier').should('exist');
         cy.get('#addFilter').should('be.disabled');
     });
 
