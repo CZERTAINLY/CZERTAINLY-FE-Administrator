@@ -18,6 +18,13 @@ RUN npm run build
 # production environment
 FROM nginxinc/nginx-unprivileged:1.29.1-alpine
 
+USER root
+RUN apk update \
+  && apk add --no-cache --upgrade pcre2 \
+  && apk info -v pcre2 \
+  && rm -rf /var/cache/apk/*
+USER 101
+
 WORKDIR /usr/share/nginx/html
 
 ENV API_URL=/api
