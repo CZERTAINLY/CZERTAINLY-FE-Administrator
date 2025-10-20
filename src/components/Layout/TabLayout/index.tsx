@@ -24,10 +24,10 @@ export default function TabLayout({ tabs, onlyActiveTabContent = false, selected
     useEffect(() => {
         if (selectedTab !== undefined && selectedTab !== activeTab) {
             setActiveTab(selectedTab);
-        } else if (memoizedTabs.length <= activeTab) {
+        } else if (tabs.length <= activeTab) {
             setActiveTab(0);
         }
-    }, [activeTab, memoizedTabs, selectedTab]);
+    }, [activeTab, tabs, selectedTab]);
 
     return (
         <>
