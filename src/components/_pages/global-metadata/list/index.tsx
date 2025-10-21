@@ -107,7 +107,6 @@ export default function GlobalMetadataList() {
                 titleSize="large"
                 refreshAction={getFreshData}
             >
-                <br />
                 <CustomTable
                     headers={globalMetadataTableHeaders}
                     data={globalMetadataTableData}

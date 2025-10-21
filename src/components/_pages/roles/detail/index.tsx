@@ -263,12 +263,10 @@ export default function UserDetail() {
                 refreshAction={getFreshDetails}
                 widgetLockName={LockWidgetNameEnum.RoleDetails}
             >
-                <br />
                 <CustomTable headers={detailHeaders} data={detailData} />
             </Widget>
 
             <Widget title="Assigned Users" busy={isFetchingDetail} titleSize="large">
-                <br />
                 <CustomTable headers={usersHeaders} data={usersData} />
             </Widget>
 

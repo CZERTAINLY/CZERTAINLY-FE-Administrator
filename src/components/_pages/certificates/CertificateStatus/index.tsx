@@ -28,11 +28,14 @@ function CertificateStatus({ status, asIcon = false }: Props) {
     const text = getStatusText(status);
 
     return asIcon ? (
-        <i title={capitalize(text)} className={`fa fa-circle`} style={{ color: color }} />
+        <span title={capitalize(text)} className="w-3 h-3 rounded-full inline-block" style={{ backgroundColor: color }} />
     ) : (
-        <Badge color={color} style={{ background: color }}>
+        <span
+            style={{ backgroundColor: color }}
+            className="inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-xs font-medium text-white"
+        >
             {capitalize(text)}
-        </Badge>
+        </span>
     );
 }
 

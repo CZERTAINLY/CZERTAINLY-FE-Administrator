@@ -216,7 +216,7 @@ export default function UsersList() {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <div>
             <Widget
                 title="List of Users"
                 busy={isBusy}
@@ -225,7 +225,6 @@ export default function UsersList() {
                 titleSize="large"
                 refreshAction={getFreshData}
             >
-                <br />
                 <CustomTable
                     headers={userTableHeader}
                     data={userTableData}
@@ -246,6 +245,6 @@ export default function UsersList() {
                     { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
-        </Container>
+        </div>
     );
 }

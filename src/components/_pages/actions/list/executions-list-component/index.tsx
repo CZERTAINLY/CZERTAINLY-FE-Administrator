@@ -145,7 +145,6 @@ const ExecutionsList = () => {
                     description: 'Executions is named set of execution items',
                 }}
             >
-                <br />
                 <CustomTable
                     checkedRows={checkedRows}
                     hasCheckboxes

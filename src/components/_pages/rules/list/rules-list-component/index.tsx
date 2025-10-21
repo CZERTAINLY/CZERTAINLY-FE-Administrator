@@ -140,7 +140,6 @@ const RulesList = () => {
                     description: 'Rules contain set of conditions',
                 }}
             >
-                <br />
                 <CustomTable
                     checkedRows={checkedRows}
                     hasCheckboxes

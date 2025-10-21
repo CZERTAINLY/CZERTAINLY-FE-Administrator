@@ -1,5 +1,3 @@
-import { Col, Container, Row } from 'reactstrap';
-
 import Spinner from 'components/Spinner';
 import { selectors as enumSelectors } from 'ducks/enums';
 import { actions as certificatesActions, selectors as certificatesSelectors } from 'ducks/certificates';
@@ -16,7 +14,7 @@ import {
 import { getDateInString } from 'utils/dateUtil';
 import CountBadge from './DashboardItem/CountBadge';
 import DonutChart from './DashboardItem/DonutChart';
-import SwitchWidget from 'components/SwitchWidget';
+import Switch from 'components/Switch';
 
 function Dashboard() {
     const dashboard = useSelector(selectors.statisticsDashboard);
@@ -51,189 +49,157 @@ function Dashboard() {
     }
 
     return (
-        <Container className="themed-container" fluid={true}>
-            <Row className="align-items-stretch">
-                <Col className="d-flex">
+        <div>
+            <div className="flex flex-row gap-4 md:gap-8 mb-4 md:mb-8">
+                <div className="flex-1">
                     <CountBadge
                         data={dashboard?.totalCertificates}
                         title="Certificates"
                         link="../certificates"
                         extraComponent={
-                            <div className="d-flex align-items-center">
-                                <SwitchWidget
-                                    label="Include archived"
-                                    id="archived-switch"
-                                    disabled={false}
-                                    checked={isIncludeArchived}
-                                    onClick={() => dispatch(certificatesActions.setIncludeArchived(!isIncludeArchived))}
-                                />
-                            </div>
+                            <Switch
+                                label="Include archived"
+                                id="archived-switch"
+                                checked={isIncludeArchived}
+                                onChange={() => dispatch(certificatesActions.setIncludeArchived(!isIncludeArchived))}
+                            />
                         }
                     />
-                </Col>
-
-                <Col className="d-flex">
+                </div>
+                <div className="flex-1">
                     <CountBadge data={dashboard?.totalGroups} title="Groups" link="../groups" />
-                </Col>
-
-                <Col className="d-flex">
+                </div>
+                <div className="flex-1">
                     <CountBadge data={dashboard?.totalDiscoveries} title="Discoveries" link="../discoveries" />
-                </Col>
-
-                <Col className="d-flex">
+                </div>
+                <div className="flex-1">
                     <CountBadge data={dashboard?.totalRaProfiles} title="RA Profiles" link="../raprofiles" />
-                </Col>
-            </Row>
+                </div>
+            </div>
 
-            <Row xs="1" sm="1" md="2" lg="2" xl="3">
+            <div className="flex flex-row flex-wrap gap-4 md:gap-8">
                 {!isEmpty(dashboard?.certificateStatByState) && (
-                    <Col>
-                        <DonutChart
-                            colorOptions={certificatesStateColorOptions}
-                            title={'Certificates by State'}
-                            data={dashboard?.certificateStatByState}
-                            entity={EntityType.CERTIFICATE}
-                            onSetFilter={(index, labels) => {
-                                const certificateStateEnum = platformEnums?.CertificateState;
-                                const certificateStateList = Object.keys(certificateStateEnum).map((key) => certificateStateEnum[key]);
-                                const selectedCertificateState = certificateStateList.find((status) => status.label === labels[index]);
-                                return [
-                                    {
-                                        fieldSource: FilterFieldSource.Property,
-                                        condition: FilterConditionOperator.Equals,
-                                        fieldIdentifier: 'CERTIFICATE_STATE',
-                                        value: selectedCertificateState?.code ? [selectedCertificateState?.code] : [''],
-                                    },
-                                ];
-                            }}
-                            redirect="../certificates"
-                        />
-                    </Col>
+                    <DonutChart
+                        colorOptions={certificatesStateColorOptions}
+                        title={'Certificates by State'}
+                        data={dashboard?.certificateStatByState}
+                        entity={EntityType.CERTIFICATE}
+                        onSetFilter={(index, labels) => {
+                            const certificateStateEnum = platformEnums?.CertificateState;
+                            const certificateStateList = Object.keys(certificateStateEnum).map((key) => certificateStateEnum[key]);
+                            const selectedCertificateState = certificateStateList.find((status) => status.label === labels[index]);
+                            return [
+                                {
+                                    fieldSource: FilterFieldSource.Property,
+                                    condition: FilterConditionOperator.Equals,
+                                    fieldIdentifier: 'CERTIFICATE_STATE',
+                                    value: selectedCertificateState?.code ? [selectedCertificateState?.code] : [''],
+                                },
+                            ];
+                        }}
+                        redirect="../certificates"
+                    />
                 )}
                 {!isEmpty(dashboard?.certificateStatByValidationStatus) && (
-                    <Col>
-                        <DonutChart
-                            colorOptions={certificateValidationStatusColorOptions}
-                            title={'Certificates by Validation'}
-                            data={dashboard?.certificateStatByValidationStatus}
-                            entity={EntityType.CERTIFICATE}
-                            onSetFilter={(index, labels) => {
-                                const certificateValidationStatusEnum = platformEnums?.CertificateValidationStatus;
-                                const certificateValidationStatusList = Object.keys(certificateValidationStatusEnum).map(
-                                    (key) => certificateValidationStatusEnum[key],
-                                );
-                                const selectedCertificateValidationStatus = certificateValidationStatusList.find(
-                                    (status) => status.label === labels[index],
-                                );
-                                return [
-                                    {
-                                        fieldSource: FilterFieldSource.Property,
-                                        condition: FilterConditionOperator.Equals,
-                                        fieldIdentifier: 'CERTIFICATE_VALIDATION_STATUS',
-                                        value: selectedCertificateValidationStatus?.code
-                                            ? [selectedCertificateValidationStatus?.code]
-                                            : [''],
-                                    },
-                                ];
-                            }}
-                            redirect="../certificates"
-                        />
-                    </Col>
+                    <DonutChart
+                        colorOptions={certificateValidationStatusColorOptions}
+                        title={'Certificates by Validation'}
+                        data={dashboard?.certificateStatByValidationStatus}
+                        entity={EntityType.CERTIFICATE}
+                        onSetFilter={(index, labels) => {
+                            const certificateValidationStatusEnum = platformEnums?.CertificateValidationStatus;
+                            const certificateValidationStatusList = Object.keys(certificateValidationStatusEnum).map(
+                                (key) => certificateValidationStatusEnum[key],
+                            );
+                            const selectedCertificateValidationStatus = certificateValidationStatusList.find(
+                                (status) => status.label === labels[index],
+                            );
+                            return [
+                                {
+                                    fieldSource: FilterFieldSource.Property,
+                                    condition: FilterConditionOperator.Equals,
+                                    fieldIdentifier: 'CERTIFICATE_VALIDATION_STATUS',
+                                    value: selectedCertificateValidationStatus?.code ? [selectedCertificateValidationStatus?.code] : [''],
+                                },
+                            ];
+                        }}
+                        redirect="../certificates"
+                    />
                 )}
                 {!isEmpty(dashboard?.certificateStatByComplianceStatus) && (
-                    <Col>
-                        <DonutChart
-                            title={'Certificates by Compliance'}
-                            data={dashboard?.certificateStatByComplianceStatus}
-                            colorOptions={certificateComplianceColorOptions}
-                            entity={EntityType.CERTIFICATE}
-                            onSetFilter={(index, labels) => {
-                                const complianceStatusEnum = platformEnums?.ComplianceStatus;
-                                const complianceStatusList = Object.keys(complianceStatusEnum).map((key) => complianceStatusEnum[key]);
-                                const selectedComplianceStatus = complianceStatusList.find((status) => status.label === labels[index]);
-                                return [
-                                    {
-                                        fieldSource: FilterFieldSource.Property,
-                                        condition: FilterConditionOperator.Equals,
-                                        fieldIdentifier: 'COMPLIANCE_STATUS',
-                                        value: selectedComplianceStatus?.code ? [selectedComplianceStatus?.code] : [''],
-                                    },
-                                ];
-                            }}
-                            redirect="../certificates"
-                        />
-                    </Col>
+                    <DonutChart
+                        title={'Certificates by Compliance'}
+                        data={dashboard?.certificateStatByComplianceStatus}
+                        colorOptions={certificateComplianceColorOptions}
+                        entity={EntityType.CERTIFICATE}
+                        onSetFilter={(index, labels) => {
+                            const complianceStatusEnum = platformEnums?.ComplianceStatus;
+                            const complianceStatusList = Object.keys(complianceStatusEnum).map((key) => complianceStatusEnum[key]);
+                            const selectedComplianceStatus = complianceStatusList.find((status) => status.label === labels[index]);
+                            return [
+                                {
+                                    fieldSource: FilterFieldSource.Property,
+                                    condition: FilterConditionOperator.Equals,
+                                    fieldIdentifier: 'COMPLIANCE_STATUS',
+                                    value: selectedComplianceStatus?.code ? [selectedComplianceStatus?.code] : [''],
+                                },
+                            ];
+                        }}
+                        redirect="../certificates"
+                    />
                 )}
                 {!isEmpty(dashboard?.certificateStatByType) && (
-                    <Col>
-                        <DonutChart
-                            title={'Certificates by Type'}
-                            data={dashboard?.certificateStatByType}
-                            entity={EntityType.CERTIFICATE}
-                            onSetFilter={(_index, _labels) => []}
-                            redirect="../certificates"
-                        />
-                    </Col>
+                    <DonutChart
+                        title={'Certificates by Type'}
+                        data={dashboard?.certificateStatByType}
+                        entity={EntityType.CERTIFICATE}
+                        onSetFilter={(_index, _labels) => []}
+                        redirect="../certificates"
+                    />
                 )}
                 {!isEmpty(dashboard?.certificateStatByExpiry) && (
-                    <Col>
-                        <DonutChart
-                            colorOptions={certificateByExpirationDaysColorOptions}
-                            title={'Certificates by Expiration in Days'}
-                            data={dashboard?.certificateStatByExpiry}
-                            entity={EntityType.CERTIFICATE}
-                            onSetFilter={(index, labels) => {
-                                if (labels[index] === 'More') {
-                                    return [
-                                        {
-                                            fieldSource: FilterFieldSource.Property,
-                                            condition: FilterConditionOperator.Greater,
-                                            fieldIdentifier: 'NOT_AFTER',
-                                            value: JSON.parse(JSON.stringify(getDateInString(90))),
-                                        },
-                                    ];
-                                }
-                                if (labels[index] === 'Expired') {
-                                    return [
-                                        {
-                                            fieldSource: FilterFieldSource.Property,
-                                            condition: FilterConditionOperator.Lesser,
-                                            fieldIdentifier: 'NOT_AFTER',
-                                            value: JSON.parse(JSON.stringify(getDateInString(0))),
-                                        },
-                                    ];
-                                }
-                                if (labels[index] === 'Not Issued') {
-                                    return [
-                                        {
-                                            fieldSource: FilterFieldSource.Property,
-                                            condition: FilterConditionOperator.Empty,
-                                            fieldIdentifier: 'NOT_AFTER',
-                                        },
-                                    ];
-                                }
-                                if (labels[index] === '60' || labels[index] === '90') {
-                                    return [
-                                        {
-                                            fieldSource: FilterFieldSource.Property,
-                                            condition: FilterConditionOperator.Greater,
-                                            fieldIdentifier: 'NOT_AFTER',
-                                            value: JSON.parse(JSON.stringify(getDateInString(+labels[index] - 30))),
-                                        },
-                                        {
-                                            fieldSource: FilterFieldSource.Property,
-                                            condition: FilterConditionOperator.Lesser,
-                                            fieldIdentifier: 'NOT_AFTER',
-                                            value: JSON.parse(JSON.stringify(getDateInString(+labels[index]))),
-                                        },
-                                    ];
-                                }
+                    <DonutChart
+                        colorOptions={certificateByExpirationDaysColorOptions}
+                        title={'Certificates by Expiration in Days'}
+                        data={dashboard?.certificateStatByExpiry}
+                        entity={EntityType.CERTIFICATE}
+                        onSetFilter={(index, labels) => {
+                            if (labels[index] === 'More') {
                                 return [
                                     {
                                         fieldSource: FilterFieldSource.Property,
                                         condition: FilterConditionOperator.Greater,
                                         fieldIdentifier: 'NOT_AFTER',
-                                        value: JSON.parse(JSON.stringify(getDateInString(+labels[index] - 10))),
+                                        value: JSON.parse(JSON.stringify(getDateInString(90))),
+                                    },
+                                ];
+                            }
+                            if (labels[index] === 'Expired') {
+                                return [
+                                    {
+                                        fieldSource: FilterFieldSource.Property,
+                                        condition: FilterConditionOperator.Lesser,
+                                        fieldIdentifier: 'NOT_AFTER',
+                                        value: JSON.parse(JSON.stringify(getDateInString(0))),
+                                    },
+                                ];
+                            }
+                            if (labels[index] === 'Not Issued') {
+                                return [
+                                    {
+                                        fieldSource: FilterFieldSource.Property,
+                                        condition: FilterConditionOperator.Empty,
+                                        fieldIdentifier: 'NOT_AFTER',
+                                    },
+                                ];
+                            }
+                            if (labels[index] === '60' || labels[index] === '90') {
+                                return [
+                                    {
+                                        fieldSource: FilterFieldSource.Property,
+                                        condition: FilterConditionOperator.Greater,
+                                        fieldIdentifier: 'NOT_AFTER',
+                                        value: JSON.parse(JSON.stringify(getDateInString(+labels[index] - 30))),
                                     },
                                     {
                                         fieldSource: FilterFieldSource.Property,
@@ -242,127 +208,133 @@ function Dashboard() {
                                         value: JSON.parse(JSON.stringify(getDateInString(+labels[index]))),
                                     },
                                 ];
-                            }}
-                            redirect="../certificates"
-                        />
-                    </Col>
+                            }
+                            return [
+                                {
+                                    fieldSource: FilterFieldSource.Property,
+                                    condition: FilterConditionOperator.Greater,
+                                    fieldIdentifier: 'NOT_AFTER',
+                                    value: JSON.parse(JSON.stringify(getDateInString(+labels[index] - 10))),
+                                },
+                                {
+                                    fieldSource: FilterFieldSource.Property,
+                                    condition: FilterConditionOperator.Lesser,
+                                    fieldIdentifier: 'NOT_AFTER',
+                                    value: JSON.parse(JSON.stringify(getDateInString(+labels[index]))),
+                                },
+                            ];
+                        }}
+                        redirect="../certificates"
+                    />
                 )}
                 {!isEmpty(dashboard?.certificateStatByKeySize) && (
-                    <Col>
-                        <DonutChart
-                            title={'Certificates by Key Size'}
-                            colorOptions={getDonutChartColorsByRandomNumberOfOptions(
-                                Object.keys(dashboard?.certificateStatByKeySize ?? {}).length,
-                            )}
-                            data={dashboard?.certificateStatByKeySize}
-                            entity={EntityType.CERTIFICATE}
-                            onSetFilter={(index, labels) => [
+                    <DonutChart
+                        title={'Certificates by Key Size'}
+                        colorOptions={getDonutChartColorsByRandomNumberOfOptions(
+                            Object.keys(dashboard?.certificateStatByKeySize ?? {}).length,
+                        )}
+                        data={dashboard?.certificateStatByKeySize}
+                        entity={EntityType.CERTIFICATE}
+                        onSetFilter={(index, labels) => [
+                            {
+                                fieldSource: FilterFieldSource.Property,
+                                condition: FilterConditionOperator.Equals,
+                                fieldIdentifier: 'KEY_SIZE',
+                                value: JSON.parse(JSON.stringify(labels[index])),
+                            },
+                        ]}
+                        redirect="../certificates"
+                    />
+                )}
+                {!isEmpty(dashboard?.raProfileStatByCertificateCount) && (
+                    <DonutChart
+                        title={'Certificates by RA Profile'}
+                        colorOptions={getDonutChartColorsByRandomNumberOfOptions(
+                            Object.keys(dashboard?.raProfileStatByCertificateCount ?? {}).length,
+                        )}
+                        data={dashboard?.raProfileStatByCertificateCount}
+                        entity={EntityType.CERTIFICATE}
+                        onSetFilter={(index, labels) =>
+                            labels[index] === 'Unknown' || labels[index] === 'Unassigned'
+                                ? [
+                                      {
+                                          fieldSource: FilterFieldSource.Property,
+                                          condition: FilterConditionOperator.Empty,
+                                          fieldIdentifier: 'RA_PROFILE_NAME',
+                                          value: JSON.parse(JSON.stringify('')),
+                                      },
+                                  ]
+                                : [
+                                      {
+                                          fieldSource: FilterFieldSource.Property,
+                                          condition: FilterConditionOperator.Equals,
+                                          fieldIdentifier: 'RA_PROFILE_NAME',
+                                          value: JSON.parse(JSON.stringify(labels[index])),
+                                      },
+                                  ]
+                        }
+                        redirect="../certificates"
+                    />
+                )}
+                {!isEmpty(dashboard?.groupStatByCertificateCount) && (
+                    <DonutChart
+                        title={'Certificates by Group'}
+                        colorOptions={getDonutChartColorsByRandomNumberOfOptions(
+                            Object.keys(dashboard?.groupStatByCertificateCount ?? {}).length,
+                        )}
+                        data={dashboard?.groupStatByCertificateCount}
+                        entity={EntityType.CERTIFICATE}
+                        onSetFilter={(index, labels) =>
+                            labels[index] === 'Unassigned'
+                                ? [
+                                      {
+                                          fieldSource: FilterFieldSource.Property,
+                                          condition: FilterConditionOperator.Empty,
+                                          fieldIdentifier: 'GROUP_NAME',
+                                          value: JSON.parse(JSON.stringify('')),
+                                      },
+                                  ]
+                                : [
+                                      {
+                                          fieldSource: FilterFieldSource.Property,
+                                          condition: FilterConditionOperator.Equals,
+                                          fieldIdentifier: 'GROUP_NAME',
+                                          value: JSON.parse(JSON.stringify(labels[index])),
+                                      },
+                                  ]
+                        }
+                        redirect="../certificates"
+                    />
+                )}
+                {!isEmpty(dashboard?.certificateStatBySubjectType) && (
+                    <DonutChart
+                        title={'Certificates by Subject type'}
+                        data={dashboard?.certificateStatBySubjectType}
+                        entity={EntityType.CERTIFICATE}
+                        onSetFilter={(index, labels) => {
+                            const certificateSubjectTypeEnum = platformEnums?.CertificateSubjectType;
+                            const certificateSubjectTypeList = Object.keys(certificateSubjectTypeEnum).map(
+                                (key) => certificateSubjectTypeEnum[key],
+                            );
+                            const selectedCertificateSubjectType = certificateSubjectTypeList.find(
+                                (status) => status.label === labels[index],
+                            );
+                            return [
                                 {
                                     fieldSource: FilterFieldSource.Property,
                                     condition: FilterConditionOperator.Equals,
-                                    fieldIdentifier: 'KEY_SIZE',
-                                    value: JSON.parse(JSON.stringify(labels[index])),
+                                    fieldIdentifier: 'SUBJECT_TYPE',
+                                    value: selectedCertificateSubjectType?.code ? [selectedCertificateSubjectType?.code] : [''],
                                 },
-                            ]}
-                            redirect="../certificates"
-                        />
-                    </Col>
+                            ];
+                        }}
+                        redirect="../certificates"
+                    />
                 )}
-                {!isEmpty(dashboard?.raProfileStatByCertificateCount) && (
-                    <Col>
-                        <DonutChart
-                            title={'Certificates by RA Profile'}
-                            colorOptions={getDonutChartColorsByRandomNumberOfOptions(
-                                Object.keys(dashboard?.raProfileStatByCertificateCount ?? {}).length,
-                            )}
-                            data={dashboard?.raProfileStatByCertificateCount}
-                            entity={EntityType.CERTIFICATE}
-                            onSetFilter={(index, labels) =>
-                                labels[index] === 'Unknown' || labels[index] === 'Unassigned'
-                                    ? [
-                                          {
-                                              fieldSource: FilterFieldSource.Property,
-                                              condition: FilterConditionOperator.Empty,
-                                              fieldIdentifier: 'RA_PROFILE_NAME',
-                                              value: JSON.parse(JSON.stringify('')),
-                                          },
-                                      ]
-                                    : [
-                                          {
-                                              fieldSource: FilterFieldSource.Property,
-                                              condition: FilterConditionOperator.Equals,
-                                              fieldIdentifier: 'RA_PROFILE_NAME',
-                                              value: JSON.parse(JSON.stringify(labels[index])),
-                                          },
-                                      ]
-                            }
-                            redirect="../certificates"
-                        />
-                    </Col>
-                )}
-                {!isEmpty(dashboard?.groupStatByCertificateCount) && (
-                    <Col>
-                        <DonutChart
-                            title={'Certificates by Group'}
-                            colorOptions={getDonutChartColorsByRandomNumberOfOptions(
-                                Object.keys(dashboard?.groupStatByCertificateCount ?? {}).length,
-                            )}
-                            data={dashboard?.groupStatByCertificateCount}
-                            entity={EntityType.CERTIFICATE}
-                            onSetFilter={(index, labels) =>
-                                labels[index] === 'Unassigned'
-                                    ? [
-                                          {
-                                              fieldSource: FilterFieldSource.Property,
-                                              condition: FilterConditionOperator.Empty,
-                                              fieldIdentifier: 'GROUP_NAME',
-                                              value: JSON.parse(JSON.stringify('')),
-                                          },
-                                      ]
-                                    : [
-                                          {
-                                              fieldSource: FilterFieldSource.Property,
-                                              condition: FilterConditionOperator.Equals,
-                                              fieldIdentifier: 'GROUP_NAME',
-                                              value: JSON.parse(JSON.stringify(labels[index])),
-                                          },
-                                      ]
-                            }
-                            redirect="../certificates"
-                        />
-                    </Col>
-                )}
-                {!isEmpty(dashboard?.certificateStatBySubjectType) && (
-                    <Col>
-                        <DonutChart
-                            title={'Certificates by Subject type'}
-                            data={dashboard?.certificateStatBySubjectType}
-                            entity={EntityType.CERTIFICATE}
-                            onSetFilter={(index, labels) => {
-                                const certificateSubjectTypeEnum = platformEnums?.CertificateSubjectType;
-                                const certificateSubjectTypeList = Object.keys(certificateSubjectTypeEnum).map(
-                                    (key) => certificateSubjectTypeEnum[key],
-                                );
-                                const selectedCertificateSubjectType = certificateSubjectTypeList.find(
-                                    (status) => status.label === labels[index],
-                                );
-                                return [
-                                    {
-                                        fieldSource: FilterFieldSource.Property,
-                                        condition: FilterConditionOperator.Equals,
-                                        fieldIdentifier: 'SUBJECT_TYPE',
-                                        value: selectedCertificateSubjectType?.code ? [selectedCertificateSubjectType?.code] : [''],
-                                    },
-                                ];
-                            }}
-                            redirect="../certificates"
-                        />
-                    </Col>
-                )}
-            </Row>
+            </div>
 
             <Spinner active={isFetching || dashboard === null} />
-        </Container>
+        </div>
     );
 }
 

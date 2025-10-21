@@ -213,7 +213,6 @@ function RaProfileList() {
                 titleSize="large"
                 refreshAction={getFreshData}
             >
-                <br />
                 <CustomTable
                     headers={raProfilesTableHeaders}
                     data={profilesTableData}

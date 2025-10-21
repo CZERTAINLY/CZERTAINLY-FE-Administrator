@@ -140,7 +140,6 @@ const ActionsList = () => {
                     description: 'Actions are combination of Executions',
                 }}
             >
-                <br />
                 <CustomTable
                     checkedRows={checkedRows}
                     hasCheckboxes

@@ -145,7 +145,6 @@ export default function CustomAttributesList() {
                 titleSize="large"
                 refreshAction={getFreshData}
             >
-                <br />
                 <CustomTable
                     headers={customAttributesTableHeaders}
                     data={customAttributesTableData}

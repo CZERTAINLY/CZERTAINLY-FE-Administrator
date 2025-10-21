@@ -195,7 +195,6 @@ export default function SchedulerJobDetail() {
                 refreshAction={getFreshSchedulerJobDetails}
                 widgetLockName={LockWidgetNameEnum.SchedulerJobDetail}
             >
-                <br />
                 <CustomTable headers={detailHeaders} data={detailData} />
             </Widget>
             {id && <SchedulerJobHistory uuid={id} />}

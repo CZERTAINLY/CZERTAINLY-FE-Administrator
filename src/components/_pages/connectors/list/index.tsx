@@ -239,7 +239,7 @@ export default function ConnectorList() {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <div>
             <Widget
                 title="Connector Store"
                 busy={isBusy}
@@ -248,8 +248,6 @@ export default function ConnectorList() {
                 widgetButtons={buttons}
                 titleSize="large"
             >
-                <br />
-
                 <CustomTable
                     headers={connectorsRowHeaders}
                     data={connectorList}
@@ -292,6 +290,6 @@ export default function ConnectorList() {
                     { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
                 ]}
             />
-        </Container>
+        </div>
     );
 }

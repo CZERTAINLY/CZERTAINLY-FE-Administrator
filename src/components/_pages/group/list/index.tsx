@@ -119,7 +119,6 @@ export default function GroupList() {
                 titleSize="large"
                 refreshAction={getFreshData}
             >
-                <br />
                 <CustomTable
                     headers={groupsTableHeaders}
                     data={groupsTableData}

@@ -259,7 +259,6 @@ function TokenProfileList() {
                 titleSize="large"
                 refreshAction={getFreshData}
             >
-                <br />
                 <CustomTable
                     headers={tokenProfilesTableHeaders}
                     data={profilesTableData}

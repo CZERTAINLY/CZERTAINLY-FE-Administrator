@@ -1,77 +1,60 @@
-import cx from 'classnames';
-import { useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Link, NavLink } from 'react-router';
-import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Nav, NavItem, Navbar } from 'reactstrap';
+import { Link, useNavigate } from 'react-router';
+import { Menu, User } from 'lucide-react';
+import Dropdown from 'components/Dropdown';
+import NotificationsOverview from 'components/_pages/notifications/overview';
 
 import { selectors } from 'ducks/auth';
 
-import NotificationsOverview from 'components/_pages/notifications/overview';
 import logo from '../../../resources/images/czertainly_white_H.svg';
-import style from './Header.module.scss';
 
 interface Props {
     sidebarToggle: () => void;
 }
 
 function Header({ sidebarToggle }: Props) {
-    const [isOpen, setIsOpen] = useState(false);
     const profile = useSelector(selectors.profile);
 
-    const toggleDropdown = useCallback(() => setIsOpen(!isOpen), [isOpen]);
+    const navigate = useNavigate();
 
     return (
-        <Navbar className={cx(style.root, style.sticky)}>
-            <Nav>
-                <NavItem className={cx(style.logo)}>
-                    <Link to="/dashboard">
-                        <img src={logo} alt="CZERTAINLY Logo" />
-                    </Link>
-                </NavItem>
-            </Nav>
-
-            <Nav>
-                <NavItem
-                    className={cx('visible-xs mr-4 d-sm-up-none', style.headerIcon, style.sidebarToggler)}
-                    href="#"
-                    onClick={sidebarToggle}
-                >
-                    <i className="fa fa-bars fa-2x text-muted" />
-                </NavItem>
-                <h4 className={style.appName}>Administrator Interface</h4>
-            </Nav>
-
-            <Nav className="ml-auto">
-                {!!profile ? (
-                    <Dropdown isOpen={isOpen} toggle={toggleDropdown}>
-                        <DropdownToggle nav>
-                            <i className={cx('fa fa-user-circle-o fa-2x', style.adminPhoto)} />
-                            <span className={style.adminName}>{profile.username}</span>
-                            <i className={cx('fa fa-angle-down ml-sm', style.arrow, { [style.arrowActive]: isOpen })} />
-                        </DropdownToggle>
-
-                        <DropdownMenu style={{ width: '100%' }}>
-                            <DropdownItem>
-                                <NavLink to={`/userprofile`}>Profile</NavLink>
-                            </DropdownItem>
-
-                            <DropdownItem>
-                                <NavLink
-                                    to="#"
-                                    onClick={() => {
-                                        window.location.href = (window as any).__ENV__.LOGOUT_URL;
-                                    }}
-                                >
-                                    Log out
-                                </NavLink>
-                            </DropdownItem>
-                        </DropdownMenu>
-                    </Dropdown>
-                ) : null}
-
+        <header className="flex items-center justify-between sticky top-0 left-0 w-full z-50 bg-blue-500 px-4 py-2 h-[var(--header-height)]">
+            <Link to="/dashboard">
+                <img src={logo} alt="CZERTAINLY Logo" className="h-9" />
+            </Link>
+            <div className="flex items-center gap-2">
+                {!!profile && (
+                    <Dropdown
+                        title={
+                            <div className="flex items-center gap-2">
+                                <User size={24} />
+                                {profile.username}
+                            </div>
+                        }
+                        btnStyle="transparent"
+                        className="text-white"
+                        items={[
+                            {
+                                title: 'Profile',
+                                onClick: () => {
+                                    navigate('/userprofile');
+                                },
+                            },
+                            {
+                                title: 'Log out',
+                                onClick: () => {
+                                    window.location.href = (window as any).__ENV__.LOGOUT_URL;
+                                },
+                            },
+                        ]}
+                    />
+                )}
                 <NotificationsOverview />
-            </Nav>
-        </Navbar>
+                <button className="text-white md:hidden" onClick={sidebarToggle}>
+                    <Menu size={24} />
+                </button>
+            </div>
+        </header>
     );
 }
 

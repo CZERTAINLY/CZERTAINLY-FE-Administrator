@@ -1,7 +1,9 @@
-import LinksGroup from './LinksGroup';
-import style from './Sidebar.module.scss';
 import { Resource } from 'types/openapi';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import { NavLink } from 'react-router';
+import cx from 'classnames';
+import { ChevronDown } from 'lucide-react';
+import Button from 'components/Button';
 
 type MenuItemMapping = {
     _key: string;
@@ -217,18 +219,62 @@ type Props = {
 };
 export default function Sidebar({ allowedResources }: Props) {
     const allowedMenuItems = useMemo(() => getAllowedMenuItems(allowedResources), [allowedResources]);
+    const [openMenuItems, setOpenMenuItems] = useState<string[]>([]);
 
     function renderMenuItem(mapping: MenuItemMapping) {
         if ('children' in mapping) {
-            return <LinksGroup key={mapping._key} header={mapping.header} childrenLinks={mapping.children} />;
+            const isActive = openMenuItems.includes(mapping._key);
+            return (
+                <li>
+                    <Button
+                        type="transparent"
+                        className="flex items-center justify-between gap-x-2 px-4 py-2 w-full"
+                        onClick={() =>
+                            setOpenMenuItems((prev) => (isActive ? prev.filter((item) => item !== mapping._key) : [...prev, mapping._key]))
+                        }
+                    >
+                        {mapping.header}
+                        <ChevronDown size={20} className={cx(isActive && 'rotate-180')} />
+                    </Button>
+                    {isActive && (
+                        <ul>
+                            {mapping.children.map((child) => (
+                                <li key={child._key}>
+                                    <NavLink
+                                        to={child.link}
+                                        className={({ isActive }) =>
+                                            cx(
+                                                'block px-4 pl-8 py-2 no-underline hover:bg-gray-200 rounded-lg',
+                                                isActive && 'text-blue-600',
+                                            )
+                                        }
+                                    >
+                                        {child.name}
+                                    </NavLink>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </li>
+            );
         }
-        return <LinksGroup key={mapping._key} header={mapping.header} headerLink={mapping.headerLink} />;
+        return (
+            <li>
+                <NavLink
+                    key={mapping._key}
+                    to={mapping.headerLink}
+                    className={({ isActive }) =>
+                        cx('block px-4 py-2 no-underline hover:bg-gray-200 rounded-lg', isActive && 'text-blue-600')
+                    }
+                >
+                    {mapping.header}
+                </NavLink>
+            </li>
+        );
     }
     return (
-        <nav className={style.root}>
-            <div className={style.nav}>
-                <ul>{allowedMenuItems.map((item) => renderMenuItem(item))}</ul>
-            </div>
+        <nav className="w-[var(--sidebar-width)] h-[calc(100vh-var(--header-height))] overflow-y-auto sticky top-[var(--header-height)]">
+            <ul className="list-none p-2 m-0">{allowedMenuItems.map((item) => renderMenuItem(item))}</ul>
         </nav>
     );
 }

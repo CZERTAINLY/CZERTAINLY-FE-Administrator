@@ -143,37 +143,39 @@ function PagedList({
 
     return (
         <>
-            {getAvailableFiltersApi && filterTitle && (
-                <FilterWidget
-                    entity={entity}
-                    title={filterTitle}
-                    getAvailableFiltersApi={getAvailableFiltersApi}
-                    extraFilterComponent={extraFilterComponent}
-                />
-            )}
+            <div className="flex flex-col gap-8 md:gap-4">
+                {getAvailableFiltersApi && filterTitle && (
+                    <FilterWidget
+                        entity={entity}
+                        title={filterTitle}
+                        getAvailableFiltersApi={getAvailableFiltersApi}
+                        extraFilterComponent={extraFilterComponent}
+                    />
+                )}
 
-            <Widget
-                title={title}
-                busy={isBusy || isFetchingList}
-                widgetLockName={pageWidgetLockName}
-                refreshAction={getFreshData}
-                widgetButtons={buttons}
-                titleSize="large"
-                hideWidgetButtons={hideWidgetButtons}
-            >
-                <CustomTable
-                    headers={headers}
-                    data={data}
-                    hasCheckboxes={hasCheckboxes}
-                    hasDetails={hasDetails}
-                    hasPagination={true}
-                    multiSelect={multiSelect}
-                    paginationData={paginationData}
-                    onPageChanged={setPageNumber}
-                    onCheckedRowsChanged={onCheckedRowsChanged}
-                    onPageSizeChanged={onPageSizeChanged}
-                />
-            </Widget>
+                <Widget
+                    title={title}
+                    busy={isBusy || isFetchingList}
+                    widgetLockName={pageWidgetLockName}
+                    refreshAction={getFreshData}
+                    widgetButtons={buttons}
+                    titleSize="larger"
+                    hideWidgetButtons={hideWidgetButtons}
+                >
+                    <CustomTable
+                        headers={headers}
+                        data={data}
+                        hasCheckboxes={hasCheckboxes}
+                        hasDetails={hasDetails}
+                        hasPagination={true}
+                        multiSelect={multiSelect}
+                        paginationData={paginationData}
+                        onPageChanged={setPageNumber}
+                        onCheckedRowsChanged={onCheckedRowsChanged}
+                        onPageSizeChanged={onPageSizeChanged}
+                    />
+                </Widget>
+            </div>
 
             {onDeleteCallback && (
                 <Dialog

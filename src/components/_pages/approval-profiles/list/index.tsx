@@ -107,7 +107,6 @@ export default function ApprovalProfilesList() {
                 titleSize="large"
                 refreshAction={getFreshData}
             >
-                <br />
                 <CustomTable
                     headers={approvalProfilesTableHeader}
                     data={approvalProfilesTableData}

@@ -6,8 +6,9 @@ import { ApiClients } from '../../api';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { EntityType, actions, selectors } from 'ducks/filters';
 import { useDispatch, useSelector } from 'react-redux';
-import Select, { components, MultiValue, SingleValue } from 'react-select';
-import { Badge, Button, Col, FormGroup, FormText, Input, Label, Row } from 'reactstrap';
+import Select, { SingleValue, MultiValue } from 'components/Select';
+import TextInput from 'components/TextInput';
+import { FormText, Input } from 'reactstrap';
 import { Observable } from 'rxjs';
 import { SearchFieldListModel, SearchFilterModel } from 'types/certificate';
 import {
@@ -27,13 +28,15 @@ import {
     getFormattedDateTime,
     getFormattedUtc,
 } from 'utils/dateUtil';
-import styles from './FilterWidget.module.scss';
+
 import {
     getInputStringFromIso8601String as getDurationStringFromIso8601String,
     getIso8601StringFromInputString as getIso8601StringFromDurationString,
 } from 'utils/duration';
 import { validateDuration } from 'utils/validators';
 import { parse } from 'regexp-tree';
+import Button from 'components/Button';
+import Badge from 'components/Badge';
 
 const noValue: { [condition in FilterConditionOperator]: boolean } = {
     [FilterConditionOperator.Equals]: false,
@@ -484,19 +487,10 @@ export default function FilterWidget({
                     <b>{getEnumLabel(searchGroupEnum, fieldSource)}&nbsp;</b>'{label}'&nbsp;
                     {getEnumLabel(FilterConditionOperatorEnum, fieldCondition)}&nbsp;
                     {value}
-                    {!disableBadgeRemove && (
-                        <span
-                            data-testid="filter-badge-span"
-                            className={styles.filterBadgeSpan}
-                            onClick={() => onRemoveFilterClick(itemNumber)}
-                        >
-                            &times;
-                        </span>
-                    )}
                 </React.Fragment>
             );
         },
-        [isFetchingAvailableFilters, FilterConditionOperatorEnum, disableBadgeRemove, onRemoveFilterClick, searchGroupEnum, busyBadges],
+        [isFetchingAvailableFilters, FilterConditionOperatorEnum, searchGroupEnum, busyBadges],
     );
 
     const renderFilterValueInput = useCallback(() => {
@@ -520,7 +514,7 @@ export default function FilterWidget({
             const isRegex = filterCondition?.value === 'MATCHES' || filterCondition?.value === 'NOT_MATCHES';
             return (
                 <>
-                    <Input
+                    <TextInput
                         id="valueSelect"
                         type={
                             currentField?.attributeContentType && checkIfFieldAttributeTypeIsDate(currentField)
@@ -537,8 +531,7 @@ export default function FilterWidget({
                                   : undefined
                         }
                         value={filterValue?.toString() ?? ''}
-                        onChange={(e) => {
-                            const value = e.target.value;
+                        onChange={(value: string) => {
                             setFilterValue(JSON.parse(JSON.stringify(value)));
 
                             if (isRegex) {
@@ -563,40 +556,28 @@ export default function FilterWidget({
         function renderBooleanInput() {
             return (
                 <Select
-                    id="value"
-                    inputId="valueSelect"
-                    options={filterField ? booleanOptions : undefined}
+                    id="valueSelect"
+                    options={filterField ? booleanOptions : []}
                     value={filterValue ?? null}
                     onChange={(e) => {
-                        setFilterValue(e);
+                        setFilterValue({ label: e, value: e });
                     }}
                     isDisabled={!filterField || !filterCondition || noValue[filterCondition.value]}
-                    components={{
-                        Menu: (props) => (
-                            <components.Menu {...props} innerProps={{ ...props.innerProps, 'data-testid': 'value-menu' } as any} />
-                        ),
-                    }}
                 />
             );
         }
         function renderDefaultInput() {
             return (
                 <Select
-                    id="value"
-                    inputId="valueSelect"
+                    id="valueSelect"
                     options={objectValueOptions}
                     value={filterValue ?? null}
                     onChange={(e) => {
                         setFilterValue(e);
                     }}
-                    isMulti={currentField?.multiValue}
-                    isClearable={true}
+                    // isMulti={currentField?.multiValue}
+                    // isClearable
                     isDisabled={!filterField || !filterCondition || noValue[filterCondition.value]}
-                    components={{
-                        Menu: (props) => (
-                            <components.Menu {...props} innerProps={{ ...props.innerProps, 'data-testid': 'value-menu' } as any} />
-                        ),
-                    }}
                 />
             );
         }
@@ -659,146 +640,83 @@ export default function FilterWidget({
         regexError,
         validateRegex,
     ]);
+
     return (
         <>
             <Widget title={title} busy={isFetchingAvailableFilters} titleSize="larger">
                 <div id="unselectFilters" onClick={onUnselectFiltersClick}>
-                    <div style={{ width: '99%', borderBottom: 'solid 1px silver', marginBottom: '1rem' }}>
-                        <Row>
-                            <Col>
-                                <FormGroup>
-                                    <Label for="groupSelectInput">Filter Field Source</Label>
-                                    <Select
-                                        id="group"
-                                        inputId="groupSelectInput"
-                                        options={availableFilters.map((f) => ({
-                                            label: getEnumLabel(searchGroupEnum, f.filterFieldSource),
-                                            value: f.filterFieldSource,
-                                        }))}
-                                        onChange={(e) => {
-                                            setFilterGroup(e);
-                                            setFilterField(undefined);
-                                            setFilterCondition(undefined);
-                                            setFilterValue(undefined);
-                                            setRegexError('');
-                                        }}
-                                        value={filterGroup || null}
-                                        isClearable={true}
-                                        components={{
-                                            Menu: (props) => (
-                                                <components.Menu
-                                                    {...props}
-                                                    innerProps={{ ...props.innerProps, 'data-testid': 'group-menu' } as any}
-                                                />
-                                            ),
-                                            Control: (props) => (
-                                                <components.Control
-                                                    {...props}
-                                                    innerProps={{ ...props.innerProps, 'data-testid': 'group-control' } as any}
-                                                />
-                                            ),
-                                        }}
-                                    />
-                                </FormGroup>
-                            </Col>
+                    <div>
+                        <div className="flex flex-row gap-2 mb-4 items-end">
+                            <div className="grid grid-cols-4 gap-2 w-full">
+                                <Select
+                                    id="group"
+                                    label="Filter Field Source"
+                                    options={availableFilters.map((f) => ({
+                                        label: getEnumLabel(searchGroupEnum, f.filterFieldSource),
+                                        value: f.filterFieldSource,
+                                    }))}
+                                    onChange={(e) => {
+                                        setFilterGroup({ label: e, value: e });
+                                        setFilterField(undefined);
+                                        setFilterCondition(undefined);
+                                        setFilterValue(undefined);
+                                        setRegexError('');
+                                    }}
+                                    value={filterGroup || null}
+                                    // isClearable
+                                />
+                                <Select
+                                    label="Filter Field"
+                                    id="field"
+                                    options={currentFields?.map((f) => ({ label: f.fieldLabel, value: f.fieldIdentifier })) || []}
+                                    onChange={(e) => {
+                                        setFilterField({ label: e, value: e });
+                                        setFilterCondition(undefined);
+                                        setFilterValue(undefined);
+                                        setRegexError('');
+                                    }}
+                                    value={filterField || null}
+                                    isDisabled={!filterGroup}
+                                    // isClearable
+                                />
 
-                            <Col>
-                                <FormGroup>
-                                    <Label for="fieldSelectInput">Filter Field</Label>
-                                    <Select
-                                        id="field"
-                                        inputId="fieldSelectInput"
-                                        options={currentFields?.map((f) => ({ label: f.fieldLabel, value: f.fieldIdentifier }))}
-                                        onChange={(e) => {
-                                            setFilterField(e);
-                                            setFilterCondition(undefined);
-                                            setFilterValue(undefined);
-                                            setRegexError('');
-                                        }}
-                                        value={filterField || null}
-                                        isDisabled={!filterGroup}
-                                        isClearable={true}
-                                        components={{
-                                            Menu: (props) => (
-                                                <components.Menu
-                                                    {...props}
-                                                    innerProps={{ ...props.innerProps, 'data-testid': 'field-menu' } as any}
-                                                />
-                                            ),
-                                            Control: (props) => (
-                                                <components.Control
-                                                    {...props}
-                                                    innerProps={{ ...props.innerProps, 'data-testid': 'field-control' } as any}
-                                                />
-                                            ),
-                                        }}
-                                    />
-                                </FormGroup>
-                            </Col>
-
-                            <Col>
-                                <FormGroup>
-                                    <Label for="conditionsSelectInput">Filter Condition</Label>
-                                    <Select
-                                        id="conditions"
-                                        inputId="conditionsSelectInput"
-                                        options={
-                                            filterField
-                                                ? currentField?.conditions.map((c) => ({
-                                                      label: getEnumLabel(FilterConditionOperatorEnum, c),
-                                                      value: c,
-                                                  }))
-                                                : undefined
-                                        }
-                                        onChange={(e) => {
-                                            setFilterCondition(e);
-                                            setFilterValue(undefined);
-                                            setRegexError('');
-                                        }}
-                                        value={filterCondition || null}
-                                        isDisabled={!filterField}
-                                        components={{
-                                            Menu: (props) => (
-                                                <components.Menu
-                                                    {...props}
-                                                    innerProps={{ ...props.innerProps, 'data-testid': 'condition-menu' } as any}
-                                                />
-                                            ),
-                                            Control: (props) => (
-                                                <components.Control
-                                                    {...props}
-                                                    innerProps={{ ...props.innerProps, 'data-testid': 'condition-control' } as any}
-                                                />
-                                            ),
-                                        }}
-                                    />
-                                </FormGroup>
-                            </Col>
-
-                            <Col>
-                                <FormGroup>
-                                    <Label for="valueSelect">Filter Value</Label>
-                                    {renderFilterValueInput()}
-                                </FormGroup>
-                            </Col>
-
-                            <Col md="auto">
-                                <Button
-                                    id="addFilter"
-                                    style={{ width: '7em', marginTop: '2em' }}
-                                    color="primary"
-                                    disabled={
-                                        !filterField ||
-                                        !filterCondition ||
-                                        !isValidValue ||
-                                        (!noValue[filterCondition.value] && !filterValue)
+                                <Select
+                                    id="conditions"
+                                    label="Filter Condition"
+                                    options={
+                                        filterField
+                                            ? currentField?.conditions.map((c) => ({
+                                                  label: getEnumLabel(FilterConditionOperatorEnum, c),
+                                                  value: c,
+                                              }))
+                                            : []
                                     }
-                                    onClick={onUpdateFilterClick}
-                                >
-                                    {selectedFilter === -1 ? 'Add' : 'Update'}
-                                </Button>
-                            </Col>
-                        </Row>
+                                    onChange={(e) => {
+                                        setFilterCondition({ label: e, value: e });
+                                        setFilterValue(undefined);
+                                        setRegexError('');
+                                    }}
+                                    value={filterCondition || null}
+                                    isDisabled={!filterField}
+                                />
+
+                                <div>
+                                    <label htmlFor="valueSelect" className="block text-sm font-medium mb-2 dark:text-white">
+                                        Filter Value
+                                    </label>
+                                    {renderFilterValueInput()}
+                                </div>
+                            </div>
+                            <Button
+                                id="addFilter"
+                                disabled={
+                                    !filterField || !filterCondition || !isValidValue || (!noValue[filterCondition.value] && !filterValue)
+                                }
+                                onClick={onUpdateFilterClick}
+                            >
+                                {selectedFilter === -1 ? 'Add' : 'Update'}
+                            </Button>
+                        </div>
                     </div>
                     {currentFilters.map((f, i) => {
                         const field = availableFilters
@@ -855,19 +773,25 @@ export default function FilterWidget({
                         }
                         return (
                             <Badge
-                                data-testid="filter-badge"
-                                className={styles.filterBadge}
                                 key={f.fieldIdentifier + i}
                                 onClick={() => toggleFilter(i)}
-                                color={selectedFilter === i ? 'primary' : 'secondary'}
+                                color={selectedFilter === i ? 'blue' : 'light-gray'}
+                                onRemove={() => {
+                                    if (disableBadgeRemove) return;
+                                    onRemoveFilterClick(i);
+                                }}
                             >
                                 {!isFetchingAvailableFilters && !busyBadges && getBadgeContent(i, f.fieldSource, f.condition, label, value)}
                             </Badge>
                         );
                     })}
                 </div>
-                {/* {appendInWidgetContent} */}
-                {extraFilterComponent}
+                {extraFilterComponent && (
+                    <>
+                        <div className="border-t border-gray-200 my-4"></div>
+                        <div className="mt-4">{extraFilterComponent}</div>
+                    </>
+                )}
             </Widget>
         </>
     );

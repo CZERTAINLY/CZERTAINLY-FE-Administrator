@@ -147,7 +147,6 @@ const ConditionsList = () => {
                     description: 'Condition is named set of conditions items',
                 }}
             >
-                <br />
                 <CustomTable
                     checkedRows={checkedRows}
                     hasCheckboxes

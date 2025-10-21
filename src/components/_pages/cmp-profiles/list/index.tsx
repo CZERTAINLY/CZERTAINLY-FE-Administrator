@@ -231,7 +231,6 @@ export default function AdministratorsList() {
                 titleSize="large"
                 refreshAction={getFreshData}
             >
-                <br />
                 <CustomTable
                     headers={cmpProfilesTableHeader}
                     data={cmpProfilesTableData}

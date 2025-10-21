@@ -163,7 +163,6 @@ const TriggerList = () => {
                     description: 'Triggers are defined to trigger actions based on certain conditions of a resource',
                 }}
             >
-                <br />
                 <CustomTable
                     checkedRows={checkedRows}
                     hasCheckboxes

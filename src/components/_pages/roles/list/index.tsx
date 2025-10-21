@@ -163,7 +163,7 @@ export default function RolesList() {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <div>
             <Widget
                 title="List of Roles"
                 busy={isBusy}
@@ -172,7 +172,6 @@ export default function RolesList() {
                 titleSize="large"
                 refreshAction={getFreshData}
             >
-                <br />
                 <CustomTable
                     headers={rolesTableHeader}
                     data={rolesTableData}
@@ -193,6 +192,6 @@ export default function RolesList() {
                     { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
-        </Container>
+        </div>
     );
 }

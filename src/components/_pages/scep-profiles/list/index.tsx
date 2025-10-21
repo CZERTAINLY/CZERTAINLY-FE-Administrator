@@ -230,7 +230,6 @@ export default function ScepProfiles() {
                 titleSize="large"
                 refreshAction={getFreshData}
             >
-                <br />
                 <CustomTable
                     headers={scepProfilesTableHeader}
                     data={scepProfilesTableData}

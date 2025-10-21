@@ -208,7 +208,6 @@ export default function AdministratorsList() {
                 refreshAction={getFreshData}
                 dataTestId="compliance-profile-list"
             >
-                <br />
                 <CustomTable
                     headers={complianceProfilesTableHeader}
                     data={complianceProfilesTableData}

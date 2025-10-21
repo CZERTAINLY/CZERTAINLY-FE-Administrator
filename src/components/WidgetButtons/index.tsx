@@ -1,6 +1,43 @@
-import cx from 'classnames';
+import cn from 'classnames';
 import React from 'react';
-import { Button, ButtonProps } from 'reactstrap';
+import {
+    Plus,
+    Copy,
+    Trash2,
+    X,
+    Check,
+    Plug,
+    PencilLine,
+    History,
+    XCircle,
+    Upload,
+    Download,
+    Users,
+    User,
+    Box,
+    Repeat,
+    MinusSquare,
+    Info,
+    Gavel,
+    ArrowUpCircle,
+    RefreshCw,
+    Minus,
+    Lock,
+    RotateCw,
+    Handshake,
+    Ban,
+    MinusCircle,
+    Bomb,
+    Search,
+    Shuffle,
+    Pen,
+    CheckSquare,
+    Key,
+    Link,
+    Recycle,
+    Archive,
+    ArchiveRestore,
+} from 'lucide-react';
 
 export type IconName =
     | 'plus'
@@ -56,105 +93,69 @@ interface Props {
     justify?: 'start' | 'end' | 'center';
 }
 
-const colors = {
-    plus: 'auto',
-    copy: 'auto',
-    trash: 'red',
-    times: 'red',
-    check: 'green',
-    plug: 'auto',
-    pencil: 'auto',
-    history: 'auto',
-    'cross-circle': 'black',
-    upload: 'auto',
-    download: 'auto',
-    group: 'auto',
-    user: 'auto',
-    cubes: 'auto',
-    retweet: 'auto',
-    'minus-square': 'red',
-    push: 'auto',
-    sync: 'auto',
-    info: 'auto',
-    minus: 'red',
-    gavel: 'auto',
-    lock: 'auto',
-    refresh: 'auto',
-    reload: 'auto',
-    handshake: 'red',
-    compromise: 'red',
-    destroy: 'red',
-    bomb: 'red',
-    search: 'auto',
-    random: 'auto',
-    sign: 'auto',
-    verify: 'green',
-    key: 'auto',
-    link: 'auto',
-    recycle: 'auto',
-    rekey: 'auto',
-    archive: 'auto',
-    unarchive: 'auto',
-};
+const getIcon = (icon: IconName, size: number = 20): React.ReactNode => {
+    const iconMap: Record<IconName, React.ComponentType<{ size?: number }>> = {
+        plus: Plus,
+        copy: Copy,
+        trash: Trash2,
+        times: X,
+        check: Check,
+        plug: Plug,
+        pencil: PencilLine,
+        history: History,
+        'cross-circle': XCircle,
+        upload: Upload,
+        download: Download,
+        group: Users,
+        user: User,
+        cubes: Box,
+        retweet: Repeat,
+        'minus-square': MinusSquare,
+        push: ArrowUpCircle,
+        sync: RefreshCw,
+        info: Info,
+        minus: Minus,
+        gavel: Gavel,
+        lock: Lock,
+        refresh: RefreshCw,
+        reload: RotateCw,
+        handshake: Handshake,
+        compromise: Ban,
+        destroy: MinusCircle,
+        bomb: Bomb,
+        search: Search,
+        random: Shuffle,
+        sign: Pen,
+        verify: CheckSquare,
+        key: Key,
+        link: Link,
+        recycle: Recycle,
+        rekey: Shuffle,
+        archive: Archive,
+        unarchive: ArchiveRestore,
+    };
 
-const classNames = {
-    plus: 'fa fa-plus',
-    copy: 'fa fa-copy',
-    trash: 'fa fa-trash',
-    times: 'fa fa-times',
-    check: 'fa fa-check',
-    plug: 'fa fa-plug',
-    pencil: 'fa fa-pencil-square-o',
-    history: 'fa fa-history',
-    'cross-circle': 'fa fa-times-circle',
-    upload: 'fa fa-upload',
-    download: 'fa fa-download',
-    group: 'fa fa-group',
-    user: 'fa fa-user-o',
-    cubes: 'fa fa-cubes',
-    retweet: 'fa fa-retweet',
-    'minus-square': 'fa fa-minus-square',
-    push: 'fa fa-arrow-circle-up',
-    sync: 'fa fa-refresh',
-    info: 'fa fa-info-circle',
-    minus: 'fa fa-minus',
-    gavel: 'fa fa-gavel',
-    lock: 'fa fa-lock',
-    stopwatch: 'fa fa-stopwatch',
-    refresh: 'fa fa-refresh',
-    reload: 'fa fa-rotate-right',
-    handshake: 'fa fa-circle-exclamation',
-    compromise: 'fa fa-ban',
-    destroy: 'fa fa-circle-minus',
-    bomb: 'fa fa-bomb',
-    search: 'fa fa-search',
-    random: 'fa fa-dice',
-    sign: 'fas fa-pen',
-    verify: 'fa fa-check-square',
-    key: 'fa fa-key',
-    link: 'fa fa-link',
-    recycle: 'fa fa-recycle',
-    rekey: 'fa fa-random',
-    archive: 'fa fa-box-archive',
-    unarchive: 'fa fa-box-open',
+    const IconComponent = iconMap[icon];
+    return IconComponent ? <IconComponent size={size} /> : null;
 };
-
-//TODO: Add refresh button put it on left which should be optional
 
 function WidgetButtons({ buttons, justify = 'center' }: Props) {
     const renderButton = (button: WidgetButtonProps) => {
-        let toolTip: JSX.Element | undefined;
-        let style;
+        let toolTip: React.ReactNode | undefined;
 
-        let btnProps: ButtonProps = {
-            className: 'btn btn-link',
-            color: 'white',
+        const btnProps = {
+            className:
+                'py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent text-gray-800 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none dark:text-white dark:hover:bg-neutral-700 dark:focus:bg-neutral-700',
             onClick: button.onClick,
             disabled: button.disabled,
         };
 
         if (!button.disabled) {
-            style = { color: colors[button.icon] };
+            btnProps.className = `${btnProps.className} opacity-100`;
+        }
+
+        if (button.hidden) {
+            btnProps.disabled = true;
         }
 
         const key = button.icon + button.tooltip + button.id || '';
@@ -162,30 +163,26 @@ function WidgetButtons({ buttons, justify = 'center' }: Props) {
         return button.custom ? (
             <span key={key}>{button.custom}</span>
         ) : (
-            <Button data-testid={`${button.id}-button`} key={key} {...btnProps} title={button.tooltip} hidden={button.hidden}>
-                <i className={classNames[button.icon]} style={style} />
+            <button data-testid={`${button.id}-button`} key={key} type="button" {...btnProps} title={button.tooltip}>
+                {getIcon(button.icon)}
                 {toolTip}
-            </Button>
+            </button>
         );
     };
 
-    const renderedButtons: JSX.Element[] = [];
+    const renderedButtons: React.ReactNode[] = [];
 
     buttons.forEach((button) => {
         renderedButtons.push(renderButton(button));
     });
 
-    return (
-        <div
-            className={cx('d-flex ms-2', {
-                'justify-content-start': justify === 'start',
-                'justify-content-center': justify === 'center',
-                'justify-content-end': justify === 'end',
-            })}
-        >
-            {renderedButtons}
-        </div>
-    );
+    const wrapperClassName = cn('flex ml-2', {
+        'justify-start': justify === 'start',
+        'justify-center': justify === 'center',
+        'justify-end': justify === 'end',
+    });
+
+    return <div className={wrapperClassName}>{renderedButtons}</div>;
 }
 
 export default WidgetButtons;

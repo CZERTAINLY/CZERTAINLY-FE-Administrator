@@ -120,7 +120,6 @@ const NotificationInstanceList = () => {
                 widgetButtons={buttons}
                 widgetLockName={LockWidgetNameEnum.NotificationStore}
             >
-                <br />
                 <CustomTable
                     checkedRows={checkedRows}
                     hasCheckboxes

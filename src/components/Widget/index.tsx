@@ -7,9 +7,10 @@ import WidgetLock from 'components/WidgetLock';
 import { selectors } from 'ducks/user-interface';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router';
-import { Button, Card, CardBody, CardHeader, Collapse } from 'reactstrap';
+import { Card, CardBody, CardHeader, Collapse } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import style from './Widget.module.scss';
+import { RefreshCw } from 'lucide-react';
+import Button from 'components/Button';
 
 interface WidgetInfoCard {
     title: string;
@@ -44,7 +45,7 @@ function Widget({
     titleLink,
     titleSize = 'medium',
     widgetButtons,
-    titleBoldness = 'normal',
+    titleBoldness = 'bold',
     className,
     children = [],
     busy = false,
@@ -66,14 +67,14 @@ function Widget({
         title ? (
             <h5
                 className={cx(
-                    style.title,
-                    { 'fw-bold': titleBoldness === 'bold' },
-                    { 'fw-bolder': titleBoldness === 'bolder' },
-                    { 'fw-normal': titleBoldness === 'normal' },
-                    { [style.titleMedium]: titleSize === 'medium' },
-                    { [style.titleLarge]: titleSize === 'large' },
-                    { [style.titleSmall]: titleSize === 'small' },
-                    { [style.titleXL]: titleSize === 'larger' },
+                    '',
+                    { 'font-bold': titleBoldness === 'bold' },
+                    { 'font-extrabold': titleBoldness === 'bolder' },
+                    { 'font-normal': titleBoldness === 'normal' },
+                    { 'text-base': titleSize === 'medium' },
+                    { 'text-lg font-bold': titleSize === 'large' },
+                    { 'text-sm': titleSize === 'small' },
+                    { 'text-xl font-bold': titleSize === 'larger' },
                 )}
             >
                 {title}
@@ -84,15 +85,9 @@ function Widget({
 
     const renderRefreshButton = () =>
         refreshAction ? (
-            <div className="ms-2 mb-1 me-auto">
-                <Button
-                    onClick={refreshAction}
-                    data-testid="refresh-icon"
-                    style={{ backgroundColor: 'transparent', border: 'none', padding: '1px 5px' }}
-                >
-                    <i className={cx(style.refreshIcon, 'fa fa-refresh ')} />
-                </Button>
-            </div>
+            <Button onClick={refreshAction} data-testid="refresh-icon" type="transparent">
+                <RefreshCw size={20} />
+            </Button>
         ) : null;
 
     const renderWidgetButtons = useCallback(() => {
@@ -109,15 +104,22 @@ function Widget({
         else {
             return (
                 <div className="ms-auto">
-                    <WidgetButtons buttons={updatedWidgetButtons} />
+                    <WidgetButtons buttons={updatedWidgetButtons} justify="end" />
                 </div>
             );
         }
     }, [widgetButtons, hideWidgetButtons, widgetLock, widgetInfoCard, showWidgetInfo]);
 
     return (
-        <section data-testid={dataTestId} className={cx(style.widget, className)} id={id}>
-            <div className="d-flex align-items-center">
+        <section
+            data-testid={dataTestId}
+            className={cx(
+                'relative flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl p-4 md:p-5 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400',
+                className,
+            )}
+            id={id}
+        >
+            <div className="flex items-center gap-2 mb-4">
                 <div>{renderTitle()}</div>
                 {renderRefreshButton()}
                 {renderWidgetButtons()}

@@ -1,0 +1,39 @@
+:root {
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  color: #1F2937;
+
+  --header-height: 68px;
+  --sidebar-width: 260px;
+  --main-background-color: #F8FAFC;
+
+  --status-success-color: #1ab394;
+  --status-danger-color: #eb3349;
+  --status-warning-color: #f37d63;
+  --status-dark-color: #1F2937;
+}
+
+@import "tailwindcss";
+
+/* Source files to scan for Tailwind classes */
+@source "../src";
+
+/* Light mode by default, dark mode with .dark class */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Preline UI */
+@source "../node_modules/preline/dist/*.js";
+@import "../node_modules/preline/variants.css";
+
+/* Plugins */
+@plugin "@tailwindcss/forms";
+
+button {
+  cursor: pointer;
+}
+
+table a {
+  color: #2798E7;
+}

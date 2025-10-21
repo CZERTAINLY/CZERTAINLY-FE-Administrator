@@ -187,7 +187,6 @@ export default function AcmeAccountList() {
                 titleSize="large"
                 refreshAction={getFreshData}
             >
-                <br />
                 <CustomTable
                     headers={acmeAccountsTableHeader}
                     data={acmeAccountsTableData}
