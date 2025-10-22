@@ -18,7 +18,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router';
 import Select from 'react-select';
 
-import { Badge, Form as BootstrapForm, Button, ButtonGroup, Container, FormGroup, Label } from 'reactstrap';
+import { Form as BootstrapForm, Button, ButtonGroup, Container, FormGroup, Label } from 'reactstrap';
+import Badge from 'components/Badge';
 import { AttributeDescriptorModel } from 'types/attributes';
 
 import { mutators } from 'utils/attributes/attributeEditorMutators';

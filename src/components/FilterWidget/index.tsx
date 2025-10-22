@@ -775,7 +775,7 @@ export default function FilterWidget({
                             <Badge
                                 key={f.fieldIdentifier + i}
                                 onClick={() => toggleFilter(i)}
-                                color={selectedFilter === i ? 'blue' : 'light-gray'}
+                                color={selectedFilter === i ? 'primary' : 'secondary'}
                                 onRemove={() => {
                                     if (disableBadgeRemove) return;
                                     onRemoveFilterClick(i);

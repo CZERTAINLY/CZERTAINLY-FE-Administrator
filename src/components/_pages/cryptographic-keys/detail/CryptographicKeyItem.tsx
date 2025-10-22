@@ -13,7 +13,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import Select from 'react-select';
 
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import { Badge, Button, Col, Row } from 'reactstrap';
+import { Button, Col, Row } from 'reactstrap';
+import Badge from 'components/Badge';
 import { CryptographicKeyHistoryModel, CryptographicKeyItemDetailResponseModel } from 'types/cryptographic-keys';
 import { KeyCompromiseReason, KeyState, KeyUsage, PlatformEnum } from 'types/openapi';
 import { dateFormatter } from 'utils/dateUtil';
@@ -483,7 +484,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
         <div className="key-details">
             <div>
                 <h6 className="d-inline-block">
-                    <Badge key={keyItem.uuid} color="dark" className="mr-xs">
+                    <Badge key={keyItem.uuid} color="gray" className="mr-xs">
                         {keyItem.keyAlgorithm}
                     </Badge>
                 </h6>

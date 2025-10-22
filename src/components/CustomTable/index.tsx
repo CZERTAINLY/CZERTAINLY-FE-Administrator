@@ -512,7 +512,7 @@ function CustomTable({
                         {tblData?.length > 0 && (
                             <Select
                                 id="pageSize"
-                                options={(paginationData?.itemsPerPageOptions || []).map((option: number) => ({
+                                options={(paginationData?.itemsPerPageOptions || [10, 20, 50, 100]).map((option: number) => ({
                                     label: option.toString(),
                                     value: option.toString(),
                                 }))}

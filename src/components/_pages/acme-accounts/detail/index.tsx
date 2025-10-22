@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
-import { Badge, Container } from 'reactstrap';
+import { Container } from 'reactstrap';
 
 import { actions, selectors } from 'ducks/acme-accounts';
 
@@ -18,6 +18,7 @@ import { acmeAccountStatus } from '../acmeAccountStatus';
 import { createWidgetDetailHeaders } from 'utils/widget';
 import GoBackButton from 'components/GoBackButton';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import Badge from 'components/Badge';
 
 export default function AcmeAccountDetail() {
     const dispatch = useDispatch();
@@ -147,7 +148,14 @@ export default function AcmeAccountDetail() {
             },
             {
                 id: 'contacts',
-                columns: ['Contacts', <>{acmeAccount?.contact?.map((contact) => <div key={contact}>{contact}</div>)}</>],
+                columns: [
+                    'Contacts',
+                    <>
+                        {acmeAccount?.contact?.map((contact) => (
+                            <div key={contact}>{contact}</div>
+                        ))}
+                    </>,
+                ],
             },
         ];
     }, [acmeAccount]);

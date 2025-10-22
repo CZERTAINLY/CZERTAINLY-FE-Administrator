@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
-import { Badge, Container, Table } from 'reactstrap';
+import { Container, Table } from 'reactstrap';
 
 import { actions, selectors } from 'ducks/compliance-profiles';
 
@@ -10,6 +10,7 @@ import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { LockWidgetNameEnum } from 'types/user-interface';
+import Badge from 'components/Badge';
 
 export default function AdministratorsList() {
     const dispatch = useDispatch();
@@ -180,16 +181,16 @@ export default function AdministratorsList() {
                         {complianceProfile.name}
                     </Link>,
                     complianceProfile.description || '',
-                    <Badge key={complianceProfile.uuid} color="secondary" searchvalue={complianceProfile.providerRulesCount}>
+                    <Badge key={complianceProfile.uuid} color="secondary">
                         {complianceProfile.providerRulesCount.toString()}
                     </Badge>,
-                    <Badge key={complianceProfile.uuid} color="secondary" searchvalue={complianceProfile.providerGroupsCount}>
+                    <Badge key={complianceProfile.uuid} color="secondary">
                         {complianceProfile.providerGroupsCount.toString()}
                     </Badge>,
-                    <Badge key={complianceProfile.uuid} color="secondary" searchvalue={complianceProfile.internalRulesCount}>
+                    <Badge key={complianceProfile.uuid} color="secondary">
                         {complianceProfile.internalRulesCount.toString()}
                     </Badge>,
-                    <Badge key={complianceProfile.uuid} color="secondary" searchvalue={complianceProfile.associations}>
+                    <Badge key={complianceProfile.uuid} color="secondary">
                         {complianceProfile.associations.toString()}
                     </Badge>,
                 ],

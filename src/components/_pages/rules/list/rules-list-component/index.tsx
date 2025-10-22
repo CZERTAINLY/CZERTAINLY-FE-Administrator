@@ -8,7 +8,7 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
-import Select from 'react-select';
+import Select from 'components/Select';
 import { PlatformEnum, Resource } from 'types/openapi';
 
 import { useRuleEvaluatorResourceOptions } from 'utils/rules';
@@ -97,18 +97,15 @@ const RulesList = () => {
                 tooltip: 'Select Resource',
                 onClick: () => {},
                 custom: (
-                    <div className={styles.listSelectContainer}>
-                        <Select
-                            isClearable
-                            maxMenuHeight={140}
-                            menuPlacement="auto"
-                            options={resourceOptionsWithRuleEvaluator}
-                            placeholder="Select Resource"
-                            onChange={(event) => {
-                                setSelectedResource(event?.value as Resource);
-                            }}
-                        />
-                    </div>
+                    <Select
+                        placeholder="Select Resource"
+                        id="resource"
+                        options={resourceOptionsWithRuleEvaluator}
+                        value={selectedResource || 'Select Resource'}
+                        onChange={(value) => {
+                            setSelectedResource(value as Resource);
+                        }}
+                    />
                 ),
             },
             {
@@ -124,7 +121,7 @@ const RulesList = () => {
                 onClick: () => setConfirmDelete(true),
             },
         ],
-        [checkedRows, resourceOptionsWithRuleEvaluator, navigate],
+        [checkedRows, resourceOptionsWithRuleEvaluator, navigate, selectedResource],
     );
 
     return (

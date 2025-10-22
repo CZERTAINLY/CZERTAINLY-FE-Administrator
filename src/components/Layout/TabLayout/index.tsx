@@ -1,13 +1,15 @@
 import cx from 'classnames';
+import Tabs from 'components/Tabs';
 import { useEffect, useMemo, useState } from 'react';
 import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
+import Widget from 'components/Widget';
 
 type Props = {
     tabs: {
-        title: string | JSX.Element;
+        title: string | React.ReactNode;
         hidden?: boolean;
-        content: JSX.Element;
         disabled?: boolean;
+        content: React.ReactNode;
         onClick?: () => void;
     }[];
     onlyActiveTabContent?: boolean;
@@ -30,28 +32,9 @@ export default function TabLayout({ tabs, onlyActiveTabContent = false, selected
     }, [activeTab, memoizedTabs, selectedTab]);
 
     return (
-        <>
-            <Nav tabs>
-                {memoizedTabs.map((t, i) => (
-                    <NavItem key={`nav-${i}`}>
-                        <NavLink
-                            className={cx({ active: activeTab === i })}
-                            disabled={t.disabled}
-                            onClick={() => {
-                                if (t.disabled) {
-                                    return;
-                                }
-                                setActiveTab(i);
-                                if (t.onClick) {
-                                    t.onClick();
-                                }
-                            }}
-                        >
-                            {t.title}
-                        </NavLink>
-                    </NavItem>
-                ))}
-            </Nav>
+        <Widget>
+            <Tabs tabs={memoizedTabs} selectedTab={activeTab} onTabChange={setActiveTab} />
+            <hr className="my-4 border-gray-200" />
             <TabContent activeTab={activeTab}>
                 {memoizedTabs.map((t, i) =>
                     onlyActiveTabContent === false || activeTab === i ? (
@@ -61,6 +44,6 @@ export default function TabLayout({ tabs, onlyActiveTabContent = false, selected
                     ) : null,
                 )}
             </TabContent>
-        </>
+        </Widget>
     );
 }

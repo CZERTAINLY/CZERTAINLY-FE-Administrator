@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
-import { Badge, Container, Table } from 'reactstrap';
+import { Table } from 'reactstrap';
 
+import Badge from 'components/Badge';
 import { actions, selectors } from 'ducks/connectors';
 
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
@@ -231,7 +232,7 @@ export default function ConnectorList() {
 
                         <span style={{ whiteSpace: 'nowrap' }}>{connector.url}</span>,
 
-                        <Badge color={`${connectorStatus[1]}`}>{connectorStatus[0]}</Badge>,
+                        <Badge style={{ backgroundColor: connectorStatus[1] }}>{connectorStatus[0]}</Badge>,
                     ],
                 };
             }),

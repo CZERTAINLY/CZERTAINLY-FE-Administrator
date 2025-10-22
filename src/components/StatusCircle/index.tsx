@@ -1,4 +1,4 @@
-import { Badge } from 'reactstrap';
+import Badge from 'components/Badge';
 
 interface Props {
     status?: boolean;
@@ -22,7 +22,7 @@ function StatusCircle({ status }: Props) {
 
         default:
             return (
-                <Badge color="dark">
+                <Badge color="gray">
                     <i className="fa fa-question-circle"></i>
                 </Badge>
             );

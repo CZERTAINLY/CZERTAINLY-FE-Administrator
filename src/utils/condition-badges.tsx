@@ -1,5 +1,5 @@
 import { getEnumLabel } from 'ducks/enums';
-import { Badge } from 'reactstrap';
+import Badge from 'components/Badge';
 import { SearchFieldListModel, SearchFieldModel } from 'types/certificate';
 import { EnumItemDto } from 'types/enums';
 import { AttributeContentType, ConditionItemDto, FilterFieldType } from 'types/openapi';

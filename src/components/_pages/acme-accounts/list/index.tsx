@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
-import { Badge, Container } from 'reactstrap';
+import { Container } from 'reactstrap';
 
 import { actions, selectors } from 'ducks/acme-accounts';
 
@@ -13,6 +13,7 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { acmeAccountStatus } from '../acmeAccountStatus';
+import Badge from 'components/Badge';
 
 export default function AcmeAccountList() {
     const dispatch = useDispatch();

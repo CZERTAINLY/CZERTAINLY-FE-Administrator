@@ -13,13 +13,14 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 import Select from 'react-select';
-import { Badge, Container } from 'reactstrap';
+import { Container } from 'reactstrap';
 import { SearchRequestModel } from 'types/certificate';
 import { KeyCompromiseReason, KeyUsage, PlatformEnum } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { dateFormatter } from 'utils/dateUtil';
 import KeyStateCircle from '../KeyStateCircle';
 import KeyStatusCircle from '../KeyStatusCircle';
+import Badge from 'components/Badge';
 
 function CryptographicKeyList() {
     const dispatch = useDispatch();

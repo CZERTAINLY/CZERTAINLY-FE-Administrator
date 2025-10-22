@@ -5,6 +5,7 @@
   font-style: normal;
   color: #1F2937;
 
+  --primary-blue-color: #2798E7;
   --header-height: 68px;
   --sidebar-width: 260px;
   --main-background-color: #F8FAFC;
@@ -13,6 +14,8 @@
   --status-danger-color: #eb3349;
   --status-warning-color: #f37d63;
   --status-dark-color: #1F2937;
+  --status-gray-color: var(--gray-500);
+  --status-info-color: #2798E7;
 }
 
 @import "tailwindcss";
@@ -35,5 +38,5 @@ button {
 }
 
 table a {
-  color: #2798E7;
+  color: var(--primary-blue-color);
 }

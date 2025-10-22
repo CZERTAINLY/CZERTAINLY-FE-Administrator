@@ -9,7 +9,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 
-import { Badge, Button, Col, Container, Row } from 'reactstrap';
+import { Button, Col, Container, Row } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { PlatformEnum, Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
@@ -26,6 +26,7 @@ import { getComplianceProfileStatusColor } from 'utils/compliance-profile';
 import ProfileAssociations from 'components/_pages/compliance-profiles/detail/ProfileAssociations/ProfileAssociations';
 import { EntityType, selectors as filtersSelectors, actions as filterActions } from 'ducks/filters';
 import { renderConditionItems } from 'utils/condition-badges';
+import Badge from 'components/Badge';
 
 export default function ComplianceProfileDetail() {
     const dispatch = useDispatch();

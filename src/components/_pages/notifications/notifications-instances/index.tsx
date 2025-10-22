@@ -6,7 +6,7 @@ import { actions as notificationsActions, selectors as notificationsSelectors } 
 import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
-import { Badge } from 'reactstrap';
+import Badge from 'components/Badge';
 import { LockWidgetNameEnum } from 'types/user-interface';
 
 const NotificationInstanceList = () => {

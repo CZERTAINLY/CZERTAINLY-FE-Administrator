@@ -43,7 +43,6 @@ import Select from 'react-select';
 
 import { actions as raProfilesActions, selectors as raProfilesSelectors } from 'ducks/ra-profiles';
 import {
-    Badge,
     Form as BootstrapForm,
     Button,
     ButtonGroup,
@@ -85,6 +84,7 @@ import CertificateList from 'components/_pages/certificates/list';
 import { capitalize } from 'utils/common-utils';
 import GoBackButton from 'components/GoBackButton';
 import ComplianceCheckResultWidget from 'components/_pages/certificates/ComplianceCheckResultWidget/ComplianceCheckResultWidget';
+import Badge from 'components/Badge';
 
 interface ChainDownloadSwitchState {
     isDownloadTriggered: boolean;

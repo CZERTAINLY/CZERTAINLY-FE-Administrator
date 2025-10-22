@@ -119,14 +119,19 @@ function Widget({
             )}
             id={id}
         >
-            <div className="flex items-center gap-2 mb-4">
-                <div>{renderTitle()}</div>
-                {renderRefreshButton()}
-                {renderWidgetButtons()}
-                {widgetExtraTopNode}
+            <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
+                <div className="flex items-center gap-2">
+                    {renderTitle()}
+                    {renderRefreshButton()}
+                </div>
+
+                <div className="flex-1 flex items-center gap-2 justify-end">
+                    {renderWidgetButtons()}
+                    {widgetExtraTopNode}
+                </div>
             </div>
 
-            {widgetInfoCard && (
+            {/* {widgetInfoCard && (
                 <Collapse isOpen={showWidgetInfo}>
                     <Card color="default" className="my-2">
                         <CardHeader>{widgetInfoCard.title}</CardHeader>
@@ -144,7 +149,7 @@ function Widget({
                         </CardBody>
                     </Card>
                 </Collapse>
-            )}
+            )} */}
             {widgetLock ? (
                 <WidgetLock
                     lockTitle={widgetLock.lockTitle}

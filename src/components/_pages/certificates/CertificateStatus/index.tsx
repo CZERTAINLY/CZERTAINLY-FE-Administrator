@@ -1,4 +1,3 @@
-import { Badge } from 'reactstrap';
 import {
     CertificateEventHistoryDtoStatusEnum,
     CertificateState,

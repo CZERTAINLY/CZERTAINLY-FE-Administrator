@@ -1,28 +1,37 @@
 import cn from 'classnames';
 
+export type BadgeColor = 'gray' | 'secondary' | 'success' | 'primary' | 'danger' | 'warning' | 'info' | 'transparent';
+
 interface Props {
-    color: 'gray' | 'light-gray' | 'teal' | 'blue' | 'red' | 'yellow' | 'transparent';
+    color?: BadgeColor;
     onClick?: () => void;
     onRemove?: () => void;
     children: React.ReactNode;
+    style?: React.CSSProperties;
 }
 
-function Switch({ color, onClick, onRemove, children }: Props) {
+function Switch({ color = 'secondary', onClick, onRemove, children, style }: Props) {
     const colorClasses = {
         gray: 'bg-gray-800 text-white dark:bg-white dark:text-neutral-800',
-        'light-gray': 'bg-gray-500 text-white',
-        teal: 'bg-teal-500 text-white',
-        blue: 'bg-blue-600 text-white dark:bg-blue-500',
-        red: 'bg-red-500 text-white',
-        yellow: 'bg-yellow-500 text-white',
+        secondary: 'bg-gray-500 text-white',
+        success: 'bg-[var(--status-success-color)] text-white',
+        primary: 'bg-blue-600 text-white dark:bg-blue-500',
+        danger: 'bg-[var(--status-danger-color)] text-white',
+        warning: 'bg-[var(--status-warning-color)] text-white',
+        info: 'bg-[var(--status-info-color)] text-white',
         transparent: 'bg-white text-gray-600',
     };
     return (
         <span
             onClick={onClick}
-            className={cn('inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-xs font-medium', colorClasses[color], {
-                'cursor-pointer': !!onClick,
-            })}
+            className={cn(
+                'inline-flex items-center justify-center gap-x-1.5 py-0.5 px-1.5 rounded-md text-xs font-medium min-w-[24px]',
+                colorClasses[color],
+                {
+                    'cursor-pointer': !!onClick,
+                },
+            )}
+            style={style}
         >
             {children}
             {onRemove && (

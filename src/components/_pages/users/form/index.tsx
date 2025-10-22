@@ -18,7 +18,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 import Select from 'react-select';
 
-import { Badge, Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, FormText, Input, Label } from 'reactstrap';
+import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, FormText, Input, Label } from 'reactstrap';
+import Badge from 'components/Badge';
 import { UserDetailModel } from 'types/auth';
 import { CertificateDetailResponseModel, CertificateListResponseModel } from 'types/certificate';
 

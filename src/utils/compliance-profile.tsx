@@ -1,4 +1,5 @@
-import { Badge, Button } from 'reactstrap';
+import { Button } from 'reactstrap';
+import Badge from 'components/Badge';
 import { TRuleGroupType } from 'types/complianceProfiles';
 import { ComplianceGroupListDto, ComplianceProfileDtoV2, ComplianceRuleListDto, Resource } from 'types/openapi';
 import { ComplianceRuleAvailabilityStatus } from 'types/openapi/models/ComplianceRuleAvailabilityStatus';
@@ -7,11 +8,11 @@ import { capitalize } from 'utils/common-utils';
 export const getComplianceProfileStatusColor = (status: ComplianceRuleAvailabilityStatus) => {
     switch (status) {
         case ComplianceRuleAvailabilityStatus.Available:
-            return '#14B8A6';
+            return 'success';
         case ComplianceRuleAvailabilityStatus.NotAvailable:
-            return '#EF4444';
+            return 'danger';
         case ComplianceRuleAvailabilityStatus.Updated:
-            return '#EAB308';
+            return 'warning';
     }
 };
 

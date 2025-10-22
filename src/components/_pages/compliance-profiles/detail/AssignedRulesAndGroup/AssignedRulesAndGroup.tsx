@@ -2,7 +2,7 @@ import Widget from 'components/Widget';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Select, { ClearIndicatorProps, components } from 'react-select';
-import { Badge, Col, Label, Row, UncontrolledTooltip } from 'reactstrap';
+import { Col, Label, Row, UncontrolledTooltip } from 'reactstrap';
 import { actions, selectors } from 'ducks/compliance-profiles';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { ComplianceProfileDtoV2, ComplianceRuleAvailabilityStatus, PlatformEnum, Resource } from 'types/openapi';
@@ -23,6 +23,7 @@ import {
 import { ResourceBadges } from 'components/_pages/compliance-profiles/detail/Components/ResourceBadges';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { TRuleGroupType } from 'types/complianceProfiles';
+import Badge from 'components/Badge';
 
 interface Props {
     profile: ComplianceProfileDtoV2 | undefined;

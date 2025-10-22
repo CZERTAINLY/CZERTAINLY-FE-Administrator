@@ -12,7 +12,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 
 import Select from 'react-select';
-import { Badge, Col, Container, Row, Table } from 'reactstrap';
+import { Col, Container, Row, Table } from 'reactstrap';
+import Badge from 'components/Badge';
 import { AttributeDescriptorModel } from 'types/attributes';
 import { FunctionGroupModel } from 'types/connectors';
 
@@ -213,7 +214,7 @@ export default function ConnectorDetail() {
             },
             {
                 id: 'status',
-                columns: ['Status', <Badge color={`${connectorStatus[1]}`}>{connectorStatus[0]}</Badge>],
+                columns: ['Status', <Badge style={{ backgroundColor: connectorStatus[1] }}>{connectorStatus[0]}</Badge>],
             },
             {
                 id: 'authType',
@@ -270,14 +271,14 @@ export default function ConnectorDetail() {
     );
 
     const renderStatusBadge = useCallback((status?: HealthStatus) => {
-        if (!status) return <Badge color="light">Unknown</Badge>;
+        if (!status) return <Badge color="transparent">Unknown</Badge>;
         switch (status) {
             case HealthStatus.Ok:
                 return <Badge color="success">{status}</Badge>;
             case HealthStatus.Nok:
                 return <Badge color="danger">{status}</Badge>;
             case HealthStatus.Unknown:
-                return <Badge color="light">{status}</Badge>;
+                return <Badge color="transparent">{status}</Badge>;
             default:
                 return <Badge color="warning">{status}</Badge>;
         }

@@ -1,7 +1,8 @@
 import { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
-import { Badge, Container } from 'reactstrap';
+import { Container } from 'reactstrap';
+import Badge from 'components/Badge';
 
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { EntityType } from 'ducks/filters';

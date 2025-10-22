@@ -14,7 +14,8 @@ import { Link, useNavigate, useParams } from 'react-router';
 import Select from 'react-select';
 
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import { Badge, Col, Container, Label, Row } from 'reactstrap';
+import { Col, Container, Label, Row } from 'reactstrap';
+import Badge from 'components/Badge';
 import { KeyUsage, PlatformEnum, Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';

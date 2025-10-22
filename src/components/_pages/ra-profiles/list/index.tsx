@@ -1,7 +1,8 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
-import { Badge, Container } from 'reactstrap';
+import { Container } from 'reactstrap';
+import Badge from 'components/Badge';
 
 import { actions, selectors } from 'ducks/ra-profiles';
 
@@ -164,9 +165,7 @@ function RaProfileList() {
                 <>
                     {protocols.map((protocol) => (
                         <Fragment key={protocol}>
-                            <Badge color="secondary" searchvalue={protocol}>
-                                {protocol}
-                            </Badge>
+                            <Badge color="secondary">{protocol}</Badge>
                             &nbsp;
                         </Fragment>
                     ))}
