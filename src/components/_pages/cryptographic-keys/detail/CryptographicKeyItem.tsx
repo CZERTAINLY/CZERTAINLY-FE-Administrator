@@ -13,7 +13,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import Select from 'react-select';
 
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import { Button, Col, Row } from 'reactstrap';
 import Badge from 'components/Badge';
 import { CryptographicKeyHistoryModel, CryptographicKeyItemDetailResponseModel } from 'types/cryptographic-keys';
 import { KeyCompromiseReason, KeyState, KeyUsage, PlatformEnum } from 'types/openapi';
@@ -23,8 +22,10 @@ import KeyStatus from '../KeyStatus';
 import SignVerifyData from './SignVerifyData';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
 import EditableTableCell from 'components/CustomTable/EditableTableCell';
-import { keyWithoutTokenInstanceActionNotes } from 'components/_pages/cryptographic-keys/detail';
+import { keyWithoutTokenInstanceActionNotes } from './constants';
 import { createWidgetDetailHeaders } from 'utils/widget';
+import Button from 'components/Button';
+import { Info } from 'lucide-react';
 interface Props {
     keyUuid: string;
     tokenInstanceUuid?: string;
@@ -255,7 +256,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
 
     const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
 
-    const detailDataSlice1: TableDataRow[] = useMemo(
+    const detailData: TableDataRow[] = useMemo(
         () =>
             !keyItem
                 ? []
@@ -287,28 +288,14 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                           id: 'keyAlgorithm',
                           columns: ['Key Algorithm', keyItem.keyAlgorithm],
                       },
-                  ],
-        [keyItem, keyTypeEnum, isUpdatingKeyItem, onEditName],
-    );
-
-    const detailDataSlice2: TableDataRow[] = useMemo(
-        () =>
-            !keyItem
-                ? []
-                : [
                       {
                           id: 'format',
                           columns: [
                               'Key Format',
-                              <div>
-                                  {keyItem.format} &nbsp;&nbsp;&nbsp;
-                                  <Button
-                                      color="white"
-                                      size="sm"
-                                      onClick={() => setDisplayKeyData(true)}
-                                      title="Show Additional Information"
-                                  >
-                                      <i className="fa fa-info-circle" aria-hidden="true"></i>
+                              <div className="flex items-center gap-2">
+                                  {keyItem.format}
+                                  <Button type="transparent" onClick={() => setDisplayKeyData(true)} title="Show Additional Information">
+                                      <Info size={16} />
                                   </Button>
                               </div>,
                           ],
@@ -318,7 +305,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                           columns: [
                               'Key Usages',
                               keyItem.usage?.map((usage) => (
-                                  <Badge key={usage} color="secondary" className="mr-xs">
+                                  <Badge key={usage} color="secondary">
                                       {usage}
                                   </Badge>
                               )) ?? 'None',
@@ -343,7 +330,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                           ],
                       },
                   ],
-        [keyCompromiseReasonEnum, keyItem],
+        [keyItem, keyTypeEnum, isUpdatingKeyItem, onEditName],
     );
 
     const historyHeaders: TableHeader[] = useMemo(
@@ -404,8 +391,12 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                               <div style={{ wordBreak: 'break-all' }}>{history.message}</div>,
 
                               history.additionalInformation ? (
-                                  <Button color="white" onClick={() => setCurrentInfoId(history.uuid)} title="Show Additional Information">
-                                      <i className="fa fa-info-circle" aria-hidden="true"></i>
+                                  <Button
+                                      type="transparent"
+                                      onClick={() => setCurrentInfoId(history.uuid)}
+                                      title="Show Additional Information"
+                                  >
+                                      <Info size={16} />
                                   </Button>
                               ) : (
                                   ''
@@ -484,32 +475,21 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
         <div className="key-details">
             <div>
                 <h6 className="d-inline-block">
-                    <Badge key={keyItem.uuid} color="gray" className="mr-xs">
+                    <Badge key={keyItem.uuid} color="gray">
                         {keyItem.keyAlgorithm}
                     </Badge>
                 </h6>
-                <div className="fa-pull-right mt-n-xs">
+                <div className="flex justify-end">
                     <WidgetButtons buttons={buttons} />
                 </div>
             </div>
-            <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                <Col>
-                    <CustomTable headers={detailHeaders} data={detailDataSlice1} />
-                </Col>
+            <CustomTable headers={detailHeaders} data={detailData} />
 
-                <Col>
-                    <CustomTable headers={detailHeaders} data={detailDataSlice2} />
-                </Col>
-
-                {keyItem.metadata && keyItem.metadata.length > 0 ? (
-                    <Col>
-                        <Widget title="Metadata" className="mt-3" titleSize="large">
-                            <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={keyItem.metadata} />
-                        </Widget>
-                    </Col>
-                ) : null}
-            </Row>
-
+            {keyItem.metadata && keyItem.metadata.length > 0 && (
+                <Widget title="Metadata" className="mt-3" titleSize="large">
+                    <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={keyItem.metadata} />
+                </Widget>
+            )}
             <Widget title="Event History" className="mt-3" titleSize="large" refreshAction={getFreshHistory}>
                 <CustomTable headers={historyHeaders} data={historyEntry} hasPagination={true} />
             </Widget>

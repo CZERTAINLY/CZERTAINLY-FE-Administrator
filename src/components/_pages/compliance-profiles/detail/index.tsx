@@ -9,7 +9,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 
-import { Button, Col, Container, Row } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { PlatformEnum, Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
@@ -27,6 +26,9 @@ import ProfileAssociations from 'components/_pages/compliance-profiles/detail/Pr
 import { EntityType, selectors as filtersSelectors, actions as filterActions } from 'ducks/filters';
 import { renderConditionItems } from 'utils/condition-badges';
 import Badge from 'components/Badge';
+import Breadcrumb from 'components/Breadcrumb';
+import Container from 'components/Container';
+import Button from 'components/Button';
 
 export default function ComplianceProfileDetail() {
     const dispatch = useDispatch();
@@ -376,29 +378,27 @@ export default function ComplianceProfileDetail() {
     }, [profile, dispatch]);
 
     return (
-        <Container className="themed-container" fluid>
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                forcedPath="/complianceprofiles"
-                text={`${getEnumLabel(resourceEnum, Resource.ComplianceProfiles)} Inventory`}
+        <div>
+            <Breadcrumb
+                items={[
+                    { label: 'Compliance Profiles', href: '/complianceprofiles' },
+                    { label: profile?.name || 'Compliance Profile Details', href: '' },
+                ]}
             />
-            <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                <Col>
-                    <Widget
-                        title="Compliance Profile Details"
-                        busy={isFetchingDetail}
-                        widgetButtons={buttons}
-                        titleSize="large"
-                        refreshAction={getFreshComplianceProfileDetails}
-                        widgetLockName={LockWidgetNameEnum.ComplianceProfileDetails}
-                        lockSize="large"
-                        dataTestId="compliance-profile-details-widget"
-                    >
-                        <CustomTable headers={detailHeaders} data={detailData} />
-                    </Widget>
-                </Col>
-
-                <Col>
+            <Container className="md:grid grid-cols-2">
+                <Widget
+                    title="Compliance Profile Details"
+                    busy={isFetchingDetail}
+                    widgetButtons={buttons}
+                    titleSize="large"
+                    refreshAction={getFreshComplianceProfileDetails}
+                    widgetLockName={LockWidgetNameEnum.ComplianceProfileDetails}
+                    lockSize="large"
+                    dataTestId="compliance-profile-details-widget"
+                >
+                    <CustomTable headers={detailHeaders} data={detailData} />
+                </Widget>
+                <Container className="flex flex-col">
                     <ProfileAssociations profile={profile} />
                     {profile && (
                         <CustomAttributeWidget
@@ -407,27 +407,22 @@ export default function ComplianceProfileDetail() {
                             attributes={profile.customAttributes}
                         />
                     )}
-                </Col>
-            </Row>
-
-            <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                <Col>
-                    <AssignedRulesAndGroup
-                        profile={profile}
-                        setSelectedEntityDetails={setSelectedEntityDetails}
-                        setIsEntityDetailMenuOpen={setIsEntityDetailMenuOpen}
-                        onReset={(resetFn) => setAssignedRulesResetFunction(() => resetFn)}
-                    />
-                </Col>
-                <Col>
-                    <AvailableRulesAndGroups
-                        profile={profile}
-                        setSelectedEntityDetails={setSelectedEntityDetails}
-                        setIsEntityDetailMenuOpen={setIsEntityDetailMenuOpen}
-                        onReset={(resetFn) => setAvailableRulesResetFunction(() => resetFn)}
-                    />
-                </Col>
-            </Row>
+                </Container>
+            </Container>
+            <Container className="md:grid grid-cols-2" marginTop>
+                <AssignedRulesAndGroup
+                    profile={profile}
+                    setSelectedEntityDetails={setSelectedEntityDetails}
+                    setIsEntityDetailMenuOpen={setIsEntityDetailMenuOpen}
+                    onReset={(resetFn) => setAssignedRulesResetFunction(() => resetFn)}
+                />
+                <AvailableRulesAndGroups
+                    profile={profile}
+                    setSelectedEntityDetails={setSelectedEntityDetails}
+                    setIsEntityDetailMenuOpen={setIsEntityDetailMenuOpen}
+                    onReset={(resetFn) => setAvailableRulesResetFunction(() => resetFn)}
+                />
+            </Container>
 
             <Dialog
                 isOpen={confirmDelete}
@@ -499,6 +494,6 @@ export default function ComplianceProfileDetail() {
                 ]}
                 dataTestId="delete-error-dialog"
             />
-        </Container>
+        </div>
     );
 }

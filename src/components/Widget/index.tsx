@@ -7,7 +7,6 @@ import WidgetLock from 'components/WidgetLock';
 import { selectors } from 'ducks/user-interface';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router';
-import { Card, CardBody, CardHeader, Collapse } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { RefreshCw } from 'lucide-react';
 import Button from 'components/Button';
@@ -37,6 +36,7 @@ interface Props {
     widgetInfoCard?: WidgetInfoCard;
     innerContainerProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
     dataTestId?: string;
+    noBorder?: boolean;
 }
 
 function Widget({
@@ -57,6 +57,7 @@ function Widget({
     widgetInfoCard,
     innerContainerProps,
     dataTestId,
+    noBorder = false,
 }: Props) {
     const widgetLock = useSelector(selectors.selectWidgetLocks).find(
         (lock) => lock.widgetName === widgetLockName || (Array.isArray(widgetLockName) && widgetLockName.includes(lock.widgetName)),
@@ -86,7 +87,7 @@ function Widget({
     const renderRefreshButton = () =>
         refreshAction ? (
             <Button onClick={refreshAction} data-testid="refresh-icon" type="transparent">
-                <RefreshCw size={20} />
+                <RefreshCw size={16} />
             </Button>
         ) : null;
 
@@ -102,21 +103,16 @@ function Widget({
         if (!updatedWidgetButtons.length) return null;
         if (hideWidgetButtons) return null;
         else {
-            return (
-                <div className="ms-auto">
-                    <WidgetButtons buttons={updatedWidgetButtons} justify="end" />
-                </div>
-            );
+            return <WidgetButtons buttons={updatedWidgetButtons} justify="end" />;
         }
     }, [widgetButtons, hideWidgetButtons, widgetLock, widgetInfoCard, showWidgetInfo]);
 
     return (
         <section
             data-testid={dataTestId}
-            className={cx(
-                'relative flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl p-4 md:p-5 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400',
-                className,
-            )}
+            className={cx('relative flex flex-col bg-white shadow-2xs rounded-xl dark:bg-neutral-900 dark:text-neutral-400', className, {
+                'border border-gray-200 dark:border-neutral-700 p-4 md:p-5': !noBorder,
+            })}
             id={id}
         >
             <div className="flex items-center justify-between flex-wrap gap-2 mb-4">

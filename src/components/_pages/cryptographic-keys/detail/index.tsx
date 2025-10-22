@@ -14,20 +14,15 @@ import { Link, useNavigate, useParams } from 'react-router';
 import Select from 'react-select';
 
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import { Col, Container, Label, Row } from 'reactstrap';
 import { KeyCompromiseReason, KeyState, KeyType, PlatformEnum, Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { dateFormatter } from 'utils/dateUtil';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import CryptographicKeyItem from './CryptographicKeyItem';
 import { createWidgetDetailHeaders } from 'utils/widget';
-import GoBackButton from 'components/GoBackButton';
-
-export const keyWithoutTokenInstanceActionNotes = {
-    delete: 'Note that no token instance is associated with the Key. The key record will be removed from the platform, but will not be deleted in external key storage service.',
-    destroy:
-        'Note that no token instance is associated with the Key. The key will be marked as destroyed, but will not be destroyed in external key storage service.',
-};
+import Breadcrumb from 'components/Breadcrumb';
+import Container from 'components/Container';
+import { keyWithoutTokenInstanceActionNotes } from './constants';
 
 export default function CryptographicKeyDetail() {
     const dispatch = useDispatch();
@@ -342,13 +337,10 @@ export default function CryptographicKeyDetail() {
         setSelectedTab(keyTab < 0 ? 0 : keyTab);
 
         const tabs = keyItems.map((item, i) => ({
-            title: (
-                <div className="d-flex p-2 px-3" onClick={() => setSelectedTab(i)}>
-                    {getEnumLabel(keyTypeEnum, item.type)}
-                </div>
-            ),
+            title: getEnumLabel(keyTypeEnum, item.type),
+            onClick: () => setSelectedTab(i),
             content: (
-                <Widget busy={isBusy || isFetchingHistory}>
+                <Widget busy={isBusy || isFetchingHistory} noBorder>
                     <CryptographicKeyItem
                         key={item.uuid}
                         keyItem={item}
@@ -364,33 +356,25 @@ export default function CryptographicKeyDetail() {
     }, [cryptographicKey, isBusy, isFetchingHistory, keyTypeEnum, keyItemUuid]);
 
     return (
-        <Container className="themed-container" fluid>
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                forcedPath="/keys"
-                text={`${getEnumLabel(resourceEnum, Resource.Keys)} Inventory`}
+        <>
+            <Breadcrumb
+                items={[{ label: `${getEnumLabel(resourceEnum, Resource.Keys)} Inventory`, href: '/keys' }, { label: 'Key Details' }]}
             />
-            <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                <Col>
-                    <Widget
-                        title="Key Details"
-                        busy={isBusy}
-                        widgetButtons={buttons}
-                        titleSize="large"
-                        refreshAction={getFreshCryptographicKeyDetails}
-                        widgetLockName={LockWidgetNameEnum.keyDetails}
-                        lockSize="large"
-                    >
-                        <br />
-
-                        <CustomTable headers={detailHeaders} data={detailData} />
-                    </Widget>
-                </Col>
-
-                <Col>
-                    <Widget title="Attributes" busy={isBusy} titleSize="large">
-                        <br />
-                        <Label>Key Attributes</Label>
+            <Container className="md:flex-row">
+                <Widget
+                    title="Key Details"
+                    busy={isBusy}
+                    widgetButtons={buttons}
+                    titleSize="large"
+                    refreshAction={getFreshCryptographicKeyDetails}
+                    widgetLockName={LockWidgetNameEnum.keyDetails}
+                    lockSize="large"
+                    className="w-full md:w-1/2"
+                >
+                    <CustomTable headers={detailHeaders} data={detailData} />
+                </Widget>
+                <Container className="w-full md:w-1/2">
+                    <Widget title="Key Attributes" busy={isBusy} titleSize="large">
                         <AttributeViewer attributes={cryptographicKey?.attributes} />
                     </Widget>
 
@@ -401,14 +385,14 @@ export default function CryptographicKeyDetail() {
                             attributes={cryptographicKey.customAttributes}
                         />
                     )}
-                </Col>
-            </Row>
-            {itemTabs.tabs.length > 0 && <TabLayout tabs={itemTabs.tabs} selectedTab={selectedTab} />}
-            <Widget title="Key Associations" busy={isBusy} titleSize="large">
-                <br />
-
-                <CustomTable headers={associationHeaders} data={associationBody} />
-            </Widget>
+                </Container>
+            </Container>
+            <Container marginTop>
+                {itemTabs.tabs.length > 0 && <TabLayout tabs={itemTabs.tabs} selectedTab={selectedTab} />}
+                <Widget title="Key Associations" busy={isBusy} titleSize="large">
+                    <CustomTable headers={associationHeaders} data={associationBody} />
+                </Widget>
+            </Container>
             <Dialog
                 isOpen={confirmDelete}
                 caption="Delete Key"
@@ -462,6 +446,6 @@ export default function CryptographicKeyDetail() {
                     { color: 'secondary', onClick: () => setConfirmDestroy(false), body: 'Cancel' },
                 ]}
             />
-        </Container>
+        </>
     );
 }

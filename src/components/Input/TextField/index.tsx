@@ -16,7 +16,7 @@ type Props = {
     label: string;
     disabled?: boolean;
     inputType?: InputType;
-    description?: string | JSX.Element;
+    description?: string | React.ReactNode;
     validators: ((value: any, allValues: any, fieldState: any) => string | undefined | Promise<string | undefined>)[];
     inputGroupIcon?: InputGroupIcon;
     placeholder?: string;

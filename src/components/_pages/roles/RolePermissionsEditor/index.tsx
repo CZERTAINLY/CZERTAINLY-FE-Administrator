@@ -272,7 +272,7 @@ function RolePermissionsEditor({
     );
 
     const getObjectRowActions = useCallback(
-        (object: ObjectPermissionsResponseModel): JSX.Element[] =>
+        (object: ObjectPermissionsResponseModel): React.ReactNode[] =>
             currentResource?.actions.map((action) => (
                 <label
                     htmlFor={`${object.uuid}_${action.name}`}

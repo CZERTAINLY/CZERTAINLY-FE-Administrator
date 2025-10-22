@@ -38,6 +38,7 @@ import {
     Archive,
     ArchiveRestore,
 } from 'lucide-react';
+import Button from 'components/Button';
 
 export type IconName =
     | 'plus'
@@ -136,7 +137,7 @@ const getIcon = (icon: IconName, size: number = 20): React.ReactNode => {
     };
 
     const IconComponent = iconMap[icon];
-    return IconComponent ? <IconComponent size={size} /> : null;
+    return IconComponent ? <IconComponent size={16} /> : null;
 };
 
 function WidgetButtons({ buttons, justify = 'center' }: Props) {
@@ -144,29 +145,19 @@ function WidgetButtons({ buttons, justify = 'center' }: Props) {
         let toolTip: React.ReactNode | undefined;
 
         const btnProps = {
-            className:
-                'py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent text-gray-800 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none dark:text-white dark:hover:bg-neutral-700 dark:focus:bg-neutral-700',
             onClick: button.onClick,
             disabled: button.disabled,
         };
-
-        if (!button.disabled) {
-            btnProps.className = `${btnProps.className} opacity-100`;
-        }
-
-        if (button.hidden) {
-            btnProps.disabled = true;
-        }
 
         const key = button.icon + button.tooltip + button.id || '';
 
         return button.custom ? (
             <span key={key}>{button.custom}</span>
         ) : (
-            <button data-testid={`${button.id}-button`} key={key} type="button" {...btnProps} title={button.tooltip}>
+            <Button type="transparent" data-testid={`${button.id}-button`} title={button.tooltip} {...btnProps}>
                 {getIcon(button.icon)}
                 {toolTip}
-            </button>
+            </Button>
         );
     };
 

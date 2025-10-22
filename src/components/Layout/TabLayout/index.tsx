@@ -1,7 +1,7 @@
 import cx from 'classnames';
 import Tabs from 'components/Tabs';
 import { useEffect, useMemo, useState } from 'react';
-import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
+import { TabContent, TabPane } from 'reactstrap';
 import Widget from 'components/Widget';
 
 type Props = {
@@ -14,36 +14,21 @@ type Props = {
     }[];
     onlyActiveTabContent?: boolean;
     selectedTab?: number;
+    noBorder?: boolean;
 };
 
-export default function TabLayout({ tabs, onlyActiveTabContent = false, selectedTab }: Props) {
+export default function TabLayout({ tabs, onlyActiveTabContent = true, selectedTab, noBorder = false }: Props) {
     const [activeTab, setActiveTab] = useState(selectedTab || 0);
 
     const memoizedTabs = useMemo(() => {
         return tabs.filter((e) => !e.hidden);
     }, [tabs]);
 
-    useEffect(() => {
-        if (selectedTab !== undefined && selectedTab !== activeTab) {
-            setActiveTab(selectedTab);
-        } else if (memoizedTabs.length <= activeTab) {
-            setActiveTab(0);
-        }
-    }, [activeTab, memoizedTabs, selectedTab]);
-
     return (
-        <Widget>
+        <Widget noBorder={noBorder}>
             <Tabs tabs={memoizedTabs} selectedTab={activeTab} onTabChange={setActiveTab} />
             <hr className="my-4 border-gray-200" />
-            <TabContent activeTab={activeTab}>
-                {memoizedTabs.map((t, i) =>
-                    onlyActiveTabContent === false || activeTab === i ? (
-                        <TabPane key={`pane-${i}`} tabId={i}>
-                            {t.content}
-                        </TabPane>
-                    ) : null,
-                )}
-            </TabContent>
+            {memoizedTabs.map((t, i) => (onlyActiveTabContent === false || activeTab === i ? <div key={i}>{t.content}</div> : null))}
         </Widget>
     );
 }

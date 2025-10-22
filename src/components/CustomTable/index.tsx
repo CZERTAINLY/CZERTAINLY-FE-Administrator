@@ -1,15 +1,16 @@
 import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { jsxInnerText } from 'utils/jsxInnerText';
 
-import styles from './CustomTable.module.scss';
 import NewRowWidget, { NewRowWidgetProps } from './NewRowWidget';
 import Select from 'components/Select';
 import Pagination from 'components/Pagination';
 import Checkbox from 'components/Checkbox';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import cn from 'classnames';
 
 export interface TableHeader {
     id: string;
-    content: string | JSX.Element;
+    content: string | React.ReactNode;
     align?: 'left' | 'center' | 'right';
     sortable?: boolean;
     sort?: 'asc' | 'desc';
@@ -19,8 +20,8 @@ export interface TableHeader {
 
 export interface TableDataRow {
     id: number | string;
-    columns: (string | JSX.Element | JSX.Element[])[];
-    detailColumns?: (string | JSX.Element | JSX.Element[])[];
+    columns: (string | React.ReactNode | React.ReactNode[])[];
+    detailColumns?: (string | React.ReactNode | React.ReactNode[])[];
     options?: {
         useAccentBottomBorder?: boolean;
     };
@@ -116,7 +117,7 @@ function CustomTable({
                 ? [...data].filter((row) => {
                       let rowStr = '';
                       row.columns.forEach((col) => {
-                          rowStr += typeof col === 'string' ? col : jsxInnerText(col as JSX.Element);
+                          rowStr += typeof col === 'string' ? col : jsxInnerText(col as React.ReactNode);
                       });
                       return rowStr.toLowerCase().includes(searchKey.toLowerCase());
                   })
@@ -138,11 +139,11 @@ function CustomTable({
                     const aVal =
                         typeof a.columns[sortColumnIndex] === 'string'
                             ? (a.columns[sortColumnIndex] as string).toLowerCase()
-                            : jsxInnerText(a.columns[sortColumnIndex] as JSX.Element).toLowerCase();
+                            : jsxInnerText(a.columns[sortColumnIndex] as React.ReactNode).toLowerCase();
                     const bVal =
                         typeof b.columns[sortColumnIndex] === 'string'
                             ? (b.columns[sortColumnIndex] as string).toLowerCase()
-                            : jsxInnerText(b.columns[sortColumnIndex] as JSX.Element).toLowerCase();
+                            : jsxInnerText(b.columns[sortColumnIndex] as React.ReactNode).toLowerCase();
 
                     switch (sortCol.sortType) {
                         case 'date':
@@ -310,6 +311,30 @@ function CustomTable({
         return tblCheckedRows.length === tblData.slice((page - 1) * ps, page * ps).length && tblData.length > 0;
     }, [tblData, tblCheckedRows, paginationData, pageSize, page]);
 
+    const getSortIcon = useCallback((sort: 'asc' | 'desc') => {
+        return (
+            <div className="w-[14px]">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    className="lucide lucide-arrow-down-up-icon lucide-arrow-down-up"
+                >
+                    <path d="m3 16 4 4 4-4" color={sort && sort === 'desc' ? 'var(--dark-gray-color)' : 'currentColor'} />
+                    <path d="M7 20V4" color={sort && sort === 'desc' ? 'var(--dark-gray-color)' : 'currentColor'} />
+                    <path d="m21 8-4-4-4 4" color={sort && sort === 'asc' ? 'var(--dark-gray-color)' : 'currentColor'} />
+                    <path d="M17 4v16" color={sort && sort === 'asc' ? 'var(--dark-gray-color)' : 'currentColor'} />
+                </svg>
+            </div>
+        );
+    }, []);
+
     const header = useMemo(() => {
         const columns = tblHeaders ? [...tblHeaders] : [];
 
@@ -319,7 +344,9 @@ function CustomTable({
             <Fragment key={header.id}>
                 <th
                     scope="col"
-                    className="p-2 text-start text-xs font-medium text-gray-500 uppercase dark:text-neutral-400"
+                    className={cn('p-2 text-start text-xs font-medium text-gray-500 uppercase dark:text-neutral-400', {
+                        'cursor-pointer': header.sortable,
+                    })}
                     data-id={header.id}
                     {...(header.sortable ? { onClick: onColumnSortClick } : {})}
                     style={{ ...(header.width ? { width: header.width } : {}), ...(header.align ? { textAlign: header.align } : {}) }}
@@ -335,26 +362,11 @@ function CustomTable({
                             <>&nbsp;</>
                         )
                     ) : header.sortable ? (
-                        <>
+                        <div className="flex items-center gap-1">
                             {header.content}
                             &nbsp;
-                            {header.sort === 'asc' ? (
-                                <>
-                                    <i className="fa fa-arrow-up" />
-                                    <i className="fa fa-arrow-down" style={{ opacity: 0.25 }} />
-                                </>
-                            ) : header.sort === 'desc' ? (
-                                <>
-                                    <i className="fa fa-arrow-up" style={{ opacity: 0.25 }} />
-                                    <i className="fa fa-arrow-down" />
-                                </>
-                            ) : (
-                                <>
-                                    <i className="fa fa-arrow-up" style={{ opacity: 0.25 }} />
-                                    <i className="fa fa-arrow-down" style={{ opacity: 0.25 }} />
-                                </>
-                            )}
-                        </>
+                            {getSortIcon(header.sort)}
+                        </div>
                     ) : (
                         header.content
                     )}
@@ -404,9 +416,9 @@ function CustomTable({
                                 className="px-2 py-2 whitespace-nowrap text-xs font-medium text-gray-800 dark:text-neutral-200"
                             >
                                 {expandedRow === row.id ? (
-                                    <i className="fa fa-caret-up" data-expander="true" />
+                                    <ChevronUp size={16} className="text-[var(--status-light-gray-color)]" />
                                 ) : (
-                                    <i className="fa fa-caret-down" data-expander="true" />
+                                    <ChevronDown size={16} className="text-[var(--status-light-gray-color)]" />
                                 )}
                             </td>
                         )}
@@ -430,31 +442,26 @@ function CustomTable({
                             </td>
                         ))}
                     </tr>
-
-                    {!hasDetails ? (
-                        <></>
-                    ) : (
+                    {hasDetails && (
                         <tr key={`trd${row.id}`}>
-                            {row.detailColumns && expandedRow === row.id ? (
-                                row.detailColumns.length === 1 ? (
-                                    <td
-                                        colSpan={row.columns.length + (hasCheckboxes ? 1 : 0) + (hasDetails ? 1 : 0)}
-                                        className={styles.detailCell}
-                                    >
+                            {row.detailColumns &&
+                                expandedRow === row.id &&
+                                (row.detailColumns.length === 1 ? (
+                                    <td className="px-2 py-2 whitespace-nowrap text-xs font-medium text-gray-800 dark:text-neutral-200">
                                         {row.detailColumns[0]}
                                     </td>
                                 ) : (
                                     row.detailColumns.map((e, index) => {
                                         return (
-                                            <td key={index}>
+                                            <td
+                                                key={index}
+                                                className="px-2 py-2 whitespace-nowrap text-xs font-medium text-gray-800 dark:text-neutral-200"
+                                            >
                                                 <div>{e}</div>
                                             </td>
                                         );
                                     })
-                                )
-                            ) : (
-                                <></>
-                            )}
+                                ))}
                         </tr>
                     )}
                 </Fragment>
@@ -491,7 +498,7 @@ function CustomTable({
                 </div>
             )}
             <div className="py-2">
-                <div className="overflow-x-auto border border-gray-100 rounded-md">
+                <div className={cn('overflow-x-auto rounded-md', { 'border border-gray-100': hasHeader })}>
                     <div className="min-w-full inline-block align-middle">
                         <div className="overflow-hidden">
                             <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
@@ -506,8 +513,9 @@ function CustomTable({
                     </div>
                 </div>
             </div>
+
             {hasPagination && (
-                <div className="flex justify-between items-center gap-2 mt-2">
+                <div className="flex justify-between items-center gap-2">
                     <div>
                         {tblData?.length > 0 && (
                             <Select
@@ -522,11 +530,13 @@ function CustomTable({
                         )}
                     </div>
 
-                    <Pagination
-                        page={paginationData?.page || page}
-                        totalPages={paginationData?.totalPages || totalPages}
-                        onPageChange={onPageChange}
-                    />
+                    {tblData?.length > 1 && (
+                        <Pagination
+                            page={paginationData?.page || page}
+                            totalPages={paginationData?.totalPages || totalPages}
+                            onPageChange={onPageChange}
+                        />
+                    )}
 
                     {tblData?.length ? (
                         <div className="text-sm">
@@ -554,7 +564,7 @@ function CustomTable({
                             )}
                         </div>
                     ) : (
-                        <div>No items to show</div>
+                        <div className="text-sm">No items to show</div>
                     )}
                 </div>
             )}

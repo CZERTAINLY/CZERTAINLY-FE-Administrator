@@ -20,7 +20,7 @@ const renderTypeWithOptionalNav = (
 ) => {
     const { name, uuid, path, navigate, buttonTitle } = opts;
 
-    let additional: JSX.Element | string = '';
+    let additional: React.ReactNode | string = '';
 
     if (path && uuid) {
         if (name) {

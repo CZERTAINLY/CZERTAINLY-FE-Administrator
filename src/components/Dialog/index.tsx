@@ -3,7 +3,7 @@ import styles from './Dialog.module.scss';
 
 interface DialogButton {
     color: string;
-    body: string | JSX.Element;
+    body: string | React.ReactNode;
     onClick: (formData?: any) => void;
     disabled?: boolean;
 }
@@ -11,8 +11,8 @@ interface DialogButton {
 interface Props {
     isOpen: boolean;
     toggle?: () => void;
-    caption?: string | JSX.Element;
-    body?: string | JSX.Element;
+    caption?: string | React.ReactNode;
+    body?: string | React.ReactNode;
     buttons?: DialogButton[];
     size?: 'sm' | 'lg' | 'xl';
     dataTestId?: string;

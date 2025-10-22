@@ -16,9 +16,10 @@ export type Props = {
     resource: Resource;
     resourceUuid: string;
     attributes: AttributeResponseModel[] | undefined;
+    className?: string;
 };
 
-export default function CustomAttributeWidget({ resource, resourceUuid, attributes }: Props) {
+export default function CustomAttributeWidget({ resource, resourceUuid, attributes, className }: Props) {
     const dispatch = useDispatch();
     const [isAttributeContentLoaded, setIsAttributeContentLoaded] = useState<boolean>(false);
 
@@ -101,6 +102,7 @@ export default function CustomAttributeWidget({ resource, resourceUuid, attribut
             busy={isFetchingResourceCustomAttributes || isUpdatingContent}
             titleSize="large"
             widgetLockName={LockWidgetNameEnum.CustomAttributeWidget}
+            className={className}
         >
             <AttributeViewer
                 attributes={loadedAttributes}

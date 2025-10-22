@@ -144,16 +144,15 @@ export default function DiscoveryCertificates({ id, triggerHistorySummary }: Pro
     );
 
     return (
-        <Widget title="Discovered Certificates" busy={isFetchingDiscoveryCertificates}>
-            <br />
-
+        <Widget title="Discovered Certificates" titleSize="large" busy={isFetchingDiscoveryCertificates}>
             <TabLayout
                 tabs={[
                     { title: 'All', onClick: () => setNewlyDiscovered(undefined), content: pagedTable },
                     { title: 'New', onClick: () => setNewlyDiscovered(true), content: pagedTable },
                     { title: 'Existing', onClick: () => setNewlyDiscovered(false), content: pagedTable },
                 ]}
-                onlyActiveTabContent={true}
+                onlyActiveTabContent
+                noBorder
             />
             <Dialog
                 isOpen={showMessage}

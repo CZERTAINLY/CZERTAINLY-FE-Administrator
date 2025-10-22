@@ -267,28 +267,24 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
             lockSize="large"
             dataTestId="assigned-rules-and-group-widget"
         >
-            <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                <Col style={{ width: '100%' }}>
-                    <Label for="assignedRulesSource">Rules Source</Label>
-                    <Select
-                        id="assignedRulesSource"
-                        inputId="assignedRulesSource"
-                        placeholder="Select..."
-                        maxMenuHeight={140}
-                        options={rulesSourceOptions}
-                        value={rulesSourceOptions.find((opt) => opt.value === assignedRulesSource) || null}
-                        menuPlacement="auto"
-                        onChange={(event) => {
-                            setAssignedResourceType('All');
-                            setAssignedRulesSource((event?.value as 'Internal' | 'Provider') || null);
-                        }}
-                        isClearable
-                        components={{
-                            ClearIndicator: AssignedRulesSourceClear,
-                        }}
-                    />
-                </Col>
-            </Row>
+            <Label for="assignedRulesSource">Rules Source</Label>
+            <Select
+                id="assignedRulesSource"
+                inputId="assignedRulesSource"
+                placeholder="Select..."
+                maxMenuHeight={140}
+                options={rulesSourceOptions}
+                value={rulesSourceOptions.find((opt) => opt.value === assignedRulesSource) || null}
+                menuPlacement="auto"
+                onChange={(event) => {
+                    setAssignedResourceType('All');
+                    setAssignedRulesSource((event?.value as 'Internal' | 'Provider') || null);
+                }}
+                isClearable
+                components={{
+                    ClearIndicator: AssignedRulesSourceClear,
+                }}
+            />
             {assignedRulesSource === 'Provider' && (
                 <Row xs="1" sm="1" md="2" lg="2" xl="2" style={{ marginTop: '10px' }}>
                     <Col>
@@ -335,7 +331,7 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
                 <CustomTable
                     headers={tableHeadersAssignedRulesAndGroups}
                     data={tableDataAssignedRulesAndGroups}
-                    hasPagination={true}
+                    hasPagination
                     canSearch={true}
                 />
             </Widget>

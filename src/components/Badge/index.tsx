@@ -8,9 +8,10 @@ interface Props {
     onRemove?: () => void;
     children: React.ReactNode;
     style?: React.CSSProperties;
+    className?: string;
 }
 
-function Switch({ color = 'secondary', onClick, onRemove, children, style }: Props) {
+function Switch({ color = 'secondary', onClick, onRemove, children, style, className }: Props) {
     const colorClasses = {
         gray: 'bg-gray-800 text-white dark:bg-white dark:text-neutral-800',
         secondary: 'bg-gray-500 text-white',
@@ -30,6 +31,7 @@ function Switch({ color = 'secondary', onClick, onRemove, children, style }: Pro
                 {
                     'cursor-pointer': !!onClick,
                 },
+                className,
             )}
             style={style}
         >
