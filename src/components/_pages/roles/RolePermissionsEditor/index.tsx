@@ -244,7 +244,7 @@ function RolePermissionsEditor({
                     </div>
                 </Widget>
             ),
-        [allowAction, allowAllActions, currentResource, disabled, isBusy, permissions.allowAllResources, permissions?.resources],
+        [allowAction, allowAllActions, currentResource, disabled, isBusy, permissions],
     );
 
     const objectHeaders: TableHeader[] = useMemo(
@@ -294,7 +294,7 @@ function RolePermissionsEditor({
                     />
                 </label>
             )) || [],
-        [currentResource?.actions, currentResource?.uuid, disabled, setOLP],
+        [currentResource, disabled, setOLP],
     );
 
     const objectRows: TableDataRow[] = useMemo(

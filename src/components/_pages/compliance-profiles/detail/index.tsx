@@ -274,8 +274,8 @@ export default function ComplianceProfileDetail() {
         });
     }, [groupRules, resourceEnum, entityDetailHeaders]);
 
-    const EntityDetailMenu = useCallback(() => {
-        return (
+    const entityDetailMenuContent = useMemo(
+        () => (
             <Widget titleSize="larger" busy={selectedEntityDetails?.entityDetails?.entityType === 'group' ? isFetchingGroupRules : false}>
                 {selectedEntityDetails?.entityDetails?.entityType === 'rule' && (
                     <TabLayout
@@ -331,22 +331,23 @@ export default function ComplianceProfileDetail() {
                     />
                 )}
             </Widget>
-        );
-    }, [
-        selectedEntityDetails?.entityDetails?.entityType,
-        selectedEntityDetails?.conditionItems,
-        selectedEntityDetails?.attributes,
-        isFetchingGroupRules,
-        entityDetailHeaders,
-        ruleDetailData,
-        availableFilters,
-        platformEnums,
-        searchGroupEnum,
-        filterConditionOperatorEnum,
-        groupDetailData,
-        groupRulesDetailHeaders,
-        groupRulesDetailData,
-    ]);
+        ),
+        [
+            selectedEntityDetails?.entityDetails?.entityType,
+            selectedEntityDetails?.conditionItems,
+            selectedEntityDetails?.attributes,
+            isFetchingGroupRules,
+            entityDetailHeaders,
+            ruleDetailData,
+            availableFilters,
+            platformEnums,
+            searchGroupEnum,
+            filterConditionOperatorEnum,
+            groupDetailData,
+            groupRulesDetailHeaders,
+            groupRulesDetailData,
+        ],
+    );
 
     //get list of rules for group detail page
     useEffect(() => {
@@ -456,7 +457,7 @@ export default function ComplianceProfileDetail() {
                             : 'Entity Details'}
                     </p>
                 }
-                body={<EntityDetailMenu />}
+                body={entityDetailMenuContent}
                 toggle={() => setIsEntityDetailMenuOpen(false)}
                 buttons={[]}
                 size="lg"

@@ -330,7 +330,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                           ],
                       },
                   ],
-        [keyItem, keyTypeEnum, isUpdatingKeyItem, onEditName],
+        [keyItem, keyTypeEnum, isUpdatingKeyItem, onEditName, keyCompromiseReasonEnum],
     );
 
     const historyHeaders: TableHeader[] = useMemo(

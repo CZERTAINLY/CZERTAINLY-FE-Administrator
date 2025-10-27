@@ -127,7 +127,7 @@ const ConditionsList = () => {
                 onClick: () => setConfirmDelete(true),
             },
         ],
-        [checkedRows, resourceOptionsWithRuleEvaluator, navigate],
+        [checkedRows, resourceOptionsWithRuleEvaluator, navigate, selectedResource],
     );
 
     return (

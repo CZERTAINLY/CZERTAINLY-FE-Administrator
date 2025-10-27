@@ -143,7 +143,7 @@ const TriggerList = () => {
                 onClick: () => setConfirmDelete(true),
             },
         ],
-        [checkedRows, navigate, resourceOptionsWithEvents],
+        [checkedRows, navigate, resourceOptionsWithEvents, selectedResource],
     );
 
     return (
