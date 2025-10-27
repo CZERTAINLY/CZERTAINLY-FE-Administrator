@@ -45,10 +45,9 @@ export default defineConfig(async () => {
         },
         plugins: [
             react(),
-            // temporarily disabled, needs to be enabled after redesign is complete
-            // eslint({
-            //     failOnWarning: true,
-            // }),
+            eslint({
+                failOnWarning: true,
+            }),
             istanbul({
                 cypress: true, // enable during Cypress runs
                 requireEnv: false, // or set via env var
