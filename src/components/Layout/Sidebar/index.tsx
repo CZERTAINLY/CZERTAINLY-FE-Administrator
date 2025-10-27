@@ -225,7 +225,7 @@ export default function Sidebar({ allowedResources }: Props) {
         if ('children' in mapping) {
             const isActive = openMenuItems.includes(mapping._key);
             return (
-                <li>
+                <li key={mapping.header}>
                     <Button
                         type="transparent"
                         className="flex items-center justify-between gap-x-2 px-4 py-2 w-full"
@@ -239,7 +239,7 @@ export default function Sidebar({ allowedResources }: Props) {
                     {isActive && (
                         <ul>
                             {mapping.children.map((child) => (
-                                <li key={child._key}>
+                                <li key={child.name}>
                                     <NavLink
                                         to={child.link}
                                         className={({ isActive }) =>

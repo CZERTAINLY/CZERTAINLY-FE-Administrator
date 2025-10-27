@@ -27,7 +27,7 @@ function Breadcrumb({ items }: Props) {
                             xmlns="http://www.w3.org/2000/svg"
                             aria-hidden="true"
                         >
-                            <path d="M6 13L10 3" stroke="currentColor" stroke-linecap="round"></path>
+                            <path d="M6 13L10 3" stroke="currentColor" strokeLinecap="round" />
                         </svg>
                     )}
                 </li>
