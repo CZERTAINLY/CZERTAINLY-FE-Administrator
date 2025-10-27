@@ -249,7 +249,7 @@ function CustomTable({
             if (!id) return;
 
             if (!multiSelect) {
-                const checked: string[] = d.includes(id) ? [] : [id];
+                const checked: string[] = tblCheckedRows.includes(id) ? [] : [id];
                 setTblCheckedRows(checked);
                 if (onCheckedRowsChanged) onCheckedRowsChanged(checked);
                 return;
@@ -311,7 +311,7 @@ function CustomTable({
         return tblCheckedRows.length === tblData.slice((page - 1) * ps, page * ps).length && tblData.length > 0;
     }, [tblData, tblCheckedRows, paginationData, pageSize, page]);
 
-    const getSortIcon = useCallback((sort: 'asc' | 'desc') => {
+    const getSortIcon = useCallback((sort: 'asc' | 'desc' | undefined) => {
         return (
             <div className="w-[14px]">
                 <svg
@@ -373,7 +373,17 @@ function CustomTable({
                 </th>
             </Fragment>
         ));
-    }, [tblHeaders, hasCheckboxes, hasDetails, onColumnSortClick, hasAllCheckBox, multiSelect, checkAllChecked, onCheckAllCheckboxClick]);
+    }, [
+        tblHeaders,
+        hasCheckboxes,
+        hasDetails,
+        onColumnSortClick,
+        hasAllCheckBox,
+        multiSelect,
+        checkAllChecked,
+        onCheckAllCheckboxClick,
+        getSortIcon,
+    ]);
 
     const getRowStyle = useCallback((row: TableDataRow) => {
         if (!row.options) return undefined;
@@ -426,7 +436,11 @@ function CustomTable({
                             <td className="p-2">
                                 <Checkbox
                                     checked={tblCheckedRows.includes(row.id)}
-                                    onChange={(value) => onRowCheckboxClick(value, row.id.toString())}
+                                    onChange={(value) => {
+                                        console.log('1111111value', value);
+                                        console.log('1111111row.id', row.id);
+                                        onRowCheckboxClick(value, row.id.toString());
+                                    }}
                                     id={`${row.id}__checkbox__`}
                                 />
                             </td>

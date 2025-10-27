@@ -216,7 +216,6 @@ export default function ApprovalsList() {
                                 titleSize="large"
                                 refreshAction={listUserApprovals}
                             >
-                                <br />
                                 <CustomTable
                                     headers={approvalProfilesTableHeader}
                                     data={approvalProfilesTableData}
@@ -257,7 +256,6 @@ export default function ApprovalsList() {
                                 titleSize="large"
                                 refreshAction={listApprovals}
                             >
-                                <br />
                                 <CustomTable
                                     headers={approvalProfilesTableHeader}
                                     data={approvalProfilesTableData}

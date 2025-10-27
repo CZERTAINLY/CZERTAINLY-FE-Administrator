@@ -11,15 +11,15 @@ import { actions, selectors } from 'ducks/cmp-profiles';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router';
-import { Col, Container, Row } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { PlatformEnum, Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import { createWidgetDetailHeaders, getGroupNames, getOwnerName } from 'utils/widget';
 import { actions as groupsActions, selectors as groupsSelectors } from 'ducks/certificateGroups';
 import { actions as userAction, selectors as userSelectors } from 'ducks/users';
-import GoBackButton from 'components/GoBackButton';
 import Badge from 'components/Badge';
+import Container from 'components/Container';
+import Breadcrumb from 'components/Breadcrumb';
 
 export default function AdministratorDetail() {
     const dispatch = useDispatch();
@@ -286,15 +286,15 @@ export default function AdministratorDetail() {
     }, [cmpProfile, ownerName, groupNames]);
 
     return (
-        <Container className="themed-container" fluid>
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                forcedPath="/cmpprofiles"
-                text={`${getEnumLabel(resourceEnum, Resource.CmpProfiles)} Inventory`}
+        <div>
+            <Breadcrumb
+                items={[
+                    { label: `${getEnumLabel(resourceEnum, Resource.CmpProfiles)} Inventory`, href: '/cmpprofiles' },
+                    { label: cmpProfile?.name || 'CMP Profile Details', href: '' },
+                ]}
             />
-
-            <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                <Col>
+            <Container>
+                <Container className="md:grid grid-cols-2 items-start">
                     <Widget
                         title="CMP Profile Details"
                         busy={isBusy}
@@ -306,8 +306,6 @@ export default function AdministratorDetail() {
                     >
                         <CustomTable headers={tableHeader} data={cmpProfileDetailData} />
                     </Widget>
-                </Col>
-                <Col>
                     {cmpProfile && (
                         <CustomAttributeWidget
                             resource={Resource.CmpProfiles}
@@ -315,91 +313,75 @@ export default function AdministratorDetail() {
                             attributes={cmpProfile.customAttributes}
                         />
                     )}
-                </Col>
-            </Row>
+                </Container>
 
-            <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                <Col>
+                <Container className="md:grid grid-cols-2 items-start">
                     <Widget title="Request Configuration">
                         <CustomTable headers={tableHeader} data={requestConfigurationData} />
                     </Widget>
-                </Col>
-                <Col>
                     <Widget title="Response Configuration">
                         <CustomTable headers={tableHeader} data={responseConfigurationData} />
                     </Widget>
-                </Col>
-            </Row>
+                </Container>
 
-            {raProfileDetailData.length === 0 ? (
-                <></>
-            ) : (
-                <>
-                    <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                        <Col>
-                            <Widget title={raProfileText} busy={isBusy}>
-                                <CustomTable headers={tableHeader} data={raProfileDetailData} />
-                            </Widget>
-                        </Col>
-                        <Col>
-                            {cmpProfile?.issueCertificateAttributes === undefined || cmpProfile.issueCertificateAttributes.length === 0 ? (
-                                <></>
-                            ) : (
-                                <Widget title="List of Attributes to Issue Certificate" busy={isBusy}>
-                                    <AttributeViewer attributes={cmpProfile?.issueCertificateAttributes} />
-                                </Widget>
-                            )}
-                        </Col>
-
-                        <Col>
-                            {cmpProfile?.revokeCertificateAttributes === undefined ||
-                            cmpProfile.revokeCertificateAttributes.length === 0 ? (
-                                <></>
-                            ) : (
-                                <Widget title="List of Attributes to Revoke Certificate" busy={isBusy}>
-                                    <AttributeViewer attributes={cmpProfile?.revokeCertificateAttributes} />
-                                </Widget>
-                            )}
-                        </Col>
-                    </Row>
-                </>
-            )}
-
-            <Widget title="Default Certificate associations" busy={isBusy} titleSize="large">
-                <CustomTable headers={tableHeader} data={defaultCertificateAssociationsData} />
-                <Widget title="Custom Attributes" busy={isBusy}>
-                    <AttributeViewer attributes={cmpProfile?.certificateAssociations?.customAttributes} />
-                </Widget>
-            </Widget>
-
-            <Dialog
-                isOpen={confirmDelete}
-                caption="Delete CMP Profile"
-                body="You are about to delete CMP Profile. Is this what you want to do?"
-                toggle={() => setConfirmDelete(false)}
-                buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
-                ]}
-            />
-
-            <Dialog
-                isOpen={deleteErrorMessage.length > 0}
-                caption="Delete CMP Profile"
-                body={
+                {raProfileDetailData.length > 0 && (
                     <>
-                        Failed to delete the CMP Profile that has dependent objects. Please find the details below:
-                        <br />
-                        <br />
-                        {deleteErrorMessage}
+                        <Widget title={raProfileText} busy={isBusy}>
+                            <CustomTable headers={tableHeader} data={raProfileDetailData} />
+                        </Widget>
+                        {cmpProfile?.issueCertificateAttributes === undefined || cmpProfile.issueCertificateAttributes.length === 0 ? (
+                            <></>
+                        ) : (
+                            <Widget title="List of Attributes to Issue Certificate" busy={isBusy} noBorder className="mt-2">
+                                <AttributeViewer attributes={cmpProfile?.issueCertificateAttributes} />
+                            </Widget>
+                        )}
+                        {cmpProfile?.revokeCertificateAttributes === undefined || cmpProfile.revokeCertificateAttributes.length === 0 ? (
+                            <></>
+                        ) : (
+                            <Widget title="List of Attributes to Revoke Certificate" busy={isBusy} noBorder className="mt-2">
+                                <AttributeViewer attributes={cmpProfile?.revokeCertificateAttributes} />
+                            </Widget>
+                        )}
                     </>
-                }
-                toggle={() => dispatch(actions.clearDeleteErrorMessages())}
-                buttons={[
-                    { color: 'danger', onClick: onForceDeleteCmpProfile, body: 'Force' },
-                    { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
-                ]}
-            />
-        </Container>
+                )}
+
+                <Widget title="Default Certificate associations" busy={isBusy} titleSize="large">
+                    <CustomTable headers={tableHeader} data={defaultCertificateAssociationsData} />
+                    <Widget title="Custom Attributes" busy={isBusy} noBorder className="mt-2" titleSize="large">
+                        <AttributeViewer attributes={cmpProfile?.certificateAssociations?.customAttributes} />
+                    </Widget>
+                </Widget>
+
+                <Dialog
+                    isOpen={confirmDelete}
+                    caption="Delete CMP Profile"
+                    body="You are about to delete CMP Profile. Is this what you want to do?"
+                    toggle={() => setConfirmDelete(false)}
+                    buttons={[
+                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                        { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    ]}
+                />
+
+                <Dialog
+                    isOpen={deleteErrorMessage.length > 0}
+                    caption="Delete CMP Profile"
+                    body={
+                        <>
+                            Failed to delete the CMP Profile that has dependent objects. Please find the details below:
+                            <br />
+                            <br />
+                            {deleteErrorMessage}
+                        </>
+                    }
+                    toggle={() => dispatch(actions.clearDeleteErrorMessages())}
+                    buttons={[
+                        { color: 'danger', onClick: onForceDeleteCmpProfile, body: 'Force' },
+                        { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
+                    ]}
+                />
+            </Container>
+        </div>
     );
 }

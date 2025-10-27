@@ -11,15 +11,15 @@ import { actions, selectors } from 'ducks/tokens';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router';
-import { Container, Label } from 'reactstrap';
 import { PlatformEnum, Resource, TokenInstanceStatus } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import TokenActivationDialogBody from '../TokenActivationDialogBody';
 import RandomDataGeneration from './RandomDataGeneration';
 import { createWidgetDetailHeaders } from 'utils/widget';
-import GoBackButton from 'components/GoBackButton';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import Container from 'components/Container';
+import Breadcrumb from 'components/Breadcrumb';
 
 export default function TokenDetail() {
     const dispatch = useDispatch();
@@ -204,87 +204,90 @@ export default function TokenDetail() {
     );
 
     return (
-        <Container className="themed-container" fluid>
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                forcedPath="/tokens"
-                text={`${getEnumLabel(resourceEnum, Resource.Tokens)} Inventory`}
+        <div>
+            <Breadcrumb
+                items={[
+                    { label: `${getEnumLabel(resourceEnum, Resource.Tokens)} Inventory`, href: '/tokens' },
+                    { label: token?.name || 'Token Details', href: '' },
+                ]}
             />
-            <Widget
-                title="Token Details"
-                busy={isBusy}
-                widgetButtons={buttons}
-                titleSize="large"
-                refreshAction={getFreshTokenDetails}
-                widgetLockName={LockWidgetNameEnum.TokenDetails}
-            >
-                <br />
+            <Container>
+                <Widget
+                    title="Token Details"
+                    busy={isBusy}
+                    widgetButtons={buttons}
+                    titleSize="large"
+                    refreshAction={getFreshTokenDetails}
+                    widgetLockName={LockWidgetNameEnum.TokenDetails}
+                >
+                    <CustomTable headers={detailHeaders} data={detailData} />
+                </Widget>
 
-                <CustomTable headers={detailHeaders} data={detailData} />
-            </Widget>
+                <Widget
+                    title="Token Attributes"
+                    titleSize="large"
+                    refreshAction={getFreshAttributes}
+                    widgetLockName={LockWidgetNameEnum.TokenDetails}
+                >
+                    <AttributeViewer attributes={token?.attributes} />
+                </Widget>
 
-            <Widget
-                title="Attributes"
-                titleSize="large"
-                refreshAction={getFreshAttributes}
-                widgetLockName={LockWidgetNameEnum.TokenDetails}
-            >
-                <br />
+                {token && (
+                    <CustomAttributeWidget resource={Resource.Tokens} resourceUuid={token.uuid} attributes={token.customAttributes} />
+                )}
 
-                <Label>Token Attributes</Label>
-                <AttributeViewer attributes={token?.attributes} />
-            </Widget>
+                <Widget title="Metadata" titleSize="large">
+                    <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={token?.metadata} />
+                </Widget>
 
-            {token && <CustomAttributeWidget resource={Resource.Tokens} resourceUuid={token.uuid} attributes={token.customAttributes} />}
-
-            <Widget title="Metadata" titleSize="large">
-                <br />
-                <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={token?.metadata} />
-            </Widget>
-
-            <Dialog
-                isOpen={confirmDelete}
-                caption="Delete Token"
-                body="You are about to delete Token. If you continue, objects
+                <Dialog
+                    isOpen={confirmDelete}
+                    caption="Delete Token"
+                    body="You are about to delete Token. If you continue, objects
                   related to the token will fail. Is this what you want to do?"
-                toggle={() => setConfirmDelete(false)}
-                buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
-                ]}
-            />
+                    toggle={() => setConfirmDelete(false)}
+                    buttons={[
+                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                        { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    ]}
+                />
 
-            <Dialog
-                isOpen={confirmDeactivation}
-                caption="Deactivate Token"
-                body="You are about to deactivate Token. If you continue, objects
+                <Dialog
+                    isOpen={confirmDeactivation}
+                    caption="Deactivate Token"
+                    body="You are about to deactivate Token. If you continue, objects
                   related to the token not work. Is this what you want to do?"
-                toggle={() => setConfirmDeactivation(false)}
-                buttons={[
-                    { color: 'danger', onClick: onDeactivationConfirmed, body: 'Deactivate' },
-                    { color: 'secondary', onClick: () => setConfirmDeactivation(false), body: 'Cancel' },
-                ]}
-            />
+                    toggle={() => setConfirmDeactivation(false)}
+                    buttons={[
+                        { color: 'danger', onClick: onDeactivationConfirmed, body: 'Deactivate' },
+                        { color: 'secondary', onClick: () => setConfirmDeactivation(false), body: 'Cancel' },
+                    ]}
+                />
 
-            <Dialog
-                isOpen={activateToken}
-                caption="Activate Token"
-                body={TokenActivationDialogBody({ visible: activateToken, onClose: () => setActivateToken(false), tokenUuid: token?.uuid })}
-                toggle={() => setActivateToken(false)}
-                buttons={[]}
-            />
+                <Dialog
+                    isOpen={activateToken}
+                    caption="Activate Token"
+                    body={TokenActivationDialogBody({
+                        visible: activateToken,
+                        onClose: () => setActivateToken(false),
+                        tokenUuid: token?.uuid,
+                    })}
+                    toggle={() => setActivateToken(false)}
+                    buttons={[]}
+                />
 
-            <Dialog
-                isOpen={randomDataGeneration}
-                caption="Random Data Generation"
-                body={RandomDataGeneration({
-                    visible: randomDataGeneration,
-                    onClose: () => setRandomDataGeneration(false),
-                    tokenUuid: token?.uuid,
-                })}
-                toggle={() => setRandomDataGeneration(false)}
-                buttons={[]}
-            />
-        </Container>
+                <Dialog
+                    isOpen={randomDataGeneration}
+                    caption="Random Data Generation"
+                    body={RandomDataGeneration({
+                        visible: randomDataGeneration,
+                        onClose: () => setRandomDataGeneration(false),
+                        tokenUuid: token?.uuid,
+                    })}
+                    toggle={() => setRandomDataGeneration(false)}
+                    buttons={[]}
+                />
+            </Container>
+        </div>
     );
 }

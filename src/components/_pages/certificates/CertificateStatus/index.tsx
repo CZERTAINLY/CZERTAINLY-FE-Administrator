@@ -8,6 +8,7 @@ import {
 } from 'types/openapi';
 import { getCertificateStatusColor, useGetStatusText } from 'utils/certificate';
 import { capitalize } from 'utils/common-utils';
+import Badge from 'components/Badge';
 
 interface Props {
     status:
@@ -29,12 +30,7 @@ function CertificateStatus({ status, asIcon = false }: Props) {
     return asIcon ? (
         <span title={capitalize(text)} className="w-3 h-3 rounded-full inline-block" style={{ backgroundColor: color }} />
     ) : (
-        <span
-            style={{ backgroundColor: color }}
-            className="inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-xs font-medium text-white"
-        >
-            {capitalize(text)}
-        </span>
+        <Badge style={{ backgroundColor: color }}>{capitalize(text)}</Badge>
     );
 }
 

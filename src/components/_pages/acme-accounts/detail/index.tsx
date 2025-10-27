@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
-import { Container } from 'reactstrap';
 
 import { actions, selectors } from 'ducks/acme-accounts';
 
@@ -16,9 +15,10 @@ import { AccountStatus, PlatformEnum, Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { acmeAccountStatus } from '../acmeAccountStatus';
 import { createWidgetDetailHeaders } from 'utils/widget';
-import GoBackButton from 'components/GoBackButton';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import Badge from 'components/Badge';
+import Container from 'components/Container';
+import Breadcrumb from 'components/Breadcrumb';
 
 export default function AcmeAccountDetail() {
     const dispatch = useDispatch();
@@ -204,37 +204,40 @@ export default function AcmeAccountDetail() {
     );
 
     return (
-        <Container className="themed-container" fluid>
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                forcedPath="/acmeaccounts"
-                text={`${getEnumLabel(resourceEnum, Resource.AcmeAccounts)} Inventory`}
-            />
-            <Widget
-                title="ACME Account Details"
-                busy={isFetchingDetail || isEnabling || isDisabling || isRevoking}
-                widgetButtons={buttons}
-                titleSize="large"
-                refreshAction={getFreshAcmeAccount}
-                widgetLockName={LockWidgetNameEnum.ACMEAccountDetails}
-            >
-                <CustomTable headers={detailHeaders} data={detailData} />
-            </Widget>
-
-            <Widget title="Order Summary" busy={isFetchingDetail || isEnabling || isDisabling || isRevoking} titleSize="large">
-                <CustomTable headers={orderHeaders} data={orderData} />
-            </Widget>
-
-            <Dialog
-                isOpen={confirmRevoke}
-                caption="Revoke ACME Account"
-                body="You are about to revoke an ACME Account. Is this what you want to do?"
-                toggle={() => setConfirmRevoke(false)}
-                buttons={[
-                    { color: 'danger', onClick: onRevokeConfirmed, body: 'Yes, revoke' },
-                    { color: 'secondary', onClick: () => setConfirmRevoke(false), body: 'Cancel' },
+        <div>
+            <Breadcrumb
+                items={[
+                    { label: `${getEnumLabel(resourceEnum, Resource.AcmeAccounts)} Inventory`, href: '/acmeaccounts' },
+                    { label: acmeAccount?.accountId || 'ACME Account Details', href: '' },
                 ]}
             />
-        </Container>
+            <Container>
+                <Widget
+                    title="ACME Account Details"
+                    busy={isFetchingDetail || isEnabling || isDisabling || isRevoking}
+                    widgetButtons={buttons}
+                    titleSize="large"
+                    refreshAction={getFreshAcmeAccount}
+                    widgetLockName={LockWidgetNameEnum.ACMEAccountDetails}
+                >
+                    <CustomTable headers={detailHeaders} data={detailData} />
+                </Widget>
+
+                <Widget title="Order Summary" busy={isFetchingDetail || isEnabling || isDisabling || isRevoking} titleSize="large">
+                    <CustomTable headers={orderHeaders} data={orderData} />
+                </Widget>
+
+                <Dialog
+                    isOpen={confirmRevoke}
+                    caption="Revoke ACME Account"
+                    body="You are about to revoke an ACME Account. Is this what you want to do?"
+                    toggle={() => setConfirmRevoke(false)}
+                    buttons={[
+                        { color: 'danger', onClick: onRevokeConfirmed, body: 'Yes, revoke' },
+                        { color: 'secondary', onClick: () => setConfirmRevoke(false), body: 'Cancel' },
+                    ]}
+                />
+            </Container>
+        </div>
     );
 }

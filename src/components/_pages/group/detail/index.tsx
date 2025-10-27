@@ -9,15 +9,15 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 
-import { Container } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { PlatformEnum, Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import EventsTable from 'components/_pages/notifications/events-settings/EventsTable';
 import TabLayout from 'components/Layout/TabLayout';
 import { getEditAndDeleteWidgetButtons, createWidgetDetailHeaders } from 'utils/widget';
-import GoBackButton from 'components/GoBackButton';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import Container from 'components/Container';
+import Breadcrumb from 'components/Breadcrumb';
 
 export default function GroupDetail() {
     const dispatch = useDispatch();
@@ -80,67 +80,70 @@ export default function GroupDetail() {
     );
 
     return (
-        <Container className="themed-container" fluid>
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                forcedPath="/groups"
-                text={`${getEnumLabel(resourceEnum, Resource.Groups)} Inventory`}
-            />
-            <TabLayout
-                tabs={[
-                    {
-                        title: 'Details',
-                        content: (
-                            <Widget>
-                                <Widget
-                                    title="Group Details"
-                                    busy={isFetchingDetail}
-                                    widgetButtons={buttons}
-                                    titleSize="large"
-                                    refreshAction={getFreshGroupDetails}
-                                    widgetLockName={LockWidgetNameEnum.GroupDetails}
-                                >
-                                    <CustomTable headers={detailHeaders} data={detailData} />
-                                </Widget>
-
-                                {group && (
-                                    <CustomAttributeWidget
-                                        resource={Resource.Groups}
-                                        resourceUuid={group.uuid}
-                                        attributes={group.customAttributes}
-                                    />
-                                )}
-                            </Widget>
-                        ),
-                    },
-                    {
-                        title: 'Events',
-                        content: (
-                            <Widget>
-                                {group && (
-                                    <EventsTable
-                                        mode="association"
-                                        resource={Resource.Groups}
-                                        resourceUuid={group.uuid}
-                                        widgetLocks={[LockWidgetNameEnum.GroupDetails, LockWidgetNameEnum.EventSettings]}
-                                    />
-                                )}
-                            </Widget>
-                        ),
-                    },
+        <div>
+            <Breadcrumb
+                items={[
+                    { label: `${getEnumLabel(resourceEnum, Resource.Groups)} Inventory`, href: '/groups' },
+                    { label: group?.name || 'Group Details', href: '' },
                 ]}
             />
+            <Container>
+                <TabLayout
+                    tabs={[
+                        {
+                            title: 'Details',
+                            content: (
+                                <Container>
+                                    <Widget
+                                        title="Group Details"
+                                        busy={isFetchingDetail}
+                                        widgetButtons={buttons}
+                                        titleSize="large"
+                                        refreshAction={getFreshGroupDetails}
+                                        widgetLockName={LockWidgetNameEnum.GroupDetails}
+                                    >
+                                        <CustomTable headers={detailHeaders} data={detailData} />
+                                    </Widget>
 
-            <Dialog
-                isOpen={confirmDelete}
-                caption="Delete Group"
-                body="You are about to delete an Group. Is this what you want to do?"
-                toggle={() => setConfirmDelete(false)}
-                buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
-                ]}
-            />
-        </Container>
+                                    {group && (
+                                        <CustomAttributeWidget
+                                            resource={Resource.Groups}
+                                            resourceUuid={group.uuid}
+                                            attributes={group.customAttributes}
+                                        />
+                                    )}
+                                </Container>
+                            ),
+                        },
+                        {
+                            title: 'Events',
+                            content: (
+                                <>
+                                    {group && (
+                                        <EventsTable
+                                            mode="association"
+                                            resource={Resource.Groups}
+                                            resourceUuid={group.uuid}
+                                            widgetLocks={[LockWidgetNameEnum.GroupDetails, LockWidgetNameEnum.EventSettings]}
+                                        />
+                                    )}
+                                </>
+                            ),
+                        },
+                    ]}
+                />
+
+                <Dialog
+                    isOpen={confirmDelete}
+                    caption="Delete Group"
+                    body="You are about to delete an Group. Is this what you want to do?"
+                    toggle={() => setConfirmDelete(false)}
+                    buttons={[
+                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                        { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    ]}
+                />
+            </Container>
+        </div>
     );
 }

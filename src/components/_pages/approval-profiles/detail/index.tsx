@@ -1,6 +1,5 @@
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
-import GoBackButton from 'components/GoBackButton';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as profileApprovalActions, selectors as profileApprovalSelectors } from 'ducks/approval-profiles';
@@ -8,11 +7,12 @@ import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router';
-import { Col, Container, Row } from 'reactstrap';
 import { ApproverType, ProfileApprovalStepModel } from 'types/approval-profiles';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { createWidgetDetailHeaders } from 'utils/widget';
+import Breadcrumb from 'components/Breadcrumb';
+import Container from 'components/Container';
 
 const ApprovalProfileDetails = () => {
     const dispatch = useDispatch();
@@ -177,32 +177,28 @@ const ApprovalProfileDetails = () => {
     );
 
     return (
-        <Container className="themed-container" fluid>
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                forcedPath="/approvalprofiles"
-                text={`${getEnumLabel(resourceEnum, Resource.ApprovalProfiles)} Inventory`}
+        <div>
+            <Breadcrumb
+                items={[
+                    { label: `${getEnumLabel(resourceEnum, Resource.ApprovalProfiles)} Inventory`, href: '/approvalprofiles' },
+                    { label: profileApprovalDetail?.name || 'Approval Profile Details', href: '' },
+                ]}
             />
-            <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                <Col>
-                    <Widget
-                        title="Approval Profile Details"
-                        busy={isBusy}
-                        titleSize="large"
-                        widgetButtons={buttons}
-                        refreshAction={getFreshData}
-                        widgetLockName={LockWidgetNameEnum.ApprovalProfileDetails}
-                    >
-                        <CustomTable headers={detailHeaders} data={detailData} />
-                    </Widget>
-                </Col>
-                <Col>
-                    <Widget title="Approval Profile Steps" busy={isBusy} widgetLockName={LockWidgetNameEnum.ApprovalProfileDetails}>
-                        <CustomTable headers={stepsHeaders} data={stepsRows} />
-                    </Widget>
-                </Col>
-            </Row>
-
+            <Container className="md:grid grid-cols-2 items-start">
+                <Widget
+                    title="Approval Profile Details"
+                    busy={isBusy}
+                    titleSize="large"
+                    widgetButtons={buttons}
+                    refreshAction={getFreshData}
+                    widgetLockName={LockWidgetNameEnum.ApprovalProfileDetails}
+                >
+                    <CustomTable headers={detailHeaders} data={detailData} />
+                </Widget>
+                <Widget title="Approval Profile Steps" busy={isBusy} widgetLockName={LockWidgetNameEnum.ApprovalProfileDetails}>
+                    <CustomTable headers={stepsHeaders} data={stepsRows} />
+                </Widget>
+            </Container>
             <Dialog
                 isOpen={confirmDelete}
                 caption="Delete Approval Profile"
@@ -231,7 +227,7 @@ const ApprovalProfileDetails = () => {
                     { color: 'secondary', onClick: () => dispatch(profileApprovalActions.clearDeleteErrorMessages()), body: 'Cancel' },
                 ]}
             />
-        </Container>
+        </div>
     );
 };
 
