@@ -527,7 +527,7 @@ function CustomTable({
                     </div>
                 </div>
             </div>
-
+            {console.log('paginationData', paginationData)}
             {hasPagination && (
                 <div className="flex justify-between items-center gap-2">
                     <div>
@@ -544,7 +544,7 @@ function CustomTable({
                         )}
                     </div>
 
-                    {tblData?.length > 1 && (
+                    {tblData?.length > 1 && paginationData && (
                         <Pagination
                             page={paginationData?.page || page}
                             totalPages={paginationData?.totalPages || totalPages}

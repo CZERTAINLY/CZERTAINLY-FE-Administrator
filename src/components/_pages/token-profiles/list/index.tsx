@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
-import { Container } from 'reactstrap';
 import Badge from 'components/Badge';
 
 import { actions, selectors } from 'ducks/token-profiles';
@@ -251,7 +250,7 @@ function TokenProfileList() {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <>
             <Widget
                 title="List of Token Profiles"
                 busy={isBusy}
@@ -293,7 +292,7 @@ function TokenProfileList() {
                     { color: 'secondary', onClick: () => setKeyUsageUpdate(false), body: 'Cancel' },
                 ]}
             />
-        </Container>
+        </>
     );
 }
 

@@ -1,7 +1,7 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
-import { Container } from 'reactstrap';
+
 import Badge from 'components/Badge';
 
 import { actions, selectors } from 'ducks/ra-profiles';
@@ -203,7 +203,7 @@ function RaProfileList() {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <>
             <Widget
                 title="List of RA Profiles"
                 busy={isBusy}
@@ -216,9 +216,9 @@ function RaProfileList() {
                     headers={raProfilesTableHeaders}
                     data={profilesTableData}
                     onCheckedRowsChanged={setCheckedRows}
-                    canSearch={true}
-                    hasCheckboxes={true}
-                    hasPagination={true}
+                    canSearch
+                    hasCheckboxes
+                    hasPagination
                 />
             </Widget>
 
@@ -243,7 +243,7 @@ function RaProfileList() {
                     { color: 'secondary', onClick: () => setComplianceCheck(false), body: 'Cancel' },
                 ]}
             />
-        </Container>
+        </>
     );
 }
 

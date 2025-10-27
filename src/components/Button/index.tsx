@@ -2,10 +2,11 @@ import cn from 'classnames';
 
 export type ButtonType = 'solid' | 'outline' | 'transparent';
 
+export type ButtonColor = 'blue' | 'red' | 'transparent';
 interface Props {
     type?: ButtonType;
-    color?: 'blue' | 'red' | 'transparent';
-    onClick: (event: React.MouseEvent) => void;
+    color?: ButtonColor;
+    onClick?: (event: React.MouseEvent) => void;
     id?: string;
     children?: React.ReactNode;
     disabled?: boolean;

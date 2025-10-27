@@ -13,7 +13,6 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 import Select from 'react-select';
-import { Container } from 'reactstrap';
 import { SearchRequestModel } from 'types/certificate';
 import { KeyCompromiseReason, KeyUsage, PlatformEnum } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
@@ -299,7 +298,7 @@ function CryptographicKeyList() {
     const onListCallback = useCallback((filters: SearchRequestModel) => dispatch(actions.listCryptographicKeys(filters)), [dispatch]);
 
     return (
-        <Container className="themed-container" fluid>
+        <>
             <PagedList
                 entity={EntityType.KEY}
                 onListCallback={onListCallback}
@@ -361,7 +360,7 @@ function CryptographicKeyList() {
                     { color: 'secondary', onClick: () => setKeyUsageUpdate(false), body: 'Cancel' },
                 ]}
             />
-        </Container>
+        </>
     );
 }
 

@@ -1,7 +1,5 @@
 import TabLayout from 'components/Layout/TabLayout';
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router';
-import { Container } from 'reactstrap';
+import { useState } from 'react';
 import ConditionsListComponent from './conditions-list-component';
 import RulesListComponent from './rules-list-component';
 

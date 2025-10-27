@@ -17,7 +17,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 import Select, { SingleValue } from 'react-select';
 
-import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
+import { Form as BootstrapForm, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
 import { AttributeDescriptorModel } from 'types/attributes';
 import { TokenProfileResponseModel } from 'types/token-profiles';
 import { actions as userInterfaceActions } from '../../../../ducks/user-interface';
@@ -29,6 +29,9 @@ import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
 import { KeyRequestType, PlatformEnum, Resource } from '../../../../types/openapi';
+import Container from 'components/Container';
+import Button from 'components/Button';
+import Breadcrumb from 'components/Breadcrumb';
 
 interface CryptographicKeyFormProps {
     usesGlobalModal?: boolean;
@@ -304,91 +307,27 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
     const title = useMemo(() => (editMode ? 'Edit Key' : 'Create Key'), [editMode]);
 
     return (
-        <Widget title={title} busy={isBusy}>
-            <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
-                {({ handleSubmit, pristine, submitting, valid, form }) => (
-                    <BootstrapForm onSubmit={handleSubmit}>
-                        <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="name">Key Name</Label>
-
-                                    <Input
-                                        {...input}
-                                        id="name"
-                                        type="text"
-                                        placeholder="Enter Key Name"
-                                        valid={!meta.touched || !meta.error}
-                                        invalid={meta.touched && meta.error}
-                                    />
-
-                                    <FormFeedback>{meta.error}</FormFeedback>
-                                </FormGroup>
-                            )}
-                        </Field>
-
-                        <Field name="description" validate={composeValidators(validateLength(0, 300))}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="description">Description</Label>
-
-                                    <Input
-                                        {...input}
-                                        id="description"
-                                        type="textarea"
-                                        className="form-control"
-                                        placeholder="Enter Description / Comment"
-                                        valid={!meta.touched || !meta.error}
-                                        invalid={meta.touched && meta.error}
-                                    />
-
-                                    <FormFeedback>{meta.error}</FormFeedback>
-                                </FormGroup>
-                            )}
-                        </Field>
-
-                        {editMode ? (
-                            <Field name="owner" validate={composeValidators(validateAlphaNumericWithSpecialChars())}>
+        <div>
+            <Breadcrumb
+                items={[
+                    { label: 'Keys', href: '/keys' },
+                    { label: title, href: '' },
+                ]}
+            />
+            <Widget title={title} busy={isBusy}>
+                <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
+                    {({ handleSubmit, pristine, submitting, valid, form }) => (
+                        <BootstrapForm onSubmit={handleSubmit}>
+                            <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}>
                                 {({ input, meta }) => (
                                     <FormGroup>
-                                        <Label for="ownerSelect">Owner</Label>
-
-                                        <Select
-                                            inputId="ownerSelect"
-                                            {...input}
-                                            maxMenuHeight={140}
-                                            menuPlacement="auto"
-                                            options={optionsForUsers}
-                                            placeholder="Select Owner"
-                                            onChange={(event) => {
-                                                input.onChange(event);
-                                            }}
-                                            styles={{
-                                                control: (provided) =>
-                                                    meta.touched && meta.invalid
-                                                        ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
-                                                        : { ...provided },
-                                            }}
-                                        />
-
-                                        <FormFeedback>{meta.error}</FormFeedback>
-                                    </FormGroup>
-                                )}
-                            </Field>
-                        ) : (
-                            <Field name="owner">
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Label for="owner">Owner</Label>
+                                        <Label for="name">Key Name</Label>
 
                                         <Input
                                             {...input}
-                                            id="owner"
+                                            id="name"
                                             type="text"
-                                            className="form-control"
-                                            placeholder="Enter Key Owner"
-                                            disabled={!editMode}
-                                            value={auth?.username || ''}
+                                            placeholder="Enter Key Name"
                                             valid={!meta.touched || !meta.error}
                                             invalid={meta.touched && meta.error}
                                         />
@@ -397,91 +336,99 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                                     </FormGroup>
                                 )}
                             </Field>
-                        )}
 
-                        <Field name="selectedGroups">
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="selectedGroupsSelect">Groups</Label>
-
-                                    <Select
-                                        {...input}
-                                        inputId="selectedGroupsSelect"
-                                        maxMenuHeight={140}
-                                        menuPlacement="auto"
-                                        options={optionsForGroups}
-                                        placeholder="Select Groups"
-                                        onChange={(event) => {
-                                            input.onChange(event);
-                                        }}
-                                        isMulti
-                                        styles={{
-                                            control: (provided) =>
-                                                meta.touched && meta.invalid
-                                                    ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
-                                                    : { ...provided },
-                                        }}
-                                    />
-
-                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
-                                        {meta.error}
-                                    </div>
-                                </FormGroup>
-                            )}
-                        </Field>
-
-                        <Field name="tokenProfile" validate={editMode ? undefined : validateRequired()}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="tokenProfileSelect">Token Profile</Label>
-
-                                    <Select
-                                        {...input}
-                                        inputId="tokenProfileSelect"
-                                        maxMenuHeight={140}
-                                        menuPlacement="auto"
-                                        options={optionsForKeys}
-                                        placeholder="Select Token Profile"
-                                        onChange={(event) => {
-                                            onTokenProfileChange(event);
-                                            form.mutators.clearAttributes('cryptographicKey');
-                                            form.mutators.setAttribute('type', undefined);
-                                            input.onChange(event);
-                                        }}
-                                        styles={{
-                                            control: (provided) =>
-                                                meta.touched && meta.invalid
-                                                    ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
-                                                    : { ...provided },
-                                        }}
-                                        isDisabled={editMode}
-                                    />
-
-                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
-                                        {meta.error}
-                                    </div>
-                                </FormGroup>
-                            )}
-                        </Field>
-
-                        {tokenProfile && !editMode ? (
-                            <Field name="type" validate={validateRequired()}>
+                            <Field name="description" validate={composeValidators(validateLength(0, 300))}>
                                 {({ input, meta }) => (
                                     <FormGroup>
-                                        <Label for="typeSelect">Select Key Type</Label>
+                                        <Label for="description">Description</Label>
+
+                                        <Input
+                                            {...input}
+                                            id="description"
+                                            type="textarea"
+                                            className="form-control"
+                                            placeholder="Enter Description / Comment"
+                                            valid={!meta.touched || !meta.error}
+                                            invalid={meta.touched && meta.error}
+                                        />
+
+                                        <FormFeedback>{meta.error}</FormFeedback>
+                                    </FormGroup>
+                                )}
+                            </Field>
+
+                            {editMode ? (
+                                <Field name="owner" validate={composeValidators(validateAlphaNumericWithSpecialChars())}>
+                                    {({ input, meta }) => (
+                                        <FormGroup>
+                                            <Label for="ownerSelect">Owner</Label>
+
+                                            <Select
+                                                inputId="ownerSelect"
+                                                {...input}
+                                                maxMenuHeight={140}
+                                                menuPlacement="auto"
+                                                options={optionsForUsers}
+                                                placeholder="Select Owner"
+                                                onChange={(event) => {
+                                                    input.onChange(event);
+                                                }}
+                                                styles={{
+                                                    control: (provided) =>
+                                                        meta.touched && meta.invalid
+                                                            ? {
+                                                                  ...provided,
+                                                                  border: 'solid 1px red',
+                                                                  '&:hover': { border: 'solid 1px red' },
+                                                              }
+                                                            : { ...provided },
+                                                }}
+                                            />
+
+                                            <FormFeedback>{meta.error}</FormFeedback>
+                                        </FormGroup>
+                                    )}
+                                </Field>
+                            ) : (
+                                <Field name="owner">
+                                    {({ input, meta }) => (
+                                        <FormGroup>
+                                            <Label for="owner">Owner</Label>
+
+                                            <Input
+                                                {...input}
+                                                id="owner"
+                                                type="text"
+                                                className="form-control"
+                                                placeholder="Enter Key Owner"
+                                                disabled={!editMode}
+                                                value={auth?.username || ''}
+                                                valid={!meta.touched || !meta.error}
+                                                invalid={meta.touched && meta.error}
+                                            />
+
+                                            <FormFeedback>{meta.error}</FormFeedback>
+                                        </FormGroup>
+                                    )}
+                                </Field>
+                            )}
+
+                            <Field name="selectedGroups">
+                                {({ input, meta }) => (
+                                    <FormGroup>
+                                        <Label for="selectedGroupsSelect">Groups</Label>
 
                                         <Select
                                             {...input}
-                                            id="type"
-                                            inputId="typeSelect"
+                                            inputId="selectedGroupsSelect"
                                             maxMenuHeight={140}
                                             menuPlacement="auto"
-                                            options={optionsForType()}
-                                            placeholder="Select to change Key Type"
-                                            onChange={(event: any) => {
-                                                onKeyTypeChange(event.value, form);
+                                            options={optionsForGroups}
+                                            placeholder="Select Groups"
+                                            onChange={(event) => {
                                                 input.onChange(event);
                                             }}
+                                            isMulti
                                             styles={{
                                                 control: (provided) =>
                                                     meta.touched && meta.invalid
@@ -496,35 +443,106 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                                     </FormGroup>
                                 )}
                             </Field>
-                        ) : (
-                            <></>
-                        )}
 
-                        <br />
+                            <Field name="tokenProfile" validate={editMode ? undefined : validateRequired()}>
+                                {({ input, meta }) => (
+                                    <FormGroup>
+                                        <Label for="tokenProfileSelect">Token Profile</Label>
 
-                        <TabLayout tabs={attributeTabs(form)} />
+                                        <Select
+                                            {...input}
+                                            inputId="tokenProfileSelect"
+                                            maxMenuHeight={140}
+                                            menuPlacement="auto"
+                                            options={optionsForKeys}
+                                            placeholder="Select Token Profile"
+                                            onChange={(event) => {
+                                                onTokenProfileChange(event);
+                                                form.mutators.clearAttributes('cryptographicKey');
+                                                form.mutators.setAttribute('type', undefined);
+                                                input.onChange(event);
+                                            }}
+                                            styles={{
+                                                control: (provided) =>
+                                                    meta.touched && meta.invalid
+                                                        ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
+                                                        : { ...provided },
+                                            }}
+                                            isDisabled={editMode}
+                                        />
 
-                        <div className="d-flex justify-content-end">
-                            <ButtonGroup>
+                                        <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
+                                            {meta.error}
+                                        </div>
+                                    </FormGroup>
+                                )}
+                            </Field>
+
+                            {tokenProfile && !editMode ? (
+                                <Field name="type" validate={validateRequired()}>
+                                    {({ input, meta }) => (
+                                        <FormGroup>
+                                            <Label for="typeSelect">Select Key Type</Label>
+
+                                            <Select
+                                                {...input}
+                                                id="type"
+                                                inputId="typeSelect"
+                                                maxMenuHeight={140}
+                                                menuPlacement="auto"
+                                                options={optionsForType()}
+                                                placeholder="Select to change Key Type"
+                                                onChange={(event: any) => {
+                                                    onKeyTypeChange(event.value, form);
+                                                    input.onChange(event);
+                                                }}
+                                                styles={{
+                                                    control: (provided) =>
+                                                        meta.touched && meta.invalid
+                                                            ? {
+                                                                  ...provided,
+                                                                  border: 'solid 1px red',
+                                                                  '&:hover': { border: 'solid 1px red' },
+                                                              }
+                                                            : { ...provided },
+                                                }}
+                                            />
+
+                                            <div
+                                                className="invalid-feedback"
+                                                style={meta.touched && meta.invalid ? { display: 'block' } : {}}
+                                            >
+                                                {meta.error}
+                                            </div>
+                                        </FormGroup>
+                                    )}
+                                </Field>
+                            ) : (
+                                <></>
+                            )}
+
+                            <TabLayout tabs={attributeTabs(form)} />
+
+                            <Container className="flex-row">
                                 <ProgressButton
                                     title={editMode ? 'Update' : 'Create'}
                                     inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
-                                    inProgress={submitting}
+                                    inProgress={submitting ?? false}
                                     disabled={pristine || submitting || !valid}
                                 />
 
                                 <Button
-                                    color="default"
+                                    type="outline"
                                     onClick={() => (usesGlobalModal ? dispatch(userInterfaceActions.hideGlobalModal()) : onCancelClick())}
                                     disabled={submitting}
                                 >
                                     Cancel
                                 </Button>
-                            </ButtonGroup>
-                        </div>
-                    </BootstrapForm>
-                )}
-            </Form>
-        </Widget>
+                            </Container>
+                        </BootstrapForm>
+                    )}
+                </Form>
+            </Widget>
+        </div>
     );
 }

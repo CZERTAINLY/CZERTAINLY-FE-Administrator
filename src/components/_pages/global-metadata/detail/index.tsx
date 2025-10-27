@@ -10,12 +10,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import { Container } from 'reactstrap';
 import Badge from 'components/Badge';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { getEditAndDeleteWidgetButtons, createWidgetDetailHeaders } from 'utils/widget';
 import GoBackButton from 'components/GoBackButton';
+import Container from 'components/Container';
+import Breadcrumb from 'components/Breadcrumb';
 
 export default function GlobalMetadataDetail() {
     const dispatch = useDispatch();
@@ -96,33 +97,37 @@ export default function GlobalMetadataDetail() {
     );
 
     return (
-        <Container className="themed-container" fluid>
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                forcedPath="/globalmetadata"
-                text={`${getEnumLabel(resourceEnum, Resource.GlobalMetadata)} Inventory`}
-            />
-            <Widget
-                title="Global Metadata Details"
-                busy={isFetchingDetail}
-                widgetButtons={buttons}
-                titleSize="large"
-                refreshAction={getFreshGlobalMetadata}
-                widgetLockName={LockWidgetNameEnum.GlobalMetadataDetails}
-            >
-                <CustomTable headers={detailHeaders} data={detailData} />
-            </Widget>
-
-            <Dialog
-                isOpen={confirmDelete}
-                caption="Delete Global Metadata"
-                body="You are about to delete a Global Metadata. Is this what you want to do?"
-                toggle={() => setConfirmDelete(false)}
-                buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+        <div>
+            <Breadcrumb
+                items={[
+                    { label: `${getEnumLabel(resourceEnum, Resource.GlobalMetadata)} Inventory`, href: '/globalmetadata' },
+                    { label: globalMetadata?.name || 'Global Metadata Details', href: '' },
                 ]}
             />
-        </Container>
+
+            <Container>
+                <Widget
+                    title="Global Metadata Details"
+                    busy={isFetchingDetail}
+                    widgetButtons={buttons}
+                    titleSize="large"
+                    refreshAction={getFreshGlobalMetadata}
+                    widgetLockName={LockWidgetNameEnum.GlobalMetadataDetails}
+                >
+                    <CustomTable headers={detailHeaders} data={detailData} />
+                </Widget>
+
+                <Dialog
+                    isOpen={confirmDelete}
+                    caption="Delete Global Metadata"
+                    body="You are about to delete a Global Metadata. Is this what you want to do?"
+                    toggle={() => setConfirmDelete(false)}
+                    buttons={[
+                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                        { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    ]}
+                />
+            </Container>
+        </div>
     );
 }

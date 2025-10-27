@@ -2,7 +2,6 @@ import TabLayout from 'components/Layout/TabLayout';
 import { selectors as authSelectors } from 'ducks/auth';
 import { actions as notificationActions } from 'ducks/notifications';
 import { useDispatch, useSelector } from 'react-redux';
-import { Container } from 'reactstrap';
 import { Resource } from 'types/openapi';
 import NotificationInstanceList from '../notifications-instances';
 import { useEffect } from 'react';
@@ -18,22 +17,20 @@ const EventsSettings = () => {
     }, [dispatch]);
 
     return (
-        <Container className="themed-container" fluid>
-            <TabLayout
-                tabs={[
-                    {
-                        title: 'Events',
-                        disabled: !profile?.permissions.allowedListings.includes(Resource.Settings),
-                        content: <EventsTable mode="platform" widgetLocks={[LockWidgetNameEnum.EventSettings]} />,
-                    },
-                    {
-                        title: 'Notification Instances',
-                        disabled: !profile?.permissions.allowedListings.includes(Resource.NotificationInstances),
-                        content: <NotificationInstanceList />,
-                    },
-                ]}
-            />
-        </Container>
+        <TabLayout
+            tabs={[
+                {
+                    title: 'Events',
+                    disabled: !profile?.permissions.allowedListings.includes(Resource.Settings),
+                    content: <EventsTable mode="platform" widgetLocks={[LockWidgetNameEnum.EventSettings]} />,
+                },
+                {
+                    title: 'Notification Instances',
+                    disabled: !profile?.permissions.allowedListings.includes(Resource.NotificationInstances),
+                    content: <NotificationInstanceList />,
+                },
+            ]}
+        />
     );
 };
 

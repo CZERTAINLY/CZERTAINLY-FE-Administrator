@@ -1,7 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
-import { Container } from 'reactstrap';
 import Badge from 'components/Badge';
 
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
@@ -142,22 +141,20 @@ function SchedulerJobsList() {
     const onListCallback = useCallback((pagination: SearchRequestModel) => dispatch(actions.listSchedulerJobs(pagination)), [dispatch]);
 
     return (
-        <Container className="themed-container" fluid>
-            <PagedList
-                entity={EntityType.SCHEDULER}
-                onListCallback={onListCallback}
-                onDeleteCallback={(uuids) => uuids.forEach((uuid) => dispatch(actions.deleteSchedulerJob({ uuid, redirect: false })))}
-                headers={schedulerJobsRowHeaders}
-                data={schedulerJobList}
-                isBusy={isBusy}
-                addHidden={true}
-                title="Scheduled Jobs Store"
-                entityNameSingular="a Scheduled Job"
-                entityNamePlural="Scheduled Jobs"
-                pageWidgetLockName={LockWidgetNameEnum.ListOfScheduler}
-                additionalButtons={buttons}
-            />
-        </Container>
+        <PagedList
+            entity={EntityType.SCHEDULER}
+            onListCallback={onListCallback}
+            onDeleteCallback={(uuids) => uuids.forEach((uuid) => dispatch(actions.deleteSchedulerJob({ uuid, redirect: false })))}
+            headers={schedulerJobsRowHeaders}
+            data={schedulerJobList}
+            isBusy={isBusy}
+            addHidden={true}
+            title="Scheduled Jobs Store"
+            entityNameSingular="a Scheduled Job"
+            entityNamePlural="Scheduled Jobs"
+            pageWidgetLockName={LockWidgetNameEnum.ListOfScheduler}
+            additionalButtons={buttons}
+        />
     );
 }
 

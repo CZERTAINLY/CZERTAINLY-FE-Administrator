@@ -7,7 +7,6 @@ import { actions, selectors } from 'ducks/scheduler';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
-import { Container } from 'reactstrap';
 import Badge from 'components/Badge';
 import SwitchField from 'components/Input/SwitchField';
 import { PlatformEnum, Resource, SchedulerJobExecutionStatus } from 'types/openapi';
@@ -19,7 +18,8 @@ import TextField from 'components/Input/TextField';
 import { Form } from 'react-final-form';
 import SchedulerJobHistory from './SchedulerJobHistory';
 import { createWidgetDetailHeaders } from 'utils/widget';
-import GoBackButton from 'components/GoBackButton';
+import Breadcrumb from 'components/Breadcrumb';
+import Container from 'components/Container';
 
 interface EditFormValues {
     cronExpression: string | undefined;
@@ -182,104 +182,107 @@ export default function SchedulerJobDetail() {
     );
 
     return (
-        <Container className="themed-container" fluid>
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                forcedPath="/jobs"
-                text={`${getEnumLabel(resourceEnum, Resource.Jobs)} Inventory`}
-            />
-            <Widget
-                title="Scheduled Job Details"
-                busy={isBusy}
-                widgetButtons={buttons}
-                titleSize="large"
-                refreshAction={getFreshSchedulerJobDetails}
-                widgetLockName={LockWidgetNameEnum.SchedulerJobDetail}
-            >
-                <CustomTable headers={detailHeaders} data={detailData} />
-            </Widget>
-            {id && <SchedulerJobHistory uuid={id} />}
-
-            <Dialog
-                isOpen={confirmDelete}
-                caption="Delete Scheduled Job"
-                body="You are about to delete Scheduled Job. Is this what you want to do?"
-                toggle={() => setConfirmDelete(false)}
-                buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+        <div>
+            <Breadcrumb
+                items={[
+                    { label: `${getEnumLabel(resourceEnum, Resource.Jobs)} Inventory`, href: '/jobs' },
+                    { label: schedulerJob?.jobName || 'Scheduled Job Details', href: '' },
                 ]}
             />
-            <Dialog
-                size="lg"
-                isOpen={editCronOpen}
-                caption="Edit CRON Expression"
-                body={
-                    <Form
-                        onSubmit={handleCronSave}
-                        initialValues={{ cronExpression: newCronExpression }}
-                        render={({ handleSubmit, values }) => (
-                            <form onSubmit={handleSubmit}>
-                                <TextField
-                                    id="cronExpression"
-                                    label="Cron Expression"
-                                    validators={[validateRequired(), validateQuartzCronExpression(values.cronExpression)]}
-                                    description={getStrongFromCronExpression(values.cronExpression)}
-                                    inputGroupIcon={{
-                                        icon: 'fa fa-stopwatch',
-                                        onClick: () => setCronModalOpen(true),
-                                    }}
-                                />
-                                <div className="d-flex justify-content-between mt-3">
-                                    <button type="submit" className="btn btn-primary">
-                                        Save
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className="btn btn-secondary"
-                                        onClick={() => {
-                                            setNewCronExpression(originalCronExpression);
-                                            setEditCronOpen(false);
+            <Container>
+                <Widget
+                    title="Scheduled Job Details"
+                    busy={isBusy}
+                    widgetButtons={buttons}
+                    titleSize="large"
+                    refreshAction={getFreshSchedulerJobDetails}
+                    widgetLockName={LockWidgetNameEnum.SchedulerJobDetail}
+                >
+                    <CustomTable headers={detailHeaders} data={detailData} />
+                </Widget>
+                {id && <SchedulerJobHistory uuid={id} />}
+
+                <Dialog
+                    isOpen={confirmDelete}
+                    caption="Delete Scheduled Job"
+                    body="You are about to delete Scheduled Job. Is this what you want to do?"
+                    toggle={() => setConfirmDelete(false)}
+                    buttons={[
+                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                        { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    ]}
+                />
+                <Dialog
+                    size="lg"
+                    isOpen={editCronOpen}
+                    caption="Edit CRON Expression"
+                    body={
+                        <Form
+                            onSubmit={handleCronSave}
+                            initialValues={{ cronExpression: newCronExpression }}
+                            render={({ handleSubmit, values }) => (
+                                <form onSubmit={handleSubmit}>
+                                    <TextField
+                                        id="cronExpression"
+                                        label="Cron Expression"
+                                        validators={[validateRequired(), validateQuartzCronExpression(values.cronExpression)]}
+                                        description={getStrongFromCronExpression(values.cronExpression)}
+                                        inputGroupIcon={{
+                                            icon: 'fa fa-stopwatch',
+                                            onClick: () => setCronModalOpen(true),
                                         }}
-                                    >
-                                        Cancel
-                                    </button>
-                                </div>
-                            </form>
-                        )}
-                    />
-                }
-                toggle={() => setEditCronOpen(false)}
-            />
+                                    />
+                                    <div className="d-flex justify-content-between mt-3">
+                                        <button type="submit" className="btn btn-primary">
+                                            Save
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="btn btn-secondary"
+                                            onClick={() => {
+                                                setNewCronExpression(originalCronExpression);
+                                                setEditCronOpen(false);
+                                            }}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </form>
+                            )}
+                        />
+                    }
+                    toggle={() => setEditCronOpen(false)}
+                />
 
-            <Dialog
-                size="lg"
-                isOpen={cronModalOpen}
-                caption="Select CRON Expression"
-                body={
-                    <div className="d-flex justify-content-center">
-                        <Cron value={newCronExpression} onChange={handleCronSelectChange} showResultText showResultCron />
-                    </div>
-                }
-                toggle={() => setCronModalOpen(false)}
-                buttons={[
-                    {
-                        color: 'primary',
-                        onClick: () => {
-                            setCronModalOpen(false);
+                <Dialog
+                    size="lg"
+                    isOpen={cronModalOpen}
+                    caption="Select CRON Expression"
+                    body={
+                        <div className="d-flex justify-content-center">
+                            <Cron value={newCronExpression} onChange={handleCronSelectChange} showResultText showResultCron />
+                        </div>
+                    }
+                    toggle={() => setCronModalOpen(false)}
+                    buttons={[
+                        {
+                            color: 'primary',
+                            onClick: () => {
+                                setCronModalOpen(false);
+                            },
+                            body: 'Ok',
                         },
-                        body: 'Ok',
-                    },
-                    {
-                        color: 'secondary',
-                        onClick: () => {
-                            setNewCronExpression(originalCronExpression);
-                            setCronModalOpen(false);
+                        {
+                            color: 'secondary',
+                            onClick: () => {
+                                setNewCronExpression(originalCronExpression);
+                                setCronModalOpen(false);
+                            },
+                            body: 'Cancel',
                         },
-                        body: 'Cancel',
-                    },
-                ]}
-            />
-        </Container>
+                    ]}
+                />
+            </Container>
+        </div>
     );
 }

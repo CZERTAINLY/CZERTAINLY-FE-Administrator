@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
-import { Container } from 'reactstrap';
 import Badge from 'components/Badge';
 
 import { actions, selectors } from 'ducks/credentials';
@@ -125,7 +124,7 @@ function CredentialList() {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <>
             <Widget
                 title="Credential Store"
                 busy={isBusy}
@@ -156,7 +155,7 @@ function CredentialList() {
                     { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
-        </Container>
+        </>
     );
 }
 

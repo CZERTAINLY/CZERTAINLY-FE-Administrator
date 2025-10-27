@@ -8,7 +8,7 @@ interface Props {
     }[];
 }
 
-function Switch({ items }: Props) {
+function Breadcrumb({ items }: Props) {
     return (
         <ol className="flex items-center whitespace-nowrap mb-4 md:mb-8">
             {items.map((item, index) => (
@@ -36,4 +36,4 @@ function Switch({ items }: Props) {
     );
 }
 
-export default Switch;
+export default Breadcrumb;

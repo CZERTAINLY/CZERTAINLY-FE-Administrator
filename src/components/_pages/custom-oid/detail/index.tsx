@@ -7,11 +7,11 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { Container } from 'reactstrap';
 import { OidCategory, PlatformEnum, Resource } from 'types/openapi';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { getEditAndDeleteWidgetButtons, createWidgetDetailHeaders, createTableDataRow } from 'utils/widget';
-import GoBackButton from 'components/GoBackButton';
+import Container from 'components/Container';
+import Breadcrumb from 'components/Breadcrumb';
 
 export default function CustomOIDDetail() {
     const dispatch = useDispatch();
@@ -85,40 +85,43 @@ export default function CustomOIDDetail() {
         [oid],
     );
     return (
-        <Container className="themed-container" fluid>
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                forcedPath="/custom-oids"
-                text={`${getEnumLabel(resourceEnum, Resource.Oids)} Inventory`}
-            />
-            <Widget
-                title="OID Details"
-                busy={isBusy}
-                widgetButtons={buttons}
-                titleSize="large"
-                refreshAction={getFreshOIDDetails}
-                widgetLockName={LockWidgetNameEnum.EntityDetails}
-            >
-                <br />
-
-                <CustomTable headers={detailHeaders} data={detailData} />
-            </Widget>
-            {showAdditionalProperties && (
-                <Widget title="Additional Properties" titleSize="large">
-                    <br />
-                    <CustomTable headers={detailHeaders} data={additionalPropertiesData} />
-                </Widget>
-            )}
-            <Dialog
-                isOpen={confirmDelete}
-                caption="Delete Custom OID"
-                body="You are about to delete Custom OID. Is this what you want to do?"
-                toggle={() => setConfirmDelete(false)}
-                buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+        <div>
+            <Breadcrumb
+                items={[
+                    { label: `${getEnumLabel(resourceEnum, Resource.Oids)} Inventory`, href: '/custom-oids' },
+                    { label: oid?.oid || 'OID Details', href: '' },
                 ]}
             />
-        </Container>
+            <Container>
+                <Widget
+                    title="OID Details"
+                    busy={isBusy}
+                    widgetButtons={buttons}
+                    titleSize="large"
+                    refreshAction={getFreshOIDDetails}
+                    widgetLockName={LockWidgetNameEnum.EntityDetails}
+                >
+                    <br />
+
+                    <CustomTable headers={detailHeaders} data={detailData} />
+                </Widget>
+                {showAdditionalProperties && (
+                    <Widget title="Additional Properties" titleSize="large">
+                        <br />
+                        <CustomTable headers={detailHeaders} data={additionalPropertiesData} />
+                    </Widget>
+                )}
+                <Dialog
+                    isOpen={confirmDelete}
+                    caption="Delete Custom OID"
+                    body="You are about to delete Custom OID. Is this what you want to do?"
+                    toggle={() => setConfirmDelete(false)}
+                    buttons={[
+                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
+                        { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    ]}
+                />
+            </Container>
+        </div>
     );
 }

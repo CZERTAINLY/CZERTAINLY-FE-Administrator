@@ -1,32 +1,25 @@
-import { Button, Spinner } from 'reactstrap';
+import cn from 'classnames';
+import Button, { ButtonColor } from 'components/Button';
+import Spinner from 'components/Spinner';
 
 interface Props {
     disabled?: boolean;
     inProgress: boolean;
     title: string;
     inProgressTitle?: string;
-    color?: string;
+    color?: ButtonColor;
     className?: string;
     type?: 'submit' | 'reset' | 'button';
     onClick?: () => void;
 }
 
-function ProgressButton({
-    inProgress,
-    title,
-    inProgressTitle = title,
-    disabled = false,
-    color = 'primary',
-    className = 'btn btn-primary',
-    type = 'submit',
-    onClick,
-}: Props) {
+function ProgressButton({ inProgress, title, inProgressTitle = title, disabled = false, color = 'blue', type = 'submit', onClick }: Props) {
     return (
-        <Button className={className} color={color} type={type} disabled={disabled || inProgress} onClick={onClick}>
+        <Button color={color} disabled={disabled || inProgress} onClick={onClick} className={cn('relative', { 'opacity-50': inProgress })}>
             {inProgress ? (
                 <div>
                     <Spinner color="light" size="sm" />
-                    <span>&nbsp;{inProgressTitle}</span>
+                    {inProgressTitle}
                 </div>
             ) : (
                 title

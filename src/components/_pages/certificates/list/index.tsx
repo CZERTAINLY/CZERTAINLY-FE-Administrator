@@ -11,7 +11,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import { Container } from 'reactstrap';
 
 import Dropdown from 'components/Dropdown';
 
@@ -416,7 +415,7 @@ export default function CertificateList({
     }, [preservedFilters, dispatch, withPreservedFilters]);
 
     return (
-        <Container className="themed-container" fluid>
+        <>
             <PagedList
                 hideWidgetButtons={hideWidgetButtons}
                 entity={EntityType.CERTIFICATE}
@@ -507,6 +506,6 @@ export default function CertificateList({
                 toggle={() => setUpdateRaProfile(false)}
                 buttons={[]}
             />
-        </Container>
+        </>
     );
 }

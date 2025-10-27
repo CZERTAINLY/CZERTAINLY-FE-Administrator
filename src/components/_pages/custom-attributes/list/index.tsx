@@ -10,7 +10,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
 
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import { Container } from 'reactstrap';
 import Badge from 'components/Badge';
 import { PlatformEnum } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
@@ -137,7 +136,7 @@ export default function CustomAttributesList() {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <>
             <Widget
                 title="List of Custom Attributes"
                 busy={isBusy}
@@ -168,6 +167,6 @@ export default function CustomAttributesList() {
                     { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
-        </Container>
+        </>
     );
 }

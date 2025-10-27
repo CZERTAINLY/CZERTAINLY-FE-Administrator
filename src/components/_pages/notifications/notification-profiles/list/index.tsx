@@ -7,7 +7,6 @@ import { useCallback, useMemo } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
-import { Container } from 'reactstrap';
 import Badge from 'components/Badge';
 import { EntityType } from 'ducks/filters';
 import { SearchRequestModel } from 'types/certificate';
@@ -80,18 +79,16 @@ const NotificationProfilesList = () => {
     );
 
     return (
-        <Container className="themed-container" fluid>
-            <PagedList
-                entity={EntityType.NOTIFICATION_PROFILES}
-                onListCallback={onListCallback}
-                headers={headers}
-                data={dataRows}
-                title="List of Notification Profiles"
-                entityNameSingular="a Notification Profile"
-                entityNamePlural="Notification Profiles"
-                pageWidgetLockName={LockWidgetNameEnum.ListOfNotificationProfiles}
-            />
-        </Container>
+        <PagedList
+            entity={EntityType.NOTIFICATION_PROFILES}
+            onListCallback={onListCallback}
+            headers={headers}
+            data={dataRows}
+            title="List of Notification Profiles"
+            entityNameSingular="a Notification Profile"
+            entityNamePlural="Notification Profiles"
+            pageWidgetLockName={LockWidgetNameEnum.ListOfNotificationProfiles}
+        />
     );
 };
 

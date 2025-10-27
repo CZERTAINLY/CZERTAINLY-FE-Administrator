@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
-import { Container } from 'reactstrap';
 
 import { actions, selectors } from 'ducks/acme-accounts';
 
@@ -179,7 +178,7 @@ export default function AcmeAccountList() {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <>
             <Widget
                 title="List of ACME Accounts"
                 busy={isBusy}
@@ -210,6 +209,6 @@ export default function AcmeAccountList() {
                     { color: 'secondary', onClick: () => setConfirmRevoke(false), body: 'Cancel' },
                 ]}
             />
-        </Container>
+        </>
     );
 }

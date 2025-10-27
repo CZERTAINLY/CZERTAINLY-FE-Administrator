@@ -9,7 +9,6 @@ import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rule
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import Select from 'components/Select';
-import { Container } from 'reactstrap';
 import { PlatformEnum, Resource } from 'types/openapi';
 
 import { useHasEventsResourceOptions, useRuleEvaluatorResourceOptions } from 'utils/rules';
@@ -147,7 +146,7 @@ const TriggerList = () => {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <>
             <Widget
                 titleSize="larger"
                 title="Triggers"
@@ -183,7 +182,7 @@ const TriggerList = () => {
                     { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
-        </Container>
+        </>
     );
 };
 

@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
-import { Container } from 'reactstrap';
 import Badge from 'components/Badge';
 
 import { actions, selectors } from 'ducks/tokens';
@@ -171,7 +170,7 @@ function TokenList() {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <>
             <Widget
                 title="Token Store"
                 busy={isBusy}
@@ -226,7 +225,7 @@ function TokenList() {
                 toggle={() => setActivateToken(false)}
                 buttons={[]}
             />
-        </Container>
+        </>
     );
 }
 

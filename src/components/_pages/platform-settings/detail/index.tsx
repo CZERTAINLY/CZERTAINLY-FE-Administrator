@@ -9,8 +9,10 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 
-import { Container } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
+
+// import Container from 'components/Container';
+// import Breadcrumb from 'components/Breadcrumb';
 
 export default function PlatformSettingsDetail() {
     const dispatch = useDispatch();
@@ -46,7 +48,12 @@ export default function PlatformSettingsDetail() {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <div>
+            {/* <Breadcrumb
+                items={[
+                    { label: 'Platform Settings', href: '/platformsettings' },
+                ]}
+            /> */}
             <Widget
                 title="Platform Settings"
                 busy={isFetchingPlatform}
@@ -68,6 +75,6 @@ export default function PlatformSettingsDetail() {
                     ]}
                 />
             </Widget>
-        </Container>
+        </div>
     );
 }

@@ -8,7 +8,6 @@ import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
-import { Container } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
 
 export default function GroupList() {
@@ -110,7 +109,7 @@ export default function GroupList() {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <>
             <Widget
                 title="List of Groups"
                 busy={isBusy}
@@ -123,9 +122,9 @@ export default function GroupList() {
                     headers={groupsTableHeaders}
                     data={groupsTableData}
                     onCheckedRowsChanged={setCheckedRows}
-                    canSearch={true}
-                    hasCheckboxes={true}
-                    hasPagination={true}
+                    canSearch
+                    hasCheckboxes
+                    hasPagination
                 />
             </Widget>
 
@@ -139,6 +138,6 @@ export default function GroupList() {
                     { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
-        </Container>
+        </>
     );
 }

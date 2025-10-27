@@ -3,7 +3,6 @@ import { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { actions, selectors } from 'ducks/oids';
 import { EntityType } from 'ducks/filters';
-import { Container } from 'reactstrap';
 import PagedList from 'components/PagedList/PagedList';
 import { ApiClients } from 'src/api';
 import { Link } from 'react-router';
@@ -85,21 +84,19 @@ export default function CustomOIDList() {
     );
 
     return (
-        <Container className="themed-container" fluid>
-            <PagedList
-                entity={EntityType.OID}
-                onListCallback={onListCallback}
-                onDeleteCallback={onDeleteCallback}
-                getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.oids.getSearchableInformation(), [])}
-                headers={oidsRowHeaders}
-                data={oidsList}
-                isBusy={isBusy}
-                title="Custom OIDs"
-                entityNameSingular="an OID"
-                entityNamePlural="OIDs"
-                filterTitle="Certificates by Compliance"
-                pageWidgetLockName={LockWidgetNameEnum.EntityStore}
-            />
-        </Container>
+        <PagedList
+            entity={EntityType.OID}
+            onListCallback={onListCallback}
+            onDeleteCallback={onDeleteCallback}
+            getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.oids.getSearchableInformation(), [])}
+            headers={oidsRowHeaders}
+            data={oidsList}
+            isBusy={isBusy}
+            title="Custom OIDs"
+            entityNameSingular="an OID"
+            entityNamePlural="OIDs"
+            filterTitle="Certificates by Compliance"
+            pageWidgetLockName={LockWidgetNameEnum.EntityStore}
+        />
     );
 }
