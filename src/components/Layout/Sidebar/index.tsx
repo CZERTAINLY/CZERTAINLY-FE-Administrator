@@ -1,12 +1,31 @@
 import { Resource } from 'types/openapi';
-import { useMemo, useState } from 'react';
-import { NavLink } from 'react-router';
+import { useMemo, useState, useEffect } from 'react';
+import { NavLink, useLocation } from 'react-router';
+import { useLocalStorage } from 'usehooks-ts';
 import cx from 'classnames';
-import { ChevronDown } from 'lucide-react';
+import {
+    Award,
+    ChevronDown,
+    HomeIcon,
+    KeyIcon,
+    SearchCheck,
+    Link,
+    CircleUser,
+    Users,
+    Table,
+    ListChecks,
+    CircleCheckBig,
+    Calendar,
+    Settings,
+    FileJson2,
+    Split,
+    ArrowRightToLine,
+} from 'lucide-react';
 import Button from 'components/Button';
 
 type MenuItemMapping = {
     _key: string;
+    icon?: React.ReactNode;
     header: string;
     requiredResources?: Resource[];
 } & (
@@ -28,17 +47,37 @@ type MenuItemMapping = {
 const menuItemMappings: MenuItemMapping[] = [
     {
         _key: '/dashboard',
+        icon: <HomeIcon size={16} />,
         header: 'Dashboard',
         headerLink: '/dashboard',
         requiredResources: [Resource.Certificates, Resource.RaProfiles, Resource.Discoveries, Resource.Groups],
     },
-    { _key: '/certificates', header: 'Certificates', headerLink: '/certificates', requiredResources: [Resource.Certificates] },
-    { _key: '/keys', header: 'Keys', headerLink: '/keys', requiredResources: [Resource.Keys] },
-    { _key: '/discovery', header: 'Discoveries', headerLink: '/discoveries', requiredResources: [Resource.Discoveries] },
-    { _key: '/connectors', header: 'Connectors', headerLink: '/connectors', requiredResources: [Resource.Connectors] },
+    {
+        _key: '/certificates',
+        icon: <Award size={16} />,
+        header: 'Certificates',
+        headerLink: '/certificates',
+        requiredResources: [Resource.Certificates],
+    },
+    { _key: '/keys', icon: <KeyIcon size={16} />, header: 'Keys', headerLink: '/keys', requiredResources: [Resource.Keys] },
+    {
+        _key: '/discovery',
+        icon: <SearchCheck size={16} />,
+        header: 'Discoveries',
+        headerLink: '/discoveries',
+        requiredResources: [Resource.Discoveries],
+    },
+    {
+        _key: '/connectors',
+        icon: <Link size={16} />,
+        header: 'Connectors',
+        headerLink: '/connectors',
+        requiredResources: [Resource.Connectors],
+    },
 
     {
         _key: 'accessControl',
+        icon: <CircleUser size={16} />,
         header: 'Access Control',
         children: [
             { _key: '/users', name: 'Users', link: '/users', requiredResources: [Resource.Users] },
@@ -47,6 +86,7 @@ const menuItemMappings: MenuItemMapping[] = [
     },
     {
         _key: 'profiles',
+        icon: <Users size={16} />,
         header: 'Profiles',
         children: [
             {
@@ -78,6 +118,7 @@ const menuItemMappings: MenuItemMapping[] = [
 
     {
         _key: 'inventory',
+        icon: <Table size={16} />,
         header: 'Inventory',
         children: [
             { _key: '/credentials', name: 'Credentials', link: '/credentials', requiredResources: [Resource.Credentials] },
@@ -91,6 +132,7 @@ const menuItemMappings: MenuItemMapping[] = [
 
     {
         _key: 'protocols',
+        icon: <ListChecks size={16} />,
         header: 'Protocols',
         children: [
             {
@@ -107,6 +149,7 @@ const menuItemMappings: MenuItemMapping[] = [
 
     {
         _key: 'approvals',
+        icon: <CircleCheckBig size={16} />,
         header: 'Approvals',
         children: [
             {
@@ -124,10 +167,11 @@ const menuItemMappings: MenuItemMapping[] = [
         ],
     },
 
-    { _key: '/jobs', header: 'Scheduler', headerLink: '/jobs', requiredResources: [Resource.Jobs] },
+    { _key: '/jobs', icon: <Calendar size={16} />, header: 'Scheduler', headerLink: '/jobs', requiredResources: [Resource.Jobs] },
 
     {
         _key: 'settings',
+        icon: <Settings size={16} />,
         header: 'Settings',
         children: [
             { _key: '/settings', name: 'Platform', link: '/settings', requiredResources: [Resource.Settings] },
@@ -155,9 +199,16 @@ const menuItemMappings: MenuItemMapping[] = [
         ],
     },
 
-    { _key: '/auditlogs', header: 'Audit Logs', headerLink: '/auditlogs', requiredResources: [Resource.AuditLogs] },
+    {
+        _key: '/auditlogs',
+        icon: <FileJson2 size={16} />,
+        header: 'Audit Logs',
+        headerLink: '/auditlogs',
+        requiredResources: [Resource.AuditLogs],
+    },
     {
         _key: 'workflows',
+        icon: <Split size={16} />,
         header: 'Workflows',
         children: [
             // { _key: '/conditions', name: 'Conditions', link: '/conditions' },
@@ -218,63 +269,135 @@ type Props = {
     allowedResources?: Resource[];
 };
 export default function Sidebar({ allowedResources }: Props) {
+    const [defaultMenuSize, setDefaultMenuSize] = useLocalStorage<'small' | 'large'>('menu-size', 'small');
+    const [menuSize, setMenuSize] = useState<'small' | 'large' | 'flying'>(defaultMenuSize);
+    const location = useLocation();
+
     const allowedMenuItems = useMemo(() => getAllowedMenuItems(allowedResources), [allowedResources]);
     const [openMenuItems, setOpenMenuItems] = useState<string[]>([]);
 
+    useEffect(() => {
+        if (menuSize === 'flying') return;
+        document.documentElement.style.setProperty('--sidebar-width', menuSize === 'small' ? '84px' : '260px');
+    }, [menuSize]);
+
+    function toggleMenuSize() {
+        const newMenuSize = menuSize === 'small' ? 'large' : 'small';
+        setMenuSize(newMenuSize);
+        setOpenMenuItems([]);
+        setDefaultMenuSize(newMenuSize);
+    }
+
     function renderMenuItem(mapping: MenuItemMapping) {
         if ('children' in mapping) {
+            const childrenKeys = mapping.children.map((child) => child.link);
+            const activePage = location.pathname;
+            const isChildActive = childrenKeys.some((child) => child === activePage);
             const isActive = openMenuItems.includes(mapping._key);
             return (
-                <li key={mapping.header}>
+                <li key={mapping.header} className={cx('flex justify-center', { 'flex-col': menuSize != 'small' })}>
                     <Button
                         type="transparent"
-                        className="flex items-center justify-between gap-x-2 px-4 py-2 w-full"
-                        onClick={() =>
-                            setOpenMenuItems((prev) => (isActive ? prev.filter((item) => item !== mapping._key) : [...prev, mapping._key]))
-                        }
+                        className={cx('px-3.5 py-2.5 border-none justify-between h-[40px]', {
+                            'flex w-full items-center': menuSize != 'small',
+                        })}
+                        onClick={() => {
+                            if (menuSize === 'small') {
+                                setMenuSize('flying');
+                            }
+                            setOpenMenuItems((prev) => (isActive ? prev.filter((item) => item !== mapping._key) : [...prev, mapping._key]));
+                        }}
+                        aria-expanded={isActive}
+                        aria-controls={mapping._key}
                     >
-                        {mapping.header}
-                        <ChevronDown size={20} className={cx(isActive && 'rotate-180')} />
+                        <div className={cx('flex items-center gap-x-2', { 'text-blue-600': isChildActive })}>
+                            {mapping.icon}
+                            <span className={cx('text-sm', { 'sr-only': menuSize === 'small' })}>{mapping.header}</span>
+                        </div>
+                        {menuSize != 'small' && <ChevronDown size={20} className={cx({ isActive: 'rotate-180' })} />}
                     </Button>
-                    {isActive && (
-                        <ul>
-                            {mapping.children.map((child) => (
-                                <li key={child.name}>
-                                    <NavLink
-                                        to={child.link}
-                                        className={({ isActive }) =>
-                                            cx(
-                                                'block px-4 pl-8 py-2 no-underline hover:bg-gray-200 rounded-lg',
-                                                isActive && 'text-blue-600',
-                                            )
-                                        }
-                                    >
-                                        {child.name}
-                                    </NavLink>
-                                </li>
-                            ))}
-                        </ul>
-                    )}
+                    <ul
+                        className={cx(
+                            `transition-[max-height] duration-300 ease-in-out overflow-hidden relative before:content-[''] before:absolute before:left-0 before:top-0 before:h-full before:w-0.5 before:bg-gray-200`,
+                            {
+                                'w-0': !isActive,
+                            },
+                        )}
+                        style={{
+                            maxHeight: isActive ? `${40 * mapping.children.length}px` : 0,
+                        }}
+                        id={mapping._key}
+                    >
+                        {mapping.children.map((child) => (
+                            <li key={child.name}>
+                                <NavLink
+                                    to={child.link}
+                                    className={({ isActive }) =>
+                                        cx('block px-4 pl-8 py-2 no-underline hover:bg-gray-200 rounded-lg', isActive && 'text-blue-600')
+                                    }
+                                >
+                                    {child.name}
+                                </NavLink>
+                            </li>
+                        ))}
+                    </ul>
                 </li>
             );
         }
         return (
-            <li>
+            <li key={mapping._key} className="flex justify-center">
                 <NavLink
-                    key={mapping._key}
                     to={mapping.headerLink}
+                    onClick={() => {
+                        if (menuSize === 'flying') {
+                            setMenuSize('small');
+                            setOpenMenuItems([]);
+                        }
+                    }}
                     className={({ isActive }) =>
-                        cx('block px-4 py-2 no-underline hover:bg-gray-200 rounded-lg', isActive && 'text-blue-600')
+                        cx('flex px-3.5 py-2.5 no-underline hover:bg-gray-200 rounded-lg h-[40px] items-center', {
+                            'text-blue-600': isActive,
+                            'w-full gap-x-2': menuSize !== 'small',
+                        })
                     }
                 >
-                    {mapping.header}
+                    {mapping.icon}
+                    <span className={cx('text-sm', { 'sr-only': menuSize === 'small' })}>{mapping.header}</span>
                 </NavLink>
             </li>
         );
     }
     return (
-        <nav className="w-[var(--sidebar-width)] h-[calc(100vh-var(--header-height))] overflow-y-auto sticky top-[var(--header-height)]">
-            <ul className="list-none p-2 m-0">{allowedMenuItems.map((item) => renderMenuItem(item))}</ul>
-        </nav>
+        <div className="p-4 w-[var(--sidebar-width)] h-[calc(100vh-var(--header-height))] overflow-y-auto sticky top-[var(--header-height)] z-10">
+            <nav className="pb-4">
+                <ul className="list-none m-0 flex flex-col gap-y-1">{allowedMenuItems.map((item) => renderMenuItem(item))}</ul>
+            </nav>
+            {menuSize === 'flying' && (
+                <div
+                    className={cx('p-4 fixed top-[var(--header-height)] left-0 w-[260px] h-full bg-white shadow-lg', {})}
+                    onMouseLeave={() => {
+                        setMenuSize('small');
+                        setOpenMenuItems([]);
+                    }}
+                >
+                    <nav className="pb-4">
+                        <ul className="list-none m-0 flex flex-col gap-y-1">{allowedMenuItems.map((item) => renderMenuItem(item))}</ul>
+                    </nav>
+                </div>
+            )}
+            <hr className="border-gray-200" />
+            <div className="flex justify-center pt-4">
+                <Button
+                    type="transparent"
+                    className={cx('inline-flex px-3.5 py-2.5 border-none', {
+                        'w-full gap-x-2': menuSize !== 'small',
+                    })}
+                    onClick={() => toggleMenuSize()}
+                >
+                    <ArrowRightToLine size={20} className={cx(menuSize === 'large' && 'rotate-180')} />
+                    <span className={cx({ 'sr-only': menuSize === 'small' })}>Collapse</span>
+                </Button>
+            </div>
+        </div>
     );
 }

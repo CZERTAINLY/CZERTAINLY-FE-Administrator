@@ -1,26 +1,26 @@
 :root {
-  font-family: "Inter", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: 400;
-  font-style: normal;
-  color: #1F2937;
+    font-family: 'Inter', sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    color: #1f2937;
 
-  --primary-blue-color: #2798E7;
-  --header-height: 68px;
-  --sidebar-width: 260px;
-  --main-background-color: #F8FAFC;
-  --dark-gray-color: #1F2937;
+    --primary-blue-color: #2798e7;
+    --header-height: 68px;
+    --sidebar-width: 84px;
+    --main-background-color: #f8fafc;
+    --dark-gray-color: #1f2937;
 
-  --status-success-color: #1ab394;
-  --status-danger-color: #eb3349;
-  --status-warning-color: #f37d63;
-  --status-dark-color: var(--dark-gray-color);
-  --status-light-gray-color: var(--gray-300);
-  --status-gray-color: var(--gray-500);
-  --status-info-color: #2798E7;
+    --status-success-color: #1ab394;
+    --status-danger-color: #eb3349;
+    --status-warning-color: #f37d63;
+    --status-dark-color: var(--dark-gray-color);
+    --status-light-gray-color: var(--gray-300);
+    --status-gray-color: var(--gray-500);
+    --status-info-color: #2798e7;
 }
 
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* Source files to scan for Tailwind classes */
 @source "../src";
@@ -30,15 +30,15 @@
 
 /* Preline UI */
 @source "../node_modules/preline/dist/*.js";
-@import "../node_modules/preline/variants.css";
+@import '../node_modules/preline/variants.css';
 
 /* Plugins */
 @plugin "@tailwindcss/forms";
 
 button {
-  cursor: pointer;
+    cursor: pointer;
 }
 
 table a {
-  color: var(--primary-blue-color);
+    color: var(--primary-blue-color);
 }
