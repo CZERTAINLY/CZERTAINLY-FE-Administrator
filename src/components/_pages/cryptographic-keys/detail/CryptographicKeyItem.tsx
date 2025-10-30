@@ -294,7 +294,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                               'Key Format',
                               <div className="flex items-center gap-2">
                                   {keyItem.format}
-                                  <Button type="transparent" onClick={() => setDisplayKeyData(true)} title="Show Additional Information">
+                                  <Button variant="transparent" onClick={() => setDisplayKeyData(true)} title="Show Additional Information">
                                       <Info size={16} />
                                   </Button>
                               </div>,
@@ -392,7 +392,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
 
                               history.additionalInformation ? (
                                   <Button
-                                      type="transparent"
+                                      variant="transparent"
                                       onClick={() => setCurrentInfoId(history.uuid)}
                                       title="Show Additional Information"
                                   >
@@ -502,11 +502,12 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                         {!tokenInstanceUuid && <p>{keyWithoutTokenInstanceActionNotes.delete}</p>}
                     </div>
                 }
+                size="lg"
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
-                    { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
@@ -530,7 +531,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 toggle={() => setConfirmCompromise(false)}
                 buttons={[
                     { color: 'danger', onClick: onCompromise, body: 'Yes' },
-                    { color: 'secondary', type: 'outline', onClick: () => setConfirmCompromise(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmCompromise(false), body: 'Cancel' },
                 ]}
             />
 
@@ -550,7 +551,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 icon="destroy"
                 buttons={[
                     { color: 'danger', onClick: onDestroy, body: 'Destroy' },
-                    { color: 'secondary', type: 'outline', onClick: () => setConfirmDestroy(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDestroy(false), body: 'Cancel' },
                 ]}
             />
 
@@ -615,7 +616,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 noBorder
                 buttons={[
                     { color: 'primary', onClick: onUpdateKeyUsageConfirmed, body: 'Update' },
-                    { color: 'secondary', type: 'outline', onClick: () => setKeyUsageUpdate(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setKeyUsageUpdate(false), body: 'Cancel' },
                 ]}
             />
         </div>

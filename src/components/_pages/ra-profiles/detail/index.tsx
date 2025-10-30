@@ -1048,7 +1048,7 @@ export default function RaProfileDetail() {
                 icon="delete"
                 buttons={[
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
-                    { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
@@ -1073,7 +1073,7 @@ export default function RaProfileDetail() {
                 toggle={() => setConfirmDeactivateAcme(false)}
                 buttons={[
                     { color: 'danger', onClick: onDeactivateAcmeConfirmed, body: 'Yes, deactivate' },
-                    { color: 'secondary', type: 'outline', onClick: () => setConfirmDeactivateAcme(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDeactivateAcme(false), body: 'Cancel' },
                 ]}
             />
 
@@ -1084,7 +1084,7 @@ export default function RaProfileDetail() {
                 toggle={() => setConfirmDeactivateCmp(false)}
                 buttons={[
                     { color: 'danger', onClick: onDeactivateCmpConfirmed, body: 'Yes, deactivate' },
-                    { color: 'secondary', type: 'outline', onClick: () => setConfirmDeactivateCmp(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDeactivateCmp(false), body: 'Cancel' },
                 ]}
             />
 
@@ -1095,7 +1095,7 @@ export default function RaProfileDetail() {
                 toggle={() => setConfirmDeactivateScep(false)}
                 buttons={[
                     { color: 'danger', onClick: onDeactivateScepConfirmed, body: 'Yes, deactivate' },
-                    { color: 'secondary', type: 'outline', onClick: () => setConfirmDeactivateScep(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDeactivateScep(false), body: 'Cancel' },
                 ]}
             />
 
@@ -1149,7 +1149,7 @@ export default function RaProfileDetail() {
                 noBorder
                 buttons={[
                     { color: 'primary', onClick: onComplianceCheck, body: 'Yes' },
-                    { color: 'secondary', type: 'outline', onClick: () => setComplianceCheck(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setComplianceCheck(false), body: 'Cancel' },
                 ]}
             />
 
@@ -1207,7 +1207,7 @@ export default function RaProfileDetail() {
                     },
                     {
                         color: 'secondary',
-                        type: 'outline',
+                        variant: 'outline',
                         onClick: () => setConfirmDeassociateApprovalProfileDialog(undefined),
                         body: 'Cancel',
                     },

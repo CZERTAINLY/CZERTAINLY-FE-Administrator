@@ -433,7 +433,7 @@ export default function ComplianceProfileDetail() {
                 icon="delete"
                 buttons={[
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
-                    { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
                 dataTestId="delete-confirmation-dialog"
             />
@@ -445,7 +445,7 @@ export default function ComplianceProfileDetail() {
                 noBorder
                 buttons={[
                     { color: 'primary', onClick: onComplianceCheck, body: 'Yes' },
-                    { color: 'secondary', type: 'outline', onClick: () => setComplianceCheck(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setComplianceCheck(false), body: 'Cancel' },
                 ]}
                 dataTestId="compliance-check-dialog"
             />
@@ -493,7 +493,7 @@ export default function ComplianceProfileDetail() {
                 toggle={() => dispatch(actions.clearDeleteErrorMessages())}
                 buttons={[
                     { color: 'danger', onClick: onForceDeleteComplianceProfile, body: 'Force' },
-                    { color: 'secondary', type: 'outline', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
                 ]}
                 dataTestId="delete-error-dialog"
             />

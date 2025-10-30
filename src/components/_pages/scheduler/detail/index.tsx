@@ -210,7 +210,7 @@ export default function SchedulerJobDetail() {
                     icon="delete"
                     buttons={[
                         { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
-                        { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                        { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                     ]}
                 />
                 <Dialog
@@ -275,7 +275,7 @@ export default function SchedulerJobDetail() {
                         },
                         {
                             color: 'secondary',
-                            type: 'outline',
+                            variant: 'outline',
                             onClick: () => {
                                 setNewCronExpression(originalCronExpression);
                                 setCronModalOpen(false);

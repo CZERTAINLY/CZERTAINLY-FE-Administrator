@@ -179,7 +179,7 @@ export default function ProfileAssociationsDialog({ isOpen, onClose, profile, as
                                     Associate
                                 </Button>
 
-                                <Button color="secondary" type="outline" disabled={submitting} onClick={onCancel}>
+                                <Button color="secondary" variant="outline" disabled={submitting} onClick={onCancel}>
                                     Cancel
                                 </Button>
                             </div>

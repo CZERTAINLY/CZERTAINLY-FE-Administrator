@@ -279,7 +279,7 @@ function TokenProfileList() {
                 icon="delete"
                 buttons={[
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
-                    { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
@@ -292,7 +292,7 @@ function TokenProfileList() {
                 noBorder
                 buttons={[
                     { color: 'primary', onClick: onUpdateKeyUsageConfirmed, body: 'Update' },
-                    { color: 'secondary', type: 'outline', onClick: () => setKeyUsageUpdate(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setKeyUsageUpdate(false), body: 'Cancel' },
                 ]}
             />
         </>

@@ -249,7 +249,7 @@ export default function TokenDetail() {
                     icon="delete"
                     buttons={[
                         { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
-                        { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                        { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                     ]}
                 />
 
@@ -261,7 +261,7 @@ export default function TokenDetail() {
                     toggle={() => setConfirmDeactivation(false)}
                     buttons={[
                         { color: 'danger', onClick: onDeactivationConfirmed, body: 'Deactivate' },
-                        { color: 'secondary', type: 'outline', onClick: () => setConfirmDeactivation(false), body: 'Cancel' },
+                        { color: 'secondary', variant: 'outline', onClick: () => setConfirmDeactivation(false), body: 'Cancel' },
                     ]}
                 />
 

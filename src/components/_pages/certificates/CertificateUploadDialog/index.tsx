@@ -115,7 +115,7 @@ export default function CertificateUploadDialog({ onCancel, onUpload, okButtonTi
                                 inProgress={submitting}
                                 disabled={!valid || !fileContent}
                             />
-                            <Button color="secondary" type="outline" onClick={onCancel} disabled={submitting}>
+                            <Button color="secondary" variant="outline" onClick={onCancel} disabled={submitting}>
                                 Cancel
                             </Button>
                         </div>

@@ -67,7 +67,7 @@ export default function CertificateOwnerDialog({ uuids, onCancel, onUpdate, user
                 <Button color="primary" onClick={updateOwner} disabled={!ownerUuid}>
                     Update
                 </Button>
-                <Button color="secondary" type="outline" onClick={onCancel} className="ml-auto">
+                <Button color="secondary" variant="outline" onClick={onCancel} className="ml-auto">
                     Cancel
                 </Button>
             </div>

@@ -1,4 +1,4 @@
-import Button, { ButtonColor, ButtonType } from 'components/Button';
+import Button, { ButtonColor, ButtonVariant } from 'components/Button';
 import { Trash2, Info, AlertTriangle, X, ArrowUpFromLine, Users, User, CircleMinus } from 'lucide-react';
 import cx from 'classnames';
 import { useEffect } from 'react';
@@ -8,7 +8,7 @@ interface DialogButton {
     body: string | React.ReactNode;
     onClick: (formData?: any) => void;
     disabled?: boolean;
-    type?: ButtonType;
+    variant?: ButtonVariant;
 }
 
 interface Props {
@@ -122,7 +122,7 @@ export default function Dialog({ isOpen, toggle, caption, body, buttons, size = 
                     )}
                 >
                     <div className="w-full flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl pointer-events-auto dark:bg-neutral-800 dark:border-neutral-700 dark:shadow-neutral-700/70 md:p-4 relative">
-                        <Button type="transparent" onClick={toggle} className="absolute right-2 top-2">
+                        <Button variant="transparent" onClick={toggle} className="absolute right-2 top-2">
                             <X size={16} />
                         </Button>
                         <div
@@ -153,7 +153,7 @@ export default function Dialog({ isOpen, toggle, caption, body, buttons, size = 
                                         onClick={() => button.onClick()}
                                         disabled={button.disabled || false}
                                         data-hs-overlay="#hs-scale-animation-modal"
-                                        type={button.type}
+                                        variant={button.variant}
                                     >
                                         {button.body}
                                     </Button>

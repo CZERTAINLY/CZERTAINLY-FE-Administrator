@@ -78,7 +78,7 @@ export default function CertificateGroupDialog({ uuids, onCancel, onUpdate }: Pr
                 >
                     Update
                 </Button>
-                <Button color="secondary" type="outline" onClick={onCancel} className="ml-auto">
+                <Button color="secondary" variant="outline" onClick={onCancel} className="ml-auto">
                     Cancel
                 </Button>
             </div>

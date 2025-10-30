@@ -338,7 +338,7 @@ function CryptographicKeyList() {
                 size="md"
                 buttons={[
                     { color: 'danger', onClick: onCompromise, body: 'Yes' },
-                    { color: 'secondary', type: 'outline', onClick: () => setConfirmCompromise(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmCompromise(false), body: 'Cancel' },
                 ]}
             />
             <Dialog
@@ -349,7 +349,7 @@ function CryptographicKeyList() {
                 icon="destroy"
                 buttons={[
                     { color: 'danger', onClick: onDestroy, body: 'Destroy' },
-                    { color: 'secondary', type: 'outline', onClick: () => setConfirmDestroy(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDestroy(false), body: 'Cancel' },
                 ]}
             />
             <Dialog
@@ -361,7 +361,7 @@ function CryptographicKeyList() {
                 noBorder
                 buttons={[
                     { color: 'primary', onClick: onUpdateKeyUsageConfirmed, body: 'Update' },
-                    { color: 'secondary', type: 'outline', onClick: () => setKeyUsageUpdate(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setKeyUsageUpdate(false), body: 'Cancel' },
                 ]}
             />
         </>

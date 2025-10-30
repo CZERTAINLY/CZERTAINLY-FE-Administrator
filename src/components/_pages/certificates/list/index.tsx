@@ -495,7 +495,7 @@ export default function CertificateList({
                 toggle={() => setUpdateEntity(false)}
                 buttons={[
                     { color: 'primary', onClick: () => {}, body: 'Update' },
-                    { color: 'secondary', type: 'outline', onClick: () => setUpdateEntity(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setUpdateEntity(false), body: 'Cancel' },
                 ]}
             />
 

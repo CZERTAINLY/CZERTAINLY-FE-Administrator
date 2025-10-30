@@ -230,7 +230,7 @@ function RaProfileList() {
                 icon="delete"
                 buttons={[
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
-                    { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
@@ -242,7 +242,7 @@ function RaProfileList() {
                 noBorder
                 buttons={[
                     { color: 'primary', onClick: onComplianceCheckConfirmed, body: 'Yes' },
-                    { color: 'secondary', type: 'outline', onClick: () => setComplianceCheck(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setComplianceCheck(false), body: 'Cancel' },
                 ]}
             />
         </>

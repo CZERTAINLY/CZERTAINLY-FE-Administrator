@@ -563,7 +563,7 @@ export default function LocationDetail() {
                     icon="delete"
                     buttons={[
                         { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
-                        { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                        { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                     ]}
                 />
                 <Dialog
@@ -592,7 +592,7 @@ export default function LocationDetail() {
                     toggle={() => setConfirmRemoveDialog(false)}
                     buttons={[
                         { color: 'danger', onClick: onRemoveConfirmed, body: 'Yes, remove' },
-                        { color: 'secondary', type: 'outline', onClick: () => setConfirmRemoveDialog(false), body: 'Cancel' },
+                        { color: 'secondary', variant: 'outline', onClick: () => setConfirmRemoveDialog(false), body: 'Cancel' },
                     ]}
                 />
                 <Dialog

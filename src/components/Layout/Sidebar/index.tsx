@@ -297,7 +297,7 @@ export default function Sidebar({ allowedResources }: Props) {
             return (
                 <li key={mapping.header} className={cx('flex justify-center', { 'flex-col': menuSize != 'small' })}>
                     <Button
-                        type="transparent"
+                        variant="transparent"
                         className={cx('!px-3.5 !py-2.5 border-none justify-between h-[40px]', {
                             'flex w-full items-center': menuSize != 'small',
                         })}
@@ -388,7 +388,7 @@ export default function Sidebar({ allowedResources }: Props) {
             <hr className="border-gray-200" />
             <div className="flex justify-center pt-4">
                 <Button
-                    type="transparent"
+                    variant="transparent"
                     className={cx('inline-flex px-3.5 py-2.5 border-none', {
                         'w-full gap-x-2': menuSize !== 'small',
                     })}

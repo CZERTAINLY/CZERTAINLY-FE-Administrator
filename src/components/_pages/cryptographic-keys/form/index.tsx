@@ -532,7 +532,7 @@ export default function CryptographicKeyForm({ usesGlobalModal = false }: Crypto
                                 />
 
                                 <Button
-                                    type="outline"
+                                    variant="outline"
                                     onClick={() => (usesGlobalModal ? dispatch(userInterfaceActions.hideGlobalModal()) : onCancelClick())}
                                     disabled={submitting}
                                 >

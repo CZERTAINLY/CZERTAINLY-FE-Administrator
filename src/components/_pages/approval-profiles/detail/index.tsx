@@ -208,7 +208,7 @@ const ApprovalProfileDetails = () => {
                 icon="delete"
                 buttons={[
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
-                    { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
@@ -227,7 +227,7 @@ const ApprovalProfileDetails = () => {
                 buttons={[
                     {
                         color: 'secondary',
-                        type: 'outline',
+                        variant: 'outline',
                         onClick: () => dispatch(profileApprovalActions.clearDeleteErrorMessages()),
                         body: 'Cancel',
                     },

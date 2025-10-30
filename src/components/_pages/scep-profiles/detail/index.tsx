@@ -406,7 +406,7 @@ export default function ScepProfileDetail() {
                     icon="delete"
                     buttons={[
                         { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
-                        { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                        { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                     ]}
                 />
 
@@ -426,7 +426,7 @@ export default function ScepProfileDetail() {
                         { color: 'danger', onClick: onForceDeleteScepProfile, body: 'Force' },
                         {
                             color: 'secondary',
-                            type: 'outline',
+                            variant: 'outline',
                             onClick: () => dispatch(actions.clearDeleteErrorMessages()),
                             body: 'Cancel',
                         },

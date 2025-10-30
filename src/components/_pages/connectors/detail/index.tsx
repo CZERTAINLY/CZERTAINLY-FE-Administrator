@@ -459,7 +459,7 @@ export default function ConnectorDetail() {
                 icon="delete"
                 buttons={[
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
-                    { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
@@ -470,7 +470,7 @@ export default function ConnectorDetail() {
                 toggle={() => setConfirmAuthorize(false)}
                 buttons={[
                     { color: 'success', onClick: onAuthorizeConfirmed, body: 'Yes, approve' },
-                    { color: 'secondary', type: 'outline', onClick: () => setConfirmAuthorize(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmAuthorize(false), body: 'Cancel' },
                 ]}
             />
 
@@ -488,7 +488,7 @@ export default function ConnectorDetail() {
                 toggle={() => dispatch(actions.clearDeleteErrorMessages())}
                 buttons={[
                     { color: 'danger', onClick: onForceDeleteConnector, body: 'Force' },
-                    { color: 'secondary', type: 'outline', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
                 ]}
             />
         </div>

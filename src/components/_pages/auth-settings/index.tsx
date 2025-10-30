@@ -213,7 +213,7 @@ const AuthenticationSettings = () => {
                     )
                 }
                 toggle={onCloseProviderJwkSetKeys}
-                buttons={[{ color: 'secondary', type: 'outline', onClick: onCloseProviderJwkSetKeys, body: 'Close' }]}
+                buttons={[{ color: 'secondary', variant: 'outline', onClick: onCloseProviderJwkSetKeys, body: 'Close' }]}
             />
         </Container>
     );

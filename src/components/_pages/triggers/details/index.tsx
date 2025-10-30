@@ -610,7 +610,7 @@ const TriggerDetails = () => {
                 icon="delete"
                 buttons={[
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
-                    { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
@@ -621,7 +621,7 @@ const TriggerDetails = () => {
                 toggle={() => setConfirmIgnoreTrigger(false)}
                 buttons={[
                     { color: 'warning', onClick: onIgnoreTriggerConfirmed, body: 'Ignore & remove actions' },
-                    { color: 'secondary', type: 'outline', onClick: () => setConfirmIgnoreTrigger(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmIgnoreTrigger(false), body: 'Cancel' },
                 ]}
             />
         </Container>

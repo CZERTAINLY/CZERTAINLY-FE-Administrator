@@ -407,7 +407,7 @@ export default function CryptographicKeyDetail() {
                 icon="delete"
                 buttons={[
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
-                    { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
             <Dialog
@@ -432,7 +432,7 @@ export default function CryptographicKeyDetail() {
                 toggle={() => setConfirmCompromise(false)}
                 buttons={[
                     { color: 'danger', onClick: onCompromise, body: 'Yes' },
-                    { color: 'secondary', type: 'outline', onClick: () => setConfirmCompromise(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmCompromise(false), body: 'Cancel' },
                 ]}
             />
             <Dialog
@@ -448,7 +448,7 @@ export default function CryptographicKeyDetail() {
                 icon="destroy"
                 buttons={[
                     { color: 'danger', onClick: onDestroy, body: 'Destroy' },
-                    { color: 'secondary', type: 'outline', onClick: () => setConfirmDestroy(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDestroy(false), body: 'Cancel' },
                 ]}
             />
         </>

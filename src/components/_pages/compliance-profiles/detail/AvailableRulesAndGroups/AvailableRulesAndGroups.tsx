@@ -484,7 +484,7 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
                 icon="delete"
                 buttons={[
                     { color: 'danger', onClick: () => deleteInternalRule(deletingInternalRuleId!), body: 'Delete' },
-                    { color: 'secondary', type: 'outline', onClick: () => setDeletingInternalRuleId(null), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setDeletingInternalRuleId(null), body: 'Cancel' },
                 ]}
                 dataTestId="delete-internal-rule-dialog"
             />

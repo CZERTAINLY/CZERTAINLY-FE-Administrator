@@ -230,7 +230,7 @@ export default function AdministratorsList() {
                 icon="delete"
                 buttons={[
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
-                    { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
                 dataTestId="delete-compliance-profile-dialog"
             />
@@ -242,7 +242,7 @@ export default function AdministratorsList() {
                 toggle={() => setConfirmForceDelete(false)}
                 buttons={[
                     { color: 'danger', onClick: onForceDeleteConfirmed, body: 'Force delete' },
-                    { color: 'secondary', type: 'outline', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
                 ]}
                 dataTestId="force-delete-compliance-profile-dialog"
             />
@@ -255,7 +255,7 @@ export default function AdministratorsList() {
                 noBorder
                 buttons={[
                     { color: 'primary', onClick: onComplianceCheckConfirmed, body: 'Yes' },
-                    { color: 'secondary', type: 'outline', onClick: () => setComplianceCheck(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setComplianceCheck(false), body: 'Cancel' },
                 ]}
                 dataTestId="compliance-check-dialog"
             />

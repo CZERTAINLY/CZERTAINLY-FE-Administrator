@@ -97,10 +97,10 @@ const EditableTableCell = <TValue,>({
                                 ))}
                         </Field>
                         <div className={styles.btnGroup}>
-                            <Button type="transparent" onClick={() => handleSubmit()} disabled={busy}>
+                            <Button variant="transparent" onClick={() => handleSubmit()} disabled={busy}>
                                 <Check size={16} />
                             </Button>
-                            <Button type="transparent" onClick={() => handleCancel()} disabled={busy}>
+                            <Button variant="transparent" onClick={() => handleCancel()} disabled={busy}>
                                 <X size={16} />
                             </Button>
                         </div>
@@ -114,7 +114,7 @@ const EditableTableCell = <TValue,>({
             <Spinner active={busy} />
             <Button
                 title="Edit"
-                type="transparent"
+                variant="transparent"
                 onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();

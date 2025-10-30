@@ -386,7 +386,7 @@ export default function AdministratorDetail() {
                     icon="delete"
                     buttons={[
                         { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
-                        { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                        { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                     ]}
                 />
                 <Dialog
@@ -405,7 +405,7 @@ export default function AdministratorDetail() {
                         { color: 'danger', onClick: onForceDeleteAcmeProfile, body: 'Force' },
                         {
                             color: 'secondary',
-                            type: 'outline',
+                            variant: 'outline',
                             onClick: () => dispatch(actions.clearDeleteErrorMessages()),
                             body: 'Cancel',
                         },
