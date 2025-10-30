@@ -227,9 +227,10 @@ function RaProfileList() {
                 caption={`Delete RA ${checkedRows.length > 1 ? 'Profiles' : 'Profile'}`}
                 body={`You are about to delete ${checkedRows.length > 1 ? 'a RA Profile' : 'RA profiles'}. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
@@ -238,9 +239,10 @@ function RaProfileList() {
                 caption={`Initiate Compliance Check`}
                 body={'Initiate the compliance check for the selected RA Profile(s)?'}
                 toggle={() => setComplianceCheck(false)}
+                noBorder
                 buttons={[
                     { color: 'primary', onClick: onComplianceCheckConfirmed, body: 'Yes' },
-                    { color: 'secondary', onClick: () => setComplianceCheck(false), body: 'Cancel' },
+                    { color: 'secondary', type: 'outline', onClick: () => setComplianceCheck(false), body: 'Cancel' },
                 ]}
             />
         </>

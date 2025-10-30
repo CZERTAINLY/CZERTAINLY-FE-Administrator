@@ -207,9 +207,10 @@ export default function CustomAttributeDetail() {
                 caption="Delete Custom Attribute"
                 body="You are about to delete an Custom Attribute. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
         </div>

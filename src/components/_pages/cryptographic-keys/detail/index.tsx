@@ -396,6 +396,7 @@ export default function CryptographicKeyDetail() {
             <Dialog
                 isOpen={confirmDelete}
                 caption="Delete Key"
+                size="lg"
                 body={
                     <div>
                         <p>You are about to delete the Key. Is this what you want to do?</p>
@@ -403,14 +404,17 @@ export default function CryptographicKeyDetail() {
                     </div>
                 }
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
             <Dialog
                 isOpen={confirmCompromise}
                 caption={`Compromise Key`}
+                size="md"
+                noBorder
                 body={
                     <div>
                         <p>You are about to mark the Key as compromised. Is this what you want to do?</p>
@@ -428,7 +432,7 @@ export default function CryptographicKeyDetail() {
                 toggle={() => setConfirmCompromise(false)}
                 buttons={[
                     { color: 'danger', onClick: onCompromise, body: 'Yes' },
-                    { color: 'secondary', onClick: () => setConfirmCompromise(false), body: 'Cancel' },
+                    { color: 'secondary', type: 'outline', onClick: () => setConfirmCompromise(false), body: 'Cancel' },
                 ]}
             />
             <Dialog
@@ -441,9 +445,10 @@ export default function CryptographicKeyDetail() {
                     </div>
                 }
                 toggle={() => setConfirmDestroy(false)}
+                icon="destroy"
                 buttons={[
-                    { color: 'danger', onClick: onDestroy, body: 'Yes, Destroy' },
-                    { color: 'secondary', onClick: () => setConfirmDestroy(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDestroy, body: 'Destroy' },
+                    { color: 'secondary', type: 'outline', onClick: () => setConfirmDestroy(false), body: 'Cancel' },
                 ]}
             />
         </>

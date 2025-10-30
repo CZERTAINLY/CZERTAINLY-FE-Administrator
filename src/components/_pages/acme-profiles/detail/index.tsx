@@ -383,9 +383,10 @@ export default function AdministratorDetail() {
                     body="You are about to delete ACME Profile which may have associated ACME
                   Account(s). When deleted the ACME Account(s) will be revoked."
                     toggle={() => setConfirmDelete(false)}
+                    icon="delete"
                     buttons={[
-                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                        { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                        { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                     ]}
                 />
                 <Dialog
@@ -402,7 +403,12 @@ export default function AdministratorDetail() {
                     toggle={() => dispatch(actions.clearDeleteErrorMessages())}
                     buttons={[
                         { color: 'danger', onClick: onForceDeleteAcmeProfile, body: 'Force' },
-                        { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
+                        {
+                            color: 'secondary',
+                            type: 'outline',
+                            onClick: () => dispatch(actions.clearDeleteErrorMessages()),
+                            body: 'Cancel',
+                        },
                     ]}
                 />
             </Container>

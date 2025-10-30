@@ -28,7 +28,7 @@ import CertificateOwnerDialog from '../CertificateOwnerDialog';
 import CertificateRAProfileDialog from '../CertificateRAProfileDialog';
 import CertificateStatus from '../CertificateStatus';
 import CertificateUploadDialog from '../CertificateUploadDialog';
-import { Download } from 'lucide-react';
+import { Download, Plug } from 'lucide-react';
 import Switch from 'components/Switch';
 
 interface Props {
@@ -123,9 +123,9 @@ export default function CertificateList({
     const downloadDropDown = useMemo(
         () => (
             <Dropdown
-                title={<Download size={20} />}
+                title={<Download size={16} />}
                 btnStyle="transparent"
-                maxWidth={100}
+                // maxWidth={100}
                 disabled={checkedRows.length === 0}
                 items={[
                     {
@@ -451,6 +451,8 @@ export default function CertificateList({
                 body={<CertificateUploadDialog onCancel={() => setUpload(false)} onUpload={(data) => onUploadClick(data)} />}
                 toggle={() => setUpload(false)}
                 buttons={[]}
+                size="xl"
+                icon="upload"
             />
 
             <Dialog
@@ -465,6 +467,8 @@ export default function CertificateList({
                 }
                 toggle={() => setUpdateGroup(false)}
                 buttons={[]}
+                icon="users"
+                size="md"
             />
 
             <Dialog
@@ -480,6 +484,8 @@ export default function CertificateList({
                 }
                 toggle={() => setUpdateOwner(false)}
                 buttons={[]}
+                icon="user"
+                size="md"
             />
 
             <Dialog
@@ -489,7 +495,7 @@ export default function CertificateList({
                 toggle={() => setUpdateEntity(false)}
                 buttons={[
                     { color: 'primary', onClick: () => {}, body: 'Update' },
-                    { color: 'secondary', onClick: () => setUpdateEntity(false), body: 'Cancel' },
+                    { color: 'secondary', type: 'outline', onClick: () => setUpdateEntity(false), body: 'Cancel' },
                 ]}
             />
 
@@ -505,6 +511,8 @@ export default function CertificateList({
                 }
                 toggle={() => setUpdateRaProfile(false)}
                 buttons={[]}
+                size="md"
+                icon={<Plug size={26} strokeWidth={1} />}
             />
         </>
     );

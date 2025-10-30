@@ -311,7 +311,7 @@ export default function ApprovalDetails() {
                     toggle={() => setRecipientApproveDialog(false)}
                     buttons={[
                         { color: 'primary', onClick: onApproveRecipient, body: 'Yes, approve' },
-                        { color: 'secondary', onClick: () => setRecipientApproveDialog(false), body: 'Cancel' },
+                        { color: 'secondary', type: 'outline', onClick: () => setRecipientApproveDialog(false), body: 'Cancel' },
                     ]}
                 />
 
@@ -327,7 +327,7 @@ export default function ApprovalDetails() {
                     }
                     buttons={[
                         { color: 'primary', onClick: onRejectRecipient, body: 'Yes, reject' },
-                        { color: 'secondary', onClick: () => setRecipientRejectDialog(false), body: 'Cancel' },
+                        { color: 'secondary', type: 'outline', onClick: () => setRecipientRejectDialog(false), body: 'Cancel' },
                     ]}
                 />
             </Container>

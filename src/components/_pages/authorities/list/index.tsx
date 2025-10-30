@@ -195,9 +195,10 @@ function AuthorityList() {
                 caption={`Delete ${checkedRows.length > 1 ? 'Authorities' : 'an Authority'}`}
                 body={`You are about to delete ${checkedRows.length > 1 ? 'Authorities' : 'a Authority'}. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
@@ -208,7 +209,7 @@ function AuthorityList() {
                 toggle={() => setConfirmForceDelete(false)}
                 buttons={[
                     { color: 'danger', onClick: onForceDeleteConfirmed, body: 'Force delete' },
-                    { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
+                    { color: 'secondary', type: 'outline', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
                 ]}
             />
         </Container>

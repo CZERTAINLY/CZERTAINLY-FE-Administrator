@@ -7,7 +7,8 @@ import { actions as raProfileActions, selectors as raProfileSelectors } from 'du
 import Select, { SingleValue } from 'react-select';
 
 import Spinner from 'components/Spinner';
-import { Button, ButtonGroup, FormGroup, Label } from 'reactstrap';
+import { FormGroup } from 'reactstrap';
+import Button from 'components/Button';
 
 interface Props {
     uuids: string[];
@@ -47,8 +48,6 @@ export default function CertificateGroupDialog({ uuids, onCancel, onUpdate }: Pr
     return (
         <>
             <FormGroup>
-                <Label for="raProfileSelect">RA Profile</Label>
-
                 <Select
                     id="raProfile"
                     inputId="raProfileSelect"
@@ -61,20 +60,16 @@ export default function CertificateGroupDialog({ uuids, onCancel, onUpdate }: Pr
                 />
             </FormGroup>
 
-            <div className="d-flex justify-content-end">
-                <ButtonGroup>
-                    <Button color="danger" onClick={removeRaprofile}>
-                        <span className="text-white">Remove</span>
-                    </Button>
-
-                    <Button color="primary" onClick={updateRaProfile} disabled={!selectedRaProfile}>
-                        Update
-                    </Button>
-
-                    <Button color="default" onClick={onCancel}>
-                        Cancel
-                    </Button>
-                </ButtonGroup>
+            <div className="flex gap-4">
+                <Button color="danger" onClick={removeRaprofile}>
+                    Remove
+                </Button>
+                <Button color="primary" onClick={updateRaProfile} disabled={!selectedRaProfile}>
+                    Update
+                </Button>
+                <Button color="secondary" type="outline" onClick={onCancel} className="ml-auto">
+                    Cancel
+                </Button>
             </div>
 
             <Spinner active={isFetchingRaProffiles} />

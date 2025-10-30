@@ -298,7 +298,7 @@ export default function Sidebar({ allowedResources }: Props) {
                 <li key={mapping.header} className={cx('flex justify-center', { 'flex-col': menuSize != 'small' })}>
                     <Button
                         type="transparent"
-                        className={cx('px-3.5 py-2.5 border-none justify-between h-[40px]', {
+                        className={cx('!px-3.5 !py-2.5 border-none justify-between h-[40px]', {
                             'flex w-full items-center': menuSize != 'small',
                         })}
                         onClick={() => {
@@ -318,7 +318,7 @@ export default function Sidebar({ allowedResources }: Props) {
                     </Button>
                     <ul
                         className={cx(
-                            `transition-[max-height] duration-300 ease-in-out overflow-hidden relative before:content-[''] before:absolute before:left-0 before:top-0 before:h-full before:w-0.5 before:bg-gray-200`,
+                            `transition-[max-height] duration-300 ease-in-out overflow-hidden relative before:content-[''] before:absolute before:left-6 before:top-0 before:h-[calc(100%-20px)] before:w-0.5 before:bg-gray-200`,
                             {
                                 'w-0': !isActive,
                             },
@@ -333,7 +333,7 @@ export default function Sidebar({ allowedResources }: Props) {
                                 <NavLink
                                     to={child.link}
                                     className={({ isActive }) =>
-                                        cx('block px-4 pl-8 py-2 no-underline hover:bg-gray-200 rounded-lg', isActive && 'text-blue-600')
+                                        cx('block px-4 ml-8 py-2 no-underline hover:bg-gray-200 rounded-lg', isActive && 'text-blue-600')
                                     }
                                 >
                                     {child.name}

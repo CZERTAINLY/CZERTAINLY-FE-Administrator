@@ -4,7 +4,8 @@ import { useDispatch } from 'react-redux';
 import { actions } from 'ducks/certificates';
 
 import Select from 'react-select';
-import { Button, ButtonGroup, FormGroup } from 'reactstrap';
+import { FormGroup } from 'reactstrap';
+import Button from 'components/Button';
 import { UserResponseModel } from 'types/users';
 
 interface Props {
@@ -58,20 +59,17 @@ export default function CertificateOwnerDialog({ uuids, onCancel, onUpdate, user
                 />
             </FormGroup>
 
-            <div className="d-flex justify-content-end">
-                <ButtonGroup>
-                    <Button color="danger" onClick={removeOwner}>
-                        <span className="text-white">Remove</span>
-                    </Button>
+            <div className="flex gap-4">
+                <Button color="danger" onClick={removeOwner}>
+                    Remove
+                </Button>
 
-                    <Button color="primary" onClick={updateOwner} disabled={!ownerUuid}>
-                        Update
-                    </Button>
-
-                    <Button color="default" onClick={onCancel}>
-                        Cancel
-                    </Button>
-                </ButtonGroup>
+                <Button color="primary" onClick={updateOwner} disabled={!ownerUuid}>
+                    Update
+                </Button>
+                <Button color="secondary" type="outline" onClick={onCancel} className="ml-auto">
+                    Cancel
+                </Button>
             </div>
         </>
     );

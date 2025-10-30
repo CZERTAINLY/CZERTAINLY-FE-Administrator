@@ -234,7 +234,7 @@ export default function AcmeAccountDetail() {
                     toggle={() => setConfirmRevoke(false)}
                     buttons={[
                         { color: 'danger', onClick: onRevokeConfirmed, body: 'Yes, revoke' },
-                        { color: 'secondary', onClick: () => setConfirmRevoke(false), body: 'Cancel' },
+                        { color: 'secondary', type: 'outline', onClick: () => setConfirmRevoke(false), body: 'Cancel' },
                     ]}
                 />
             </Container>

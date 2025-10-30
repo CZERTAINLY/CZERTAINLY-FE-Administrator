@@ -142,9 +142,10 @@ export default function AuthorityDetail() {
                     body="You are about to delete Authority. If you continue, connectors
                   related to the authority will fail. Is this what you want to do?"
                     toggle={() => setConfirmDelete(false)}
+                    icon="delete"
                     buttons={[
-                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                        { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                        { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                     ]}
                 />
 
@@ -162,7 +163,12 @@ export default function AuthorityDetail() {
                     toggle={() => dispatch(actions.clearDeleteErrorMessages())}
                     buttons={[
                         { color: 'danger', onClick: onForceDeleteAuthority, body: 'Force' },
-                        { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
+                        {
+                            color: 'secondary',
+                            type: 'outline',
+                            onClick: () => dispatch(actions.clearDeleteErrorMessages()),
+                            body: 'Cancel',
+                        },
                     ]}
                 />
             </Container>

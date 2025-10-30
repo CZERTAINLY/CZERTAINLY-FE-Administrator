@@ -456,9 +456,10 @@ export default function ConnectorDetail() {
                 caption="Delete Connector"
                 body="You are about to delete an Connector. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
@@ -469,7 +470,7 @@ export default function ConnectorDetail() {
                 toggle={() => setConfirmAuthorize(false)}
                 buttons={[
                     { color: 'success', onClick: onAuthorizeConfirmed, body: 'Yes, approve' },
-                    { color: 'secondary', onClick: () => setConfirmAuthorize(false), body: 'Cancel' },
+                    { color: 'secondary', type: 'outline', onClick: () => setConfirmAuthorize(false), body: 'Cancel' },
                 ]}
             />
 
@@ -487,7 +488,7 @@ export default function ConnectorDetail() {
                 toggle={() => dispatch(actions.clearDeleteErrorMessages())}
                 buttons={[
                     { color: 'danger', onClick: onForceDeleteConnector, body: 'Force' },
-                    { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
+                    { color: 'secondary', type: 'outline', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
                 ]}
             />
         </div>

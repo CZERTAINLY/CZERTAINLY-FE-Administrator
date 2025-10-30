@@ -207,13 +207,14 @@ export default function SchedulerJobDetail() {
                     caption="Delete Scheduled Job"
                     body="You are about to delete Scheduled Job. Is this what you want to do?"
                     toggle={() => setConfirmDelete(false)}
+                    icon="delete"
                     buttons={[
-                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                        { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                        { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                     ]}
                 />
                 <Dialog
-                    size="lg"
+                    size="xl"
                     isOpen={editCronOpen}
                     caption="Edit CRON Expression"
                     body={
@@ -255,7 +256,7 @@ export default function SchedulerJobDetail() {
                 />
 
                 <Dialog
-                    size="lg"
+                    size="xl"
                     isOpen={cronModalOpen}
                     caption="Select CRON Expression"
                     body={
@@ -274,6 +275,7 @@ export default function SchedulerJobDetail() {
                         },
                         {
                             color: 'secondary',
+                            type: 'outline',
                             onClick: () => {
                                 setNewCronExpression(originalCronExpression);
                                 setCronModalOpen(false);

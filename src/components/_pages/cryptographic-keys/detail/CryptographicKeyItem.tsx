@@ -503,9 +503,10 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                     </div>
                 }
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
@@ -529,7 +530,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 toggle={() => setConfirmCompromise(false)}
                 buttons={[
                     { color: 'danger', onClick: onCompromise, body: 'Yes' },
-                    { color: 'secondary', onClick: () => setConfirmCompromise(false), body: 'Cancel' },
+                    { color: 'secondary', type: 'outline', onClick: () => setConfirmCompromise(false), body: 'Cancel' },
                 ]}
             />
 
@@ -546,9 +547,10 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                     </div>
                 }
                 toggle={() => setConfirmDestroy(false)}
+                icon="destroy"
                 buttons={[
-                    { color: 'danger', onClick: onDestroy, body: 'Yes, Destroy' },
-                    { color: 'secondary', onClick: () => setConfirmDestroy(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDestroy, body: 'Destroy' },
+                    { color: 'secondary', type: 'outline', onClick: () => setConfirmDestroy(false), body: 'Cancel' },
                 ]}
             />
 
@@ -606,12 +608,14 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
 
             <Dialog
                 isOpen={keyUsageUpdate}
-                caption={`Update Key Usage`}
+                caption="Update Key Usage"
                 body={keyUsageBody}
                 toggle={() => setKeyUsageUpdate(false)}
+                size="md"
+                noBorder
                 buttons={[
                     { color: 'primary', onClick: onUpdateKeyUsageConfirmed, body: 'Update' },
-                    { color: 'secondary', onClick: () => setKeyUsageUpdate(false), body: 'Cancel' },
+                    { color: 'secondary', type: 'outline', onClick: () => setKeyUsageUpdate(false), body: 'Cancel' },
                 ]}
             />
         </div>

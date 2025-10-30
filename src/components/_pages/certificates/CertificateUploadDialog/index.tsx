@@ -3,7 +3,7 @@ import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } 
 import { useEffect, useState } from 'react';
 import { Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { Form as BootstrapForm, Button, ButtonGroup } from 'reactstrap';
+import { Form as BootstrapForm } from 'reactstrap';
 import { CertificateDetailResponseModel } from 'types/certificate';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
 import { transformParseCertificateResponseDtoToCertificateResponseDetailModel } from '../../../../ducks/transform/utilsCertificate';
@@ -17,6 +17,7 @@ import AttributeEditor from '../../../Attributes/AttributeEditor';
 import FileUpload from '../../../Input/FileUpload/FileUpload';
 import TabLayout from '../../../Layout/TabLayout';
 import ProgressButton from '../../../ProgressButton';
+import Button from 'components/Button';
 
 interface FormValues {}
 
@@ -107,18 +108,16 @@ export default function CertificateUploadDialog({ onCancel, onUpload, okButtonTi
 
                         <br />
 
-                        <div className="d-flex justify-content-end">
-                            <ButtonGroup>
-                                <ProgressButton
-                                    title={okButtonTitle}
-                                    inProgressTitle={okButtonTitle}
-                                    inProgress={submitting}
-                                    disabled={!valid || !fileContent}
-                                />
-                                <Button color="default" onClick={onCancel} disabled={submitting}>
-                                    Cancel
-                                </Button>
-                            </ButtonGroup>
+                        <div className="flex gap-4 justify-center">
+                            <ProgressButton
+                                title={okButtonTitle}
+                                inProgressTitle={okButtonTitle}
+                                inProgress={submitting}
+                                disabled={!valid || !fileContent}
+                            />
+                            <Button color="secondary" type="outline" onClick={onCancel} disabled={submitting}>
+                                Cancel
+                            </Button>
                         </div>
                     </div>
                 </BootstrapForm>

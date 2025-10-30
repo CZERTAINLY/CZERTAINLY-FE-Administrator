@@ -276,20 +276,23 @@ function TokenProfileList() {
                     checkedRows.length > 1 ? 'a Token Profile' : 'Token Profiles'
                 }. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
             <Dialog
                 isOpen={keyUsageUpdate}
-                caption={`Update Key Usage`}
+                caption="Update Key Usage"
                 body={keyUsageBody}
                 toggle={() => setKeyUsageUpdate(false)}
+                size="md"
+                noBorder
                 buttons={[
                     { color: 'primary', onClick: onUpdateKeyUsageConfirmed, body: 'Update' },
-                    { color: 'secondary', onClick: () => setKeyUsageUpdate(false), body: 'Cancel' },
+                    { color: 'secondary', type: 'outline', onClick: () => setKeyUsageUpdate(false), body: 'Cancel' },
                 ]}
             />
         </>

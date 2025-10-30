@@ -205,9 +205,10 @@ const ApprovalProfileDetails = () => {
                 body="You are about to delete Approval Profile which may have associated Approval
                   Account(s). When deleted the Approval Account(s) will be revoked."
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
@@ -224,7 +225,12 @@ const ApprovalProfileDetails = () => {
                 }
                 toggle={() => dispatch(profileApprovalActions.clearDeleteErrorMessages())}
                 buttons={[
-                    { color: 'secondary', onClick: () => dispatch(profileApprovalActions.clearDeleteErrorMessages()), body: 'Cancel' },
+                    {
+                        color: 'secondary',
+                        type: 'outline',
+                        onClick: () => dispatch(profileApprovalActions.clearDeleteErrorMessages()),
+                        body: 'Cancel',
+                    },
                 ]}
             />
         </div>

@@ -56,7 +56,7 @@ export default function CodeBlock({ content }: Props) {
                     </pre>
                 }
                 toggle={() => setShowDialog(false)}
-                buttons={[{ color: 'secondary', onClick: () => setShowDialog(false), body: 'Cancel' }]}
+                buttons={[{ color: 'secondary', type: 'outline', onClick: () => setShowDialog(false), body: 'Cancel' }]}
             />
         </>
     );

@@ -539,7 +539,7 @@ function RolePermissionsEditor({
                 size="lg"
                 buttons={[
                     { disabled: objectsToAdd.length === 0, color: 'primary', onClick: () => addSelectedObjects(), body: 'Ok' },
-                    { color: 'secondary', onClick: () => setObjectListDialog(false), body: 'Close' },
+                    { color: 'secondary', type: 'outline', onClick: () => setObjectListDialog(false), body: 'Close' },
                 ]}
             />
         </>

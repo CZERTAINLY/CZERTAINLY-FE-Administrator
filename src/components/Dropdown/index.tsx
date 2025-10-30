@@ -28,7 +28,7 @@ function Dropdown({ title, items, disabled = false, btnStyle, className, hideArr
                 id="hs-dropdown-default"
                 type="button"
                 className={cn(
-                    'hs-dropdown-toggle py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg focus:outline-hidden disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 text-inherit',
+                    'hs-dropdown-toggle p-2 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg focus:outline-hidden disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 text-inherit',
                     {
                         'border border-gray-200 shadow-2xs bg-white text-gray-800 hover:bg-gray-50 focus:bg-gray-50':
                             btnStyle !== 'transparent',

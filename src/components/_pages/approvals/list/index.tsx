@@ -296,7 +296,7 @@ export default function ApprovalsList() {
                 toggle={() => setApproveApprovalDialogOpen(false)}
                 buttons={[
                     { color: 'primary', onClick: onApproveApprover, body: 'Yes, approve' },
-                    { color: 'secondary', onClick: () => setApproveApprovalDialogOpen(false), body: 'Cancel' },
+                    { color: 'secondary', type: 'outline', onClick: () => setApproveApprovalDialogOpen(false), body: 'Cancel' },
                 ]}
             />
 
@@ -307,7 +307,7 @@ export default function ApprovalsList() {
                 toggle={() => setRejectApprovalDialogOpen(false)}
                 buttons={[
                     { color: 'primary', onClick: onRejectApprover, body: 'Yes, reject' },
-                    { color: 'secondary', onClick: () => setRejectApprovalDialogOpen(false), body: 'Cancel' },
+                    { color: 'secondary', type: 'outline', onClick: () => setRejectApprovalDialogOpen(false), body: 'Cancel' },
                 ]}
             />
         </>

@@ -2264,9 +2264,10 @@ export default function CertificateDetail() {
                 caption="Delete Certificate"
                 body="You are about to delete a Certificate. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
@@ -2277,7 +2278,7 @@ export default function CertificateDetail() {
                 toggle={() => onCancelGroupUpdate()}
                 buttons={[
                     { color: 'primary', onClick: () => onUpdateGroup(), body: 'Update' },
-                    { color: 'secondary', onClick: () => onCancelGroupUpdate(), body: 'Cancel' },
+                    { color: 'secondary', type: 'outline', onClick: () => onCancelGroupUpdate(), body: 'Cancel' },
                 ]}
             />
 
@@ -2288,7 +2289,7 @@ export default function CertificateDetail() {
                 toggle={() => onCancelOwnerUpdate()}
                 buttons={[
                     { color: 'primary', onClick: onUpdateOwner, body: 'Update', disabled: true ? ownerUuid === undefined : false },
-                    { color: 'secondary', onClick: () => onCancelOwnerUpdate(), body: 'Cancel' },
+                    { color: 'secondary', type: 'outline', onClick: () => onCancelOwnerUpdate(), body: 'Cancel' },
                 ]}
             />
 
@@ -2299,7 +2300,7 @@ export default function CertificateDetail() {
                 toggle={() => onCancelRaProfileUpdate()}
                 buttons={[
                     { color: 'primary', onClick: onUpdateRaProfile, body: 'Update', disabled: true ? raProfile === undefined : false },
-                    { color: 'secondary', onClick: () => onCancelRaProfileUpdate(), body: 'Cancel' },
+                    { color: 'secondary', type: 'outline', onClick: () => onCancelRaProfileUpdate(), body: 'Cancel' },
                 ]}
             />
 
@@ -2333,7 +2334,7 @@ export default function CertificateDetail() {
                 toggle={() => setRevoke(false)}
                 buttons={[
                     { color: 'primary', onClick: onRevoke, body: 'Revoke' },
-                    { color: 'secondary', onClick: () => setRevoke(false), body: 'Cancel' },
+                    { color: 'secondary', type: 'outline', onClick: () => setRevoke(false), body: 'Cancel' },
                 ]}
             />
 
@@ -2419,9 +2420,10 @@ export default function CertificateDetail() {
                     </>
                 }
                 toggle={() => setConfirmDeleteRelatedCertificate(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: () => onDeleteRelatedCertificate(), body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDeleteRelatedCertificate(false), body: 'Cancel' },
+                    { color: 'danger', onClick: () => onDeleteRelatedCertificate(), body: 'Delete' },
+                    { color: 'secondary', type: 'outline', onClick: () => setConfirmDeleteRelatedCertificate(false), body: 'Cancel' },
                 ]}
             />
 
@@ -2521,7 +2523,7 @@ export default function CertificateDetail() {
                 toggle={() => setConfirmRemove(false)}
                 buttons={[
                     { color: 'primary', onClick: onRemove, body: 'Remove' },
-                    { color: 'secondary', onClick: () => setConfirmRemove(false), body: 'Cancel' },
+                    { color: 'secondary', type: 'outline', onClick: () => setConfirmRemove(false), body: 'Cancel' },
                 ]}
             />
         </Container>

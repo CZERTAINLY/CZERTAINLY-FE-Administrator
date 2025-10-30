@@ -1044,9 +1044,11 @@ export default function RaProfileDetail() {
                   authorizations from clients. If you continue, these authorizations
                   will be deleted as well. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
+                size="lg"
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
@@ -1071,7 +1073,7 @@ export default function RaProfileDetail() {
                 toggle={() => setConfirmDeactivateAcme(false)}
                 buttons={[
                     { color: 'danger', onClick: onDeactivateAcmeConfirmed, body: 'Yes, deactivate' },
-                    { color: 'secondary', onClick: () => setConfirmDeactivateAcme(false), body: 'Cancel' },
+                    { color: 'secondary', type: 'outline', onClick: () => setConfirmDeactivateAcme(false), body: 'Cancel' },
                 ]}
             />
 
@@ -1082,7 +1084,7 @@ export default function RaProfileDetail() {
                 toggle={() => setConfirmDeactivateCmp(false)}
                 buttons={[
                     { color: 'danger', onClick: onDeactivateCmpConfirmed, body: 'Yes, deactivate' },
-                    { color: 'secondary', onClick: () => setConfirmDeactivateCmp(false), body: 'Cancel' },
+                    { color: 'secondary', type: 'outline', onClick: () => setConfirmDeactivateCmp(false), body: 'Cancel' },
                 ]}
             />
 
@@ -1093,7 +1095,7 @@ export default function RaProfileDetail() {
                 toggle={() => setConfirmDeactivateScep(false)}
                 buttons={[
                     { color: 'danger', onClick: onDeactivateScepConfirmed, body: 'Yes, deactivate' },
-                    { color: 'secondary', onClick: () => setConfirmDeactivateScep(false), body: 'Cancel' },
+                    { color: 'secondary', type: 'outline', onClick: () => setConfirmDeactivateScep(false), body: 'Cancel' },
                 ]}
             />
 
@@ -1144,9 +1146,10 @@ export default function RaProfileDetail() {
                 caption={`Initiate Compliance Check`}
                 body={'Initiate the compliance check for the certificates with RA Profile?'}
                 toggle={() => setComplianceCheck(false)}
+                noBorder
                 buttons={[
                     { color: 'primary', onClick: onComplianceCheck, body: 'Yes' },
-                    { color: 'secondary', onClick: () => setComplianceCheck(false), body: 'Cancel' },
+                    { color: 'secondary', type: 'outline', onClick: () => setComplianceCheck(false), body: 'Cancel' },
                 ]}
             />
 
@@ -1202,7 +1205,12 @@ export default function RaProfileDetail() {
                                 : {},
                         body: 'Yes',
                     },
-                    { color: 'secondary', onClick: () => setConfirmDeassociateApprovalProfileDialog(undefined), body: 'Cancel' },
+                    {
+                        color: 'secondary',
+                        type: 'outline',
+                        onClick: () => setConfirmDeassociateApprovalProfileDialog(undefined),
+                        body: 'Cancel',
+                    },
                 ]}
             />
         </div>

@@ -227,9 +227,10 @@ export default function AdministratorsList() {
                 } which may have associated RA
                    Profiles(s). Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
                 dataTestId="delete-compliance-profile-dialog"
             />
@@ -241,7 +242,7 @@ export default function AdministratorsList() {
                 toggle={() => setConfirmForceDelete(false)}
                 buttons={[
                     { color: 'danger', onClick: onForceDeleteConfirmed, body: 'Force delete' },
-                    { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
+                    { color: 'secondary', type: 'outline', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
                 ]}
                 dataTestId="force-delete-compliance-profile-dialog"
             />
@@ -251,9 +252,10 @@ export default function AdministratorsList() {
                 caption={`Initiate Compliance Check`}
                 body={'Initiate the compliance check for the selected Compliance Profile(s)?'}
                 toggle={() => setComplianceCheck(false)}
+                noBorder
                 buttons={[
                     { color: 'primary', onClick: onComplianceCheckConfirmed, body: 'Yes' },
-                    { color: 'secondary', onClick: () => setComplianceCheck(false), body: 'Cancel' },
+                    { color: 'secondary', type: 'outline', onClick: () => setComplianceCheck(false), body: 'Cancel' },
                 ]}
                 dataTestId="compliance-check-dialog"
             />

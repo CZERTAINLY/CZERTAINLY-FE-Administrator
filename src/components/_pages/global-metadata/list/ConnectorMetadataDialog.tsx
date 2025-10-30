@@ -120,7 +120,7 @@ export default function ConnectorMetadataDialog({ show, setShow }: Props) {
                 </>
             }
             toggle={() => setShow(false)}
-            buttons={[{ color: 'secondary', onClick: () => setShow(false), body: 'Cancel' }]}
+            buttons={[{ color: 'secondary', type: 'outline', onClick: () => setShow(false), body: 'Cancel' }]}
         />
     );
 }

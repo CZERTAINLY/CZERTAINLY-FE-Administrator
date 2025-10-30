@@ -358,9 +358,10 @@ export default function AdministratorDetail() {
                     caption="Delete CMP Profile"
                     body="You are about to delete CMP Profile. Is this what you want to do?"
                     toggle={() => setConfirmDelete(false)}
+                    icon="delete"
                     buttons={[
-                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                        { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                        { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                     ]}
                 />
 
@@ -378,7 +379,12 @@ export default function AdministratorDetail() {
                     toggle={() => dispatch(actions.clearDeleteErrorMessages())}
                     buttons={[
                         { color: 'danger', onClick: onForceDeleteCmpProfile, body: 'Force' },
-                        { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
+                        {
+                            color: 'secondary',
+                            type: 'outline',
+                            onClick: () => dispatch(actions.clearDeleteErrorMessages()),
+                            body: 'Cancel',
+                        },
                     ]}
                 />
             </Container>

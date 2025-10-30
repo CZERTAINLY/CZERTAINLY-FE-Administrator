@@ -4,7 +4,7 @@ import Spinner from 'components/Spinner';
 
 interface Props {
     disabled?: boolean;
-    inProgress: boolean;
+    inProgress: boolean | undefined;
     title: string;
     inProgressTitle?: string;
     color?: ButtonColor;
@@ -13,7 +13,15 @@ interface Props {
     onClick?: () => void;
 }
 
-function ProgressButton({ inProgress, title, inProgressTitle = title, disabled = false, color = 'blue', type = 'submit', onClick }: Props) {
+function ProgressButton({
+    inProgress,
+    title,
+    inProgressTitle = title,
+    disabled = false,
+    color = 'primary',
+    type = 'submit',
+    onClick,
+}: Props) {
     return (
         <Button color={color} disabled={disabled || inProgress} onClick={onClick} className={cn('relative', { 'opacity-50': inProgress })}>
             {inProgress ? (

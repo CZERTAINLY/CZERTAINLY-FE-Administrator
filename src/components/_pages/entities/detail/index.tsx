@@ -133,9 +133,10 @@ export default function EntityDetail() {
                     caption="Delete Entity"
                     body="You are about to delete Entity. Is this what you want to do?"
                     toggle={() => setConfirmDelete(false)}
+                    icon="delete"
                     buttons={[
-                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                        { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                        { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                     ]}
                 />
             </Container>

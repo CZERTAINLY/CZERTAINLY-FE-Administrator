@@ -430,9 +430,10 @@ export default function ComplianceProfileDetail() {
                 caption="Delete Compliance Profile"
                 body="You are about to delete a Compliance Profile. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
                 dataTestId="delete-confirmation-dialog"
             />
@@ -441,9 +442,10 @@ export default function ComplianceProfileDetail() {
                 caption={`Initiate Compliance Check`}
                 body={'Initiate the compliance check for the Compliance Profile?'}
                 toggle={() => setComplianceCheck(false)}
+                noBorder
                 buttons={[
                     { color: 'primary', onClick: onComplianceCheck, body: 'Yes' },
-                    { color: 'secondary', onClick: () => setComplianceCheck(false), body: 'Cancel' },
+                    { color: 'secondary', type: 'outline', onClick: () => setComplianceCheck(false), body: 'Cancel' },
                 ]}
                 dataTestId="compliance-check-dialog"
             />
@@ -491,7 +493,7 @@ export default function ComplianceProfileDetail() {
                 toggle={() => dispatch(actions.clearDeleteErrorMessages())}
                 buttons={[
                     { color: 'danger', onClick: onForceDeleteComplianceProfile, body: 'Force' },
-                    { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
+                    { color: 'secondary', type: 'outline', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
                 ]}
                 dataTestId="delete-error-dialog"
             />

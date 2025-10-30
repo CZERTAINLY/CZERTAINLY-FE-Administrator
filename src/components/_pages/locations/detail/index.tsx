@@ -560,9 +560,10 @@ export default function LocationDetail() {
                     caption="Delete Location"
                     body="You are about to delete Location. Is this what you want to do?"
                     toggle={() => setConfirmDelete(false)}
+                    icon="delete"
                     buttons={[
-                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                        { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                        { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                     ]}
                 />
                 <Dialog
@@ -591,7 +592,7 @@ export default function LocationDetail() {
                     toggle={() => setConfirmRemoveDialog(false)}
                     buttons={[
                         { color: 'danger', onClick: onRemoveConfirmed, body: 'Yes, remove' },
-                        { color: 'secondary', onClick: () => setConfirmRemoveDialog(false), body: 'Cancel' },
+                        { color: 'secondary', type: 'outline', onClick: () => setConfirmRemoveDialog(false), body: 'Cancel' },
                     ]}
                 />
                 <Dialog

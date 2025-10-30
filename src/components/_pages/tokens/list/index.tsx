@@ -196,9 +196,10 @@ function TokenList() {
                 caption={`Delete ${checkedRows.length > 1 ? 'Tokens' : 'a Token'}`}
                 body={`You are about to delete ${checkedRows.length > 1 ? 'Tokens' : 'a Token'}. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
@@ -210,7 +211,7 @@ function TokenList() {
                 toggle={() => setConfirmDeactivation(false)}
                 buttons={[
                     { color: 'danger', onClick: onDeactivationConfirmed, body: 'Deactivate' },
-                    { color: 'secondary', onClick: () => setConfirmDeactivation(false), body: 'Cancel' },
+                    { color: 'secondary', type: 'outline', onClick: () => setConfirmDeactivation(false), body: 'Cancel' },
                 ]}
             />
 

@@ -246,9 +246,10 @@ export default function TokenDetail() {
                     body="You are about to delete Token. If you continue, objects
                   related to the token will fail. Is this what you want to do?"
                     toggle={() => setConfirmDelete(false)}
+                    icon="delete"
                     buttons={[
-                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                        { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                        { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                     ]}
                 />
 
@@ -260,7 +261,7 @@ export default function TokenDetail() {
                     toggle={() => setConfirmDeactivation(false)}
                     buttons={[
                         { color: 'danger', onClick: onDeactivationConfirmed, body: 'Deactivate' },
-                        { color: 'secondary', onClick: () => setConfirmDeactivation(false), body: 'Cancel' },
+                        { color: 'secondary', type: 'outline', onClick: () => setConfirmDeactivation(false), body: 'Cancel' },
                     ]}
                 />
 

@@ -403,9 +403,10 @@ export default function ScepProfileDetail() {
                     body="You are about to delete SCEP Profile which may have associated SCEP
                   Account(s). When deleted the SCEP Account(s) will be revoked."
                     toggle={() => setConfirmDelete(false)}
+                    icon="delete"
                     buttons={[
-                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                        { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                        { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                     ]}
                 />
 
@@ -423,7 +424,12 @@ export default function ScepProfileDetail() {
                     toggle={() => dispatch(actions.clearDeleteErrorMessages())}
                     buttons={[
                         { color: 'danger', onClick: onForceDeleteScepProfile, body: 'Force' },
-                        { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
+                        {
+                            color: 'secondary',
+                            type: 'outline',
+                            onClick: () => dispatch(actions.clearDeleteErrorMessages()),
+                            body: 'Cancel',
+                        },
                     ]}
                 />
             </Container>
