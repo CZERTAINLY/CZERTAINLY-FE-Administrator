@@ -1,80 +1,92 @@
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { actions, selectors } from 'ducks/notifications';
 
 import { ArrowRight, Bell, Check } from 'lucide-react';
-import Dropdown, { DropdownItem } from 'components/Dropdown';
-import { useNavigate } from 'react-router';
+import Dropdown from 'components/Dropdown';
+import { useNavigate, Link } from 'react-router';
 import Button from 'components/Button';
-// import { LockWidgetNameEnum } from 'types/user-interface';
+import { LockWidgetNameEnum } from 'types/user-interface';
 import { formatTimeAgo } from 'utils/dateUtil';
+import Widget from 'components/Widget';
 
 function NotificationsOverview() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-
+    const dropdownRef = useRef<HTMLButtonElement>(null);
     const overviewNotifications = useSelector(selectors.overviewNotifications);
-    // TODO: Add a loading state
-    // const isFetchingOverview = useSelector(selectors.isFetchingOverview);
 
-    const notificationsList: DropdownItem[] = useMemo(
+    const isFetchingOverview = useSelector(selectors.isFetchingOverview);
+
+    const notificationsList: React.ReactNode = useMemo(
         () =>
             overviewNotifications.length === 0
-                ? [
-                      {
-                          title: 'No unread notifications',
-                          onClick: () => {},
-                      },
-                  ]
-                : overviewNotifications.map((notification) => ({
-                      title: (
-                          <div className="flex items-center gap-2" key={notification.uuid}>
-                              <Button onClick={() => dispatch(actions.markAsReadNotification({ uuid: notification.uuid }))}>
-                                  <Check size={18} />
+                ? 'No unread notifications'
+                : overviewNotifications.map((notification, index) => (
+                      <>
+                          <div className="flex items-start gap-1 mb-2" key={notification.uuid}>
+                              <Button
+                                  variant="transparent"
+                                  onClick={() => dispatch(actions.markAsReadNotification({ uuid: notification.uuid }))}
+                              >
+                                  <Check size={16} />
                               </Button>
-                              <div className="flex flex-col">
-                                  <span className="text-sm font-medium">{notification.message}</span>
-                                  <span className="text-xs text-gray-500">{formatTimeAgo(notification.sentAt)}</span>
+                              <div className="">
+                                  <span className="text-sm leading-[16px] font-medium text-gray-800 mr-2">{notification.message}</span>
+                                  <span className="text-xs leading-[16px] text-gray-500 mr-2">{formatTimeAgo(notification.sentAt)}</span>
                                   <Button
+                                      color="secondary"
+                                      className="!rounded-full !p-0.5 relative top-[1px]"
                                       onClick={() => {
                                           navigate(
                                               `/${notification.targetObjectType}/detail/${notification.targetObjectIdentification?.reduce(
                                                   (prev, curr) => prev + '/' + curr,
                                               )}`,
                                           );
+                                          dropdownRef.current?.click();
                                       }}
                                   >
-                                      <ArrowRight size={18} />
+                                      <ArrowRight size={10} strokeWidth={3} />
                                   </Button>
                               </div>
                           </div>
-                      ),
-                      onClick: () => {},
-                  })),
+                          {index < overviewNotifications.length - 1 && <hr className="border-gray-200 mb-2" />}
+                      </>
+                  )),
         [overviewNotifications, dispatch, navigate],
     );
 
     return (
         <Dropdown
             title={
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 text-white">
                     <Bell size={24} />
                     <span className="sr-only">Notifications</span>
                 </div>
             }
             btnStyle="transparent"
-            className="text-white"
-            items={[
-                ...notificationsList,
-                {
-                    title: 'View all notifications',
-                    onClick: () => {
-                        navigate('/notifications');
-                    },
-                },
-            ]}
+            menuClassName="max-w-[360px]"
+            menu={
+                <Widget
+                    busy={isFetchingOverview}
+                    widgetLockName={LockWidgetNameEnum.NotificationsOverview}
+                    className="!p-0"
+                    noBorder
+                    hideWidgetButtons={true}
+                >
+                    <div className="max-h-[360px] overflow-y-auto">{notificationsList}</div>
+                    <div className="sticky bottom-0 bg-white pt-2 border-t border-gray-200">
+                        <Link to="/notifications" className="w-full" onClick={() => dropdownRef.current?.click()}>
+                            <Button color="secondary" className="w-full justify-center">
+                                View all notifications
+                            </Button>
+                        </Link>
+                    </div>
+                </Widget>
+            }
             hideArrow
+            buttonRef={dropdownRef}
         />
     );
 }

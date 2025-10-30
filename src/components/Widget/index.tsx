@@ -110,9 +110,13 @@ function Widget({
     return (
         <section
             data-testid={dataTestId}
-            className={cx('relative flex flex-col bg-white shadow-2xs rounded-xl dark:bg-neutral-900 dark:text-neutral-400', className, {
-                'border border-gray-200 dark:border-neutral-700 p-4 md:p-5': !noBorder,
-            })}
+            className={cx(
+                'relative flex flex-col bg-white shadow-2xs rounded-xl dark:bg-neutral-900 dark:text-neutral-400',
+                {
+                    'border border-gray-200 dark:border-neutral-700 p-4 md:p-5': !noBorder,
+                },
+                className,
+            )}
             id={id}
         >
             <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
