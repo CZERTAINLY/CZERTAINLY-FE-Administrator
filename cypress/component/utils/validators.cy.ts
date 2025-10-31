@@ -14,6 +14,7 @@ import {
     validatePattern,
     validateLength,
     validateQuartzCronExpression,
+    validatePostgresPosixRegex,
 } from '../../../src/utils/validators';
 
 describe('Validator Functions', () => {
@@ -310,6 +311,300 @@ describe('Validator Functions', () => {
             expectToFail(validator('invalid cron'));
             expectToFail(validator('* * *'));
             expectToFail(validator('60 24 0 0 0 0'));
+        });
+    });
+
+    describe('validatePostgresPosixRegex', () => {
+        describe('Basic syntax validation', () => {
+            it('should pass for empty string', () => {
+                expect(validatePostgresPosixRegex('')).to.equal('');
+            });
+
+            it('should pass for simple valid regex patterns', () => {
+                expect(validatePostgresPosixRegex('abc')).to.equal('');
+                expect(validatePostgresPosixRegex('[a-z]+')).to.equal('');
+                expect(validatePostgresPosixRegex('\\d+')).to.equal('');
+                expect(validatePostgresPosixRegex('test.*pattern')).to.equal('');
+            });
+
+            it('should detect gross syntax errors', () => {
+                const result = validatePostgresPosixRegex('test\\');
+                expect(result).to.include('Invalid regex pattern');
+            });
+        });
+
+        describe('Forbidden PCRE/JS tokens', () => {
+            it('should reject positive lookahead (?=)', () => {
+                const result = validatePostgresPosixRegex('test(?=pattern)');
+                expect(result).to.include('Unsupported regex token for PostgreSQL POSIX');
+                expect(result).to.include('(?=');
+            });
+
+            it('should reject negative lookahead (?!)', () => {
+                const result = validatePostgresPosixRegex('test(?!pattern)');
+                expect(result).to.include('Unsupported regex token for PostgreSQL POSIX');
+                expect(result).to.include('(?!');
+            });
+
+            it('should reject non-capturing group (?:)', () => {
+                const result = validatePostgresPosixRegex('(?:test)');
+                expect(result).to.include('Unsupported regex token for PostgreSQL POSIX');
+                expect(result).to.include('(?:');
+            });
+
+            it('should reject inline modifiers (?i)', () => {
+                const result = validatePostgresPosixRegex('(?i)test');
+                expect(result).to.be.a('string');
+                expect(result.length).to.be.greaterThan(0);
+            });
+
+            it('should reject atomic groups (?>)', () => {
+                const result = validatePostgresPosixRegex('(?>test)');
+                expect(result).to.be.a('string');
+                expect(result.length).to.be.greaterThan(0);
+            });
+
+            it('should reject named capture groups (?P<)', () => {
+                const result = validatePostgresPosixRegex('(?P<name>test)');
+                expect(result).to.be.a('string');
+                expect(result.length).to.be.greaterThan(0);
+            });
+
+            it('should reject Unicode property escapes \\p{', () => {
+                const result = validatePostgresPosixRegex('\\p{Letter}');
+                expect(result).to.include('Unsupported regex token for PostgreSQL POSIX');
+                expect(result).to.include('\\p{');
+            });
+
+            it('should allow escaped forbidden tokens', () => {
+                expect(validatePostgresPosixRegex('\\\\Q')).to.equal('');
+                expect(validatePostgresPosixRegex('\\(\\?\\=')).to.equal('');
+            });
+        });
+
+        describe('Single backslash validation', () => {
+            it('should reject forbidden single backslash sequences', () => {
+                const result = validatePostgresPosixRegex('\\Q');
+                expect(result).to.include('Unsupported');
+                expect(result).to.include('\\Q');
+            });
+
+            it('should reject \\u escape', () => {
+                const result = validatePostgresPosixRegex('\\u0041');
+                expect(result).to.include('Unsupported escape sequence');
+                expect(result).to.include('\\u');
+            });
+
+            it('should reject \\x escape (when single backslash)', () => {
+                const result = validatePostgresPosixRegex('\\xAB');
+                expect(result).to.include('Unsupported escape sequence');
+                expect(result).to.include('\\x');
+            });
+
+            it('should reject \\K escape (single backslash)', () => {
+                const result = validatePostgresPosixRegex('test\\K');
+                expect(result).to.include('Unsupported');
+                expect(result).to.include('\\K');
+            });
+
+            it('should allow double backslash before forbidden characters', () => {
+                expect(validatePostgresPosixRegex('\\\\Q')).to.equal('');
+                expect(validatePostgresPosixRegex('\\\\u0041')).to.equal('');
+                expect(validatePostgresPosixRegex('\\\\x41')).to.equal('');
+            });
+
+            it('should allow common POSIX escapes', () => {
+                expect(validatePostgresPosixRegex('\\d')).to.equal('');
+                expect(validatePostgresPosixRegex('\\w')).to.equal('');
+                expect(validatePostgresPosixRegex('\\s')).to.equal('');
+                expect(validatePostgresPosixRegex('\\n')).to.equal('');
+                expect(validatePostgresPosixRegex('\\t')).to.equal('');
+            });
+        });
+
+        describe('Structural checks - Parentheses', () => {
+            it('should pass for balanced parentheses', () => {
+                expect(validatePostgresPosixRegex('(test)')).to.equal('');
+                expect(validatePostgresPosixRegex('((test))')).to.equal('');
+                expect(validatePostgresPosixRegex('(a)(b)')).to.equal('');
+            });
+
+            it('should reject unbalanced opening parenthesis', () => {
+                const result = validatePostgresPosixRegex('(test');
+                expect(result).to.include('Invalid regex pattern');
+            });
+
+            it('should reject unbalanced closing parenthesis', () => {
+                const result = validatePostgresPosixRegex('test)');
+                expect(result).to.include('Invalid regex pattern');
+            });
+
+            it('should ignore escaped parentheses', () => {
+                expect(validatePostgresPosixRegex('\\(test\\)')).to.equal('');
+            });
+        });
+
+        describe('Structural checks - Brackets', () => {
+            it('should pass for balanced brackets', () => {
+                expect(validatePostgresPosixRegex('[abc]')).to.equal('');
+                expect(validatePostgresPosixRegex('[a-z]')).to.equal('');
+                expect(validatePostgresPosixRegex('[^abc]')).to.equal('');
+            });
+
+            it('should reject unterminated character class', () => {
+                const result = validatePostgresPosixRegex('[abc');
+                expect(result).to.include('Invalid regex pattern');
+            });
+
+            it('should allow nested brackets for POSIX classes', () => {
+                expect(validatePostgresPosixRegex('[[:alpha:]]')).to.equal('');
+            });
+        });
+
+        describe('POSIX character classes', () => {
+            it('should pass for valid POSIX classes', () => {
+                expect(validatePostgresPosixRegex('[[:alnum:]]')).to.equal('');
+                expect(validatePostgresPosixRegex('[[:alpha:]]')).to.equal('');
+                expect(validatePostgresPosixRegex('[[:digit:]]')).to.equal('');
+                expect(validatePostgresPosixRegex('[[:lower:]]')).to.equal('');
+                expect(validatePostgresPosixRegex('[[:upper:]]')).to.equal('');
+                expect(validatePostgresPosixRegex('[[:space:]]')).to.equal('');
+                expect(validatePostgresPosixRegex('[[:punct:]]')).to.equal('');
+                expect(validatePostgresPosixRegex('[[:xdigit:]]')).to.equal('');
+            });
+
+            it('should reject unknown POSIX classes', () => {
+                const result = validatePostgresPosixRegex('[[:invalid:]]');
+                expect(result).to.include('Unknown POSIX class');
+                expect(result).to.include('invalid');
+            });
+
+            it('should reject unterminated POSIX class', () => {
+                const result = validatePostgresPosixRegex('[[:alpha]');
+                expect(result).to.include('Unterminated POSIX character class');
+            });
+
+            it('should allow POSIX classes combined with other characters', () => {
+                expect(validatePostgresPosixRegex('[[:alpha:]0-9]')).to.equal('');
+            });
+        });
+
+        describe('Quantifiers', () => {
+            it('should pass for valid exact quantifiers {m}', () => {
+                expect(validatePostgresPosixRegex('a{3}')).to.equal('');
+                expect(validatePostgresPosixRegex('test{10}')).to.equal('');
+            });
+
+            it('should pass for valid min quantifiers {m,}', () => {
+                expect(validatePostgresPosixRegex('a{3,}')).to.equal('');
+                expect(validatePostgresPosixRegex('test{1,}')).to.equal('');
+            });
+
+            it('should pass for valid range quantifiers {m,n}', () => {
+                expect(validatePostgresPosixRegex('a{3,5}')).to.equal('');
+                expect(validatePostgresPosixRegex('test{1,10}')).to.equal('');
+            });
+
+            it('should reject unterminated quantifiers', () => {
+                const result = validatePostgresPosixRegex('a{3');
+                expect(result).to.include('Unterminated quantifier');
+            });
+
+            it('should reject unterminated quantifier without closing brace', () => {
+                const result = validatePostgresPosixRegex('a{2');
+                // May be caught by parse() or our custom check
+                expect(result).to.be.a('string');
+                expect(result.length).to.be.greaterThan(0);
+            });
+
+            it('should reject invalid quantifier format', () => {
+                const result = validatePostgresPosixRegex('a{a}');
+                expect(result).to.include('Invalid quantifier');
+            });
+
+            it('should reject invalid range where m > n', () => {
+                const result = validatePostgresPosixRegex('a{5,3}');
+                expect(result).to.include('Invalid regex pattern');
+            });
+
+            it('should allow quantifiers in character classes', () => {
+                expect(validatePostgresPosixRegex('[a-z]{2,4}')).to.equal('');
+            });
+        });
+
+        describe('Backreferences', () => {
+            it('should pass for valid backreferences', () => {
+                expect(validatePostgresPosixRegex('(test)\\1')).to.equal('');
+                expect(validatePostgresPosixRegex('(a)(b)\\1\\2')).to.equal('');
+            });
+
+            it('should reject backreferences to non-existent groups', () => {
+                const result = validatePostgresPosixRegex('test\\1');
+                expect(result).to.include('Backreference');
+                expect(result).to.include('non-existent capturing group');
+            });
+
+            it('should reject backreference beyond available groups', () => {
+                const result = validatePostgresPosixRegex('(test)\\2');
+                expect(result).to.include('Backreference');
+                expect(result).to.include('non-existent capturing group');
+            });
+
+            it('should allow escaped digits', () => {
+                expect(validatePostgresPosixRegex('\\\\1')).to.equal('');
+            });
+        });
+
+        describe('Complex valid patterns', () => {
+            it('should pass for email-like patterns', () => {
+                expect(validatePostgresPosixRegex('[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}')).to.equal('');
+            });
+
+            it('should pass for phone number patterns', () => {
+                expect(validatePostgresPosixRegex('^\\d{3}-\\d{3}-\\d{4}$')).to.equal('');
+            });
+
+            it('should pass for alphanumeric validation', () => {
+                expect(validatePostgresPosixRegex('^[a-zA-Z0-9]+$')).to.equal('');
+            });
+
+            it('should pass for word boundaries', () => {
+                expect(validatePostgresPosixRegex('\\bword\\b')).to.equal('');
+            });
+
+            it('should pass for multiple groups with backreferences', () => {
+                expect(validatePostgresPosixRegex('(.)(.)(.)\\1\\2\\3')).to.equal('');
+            });
+
+            it('should pass for escaped forbidden characters', () => {
+                expect(validatePostgresPosixRegex('something\\\\Q')).to.equal('');
+            });
+
+            it('should pass for complex JSON-like pattern', () => {
+                expect(validatePostgresPosixRegex('"dNSName"\\s*:\\s*\\[[^\\]]*"\\s*3key\\.company\\s*"[^]]*\\]')).to.equal('');
+            });
+        });
+
+        describe('Edge cases', () => {
+            it('should handle multiple errors by returning the first one', () => {
+                const result = validatePostgresPosixRegex('(test(?=lookahead)');
+                expect(result).to.be.a('string');
+                expect(result.length).to.be.greaterThan(0);
+            });
+
+            it('should handle mixed valid and invalid patterns', () => {
+                const result = validatePostgresPosixRegex('valid.*\\Kinvalid');
+                expect(result).to.include('Unsupported');
+            });
+
+            it('should handle escaped backslashes correctly', () => {
+                expect(validatePostgresPosixRegex('\\\\')).to.equal('');
+                expect(validatePostgresPosixRegex('\\\\\\\\')).to.equal('');
+            });
+
+            it('should handle literal braces not used as quantifiers', () => {
+                expect(validatePostgresPosixRegex('\\{test\\}')).to.equal('');
+            });
         });
     });
 });
