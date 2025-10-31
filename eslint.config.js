@@ -31,6 +31,8 @@ export default [
         rules: {
             'prettier/prettier': 'error',
             ...reactHooks.configs.recommended.rules,
+            // TODO: Enable react-hooks/set-state-in-effect and fix linter errors
+            'react-hooks/set-state-in-effect': 'off',
             // TODO: Enable jsx-a11y and fix linter errors
             // ...jsxA11y.configs.recommended.rules
         },

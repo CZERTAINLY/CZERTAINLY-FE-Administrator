@@ -18,7 +18,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 import Select from 'react-select';
 
-import { Badge, Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, FormText, Input, Label } from 'reactstrap';
+import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, FormText, Input, Label } from 'reactstrap';
+import Badge from 'components/Badge';
 import { UserDetailModel } from 'types/auth';
 import { CertificateDetailResponseModel, CertificateListResponseModel } from 'types/certificate';
 
@@ -82,8 +83,6 @@ function UserForm() {
     const [user, setUser] = useState<UserDetailModel>();
 
     const [userRoles, setUserRoles] = useState<string[]>([]);
-
-    const [optionsForCertificate, setOptionsForCertificate] = useState<{ label: string; value: string }[]>([]);
 
     const isBusy = useMemo(
         () =>
@@ -228,10 +227,10 @@ function UserForm() {
         setCurrentPage(currentPage + 1);
     }, [certificates, currentPage, loadedCerts]);
 
-    /* Update cert list */
+    /* Compute cert options from loaded certs */
 
-    useEffect(() => {
-        setOptionsForCertificate(
+    const optionsForCertificate = useMemo(
+        () =>
             loadedCerts
                 .filter((e) => e.state !== CertStatus.Requested)
                 .map((loadedCert) => ({
@@ -241,8 +240,8 @@ function UserForm() {
                             : `( ${loadedCert.commonName} ) ( empty )`,
                     value: loadedCert.uuid,
                 })),
-        );
-    }, [loadedCerts]);
+        [loadedCerts],
+    );
 
     const onSubmit = useCallback(
         (values: FormValues) => {

@@ -90,7 +90,7 @@ const ComplianceProfileDetailsTest = () => {
                     toggle={() => setComplianceCheck(false)}
                     buttons={[
                         { color: 'primary', onClick: () => setComplianceCheck(false), body: 'Yes' },
-                        { color: 'secondary', onClick: () => setComplianceCheck(false), body: 'Cancel' },
+                        { color: 'secondary', type: 'outline', onClick: () => setComplianceCheck(false), body: 'Cancel' },
                     ]}
                 />
                 <Dialog
@@ -100,7 +100,7 @@ const ComplianceProfileDetailsTest = () => {
                     toggle={() => setConfirmDelete(false)}
                     buttons={[
                         { color: 'danger', onClick: () => console.log('Delete compliance profile'), body: 'Yes, delete' },
-                        { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                        { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                     ]}
                 />
             </MockRouter>
@@ -168,7 +168,7 @@ const ComplianceProfileDetailsWithAssociationsTest = () => {
                             },
                             body: 'Yes, delete',
                         },
-                        { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                        { color: 'secondary', type: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                     ]}
                 />
                 <Dialog
@@ -185,7 +185,7 @@ const ComplianceProfileDetailsWithAssociationsTest = () => {
                     toggle={() => setDeleteErrorMessage('')}
                     buttons={[
                         { color: 'danger', onClick: () => setDeleteErrorMessage(''), body: 'Force' },
-                        { color: 'secondary', onClick: () => setDeleteErrorMessage(''), body: 'Cancel' },
+                        { color: 'secondary', type: 'outline', onClick: () => setDeleteErrorMessage(''), body: 'Cancel' },
                     ]}
                 />
             </MockRouter>

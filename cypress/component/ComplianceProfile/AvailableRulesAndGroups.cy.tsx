@@ -63,7 +63,7 @@ const AvailableRulesAndGroups2 = () => {
                         </>
                     }
                     toggle={() => setIsEntityDetailMenuOpen(false)}
-                    buttons={[{ color: 'secondary', onClick: () => setIsEntityDetailMenuOpen(false), body: 'Close' }]}
+                    buttons={[{ color: 'secondary', type: 'outline', onClick: () => setIsEntityDetailMenuOpen(false), body: 'Close' }]}
                 />
             )}
         </>

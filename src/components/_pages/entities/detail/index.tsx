@@ -10,13 +10,14 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router';
 
-import { Container, Label } from 'reactstrap';
+import { Label } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { PlatformEnum, Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import { getEditAndDeleteWidgetButtons, createWidgetDetailHeaders } from 'utils/widget';
-import GoBackButton from 'components/GoBackButton';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import Container from 'components/Container';
+import Breadcrumb from 'components/Breadcrumb';
 
 export default function EntityDetail() {
     const dispatch = useDispatch();
@@ -96,45 +97,49 @@ export default function EntityDetail() {
     );
 
     return (
-        <Container className="themed-container" fluid>
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                forcedPath="/entities"
-                text={`${getEnumLabel(resourceEnum, Resource.Entities)} Inventory`}
-            />
-            <Widget
-                title="Entity Details"
-                busy={isBusy}
-                widgetButtons={buttons}
-                titleSize="large"
-                refreshAction={getFreshEntityDetails}
-                widgetLockName={LockWidgetNameEnum.EntityDetails}
-            >
-                <br />
-
-                <CustomTable headers={detailHeaders} data={detailData} />
-            </Widget>
-
-            <Widget title="Attributes" titleSize="large">
-                <br />
-                <Label>Entity Attributes</Label>
-                <AttributeViewer attributes={entity?.attributes} />
-            </Widget>
-
-            {entity && (
-                <CustomAttributeWidget resource={Resource.Entities} resourceUuid={entity.uuid} attributes={entity.customAttributes} />
-            )}
-
-            <Dialog
-                isOpen={confirmDelete}
-                caption="Delete Entity"
-                body="You are about to delete Entity. Is this what you want to do?"
-                toggle={() => setConfirmDelete(false)}
-                buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+        <div>
+            <Breadcrumb
+                items={[
+                    { label: `${getEnumLabel(resourceEnum, Resource.Entities)} Inventory`, href: '/entities' },
+                    { label: entity?.name || 'Entity Details', href: '' },
                 ]}
             />
-        </Container>
+            <Container>
+                <Widget
+                    title="Entity Details"
+                    busy={isBusy}
+                    widgetButtons={buttons}
+                    titleSize="large"
+                    refreshAction={getFreshEntityDetails}
+                    widgetLockName={LockWidgetNameEnum.EntityDetails}
+                >
+                    <br />
+
+                    <CustomTable headers={detailHeaders} data={detailData} />
+                </Widget>
+
+                <Widget title="Attributes" titleSize="large">
+                    <br />
+                    <Label>Entity Attributes</Label>
+                    <AttributeViewer attributes={entity?.attributes} />
+                </Widget>
+
+                {entity && (
+                    <CustomAttributeWidget resource={Resource.Entities} resourceUuid={entity.uuid} attributes={entity.customAttributes} />
+                )}
+
+                <Dialog
+                    isOpen={confirmDelete}
+                    caption="Delete Entity"
+                    body="You are about to delete Entity. Is this what you want to do?"
+                    toggle={() => setConfirmDelete(false)}
+                    icon="delete"
+                    buttons={[
+                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                        { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    ]}
+                />
+            </Container>
+        </div>
     );
 }

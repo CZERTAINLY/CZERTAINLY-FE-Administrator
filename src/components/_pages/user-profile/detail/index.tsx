@@ -2,8 +2,6 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 
-import { Container } from 'reactstrap';
-
 import { actions, selectors } from 'ducks/auth';
 
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
@@ -72,10 +70,8 @@ export default function UserProfileDetail() {
     );
 
     return (
-        <Container className="themed-container" fluid>
-            <Widget title="User Details" busy={isFetchingDetail} widgetButtons={buttons} titleSize="large">
-                <CustomTable headers={detailHeaders} data={detailData} />
-            </Widget>
-        </Container>
+        <Widget title="User Details" busy={isFetchingDetail} widgetButtons={buttons} titleSize="large">
+            <CustomTable headers={detailHeaders} data={detailData} />
+        </Widget>
     );
 }

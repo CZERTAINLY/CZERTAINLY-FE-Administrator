@@ -228,7 +228,7 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
                   }
                 : null,
         }),
-        [certificate?.key, certificate?.altKey],
+        [certificate],
     );
 
     useEffect(() => {

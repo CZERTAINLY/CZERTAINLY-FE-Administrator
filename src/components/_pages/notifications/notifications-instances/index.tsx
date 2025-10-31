@@ -6,7 +6,7 @@ import { actions as notificationsActions, selectors as notificationsSelectors } 
 import { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
-import { Badge } from 'reactstrap';
+import Badge from 'components/Badge';
 import { LockWidgetNameEnum } from 'types/user-interface';
 
 const NotificationInstanceList = () => {
@@ -120,7 +120,6 @@ const NotificationInstanceList = () => {
                 widgetButtons={buttons}
                 widgetLockName={LockWidgetNameEnum.NotificationStore}
             >
-                <br />
                 <CustomTable
                     checkedRows={checkedRows}
                     hasCheckboxes
@@ -141,9 +140,10 @@ const NotificationInstanceList = () => {
                 caption={`Delete a Notification Instance`}
                 body={`You are about to delete a Notification Instance. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
         </>

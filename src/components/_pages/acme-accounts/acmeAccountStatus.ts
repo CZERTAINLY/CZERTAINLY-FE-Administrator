@@ -1,4 +1,6 @@
-export function acmeAccountStatus(status: string) {
+import { BadgeColor } from 'components/Badge';
+
+export function acmeAccountStatus(status: string): [string, BadgeColor] {
     switch (status) {
         case 'valid':
             return ['Valid', 'success'];
@@ -7,9 +9,9 @@ export function acmeAccountStatus(status: string) {
             return ['Deactivated', 'danger'];
 
         case 'revoked':
-            return ['Revoked', 'dark'];
+            return ['Revoked', 'gray'];
 
         default:
-            return [status || 'Unknown', 'dark'];
+            return [status || 'Unknown', 'gray'];
     }
 }

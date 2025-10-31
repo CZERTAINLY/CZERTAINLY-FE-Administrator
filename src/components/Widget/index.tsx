@@ -7,9 +7,9 @@ import WidgetLock from 'components/WidgetLock';
 import { selectors } from 'ducks/user-interface';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router';
-import { Button, Card, CardBody, CardHeader, Collapse } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import style from './Widget.module.scss';
+import { RefreshCw } from 'lucide-react';
+import Button from 'components/Button';
 
 interface WidgetInfoCard {
     title: string;
@@ -36,6 +36,7 @@ interface Props {
     widgetInfoCard?: WidgetInfoCard;
     innerContainerProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
     dataTestId?: string;
+    noBorder?: boolean;
 }
 
 function Widget({
@@ -44,7 +45,7 @@ function Widget({
     titleLink,
     titleSize = 'medium',
     widgetButtons,
-    titleBoldness = 'normal',
+    titleBoldness = 'bold',
     className,
     children = [],
     busy = false,
@@ -56,6 +57,7 @@ function Widget({
     widgetInfoCard,
     innerContainerProps,
     dataTestId,
+    noBorder = false,
 }: Props) {
     const widgetLock = useSelector(selectors.selectWidgetLocks).find(
         (lock) => lock.widgetName === widgetLockName || (Array.isArray(widgetLockName) && widgetLockName.includes(lock.widgetName)),
@@ -66,14 +68,14 @@ function Widget({
         title ? (
             <h5
                 className={cx(
-                    style.title,
-                    { 'fw-bold': titleBoldness === 'bold' },
-                    { 'fw-bolder': titleBoldness === 'bolder' },
-                    { 'fw-normal': titleBoldness === 'normal' },
-                    { [style.titleMedium]: titleSize === 'medium' },
-                    { [style.titleLarge]: titleSize === 'large' },
-                    { [style.titleSmall]: titleSize === 'small' },
-                    { [style.titleXL]: titleSize === 'larger' },
+                    '',
+                    { 'font-bold': titleBoldness === 'bold' },
+                    { 'font-extrabold': titleBoldness === 'bolder' },
+                    { 'font-normal': titleBoldness === 'normal' },
+                    { 'text-base': titleSize === 'medium' },
+                    { 'text-lg font-bold': titleSize === 'large' },
+                    { 'text-sm': titleSize === 'small' },
+                    { 'text-xl font-bold': titleSize === 'larger' },
                 )}
             >
                 {title}
@@ -84,15 +86,9 @@ function Widget({
 
     const renderRefreshButton = () =>
         refreshAction ? (
-            <div className="ms-2 mb-1 me-auto">
-                <Button
-                    onClick={refreshAction}
-                    data-testid="refresh-icon"
-                    style={{ backgroundColor: 'transparent', border: 'none', padding: '1px 5px' }}
-                >
-                    <i className={cx(style.refreshIcon, 'fa fa-refresh ')} />
-                </Button>
-            </div>
+            <Button onClick={refreshAction} data-testid="refresh-icon" variant="transparent">
+                <RefreshCw size={16} />
+            </Button>
         ) : null;
 
     const renderWidgetButtons = useCallback(() => {
@@ -107,24 +103,35 @@ function Widget({
         if (!updatedWidgetButtons.length) return null;
         if (hideWidgetButtons) return null;
         else {
-            return (
-                <div className="ms-auto">
-                    <WidgetButtons buttons={updatedWidgetButtons} />
-                </div>
-            );
+            return <WidgetButtons buttons={updatedWidgetButtons} justify="end" />;
         }
     }, [widgetButtons, hideWidgetButtons, widgetLock, widgetInfoCard, showWidgetInfo]);
 
     return (
-        <section data-testid={dataTestId} className={cx(style.widget, className)} id={id}>
-            <div className="d-flex align-items-center">
-                <div>{renderTitle()}</div>
-                {renderRefreshButton()}
-                {renderWidgetButtons()}
-                {widgetExtraTopNode}
+        <section
+            data-testid={dataTestId}
+            className={cx(
+                'relative flex flex-col bg-white shadow-2xs rounded-xl dark:bg-neutral-900 dark:text-neutral-400',
+                {
+                    'border border-gray-200 dark:border-neutral-700 p-4 md:p-5': !noBorder,
+                },
+                className,
+            )}
+            id={id}
+        >
+            <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
+                <div className="flex items-center gap-2">
+                    {renderTitle()}
+                    {renderRefreshButton()}
+                </div>
+
+                <div className="flex-1 flex items-center gap-2 justify-end">
+                    {renderWidgetButtons()}
+                    {widgetExtraTopNode}
+                </div>
             </div>
 
-            {widgetInfoCard && (
+            {/* {widgetInfoCard && (
                 <Collapse isOpen={showWidgetInfo}>
                     <Card color="default" className="my-2">
                         <CardHeader>{widgetInfoCard.title}</CardHeader>
@@ -142,7 +149,7 @@ function Widget({
                         </CardBody>
                     </Card>
                 </Collapse>
-            )}
+            )} */}
             {widgetLock ? (
                 <WidgetLock
                     lockTitle={widgetLock.lockTitle}

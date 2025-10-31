@@ -1,7 +1,7 @@
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { useSelector } from 'react-redux';
-import { Badge } from 'reactstrap';
 import { ConnectorStatus, PlatformEnum } from 'types/openapi';
+import Badge from 'components/Badge';
 
 interface Props {
     status: ConnectorStatus | undefined;

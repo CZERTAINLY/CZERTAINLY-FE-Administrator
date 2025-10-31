@@ -7,7 +7,8 @@ import { actions } from 'ducks/certificates';
 import Select from 'react-select';
 
 import Spinner from 'components/Spinner';
-import { Button, ButtonGroup, FormGroup, Label } from 'reactstrap';
+import { FormGroup } from 'reactstrap';
+import Button from 'components/Button';
 
 interface Props {
     uuids: string[];
@@ -51,8 +52,6 @@ export default function CertificateGroupDialog({ uuids, onCancel, onUpdate }: Pr
     return (
         <>
             <FormGroup>
-                <Label for="groupSelect">Groups</Label>
-
                 <Select
                     id="group"
                     inputId="groupSelect"
@@ -67,24 +66,21 @@ export default function CertificateGroupDialog({ uuids, onCancel, onUpdate }: Pr
                 />
             </FormGroup>
 
-            <div className="d-flex justify-content-end">
-                <ButtonGroup>
-                    <Button color="danger" onClick={removeGroup} title="Remove groups from selected certificates">
-                        <span className="text-white">Remove</span>
-                    </Button>
-                    <Button
-                        color="primary"
-                        onClick={updateGroup}
-                        disabled={!selectedGroups?.length}
-                        title="Update groups for selected certificates"
-                    >
-                        Update
-                    </Button>
-
-                    <Button color="default" onClick={onCancel}>
-                        Cancel
-                    </Button>
-                </ButtonGroup>
+            <div className="flex gap-4">
+                <Button color="danger" onClick={removeGroup} title="Remove groups from selected certificates">
+                    Remove
+                </Button>
+                <Button
+                    color="primary"
+                    onClick={updateGroup}
+                    disabled={!selectedGroups?.length}
+                    title="Update groups for selected certificates"
+                >
+                    Update
+                </Button>
+                <Button color="secondary" variant="outline" onClick={onCancel} className="ml-auto">
+                    Cancel
+                </Button>
             </div>
 
             <Spinner active={isFetchingGroups} />

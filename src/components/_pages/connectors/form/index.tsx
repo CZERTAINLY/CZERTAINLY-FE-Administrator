@@ -11,7 +11,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 
 import Select from 'react-select';
-import { Badge, Form as BootstrapForm, Button, ButtonGroup, Container, FormFeedback, FormGroup, Input, Label, Table } from 'reactstrap';
+import { Form as BootstrapForm, Button, ButtonGroup, Container, FormFeedback, FormGroup, Input, Label, Table } from 'reactstrap';
+import Badge from 'components/Badge';
 import { ConnectorResponseModel, EndpointModel } from 'types/connectors';
 import { AuthType, ConnectorStatus, PlatformEnum, Resource } from 'types/openapi';
 

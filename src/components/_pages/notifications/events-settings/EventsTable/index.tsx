@@ -298,7 +298,6 @@ const EventsTable = ({ mode, resource, resourceUuid, widgetLocks }: Props) => {
                     description: textContent.description,
                 }}
             >
-                <br />
                 <CustomTable headers={headers} data={dataRows} />
             </Widget>
             <Dialog

@@ -8,10 +8,9 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as actionGroupsActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
-import Select from 'react-select';
+import Select from 'components/Select';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { useRuleEvaluatorResourceOptions } from 'utils/rules';
-import styles from './actionGroupsList.module.scss';
 
 const ExecutionsList = () => {
     const executions = useSelector(rulesSelectors.executions);
@@ -102,18 +101,15 @@ const ExecutionsList = () => {
                 tooltip: 'Select Resource',
                 onClick: () => {},
                 custom: (
-                    <div className={styles.listSelectContainer}>
-                        <Select
-                            isClearable
-                            maxMenuHeight={140}
-                            menuPlacement="auto"
-                            options={resourceOptionsWithRuleEvaluator}
-                            placeholder="Select Resource"
-                            onChange={(event) => {
-                                setSelectedResource(event?.value as Resource);
-                            }}
-                        />
-                    </div>
+                    <Select
+                        placeholder="Select Resource"
+                        id="resource"
+                        options={resourceOptionsWithRuleEvaluator}
+                        value={selectedResource || 'Select Resource'}
+                        onChange={(value) => {
+                            setSelectedResource(value as Resource);
+                        }}
+                    />
                 ),
             },
             {
@@ -129,7 +125,7 @@ const ExecutionsList = () => {
                 onClick: () => setConfirmDelete(true),
             },
         ],
-        [checkedRows, resourceOptionsWithRuleEvaluator, navigate],
+        [checkedRows, resourceOptionsWithRuleEvaluator, navigate, selectedResource],
     );
 
     return (
@@ -145,7 +141,6 @@ const ExecutionsList = () => {
                     description: 'Executions is named set of execution items',
                 }}
             >
-                <br />
                 <CustomTable
                     checkedRows={checkedRows}
                     hasCheckboxes
@@ -165,9 +160,10 @@ const ExecutionsList = () => {
                 caption={`Delete an Execution`}
                 body={`You are about to delete a Execution. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
         </>

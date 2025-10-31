@@ -916,7 +916,7 @@ export default function AttributeEditor({
     );
 
     const attrs = useMemo(() => {
-        const attrs: JSX.Element[] = [];
+        const attrs: React.ReactNode[] = [];
 
         const attributeSelector = (
             <CustomAttributeAddSelect

@@ -1,7 +1,8 @@
 import { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
-import { Badge, Container } from 'reactstrap';
+
+import Badge from 'components/Badge';
 
 import { actions, selectors } from 'ducks/discoveries';
 import { EntityType } from 'ducks/filters';
@@ -104,25 +105,20 @@ function DiscoveryList() {
     const onListCallback = useCallback((filters: SearchRequestModel) => dispatch(actions.listDiscoveries(filters)), [dispatch]);
 
     return (
-        <Container className="themed-container" fluid>
-            <PagedList
-                entity={EntityType.DISCOVERY}
-                onListCallback={onListCallback}
-                onDeleteCallback={(uuids) => dispatch(actions.bulkDeleteDiscovery({ uuids }))}
-                getAvailableFiltersApi={useCallback(
-                    (apiClients: ApiClients) => apiClients.discoveries.getSearchableFieldInformation3(),
-                    [],
-                )}
-                headers={discoveriesRowHeaders}
-                data={discoveryList}
-                isBusy={isBusy}
-                title="Discovery Store"
-                entityNameSingular="a Discovery"
-                entityNamePlural="Discoveries"
-                filterTitle="Discoveries Filter"
-                pageWidgetLockName={LockWidgetNameEnum.DiscoveriesStore}
-            />
-        </Container>
+        <PagedList
+            entity={EntityType.DISCOVERY}
+            onListCallback={onListCallback}
+            onDeleteCallback={(uuids) => dispatch(actions.bulkDeleteDiscovery({ uuids }))}
+            getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.discoveries.getSearchableFieldInformation3(), [])}
+            headers={discoveriesRowHeaders}
+            data={discoveryList}
+            isBusy={isBusy}
+            title="Discovery Store"
+            entityNameSingular="a Discovery"
+            entityNamePlural="Discoveries"
+            filterTitle="Discoveries Filter"
+            pageWidgetLockName={LockWidgetNameEnum.DiscoveriesStore}
+        />
     );
 }
 

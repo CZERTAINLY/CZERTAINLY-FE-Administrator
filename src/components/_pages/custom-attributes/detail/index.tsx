@@ -9,14 +9,14 @@ import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
-import { Badge, Container } from 'reactstrap';
+import Badge from 'components/Badge';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { getAttributeContent } from 'utils/attributes/attributes';
 import { useCopyToClipboard } from 'utils/common-hooks';
 import styles from './customAttribute.module.scss';
 import { createWidgetDetailHeaders } from 'utils/widget';
-import GoBackButton from 'components/GoBackButton';
+import Breadcrumb from 'components/Breadcrumb';
 
 export default function CustomAttributeDetail() {
     const dispatch = useDispatch();
@@ -184,11 +184,12 @@ export default function CustomAttributeDetail() {
     );
 
     return (
-        <Container className="themed-container" fluid>
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                forcedPath="/customattributes"
-                text={`${getEnumLabel(resourceEnum, Resource.CustomAttributes)} Inventory`}
+        <div>
+            <Breadcrumb
+                items={[
+                    { label: `${getEnumLabel(resourceEnum, Resource.CustomAttributes)} Inventory`, href: '/customattributes' },
+                    { label: customAttribute?.name || 'Custom Attribute Details', href: '' },
+                ]}
             />
             <Widget
                 title="Custom Attribute Details"
@@ -206,11 +207,12 @@ export default function CustomAttributeDetail() {
                 caption="Delete Custom Attribute"
                 body="You are about to delete an Custom Attribute. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
-        </Container>
+        </div>
     );
 }

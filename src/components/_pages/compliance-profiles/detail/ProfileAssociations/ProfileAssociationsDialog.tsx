@@ -1,7 +1,7 @@
 import Dialog from 'components/Dialog';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ComplianceProfileDtoV2, PlatformEnum, Resource, ResourceObjectDto } from 'types/openapi';
-import { Button, ButtonGroup, Form as BootstrapForm, FormGroup, Label } from 'reactstrap';
+import { Form as BootstrapForm, FormGroup, Label } from 'reactstrap';
 import { Field, Form } from 'react-final-form';
 import Select from 'react-select';
 import { useDispatch, useSelector } from 'react-redux';
@@ -14,6 +14,7 @@ import { actions as tokenProfileActions, selectors as tokenProfileSelectors } fr
 import { actions } from 'ducks/compliance-profiles';
 import { makeOptions } from 'utils/compliance-profile';
 import { TestableControl, TestableMenu } from 'utils/HOC/withDataTestId';
+import Button from 'components/Button';
 
 type Props = {
     isOpen: boolean;
@@ -173,21 +174,14 @@ export default function ProfileAssociationsDialog({ isOpen, onClose, profile, as
                                 </Field>
                             )}
 
-                            <div style={{ textAlign: 'right' }}>
-                                <ButtonGroup>
-                                    <Button
-                                        type="submit"
-                                        color="primary"
-                                        disabled={pristine || submitting || !valid}
-                                        onClick={handleSubmit}
-                                    >
-                                        Associate
-                                    </Button>
+                            <div className="flex justify-center gap-4">
+                                <Button type="submit" color="primary" disabled={pristine || submitting || !valid} onClick={handleSubmit}>
+                                    Associate
+                                </Button>
 
-                                    <Button type="button" color="secondary" disabled={submitting} onClick={onCancel}>
-                                        Cancel
-                                    </Button>
-                                </ButtonGroup>
+                                <Button color="secondary" variant="outline" disabled={submitting} onClick={onCancel}>
+                                    Cancel
+                                </Button>
                             </div>
                         </BootstrapForm>
                     )}

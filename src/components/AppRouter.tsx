@@ -344,7 +344,6 @@ export default function AppRouter() {
                     <Route path={`/${Resource.TokenProfiles.toLowerCase()}/detail/:tokenId/:id`} element={<TokenProfileDetail />} />
                     <Route path={`/${Resource.TokenProfiles.toLowerCase()}/add`} element={<TokenProfileForm />} />
                     <Route path={`/${Resource.TokenProfiles.toLowerCase()}/edit/:tokenId/:id`} element={<TokenProfileForm />} />
-                    <Route path={`/${Resource.TokenProfiles.toLowerCase()}/edit/:tokenId/:id`} element={<TokenProfileForm />} />
 
                     <Route path={`/${Resource.Keys.toLowerCase()}`} element={<CryptographicKeyList />} />
                     <Route path={`/${Resource.Keys.toLowerCase()}/list`} element={<Navigate to={`/${Resource.Keys.toLowerCase()}`} />} />
@@ -415,7 +414,7 @@ export default function AppRouter() {
             <Routes>
                 <Route path="/login" element={<AppLogin />} />
 
-                {profile ? appRoutes : <Route path="*" element={<Spinner active={true} />} />}
+                {profile ? appRoutes : <Route path="*" element={null} />}
             </Routes>
         </HashRouter>
     );

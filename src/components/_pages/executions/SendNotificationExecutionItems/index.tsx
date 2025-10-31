@@ -3,7 +3,8 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Select from 'react-select';
 import { Fragment } from 'react/jsx-runtime';
-import { Row, Col, FormGroup, Label, Button, Badge } from 'reactstrap';
+import { Row, Col, FormGroup, Label, Button } from 'reactstrap';
+import Badge from 'components/Badge';
 import { selectors as notificationProfileSelectors, actions as notificationProfileActions } from 'ducks/notification-profiles';
 import styles from './styles.module.scss';
 

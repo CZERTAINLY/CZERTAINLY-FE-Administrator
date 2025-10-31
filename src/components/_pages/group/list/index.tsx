@@ -8,7 +8,6 @@ import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
-import { Container } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
 
 export default function GroupList() {
@@ -110,7 +109,7 @@ export default function GroupList() {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <>
             <Widget
                 title="List of Groups"
                 busy={isBusy}
@@ -119,14 +118,13 @@ export default function GroupList() {
                 titleSize="large"
                 refreshAction={getFreshData}
             >
-                <br />
                 <CustomTable
                     headers={groupsTableHeaders}
                     data={groupsTableData}
                     onCheckedRowsChanged={setCheckedRows}
-                    canSearch={true}
-                    hasCheckboxes={true}
-                    hasPagination={true}
+                    canSearch
+                    hasCheckboxes
+                    hasPagination
                 />
             </Widget>
 
@@ -135,11 +133,12 @@ export default function GroupList() {
                 caption={`Delete ${checkedRows.length > 1 ? 'Groups' : 'Profile'}`}
                 body={`You are about to delete ${checkedRows.length > 1 ? 'a Group' : 'Groups'}. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
-        </Container>
+        </>
     );
 }

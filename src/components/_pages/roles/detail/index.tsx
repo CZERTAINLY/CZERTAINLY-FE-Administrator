@@ -8,14 +8,17 @@ import { actions, selectors } from 'ducks/roles';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
-import { Badge, Container } from 'reactstrap';
+
+import Badge from 'components/Badge';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { PlatformEnum, Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import BooleanBadge from 'components/BooleanBadge/BooleanBadge';
 import { createWidgetDetailHeaders } from 'utils/widget';
-import GoBackButton from 'components/GoBackButton';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import Breadcrumb from 'components/Breadcrumb';
+import Container from 'components/Container';
+import Checkbox from 'components/Checkbox';
 
 export default function UserDetail() {
     const dispatch = useDispatch();
@@ -249,75 +252,76 @@ export default function UserDetail() {
     );
 
     return (
-        <Container className="themed-container" fluid>
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                forcedPath="/roles"
-                text={`${getEnumLabel(resourceEnum, Resource.Roles)} Inventory`}
+        <div>
+            <Breadcrumb
+                items={[
+                    { label: 'Roles', href: '/roles' },
+                    { label: role?.name || 'Role Details', href: '' },
+                ]}
             />
-            <Widget
-                title="Role Details"
-                busy={isFetchingDetail}
-                widgetButtons={buttons}
-                titleSize="large"
-                refreshAction={getFreshDetails}
-                widgetLockName={LockWidgetNameEnum.RoleDetails}
-            >
-                <br />
-                <CustomTable headers={detailHeaders} data={detailData} />
-            </Widget>
+            <Container>
+                <Widget
+                    title="Role Details"
+                    busy={isFetchingDetail}
+                    widgetButtons={buttons}
+                    titleSize="large"
+                    refreshAction={getFreshDetails}
+                    widgetLockName={LockWidgetNameEnum.RoleDetails}
+                >
+                    <CustomTable headers={detailHeaders} data={detailData} />
+                </Widget>
 
-            <Widget title="Assigned Users" busy={isFetchingDetail} titleSize="large">
-                <br />
-                <CustomTable headers={usersHeaders} data={usersData} />
-            </Widget>
+                <Widget title="Assigned Users" busy={isFetchingDetail} titleSize="large">
+                    <CustomTable headers={usersHeaders} data={usersData} />
+                </Widget>
 
-            {memoizedRole && (
-                <CustomAttributeWidget
-                    resource={Resource.Roles}
-                    resourceUuid={memoizedRole.uuid}
-                    attributes={memoizedRole.customAttributes}
-                />
-            )}
-
-            <Widget
-                title="Role Permissions"
-                busy={isFetchingDetail || isFetchingPermissions}
-                titleSize="large"
-                refreshAction={role && getFreshPermissions}
-            >
-                <br />
-                {!permissions ? (
-                    <></>
-                ) : (
-                    <>
-                        <p>
-                            <input type="checkbox" checked={permissions.permissions.allowAllResources} disabled />
-                            &nbsp;&nbsp;&nbsp;All resources allowed
-                        </p>
-
-                        {permissions.permissions.resources.length === 0 ? (
-                            <></>
-                        ) : (
-                            <>
-                                <p>List of allowed resources</p>
-                                <CustomTable headers={permsHeaders} data={permsData} hasDetails={true} />
-                            </>
-                        )}
-                    </>
+                {memoizedRole && (
+                    <CustomAttributeWidget
+                        resource={Resource.Roles}
+                        resourceUuid={memoizedRole.uuid}
+                        attributes={memoizedRole.customAttributes}
+                    />
                 )}
-            </Widget>
 
+                <Widget
+                    title="Role Permissions"
+                    busy={isFetchingDetail || isFetchingPermissions}
+                    titleSize="large"
+                    refreshAction={role && getFreshPermissions}
+                >
+                    {!permissions ? (
+                        <></>
+                    ) : (
+                        <>
+                            <Checkbox
+                                checked={permissions.permissions.allowAllResources}
+                                disabled
+                                onChange={() => {}}
+                                label="All resources allowed"
+                            />
+                            {permissions.permissions.resources.length === 0 ? (
+                                <></>
+                            ) : (
+                                <>
+                                    <p className="text-sm mt-4 mb-2">List of allowed resources</p>
+                                    <CustomTable headers={permsHeaders} data={permsData} hasDetails={true} />
+                                </>
+                            )}
+                        </>
+                    )}
+                </Widget>
+            </Container>
             <Dialog
                 isOpen={confirmDelete}
                 caption="Delete Role"
                 body="You are about to delete an Role. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
-        </Container>
+        </div>
     );
 }

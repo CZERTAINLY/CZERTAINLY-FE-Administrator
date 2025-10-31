@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
-import { Badge, Container, Table } from 'reactstrap';
+import { Table } from 'reactstrap';
 
+import Badge from 'components/Badge';
 import { actions, selectors } from 'ducks/connectors';
 
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
@@ -231,7 +232,7 @@ export default function ConnectorList() {
 
                         <span style={{ whiteSpace: 'nowrap' }}>{connector.url}</span>,
 
-                        <Badge color={`${connectorStatus[1]}`}>{connectorStatus[0]}</Badge>,
+                        <Badge style={{ backgroundColor: connectorStatus[1] }}>{connectorStatus[0]}</Badge>,
                     ],
                 };
             }),
@@ -239,7 +240,7 @@ export default function ConnectorList() {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <div>
             <Widget
                 title="Connector Store"
                 busy={isBusy}
@@ -248,8 +249,6 @@ export default function ConnectorList() {
                 widgetButtons={buttons}
                 titleSize="large"
             >
-                <br />
-
                 <CustomTable
                     headers={connectorsRowHeaders}
                     data={connectorList}
@@ -265,9 +264,10 @@ export default function ConnectorList() {
                 caption={`Delete ${checkedRows.length > 1 ? 'Connectors' : 'a Connector'}`}
                 body={`You are about to delete ${checkedRows.length > 1 ? 'Connectors' : 'a Connector'}. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
@@ -278,7 +278,7 @@ export default function ConnectorList() {
                 toggle={() => setConfirmAuthorize(false)}
                 buttons={[
                     { color: 'danger', onClick: onAuthorizeConfirmed, body: 'Yes, approve' },
-                    { color: 'secondary', onClick: () => setConfirmAuthorize(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmAuthorize(false), body: 'Cancel' },
                 ]}
             />
 
@@ -289,9 +289,9 @@ export default function ConnectorList() {
                 toggle={() => setConfirmForceDelete(false)}
                 buttons={[
                     { color: 'danger', onClick: onForceDeleteConfirmed, body: 'Force delete' },
-                    { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
                 ]}
             />
-        </Container>
+        </div>
     );
 }

@@ -69,7 +69,7 @@ export const getAttributeContent = (contentType: AttributeContentType, content: 
         return <CodeBlock content={content[0] as CodeBlockAttributeContentModel} />;
     }
 
-    const mapping = (content: BaseAttributeContentModel): string | JSX.Element | undefined => {
+    const mapping = (content: BaseAttributeContentModel): string | React.ReactNode | undefined => {
         switch (contentType) {
             case AttributeContentType.Boolean:
                 return content.data ? 'true' : 'false';

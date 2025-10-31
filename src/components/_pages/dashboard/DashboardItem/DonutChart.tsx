@@ -28,7 +28,7 @@ function DonutChart({ title, colorOptions, data = {}, entity, redirect, onSetFil
     const options: ApexCharts.ApexOptions = {
         labels: labels,
         fill: {
-            type: 'gradient',
+            type: 'solid',
         },
         dataLabels: {
             formatter: function (val: any, opts: any) {
@@ -60,7 +60,7 @@ function DonutChart({ title, colorOptions, data = {}, entity, redirect, onSetFil
     }
 
     return (
-        <Widget title={title} titleBoldness="bold">
+        <Widget title={title} titleBoldness="bold" className="flex-1">
             <ReactApexChart options={options} series={getValues(data)} type="donut" height="100%" width="100%" />
         </Widget>
     );

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
-import { Badge, Container } from 'reactstrap';
+import Badge from 'components/Badge';
 
 import { actions, selectors } from 'ducks/tokens';
 
@@ -170,7 +170,7 @@ function TokenList() {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <>
             <Widget
                 title="Token Store"
                 busy={isBusy}
@@ -196,9 +196,10 @@ function TokenList() {
                 caption={`Delete ${checkedRows.length > 1 ? 'Tokens' : 'a Token'}`}
                 body={`You are about to delete ${checkedRows.length > 1 ? 'Tokens' : 'a Token'}. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
@@ -210,7 +211,7 @@ function TokenList() {
                 toggle={() => setConfirmDeactivation(false)}
                 buttons={[
                     { color: 'danger', onClick: onDeactivationConfirmed, body: 'Deactivate' },
-                    { color: 'secondary', onClick: () => setConfirmDeactivation(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDeactivation(false), body: 'Cancel' },
                 ]}
             />
 
@@ -225,7 +226,7 @@ function TokenList() {
                 toggle={() => setActivateToken(false)}
                 buttons={[]}
             />
-        </Container>
+        </>
     );
 }
 

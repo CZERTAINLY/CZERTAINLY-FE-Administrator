@@ -2,12 +2,11 @@ import cx from 'classnames';
 import { useCallback, useState } from 'react';
 import { Outlet } from 'react-router';
 
-import Alerts from 'components/Alerts';
-import GlobalModal from 'components/GlobalModal';
+// import Alerts from 'components/Alerts';
+// import GlobalModal from 'components/GlobalModal';
 import Footer from 'components/Layout/Footer';
 import Header from 'components/Layout/Header';
 import Sidebar from 'components/Layout/Sidebar';
-import style from './Layout.module.scss';
 import { useSelector } from 'react-redux';
 import { selectors } from 'ducks/auth';
 
@@ -19,18 +18,17 @@ function Layout() {
     const profile = useSelector(selectors.profile);
 
     return (
-        <div className={style.root}>
+        <div className="flex flex-col min-h-screen">
             <Header sidebarToggle={toggleSidebar} />
-            <Sidebar allowedResources={profile?.permissions.allowedListings} />
-
-            <div className={cx(style.wrap, { [style.sidebarOpen]: sidebarOpen })}>
-                <main className={style.content}>
+            <div className="flex">
+                <Sidebar allowedResources={profile?.permissions.allowedListings} />
+                <main className="flex-1 bg-[var(--main-background-color)] w-[calc(100%-var(--sidebar-width))] p-4 md:p-8 !pb-0">
                     <Outlet />
+                    <Footer />
                 </main>
 
-                <Alerts />
-                <GlobalModal />
-                <Footer />
+                {/* <Alerts />
+                <GlobalModal /> */}
             </div>
         </div>
     );

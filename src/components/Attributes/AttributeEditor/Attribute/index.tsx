@@ -35,7 +35,7 @@ interface Props {
     options?: { label: string; value: any }[];
     busy?: boolean;
     userInteractedRef?: React.MutableRefObject<boolean>;
-    deleteButton?: JSX.Element;
+    deleteButton?: React.ReactNode;
 }
 
 export function Attribute({
@@ -45,7 +45,7 @@ export function Attribute({
     busy = false,
     userInteractedRef: userInteractionRef,
     deleteButton,
-}: Props): JSX.Element {
+}: Props): React.ReactNode {
     const form = useForm();
     const formState = useFormState();
     const [addNewAttributeValue, setIsAddNewAttributeValue] = useState<AddNewAttributeType | undefined>();
@@ -203,7 +203,7 @@ export function Attribute({
         return options;
     };
 
-    const createSelect = (descriptor: DataAttributeModel | CustomAttributeModel): JSX.Element => {
+    const createSelect = (descriptor: DataAttributeModel | CustomAttributeModel): React.ReactNode => {
         const errorStyles = {
             border: 'solid 1px red',
             '&:hover': { border: 'solid 1px red' },
@@ -320,7 +320,7 @@ export function Attribute({
         );
     };
 
-    const createFile = (descriptor: DataAttributeModel | CustomAttributeModel): JSX.Element => {
+    const createFile = (descriptor: DataAttributeModel | CustomAttributeModel): React.ReactNode => {
         return (
             <>
                 {descriptor.properties.visible ? (
@@ -425,7 +425,7 @@ export function Attribute({
         );
     };
 
-    const createInput = (descriptor: DataAttributeModel | CustomAttributeModel): JSX.Element => {
+    const createInput = (descriptor: DataAttributeModel | CustomAttributeModel): React.ReactNode => {
         if (descriptor.contentType === AttributeContentType.Codeblock) {
             const attributes = formState.values[name.slice(0, name.indexOf('.'))];
             const language = attributes ? (attributes[descriptor.name]?.language ?? 'javascript') : 'javascript';
@@ -541,13 +541,13 @@ export function Attribute({
         );
     };
 
-    const createField = (descriptor: DataAttributeModel | CustomAttributeModel): JSX.Element => {
+    const createField = (descriptor: DataAttributeModel | CustomAttributeModel): React.ReactNode => {
         if (descriptor.properties.list) return createSelect(descriptor);
         if (descriptor.contentType === AttributeContentType.File) return createFile(descriptor);
         return createInput(descriptor);
     };
 
-    const createInfo = (descriptor: InfoAttributeModel): JSX.Element => {
+    const createInfo = (descriptor: InfoAttributeModel): React.ReactNode => {
         return (
             <Card color="default" id={`${descriptor.name}Info`}>
                 <CardHeader>{descriptor.properties.label}</CardHeader>

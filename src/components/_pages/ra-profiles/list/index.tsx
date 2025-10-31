@@ -1,7 +1,8 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
-import { Badge, Container } from 'reactstrap';
+
+import Badge from 'components/Badge';
 
 import { actions, selectors } from 'ducks/ra-profiles';
 
@@ -164,9 +165,7 @@ function RaProfileList() {
                 <>
                     {protocols.map((protocol) => (
                         <Fragment key={protocol}>
-                            <Badge color="secondary" searchvalue={protocol}>
-                                {protocol}
-                            </Badge>
+                            <Badge color="secondary">{protocol}</Badge>
                             &nbsp;
                         </Fragment>
                     ))}
@@ -204,7 +203,7 @@ function RaProfileList() {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <>
             <Widget
                 title="List of RA Profiles"
                 busy={isBusy}
@@ -213,14 +212,13 @@ function RaProfileList() {
                 titleSize="large"
                 refreshAction={getFreshData}
             >
-                <br />
                 <CustomTable
                     headers={raProfilesTableHeaders}
                     data={profilesTableData}
                     onCheckedRowsChanged={setCheckedRows}
-                    canSearch={true}
-                    hasCheckboxes={true}
-                    hasPagination={true}
+                    canSearch
+                    hasCheckboxes
+                    hasPagination
                 />
             </Widget>
 
@@ -229,9 +227,10 @@ function RaProfileList() {
                 caption={`Delete RA ${checkedRows.length > 1 ? 'Profiles' : 'Profile'}`}
                 body={`You are about to delete ${checkedRows.length > 1 ? 'a RA Profile' : 'RA profiles'}. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
@@ -240,12 +239,13 @@ function RaProfileList() {
                 caption={`Initiate Compliance Check`}
                 body={'Initiate the compliance check for the selected RA Profile(s)?'}
                 toggle={() => setComplianceCheck(false)}
+                noBorder
                 buttons={[
                     { color: 'primary', onClick: onComplianceCheckConfirmed, body: 'Yes' },
-                    { color: 'secondary', onClick: () => setComplianceCheck(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setComplianceCheck(false), body: 'Cancel' },
                 ]}
             />
-        </Container>
+        </>
     );
 }
 

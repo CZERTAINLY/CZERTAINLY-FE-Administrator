@@ -81,7 +81,7 @@ describe('Create a table', () => {
         const groupUuids: string[] = [];
         const groupNames = getGroupNames(groupUuids, mockGroups); // [] in this case, triggers Unassigned in page
 
-        const groupsCell: string | JSX.Element | JSX.Element[] =
+        const groupsCell: string | React.ReactNode | React.ReactNode[] =
             Array.isArray(groupNames) && groupNames.length === 0
                 ? 'Unassigned'
                 : Array.isArray(groupNames)
@@ -127,7 +127,7 @@ describe('Create a table', () => {
         const groupUuids: string[] = ['g-1', 'g-2'];
         const groupNames = getGroupNames(groupUuids, mockGroups) as string[];
 
-        const groupsCell: string | JSX.Element | JSX.Element[] = groupNames.map((n) => (
+        const groupsCell: string | React.ReactNode | React.ReactNode[] = groupNames.map((n) => (
             <span key={n}>
                 {n}
                 <br />

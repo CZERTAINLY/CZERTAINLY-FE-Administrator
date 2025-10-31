@@ -1,94 +1,93 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { actions, selectors } from 'ducks/notifications';
 
-import Widget from 'components/Widget';
-import { Link, useNavigate } from 'react-router';
-import { Button, Col, Dropdown, DropdownMenu, DropdownToggle, Row } from 'reactstrap';
+import { ArrowRight, Bell, Check } from 'lucide-react';
+import Dropdown from 'components/Dropdown';
+import { useNavigate, Link } from 'react-router';
+import Button from 'components/Button';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { formatTimeAgo } from 'utils/dateUtil';
+import Widget from 'components/Widget';
 
 function NotificationsOverview() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-
+    const dropdownRef = useRef<HTMLButtonElement>(null);
     const overviewNotifications = useSelector(selectors.overviewNotifications);
+
     const isFetchingOverview = useSelector(selectors.isFetchingOverview);
 
-    const [isOpenNotifications, setIsOpenNotifications] = useState(false);
-    const toggleNotificationsDropdown = useCallback(() => setIsOpenNotifications(!isOpenNotifications), [isOpenNotifications]);
-
-    const notificationsList = useMemo(
+    const notificationsList: React.ReactNode = useMemo(
         () =>
-            overviewNotifications.length === 0 ? (
-                <div className={'p-2 ml-2 text-center fw-lighter fst-italic'}>No unread notifications</div>
-            ) : (
-                overviewNotifications.map((notification, i) => (
-                    <div key={notification.uuid} className={i % 2 === 1 ? 'p-2 ml-2 bg-secondary bg-opacity-10' : 'p-2 ml-2'}>
-                        <Row className="g-0">
-                            <Col className="g-0 col-1">
-                                <Button
-                                    color="white"
-                                    size="md"
-                                    className={'p-0 m-0'}
-                                    onClick={() => dispatch(actions.markAsReadNotification({ uuid: notification.uuid }))}
-                                >
-                                    <i className="fa fa-check"></i>
-                                </Button>
-                            </Col>
-                            <Col className="g-0 col-11">
-                                {notification.message}
-                                <span className="fw-light small px-1">{formatTimeAgo(notification.sentAt)}</span>
-                                {notification.targetObjectType && notification.targetObjectIdentification && (
-                                    <Button
-                                        color="white"
-                                        size="sm"
-                                        className={'p-0 m-0'}
-                                        onClick={() => {
-                                            navigate(
-                                                `/${notification.targetObjectType}/detail/${notification.targetObjectIdentification?.reduce(
-                                                    (prev, curr) => prev + '/' + curr,
-                                                )}`,
-                                            );
-                                        }}
-                                    >
-                                        <i className="fa fa-circle-arrow-right"></i>
-                                    </Button>
-                                )}
-                            </Col>
-                        </Row>
-                    </div>
-                ))
-            ),
+            overviewNotifications.length === 0
+                ? 'No unread notifications'
+                : overviewNotifications.map((notification, index) => (
+                      <>
+                          <div className="flex items-start gap-1 mb-2" key={notification.uuid}>
+                              <Button
+                                  variant="transparent"
+                                  onClick={() => dispatch(actions.markAsReadNotification({ uuid: notification.uuid }))}
+                              >
+                                  <Check size={16} />
+                              </Button>
+                              <div className="">
+                                  <span className="text-sm leading-[16px] font-medium text-gray-800 mr-2">{notification.message}</span>
+                                  <span className="text-xs leading-[16px] text-gray-500 mr-2">{formatTimeAgo(notification.sentAt)}</span>
+                                  <Button
+                                      color="secondary"
+                                      className="!rounded-full !p-0.5 relative top-[1px]"
+                                      onClick={() => {
+                                          navigate(
+                                              `/${notification.targetObjectType}/detail/${notification.targetObjectIdentification?.reduce(
+                                                  (prev, curr) => prev + '/' + curr,
+                                              )}`,
+                                          );
+                                          dropdownRef.current?.click();
+                                      }}
+                                  >
+                                      <ArrowRight size={10} strokeWidth={3} />
+                                  </Button>
+                              </div>
+                          </div>
+                          {index < overviewNotifications.length - 1 && <hr className="border-gray-200 mb-2" />}
+                      </>
+                  )),
         [overviewNotifications, dispatch, navigate],
     );
 
     return (
-        <Dropdown isOpen={isOpenNotifications} toggle={toggleNotificationsDropdown}>
-            <DropdownToggle nav>
-                <i
-                    className={overviewNotifications.length > 0 ? 'fa fa-bell pt-1 mt-2 text-warning' : 'fa fa-bell-slash pt-1 mt-2'}
-                    style={{ color: 'white' }}
-                />
-            </DropdownToggle>
-
-            <DropdownMenu style={{ width: '400px', maxHeight: '500px', overflowY: 'auto' }} className="m-0 p-0">
+        <Dropdown
+            title={
+                <div className="flex items-center gap-2 text-white">
+                    <Bell size={24} />
+                    <span className="sr-only">Notifications</span>
+                </div>
+            }
+            btnStyle="transparent"
+            menuClassName="max-w-[360px]"
+            menu={
                 <Widget
                     busy={isFetchingOverview}
                     widgetLockName={LockWidgetNameEnum.NotificationsOverview}
-                    className="m-0 p-0"
+                    className="!p-0"
+                    noBorder
                     hideWidgetButtons={true}
                 >
-                    {notificationsList}
-                    <div className={'p-2 ml-auto bg-dark text-white text-center'}>
-                        <Link to="/notifications" onClick={() => setIsOpenNotifications(false)} className="text-reset">
-                            View all notifications
+                    <div className="max-h-[360px] overflow-y-auto">{notificationsList}</div>
+                    <div className="sticky bottom-0 bg-white pt-2 border-t border-gray-200">
+                        <Link to="/notifications" className="w-full" onClick={() => dropdownRef.current?.click()}>
+                            <Button color="secondary" className="w-full justify-center">
+                                View all notifications
+                            </Button>
                         </Link>
                     </div>
                 </Widget>
-            </DropdownMenu>
-        </Dropdown>
+            }
+            hideArrow
+            buttonRef={dropdownRef}
+        />
     );
 }
 

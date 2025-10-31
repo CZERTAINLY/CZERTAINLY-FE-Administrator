@@ -8,8 +8,8 @@ import { actions, selectors } from 'ducks/roles';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
-import { Badge, Container } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
+import Badge from 'components/Badge';
 
 export default function RolesList() {
     const dispatch = useDispatch();
@@ -163,7 +163,7 @@ export default function RolesList() {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <div>
             <Widget
                 title="List of Roles"
                 busy={isBusy}
@@ -172,7 +172,6 @@ export default function RolesList() {
                 titleSize="large"
                 refreshAction={getFreshData}
             >
-                <br />
                 <CustomTable
                     headers={rolesTableHeader}
                     data={rolesTableData}
@@ -188,11 +187,12 @@ export default function RolesList() {
                 caption={`Delete ${checkedRows.length > 1 ? 'Roles' : 'an Role'}`}
                 body={`You are about to delete ${checkedRows.length > 1 ? 'Roles' : 'an Role'}. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
-        </Container>
+        </div>
     );
 }

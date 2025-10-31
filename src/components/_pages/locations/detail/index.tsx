@@ -18,7 +18,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router';
 import Select from 'react-select';
 
-import { Badge, Form as BootstrapForm, Button, ButtonGroup, Container, FormGroup, Label } from 'reactstrap';
+import { Form as BootstrapForm, Button, ButtonGroup, FormGroup, Label } from 'reactstrap';
+import Badge from 'components/Badge';
 import { AttributeDescriptorModel } from 'types/attributes';
 
 import { mutators } from 'utils/attributes/attributeEditorMutators';
@@ -35,8 +36,9 @@ import CertificateStatusBadge from '../../../_pages/certificates/CertificateStat
 import cx from 'classnames';
 import style from './locationDetail.module.scss';
 import { createWidgetDetailHeaders } from 'utils/widget';
-import GoBackButton from 'components/GoBackButton';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import Container from 'components/Container';
+import Breadcrumb from 'components/Breadcrumb';
 
 export default function LocationDetail() {
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
@@ -477,313 +479,309 @@ export default function LocationDetail() {
     );
 
     return (
-        <Container className="themed-container" fluid>
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                forcedPath="/locations"
-                text={`${getEnumLabel(resourceEnum, Resource.Locations)} Inventory`}
+        <div>
+            <Breadcrumb
+                items={[
+                    { label: `${getEnumLabel(resourceEnum, Resource.Locations)} Inventory`, href: '/locations' },
+                    { label: location?.name || 'Location Details', href: '' },
+                ]}
             />
-            <TabLayout
-                tabs={[
-                    {
-                        title: 'Details',
-                        content: (
-                            <Widget>
-                                <Widget
-                                    title="Location Properties"
-                                    busy={isBusy}
-                                    widgetButtons={buttons}
-                                    titleSize="large"
-                                    refreshAction={getFreshLocationDetails}
-                                    widgetLockName={LockWidgetNameEnum.LocationDetails}
-                                >
-                                    <br />
+            <Container>
+                <TabLayout
+                    tabs={[
+                        {
+                            title: 'Details',
+                            content: (
+                                <Container>
+                                    <Widget
+                                        title="Location Properties"
+                                        busy={isBusy}
+                                        widgetButtons={buttons}
+                                        titleSize="large"
+                                        refreshAction={getFreshLocationDetails}
+                                        widgetLockName={LockWidgetNameEnum.LocationDetails}
+                                    >
+                                        <CustomTable headers={detailHeaders} data={detailData} />
+                                    </Widget>
 
-                                    <CustomTable headers={detailHeaders} data={detailData} />
-                                </Widget>
-
-                                <Widget
-                                    title="Location Certificates"
-                                    titleSize="large"
-                                    widgetButtons={certButtons}
-                                    busy={
-                                        isRenewingCertificate ||
-                                        isPushingCertificate ||
-                                        isRemovingCertificate ||
-                                        isSyncing ||
-                                        isIssuingCertificate
-                                    }
-                                >
-                                    <br />
-
-                                    <Label>Location certificates</Label>
-
-                                    <CustomTable
-                                        headers={certHeaders}
-                                        data={certData}
-                                        hasCheckboxes={true}
-                                        multiSelect={false}
-                                        onCheckedRowsChanged={(rows) => {
-                                            setCertCheckedRows(rows as string[]);
-                                        }}
-                                        hasDetails={true}
-                                    />
-                                </Widget>
-                            </Widget>
-                        ),
-                    },
-                    {
-                        title: 'Attributes',
-                        content: (
-                            <Widget>
-                                <Widget title="Attributes" titleSize="large">
-                                    <br />
-
-                                    <Label>Location Attributes</Label>
-                                    <AttributeViewer attributes={location?.attributes} />
-                                </Widget>
-                                {location && (
-                                    <CustomAttributeWidget
-                                        resource={Resource.Locations}
-                                        resourceUuid={location.uuid}
-                                        attributes={location.customAttributes}
-                                    />
-                                )}
-
-                                <Widget title="Metadata" titleSize="large">
-                                    <br />
-                                    {location?.metadata && (
-                                        <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={location.metadata} />
+                                    <Widget
+                                        title="Location Certificates"
+                                        titleSize="large"
+                                        widgetButtons={certButtons}
+                                        busy={
+                                            isRenewingCertificate ||
+                                            isPushingCertificate ||
+                                            isRemovingCertificate ||
+                                            isSyncing ||
+                                            isIssuingCertificate
+                                        }
+                                    >
+                                        <CustomTable
+                                            headers={certHeaders}
+                                            data={certData}
+                                            hasCheckboxes
+                                            multiSelect={false}
+                                            onCheckedRowsChanged={(rows) => {
+                                                setCertCheckedRows(rows as string[]);
+                                            }}
+                                            hasDetails
+                                        />
+                                    </Widget>
+                                </Container>
+                            ),
+                        },
+                        {
+                            title: 'Attributes',
+                            content: (
+                                <Container>
+                                    <Widget title="Location Attributes" titleSize="large">
+                                        <AttributeViewer attributes={location?.attributes} />
+                                    </Widget>
+                                    {location && (
+                                        <CustomAttributeWidget
+                                            resource={Resource.Locations}
+                                            resourceUuid={location.uuid}
+                                            attributes={location.customAttributes}
+                                        />
                                     )}
-                                </Widget>
-                            </Widget>
-                        ),
-                    },
-                ]}
-            />
-            <Dialog
-                isOpen={confirmDelete}
-                caption="Delete Location"
-                body="You are about to delete Location. Is this what you want to do?"
-                toggle={() => setConfirmDelete(false)}
-                buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
-                ]}
-            />
-            <Dialog
-                isOpen={confirmRemoveDialog}
-                caption={`Remove ${certCheckedRows.length === 1 ? 'certificate' : 'certificates'} from the location`}
-                body={
-                    <>
-                        You are about to remove certificates from the location:
-                        <br />
-                        {certCheckedRows.map((uuid) => {
-                            const cert = location?.certificates.find((c) => c.certificateUuid === uuid);
-                            return cert ? (
-                                <>
-                                    {cert.commonName || 'empty'}
-                                    <br />
-                                </>
-                            ) : (
-                                <></>
-                            );
-                        })}
-                        <br />
-                        <br />
-                        Is this what you want to do?
-                    </>
-                }
-                toggle={() => setConfirmRemoveDialog(false)}
-                buttons={[
-                    { color: 'danger', onClick: onRemoveConfirmed, body: 'Yes, remove' },
-                    { color: 'secondary', onClick: () => setConfirmRemoveDialog(false), body: 'Cancel' },
-                ]}
-            />
-            <Dialog
-                isOpen={pushDialog}
-                caption="Push certificate to the location"
-                toggle={() => setPushDialog(false)}
-                buttons={[]}
-                size="xl"
-                body={
-                    <>
-                        <CertificateList
-                            selectCertsOnly={true}
-                            multiSelect={false}
-                            hideWidgetButtons
-                            onCheckedRowsChanged={(certs: (string | number)[]) => setSelectedCerts(certs as string[])}
-                        />
 
-                        <Form onSubmit={onPushSubmit} mutators={{ ...mutators() }}>
-                            {({ handleSubmit, pristine, submitting, valid }) => (
-                                <BootstrapForm onSubmit={handleSubmit}>
-                                    <AttributeEditor
-                                        id="pushAttributes"
-                                        attributeDescriptors={pushAttributeDescriptors!}
-                                        groupAttributesCallbackAttributes={pushGroupAttributesCallbackAttributes}
-                                        setGroupAttributesCallbackAttributes={setPushGroupAttributesCallbackAttributes}
-                                    />
+                                    <Widget title="Metadata" titleSize="large">
+                                        {location?.metadata && (
+                                            <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={location.metadata} />
+                                        )}
+                                    </Widget>
+                                </Container>
+                            ),
+                        },
+                    ]}
+                />
+                <Dialog
+                    isOpen={confirmDelete}
+                    caption="Delete Location"
+                    body="You are about to delete Location. Is this what you want to do?"
+                    toggle={() => setConfirmDelete(false)}
+                    icon="delete"
+                    buttons={[
+                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                        { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    ]}
+                />
+                <Dialog
+                    isOpen={confirmRemoveDialog}
+                    caption={`Remove ${certCheckedRows.length === 1 ? 'certificate' : 'certificates'} from the location`}
+                    body={
+                        <>
+                            You are about to remove certificates from the location:
+                            <br />
+                            {certCheckedRows.map((uuid) => {
+                                const cert = location?.certificates.find((c) => c.certificateUuid === uuid);
+                                return cert ? (
+                                    <>
+                                        {cert.commonName || 'empty'}
+                                        <br />
+                                    </>
+                                ) : (
+                                    <></>
+                                );
+                            })}
+                            <br />
+                            <br />
+                            Is this what you want to do?
+                        </>
+                    }
+                    toggle={() => setConfirmRemoveDialog(false)}
+                    buttons={[
+                        { color: 'danger', onClick: onRemoveConfirmed, body: 'Yes, remove' },
+                        { color: 'secondary', variant: 'outline', onClick: () => setConfirmRemoveDialog(false), body: 'Cancel' },
+                    ]}
+                />
+                <Dialog
+                    isOpen={pushDialog}
+                    caption="Push certificate to the location"
+                    toggle={() => setPushDialog(false)}
+                    buttons={[]}
+                    size="xl"
+                    body={
+                        <>
+                            <CertificateList
+                                selectCertsOnly={true}
+                                multiSelect={false}
+                                hideWidgetButtons
+                                onCheckedRowsChanged={(certs: (string | number)[]) => setSelectedCerts(certs as string[])}
+                            />
 
-                                    <div style={{ textAlign: 'right' }}>
-                                        <ButtonGroup>
-                                            <ProgressButton
-                                                inProgress={isPushingCertificate}
-                                                title="Push"
-                                                type="submit"
-                                                color="primary"
-                                                disabled={pristine || submitting || !valid || selectedCerts.length === 0}
-                                                onClick={handleSubmit}
-                                            />
+                            <Form onSubmit={onPushSubmit} mutators={{ ...mutators() }}>
+                                {({ handleSubmit, pristine, submitting, valid }) => (
+                                    <BootstrapForm onSubmit={handleSubmit}>
+                                        <AttributeEditor
+                                            id="pushAttributes"
+                                            attributeDescriptors={pushAttributeDescriptors!}
+                                            groupAttributesCallbackAttributes={pushGroupAttributesCallbackAttributes}
+                                            setGroupAttributesCallbackAttributes={setPushGroupAttributesCallbackAttributes}
+                                        />
 
-                                            <Button
-                                                type="button"
-                                                color="secondary"
-                                                disabled={submitting}
-                                                onClick={() => setPushDialog(false)}
-                                            >
-                                                Cancel
-                                            </Button>
-                                        </ButtonGroup>
-                                    </div>
-                                </BootstrapForm>
-                            )}
-                        </Form>
-
-                        <Spinner active={isPushingCertificate || isRemovingCertificate} />
-                    </>
-                }
-            />
-            <Dialog
-                isOpen={issueDialog}
-                caption="Issue certificate for the location"
-                toggle={() => setIssueDialog(false)}
-                buttons={[]}
-                size="lg"
-                body={
-                    <>
-                        <Form onSubmit={onIssueSubmit} mutators={{ ...mutators() }}>
-                            {({ handleSubmit, pristine, submitting, valid }) => (
-                                <BootstrapForm onSubmit={handleSubmit}>
-                                    <Field name="raProfile" validate={validateRequired()}>
-                                        {({ input, meta }) => (
-                                            <FormGroup>
-                                                <Label for="certificateSelect">RA Profile</Label>
-
-                                                <Select
-                                                    {...input}
-                                                    inputId="certificateSelect"
-                                                    maxMenuHeight={140}
-                                                    menuPlacement="auto"
-                                                    options={raProfiles.map((p) => ({
-                                                        value: p.uuid + ':#' + p.authorityInstanceUuid,
-                                                        label: p.name,
-                                                    }))}
-                                                    placeholder="Select RA profile"
-                                                    styles={{
-                                                        control: (provided) =>
-                                                            meta.touched && meta.invalid
-                                                                ? {
-                                                                      ...provided,
-                                                                      border: 'solid 1px red',
-                                                                      '&:hover': { border: 'solid 1px red' },
-                                                                  }
-                                                                : { ...provided },
-                                                    }}
-                                                    onChange={(value) => {
-                                                        input.onChange(value);
-                                                        dispatch(
-                                                            raActions.listIssuanceAttributeDescriptors({
-                                                                authorityUuid: value.value.split(':#')[1],
-                                                                uuid: value.value.split(':#')[0],
-                                                            }),
-                                                        );
-                                                    }}
+                                        <div style={{ textAlign: 'right' }}>
+                                            <ButtonGroup>
+                                                <ProgressButton
+                                                    inProgress={isPushingCertificate}
+                                                    title="Push"
+                                                    type="submit"
+                                                    color="primary"
+                                                    disabled={pristine || submitting || !valid || selectedCerts.length === 0}
+                                                    onClick={handleSubmit}
                                                 />
 
-                                                <div
-                                                    className="invalid-feedback"
-                                                    style={meta.touched && meta.invalid ? { display: 'block' } : {}}
+                                                <Button
+                                                    type="button"
+                                                    color="secondary"
+                                                    disabled={submitting}
+                                                    onClick={() => setPushDialog(false)}
                                                 >
-                                                    {meta.error}
-                                                </div>
-                                            </FormGroup>
-                                        )}
-                                    </Field>
+                                                    Cancel
+                                                </Button>
+                                            </ButtonGroup>
+                                        </div>
+                                    </BootstrapForm>
+                                )}
+                            </Form>
 
-                                    <br />
+                            <Spinner active={isPushingCertificate || isRemovingCertificate} />
+                        </>
+                    }
+                />
+                <Dialog
+                    isOpen={issueDialog}
+                    caption="Issue certificate for the location"
+                    toggle={() => setIssueDialog(false)}
+                    buttons={[]}
+                    size="lg"
+                    body={
+                        <>
+                            <Form onSubmit={onIssueSubmit} mutators={{ ...mutators() }}>
+                                {({ handleSubmit, pristine, submitting, valid }) => (
+                                    <BootstrapForm onSubmit={handleSubmit}>
+                                        <Field name="raProfile" validate={validateRequired()}>
+                                            {({ input, meta }) => (
+                                                <FormGroup>
+                                                    <Label for="certificateSelect">RA Profile</Label>
 
-                                    <TabLayout
-                                        tabs={[
-                                            {
-                                                title: 'Certificate Signing Request Attributes',
-                                                content: csrAttributeDescriptors ? (
-                                                    <AttributeEditor
-                                                        id="csrAttributes"
-                                                        attributeDescriptors={csrAttributeDescriptors}
-                                                        groupAttributesCallbackAttributes={csrGroupAttributesCallbackAttributes}
-                                                        setGroupAttributesCallbackAttributes={setCsrGroupAttributesCallbackAttributes}
+                                                    <Select
+                                                        {...input}
+                                                        inputId="certificateSelect"
+                                                        maxMenuHeight={140}
+                                                        menuPlacement="auto"
+                                                        options={raProfiles.map((p) => ({
+                                                            value: p.uuid + ':#' + p.authorityInstanceUuid,
+                                                            label: p.name,
+                                                        }))}
+                                                        placeholder="Select RA profile"
+                                                        styles={{
+                                                            control: (provided) =>
+                                                                meta.touched && meta.invalid
+                                                                    ? {
+                                                                          ...provided,
+                                                                          border: 'solid 1px red',
+                                                                          '&:hover': { border: 'solid 1px red' },
+                                                                      }
+                                                                    : { ...provided },
+                                                        }}
+                                                        onChange={(value) => {
+                                                            input.onChange(value);
+                                                            dispatch(
+                                                                raActions.listIssuanceAttributeDescriptors({
+                                                                    authorityUuid: value.value.split(':#')[1],
+                                                                    uuid: value.value.split(':#')[0],
+                                                                }),
+                                                            );
+                                                        }}
                                                     />
-                                                ) : (
-                                                    <></>
-                                                ),
-                                            },
-                                            {
-                                                title: 'RA Profile Issue Attributes',
-                                                content: issuanceAttributeDescriptors ? (
-                                                    <AttributeEditor
-                                                        id="issueAttributes"
-                                                        attributeDescriptors={issuanceAttributeDescriptors}
-                                                        groupAttributesCallbackAttributes={issueGroupAttributesCallbackAttributes}
-                                                        setGroupAttributesCallbackAttributes={setIssueGroupAttributesCallbackAttributes}
-                                                    />
-                                                ) : (
-                                                    <></>
-                                                ),
-                                            },
-                                            {
-                                                title: 'Certificate Custom Attributes',
-                                                content: (
-                                                    <AttributeEditor
-                                                        id="customCertificate"
-                                                        attributeDescriptors={resourceCustomAttributes}
-                                                    />
-                                                ),
-                                            },
-                                        ]}
-                                    />
 
-                                    <div style={{ textAlign: 'right' }}>
-                                        <ButtonGroup>
-                                            <ProgressButton
-                                                inProgress={isPushingCertificate}
-                                                title="Issue"
-                                                type="submit"
-                                                color="primary"
-                                                disabled={pristine || submitting || !valid}
-                                                onClick={handleSubmit}
-                                            />
+                                                    <div
+                                                        className="invalid-feedback"
+                                                        style={meta.touched && meta.invalid ? { display: 'block' } : {}}
+                                                    >
+                                                        {meta.error}
+                                                    </div>
+                                                </FormGroup>
+                                            )}
+                                        </Field>
 
-                                            <Button
-                                                type="button"
-                                                color="secondary"
-                                                disabled={submitting}
-                                                onClick={() => setIssueDialog(false)}
-                                            >
-                                                Cancel
-                                            </Button>
-                                        </ButtonGroup>
-                                    </div>
-                                </BootstrapForm>
-                            )}
-                        </Form>
+                                        <br />
 
-                        <Spinner
-                            active={isFetchingRaProfiles || isFetchingIssuanceAttributes || isIssuingCertificate || isRemovingCertificate}
-                        />
-                    </>
-                }
-            />
-        </Container>
+                                        <TabLayout
+                                            tabs={[
+                                                {
+                                                    title: 'Certificate Signing Request Attributes',
+                                                    content: csrAttributeDescriptors ? (
+                                                        <AttributeEditor
+                                                            id="csrAttributes"
+                                                            attributeDescriptors={csrAttributeDescriptors}
+                                                            groupAttributesCallbackAttributes={csrGroupAttributesCallbackAttributes}
+                                                            setGroupAttributesCallbackAttributes={setCsrGroupAttributesCallbackAttributes}
+                                                        />
+                                                    ) : (
+                                                        <></>
+                                                    ),
+                                                },
+                                                {
+                                                    title: 'RA Profile Issue Attributes',
+                                                    content: issuanceAttributeDescriptors ? (
+                                                        <AttributeEditor
+                                                            id="issueAttributes"
+                                                            attributeDescriptors={issuanceAttributeDescriptors}
+                                                            groupAttributesCallbackAttributes={issueGroupAttributesCallbackAttributes}
+                                                            setGroupAttributesCallbackAttributes={setIssueGroupAttributesCallbackAttributes}
+                                                        />
+                                                    ) : (
+                                                        <></>
+                                                    ),
+                                                },
+                                                {
+                                                    title: 'Certificate Custom Attributes',
+                                                    content: (
+                                                        <AttributeEditor
+                                                            id="customCertificate"
+                                                            attributeDescriptors={resourceCustomAttributes}
+                                                        />
+                                                    ),
+                                                },
+                                            ]}
+                                        />
+
+                                        <div style={{ textAlign: 'right' }}>
+                                            <ButtonGroup>
+                                                <ProgressButton
+                                                    inProgress={isPushingCertificate}
+                                                    title="Issue"
+                                                    type="submit"
+                                                    color="primary"
+                                                    disabled={pristine || submitting || !valid}
+                                                    onClick={handleSubmit}
+                                                />
+
+                                                <Button
+                                                    type="button"
+                                                    color="secondary"
+                                                    disabled={submitting}
+                                                    onClick={() => setIssueDialog(false)}
+                                                >
+                                                    Cancel
+                                                </Button>
+                                            </ButtonGroup>
+                                        </div>
+                                    </BootstrapForm>
+                                )}
+                            </Form>
+
+                            <Spinner
+                                active={
+                                    isFetchingRaProfiles || isFetchingIssuanceAttributes || isIssuingCertificate || isRemovingCertificate
+                                }
+                            />
+                        </>
+                    }
+                />
+            </Container>
+        </div>
     );
 }

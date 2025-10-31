@@ -9,13 +9,15 @@ import { actions, selectors } from 'ducks/authorities';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router';
-import { Container, Label } from 'reactstrap';
+import { Label } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { PlatformEnum, Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import { getEditAndDeleteWidgetButtons, createWidgetDetailHeaders } from 'utils/widget';
-import GoBackButton from 'components/GoBackButton';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import Container from 'components/Container';
+import Breadcrumb from 'components/Breadcrumb';
+
 export default function AuthorityDetail() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -102,69 +104,74 @@ export default function AuthorityDetail() {
     );
 
     return (
-        <Container className="themed-container" fluid>
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                forcedPath="/authorities"
-                text={`${getEnumLabel(resourceEnum, Resource.Authorities)} Inventory`}
+        <div>
+            <Breadcrumb
+                items={[
+                    { label: `${getEnumLabel(resourceEnum, Resource.Authorities)} Inventory`, href: '/authorities' },
+                    { label: authority?.name || 'Certification Authority Details', href: '' },
+                ]}
             />
-            <Widget
-                title="Certification Authority Details"
-                busy={isBusy}
-                widgetButtons={buttons}
-                titleSize="large"
-                refreshAction={getFreshAuthorityDetails}
-                widgetLockName={LockWidgetNameEnum.CertificationAuthorityDetails}
-            >
-                <br />
+            <Container>
+                <Widget
+                    title="Certification Authority Details"
+                    busy={isBusy}
+                    widgetButtons={buttons}
+                    titleSize="large"
+                    refreshAction={getFreshAuthorityDetails}
+                    widgetLockName={LockWidgetNameEnum.CertificationAuthorityDetails}
+                >
+                    <CustomTable headers={detailHeaders} data={detailData} />
+                </Widget>
 
-                <CustomTable headers={detailHeaders} data={detailData} />
-            </Widget>
+                <Widget title="Attributes" titleSize="large">
+                    <Label>Certification Authority Attributes</Label>
+                    <AttributeViewer attributes={authority?.attributes} />
+                </Widget>
 
-            <Widget title="Attributes" titleSize="large">
-                <br />
+                {authority && (
+                    <CustomAttributeWidget
+                        resource={Resource.Authorities}
+                        resourceUuid={authority.uuid}
+                        attributes={authority.customAttributes}
+                    />
+                )}
 
-                <Label>Certification Authority Attributes</Label>
-                <AttributeViewer attributes={authority?.attributes} />
-            </Widget>
-
-            {authority && (
-                <CustomAttributeWidget
-                    resource={Resource.Authorities}
-                    resourceUuid={authority.uuid}
-                    attributes={authority.customAttributes}
-                />
-            )}
-
-            <Dialog
-                isOpen={confirmDelete}
-                caption="Delete Certification Authority"
-                body="You are about to delete Authority. If you continue, connectors
+                <Dialog
+                    isOpen={confirmDelete}
+                    caption="Delete Certification Authority"
+                    body="You are about to delete Authority. If you continue, connectors
                   related to the authority will fail. Is this what you want to do?"
-                toggle={() => setConfirmDelete(false)}
-                buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
-                ]}
-            />
+                    toggle={() => setConfirmDelete(false)}
+                    icon="delete"
+                    buttons={[
+                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                        { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    ]}
+                />
 
-            <Dialog
-                isOpen={deleteErrorMessage !== ''}
-                caption="Delete Authority"
-                body={
-                    <>
-                        Failed to delete the Authority Instance as it has dependent objects. Please find the details below:
-                        <br />
-                        <br />
-                        {deleteErrorMessage}
-                    </>
-                }
-                toggle={() => dispatch(actions.clearDeleteErrorMessages())}
-                buttons={[
-                    { color: 'danger', onClick: onForceDeleteAuthority, body: 'Force' },
-                    { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
-                ]}
-            />
-        </Container>
+                <Dialog
+                    isOpen={deleteErrorMessage !== ''}
+                    caption="Delete Authority"
+                    body={
+                        <>
+                            Failed to delete the Authority Instance as it has dependent objects. Please find the details below:
+                            <br />
+                            <br />
+                            {deleteErrorMessage}
+                        </>
+                    }
+                    toggle={() => dispatch(actions.clearDeleteErrorMessages())}
+                    buttons={[
+                        { color: 'danger', onClick: onForceDeleteAuthority, body: 'Force' },
+                        {
+                            color: 'secondary',
+                            variant: 'outline',
+                            onClick: () => dispatch(actions.clearDeleteErrorMessages()),
+                            body: 'Cancel',
+                        },
+                    ]}
+                />
+            </Container>
+        </div>
     );
 }

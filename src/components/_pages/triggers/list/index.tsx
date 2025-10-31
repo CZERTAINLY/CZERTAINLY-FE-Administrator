@@ -8,12 +8,10 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
-import Select from 'react-select';
-import { Container } from 'reactstrap';
+import Select from 'components/Select';
 import { PlatformEnum, Resource } from 'types/openapi';
 
 import { useHasEventsResourceOptions, useRuleEvaluatorResourceOptions } from 'utils/rules';
-import styles from './triggerList.module.scss';
 
 const TriggerList = () => {
     const triggers = useSelector(rulesSelectors.triggers);
@@ -120,18 +118,15 @@ const TriggerList = () => {
                 tooltip: 'Select Resource',
                 onClick: () => {},
                 custom: (
-                    <div className={styles.listSelectContainer}>
-                        <Select
-                            isClearable
-                            maxMenuHeight={140}
-                            menuPlacement="auto"
-                            options={resourceOptionsWithEvents}
-                            placeholder="Select Resource"
-                            onChange={(event) => {
-                                setSelectedResource(event?.value as Resource);
-                            }}
-                        />
-                    </div>
+                    <Select
+                        placeholder="Select Resource"
+                        id="resource"
+                        options={resourceOptionsWithEvents}
+                        value={selectedResource || 'Select Resource'}
+                        onChange={(value) => {
+                            setSelectedResource(value as Resource);
+                        }}
+                    />
                 ),
             },
             {
@@ -147,11 +142,11 @@ const TriggerList = () => {
                 onClick: () => setConfirmDelete(true),
             },
         ],
-        [checkedRows, navigate, resourceOptionsWithEvents],
+        [checkedRows, navigate, resourceOptionsWithEvents, selectedResource],
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <>
             <Widget
                 titleSize="larger"
                 title="Triggers"
@@ -163,7 +158,6 @@ const TriggerList = () => {
                     description: 'Triggers are defined to trigger actions based on certain conditions of a resource',
                 }}
             >
-                <br />
                 <CustomTable
                     checkedRows={checkedRows}
                     hasCheckboxes
@@ -183,12 +177,13 @@ const TriggerList = () => {
                 caption={`Delete a Trigger`}
                 body={`You are about to delete a Trigger. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
-        </Container>
+        </>
     );
 };
 

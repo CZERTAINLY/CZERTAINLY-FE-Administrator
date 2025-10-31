@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
-import { Container } from 'reactstrap';
 
 import { actions as profileApprovalActions, selectors as profileApprovalSelector } from 'ducks/approval-profiles';
 
@@ -98,32 +97,29 @@ export default function ApprovalProfilesList() {
     );
 
     return (
-        <Container className="themed-container" fluid>
-            <Widget
-                title="List of Approval Profiles"
-                busy={isBusy}
-                widgetLockName={LockWidgetNameEnum.ListOfApprovalProfiles}
-                widgetButtons={buttons}
-                titleSize="large"
-                refreshAction={getFreshData}
-            >
-                <br />
-                <CustomTable
-                    headers={approvalProfilesTableHeader}
-                    data={approvalProfilesTableData}
-                    hasPagination={true}
-                    onPageChanged={setPageNumber}
-                    onPageSizeChanged={setPageSize}
-                    paginationData={{
-                        pageSize: pageSize,
-                        totalItems: profileApprovalListTotalItems || 0,
-                        itemsPerPageOptions: [10, 20, 50, 100],
-                        loadedPageSize: pageSize,
-                        totalPages: profileApprovalListTotalItems ? Math.ceil(profileApprovalListTotalItems / pageSize) : 0,
-                        page: pageNumber,
-                    }}
-                />
-            </Widget>
-        </Container>
+        <Widget
+            title="List of Approval Profiles"
+            busy={isBusy}
+            widgetLockName={LockWidgetNameEnum.ListOfApprovalProfiles}
+            widgetButtons={buttons}
+            titleSize="large"
+            refreshAction={getFreshData}
+        >
+            <CustomTable
+                headers={approvalProfilesTableHeader}
+                data={approvalProfilesTableData}
+                hasPagination={true}
+                onPageChanged={setPageNumber}
+                onPageSizeChanged={setPageSize}
+                paginationData={{
+                    pageSize: pageSize,
+                    totalItems: profileApprovalListTotalItems || 0,
+                    itemsPerPageOptions: [10, 20, 50, 100],
+                    loadedPageSize: pageSize,
+                    totalPages: profileApprovalListTotalItems ? Math.ceil(profileApprovalListTotalItems / pageSize) : 0,
+                    page: pageNumber,
+                }}
+            />
+        </Widget>
     );
 }
