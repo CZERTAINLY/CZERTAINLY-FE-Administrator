@@ -74,6 +74,7 @@ import Badge from 'components/Badge';
 import Container from 'components/Container';
 import Breadcrumb from 'components/Breadcrumb';
 import CertificateDetailsContent from './CertificateDetailsContent';
+import CertificateRequestContent from './CertificateRequestContent';
 
 interface ChainDownloadSwitchState {
     isDownloadTriggered: boolean;
@@ -117,9 +118,6 @@ export default function CertificateDetail() {
 
     const [isFlowTabOpened, setIsFlowTabOpened] = useState<boolean>(false);
     const raProfileSelected = useSelector(raProfilesSelectors.raProfile);
-    const certificateRequestFormatEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateFormat));
-
-    const certificateTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateType));
     const certificateValidationCheck = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateValidationCheck));
     const isFetchingApprovals = useSelector(selectors.isFetchingApprovals);
     const isFetching = useSelector(selectors.isFetchingDetail);
@@ -389,69 +387,6 @@ export default function CertificateDetail() {
         });
     }, [dispatch, certificate, locationsCheckedRows, locationToEntityMap]);
 
-    const downloadCSRDropDown = useMemo(
-        () => (
-            <UncontrolledButtonDropdown>
-                <DropdownToggle color="light" caret className="btn btn-link" title="Download">
-                    <i className="fa fa-download" aria-hidden="true" />
-                </DropdownToggle>
-
-                <DropdownMenu>
-                    <div className="d-flex">
-                        <DropdownItem
-                            key="pem"
-                            onClick={() =>
-                                downloadFile(
-                                    formatPEM(certificate?.certificateRequest?.content ?? '', true),
-                                    fileNameToDownload + '_CSR' + '.pem',
-                                )
-                            }
-                        >
-                            PEM (.pem)
-                        </DropdownItem>
-                        <i
-                            className={cx('fa fa-copy', styles.copyButton)}
-                            onClick={() => {
-                                if (!certificate?.certificateRequest?.content) return;
-                                copyToClipboard(
-                                    formatPEM(certificate?.certificateRequest?.content ?? '', true),
-                                    'Certificate request content was copied to clipboard',
-                                    'Failed to copy certificate request content to clipboard',
-                                );
-                            }}
-                        />
-                    </div>
-
-                    <DropdownItem
-                        key="req"
-                        onClick={() =>
-                            downloadFile(
-                                Buffer.from(certificate?.certificateRequest?.content ?? '', 'base64'),
-                                fileNameToDownload + '_CSR' + '.req',
-                            )
-                        }
-                    >
-                        REQ (.req)
-                    </DropdownItem>
-                </DropdownMenu>
-            </UncontrolledButtonDropdown>
-        ),
-        [certificate, fileNameToDownload, copyToClipboard],
-    );
-
-    const buttonsCSR: WidgetButtonProps[] = useMemo(
-        () => [
-            {
-                icon: 'download',
-                disabled: false,
-                tooltip: 'Download CSR',
-                custom: downloadCSRDropDown,
-                onClick: () => {},
-            },
-        ],
-        [downloadCSRDropDown],
-    );
-
     const buttonsLocations: WidgetButtonProps[] = useMemo(
         () => [
             {
@@ -603,64 +538,6 @@ export default function CertificateDetail() {
         ],
         [],
     );
-
-    const csrPropertiesData: TableDataRow[] = useMemo(() => {
-        return certificate?.certificateRequest
-            ? ([
-                  {
-                      id: 'commonName',
-                      columns: ['Common Name', certificate?.certificateRequest?.commonName ?? ''],
-                  },
-                  {
-                      id: 'certificateType',
-                      columns: [
-                          'Certificate Type',
-                          certificate?.certificateRequest?.certificateType
-                              ? getEnumLabel(certificateTypeEnum, certificate?.certificateRequest?.certificateType)
-                              : '',
-                      ],
-                  },
-                  {
-                      id: 'certificateRequestFormat',
-                      columns: [
-                          'Certificate Request Format',
-                          certificate?.certificateRequest?.certificateRequestFormat
-                              ? getEnumLabel(certificateRequestFormatEnum, certificate?.certificateRequest?.certificateRequestFormat)
-                              : '',
-                      ],
-                  },
-                  {
-                      id: 'publicKeyAlgorithm',
-                      columns: ['Public Key Algorithm', certificate?.certificateRequest?.publicKeyAlgorithm ?? ''],
-                  },
-                  {
-                      id: 'signatureAlgorithm',
-                      columns: ['Signature Algorithm', certificate?.certificateRequest?.signatureAlgorithm ?? ''],
-                  },
-                  certificate.hybridCertificate
-                      ? {
-                            id: 'altSignatureAlgorithm',
-                            columns: ['Alternative Signature Algorithm', certificate?.certificateRequest?.altSignatureAlgorithm ?? ''],
-                        }
-                      : null,
-                  {
-                      id: 'subjectDn',
-                      columns: ['Subject DN', certificate?.certificateRequest?.subjectDn ?? ''],
-                  },
-                  {
-                      id: 'asn1RequestStructure',
-                      columns: [
-                          'ASN.1 Structure',
-                          certificate?.certificateRequest?.content ? (
-                              <Asn1Dialog content={certificate?.certificateRequest?.content} isCSR={true} />
-                          ) : (
-                              <>n/a</>
-                          ),
-                      ],
-                  },
-              ].filter((el) => el !== null) as NonNullable<TableDataRow>[])
-            : [];
-    }, [certificate?.certificateRequest, certificate?.hybridCertificate, certificateRequestFormatEnum, certificateTypeEnum]);
 
     const validationData: TableDataRow[] = useMemo(() => {
         let validationDataRows =
@@ -1152,52 +1029,12 @@ export default function CertificateDetail() {
                         title: 'Request',
                         hidden: !certificate?.certificateRequest?.content,
                         content: (
-                            <>
-                                <Container className="md:grid grid-cols-2 items-start">
-                                    <Widget
-                                        widgetButtons={buttonsCSR}
-                                        title="Properties"
-                                        busy={isBusy}
-                                        titleSize="large"
-                                        lockSize="large"
-                                        refreshAction={getFreshCertificateDetail}
-                                    >
-                                        <CustomTable headers={detailHeaders} data={csrPropertiesData} />
-                                    </Widget>
-                                    <Container>
-                                        <Widget title="Request Attributes" busy={isBusy} titleSize="large">
-                                            <AttributeViewer
-                                                viewerType={ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE}
-                                                attributes={certificate?.certificateRequest?.attributes}
-                                            />
-                                        </Widget>
-
-                                        <Widget title="Signature Attributes" titleSize="large">
-                                            <AttributeViewer
-                                                viewerType={ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE}
-                                                attributes={certificate?.certificateRequest?.signatureAttributes}
-                                            />
-                                        </Widget>
-                                    </Container>
-                                </Container>
-                                <Container marginTop>
-                                    {certificate?.hybridCertificate && (
-                                        <Widget title="Alternative Signature Attributes" titleSize="large">
-                                            <br />
-                                            <AttributeViewer
-                                                viewerType={ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE}
-                                                attributes={certificate?.certificateRequest?.altSignatureAttributes}
-                                            />
-                                        </Widget>
-                                    )}
-                                    <ComplianceCheckResultWidget
-                                        resource={Resource.CertificateRequests}
-                                        widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}
-                                        objectUuid={certificate?.certificateRequest?.uuid ?? ''}
-                                        setSelectedAttributesInfo={setSelectedAttributesInfo}
-                                    />
-                                </Container>
-                            </>
+                            <CertificateRequestContent
+                                certificate={certificate}
+                                isBusy={isBusy}
+                                getFreshCertificateDetail={getFreshCertificateDetail}
+                                setSelectedAttributesInfo={setSelectedAttributesInfo}
+                            />
                         ),
                     },
                     {
