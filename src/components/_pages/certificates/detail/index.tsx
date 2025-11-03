@@ -46,13 +46,10 @@ import {
     Form as BootstrapForm,
     Button,
     ButtonGroup,
-    Col,
-    Container,
     DropdownItem,
     DropdownMenu,
     DropdownToggle,
     Label,
-    Row,
     UncontrolledButtonDropdown,
 } from 'reactstrap';
 import { AttributeDescriptorModel, AttributeResponseModel } from 'types/attributes';
@@ -82,9 +79,10 @@ import styles from './certificateDetail.module.scss';
 import { createWidgetDetailHeaders } from 'utils/widget';
 import CertificateList from 'components/_pages/certificates/list';
 import { capitalize } from 'utils/common-utils';
-import GoBackButton from 'components/GoBackButton';
 import ComplianceCheckResultWidget from 'components/_pages/certificates/ComplianceCheckResultWidget/ComplianceCheckResultWidget';
 import Badge from 'components/Badge';
+import Container from 'components/Container';
+import Breadcrumb from 'components/Breadcrumb';
 
 interface ChainDownloadSwitchState {
     isDownloadTriggered: boolean;
@@ -787,15 +785,13 @@ export default function CertificateDetail() {
 
     const updateOwnerBody = useMemo(
         () => (
-            <div>
-                <Select
-                    maxMenuHeight={140}
-                    menuPlacement="auto"
-                    options={userOptions}
-                    placeholder={`Select Owner`}
-                    onChange={(event) => setOwnerUuid(event?.value)}
-                />
-            </div>
+            <Select
+                maxMenuHeight={140}
+                menuPlacement="auto"
+                options={userOptions}
+                placeholder={`Select Owner`}
+                onChange={(event) => setOwnerUuid(event?.value)}
+            />
         ),
         [setOwnerUuid, userOptions],
     );
@@ -1982,80 +1978,64 @@ export default function CertificateDetail() {
     }, [handleRelatedFiltersClear]);
 
     return (
-        <Container className={cx('themed-container', styles.certificateContainer)} fluid>
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                text={`${getEnumLabel(resourceEnum, Resource.Certificates)} Inventory`}
-                onClick={() => {
-                    handleRelatedFiltersClear();
-                    navigate('/certificates');
-                }}
+        <div>
+            <Breadcrumb
+                items={[
+                    { label: `${getEnumLabel(resourceEnum, Resource.Certificates)} Inventory`, href: '/certificates' },
+                    { label: certificate?.commonName || 'Certificate Details', href: '' },
+                ]}
             />
             <TabLayout
                 tabs={[
                     {
                         title: 'Details',
                         content: (
-                            <Widget>
-                                <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                                    <Col>
-                                        <Widget
-                                            title={certificateTitle}
-                                            busy={isBusy}
-                                            widgetButtons={buttons}
-                                            titleSize="large"
-                                            lockSize="large"
-                                            widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}
-                                            refreshAction={getFreshCertificateDetail}
-                                        >
-                                            <br />
-                                            <CustomTable hasPagination={false} headers={detailHeaders} data={detailData} />
+                            <Container className="md:grid grid-cols-2 items-start">
+                                <Widget
+                                    title={certificateTitle}
+                                    busy={isBusy}
+                                    widgetButtons={buttons}
+                                    titleSize="large"
+                                    lockSize="large"
+                                    widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}
+                                    refreshAction={getFreshCertificateDetail}
+                                >
+                                    <CustomTable hasPagination={false} headers={detailHeaders} data={detailData} />
+                                </Widget>
+                                <Container>
+                                    <Widget title="Subject Alternative Names" busy={isBusy} titleSize="large">
+                                        <CustomTable headers={detailHeaders} data={sanData} />
+                                    </Widget>
+                                    {certificate?.protocolInfo && (
+                                        <Widget title="Protocol" busy={isBusy} titleSize="large">
+                                            <CustomTable headers={protocolHeader} data={protocolData} />
                                         </Widget>
-                                    </Col>
-
-                                    <Col>
-                                        <Widget title="Subject Alternative Names" busy={isBusy} titleSize="large">
-                                            <br />
-                                            <CustomTable headers={detailHeaders} data={sanData} />
-                                        </Widget>
-                                        {certificate?.protocolInfo && (
-                                            <Widget title="Protocol" busy={isBusy} titleSize="large">
-                                                <br />
-                                                <CustomTable headers={protocolHeader} data={protocolData} />
-                                            </Widget>
-                                        )}
-                                        <Widget title="Other Properties" busy={isBusy} titleSize="large">
-                                            <br />
-                                            <CustomTable headers={propertiesHeaders} data={propertiesData} />
-                                        </Widget>
-                                    </Col>
-                                </Row>
-                            </Widget>
+                                    )}
+                                    <Widget title="Other Properties" busy={isBusy} titleSize="large">
+                                        <CustomTable headers={propertiesHeaders} data={propertiesData} />
+                                    </Widget>
+                                </Container>
+                            </Container>
                         ),
                     },
                     {
                         title: 'Request',
                         hidden: !certificate?.certificateRequest?.content,
                         content: (
-                            <Widget>
-                                <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                                    <Col>
-                                        <Widget
-                                            widgetButtons={buttonsCSR}
-                                            title="Properties"
-                                            busy={isBusy}
-                                            titleSize="large"
-                                            lockSize="large"
-                                            refreshAction={getFreshCertificateDetail}
-                                        >
-                                            <br />
-                                            <CustomTable headers={detailHeaders} data={csrPropertiesData} />
-                                        </Widget>
-                                    </Col>
-
-                                    <Col>
+                            <>
+                                <Container className="md:grid grid-cols-2 items-start">
+                                    <Widget
+                                        widgetButtons={buttonsCSR}
+                                        title="Properties"
+                                        busy={isBusy}
+                                        titleSize="large"
+                                        lockSize="large"
+                                        refreshAction={getFreshCertificateDetail}
+                                    >
+                                        <CustomTable headers={detailHeaders} data={csrPropertiesData} />
+                                    </Widget>
+                                    <Container>
                                         <Widget title="Request Attributes" busy={isBusy} titleSize="large">
-                                            <br />
                                             <AttributeViewer
                                                 viewerType={ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE}
                                                 attributes={certificate?.certificateRequest?.attributes}
@@ -2063,41 +2043,37 @@ export default function CertificateDetail() {
                                         </Widget>
 
                                         <Widget title="Signature Attributes" titleSize="large">
-                                            <br />
                                             <AttributeViewer
                                                 viewerType={ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE}
                                                 attributes={certificate?.certificateRequest?.signatureAttributes}
                                             />
                                         </Widget>
-
-                                        {certificate?.hybridCertificate && (
-                                            <Widget title="Alternative Signature Attributes" titleSize="large">
-                                                <br />
-                                                <AttributeViewer
-                                                    viewerType={ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE}
-                                                    attributes={certificate?.certificateRequest?.altSignatureAttributes}
-                                                />
-                                            </Widget>
-                                        )}
-                                    </Col>
-                                </Row>
-                                <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                                    <Col style={{ width: '100%' }}>
-                                        <ComplianceCheckResultWidget
-                                            resource={Resource.CertificateRequests}
-                                            widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}
-                                            objectUuid={certificate?.certificateRequest?.uuid ?? ''}
-                                            setSelectedAttributesInfo={setSelectedAttributesInfo}
-                                        />
-                                    </Col>
-                                </Row>
-                            </Widget>
+                                    </Container>
+                                </Container>
+                                <Container marginTop>
+                                    {certificate?.hybridCertificate && (
+                                        <Widget title="Alternative Signature Attributes" titleSize="large">
+                                            <br />
+                                            <AttributeViewer
+                                                viewerType={ATTRIBUTE_VIEWER_TYPE.ATTRIBUTE}
+                                                attributes={certificate?.certificateRequest?.altSignatureAttributes}
+                                            />
+                                        </Widget>
+                                    )}
+                                    <ComplianceCheckResultWidget
+                                        resource={Resource.CertificateRequests}
+                                        widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}
+                                        objectUuid={certificate?.certificateRequest?.uuid ?? ''}
+                                        setSelectedAttributesInfo={setSelectedAttributesInfo}
+                                    />
+                                </Container>
+                            </>
                         ),
                     },
                     {
                         title: 'Attributes',
                         content: (
-                            <Widget>
+                            <Container>
                                 <Widget title="Metadata" titleSize="large" widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}>
                                     <br />
                                     <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={certificate?.metadata} />
@@ -2128,14 +2104,14 @@ export default function CertificateDetail() {
                                         attributes={certificate.customAttributes}
                                     />
                                 )}
-                            </Widget>
+                            </Container>
                         ),
                     },
                     {
                         title: 'Validation',
                         hidden: !certificate?.certificateContent,
                         content: (
-                            <Widget>
+                            <Container>
                                 <Widget
                                     title="Validation Status"
                                     busy={isFetchingValidationResult}
@@ -2143,7 +2119,6 @@ export default function CertificateDetail() {
                                     refreshAction={certificate && getFreshCertificateValidations}
                                     widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}
                                 >
-                                    <br />
                                     <CustomTable headers={validationHeaders} data={validationData} />
                                 </Widget>
                                 <ComplianceCheckResultWidget
@@ -2152,62 +2127,53 @@ export default function CertificateDetail() {
                                     objectUuid={certificate?.uuid ?? ''}
                                     setSelectedAttributesInfo={setSelectedAttributesInfo}
                                 />
-                            </Widget>
+                            </Container>
                         ),
                     },
                     {
                         title: 'Approvals',
                         content: (
-                            <Widget>
-                                <Widget
-                                    title="Certificate Approvals"
-                                    busy={isFetchingApprovals}
-                                    titleSize="large"
-                                    refreshAction={getFreshApprovalList}
-                                >
-                                    <br />
-                                    <CustomTable headers={approvalsHeader} data={approvalsTableData} />
-                                </Widget>
+                            <Widget
+                                title="Certificate Approvals"
+                                busy={isFetchingApprovals}
+                                titleSize="large"
+                                refreshAction={getFreshApprovalList}
+                            >
+                                <CustomTable headers={approvalsHeader} data={approvalsTableData} />
                             </Widget>
                         ),
                     },
                     {
                         title: 'Locations',
                         content: (
-                            <Widget>
-                                <Widget
-                                    title="Certificate Locations"
-                                    busy={isFetchingLocations || isRemovingCertificate || isPushingCertificate}
-                                    widgetButtons={buttonsLocations}
-                                    titleSize="large"
-                                    refreshAction={getFreshCertificateLocations}
-                                    widgetLockName={LockWidgetNameEnum.CertificationLocations}
-                                >
-                                    <br />
-                                    <CustomTable
-                                        headers={locationsHeaders}
-                                        data={locationsData}
-                                        hasCheckboxes={true}
-                                        onCheckedRowsChanged={(rows) => setLocationCheckedRows(rows as string[])}
-                                    />
-                                </Widget>
+                            <Widget
+                                title="Certificate Locations"
+                                busy={isFetchingLocations || isRemovingCertificate || isPushingCertificate}
+                                widgetButtons={buttonsLocations}
+                                titleSize="large"
+                                refreshAction={getFreshCertificateLocations}
+                                widgetLockName={LockWidgetNameEnum.CertificationLocations}
+                            >
+                                <CustomTable
+                                    headers={locationsHeaders}
+                                    data={locationsData}
+                                    hasCheckboxes={true}
+                                    onCheckedRowsChanged={(rows) => setLocationCheckedRows(rows as string[])}
+                                />
                             </Widget>
                         ),
                     },
                     {
                         title: 'History',
                         content: (
-                            <Widget>
-                                <Widget
-                                    title="Event History"
-                                    busy={isFetchingHistory}
-                                    titleSize="large"
-                                    refreshAction={getFreshCertificateHistory}
-                                    widgetLockName={LockWidgetNameEnum.CertificateEventHistory}
-                                >
-                                    <br />
-                                    <CustomTable headers={historyHeaders} data={historyEntry} hasPagination={true} />
-                                </Widget>
+                            <Widget
+                                title="Event History"
+                                busy={isFetchingHistory}
+                                titleSize="large"
+                                refreshAction={getFreshCertificateHistory}
+                                widgetLockName={LockWidgetNameEnum.CertificateEventHistory}
+                            >
+                                <CustomTable headers={historyHeaders} data={historyEntry} hasPagination={true} />
                             </Widget>
                         ),
                     },
@@ -2234,25 +2200,22 @@ export default function CertificateDetail() {
                     {
                         title: 'Related Certificates',
                         content: (
-                            <Widget>
-                                <Widget
-                                    title="Related Certificates"
-                                    busy={isDeassociating || isAssociating || isFetchingRelations}
-                                    titleSize="large"
-                                    widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}
-                                    widgetButtons={relatedCertificatesButtons}
-                                    refreshAction={getFreshRelatedCertificates}
-                                >
-                                    <br />
-                                    <CustomTable
-                                        headers={relatedCertificatesHeaders}
-                                        data={relatedCertificatesData}
-                                        hasCheckboxes={true}
-                                        hasPagination={true}
-                                        onCheckedRowsChanged={(rows) => setRelatedCertificateCheckedRows(rows as string[])}
-                                        multiSelect={false}
-                                    />
-                                </Widget>
+                            <Widget
+                                title="Related Certificates"
+                                busy={isDeassociating || isAssociating || isFetchingRelations}
+                                titleSize="large"
+                                widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}
+                                widgetButtons={relatedCertificatesButtons}
+                                refreshAction={getFreshRelatedCertificates}
+                            >
+                                <CustomTable
+                                    headers={relatedCertificatesHeaders}
+                                    data={relatedCertificatesData}
+                                    hasCheckboxes={true}
+                                    hasPagination={true}
+                                    onCheckedRowsChanged={(rows) => setRelatedCertificateCheckedRows(rows as string[])}
+                                    multiSelect={false}
+                                />
                             </Widget>
                         ),
                     },
@@ -2526,6 +2489,6 @@ export default function CertificateDetail() {
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmRemove(false), body: 'Cancel' },
                 ]}
             />
-        </Container>
+        </div>
     );
 }
