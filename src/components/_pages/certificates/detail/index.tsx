@@ -7,39 +7,33 @@ import ProgressButton from 'components/ProgressButton';
 import Spinner from 'components/Spinner';
 import StatusBadge from 'components/StatusBadge';
 import { actions as utilsActuatorActions } from 'ducks/utilsActuator';
-import { actions as userInterfaceActions } from '../../../../ducks/user-interface';
 
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
-import { actions as groupAction, selectors as groupSelectors } from 'ducks/certificateGroups';
-import { actions as userAction, selectors as userSelectors } from 'ducks/users';
+import { selectors as groupSelectors } from 'ducks/certificateGroups';
+import { selectors as userSelectors } from 'ducks/users';
 
 import { actions, selectors } from 'ducks/certificates';
 import { actions as connectorActions } from 'ducks/connectors';
 import { actions as locationActions, selectors as locationSelectors } from 'ducks/locations';
-import { actions as raProfileAction, selectors as raProfileSelectors } from 'ducks/ra-profiles';
+import { selectors as raProfileSelectors } from 'ducks/ra-profiles';
 import { selectors as settingSelectors } from 'ducks/settings';
 import { EntityType, actions as filterActions, selectors as filterSelectors } from 'ducks/filters';
 
 import {
     CertificateState as CertStatus,
     CertificateFormatEncoding,
-    CertificateProtocol,
-    CertificateRequestFormat,
-    CertificateRevocationReason,
     CertificateSimpleDto,
     CertificateSubjectType,
-    CertificateValidationStatus,
     FilterConditionOperator,
     FilterFieldSource,
     SearchFilterRequestDto,
 } from '../../../../types/openapi';
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router';
-import Select from 'react-select';
 
 import { actions as raProfilesActions, selectors as raProfilesSelectors } from 'ducks/ra-profiles';
 import {
@@ -53,7 +47,7 @@ import {
     UncontrolledButtonDropdown,
 } from 'reactstrap';
 import { AttributeDescriptorModel, AttributeResponseModel } from 'types/attributes';
-import { ComplianceStatus, PlatformEnum, Resource } from 'types/openapi';
+import { PlatformEnum, Resource } from 'types/openapi';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { mutators } from 'utils/attributes/attributeEditorMutators';
 import { collectFormAttributes } from 'utils/attributes/attributes';
@@ -63,18 +57,14 @@ import { dateFormatter } from 'utils/dateUtil';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import TabLayout from '../../../Layout/TabLayout';
 import Asn1Dialog from '../Asn1Dialog/Asn1Dialog';
-import CertificateRekeyDialog from '../CertificateRekeyDialog';
-import CertificateRenewDialog from '../CertificateRenewDialog';
 
 import cx from 'classnames';
 import FlowChart, { CustomNode } from 'components/FlowChart';
-import SwitchWidget from 'components/SwitchWidget';
 import { transformCertificateObjectToNodesAndEdges } from 'ducks/transform/certificates';
 import { Edge } from 'reactflow';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { DeviceType, useCopyToClipboard, useDeviceType } from 'utils/common-hooks';
 import CertificateStatus from '../CertificateStatus';
-import CertificateDownloadForm from './CertificateDownloadForm';
 import styles from './certificateDetail.module.scss';
 import { createWidgetDetailHeaders } from 'utils/widget';
 import CertificateList from 'components/_pages/certificates/list';
@@ -83,6 +73,7 @@ import ComplianceCheckResultWidget from 'components/_pages/certificates/Complian
 import Badge from 'components/Badge';
 import Container from 'components/Container';
 import Breadcrumb from 'components/Breadcrumb';
+import CertificateDetailsContent from './CertificateDetailsContent';
 
 interface ChainDownloadSwitchState {
     isDownloadTriggered: boolean;
@@ -98,7 +89,6 @@ interface SelectChangeValue {
 export default function CertificateDetail() {
     const dispatch = useDispatch();
     const { id } = useParams();
-    const navigate = useNavigate();
 
     const copyToClipboard = useCopyToClipboard();
     const certificate = useSelector(selectors.certificateDetail);
@@ -107,8 +97,6 @@ export default function CertificateDetail() {
     const certificateChainDownloadContent = useSelector(selectors.certificateChainDownloadContent);
     const certificateDownloadContent = useSelector(selectors.certificateDownloadContent);
 
-    const groupsList = useSelector(groupSelectors.certificateGroups);
-    const raProfiles = useSelector(raProfileSelectors.raProfiles);
     const users = useSelector(userSelectors.users);
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const eventHistory = useSelector(selectors.certificateHistory);
@@ -128,17 +116,11 @@ export default function CertificateDetail() {
     const [certificateDownloadSwitch, setCertificateDownload] = useState<ChainDownloadSwitchState>({ isDownloadTriggered: false });
 
     const [isFlowTabOpened, setIsFlowTabOpened] = useState<boolean>(false);
-    const [raProfileOptions, setRaProfileOptions] = useState<{ label: string; value: string }[]>([]);
-    const [userOptions, setUserOptions] = useState<{ label: string; value: string }[]>([]);
-    const [certificateRevokeReasonOptions, setCertificateRevokeReasonOptions] = useState<{ label: string; value: string }[]>([]);
     const raProfileSelected = useSelector(raProfilesSelectors.raProfile);
     const certificateRequestFormatEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateFormat));
-    const certificateKeyUsageEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateKeyUsage));
 
     const certificateTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateType));
-    const certificateRevocationReason = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateRevocationReason));
     const certificateValidationCheck = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateValidationCheck));
-    const certificateProtocol = useSelector(enumSelectors.platformEnum(PlatformEnum.CertificateProtocol));
     const isFetchingApprovals = useSelector(selectors.isFetchingApprovals);
     const isFetching = useSelector(selectors.isFetchingDetail);
     const isDeleting = useSelector(selectors.isDeleting);
@@ -152,28 +134,14 @@ export default function CertificateDetail() {
     const isRekeying = useSelector(selectors.isRekeying);
     const isFetchingValidationResult = useSelector(selectors.isFetchingValidationResult);
     const isFetchingCertificateChain = useSelector(selectors.isFetchingCertificateChain);
-    const isUpdatingTrustedStatus = useSelector(selectors.isUpdatingTrustedStatus);
     const isArchiving = useSelector(selectors.isArchiving);
 
     const isDeassociating = useSelector(selectors.isDeassociating);
     const isAssociating = useSelector(selectors.isAssociating);
     const isFetchingRelations = useSelector(selectors.isFetchingRelations);
 
-    const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
-    const [renew, setRenew] = useState<boolean>(false);
-    const [rekey, setRekey] = useState<boolean>(false);
-    const [revoke, setRevoke] = useState<boolean>(false);
-    const [updateGroup, setUpdateGroup] = useState<boolean>(false);
-    const [updateOwner, setUpdateOwner] = useState<boolean>(false);
-    const [updateRaProfile, setUpdateRaProfile] = useState<boolean>(false);
     const deviceType = useDeviceType();
     const [currentInfoId, setCurrentInfoId] = useState('');
-
-    const [groups, setGroups] = useState<SelectChangeValue[]>([]);
-    const [ownerUuid, setOwnerUuid] = useState<string>();
-    const [raProfile, setRaProfile] = useState<string>();
-    const [raProfileAuthorityUuid, setRaProfileAuthorityUuid] = useState<string>();
-    const [revokeReason, setRevokeReason] = useState<CertificateRevocationReason>();
 
     const [locationsCheckedRows, setLocationCheckedRows] = useState<string[]>([]);
     const [selectLocationsCheckedRows, setSelectLocationCheckedRows] = useState<string[]>([]);
@@ -227,7 +195,7 @@ export default function CertificateDetail() {
         ],
     );
 
-    const isCertificateArchived = useMemo(() => certificate?.archived ?? false, [certificate?.archived]);
+    const isCertificateArchived = !!certificate?.archived;
 
     const transformCertificate = useCallback(() => {
         const { nodes, edges } = transformCertificateObjectToNodesAndEdges(
@@ -361,57 +329,6 @@ export default function CertificateDetail() {
     }, [certificate, locations]);
 
     useEffect(() => {
-        setUserOptions(
-            users.map((user) => ({
-                value: user.uuid,
-                label: `${user.firstName ? user.firstName + ' ' : ''}${user.lastName ? user.lastName + ' ' : ''}(${user.username})`,
-            })),
-        );
-    }, [dispatch, users]);
-
-    useEffect(() => {
-        setRaProfileOptions(raProfiles.map((group) => ({ value: group.uuid + ':#' + group.authorityInstanceUuid, label: group.name })));
-    }, [dispatch, raProfiles]);
-
-    useEffect(() => {
-        if (!certificateRevocationReason) return;
-        const certificateRevokeReasonOptions = Object.keys(certificateRevocationReason)
-            .map((key) => ({
-                value: certificateRevocationReason[key].code,
-                label: certificateRevocationReason[key].label,
-            }))
-            .sort((a, b) => a.label.localeCompare(b.label));
-        setCertificateRevokeReasonOptions(certificateRevokeReasonOptions);
-    }, [dispatch, certificateRevocationReason]);
-
-    const getGroupList = useCallback(() => {
-        if (!id) return;
-        dispatch(groupAction.listGroups());
-    }, [dispatch, id]);
-
-    const getUserList = useCallback(() => {
-        if (!id) {
-            return;
-        }
-        dispatch(userAction.list());
-    }, [dispatch, id]);
-
-    useEffect(() => {
-        if (!id || !revoke) return;
-        dispatch(
-            actions.getRevocationAttributes({
-                raProfileUuid: certificate?.raProfile?.uuid || '',
-                authorityUuid: certificate?.raProfile?.authorityInstanceUuid || '',
-            }),
-        );
-    }, [dispatch, revoke, id, certificate?.raProfile?.uuid, certificate?.raProfile?.authorityInstanceUuid]);
-
-    const getRaProfileList = useCallback(() => {
-        if (!id) return;
-        dispatch(raProfileAction.listRaProfiles());
-    }, [dispatch, id]);
-
-    useEffect(() => {
         dispatch(connectorActions.clearCallbackData());
         setGroupAttributesCallbackAttributes([]);
 
@@ -424,105 +341,6 @@ export default function CertificateDetail() {
                   }),
               );
     }, [dispatch, locationToEntityMap, selectLocationsCheckedRows]);
-
-    const onDeleteConfirmed = useCallback(() => {
-        if (!certificate) return;
-
-        dispatch(actions.deleteCertificate({ uuid: certificate.uuid }));
-        setConfirmDelete(false);
-    }, [certificate, dispatch]);
-
-    const onCancelGroupUpdate = useCallback(() => {
-        setUpdateGroup(false);
-        const certificatePreselectedGroups = certificate?.groups?.map((group) => ({
-            value: group.uuid,
-            label: group.name,
-        }));
-
-        setGroups(certificatePreselectedGroups || []);
-    }, [setUpdateGroup, setGroups, certificate?.groups]);
-
-    const onCancelOwnerUpdate = useCallback(() => {
-        setUpdateOwner(false);
-        setOwnerUuid(undefined);
-    }, [setUpdateOwner, setOwnerUuid]);
-
-    const onCancelRaProfileUpdate = useCallback(() => {
-        setUpdateRaProfile(false);
-        setRaProfile(undefined);
-    }, [setUpdateRaProfile, setRaProfile]);
-
-    const onComplianceCheck = useCallback(() => {
-        if (!certificate?.uuid) return;
-
-        dispatch(actions.checkCompliance({ certificateUuids: [certificate.uuid] }));
-    }, [dispatch, certificate?.uuid]);
-
-    const onUpdateGroup = useCallback(() => {
-        if (!certificate || !groups) return;
-
-        dispatch(actions.updateGroup({ uuid: certificate.uuid, updateGroupRequest: { groupUuids: groups.map((group) => group.value) } }));
-        setUpdateGroup(false);
-    }, [certificate, dispatch, groups]);
-
-    const onUpdateOwner = useCallback(() => {
-        if (!certificate || !ownerUuid || !users) {
-            return;
-        }
-        const user = users.find((u) => u.uuid === ownerUuid);
-        if (!user) {
-            return;
-        }
-
-        dispatch(actions.updateOwner({ uuid: certificate.uuid, user, updateOwnerRequest: { ownerUuid: ownerUuid } }));
-        setUpdateOwner(false);
-    }, [certificate, dispatch, ownerUuid, users]);
-
-    const onUpdateRaProfile = useCallback(() => {
-        if (!certificate || !raProfile) return;
-
-        dispatch(
-            actions.updateRaProfile({
-                uuid: certificate.uuid,
-                updateRaProfileRequest: { raProfileUuid: raProfile },
-                authorityUuid: raProfileAuthorityUuid || '',
-            }),
-        );
-        setUpdateRaProfile(false);
-    }, [certificate, dispatch, raProfile, raProfileAuthorityUuid]);
-
-    const onRevoke = useCallback(() => {
-        if (!certificate) return;
-
-        dispatch(
-            actions.revokeCertificate({
-                uuid: certificate.uuid,
-                revokeRequest: { reason: revokeReason || CertificateRevocationReason.Unspecified, attributes: [] },
-                raProfileUuid: certificate.raProfile?.uuid || '',
-                authorityUuid: certificate.raProfile?.authorityInstanceUuid || '',
-            }),
-        );
-        setRevoke(false);
-    }, [certificate, dispatch, revokeReason]);
-
-    const onRenew = useCallback(
-        (data: { fileContent?: string }) => {
-            dispatch(
-                actions.renewCertificate({
-                    uuid: certificate?.uuid || '',
-                    renewRequest: {
-                        format: CertificateRequestFormat.Pkcs10,
-                        request: data.fileContent,
-                    },
-                    raProfileUuid: certificate?.raProfile?.uuid || '',
-                    authorityUuid: certificate?.raProfile?.authorityInstanceUuid || '',
-                }),
-            );
-
-            setRenew(false);
-        },
-        [dispatch, certificate],
-    );
 
     const onAddCertToLocations = useCallback(
         (values: { locationAttributes: Record<string, any> }) => {
@@ -570,132 +388,6 @@ export default function CertificateDetail() {
             );
         });
     }, [dispatch, certificate, locationsCheckedRows, locationToEntityMap]);
-
-    const onDownloadClick = useCallback(() => {
-        dispatch(
-            userInterfaceActions.showGlobalModal({
-                content: <CertificateDownloadForm />,
-                isOpen: true,
-                size: 'lg',
-                title: 'Download',
-            }),
-        );
-    }, [dispatch]);
-
-    useEffect(() => {
-        const certificatePreselectedGroups = certificate?.groups?.length
-            ? certificate.groups.map((group) => ({
-                  value: group.uuid,
-                  label: group.name,
-              }))
-            : [];
-
-        setGroups(certificatePreselectedGroups);
-    }, [certificate?.groups]);
-
-    const groupOptions = useMemo(
-        () =>
-            groupsList.map((group) => ({
-                value: group.uuid,
-                label: group.name,
-            })),
-        [groupsList],
-    );
-
-    const buttons: WidgetButtonProps[] = useMemo(
-        () => [
-            {
-                icon: 'trash',
-                disabled: false,
-                tooltip: 'Delete',
-                onClick: () => {
-                    setConfirmDelete(true);
-                },
-            },
-            {
-                icon: 'cubes',
-                disabled: !certificate?.raProfile || certificate?.state !== CertStatus.Requested || isCertificateArchived,
-                tooltip: 'Issue',
-                onClick: () => {
-                    dispatch(
-                        actions.issueCertificateNew({
-                            certificateUuid: certificate?.uuid ?? '',
-                            raProfileUuid: certificate?.raProfile?.uuid ?? '',
-                            authorityUuid: certificate?.raProfile?.authorityInstanceUuid ?? '',
-                        }),
-                    );
-                },
-            },
-            {
-                icon: 'retweet',
-                disabled: !certificate?.raProfile || certificate?.state !== CertStatus.Issued || isCertificateArchived,
-                tooltip: 'Renew',
-                onClick: () => {
-                    setRenew(true);
-                },
-            },
-            {
-                icon: 'rekey',
-                disabled: !certificate?.raProfile || certificate?.state !== CertStatus.Issued || isCertificateArchived,
-                tooltip: 'Rekey',
-                onClick: () => {
-                    setRekey(true);
-                },
-            },
-            {
-                icon: 'minus-square',
-                disabled: !certificate?.raProfile || certificate?.state !== CertStatus.Issued || isCertificateArchived,
-                tooltip: 'Revoke',
-                onClick: () => {
-                    setRevoke(true);
-                },
-            },
-            {
-                icon: 'gavel',
-                disabled: !certificate?.raProfile || !certificate?.certificateContent || isCertificateArchived,
-                tooltip: 'Check Compliance',
-                onClick: () => {
-                    onComplianceCheck();
-                },
-            },
-            {
-                icon: 'download',
-                disabled: !certificate?.certificateContent,
-                onClick: () => {
-                    onDownloadClick();
-                },
-            },
-            {
-                icon: 'copy',
-                disabled: !certificate?.certificateContent,
-                tooltip: 'Copy certificate content',
-                onClick: () => {
-                    copyToClipboard(
-                        formatPEM(certificate?.certificateContent ?? ''),
-                        'Certificate content was copied to clipboard',
-                        'Failed to copy certificate content to clipboard',
-                    );
-                },
-            },
-            {
-                icon: 'archive',
-                disabled: isCertificateArchived || isArchiving,
-                tooltip: 'Archive',
-                onClick: () => {
-                    dispatch(actions.archiveCertificate({ uuid: certificate?.uuid ?? '' }));
-                },
-            },
-            {
-                icon: 'unarchive',
-                disabled: !isCertificateArchived || isArchiving,
-                tooltip: 'Unarchive',
-                onClick: () => {
-                    dispatch(actions.unarchiveCertificate({ uuid: certificate?.uuid ?? '' }));
-                },
-            },
-        ],
-        [certificate, onComplianceCheck, dispatch, onDownloadClick, copyToClipboard, isCertificateArchived, isArchiving],
-    );
 
     const downloadCSRDropDown = useMemo(
         () => (
@@ -781,76 +473,6 @@ export default function CertificateDetail() {
             },
         ],
         [locationsCheckedRows.length, isCertificateArchived],
-    );
-
-    const updateOwnerBody = useMemo(
-        () => (
-            <Select
-                maxMenuHeight={140}
-                menuPlacement="auto"
-                options={userOptions}
-                placeholder={`Select Owner`}
-                onChange={(event) => setOwnerUuid(event?.value)}
-            />
-        ),
-        [setOwnerUuid, userOptions],
-    );
-
-    const updateGroupBody = useMemo(() => {
-        return (
-            <div>
-                <Select
-                    maxMenuHeight={140}
-                    menuPlacement="auto"
-                    options={groupOptions}
-                    placeholder={`Select Groups`}
-                    value={groups}
-                    onChange={(event) => {
-                        const newGroupsList = event.length ? [...event] : [];
-                        setGroups(newGroupsList);
-                    }}
-                    isMulti
-                />
-            </div>
-        );
-    }, [setGroups, groupOptions, groups]);
-
-    const updateRaAndAuthorityState = useCallback((value: string) => {
-        setRaProfile(value.split(':#')[0]);
-        setRaProfileAuthorityUuid(value.split(':#')[1]);
-    }, []);
-
-    const updateRaProfileBody = useMemo(() => {
-        return (
-            <div>
-                <Select
-                    maxMenuHeight={140}
-                    menuPlacement="auto"
-                    options={raProfileOptions}
-                    placeholder={`Select RA Profile`}
-                    onChange={(event) => updateRaAndAuthorityState(event?.value || '')}
-                />
-            </div>
-        );
-    }, [raProfileOptions, updateRaAndAuthorityState]);
-
-    const revokeBody = useMemo(() => {
-        return (
-            <div>
-                <Select
-                    maxMenuHeight={140}
-                    menuPlacement="auto"
-                    options={certificateRevokeReasonOptions}
-                    placeholder={`Select Revocation Reason`}
-                    onChange={(event: any) => setRevokeReason(event?.value as CertificateRevocationReason)}
-                />
-            </div>
-        );
-    }, [setRevokeReason, certificateRevokeReasonOptions]);
-
-    const certificateTitle = useMemo(
-        () => (certificate?.state === CertStatus.Requested ? 'CSR Properties' : 'Certificate Properties'),
-        [certificate?.state],
     );
 
     const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
@@ -944,24 +566,6 @@ export default function CertificateDetail() {
         return returnList;
     };
 
-    const propertiesHeaders: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'attribute',
-                content: 'Attribute',
-            },
-            {
-                id: 'value',
-                content: 'Value',
-            },
-            {
-                id: 'action',
-                content: 'Action',
-            },
-        ],
-        [],
-    );
-
     const validationHeaders: TableHeader[] = useMemo(
         () => [
             {
@@ -999,169 +603,6 @@ export default function CertificateDetail() {
         ],
         [],
     );
-
-    const propertiesData: TableDataRow[] = useMemo(() => {
-        return !certificate
-            ? []
-            : [
-                  {
-                      id: 'uuid',
-                      columns: ['UUID', certificate.uuid, ''],
-                  },
-                  {
-                      id: 'owner',
-                      columns: [
-                          'Owner',
-                          certificate?.ownerUuid ? (
-                              <Link to={`../../users/detail/${certificate.ownerUuid}`}>{certificate.owner ?? 'Unassigned'}</Link>
-                          ) : (
-                              (certificate.owner ?? 'Unassigned')
-                          ),
-                          <div className="d-flex">
-                              <Button
-                                  disabled={isCertificateArchived}
-                                  className="btn btn-link"
-                                  size="sm"
-                                  color="secondary"
-                                  onClick={() => {
-                                      setOwnerUuid(undefined);
-                                      getUserList();
-                                      setUpdateOwner(true);
-                                  }}
-                                  title="Update Owner"
-                              >
-                                  <i className="fa fa-pencil-square-o" />
-                              </Button>
-
-                              <Button
-                                  className="btn btn-link"
-                                  size="sm"
-                                  color="secondary"
-                                  disabled={!certificate?.ownerUuid || isCertificateArchived}
-                                  onClick={() => {
-                                      if (!certificate?.ownerUuid || !id) return;
-                                      dispatch(
-                                          actions.deleteOwner({
-                                              uuid: id,
-                                          }),
-                                      );
-                                  }}
-                              >
-                                  <i className="fa fa-trash text-danger" />
-                              </Button>
-                          </div>,
-                      ],
-                  },
-                  {
-                      id: 'groups',
-                      columns: [
-                          'Groups',
-                          certificate?.groups?.length
-                              ? certificate?.groups.map((group, i) => (
-                                    <React.Fragment key={group.uuid}>
-                                        <Link to={`../../groups/detail/${group.uuid}`}>{group.name}</Link>
-                                        {certificate?.groups?.length && i !== certificate.groups.length - 1 ? `, ` : ``}
-                                    </React.Fragment>
-                                ))
-                              : 'Unassigned',
-                          <div className="d-flex">
-                              <Button
-                                  disabled={isCertificateArchived}
-                                  className="btn btn-link"
-                                  size="sm"
-                                  color="secondary"
-                                  onClick={() => {
-                                      getGroupList();
-                                      setUpdateGroup(true);
-                                  }}
-                                  title="Update Group"
-                              >
-                                  <i className="fa fa-pencil-square-o" />
-                              </Button>
-                              <Button
-                                  className="btn btn-link"
-                                  size="sm"
-                                  color="secondary"
-                                  disabled={!certificate?.groups?.length || isCertificateArchived}
-                                  onClick={() => {
-                                      if (!id) return;
-                                      dispatch(
-                                          actions.deleteGroups({
-                                              uuid: id,
-                                          }),
-                                      );
-                                  }}
-                              >
-                                  <i className="fa fa-trash text-danger" />
-                              </Button>
-                          </div>,
-                      ],
-                  },
-                  {
-                      id: 'raProfile',
-                      columns: [
-                          'RA Profile',
-                          certificate?.raProfile?.name ? (
-                              <Link
-                                  to={`../../raProfiles/detail/${certificate?.raProfile.authorityInstanceUuid}/${certificate?.raProfile.uuid}`}
-                              >
-                                  {certificate?.raProfile.name}
-                              </Link>
-                          ) : (
-                              'Unassigned'
-                          ),
-                          <div className="d-flex">
-                              <Button
-                                  disabled={isCertificateArchived}
-                                  className="btn btn-link"
-                                  size="sm"
-                                  color="secondary"
-                                  onClick={() => {
-                                      getRaProfileList();
-                                      setUpdateRaProfile(true);
-                                  }}
-                                  title="Update RA Profile"
-                              >
-                                  <i className="fa fa-pencil-square-o" />
-                              </Button>
-                              <Button
-                                  className="btn btn-link"
-                                  size="sm"
-                                  color="secondary"
-                                  disabled={!certificate?.raProfile?.uuid || isCertificateArchived}
-                                  onClick={() => {
-                                      if (!certificate?.raProfile?.authorityInstanceUuid || !id) return;
-                                      dispatch(
-                                          actions.deleteRaProfile({
-                                              uuid: id,
-                                          }),
-                                      );
-                                  }}
-                              >
-                                  <i className="fa fa-trash text-danger" />
-                              </Button>
-                          </div>,
-                      ],
-                  },
-                  {
-                      id: 'type',
-                      columns: ['Type', certificate.certificateType || '', ''],
-                  },
-              ];
-    }, [certificate, getGroupList, getRaProfileList, getUserList, dispatch, id, isCertificateArchived]);
-
-    const sanData: TableDataRow[] = useMemo(() => {
-        let sanList: TableDataRow[] = [];
-        for (let [key, value] of Object.entries(certificate?.subjectAlternativeNames || {})) {
-            if (value && Array.isArray(value) && value.length > 0) {
-                sanList.push({
-                    id: key,
-                    columns: [key, value.join(', ')],
-                });
-            }
-        }
-        return sanList;
-    }, [certificate]);
 
     const csrPropertiesData: TableDataRow[] = useMemo(() => {
         return certificate?.certificateRequest
@@ -1446,231 +887,6 @@ export default function CertificateDetail() {
         setIsAlreadyRelatedError(isAlreadyRelated);
     }, [selectedCertificate, getCertificateIsAlreadyRelated]);
 
-    const switchCallback = useCallback(() => {
-        if (!certificate) return;
-        if (isUpdatingTrustedStatus) return;
-
-        if (certificate?.trustedCa) {
-            dispatch(
-                actions.updateCertificateTrustedStatus({
-                    uuid: certificate.uuid,
-                    updateCertificateTrustedStatusRequest: {
-                        trustedCa: false,
-                    },
-                }),
-            );
-        } else {
-            dispatch(
-                actions.updateCertificateTrustedStatus({
-                    uuid: certificate.uuid,
-                    updateCertificateTrustedStatusRequest: {
-                        trustedCa: true,
-                    },
-                }),
-            );
-        }
-    }, [certificate, isUpdatingTrustedStatus, dispatch]);
-
-    const detailData: TableDataRow[] = useMemo(() => {
-        const certDetail = !certificate
-            ? []
-            : ([
-                  {
-                      id: 'commonName',
-                      columns: [<span style={{ whiteSpace: 'nowrap' }}>Common Name</span>, certificate.commonName],
-                  },
-                  {
-                      id: 'serialNumber',
-                      columns: ['Serial Number', certificate.serialNumber || ''],
-                  },
-                  {
-                      id: 'key',
-                      columns: [
-                          'Key',
-                          certificate.key ? <Link to={`../keys/detail/${certificate.key.uuid}`}>{certificate.key.name}</Link> : '',
-                      ],
-                  },
-                  certificate.hybridCertificate
-                      ? {
-                            id: 'altKey',
-                            columns: [
-                                'Alternative Key',
-                                certificate.altKey ? (
-                                    <Link to={`../keys/detail/${certificate.altKey.uuid}`}>{certificate.altKey.name}</Link>
-                                ) : (
-                                    ''
-                                ),
-                            ],
-                        }
-                      : null,
-                  {
-                      id: 'issuerCommonName',
-                      columns: [
-                          'Issuer Common Name',
-                          certificate?.issuerCommonName && certificate?.issuerCertificateUuid ? (
-                              <Link to={`../certificates/detail/${certificate.issuerCertificateUuid}`}>{certificate.issuerCommonName}</Link>
-                          ) : certificate?.issuerCommonName ? (
-                              certificate.issuerCommonName
-                          ) : (
-                              ''
-                          ),
-                      ],
-                  },
-                  {
-                      id: 'issuerDN',
-                      columns: ['Issuer DN', certificate.issuerDn || ''],
-                  },
-                  {
-                      id: 'subjectDN',
-                      columns: ['Subject DN', certificate.subjectDn],
-                  },
-                  {
-                      id: 'validFrom',
-                      columns: [
-                          'Valid From',
-                          certificate.notBefore ? <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(certificate.notBefore)}</span> : '',
-                      ],
-                  },
-                  {
-                      id: 'expiresAt',
-                      columns: [
-                          'Expires At',
-                          certificate.notAfter ? <span style={{ whiteSpace: 'nowrap' }}>{dateFormatter(certificate.notAfter)}</span> : '',
-                      ],
-                  },
-                  {
-                      id: 'publicKeyAlgorithm',
-                      columns: ['Public Key Algorithm', certificate.publicKeyAlgorithm],
-                  },
-                  certificate.hybridCertificate
-                      ? {
-                            id: 'altPublicKeyAlgorithm',
-                            columns: ['Alternative Public Key Algorithm', certificate.altPublicKeyAlgorithm],
-                        }
-                      : null,
-                  {
-                      id: 'signatureAlgorithm',
-                      columns: ['Signature Algorithm', certificate.signatureAlgorithm],
-                  },
-                  certificate.hybridCertificate
-                      ? {
-                            id: 'altSignatureAlgorithm',
-                            columns: ['Alternative Signature Algorithm', certificate.altSignatureAlgorithm],
-                        }
-                      : null,
-                  {
-                      id: 'certState',
-                      columns: ['State', <CertificateStatus status={certificate.state} />],
-                  },
-                  {
-                      id: 'validationStatus',
-                      columns: [
-                          'Validation Status',
-                          validationResult?.resultStatus ? (
-                              <CertificateStatus status={validationResult?.resultStatus} />
-                          ) : (
-                              <CertificateStatus status={CertificateValidationStatus.NotChecked} />
-                          ),
-                      ],
-                  },
-                  {
-                      id: 'complianceStatus',
-                      columns: ['Compliance Status', <CertificateStatus status={certificate.complianceStatus || ComplianceStatus.Na} />],
-                  },
-                  {
-                      id: 'fingerprint',
-                      columns: ['Fingerprint', certificate.fingerprint || ''],
-                  },
-                  {
-                      id: 'fingerprintAlgorithm',
-                      columns: ['Fingerprint Algorithm', 'SHA256'],
-                  },
-                  {
-                      id: 'keySize',
-                      columns: ['Key Size', certificate.keySize.toString()],
-                  },
-                  certificate.hybridCertificate
-                      ? {
-                            id: 'altKeySize',
-                            columns: ['Alternative Key Size', certificate.altKeySize?.toString()],
-                        }
-                      : null,
-                  {
-                      id: 'keyUsage',
-                      columns: [
-                          'Key Usage',
-                          certificate?.keyUsage?.map(function (name) {
-                              return (
-                                  <div key={name} style={{ margin: '1px' }}>
-                                      <Badge>{getEnumLabel(certificateKeyUsageEnum, name)}</Badge>
-                                      &nbsp;
-                                  </div>
-                              );
-                          }) || '',
-                      ],
-                  },
-                  {
-                      id: 'extendedKeyUsage',
-                      columns: [
-                          'Extended Key Usage',
-                          certificate.extendedKeyUsage?.map(function (name) {
-                              return (
-                                  <div key={name} style={{ margin: '1px' }}>
-                                      <Badge>{name}</Badge>
-                                      &nbsp;
-                                  </div>
-                              );
-                          }) || '',
-                      ],
-                  },
-                  {
-                      id: 'subjectType',
-                      columns: [
-                          'Subject Type',
-                          certificate.subjectType ? <CertificateStatus status={certificate.subjectType} /> : <>n/a</>,
-                      ],
-                  },
-                  {
-                      id: 'archivationStatus',
-                      columns: [
-                          'Archived',
-                          <Badge key="archivationStatus" color={isCertificateArchived ? 'secondary' : 'success'}>
-                              {isCertificateArchived ? 'Yes' : 'No'}
-                          </Badge>,
-                      ],
-                  },
-              ].filter((el) => el !== null) as NonNullable<TableDataRow>[]);
-
-        if (certificate?.state !== CertStatus.Requested) {
-            certDetail.push({
-                id: 'asn1structure',
-                columns: [
-                    'ASN.1 Structure',
-                    certificate?.certificateContent ? <Asn1Dialog content={certificate.certificateContent} /> : <>n/a</>,
-                ],
-            });
-        }
-
-        if (certificate?.trustedCa !== undefined) {
-            certDetail.unshift({
-                id: 'trustedCa',
-                columns: [
-                    certificate?.subjectType == CertificateSubjectType.SelfSignedEndEntity ? 'Trusted Self-Signed' : 'Trusted CA',
-                    <SwitchWidget disabled={isUpdatingTrustedStatus} checked={certificate.trustedCa ?? false} onClick={switchCallback} />,
-                ],
-            });
-        }
-
-        return certDetail;
-    }, [
-        certificate,
-        validationResult?.resultStatus,
-        isCertificateArchived,
-        certificateKeyUsageEnum,
-        isUpdatingTrustedStatus,
-        switchCallback,
-    ]);
-
     const locationsHeaders: TableHeader[] = useMemo(
         () => [
             {
@@ -1890,72 +1106,6 @@ export default function CertificateDetail() {
         }));
     }, [approvals]);
 
-    const protocolHeader: TableHeader[] = useMemo(
-        () => [
-            {
-                id: 'property',
-                content: 'Property',
-            },
-            {
-                id: 'value',
-                content: 'Value',
-            },
-        ],
-        [],
-    );
-
-    const protocolData: TableDataRow[] = useMemo(() => {
-        const protocolInfo = certificate?.protocolInfo;
-        if (!protocolInfo) return [];
-
-        function getProtocolProfileLink(): string {
-            if (!protocolInfo) return '';
-            switch (protocolInfo.protocol) {
-                case CertificateProtocol.Acme:
-                    return `../acmeprofiles/detail/${protocolInfo.protocolProfileUuid}`;
-                case CertificateProtocol.Cmp:
-                    return `../cmpprofiles/detail/${protocolInfo.protocolProfileUuid}`;
-                case CertificateProtocol.Scep:
-                    return `../scepprofiles/detail/${protocolInfo.protocolProfileUuid}`;
-            }
-        }
-        const data = [
-            {
-                id: 'protocol',
-                columns: [
-                    'Protocol Name',
-                    <Badge key="protocol" color="secondary">
-                        {getEnumLabel(certificateProtocol, protocolInfo.protocol)}
-                    </Badge>,
-                ],
-            },
-            {
-                id: 'protocolProfileUuid',
-                columns: [
-                    'Protocol Profile UUID',
-                    <Link key="protocolProfileUuid" to={getProtocolProfileLink()}>
-                        {protocolInfo.protocolProfileUuid}
-                    </Link>,
-                ],
-            },
-        ];
-        if (protocolInfo.protocol === CertificateProtocol.Acme && protocolInfo.additionalProtocolUuid) {
-            data.push({
-                id: 'additionalProfileUuid',
-                columns: [
-                    'Protocol Account UUID',
-                    <Link
-                        key="additionalProfileUuid"
-                        to={`../acmeaccounts/detail/${protocolInfo.protocolProfileUuid}/${protocolInfo.additionalProtocolUuid}`}
-                    >
-                        {protocolInfo.additionalProtocolUuid}
-                    </Link>,
-                ],
-            });
-        }
-        return data;
-    }, [certificate?.protocolInfo, certificateProtocol]);
-
     const defaultViewport = useMemo(
         () => ({
             zoom: 0.5,
@@ -1990,32 +1140,12 @@ export default function CertificateDetail() {
                     {
                         title: 'Details',
                         content: (
-                            <Container className="md:grid grid-cols-2 items-start">
-                                <Widget
-                                    title={certificateTitle}
-                                    busy={isBusy}
-                                    widgetButtons={buttons}
-                                    titleSize="large"
-                                    lockSize="large"
-                                    widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}
-                                    refreshAction={getFreshCertificateDetail}
-                                >
-                                    <CustomTable hasPagination={false} headers={detailHeaders} data={detailData} />
-                                </Widget>
-                                <Container>
-                                    <Widget title="Subject Alternative Names" busy={isBusy} titleSize="large">
-                                        <CustomTable headers={detailHeaders} data={sanData} />
-                                    </Widget>
-                                    {certificate?.protocolInfo && (
-                                        <Widget title="Protocol" busy={isBusy} titleSize="large">
-                                            <CustomTable headers={protocolHeader} data={protocolData} />
-                                        </Widget>
-                                    )}
-                                    <Widget title="Other Properties" busy={isBusy} titleSize="large">
-                                        <CustomTable headers={propertiesHeaders} data={propertiesData} />
-                                    </Widget>
-                                </Container>
-                            </Container>
+                            <CertificateDetailsContent
+                                certificate={certificate}
+                                validationResult={validationResult}
+                                isBusy={isBusy}
+                                getFreshCertificateDetail={getFreshCertificateDetail}
+                            />
                         ),
                     },
                     {
@@ -2219,85 +1349,6 @@ export default function CertificateDetail() {
                             </Widget>
                         ),
                     },
-                ]}
-            />
-
-            <Dialog
-                isOpen={confirmDelete}
-                caption="Delete Certificate"
-                body="You are about to delete a Certificate. Is this what you want to do?"
-                toggle={() => setConfirmDelete(false)}
-                icon="delete"
-                buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
-                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
-                ]}
-            />
-
-            <Dialog
-                isOpen={updateGroup}
-                caption={`Update Groups`}
-                body={updateGroupBody}
-                toggle={() => onCancelGroupUpdate()}
-                buttons={[
-                    { color: 'primary', onClick: () => onUpdateGroup(), body: 'Update' },
-                    { color: 'secondary', variant: 'outline', onClick: () => onCancelGroupUpdate(), body: 'Cancel' },
-                ]}
-            />
-
-            <Dialog
-                isOpen={updateOwner}
-                caption={`Update Owner`}
-                body={updateOwnerBody}
-                toggle={() => onCancelOwnerUpdate()}
-                buttons={[
-                    { color: 'primary', onClick: onUpdateOwner, body: 'Update', disabled: true ? ownerUuid === undefined : false },
-                    { color: 'secondary', variant: 'outline', onClick: () => onCancelOwnerUpdate(), body: 'Cancel' },
-                ]}
-            />
-
-            <Dialog
-                isOpen={updateRaProfile}
-                caption={`Update RA Profile`}
-                body={updateRaProfileBody}
-                toggle={() => onCancelRaProfileUpdate()}
-                buttons={[
-                    { color: 'primary', onClick: onUpdateRaProfile, body: 'Update', disabled: true ? raProfile === undefined : false },
-                    { color: 'secondary', variant: 'outline', onClick: () => onCancelRaProfileUpdate(), body: 'Cancel' },
-                ]}
-            />
-
-            <Dialog
-                isOpen={renew}
-                caption={`Renew Certificate`}
-                body={
-                    <CertificateRenewDialog
-                        onCancel={() => setRenew(false)}
-                        onRenew={onRenew}
-                        allowWithoutFile={certificate?.privateKeyAvailability || false}
-                    />
-                }
-                toggle={() => setRenew(false)}
-                buttons={[]}
-            />
-
-            <Dialog
-                size="lg"
-                isOpen={rekey}
-                caption={`Rekey Certificate`}
-                body={<CertificateRekeyDialog onCancel={() => setRekey(false)} certificate={certificate} />}
-                toggle={() => setRekey(false)}
-                buttons={[]}
-            />
-
-            <Dialog
-                isOpen={revoke}
-                caption={`Revoke Certificate`}
-                body={revokeBody}
-                toggle={() => setRevoke(false)}
-                buttons={[
-                    { color: 'primary', onClick: onRevoke, body: 'Revoke' },
-                    { color: 'secondary', variant: 'outline', onClick: () => setRevoke(false), body: 'Cancel' },
                 ]}
             />
 
