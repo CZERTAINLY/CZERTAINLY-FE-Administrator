@@ -355,7 +355,7 @@ export default function Sidebar({ allowedResources }: Props) {
                         }
                     }}
                     className={({ isActive }) =>
-                        cx('flex px-3.5 py-2.5 no-underline hover:bg-gray-200 rounded-lg h-[40px] items-center', {
+                        cx('flex px-3.5 py-2.5 no-underline hover:bg-gray-200 rounded-lg h-[40px] items-center dark:text-white', {
                             'text-blue-600': isActive,
                             'w-full gap-x-2': menuSize !== 'small',
                         })
@@ -368,7 +368,7 @@ export default function Sidebar({ allowedResources }: Props) {
         );
     }
     return (
-        <div className="p-4 w-[var(--sidebar-width)] h-[calc(100vh-var(--header-height))] overflow-y-auto sticky top-[var(--header-height)] z-10">
+        <div className="p-4 w-[var(--sidebar-width)] h-[calc(100vh-var(--header-height))] overflow-y-auto sticky top-[var(--header-height)] z-10 dark:bg-neutral-900">
             <nav className="pb-4">
                 <ul className="list-none m-0 flex flex-col gap-y-1">{allowedMenuItems.map((item) => renderMenuItem(item))}</ul>
             </nav>

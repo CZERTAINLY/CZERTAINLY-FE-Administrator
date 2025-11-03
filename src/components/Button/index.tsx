@@ -21,7 +21,7 @@ const baseButton =
 const buttonClasses = {
     solid: '',
     outline: '',
-    transparent: '!p-2 border-transparent',
+    transparent: '!p-2 border-transparent dark:text-white',
 };
 
 const colorClasses = {
