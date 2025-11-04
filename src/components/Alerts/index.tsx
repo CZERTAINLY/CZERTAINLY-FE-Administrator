@@ -8,18 +8,19 @@ import Container from 'components/Container';
 
 function Alerts() {
     const alerts = useSelector(selectors.selectMessages);
+    console.log('alerts', alerts);
     const dispatch = useDispatch();
 
     return (
-        <Container className="fixed bottom-16 left-16 right-16 !gap-2 z-9999">
+        <Container className="sticky bottom-12 !gap-2 z-9999">
             {alerts.map((alert) => (
                 <div
                     key={alert.id}
                     className={cn('mt-2 text-sm border rounded-lg px-10 py-4 relative transition-opacity duration-[3000ms]', {
                         'bg-teal-100 text-teal-800 border-teal-200 dark:bg-teal-800/10 dark:border-teal-900 dark:text-teal-500':
-                            alert.color === 'info',
+                            alert.color === 'success',
                         'bg-red-100 text-red-800 border-red-200 dark:bg-red-800/10 dark:border-red-900 dark:text-red-500':
-                            alert.color !== 'info',
+                            alert.color !== 'success',
                         'opacity-0': alert.isHiding,
                         'opacity-100': !alert.isHiding,
                     })}
@@ -28,7 +29,7 @@ function Alerts() {
                     aria-labelledby="hs-soft-color-warning-label"
                 >
                     <div className="absolute top-4 left-4 translate-y-[3px]">
-                        {alert.color === 'info' ? <CircleCheck size={14} /> : <CircleX size={14} />}
+                        {alert.color === 'success' ? <CircleCheck size={14} /> : <CircleX size={14} />}
                     </div>
                     <span id="hs-soft-color-warning-label" dangerouslySetInnerHTML={{ __html: alert.message }} />
                     <button className="absolute top-2 right-2 translate-y-[3px]" onClick={() => dispatch(actions.dismiss(alert.id))}>
