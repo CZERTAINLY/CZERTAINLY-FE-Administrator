@@ -1,30 +1,42 @@
+import cn from 'classnames';
 import { useDispatch, useSelector } from 'react-redux';
-import { Alert } from 'reactstrap';
 
 import { actions, selectors } from 'ducks/alerts';
 
-import style from './Alerts.module.scss';
+import { CircleCheck, CircleX, X } from 'lucide-react';
+import Container from 'components/Container';
 
 function Alerts() {
     const alerts = useSelector(selectors.selectMessages);
     const dispatch = useDispatch();
 
     return (
-        <div className={style.alerts}>
+        <Container className="fixed bottom-16 left-16 right-16 !gap-2 z-9999">
             {alerts.map((alert) => (
-                <Alert
-                    className={style.alert}
+                <div
                     key={alert.id}
-                    style={{ background: alert.color === 'info' ? '#d0e3f0' : '' }}
-                    color={alert.color === 'info' ? 'secondary' : alert.color}
-                    toggle={() => dispatch(actions.dismiss(alert.id))}
-                    isOpen
-                    data-hiding={alert.isHiding}
+                    className={cn('mt-2 text-sm border rounded-lg px-10 py-4 relative transition-opacity duration-[3000ms]', {
+                        'bg-teal-100 text-teal-800 border-teal-200 dark:bg-teal-800/10 dark:border-teal-900 dark:text-teal-500':
+                            alert.color === 'info',
+                        'bg-red-100 text-red-800 border-red-200 dark:bg-red-800/10 dark:border-red-900 dark:text-red-500':
+                            alert.color !== 'info',
+                        'opacity-0': alert.isHiding,
+                        'opacity-100': !alert.isHiding,
+                    })}
+                    role="alert"
+                    tabIndex={-1}
+                    aria-labelledby="hs-soft-color-warning-label"
                 >
-                    <span dangerouslySetInnerHTML={{ __html: alert.message }} />
-                </Alert>
+                    <div className="absolute top-4 left-4 translate-y-[3px]">
+                        {alert.color === 'info' ? <CircleCheck size={14} /> : <CircleX size={14} />}
+                    </div>
+                    <span id="hs-soft-color-warning-label" dangerouslySetInnerHTML={{ __html: alert.message }} />
+                    <button className="absolute top-2 right-2 translate-y-[3px]" onClick={() => dispatch(actions.dismiss(alert.id))}>
+                        <X size={14} />
+                    </button>
+                </div>
             ))}
-        </div>
+        </Container>
     );
 }
 
