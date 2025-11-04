@@ -142,7 +142,7 @@ function PagedList({
     );
 
     return (
-        <>
+        <div className="flex flex-col gap-4 md:gap-8">
             {getAvailableFiltersApi && filterTitle && (
                 <FilterWidget
                     entity={entity}
@@ -158,7 +158,7 @@ function PagedList({
                 widgetLockName={pageWidgetLockName}
                 refreshAction={getFreshData}
                 widgetButtons={buttons}
-                titleSize="large"
+                titleSize="larger"
                 hideWidgetButtons={hideWidgetButtons}
             >
                 <CustomTable
@@ -174,7 +174,6 @@ function PagedList({
                     onPageSizeChanged={onPageSizeChanged}
                 />
             </Widget>
-
             {onDeleteCallback && (
                 <Dialog
                     isOpen={confirmDelete}
@@ -183,13 +182,14 @@ function PagedList({
                         checkedRows.length > 1 ? entityNamePlural : entityNameSingular
                     }. Is this what you want to do?`}
                     toggle={() => setConfirmDelete(false)}
+                    icon="delete"
                     buttons={[
-                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                        { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                        { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                     ]}
                 />
             )}
-        </>
+        </div>
     );
 }
 

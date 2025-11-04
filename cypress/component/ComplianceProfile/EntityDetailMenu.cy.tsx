@@ -5,13 +5,14 @@ import TabLayout from 'components/Layout/TabLayout';
 import Widget from 'components/Widget';
 import { getEnumLabel } from 'ducks/enums';
 import { Link } from 'react-router';
-import { Badge } from 'reactstrap';
+
 import { AttributeResponseModel } from 'types/attributes';
 import { ComplianceRuleAvailabilityStatus, EnumItemDto, FilterFieldSource, FilterConditionOperator, PlatformEnum } from 'types/openapi';
 import { capitalize } from 'utils/common-utils';
 import { getComplianceProfileStatusColor } from 'utils/compliance-profile';
 import { renderConditionItems } from 'utils/condition-badges';
 import { componentLoadWait } from '../../utils/constants';
+import Badge from 'components/Badge';
 
 const RuleDetailMenuTest = () => {
     const mockResourceEnum: { [key: string]: EnumItemDto } = useMemo(

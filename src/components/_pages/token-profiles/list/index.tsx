@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
-import { Badge, Container } from 'reactstrap';
+import Badge from 'components/Badge';
 
 import { actions, selectors } from 'ducks/token-profiles';
 
@@ -250,7 +250,7 @@ function TokenProfileList() {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <>
             <Widget
                 title="List of Token Profiles"
                 busy={isBusy}
@@ -259,7 +259,6 @@ function TokenProfileList() {
                 titleSize="large"
                 refreshAction={getFreshData}
             >
-                <br />
                 <CustomTable
                     headers={tokenProfilesTableHeaders}
                     data={profilesTableData}
@@ -277,23 +276,26 @@ function TokenProfileList() {
                     checkedRows.length > 1 ? 'a Token Profile' : 'Token Profiles'
                 }. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
             <Dialog
                 isOpen={keyUsageUpdate}
-                caption={`Update Key Usage`}
+                caption="Update Key Usage"
                 body={keyUsageBody}
                 toggle={() => setKeyUsageUpdate(false)}
+                size="md"
+                noBorder
                 buttons={[
                     { color: 'primary', onClick: onUpdateKeyUsageConfirmed, body: 'Update' },
-                    { color: 'secondary', onClick: () => setKeyUsageUpdate(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setKeyUsageUpdate(false), body: 'Cancel' },
                 ]}
             />
-        </Container>
+        </>
     );
 }
 

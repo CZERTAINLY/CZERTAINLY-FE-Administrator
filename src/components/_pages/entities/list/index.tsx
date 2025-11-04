@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
-import { Badge, Container } from 'reactstrap';
+import Badge from 'components/Badge';
 
 import { actions, selectors } from 'ducks/entities';
 
@@ -69,22 +69,20 @@ function EntityList() {
     const onListCallback = useCallback((filters: SearchRequestModel) => dispatch(actions.listEntities(filters)), [dispatch]);
 
     return (
-        <Container className="themed-container" fluid>
-            <PagedList
-                entity={EntityType.ENTITY}
-                onListCallback={onListCallback}
-                onDeleteCallback={(uuids) => uuids.map((uuid) => dispatch(actions.deleteEntity({ uuid })))}
-                getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.entities.getSearchableFieldInformation2(), [])}
-                headers={entitiesRowHeaders}
-                data={entityList}
-                isBusy={isBusy}
-                title="Entity Store"
-                entityNameSingular="an Entity"
-                entityNamePlural="Entities"
-                filterTitle="Entities Filter"
-                pageWidgetLockName={LockWidgetNameEnum.EntityStore}
-            />
-        </Container>
+        <PagedList
+            entity={EntityType.ENTITY}
+            onListCallback={onListCallback}
+            onDeleteCallback={(uuids) => uuids.map((uuid) => dispatch(actions.deleteEntity({ uuid })))}
+            getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.entities.getSearchableFieldInformation2(), [])}
+            headers={entitiesRowHeaders}
+            data={entityList}
+            isBusy={isBusy}
+            title="Entity Store"
+            entityNameSingular="an Entity"
+            entityNamePlural="Entities"
+            filterTitle="Entities Filter"
+            pageWidgetLockName={LockWidgetNameEnum.EntityStore}
+        />
     );
 }
 

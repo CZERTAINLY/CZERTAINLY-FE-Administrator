@@ -46,7 +46,7 @@ export default function AttributeViewer({
     onSubmit,
     onRemove,
 }: Props) {
-    const getContent = useCallback(getAttributeContent, []);
+    const getContent = getAttributeContent;
     const [editingAttributesNames, setEditingAttributesNames] = useState<string[]>([]);
     const contentTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AttributeContentType));
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));

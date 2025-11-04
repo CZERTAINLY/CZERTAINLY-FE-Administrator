@@ -2,7 +2,7 @@ import Widget from 'components/Widget';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Select, { ClearIndicatorProps, components } from 'react-select';
-import { Badge, Col, Label, Row, UncontrolledTooltip } from 'reactstrap';
+import { Col, Label, Row, UncontrolledTooltip } from 'reactstrap';
 import { actions, selectors } from 'ducks/compliance-profiles';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { ComplianceProfileDtoV2, ComplianceRuleAvailabilityStatus, PlatformEnum, Resource } from 'types/openapi';
@@ -23,6 +23,7 @@ import {
 import { ResourceBadges } from 'components/_pages/compliance-profiles/detail/Components/ResourceBadges';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { TRuleGroupType } from 'types/complianceProfiles';
+import Badge from 'components/Badge';
 
 interface Props {
     profile: ComplianceProfileDtoV2 | undefined;
@@ -266,28 +267,24 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
             lockSize="large"
             dataTestId="assigned-rules-and-group-widget"
         >
-            <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                <Col style={{ width: '100%' }}>
-                    <Label for="assignedRulesSource">Rules Source</Label>
-                    <Select
-                        id="assignedRulesSource"
-                        inputId="assignedRulesSource"
-                        placeholder="Select..."
-                        maxMenuHeight={140}
-                        options={rulesSourceOptions}
-                        value={rulesSourceOptions.find((opt) => opt.value === assignedRulesSource) || null}
-                        menuPlacement="auto"
-                        onChange={(event) => {
-                            setAssignedResourceType('All');
-                            setAssignedRulesSource((event?.value as 'Internal' | 'Provider') || null);
-                        }}
-                        isClearable
-                        components={{
-                            ClearIndicator: AssignedRulesSourceClear,
-                        }}
-                    />
-                </Col>
-            </Row>
+            <Label for="assignedRulesSource">Rules Source</Label>
+            <Select
+                id="assignedRulesSource"
+                inputId="assignedRulesSource"
+                placeholder="Select..."
+                maxMenuHeight={140}
+                options={rulesSourceOptions}
+                value={rulesSourceOptions.find((opt) => opt.value === assignedRulesSource) || null}
+                menuPlacement="auto"
+                onChange={(event) => {
+                    setAssignedResourceType('All');
+                    setAssignedRulesSource((event?.value as 'Internal' | 'Provider') || null);
+                }}
+                isClearable
+                components={{
+                    ClearIndicator: AssignedRulesSourceClear,
+                }}
+            />
             {assignedRulesSource === 'Provider' && (
                 <Row xs="1" sm="1" md="2" lg="2" xl="2" style={{ marginTop: '10px' }}>
                     <Col>
@@ -334,7 +331,7 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
                 <CustomTable
                     headers={tableHeadersAssignedRulesAndGroups}
                     data={tableDataAssignedRulesAndGroups}
-                    hasPagination={true}
+                    hasPagination
                     canSearch={true}
                 />
             </Widget>

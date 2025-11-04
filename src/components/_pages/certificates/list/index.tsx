@@ -11,7 +11,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import { Badge, Container, DropdownItem, DropdownMenu, DropdownToggle, UncontrolledButtonDropdown } from 'reactstrap';
+
+import Dropdown from 'components/Dropdown';
 
 import { ApiClients } from '../../../../api';
 import PagedList from 'components/PagedList/PagedList';
@@ -27,7 +28,9 @@ import CertificateOwnerDialog from '../CertificateOwnerDialog';
 import CertificateRAProfileDialog from '../CertificateRAProfileDialog';
 import CertificateStatus from '../CertificateStatus';
 import CertificateUploadDialog from '../CertificateUploadDialog';
-import SwitchWidget from 'components/SwitchWidget';
+import { Download, Plug } from 'lucide-react';
+import Switch from 'components/Switch';
+
 interface Props {
     selectCertsOnly?: boolean;
     multiSelect?: boolean;
@@ -119,31 +122,26 @@ export default function CertificateList({
 
     const downloadDropDown = useMemo(
         () => (
-            <UncontrolledButtonDropdown>
-                <DropdownToggle color="light" caret className="btn btn-link" disabled={checkedRows.length === 0} title="Download">
-                    <i className="fa fa-download" aria-hidden="true" />
-                </DropdownToggle>
-
-                <DropdownMenu>
-                    <DropdownItem
-                        key="pem"
-                        onClick={() => {
+            <Dropdown
+                title={<Download size={16} />}
+                btnStyle="transparent"
+                // maxWidth={100}
+                disabled={checkedRows.length === 0}
+                items={[
+                    {
+                        title: 'Download PEM (.pem)',
+                        onClick: () => {
                             dispatch(actions.getCertificateContents({ uuids: checkedRows, format: 'pem' }));
-                        }}
-                    >
-                        PEM (.pem)
-                    </DropdownItem>
-
-                    <DropdownItem
-                        key="der"
-                        onClick={() => {
+                        },
+                    },
+                    {
+                        title: 'Download DER (.cer)',
+                        onClick: () => {
                             dispatch(actions.getCertificateContents({ uuids: checkedRows, format: 'cer' }));
-                        }}
-                    >
-                        DER (.cer)
-                    </DropdownItem>
-                </DropdownMenu>
-            </UncontrolledButtonDropdown>
+                        },
+                    },
+                ]}
+            />
         ),
         [dispatch, checkedRows],
     );
@@ -186,7 +184,6 @@ export default function CertificateList({
                               setUpdateOwner(true);
                           },
                       },
-                      // { icon: "cubes", disabled: true, tooltip: "Update Entity", onClick: () => { setUpdateEntity(true) } },
                       {
                           icon: 'plug',
                           disabled: checkedRows.length === 0,
@@ -383,15 +380,20 @@ export default function CertificateList({
                             certificate.issuerCommonName || ''
                         ),
                         certificate.certificateType ? (
-                            <Badge color={certificate.certificateType === CertificateType.X509 ? 'primary' : 'secondary'}>
+                            <span
+                                className={`inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-xs font-medium text-white ${certificate.certificateType === CertificateType.X509 ? 'bg-blue-600' : 'bg-gray-500'}`}
+                            >
                                 {getEnumLabel(certificateTypeEnum, certificate.certificateType)}
-                            </Badge>
+                            </span>
                         ) : (
                             ''
                         ),
-                        <Badge key="archivationStatus" color={certificate.archived ? 'secondary' : 'success'}>
+                        <span
+                            key="archivationStatus"
+                            className={`inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-xs font-medium text-white ${certificate.archived ? 'bg-gray-500' : 'bg-teal-500'}`}
+                        >
                             {certificate.archived ? 'Yes' : 'No'}
-                        </Badge>,
+                        </span>,
                     ],
                 };
             }),
@@ -413,7 +415,7 @@ export default function CertificateList({
     }, [preservedFilters, dispatch, withPreservedFilters]);
 
     return (
-        <Container className="themed-container" fluid>
+        <>
             <PagedList
                 hideWidgetButtons={hideWidgetButtons}
                 entity={EntityType.CERTIFICATE}
@@ -434,12 +436,11 @@ export default function CertificateList({
                 multiSelect={multiSelect}
                 pageWidgetLockName={LockWidgetNameEnum.ListOfCertificates}
                 extraFilterComponent={
-                    <SwitchWidget
+                    <Switch
                         label="Include archived"
                         id="archived-switch"
-                        disabled={false}
                         checked={isIncludeArchived}
-                        onClick={() => dispatch(actions.setIncludeArchived(!isIncludeArchived))}
+                        onChange={() => dispatch(actions.setIncludeArchived(!isIncludeArchived))}
                     />
                 }
             />
@@ -450,6 +451,8 @@ export default function CertificateList({
                 body={<CertificateUploadDialog onCancel={() => setUpload(false)} onUpload={(data) => onUploadClick(data)} />}
                 toggle={() => setUpload(false)}
                 buttons={[]}
+                size="xl"
+                icon="upload"
             />
 
             <Dialog
@@ -464,6 +467,8 @@ export default function CertificateList({
                 }
                 toggle={() => setUpdateGroup(false)}
                 buttons={[]}
+                icon="users"
+                size="md"
             />
 
             <Dialog
@@ -479,6 +484,8 @@ export default function CertificateList({
                 }
                 toggle={() => setUpdateOwner(false)}
                 buttons={[]}
+                icon="user"
+                size="md"
             />
 
             <Dialog
@@ -488,7 +495,7 @@ export default function CertificateList({
                 toggle={() => setUpdateEntity(false)}
                 buttons={[
                     { color: 'primary', onClick: () => {}, body: 'Update' },
-                    { color: 'secondary', onClick: () => setUpdateEntity(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setUpdateEntity(false), body: 'Cancel' },
                 ]}
             />
 
@@ -504,7 +511,9 @@ export default function CertificateList({
                 }
                 toggle={() => setUpdateRaProfile(false)}
                 buttons={[]}
+                size="md"
+                icon={<Plug size={26} strokeWidth={1} />}
             />
-        </Container>
+        </>
     );
 }

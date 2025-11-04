@@ -8,9 +8,9 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 
-import { Container } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { renderOAuth2StateBadges } from 'utils/oauth2Providers';
+import Container from 'components/Container';
 
 export default function OAuth2ProviderDetail() {
     const { providerName } = useParams();
@@ -117,7 +117,7 @@ export default function OAuth2ProviderDetail() {
         [oauth2Provider],
     );
     return (
-        <Container className="themed-container" fluid>
+        <Container>
             <Widget
                 title="Provider Details"
                 busy={isFetchingProvider}

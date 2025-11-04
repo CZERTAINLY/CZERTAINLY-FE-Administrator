@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
-import { Badge, Container } from 'reactstrap';
 
 import { actions, selectors } from 'ducks/acme-accounts';
 
@@ -13,6 +12,7 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { acmeAccountStatus } from '../acmeAccountStatus';
+import Badge from 'components/Badge';
 
 export default function AcmeAccountList() {
     const dispatch = useDispatch();
@@ -178,7 +178,7 @@ export default function AcmeAccountList() {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <>
             <Widget
                 title="List of ACME Accounts"
                 busy={isBusy}
@@ -187,7 +187,6 @@ export default function AcmeAccountList() {
                 titleSize="large"
                 refreshAction={getFreshData}
             >
-                <br />
                 <CustomTable
                     headers={acmeAccountsTableHeader}
                     data={acmeAccountsTableData}
@@ -207,9 +206,9 @@ export default function AcmeAccountList() {
                 toggle={() => setConfirmRevoke(false)}
                 buttons={[
                     { color: 'danger', onClick: onRevokeConfirmed, body: 'Yes, revoke' },
-                    { color: 'secondary', onClick: () => setConfirmRevoke(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmRevoke(false), body: 'Cancel' },
                 ]}
             />
-        </Container>
+        </>
     );
 }

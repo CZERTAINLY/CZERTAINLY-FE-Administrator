@@ -1,14 +1,16 @@
-import cx from 'classnames';
 import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
-import { Input, Pagination, PaginationItem, PaginationLink, Table } from 'reactstrap';
 import { jsxInnerText } from 'utils/jsxInnerText';
 
-import styles from './CustomTable.module.scss';
 import NewRowWidget, { NewRowWidgetProps } from './NewRowWidget';
+import Select from 'components/Select';
+import Pagination from 'components/Pagination';
+import Checkbox from 'components/Checkbox';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import cn from 'classnames';
 
 export interface TableHeader {
     id: string;
-    content: string | JSX.Element;
+    content: string | React.ReactNode;
     align?: 'left' | 'center' | 'right';
     sortable?: boolean;
     sort?: 'asc' | 'desc';
@@ -18,8 +20,8 @@ export interface TableHeader {
 
 export interface TableDataRow {
     id: number | string;
-    columns: (string | JSX.Element | JSX.Element[])[];
-    detailColumns?: (string | JSX.Element | JSX.Element[])[];
+    columns: (string | React.ReactNode | React.ReactNode[])[];
+    detailColumns?: (string | React.ReactNode | React.ReactNode[])[];
     options?: {
         useAccentBottomBorder?: boolean;
     };
@@ -86,37 +88,13 @@ function CustomTable({
         setTblCheckedRows(checkedRows || emptyCheckedRows);
     }, [checkedRows]);
 
-    const firstPage = useCallback(() => {
-        if (paginationData) {
-            if (onPageChanged) onPageChanged(1);
-        } else {
-            setPage(1);
-        }
-    }, [onPageChanged, paginationData]);
-
-    const prevPage = useCallback(() => {
-        if (paginationData) {
-            if (onPageChanged) onPageChanged(paginationData.page - 1);
-        } else {
-            setPage(page - 1);
-        }
-    }, [onPageChanged, page, paginationData]);
-
-    const nextPage = useCallback(() => {
-        if (paginationData) {
-            if (onPageChanged) onPageChanged(paginationData.page + 1);
-        } else {
-            setPage(page + 1);
-        }
-    }, [onPageChanged, page, paginationData]);
-
-    const lastPage = useCallback(() => {
-        if (paginationData) {
-            if (onPageChanged) onPageChanged(paginationData.totalPages);
-        } else {
-            setPage(totalPages);
-        }
-    }, [onPageChanged, paginationData, totalPages]);
+    const onPageChange = useCallback(
+        (page: number) => {
+            if (onPageChanged) onPageChanged(page);
+            else setPage(page);
+        },
+        [onPageChanged, setPage],
+    );
 
     useEffect(() => {
         setTblHeaders(headers);
@@ -139,7 +117,7 @@ function CustomTable({
                 ? [...data].filter((row) => {
                       let rowStr = '';
                       row.columns.forEach((col) => {
-                          rowStr += typeof col === 'string' ? col : jsxInnerText(col as JSX.Element);
+                          rowStr += typeof col === 'string' ? col : jsxInnerText(col as React.ReactNode);
                       });
                       return rowStr.toLowerCase().includes(searchKey.toLowerCase());
                   })
@@ -161,11 +139,11 @@ function CustomTable({
                     const aVal =
                         typeof a.columns[sortColumnIndex] === 'string'
                             ? (a.columns[sortColumnIndex] as string).toLowerCase()
-                            : jsxInnerText(a.columns[sortColumnIndex] as JSX.Element).toLowerCase();
+                            : jsxInnerText(a.columns[sortColumnIndex] as React.ReactNode).toLowerCase();
                     const bVal =
                         typeof b.columns[sortColumnIndex] === 'string'
                             ? (b.columns[sortColumnIndex] as string).toLowerCase()
-                            : jsxInnerText(b.columns[sortColumnIndex] as JSX.Element).toLowerCase();
+                            : jsxInnerText(b.columns[sortColumnIndex] as React.ReactNode).toLowerCase();
 
                     switch (sortCol.sortType) {
                         case 'date':
@@ -197,8 +175,8 @@ function CustomTable({
     }, [tblData, pageSize, page]);
 
     const onCheckAllCheckboxClick = useCallback(
-        (e: React.ChangeEvent<HTMLInputElement>) => {
-            if (!e.target.checked) {
+        (value: boolean) => {
+            if (!value) {
                 setTblCheckedRows([]);
                 if (onCheckedRowsChanged) onCheckedRowsChanged([]);
                 return;
@@ -267,8 +245,7 @@ function CustomTable({
     );
 
     const onRowCheckboxClick = useCallback(
-        (e: React.ChangeEvent<HTMLInputElement>) => {
-            const id = e.target.getAttribute('data-id');
+        (value: boolean, id: string) => {
             if (!id) return;
 
             if (!multiSelect) {
@@ -280,7 +257,7 @@ function CustomTable({
 
             const checked = [...tblCheckedRows];
 
-            if (e.target.checked) {
+            if (value) {
                 if (id && !checked.includes(id)) checked.push(id);
             } else {
                 if (id && checked.includes(id)) checked.splice(checked.indexOf(id), 1);
@@ -317,13 +294,13 @@ function CustomTable({
     );
 
     const onPageSizeChange = useCallback(
-        (event: React.ChangeEvent<HTMLInputElement>) => {
+        (value: string) => {
             if (onPageSizeChanged) {
-                onPageSizeChanged(parseInt(event.target.value));
+                onPageSizeChanged(parseInt(value));
                 return;
             }
 
-            setPageSize(parseInt(event.target.value));
+            setPageSize(parseInt(value));
             setPage(1);
         },
         [onPageSizeChanged],
@@ -334,6 +311,30 @@ function CustomTable({
         return tblCheckedRows.length === tblData.slice((page - 1) * ps, page * ps).length && tblData.length > 0;
     }, [tblData, tblCheckedRows, paginationData, pageSize, page]);
 
+    const getSortIcon = useCallback((sort: 'asc' | 'desc' | undefined) => {
+        return (
+            <div className="w-[14px]">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="lucide lucide-arrow-down-up-icon lucide-arrow-down-up"
+                >
+                    <path d="m3 16 4 4 4-4" color={sort && sort === 'desc' ? 'var(--dark-gray-color)' : 'currentColor'} />
+                    <path d="M7 20V4" color={sort && sort === 'desc' ? 'var(--dark-gray-color)' : 'currentColor'} />
+                    <path d="m21 8-4-4-4 4" color={sort && sort === 'asc' ? 'var(--dark-gray-color)' : 'currentColor'} />
+                    <path d="M17 4v16" color={sort && sort === 'asc' ? 'var(--dark-gray-color)' : 'currentColor'} />
+                </svg>
+            </div>
+        );
+    }, []);
+
     const header = useMemo(() => {
         const columns = tblHeaders ? [...tblHeaders] : [];
 
@@ -342,51 +343,47 @@ function CustomTable({
         return columns.map((header) => (
             <Fragment key={header.id}>
                 <th
-                    className={styles.header}
+                    scope="col"
+                    className={cn('p-2 text-start text-xs font-medium text-gray-500 uppercase dark:text-neutral-400', {
+                        'cursor-pointer': header.sortable,
+                    })}
                     data-id={header.id}
                     {...(header.sortable ? { onClick: onColumnSortClick } : {})}
                     style={{ ...(header.width ? { width: header.width } : {}), ...(header.align ? { textAlign: header.align } : {}) }}
                 >
                     {header.id === '__checkbox__' ? (
                         hasAllCheckBox && multiSelect ? (
-                            <input
-                                id={`${header.id}__checkbox__`}
-                                type="checkbox"
+                            <Checkbox
                                 checked={checkAllChecked}
-                                onChange={onCheckAllCheckboxClick}
-                                data-testid="table-checkbox"
+                                onChange={(value) => onCheckAllCheckboxClick(value)}
+                                id={`${header.id}__checkbox__`}
                             />
                         ) : (
                             <>&nbsp;</>
                         )
                     ) : header.sortable ? (
-                        <>
+                        <div className="flex items-center gap-1">
                             {header.content}
                             &nbsp;
-                            {header.sort === 'asc' ? (
-                                <>
-                                    <i className="fa fa-arrow-up" />
-                                    <i className="fa fa-arrow-down" style={{ opacity: 0.25 }} />
-                                </>
-                            ) : header.sort === 'desc' ? (
-                                <>
-                                    <i className="fa fa-arrow-up" style={{ opacity: 0.25 }} />
-                                    <i className="fa fa-arrow-down" />
-                                </>
-                            ) : (
-                                <>
-                                    <i className="fa fa-arrow-up" style={{ opacity: 0.25 }} />
-                                    <i className="fa fa-arrow-down" style={{ opacity: 0.25 }} />
-                                </>
-                            )}
-                        </>
+                            {getSortIcon(header.sort)}
+                        </div>
                     ) : (
                         header.content
                     )}
                 </th>
             </Fragment>
         ));
-    }, [tblHeaders, hasCheckboxes, hasDetails, onColumnSortClick, hasAllCheckBox, multiSelect, checkAllChecked, onCheckAllCheckboxClick]);
+    }, [
+        tblHeaders,
+        hasCheckboxes,
+        hasDetails,
+        onColumnSortClick,
+        hasAllCheckBox,
+        multiSelect,
+        checkAllChecked,
+        onCheckAllCheckboxClick,
+        getSortIcon,
+    ]);
 
     const getRowStyle = useCallback((row: TableDataRow) => {
         if (!row.options) return undefined;
@@ -397,189 +394,165 @@ function CustomTable({
         return style;
     }, []);
 
-    const body = useMemo(
-        () =>
-            tblData
-                .filter((row, index) => {
-                    if (!hasPagination) return true;
-                    if (pageSize === 0) return true;
-                    return paginationData ? true : index >= (page - 1) * pageSize && index < page * pageSize;
-                })
-                .map((row, index) => (
-                    <Fragment key={row.id}>
-                        <tr
-                            key={`tr${row.id}`}
-                            {...(hasCheckboxes || hasDetails
-                                ? {
-                                      onClick: (e) => {
-                                          onRowToggleSelection(e, row.id, hasCheckboxes);
-                                      },
-                                  }
-                                : {})}
-                            style={getRowStyle(row)}
-                            data-id={row.id}
-                        >
-                            {!hasDetails ? (
-                                <></>
-                            ) : !row.detailColumns || row.detailColumns.length === 0 ? (
-                                <td></td>
-                            ) : (
-                                <td id="show-detail-more-column" key="show-detail-more-column">
-                                    {expandedRow === row.id ? (
-                                        <i className="fa fa-caret-up" data-expander="true" />
-                                    ) : (
-                                        <i className="fa fa-caret-down" data-expander="true" />
-                                    )}
-                                </td>
-                            )}
-                            {!hasCheckboxes ? (
-                                <></>
-                            ) : (
-                                <td>
-                                    <input
-                                        id={`${row.id}__checkbox__`}
-                                        type="checkbox"
-                                        checked={tblCheckedRows.includes(row.id)}
-                                        onChange={onRowCheckboxClick}
-                                        data-id={row.id}
-                                        data-testid="table-checkbox"
-                                    />
-                                </td>
-                            )}
-
-                            {row.columns.map((column, index) => (
-                                <td
-                                    key={index}
-                                    className={styles.dataCell}
-                                    style={tblHeaders && tblHeaders[index]?.align ? { textAlign: tblHeaders[index]?.align } : {}}
-                                >
-                                    <div>{column ? column : <></>}</div>
-                                </td>
-                            ))}
-                        </tr>
-
+    const body = useMemo(() => {
+        return tblData
+            .filter((row, index) => {
+                if (!hasPagination) return true;
+                if (pageSize === 0) return true;
+                return paginationData ? true : index >= (page - 1) * pageSize && index < page * pageSize;
+            })
+            .map((row, index) => (
+                <Fragment key={row.id}>
+                    <tr
+                        key={`tr${row.id}`}
+                        {...(hasCheckboxes || hasDetails
+                            ? {
+                                  onClick: (e) => {
+                                      onRowToggleSelection(e, row.id, hasCheckboxes);
+                                  },
+                              }
+                            : {})}
+                        style={getRowStyle(row)}
+                        data-id={row.id}
+                    >
                         {!hasDetails ? (
                             <></>
+                        ) : !row.detailColumns || row.detailColumns.length === 0 ? (
+                            <td></td>
                         ) : (
-                            <tr key={`trd${row.id}`}>
-                                {row.detailColumns && expandedRow === row.id ? (
-                                    row.detailColumns.length === 1 ? (
-                                        <td
-                                            colSpan={row.columns.length + (hasCheckboxes ? 1 : 0) + (hasDetails ? 1 : 0)}
-                                            className={styles.detailCell}
-                                        >
-                                            {row.detailColumns[0]}
-                                        </td>
-                                    ) : (
-                                        row.detailColumns.map((e, index) => {
-                                            return (
-                                                <td key={index}>
-                                                    <div>{e}</div>
-                                                </td>
-                                            );
-                                        })
-                                    )
+                            <td
+                                id="show-detail-more-column"
+                                key="show-detail-more-column"
+                                className="px-2 py-2 whitespace-nowrap text-xs font-medium text-gray-800 dark:text-neutral-200"
+                            >
+                                {expandedRow === row.id ? (
+                                    <ChevronUp size={16} className="text-[var(--status-light-gray-color)]" />
                                 ) : (
-                                    <></>
+                                    <ChevronDown size={16} className="text-[var(--status-light-gray-color)]" />
                                 )}
-                            </tr>
+                            </td>
                         )}
-                    </Fragment>
-                )),
+                        {hasCheckboxes && (
+                            <td className="p-2">
+                                <Checkbox
+                                    checked={tblCheckedRows.includes(row.id)}
+                                    onChange={(value) => {
+                                        console.log('1111111value', value);
+                                        console.log('1111111row.id', row.id);
+                                        onRowCheckboxClick(value, row.id.toString());
+                                    }}
+                                    id={`${row.id}__checkbox__`}
+                                />
+                            </td>
+                        )}
 
-        [
-            tblData,
-            hasPagination,
-            pageSize,
-            paginationData,
-            page,
-            hasCheckboxes,
-            onRowToggleSelection,
-            tblCheckedRows,
-            onRowCheckboxClick,
-            hasDetails,
-            expandedRow,
-            tblHeaders,
-            getRowStyle,
-        ],
-    );
-
-    const pagination = (paginationData ? paginationData.totalItems > paginationData.pageSize : tblData.length > pageSize) ? (
-        <Pagination size="sm" aria-label="Navigation">
-            <PaginationItem disabled={(paginationData ? paginationData.page : page) === 1}>
-                <PaginationLink first onClick={firstPage} />
-            </PaginationItem>
-
-            <PaginationItem disabled={(paginationData ? paginationData.page : page) === 1}>
-                <PaginationLink previous onClick={prevPage} />
-            </PaginationItem>
-
-            <PaginationItem active>
-                <PaginationLink>{paginationData ? paginationData.page : page}</PaginationLink>
-            </PaginationItem>
-
-            <PaginationItem disabled={paginationData ? paginationData.page === paginationData.totalPages : page === totalPages}>
-                <PaginationLink next onClick={nextPage} />
-            </PaginationItem>
-
-            <PaginationItem disabled={paginationData ? paginationData.page === paginationData.totalPages : page === totalPages}>
-                <PaginationLink last onClick={lastPage} />
-            </PaginationItem>
-        </Pagination>
-    ) : undefined;
+                        {row.columns.map((column, index) => (
+                            <td
+                                key={index}
+                                style={tblHeaders && tblHeaders[index]?.align ? { textAlign: tblHeaders[index]?.align } : {}}
+                                className="px-1 py-2 whitespace-nowrap text-xs font-medium text-gray-800 dark:text-neutral-200"
+                            >
+                                <div>{column ? column : <></>}</div>
+                            </td>
+                        ))}
+                    </tr>
+                    {hasDetails && (
+                        <tr key={`trd${row.id}`}>
+                            {row.detailColumns &&
+                                expandedRow === row.id &&
+                                (row.detailColumns.length === 1 ? (
+                                    <td className="px-2 py-2 whitespace-nowrap text-xs font-medium text-gray-800 dark:text-neutral-200">
+                                        {row.detailColumns[0]}
+                                    </td>
+                                ) : (
+                                    row.detailColumns.map((e, index) => {
+                                        return (
+                                            <td
+                                                key={index}
+                                                className="px-2 py-2 whitespace-nowrap text-xs font-medium text-gray-800 dark:text-neutral-200"
+                                            >
+                                                <div>{e}</div>
+                                            </td>
+                                        );
+                                    })
+                                ))}
+                        </tr>
+                    )}
+                </Fragment>
+            ));
+    }, [
+        tblData,
+        hasPagination,
+        pageSize,
+        paginationData,
+        page,
+        hasCheckboxes,
+        onRowToggleSelection,
+        tblCheckedRows,
+        onRowCheckboxClick,
+        hasDetails,
+        expandedRow,
+        tblHeaders,
+        getRowStyle,
+    ]);
 
     return (
-        <div className={styles.customTable} data-testid="custom-table">
-            {canSearch ? (
-                <>
-                    <div className="fa-pull-right mt-n-xs">
-                        <Input id="search" placeholder="Search" onChange={(event) => setSearchKey(event.target.value)} />
+        <div data-testid="custom-table">
+            {canSearch && (
+                <div className="flex justify-end mb-3">
+                    <div className="max-w-sm">
+                        <input
+                            id="search"
+                            placeholder="Search"
+                            onChange={(event) => setSearchKey(event.target.value)}
+                            type="text"
+                            className="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
+                        />
                     </div>
-                    <br />
-                    <br />
-                </>
-            ) : (
-                <></>
+                </div>
             )}
-            <div className={cx('table-responsive', styles.logsTableContainer)}>
-                <Table className={cx('table-hover', styles.logsTable)} size="sm">
-                    {!hasHeader ? (
-                        <></>
-                    ) : (
-                        <thead>
-                            <tr>{header}</tr>
-                        </thead>
-                    )}
-                    <tbody>{body}</tbody>
-                </Table>
-            </div>
-            {!hasPagination ? (
-                <></>
-            ) : (
-                <div className={styles.paginationContainer}>
-                    <div>
-                        {tblData?.length ? (
-                            <Input type="select" value={paginationData ? paginationData.pageSize : pageSize} onChange={onPageSizeChange}>
-                                {paginationData ? (
-                                    paginationData.itemsPerPageOptions.map((option) => <option key={option}>{option}</option>)
-                                ) : (
-                                    <>
-                                        <option>10</option>
-                                        <option>20</option>
-                                        <option>50</option>
-                                        <option>100</option>
-                                    </>
+            <div className="py-2">
+                <div className={cn('overflow-x-auto rounded-md', { 'border border-gray-100': hasHeader })}>
+                    <div className="min-w-full inline-block align-middle">
+                        <div className="overflow-hidden">
+                            <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
+                                {hasHeader && (
+                                    <thead className="bg-gray-50 dark:bg-neutral-700">
+                                        <tr>{header}</tr>
+                                    </thead>
                                 )}
-                            </Input>
-                        ) : (
-                            <></>
+                                <tbody className="divide-y divide-gray-200 dark:divide-neutral-700">{body}</tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {hasPagination && (
+                <div className="flex justify-between items-center gap-2">
+                    <div>
+                        {tblData?.length > 0 && (
+                            <Select
+                                id="pageSize"
+                                options={(paginationData?.itemsPerPageOptions || [10, 20, 50, 100]).map((option: number) => ({
+                                    label: option.toString(),
+                                    value: option.toString(),
+                                }))}
+                                value={(paginationData ? paginationData.pageSize : pageSize).toString()}
+                                onChange={onPageSizeChange}
+                            />
                         )}
                     </div>
 
-                    {pagination}
+                    {tblData?.length > 1 && paginationData && (
+                        <Pagination
+                            page={paginationData?.page || page}
+                            totalPages={paginationData?.totalPages || totalPages}
+                            onPageChange={onPageChange}
+                        />
+                    )}
 
                     {tblData?.length ? (
-                        <div style={{ textAlign: 'right' }}>
+                        <div className="text-sm">
                             {paginationData ? (
                                 <div>
                                     Showing {(paginationData.page - 1) * paginationData.pageSize + 1} to{' '}
@@ -604,7 +577,7 @@ function CustomTable({
                             )}
                         </div>
                     ) : (
-                        <div>No items to show</div>
+                        <div className="text-sm">No items to show</div>
                     )}
                 </div>
             )}

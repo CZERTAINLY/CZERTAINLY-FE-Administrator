@@ -14,12 +14,15 @@ import { Link, useNavigate, useParams } from 'react-router';
 import Select from 'react-select';
 
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import { Badge, Col, Container, Label, Row } from 'reactstrap';
+import { Label } from 'reactstrap';
+import Badge from 'components/Badge';
 import { KeyUsage, PlatformEnum, Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import { createWidgetDetailHeaders } from 'utils/widget';
 import GoBackButton from 'components/GoBackButton';
+import Breadcrumb from 'components/Breadcrumb';
+import Container from 'components/Container';
 
 export default function TokenProfileDetail() {
     const dispatch = useDispatch();
@@ -238,32 +241,28 @@ export default function TokenProfileDetail() {
     }, [dispatch, tokenProfile, keyUsages]);
 
     return (
-        <Container className="themed-container" fluid>
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                forcedPath="/tokenprofiles"
-                text={`${getEnumLabel(resourceEnum, Resource.TokenProfiles)} Inventory`}
+        <div>
+            <Breadcrumb
+                items={[
+                    { label: 'Token Profiles', href: '/tokenprofiles' },
+                    { label: tokenProfile?.name || 'Token Profile Details', href: '' },
+                ]}
             />
-            <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                <Col>
-                    <Widget
-                        title="Token Profile Details"
-                        busy={isBusy}
-                        widgetButtons={buttons}
-                        titleSize="large"
-                        refreshAction={getFreshTokenProfileDetails}
-                        widgetLockName={LockWidgetNameEnum.TokenProfileDetails}
-                        lockSize="large"
-                    >
-                        <br />
-
-                        <CustomTable headers={detailHeaders} data={detailData} />
-                    </Widget>
-                </Col>
-
-                <Col>
+            <Container className="md:flex-row">
+                <Widget
+                    title="Token Profile Details"
+                    busy={isBusy}
+                    widgetButtons={buttons}
+                    titleSize="large"
+                    refreshAction={getFreshTokenProfileDetails}
+                    widgetLockName={LockWidgetNameEnum.TokenProfileDetails}
+                    lockSize="large"
+                    className="w-full md:w-1/2"
+                >
+                    <CustomTable headers={detailHeaders} data={detailData} />
+                </Widget>
+                <Container className="w-full md:w-1/2 flex flex-col">
                     <Widget title="Attributes" busy={isBusy} titleSize="large">
-                        <br />
                         <Label>Token Profile Attributes</Label>
                         <AttributeViewer attributes={tokenProfile?.attributes} />
                     </Widget>
@@ -275,34 +274,32 @@ export default function TokenProfileDetail() {
                             attributes={tokenProfile.customAttributes}
                         />
                     )}
-                </Col>
-            </Row>
-
-            <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                <Col></Col>
-            </Row>
-
+                </Container>
+            </Container>
             <Dialog
                 isOpen={confirmDelete}
                 caption="Delete Token Profile"
                 body="You are about to delete Token Profile. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
             <Dialog
                 isOpen={keyUsageUpdate}
-                caption={`Update Key Usage`}
+                caption="Update Key Usage"
                 body={keyUsageBody}
                 toggle={() => setKeyUsageUpdate(false)}
+                size="md"
+                noBorder
                 buttons={[
                     { color: 'primary', onClick: onUpdateKeyUsageConfirmed, body: 'Update' },
-                    { color: 'secondary', onClick: () => setKeyUsageUpdate(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setKeyUsageUpdate(false), body: 'Cancel' },
                 ]}
             />
-        </Container>
+        </div>
     );
 }

@@ -244,7 +244,7 @@ function RolePermissionsEditor({
                     </div>
                 </Widget>
             ),
-        [allowAction, allowAllActions, currentResource, disabled, isBusy, permissions.allowAllResources, permissions?.resources],
+        [allowAction, allowAllActions, currentResource, disabled, isBusy, permissions],
     );
 
     const objectHeaders: TableHeader[] = useMemo(
@@ -272,7 +272,7 @@ function RolePermissionsEditor({
     );
 
     const getObjectRowActions = useCallback(
-        (object: ObjectPermissionsResponseModel): JSX.Element[] =>
+        (object: ObjectPermissionsResponseModel): React.ReactNode[] =>
             currentResource?.actions.map((action) => (
                 <label
                     htmlFor={`${object.uuid}_${action.name}`}
@@ -294,7 +294,7 @@ function RolePermissionsEditor({
                     />
                 </label>
             )) || [],
-        [currentResource?.actions, currentResource?.uuid, disabled, setOLP],
+        [currentResource, disabled, setOLP],
     );
 
     const objectRows: TableDataRow[] = useMemo(
@@ -539,7 +539,7 @@ function RolePermissionsEditor({
                 size="lg"
                 buttons={[
                     { disabled: objectsToAdd.length === 0, color: 'primary', onClick: () => addSelectedObjects(), body: 'Ok' },
-                    { color: 'secondary', onClick: () => setObjectListDialog(false), body: 'Close' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setObjectListDialog(false), body: 'Close' },
                 ]}
             />
         </>

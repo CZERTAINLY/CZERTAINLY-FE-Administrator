@@ -1,7 +1,8 @@
 import { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
-import { Badge, Container } from 'reactstrap';
+
+import Badge from 'components/Badge';
 
 import { EntityType } from 'ducks/filters';
 import { actions, selectors } from 'ducks/locations';
@@ -130,32 +131,30 @@ function LocationList() {
     const onListCallback = useCallback((filters: SearchRequestModel) => dispatch(actions.listLocations(filters)), [dispatch]);
 
     return (
-        <Container className="themed-container" fluid>
-            <PagedList
-                entity={EntityType.LOCATION}
-                onListCallback={onListCallback}
-                onDeleteCallback={(uuids) =>
-                    uuids.map((uuid) =>
-                        dispatch(
-                            actions.deleteLocation({
-                                entityUuid: locations.find((data) => data.uuid === uuid)?.entityInstanceUuid || '',
-                                uuid,
-                            }),
-                        ),
-                    )
-                }
-                getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.locations.getSearchableFieldInformation(), [])}
-                headers={locationsRowHeaders}
-                data={locationList}
-                isBusy={isBusy}
-                title="Locations Store"
-                entityNameSingular="a Location"
-                entityNamePlural="Locations"
-                filterTitle="Locations Filter"
-                additionalButtons={buttons}
-                pageWidgetLockName={LockWidgetNameEnum.LocationsStore}
-            />
-        </Container>
+        <PagedList
+            entity={EntityType.LOCATION}
+            onListCallback={onListCallback}
+            onDeleteCallback={(uuids) =>
+                uuids.map((uuid) =>
+                    dispatch(
+                        actions.deleteLocation({
+                            entityUuid: locations.find((data) => data.uuid === uuid)?.entityInstanceUuid || '',
+                            uuid,
+                        }),
+                    ),
+                )
+            }
+            getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.locations.getSearchableFieldInformation(), [])}
+            headers={locationsRowHeaders}
+            data={locationList}
+            isBusy={isBusy}
+            title="Locations Store"
+            entityNameSingular="a Location"
+            entityNamePlural="Locations"
+            filterTitle="Locations Filter"
+            additionalButtons={buttons}
+            pageWidgetLockName={LockWidgetNameEnum.LocationsStore}
+        />
     );
 }
 

@@ -1,4 +1,5 @@
-import { Badge } from 'reactstrap';
+import Badge from 'components/Badge';
+import { Check, HelpCircle, X } from 'lucide-react';
 
 interface Props {
     status?: boolean;
@@ -9,21 +10,21 @@ function StatusCircle({ status }: Props) {
         case true:
             return (
                 <Badge color="success">
-                    <i className="fa fa-check-circle"></i>
+                    <Check size={16} />
                 </Badge>
             );
 
         case false:
             return (
                 <Badge color="danger">
-                    <i className="fa fa-times-circle"></i>
+                    <X size={16} />
                 </Badge>
             );
 
         default:
             return (
-                <Badge color="dark">
-                    <i className="fa fa-question-circle"></i>
+                <Badge color="gray">
+                    <HelpCircle size={16} />
                 </Badge>
             );
     }

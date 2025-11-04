@@ -10,11 +10,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router';
 
-import { Badge, Col, Container, Row } from 'reactstrap';
+import Badge from 'components/Badge';
 import { PlatformEnum, RecipientType } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { getInputStringFromIso8601String } from 'utils/duration';
 import Dialog from 'components/Dialog';
+import Breadcrumb from 'components/Breadcrumb';
+import Container from 'components/Container';
 
 export default function NotificationProfileDetail() {
     const { id, version } = useParams();
@@ -236,55 +238,54 @@ export default function NotificationProfileDetail() {
     );
 
     return (
-        <Container className="themed-container" fluid>
-            <Row>
-                <Col>
-                    <Widget
-                        title="Notification Profile Details"
-                        busy={isFetchingDetail}
-                        widgetLockName={LockWidgetNameEnum.NotificationProfileDetails}
-                        widgetButtons={notificationProfileWidgetButtons}
-                        titleSize="large"
-                        refreshAction={getFreshData}
-                    >
-                        <CustomTable headers={headers} data={profileData} />
-                    </Widget>
-                </Col>
-                <Col>
-                    <Widget
-                        title="Notification Instance Details"
-                        busy={isFetchingDetail || isFetchingNotificationInstanceDetail}
-                        widgetLockName={LockWidgetNameEnum.NotificationProfileDetails}
-                        titleSize="large"
-                    >
-                        <CustomTable headers={headers} data={notificationInstanceData} />
-                    </Widget>
-                </Col>
-            </Row>
+        <div>
+            <Breadcrumb
+                items={[
+                    { label: 'Notification Profiles', href: '/notificationprofiles' },
+                    { label: notificationProfile?.name || 'Notification Profile Details', href: '' },
+                ]}
+            />
+            <Container className="md:grid grid-cols-2">
+                <Widget
+                    title="Notification Profile Details"
+                    busy={isFetchingDetail}
+                    widgetLockName={LockWidgetNameEnum.NotificationProfileDetails}
+                    widgetButtons={notificationProfileWidgetButtons}
+                    titleSize="large"
+                    refreshAction={getFreshData}
+                >
+                    <CustomTable headers={headers} data={profileData} />
+                </Widget>
+                <Widget
+                    title="Notification Instance Details"
+                    busy={isFetchingDetail || isFetchingNotificationInstanceDetail}
+                    widgetLockName={LockWidgetNameEnum.NotificationProfileDetails}
+                    titleSize="large"
+                >
+                    <CustomTable headers={headers} data={notificationInstanceData} />
+                </Widget>
+            </Container>
             {!!notificationProfile?.recipients?.length && (
-                <Row>
-                    <Col>
-                        <Widget
-                            title="Recipients"
-                            busy={isFetchingDetail || isFetchingNotificationInstanceDetail}
-                            widgetLockName={LockWidgetNameEnum.NotificationProfileDetails}
-                            titleSize="large"
-                        >
-                            <CustomTable headers={recipientHeaders} data={recipientsData} />
-                        </Widget>
-                    </Col>
-                </Row>
+                <Widget
+                    title="Recipients"
+                    busy={isFetchingDetail || isFetchingNotificationInstanceDetail}
+                    widgetLockName={LockWidgetNameEnum.NotificationProfileDetails}
+                    titleSize="large"
+                >
+                    <CustomTable headers={recipientHeaders} data={recipientsData} />
+                </Widget>
             )}
             <Dialog
                 isOpen={confirmDelete}
                 caption="Delete Notification Profile"
                 body="You are about to delete a Notification Profile. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
-        </Container>
+        </div>
     );
 }

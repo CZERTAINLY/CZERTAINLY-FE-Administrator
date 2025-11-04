@@ -1,8 +1,10 @@
-import { Button, Input } from 'reactstrap';
+import { Input } from 'reactstrap';
 import styles from './EditableTableCell.module.scss';
 import { useCallback, useState, useRef } from 'react';
 import Spinner from 'components/Spinner';
 import { Field, FieldRenderProps, Form } from 'react-final-form';
+import Button from 'components/Button';
+import { Check, X, Pencil } from 'lucide-react';
 
 export interface EditableTableCellProps<TValue> {
     value: TValue;
@@ -95,21 +97,11 @@ const EditableTableCell = <TValue,>({
                                 ))}
                         </Field>
                         <div className={styles.btnGroup}>
-                            <Button
-                                className={`btn btn-link ${styles.editCellBtn}`}
-                                color="link"
-                                onClick={() => handleSubmit()}
-                                disabled={busy}
-                            >
-                                <i className="fa fa-check" style={{ color: 'green' }} />
+                            <Button variant="transparent" onClick={() => handleSubmit()} disabled={busy}>
+                                <Check size={16} />
                             </Button>
-                            <Button
-                                className={`btn btn-link ${styles.editCellBtn}`}
-                                color="link"
-                                onClick={() => handleCancel()}
-                                disabled={busy}
-                            >
-                                <i className="fa fa-times" style={{ color: 'red' }} />
+                            <Button variant="transparent" onClick={() => handleCancel()} disabled={busy}>
+                                <X size={16} />
                             </Button>
                         </div>
                     </>
@@ -122,8 +114,7 @@ const EditableTableCell = <TValue,>({
             <Spinner active={busy} />
             <Button
                 title="Edit"
-                className={`btn btn-link ${styles.editCellBtn}`}
-                color="link"
+                variant="transparent"
                 onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -131,7 +122,7 @@ const EditableTableCell = <TValue,>({
                 }}
                 disabled={busy}
             >
-                <i className="fa fa-pencil" />
+                <Pencil size={16} />
             </Button>
         </div>
     );

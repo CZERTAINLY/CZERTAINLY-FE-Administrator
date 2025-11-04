@@ -13,13 +13,13 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 import Select from 'react-select';
-import { Badge, Container } from 'reactstrap';
 import { SearchRequestModel } from 'types/certificate';
 import { KeyCompromiseReason, KeyUsage, PlatformEnum } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { dateFormatter } from 'utils/dateUtil';
 import KeyStateCircle from '../KeyStateCircle';
 import KeyStatusCircle from '../KeyStatusCircle';
+import Badge from 'components/Badge';
 
 function CryptographicKeyList() {
     const dispatch = useDispatch();
@@ -298,7 +298,7 @@ function CryptographicKeyList() {
     const onListCallback = useCallback((filters: SearchRequestModel) => dispatch(actions.listCryptographicKeys(filters)), [dispatch]);
 
     return (
-        <Container className="themed-container" fluid>
+        <>
             <PagedList
                 entity={EntityType.KEY}
                 onListCallback={onListCallback}
@@ -335,9 +335,10 @@ function CryptographicKeyList() {
                     </div>
                 }
                 toggle={() => setConfirmCompromise(false)}
+                size="md"
                 buttons={[
                     { color: 'danger', onClick: onCompromise, body: 'Yes' },
-                    { color: 'secondary', onClick: () => setConfirmCompromise(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmCompromise(false), body: 'Cancel' },
                 ]}
             />
             <Dialog
@@ -345,22 +346,25 @@ function CryptographicKeyList() {
                 caption={`Destroy ${checkedRows.length > 1 ? 'Keys' : 'Key'}`}
                 body={`You are about to destroy ${checkedRows.length > 1 ? 'a Key' : 'Keys'}. Is this what you want to do?`}
                 toggle={() => setConfirmDestroy(false)}
+                icon="destroy"
                 buttons={[
-                    { color: 'danger', onClick: onDestroy, body: 'Yes, Destroy' },
-                    { color: 'secondary', onClick: () => setConfirmDestroy(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDestroy, body: 'Destroy' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDestroy(false), body: 'Cancel' },
                 ]}
             />
             <Dialog
                 isOpen={keyUsageUpdate}
-                caption={`Update Key Usage`}
+                caption="Update Key Usage"
                 body={keyUsageBody}
                 toggle={() => setKeyUsageUpdate(false)}
+                size="md"
+                noBorder
                 buttons={[
                     { color: 'primary', onClick: onUpdateKeyUsageConfirmed, body: 'Update' },
-                    { color: 'secondary', onClick: () => setKeyUsageUpdate(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setKeyUsageUpdate(false), body: 'Cancel' },
                 ]}
             />
-        </Container>
+        </>
     );
 }
 

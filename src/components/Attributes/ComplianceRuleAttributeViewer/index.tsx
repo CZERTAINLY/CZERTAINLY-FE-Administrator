@@ -10,7 +10,7 @@ export interface Props {
 }
 
 export default function ComplianceRuleAttributeViewer({ attributes, descriptorAttributes, hasHeader = true }: Props) {
-    const getContent = useCallback(getAttributeContent, []);
+    const getContent = getAttributeContent;
 
     const tableHeaders: TableHeader[] = useMemo(
         () => [

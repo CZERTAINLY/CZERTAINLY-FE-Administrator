@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
-import { Badge, Container, Table } from 'reactstrap';
+import { Container, Table } from 'reactstrap';
 
 import { actions, selectors } from 'ducks/compliance-profiles';
 
@@ -10,6 +10,7 @@ import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { LockWidgetNameEnum } from 'types/user-interface';
+import Badge from 'components/Badge';
 
 export default function AdministratorsList() {
     const dispatch = useDispatch();
@@ -180,16 +181,16 @@ export default function AdministratorsList() {
                         {complianceProfile.name}
                     </Link>,
                     complianceProfile.description || '',
-                    <Badge key={complianceProfile.uuid} color="secondary" searchvalue={complianceProfile.providerRulesCount}>
+                    <Badge key={complianceProfile.uuid} color="secondary">
                         {complianceProfile.providerRulesCount.toString()}
                     </Badge>,
-                    <Badge key={complianceProfile.uuid} color="secondary" searchvalue={complianceProfile.providerGroupsCount}>
+                    <Badge key={complianceProfile.uuid} color="secondary">
                         {complianceProfile.providerGroupsCount.toString()}
                     </Badge>,
-                    <Badge key={complianceProfile.uuid} color="secondary" searchvalue={complianceProfile.internalRulesCount}>
+                    <Badge key={complianceProfile.uuid} color="secondary">
                         {complianceProfile.internalRulesCount.toString()}
                     </Badge>,
-                    <Badge key={complianceProfile.uuid} color="secondary" searchvalue={complianceProfile.associations}>
+                    <Badge key={complianceProfile.uuid} color="secondary">
                         {complianceProfile.associations.toString()}
                     </Badge>,
                 ],
@@ -208,7 +209,6 @@ export default function AdministratorsList() {
                 refreshAction={getFreshData}
                 dataTestId="compliance-profile-list"
             >
-                <br />
                 <CustomTable
                     headers={complianceProfilesTableHeader}
                     data={complianceProfilesTableData}
@@ -227,9 +227,10 @@ export default function AdministratorsList() {
                 } which may have associated RA
                    Profiles(s). Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
                 dataTestId="delete-compliance-profile-dialog"
             />
@@ -241,7 +242,7 @@ export default function AdministratorsList() {
                 toggle={() => setConfirmForceDelete(false)}
                 buttons={[
                     { color: 'danger', onClick: onForceDeleteConfirmed, body: 'Force delete' },
-                    { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
                 ]}
                 dataTestId="force-delete-compliance-profile-dialog"
             />
@@ -251,9 +252,10 @@ export default function AdministratorsList() {
                 caption={`Initiate Compliance Check`}
                 body={'Initiate the compliance check for the selected Compliance Profile(s)?'}
                 toggle={() => setComplianceCheck(false)}
+                noBorder
                 buttons={[
                     { color: 'primary', onClick: onComplianceCheckConfirmed, body: 'Yes' },
-                    { color: 'secondary', onClick: () => setComplianceCheck(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setComplianceCheck(false), body: 'Cancel' },
                 ]}
                 dataTestId="compliance-check-dialog"
             />

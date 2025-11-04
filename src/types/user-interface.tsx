@@ -115,7 +115,7 @@ export interface WidgetLockErrorModel {
 export interface GlobalModalModel {
     title?: string;
     size?: 'sm' | 'lg' | 'xl';
-    content: string | JSX.Element | undefined;
+    content: string | React.ReactNode | undefined;
     type?: 'success' | 'error' | 'warning' | 'info' | 'confirm' | 'question';
     isOpen: boolean;
     showCancelButton?: boolean;
@@ -129,7 +129,7 @@ export interface GlobalModalModel {
 export interface AddNewAttributeType {
     name: string;
     contentType: AttributeContentType;
-    content: JSX.Element;
+    content: React.ReactNode;
 }
 
 export interface ReactFlowUI {

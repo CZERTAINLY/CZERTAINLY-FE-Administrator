@@ -1,4 +1,4 @@
-import { Badge } from 'reactstrap';
+import Badge from 'components/Badge';
 import { CertificateEventHistoryDtoStatusEnum, KeyEventHistoryDtoStatusEnum } from 'types/openapi';
 
 interface Props {

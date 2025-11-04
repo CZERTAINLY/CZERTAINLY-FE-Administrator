@@ -1,5 +1,5 @@
 import { Fragment } from 'react/jsx-runtime';
-import { Badge } from 'reactstrap';
+import Badge from 'components/Badge';
 import { OAuth2ProviderSettingsModel } from 'types/auth-settings';
 
 export function isValidJWTBearerProvider(provider: OAuth2ProviderSettingsModel) {

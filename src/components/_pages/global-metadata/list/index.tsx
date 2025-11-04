@@ -8,7 +8,6 @@ import { actions, selectors } from 'ducks/globalMetadata';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
-import { Container } from 'reactstrap';
 import { PlatformEnum } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import ConnectorMetadataDialog from './ConnectorMetadataDialog';
@@ -98,7 +97,7 @@ export default function GlobalMetadataList() {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <>
             <Widget
                 title="List of Global Metadata"
                 busy={isBusy}
@@ -107,7 +106,6 @@ export default function GlobalMetadataList() {
                 titleSize="large"
                 refreshAction={getFreshData}
             >
-                <br />
                 <CustomTable
                     headers={globalMetadataTableHeaders}
                     data={globalMetadataTableData}
@@ -123,13 +121,14 @@ export default function GlobalMetadataList() {
                 caption={`Delete Global Metadata`}
                 body={`You are about to delete selected Global Metadata. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
             <ConnectorMetadataDialog show={showPromote} setShow={setShowPromote} />
-        </Container>
+        </>
     );
 }
