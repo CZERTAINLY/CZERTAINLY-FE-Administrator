@@ -3,7 +3,7 @@ import cn from 'classnames';
 export type ButtonVariant = 'solid' | 'outline' | 'transparent';
 
 export type ButtonColor = 'primary' | 'danger' | 'secondary' | 'warning';
-interface Props {
+export interface Props {
     variant?: ButtonVariant;
     color?: ButtonColor;
     onClick?: (event: React.MouseEvent) => void;

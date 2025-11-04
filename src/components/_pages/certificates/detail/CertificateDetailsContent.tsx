@@ -148,7 +148,7 @@ export default function CertificateDetailsContent({ certificate, validationResul
             userInterfaceActions.showGlobalModal({
                 content: <CertificateDownloadForm />,
                 isOpen: true,
-                size: 'lg',
+                size: 'md',
                 title: 'Download',
             }),
         );

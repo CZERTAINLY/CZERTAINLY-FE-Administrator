@@ -2,8 +2,8 @@ import cx from 'classnames';
 import { useCallback, useState } from 'react';
 import { Outlet } from 'react-router';
 
-// import Alerts from 'components/Alerts';
-// import GlobalModal from 'components/GlobalModal';
+import Alerts from 'components/Alerts';
+import GlobalModal from 'components/GlobalModal';
 import Footer from 'components/Layout/Footer';
 import Header from 'components/Layout/Header';
 import Sidebar from 'components/Layout/Sidebar';
@@ -27,8 +27,8 @@ function Layout() {
                     <Footer />
                 </main>
 
-                {/* <Alerts />
-                <GlobalModal /> */}
+                <Alerts />
+                <GlobalModal />
             </div>
         </div>
     );

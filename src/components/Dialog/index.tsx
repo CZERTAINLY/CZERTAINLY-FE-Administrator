@@ -3,7 +3,9 @@ import { Trash2, Info, AlertTriangle, X, ArrowUpFromLine, Users, User, CircleMin
 import cx from 'classnames';
 import { useEffect } from 'react';
 
-interface DialogButton {
+export type ModalSize = 'sm' | 'md' | 'lg' | 'xl';
+
+export interface DialogButton {
     color: ButtonColor;
     body: string | React.ReactNode;
     onClick: (formData?: any) => void;
@@ -17,7 +19,7 @@ interface Props {
     caption?: string | React.ReactNode;
     body?: string | React.ReactNode;
     buttons?: DialogButton[];
-    size?: 'sm' | 'md' | 'lg' | 'xl';
+    size?: ModalSize;
     dataTestId?: string;
     icon?: 'delete' | 'info' | 'warning' | 'success' | 'error' | 'users' | 'user' | React.ReactNode;
     noBorder?: boolean;
@@ -121,7 +123,7 @@ export default function Dialog({ isOpen, toggle, caption, body, buttons, size = 
                         },
                     )}
                 >
-                    <div className="w-full flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl pointer-events-auto dark:bg-neutral-800 dark:border-neutral-700 dark:shadow-neutral-700/70 md:p-4 relative">
+                    <div className="w-full flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl pointer-events-auto dark:bg-neutral-800 dark:border-neutral-700 dark:shadow-neutral-700/70 md:p-8 relative">
                         <Button variant="transparent" onClick={toggle} className="absolute right-2 top-2">
                             <X size={16} />
                         </Button>
@@ -138,7 +140,7 @@ export default function Dialog({ isOpen, toggle, caption, body, buttons, size = 
                                 {caption}
                             </h3>
                         </div>
-                        <div className="p-4 overflow-y-auto text-center text-gray-500 dark:text-white">{body}</div>
+                        <div className="p-4 overflow-y-auto text-gray-800 dark:text-white">{body}</div>
                         {buttons && buttons.length > 0 && (
                             <div
                                 className={cx('flex justify-center items-center gap-4 py-3 px-4 mt-2 dark:border-neutral-700', {

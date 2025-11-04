@@ -10,13 +10,11 @@ import { actions as utilsActuatorActions } from 'ducks/utilsActuator';
 
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
-import { selectors as groupSelectors } from 'ducks/certificateGroups';
 import { selectors as userSelectors } from 'ducks/users';
 
 import { actions, selectors } from 'ducks/certificates';
 import { actions as connectorActions } from 'ducks/connectors';
 import { actions as locationActions, selectors as locationSelectors } from 'ducks/locations';
-import { selectors as raProfileSelectors } from 'ducks/ra-profiles';
 import { selectors as settingSelectors } from 'ducks/settings';
 import { EntityType, actions as filterActions, selectors as filterSelectors } from 'ducks/filters';
 
@@ -36,16 +34,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router';
 
 import { actions as raProfilesActions, selectors as raProfilesSelectors } from 'ducks/ra-profiles';
-import {
-    Form as BootstrapForm,
-    Button,
-    ButtonGroup,
-    DropdownItem,
-    DropdownMenu,
-    DropdownToggle,
-    Label,
-    UncontrolledButtonDropdown,
-} from 'reactstrap';
+import { Form as BootstrapForm, Button, ButtonGroup, Label } from 'reactstrap';
 import { AttributeDescriptorModel, AttributeResponseModel } from 'types/attributes';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
@@ -65,7 +54,6 @@ import { Edge } from 'reactflow';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { DeviceType, useCopyToClipboard, useDeviceType } from 'utils/common-hooks';
 import CertificateStatus from '../CertificateStatus';
-import styles from './certificateDetail.module.scss';
 import { createWidgetDetailHeaders } from 'utils/widget';
 import CertificateList from 'components/_pages/certificates/list';
 import { capitalize } from 'utils/common-utils';
@@ -80,11 +68,6 @@ interface ChainDownloadSwitchState {
     isDownloadTriggered: boolean;
     certificateEncoding?: CertificateFormatEncoding;
     isCopyTriggered?: boolean;
-}
-
-interface SelectChangeValue {
-    value: string;
-    label: string;
 }
 
 export default function CertificateDetail() {
@@ -409,8 +392,6 @@ export default function CertificateDetail() {
         ],
         [locationsCheckedRows.length, isCertificateArchived],
     );
-
-    const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
 
     const historyHeaders: TableHeader[] = useMemo(
         () => [
