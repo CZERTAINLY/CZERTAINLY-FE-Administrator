@@ -150,6 +150,7 @@ export default function CertificateDetailsContent({ certificate, validationResul
                 isOpen: true,
                 size: 'md',
                 title: 'Download',
+                icon: 'download',
             }),
         );
     }, [dispatch]);

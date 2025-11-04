@@ -16,6 +16,7 @@ export default function GlobalModal() {
         showCloseButton,
         okButtonCallback,
         cancelButtonCallback,
+        icon,
     } = globalModal;
     const dispatch = useDispatch();
 
@@ -60,6 +61,7 @@ export default function GlobalModal() {
             buttons={buttons}
             caption={title}
             body={content}
+            icon={icon}
         />
     );
 }
