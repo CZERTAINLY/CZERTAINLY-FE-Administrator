@@ -20,7 +20,7 @@
         "html-react-parser": "^5.2.2",
         "jszip": "^3.10.1",
         "lodash.debounce": "^4.0.8",
-        "marked": "^15.0.7",
+        "marked": "^16.0.0",
         "react": "^18.3.1",
         "react-apexcharts": "^1.7.0",
         "react-cron-generator": "^2.0.19",
