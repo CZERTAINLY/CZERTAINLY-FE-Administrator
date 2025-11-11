@@ -6,7 +6,7 @@ import istanbul from 'vite-plugin-istanbul';
 
 async function loadProxyConfig() {
     try {
-        const { default: customProxyConfig } = await import('./src/setupProxy.js');
+        const { default: customProxyConfig } = await import('./src/setupProxy.cjs');
         return customProxyConfig.server.proxy;
     } catch (error) {
         return {};
