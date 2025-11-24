@@ -109,7 +109,7 @@ export const getAttributeContent = (contentType: AttributeContentType, content: 
     return content.map((content) => mapping(content) ?? checkFileNameAndMimeType(content)).join(', ');
 };
 
-const getAttributeFormValue = (contentType: AttributeContentType, item: any) => {
+const getAttributeFormValue = (contentType: AttributeContentType, defaultContent: any, item: any) => {
     if (contentType === AttributeContentType.Datetime) {
         const returnVal = item?.value?.data
             ? { data: new Date(item.value.data).toISOString() }
@@ -128,7 +128,13 @@ const getAttributeFormValue = (contentType: AttributeContentType, item: any) => 
         return returnVal;
     }
     if (contentType === AttributeContentType.Codeblock) {
-        return { data: { code: utf8ToBase64(item.code), language: item.language } } as CodeBlockAttributeContent;
+        let language = item?.language;
+        // if language is not set in form item, try to get it from the default content of descriptor
+        if (language === undefined && defaultContent && defaultContent.length > 0) {
+            const contentData = defaultContent[0].data;
+            language = (contentData as CodeBlockAttributeContentDataModel).language;
+        }
+        return { data: { code: utf8ToBase64(item.code), language: language } } as CodeBlockAttributeContent;
     }
 
     if (contentType === AttributeContentType.Secret) {
@@ -174,9 +180,9 @@ export function collectFormAttributes(
 
         if (isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor)) {
             if (Array.isArray(attributes[attribute])) {
-                content = attributes[attribute].map((i: any) => getAttributeFormValue(descriptor.contentType, i));
+                content = attributes[attribute].map((i: any) => getAttributeFormValue(descriptor.contentType, descriptor.content, i));
             } else {
-                content = getAttributeFormValue(descriptor.contentType, attributes[attribute]);
+                content = getAttributeFormValue(descriptor.contentType, descriptor.content, attributes[attribute]);
             }
 
             if (typeof content.data !== 'undefined' || Array.isArray(content)) {

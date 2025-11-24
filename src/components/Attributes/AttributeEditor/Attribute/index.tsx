@@ -10,6 +10,7 @@ import Editor from 'react-simple-code-editor';
 import { Card, CardBody, CardHeader, FormFeedback, FormGroup, FormText, Input, Label } from 'reactstrap';
 import { InputType } from 'reactstrap/types/lib/Input';
 import {
+    CodeBlockAttributeContentDataModel,
     CustomAttributeModel,
     DataAttributeModel,
     InfoAttributeModel,
@@ -427,8 +428,15 @@ export function Attribute({
 
     const createInput = (descriptor: DataAttributeModel | CustomAttributeModel): JSX.Element => {
         if (descriptor.contentType === AttributeContentType.Codeblock) {
+            let language = undefined;
             const attributes = formState.values[name.slice(0, name.indexOf('.'))];
-            const language = attributes ? (attributes[descriptor.name]?.language ?? 'javascript') : 'javascript';
+            language = attributes ? (attributes[descriptor.name]?.language ?? undefined) : undefined;
+
+            // if attribute language is not set in form state attribute content, try to get it from the default content of descriptor
+            if (language === undefined && descriptor.content && descriptor.content.length > 0) {
+                const contentData = descriptor.content[0].data;
+                language = (contentData as CodeBlockAttributeContentDataModel).language;
+            }
 
             return (
                 <>
