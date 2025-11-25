@@ -10,7 +10,6 @@ import Editor from 'react-simple-code-editor';
 import { Card, CardBody, CardHeader, FormFeedback, FormGroup, FormText, Input, Label } from 'reactstrap';
 import { InputType } from 'reactstrap/types/lib/Input';
 import {
-    CodeBlockAttributeContentDataModel,
     CustomAttributeModel,
     DataAttributeModel,
     InfoAttributeModel,
