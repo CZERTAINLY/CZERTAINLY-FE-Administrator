@@ -53,8 +53,6 @@ export default function AttributeViewer({
     const dispatch = useDispatch();
     const copyToClipboard = useCopyToClipboard();
 
-    console.log({ attributes, descriptors, metadata, viewerType, onSubmit, onRemove });
-
     const onCopyContentClick = useCallback(
         (attribute: AttributeResponseModel) => {
             if (!attribute?.content?.length) return;
