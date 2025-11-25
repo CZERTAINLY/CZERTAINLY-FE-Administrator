@@ -428,9 +428,8 @@ export function Attribute({
 
     const createInput = (descriptor: DataAttributeModel | CustomAttributeModel): JSX.Element => {
         if (descriptor.contentType === AttributeContentType.Codeblock) {
-            let language = undefined;
             const attributes = formState.values[name.slice(0, name.indexOf('.'))];
-            language = getCodeBlockLanguage(
+            const language = getCodeBlockLanguage(
                 attributes ? (attributes[descriptor.name]?.language ?? undefined) : undefined,
                 descriptor.content,
             );
