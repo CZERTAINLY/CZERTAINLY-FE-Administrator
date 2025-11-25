@@ -27,7 +27,7 @@ import { getStepValue } from 'utils/common-utils';
 import { getFormattedDateTime } from 'utils/dateUtil';
 import { composeValidators, validateFloat, validateInteger, validatePattern, validateRequired } from 'utils/validators';
 import { actions as userInterfaceActions, selectors as userInterfaceSelectors } from '../../../../ducks/user-interface';
-import { getAttributeContent } from '../../../../utils/attributes/attributes';
+import { getAttributeContent, getCodeBlockLanguage } from '../../../../utils/attributes/attributes';
 import { getHighLightedCode } from '../../CodeBlock';
 
 interface Props {
@@ -430,13 +430,10 @@ export function Attribute({
         if (descriptor.contentType === AttributeContentType.Codeblock) {
             let language = undefined;
             const attributes = formState.values[name.slice(0, name.indexOf('.'))];
-            language = attributes ? (attributes[descriptor.name]?.language ?? undefined) : undefined;
-
-            // if attribute language is not set in form state attribute content, try to get it from the default content of descriptor
-            if (language === undefined && descriptor.content && descriptor.content.length > 0) {
-                const contentData = descriptor.content[0].data;
-                language = (contentData as CodeBlockAttributeContentDataModel).language;
-            }
+            language = getCodeBlockLanguage(
+                attributes ? (attributes[descriptor.name]?.language ?? undefined) : undefined,
+                descriptor.content,
+            );
 
             return (
                 <>

@@ -10,7 +10,13 @@ import {
     isCustomAttributeModel,
     isDataAttributeModel,
 } from 'types/attributes';
-import { AttributeContentType, CodeBlockAttributeContent, FileAttributeContentData, SecretAttributeContent } from 'types/openapi';
+import {
+    AttributeContentType,
+    CodeBlockAttributeContent,
+    FileAttributeContentData,
+    ProgrammingLanguageEnum,
+    SecretAttributeContent,
+} from 'types/openapi';
 import { base64ToUtf8, utf8ToBase64 } from 'utils/common-utils';
 import { getFormattedDate, getFormattedDateTime } from 'utils/dateUtil';
 import CodeBlock from '../../components/Attributes/CodeBlock';
@@ -109,7 +115,7 @@ export const getAttributeContent = (contentType: AttributeContentType, content: 
     return content.map((content) => mapping(content) ?? checkFileNameAndMimeType(content)).join(', ');
 };
 
-const getAttributeFormValue = (contentType: AttributeContentType, defaultContent: any, item: any) => {
+const getAttributeFormValue = (contentType: AttributeContentType, descriptorContent: any, item: any) => {
     if (contentType === AttributeContentType.Datetime) {
         const returnVal = item?.value?.data
             ? { data: new Date(item.value.data).toISOString() }
@@ -128,12 +134,7 @@ const getAttributeFormValue = (contentType: AttributeContentType, defaultContent
         return returnVal;
     }
     if (contentType === AttributeContentType.Codeblock) {
-        let language = item?.language;
-        // if language is not set in form item, try to get it from the default content of descriptor
-        if (language === undefined && defaultContent && defaultContent.length > 0) {
-            const contentData = defaultContent[0].data;
-            language = (contentData as CodeBlockAttributeContentDataModel).language;
-        }
+        const language = getCodeBlockLanguage(item?.language, descriptorContent);
         return { data: { code: utf8ToBase64(item.code), language: language } } as CodeBlockAttributeContent;
     }
 
@@ -146,6 +147,18 @@ const getAttributeFormValue = (contentType: AttributeContentType, defaultContent
     }
 
     return item.value ?? { data: item };
+};
+
+export const getCodeBlockLanguage = (formInputLanguage: any, descriptorContent: any): ProgrammingLanguageEnum => {
+    // if language is not set in form input item, try to get it from the default content of descriptor
+    if (formInputLanguage !== undefined) return formInputLanguage;
+    if (descriptorContent && descriptorContent.length > 0) {
+        const contentData = descriptorContent[0].data;
+        if (contentData) {
+            return (contentData as CodeBlockAttributeContentDataModel).language ?? ProgrammingLanguageEnum.Javascript;
+        }
+    }
+    return ProgrammingLanguageEnum.Javascript;
 };
 
 export function collectFormAttributes(
