@@ -115,7 +115,11 @@ export const getAttributeContent = (contentType: AttributeContentType, content: 
     return content.map((content) => mapping(content) ?? checkFileNameAndMimeType(content)).join(', ');
 };
 
-const getAttributeFormValue = (contentType: AttributeContentType, descriptorContent: any, item: any) => {
+const getAttributeFormValue = (
+    contentType: AttributeContentType,
+    descriptorContent: BaseAttributeContentModel[] | undefined,
+    item: any,
+) => {
     if (contentType === AttributeContentType.Datetime) {
         const returnVal = item?.value?.data
             ? { data: new Date(item.value.data).toISOString() }
@@ -149,7 +153,19 @@ const getAttributeFormValue = (contentType: AttributeContentType, descriptorCont
     return item.value ?? { data: item };
 };
 
-export const getCodeBlockLanguage = (formInputLanguage: any, descriptorContent: any): ProgrammingLanguageEnum => {
+/**
+ * Determines the programming language for a code block attribute.
+ * Falls back to descriptor's default content language if not specified in form input,
+ * and ultimately defaults to JavaScript if no language is found.
+ *
+ * @param formInputLanguage - The language from the form input
+ * @param descriptorContent - The descriptor's default content array
+ * @returns The resolved programming language
+ */
+export const getCodeBlockLanguage = (
+    formInputLanguage: ProgrammingLanguageEnum | undefined,
+    descriptorContent: BaseAttributeContentModel[] | undefined,
+): ProgrammingLanguageEnum => {
     // if language is not set in form input item, try to get it from the default content of descriptor
     if (formInputLanguage !== undefined) return formInputLanguage;
     if (descriptorContent && descriptorContent.length > 0) {
