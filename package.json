@@ -42,7 +42,7 @@
         "start": "vite",
         "build": "vite build",
         "serve": "vite preview",
-        "lint": "eslint ./src && prettier --check \"**/**.{ts,js,tsx}\" \"*.{json,md,yml}\"",
+        "lint": "eslint ./src && prettier --check \"**/**.{ts,js,cjs,tsx}\" \"*.{json,md,yml}\"",
         "prepare": "husky",
         "generate-types": "openapi-generator-cli generate --generator-key typescript-rxjs-remote && prettier --write \"src/types/openapi/apis/*.ts\" && prettier --write \"src/types/openapi/models/*.ts\"",
         "generate-types-local": "openapi-generator-cli generate --generator-key typescript-rxjs-local && prettier --write \"src/types/openapi/apis/*.ts\" && prettier --write \"src/types/openapi/models/*.ts\"",
