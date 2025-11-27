@@ -26,7 +26,7 @@ import { getStepValue } from 'utils/common-utils';
 import { getFormattedDateTime } from 'utils/dateUtil';
 import { composeValidators, validateFloat, validateInteger, validatePattern, validateRequired } from 'utils/validators';
 import { actions as userInterfaceActions, selectors as userInterfaceSelectors } from '../../../../ducks/user-interface';
-import { getAttributeContent } from '../../../../utils/attributes/attributes';
+import { getAttributeContent, getCodeBlockLanguage } from '../../../../utils/attributes/attributes';
 import { getHighLightedCode } from '../../CodeBlock';
 
 interface Props {
@@ -428,7 +428,10 @@ export function Attribute({
     const createInput = (descriptor: DataAttributeModel | CustomAttributeModel): JSX.Element => {
         if (descriptor.contentType === AttributeContentType.Codeblock) {
             const attributes = formState.values[name.slice(0, name.indexOf('.'))];
-            const language = attributes ? (attributes[descriptor.name]?.language ?? 'javascript') : 'javascript';
+            const language = getCodeBlockLanguage(
+                attributes ? (attributes[descriptor.name]?.language ?? undefined) : undefined,
+                descriptor.content,
+            );
 
             return (
                 <>
