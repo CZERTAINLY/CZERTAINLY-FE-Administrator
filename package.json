@@ -1,6 +1,6 @@
 {
     "name": "czertainly-administrator",
-    "version": "2.16.1",
+    "version": "2.16.2",
     "homepage": ".",
     "private": true,
     "type": "module",
