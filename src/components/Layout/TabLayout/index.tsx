@@ -22,6 +22,14 @@ export default function TabLayout({ tabs, onlyActiveTabContent = true, selectedT
         return tabs.filter((e) => !e.hidden);
     }, [tabs]);
 
+    useEffect(() => {
+        if (selectedTab !== undefined && selectedTab !== activeTab) {
+            setActiveTab(selectedTab);
+        } else if (tabs.length <= activeTab) {
+            setActiveTab(0);
+        }
+    }, [activeTab, tabs, selectedTab]);
+
     return (
         <Widget noBorder={noBorder}>
             <Tabs tabs={memoizedTabs} selectedTab={activeTab} onTabChange={setActiveTab} />

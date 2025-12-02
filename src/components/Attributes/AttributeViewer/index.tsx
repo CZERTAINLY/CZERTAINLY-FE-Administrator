@@ -75,8 +75,6 @@ export default function AttributeViewer({
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const dispatch = useDispatch();
     const copyToClipboard = useCopyToClipboard();
-    console.log('editingAttributesNames', editingAttributesNames);
-    console.log({ attributes, descriptors, metadata, viewerType, onSubmit, onRemove });
 
     const onCopyContentClick = useCallback(
         (attribute: AttributeResponseModel) => {
