@@ -3,19 +3,27 @@ import ProgressButton from 'components/ProgressButton';
 import Widget from 'components/Widget';
 
 import { actions as rolesActions, selectors as rolesSelectors } from 'ducks/roles';
-import { useCallback, useEffect, useMemo } from 'react';
-import { Field, Form } from 'react-final-form';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 
-import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
+import Button from 'components/Button';
+import Container from 'components/Container';
+import Label from 'components/Label';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateEmail, validateLength, validateRequired } from 'utils/validators';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
 import { Resource } from '../../../../types/openapi';
-import { mutators } from '../../../../utils/attributes/attributeEditorMutators';
 import { collectFormAttributes } from '../../../../utils/attributes/attributes';
 import AttributeEditor from '../../../Attributes/AttributeEditor';
 import TabLayout from '../../../Layout/TabLayout';
+import TextInput from 'components/TextInput';
+
+interface RoleFormProps {
+    roleId?: string;
+    onCancel?: () => void;
+    onSuccess?: () => void;
+}
 
 interface FormValues {
     name: string;
@@ -23,11 +31,11 @@ interface FormValues {
     email: string;
 }
 
-function RoleForm() {
+function RoleForm({ roleId, onCancel, onSuccess }: RoleFormProps) {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
-    const { id } = useParams();
+    const { id: routeId } = useParams();
+    const id = roleId || routeId;
 
     const editMode = useMemo(() => !!id, [id]);
 
@@ -41,15 +49,82 @@ function RoleForm() {
         [isFetchingRoleDetail, isFetchingResourceCustomAttributes],
     );
 
+    const previousIdRef = useRef<string | undefined>(undefined);
+
     useEffect(() => {
         dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Roles));
     }, [dispatch]);
 
     useEffect(() => {
         if (editMode && id) {
-            dispatch(rolesActions.getDetail({ uuid: id }));
+            // Fetch if id changed or if we don't have the correct role loaded
+            if (previousIdRef.current !== id || !roleSelector || roleSelector.uuid !== id) {
+                dispatch(rolesActions.getDetail({ uuid: id }));
+                previousIdRef.current = id;
+            }
+        } else {
+            previousIdRef.current = undefined;
         }
-    }, [dispatch, editMode, id]);
+    }, [dispatch, editMode, id, roleSelector]);
+
+    const defaultValues: FormValues = useMemo(
+        () => ({
+            name: editMode ? roleSelector?.name || '' : '',
+            description: editMode ? roleSelector?.description || '' : '',
+            email: editMode ? roleSelector?.email || '' : '',
+        }),
+        [editMode, roleSelector],
+    );
+
+    const methods = useForm<FormValues>({
+        defaultValues,
+        mode: 'onChange',
+    });
+
+    const {
+        handleSubmit,
+        control,
+        formState: { isDirty, isSubmitting, isValid },
+        reset,
+    } = methods;
+
+    // Reset form values when roleSelector is loaded in edit mode
+    useEffect(() => {
+        if (editMode && id) {
+            if (roleSelector && roleSelector.uuid === id && !isFetchingRoleDetail) {
+                const newDefaultValues: FormValues = {
+                    name: roleSelector.name || '',
+                    description: roleSelector.description || '',
+                    email: roleSelector.email || '',
+                };
+                reset(newDefaultValues, { keepDefaultValues: false });
+            } else if (previousIdRef.current !== id && previousIdRef.current !== undefined) {
+                // Reset form when id changes (switching between roles)
+                reset({
+                    name: '',
+                    description: '',
+                    email: '',
+                });
+            }
+        } else if (!editMode) {
+            // Reset form when switching to create mode
+            reset({
+                name: '',
+                description: '',
+                email: '',
+            });
+        }
+    }, [editMode, roleSelector, id, reset, isFetchingRoleDetail]);
+
+    // Helper function to convert validators for react-hook-form
+    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
+        return {
+            validate: (value: any) => {
+                const composed = composeValidators(...validators);
+                return composed(value);
+            },
+        };
+    };
 
     const onSubmit = useCallback(
         (values: FormValues) => {
@@ -80,24 +155,9 @@ function RoleForm() {
         [dispatch, editMode, id, resourceCustomAttributes],
     );
 
-    const onCancel = useCallback(() => {
-        navigate(-1);
-    }, [navigate]);
-
     const submitTitle = useMemo(() => (editMode ? 'Save' : 'Create'), [editMode]);
 
     const inProgressTitle = useMemo(() => (editMode ? 'Saving...' : 'Creating...'), [editMode]);
-
-    const defaultValues: FormValues = useMemo(
-        () => ({
-            name: editMode ? roleSelector?.name || '' : '',
-            description: editMode ? roleSelector?.description || '' : '',
-            email: editMode ? roleSelector?.email || '' : '',
-        }),
-        [editMode, roleSelector],
-    );
-
-    const title = useMemo(() => (editMode ? 'Edit Role' : 'Add Role'), [editMode]);
 
     const renderCustomAttributesEditor = useMemo(() => {
         if (isBusy) return <></>;
@@ -107,100 +167,107 @@ function RoleForm() {
     }, [roleSelector, resourceCustomAttributes, isBusy]);
 
     return (
-        <>
-            <Widget title={title} busy={isBusy}>
-                <Form onSubmit={onSubmit} initialValues={defaultValues} mutators={{ ...mutators<FormValues>() }}>
-                    {({ handleSubmit, pristine, submitting, values, valid }) => (
-                        <BootstrapForm onSubmit={handleSubmit}>
-                            <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}>
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Label for="name">Role Name</Label>
+        <FormProvider {...methods}>
+            <form onSubmit={handleSubmit(onSubmit)}>
+                <Widget busy={isBusy} noBorder>
+                    <div className="space-y-4">
+                        <Controller
+                            name="name"
+                            control={control}
+                            rules={buildValidationRules([validateRequired(), validateAlphaNumericWithSpecialChars()])}
+                            render={({ field, fieldState }) => (
+                                <TextInput
+                                    {...field}
+                                    id="name"
+                                    type="text"
+                                    label="Role Name"
+                                    required
+                                    placeholder="Enter name of the role"
+                                    disabled={editMode || roleSelector?.systemRole}
+                                    invalid={fieldState.error && fieldState.isTouched}
+                                    error={
+                                        fieldState.error && fieldState.isTouched
+                                            ? typeof fieldState.error === 'string'
+                                                ? fieldState.error
+                                                : fieldState.error?.message || 'Invalid value'
+                                            : undefined
+                                    }
+                                />
+                            )}
+                        />
 
-                                        <Input
-                                            id="name"
-                                            {...input}
-                                            valid={!meta.error && meta.touched}
-                                            invalid={!!meta.error && meta.touched}
-                                            disabled={editMode || roleSelector?.systemRole}
-                                            type="text"
-                                            placeholder="Enter name of the role"
-                                        />
+                        <Controller
+                            name="description"
+                            control={control}
+                            rules={buildValidationRules([validateLength(0, 300)])}
+                            render={({ field, fieldState }) => (
+                                <TextInput
+                                    {...field}
+                                    id="description"
+                                    type="text"
+                                    label="Description"
+                                    placeholder="Enter description of the role"
+                                    disabled={roleSelector?.systemRole}
+                                    invalid={fieldState.error && fieldState.isTouched}
+                                    error={
+                                        fieldState.error && fieldState.isTouched
+                                            ? typeof fieldState.error === 'string'
+                                                ? fieldState.error
+                                                : fieldState.error?.message || 'Invalid value'
+                                            : undefined
+                                    }
+                                />
+                            )}
+                        />
 
-                                        <FormFeedback>{meta.error}</FormFeedback>
-                                    </FormGroup>
-                                )}
-                            </Field>
+                        <Controller
+                            name="email"
+                            control={control}
+                            rules={buildValidationRules([validateEmail()])}
+                            render={({ field, fieldState }) => (
+                                <TextInput
+                                    {...field}
+                                    id="email"
+                                    type="email"
+                                    label="E-mail"
+                                    placeholder="Enter e-mail of the role"
+                                    invalid={fieldState.error && fieldState.isTouched}
+                                    error={
+                                        fieldState.error && fieldState.isTouched
+                                            ? typeof fieldState.error === 'string'
+                                                ? fieldState.error
+                                                : fieldState.error?.message || 'Invalid value'
+                                            : undefined
+                                    }
+                                />
+                            )}
+                        />
 
-                            <Field name="description" validate={composeValidators(validateLength(0, 300))}>
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Label for="description">Description</Label>
-
-                                        <Input
-                                            id="description"
-                                            {...input}
-                                            valid={!meta.error && meta.touched}
-                                            invalid={!!meta.error && meta.touched}
-                                            type="text"
-                                            placeholder="Enter description of the role"
-                                            disabled={roleSelector?.systemRole}
-                                        />
-
-                                        <FormFeedback>{meta.error}</FormFeedback>
-                                    </FormGroup>
-                                )}
-                            </Field>
-
-                            <Field name="email" validate={composeValidators(validateEmail())}>
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Label for="email">E-mail</Label>
-
-                                        <Input
-                                            {...input}
-                                            valid={!meta.error && meta.touched}
-                                            invalid={!!meta.error && meta.touched}
-                                            type="text"
-                                            id="email"
-                                            placeholder="Enter e-mail of the role"
-                                        />
-
-                                        <FormFeedback>{meta.error}</FormFeedback>
-                                    </FormGroup>
-                                )}
-                            </Field>
-
-                            <br />
-
-                            <TabLayout
-                                tabs={[
-                                    {
-                                        title: 'Custom Attributes',
-                                        content: renderCustomAttributesEditor,
-                                    },
-                                ]}
+                        <TabLayout
+                            noBorder
+                            tabs={[
+                                {
+                                    title: 'Custom Attributes',
+                                    content: renderCustomAttributesEditor,
+                                },
+                            ]}
+                        />
+                        <Container className="flex-row justify-end modal-footer" gap={4}>
+                            <Button variant="outline" onClick={onCancel} disabled={isSubmitting} type="button">
+                                Cancel
+                            </Button>
+                            <ProgressButton
+                                title={submitTitle}
+                                inProgressTitle={inProgressTitle}
+                                inProgress={isSubmitting}
+                                disabled={!isDirty || isSubmitting || roleSelector?.systemRole}
+                                type="submit"
                             />
-
-                            <div className="d-flex justify-content-end">
-                                <ButtonGroup>
-                                    <ProgressButton
-                                        title={submitTitle}
-                                        inProgressTitle={inProgressTitle}
-                                        inProgress={submitting}
-                                        disabled={pristine || submitting || roleSelector?.systemRole}
-                                    />
-
-                                    <Button color="default" onClick={onCancel} disabled={submitting}>
-                                        Cancel
-                                    </Button>
-                                </ButtonGroup>
-                            </div>
-                        </BootstrapForm>
-                    )}
-                </Form>
-            </Widget>
-        </>
+                        </Container>
+                    </div>
+                </Widget>
+            </form>
+        </FormProvider>
     );
 }
 

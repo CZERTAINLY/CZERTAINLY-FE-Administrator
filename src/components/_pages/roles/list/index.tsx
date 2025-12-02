@@ -3,9 +3,10 @@ import Dialog from 'components/Dialog';
 
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
+import RoleForm from '../RoleForm';
 
 import { actions, selectors } from 'ducks/roles';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
 import { LockWidgetNameEnum } from 'types/user-interface';
@@ -21,10 +22,13 @@ export default function RolesList() {
     const isFetching = useSelector(selectors.isFetchingList);
     const isDeleting = useSelector(selectors.isDeleting);
     const isUpdating = useSelector(selectors.isUpdating);
+    const isCreating = useSelector(selectors.isCreating);
 
     const isBusy = isFetching || isDeleting || isUpdating;
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+    const [editingRoleId, setEditingRoleId] = useState<string | undefined>(undefined);
 
     const getFreshData = useCallback(() => {
         dispatch(actions.setRolesListCheckedRows({ checkedRows: [] }));
@@ -35,9 +39,37 @@ export default function RolesList() {
         getFreshData();
     }, [getFreshData]);
 
+    const wasCreating = useRef(isCreating);
+    const wasUpdating = useRef(isUpdating);
+
+    useEffect(() => {
+        if (wasCreating.current && !isCreating) {
+            setIsAddModalOpen(false);
+            getFreshData();
+        }
+        wasCreating.current = isCreating;
+    }, [isCreating, getFreshData]);
+
+    useEffect(() => {
+        if (wasUpdating.current && !isUpdating) {
+            setEditingRoleId(undefined);
+            getFreshData();
+        }
+        wasUpdating.current = isUpdating;
+    }, [isUpdating, getFreshData]);
+
+    const handleOpenAddModal = useCallback(() => {
+        setIsAddModalOpen(true);
+    }, []);
+
+    const handleCloseAddModal = useCallback(() => {
+        setIsAddModalOpen(false);
+        setEditingRoleId(undefined);
+    }, []);
+
     const onAddClick = useCallback(() => {
-        navigate(`./add`);
-    }, [navigate]);
+        handleOpenAddModal();
+    }, [handleOpenAddModal]);
 
     const onEditRoleUsersClick = useCallback(() => {
         if (checkedRows.length !== 1) return;
@@ -75,9 +107,7 @@ export default function RolesList() {
                 icon: 'plus',
                 disabled: false,
                 tooltip: 'Create',
-                onClick: () => {
-                    onAddClick();
-                },
+                onClick: handleOpenAddModal,
             },
             {
                 icon: 'trash',
@@ -104,7 +134,7 @@ export default function RolesList() {
                 },
             },
         ],
-        [checkedRows.length, isSystemRoleSelected, onAddClick, onEditRolePermissionsClick, onEditRoleUsersClick],
+        [checkedRows.length, isSystemRoleSelected, handleOpenAddModal, onEditRolePermissionsClick, onEditRoleUsersClick],
     );
 
     const rolesTableHeader: TableHeader[] = useMemo(
@@ -192,6 +222,14 @@ export default function RolesList() {
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
+            />
+
+            <Dialog
+                isOpen={isAddModalOpen || !!editingRoleId}
+                toggle={handleCloseAddModal}
+                caption={editingRoleId ? 'Edit Role' : 'Create Role'}
+                size="xl"
+                body={<RoleForm roleId={editingRoleId} onCancel={handleCloseAddModal} />}
             />
         </div>
     );
