@@ -10,8 +10,11 @@ import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rule
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
-import { Button, ButtonGroup, Col, Container, Input, Row } from 'reactstrap';
 import { PlatformEnum, Resource } from 'types/openapi';
+import Button from 'components/Button';
+import Container from 'components/Container';
+import TextInput from 'components/TextInput';
+import { Check, X, PencilLine, Trash2 } from 'lucide-react';
 interface SelectChangeValue {
     value: string;
     label: string;
@@ -178,21 +181,20 @@ const RuleDetails = () => {
                           columns: [
                               'Description',
                               updateDescriptionEditEnable ? (
-                                  <Input
+                                  <TextInput
                                       value={updatedDescription}
-                                      onChange={(e) => setUpdatedDescription(e.target.value)}
+                                      onChange={(value) => setUpdatedDescription(value)}
                                       placeholder="Enter Description"
                                   />
                               ) : (
                                   actionDetails.description || ''
                               ),
-                              <div>
+                              <div className="flex items-center gap-2">
                                   {updateDescriptionEditEnable ? (
-                                      <ButtonGroup>
+                                      <>
                                           <Button
-                                              className="btn btn-link mx-auto"
-                                              size="sm"
-                                              color="secondary"
+                                              variant="transparent"
+                                              color="primary"
                                               title="Update Description"
                                               onClick={onUpdateDescriptionConfirmed}
                                               disabled={
@@ -201,11 +203,11 @@ const RuleDetails = () => {
                                                   updatedDescription === ''
                                               }
                                           >
-                                              <i className="fa fa-check" />
+                                              <Check size={16} />
                                           </Button>
                                           <Button
-                                              className="btn btn-link mx-auto danger"
-                                              size="sm"
+                                              variant="transparent"
+                                              color="danger"
                                               title="Cancel"
                                               disabled={isUpdatingAction}
                                               onClick={() => {
@@ -213,20 +215,19 @@ const RuleDetails = () => {
                                                   setUpdatedDescription(actionDetails?.description || '');
                                               }}
                                           >
-                                              <i className="fa fa-close text-danger" />
+                                              <X size={16} />
                                           </Button>
-                                      </ButtonGroup>
+                                      </>
                                   ) : (
                                       <Button
-                                          className="btn btn-link mx-auto"
-                                          size="sm"
+                                          variant="transparent"
                                           color="secondary"
                                           title="Update Description"
                                           onClick={() => {
                                               setUpdateDescription(true);
                                           }}
                                       >
-                                          <i className="fa fa-pencil-square-o" />
+                                          <PencilLine size={16} />
                                       </Button>
                                   )}
                               </div>,
@@ -278,8 +279,7 @@ const RuleDetails = () => {
                           getEnumLabel(executionTypeEnum, conditionGroup.type) || '',
                           conditionGroup.description || '',
                           <Button
-                              className="btn btn-link text-danger"
-                              size="sm"
+                              variant="transparent"
                               color="danger"
                               title={
                                   isDeleteDisabled
@@ -291,7 +291,7 @@ const RuleDetails = () => {
                               }}
                               disabled={isDeleteDisabled}
                           >
-                              <i className="fa fa-trash" />
+                              <Trash2 size={16} />
                           </Button>,
                       ],
                   };
@@ -318,19 +318,19 @@ const RuleDetails = () => {
     }, [actionDetails]);
 
     return (
-        <Container className="themed-container" fluid>
+        <Container className="themed-container">
             <GoBackButton
                 style={{ marginBottom: '10px' }}
                 forcedPath="/actions"
                 text={`${getEnumLabel(resourceTypeEnum, Resource.Actions)} Inventory`}
             />
-            <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                <Col>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
                     <Widget refreshAction={getFreshDetails} busy={isBusy} title="Action Details" titleSize="large" widgetButtons={buttons}>
                         <CustomTable data={conditionGroupsDetailData} headers={tableHeader} />
                     </Widget>
-                </Col>
-                <Col>
+                </div>
+                <div>
                     <Widget
                         busy={isBusy}
                         title="Executions"
@@ -350,8 +350,8 @@ const RuleDetails = () => {
                             }}
                         />
                     </Widget>
-                </Col>
-            </Row>
+                </div>
+            </div>
 
             {renderActionExecutions}
             <Dialog

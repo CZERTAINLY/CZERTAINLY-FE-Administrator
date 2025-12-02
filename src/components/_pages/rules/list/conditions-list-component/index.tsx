@@ -6,26 +6,28 @@ import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Link } from 'react-router';
 import Select from 'components/Select';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { useRuleEvaluatorResourceOptions } from 'utils/rules';
+import ConditionForm from '../../../conditions/form';
 
 const ConditionsList = () => {
     const conditions = useSelector(rulesSelectors.conditions);
 
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const conditionTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ConditionType));
     const [selectedResource, setSelectedResource] = useState<Resource>();
     const isFetchingList = useSelector(rulesSelectors.isFetchingConditions);
     const isDeleting = useSelector(rulesSelectors.isDeletingCondition);
+    const isCreatingCondition = useSelector(rulesSelectors.isCreatingCondition);
 
     const [checkedRows, setCheckedRows] = useState<string[]>([]);
     const [confirmDelete, setConfirmDelete] = useState(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const { resourceOptionsWithRuleEvaluator, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
 
     const isBusy = useMemo(
@@ -33,15 +35,32 @@ const ConditionsList = () => {
         [isFetchingList, isDeleting, isFetchingResourcesList],
     );
 
+    const wasCreating = useRef(isCreatingCondition);
+    const getFreshListConditionGroups = useCallback(() => {
+        dispatch(rulesActions.listConditions({ resource: selectedResource }));
+    }, [dispatch, selectedResource]);
+
+    useEffect(() => {
+        if (wasCreating.current && !isCreatingCondition) {
+            setIsAddModalOpen(false);
+            getFreshListConditionGroups();
+        }
+        wasCreating.current = isCreatingCondition;
+    }, [isCreatingCondition, getFreshListConditionGroups]);
+
+    const handleOpenAddModal = useCallback(() => {
+        setIsAddModalOpen(true);
+    }, []);
+
+    const handleCloseAddModal = useCallback(() => {
+        setIsAddModalOpen(false);
+    }, []);
+
     const onDeleteConfirmed = useCallback(() => {
         dispatch(rulesActions.deleteCondition({ conditionUuid: checkedRows[0] }));
         setConfirmDelete(false);
         setCheckedRows([]);
     }, [dispatch, checkedRows]);
-
-    const getFreshListConditionGroups = useCallback(() => {
-        dispatch(rulesActions.listConditions({ resource: selectedResource }));
-    }, [dispatch, selectedResource]);
 
     useEffect(() => {
         getFreshListConditionGroups();
@@ -118,7 +137,7 @@ const ConditionsList = () => {
                 icon: 'plus',
                 disabled: false,
                 tooltip: 'Create',
-                onClick: () => navigate(`../conditions/add`),
+                onClick: handleOpenAddModal,
             },
             {
                 icon: 'trash',
@@ -127,7 +146,7 @@ const ConditionsList = () => {
                 onClick: () => setConfirmDelete(true),
             },
         ],
-        [checkedRows, resourceOptionsWithRuleEvaluator, navigate, selectedResource],
+        [checkedRows, resourceOptionsWithRuleEvaluator, selectedResource, handleOpenAddModal],
     );
 
     return (
@@ -167,6 +186,15 @@ const ConditionsList = () => {
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
+            />
+
+            <Dialog
+                isOpen={isAddModalOpen}
+                toggle={handleCloseAddModal}
+                caption="Create Condition"
+                size="xl"
+                body={<ConditionForm onCancel={handleCloseAddModal} onSuccess={handleCloseAddModal} />}
+                noBorder
             />
         </>
     );

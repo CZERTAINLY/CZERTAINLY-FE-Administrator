@@ -6,17 +6,17 @@ import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Link } from 'react-router';
 import Select from 'components/Select';
 import { PlatformEnum, Resource } from 'types/openapi';
 
 import { useHasEventsResourceOptions, useRuleEvaluatorResourceOptions } from 'utils/rules';
+import TriggerForm from '../form';
 
 const TriggerList = () => {
     const triggers = useSelector(rulesSelectors.triggers);
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const eventNameEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ResourceEvent));
@@ -24,23 +24,42 @@ const TriggerList = () => {
     const [selectedResource, setSelectedResource] = useState<Resource>();
     const isFetchingList = useSelector(rulesSelectors.isFetchingTriggers);
     const isDeleting = useSelector(rulesSelectors.isDeletingTrigger);
+    const isCreatingTrigger = useSelector(rulesSelectors.isCreatingTrigger);
 
     const [checkedRows, setCheckedRows] = useState<string[]>([]);
     const [confirmDelete, setConfirmDelete] = useState(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
     const { resourceOptionsWithEvents } = useHasEventsResourceOptions();
 
     const isBusy = useMemo(() => isFetchingList || isDeleting, [isFetchingList, isDeleting]);
+
+    const wasCreating = useRef(isCreatingTrigger);
+    const getFreshList = useCallback(() => {
+        dispatch(rulesActions.listTriggers({ resource: selectedResource }));
+    }, [dispatch, selectedResource]);
+
+    useEffect(() => {
+        if (wasCreating.current && !isCreatingTrigger) {
+            setIsAddModalOpen(false);
+            getFreshList();
+        }
+        wasCreating.current = isCreatingTrigger;
+    }, [isCreatingTrigger, getFreshList]);
+
+    const handleOpenAddModal = useCallback(() => {
+        setIsAddModalOpen(true);
+    }, []);
+
+    const handleCloseAddModal = useCallback(() => {
+        setIsAddModalOpen(false);
+    }, []);
 
     const onDeleteConfirmed = useCallback(() => {
         dispatch(rulesActions.deleteTrigger({ triggerUuid: checkedRows[0] }));
         setConfirmDelete(false);
         setCheckedRows([]);
     }, [dispatch, checkedRows]);
-
-    const getFreshList = useCallback(() => {
-        dispatch(rulesActions.listTriggers({ resource: selectedResource }));
-    }, [dispatch, selectedResource]);
 
     useEffect(() => {
         getFreshList();
@@ -133,7 +152,7 @@ const TriggerList = () => {
                 icon: 'plus',
                 disabled: false,
                 tooltip: 'Create',
-                onClick: () => navigate(`./add`),
+                onClick: handleOpenAddModal,
             },
             {
                 icon: 'trash',
@@ -142,7 +161,7 @@ const TriggerList = () => {
                 onClick: () => setConfirmDelete(true),
             },
         ],
-        [checkedRows, navigate, resourceOptionsWithEvents, selectedResource],
+        [checkedRows, resourceOptionsWithEvents, selectedResource, handleOpenAddModal],
     );
 
     return (
@@ -182,6 +201,15 @@ const TriggerList = () => {
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
+            />
+
+            <Dialog
+                isOpen={isAddModalOpen}
+                toggle={handleCloseAddModal}
+                caption="Create Trigger"
+                size="xl"
+                body={<TriggerForm onCancel={handleCloseAddModal} onSuccess={handleCloseAddModal} />}
+                noBorder
             />
         </>
     );
