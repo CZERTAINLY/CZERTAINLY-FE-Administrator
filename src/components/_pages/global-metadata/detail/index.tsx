@@ -7,7 +7,7 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions, selectors } from 'ducks/globalMetadata';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router';
+import { useParams } from 'react-router';
 
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import Badge from 'components/Badge';
@@ -17,10 +17,10 @@ import { getEditAndDeleteWidgetButtons, createWidgetDetailHeaders } from 'utils/
 import GoBackButton from 'components/GoBackButton';
 import Container from 'components/Container';
 import Breadcrumb from 'components/Breadcrumb';
+import GlobalMetadataForm from '../form';
 
 export default function GlobalMetadataDetail() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const { id } = useParams();
 
@@ -29,6 +29,7 @@ export default function GlobalMetadataDetail() {
     const attributeContentTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AttributeContentType));
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
     const getFreshGlobalMetadata = useCallback(() => {
         if (!id) return;
@@ -42,9 +43,18 @@ export default function GlobalMetadataDetail() {
         }
     }, [dispatch, globalMetadata, id]);
 
+    const handleOpenEditModal = useCallback(() => {
+        setIsEditModalOpen(true);
+    }, []);
+
+    const handleCloseEditModal = useCallback(() => {
+        setIsEditModalOpen(false);
+        getFreshGlobalMetadata();
+    }, [getFreshGlobalMetadata]);
+
     const onEditClick = useCallback(() => {
-        navigate(`../../edit/${globalMetadata?.uuid}`, { relative: 'path' });
-    }, [globalMetadata, navigate]);
+        handleOpenEditModal();
+    }, [handleOpenEditModal]);
 
     const onDeleteConfirmed = useCallback(() => {
         if (!globalMetadata) return;
@@ -127,6 +137,20 @@ export default function GlobalMetadataDetail() {
                         { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                         { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                     ]}
+                />
+
+                <Dialog
+                    isOpen={isEditModalOpen}
+                    toggle={handleCloseEditModal}
+                    caption="Edit Global Metadata"
+                    size="xl"
+                    body={
+                        <GlobalMetadataForm
+                            globalMetadataId={globalMetadata?.uuid}
+                            onCancel={handleCloseEditModal}
+                            onSuccess={handleCloseEditModal}
+                        />
+                    }
                 />
             </Container>
         </div>

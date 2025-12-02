@@ -141,14 +141,6 @@ export default function DiscoveryForm({ onSuccess, onCancel }: DiscoveryFormProp
         [dispatch, discoveryProviderAttributeDescriptors, groupAttributesCallbackAttributes, resourceCustomAttributes, selectedTriggers],
     );
 
-    const handleCancel = useCallback(() => {
-        if (onCancel) {
-            onCancel();
-        } else {
-            navigate(-1);
-        }
-    }, [navigate, onCancel]);
-
     const optionsForDiscoveryProviders = useMemo(
         () =>
             discoveryProviders?.map((provider) => ({
@@ -495,7 +487,7 @@ export default function DiscoveryForm({ onSuccess, onCancel }: DiscoveryFormProp
                 </Widget>
 
                 <Container className="flex-row justify-end modal-footer" gap={4}>
-                    <Button variant="outline" onClick={handleCancel} disabled={isSubmitting} type="button">
+                    <Button variant="outline" onClick={onCancel} disabled={isSubmitting} type="button">
                         Cancel
                     </Button>
                     <ProgressButton

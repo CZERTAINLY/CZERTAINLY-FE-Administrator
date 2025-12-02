@@ -7,7 +7,8 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions, selectors } from 'ducks/customAttributes';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router';
+import { Link } from 'react-router';
+import CustomAttributeForm from '../form';
 
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import Badge from 'components/Badge';
@@ -16,7 +17,6 @@ import { LockWidgetNameEnum } from 'types/user-interface';
 
 export default function CustomAttributesList() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const checkedRows = useSelector(selectors.checkedRows);
     const customAttributes = useSelector(selectors.customAttributes);
@@ -31,6 +31,8 @@ export default function CustomAttributesList() {
     const attributeContentTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AttributeContentType));
     const resourcesEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+    const [editingCustomAttributeId, setEditingCustomAttributeId] = useState<string | undefined>(undefined);
 
     const getFreshData = useCallback(() => {
         dispatch(actions.setCheckedRows({ checkedRows: [] }));
@@ -41,9 +43,19 @@ export default function CustomAttributesList() {
         getFreshData();
     }, [getFreshData]);
 
+    const handleOpenAddModal = useCallback(() => {
+        setIsAddModalOpen(true);
+    }, []);
+
+    const handleCloseAddModal = useCallback(() => {
+        setIsAddModalOpen(false);
+        setEditingCustomAttributeId(undefined);
+        getFreshData();
+    }, [getFreshData]);
+
     const onAddClick = useCallback(() => {
-        navigate(`./add`);
-    }, [navigate]);
+        handleOpenAddModal();
+    }, [handleOpenAddModal]);
 
     const onDeleteConfirmed = useCallback(() => {
         dispatch(actions.bulkDeleteCustomAttributes(checkedRows));
@@ -119,7 +131,9 @@ export default function CustomAttributesList() {
             customAttributes.map((customAttribute) => ({
                 id: customAttribute.uuid,
                 columns: [
-                    <Link to={`./detail/${customAttribute.uuid}`}>{customAttribute.name}</Link>,
+                    <Link key={customAttribute.uuid} to={`./detail/${customAttribute.uuid}`}>
+                        {customAttribute.name}
+                    </Link>,
                     <StatusBadge enabled={customAttribute.enabled} />,
                     getEnumLabel(attributeContentTypeEnum, customAttribute.contentType),
                     customAttribute.description,
@@ -167,6 +181,20 @@ export default function CustomAttributesList() {
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
+            />
+
+            <Dialog
+                isOpen={isAddModalOpen || !!editingCustomAttributeId}
+                toggle={handleCloseAddModal}
+                caption={editingCustomAttributeId ? 'Edit Custom Attribute' : 'Create Custom Attribute'}
+                size="xl"
+                body={
+                    <CustomAttributeForm
+                        customAttributeId={editingCustomAttributeId}
+                        onCancel={handleCloseAddModal}
+                        onSuccess={handleCloseAddModal}
+                    />
+                }
             />
         </>
     );

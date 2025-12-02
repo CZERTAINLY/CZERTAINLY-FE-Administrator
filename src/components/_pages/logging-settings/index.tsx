@@ -3,16 +3,16 @@ import Widget from 'components/Widget';
 import { actions, selectors } from 'ducks/settings';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Container, Form as BootstrapForm, FormGroup, Label, ButtonGroup } from 'reactstrap';
+import Container from 'components/Container';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { Form } from 'react-final-form';
+import { useForm, Controller, FormProvider, useWatch } from 'react-hook-form';
 import { AuditLoggingSettingsDtoOutputEnum, Module, PlatformEnum, Resource } from 'types/openapi';
 
-import Select, { Props as SelectProps } from 'react-select';
+import Select from 'components/Select';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { isObjectSame } from 'utils/common-utils';
 import ProgressButton from 'components/ProgressButton';
-import SwitchField from 'components/Input/SwitchField';
+import Switch from 'components/Switch';
 
 type ModuleOptionType = { value: Module; label: string };
 type ResourceOptionType = { value: Resource; label: string };
@@ -103,7 +103,7 @@ const LoggingSetting = () => {
     );
 
     const onAuditFormSubmit = useCallback(
-        (values: AuditFormValues) => {
+        (values: AuditFormValuesForHook) => {
             if (!values || !loggingSettings) return;
             dispatch(
                 actions.updateLoggingSettings({
@@ -115,7 +115,7 @@ const LoggingSetting = () => {
                         ignoredResources: values.ignoredResources?.map((el) => el.value),
                         loggedModules: values.loggedModules?.map((el) => el.value),
                         loggedResources: values.loggedResources?.map((el) => el.value),
-                        output: values.output.value,
+                        output: values.output,
                         verbose: values.verbose,
                     },
                 }),
@@ -124,40 +124,58 @@ const LoggingSetting = () => {
         [dispatch, loggingSettings],
     );
 
-    const auditFormInitialValues = useMemo(() => {
+    const auditFormDefaultValues = useMemo(() => {
         if (!loggingSettings) return {};
         const auditLogs = loggingSettings.auditLogs;
         return {
             ...auditLogs,
-            ignoredModules: auditLogs?.ignoredModules?.map((el) => ({
-                value: el,
-                label: getEnumLabel(moduleEnum, el),
-            })),
-            ignoredResources: auditLogs?.ignoredResources?.map((el) => ({
-                value: el,
-                label: getEnumLabel(resourceEnum, el),
-            })),
-            loggedModules: auditLogs?.loggedModules?.map((el) => ({
-                value: el,
-                label: getEnumLabel(moduleEnum, el),
-            })),
-            loggedResources: auditLogs?.loggedResources?.map((el) => ({
-                value: el,
-                label: getEnumLabel(resourceEnum, el),
-            })),
-            output: {
-                label: loggingSettings.auditLogs.output,
-                value: loggingSettings.auditLogs.output,
-            },
+            ignoredModules:
+                auditLogs?.ignoredModules?.map((el) => ({
+                    value: el,
+                    label: getEnumLabel(moduleEnum, el),
+                })) || [],
+            ignoredResources:
+                auditLogs?.ignoredResources?.map((el) => ({
+                    value: el,
+                    label: getEnumLabel(resourceEnum, el),
+                })) || [],
+            loggedModules:
+                auditLogs?.loggedModules?.map((el) => ({
+                    value: el,
+                    label: getEnumLabel(moduleEnum, el),
+                })) || [],
+            loggedResources:
+                auditLogs?.loggedResources?.map((el) => ({
+                    value: el,
+                    label: getEnumLabel(resourceEnum, el),
+                })) || [],
+            output: loggingSettings.auditLogs.output,
             verbose: loggingSettings.auditLogs.verbose,
-        } as AuditFormValues;
+        } as Omit<AuditFormValues, 'output'> & { output: AuditLoggingSettingsDtoOutputEnum };
     }, [loggingSettings, moduleEnum, resourceEnum]);
 
-    const hasAuditFormValuesChanged = useCallback(
-        (values: AuditFormValues) =>
-            !isObjectSame(values as unknown as Record<string, unknown>, auditFormInitialValues as unknown as Record<string, unknown>),
-        [auditFormInitialValues],
-    );
+    type AuditFormValuesForHook = Omit<AuditFormValues, 'output'> & { output: AuditLoggingSettingsDtoOutputEnum };
+
+    const auditFormMethods = useForm<AuditFormValuesForHook>({
+        defaultValues: auditFormDefaultValues,
+        mode: 'onChange',
+    });
+
+    const {
+        handleSubmit: auditHandleSubmit,
+        control: auditControl,
+        watch: auditWatch,
+        formState: { isDirty: auditIsDirty, isSubmitting: auditIsSubmitting, isValid: auditIsValid },
+        reset: auditReset,
+    } = auditFormMethods;
+
+    const auditFormValues = useWatch({ control: auditControl });
+
+    useEffect(() => {
+        auditReset(auditFormDefaultValues);
+    }, [auditFormDefaultValues, auditReset]);
+
+    const hasAuditFormValuesChanged = useMemo(() => auditIsDirty, [auditIsDirty]);
 
     const onEventFormSubmit = useCallback(
         (values: EventFormValues) => {
@@ -180,153 +198,330 @@ const LoggingSetting = () => {
         [dispatch, loggingSettings],
     );
 
-    const eventFormInitialValues = useMemo(() => {
+    const eventFormDefaultValues = useMemo(() => {
         if (!loggingSettings) return {};
         const eventLogs = loggingSettings.eventLogs;
         return {
             ...eventLogs,
-            ignoredModules: eventLogs?.ignoredModules?.map((el) => ({
-                value: el,
-                label: getEnumLabel(moduleEnum, el),
-            })),
-            ignoredResources: eventLogs?.ignoredResources?.map((el) => ({
-                value: el,
-                label: getEnumLabel(resourceEnum, el),
-            })),
-            loggedModules: eventLogs?.loggedModules?.map((el) => ({
-                value: el,
-                label: getEnumLabel(moduleEnum, el),
-            })),
-            loggedResources: eventLogs?.loggedResources?.map((el) => ({
-                value: el,
-                label: getEnumLabel(resourceEnum, el),
-            })),
+            ignoredModules:
+                eventLogs?.ignoredModules?.map((el) => ({
+                    value: el,
+                    label: getEnumLabel(moduleEnum, el),
+                })) || [],
+            ignoredResources:
+                eventLogs?.ignoredResources?.map((el) => ({
+                    value: el,
+                    label: getEnumLabel(resourceEnum, el),
+                })) || [],
+            loggedModules:
+                eventLogs?.loggedModules?.map((el) => ({
+                    value: el,
+                    label: getEnumLabel(moduleEnum, el),
+                })) || [],
+            loggedResources:
+                eventLogs?.loggedResources?.map((el) => ({
+                    value: el,
+                    label: getEnumLabel(resourceEnum, el),
+                })) || [],
         };
     }, [loggingSettings, moduleEnum, resourceEnum]);
 
-    const hasEventFormValuesChanged = useCallback(
-        (values: EventFormValues) =>
-            !isObjectSame(values as unknown as Record<string, unknown>, eventFormInitialValues as unknown as Record<string, unknown>),
-        [eventFormInitialValues],
-    );
+    const eventFormMethods = useForm<EventFormValues>({
+        defaultValues: eventFormDefaultValues,
+        mode: 'onChange',
+    });
 
-    const createForm = useCallback(
-        <T extends CommonFormValues>(
-            initialValues: T,
-            onSubmit: (values: T) => void,
-            hasValuesChanged: (values: T) => boolean,
-            formType: 'audit' | 'event',
-        ) => {
-            const commonSelectProps: SelectProps = { minMenuHeight: 200, closeMenuOnSelect: false, isMulti: true };
-            const loggedSelectProps: SelectProps = {
-                styles: {
-                    multiValue: (provided) => ({
-                        ...provided,
-                        border: '1px solid var(--bs-green)',
-                        background: 'var(--bs-success-bg-subtle)',
-                    }),
-                },
-            };
-            const ignoredSelectProps: SelectProps = {
-                styles: {
-                    multiValue: (provided) => ({
-                        ...provided,
-                        border: '1px solid var(--bs-red)',
-                        background: 'var(--bs-danger-bg-subtle)',
-                    }),
-                },
-            };
+    const {
+        handleSubmit: eventHandleSubmit,
+        control: eventControl,
+        watch: eventWatch,
+        formState: { isDirty: eventIsDirty, isSubmitting: eventIsSubmitting, isValid: eventIsValid },
+        reset: eventReset,
+    } = eventFormMethods;
 
-            return (
-                <Form initialValues={initialValues} onSubmit={onSubmit}>
-                    {({ handleSubmit, values, submitting, form }) => (
-                        <BootstrapForm onSubmit={handleSubmit} className="mt-2">
-                            <Widget title="Module Logging">
-                                <SwitchField id="logAllModules" label="Collect logs for all modules" />
-                                {!values.logAllModules ? (
-                                    <FormGroup>
-                                        <Label for="loggedModules">Select Modules to Log</Label>
-                                        <Select
-                                            {...commonSelectProps}
-                                            {...loggedSelectProps}
-                                            value={values.loggedModules || []}
-                                            options={moduleSelectorItems}
-                                            onChange={(e) => form.change('loggedModules', e as ModuleOptionType[])}
-                                        />
-                                    </FormGroup>
-                                ) : (
-                                    <FormGroup>
-                                        <Label for="ignoredModules">Select Modules to Ignore</Label>
-                                        <Select
-                                            {...commonSelectProps}
-                                            {...ignoredSelectProps}
-                                            value={values.ignoredModules || []}
-                                            options={moduleSelectorItems}
-                                            onChange={(e) => form.change('ignoredModules', e as ModuleOptionType[])}
-                                        />
-                                    </FormGroup>
-                                )}
-                            </Widget>
-                            <Widget title="Resource Logging">
-                                <SwitchField id="logAllResources" label="Collect logs for all resources" />
-                                {!values.logAllResources ? (
-                                    <FormGroup>
-                                        <Label for="loggedResources">Select Resources to Log</Label>
-                                        <Select
-                                            {...commonSelectProps}
-                                            {...loggedSelectProps}
-                                            value={values.loggedResources || []}
-                                            options={resourceSelectorItems}
-                                            onChange={(e) => form.change('loggedResources', e as ResourceOptionType[])}
-                                        />
-                                    </FormGroup>
-                                ) : (
-                                    <FormGroup>
-                                        <Label for="ignoredResources">Select Resources to Ignore</Label>
-                                        <Select
-                                            {...commonSelectProps}
-                                            {...ignoredSelectProps}
-                                            value={values.ignoredResources || []}
-                                            options={resourceSelectorItems}
-                                            onChange={(e) => form.change('ignoredResources', e as ResourceOptionType[])}
-                                        />
-                                    </FormGroup>
-                                )}
-                            </Widget>
+    const eventFormValues = useWatch({ control: eventControl });
 
-                            {formType === 'audit' && (
-                                <FormGroup>
-                                    <Label for="output">Audit Logs Output Destination</Label>
-                                    <Select
-                                        options={auditLogsOutputOptions}
-                                        placeholder={`Select Output`}
-                                        value={values.output}
-                                        onChange={(e) => form.change('output', e ?? undefined)}
+    useEffect(() => {
+        eventReset(eventFormDefaultValues);
+    }, [eventFormDefaultValues, eventReset]);
+
+    const hasEventFormValuesChanged = useMemo(() => eventIsDirty, [eventIsDirty]);
+
+    const createAuditForm = useCallback(() => {
+        return (
+            <FormProvider {...auditFormMethods}>
+                <form onSubmit={auditHandleSubmit(onAuditFormSubmit)} className="mt-2 space-y-4">
+                    <Widget>
+                        <div className="space-y-4">
+                            <Controller
+                                name="logAllModules"
+                                control={auditControl}
+                                render={({ field }) => (
+                                    <Switch
+                                        id="logAllModules"
+                                        checked={field.value}
+                                        onChange={field.onChange}
+                                        label="Collect logs for all modules"
                                     />
-                                </FormGroup>
+                                )}
+                            />
+                            {!auditFormValues.logAllModules ? (
+                                <Controller
+                                    name="loggedModules"
+                                    control={auditControl}
+                                    render={({ field }) => (
+                                        <Select
+                                            id="loggedModules"
+                                            label="Select Modules to Log"
+                                            options={moduleSelectorItems.map((item) => ({ value: item.value, label: item.label }))}
+                                            value={field.value || []}
+                                            onChange={(value) => field.onChange(value)}
+                                            isMulti
+                                        />
+                                    )}
+                                />
+                            ) : (
+                                <Controller
+                                    name="ignoredModules"
+                                    control={auditControl}
+                                    render={({ field }) => (
+                                        <Select
+                                            id="ignoredModules"
+                                            label="Select Modules to Ignore"
+                                            options={moduleSelectorItems.map((item) => ({ value: item.value, label: item.label }))}
+                                            value={field.value || []}
+                                            onChange={(value) => field.onChange(value)}
+                                            isMulti
+                                        />
+                                    )}
+                                />
                             )}
-                            {formType === 'audit' && <SwitchField id="verbose" label="Verbose" />}
-                            <div className="d-flex justify-content-end">
-                                <ButtonGroup>
-                                    <ProgressButton
-                                        title={'Apply'}
-                                        inProgressTitle={'Applying..'}
-                                        disabled={submitting || isBusy || !hasValuesChanged(values)}
-                                        inProgress={isUpdating}
-                                        type="submit"
+                        </div>
+                    </Widget>
+                    <Widget title="Resource Logging">
+                        <Controller
+                            name="logAllResources"
+                            control={auditControl}
+                            render={({ field }) => (
+                                <Switch
+                                    id="logAllResources"
+                                    checked={field.value}
+                                    onChange={field.onChange}
+                                    label="Collect logs for all resources"
+                                />
+                            )}
+                        />
+                        {!auditFormValues.logAllResources ? (
+                            <Controller
+                                name="loggedResources"
+                                control={auditControl}
+                                render={({ field }) => (
+                                    <Select
+                                        id="loggedResources"
+                                        label="Select Resources to Log"
+                                        options={resourceSelectorItems.map((item) => ({ value: item.value, label: item.label }))}
+                                        value={field.value || []}
+                                        onChange={(value) => field.onChange(value)}
+                                        isMulti
                                     />
-                                </ButtonGroup>
+                                )}
+                            />
+                        ) : (
+                            <Controller
+                                name="ignoredResources"
+                                control={auditControl}
+                                render={({ field }) => (
+                                    <Select
+                                        id="ignoredResources"
+                                        label="Select Resources to Ignore"
+                                        options={resourceSelectorItems.map((item) => ({ value: item.value, label: item.label }))}
+                                        value={field.value || []}
+                                        onChange={(value) => field.onChange(value)}
+                                        isMulti
+                                    />
+                                )}
+                            />
+                        )}
+                    </Widget>
+
+                    <Controller
+                        name="output"
+                        control={auditControl}
+                        render={({ field }) => (
+                            <Select
+                                id="output"
+                                label="Audit Logs Output Destination"
+                                options={auditLogsOutputOptions.map((item) => ({ value: item.value, label: item.label }))}
+                                value={field.value || ''}
+                                onChange={(value: string | number) => field.onChange(value as AuditLoggingSettingsDtoOutputEnum)}
+                                placeholder="Select Output"
+                            />
+                        )}
+                    />
+                    <Controller
+                        name="verbose"
+                        control={auditControl}
+                        render={({ field }) => <Switch id="verbose" checked={field.value} onChange={field.onChange} label="Verbose" />}
+                    />
+                    <div className="flex justify-end">
+                        <ProgressButton
+                            title={'Apply'}
+                            inProgressTitle={'Applying..'}
+                            disabled={auditIsSubmitting || isBusy || !hasAuditFormValuesChanged}
+                            inProgress={isUpdating}
+                            type="submit"
+                        />
+                    </div>
+                </form>
+            </FormProvider>
+        );
+    }, [
+        auditFormMethods,
+        auditHandleSubmit,
+        onAuditFormSubmit,
+        auditControl,
+        auditFormValues.logAllModules,
+        auditFormValues.logAllResources,
+        moduleSelectorItems,
+        resourceSelectorItems,
+        auditLogsOutputOptions,
+        auditIsSubmitting,
+        isBusy,
+        hasAuditFormValuesChanged,
+        isUpdating,
+    ]);
+
+    const createEventForm = useCallback(() => {
+        return (
+            <FormProvider {...eventFormMethods}>
+                <form onSubmit={eventHandleSubmit(onEventFormSubmit)} className="mt-2 space-y-4">
+                    <Widget title="Module Logging">
+                        <Controller
+                            name="logAllModules"
+                            control={eventControl}
+                            render={({ field }) => (
+                                <Switch
+                                    id="logAllModules"
+                                    checked={field.value}
+                                    onChange={field.onChange}
+                                    label="Collect logs for all modules"
+                                />
+                            )}
+                        />
+                        {!eventFormValues.logAllModules ? (
+                            <div className="mb-4">
+                                <Controller
+                                    name="loggedModules"
+                                    control={eventControl}
+                                    render={({ field }) => (
+                                        <Select
+                                            id="loggedModules"
+                                            label="Select Modules to Log"
+                                            options={moduleSelectorItems.map((item) => ({ value: item.value, label: item.label }))}
+                                            value={field.value || []}
+                                            onChange={(value) => field.onChange(value)}
+                                            isMulti
+                                        />
+                                    )}
+                                />
                             </div>
-                        </BootstrapForm>
-                    )}
-                </Form>
-            );
-        },
-        [auditLogsOutputOptions, isBusy, isUpdating, moduleSelectorItems, resourceSelectorItems],
-    );
+                        ) : (
+                            <div className="mb-4">
+                                <Controller
+                                    name="ignoredModules"
+                                    control={eventControl}
+                                    render={({ field }) => (
+                                        <Select
+                                            id="ignoredModules"
+                                            label="Select Modules to Ignore"
+                                            options={moduleSelectorItems.map((item) => ({ value: item.value, label: item.label }))}
+                                            value={field.value || []}
+                                            onChange={(value) => field.onChange(value)}
+                                            isMulti
+                                        />
+                                    )}
+                                />
+                            </div>
+                        )}
+                    </Widget>
+                    <Widget title="Resource Logging">
+                        <Controller
+                            name="logAllResources"
+                            control={eventControl}
+                            render={({ field }) => (
+                                <Switch
+                                    id="logAllResources"
+                                    checked={field.value}
+                                    onChange={field.onChange}
+                                    label="Collect logs for all resources"
+                                />
+                            )}
+                        />
+                        {!eventFormValues.logAllResources ? (
+                            <div className="mb-4">
+                                <Controller
+                                    name="loggedResources"
+                                    control={eventControl}
+                                    render={({ field }) => (
+                                        <Select
+                                            id="loggedResources"
+                                            label="Select Resources to Log"
+                                            options={resourceSelectorItems.map((item) => ({ value: item.value, label: item.label }))}
+                                            value={field.value || []}
+                                            onChange={(value) => field.onChange(value)}
+                                            isMulti
+                                        />
+                                    )}
+                                />
+                            </div>
+                        ) : (
+                            <div className="mb-4">
+                                <Controller
+                                    name="ignoredResources"
+                                    control={eventControl}
+                                    render={({ field }) => (
+                                        <Select
+                                            id="ignoredResources"
+                                            label="Select Resources to Ignore"
+                                            options={resourceSelectorItems.map((item) => ({ value: item.value, label: item.label }))}
+                                            value={field.value || []}
+                                            onChange={(value) => field.onChange(value)}
+                                            isMulti
+                                        />
+                                    )}
+                                />
+                            </div>
+                        )}
+                    </Widget>
+                    <div className="flex justify-end gap-2 mt-4">
+                        <ProgressButton
+                            title={'Apply'}
+                            inProgressTitle={'Applying..'}
+                            disabled={eventIsSubmitting || isBusy || !hasEventFormValuesChanged}
+                            inProgress={isUpdating}
+                            type="submit"
+                        />
+                    </div>
+                </form>
+            </FormProvider>
+        );
+    }, [
+        eventFormMethods,
+        eventHandleSubmit,
+        onEventFormSubmit,
+        eventControl,
+        eventFormValues.logAllModules,
+        eventFormValues.logAllResources,
+        moduleSelectorItems,
+        resourceSelectorItems,
+        eventIsSubmitting,
+        isBusy,
+        hasEventFormValuesChanged,
+        isUpdating,
+    ]);
 
     return (
-        <Container className="themed-container" fluid>
+        <Container>
             <Widget
                 title="Logging Settings"
                 titleSize="larger"
@@ -335,24 +530,15 @@ const LoggingSetting = () => {
                 widgetLockName={LockWidgetNameEnum.LoggingSettings}
             >
                 <TabLayout
+                    noBorder
                     tabs={[
                         {
                             title: 'Audit logs',
-                            content: createForm(
-                                auditFormInitialValues as AuditFormValues,
-                                onAuditFormSubmit,
-                                hasAuditFormValuesChanged,
-                                'audit',
-                            ),
+                            content: createAuditForm(),
                         },
                         {
                             title: 'Event logs',
-                            content: createForm(
-                                eventFormInitialValues as EventFormValues,
-                                onEventFormSubmit,
-                                hasEventFormValuesChanged,
-                                'event',
-                            ),
+                            content: createEventForm(),
                         },
                     ]}
                 />

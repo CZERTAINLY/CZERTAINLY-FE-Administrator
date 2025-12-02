@@ -11,11 +11,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { PlatformEnum, Resource, ResourceEvent } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import Dialog from 'components/Dialog';
-import { Form } from 'react-final-form';
-import { Button, ButtonGroup } from 'reactstrap';
-import CustomSelect from 'components/Input/CustomSelect';
+import { useForm, Controller, FormProvider, useWatch } from 'react-hook-form';
+import Button from 'components/Button';
+import ProgressButton from 'components/ProgressButton';
+import Select from 'components/Select';
+import { Edit } from 'lucide-react';
 import TriggerEditorWidget from 'components/TriggerEditorWidget';
 import { isObjectSame } from 'utils/common-utils';
+import Container from 'components/Container';
 
 type Props = (
     | {
@@ -209,13 +212,13 @@ const EventsTable = ({ mode, resource, resourceUuid, widgetLocks }: Props) => {
                         resourceEvent?.producedResource ? getEnumLabel(resourceEnum, resourceEvent.producedResource) : '',
                         (triggerUuids?.length ?? 0).toString(),
                         <Button
-                            className="btn btn-link py-0 px-1 ms-2"
-                            color="white"
+                            variant="transparent"
+                            color="primary"
                             title="Edit"
                             key="edit"
                             onClick={() => onEdit(event as ResourceEvent)}
                         >
-                            <i className="fa fa-edit" style={{ color: 'auto' }} />
+                            <Edit size={16} />
                         </Button>,
                     ],
                 };
@@ -251,7 +254,7 @@ const EventsTable = ({ mode, resource, resourceUuid, widgetLocks }: Props) => {
         [eventOptions.length, textContent.addTooltip],
     );
 
-    const initialValues: FormValues = useMemo(() => {
+    const defaultValues: FormValues = useMemo(() => {
         const resourceEvent = getResourceEventModel(editedEvent);
 
         if (!resourceEvent) return {};
@@ -272,15 +275,35 @@ const EventsTable = ({ mode, resource, resourceUuid, widgetLocks }: Props) => {
         };
     }, [editedEvent, eventTriggerAssociation, eventsSettings, getResourceEventModel, mode, resourceEnum, resourceEventEnum]);
 
+    const methods = useForm<FormValues>({
+        defaultValues,
+        mode: 'onChange',
+    });
+
+    const {
+        handleSubmit,
+        control,
+        setValue,
+        formState: { isDirty, isSubmitting, isValid },
+        reset,
+    } = methods;
+
+    const formValues = useWatch({ control });
+
+    // Reset form when editedEvent or defaultValues change
+    useEffect(() => {
+        reset(defaultValues);
+    }, [defaultValues, reset]);
+
     const areDefaultValuesSame = useCallback(
         (values: FormValues) => {
             const areValuesSame = isObjectSame(
                 values as unknown as Record<string, unknown>,
-                initialValues as unknown as Record<string, unknown>,
+                defaultValues as unknown as Record<string, unknown>,
             );
             return areValuesSame;
         },
-        [initialValues],
+        [defaultValues],
     );
 
     return (
@@ -305,59 +328,98 @@ const EventsTable = ({ mode, resource, resourceUuid, widgetLocks }: Props) => {
                 caption={textContent.dialogTitle}
                 size="xl"
                 body={
-                    <Form onSubmit={onSubmit} initialValues={initialValues}>
-                        {({ values, handleSubmit, submitting, valid, form }) => (
-                            <>
-                                <CustomSelect
-                                    label="Event"
-                                    options={eventOptions}
-                                    value={values.event}
-                                    onChange={(e) => {
-                                        form.change('event', e as OptionType);
-                                        const producedResource = getResourceEventModel((e as OptionType).value)?.producedResource;
+                    <FormProvider {...methods}>
+                        <form onSubmit={handleSubmit(onSubmit)}>
+                            <div className="space-y-4">
+                                <Controller
+                                    name="event"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Select
+                                            id="event"
+                                            label="Event"
+                                            options={eventOptions}
+                                            value={field.value?.value ?? ''}
+                                            onChange={(value: string | number) => {
+                                                const selectedOption = eventOptions.find((opt) => opt.value === value);
+                                                if (selectedOption) {
+                                                    field.onChange(selectedOption);
+                                                    const producedResource = getResourceEventModel(String(value))?.producedResource;
 
-                                        if (producedResource) {
-                                            form.change('resource', {
-                                                value: producedResource,
-                                                label: getEnumLabel(resourceEnum, producedResource),
-                                            });
-                                        }
-                                    }}
-                                    isDisabled={!!editedEvent}
-                                    required
-                                />
-                                {values.event?.value && (
-                                    <>
-                                        <CustomSelect label="Resource" value={values.resource} isDisabled />
-                                        <TriggerEditorWidget
-                                            resource={values.resource?.value as Resource}
-                                            selectedTriggers={values.triggerUuids ?? []}
-                                            onSelectedTriggersChange={(e) => {
-                                                form.change('triggerUuids', e);
+                                                    if (producedResource) {
+                                                        setValue('resource', {
+                                                            value: producedResource,
+                                                            label: getEnumLabel(resourceEnum, producedResource),
+                                                        });
+                                                    }
+                                                }
                                             }}
-                                            noteText={`Only Triggers associated with the same Resource as the Event are shown`}
+                                            isDisabled={!!editedEvent}
+                                            required
+                                        />
+                                    )}
+                                />
+                                {formValues.event?.value && (
+                                    <>
+                                        <Controller
+                                            name="resource"
+                                            control={control}
+                                            render={({ field }) => (
+                                                <Select
+                                                    id="resource"
+                                                    label="Resource"
+                                                    options={
+                                                        field.value
+                                                            ? [
+                                                                  {
+                                                                      value: field.value.value,
+                                                                      label: field.value.label,
+                                                                  },
+                                                              ]
+                                                            : []
+                                                    }
+                                                    value={field.value?.value ?? ''}
+                                                    onChange={() => {}}
+                                                    isDisabled
+                                                />
+                                            )}
+                                        />
+                                        <Controller
+                                            name="triggerUuids"
+                                            control={control}
+                                            render={({ field }) => (
+                                                <TriggerEditorWidget
+                                                    resource={formValues.resource?.value as Resource}
+                                                    selectedTriggers={field.value ?? []}
+                                                    onSelectedTriggersChange={(e) => {
+                                                        field.onChange(e);
+                                                    }}
+                                                    noteText={`Only Triggers associated with the same Resource as the Event are shown`}
+                                                />
+                                            )}
                                         />
                                     </>
                                 )}
-                                <div style={{ textAlign: 'right' }}>
-                                    <ButtonGroup>
-                                        <Button
-                                            type="submit"
-                                            color="primary"
-                                            disabled={isBusy || submitting || !valid || areDefaultValuesSame(values)}
-                                            onClick={handleSubmit}
-                                        >
-                                            {editedEvent ? 'Save' : textContent.confirmDialogButtonText}
-                                        </Button>
-
-                                        <Button type="button" color="secondary" disabled={isBusy || submitting} onClick={onClose}>
-                                            Cancel
-                                        </Button>
-                                    </ButtonGroup>
-                                </div>
-                            </>
-                        )}
-                    </Form>
+                                <Container className="flex-row justify-end modal-footer" gap={4}>
+                                    <Button
+                                        variant="outline"
+                                        color="secondary"
+                                        disabled={isBusy || isSubmitting}
+                                        onClick={onClose}
+                                        type="button"
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <ProgressButton
+                                        title={editedEvent ? 'Save' : textContent.confirmDialogButtonText}
+                                        inProgress={isSubmitting}
+                                        disabled={isBusy || isSubmitting || !isValid || areDefaultValuesSame(formValues as FormValues)}
+                                        type="submit"
+                                    />
+                                </Container>
+                            </div>
+                        </form>
+                    </FormProvider>
                 }
                 toggle={() => setIsTriggersDialogOpen(false)}
             />

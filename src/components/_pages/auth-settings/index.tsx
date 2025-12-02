@@ -1,18 +1,21 @@
 import JwkSetKeysTable from 'components/_pages/auth-settings/JwkSetKeysTable';
+import OAuth2ProviderForm from 'components/_pages/auth-settings/form';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
-import SwitchField from 'components/Input/SwitchField';
 import TabLayout from 'components/Layout/TabLayout';
 import ProgressButton from 'components/ProgressButton';
 import Spinner from 'components/Spinner';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as authSettingsActions, selectors as authSettingsSelectors } from 'ducks/auth-settings';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Form } from 'react-final-form';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router';
-import { Form as BootstrapForm, Button, ButtonGroup, Container } from 'reactstrap';
+import { Link } from 'react-router';
+import Button from 'components/Button';
+import Container from 'components/Container';
+import Switch from 'components/Switch';
+import { Key } from 'lucide-react';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { renderOAuth2StateBadges } from 'utils/oauth2Providers';
 
@@ -22,7 +25,6 @@ type FormValues = {
 
 const AuthenticationSettings = () => {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const authenticationSettings = useSelector(authSettingsSelectors.authenticationSettings);
     const isFetchingSettings = useSelector(authSettingsSelectors.isFetchingSettings);
@@ -30,8 +32,16 @@ const AuthenticationSettings = () => {
 
     const oauth2Provider = useSelector(authSettingsSelectors.oauth2Provider);
     const isFetchingProvider = useSelector(authSettingsSelectors.isFetchingProvider);
+    const isCreatingProvider = useSelector(authSettingsSelectors.isCreatingProvider);
+    const isUpdatingProvider = useSelector(authSettingsSelectors.isUpdatingProvider);
+
     const [selectedProvider, setSelectedProvider] = useState<string | null>(null);
     const [jwkSetKeysDialog, setJwkSetKeysDialog] = useState(false);
+    const [isOAuth2FormDialogOpen, setIsOAuth2FormDialogOpen] = useState(false);
+    const [editingProviderName, setEditingProviderName] = useState<string | undefined>(undefined);
+
+    const wasCreating = useRef(isCreatingProvider);
+    const wasUpdating = useRef(isUpdatingProvider);
 
     const getAuthenticationSettings = useCallback(() => {
         dispatch(authSettingsActions.getAuthenticationSettings());
@@ -70,6 +80,44 @@ const AuthenticationSettings = () => {
         setSelectedProvider(null);
         setJwkSetKeysDialog(false);
     }, []);
+
+    const handleOpenOAuth2FormDialog = useCallback(
+        (providerName?: string) => {
+            setEditingProviderName(providerName);
+            setIsOAuth2FormDialogOpen(true);
+            if (providerName) {
+                dispatch(authSettingsActions.resetOAuth2ProviderSettings());
+                dispatch(authSettingsActions.getOAuth2ProviderSettings({ providerName }));
+            } else {
+                dispatch(authSettingsActions.resetOAuth2ProviderSettings());
+            }
+        },
+        [dispatch],
+    );
+
+    const handleCloseOAuth2FormDialog = useCallback(() => {
+        setIsOAuth2FormDialogOpen(false);
+        setEditingProviderName(undefined);
+        dispatch(authSettingsActions.resetOAuth2ProviderSettings());
+    }, [dispatch]);
+
+    // Track creation/update state and close dialog on success
+    useEffect(() => {
+        if (wasCreating.current && !isCreatingProvider && isOAuth2FormDialogOpen) {
+            handleCloseOAuth2FormDialog();
+            getAuthenticationSettings();
+        }
+        wasCreating.current = isCreatingProvider;
+    }, [isCreatingProvider, isOAuth2FormDialogOpen, handleCloseOAuth2FormDialog, getAuthenticationSettings]);
+
+    useEffect(() => {
+        if (wasUpdating.current && !isUpdatingProvider && isOAuth2FormDialogOpen) {
+            handleCloseOAuth2FormDialog();
+            getAuthenticationSettings();
+        }
+        wasUpdating.current = isUpdatingProvider;
+    }, [isUpdatingProvider, isOAuth2FormDialogOpen, handleCloseOAuth2FormDialog, getAuthenticationSettings]);
+
     const providersButtons: WidgetButtonProps[] = useMemo(
         () => [
             {
@@ -77,11 +125,11 @@ const AuthenticationSettings = () => {
                 disabled: false,
                 tooltip: 'Create Authentication Provider',
                 onClick: () => {
-                    navigate('./add');
+                    handleOpenOAuth2FormDialog();
                 },
             },
         ],
-        [navigate],
+        [handleOpenOAuth2FormDialog],
     );
 
     const providerHeaders: TableHeader[] = useMemo(
@@ -121,32 +169,47 @@ const AuthenticationSettings = () => {
                           provider.issuerUrl ?? '',
                           renderOAuth2StateBadges(provider),
                           <Button
-                              className="btn btn-link py-0 px-1 ms-2"
-                              color="white"
+                              className="py-0 px-1 ms-2"
+                              variant="transparent"
+                              color="primary"
                               title="Detail"
                               key="jwkKeyInfo"
                               onClick={() => onShowProviderJwkSetKeys(providerName)}
                           >
-                              <i className="fa fa-key" style={{ color: 'auto' }} />
+                              <Key className="w-4 h-4" />
                           </Button>,
                       ],
                   })),
         [authenticationSettings, onShowProviderJwkSetKeys],
     );
 
-    const initialValues = useMemo(() => {
-        if (!authenticationSettings) return {};
+    const defaultValues = useMemo(() => {
+        if (!authenticationSettings) return { disableLocalhostUser: false };
         return { disableLocalhostUser: authenticationSettings.disableLocalhostUser };
     }, [authenticationSettings]);
 
-    const hasValuesChanged = useCallback(
-        (values: FormValues) => {
-            return values.disableLocalhostUser !== initialValues?.disableLocalhostUser;
-        },
-        [initialValues],
-    );
+    const {
+        handleSubmit,
+        control,
+        formState: { isDirty, isSubmitting },
+        reset,
+    } = useForm<FormValues>({
+        defaultValues,
+        mode: 'onChange',
+    });
+
+    // Reset form when authenticationSettings changes
+    useEffect(() => {
+        if (authenticationSettings) {
+            reset({ disableLocalhostUser: authenticationSettings.disableLocalhostUser });
+        }
+    }, [authenticationSettings, reset]);
+
+    const hasValuesChanged = useMemo(() => {
+        return isDirty;
+    }, [isDirty]);
     return (
-        <Container className="themed-container" fluid>
+        <Container>
             <TabLayout
                 tabs={[
                     {
@@ -175,25 +238,31 @@ const AuthenticationSettings = () => {
                                 busy={isBusy}
                                 widgetLockName={LockWidgetNameEnum.AuthenticationSettings}
                                 lockSize="large"
+                                noBorder
                             >
-                                <Form initialValues={initialValues} onSubmit={onSubmit}>
-                                    {({ handleSubmit, values, submitting }) => (
-                                        <BootstrapForm onSubmit={handleSubmit} className="mt-2">
-                                            <SwitchField id="disableLocalhostUser" label="Disable Localhost User" />
-                                            <div className="d-flex justify-content-end">
-                                                <ButtonGroup>
-                                                    <ProgressButton
-                                                        title={'Apply'}
-                                                        inProgressTitle={'Applying..'}
-                                                        disabled={submitting || isBusy || !hasValuesChanged(values)}
-                                                        inProgress={isUpdatingSettings}
-                                                        type="submit"
-                                                    />
-                                                </ButtonGroup>
-                                            </div>
-                                        </BootstrapForm>
-                                    )}
-                                </Form>
+                                <form onSubmit={handleSubmit(onSubmit)} className="mt-2">
+                                    <Controller
+                                        name="disableLocalhostUser"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <Switch
+                                                id="disableLocalhostUser"
+                                                label="Disable Localhost User"
+                                                checked={field.value}
+                                                onChange={field.onChange}
+                                            />
+                                        )}
+                                    />
+                                    <div className="flex justify-end mt-4">
+                                        <ProgressButton
+                                            title={'Apply'}
+                                            inProgressTitle={'Applying..'}
+                                            disabled={isSubmitting || isBusy || !hasValuesChanged}
+                                            inProgress={isUpdatingSettings}
+                                            type="submit"
+                                        />
+                                    </div>
+                                </form>
                             </Widget>
                         ),
                     },
@@ -213,7 +282,14 @@ const AuthenticationSettings = () => {
                     )
                 }
                 toggle={onCloseProviderJwkSetKeys}
-                buttons={[{ color: 'secondary', variant: 'outline', onClick: onCloseProviderJwkSetKeys, body: 'Close' }]}
+                buttons={[{ color: 'primary', variant: 'outline', onClick: onCloseProviderJwkSetKeys, body: 'Close' }]}
+            />
+            <Dialog
+                isOpen={isOAuth2FormDialogOpen}
+                toggle={handleCloseOAuth2FormDialog}
+                caption={editingProviderName ? 'Edit OAuth2 Provider' : 'Create OAuth2 Provider'}
+                size="xl"
+                body={<OAuth2ProviderForm providerName={editingProviderName} onCancel={handleCloseOAuth2FormDialog} />}
             />
         </Container>
     );
