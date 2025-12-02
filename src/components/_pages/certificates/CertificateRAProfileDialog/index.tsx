@@ -4,11 +4,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { actions } from 'ducks/certificates';
 import { actions as raProfileActions, selectors as raProfileSelectors } from 'ducks/ra-profiles';
 
-import Select, { SingleValue } from 'react-select';
+import Select from 'components/Select';
 
 import Spinner from 'components/Spinner';
 import { FormGroup } from 'reactstrap';
 import Button from 'components/Button';
+import Container from 'components/Container';
 
 interface Props {
     uuids: string[];
@@ -23,7 +24,7 @@ export default function CertificateGroupDialog({ uuids, onCancel, onUpdate }: Pr
 
     const isFetchingRaProffiles = useSelector(raProfileSelectors.isFetchingList);
 
-    const [selectedRaProfile, setSelectedRaProfile] = useState<SingleValue<{ value: string; label: string }>>();
+    const [selectedRaProfile, setSelectedRaProfile] = useState<string>();
 
     useEffect(() => {
         dispatch(raProfileActions.listRaProfiles());
@@ -38,8 +39,8 @@ export default function CertificateGroupDialog({ uuids, onCancel, onUpdate }: Pr
         if (!selectedRaProfile) return;
         dispatch(
             actions.bulkUpdateRaProfile({
-                raProfileRequest: { certificateUuids: uuids, raProfileUuid: selectedRaProfile.value.split(':#')[0], filters: [] },
-                authorityUuid: selectedRaProfile.value.split(':#')[1],
+                raProfileRequest: { certificateUuids: uuids, raProfileUuid: selectedRaProfile.split(':#')[0], filters: [] },
+                authorityUuid: selectedRaProfile.split(':#')[1],
             }),
         );
         onUpdate();
@@ -50,17 +51,16 @@ export default function CertificateGroupDialog({ uuids, onCancel, onUpdate }: Pr
             <FormGroup>
                 <Select
                     id="raProfile"
-                    inputId="raProfileSelect"
                     options={raProfiles.map((raProfile) => ({
                         value: raProfile.uuid + ':#' + raProfile.authorityInstanceUuid,
                         label: raProfile.name,
                     }))}
-                    value={selectedRaProfile}
-                    onChange={(e) => setSelectedRaProfile(e)}
+                    value={selectedRaProfile || ''}
+                    onChange={(value) => setSelectedRaProfile(value as string)}
                 />
             </FormGroup>
 
-            <div className="flex gap-4">
+            <Container className="flex-row justify-end modal-footer" gap={4}>
                 <Button color="danger" onClick={removeRaprofile}>
                     Remove
                 </Button>
@@ -70,7 +70,7 @@ export default function CertificateGroupDialog({ uuids, onCancel, onUpdate }: Pr
                 <Button color="secondary" variant="outline" onClick={onCancel} className="ml-auto">
                     Cancel
                 </Button>
-            </div>
+            </Container>
 
             <Spinner active={isFetchingRaProffiles} />
         </>

@@ -1,11 +1,12 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router';
+import { Link } from 'react-router';
 import Badge from 'components/Badge';
 
 import { actions, selectors } from 'ducks/credentials';
 
 import Widget from 'components/Widget';
+import CredentialForm from '../form';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
@@ -14,7 +15,6 @@ import { LockWidgetNameEnum } from 'types/user-interface';
 
 function CredentialList() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const checkedRows = useSelector(selectors.checkedRows);
     const credentials = useSelector(selectors.credentials);
@@ -22,10 +22,14 @@ function CredentialList() {
     const isFetching = useSelector(selectors.isFetchingList);
     const isDeleting = useSelector(selectors.isDeleting);
     const isBulkDeleting = useSelector(selectors.isBulkDeleting);
+    const isCreating = useSelector(selectors.isCreating);
+    const isUpdating = useSelector(selectors.isUpdating);
 
     const isBusy = isFetching || isDeleting || isBulkDeleting;
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+    const [editingCredentialId, setEditingCredentialId] = useState<string | undefined>(undefined);
 
     const getFreshData = useCallback(() => {
         dispatch(actions.setCheckedRows({ checkedRows: [] }));
@@ -37,9 +41,37 @@ function CredentialList() {
         getFreshData();
     }, [getFreshData]);
 
+    const wasCreating = useRef(isCreating);
+    const wasUpdating = useRef(isUpdating);
+
+    useEffect(() => {
+        if (wasCreating.current && !isCreating) {
+            setIsAddModalOpen(false);
+            getFreshData();
+        }
+        wasCreating.current = isCreating;
+    }, [isCreating, getFreshData]);
+
+    useEffect(() => {
+        if (wasUpdating.current && !isUpdating) {
+            setEditingCredentialId(undefined);
+            getFreshData();
+        }
+        wasUpdating.current = isUpdating;
+    }, [isUpdating, getFreshData]);
+
+    const handleOpenAddModal = useCallback(() => {
+        setIsAddModalOpen(true);
+    }, []);
+
+    const handleCloseAddModal = useCallback(() => {
+        setIsAddModalOpen(false);
+        setEditingCredentialId(undefined);
+    }, []);
+
     const onAddClick = useCallback(() => {
-        navigate(`./add`);
-    }, [navigate]);
+        handleOpenAddModal();
+    }, [handleOpenAddModal]);
 
     const onDeleteConfirmed = useCallback(() => {
         setConfirmDelete(false);
@@ -60,9 +92,7 @@ function CredentialList() {
                 icon: 'plus',
                 disabled: false,
                 tooltip: 'Create',
-                onClick: () => {
-                    onAddClick();
-                },
+                onClick: handleOpenAddModal,
             },
             {
                 icon: 'trash',
@@ -73,7 +103,7 @@ function CredentialList() {
                 },
             },
         ],
-        [checkedRows, onAddClick],
+        [checkedRows, handleOpenAddModal],
     );
 
     const credentialRowHeaders: TableHeader[] = useMemo(
@@ -155,6 +185,14 @@ function CredentialList() {
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
+            />
+
+            <Dialog
+                isOpen={isAddModalOpen || !!editingCredentialId}
+                toggle={handleCloseAddModal}
+                caption={editingCredentialId ? 'Edit Credential' : 'Create Credential'}
+                size="xl"
+                body={<CredentialForm credentialId={editingCredentialId} onCancel={handleCloseAddModal} onSuccess={handleCloseAddModal} />}
             />
         </>
     );

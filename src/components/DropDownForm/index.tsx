@@ -1,12 +1,8 @@
 import ProgressButton from 'components/ProgressButton';
-import { Field, Form } from 'react-final-form';
-import { Form as BootstrapForm, Button, ButtonGroup, Container } from 'reactstrap';
+import Button from 'components/Button';
+import Select from 'components/Select';
+import { useForm, Controller } from 'react-hook-form';
 
-import Select from 'react-select';
-import { FormGroup, Label } from 'reactstrap';
-
-import { validateRequired } from 'utils/validators';
-import style from './dropDownForm.module.scss';
 interface DropDownOptions {
     label: string;
     value: string | number;
@@ -16,6 +12,7 @@ interface DropDownOptionsData {
     formLabel: string;
     formValue: string;
     options: DropDownOptions[];
+    placement?: 'top' | 'bottom';
 }
 
 interface Props {
@@ -24,52 +21,57 @@ interface Props {
     onClose: () => void;
     isBusy?: boolean;
 }
-const DropDownListForm = ({ onSubmit, onClose, dropDownOptionsList, isBusy = false }: Props) => {
-    return (
-        <Container className={style.certificateDownloadContainer}>
-            <Form onSubmit={onSubmit}>
-                {({ handleSubmit, submitting, valid, values, errors, pristine }) => (
-                    <BootstrapForm onSubmit={handleSubmit}>
-                        {dropDownOptionsList.map((dropDownOptionsListItem, i) => {
-                            return (
-                                <Field key={i} name={dropDownOptionsListItem.formValue} validate={validateRequired()}>
-                                    {({ input, meta }) => (
-                                        <FormGroup>
-                                            <Label for={dropDownOptionsListItem.formValue}>{dropDownOptionsListItem.formLabel}</Label>
-                                            <Select
-                                                {...input}
-                                                id={dropDownOptionsListItem.formValue}
-                                                maxMenuHeight={140}
-                                                menuPlacement="auto"
-                                                options={dropDownOptionsListItem.options}
-                                                placeholder={`Select ${dropDownOptionsListItem.formLabel}`}
-                                                isClearable={true}
-                                            />
-                                        </FormGroup>
-                                    )}
-                                </Field>
-                            );
-                        })}
-                        <div className="d-flex">
-                            <ButtonGroup className="ms-auto">
-                                <ProgressButton
-                                    inProgress={isBusy}
-                                    title={isBusy ? 'Submitting' : 'Submit'}
-                                    type="submit"
-                                    color="primary"
-                                    disabled={pristine || isBusy || !valid}
-                                    onClick={handleSubmit}
-                                />
 
-                                <Button type="button" color="secondary" disabled={isBusy} onClick={onClose}>
-                                    Close
-                                </Button>
-                            </ButtonGroup>
-                        </div>
-                    </BootstrapForm>
-                )}
-            </Form>{' '}
-        </Container>
+const DropDownListForm = ({ onSubmit, onClose, dropDownOptionsList, isBusy = false }: Props) => {
+    const defaultValues = dropDownOptionsList.reduce((acc, item) => ({ ...acc, [item.formValue]: '' }), {} as Record<string, string>);
+
+    const {
+        control,
+        handleSubmit,
+        formState: { isValid, isDirty },
+    } = useForm<Record<string, string>>({
+        mode: 'onChange',
+        defaultValues,
+    });
+
+    return (
+        <div className="mt-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+                {dropDownOptionsList.map((dropDownOptionsListItem) => (
+                    <Controller
+                        key={dropDownOptionsListItem.formValue}
+                        name={dropDownOptionsListItem.formValue}
+                        control={control}
+                        rules={{ required: true }}
+                        render={({ field }: { field: any }) => {
+                            return (
+                                <Select
+                                    id={dropDownOptionsListItem.formValue}
+                                    label={dropDownOptionsListItem.formLabel}
+                                    options={dropDownOptionsListItem.options}
+                                    placeholder={`Select ${dropDownOptionsListItem.formLabel}`}
+                                    value={field.value}
+                                    onChange={field.onChange}
+                                    placement={dropDownOptionsListItem.placement}
+                                />
+                            );
+                        }}
+                    />
+                ))}
+                <div className="flex justify-center items-center gap-4">
+                    <ProgressButton
+                        inProgress={isBusy}
+                        title={isBusy ? 'Submitting' : 'Submit'}
+                        type="submit"
+                        disabled={!isDirty || isBusy || !isValid}
+                    />
+
+                    <Button variant="outline" color="secondary" disabled={isBusy} onClick={onClose}>
+                        Close
+                    </Button>
+                </div>
+            </form>
+        </div>
     );
 };
 

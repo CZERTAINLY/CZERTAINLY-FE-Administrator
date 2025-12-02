@@ -1,8 +1,7 @@
-import { useMemo } from 'react';
-import { Field } from 'react-final-form';
-import Select from 'react-select';
-import { Col, Row } from 'reactstrap';
+import { useMemo, useState } from 'react';
+import Select from 'components/Select';
 import { AttributeDescriptorModel, CustomAttributeModel, isCustomAttributeModel } from '../../../../types/attributes';
+import Label from 'components/Label';
 
 export type Props = {
     attributeDescriptors: AttributeDescriptorModel[] | undefined;
@@ -10,42 +9,55 @@ export type Props = {
 };
 
 export default function CustomAttributeAddSelect({ attributeDescriptors, onAdd }: Props) {
-    const options = useMemo(
-        () =>
-            attributeDescriptors
-                ?.filter<CustomAttributeModel>((el) => isCustomAttributeModel(el))
-                .map((el) => ({
-                    label: el.properties.label,
-                    value: el,
-                })) || [],
-        [attributeDescriptors],
-    );
+    const { options, uuidToAttributeMap } = useMemo(() => {
+        const customAttributes = attributeDescriptors?.filter<CustomAttributeModel>((el) => isCustomAttributeModel(el)) || [];
+
+        const map = new Map<string, CustomAttributeModel>();
+        const opts = customAttributes.map((el) => {
+            map.set(el.uuid, el);
+            return {
+                label: el.properties.label,
+                value: el.uuid,
+            };
+        });
+
+        return {
+            options: opts,
+            uuidToAttributeMap: map,
+        };
+    }, [attributeDescriptors]);
+
+    const [selectedValues, setSelectedValues] = useState<{ value: string | number; label: string }[]>([]);
 
     if (options.length === 0) return null;
 
     return (
         <>
-            <h6>
-                <b>Show custom attribute</b>
-            </h6>
-            <Row>
-                <Col xs="6" sm="6" md="6" lg="6" xl="6">
-                    <Field key={'selectAddShowCustomAttribute'} name={'selectAddCustomAttribute'}>
-                        {({ input }) => (
-                            <Select
-                                {...input}
-                                inputId="selectAddCustomAttribute"
-                                options={options}
-                                placeholder="Show..."
-                                isClearable={true}
-                                onChange={(v) => {
-                                    onAdd(v.value);
-                                }}
-                            />
-                        )}
-                    </Field>
-                </Col>
-            </Row>
+            <Label title="Show custom attribute" />
+            <Select
+                id="selectAddCustomAttribute"
+                options={options}
+                placeholder="Show..."
+                isClearable
+                isMulti
+                value={selectedValues}
+                onChange={(values) => {
+                    const newValues = values || [];
+                    setSelectedValues(newValues);
+
+                    // Find newly added attributes (ones that weren't in the previous selection)
+                    const previousUuids = new Set(selectedValues.map((v) => v.value.toString()));
+                    const newlyAdded = newValues.filter((v) => !previousUuids.has(v.value.toString()));
+
+                    // Call onAdd for each newly added attribute
+                    newlyAdded.forEach((selected) => {
+                        const attribute = uuidToAttributeMap.get(selected.value.toString());
+                        if (attribute) {
+                            onAdd(attribute);
+                        }
+                    });
+                }}
+            />
         </>
     );
 }

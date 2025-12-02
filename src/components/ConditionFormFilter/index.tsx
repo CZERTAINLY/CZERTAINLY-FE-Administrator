@@ -5,7 +5,7 @@ import FilterWidgetRuleAction from 'components/FilterWidgetRuleAction';
 import { ExecutionFormValues } from 'components/_pages/executions/form';
 import { EntityType, actions as filterActions } from 'ducks/filters';
 import { useEffect, useMemo } from 'react';
-import { useForm } from 'react-final-form';
+import { useFormContext } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { Resource } from 'types/openapi';
 import { filterToConditionItems } from 'utils/rules';
@@ -19,8 +19,8 @@ interface ConditionGroupFormFilterProps {
 }
 
 const ConditionFormFilter = ({ resource, formType, includeIgnoreAction }: ConditionGroupFormFilterProps) => {
-    const form = useForm<ConditionFormValues>();
-    const actionGroupForm = useForm<ExecutionFormValues>();
+    const form = useFormContext<ConditionFormValues>();
+    const actionGroupForm = useFormContext<ExecutionFormValues>();
 
     const dispatch = useDispatch();
 
@@ -43,7 +43,7 @@ const ConditionFormFilter = ({ resource, formType, includeIgnoreAction }: Condit
                     }
                     includeIgnoreAction={includeIgnoreAction}
                     onActionsUpdate={(currentActions) => {
-                        actionGroupForm.change('items', currentActions);
+                        actionGroupForm.setValue('items', currentActions);
                     }}
                 />
             </div>
@@ -59,7 +59,7 @@ const ConditionFormFilter = ({ resource, formType, includeIgnoreAction }: Condit
                     }
                     onFilterUpdate={(currentFilters) => {
                         const currentConditionItems = filterToConditionItems(currentFilters);
-                        form.change('items', currentConditionItems);
+                        form.setValue('items', currentConditionItems);
                     }}
                 />
             </div>

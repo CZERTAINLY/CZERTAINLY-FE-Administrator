@@ -3,9 +3,10 @@ import Dialog from 'components/Dialog';
 
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
+import RoleForm from '../RoleForm';
 
 import { actions, selectors } from 'ducks/roles';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 
@@ -31,8 +32,10 @@ export default function UserDetail() {
 
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
     const isFetchingPermissions = useSelector(selectors.isFetchingPermissions);
+    const isUpdating = useSelector(selectors.isUpdating);
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
     const memoizedRole = useMemo(() => role, [role]);
 
@@ -58,9 +61,24 @@ export default function UserDetail() {
         getFreshPermissions();
     }, [getFreshPermissions]);
 
+    const wasUpdating = useRef(isUpdating);
+
+    useEffect(() => {
+        if (wasUpdating.current && !isUpdating) {
+            setIsEditModalOpen(false);
+            getFreshDetails();
+        }
+        wasUpdating.current = isUpdating;
+    }, [isUpdating, getFreshDetails]);
+
+    const handleCloseEditModal = useCallback(() => {
+        setIsEditModalOpen(false);
+    }, []);
+
     const onEditClick = useCallback(() => {
-        navigate(`../../roles/edit/${role?.uuid}`);
-    }, [role, navigate]);
+        if (!role) return;
+        setIsEditModalOpen(true);
+    }, [role]);
 
     const onEditRoleUsersClick = useCallback(() => {
         navigate(`../../roles/users/${role?.uuid}`);
@@ -321,6 +339,14 @@ export default function UserDetail() {
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
+            />
+
+            <Dialog
+                isOpen={isEditModalOpen}
+                toggle={handleCloseEditModal}
+                caption="Edit Role"
+                size="xl"
+                body={<RoleForm roleId={role?.uuid} onCancel={handleCloseEditModal} />}
             />
         </div>
     );

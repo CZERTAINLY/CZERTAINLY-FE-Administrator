@@ -294,13 +294,13 @@ function CustomTable({
     );
 
     const onPageSizeChange = useCallback(
-        (value: string) => {
+        (value: string | number) => {
             if (onPageSizeChanged) {
-                onPageSizeChanged(parseInt(value));
+                onPageSizeChanged(typeof value === 'string' ? parseInt(value) : value);
                 return;
             }
 
-            setPageSize(parseInt(value));
+            setPageSize(typeof value === 'string' ? parseInt(value) : value);
             setPage(1);
         },
         [onPageSizeChanged],
@@ -389,7 +389,7 @@ function CustomTable({
         if (!row.options) return undefined;
         const style: React.CSSProperties = {};
         if (row.options.useAccentBottomBorder) {
-            Object.assign(style, { borderBottom: '2px solid gray' } as React.CSSProperties);
+            Object.assign(style, { borderBottom: '1px solid' } as React.CSSProperties);
         }
         return style;
     }, []);
@@ -511,22 +511,24 @@ function CustomTable({
                     </div>
                 </div>
             )}
-            <div className="py-2">
-                <div className={cn('overflow-x-auto rounded-md', { 'border border-gray-100': hasHeader })}>
-                    <div className="min-w-full inline-block align-middle">
-                        <div className="overflow-hidden">
-                            <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
-                                {hasHeader && (
-                                    <thead className="bg-gray-50 dark:bg-neutral-700">
-                                        <tr>{header}</tr>
-                                    </thead>
-                                )}
-                                <tbody className="divide-y divide-gray-200 dark:divide-neutral-700">{body}</tbody>
-                            </table>
+            {body?.length > 0 && (
+                <div className="py-2">
+                    <div className={cn('overflow-x-auto rounded-md', { 'border border-gray-100': hasHeader })}>
+                        <div className="min-w-full inline-block align-middle">
+                            <div className="overflow-hidden">
+                                <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
+                                    {hasHeader && (
+                                        <thead className="bg-gray-50 dark:bg-neutral-700">
+                                            <tr>{header}</tr>
+                                        </thead>
+                                    )}
+                                    <tbody className="divide-y divide-gray-200 dark:divide-neutral-700">{body}</tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            )}
             {hasPagination && (
                 <div className="flex justify-between items-center gap-2">
                     <div>

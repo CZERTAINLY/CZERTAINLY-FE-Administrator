@@ -1,24 +1,31 @@
-import CheckboxField from 'components/Input/CheckboxField';
-import TextField from 'components/Input/TextField';
 import ProgressButton from 'components/ProgressButton';
 import Widget from 'components/Widget';
 
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions, selectors } from 'ducks/globalMetadata';
-import { useCallback, useEffect, useMemo } from 'react';
-import { Field, Form } from 'react-final-form';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router';
-import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
+import { useParams } from 'react-router';
+import Button from 'components/Button';
+import Container from 'components/Container';
+import Switch from 'components/Switch';
+import TextInput from 'components/TextInput';
 import { GlobalMetadataCreateRequestModel, GlobalMetadataUpdateRequestModel } from 'types/globalMetadata';
 import { AttributeContentType, PlatformEnum } from 'types/openapi';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
+import Select from 'components/Select';
+interface GlobalMetadataFormProps {
+    globalMetadataId?: string;
+    onCancel?: () => void;
+    onSuccess?: () => void;
+}
 
-export default function GlobalMetadataForm() {
+export default function GlobalMetadataForm({ globalMetadataId, onCancel, onSuccess }: GlobalMetadataFormProps) {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
-    const { id } = useParams();
+    const { id: routeId } = useParams();
+    const id = globalMetadataId || routeId;
     const editMode = useMemo(() => !!id, [id]);
 
     const globalMetadataDetail = useSelector(selectors.globalMetadata);
@@ -46,6 +53,27 @@ export default function GlobalMetadataForm() {
         [globalMetadataDetail, defaultValuesCreate],
     );
 
+    const methods = useForm<GlobalMetadataCreateRequestModel>({
+        defaultValues: editMode ? defaultValuesUpdate : defaultValuesCreate,
+        mode: 'onChange',
+    });
+
+    const {
+        handleSubmit,
+        control,
+        formState: { isDirty, isSubmitting, isValid },
+    } = methods;
+
+    // Helper function to convert validators for react-hook-form
+    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
+        return {
+            validate: (value: any) => {
+                const composed = composeValidators(...validators);
+                return composed(value);
+            },
+        };
+    };
+
     const onSubmit = useCallback(
         (values: GlobalMetadataCreateRequestModel) =>
             editMode
@@ -60,72 +88,191 @@ export default function GlobalMetadataForm() {
     );
 
     useEffect(() => {
-        if (editMode && id !== globalMetadataDetail?.uuid) {
-            dispatch(actions.getGlobalMetadata(id!));
+        if (editMode && id && id !== globalMetadataDetail?.uuid) {
+            dispatch(actions.getGlobalMetadata(id));
         }
     }, [dispatch, editMode, id, globalMetadataDetail?.uuid]);
 
+    const wasCreating = useRef(isCreating);
+    const wasUpdating = useRef(isUpdating);
+
+    useEffect(() => {
+        if (wasCreating.current && !isCreating) {
+            if (onSuccess) {
+                onSuccess();
+            }
+        }
+        wasCreating.current = isCreating;
+    }, [isCreating, onSuccess]);
+
+    useEffect(() => {
+        if (wasUpdating.current && !isUpdating) {
+            if (onSuccess) {
+                onSuccess();
+            }
+        }
+        wasUpdating.current = isUpdating;
+    }, [isUpdating, onSuccess]);
+
+    const contentTypeOptions = useMemo(
+        () =>
+            Object.values(AttributeContentType).map((contentType) => ({
+                value: contentType,
+                label: getEnumLabel(attributeContentTypeEnum, contentType),
+            })),
+        [attributeContentTypeEnum],
+    );
+
     return (
-        <Widget title={editMode ? 'Edit Global Metadata' : 'Add Global Metadata'} busy={isBusy}>
-            <Form<GlobalMetadataCreateRequestModel>
-                initialValues={editMode ? defaultValuesUpdate : defaultValuesCreate}
-                onSubmit={onSubmit}
-            >
-                {({ handleSubmit, pristine, submitting, valid, values, form }) => (
-                    <BootstrapForm onSubmit={handleSubmit}>
-                        <TextField
-                            label={'Name'}
-                            id={'name'}
-                            disabled={editMode}
-                            validators={[validateRequired(), validateAlphaNumericWithSpecialChars()]}
-                        />
-                        <TextField label={'Label'} id={'label'} validators={[validateRequired(), validateAlphaNumericWithSpecialChars()]} />
-                        <TextField label={'Description'} id={'description'} validators={[validateLength(0, 300)]} />
-
-                        <Field name="contentType" validate={composeValidators(validateRequired())}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="contentType">Content Type</Label>
-                                    <Input
-                                        {...input}
-                                        valid={!meta.error && meta.touched}
-                                        invalid={!!meta.error && meta.touched}
-                                        type="select"
-                                        id="contentType"
-                                        placeholder="Content Type"
-                                        disabled={editMode}
-                                    >
-                                        {Object.values(AttributeContentType).map((contentType) => (
-                                            <option key={contentType} value={contentType}>
-                                                {getEnumLabel(attributeContentTypeEnum, contentType)}
-                                            </option>
-                                        ))}
-                                    </Input>
-                                    <FormFeedback>{meta.error}</FormFeedback>
-                                </FormGroup>
-                            )}
-                        </Field>
-
-                        <TextField label={'Group'} id={'group'} validators={[validateAlphaNumericWithSpecialChars()]} />
-
-                        <CheckboxField label={'Visible'} id={'visible'} />
-
-                        <div className="d-flex justify-content-end">
-                            <ButtonGroup>
-                                <ProgressButton
-                                    title={editMode ? 'Update' : 'Create'}
-                                    inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
-                                    inProgress={submitting}
-                                    disabled={pristine || submitting || !valid}
+        <FormProvider {...methods}>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <Widget noBorder busy={isBusy}>
+                    <div className="space-y-4">
+                        <Controller
+                            name="name"
+                            control={control}
+                            rules={buildValidationRules([validateRequired(), validateAlphaNumericWithSpecialChars()])}
+                            render={({ field, fieldState }) => (
+                                <TextInput
+                                    {...field}
+                                    id="name"
+                                    type="text"
+                                    label="Name"
+                                    required
+                                    disabled={editMode}
+                                    invalid={fieldState.error && fieldState.isTouched}
+                                    error={
+                                        fieldState.error && fieldState.isTouched
+                                            ? typeof fieldState.error === 'string'
+                                                ? fieldState.error
+                                                : fieldState.error?.message || 'Invalid value'
+                                            : undefined
+                                    }
                                 />
-                                <Button color="default" onClick={() => navigate(-1)} disabled={submitting}>
-                                    Cancel
-                                </Button>
-                            </ButtonGroup>
+                            )}
+                        />
+
+                        <Controller
+                            name="label"
+                            control={control}
+                            rules={buildValidationRules([validateRequired(), validateAlphaNumericWithSpecialChars()])}
+                            render={({ field, fieldState }) => (
+                                <TextInput
+                                    {...field}
+                                    id="label"
+                                    type="text"
+                                    label="Label"
+                                    required
+                                    invalid={fieldState.error && fieldState.isTouched}
+                                    error={
+                                        fieldState.error && fieldState.isTouched
+                                            ? typeof fieldState.error === 'string'
+                                                ? fieldState.error
+                                                : fieldState.error?.message || 'Invalid value'
+                                            : undefined
+                                    }
+                                />
+                            )}
+                        />
+
+                        <Controller
+                            name="description"
+                            control={control}
+                            rules={buildValidationRules([validateLength(0, 300)])}
+                            render={({ field, fieldState }) => (
+                                <TextInput
+                                    {...field}
+                                    id="description"
+                                    type="text"
+                                    label="Description"
+                                    invalid={fieldState.error && fieldState.isTouched}
+                                    error={
+                                        fieldState.error && fieldState.isTouched
+                                            ? typeof fieldState.error === 'string'
+                                                ? fieldState.error
+                                                : fieldState.error?.message || 'Invalid value'
+                                            : undefined
+                                    }
+                                />
+                            )}
+                        />
+
+                        <div>
+                            <label htmlFor="contentType" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
+                                Content Type <span className="text-red-500">*</span>
+                            </label>
+                            <Controller
+                                name="contentType"
+                                control={control}
+                                rules={buildValidationRules([validateRequired()])}
+                                render={({ field, fieldState }) => (
+                                    <>
+                                        <Select
+                                            id="contentType"
+                                            value={field.value || ''}
+                                            onChange={(value) => {
+                                                field.onChange(value);
+                                            }}
+                                            options={contentTypeOptions}
+                                            placeholder="Content Type"
+                                            disabled={editMode}
+                                            placement="bottom"
+                                        />
+                                        {fieldState.error && fieldState.isTouched && (
+                                            <p className="mt-1 text-sm text-red-600">
+                                                {typeof fieldState.error === 'string'
+                                                    ? fieldState.error
+                                                    : fieldState.error?.message || 'Invalid value'}
+                                            </p>
+                                        )}
+                                    </>
+                                )}
+                            />
                         </div>
-                    </BootstrapForm>
-                )}
-            </Form>
-        </Widget>
+
+                        <Controller
+                            name="group"
+                            control={control}
+                            rules={buildValidationRules([validateAlphaNumericWithSpecialChars()])}
+                            render={({ field, fieldState }) => (
+                                <TextInput
+                                    {...field}
+                                    id="group"
+                                    type="text"
+                                    label="Group"
+                                    invalid={fieldState.error && fieldState.isTouched}
+                                    error={
+                                        fieldState.error && fieldState.isTouched
+                                            ? typeof fieldState.error === 'string'
+                                                ? fieldState.error
+                                                : fieldState.error?.message || 'Invalid value'
+                                            : undefined
+                                    }
+                                />
+                            )}
+                        />
+
+                        <Controller
+                            name="visible"
+                            control={control}
+                            render={({ field }) => <Switch id="visible" checked={field.value} onChange={field.onChange} label="Visible" />}
+                        />
+
+                        <Container className="flex-row justify-end modal-footer" gap={4}>
+                            <Button variant="outline" onClick={onCancel} disabled={isSubmitting} type="button">
+                                Cancel
+                            </Button>
+                            <ProgressButton
+                                title={editMode ? 'Update' : 'Create'}
+                                inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
+                                inProgress={isSubmitting}
+                                disabled={!isDirty || isSubmitting || !isValid}
+                                type="submit"
+                            />
+                        </Container>
+                    </div>
+                </Widget>
+            </form>
+        </FormProvider>
     );
 }

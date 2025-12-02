@@ -1,12 +1,13 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router';
+import { Link } from 'react-router';
 import { Container, Table } from 'reactstrap';
 
 import { actions, selectors } from 'ducks/authorities';
 
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
+import AuthorityForm from '../form';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { LockWidgetNameEnum } from 'types/user-interface';
@@ -14,7 +15,6 @@ import Badge from 'components/Badge';
 
 function AuthorityList() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const checkedRows = useSelector(selectors.checkedRows);
     const authorities = useSelector(selectors.authorities);
@@ -26,11 +26,14 @@ function AuthorityList() {
     const isUpdating = useSelector(selectors.isUpdating);
     const isBulkDeleting = useSelector(selectors.isBulkDeleting);
     const isBulkForceDeleting = useSelector(selectors.isBulkForceDeleting);
+    const isCreating = useSelector(selectors.isCreating);
+
+    const isBusy = isFetching || isDeleting || isUpdating || isBulkDeleting || isBulkForceDeleting;
 
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [confirmForceDelete, setConfirmForceDelete] = useState<boolean>(false);
-
-    const isBusy = isFetching || isDeleting || isUpdating || isBulkDeleting || isBulkForceDeleting;
+    const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+    const [editingAuthorityId, setEditingAuthorityId] = useState<string | undefined>(undefined);
 
     const getFreshData = useCallback(() => {
         dispatch(actions.setCheckedRows({ checkedRows: [] }));
@@ -46,9 +49,37 @@ function AuthorityList() {
         setConfirmForceDelete(bulkDeleteErrorMessages.length > 0);
     }, [bulkDeleteErrorMessages]);
 
+    const wasCreating = useRef(isCreating);
+    const wasUpdating = useRef(isUpdating);
+
+    useEffect(() => {
+        if (wasCreating.current && !isCreating) {
+            setIsAddModalOpen(false);
+            getFreshData();
+        }
+        wasCreating.current = isCreating;
+    }, [isCreating, getFreshData]);
+
+    useEffect(() => {
+        if (wasUpdating.current && !isUpdating) {
+            setEditingAuthorityId(undefined);
+            getFreshData();
+        }
+        wasUpdating.current = isUpdating;
+    }, [isUpdating, getFreshData]);
+
+    const handleOpenAddModal = useCallback(() => {
+        setIsAddModalOpen(true);
+    }, []);
+
+    const handleCloseAddModal = useCallback(() => {
+        setIsAddModalOpen(false);
+        setEditingAuthorityId(undefined);
+    }, []);
+
     const onAddClick = useCallback(() => {
-        navigate('./add');
-    }, [navigate]);
+        handleOpenAddModal();
+    }, [handleOpenAddModal]);
 
     const setCheckedRows = useCallback(
         (rows: (string | number)[]) => {
@@ -74,9 +105,7 @@ function AuthorityList() {
                 icon: 'plus',
                 disabled: false,
                 tooltip: 'Create',
-                onClick: () => {
-                    onAddClick();
-                },
+                onClick: handleOpenAddModal,
             },
             {
                 icon: 'trash',
@@ -87,7 +116,7 @@ function AuthorityList() {
                 },
             },
         ],
-        [checkedRows, onAddClick],
+        [checkedRows, handleOpenAddModal],
     );
 
     const authoritiesRowHeaders: TableHeader[] = useMemo(
@@ -211,6 +240,14 @@ function AuthorityList() {
                     { color: 'danger', onClick: onForceDeleteConfirmed, body: 'Force delete' },
                     { color: 'secondary', variant: 'outline', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
                 ]}
+            />
+
+            <Dialog
+                isOpen={isAddModalOpen || !!editingAuthorityId}
+                toggle={handleCloseAddModal}
+                caption={editingAuthorityId ? 'Edit Authority' : 'Create Authority'}
+                size="xl"
+                body={<AuthorityForm authorityId={editingAuthorityId} onCancel={handleCloseAddModal} onSuccess={handleCloseAddModal} />}
             />
         </Container>
     );

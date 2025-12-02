@@ -1,7 +1,5 @@
-import cx from 'classnames';
 import Tabs from 'components/Tabs';
-import { useEffect, useMemo, useState } from 'react';
-import { TabContent, TabPane } from 'reactstrap';
+import { useMemo, useState, useEffect } from 'react';
 import Widget from 'components/Widget';
 
 type Props = {
@@ -23,6 +21,14 @@ export default function TabLayout({ tabs, onlyActiveTabContent = true, selectedT
     const memoizedTabs = useMemo(() => {
         return tabs.filter((e) => !e.hidden);
     }, [tabs]);
+
+    useEffect(() => {
+        if (selectedTab !== undefined && selectedTab !== activeTab) {
+            setActiveTab(selectedTab);
+        } else if (tabs.length <= activeTab) {
+            setActiveTab(0);
+        }
+    }, [activeTab, tabs, selectedTab]);
 
     return (
         <Widget noBorder={noBorder}>

@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
-import { Form } from 'react-final-form';
+import { FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { ButtonGroup, Form as BootstrapForm, Button, Label } from 'reactstrap';
+import Button from 'components/Button';
 import { validateNonZeroInteger, validatePositiveInteger } from 'utils/validators';
 
 import Spinner from 'components/Spinner';
@@ -36,16 +36,30 @@ export default function CertificateValidationDialogBody({ raProfile, platformSet
     const isUpdating = useSelector(selectors.isUpdating);
     const isBusy = useMemo(() => isUpdating, [isUpdating]);
 
-    const initialValues = useMemo(() => {
-        if (!raProfile?.certificateValidationSettings) return {};
+    const defaultValues: FormValues = useMemo(() => {
+        if (!raProfile?.certificateValidationSettings) {
+            return {
+                usePlatformSettings: false,
+                enabled: false,
+                frequency: undefined,
+                expiringThreshold: undefined,
+            };
+        }
 
         return {
             usePlatformSettings: raProfile.certificateValidationSettings.usePlatformSettings,
             enabled: raProfile.certificateValidationSettings.enabled,
             frequency: raProfile.certificateValidationSettings.frequency?.toString(),
             expiringThreshold: raProfile.certificateValidationSettings.expiringThreshold?.toString(),
-        } as FormValues;
+        };
     }, [raProfile]);
+
+    const methods = useForm<FormValues>({
+        mode: 'onTouched',
+        defaultValues,
+    });
+
+    const { control, handleSubmit, formState, watch } = methods;
 
     const onSubmit = useCallback(
         (values: FormValues) => {
@@ -68,13 +82,11 @@ export default function CertificateValidationDialogBody({ raProfile, platformSet
         [dispatch, raProfile, onClose],
     );
 
-    const areDefaultValuesSame = useCallback(
-        (values: FormValues) => {
-            const areValuesSame = isObjectSame(values, initialValues);
-            return areValuesSame;
-        },
-        [initialValues],
-    );
+    const watchedValues = useWatch({ control });
+    const areDefaultValuesSame = useCallback(() => {
+        const areValuesSame = isObjectSame(watchedValues, defaultValues);
+        return areValuesSame;
+    }, [watchedValues, defaultValues]);
     const certificateValidationHeaders: TableHeader[] = useMemo(
         () => [
             {
@@ -115,61 +127,60 @@ export default function CertificateValidationDialogBody({ raProfile, platformSet
         return data;
     }, [platformSettings]);
 
+    const watchedUsePlatformSettings = useWatch({ control, name: 'usePlatformSettings' });
+    const watchedEnabled = useWatch({ control, name: 'enabled' });
+
     if (!raProfile) return <></>;
 
     return (
         <>
-            <Form initialValues={initialValues} onSubmit={onSubmit}>
-                {({ handleSubmit, pristine, submitting, valid, values }) => (
-                    <BootstrapForm onSubmit={handleSubmit} className="mt-2">
-                        <SwitchField id="usePlatformSettings" label="Use Platform Certificate Validation Settings" />
-                        {values.usePlatformSettings ? (
-                            <>
-                                <Label>Current Platform Settings</Label>
-                                <CustomTable headers={certificateValidationHeaders} data={certificateValidationData} />
-                            </>
-                        ) : (
-                            <>
-                                <SwitchField id="enabled" label="Enable Certificate Validation" />
-                                {values.enabled && (
-                                    <>
-                                        <TextField
-                                            id="frequency"
-                                            label="Validation Frequency"
-                                            description="Validation frequency of certificates specified in days."
-                                            validators={[validateNonZeroInteger(), validatePositiveInteger()]}
-                                            inputType="number"
-                                        />
-                                        <TextField
-                                            id="expiringThreshold"
-                                            label="Expiring Threshold"
-                                            description="How many days before expiration should certificate's validation status change to Expiring."
-                                            validators={[validateNonZeroInteger(), validatePositiveInteger()]}
-                                            inputType="number"
-                                        />
-                                    </>
-                                )}
-                            </>
-                        )}
-                        {
-                            <div className="d-flex justify-content-end">
-                                <ButtonGroup>
-                                    <ProgressButton
-                                        title={'Save'}
-                                        inProgressTitle={'Saving...'}
-                                        disabled={submitting || isBusy || areDefaultValuesSame(values)}
-                                        inProgress={submitting || isBusy}
-                                        type="submit"
+            <FormProvider {...methods}>
+                <form onSubmit={handleSubmit(onSubmit)} className="mt-2">
+                    <SwitchField id="usePlatformSettings" label="Use Platform Certificate Validation Settings" />
+                    {watchedUsePlatformSettings ? (
+                        <>
+                            <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
+                                Current Platform Settings
+                            </label>
+                            <CustomTable headers={certificateValidationHeaders} data={certificateValidationData} />
+                        </>
+                    ) : (
+                        <>
+                            <SwitchField id="enabled" label="Enable Certificate Validation" />
+                            {watchedEnabled && (
+                                <>
+                                    <TextField
+                                        id="frequency"
+                                        label="Validation Frequency"
+                                        description="Validation frequency of certificates specified in days."
+                                        validators={[validateNonZeroInteger(), validatePositiveInteger()]}
+                                        inputType="number"
                                     />
-                                    <Button type="button" color="secondary" disabled={submitting} onClick={onClose}>
-                                        Cancel
-                                    </Button>
-                                </ButtonGroup>
-                            </div>
-                        }
-                    </BootstrapForm>
-                )}
-            </Form>
+                                    <TextField
+                                        id="expiringThreshold"
+                                        label="Expiring Threshold"
+                                        description="How many days before expiration should certificate's validation status change to Expiring."
+                                        validators={[validateNonZeroInteger(), validatePositiveInteger()]}
+                                        inputType="number"
+                                    />
+                                </>
+                            )}
+                        </>
+                    )}
+                    <div className="flex justify-end gap-2">
+                        <ProgressButton
+                            title={'Save'}
+                            inProgressTitle={'Saving...'}
+                            disabled={formState.isSubmitting || isBusy || areDefaultValuesSame()}
+                            inProgress={formState.isSubmitting || isBusy}
+                            type="submit"
+                        />
+                        <Button type="button" variant="outline" color="secondary" disabled={formState.isSubmitting} onClick={onClose}>
+                            Cancel
+                        </Button>
+                    </div>
+                </form>
+            </FormProvider>
 
             <Spinner active={isBusy} />
         </>

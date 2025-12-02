@@ -92,6 +92,7 @@ export interface WidgetButtonProps {
 interface Props {
     buttons: WidgetButtonProps[];
     justify?: 'start' | 'end' | 'center';
+    className?: string;
 }
 
 const getIcon = (icon: IconName, size: number = 20): React.ReactNode => {
@@ -140,7 +141,7 @@ const getIcon = (icon: IconName, size: number = 20): React.ReactNode => {
     return IconComponent ? <IconComponent size={16} /> : null;
 };
 
-function WidgetButtons({ buttons, justify = 'center' }: Props) {
+function WidgetButtons({ buttons, justify = 'center', className }: Props) {
     const renderButton = (button: WidgetButtonProps) => {
         let toolTip: React.ReactNode | undefined;
 
@@ -167,11 +168,15 @@ function WidgetButtons({ buttons, justify = 'center' }: Props) {
         renderedButtons.push(renderButton(button));
     });
 
-    const wrapperClassName = cn('flex ml-2', {
-        'justify-start': justify === 'start',
-        'justify-center': justify === 'center',
-        'justify-end': justify === 'end',
-    });
+    const wrapperClassName = cn(
+        'flex ml-2 items-center gap-1',
+        {
+            'justify-start': justify === 'start',
+            'justify-center': justify === 'center',
+            'justify-end': justify === 'end',
+        },
+        className,
+    );
 
     return <div className={wrapperClassName}>{renderedButtons}</div>;
 }

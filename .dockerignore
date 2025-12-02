@@ -27,7 +27,7 @@ yarn-error.log*
 # Proxy Files
 src/gateway_client_key.pem
 src/gateway_client_cert.pem
-src/setupProxy.js
+src/setupProxy.cjs
 
 # Docker
 Dockerfile

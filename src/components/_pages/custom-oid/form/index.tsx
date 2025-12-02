@@ -2,7 +2,6 @@ import Widget from 'components/Widget';
 import { actions, selectors } from 'ducks/oids';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router';
 import {
     CustomOidEntryRequestDto,
     CustomOidEntryUpdateRequestDto,
@@ -10,31 +9,37 @@ import {
     OidCategory,
     PlatformEnum,
 } from 'types/openapi';
-import { mutators } from 'utils/attributes/attributeEditorMutators';
-import { Field, Form } from 'react-final-form';
+import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { validateLength, composeValidators, validateRequired, validateOid, validateOidCode } from 'utils/validators';
-import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
-import Select from 'react-select';
+import Select from 'components/Select';
+import Button from 'components/Button';
+import Container from 'components/Container';
 import ProgressButton from 'components/ProgressButton';
 import { selectors as enumSelectors } from 'ducks/enums';
 import MultipleValueTextInput from 'components/Input/MultipleValueTextInput';
+import TextInput from 'components/TextInput';
+import TextArea from 'components/TextArea';
+import Label from 'components/Label';
+
+interface CustomOIDFormProps {
+    oidId?: string;
+    onCancel: () => void;
+    onSuccess?: () => void;
+}
 
 interface FormValues {
-    oid: string | undefined;
-    displayName: string | undefined;
-    description: string | undefined;
-    category: { value: string; label: string } | undefined;
+    oid: string;
+    displayName: string;
+    description: string;
+    category: string;
     code?: string;
     alternativeCode?: string[];
 }
 
-export default function CustomOIDForm() {
+export default function CustomOIDForm({ oidId, onCancel, onSuccess }: CustomOIDFormProps) {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
-    const { id } = useParams();
-
-    const editMode = useMemo(() => !!id, [id]);
+    const editMode = useMemo(() => !!oidId, [oidId]);
 
     const oidSelector = useSelector(selectors.oid);
     const isFetching = useSelector(selectors.isFetching);
@@ -44,22 +49,18 @@ export default function CustomOIDForm() {
     const [oid, setOid] = useState<CustomOidEntryRequestDto>();
 
     useEffect(() => {
-        if (editMode && id) {
-            dispatch(actions.getOID({ oid: id }));
+        if (editMode && oidId) {
+            dispatch(actions.getOID({ oid: oidId }));
         }
-    }, [dispatch, editMode, id]);
+    }, [dispatch, editMode, oidId]);
 
     useEffect(() => {
-        if (editMode && oidSelector?.oid === id) {
+        if (editMode && oidSelector?.oid === oidId) {
             setOid(oidSelector);
         }
-    }, [dispatch, editMode, id, oidSelector]);
+    }, [dispatch, editMode, oidId, oidSelector]);
 
     const isBusy = useMemo(() => isFetching || isCreating || isUpdating, [isFetching, isCreating, isUpdating]);
-
-    const onCancel = useCallback(() => {
-        navigate(-1);
-    }, [navigate]);
 
     const submitTitle = useMemo(() => (editMode ? 'Save' : 'Create'), [editMode]);
 
@@ -82,26 +83,52 @@ export default function CustomOIDForm() {
     }, [oidCategoryEnum]);
 
     const defaultValues: FormValues = useMemo(() => {
-        const categoryOption = oid?.category ? categoryList.find((c) => c.value === oid.category) : undefined;
+        const categoryValue = oid?.category ? oid.category : '';
 
         return {
-            oid: editMode ? oid?.oid : undefined,
-            displayName: editMode ? oid?.displayName : undefined,
-            description: editMode ? oid?.description : undefined,
-            category: editMode ? categoryOption : undefined,
+            oid: editMode ? oid?.oid || '' : '',
+            displayName: editMode ? oid?.displayName || '' : '',
+            description: editMode ? oid?.description || '' : '',
+            category: categoryValue,
             code: editMode ? oid?.additionalProperties?.code : undefined,
             alternativeCode: editMode ? oid?.additionalProperties?.altCodes : undefined,
         };
-    }, [oid, editMode, categoryList]);
+    }, [oid, editMode]);
+
+    const methods = useForm<FormValues>({
+        defaultValues,
+        mode: 'onChange',
+    });
+
+    const {
+        handleSubmit,
+        control,
+        formState: { isDirty, isSubmitting, isValid },
+    } = methods;
+
+    const watchedCategory = useWatch({
+        control,
+        name: 'category',
+    });
+
+    // Helper function to convert validators for react-hook-form
+    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
+        return {
+            validate: (value: any) => {
+                const composed = composeValidators(...validators);
+                return composed(value);
+            },
+        };
+    };
 
     const onSubmit = useCallback(
-        (values: FormValues, form: any) => {
+        (values: FormValues) => {
             const newOID = {
-                oid: values.oid!,
-                displayName: values.displayName!,
+                oid: values.oid,
+                displayName: values.displayName,
                 description: values.description,
-                category: values.category?.value as OidCategory,
-                ...(values.category?.value === OidCategory.RdnAttributeType && {
+                category: values.category as OidCategory,
+                ...(values.category === OidCategory.RdnAttributeType && {
                     additionalProperties: {
                         code: values.code,
                         altCodes: values.alternativeCode ?? undefined,
@@ -109,7 +136,7 @@ export default function CustomOIDForm() {
                 }),
             };
             if (editMode) {
-                dispatch(actions.updateOID({ oid: id!, data: newOID as CustomOidEntryUpdateRequestDto }));
+                dispatch(actions.updateOID({ oid: oidId!, data: newOID as CustomOidEntryUpdateRequestDto }));
             } else {
                 dispatch(
                     actions.createOID({
@@ -118,154 +145,183 @@ export default function CustomOIDForm() {
                 );
             }
         },
-        [dispatch, editMode, id],
+        [dispatch, editMode, oidId],
     );
 
     return (
-        <Widget title={title} busy={isBusy}>
-            <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
-                {({ handleSubmit, pristine, submitting, values, valid, form }) => (
-                    <BootstrapForm onSubmit={handleSubmit}>
-                        <Field name="oid" validate={composeValidators(validateRequired(), validateOid())}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="oid">OID*</Label>
-                                    <Input
-                                        disabled={editMode}
-                                        required
-                                        id="oid"
-                                        {...input}
-                                        valid={!meta.error && meta.touched}
-                                        invalid={!!meta.error && meta.touched}
-                                        type="text"
-                                        placeholder="Enter the OID"
-                                    />
-                                    <FormFeedback>{meta.error}</FormFeedback>
-                                </FormGroup>
+        <FormProvider {...methods}>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <Widget noBorder busy={isBusy}>
+                    <div className="space-y-4">
+                        <Controller
+                            name="oid"
+                            control={control}
+                            rules={buildValidationRules([validateRequired(), validateOid()])}
+                            render={({ field, fieldState }) => (
+                                <TextInput
+                                    {...field}
+                                    id="oid"
+                                    type="text"
+                                    label="OID"
+                                    required
+                                    placeholder="Enter the OID"
+                                    disabled={editMode}
+                                    invalid={fieldState.error && fieldState.isTouched}
+                                    error={
+                                        fieldState.error && fieldState.isTouched
+                                            ? typeof fieldState.error === 'string'
+                                                ? fieldState.error
+                                                : fieldState.error?.message || 'Invalid value'
+                                            : undefined
+                                    }
+                                />
                             )}
-                        </Field>
-                        <Field name="displayName" validate={validateRequired()}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="displayName">Display Name*</Label>
-                                    <Input
-                                        id="displayName"
-                                        {...input}
-                                        valid={!meta.error && meta.touched}
-                                        invalid={!!meta.error && meta.touched}
-                                        type="text"
-                                        placeholder="Enter the Display name"
-                                    />
-                                    <FormFeedback>{meta.error}</FormFeedback>
-                                </FormGroup>
+                        />
+                        <Controller
+                            name="displayName"
+                            control={control}
+                            rules={buildValidationRules([validateRequired()])}
+                            render={({ field, fieldState }) => (
+                                <TextInput
+                                    {...field}
+                                    id="displayName"
+                                    type="text"
+                                    label="Display Name"
+                                    required
+                                    placeholder="Enter the Display name"
+                                    invalid={fieldState.error && fieldState.isTouched}
+                                    error={
+                                        fieldState.error && fieldState.isTouched
+                                            ? typeof fieldState.error === 'string'
+                                                ? fieldState.error
+                                                : fieldState.error?.message || 'Invalid value'
+                                            : undefined
+                                    }
+                                />
                             )}
-                        </Field>
-                        <Field name="description" validate={composeValidators(validateLength(0, 300))}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="description">Description</Label>
-                                    <Input
-                                        id="description"
-                                        {...input}
-                                        type="textarea"
-                                        className="form-control"
-                                        placeholder="Enter Description / Comment"
-                                        valid={!meta.error && meta.touched}
-                                        invalid={!!meta.error && meta.touched}
-                                    />
-                                    <FormFeedback>{meta.error}</FormFeedback>
-                                </FormGroup>
+                        />
+                        <Controller
+                            name="description"
+                            control={control}
+                            rules={buildValidationRules([validateLength(0, 300)])}
+                            render={({ field, fieldState }) => (
+                                <TextArea
+                                    {...field}
+                                    id="description"
+                                    label="Description"
+                                    rows={3}
+                                    placeholder="Enter Description / Comment"
+                                    invalid={fieldState.error && fieldState.isTouched}
+                                    error={
+                                        fieldState.error && fieldState.isTouched
+                                            ? typeof fieldState.error === 'string'
+                                                ? fieldState.error
+                                                : fieldState.error?.message || 'Invalid value'
+                                            : undefined
+                                    }
+                                />
                             )}
-                        </Field>
-                        <Field name="category" validate={validateRequired()}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="category">Select Category*</Label>
+                        />
+                        <Controller
+                            name="category"
+                            control={control}
+                            rules={buildValidationRules([validateRequired()])}
+                            render={({ field, fieldState }) => (
+                                <>
                                     <Select
-                                        isDisabled={editMode}
-                                        required
-                                        {...input}
-                                        id="category"
-                                        inputId="categorySelect"
-                                        maxMenuHeight={140}
-                                        menuPlacement="auto"
-                                        options={categoryList}
-                                        onChange={(event) => {
-                                            input.onChange(event);
+                                        id="categorySelect"
+                                        label="Select Category"
+                                        value={field.value || ''}
+                                        onChange={(value) => {
+                                            field.onChange(value);
                                         }}
+                                        options={categoryList.map((c) => ({ value: c.value, label: c.label }))}
                                         placeholder="Select Category"
-                                        styles={{
-                                            control: (provided) =>
-                                                meta.touched && meta.invalid
-                                                    ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
-                                                    : { ...provided },
-                                        }}
+                                        isDisabled={editMode}
+                                        placement="bottom"
                                     />
-                                    {meta.touched && meta.error && (
-                                        <div className="invalid-feedback" style={{ display: 'block' }}>
-                                            {meta.error}
-                                        </div>
+                                    {fieldState.error && fieldState.isTouched && (
+                                        <p className="mt-1 text-sm text-red-600">
+                                            {typeof fieldState.error === 'string'
+                                                ? fieldState.error
+                                                : fieldState.error?.message || 'Invalid value'}
+                                        </p>
                                     )}
-                                </FormGroup>
+                                </>
                             )}
-                        </Field>
-                        {values.category?.value === OidCategory.RdnAttributeType && (
+                        />
+
+                        {watchedCategory === OidCategory.RdnAttributeType && (
                             <>
-                                <Field name="code" validate={composeValidators(validateRequired(), validateOidCode())}>
-                                    {({ input, meta }) => (
-                                        <FormGroup>
-                                            <Label for="code">OID code *</Label>
-                                            <Input
-                                                id="code"
-                                                {...input}
-                                                type="text"
-                                                placeholder="Enter OID code"
-                                                valid={!meta.error && meta.touched}
-                                                invalid={!!meta.error && meta.touched}
-                                            />
-                                            <FormFeedback>{meta.error}</FormFeedback>
-                                        </FormGroup>
+                                <Controller
+                                    name="code"
+                                    control={control}
+                                    rules={buildValidationRules([validateRequired(), validateOidCode()])}
+                                    render={({ field, fieldState }) => (
+                                        <TextInput
+                                            {...field}
+                                            id="code"
+                                            type="text"
+                                            label="OID code"
+                                            required
+                                            placeholder="Enter OID code"
+                                            invalid={fieldState.error && fieldState.isTouched}
+                                            error={
+                                                fieldState.error && fieldState.isTouched
+                                                    ? typeof fieldState.error === 'string'
+                                                        ? fieldState.error
+                                                        : fieldState.error?.message || 'Invalid value'
+                                                    : undefined
+                                            }
+                                        />
                                     )}
-                                </Field>
-                                <Field name="alternativeCode" validate={validateOidCode()}>
-                                    {({ input, meta }) => (
-                                        <FormGroup>
-                                            <Label for="alternativeCode">Alternative Code</Label>
+                                />
+
+                                <Label htmlFor="alternativeCode">Alternative Code</Label>
+                                <Controller
+                                    name="alternativeCode"
+                                    control={control}
+                                    rules={buildValidationRules([validateOidCode()])}
+                                    render={({ field, fieldState }) => (
+                                        <>
                                             <MultipleValueTextInput
                                                 id="alternativeCode"
-                                                value={values.alternativeCode}
+                                                value={field.value}
                                                 onChange={(values) => {
-                                                    input.onChange(values);
+                                                    field.onChange(values);
                                                 }}
-                                                onBlur={input.onBlur}
-                                                isValid={!meta.error && meta.touched}
-                                                isInvalid={!!meta.error && meta.touched}
+                                                onBlur={field.onBlur}
+                                                isValid={!fieldState.error && fieldState.isTouched}
+                                                isInvalid={!!fieldState.error && fieldState.isTouched}
                                             />
-                                            {meta.error && meta.touched && <FormFeedback>{meta.error}</FormFeedback>}
-                                        </FormGroup>
+                                            {fieldState.error && fieldState.isTouched && (
+                                                <p className="mt-1 text-sm text-red-600">
+                                                    {typeof fieldState.error === 'string'
+                                                        ? fieldState.error
+                                                        : fieldState.error?.message || 'Invalid value'}
+                                                </p>
+                                            )}
+                                        </>
                                     )}
-                                </Field>
+                                />
                             </>
                         )}
-                        {
-                            <div className="d-flex justify-content-end">
-                                <ButtonGroup>
-                                    <ProgressButton
-                                        title={submitTitle}
-                                        inProgressTitle={inProgressTitle}
-                                        inProgress={submitting}
-                                        disabled={(editMode ? pristine : false) || !valid}
-                                    />
 
-                                    <Button color="default" onClick={onCancel} disabled={submitting}>
-                                        Cancel
-                                    </Button>
-                                </ButtonGroup>
-                            </div>
-                        }
-                    </BootstrapForm>
-                )}
-            </Form>
-        </Widget>
+                        <Container className="flex-row justify-end modal-footer" gap={4}>
+                            <Button variant="outline" onClick={onCancel} disabled={isSubmitting} type="button">
+                                Cancel
+                            </Button>
+                            <ProgressButton
+                                title={submitTitle}
+                                inProgressTitle={inProgressTitle}
+                                inProgress={isSubmitting}
+                                disabled={(editMode ? !isDirty : false) || !isValid}
+                                type="submit"
+                            />
+                        </Container>
+                    </div>
+                </Widget>
+            </form>
+        </FormProvider>
     );
 }

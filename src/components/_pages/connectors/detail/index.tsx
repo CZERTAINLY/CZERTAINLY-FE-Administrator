@@ -4,14 +4,15 @@ import Dialog from 'components/Dialog';
 
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
+import ConnectorForm from '../form';
 
 import { actions, selectors } from 'ducks/connectors';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router';
+import { useParams } from 'react-router';
 
-import Select from 'react-select';
+import Select from 'components/Select';
 import Badge from 'components/Badge';
 import { AttributeDescriptorModel } from 'types/attributes';
 import { FunctionGroupModel } from 'types/connectors';
@@ -29,7 +30,6 @@ import { CircleCheck, CircleAlert, CircleHelp } from 'lucide-react';
 
 export default function ConnectorDetail() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const { id } = useParams();
 
@@ -54,6 +54,8 @@ export default function ConnectorDetail() {
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [confirmAuthorize, setConfirmAuthorize] = useState<boolean>(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+    const isUpdating = useSelector(selectors.isUpdating);
 
     const getFreshConnectorDetails = useCallback(() => {
         if (!id) return;
@@ -105,10 +107,24 @@ export default function ConnectorDetail() {
         setCurrentFunctionGroupKindAttributes(attrs);
     }, [attributes, connector, currentFunctionGroup, currentFunctionGroupKind]);
 
+    const wasUpdating = useRef(isUpdating);
+
+    useEffect(() => {
+        if (wasUpdating.current && !isUpdating) {
+            setIsEditModalOpen(false);
+            getFreshConnectorDetails();
+        }
+        wasUpdating.current = isUpdating;
+    }, [isUpdating, getFreshConnectorDetails]);
+
+    const handleCloseEditModal = useCallback(() => {
+        setIsEditModalOpen(false);
+    }, []);
+
     const onEditClick = useCallback(() => {
         if (!connector) return;
-        navigate(`../../edit/${connector.uuid}`, { relative: 'path' });
-    }, [connector, navigate]);
+        setIsEditModalOpen(true);
+    }, [connector]);
 
     const onReconnectClick = useCallback(() => {
         if (!connector) return;
@@ -415,14 +431,10 @@ export default function ConnectorDetail() {
 
                 <Widget title="Function Group Details" busy={isFetchingDetail || isReconnecting} titleSize="large">
                     <Select
-                        maxMenuHeight={140}
+                        id="functionGroup"
                         options={functionGroupSelectData}
-                        value={{
-                            label: attributeFieldNameTransform[currentFunctionGroup?.name || ''] || currentFunctionGroup?.name,
-                            value: currentFunctionGroup?.functionGroupCode,
-                        }}
-                        menuPlacement="auto"
-                        onChange={(event) => onFunctionGroupChange(event?.value || '')}
+                        value={currentFunctionGroup?.functionGroupCode || ''}
+                        onChange={(value) => onFunctionGroupChange((value as string) || '')}
                     />
                     <Container marginTop>
                         <Widget title="Endpoints" titleSize="large">
@@ -437,13 +449,11 @@ export default function ConnectorDetail() {
                             lockSize="large"
                         >
                             <Select
-                                maxMenuHeight={140}
+                                id="functionGroupKind"
                                 options={functionGroupKinds}
-                                value={{ label: currentFunctionGroupKind, value: currentFunctionGroupKind }}
+                                value={currentFunctionGroupKind || ''}
                                 placeholder={currentFunctionGroup?.kinds[0]}
-                                menuPlacement="auto"
-                                key="connectorFunctionGroupKindDropdown"
-                                onChange={(event) => onFunctionGroupKindChange(event?.value || '')}
+                                onChange={(value) => onFunctionGroupKindChange((value as string) || '')}
                             />
                             <AttributeDescriptorViewer attributeDescriptors={currentFunctionGroupKindAttributes || []} />
                         </Widget>
@@ -469,8 +479,8 @@ export default function ConnectorDetail() {
                 body="You are about to approve an Connector. Is this what you want to do?"
                 toggle={() => setConfirmAuthorize(false)}
                 buttons={[
-                    { color: 'success', onClick: onAuthorizeConfirmed, body: 'Yes, approve' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmAuthorize(false), body: 'Cancel' },
+                    { color: 'primary', onClick: onAuthorizeConfirmed, body: 'Yes, approve' },
                 ]}
             />
 
@@ -487,9 +497,17 @@ export default function ConnectorDetail() {
                 }
                 toggle={() => dispatch(actions.clearDeleteErrorMessages())}
                 buttons={[
-                    { color: 'danger', onClick: onForceDeleteConnector, body: 'Force' },
                     { color: 'secondary', variant: 'outline', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
+                    { color: 'danger', onClick: onForceDeleteConnector, body: 'Force' },
                 ]}
+            />
+
+            <Dialog
+                isOpen={isEditModalOpen}
+                toggle={handleCloseEditModal}
+                caption="Edit Connector"
+                size="xl"
+                body={<ConnectorForm connectorId={connector?.uuid} onCancel={handleCloseEditModal} />}
             />
         </div>
     );

@@ -4,8 +4,9 @@ import Spinner from 'components/Spinner';
 import { actions, selectors } from 'ducks/info';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button } from 'reactstrap';
 import { useCopyToClipboard } from 'utils/common-hooks';
+import Button from 'components/Button';
+import { Copy } from 'lucide-react';
 
 const PlatformInfoDialogLink = () => {
     const dispatch = useDispatch();
@@ -58,14 +59,12 @@ const PlatformInfoDialogLink = () => {
         return (
             <div>
                 <CustomTable data={data} headers={headers} />
-                <br />
                 <div>
                     Click to copy:{' '}
                     <Button
-                        className="btn btn-link py-0 px-1 ms-2"
-                        color="white"
+                        className="mt-2"
+                        variant="transparent"
                         title="Version Info"
-                        key="copy"
                         onClick={() =>
                             copyToClipboard(
                                 copyText,
@@ -74,7 +73,7 @@ const PlatformInfoDialogLink = () => {
                             )
                         }
                     >
-                        <i className="fa fa-copy" style={{ color: 'auto' }} />
+                        <Copy size={16} />
                     </Button>
                 </div>
             </div>
@@ -85,6 +84,7 @@ const PlatformInfoDialogLink = () => {
         <>
             <a
                 href="#"
+                className="text-blue-600"
                 onClick={(e) => {
                     e.preventDefault();
                     setIsOpen(true);
@@ -97,6 +97,8 @@ const PlatformInfoDialogLink = () => {
                 caption="Platform versions info"
                 toggle={() => setIsOpen(false)}
                 body={isFetching ? <Spinner active /> : content}
+                size="lg"
+                icon="info"
             />
         </>
     );

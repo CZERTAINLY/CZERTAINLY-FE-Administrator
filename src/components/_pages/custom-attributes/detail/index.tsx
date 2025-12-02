@@ -8,7 +8,7 @@ import { actions, selectors } from 'ducks/customAttributes';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router';
+import { useParams } from 'react-router';
 import Badge from 'components/Badge';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
@@ -17,10 +17,10 @@ import { useCopyToClipboard } from 'utils/common-hooks';
 import styles from './customAttribute.module.scss';
 import { createWidgetDetailHeaders } from 'utils/widget';
 import Breadcrumb from 'components/Breadcrumb';
+import CustomAttributeForm from '../form';
 
 export default function CustomAttributeDetail() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const { id } = useParams();
 
@@ -32,6 +32,7 @@ export default function CustomAttributeDetail() {
     const attributeContentTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AttributeContentType));
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
     const getFreshCustomAttribute = useCallback(() => {
         if (!id) return;
@@ -44,9 +45,18 @@ export default function CustomAttributeDetail() {
         }
     }, [getFreshCustomAttribute, id, customAttribute]);
 
+    const handleOpenEditModal = useCallback(() => {
+        setIsEditModalOpen(true);
+    }, []);
+
+    const handleCloseEditModal = useCallback(() => {
+        setIsEditModalOpen(false);
+        getFreshCustomAttribute();
+    }, [getFreshCustomAttribute]);
+
     const onEditClick = useCallback(() => {
-        navigate(`../../edit/${customAttribute?.uuid}`, { relative: 'path' });
-    }, [customAttribute, navigate]);
+        handleOpenEditModal();
+    }, [handleOpenEditModal]);
 
     const onDeleteConfirmed = useCallback(() => {
         if (!customAttribute) return;
@@ -212,6 +222,20 @@ export default function CustomAttributeDetail() {
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
+            />
+
+            <Dialog
+                isOpen={isEditModalOpen}
+                toggle={handleCloseEditModal}
+                caption="Edit Custom Attribute"
+                size="xl"
+                body={
+                    <CustomAttributeForm
+                        customAttributeId={customAttribute?.uuid}
+                        onCancel={handleCloseEditModal}
+                        onSuccess={handleCloseEditModal}
+                    />
+                }
             />
         </div>
     );

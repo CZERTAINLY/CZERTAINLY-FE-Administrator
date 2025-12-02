@@ -310,8 +310,8 @@ export default function ApprovalDetails() {
                     caption="Accept approval?"
                     toggle={() => setRecipientApproveDialog(false)}
                     buttons={[
-                        { color: 'primary', onClick: onApproveRecipient, body: 'Yes, approve' },
                         { color: 'secondary', variant: 'outline', onClick: () => setRecipientApproveDialog(false), body: 'Cancel' },
+                        { color: 'primary', onClick: onApproveRecipient, body: 'Yes, approve' },
                     ]}
                 />
 

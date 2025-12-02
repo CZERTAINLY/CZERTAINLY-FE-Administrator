@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 
@@ -11,6 +11,8 @@ import { selectors as pagingSelectors } from 'ducks/paging';
 import { ApiClients } from '../../../../api';
 import { TableDataRow, TableHeader } from 'components/CustomTable';
 import PagedList from 'components/PagedList/PagedList';
+import LocationForm from '../form';
+import Dialog from 'components/Dialog';
 import StatusBadge from 'components/StatusBadge';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { SearchRequestModel } from 'types/certificate';
@@ -23,10 +25,15 @@ function LocationList() {
 
     const isDeleting = useSelector(selectors.isDeleting);
     const isUpdating = useSelector(selectors.isUpdating);
+    const isCreating = useSelector(selectors.isCreating);
 
     const checkedRows = useSelector(pagingSelectors.checkedRows(EntityType.LOCATION));
 
     const isBusy = isDeleting || isUpdating;
+
+    const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+    const [editingLocationId, setEditingLocationId] = useState<string | undefined>(undefined);
+    const [editingEntityId, setEditingEntityId] = useState<string | undefined>(undefined);
 
     const onEnableClick = useCallback(() => {
         for (const uuid of checkedRows) {
@@ -130,31 +137,91 @@ function LocationList() {
 
     const onListCallback = useCallback((filters: SearchRequestModel) => dispatch(actions.listLocations(filters)), [dispatch]);
 
+    const wasCreating = useRef(isCreating);
+    const wasUpdating = useRef(isUpdating);
+
+    useEffect(() => {
+        if (wasCreating.current && !isCreating) {
+            setIsAddModalOpen(false);
+            onListCallback({ itemsPerPage: 10, pageNumber: 1, filters: [] });
+        }
+        wasCreating.current = isCreating;
+    }, [isCreating, onListCallback]);
+
+    useEffect(() => {
+        if (wasUpdating.current && !isUpdating) {
+            setEditingLocationId(undefined);
+            setEditingEntityId(undefined);
+            onListCallback({ itemsPerPage: 10, pageNumber: 1, filters: [] });
+        }
+        wasUpdating.current = isUpdating;
+    }, [isUpdating, onListCallback]);
+
+    const handleOpenAddModal = useCallback(() => {
+        setIsAddModalOpen(true);
+    }, []);
+
+    const handleCloseAddModal = useCallback(() => {
+        setIsAddModalOpen(false);
+        setEditingLocationId(undefined);
+        setEditingEntityId(undefined);
+    }, []);
+
+    const createButton: WidgetButtonProps = useMemo(
+        () => ({
+            icon: 'plus',
+            disabled: false,
+            tooltip: 'Create',
+            onClick: handleOpenAddModal,
+        }),
+        [handleOpenAddModal],
+    );
+
+    const allButtons: WidgetButtonProps[] = useMemo(() => [createButton, ...buttons], [createButton, buttons]);
+
     return (
-        <PagedList
-            entity={EntityType.LOCATION}
-            onListCallback={onListCallback}
-            onDeleteCallback={(uuids) =>
-                uuids.map((uuid) =>
-                    dispatch(
-                        actions.deleteLocation({
-                            entityUuid: locations.find((data) => data.uuid === uuid)?.entityInstanceUuid || '',
-                            uuid,
-                        }),
-                    ),
-                )
-            }
-            getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.locations.getSearchableFieldInformation(), [])}
-            headers={locationsRowHeaders}
-            data={locationList}
-            isBusy={isBusy}
-            title="Locations Store"
-            entityNameSingular="a Location"
-            entityNamePlural="Locations"
-            filterTitle="Locations Filter"
-            additionalButtons={buttons}
-            pageWidgetLockName={LockWidgetNameEnum.LocationsStore}
-        />
+        <>
+            <PagedList
+                entity={EntityType.LOCATION}
+                onListCallback={onListCallback}
+                onDeleteCallback={(uuids) =>
+                    uuids.map((uuid) =>
+                        dispatch(
+                            actions.deleteLocation({
+                                entityUuid: locations.find((data) => data.uuid === uuid)?.entityInstanceUuid || '',
+                                uuid,
+                            }),
+                        ),
+                    )
+                }
+                getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.locations.getSearchableFieldInformation(), [])}
+                headers={locationsRowHeaders}
+                data={locationList}
+                isBusy={isBusy}
+                title="Locations Store"
+                entityNameSingular="a Location"
+                entityNamePlural="Locations"
+                filterTitle="Locations Filter"
+                additionalButtons={allButtons}
+                addHidden
+                pageWidgetLockName={LockWidgetNameEnum.LocationsStore}
+            />
+
+            <Dialog
+                isOpen={isAddModalOpen || !!editingLocationId}
+                toggle={handleCloseAddModal}
+                caption={editingLocationId ? 'Edit Location' : 'Create Location'}
+                size="xl"
+                body={
+                    <LocationForm
+                        locationId={editingLocationId}
+                        entityId={editingEntityId}
+                        onCancel={handleCloseAddModal}
+                        onSuccess={handleCloseAddModal}
+                    />
+                }
+            />
+        </>
     );
 }
 

@@ -4,18 +4,19 @@ import Widget from 'components/Widget';
 import { actions as connectorActions, actions as connectorsActions } from 'ducks/connectors';
 
 import { actions, selectors } from 'ducks/credentials';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { Field, Form } from 'react-final-form';
+import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 
-import Select from 'react-select';
-import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
+import Select from 'components/Select';
+import Button from 'components/Button';
+import Container from 'components/Container';
+import TextInput from 'components/TextInput';
 import { AttributeDescriptorModel } from 'types/attributes';
 import { ConnectorResponseModel } from 'types/connectors';
 import { CredentialResponseModel } from 'types/credentials';
-import { mutators } from 'utils/attributes/attributeEditorMutators';
 
 import { collectFormAttributes } from 'utils/attributes/attributes';
 
@@ -24,22 +25,26 @@ import { actions as customAttributesActions, selectors as customAttributesSelect
 import { actions as userInterfaceActions } from '../../../../ducks/user-interface';
 import { FunctionGroupCode, Resource } from '../../../../types/openapi';
 import TabLayout from '../../../Layout/TabLayout';
+import Label from 'components/Label';
 
 interface CredentialFormProps {
+    credentialId?: string;
+    onCancel?: () => void;
+    onSuccess?: () => void;
     usesGlobalModal?: boolean;
 }
 
 interface FormValues {
-    name: string | undefined;
-    credentialProvider: { value: string; label: string } | undefined;
-    storeKind: { value: string; label: string } | undefined;
+    name: string;
+    credentialProvider: string;
+    storeKind: string;
 }
 
-export default function CredentialForm({ usesGlobalModal = false }: CredentialFormProps) {
+export default function CredentialForm({ credentialId, onCancel, onSuccess, usesGlobalModal = false }: CredentialFormProps) {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
-    const { id } = useParams();
+    const { id: routeId } = useParams();
+    const id = credentialId || routeId;
 
     const editMode = useMemo(() => !!id, [id]);
 
@@ -78,11 +83,19 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
         ],
     );
 
+    const previousIdRef = useRef<string | undefined>(undefined);
+
     useEffect(() => {
         if (editMode && id) {
-            dispatch(actions.getCredentialDetail({ uuid: id }));
+            // Fetch if id changed or if we don't have the correct credential loaded
+            if (previousIdRef.current !== id || !credentialSelector || credentialSelector.uuid !== id) {
+                dispatch(actions.getCredentialDetail({ uuid: id }));
+                previousIdRef.current = id;
+            }
+        } else {
+            previousIdRef.current = undefined;
         }
-    }, [dispatch, id, editMode]);
+    }, [dispatch, editMode, id, credentialSelector]);
 
     useEffect(() => {
         dispatch(actions.listCredentialProviders());
@@ -114,11 +127,11 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
     }, [credential, credentialProviders, dispatch, editMode, id]);
 
     const onCredentialProviderChange = useCallback(
-        (event: { label: string; value: string }) => {
-            if (!event.value || !credentialProviders) return;
+        (value: string) => {
+            if (!value || !credentialProviders) return;
             dispatch(connectorActions.clearCallbackData());
             setGroupAttributesCallbackAttributes([]);
-            const provider = credentialProviders.find((p) => p.uuid === event.value);
+            const provider = credentialProviders.find((p) => p.uuid === value);
 
             if (!provider) return;
             setCredentialProvider(provider);
@@ -127,17 +140,17 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
     );
 
     const onKindChange = useCallback(
-        (event: { label: string; value: string }) => {
-            if (!event.value || !credentialProvider) return;
+        (value: string) => {
+            if (!value || !credentialProvider) return;
             dispatch(connectorActions.clearCallbackData());
             setGroupAttributesCallbackAttributes([]);
-            dispatch(actions.getCredentialProviderAttributesDescriptors({ uuid: credentialProvider.uuid, kind: event.value }));
+            dispatch(actions.getCredentialProviderAttributesDescriptors({ uuid: credentialProvider.uuid, kind: value }));
         },
         [dispatch, credentialProvider],
     );
 
     const onSubmit = useCallback(
-        (values: FormValues, form: any) => {
+        (values: FormValues) => {
             if (editMode) {
                 dispatch(
                     actions.updateCredential({
@@ -157,9 +170,9 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
                     actions.createCredential({
                         usesGlobalModal,
                         credentialRequest: {
-                            name: values.name!,
-                            connectorUuid: values.credentialProvider!.value,
-                            kind: values.storeKind?.value!,
+                            name: values.name,
+                            connectorUuid: values.credentialProvider,
+                            kind: values.storeKind,
                             attributes: collectFormAttributes(
                                 'credential',
                                 [...(credentialProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
@@ -182,9 +195,13 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
         ],
     );
 
-    const onCancel = useCallback(() => {
-        navigate(-1);
-    }, [navigate]);
+    const handleCancel = useCallback(() => {
+        if (onCancel) {
+            onCancel();
+        } else if (usesGlobalModal) {
+            dispatch(userInterfaceActions.hideGlobalModal());
+        }
+    }, [onCancel, usesGlobalModal, dispatch]);
 
     const submitTitle = useMemo(() => (editMode ? 'Save' : 'Create'), [editMode]);
 
@@ -210,17 +227,67 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
         [credentialProvider],
     );
 
-    const defaultValues: FormValues = useMemo(() => {
-        const credentialProvider = credential?.connectorUuid
-            ? { value: credential.connectorUuid!, label: credential.connectorName! }
-            : undefined;
+    const defaultValues: FormValues = useMemo(
+        () => ({
+            name: editMode ? credential?.name || '' : '',
+            credentialProvider: editMode ? credential?.connectorUuid || '' : '',
+            storeKind: editMode ? credential?.kind || '' : '',
+        }),
+        [editMode, credential],
+    );
 
+    const methods = useForm<FormValues>({
+        defaultValues,
+        mode: 'onChange',
+    });
+
+    const {
+        handleSubmit,
+        control,
+        formState: { isDirty, isSubmitting, isValid },
+        setValue,
+        getValues,
+        reset,
+    } = methods;
+
+    const watchedStoreKind = useWatch({
+        control,
+        name: 'storeKind',
+    });
+
+    const watchedCredentialProvider = useWatch({
+        control,
+        name: 'credentialProvider',
+    });
+
+    // Reset form values when credential is loaded in edit mode
+    useEffect(() => {
+        if (editMode && id && credential && credential.uuid === id && !isFetchingCredentialDetail) {
+            const newDefaultValues: FormValues = {
+                name: credential.name || '',
+                credentialProvider: credential.connectorUuid || '',
+                storeKind: credential.kind || '',
+            };
+            reset(newDefaultValues, { keepDefaultValues: false });
+        } else if (!editMode) {
+            // Reset form when switching to create mode
+            reset({
+                name: '',
+                credentialProvider: '',
+                storeKind: '',
+            });
+        }
+    }, [editMode, credential, id, reset, isFetchingCredentialDetail]);
+
+    // Helper function to convert validators for react-hook-form
+    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
         return {
-            name: editMode ? credential?.name || undefined : undefined,
-            credentialProvider: editMode ? credentialProvider : undefined,
-            storeKind: editMode ? (credential ? { value: credential?.kind, label: credential?.kind } : undefined) : undefined,
+            validate: (value: any) => {
+                const composed = composeValidators(...validators);
+                return composed(value);
+            },
         };
-    }, [editMode, credential]);
+    };
 
     const title = useMemo(() => (editMode ? 'Edit Credential' : 'Create Credential'), [editMode]);
 
@@ -235,188 +302,182 @@ export default function CredentialForm({ usesGlobalModal = false }: CredentialFo
         );
     }, [resourceCustomAttributes, credential, isBusy]);
 
+    const wasCreating = useRef(isCreating);
+    const wasUpdating = useRef(isUpdating);
+
+    useEffect(() => {
+        if (wasCreating.current && !isCreating) {
+            if (onSuccess) {
+                onSuccess();
+            }
+        }
+        wasCreating.current = isCreating;
+    }, [isCreating, onSuccess]);
+
+    useEffect(() => {
+        if (wasUpdating.current && !isUpdating) {
+            if (onSuccess) {
+                onSuccess();
+            }
+        }
+        wasUpdating.current = isUpdating;
+    }, [isUpdating, onSuccess]);
+
     return (
-        <Widget title={title} busy={isBusy}>
-            <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
-                {({ handleSubmit, pristine, submitting, values, valid }) => (
-                    <BootstrapForm onSubmit={handleSubmit}>
-                        <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="name">Credential Name</Label>
-
-                                    <Input
-                                        id="name"
-                                        {...input}
-                                        valid={!meta.error && meta.touched}
-                                        invalid={!!meta.error && meta.touched}
-                                        type="text"
-                                        placeholder="Enter the Credential Name"
-                                        disabled={editMode}
-                                    />
-
-                                    <FormFeedback>{meta.error}</FormFeedback>
-                                </FormGroup>
+        <FormProvider {...methods}>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <Widget noBorder busy={isBusy}>
+                    <div className="space-y-4">
+                        <Controller
+                            name="name"
+                            control={control}
+                            rules={buildValidationRules([validateRequired(), validateAlphaNumericWithSpecialChars()])}
+                            render={({ field, fieldState }) => (
+                                <TextInput
+                                    {...field}
+                                    id="name"
+                                    type="text"
+                                    label="Credential Name"
+                                    required
+                                    placeholder="Enter the Credential Name"
+                                    disabled={editMode}
+                                    invalid={fieldState.error && fieldState.isTouched}
+                                    error={
+                                        fieldState.error && fieldState.isTouched
+                                            ? typeof fieldState.error === 'string'
+                                                ? fieldState.error
+                                                : fieldState.error?.message || 'Invalid value'
+                                            : undefined
+                                    }
+                                />
                             )}
-                        </Field>
+                        />
 
                         {!editMode ? (
-                            <Field name="credentialProvider" validate={validateRequired()}>
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Label for="credentialProviderSelect">Credential Provider</Label>
-
-                                        <Select
-                                            {...input}
-                                            inputId="credentialProviderSelect"
-                                            maxMenuHeight={140}
-                                            menuPlacement="auto"
-                                            options={optionsForCredentialProviders}
-                                            placeholder="Select Credential Provider"
-                                            onChange={(event) => {
-                                                onCredentialProviderChange(event);
-                                                input.onChange(event);
-                                            }}
-                                            styles={{
-                                                control: (provided) =>
-                                                    meta.touched && meta.invalid
-                                                        ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
-                                                        : { ...provided },
-                                            }}
-                                        />
-
-                                        <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
-                                            {meta.error}
-                                        </div>
-                                    </FormGroup>
-                                )}
-                            </Field>
+                            <div>
+                                <Controller
+                                    name="credentialProvider"
+                                    control={control}
+                                    rules={buildValidationRules([validateRequired()])}
+                                    render={({ field, fieldState }) => (
+                                        <>
+                                            <Select
+                                                id="credentialProviderSelect"
+                                                label="Credential Provider"
+                                                value={field.value || ''}
+                                                onChange={(value) => {
+                                                    onCredentialProviderChange(value as string);
+                                                    field.onChange(value);
+                                                }}
+                                                options={optionsForCredentialProviders || []}
+                                                placeholder="Select Credential Provider"
+                                                placement="bottom"
+                                            />
+                                            {fieldState.error && fieldState.isTouched && (
+                                                <p className="mt-1 text-sm text-red-600">
+                                                    {typeof fieldState.error === 'string'
+                                                        ? fieldState.error
+                                                        : fieldState.error?.message || 'Invalid value'}
+                                                </p>
+                                            )}
+                                        </>
+                                    )}
+                                />
+                            </div>
                         ) : (
-                            <Field name="credentialProvider" format={(value) => (value ? value.label : '')} validate={validateRequired()}>
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Label for="credentialProvider">Credential Provider</Label>
-
-                                        <Input
-                                            id="credentialProvider"
-                                            {...input}
-                                            valid={!meta.error && meta.touched}
-                                            invalid={!!meta.error && meta.touched}
-                                            type="text"
-                                            placeholder="Credential Name"
-                                            disabled={editMode}
-                                        />
-                                    </FormGroup>
-                                )}
-                            </Field>
+                            <TextInput
+                                id="credentialProvider"
+                                type="text"
+                                label="Credential Provider"
+                                value={credential?.connectorName || ''}
+                                disabled={true}
+                                onChange={() => {}}
+                            />
                         )}
 
                         {!editMode && optionsForKinds?.length ? (
-                            <Field name="storeKind" validate={validateRequired()}>
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Label for="storeKindSelect">Kind</Label>
-
-                                        <Select
-                                            inputId="storeKindSelect"
-                                            {...input}
-                                            maxMenuHeight={140}
-                                            menuPlacement="auto"
-                                            options={optionsForKinds}
-                                            placeholder="Select Kind"
-                                            onChange={(event) => {
-                                                onKindChange(event);
-                                                input.onChange(event);
-                                            }}
-                                            styles={{
-                                                control: (provided) =>
-                                                    meta.touched && meta.invalid
-                                                        ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
-                                                        : { ...provided },
-                                            }}
-                                        />
-
-                                        <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
-                                            Required Field
-                                        </div>
-                                    </FormGroup>
-                                )}
-                            </Field>
+                            <div>
+                                <Controller
+                                    name="storeKind"
+                                    control={control}
+                                    rules={buildValidationRules([validateRequired()])}
+                                    render={({ field, fieldState }) => (
+                                        <>
+                                            <Select
+                                                id="storeKindSelect"
+                                                label="Kind"
+                                                value={field.value || ''}
+                                                onChange={(value) => {
+                                                    onKindChange(value as string);
+                                                    field.onChange(value);
+                                                }}
+                                                options={optionsForKinds || []}
+                                                placeholder="Select Kind"
+                                                placement="bottom"
+                                            />
+                                            {fieldState.error && fieldState.isTouched && (
+                                                <p className="mt-1 text-sm text-red-600">Required Field</p>
+                                            )}
+                                        </>
+                                    )}
+                                />
+                            </div>
                         ) : null}
 
                         {editMode && credential?.kind ? (
-                            <Field name="storeKind" format={(value) => (value ? value.label : '')}>
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Label for="storeKind">Kind</Label>
-
-                                        <Input
-                                            id="storeKind"
-                                            {...input}
-                                            valid={!meta.error && meta.touched}
-                                            invalid={!!meta.error && meta.touched}
-                                            type="text"
-                                            placeholder="Credential Kind"
-                                            disabled={editMode}
-                                        />
-                                    </FormGroup>
-                                )}
-                            </Field>
+                            <TextInput
+                                id="storeKind"
+                                type="text"
+                                label="Kind"
+                                value={credential.kind}
+                                disabled={true}
+                                onChange={() => {}}
+                            />
                         ) : null}
 
-                        <>
-                            <br />
-                            <TabLayout
-                                tabs={[
-                                    {
-                                        title: 'Connector Attributes',
-                                        content:
-                                            credentialProvider &&
-                                            values.storeKind &&
-                                            credentialProviderAttributeDescriptors &&
-                                            credentialProviderAttributeDescriptors.length > 0 ? (
-                                                <AttributeEditor
-                                                    id="credential"
-                                                    attributeDescriptors={credentialProviderAttributeDescriptors}
-                                                    attributes={credential?.attributes}
-                                                    groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
-                                                    setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
-                                                />
-                                            ) : (
-                                                <></>
-                                            ),
-                                    },
-                                    {
-                                        title: 'Custom Attributes',
-                                        content: renderCustomAttributesEditor(),
-                                    },
-                                ]}
+                        <TabLayout
+                            noBorder
+                            tabs={[
+                                {
+                                    title: 'Connector Attributes',
+                                    content:
+                                        credentialProvider &&
+                                        watchedStoreKind &&
+                                        credentialProviderAttributeDescriptors &&
+                                        credentialProviderAttributeDescriptors.length > 0 ? (
+                                            <AttributeEditor
+                                                id="credential"
+                                                attributeDescriptors={credentialProviderAttributeDescriptors}
+                                                attributes={credential?.attributes}
+                                                groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                                                setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                                            />
+                                        ) : (
+                                            <></>
+                                        ),
+                                },
+                                {
+                                    title: 'Custom Attributes',
+                                    content: renderCustomAttributesEditor(),
+                                },
+                            ]}
+                        />
+
+                        <Container className="flex-row justify-end modal-footer" gap={4}>
+                            <Button variant="outline" onClick={handleCancel} disabled={isSubmitting} type="button">
+                                Cancel
+                            </Button>
+                            <ProgressButton
+                                title={submitTitle}
+                                inProgressTitle={inProgressTitle}
+                                inProgress={isSubmitting}
+                                disabled={(editMode ? !isDirty : false) || !isValid}
+                                type="submit"
                             />
-                        </>
-
-                        {
-                            <div className="d-flex justify-content-end">
-                                <ButtonGroup>
-                                    <ProgressButton
-                                        title={submitTitle}
-                                        inProgressTitle={inProgressTitle}
-                                        inProgress={submitting}
-                                        disabled={(editMode ? pristine : false) || !valid}
-                                    />
-
-                                    <Button
-                                        color="default"
-                                        onClick={() => (usesGlobalModal ? dispatch(userInterfaceActions.hideGlobalModal()) : onCancel())}
-                                        disabled={submitting}
-                                    >
-                                        Cancel
-                                    </Button>
-                                </ButtonGroup>
-                            </div>
-                        }
-                    </BootstrapForm>
-                )}
-            </Form>
-        </Widget>
+                        </Container>
+                    </div>
+                </Widget>
+            </form>
+        </FormProvider>
     );
 }

@@ -1,28 +1,45 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router';
 
 import { actions, selectors } from 'ducks/auth';
 
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { createWidgetDetailHeaders } from 'utils/widget';
+import UserProfileForm from '../form';
 
 export default function UserProfileDetail() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const profile = useSelector(selectors.profile);
     const isFetchingDetail = useSelector(selectors.isFetchingProfile);
+    const isUpdatingProfile = useSelector(selectors.isUpdatingProfile);
+
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     useEffect(() => {
         dispatch(actions.getProfile());
     }, [dispatch]);
 
-    const onEditClick = useCallback(() => {
-        navigate(`./edit`);
-    }, [navigate]);
+    const wasUpdating = useRef(isUpdatingProfile);
+
+    useEffect(() => {
+        if (wasUpdating.current && !isUpdatingProfile) {
+            setIsEditModalOpen(false);
+            dispatch(actions.getProfile());
+        }
+        wasUpdating.current = isUpdatingProfile;
+    }, [isUpdatingProfile, dispatch]);
+
+    const handleOpenEditModal = useCallback(() => {
+        setIsEditModalOpen(true);
+    }, []);
+
+    const handleCloseEditModal = useCallback(() => {
+        setIsEditModalOpen(false);
+    }, []);
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
@@ -30,12 +47,10 @@ export default function UserProfileDetail() {
                 icon: 'pencil',
                 disabled: profile?.systemUser || false,
                 tooltip: 'Edit',
-                onClick: () => {
-                    onEditClick();
-                },
+                onClick: handleOpenEditModal,
             },
         ],
-        [profile, onEditClick],
+        [profile, handleOpenEditModal],
     );
 
     const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
@@ -70,8 +85,19 @@ export default function UserProfileDetail() {
     );
 
     return (
-        <Widget title="User Details" busy={isFetchingDetail} widgetButtons={buttons} titleSize="large">
-            <CustomTable headers={detailHeaders} data={detailData} />
-        </Widget>
+        <>
+            <Widget title="User Details" busy={isFetchingDetail} widgetButtons={buttons} titleSize="large">
+                <CustomTable headers={detailHeaders} data={detailData} />
+            </Widget>
+
+            <Dialog
+                isOpen={isEditModalOpen}
+                toggle={handleCloseEditModal}
+                caption="Edit User Profile"
+                size="xl"
+                body={<UserProfileForm onCancel={handleCloseEditModal} onSuccess={handleCloseEditModal} />}
+                noBorder
+            />
+        </>
     );
 }

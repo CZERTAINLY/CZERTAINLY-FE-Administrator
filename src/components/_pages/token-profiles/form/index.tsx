@@ -3,22 +3,19 @@ import ProgressButton from 'components/ProgressButton';
 
 import Widget from 'components/Widget';
 import { actions as connectorActions } from 'ducks/connectors';
-import { actions as userInterfaceActions } from '../../../../ducks/user-interface';
 
 import { actions as tokenProfilesActions, selectors as tokenProfilesSelectors } from 'ducks/token-profiles';
 import { actions as tokensActions, selectors as tokensSelectors } from 'ducks/tokens';
-import { FormApi } from 'final-form';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Field, Form } from 'react-final-form';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
-import Select from 'react-select';
-
-import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
+import Select from 'components/Select';
+import Button from 'components/Button';
+import Container from 'components/Container';
 import { AttributeDescriptorModel } from 'types/attributes';
 import { TokenProfileDetailResponseModel } from 'types/token-profiles';
 
-import { mutators } from 'utils/attributes/attributeEditorMutators';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
@@ -26,22 +23,30 @@ import { composeValidators, validateAlphaNumericWithSpecialChars, validateLength
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
 import { KeyUsage, PlatformEnum, Resource } from '../../../../types/openapi';
 import TabLayout from '../../../Layout/TabLayout';
+import TextInput from 'components/TextInput';
+import TextArea from 'components/TextArea';
 
-interface TokenProfileFormFormProps {
-    usesGlobalModal?: boolean;
+interface TokenProfileFormProps {
+    tokenProfileId?: string;
+    tokenId?: string;
+    onCancel?: () => void;
+    onSuccess?: () => void;
 }
+
 interface FormValues {
     name: string;
     description: string;
-    token: { value: any; label: string } | undefined;
+    token: string;
     usages: { value: KeyUsage; label: string }[];
 }
 
-export default function TokenProfileForm({ usesGlobalModal = false }: TokenProfileFormFormProps) {
+export default function TokenProfileForm({ tokenProfileId, tokenId: propTokenId, onCancel, onSuccess }: TokenProfileFormProps) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const { id, tokenId } = useParams();
+    const { id: routeId, tokenId: routeTokenId } = useParams();
+    const id = tokenProfileId || routeId;
+    const tokenId = propTokenId || routeTokenId;
 
     const editMode = useMemo(() => !!id, [id]);
 
@@ -68,39 +73,131 @@ export default function TokenProfileForm({ usesGlobalModal = false }: TokenProfi
         [isCreating, isFetchingDetail, isUpdating, isFetchingTokenProfileAttributes, isFetchingResourceCustomAttributes],
     );
 
+    const previousIdRef = useRef<string | undefined>(undefined);
+
     useEffect(() => {
         dispatch(tokensActions.listTokens());
         dispatch(tokensActions.clearTokenProfileAttributesDescriptors());
         dispatch(connectorActions.clearCallbackData());
-
-        if (editMode) dispatch(tokenProfilesActions.getTokenProfileDetail({ tokenInstanceUuid: tokenId!, uuid: id! }));
-    }, [dispatch, editMode, id, tokenId]);
+    }, [dispatch]);
 
     useEffect(() => {
         dispatch(customAttributesActions.listResourceCustomAttributes(Resource.TokenProfiles));
     }, [dispatch]);
 
     useEffect(() => {
+        if (editMode && id && tokenId) {
+            // Fetch if id changed or if we don't have the correct profile loaded
+            if (previousIdRef.current !== id || !tokenProfileSelector || tokenProfileSelector.uuid !== id) {
+                dispatch(tokenProfilesActions.getTokenProfileDetail({ tokenInstanceUuid: tokenId, uuid: id }));
+                previousIdRef.current = id;
+            }
+        } else {
+            previousIdRef.current = undefined;
+        }
+    }, [dispatch, editMode, id, tokenId, tokenProfileSelector]);
+
+    useEffect(() => {
         if (editMode && tokenProfileSelector && tokenProfileSelector.uuid === id) {
             setTokenProfile(tokenProfileSelector);
             dispatch(tokensActions.getTokenProfileAttributesDescriptors({ tokenUuid: tokenProfileSelector.tokenInstanceUuid }));
         }
-    }, [tokens, dispatch, editMode, tokenProfile?.uuid, tokenProfileSelector, id]);
+    }, [dispatch, editMode, id, tokenProfileSelector]);
+
+    const optionsForTokens = useMemo(
+        () =>
+            tokens.map((token) => ({
+                value: token.uuid,
+                label: token.name,
+            })),
+        [tokens],
+    );
+
+    const defaultValues: FormValues = useMemo(() => {
+        const token = tokenProfile ? optionsForTokens.find((option) => option.value === tokenProfile.tokenInstanceUuid) : undefined;
+        return {
+            name: editMode ? tokenProfile?.name || '' : '',
+            description: editMode ? tokenProfile?.description || '' : '',
+            token: editMode ? token?.value || '' : '',
+            usages: editMode ? tokenProfile?.usages?.map((usage) => ({ value: usage, label: usage })) || [] : [],
+        };
+    }, [editMode, optionsForTokens, tokenProfile]);
+
+    const methods = useForm<FormValues>({
+        defaultValues,
+        mode: 'onChange',
+    });
+
+    const {
+        handleSubmit,
+        control,
+        formState: { isDirty, isSubmitting, isValid },
+        setValue,
+        getValues,
+        reset,
+    } = methods;
+
+    const watchedToken = useWatch({
+        control,
+        name: 'token',
+    });
+
+    // Reset form values when tokenProfile is loaded in edit mode
+    useEffect(() => {
+        if (editMode && id && tokenProfile && tokenProfile.uuid === id && !isFetchingDetail) {
+            const newDefaultValues: FormValues = {
+                name: tokenProfile.name || '',
+                description: tokenProfile.description || '',
+                token: tokenProfile.tokenInstanceUuid || tokenId || '',
+                usages:
+                    tokenProfile.usages?.map((usage) => ({
+                        value: usage,
+                        label: getEnumLabel(keyUsageEnum, usage),
+                    })) || [],
+            };
+            reset(newDefaultValues, { keepDefaultValues: false });
+        } else if (!editMode) {
+            // Reset form when switching to create mode
+            reset({
+                name: '',
+                description: '',
+                token: tokenId || '',
+                usages: [],
+            });
+        }
+    }, [editMode, tokenProfile, id, reset, isFetchingDetail, tokenId, keyUsageEnum]);
+
+    // Helper function to convert validators for react-hook-form
+    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
+        return {
+            validate: (value: any) => {
+                const composed = composeValidators(...validators);
+                return composed(value);
+            },
+        };
+    };
 
     const onTokenChange = useCallback(
-        (tokenUuid: string, form: FormApi<FormValues>) => {
+        (tokenUuid: string) => {
             dispatch(connectorActions.clearCallbackData());
             setGroupAttributesCallbackAttributes([]);
-            form.mutators.clearAttributes('token-profile');
+            const formValues = getValues();
+            Object.keys(formValues).forEach((key) => {
+                if (key.startsWith('__attributes__token-profile__')) {
+                    setValue(key as any, undefined);
+                }
+            });
             dispatch(tokensActions.clearTokenProfileAttributesDescriptors());
             dispatch(tokensActions.getTokenProfileAttributesDescriptors({ tokenUuid }));
         },
-        [dispatch],
+        [dispatch, getValues, setValue],
     );
 
-    const onCancelClick = useCallback(() => {
-        navigate(-1);
-    }, [navigate]);
+    useEffect(() => {
+        if (watchedToken) {
+            onTokenChange(watchedToken);
+        }
+    }, [watchedToken, onTokenChange]);
 
     const onSubmit = useCallback(
         (values: FormValues) => {
@@ -108,8 +205,8 @@ export default function TokenProfileForm({ usesGlobalModal = false }: TokenProfi
                 dispatch(
                     tokenProfilesActions.updateTokenProfile({
                         profileUuid: id!,
-                        tokenInstanceUuid: values.token!.value,
-                        redirect: `../../../tokenprofiles/detail/${values.token!.value}/${id}`,
+                        tokenInstanceUuid: values.token,
+                        redirect: `../../../tokenprofiles/detail/${values.token}/${id}`,
                         tokenProfileEditRequest: {
                             enabled: tokenProfile!.enabled,
                             description: values.description,
@@ -126,8 +223,7 @@ export default function TokenProfileForm({ usesGlobalModal = false }: TokenProfi
             } else {
                 dispatch(
                     tokenProfilesActions.createTokenProfile({
-                        tokenInstanceUuid: values.token!.value,
-                        usesGlobalModal,
+                        tokenInstanceUuid: values.token,
                         tokenProfileAddRequest: {
                             name: values.name,
                             description: values.description,
@@ -139,6 +235,7 @@ export default function TokenProfileForm({ usesGlobalModal = false }: TokenProfi
                             customAttributes: collectFormAttributes('customTokenProfile', resourceCustomAttributes, values),
                             usage: values.usages.map((item) => item.value),
                         },
+                        usesGlobalModal: false,
                     }),
                 );
             }
@@ -151,41 +248,8 @@ export default function TokenProfileForm({ usesGlobalModal = false }: TokenProfi
             tokenProfileAttributeDescriptors,
             groupAttributesCallbackAttributes,
             resourceCustomAttributes,
-            usesGlobalModal,
         ],
     );
-
-    const optionsForTokens = useMemo(
-        () =>
-            tokens.map((token) => ({
-                value: token.uuid,
-                label: token.name,
-            })),
-        [tokens],
-    );
-
-    const defaultValues: FormValues = useMemo(() => {
-        const token = tokenProfile ? optionsForTokens.find((option) => option.value === tokenProfile.tokenInstanceUuid) : undefined;
-        return {
-            name: editMode ? tokenProfile?.name || '' : '',
-            description: editMode ? tokenProfile?.description || '' : '',
-            token: editMode ? token : undefined,
-            usages: editMode ? tokenProfile?.usages?.map((usage) => ({ value: usage, label: usage })) || [] : [],
-        };
-    }, [editMode, optionsForTokens, tokenProfile]);
-
-    const title = useMemo(() => (editMode ? 'Edit Token Profile' : 'Create Token Profile'), [editMode]);
-
-    const keyUsageOptions = () => {
-        let options: { value: KeyUsage; label: string }[] = [];
-        for (let key in KeyUsage) {
-            options.push({
-                value: KeyUsage[key as keyof typeof KeyUsage],
-                label: getEnumLabel(keyUsageEnum, KeyUsage[key as keyof typeof KeyUsage]),
-            });
-        }
-        return options;
-    };
 
     const renderCustomAttributesEditor = useMemo(() => {
         if (isBusy) return <></>;
@@ -198,117 +262,132 @@ export default function TokenProfileForm({ usesGlobalModal = false }: TokenProfi
         );
     }, [isBusy, resourceCustomAttributes, tokenProfile]);
 
+    const keyUsageOptions = useMemo(() => {
+        let options: { value: KeyUsage; label: string }[] = [];
+        for (let key in KeyUsage) {
+            options.push({
+                value: KeyUsage[key as keyof typeof KeyUsage],
+                label: getEnumLabel(keyUsageEnum, KeyUsage[key as keyof typeof KeyUsage]),
+            });
+        }
+        return options;
+    }, [keyUsageEnum]);
+
     return (
-        <Widget title={title} busy={isBusy}>
-            <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
-                {({ handleSubmit, pristine, submitting, valid, form }) => (
-                    <BootstrapForm onSubmit={handleSubmit}>
-                        <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="name">Token Profile Name</Label>
-
-                                    <Input
-                                        {...input}
-                                        id="name"
-                                        type="text"
-                                        placeholder="Enter Token Profile Name"
-                                        valid={!meta.touched || !meta.error}
-                                        invalid={meta.touched && meta.error}
-                                        disabled={editMode}
-                                    />
-
-                                    <FormFeedback>{meta.error}</FormFeedback>
-                                </FormGroup>
+        <FormProvider {...methods}>
+            <form onSubmit={handleSubmit(onSubmit)}>
+                <Widget noBorder busy={isBusy}>
+                    <div className="space-y-4">
+                        <Controller
+                            name="name"
+                            control={control}
+                            rules={buildValidationRules([validateRequired(), validateAlphaNumericWithSpecialChars()])}
+                            render={({ field, fieldState }) => (
+                                <TextInput
+                                    {...field}
+                                    id="name"
+                                    type="text"
+                                    label="Token Profile Name"
+                                    required
+                                    placeholder="Enter Token Profile Name"
+                                    disabled={editMode}
+                                    invalid={fieldState.error && fieldState.isTouched}
+                                    error={
+                                        fieldState.error && fieldState.isTouched
+                                            ? typeof fieldState.error === 'string'
+                                                ? fieldState.error
+                                                : fieldState.error?.message || 'Invalid value'
+                                            : undefined
+                                    }
+                                />
                             )}
-                        </Field>
+                        />
 
-                        <Field name="description" validate={composeValidators(validateLength(0, 300))}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="description">Description</Label>
-
-                                    <Input
-                                        {...input}
-                                        id="description"
-                                        type="textarea"
-                                        className="form-control"
-                                        placeholder="Enter Description / Comment"
-                                        valid={!meta.touched || !meta.error}
-                                        invalid={meta.touched && meta.error}
-                                    />
-
-                                    <FormFeedback>{meta.error}</FormFeedback>
-                                </FormGroup>
+                        <Controller
+                            name="description"
+                            control={control}
+                            rules={buildValidationRules([validateLength(0, 300)])}
+                            render={({ field, fieldState }) => (
+                                <TextArea
+                                    {...field}
+                                    id="description"
+                                    label="Description"
+                                    rows={3}
+                                    placeholder="Enter Description / Comment"
+                                    invalid={fieldState.error && fieldState.isTouched}
+                                    error={
+                                        fieldState.error && fieldState.isTouched
+                                            ? typeof fieldState.error === 'string'
+                                                ? fieldState.error
+                                                : fieldState.error?.message || 'Invalid value'
+                                            : undefined
+                                    }
+                                />
                             )}
-                        </Field>
+                        />
 
-                        <Field name="token" validate={validateRequired()}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="tokenSelect">Select Token</Label>
+                        <div>
+                            <Controller
+                                name="token"
+                                control={control}
+                                rules={buildValidationRules([validateRequired()])}
+                                render={({ field, fieldState }) => (
+                                    <>
+                                        <Select
+                                            id="tokenSelect"
+                                            label="Select Token"
+                                            value={field.value || ''}
+                                            onChange={(value) => {
+                                                field.onChange(value);
+                                            }}
+                                            options={optionsForTokens}
+                                            placeholder="Select to change Token if needed"
+                                            placement="bottom"
+                                        />
+                                        {fieldState.error && fieldState.isTouched && (
+                                            <p className="mt-1 text-sm text-red-600">
+                                                {typeof fieldState.error === 'string'
+                                                    ? fieldState.error
+                                                    : fieldState.error?.message || 'Invalid value'}
+                                            </p>
+                                        )}
+                                    </>
+                                )}
+                            />
+                        </div>
 
-                                    <Select
-                                        {...input}
-                                        id="token"
-                                        inputId="tokenSelect"
-                                        maxMenuHeight={140}
-                                        menuPlacement="auto"
-                                        options={optionsForTokens}
-                                        placeholder="Select to change Token if needed"
-                                        onChange={(event: any) => {
-                                            onTokenChange(event.value, form);
-                                            input.onChange(event);
-                                        }}
-                                        styles={{
-                                            control: (provided) =>
-                                                meta.touched && meta.invalid
-                                                    ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
-                                                    : { ...provided },
-                                        }}
-                                    />
+                        <div>
+                            <Controller
+                                name="usages"
+                                control={control}
+                                render={({ field, fieldState }) => (
+                                    <>
+                                        <Select
+                                            id="usagesSelect"
+                                            label="Key Usages"
+                                            isMulti
+                                            value={field.value || []}
+                                            onChange={(value) => {
+                                                field.onChange(value);
+                                            }}
+                                            options={keyUsageOptions}
+                                            placeholder="Select Key Usages"
+                                            placement="bottom"
+                                        />
+                                        {fieldState.error && fieldState.isTouched && (
+                                            <p className="mt-1 text-sm text-red-600">
+                                                {typeof fieldState.error === 'string'
+                                                    ? fieldState.error
+                                                    : fieldState.error?.message || 'Invalid value'}
+                                            </p>
+                                        )}
+                                    </>
+                                )}
+                            />
+                        </div>
 
-                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
-                                        {meta.error}
-                                    </div>
-                                </FormGroup>
-                            )}
-                        </Field>
-
-                        <Field name="usages">
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="usagesSelect">Key Usages</Label>
-
-                                    <Select
-                                        {...input}
-                                        id="usages"
-                                        inputId="usagesSelect"
-                                        isMulti={true}
-                                        maxMenuHeight={140}
-                                        menuPlacement="auto"
-                                        options={keyUsageOptions()}
-                                        placeholder="Select Key Usages"
-                                        onChange={(event: any) => {
-                                            input.onChange(event);
-                                        }}
-                                        styles={{
-                                            control: (provided) =>
-                                                meta.touched && meta.invalid
-                                                    ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
-                                                    : { ...provided },
-                                        }}
-                                    />
-
-                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
-                                        {meta.error}
-                                    </div>
-                                </FormGroup>
-                            )}
-                        </Field>
-
-                        <br />
                         <TabLayout
+                            noBorder
                             tabs={[
                                 {
                                     title: 'Connector Attributes',
@@ -317,9 +396,7 @@ export default function TokenProfileForm({ usesGlobalModal = false }: TokenProfi
                                     ) : (
                                         <AttributeEditor
                                             id="token-profile"
-                                            callbackParentUuid={
-                                                tokenProfile?.tokenInstanceUuid || form.getFieldState('token')?.value?.value
-                                            }
+                                            callbackParentUuid={tokenProfile?.tokenInstanceUuid || watchedToken}
                                             callbackResource={Resource.TokenProfiles}
                                             attributeDescriptors={tokenProfileAttributeDescriptors}
                                             attributes={tokenProfile?.attributes}
@@ -335,26 +412,21 @@ export default function TokenProfileForm({ usesGlobalModal = false }: TokenProfi
                             ]}
                         />
 
-                        <div className="d-flex justify-content-end">
-                            <ButtonGroup>
-                                <ProgressButton
-                                    title={editMode ? 'Update' : 'Create'}
-                                    inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
-                                    inProgress={submitting}
-                                    disabled={pristine || submitting || !valid}
-                                />
-                                <Button
-                                    color="default"
-                                    onClick={() => (usesGlobalModal ? dispatch(userInterfaceActions.hideGlobalModal()) : onCancelClick())}
-                                    disabled={submitting}
-                                >
-                                    Cancel
-                                </Button>
-                            </ButtonGroup>
-                        </div>
-                    </BootstrapForm>
-                )}
-            </Form>
-        </Widget>
+                        <Container className="flex-row justify-end modal-footer" gap={4}>
+                            <Button variant="outline" onClick={onCancel} disabled={isSubmitting} type="button">
+                                Cancel
+                            </Button>
+                            <ProgressButton
+                                title={editMode ? 'Update' : 'Create'}
+                                inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
+                                inProgress={isSubmitting}
+                                disabled={!isDirty || isSubmitting || !isValid}
+                                type="submit"
+                            />
+                        </Container>
+                    </div>
+                </Widget>
+            </form>
+        </FormProvider>
     );
 }

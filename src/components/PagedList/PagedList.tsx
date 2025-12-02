@@ -126,7 +126,7 @@ function PagedList({
         if (additionalButtons) {
             result.push(...additionalButtons);
         }
-        return result;
+        return result.sort((a, b) => (a.icon === 'plus' ? -1 : 1));
     }, [checkedRows, additionalButtons, navigate, addHidden, onDeleteCallback]);
 
     const paginationData = useMemo(

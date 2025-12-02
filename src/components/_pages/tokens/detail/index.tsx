@@ -8,9 +8,10 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions as keyActions, selectors as keySelectors } from 'ducks/cryptographic-keys';
 import { actions, selectors } from 'ducks/tokens';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate, useParams } from 'react-router';
+import { Link, useParams } from 'react-router';
+import TokenForm from '../form';
 import { PlatformEnum, Resource, TokenInstanceStatus } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
@@ -23,7 +24,6 @@ import Breadcrumb from 'components/Breadcrumb';
 
 export default function TokenDetail() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const { id } = useParams();
 
@@ -34,14 +34,15 @@ export default function TokenDetail() {
     const isActivating = useSelector(selectors.isActivating);
     const isDeactivating = useSelector(selectors.isDeactivating);
     const isReloading = useSelector(selectors.isReloading);
+    const isUpdating = useSelector(selectors.isUpdating);
 
     const isSyncing = useSelector(keySelectors.isSyncing);
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [confirmDeactivation, setConfirmDeactivation] = useState<boolean>(false);
     const [activateToken, setActivateToken] = useState<boolean>(false);
-
     const [randomDataGeneration, setRandomDataGeneration] = useState<boolean>(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
     const isBusy = useMemo(
         () => isFetching || isDeleting || isActivating || isDeactivating || isReloading || isSyncing,
@@ -64,10 +65,28 @@ export default function TokenDetail() {
         getFreshAttributes();
     }, [getFreshTokenDetails, getFreshAttributes, id]);
 
-    const onEditClick = useCallback(() => {
+    const wasUpdating = useRef(isUpdating);
+
+    useEffect(() => {
+        if (wasUpdating.current && !isUpdating) {
+            setIsEditModalOpen(false);
+            getFreshTokenDetails();
+        }
+        wasUpdating.current = isUpdating;
+    }, [isUpdating, getFreshTokenDetails]);
+
+    const handleOpenEditModal = useCallback(() => {
         if (!token) return;
-        navigate(`../../edit/${token.uuid}`, { relative: 'path' });
-    }, [token, navigate]);
+        setIsEditModalOpen(true);
+    }, [token]);
+
+    const handleCloseEditModal = useCallback(() => {
+        setIsEditModalOpen(false);
+    }, []);
+
+    const onEditClick = useCallback(() => {
+        handleOpenEditModal();
+    }, [handleOpenEditModal]);
 
     const onDeleteConfirmed = useCallback(() => {
         if (!token) return;

@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 
@@ -14,9 +14,15 @@ import PagedList from 'components/PagedList/PagedList';
 import { SearchRequestModel } from 'types/certificate';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import DiscoveryStatus from '../DiscoveryStatus';
+import Dialog from 'components/Dialog';
+import DiscoveryForm from '../form';
+import { WidgetButtonProps } from 'components/WidgetButtons';
 
 function DiscoveryList() {
     const dispatch = useDispatch();
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [wasCreating, setWasCreating] = useState(false);
+    const isCreating = useSelector(selectors.isCreating);
 
     const discoveries = useSelector(selectors.discoveries);
     const isDeleting = useSelector(selectors.isDeleting);
@@ -104,21 +110,72 @@ function DiscoveryList() {
 
     const onListCallback = useCallback((filters: SearchRequestModel) => dispatch(actions.listDiscoveries(filters)), [dispatch]);
 
+    const handleOpenAddModal = useCallback(() => {
+        setIsAddModalOpen(true);
+    }, []);
+
+    const handleCloseAddModal = useCallback(() => {
+        setIsAddModalOpen(false);
+    }, []);
+
+    const handleFormSuccess = useCallback(() => {
+        handleCloseAddModal();
+        onListCallback({ itemsPerPage: 10, pageNumber: 1, filters: [] });
+    }, [handleCloseAddModal, onListCallback]);
+
+    // Track creation state and close modal on success
+    useEffect(() => {
+        if (isCreating) {
+            setWasCreating(true);
+        } else if (wasCreating && !isCreating && isAddModalOpen) {
+            // Creation completed (success or failure), close modal and refresh
+            handleFormSuccess();
+            setWasCreating(false);
+        }
+    }, [isCreating, wasCreating, isAddModalOpen, handleFormSuccess]);
+
+    const additionalButtons: WidgetButtonProps[] = useMemo(
+        () => [
+            {
+                icon: 'plus',
+                disabled: false,
+                tooltip: 'Add',
+                onClick: handleOpenAddModal,
+            },
+        ],
+        [handleOpenAddModal],
+    );
+
     return (
-        <PagedList
-            entity={EntityType.DISCOVERY}
-            onListCallback={onListCallback}
-            onDeleteCallback={(uuids) => dispatch(actions.bulkDeleteDiscovery({ uuids }))}
-            getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.discoveries.getSearchableFieldInformation3(), [])}
-            headers={discoveriesRowHeaders}
-            data={discoveryList}
-            isBusy={isBusy}
-            title="Discovery Store"
-            entityNameSingular="a Discovery"
-            entityNamePlural="Discoveries"
-            filterTitle="Discoveries Filter"
-            pageWidgetLockName={LockWidgetNameEnum.DiscoveriesStore}
-        />
+        <>
+            <PagedList
+                entity={EntityType.DISCOVERY}
+                onListCallback={onListCallback}
+                onDeleteCallback={(uuids) => dispatch(actions.bulkDeleteDiscovery({ uuids }))}
+                getAvailableFiltersApi={useCallback(
+                    (apiClients: ApiClients) => apiClients.discoveries.getSearchableFieldInformation3(),
+                    [],
+                )}
+                headers={discoveriesRowHeaders}
+                data={discoveryList}
+                isBusy={isBusy}
+                title="Discovery Store"
+                entityNameSingular="a Discovery"
+                entityNamePlural="Discoveries"
+                filterTitle="Discoveries Filter"
+                pageWidgetLockName={LockWidgetNameEnum.DiscoveriesStore}
+                addHidden
+                additionalButtons={additionalButtons}
+            />
+            <Dialog
+                isOpen={isAddModalOpen}
+                caption="Create Discovery"
+                body={<DiscoveryForm onCancel={handleCloseAddModal} />}
+                toggle={handleCloseAddModal}
+                size="xl"
+                buttons={[]}
+            />
+        </>
     );
 }
 

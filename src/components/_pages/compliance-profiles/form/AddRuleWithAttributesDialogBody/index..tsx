@@ -2,13 +2,12 @@ import AttributeEditor from 'components/Attributes/AttributeEditor';
 
 import { actions } from 'ducks/compliance-profiles';
 import { useCallback, useState } from 'react';
-import { Field, Form } from 'react-final-form';
+import { FormProvider, useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 
-import { Button, ButtonGroup, Form as BootstrapForm, FormGroup } from 'reactstrap';
+import Button from 'components/Button';
 import { AttributeDescriptorModel } from 'types/attributes';
 
-import { mutators } from 'utils/attributes/attributeEditorMutators';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 import TabLayout from '../../../../Layout/TabLayout';
 
@@ -41,6 +40,13 @@ export default function AddRuleWithAttributesDialogBody({
     const dispatch = useDispatch();
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 
+    const methods = useForm({
+        mode: 'onTouched',
+        defaultValues: {},
+    });
+
+    const { handleSubmit, formState } = methods;
+
     const onSubmit = useCallback(
         (values: any) => {
             if (!complianceProfileUuid) return;
@@ -71,51 +77,46 @@ export default function AddRuleWithAttributesDialogBody({
 
     return (
         <>
-            <Form onSubmit={onSubmit} mutators={{ ...mutators() }}>
-                {({ handleSubmit, pristine, submitting, valid }) => (
-                    <BootstrapForm onSubmit={handleSubmit}>
-                        {!attributes || attributes.length === 0 ? (
-                            <></>
-                        ) : (
-                            <Field name="attributes">
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <br />
-
-                                        <TabLayout
-                                            tabs={[
-                                                {
-                                                    title: 'Custom Attributes',
-                                                    content: (
-                                                        <AttributeEditor
-                                                            id="attributes"
-                                                            attributeDescriptors={attributes}
-                                                            groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
-                                                            setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
-                                                        />
-                                                    ),
-                                                },
-                                            ]}
-                                        />
-                                    </FormGroup>
-                                )}
-                            </Field>
-                        )}
-
-                        <div style={{ textAlign: 'right' }}>
-                            <ButtonGroup>
-                                <Button type="submit" color="primary" disabled={pristine || submitting || !valid} onClick={handleSubmit}>
-                                    Add
-                                </Button>
-
-                                <Button type="button" color="secondary" disabled={submitting} onClick={onClose}>
-                                    Cancel
-                                </Button>
-                            </ButtonGroup>
+            <FormProvider {...methods}>
+                <form onSubmit={handleSubmit(onSubmit)}>
+                    {!attributes || attributes.length === 0 ? (
+                        <></>
+                    ) : (
+                        <div className="mb-4">
+                            <TabLayout
+                                tabs={[
+                                    {
+                                        title: 'Custom Attributes',
+                                        content: (
+                                            <AttributeEditor
+                                                id="attributes"
+                                                attributeDescriptors={attributes}
+                                                groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                                                setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                                            />
+                                        ),
+                                    },
+                                ]}
+                            />
                         </div>
-                    </BootstrapForm>
-                )}
-            </Form>
+                    )}
+
+                    <div className="flex justify-end gap-2">
+                        <Button
+                            type="submit"
+                            color="primary"
+                            disabled={formState.isSubmitting || !formState.isValid}
+                            onClick={handleSubmit(onSubmit)}
+                        >
+                            Add
+                        </Button>
+
+                        <Button type="button" color="secondary" disabled={formState.isSubmitting} onClick={onClose}>
+                            Cancel
+                        </Button>
+                    </div>
+                </form>
+            </FormProvider>
         </>
     );
 }

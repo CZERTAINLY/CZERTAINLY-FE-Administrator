@@ -28,8 +28,9 @@ import CertificateOwnerDialog from '../CertificateOwnerDialog';
 import CertificateRAProfileDialog from '../CertificateRAProfileDialog';
 import CertificateStatus from '../CertificateStatus';
 import CertificateUploadDialog from '../CertificateUploadDialog';
-import { Download, Plug } from 'lucide-react';
+import { Download, Plug, Plus } from 'lucide-react';
 import Switch from 'components/Switch';
+import CertificateEdit from '../form';
 
 interface Props {
     selectCertsOnly?: boolean;
@@ -73,6 +74,7 @@ export default function CertificateList({
     const currentFilters = useSelector(filterSelectors.currentFilters(EntityType.CERTIFICATE));
     const preservedFilters = useSelector(filterSelectors.preservedFilters(EntityType.CERTIFICATE));
     const [upload, setUpload] = useState<boolean>(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
     const [updateGroup, setUpdateGroup] = useState<boolean>(false);
     const [updateOwner, setUpdateOwner] = useState<boolean>(false);
     const [updateEntity, setUpdateEntity] = useState<boolean>(false);
@@ -154,11 +156,29 @@ export default function CertificateList({
         dispatch(actions.bulkUnarchiveCertificate({ uuids: checkedRows, filters: appliedFilters }));
     }, [dispatch, checkedRows, appliedFilters]);
 
+    const handleOpenAddModal = useCallback(() => {
+        setIsAddModalOpen(true);
+    }, []);
+
+    const handleCloseAddModal = useCallback(() => {
+        setIsAddModalOpen(false);
+    }, []);
+
     const buttons: WidgetButtonProps[] = useMemo(
         () =>
             selectCertsOnly
                 ? []
                 : [
+                      {
+                          icon: 'plus',
+                          disabled: false,
+                          tooltip: 'Add Certificate',
+                          onClick: (event) => {
+                              event.preventDefault();
+                              handleOpenAddModal();
+                          },
+                          id: 'add-certificate',
+                      },
                       {
                           icon: 'upload',
                           disabled: false,
@@ -212,7 +232,7 @@ export default function CertificateList({
                           onClick: onUnarchiveClick,
                       },
                   ],
-        [checkedRows.length, downloadDropDown, selectCertsOnly, getUserList, onArchiveClick, onUnarchiveClick],
+        [checkedRows.length, downloadDropDown, selectCertsOnly, getUserList, onArchiveClick, onUnarchiveClick, handleOpenAddModal],
     );
 
     const certificatesRowHeaders: TableHeader[] = useMemo(
@@ -435,6 +455,7 @@ export default function CertificateList({
                 filterTitle="Certificate Inventory Filter"
                 multiSelect={multiSelect}
                 pageWidgetLockName={LockWidgetNameEnum.ListOfCertificates}
+                addHidden
                 extraFilterComponent={
                     <Switch
                         label="Include archived"
@@ -443,6 +464,16 @@ export default function CertificateList({
                         onChange={() => dispatch(actions.setIncludeArchived(!isIncludeArchived))}
                     />
                 }
+            />
+
+            <Dialog
+                isOpen={isAddModalOpen}
+                caption="Add new Certificate"
+                body={<CertificateEdit onCancel={handleCloseAddModal} />}
+                toggle={handleCloseAddModal}
+                buttons={[]}
+                size="xl"
+                icon={<Plus size={26} strokeWidth={1} />}
             />
 
             <Dialog
@@ -457,7 +488,7 @@ export default function CertificateList({
 
             <Dialog
                 isOpen={updateGroup}
-                caption={`Update Groups`}
+                caption="Update Groups"
                 body={
                     <CertificateGroupDialog
                         uuids={checkedRows}
@@ -469,11 +500,12 @@ export default function CertificateList({
                 buttons={[]}
                 icon="users"
                 size="md"
+                noBorder
             />
 
             <Dialog
                 isOpen={updateOwner}
-                caption={`Update Owner`}
+                caption="Update Owner"
                 body={
                     <CertificateOwnerDialog
                         users={users}
@@ -486,12 +518,13 @@ export default function CertificateList({
                 buttons={[]}
                 icon="user"
                 size="md"
+                noBorder
             />
 
             <Dialog
                 isOpen={updateEntity}
-                caption={`Update Entity`}
-                body={`Update Entity`}
+                caption="Update Entity"
+                body="Update Entity"
                 toggle={() => setUpdateEntity(false)}
                 buttons={[
                     { color: 'primary', onClick: () => {}, body: 'Update' },
@@ -501,7 +534,7 @@ export default function CertificateList({
 
             <Dialog
                 isOpen={updateRaProfile}
-                caption={`Update RA Profile`}
+                caption="Update RA Profile"
                 body={
                     <CertificateRAProfileDialog
                         uuids={checkedRows}
@@ -512,6 +545,7 @@ export default function CertificateList({
                 toggle={() => setUpdateRaProfile(false)}
                 buttons={[]}
                 size="md"
+                noBorder
                 icon={<Plug size={26} strokeWidth={1} />}
             />
         </>

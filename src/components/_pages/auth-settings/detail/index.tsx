@@ -1,12 +1,14 @@
 import JwkSetKeysTable from 'components/_pages/auth-settings/JwkSetKeysTable';
+import OAuth2ProviderForm from 'components/_pages/auth-settings/form';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions, selectors } from 'ducks/auth-settings';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router';
+import { useParams } from 'react-router';
 
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { renderOAuth2StateBadges } from 'utils/oauth2Providers';
@@ -16,10 +18,16 @@ export default function OAuth2ProviderDetail() {
     const { providerName } = useParams();
 
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const oauth2Provider = useSelector(selectors.oauth2Provider);
     const isFetchingProvider = useSelector(selectors.isFetchingProvider);
+    const isCreatingProvider = useSelector(selectors.isCreatingProvider);
+    const isUpdatingProvider = useSelector(selectors.isUpdatingProvider);
+
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+    const wasCreating = useRef(isCreatingProvider);
+    const wasUpdating = useRef(isUpdatingProvider);
 
     const getFreshData = useCallback(() => {
         if (!providerName) return;
@@ -31,10 +39,26 @@ export default function OAuth2ProviderDetail() {
         getFreshData();
     }, [getFreshData]);
 
-    const onEditClick = useCallback(() => {
+    const handleOpenEditDialog = useCallback(() => {
         if (!providerName) return;
-        navigate(`../authenticationsettings/edit/${providerName}`);
-    }, [navigate, providerName]);
+        setIsEditDialogOpen(true);
+        dispatch(actions.resetOAuth2ProviderSettings());
+        dispatch(actions.getOAuth2ProviderSettings({ providerName }));
+    }, [dispatch, providerName]);
+
+    const handleCloseEditDialog = useCallback(() => {
+        setIsEditDialogOpen(false);
+        dispatch(actions.resetOAuth2ProviderSettings());
+    }, [dispatch]);
+
+    // Track update state and close dialog on success
+    useEffect(() => {
+        if (wasUpdating.current && !isUpdatingProvider && isEditDialogOpen) {
+            handleCloseEditDialog();
+            getFreshData();
+        }
+        wasUpdating.current = isUpdatingProvider;
+    }, [isUpdatingProvider, isEditDialogOpen, handleCloseEditDialog, getFreshData]);
 
     const onDeleteClick = useCallback(() => {
         if (!providerName) return;
@@ -47,9 +71,7 @@ export default function OAuth2ProviderDetail() {
                 icon: 'pencil',
                 disabled: false,
                 tooltip: 'Edit',
-                onClick: () => {
-                    onEditClick();
-                },
+                onClick: handleOpenEditDialog,
             },
             {
                 icon: 'trash',
@@ -60,7 +82,7 @@ export default function OAuth2ProviderDetail() {
                 },
             },
         ],
-        [onEditClick, onDeleteClick],
+        [handleOpenEditDialog, onDeleteClick],
     );
 
     const headers: TableHeader[] = useMemo(
@@ -137,6 +159,13 @@ export default function OAuth2ProviderDetail() {
             >
                 <JwkSetKeysTable jwkSetKeys={oauth2Provider?.jwkSetKeys} />
             </Widget>
+            <Dialog
+                isOpen={isEditDialogOpen}
+                toggle={handleCloseEditDialog}
+                caption="Edit OAuth2 Provider"
+                size="xl"
+                body={<OAuth2ProviderForm providerName={providerName} onCancel={handleCloseEditDialog} />}
+            />
         </Container>
     );
 }

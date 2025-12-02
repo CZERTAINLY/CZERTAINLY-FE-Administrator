@@ -1,5 +1,5 @@
 import { TableDataRow, TableHeader } from 'components/CustomTable';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { actions, selectors } from 'ducks/oids';
 import { EntityType } from 'ducks/filters';
@@ -10,6 +10,9 @@ import { LockWidgetNameEnum } from 'types/user-interface';
 import { SearchRequestModel } from 'types/certificate';
 import { selectors as enumSelectors } from 'ducks/enums';
 import { OidCategory, PlatformEnum } from 'types/openapi';
+import Dialog from 'components/Dialog';
+import CustomOIDForm from 'components/_pages/custom-oid/form';
+import { WidgetButtonProps } from 'components/WidgetButtons';
 
 export default function CustomOIDList() {
     const dispatch = useDispatch();
@@ -18,8 +21,16 @@ export default function CustomOIDList() {
 
     const isDeleting = useSelector(selectors.isDeleting);
     const isUpdating = useSelector(selectors.isUpdating);
+    const isCreating = useSelector(selectors.isCreating);
+    const isFetching = useSelector(selectors.isFetching);
 
     const isBusy = isDeleting || isUpdating;
+
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [editingOidId, setEditingOidId] = useState<string | undefined>(undefined);
+
+    const wasCreating = useRef(isCreating);
+    const wasUpdating = useRef(isUpdating);
 
     const oidCategoryEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.OidCategory));
     const oidsRowHeaders: TableHeader[] = useMemo(
@@ -83,20 +94,79 @@ export default function CustomOIDList() {
         [dispatch],
     );
 
+    const handleOpenAddModal = useCallback(() => {
+        setEditingOidId(undefined);
+        setIsAddModalOpen(true);
+    }, []);
+
+    const handleCloseAddModal = useCallback(() => {
+        setIsAddModalOpen(false);
+        setEditingOidId(undefined);
+    }, []);
+
+    const handleOpenEditModal = useCallback((oidId: string) => {
+        setEditingOidId(oidId);
+        setIsAddModalOpen(true);
+    }, []);
+
+    const getFreshData = useCallback(() => {
+        onListCallback({ itemsPerPage: 10, pageNumber: 1, filters: [] });
+    }, [onListCallback]);
+
+    // Track creation/update state and close dialog on success
+    useEffect(() => {
+        if (wasCreating.current && !isCreating && isAddModalOpen) {
+            handleCloseAddModal();
+            getFreshData();
+        }
+        wasCreating.current = isCreating;
+    }, [isCreating, isAddModalOpen, handleCloseAddModal, getFreshData]);
+
+    useEffect(() => {
+        if (wasUpdating.current && !isUpdating && isAddModalOpen) {
+            handleCloseAddModal();
+            getFreshData();
+        }
+        wasUpdating.current = isUpdating;
+    }, [isUpdating, isAddModalOpen, handleCloseAddModal, getFreshData]);
+
+    const additionalButtons: WidgetButtonProps[] = useMemo(
+        () => [
+            {
+                icon: 'plus',
+                disabled: false,
+                tooltip: 'Create Custom OID',
+                onClick: handleOpenAddModal,
+            },
+        ],
+        [handleOpenAddModal],
+    );
+
     return (
-        <PagedList
-            entity={EntityType.OID}
-            onListCallback={onListCallback}
-            onDeleteCallback={onDeleteCallback}
-            getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.oids.getSearchableInformation(), [])}
-            headers={oidsRowHeaders}
-            data={oidsList}
-            isBusy={isBusy}
-            title="Custom OIDs"
-            entityNameSingular="an OID"
-            entityNamePlural="OIDs"
-            filterTitle="Certificates by Compliance"
-            pageWidgetLockName={LockWidgetNameEnum.EntityStore}
-        />
+        <>
+            <PagedList
+                entity={EntityType.OID}
+                onListCallback={onListCallback}
+                onDeleteCallback={onDeleteCallback}
+                getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.oids.getSearchableInformation(), [])}
+                headers={oidsRowHeaders}
+                data={oidsList}
+                isBusy={isBusy}
+                title="Custom OIDs"
+                entityNameSingular="an OID"
+                entityNamePlural="OIDs"
+                filterTitle="Certificates by Compliance"
+                pageWidgetLockName={LockWidgetNameEnum.EntityStore}
+                addHidden
+                additionalButtons={additionalButtons}
+            />
+            <Dialog
+                isOpen={isAddModalOpen || !!editingOidId}
+                toggle={handleCloseAddModal}
+                caption={editingOidId ? 'Edit Custom OID' : 'Create Custom OID'}
+                size="xl"
+                body={<CustomOIDForm oidId={editingOidId} onCancel={handleCloseAddModal} />}
+            />
+        </>
     );
 }

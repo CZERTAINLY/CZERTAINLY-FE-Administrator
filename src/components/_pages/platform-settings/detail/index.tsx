@@ -5,21 +5,25 @@ import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions, selectors } from 'ducks/settings';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router';
 
 import { LockWidgetNameEnum } from 'types/user-interface';
+import Dialog from 'components/Dialog';
+import PlatformSettingsForm from '../form';
+
+// import Container from 'components/Container';
+// import Breadcrumb from 'components/Breadcrumb';
 
 // import Container from 'components/Container';
 // import Breadcrumb from 'components/Breadcrumb';
 
 export default function PlatformSettingsDetail() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const platformSettings = useSelector(selectors.platformSettings);
     const isFetchingPlatform = useSelector(selectors.isFetchingPlatform);
+    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
     const getFreshPlatformSettings = useCallback(() => {
         dispatch(actions.getPlatformSettings());
@@ -29,9 +33,18 @@ export default function PlatformSettingsDetail() {
         getFreshPlatformSettings();
     }, [getFreshPlatformSettings]);
 
+    const handleOpenEditModal = useCallback(() => {
+        setIsEditModalOpen(true);
+    }, []);
+
+    const handleCloseEditModal = useCallback(() => {
+        setIsEditModalOpen(false);
+        getFreshPlatformSettings();
+    }, [getFreshPlatformSettings]);
+
     const onEditClick = useCallback(() => {
-        navigate(`./edit`);
-    }, [navigate]);
+        handleOpenEditModal();
+    }, [handleOpenEditModal]);
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
@@ -49,11 +62,6 @@ export default function PlatformSettingsDetail() {
 
     return (
         <div>
-            {/* <Breadcrumb
-                items={[
-                    { label: 'Platform Settings', href: '/platformsettings' },
-                ]}
-            /> */}
             <Widget
                 title="Platform Settings"
                 busy={isFetchingPlatform}
@@ -63,6 +71,7 @@ export default function PlatformSettingsDetail() {
                 refreshAction={getFreshPlatformSettings}
             >
                 <TabLayout
+                    noBorder
                     tabs={[
                         {
                             title: 'Utils',
@@ -75,6 +84,14 @@ export default function PlatformSettingsDetail() {
                     ]}
                 />
             </Widget>
+
+            <Dialog
+                isOpen={isEditModalOpen}
+                toggle={handleCloseEditModal}
+                caption="Edit Platform Settings"
+                size="xl"
+                body={<PlatformSettingsForm onCancel={handleCloseEditModal} onSuccess={handleCloseEditModal} />}
+            />
         </div>
     );
 }

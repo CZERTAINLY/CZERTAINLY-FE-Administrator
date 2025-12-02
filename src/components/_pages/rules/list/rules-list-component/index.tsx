@@ -6,27 +6,29 @@ import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Link } from 'react-router';
 import Select from 'components/Select';
 import { PlatformEnum, Resource } from 'types/openapi';
 
 import { useRuleEvaluatorResourceOptions } from 'utils/rules';
+import RulesForm from '../../form';
 import styles from './ruleList.module.scss';
 
 const RulesList = () => {
     const rules = useSelector(rulesSelectors.rules);
 
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [selectedResource, setSelectedResource] = useState<Resource>();
     const isFetchingList = useSelector(rulesSelectors.isFetchingRulesList);
     const isDeleting = useSelector(rulesSelectors.isDeletingRule);
+    const isCreatingRule = useSelector(rulesSelectors.isCreatingRule);
 
     const [checkedRows, setCheckedRows] = useState<string[]>([]);
     const [confirmDelete, setConfirmDelete] = useState(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const { resourceOptionsWithRuleEvaluator, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
 
     const isBusy = useMemo(
@@ -34,15 +36,32 @@ const RulesList = () => {
         [isFetchingList, isDeleting, isFetchingResourcesList],
     );
 
+    const wasCreating = useRef(isCreatingRule);
+    const getFreshList = useCallback(() => {
+        dispatch(rulesActions.listRules({ resource: selectedResource }));
+    }, [dispatch, selectedResource]);
+
+    useEffect(() => {
+        if (wasCreating.current && !isCreatingRule) {
+            setIsAddModalOpen(false);
+            getFreshList();
+        }
+        wasCreating.current = isCreatingRule;
+    }, [isCreatingRule, getFreshList]);
+
+    const handleOpenAddModal = useCallback(() => {
+        setIsAddModalOpen(true);
+    }, []);
+
+    const handleCloseAddModal = useCallback(() => {
+        setIsAddModalOpen(false);
+    }, []);
+
     const onDeleteConfirmed = useCallback(() => {
         dispatch(rulesActions.deleteRule({ ruleUuid: checkedRows[0] }));
         setConfirmDelete(false);
         setCheckedRows([]);
     }, [dispatch, checkedRows]);
-
-    const getFreshList = useCallback(() => {
-        dispatch(rulesActions.listRules({ resource: selectedResource }));
-    }, [dispatch, selectedResource]);
 
     useEffect(() => {
         getFreshList();
@@ -112,7 +131,7 @@ const RulesList = () => {
                 icon: 'plus',
                 disabled: false,
                 tooltip: 'Create',
-                onClick: () => navigate(`../rules/add`),
+                onClick: handleOpenAddModal,
             },
             {
                 icon: 'trash',
@@ -121,7 +140,7 @@ const RulesList = () => {
                 onClick: () => setConfirmDelete(true),
             },
         ],
-        [checkedRows, resourceOptionsWithRuleEvaluator, navigate, selectedResource],
+        [checkedRows, resourceOptionsWithRuleEvaluator, selectedResource, handleOpenAddModal],
     );
 
     return (
@@ -161,6 +180,14 @@ const RulesList = () => {
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
+            />
+
+            <Dialog
+                isOpen={isAddModalOpen}
+                toggle={handleCloseAddModal}
+                caption="Create Rule"
+                size="xl"
+                body={<RulesForm onCancel={handleCloseAddModal} onSuccess={handleCloseAddModal} />}
             />
         </>
     );

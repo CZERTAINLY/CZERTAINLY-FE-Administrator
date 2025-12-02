@@ -1,16 +1,17 @@
 import { useCallback, useEffect, useMemo } from 'react';
-import { Field, Form } from 'react-final-form';
-import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
+import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { ComplianceRuleListDto, ConditionItemRequestDto, Resource } from 'types/openapi';
-import Select from 'react-select';
-import { mutators } from 'utils/attributes/attributeEditorMutators';
+import Select from 'components/Select';
+import Button from 'components/Button';
 import { useComplianceProfileResourceOptions } from 'utils/rules';
 import { composeValidators, validateLength, validateRequired } from 'utils/validators';
+import { buildValidationRules } from 'utils/validators-helper';
 import ProgressButton from 'components/ProgressButton';
 import { EntityType, actions as filterActions } from 'ducks/filters';
 import { useDispatch, useSelector } from 'react-redux';
 import ConditionFormFilter from 'components/ConditionFormFilter';
 import { actions as complianceActions, selectors as complianceSelectors } from 'ducks/compliance-profiles';
+import cn from 'classnames';
 
 type Props = {
     rule?: ComplianceRuleListDto;
@@ -103,92 +104,135 @@ export default function InternalRuleForm({ rule, onCancel }: Props) {
         };
     }, [dispatch]);
 
+    const methods = useForm<FormValues>({
+        mode: 'onTouched',
+        defaultValues,
+    });
+
+    const { control, handleSubmit, setValue, formState } = methods;
+    const watchedResource = useWatch({ control, name: 'resource' });
+
+    const selectOptions = useMemo(
+        () =>
+            resourceOptionsWithComplianceProfile.map((opt) => ({
+                value: opt.value,
+                label: opt.label,
+            })),
+        [resourceOptionsWithComplianceProfile],
+    );
+
     return (
-        <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
-            {({ handleSubmit, pristine, submitting, values, valid, form }) => (
-                <BootstrapForm onSubmit={handleSubmit}>
-                    <Field name="name" validate={validateRequired()}>
-                        {({ input, meta }) => (
-                            <FormGroup>
-                                <Label for="name">Internal Rule Name</Label>
-                                <Input
-                                    {...input}
-                                    id="name"
-                                    valid={!meta.error && meta.touched}
-                                    invalid={!!meta.error && meta.touched}
-                                    type="text"
-                                    placeholder="Enter the Rule Name"
-                                />
-                                <FormFeedback>{meta.error}</FormFeedback>
-                            </FormGroup>
-                        )}
-                    </Field>
-                    <Field name="description" validate={composeValidators(validateLength(0, 300))}>
-                        {({ input, meta }) => (
-                            <FormGroup>
-                                <Label for="description">Description</Label>
-                                <Input
-                                    {...input}
-                                    id="description"
-                                    valid={!meta.error && meta.touched}
-                                    invalid={!!meta.error && meta.touched}
-                                    type="text"
-                                    placeholder="Enter Description / Comment"
-                                />
-                                <FormFeedback>{meta.error}</FormFeedback>
-                            </FormGroup>
-                        )}
-                    </Field>
-                    <Field name="resource" validate={validateRequired()}>
-                        {({ input, meta }) => (
-                            <FormGroup>
-                                <Label for="resource">Resource</Label>
-                                <Select
-                                    {...input}
-                                    id="resource"
-                                    inputId="resourceSelect"
-                                    maxMenuHeight={140}
-                                    menuPlacement="auto"
-                                    options={resourceOptionsWithComplianceProfile}
-                                    placeholder="Select Resource"
-                                    isClearable
-                                    value={resourceOptionsWithComplianceProfile.find((opt) => opt.value === input.value) || null}
-                                    onChange={(option) => {
-                                        const newValue = option ? option.value : Resource.None;
-                                        input.onChange(newValue);
-                                        form.change('items', []);
-                                        dispatch(filterActions.setCurrentFilters({ currentFilters: [], entity: EntityType.CONDITIONS }));
-                                    }}
-                                    styles={{
-                                        control: (provided) =>
-                                            meta.touched && meta.invalid
-                                                ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
-                                                : { ...provided },
-                                    }}
-                                />
-                                {meta.touched && meta.invalid && <FormFeedback className="d-block">{meta.error}</FormFeedback>}
-                            </FormGroup>
-                        )}
-                    </Field>
-
-                    {values?.resource && <ConditionFormFilter formType="conditionItem" resource={values.resource} />}
-
-                    <div className="d-flex justify-content-end">
-                        <ButtonGroup>
-                            <ProgressButton
-                                title={rule ? 'Update' : 'Create'}
-                                inProgressTitle={rule ? 'Updating...' : 'Creating...'}
-                                inProgress={submitting}
-                                disabled={values.resource === Resource.None || submitting || !valid || isBusy}
+        <FormProvider {...methods}>
+            <form onSubmit={handleSubmit(onSubmit)}>
+                <Controller
+                    name="name"
+                    control={control}
+                    rules={buildValidationRules([validateRequired()])}
+                    render={({ field, fieldState }) => (
+                        <div className="mb-4">
+                            <label htmlFor="name" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
+                                Internal Rule Name
+                            </label>
+                            <input
+                                {...field}
+                                id="name"
+                                type="text"
+                                placeholder="Enter the Rule Name"
+                                className={cn(
+                                    'py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600',
+                                    {
+                                        'border-red-500 focus:border-red-500 focus:ring-red-500': fieldState.error && fieldState.isTouched,
+                                    },
+                                )}
                             />
+                            {fieldState.error && fieldState.isTouched && (
+                                <p className="mt-1 text-sm text-red-600">
+                                    {typeof fieldState.error === 'string' ? fieldState.error : fieldState.error?.message || 'Invalid value'}
+                                </p>
+                            )}
+                        </div>
+                    )}
+                />
+                <Controller
+                    name="description"
+                    control={control}
+                    rules={buildValidationRules([composeValidators(validateLength(0, 300))])}
+                    render={({ field, fieldState }) => (
+                        <div className="mb-4">
+                            <label htmlFor="description" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
+                                Description
+                            </label>
+                            <input
+                                {...field}
+                                id="description"
+                                type="text"
+                                placeholder="Enter Description / Comment"
+                                className={cn(
+                                    'py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600',
+                                    {
+                                        'border-red-500 focus:border-red-500 focus:ring-red-500': fieldState.error && fieldState.isTouched,
+                                    },
+                                )}
+                            />
+                            {fieldState.error && fieldState.isTouched && (
+                                <p className="mt-1 text-sm text-red-600">
+                                    {typeof fieldState.error === 'string' ? fieldState.error : fieldState.error?.message || 'Invalid value'}
+                                </p>
+                            )}
+                        </div>
+                    )}
+                />
+                <Controller
+                    name="resource"
+                    control={control}
+                    rules={buildValidationRules([validateRequired()])}
+                    render={({ field, fieldState }) => (
+                        <div className="mb-4">
+                            <label htmlFor="resource" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
+                                Resource
+                            </label>
+                            <Select
+                                id="resourceSelect"
+                                options={selectOptions}
+                                value={field.value}
+                                onChange={(value) => {
+                                    const newValue = (value as Resource) || Resource.None;
+                                    field.onChange(newValue);
+                                    setValue('items', []);
+                                    dispatch(filterActions.setCurrentFilters({ currentFilters: [], entity: EntityType.CONDITIONS }));
+                                }}
+                                placeholder="Select Resource"
+                                isClearable
+                                className={cn({
+                                    'border-red-500': fieldState.error && fieldState.isTouched,
+                                })}
+                            />
+                            {fieldState.error && fieldState.isTouched && (
+                                <p className="mt-1 text-sm text-red-600">
+                                    {typeof fieldState.error === 'string' ? fieldState.error : fieldState.error?.message || 'Invalid value'}
+                                </p>
+                            )}
+                        </div>
+                    )}
+                />
 
-                            <Button color="default" onClick={onCancel} disabled={submitting}>
-                                Cancel
-                            </Button>
-                        </ButtonGroup>
-                    </div>
-                </BootstrapForm>
-            )}
-        </Form>
+                {watchedResource && watchedResource !== Resource.None && (
+                    <ConditionFormFilter formType="conditionItem" resource={watchedResource} />
+                )}
+
+                <div className="flex justify-end gap-2">
+                    <ProgressButton
+                        title={rule ? 'Update' : 'Create'}
+                        inProgressTitle={rule ? 'Updating...' : 'Creating...'}
+                        inProgress={formState.isSubmitting}
+                        disabled={watchedResource === Resource.None || formState.isSubmitting || !formState.isValid || isBusy}
+                    />
+
+                    <Button variant="outline" color="secondary" onClick={onCancel} disabled={formState.isSubmitting} type="button">
+                        Cancel
+                    </Button>
+                </div>
+            </form>
+        </FormProvider>
     );
 }

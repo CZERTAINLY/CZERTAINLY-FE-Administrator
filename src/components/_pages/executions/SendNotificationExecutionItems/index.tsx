@@ -1,7 +1,7 @@
 import Widget from 'components/Widget';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import Select from 'react-select';
+import Select from 'components/Select';
 import { Fragment } from 'react/jsx-runtime';
 import { Row, Col, FormGroup, Label, Button } from 'reactstrap';
 import Badge from 'components/Badge';
@@ -87,13 +87,19 @@ export function SendNotificationExecutionItems({ mode, isUpdating, notificationP
                             <Label for="fieldSelectInput">Notification Profile</Label>
                             <Select
                                 id="field"
-                                inputId="fieldSelectInput"
                                 placeholder="Select Notification Profile"
                                 options={profileSelectOptions}
-                                onChange={(e) => {
-                                    setSelectedProfile(e);
+                                onChange={(value) => {
+                                    setSelectedProfile(
+                                        value
+                                            ? {
+                                                  value: value as string,
+                                                  label: profileSelectOptions.find((opt) => opt.value === value)?.label || '',
+                                              }
+                                            : null,
+                                    );
                                 }}
-                                value={selectedProfile}
+                                value={selectedProfile?.value || ''}
                             />
                         </FormGroup>
                     </Col>

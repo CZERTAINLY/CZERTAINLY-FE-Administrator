@@ -5,13 +5,14 @@ import StatusBadge from 'components/StatusBadge';
 
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
+import UserForm from '../form';
 import { actions as certActions, selectors as certSelectors } from 'ducks/certificates';
 
 import { selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { actions, selectors } from 'ducks/users';
-import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate, useParams } from 'react-router';
+import { Link, useParams } from 'react-router';
 import Badge from 'components/Badge';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { PlatformEnum, Resource } from '../../../../types/openapi';
@@ -23,7 +24,6 @@ import Container from 'components/Container';
 
 export default function UserDetail() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const { id } = useParams();
 
@@ -32,6 +32,7 @@ export default function UserDetail() {
     const isFetchingRoles = useSelector(selectors.isFetchingRoles);
     const isDisabling = useSelector(selectors.isDisabling);
     const isEnabling = useSelector(selectors.isEnabling);
+    const isUpdating = useSelector(selectors.isUpdating);
     const isFetchingResourceCustomAttributes = useSelector(customAttributesSelectors.isFetchingResourceCustomAttributes);
     const isUpdatingContent = useSelector(customAttributesSelectors.isUpdatingContent);
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
@@ -39,6 +40,7 @@ export default function UserDetail() {
     const isFetchingCertificateDetail = useSelector(certSelectors.isFetchingDetail);
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
     const getFreshUserDetails = useCallback(() => {
         if (!id) return;
@@ -61,9 +63,24 @@ export default function UserDetail() {
         getFreshCertificateDetails();
     }, [getFreshCertificateDetails, id]);
 
+    const wasUpdating = useRef(isUpdating);
+
+    useEffect(() => {
+        if (wasUpdating.current && !isUpdating) {
+            setIsEditModalOpen(false);
+            getFreshUserDetails();
+        }
+        wasUpdating.current = isUpdating;
+    }, [isUpdating, getFreshUserDetails]);
+
+    const handleCloseEditModal = useCallback(() => {
+        setIsEditModalOpen(false);
+    }, []);
+
     const onEditClick = useCallback(() => {
-        navigate(`../../edit/${user?.uuid}`, { relative: 'path' });
-    }, [navigate, user]);
+        if (!user) return;
+        setIsEditModalOpen(true);
+    }, [user]);
 
     const onEnableClick = useCallback(() => {
         if (!user) return;
@@ -229,6 +246,14 @@ export default function UserDetail() {
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
+            />
+
+            <Dialog
+                isOpen={isEditModalOpen}
+                toggle={handleCloseEditModal}
+                caption="Edit User"
+                size="xl"
+                body={<UserForm userId={user?.uuid} onCancel={handleCloseEditModal} />}
             />
         </div>
     );

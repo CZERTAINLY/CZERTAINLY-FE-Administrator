@@ -1,23 +1,29 @@
-import SwitchField from 'components/Input/SwitchField';
+import Switch from 'components/Switch';
 import ProgressButton from 'components/ProgressButton';
-import { useCallback, useEffect, useMemo } from 'react';
-import { Form } from 'react-final-form';
+import TextInput from 'components/TextInput';
+import Container from 'components/Container';
+import Button from 'components/Button';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { actions, selectors } from 'ducks/settings';
-import { Form as BootstrapForm, ButtonGroup } from 'reactstrap';
 import { isObjectSame } from 'utils/common-utils';
-import { validateNonZeroInteger, validatePositiveInteger } from 'utils/validators';
-import TextField from 'components/Input/TextField';
+import { composeValidators, validateNonZeroInteger, validatePositiveInteger } from 'utils/validators';
 
 type FormValues = {
     enabled: boolean;
-    frequency?: number;
-    expiringThreshold?: number;
+    frequency?: string;
+    expiringThreshold?: string;
 };
 
-const CertificateSettingsForm = () => {
-    const DEFAULT_FREQUENCY = 1;
-    const DEFAULT_EXPIRING_THRESHOLD = 30;
+interface CertificateSettingsFormProps {
+    onCancel?: () => void;
+    onSuccess?: () => void;
+}
+
+const CertificateSettingsForm = ({ onCancel, onSuccess }: CertificateSettingsFormProps) => {
+    const DEFAULT_FREQUENCY = '1';
+    const DEFAULT_EXPIRING_THRESHOLD = '30';
 
     const dispatch = useDispatch();
 
@@ -35,23 +41,57 @@ const CertificateSettingsForm = () => {
 
     const isBusy = useMemo(() => isFetching || isUpdating, [isFetching, isUpdating]);
 
-    const initialValues = useMemo(() => {
+    const defaultValues = useMemo(() => {
         const validationSettings = platformSettings?.certificates?.validation;
-        if (!validationSettings) return {};
+        if (!validationSettings) {
+            return {
+                enabled: false,
+                expiringThreshold: DEFAULT_EXPIRING_THRESHOLD,
+                frequency: DEFAULT_FREQUENCY,
+            };
+        }
 
         return {
             enabled: validationSettings.enabled,
             expiringThreshold: validationSettings.expiringThreshold?.toString() || DEFAULT_EXPIRING_THRESHOLD,
             frequency: validationSettings.frequency?.toString() || DEFAULT_FREQUENCY,
-        } as FormValues;
+        };
     }, [platformSettings?.certificates?.validation]);
+
+    const methods = useForm<FormValues>({
+        defaultValues,
+        mode: 'onChange',
+    });
+
+    const {
+        handleSubmit,
+        control,
+        formState: { isDirty, isSubmitting, isValid },
+        reset,
+    } = methods;
+
+    const watchedEnabled = useWatch({
+        control,
+        name: 'enabled',
+    });
+
+    const formValues = useWatch({ control });
+
+    // Reset form when platformSettings change
+    useEffect(() => {
+        reset(defaultValues);
+    }, [defaultValues, reset]);
 
     const onSubmit = useCallback(
         (values: FormValues) => {
             dispatch(
                 actions.updatePlatformSettings({
                     certificates: {
-                        validation: values,
+                        validation: {
+                            enabled: values.enabled,
+                            frequency: values.frequency ? parseInt(values.frequency) : undefined,
+                            expiringThreshold: values.expiringThreshold ? parseInt(values.expiringThreshold) : undefined,
+                        },
                     },
                 }),
             );
@@ -59,55 +99,116 @@ const CertificateSettingsForm = () => {
         [dispatch],
     );
 
+    const wasUpdating = useRef(isUpdating);
+
+    useEffect(() => {
+        if (wasUpdating.current && !isUpdating) {
+            if (onSuccess) {
+                onSuccess();
+            }
+        }
+        wasUpdating.current = isUpdating;
+    }, [isUpdating, onSuccess]);
+
+    // Helper function to convert validators for react-hook-form
+    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
+        return {
+            validate: (value: any) => {
+                const composed = composeValidators(...validators);
+                return composed(value);
+            },
+        };
+    };
+
     const areDefaultValuesSame = useCallback(
         (values: FormValues) => {
-            const areValuesSame = isObjectSame(values, initialValues);
+            const areValuesSame = isObjectSame(
+                values as unknown as Record<string, unknown>,
+                defaultValues as unknown as Record<string, unknown>,
+            );
             return areValuesSame;
         },
-        [initialValues],
+        [defaultValues],
     );
 
     return (
-        <div style={{ paddingTop: '1.5em', paddingBottom: '1.5em' }}>
-            <Form initialValues={initialValues} onSubmit={onSubmit}>
-                {({ handleSubmit, pristine, submitting, valid, values }) => (
-                    <BootstrapForm onSubmit={handleSubmit} className="mt-2">
-                        <SwitchField id="enabled" label="Enable Certificate Validation" />
-                        {values.enabled && (
-                            <>
-                                <TextField
-                                    id="frequency"
-                                    label="Validation Frequency"
-                                    description="Validation frequency of certificates specified in days."
-                                    validators={[validateNonZeroInteger(), validatePositiveInteger()]}
-                                    inputType="number"
-                                />
-                                <TextField
-                                    id="expiringThreshold"
-                                    label="Expiring Threshold"
-                                    description="How many days before expiration should certificate's validation status change to Expiring."
-                                    validators={[validateNonZeroInteger(), validatePositiveInteger()]}
-                                    inputType="number"
-                                />
-                            </>
-                        )}
-                        {
-                            <div className="d-flex justify-content-end">
-                                <ButtonGroup>
-                                    <ProgressButton
-                                        title={'Save'}
-                                        inProgressTitle={'Saving...'}
-                                        disabled={submitting || isBusy || areDefaultValuesSame(values)}
-                                        inProgress={submitting || isBusy}
-                                        type="submit"
+        <FormProvider {...methods}>
+            <form onSubmit={handleSubmit(onSubmit)} className="mt-2 space-y-4">
+                <Controller
+                    name="enabled"
+                    control={control}
+                    render={({ field }) => (
+                        <Switch id="enabled" checked={field.value} onChange={field.onChange} label="Enable Certificate Validation" />
+                    )}
+                />
+                {watchedEnabled && (
+                    <>
+                        <div>
+                            <p className="text-sm text-gray-500 mb-2">Validation frequency of certificates specified in days.</p>
+                            <Controller
+                                name="frequency"
+                                control={control}
+                                rules={buildValidationRules([validateNonZeroInteger(), validatePositiveInteger()])}
+                                render={({ field, fieldState }) => (
+                                    <TextInput
+                                        {...field}
+                                        id="frequency"
+                                        type="number"
+                                        label="Validation Frequency"
+                                        invalid={fieldState.error && fieldState.isTouched}
+                                        error={
+                                            fieldState.error && fieldState.isTouched
+                                                ? typeof fieldState.error === 'string'
+                                                    ? fieldState.error
+                                                    : fieldState.error?.message || 'Invalid value'
+                                                : undefined
+                                        }
                                     />
-                                </ButtonGroup>
-                            </div>
-                        }
-                    </BootstrapForm>
+                                )}
+                            />
+                        </div>
+                        <div>
+                            <p className="text-sm text-gray-500 mb-2">
+                                How many days before expiration should certificate's validation status change to Expiring.
+                            </p>
+                            <Controller
+                                name="expiringThreshold"
+                                control={control}
+                                rules={buildValidationRules([validateNonZeroInteger(), validatePositiveInteger()])}
+                                render={({ field, fieldState }) => (
+                                    <TextInput
+                                        {...field}
+                                        id="expiringThreshold"
+                                        type="number"
+                                        label="Expiring Threshold"
+                                        invalid={fieldState.error && fieldState.isTouched}
+                                        error={
+                                            fieldState.error && fieldState.isTouched
+                                                ? typeof fieldState.error === 'string'
+                                                    ? fieldState.error
+                                                    : fieldState.error?.message || 'Invalid value'
+                                                : undefined
+                                        }
+                                    />
+                                )}
+                            />
+                        </div>
+                    </>
                 )}
-            </Form>
-        </div>
+                <Container className="flex-row justify-end modal-footer" gap={4}>
+                    <Button variant="outline" onClick={onCancel} disabled={isSubmitting || isBusy} type="button">
+                        Cancel
+                    </Button>
+                    <ProgressButton
+                        title={'Save'}
+                        inProgressTitle={'Saving...'}
+                        inProgress={isSubmitting || isBusy}
+                        disabled={isSubmitting || isBusy || areDefaultValuesSame(formValues as FormValues)}
+                        type="submit"
+                    />
+                </Container>
+            </form>
+        </FormProvider>
     );
 };
 

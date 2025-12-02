@@ -6,11 +6,12 @@ import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
+import CmpProfileForm from '../form';
 
 import { actions, selectors } from 'ducks/cmp-profiles';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate, useParams } from 'react-router';
+import { Link, useParams } from 'react-router';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { PlatformEnum, Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
@@ -23,7 +24,6 @@ import Breadcrumb from 'components/Breadcrumb';
 
 export default function AdministratorDetail() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const { id } = useParams();
 
@@ -31,6 +31,7 @@ export default function AdministratorDetail() {
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
     const isDisabling = useSelector(selectors.isDisabling);
     const isEnabling = useSelector(selectors.isEnabling);
+    const isUpdating = useSelector(selectors.isUpdating);
     const cmpCmpProfileVariantEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.CmpProfileVariant));
     const protectionMethodEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ProtectionMethod));
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
@@ -39,6 +40,7 @@ export default function AdministratorDetail() {
     const groups = useSelector(groupsSelectors.certificateGroups);
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
     const isBusy = useMemo(() => isFetchingDetail || isDisabling || isEnabling, [isFetchingDetail, isDisabling, isEnabling]);
 
@@ -58,9 +60,24 @@ export default function AdministratorDetail() {
         dispatch(groupsActions.listGroups());
     }, [dispatch]);
 
+    const wasUpdating = useRef(isUpdating);
+
+    useEffect(() => {
+        if (wasUpdating.current && !isUpdating) {
+            setIsEditModalOpen(false);
+            getFreshCmpProfile();
+        }
+        wasUpdating.current = isUpdating;
+    }, [isUpdating, getFreshCmpProfile]);
+
+    const handleCloseEditModal = useCallback(() => {
+        setIsEditModalOpen(false);
+    }, []);
+
     const onEditClick = useCallback(() => {
-        navigate(`../../cmpprofiles/edit/${cmpProfile?.uuid}`);
-    }, [cmpProfile, navigate]);
+        if (!cmpProfile) return;
+        setIsEditModalOpen(true);
+    }, [cmpProfile]);
 
     const onEnableClick = useCallback(() => {
         if (!cmpProfile) return;
@@ -386,6 +403,14 @@ export default function AdministratorDetail() {
                             body: 'Cancel',
                         },
                     ]}
+                />
+
+                <Dialog
+                    isOpen={isEditModalOpen}
+                    toggle={handleCloseEditModal}
+                    caption="Edit CMP Profile"
+                    size="xl"
+                    body={<CmpProfileForm cmpProfileId={cmpProfile?.uuid} onCancel={handleCloseEditModal} />}
                 />
             </Container>
         </div>

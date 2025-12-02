@@ -4,9 +4,10 @@ import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as profileApprovalActions, selectors as profileApprovalSelectors } from 'ducks/approval-profiles';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate, useParams } from 'react-router';
+import { Link, useParams } from 'react-router';
+import ApprovalProfileForm from '../form';
 import { ApproverType, ProfileApprovalStepModel } from 'types/approval-profiles';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
@@ -17,14 +18,15 @@ import Container from 'components/Container';
 const ApprovalProfileDetails = () => {
     const dispatch = useDispatch();
     const { id, version } = useParams();
-    const navigate = useNavigate();
 
     const profileApprovalDetail = useSelector(profileApprovalSelectors.profileApprovalDetail);
     const isFetchingDetail = useSelector(profileApprovalSelectors.isFetchingDetail);
     const deleteErrorMessage = useSelector(profileApprovalSelectors.deleteErrorMessage);
     const isDeleting = useSelector(profileApprovalSelectors.isDeleting);
+    const isUpdating = useSelector(profileApprovalSelectors.isUpdating);
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
     const isBusy = useMemo(() => isFetchingDetail || isDeleting, [isFetchingDetail, isDeleting]);
 
     const getFreshData = useCallback(() => {
@@ -44,10 +46,28 @@ const ApprovalProfileDetails = () => {
         setConfirmDelete(false);
     }, [profileApprovalDetail, dispatch]);
 
-    const onEditClick = useCallback(() => {
+    const wasUpdating = useRef(isUpdating);
+
+    useEffect(() => {
+        if (wasUpdating.current && !isUpdating) {
+            setIsEditModalOpen(false);
+            getFreshData();
+        }
+        wasUpdating.current = isUpdating;
+    }, [isUpdating, getFreshData]);
+
+    const handleOpenEditModal = useCallback(() => {
         if (!profileApprovalDetail) return;
-        navigate(`/approvalprofiles/edit/${profileApprovalDetail.uuid}`);
-    }, [profileApprovalDetail, navigate]);
+        setIsEditModalOpen(true);
+    }, [profileApprovalDetail]);
+
+    const handleCloseEditModal = useCallback(() => {
+        setIsEditModalOpen(false);
+    }, []);
+
+    const onEditClick = useCallback(() => {
+        handleOpenEditModal();
+    }, [handleOpenEditModal]);
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
@@ -232,6 +252,20 @@ const ApprovalProfileDetails = () => {
                         body: 'Cancel',
                     },
                 ]}
+            />
+
+            <Dialog
+                isOpen={isEditModalOpen}
+                toggle={handleCloseEditModal}
+                caption="Edit Approval Profile"
+                size="xl"
+                body={
+                    <ApprovalProfileForm
+                        approvalProfileId={profileApprovalDetail?.uuid}
+                        onCancel={handleCloseEditModal}
+                        onSuccess={handleCloseEditModal}
+                    />
+                }
             />
         </div>
     );

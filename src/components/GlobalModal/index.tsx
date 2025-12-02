@@ -1,9 +1,10 @@
+import Dialog, { DialogButton } from 'components/Dialog';
 import { actions, selectors } from 'ducks/user-interface';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 
 export default function GlobalModal() {
     const globalModal = useSelector(selectors.selectGlobalModal);
+
     const {
         isOpen,
         size,
@@ -15,54 +16,52 @@ export default function GlobalModal() {
         showCloseButton,
         okButtonCallback,
         cancelButtonCallback,
+        icon,
     } = globalModal;
     const dispatch = useDispatch();
 
+    const buttons = [] as DialogButton[];
+    if (showOkButton) {
+        buttons.push({
+            color: 'primary',
+            onClick: () => (okButtonCallback ? okButtonCallback() : dispatch(actions.resetState())),
+            body: 'OK',
+        });
+    }
+    if (showCancelButton) {
+        buttons.push({
+            color: 'secondary',
+            body: 'Cancel',
+            onClick: () => {
+                cancelButtonCallback ? cancelButtonCallback() : dispatch(actions.resetState());
+            },
+        });
+    }
+
+    if (showSubmitButton) {
+        buttons.push({
+            color: 'primary',
+            onClick: () => (okButtonCallback ? okButtonCallback() : dispatch(actions.resetState())),
+            body: 'Submit',
+        });
+    }
+    if (showCloseButton) {
+        buttons.push({
+            color: 'secondary',
+            onClick: () => dispatch(actions.resetState()),
+            body: 'Close',
+        });
+    }
+
     return (
-        <Modal size={size || undefined} isOpen={isOpen} toggle={() => {}}>
-            <ModalHeader
-                toggle={() => {
-                    dispatch(actions.resetState());
-                }}
-            >
-                {title}
-            </ModalHeader>
-
-            <ModalBody>{content}</ModalBody>
-
-            <ModalFooter>
-                {showOkButton && (
-                    <Button color="primary" onClick={() => (okButtonCallback ? okButtonCallback() : dispatch(actions.resetState()))}>
-                        Ok
-                    </Button>
-                )}
-                {showCancelButton && (
-                    <Button
-                        color="secondary"
-                        onClick={() => {
-                            cancelButtonCallback ? cancelButtonCallback() : dispatch(actions.resetState());
-                        }}
-                    >
-                        Cancel
-                    </Button>
-                )}
-                {showSubmitButton && (
-                    <Button color="primary" onClick={() => (okButtonCallback ? okButtonCallback() : dispatch(actions.resetState()))}>
-                        Submit
-                    </Button>
-                )}
-
-                {showCloseButton && (
-                    <Button
-                        color="secondary"
-                        onClick={() => {
-                            dispatch(actions.resetState());
-                        }}
-                    >
-                        Close
-                    </Button>
-                )}
-            </ModalFooter>
-        </Modal>
+        <Dialog
+            isOpen={isOpen}
+            toggle={() => dispatch(actions.resetState())}
+            size={size || undefined}
+            buttons={buttons}
+            caption={title}
+            body={content}
+            icon={icon}
+        />
     );
 }

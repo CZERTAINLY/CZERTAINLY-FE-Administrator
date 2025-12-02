@@ -12,9 +12,10 @@ import { actions as raProfilesActions, selectors as raProfilesSelectors } from '
 import { actions as settingsActions, selectors as settingsSelectors } from 'ducks/settings';
 import { actions as complianceProfileActions, selectors as complianceProfileSelectors } from 'ducks/compliance-profiles';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate, useParams } from 'react-router';
+import { Link, useParams } from 'react-router';
+import RaProfileForm from '../form';
 import { PlatformEnum, Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 
@@ -40,7 +41,6 @@ interface DeassociateApprovalProfileDialogState {
 
 export default function RaProfileDetail() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const { id, authorityId } = useParams();
 
@@ -61,6 +61,7 @@ export default function RaProfileDetail() {
     const isDeleting = useSelector(raProfilesSelectors.isDeleting);
     const isEnabling = useSelector(raProfilesSelectors.isEnabling);
     const isDisabling = useSelector(raProfilesSelectors.isDisabling);
+    const isUpdating = useSelector(raProfilesSelectors.isUpdating);
     const isActivatingAcme = useSelector(raProfilesSelectors.isActivatingAcme);
     const isDeactivatingAcme = useSelector(raProfilesSelectors.isDeactivatingAcme);
     const isActivatingCmp = useSelector(raProfilesSelectors.isActivatingCmp);
@@ -90,6 +91,7 @@ export default function RaProfileDetail() {
         useState<DeassociateApprovalProfileDialogState>();
 
     const [certificateValidationDialog, setCertificateValidationDialog] = useState<boolean>(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
     const isBusy = useMemo(
         () =>
@@ -196,10 +198,24 @@ export default function RaProfileDetail() {
         };
     }, [dispatch]);
 
+    const wasUpdating = useRef(isUpdating);
+
+    useEffect(() => {
+        if (wasUpdating.current && !isUpdating) {
+            setIsEditModalOpen(false);
+            getFreshRaProfileDetail();
+        }
+        wasUpdating.current = isUpdating;
+    }, [isUpdating, getFreshRaProfileDetail]);
+
+    const handleCloseEditModal = useCallback(() => {
+        setIsEditModalOpen(false);
+    }, []);
+
     const onEditClick = useCallback(() => {
         if (!raProfile) return;
-        navigate(`../../../edit/${raProfile.authorityInstanceUuid ?? 'unknown'}/${raProfile?.uuid}`, { relative: 'path' });
-    }, [navigate, raProfile]);
+        setIsEditModalOpen(true);
+    }, [raProfile]);
 
     const onEnableClick = useCallback(() => {
         if (!raProfile) return;
@@ -1212,6 +1228,20 @@ export default function RaProfileDetail() {
                         body: 'Cancel',
                     },
                 ]}
+            />
+
+            <Dialog
+                isOpen={isEditModalOpen}
+                toggle={handleCloseEditModal}
+                caption="Edit RA Profile"
+                size="xl"
+                body={
+                    <RaProfileForm
+                        raProfileId={raProfile?.uuid}
+                        authorityId={raProfile?.authorityInstanceUuid || authorityId}
+                        onCancel={handleCloseEditModal}
+                    />
+                }
             />
         </div>
     );

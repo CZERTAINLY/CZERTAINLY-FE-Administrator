@@ -12,7 +12,7 @@ import { EntityType, actions as filterActions } from 'ducks/filters';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import Select from 'react-select';
+import Select from 'components/Select';
 import { Edge, MarkerType } from 'reactflow';
 import { FormGroup, Label } from 'reactstrap';
 import { OtherProperties } from 'types/flowchart';
@@ -327,12 +327,12 @@ export function useTransformTriggerObjectToNodesAndEdges(
 
                         <div className="w-100">
                             <Select
-                                inputId="addnewRuleSelect"
+                                id="addnewRuleSelect"
                                 className="nodrag"
                                 placeholder="Add New Rule"
                                 options={rulesOptions}
-                                onChange={(event) => {
-                                    setNewRules(event?.map((e) => e));
+                                onChange={(values) => {
+                                    setNewRules(values || []);
                                 }}
                                 isMulti
                                 value={newRules}
@@ -347,14 +347,14 @@ export function useTransformTriggerObjectToNodesAndEdges(
 
                         <div className="w-100">
                             <Select
-                                inputId="raProfileSelect"
+                                id="raProfileSelect"
                                 className="nodrag"
                                 placeholder="Add New Action"
                                 options={actionOptions}
                                 isMulti
                                 value={newActions}
-                                onChange={(event) => {
-                                    setNewActions(event?.map((e) => e));
+                                onChange={(values) => {
+                                    setNewActions(values || []);
                                 }}
                             />
                         </div>

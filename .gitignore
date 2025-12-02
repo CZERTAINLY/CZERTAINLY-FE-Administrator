@@ -29,8 +29,9 @@ yarn-error.log*
 
 # Proxy Files
 src/*.pem
-src/setupProxy.js
+src/setupProxy.cjs
 
 # Cypress
+/cypress
 cypress.env.json
 .nyc_output/

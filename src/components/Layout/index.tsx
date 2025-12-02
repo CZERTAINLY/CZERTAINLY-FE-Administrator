@@ -1,9 +1,8 @@
-import cx from 'classnames';
 import { useCallback, useState } from 'react';
 import { Outlet } from 'react-router';
 
-// import Alerts from 'components/Alerts';
-// import GlobalModal from 'components/GlobalModal';
+import Alerts from 'components/Alerts';
+import GlobalModal from 'components/GlobalModal';
 import Footer from 'components/Layout/Footer';
 import Header from 'components/Layout/Header';
 import Sidebar from 'components/Layout/Sidebar';
@@ -22,13 +21,13 @@ function Layout() {
             <Header sidebarToggle={toggleSidebar} />
             <div className="flex">
                 <Sidebar allowedResources={profile?.permissions.allowedListings} />
-                <main className="flex-1 bg-[var(--main-background-color)] w-[calc(100%-var(--sidebar-width))] p-4 md:p-8 !pb-0 dark:bg-gray-900">
+                <main className="flex flex-col bg-[var(--main-background-color)] w-[calc(100%-var(--sidebar-width))] p-4 md:p-8 !pb-0 dark:bg-gray-900">
                     <Outlet />
+                    <div className="grow-1" />
+                    <Alerts />
                     <Footer />
                 </main>
-
-                {/* <Alerts />
-                <GlobalModal /> */}
+                <GlobalModal />
             </div>
         </div>
     );

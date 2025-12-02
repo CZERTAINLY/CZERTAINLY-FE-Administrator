@@ -10,8 +10,8 @@ import { actions, selectors } from 'ducks/cryptographic-keys';
 
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate, useParams } from 'react-router';
-import Select from 'react-select';
+import { Link, useParams } from 'react-router';
+import Select from 'components/Select';
 
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { KeyCompromiseReason, KeyState, KeyType, PlatformEnum, Resource } from 'types/openapi';
@@ -23,10 +23,10 @@ import { createWidgetDetailHeaders } from 'utils/widget';
 import Breadcrumb from 'components/Breadcrumb';
 import Container from 'components/Container';
 import { keyWithoutTokenInstanceActionNotes } from './constants';
+import CryptographicKeyForm from '../form';
 
 export default function CryptographicKeyDetail() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const { id, keyItemUuid } = useParams();
     const relativePath = '../..' + (keyItemUuid ? '/..' : '');
@@ -47,6 +47,8 @@ export default function CryptographicKeyDetail() {
     const [confirmCompromise, setConfirmCompromise] = useState<boolean>(false);
 
     const [confirmDestroy, setConfirmDestroy] = useState<boolean>(false);
+
+    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
     const [compromiseReason, setCompromiseReason] = useState<KeyCompromiseReason>();
     const keyCompromiseReasonEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.KeyCompromiseReason));
@@ -70,8 +72,13 @@ export default function CryptographicKeyDetail() {
 
     const onEditClick = useCallback(() => {
         if (!cryptographicKey) return;
-        navigate(`${relativePath}/edit/${cryptographicKey.uuid}`, { relative: 'path' });
-    }, [navigate, cryptographicKey, relativePath]);
+        setIsEditModalOpen(true);
+    }, [cryptographicKey]);
+
+    const handleEditSuccess = useCallback(() => {
+        setIsEditModalOpen(false);
+        getFreshCryptographicKeyDetails();
+    }, [getFreshCryptographicKeyDetails]);
 
     const onEnableClick = useCallback(() => {
         if (!cryptographicKey) return;
@@ -418,14 +425,14 @@ export default function CryptographicKeyDetail() {
                 body={
                     <div>
                         <p>You are about to mark the Key as compromised. Is this what you want to do?</p>
-                        <p>
+                        <p className="my-2">
                             <b>Warning:</b> This action cannot be undone.
                         </p>
                         <Select
-                            name="compromiseReason"
                             id="compromiseReason"
                             options={optionForCompromise}
-                            onChange={(e) => setCompromiseReason(e?.value)}
+                            value={compromiseReason || ''}
+                            onChange={(value) => setCompromiseReason(value as KeyCompromiseReason)}
                         />
                     </div>
                 }
@@ -450,6 +457,20 @@ export default function CryptographicKeyDetail() {
                     { color: 'danger', onClick: onDestroy, body: 'Destroy' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDestroy(false), body: 'Cancel' },
                 ]}
+            />
+            <Dialog
+                isOpen={isEditModalOpen}
+                caption="Edit Key"
+                body={
+                    <CryptographicKeyForm
+                        keyId={cryptographicKey?.uuid}
+                        onSuccess={handleEditSuccess}
+                        onCancel={() => setIsEditModalOpen(false)}
+                    />
+                }
+                toggle={() => setIsEditModalOpen(false)}
+                size="xl"
+                buttons={[]}
             />
         </>
     );

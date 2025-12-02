@@ -5,9 +5,10 @@ import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions, selectors } from 'ducks/certificateGroups';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router';
+import { useParams } from 'react-router';
+import GroupForm from '../form';
 
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { PlatformEnum, Resource } from '../../../../types/openapi';
@@ -21,14 +22,15 @@ import Breadcrumb from 'components/Breadcrumb';
 
 export default function GroupDetail() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const { id } = useParams();
 
     const group = useSelector(selectors.certificateGroup);
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
+    const isUpdating = useSelector(selectors.isUpdating);
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
     const getFreshGroupDetails = useCallback(() => {
         if (!id) return;
@@ -39,9 +41,28 @@ export default function GroupDetail() {
         getFreshGroupDetails();
     }, [getFreshGroupDetails, id]);
 
+    const wasUpdating = useRef(isUpdating);
+
+    useEffect(() => {
+        if (wasUpdating.current && !isUpdating) {
+            setIsEditModalOpen(false);
+            getFreshGroupDetails();
+        }
+        wasUpdating.current = isUpdating;
+    }, [isUpdating, getFreshGroupDetails]);
+
+    const handleOpenEditModal = useCallback(() => {
+        if (!group) return;
+        setIsEditModalOpen(true);
+    }, [group]);
+
+    const handleCloseEditModal = useCallback(() => {
+        setIsEditModalOpen(false);
+    }, []);
+
     const onEditClick = useCallback(() => {
-        navigate(`../../edit/${group?.uuid}`, { relative: 'path' });
-    }, [group, navigate]);
+        handleOpenEditModal();
+    }, [handleOpenEditModal]);
 
     const onDeleteConfirmed = useCallback(() => {
         if (!group) return;

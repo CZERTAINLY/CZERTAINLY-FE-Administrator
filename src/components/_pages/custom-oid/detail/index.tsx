@@ -1,11 +1,12 @@
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
+import CustomOIDForm from 'components/_pages/custom-oid/form';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions, selectors } from 'ducks/oids';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router';
+import { useParams } from 'react-router';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { OidCategory, PlatformEnum, Resource } from 'types/openapi';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
@@ -15,7 +16,6 @@ import Breadcrumb from 'components/Breadcrumb';
 
 export default function CustomOIDDetail() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const { id } = useParams();
 
@@ -23,10 +23,14 @@ export default function CustomOIDDetail() {
 
     const isFetching = useSelector(selectors.isFetching);
     const isDeleting = useSelector(selectors.isDeleting);
+    const isUpdating = useSelector(selectors.isUpdating);
     const oidCategoryEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.OidCategory));
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+    const wasUpdating = useRef(isUpdating);
 
     const isBusy = useMemo(() => isFetching || isDeleting, [isFetching, isDeleting]);
 
@@ -45,10 +49,23 @@ export default function CustomOIDDetail() {
         getFreshOIDDetails();
     }, [getFreshOIDDetails, id]);
 
-    const onEditClick = useCallback(() => {
+    const handleOpenEditDialog = useCallback(() => {
         if (!oid) return;
-        navigate(`../../edit/${oid.oid}`, { relative: 'path' });
-    }, [oid, navigate]);
+        setIsEditDialogOpen(true);
+    }, [oid]);
+
+    const handleCloseEditDialog = useCallback(() => {
+        setIsEditDialogOpen(false);
+    }, []);
+
+    // Track update state and close dialog on success
+    useEffect(() => {
+        if (wasUpdating.current && !isUpdating && isEditDialogOpen) {
+            handleCloseEditDialog();
+            getFreshOIDDetails();
+        }
+        wasUpdating.current = isUpdating;
+    }, [isUpdating, isEditDialogOpen, handleCloseEditDialog, getFreshOIDDetails]);
 
     const onDeleteConfirmed = useCallback(() => {
         if (!oid) return;
@@ -57,7 +74,10 @@ export default function CustomOIDDetail() {
         setConfirmDelete(false);
     }, [oid, dispatch]);
 
-    const buttons: WidgetButtonProps[] = useMemo(() => getEditAndDeleteWidgetButtons(onEditClick, setConfirmDelete), [onEditClick]);
+    const buttons: WidgetButtonProps[] = useMemo(
+        () => getEditAndDeleteWidgetButtons(handleOpenEditDialog, setConfirmDelete),
+        [handleOpenEditDialog],
+    );
 
     const detailHeaders: TableHeader[] = useMemo(() => createWidgetDetailHeaders(), []);
 
@@ -121,6 +141,13 @@ export default function CustomOIDDetail() {
                         { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                         { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                     ]}
+                />
+                <Dialog
+                    isOpen={isEditDialogOpen}
+                    toggle={handleCloseEditDialog}
+                    caption="Edit Custom OID"
+                    size="xl"
+                    body={<CustomOIDForm oidId={id} onCancel={handleCloseEditDialog} />}
                 />
             </Container>
         </div>

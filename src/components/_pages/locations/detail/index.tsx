@@ -12,10 +12,11 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions, selectors } from 'ducks/locations';
 import { actions as raActions, selectors as raSelectors } from 'ducks/ra-profiles';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Field, Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate, useParams } from 'react-router';
+import { Link, useParams } from 'react-router';
+import LocationForm from '../form';
 import Select from 'react-select';
 
 import { Form as BootstrapForm, Button, ButtonGroup, FormGroup, Label } from 'reactstrap';
@@ -43,7 +44,6 @@ import Breadcrumb from 'components/Breadcrumb';
 export default function LocationDetail() {
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const { entityId, id } = useParams();
 
@@ -58,6 +58,7 @@ export default function LocationDetail() {
 
     const isFetching = useSelector(selectors.isFetchingDetail);
     const isDeleting = useSelector(selectors.isDeleting);
+    const isUpdating = useSelector(selectors.isUpdating);
     const isFetchingPushAttributeDescriptors = useSelector(selectors.isFetchingPushAttributeDescriptors);
     const isFetchingCSRAttributeDescriptors = useSelector(selectors.isFetchingCSRAttributeDescriptors);
     const isPushingCertificate = useSelector(selectors.isPushingCertificate);
@@ -74,6 +75,7 @@ export default function LocationDetail() {
     const [csrGroupAttributesCallbackAttributes, setCsrGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
     const [confirmRemoveDialog, setConfirmRemoveDialog] = useState<boolean>(false);
     const [issueDialog, setIssueDialog] = useState<boolean>(false);
@@ -124,10 +126,28 @@ export default function LocationDetail() {
         dispatch(raActions.listRaProfiles());
     }, [dispatch, issueDialog]);
 
-    const onEditClick = useCallback(() => {
+    const wasUpdating = useRef(isUpdating);
+
+    useEffect(() => {
+        if (wasUpdating.current && !isUpdating) {
+            setIsEditModalOpen(false);
+            getFreshLocationDetails();
+        }
+        wasUpdating.current = isUpdating;
+    }, [isUpdating, getFreshLocationDetails]);
+
+    const handleOpenEditModal = useCallback(() => {
         if (!location) return;
-        navigate(`../../../edit/${location.entityInstanceUuid}/${location.uuid}`, { relative: 'path' });
-    }, [location, navigate]);
+        setIsEditModalOpen(true);
+    }, [location]);
+
+    const handleCloseEditModal = useCallback(() => {
+        setIsEditModalOpen(false);
+    }, []);
+
+    const onEditClick = useCallback(() => {
+        handleOpenEditModal();
+    }, [handleOpenEditModal]);
 
     const onEnableClick = useCallback(() => {
         if (!location) return;
@@ -779,6 +799,21 @@ export default function LocationDetail() {
                                 }
                             />
                         </>
+                    }
+                />
+
+                <Dialog
+                    isOpen={isEditModalOpen}
+                    toggle={handleCloseEditModal}
+                    caption="Edit Location"
+                    size="xl"
+                    body={
+                        <LocationForm
+                            locationId={location?.uuid}
+                            entityId={location?.entityInstanceUuid}
+                            onCancel={handleCloseEditModal}
+                            onSuccess={handleCloseEditModal}
+                        />
                     }
                 />
             </Container>

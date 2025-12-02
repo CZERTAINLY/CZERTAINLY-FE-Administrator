@@ -1,4 +1,3 @@
-import TextField from 'components/Input/TextField';
 import ProgressButton from 'components/ProgressButton';
 import Widget from 'components/Widget';
 import { actions, selectors } from 'ducks/notification-profiles';
@@ -7,49 +6,61 @@ import { actions as groupAction, selectors as groupSelectors } from 'ducks/certi
 import { actions as rolesActions, selectors as rolesSelectors } from 'ducks/roles';
 import { actions as userAction, selectors as userSelectors } from 'ducks/users';
 import { actions as notificationsActions, selectors as notificationsSelectors } from 'ducks/notifications';
-import { useCallback, useEffect, useMemo } from 'react';
-import { Field, Form, useForm, useFormState } from 'react-final-form';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { Controller, FormProvider, useForm, useFormContext, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
-import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, FormText, Input, InputGroup, Label } from 'reactstrap';
-import { mutators } from 'utils/attributes/attributeEditorMutators';
+import Select from 'components/Select';
+import Button from 'components/Button';
+import Container from 'components/Container';
+import Switch from 'components/Switch';
 import { isObjectSame } from 'utils/common-utils';
+import Label from 'components/Label';
 import {
+    composeValidators,
     validateAlphaNumericWithSpecialChars,
     validatePositiveInteger,
     validateRequired,
     validateNonZeroInteger,
     validateDuration,
 } from 'utils/validators';
-import CustomSelect from 'components/Input/CustomSelect';
 import { PlatformEnum, RecipientType } from 'types/openapi';
-import SwitchField from 'components/Input/SwitchField';
 import { NotificationProfileUpdateRequestModel } from 'types/notification-profiles';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { getInputStringFromIso8601String, getIso8601StringFromInputString } from 'utils/duration';
+import TextInput from 'components/TextInput';
+import TextArea from 'components/TextArea';
 
-interface OptionType {
-    value: string;
-    label: string;
+interface NotificationProfileFormProps {
+    notificationProfileId?: string;
+    version?: string;
+    onCancel?: () => void;
+    onSuccess?: () => void;
 }
 
 interface FormValues {
-    name?: string;
-    recipients?: OptionType[];
-    recipientType?: OptionType;
-    internalNotification?: boolean;
-    description?: string;
-    frequency?: string;
-    repetitions?: number;
-    notificationInstance?: OptionType;
+    name: string;
+    recipients: { value: string; label: string }[];
+    recipientType: string;
+    internalNotification: boolean;
+    description: string;
+    frequency: string;
+    repetitions: string;
+    notificationInstance: string;
 }
 
-export default function NotificationProfileForm() {
-    const { id, version } = useParams();
+export default function NotificationProfileForm({
+    notificationProfileId,
+    version: propVersion,
+    onCancel,
+    onSuccess,
+}: NotificationProfileFormProps) {
+    const { id: routeId, version: routeVersion } = useParams();
+    const id = notificationProfileId || routeId;
+    const version = propVersion || routeVersion;
     const editMode = id !== undefined && version !== undefined;
 
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
     const isUpdating = useSelector(selectors.isUpdating);
@@ -73,76 +84,104 @@ export default function NotificationProfileForm() {
         dispatch(notificationsActions.listNotificationInstances());
     }, [dispatch]);
 
+    const previousIdRef = useRef<string | undefined>(undefined);
+    const previousVersionRef = useRef<string | undefined>(undefined);
+
     useEffect(() => {
-        dispatch(actions.resetState());
-        if (!id || !version) return;
-        dispatch(actions.getNotificationProfileDetail({ uuid: id, version: Number(version) }));
-    }, [dispatch, id, version]);
+        if (editMode && id && version) {
+            // Fetch if id or version changed or if we don't have the correct profile loaded
+            if (
+                previousIdRef.current !== id ||
+                previousVersionRef.current !== version ||
+                !notificationProfile ||
+                notificationProfile.uuid !== id ||
+                notificationProfile.version !== Number(version)
+            ) {
+                dispatch(actions.resetState());
+                dispatch(actions.getNotificationProfileDetail({ uuid: id, version: Number(version) }));
+                previousIdRef.current = id;
+                previousVersionRef.current = version;
+            }
+        } else {
+            dispatch(actions.resetState());
+            previousIdRef.current = undefined;
+            previousVersionRef.current = undefined;
+        }
+    }, [dispatch, editMode, id, version, notificationProfile]);
 
     const defaultValues: FormValues = useMemo(() => {
         if (editMode && notificationProfile) {
             return {
-                name: notificationProfile.name,
-                recipientType: {
-                    label: getEnumLabel(recipientTypeEnum, notificationProfile.recipientType),
-                    value: notificationProfile.recipientType,
-                },
-                recipients: [],
-                internalNotification: notificationProfile.internalNotification,
-                description: notificationProfile.description,
-                frequency: notificationProfile.frequency ? getInputStringFromIso8601String(notificationProfile.frequency) : undefined,
-                repetitions: notificationProfile.repetitions,
-                ...(notificationProfile.recipients
-                    ? {
-                          recipients: notificationProfile.recipients.map((recipient) => ({
-                              label: recipient.name,
-                              value: recipient.uuid,
-                          })),
-                      }
-                    : {}),
-                ...(notificationProfile.notificationInstance
-                    ? {
-                          notificationInstance: {
-                              label: notificationProfile.notificationInstance.name,
-                              value: notificationProfile.notificationInstance.uuid,
-                          },
-                      }
-                    : {}),
+                name: notificationProfile.name || '',
+                recipientType: notificationProfile.recipientType || RecipientType.None,
+                recipients:
+                    notificationProfile.recipients?.map((recipient) => ({
+                        label: recipient.name,
+                        value: recipient.uuid,
+                    })) || [],
+                internalNotification: notificationProfile.internalNotification || false,
+                description: notificationProfile.description || '',
+                frequency: notificationProfile.frequency ? getInputStringFromIso8601String(notificationProfile.frequency) : '',
+                repetitions: notificationProfile.repetitions?.toString() || '',
+                notificationInstance: notificationProfile.notificationInstance?.uuid || '',
             };
         } else {
             return {
-                recipientType: {
-                    label: getEnumLabel(recipientTypeEnum, RecipientType.None),
-                    value: RecipientType.None,
-                },
+                name: '',
+                recipientType: RecipientType.None,
                 recipients: [],
                 internalNotification: false,
+                description: '',
+                frequency: '',
+                repetitions: '',
+                notificationInstance: '',
             };
         }
-    }, [editMode, notificationProfile, recipientTypeEnum]);
+    }, [editMode, notificationProfile]);
 
-    const onCancel = useCallback(() => {
-        navigate(-1);
-    }, [navigate]);
+    const methods = useForm<FormValues>({
+        defaultValues,
+        mode: 'onChange',
+    });
+
+    const {
+        handleSubmit,
+        control,
+        formState: { isDirty, isSubmitting, isValid },
+        setValue,
+        reset,
+    } = methods;
+
+    const formValues = useWatch({ control });
+
+    // Helper function to convert validators for react-hook-form
+    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
+        return {
+            validate: (value: any) => {
+                const composed = composeValidators(...validators);
+                return composed(value);
+            },
+        };
+    };
 
     const onSubmit = useCallback(
         (values: FormValues) => {
             const recipients = {
-                recipientType: (values.recipientType?.value as RecipientType) ?? RecipientType.None,
+                recipientType: (values.recipientType as RecipientType) ?? RecipientType.None,
             };
-            switch (values.recipientType?.value) {
+            switch (values.recipientType) {
                 case RecipientType.User:
                 case RecipientType.Group:
                 case RecipientType.Role:
-                    Object.assign(recipients, { recipientUuids: values.recipients?.map((recipient) => recipient.value) });
+                    Object.assign(recipients, { recipientUuids: values.recipients.map((recipient) => recipient.value) });
                     break;
             }
             const updateNotificationProfileRequest: NotificationProfileUpdateRequestModel = {
                 description: values.description,
                 frequency: values.frequency ? getIso8601StringFromInputString(values.frequency) : undefined,
-                repetitions: values.repetitions,
+                repetitions: values.repetitions ? parseInt(values.repetitions) : undefined,
                 internalNotification: values.internalNotification ?? false,
-                notificationInstanceUuid: values.notificationInstance?.value,
+                notificationInstanceUuid: values.notificationInstance,
                 ...recipients,
             };
 
@@ -187,119 +226,195 @@ export default function NotificationProfileForm() {
         [notificationInstances],
     );
 
+    const type = formValues.recipientType;
+    const isNotificationInstanceRequired =
+        type === RecipientType.Default ||
+        type === RecipientType.None ||
+        ((type === RecipientType.User || type === RecipientType.Role || type === RecipientType.Group) && !formValues.internalNotification);
+
     return (
-        <Widget
-            title={editMode ? 'Edit Notification Profile' : 'Create Notification Profile'}
-            busy={isBusy}
-            widgetLockName={LockWidgetNameEnum.NotificationProfileDetails}
-        >
-            <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
-                {({ handleSubmit, pristine, submitting, values, valid, form }) => {
-                    const type = values.recipientType?.value;
-                    const isNotificationInstanceRequired =
-                        type === RecipientType.Default ||
-                        type === RecipientType.None ||
-                        ((type === RecipientType.User || type === RecipientType.Role || type === RecipientType.Group) &&
-                            !values.internalNotification);
-                    return (
-                        <BootstrapForm onSubmit={handleSubmit}>
-                            <TextField
-                                label="Profile Name"
-                                id="name"
-                                validators={[validateAlphaNumericWithSpecialChars()]}
-                                disabled={editMode}
-                                required={true}
-                            />
+        <>
+            <FormProvider {...methods}>
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                    <Widget busy={isBusy} widgetLockName={LockWidgetNameEnum.NotificationProfileDetails} noBorder>
+                        <div className="space-y-4">
+                            {!editMode && (
+                                <Controller
+                                    name="name"
+                                    control={control}
+                                    rules={buildValidationRules([validateRequired(), validateAlphaNumericWithSpecialChars()])}
+                                    render={({ field, fieldState }) => (
+                                        <TextInput
+                                            {...field}
+                                            id="name"
+                                            type="text"
+                                            label="Profile Name"
+                                            required
+                                            disabled={editMode}
+                                            invalid={fieldState.error && fieldState.isTouched}
+                                            error={
+                                                fieldState.error && fieldState.isTouched
+                                                    ? typeof fieldState.error === 'string'
+                                                        ? fieldState.error
+                                                        : fieldState.error?.message || 'Invalid value'
+                                                    : undefined
+                                            }
+                                        />
+                                    )}
+                                />
+                            )}
 
-                            <TextField label="Description" id="description" inputType="textarea" validators={[]} />
-
-                            <RecipientTypeFields />
-
-                            <Field name="notificationInstance" validate={isNotificationInstanceRequired ? validateRequired() : undefined}>
-                                {({ input, meta }) => (
-                                    <CustomSelect
-                                        {...input}
-                                        isClearable
-                                        label="Notification Instance"
-                                        placeholder="Select Notification Instance"
-                                        options={notificationInstanceOptions}
-                                        onChange={(e) => form.change('notificationInstance', e as OptionType)}
-                                        required={isNotificationInstanceRequired}
+                            <Controller
+                                name="description"
+                                control={control}
+                                render={({ field, fieldState }) => (
+                                    <TextArea
+                                        {...field}
+                                        id="description"
+                                        label="Description"
+                                        rows={3}
+                                        invalid={fieldState.error && fieldState.isTouched}
                                         error={
-                                            meta.error &&
-                                            meta.touched &&
-                                            'Notification Instance is required if Recipient Type is Default or None, or if the send internal notifications is false'
+                                            fieldState.error && fieldState.isTouched
+                                                ? typeof fieldState.error === 'string'
+                                                    ? fieldState.error
+                                                    : fieldState.error?.message || 'Invalid value'
+                                                : undefined
                                         }
                                     />
                                 )}
-                            </Field>
-
-                            <SwitchField
-                                id="internalNotification"
-                                label="Send internal notifications"
-                                disabled={type === RecipientType.Default || type === RecipientType.None}
                             />
 
-                            <Field name="frequency" validate={validateDuration(['d', 'h'])}>
-                                {({ input, meta }) => {
-                                    const isInvalid = !!meta.error && meta.touched;
-                                    return (
-                                        <FormGroup>
-                                            <Label for="frequency">Frequency</Label>
-                                            <InputGroup>
-                                                <Input
-                                                    {...input}
-                                                    type="text"
-                                                    valid={!meta.error && meta.touched}
-                                                    invalid={isInvalid}
-                                                    placeholder="ex: 5d 4h"
-                                                />
-                                            </InputGroup>
-                                            {!isInvalid && <FormText>Enter duration in format: 0d 0h</FormText>}
-                                            <FormFeedback className={isInvalid ? 'd-block' : ''}>{meta.error}</FormFeedback>
-                                        </FormGroup>
-                                    );
-                                }}
-                            </Field>
-                            <TextField
-                                label="Repetitions"
-                                id="repetitions"
-                                inputType="number"
-                                validators={[validatePositiveInteger(), validateNonZeroInteger()]}
-                                description="Maximum number of repetitions of the same notification"
-                            />
+                            <RecipientTypeFields />
 
-                            <div className="d-flex justify-content-end">
-                                <ButtonGroup>
-                                    <ProgressButton
-                                        title={editMode ? 'Save' : 'Create'}
-                                        inProgressTitle={editMode ? 'Saving...' : 'Creating...'}
-                                        inProgress={submitting}
-                                        disabled={areDefaultValuesSame(values) || isBusy}
-                                    />
-
-                                    <Button color="default" onClick={onCancel} disabled={submitting}>
-                                        Cancel
-                                    </Button>
-                                </ButtonGroup>
+                            <div>
+                                <Controller
+                                    name="notificationInstance"
+                                    control={control}
+                                    rules={isNotificationInstanceRequired ? buildValidationRules([validateRequired()]) : {}}
+                                    render={({ field, fieldState }) => (
+                                        <>
+                                            <Select
+                                                id="notificationInstance"
+                                                label="Notification Instance"
+                                                required
+                                                value={field.value || ''}
+                                                onChange={(value) => {
+                                                    field.onChange(value);
+                                                }}
+                                                options={notificationInstanceOptions}
+                                                placeholder="Select Notification Instance"
+                                                isClearable
+                                                placement="bottom"
+                                            />
+                                            {fieldState.error && fieldState.isTouched && (
+                                                <p className="mt-1 text-sm text-red-600">
+                                                    Notification Instance is required if Recipient Type is Default or None, or if the send
+                                                    internal notifications is false
+                                                </p>
+                                            )}
+                                        </>
+                                    )}
+                                />
                             </div>
-                        </BootstrapForm>
-                    );
-                }}
-            </Form>
-        </Widget>
+
+                            <Controller
+                                name="internalNotification"
+                                control={control}
+                                render={({ field }) => (
+                                    <Switch
+                                        id="internalNotification"
+                                        checked={field.value}
+                                        onChange={field.onChange}
+                                        label="Send internal notifications"
+                                        disabled={type === RecipientType.Default || type === RecipientType.None}
+                                    />
+                                )}
+                            />
+
+                            <Controller
+                                name="frequency"
+                                control={control}
+                                rules={buildValidationRules([validateDuration(['d', 'h'])])}
+                                render={({ field, fieldState }) => (
+                                    <>
+                                        <TextInput
+                                            {...field}
+                                            id="frequency"
+                                            type="text"
+                                            label="Frequency"
+                                            placeholder="ex: 5d 4h"
+                                            invalid={fieldState.error && fieldState.isTouched}
+                                            error={
+                                                fieldState.error && fieldState.isTouched
+                                                    ? typeof fieldState.error === 'string'
+                                                        ? fieldState.error
+                                                        : fieldState.error?.message || 'Invalid value'
+                                                    : undefined
+                                            }
+                                        />
+                                        {!fieldState.error && <p className="mt-1 text-sm text-gray-500">Enter duration in format: 0d 0h</p>}
+                                    </>
+                                )}
+                            />
+
+                            <div>
+                                <p className="text-sm text-gray-500 mb-2">Maximum number of repetitions of the same notification</p>
+                                <Controller
+                                    name="repetitions"
+                                    control={control}
+                                    rules={buildValidationRules([validatePositiveInteger(), validateNonZeroInteger()])}
+                                    render={({ field, fieldState }) => (
+                                        <TextInput
+                                            {...field}
+                                            id="repetitions"
+                                            type="number"
+                                            label="Repetitions"
+                                            invalid={fieldState.error && fieldState.isTouched}
+                                            error={
+                                                fieldState.error && fieldState.isTouched
+                                                    ? typeof fieldState.error === 'string'
+                                                        ? fieldState.error
+                                                        : fieldState.error?.message || 'Invalid value'
+                                                    : undefined
+                                            }
+                                        />
+                                    )}
+                                />
+                            </div>
+
+                            <Container className="flex-row justify-end modal-footer" gap={4}>
+                                <Button variant="outline" onClick={onCancel} disabled={isSubmitting} type="button">
+                                    Cancel
+                                </Button>
+                                <ProgressButton
+                                    title={editMode ? 'Save' : 'Create'}
+                                    inProgressTitle={editMode ? 'Saving...' : 'Creating...'}
+                                    inProgress={isSubmitting}
+                                    disabled={areDefaultValuesSame(formValues) || isBusy}
+                                    type="submit"
+                                />
+                            </Container>
+                        </div>
+                    </Widget>
+                </form>
+            </FormProvider>
+        </>
     );
 }
 
 function RecipientTypeFields() {
-    const form = useForm<FormValues>();
-    const formState = useFormState<FormValues>();
-
+    const { control, setValue, watch } = useFormContext<FormValues>();
     const recipientTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.RecipientType));
 
     const users = useSelector(userSelectors.users);
     const roles = useSelector(rolesSelectors.roles);
     const groups = useSelector(groupSelectors.certificateGroups);
+
+    const watchedRecipientType = useWatch({
+        control,
+        name: 'recipientType',
+    });
 
     const recipientTypeOptions = useMemo(
         () =>
@@ -309,10 +424,20 @@ function RecipientTypeFields() {
             })),
         [recipientTypeEnum],
     );
+
+    // Helper function to convert validators for react-hook-form
+    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
+        return {
+            validate: (value: any) => {
+                const composed = composeValidators(...validators);
+                return composed(value);
+            },
+        };
+    };
+
     const renderRecipientField = useCallback(() => {
-        const recipientType = formState.values.recipientType?.value;
-        let props = null;
-        switch (recipientType) {
+        let props: { options: { value: string; label: string }[]; description: string; placeholder: string } | null = null;
+        switch (watchedRecipientType) {
             case RecipientType.User:
                 props = {
                     options: users.map((user) => ({ label: user.username, value: user.uuid })),
@@ -329,7 +454,7 @@ function RecipientTypeFields() {
                 break;
             case RecipientType.Role:
                 props = {
-                    options: roles.map((roles) => ({ label: roles.name, value: roles.uuid })),
+                    options: roles.map((role) => ({ label: role.name, value: role.uuid })),
                     description: 'Users with the selected Roles will be receiving the notifications.',
                     placeholder: 'Select Roles',
                 };
@@ -337,45 +462,76 @@ function RecipientTypeFields() {
         }
         if (!props) return null;
         return (
-            <Field name="recipients" validate={validateRequired()}>
-                {({ input, meta }) => (
-                    <CustomSelect
-                        {...input}
-                        label="Notification Recipients"
-                        onChange={(e) => form.change('recipients', e as OptionType[])}
-                        error={meta.error && meta.touched && 'At least one recipient is required'}
-                        closeMenuOnSelect={false}
-                        isMulti
-                        required
-                        {...props}
-                    />
-                )}
-            </Field>
+            <div>
+                <Label required>Notification Recipients</Label>
+                <p className="text-sm text-gray-500 mb-2">{props.description}</p>
+                <Controller
+                    name="recipients"
+                    control={control}
+                    rules={buildValidationRules([validateRequired()])}
+                    render={({ field, fieldState }) => (
+                        <>
+                            <Select
+                                id="recipients"
+                                isMulti
+                                value={field.value || []}
+                                onChange={(value) => {
+                                    field.onChange(value);
+                                }}
+                                options={props.options}
+                                placeholder={props.placeholder}
+                                placement="bottom"
+                            />
+                            {fieldState.error && fieldState.isTouched && (
+                                <p className="mt-1 text-sm text-red-600">At least one recipient is required</p>
+                            )}
+                        </>
+                    )}
+                />
+            </div>
         );
-    }, [formState.values, form, users, roles, groups]);
+    }, [watchedRecipientType, users, roles, groups, control]);
 
     return (
         <>
-            <CustomSelect
-                id="recipientType"
-                inputId="recipientType"
-                label="Recipient Type"
-                placeholder="Select Recipient Type"
-                options={recipientTypeOptions}
-                value={formState.values.recipientType}
-                onChange={(e) => {
-                    form.change('recipientType', e as OptionType);
-                    form.change('recipients');
-                    form.resetFieldState('notificationInstance');
-                    switch ((e as OptionType).value) {
-                        case RecipientType.None:
-                        case RecipientType.Default:
-                            form.change('internalNotification', false);
-                    }
-                }}
-                description="Recipient type of notifications managed by profile."
-                required
-            />
+            <div>
+                <Label htmlFor="recipientType" required>
+                    Recipient Type
+                </Label>
+                <p className="text-sm text-gray-500 mb-2">Recipient type of notifications managed by profile.</p>
+                <Controller
+                    name="recipientType"
+                    control={control}
+                    rules={buildValidationRules([validateRequired()])}
+                    render={({ field, fieldState }) => (
+                        <>
+                            <Select
+                                id="recipientType"
+                                value={field.value || ''}
+                                onChange={(value) => {
+                                    field.onChange(value);
+                                    setValue('recipients', []);
+                                    setValue('notificationInstance', '');
+                                    switch (value) {
+                                        case RecipientType.None:
+                                        case RecipientType.Default:
+                                            setValue('internalNotification', false);
+                                            break;
+                                    }
+                                }}
+                                options={recipientTypeOptions}
+                                placeholder="Select Recipient Type"
+                                placement="bottom"
+                            />
+                            {fieldState.error && fieldState.isTouched && (
+                                <p className="mt-1 text-sm text-red-600">
+                                    {typeof fieldState.error === 'string' ? fieldState.error : fieldState.error?.message || 'Invalid value'}
+                                </p>
+                            )}
+                        </>
+                    )}
+                />
+            </div>
             {renderRecipientField()}
         </>
     );

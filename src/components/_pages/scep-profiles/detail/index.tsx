@@ -10,10 +10,11 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 import CertificateStatus from 'components/_pages/certificates/CertificateStatus';
 
 import { actions, selectors } from 'ducks/scep-profiles';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate, useParams } from 'react-router';
+import { Link, useParams } from 'react-router';
+import ScepProfileForm from '../form';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { createWidgetDetailHeaders, getGroupNames, getOwnerName } from 'utils/widget';
@@ -26,7 +27,6 @@ import Switch from 'components/Switch';
 
 export default function ScepProfileDetail() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const { id } = useParams();
 
@@ -34,12 +34,14 @@ export default function ScepProfileDetail() {
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
     const isDisabling = useSelector(selectors.isDisabling);
     const isEnabling = useSelector(selectors.isEnabling);
+    const isUpdating = useSelector(selectors.isUpdating);
     const users = useSelector(userSelectors.users);
     const groups = useSelector(groupsSelectors.certificateGroups);
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const deleteErrorMessage = useSelector(selectors.deleteErrorMessage);
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
     const isBusy = useMemo(() => isFetchingDetail || isDisabling || isEnabling, [isFetchingDetail, isDisabling, isEnabling]);
 
@@ -59,9 +61,28 @@ export default function ScepProfileDetail() {
         dispatch(groupsActions.listGroups());
     }, [dispatch]);
 
+    const wasUpdating = useRef(isUpdating);
+
+    useEffect(() => {
+        if (wasUpdating.current && !isUpdating) {
+            setIsEditModalOpen(false);
+            getFreshScepProfile();
+        }
+        wasUpdating.current = isUpdating;
+    }, [isUpdating, getFreshScepProfile]);
+
+    const handleOpenEditModal = useCallback(() => {
+        if (!scepProfile) return;
+        setIsEditModalOpen(true);
+    }, [scepProfile]);
+
+    const handleCloseEditModal = useCallback(() => {
+        setIsEditModalOpen(false);
+    }, []);
+
     const onEditClick = useCallback(() => {
-        navigate(`../../scepprofiles/edit/${scepProfile?.uuid}`);
-    }, [scepProfile, navigate]);
+        handleOpenEditModal();
+    }, [handleOpenEditModal]);
 
     const onEnableClick = useCallback(() => {
         if (!scepProfile) return;
@@ -431,6 +452,20 @@ export default function ScepProfileDetail() {
                             body: 'Cancel',
                         },
                     ]}
+                />
+
+                <Dialog
+                    isOpen={isEditModalOpen}
+                    toggle={handleCloseEditModal}
+                    caption="Edit SCEP Profile"
+                    size="xl"
+                    body={
+                        <ScepProfileForm
+                            scepProfileId={scepProfile?.uuid}
+                            onCancel={handleCloseEditModal}
+                            onSuccess={handleCloseEditModal}
+                        />
+                    }
                 />
             </Container>
         </div>
