@@ -1,9 +1,11 @@
+import cn from 'classnames';
 import Button, { ButtonColor, ButtonVariant } from 'components/Button';
-import { Trash2, Info, AlertTriangle, X, ArrowUpFromLine, Users, User, CircleMinus } from 'lucide-react';
+import { Trash2, Info, AlertTriangle, X, ArrowUpFromLine, Users, User, CircleMinus, ArrowDownToLine } from 'lucide-react';
 import cx from 'classnames';
 import { useEffect } from 'react';
 
 export type ModalSize = 'sm' | 'md' | 'lg' | 'xl';
+export type ModalIcon = 'delete' | 'info' | 'warning' | 'success' | 'error' | 'users' | 'user' | 'download' | React.ReactNode;
 
 export interface DialogButton {
     color: ButtonColor;
@@ -21,7 +23,7 @@ interface Props {
     buttons?: DialogButton[];
     size?: ModalSize;
     dataTestId?: string;
-    icon?: 'delete' | 'info' | 'warning' | 'success' | 'error' | 'users' | 'user' | React.ReactNode;
+    icon?: ModalIcon;
     noBorder?: boolean;
 }
 
@@ -79,6 +81,9 @@ export default function Dialog({ isOpen, toggle, caption, body, buttons, size = 
             case 'destroy':
                 iconElement = <CircleMinus {...buttonProps} />;
                 break;
+            case 'download':
+                iconElement = <ArrowDownToLine {...buttonProps} />;
+                break;
             default:
                 iconElement = icon as React.ReactNode;
                 break;
@@ -123,30 +128,29 @@ export default function Dialog({ isOpen, toggle, caption, body, buttons, size = 
                         },
                     )}
                 >
-                    <div className="w-full flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl pointer-events-auto dark:bg-neutral-800 dark:border-neutral-700 dark:shadow-neutral-700/70 md:p-8 relative">
+                    <div className="w-full flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl pointer-events-auto dark:bg-neutral-800 dark:border-neutral-700 dark:shadow-neutral-700/70 p-4 md:p-8 !pb-0 relative overflow-visible">
                         <Button variant="transparent" onClick={toggle} className="absolute right-2 top-2">
                             <X size={16} />
                         </Button>
                         <div
-                            className={cx('flex flex-col justify-center items-center py-3 px-4 dark:border-neutral-700', {
+                            className={cx('flex flex-col justify-center pb-4 dark:border-neutral-700', {
                                 'border-b border-gray-200': !hideBorders,
+                                'items-center': !!icon,
                             })}
                         >
                             {renderIcon()}
-                            <h3
-                                id="hs-scale-animation-modal-label"
-                                className="font-bold text-gray-800 dark:text-white text-2xl text-center"
-                            >
+                            <h3 id="hs-scale-animation-modal-label" className="font-bold text-gray-800 dark:text-white text-2xl">
                                 {caption}
                             </h3>
                         </div>
-                        <div className="p-4 overflow-y-auto text-gray-800 dark:text-white">{body}</div>
+                        <div className={cn('pt-4 text-gray-800 dark:text-white overflow-visible', { 'pb-4': !!buttons?.length })}>
+                            {body}
+                        </div>
                         {buttons && buttons.length > 0 && (
                             <div
-                                className={cx('flex justify-center items-center gap-4 py-3 px-4 mt-2 dark:border-neutral-700', {
-                                    'border-t border-gray-200': !hideBorders,
-                                    'pt-0': hideBorders,
-                                })}
+                                className={cx(
+                                    'flex justify-end items-center gap-4 py-4 mt-2 dark:border-neutral-700 border-t border-gray-200 modal-footer',
+                                )}
                             >
                                 {buttons.map((button, index) => (
                                     <Button

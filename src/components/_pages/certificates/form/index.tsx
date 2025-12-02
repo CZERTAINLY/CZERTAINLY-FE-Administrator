@@ -8,53 +8,56 @@ import { actions as connectorActions } from 'ducks/connectors';
 import { selectors as cryptographyOperationSelectors } from 'ducks/cryptographic-operations';
 import { actions as raProfileActions, selectors as raProfileSelectors } from 'ducks/ra-profiles';
 import { actions as tokenProfileActions } from 'ducks/token-profiles';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Field, Form } from 'react-final-form';
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 
-import Select, { SingleValue } from 'react-select';
-import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Label } from 'reactstrap';
+import Button from 'components/Button';
+import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
+
 import { AttributeDescriptorModel } from 'types/attributes';
-import { CryptographicKeyPairResponseModel } from 'types/cryptographic-keys';
-import { RaProfileResponseModel } from 'types/ra-profiles';
-import { TokenProfileResponseModel } from 'types/token-profiles';
-import { mutators } from 'utils/attributes/attributeEditorMutators';
+import { CertificateDetailResponseModel } from '../../../../types/certificate';
+import { CertificateRequestFormat, Resource } from '../../../../types/openapi';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 
 import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from 'ducks/utilsActuator';
 import { ParseRequestRequestDtoParseTypeEnum } from 'types/openapi/utils';
-import { validateRequired } from 'utils/validators';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
 import { transformParseRequestResponseDtoToCertificateResponseDetailModel } from '../../../../ducks/transform/utilsCertificateRequest';
 import {
     actions as utilsCertificateRequestActions,
     selectors as utilsCertificateRequestSelectors,
 } from '../../../../ducks/utilsCertificateRequest';
-import { CertificateDetailResponseModel } from '../../../../types/certificate';
-import { CertificateRequestFormat, Resource } from '../../../../types/openapi';
+
 import CertificateAttributes from '../../../CertificateAttributes';
 import FileUpload from '../../../Input/FileUpload/FileUpload';
 import TabLayout from '../../../Layout/TabLayout';
 import RenderRequestKey from './RenderRequestKey';
-import SwitchField from 'components/Input/SwitchField';
 import RenderTokenProfile from 'components/_pages/certificates/form/RenderTokenProfile';
+import Select from 'components/Select';
+import Switch from 'components/Switch';
+import Container from 'components/Container';
+import Label from 'components/Label';
 
-export interface FormValues {
-    raProfile: SingleValue<{ label: string; value: RaProfileResponseModel }> | null;
-    format?: CertificateRequestFormat;
-    uploadCsr?: SingleValue<{ label: string; value: boolean }> | null;
-    tokenProfile?: SingleValue<{ label: string; value: TokenProfileResponseModel }> | null;
-    altTokenProfile?: SingleValue<{ label: string; value: TokenProfileResponseModel }> | null;
-    includeAltKey?: boolean;
-    key?: SingleValue<{ label: string; value: CryptographicKeyPairResponseModel }> | null;
-    altKey?: SingleValue<{ label: string; value: CryptographicKeyPairResponseModel }> | null;
+type CertificateFormValues = {
+    raProfileUuid: string;
+    uploadCsrSource?: 'external' | 'existing';
+    includeAltKey: boolean;
+    tokenProfileUuid?: string;
+    altTokenProfileUuid?: string;
+    keyUuid?: string;
+    altKeyUuid?: string;
+};
+
+const useDescriptorState = () => useState<AttributeDescriptorModel[]>(() => []);
+
+interface CertificateFormProps {
+    onCancel?: () => void;
 }
 
-export default function CertificateForm() {
+export default function CertificateForm({ onCancel }: CertificateFormProps = {}) {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const raProfiles = useSelector(raProfileSelectors.raProfiles);
     const issuanceAttributeDescriptors = useSelector(certificateSelectors.issuanceAttributes);
@@ -65,19 +68,39 @@ export default function CertificateForm() {
     const altSignatureAttributeDescriptors = useSelector(cryptographyOperationSelectors.altSignatureAttributeDescriptors);
 
     const issuingCertificate = useSelector(certificateSelectors.isIssuing);
-
     const parsedCertificateRequest = useSelector(utilsCertificateRequestSelectors.parsedCertificateRequest);
-
-    const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
-    const [csrAttributesCallbackAttributes, setCsrAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
-    const [signatureAttributesCallbackAttributes, setSignatureAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
-    const [altSignatureAttributesCallbackAttributes, setAltSignatureAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>(
-        [],
-    );
-    const [fileContent, setFileContent] = useState<string>('');
-
-    const [certificate, setCertificate] = useState<CertificateDetailResponseModel | undefined>();
     const health = useSelector(utilsActuatorSelectors.health);
+
+    const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useDescriptorState();
+    const [csrAttributesCallbackAttributes, setCsrAttributesCallbackAttributes] = useDescriptorState();
+    const [signatureAttributesCallbackAttributes, setSignatureAttributesCallbackAttributes] = useDescriptorState();
+    const [altSignatureAttributesCallbackAttributes, setAltSignatureAttributesCallbackAttributes] = useDescriptorState();
+    const [fileContent, setFileContent] = useState<string>('');
+    const [certificate, setCertificate] = useState<CertificateDetailResponseModel | undefined>();
+
+    const [attributeValuesMap, setAttributeValuesMap] = useState<Record<string, Record<string, any>>>({});
+    const attributeValuesRef = useRef<Record<string, any>>({});
+
+    const methods = useForm<CertificateFormValues>({
+        defaultValues: {
+            raProfileUuid: '',
+            includeAltKey: false,
+        },
+    });
+
+    const { control, handleSubmit, setValue } = methods;
+
+    const combinedAttributeValues = useMemo(
+        () =>
+            Object.values(attributeValuesMap).reduce<Record<string, any>>((acc, current) => {
+                return { ...acc, ...current };
+            }, {}),
+        [attributeValuesMap],
+    );
+
+    useEffect(() => {
+        attributeValuesRef.current = combinedAttributeValues;
+    }, [combinedAttributeValues]);
 
     useEffect(() => {
         dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Certificates));
@@ -97,310 +120,381 @@ export default function CertificateForm() {
         );
     }, [parsedCertificateRequest]);
 
-    const submitCallback = useCallback(
-        (values: FormValues) => {
-            if (!values.raProfile?.value.authorityInstanceUuid) return;
-
-            const attributes = collectFormAttributes(
-                'issuance_attributes',
-                [...(issuanceAttributeDescriptors[values.raProfile.value.uuid] ?? []), ...groupAttributesCallbackAttributes],
-                values,
-            );
-
-            dispatch(
-                certificateActions.issueCertificate({
-                    raProfileUuid: values.raProfile.value.uuid,
-                    authorityUuid: values.raProfile.value.authorityInstanceUuid,
-                    signRequest: {
-                        format: CertificateRequestFormat.Pkcs10,
-                        request: fileContent,
-                        attributes,
-                        csrAttributes: collectFormAttributes('csrAttributes', csrAttributeDescriptors, values),
-                        signatureAttributes: collectFormAttributes('signatureAttributes', signatureAttributeDescriptors, values),
-                        keyUuid: values.key?.value.uuid,
-                        tokenProfileUuid: values.tokenProfile?.value.uuid,
-                        customAttributes: collectFormAttributes('customCertificate', resourceCustomAttributes, values),
-                        ...(values.includeAltKey
-                            ? {
-                                  altKeyUuid: values.altKey?.value.uuid,
-                                  altTokenProfileUuid: values.altTokenProfile?.value.uuid,
-                                  altSignatureAttributes: collectFormAttributes(
-                                      'altSignatureAttributes',
-                                      altSignatureAttributeDescriptors,
-                                      values,
-                                  ),
-                              }
-                            : {}),
-                    },
-                }),
-            );
-        },
-        [
-            dispatch,
-            issuanceAttributeDescriptors,
-            groupAttributesCallbackAttributes,
-            resourceCustomAttributes,
-            csrAttributeDescriptors,
-            signatureAttributeDescriptors,
-            altSignatureAttributeDescriptors,
-            fileContent,
-        ],
+    const selectedRaProfileUuid = useWatch({ control, name: 'raProfileUuid' });
+    const selectedRaProfile = useMemo(
+        () => raProfiles.find((profile) => profile.uuid === selectedRaProfileUuid),
+        [raProfiles, selectedRaProfileUuid],
     );
+    const uploadCsrSource = useWatch({ control, name: 'uploadCsrSource' });
+    const includeAltKey = useWatch({ control, name: 'includeAltKey' });
+    const tokenProfileUuid = useWatch({ control, name: 'tokenProfileUuid' });
+    const altTokenProfileUuid = useWatch({ control, name: 'altTokenProfileUuid' });
+
+    useEffect(() => {
+        if (!selectedRaProfileUuid) {
+            setValue('tokenProfileUuid', undefined);
+            setValue('keyUuid', undefined);
+            setValue('includeAltKey', false);
+            setValue('altTokenProfileUuid', undefined);
+            setValue('altKeyUuid', undefined);
+        }
+    }, [selectedRaProfileUuid, setValue]);
+
+    useEffect(() => {
+        setValue('keyUuid', undefined);
+    }, [tokenProfileUuid, setValue]);
+
+    useEffect(() => {
+        setValue('altKeyUuid', undefined);
+    }, [altTokenProfileUuid, setValue]);
 
     const onRaProfileChange = useCallback(
-        (event: SingleValue<{ label: string; value: RaProfileResponseModel }>) => {
-            if (!event?.value.authorityInstanceUuid) return;
+        (raProfileUuid: string) => {
+            const profile = raProfiles.find((p) => p.uuid === raProfileUuid);
+            if (!profile?.authorityInstanceUuid) return;
             dispatch(connectorActions.clearCallbackData());
             setGroupAttributesCallbackAttributes([]);
             dispatch(
                 certificateActions.getIssuanceAttributes({
-                    raProfileUuid: event.value.uuid,
-                    authorityUuid: event.value.authorityInstanceUuid,
+                    raProfileUuid: profile.uuid,
+                    authorityUuid: profile.authorityInstanceUuid,
                 }),
             );
-
-            /*setRaProfUuid(event?.value || "");
-         dispatch(actions.requestIssuanceAttributes(event?.value || ""));
-         */
         },
-        [dispatch],
+        [dispatch, raProfiles, setGroupAttributesCallbackAttributes],
     );
 
-    const onCancel = useCallback(() => {
-        navigate(-1);
-    }, [navigate]);
-
-    const options = useMemo(
+    const raProfileOptions = useMemo(
         () =>
             raProfiles
-                .filter((el) => el.authorityInstanceUuid)
-                .map((raProfile) => ({
-                    label: raProfile.name,
-                    value: raProfile,
+                .filter((profile) => profile.authorityInstanceUuid)
+                .map((profile) => ({
+                    label: profile.name,
+                    value: profile.uuid,
                 })),
         [raProfiles],
     );
 
-    const defaultValues: FormValues = useMemo(
-        () => ({
-            raProfile: null,
-            fileName: '',
-            contentType: '',
-            file: '',
-        }),
-        [],
-    );
-
-    const inputOptions = useMemo(
+    const keySourceOptions = useMemo(
         () => [
-            { label: 'External', value: true },
-            { label: 'Existing Key', value: false },
+            { label: 'External', value: 'external' },
+            { label: 'Existing Key', value: 'existing' },
         ],
         [],
     );
 
+    const isExternalSource = uploadCsrSource === 'external';
+    const isExistingKeySource = uploadCsrSource === 'existing';
+
+    const submitCallback = useCallback(
+        (formValues: CertificateFormValues) => {
+            const profile = raProfiles.find((p) => p.uuid === formValues.raProfileUuid);
+            if (!profile?.authorityInstanceUuid) return;
+
+            const combinedValues = {
+                ...formValues,
+                ...attributeValuesRef.current,
+            };
+
+            const issuanceAttributes = collectFormAttributes(
+                'issuance_attributes',
+                [...(issuanceAttributeDescriptors[profile.uuid] ?? []), ...groupAttributesCallbackAttributes],
+                combinedValues,
+            );
+
+            const csrAttrs = collectFormAttributes('csrAttributes', csrAttributeDescriptors, combinedValues);
+            const signatureAttrs = collectFormAttributes('signatureAttributes', signatureAttributeDescriptors, combinedValues);
+            const customAttrs = collectFormAttributes('customCertificate', resourceCustomAttributes, combinedValues);
+
+            const payload: Parameters<typeof certificateActions.issueCertificate>[0]['signRequest'] = {
+                format: CertificateRequestFormat.Pkcs10,
+                request: fileContent,
+                attributes: issuanceAttributes,
+                csrAttributes: csrAttrs,
+                signatureAttributes: signatureAttrs,
+                keyUuid: formValues.keyUuid,
+                tokenProfileUuid: formValues.tokenProfileUuid,
+                customAttributes: customAttrs,
+            };
+
+            if (formValues.includeAltKey) {
+                payload.altKeyUuid = formValues.altKeyUuid;
+                payload.altTokenProfileUuid = formValues.altTokenProfileUuid;
+                payload.altSignatureAttributes = collectFormAttributes(
+                    'altSignatureAttributes',
+                    altSignatureAttributeDescriptors,
+                    combinedValues,
+                );
+            }
+
+            dispatch(
+                certificateActions.issueCertificate({
+                    raProfileUuid: profile.uuid,
+                    authorityUuid: profile.authorityInstanceUuid,
+                    signRequest: payload,
+                }),
+            );
+        },
+        [
+            altSignatureAttributeDescriptors,
+            csrAttributeDescriptors,
+            dispatch,
+            fileContent,
+            groupAttributesCallbackAttributes,
+            issuanceAttributeDescriptors,
+            raProfiles,
+            resourceCustomAttributes,
+            signatureAttributeDescriptors,
+        ],
+    );
+
+    const handleAttributeValuesChange = useCallback((editorId: string, values: Record<string, any> | null) => {
+        setAttributeValuesMap((prev) => {
+            const next = { ...prev };
+            if (values === null) {
+                delete next[editorId];
+            } else {
+                next[editorId] = values;
+            }
+            return next;
+        });
+    }, []);
+
+    const onSubmit = useCallback(
+        (values: CertificateFormValues) => {
+            submitCallback(values);
+        },
+        [submitCallback],
+    );
+
+    const submitHandler = useCallback(
+        (event: FormEvent<HTMLFormElement>) => {
+            event.preventDefault();
+            handleSubmit(onSubmit)(event);
+        },
+        [handleSubmit, onSubmit],
+    );
+
     return (
-        <>
-            <Form initialValues={defaultValues} onSubmit={submitCallback} mutators={{ ...mutators<FormValues>() }}>
-                {({ handleSubmit, valid, submitting, values, form }) => (
-                    <BootstrapForm onSubmit={handleSubmit}>
-                        <Widget title="Add new Certificate" busy={issuingCertificate || isFetchingResourceCustomAttributes}>
-                            <Field name="raProfile" validate={validateRequired()}>
-                                {({ input, meta, onChange }) => (
-                                    <FormGroup>
-                                        <Label for="raProfileSelect">RA Profile</Label>
-
-                                        <Select
-                                            {...input}
-                                            id="raProfile"
-                                            inputId="raProfileSelect"
-                                            maxMenuHeight={140}
-                                            menuPlacement="auto"
-                                            options={options}
-                                            placeholder="Select RA Profile"
-                                            onChange={(e) => {
-                                                onRaProfileChange(e);
-                                                input.onChange(e);
-                                            }}
-                                        />
-
-                                        <FormFeedback>{meta.error}</FormFeedback>
-                                    </FormGroup>
-                                )}
-                            </Field>
-
-                            <Field name="uploadCsr">
-                                {({ input, meta, onChange }) => (
-                                    <FormGroup>
-                                        <Label for="uploadCsrSelect">Key Source</Label>
-                                        <Select
-                                            {...input}
-                                            id="uploadCsr"
-                                            inputId="uploadCsrSelect"
-                                            maxMenuHeight={140}
-                                            menuPlacement="auto"
-                                            options={inputOptions}
-                                            placeholder="Select Key Source"
-                                            onChange={(e) => {
-                                                input.onChange(e);
-                                            }}
-                                        />
-
-                                        <FormFeedback>{meta.error}</FormFeedback>
-                                    </FormGroup>
-                                )}
-                            </Field>
-                        </Widget>
-
-                        <Widget title="Request Properties" busy={issuingCertificate || isFetchingResourceCustomAttributes}>
-                            {values.uploadCsr?.value && values.raProfile ? (
-                                <>
-                                    <FileUpload
-                                        editable
-                                        fileType={'CSR'}
-                                        onFileContentLoaded={(fileContent) => {
-                                            setFileContent(fileContent);
-                                            if (health) {
-                                                dispatch(
-                                                    utilsCertificateRequestActions.parseCertificateRequest({
-                                                        content: fileContent,
-                                                        requestParseType: ParseRequestRequestDtoParseTypeEnum.Basic,
-                                                    }),
-                                                );
-                                            }
+        <FormProvider {...methods}>
+            <form onSubmit={submitHandler} noValidate>
+                <div className="space-y-4">
+                    <Widget noBorder busy={issuingCertificate || isFetchingResourceCustomAttributes}>
+                        <div className="space-y-4">
+                            <Controller
+                                control={control}
+                                name="raProfileUuid"
+                                rules={{ required: true }}
+                                render={({ field: { value, onChange }, fieldState: { error } }) => (
+                                    <Select
+                                        id="raProfile"
+                                        options={raProfileOptions}
+                                        placeholder="Select RA Profile"
+                                        value={value ?? ''}
+                                        label="RA Profile"
+                                        onChange={(selected) => {
+                                            const uuid = (selected ?? '') as string;
+                                            onChange(uuid);
+                                            onRaProfileChange(uuid);
+                                            setValue('tokenProfileUuid', undefined);
+                                            setValue('keyUuid', undefined);
+                                            setValue('includeAltKey', false);
+                                            setValue('altTokenProfileUuid', undefined);
+                                            setValue('altKeyUuid', undefined);
                                         }}
+                                        error={error && 'RA Profile is required'}
                                     />
-
-                                    {certificate && (
-                                        <>
-                                            <br />
-                                            <CertificateAttributes csr={true} certificate={certificate} />
-                                        </>
-                                    )}
-                                </>
-                            ) : (
-                                <></>
-                            )}
-
-                            {values.uploadCsr && !values.uploadCsr?.value && values.raProfile ? (
-                                <>
-                                    <RenderTokenProfile type="normal" />
-
-                                    <RenderRequestKey type="normal" values={values} />
-
-                                    {values.key && <SwitchField id="includeAltKey" label="Include Alternative Key" />}
-
-                                    {values.includeAltKey && <RenderTokenProfile type="alt" />}
-
-                                    <RenderRequestKey type="alt" values={values} />
-
-                                    {values.tokenProfile && values.key ? (
-                                        <TabLayout
-                                            tabs={[
-                                                {
-                                                    title: 'Request Attributes',
-                                                    content: (
-                                                        <AttributeEditor
-                                                            id="csrAttributes"
-                                                            attributeDescriptors={csrAttributeDescriptors ?? []}
-                                                            groupAttributesCallbackAttributes={csrAttributesCallbackAttributes}
-                                                            setGroupAttributesCallbackAttributes={setCsrAttributesCallbackAttributes}
-                                                        />
-                                                    ),
-                                                },
-                                                {
-                                                    title: 'Signature Attributes',
-                                                    content: (
-                                                        <AttributeEditor
-                                                            id="signatureAttributes"
-                                                            attributeDescriptors={signatureAttributeDescriptors ?? []}
-                                                            groupAttributesCallbackAttributes={signatureAttributesCallbackAttributes}
-                                                            setGroupAttributesCallbackAttributes={setSignatureAttributesCallbackAttributes}
-                                                        />
-                                                    ),
-                                                },
-                                                ...(values.includeAltKey && values.altTokenProfile && values.altKey
-                                                    ? [
-                                                          {
-                                                              title: 'Alternative Signature Attributes',
-                                                              content: (
-                                                                  <AttributeEditor
-                                                                      id="altSignatureAttributes"
-                                                                      attributeDescriptors={altSignatureAttributeDescriptors ?? []}
-                                                                      groupAttributesCallbackAttributes={
-                                                                          altSignatureAttributesCallbackAttributes
-                                                                      }
-                                                                      setGroupAttributesCallbackAttributes={
-                                                                          setAltSignatureAttributesCallbackAttributes
-                                                                      }
-                                                                  />
-                                                              ),
-                                                          },
-                                                      ]
-                                                    : []),
-                                            ]}
-                                        />
-                                    ) : (
-                                        <></>
-                                    )}
-                                </>
-                            ) : (
-                                <></>
-                            )}
-                        </Widget>
-
-                        <Widget title="Other Properties" busy={issuingCertificate || isFetchingResourceCustomAttributes}>
-                            <br />
-                            <TabLayout
-                                tabs={[
-                                    {
-                                        title: 'Connector Attributes',
-                                        content: (
-                                            <AttributeEditor
-                                                id="issuance_attributes"
-                                                attributeDescriptors={
-                                                    issuanceAttributeDescriptors[values.raProfile?.value.uuid || 'unknown'] || []
-                                                }
-                                                callbackParentUuid={values.raProfile?.value.authorityInstanceUuid}
-                                                callbackResource={Resource.RaProfiles}
-                                                groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
-                                                setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
-                                            />
-                                        ),
-                                    },
-                                    {
-                                        title: 'Custom Attributes',
-                                        content: (
-                                            <AttributeEditor
-                                                id="customCertificate"
-                                                attributeDescriptors={resourceCustomAttributes}
-                                                attributes={values.raProfile?.value.customAttributes}
-                                            />
-                                        ),
-                                    },
-                                ]}
+                                )}
                             />
 
-                            <br />
-
-                            <div className="d-flex justify-content-end">
-                                <ButtonGroup>
-                                    <ProgressButton
-                                        title="Create"
-                                        inProgressTitle="Creating"
-                                        inProgress={submitting || issuingCertificate}
-                                        disabled={!valid}
+                            <Controller
+                                control={control}
+                                name="uploadCsrSource"
+                                rules={{ required: true }}
+                                render={({ field: { value, onChange }, fieldState: { error } }) => (
+                                    <Select
+                                        id="uploadCsr"
+                                        options={keySourceOptions}
+                                        placeholder="Select Key Source"
+                                        value={value ?? ''}
+                                        label="Key Source"
+                                        required
+                                        onChange={(selected) => {
+                                            const source = (selected ?? '') as 'external' | 'existing';
+                                            onChange(source);
+                                            if (source === 'external') {
+                                                setValue('tokenProfileUuid', undefined);
+                                                setValue('keyUuid', undefined);
+                                                setValue('includeAltKey', false);
+                                                setValue('altTokenProfileUuid', undefined);
+                                                setValue('altKeyUuid', undefined);
+                                            }
+                                        }}
+                                        error={error && 'Key Source is required'}
                                     />
+                                )}
+                            />
+                        </div>
+                    </Widget>
 
-                                    <Button color="default" onClick={onCancel} disabled={submitting}>
-                                        Cancel
-                                    </Button>
-                                </ButtonGroup>
+                    <Widget title="Request Properties" busy={issuingCertificate || isFetchingResourceCustomAttributes}>
+                        {isExternalSource && selectedRaProfile ? (
+                            <>
+                                <FileUpload
+                                    editable
+                                    fileType={'CSR'}
+                                    onFileContentLoaded={(uploadedContent) => {
+                                        setFileContent(uploadedContent);
+                                        if (health) {
+                                            dispatch(
+                                                utilsCertificateRequestActions.parseCertificateRequest({
+                                                    content: uploadedContent,
+                                                    requestParseType: ParseRequestRequestDtoParseTypeEnum.Basic,
+                                                }),
+                                            );
+                                        }
+                                    }}
+                                />
+
+                                {certificate && <CertificateAttributes csr certificate={certificate} />}
+                            </>
+                        ) : null}
+
+                        {isExistingKeySource && selectedRaProfile ? (
+                            <div className="space-y-4">
+                                <RenderTokenProfile type="normal" name="tokenProfileUuid" />
+                                <RenderRequestKey type="normal" name="keyUuid" tokenProfileField="tokenProfileUuid" />
+
+                                {tokenProfileUuid ? (
+                                    <Controller
+                                        control={control}
+                                        name="includeAltKey"
+                                        render={({ field: { value, onChange } }) => (
+                                            <Switch
+                                                id="includeAltKey"
+                                                label="Include Alternative Key"
+                                                checked={value ?? false}
+                                                onChange={(checked) => {
+                                                    onChange(checked);
+                                                    if (!checked) {
+                                                        setValue('altTokenProfileUuid', undefined);
+                                                        setValue('altKeyUuid', undefined);
+                                                    }
+                                                }}
+                                            />
+                                        )}
+                                    />
+                                ) : null}
+
+                                {includeAltKey ? (
+                                    <>
+                                        <RenderTokenProfile type="alt" name="altTokenProfileUuid" />
+                                        <RenderRequestKey type="alt" name="altKeyUuid" tokenProfileField="altTokenProfileUuid" />
+                                    </>
+                                ) : null}
+
+                                {tokenProfileUuid ? (
+                                    <TabLayout
+                                        tabs={[
+                                            {
+                                                title: 'Request Attributes',
+                                                content: (
+                                                    <AttributeEditor
+                                                        id="csrAttributes"
+                                                        attributeDescriptors={csrAttributeDescriptors ?? []}
+                                                        groupAttributesCallbackAttributes={csrAttributesCallbackAttributes}
+                                                        setGroupAttributesCallbackAttributes={setCsrAttributesCallbackAttributes}
+                                                        onValuesChange={(values) => handleAttributeValuesChange('csrAttributes', values)}
+                                                    />
+                                                ),
+                                            },
+                                            {
+                                                title: 'Signature Attributes',
+                                                content: (
+                                                    <AttributeEditor
+                                                        id="signatureAttributes"
+                                                        attributeDescriptors={signatureAttributeDescriptors ?? []}
+                                                        groupAttributesCallbackAttributes={signatureAttributesCallbackAttributes}
+                                                        setGroupAttributesCallbackAttributes={setSignatureAttributesCallbackAttributes}
+                                                        onValuesChange={(values) =>
+                                                            handleAttributeValuesChange('signatureAttributes', values)
+                                                        }
+                                                    />
+                                                ),
+                                            },
+                                            ...(includeAltKey && altTokenProfileUuid
+                                                ? [
+                                                      {
+                                                          title: 'Alternative Signature Attributes',
+                                                          content: (
+                                                              <AttributeEditor
+                                                                  id="altSignatureAttributes"
+                                                                  attributeDescriptors={altSignatureAttributeDescriptors ?? []}
+                                                                  groupAttributesCallbackAttributes={
+                                                                      altSignatureAttributesCallbackAttributes
+                                                                  }
+                                                                  setGroupAttributesCallbackAttributes={
+                                                                      setAltSignatureAttributesCallbackAttributes
+                                                                  }
+                                                                  onValuesChange={(values) =>
+                                                                      handleAttributeValuesChange('altSignatureAttributes', values)
+                                                                  }
+                                                              />
+                                                          ),
+                                                      },
+                                                  ]
+                                                : []),
+                                        ]}
+                                    />
+                                ) : null}
                             </div>
-                        </Widget>
-                    </BootstrapForm>
-                )}
-            </Form>
-        </>
+                        ) : null}
+                    </Widget>
+
+                    <Widget noBorder busy={issuingCertificate || isFetchingResourceCustomAttributes}>
+                        <TabLayout
+                            noBorder
+                            tabs={[
+                                {
+                                    title: 'Connector Attributes',
+                                    content: (
+                                        <AttributeEditor
+                                            id="issuance_attributes"
+                                            attributeDescriptors={issuanceAttributeDescriptors[selectedRaProfileUuid || ''] || []}
+                                            callbackParentUuid={selectedRaProfile?.authorityInstanceUuid}
+                                            callbackResource={Resource.RaProfiles}
+                                            groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                                            setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                                            onValuesChange={(values) => handleAttributeValuesChange('issuance_attributes', values)}
+                                        />
+                                    ),
+                                },
+                                {
+                                    title: 'Custom Attributes',
+                                    content: (
+                                        <AttributeEditor
+                                            id="customCertificate"
+                                            attributeDescriptors={resourceCustomAttributes}
+                                            attributes={selectedRaProfile?.customAttributes}
+                                            onValuesChange={(values) => handleAttributeValuesChange('customCertificate', values)}
+                                        />
+                                    ),
+                                },
+                            ]}
+                        />
+                    </Widget>
+                    <Container className="flex-row justify-end modal-footer" gap={4}>
+                        <div className="flex gap-2">
+                            {onCancel && (
+                                <Button variant="outline" onClick={onCancel} disabled={issuingCertificate} type="button">
+                                    Cancel
+                                </Button>
+                            )}
+                            <ProgressButton title="Create" inProgressTitle="Creating" inProgress={issuingCertificate} />
+                        </div>
+                    </Container>
+                </div>
+            </form>
+        </FormProvider>
     );
 }

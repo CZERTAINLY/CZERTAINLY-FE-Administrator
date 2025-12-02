@@ -23,7 +23,13 @@ function ProgressButton({
     onClick,
 }: Props) {
     return (
-        <Button color={color} disabled={disabled || inProgress} onClick={onClick} className={cn('relative', { 'opacity-50': inProgress })}>
+        <Button
+            color={color}
+            disabled={disabled || inProgress}
+            onClick={onClick}
+            className={cn('relative', { 'opacity-50': inProgress })}
+            type={type}
+        >
             {inProgress ? (
                 <div>
                     <Spinner color="light" size="sm" />

@@ -5,6 +5,7 @@
     "private": true,
     "type": "module",
     "dependencies": {
+        "@floating-ui/react": "^0.27.16",
         "@preline/overlay": "^3.2.3",
         "@preline/select": "^3.2.3",
         "@preline/theme-switch": "^3.2.3",

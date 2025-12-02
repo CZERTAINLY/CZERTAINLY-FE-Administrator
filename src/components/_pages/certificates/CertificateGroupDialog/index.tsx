@@ -4,11 +4,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { actions as groupsActions, selectors as groupsSelectors } from 'ducks/certificateGroups';
 import { actions } from 'ducks/certificates';
 
-import Select from 'react-select';
+import Select from 'components/Select';
 
 import Spinner from 'components/Spinner';
 import { FormGroup } from 'reactstrap';
 import Button from 'components/Button';
+import Container from 'components/Container';
 
 interface Props {
     uuids: string[];
@@ -54,19 +55,17 @@ export default function CertificateGroupDialog({ uuids, onCancel, onUpdate }: Pr
             <FormGroup>
                 <Select
                     id="group"
-                    inputId="groupSelect"
                     options={groupOptions}
-                    value={selectedGroups}
+                    value={selectedGroups || []}
                     placeholder="Select groups"
                     isMulti
-                    onChange={(event) => {
-                        const newGroups = event.length ? [...event] : [];
-                        setSelectedGroups(newGroups);
+                    onChange={(values) => {
+                        setSelectedGroups(values || []);
                     }}
                 />
             </FormGroup>
 
-            <div className="flex gap-4">
+            <Container className="flex-row justify-end modal-footer" gap={4}>
                 <Button color="danger" onClick={removeGroup} title="Remove groups from selected certificates">
                     Remove
                 </Button>
@@ -81,7 +80,7 @@ export default function CertificateGroupDialog({ uuids, onCancel, onUpdate }: Pr
                 <Button color="secondary" variant="outline" onClick={onCancel} className="ml-auto">
                     Cancel
                 </Button>
-            </div>
+            </Container>
 
             <Spinner active={isFetchingGroups} />
         </>

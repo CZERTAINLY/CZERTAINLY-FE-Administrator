@@ -3,10 +3,11 @@ import { useDispatch } from 'react-redux';
 
 import { actions } from 'ducks/certificates';
 
-import Select from 'react-select';
+import Select from 'components/Select';
 import { FormGroup } from 'reactstrap';
 import Button from 'components/Button';
 import { UserResponseModel } from 'types/users';
+import Container from 'components/Container';
 
 interface Props {
     uuids: string[];
@@ -51,15 +52,15 @@ export default function CertificateOwnerDialog({ uuids, onCancel, onUpdate, user
         <>
             <FormGroup>
                 <Select
-                    maxMenuHeight={140}
-                    menuPlacement="auto"
+                    id="certificateOwner"
                     options={userOptions}
                     placeholder={`Select Owner`}
-                    onChange={(event) => setOwnerUuid(event?.value)}
+                    value={ownerUuid || ''}
+                    onChange={(value) => setOwnerUuid(value as string)}
                 />
             </FormGroup>
 
-            <div className="flex gap-4">
+            <Container className="flex-row justify-end modal-footer" gap={4}>
                 <Button color="danger" onClick={removeOwner}>
                     Remove
                 </Button>
@@ -70,7 +71,7 @@ export default function CertificateOwnerDialog({ uuids, onCancel, onUpdate, user
                 <Button color="secondary" variant="outline" onClick={onCancel} className="ml-auto">
                     Cancel
                 </Button>
-            </div>
+            </Container>
         </>
     );
 }

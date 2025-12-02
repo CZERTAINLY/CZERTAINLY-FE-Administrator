@@ -1,7 +1,7 @@
 import cn from 'classnames';
 
 interface Props {
-    checked: boolean;
+    checked: boolean | undefined;
     onChange: (checked: boolean) => void;
     placeholder?: string;
     id: string;

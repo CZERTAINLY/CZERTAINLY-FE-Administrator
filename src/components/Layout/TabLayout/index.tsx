@@ -1,7 +1,5 @@
-import cx from 'classnames';
 import Tabs from 'components/Tabs';
-import { useEffect, useMemo, useState } from 'react';
-import { TabContent, TabPane } from 'reactstrap';
+import { useMemo, useState } from 'react';
 import Widget from 'components/Widget';
 
 type Props = {

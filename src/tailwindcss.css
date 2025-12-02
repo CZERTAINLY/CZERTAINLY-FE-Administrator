@@ -18,6 +18,7 @@
     --status-light-gray-color: var(--gray-300);
     --status-gray-color: var(--gray-500);
     --status-info-color: #2798e7;
+    --modal-footer-background-color: #f3f4f6;
 }
 
 @import 'tailwindcss';
@@ -41,4 +42,15 @@ button {
 
 table a {
     color: var(--primary-blue-color);
+}
+
+.modal-footer {
+    background-color: var(--modal-footer-background-color);
+    width: calc(100% + 4rem);
+    margin-left: -2rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    padding-bottom: 1rem;
+    padding-top: 1rem;
+    border-radius: 0 0 1rem 1rem;
 }
