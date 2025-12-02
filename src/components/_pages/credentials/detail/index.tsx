@@ -6,9 +6,10 @@ import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions, selectors } from 'ducks/credentials';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate, useParams } from 'react-router';
+import { Link, useParams } from 'react-router';
+import CredentialForm from '../form';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { PlatformEnum, Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
@@ -19,7 +20,6 @@ import Breadcrumb from 'components/Breadcrumb';
 
 function CredentialDetail() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const { id } = useParams();
 
@@ -27,10 +27,12 @@ function CredentialDetail() {
 
     const isFetching = useSelector(selectors.isFetchingDetail);
     const isDeleting = useSelector(selectors.isDeleting);
+    const isUpdating = useSelector(selectors.isUpdating);
 
     const deleteErrorMessage = useSelector(selectors.deleteErrorMessage);
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
     const getFreshCredentialDetails = useCallback(() => {
         if (!id) return;
@@ -42,10 +44,28 @@ function CredentialDetail() {
         getFreshCredentialDetails();
     }, [getFreshCredentialDetails, id]);
 
-    const onEditClick = useCallback(() => {
+    const wasUpdating = useRef(isUpdating);
+
+    useEffect(() => {
+        if (wasUpdating.current && !isUpdating) {
+            setIsEditModalOpen(false);
+            getFreshCredentialDetails();
+        }
+        wasUpdating.current = isUpdating;
+    }, [isUpdating, getFreshCredentialDetails]);
+
+    const handleOpenEditModal = useCallback(() => {
         if (!credential) return;
-        navigate(`../../credentials/edit/${credential.uuid}`);
-    }, [navigate, credential]);
+        setIsEditModalOpen(true);
+    }, [credential]);
+
+    const handleCloseEditModal = useCallback(() => {
+        setIsEditModalOpen(false);
+    }, []);
+
+    const onEditClick = useCallback(() => {
+        handleOpenEditModal();
+    }, [handleOpenEditModal]);
 
     const onDeleteConfirmed = useCallback(() => {
         if (!credential) return;
@@ -186,6 +206,16 @@ function CredentialDetail() {
                             body: 'Cancel',
                         },
                     ]}
+                />
+
+                <Dialog
+                    isOpen={isEditModalOpen}
+                    toggle={handleCloseEditModal}
+                    caption="Edit Credential"
+                    size="xl"
+                    body={
+                        <CredentialForm credentialId={credential?.uuid} onCancel={handleCloseEditModal} onSuccess={handleCloseEditModal} />
+                    }
                 />
             </Container>
         </div>

@@ -6,9 +6,10 @@ import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions, selectors } from 'ducks/entities';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate, useParams } from 'react-router';
+import { Link, useParams } from 'react-router';
+import EntityForm from '../form';
 
 import { Label } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
@@ -21,7 +22,6 @@ import Breadcrumb from 'components/Breadcrumb';
 
 export default function EntityDetail() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const { id } = useParams();
 
@@ -29,8 +29,10 @@ export default function EntityDetail() {
 
     const isFetching = useSelector(selectors.isFetchingDetail);
     const isDeleting = useSelector(selectors.isDeleting);
+    const isUpdating = useSelector(selectors.isUpdating);
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
     const isBusy = useMemo(() => isFetching || isDeleting, [isFetching, isDeleting]);
 
@@ -44,10 +46,28 @@ export default function EntityDetail() {
         getFreshEntityDetails();
     }, [getFreshEntityDetails, id]);
 
-    const onEditClick = useCallback(() => {
+    const wasUpdating = useRef(isUpdating);
+
+    useEffect(() => {
+        if (wasUpdating.current && !isUpdating) {
+            setIsEditModalOpen(false);
+            getFreshEntityDetails();
+        }
+        wasUpdating.current = isUpdating;
+    }, [isUpdating, getFreshEntityDetails]);
+
+    const handleOpenEditModal = useCallback(() => {
         if (!entity) return;
-        navigate(`../../edit/${entity.uuid}`, { relative: 'path' });
-    }, [entity, navigate]);
+        setIsEditModalOpen(true);
+    }, [entity]);
+
+    const handleCloseEditModal = useCallback(() => {
+        setIsEditModalOpen(false);
+    }, []);
+
+    const onEditClick = useCallback(() => {
+        handleOpenEditModal();
+    }, [handleOpenEditModal]);
 
     const onDeleteConfirmed = useCallback(() => {
         if (!entity) return;
@@ -138,6 +158,14 @@ export default function EntityDetail() {
                         { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                         { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                     ]}
+                />
+
+                <Dialog
+                    isOpen={isEditModalOpen}
+                    toggle={handleCloseEditModal}
+                    caption="Edit Entity"
+                    size="xl"
+                    body={<EntityForm entityId={entity?.uuid} onCancel={handleCloseEditModal} onSuccess={handleCloseEditModal} />}
                 />
             </Container>
         </div>

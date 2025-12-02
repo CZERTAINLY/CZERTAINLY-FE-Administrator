@@ -2,40 +2,47 @@ import AttributeEditor from 'components/Attributes/AttributeEditor';
 import TabLayout from 'components/Layout/TabLayout';
 import ProgressButton from 'components/ProgressButton';
 import Widget from 'components/Widget';
+import TextInput from 'components/TextInput';
 
 import { actions as alertActions } from 'ducks/alerts';
 import { actions as connectorActions } from 'ducks/connectors';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { actions as tokenActions, selectors as tokenSelectors } from 'ducks/tokens';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { Field, Form } from 'react-final-form';
+import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 
-import Select, { SingleValue } from 'react-select';
-import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
+import Select from 'components/Select';
+import Button from 'components/Button';
+import Container from 'components/Container';
 import { AttributeDescriptorModel } from 'types/attributes';
 import { ConnectorResponseModel } from 'types/connectors';
 import { FunctionGroupCode, Resource } from 'types/openapi';
 import { TokenDetailResponseDto } from 'types/tokens';
 
-import { mutators } from 'utils/attributes/attributeEditorMutators';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
 
-interface FormValues {
-    name: string | undefined;
-    tokenProvider: { value: string; label: string } | undefined;
-    storeKind: { value: string; label: string } | undefined;
+interface TokenFormProps {
+    tokenId?: string;
+    onCancel?: () => void;
+    onSuccess?: () => void;
 }
 
-export default function TokenForm() {
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
+interface FormValues {
+    name: string;
+    tokenProvider: string;
+    storeKind: string;
+}
 
-    const { id } = useParams();
+export default function TokenForm({ tokenId, onCancel, onSuccess }: TokenFormProps) {
+    const dispatch = useDispatch();
+
+    const { id: routeId } = useParams();
+    const id = tokenId || routeId;
 
     const editMode = useMemo(() => !!id, [id]);
 
@@ -81,11 +88,19 @@ export default function TokenForm() {
         dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Tokens));
     }, [dispatch]);
 
+    const previousIdRef = useRef<string | undefined>(undefined);
+
     useEffect(() => {
-        if (editMode && (!tokenDetail || tokenDetail.uuid !== id)) {
-            dispatch(tokenActions.getTokenDetail({ uuid: id! }));
+        if (editMode && id) {
+            // Fetch if id changed or if we don't have the correct token loaded
+            if (previousIdRef.current !== id || !tokenDetail || tokenDetail.uuid !== id) {
+                dispatch(tokenActions.getTokenDetail({ uuid: id }));
+                previousIdRef.current = id;
+            }
+        } else {
+            previousIdRef.current = undefined;
         }
-    }, [dispatch, editMode, tokenDetail, tokenProviders, isFetchingTokenProviders, id]);
+    }, [dispatch, editMode, id, tokenDetail]);
 
     useEffect(() => {
         if (editMode && tokenDetail?.uuid === id) {
@@ -113,91 +128,6 @@ export default function TokenForm() {
         }
     }, [tokenProvider, dispatch, editMode, tokenDetail, tokenProviders, isFetchingTokenProviders, id]);
 
-    const onTokenProviderChange = useCallback(
-        (
-            event: SingleValue<{
-                label: string | undefined;
-                value: string | undefined;
-            }>,
-        ) => {
-            if (!event) return;
-
-            dispatch(tokenActions.clearTokenProviderAttributeDescriptors());
-            dispatch(connectorActions.clearCallbackData());
-            setGroupAttributesCallbackAttributes([]);
-
-            if (!event.value || !tokenProviders) return;
-            const provider = tokenProviders.find((p) => p.uuid === event.value);
-
-            if (!provider) return;
-            setTokenProvider(provider);
-        },
-        [dispatch, tokenProviders],
-    );
-
-    const onKindChange = useCallback(
-        (
-            event: SingleValue<{
-                label: string | undefined;
-                value: string | undefined;
-            }>,
-        ) => {
-            if (!event || !event.value || !tokenProvider) return;
-
-            dispatch(connectorActions.clearCallbackData());
-            setGroupAttributesCallbackAttributes([]);
-            dispatch(tokenActions.getTokenProviderAttributesDescriptors({ uuid: tokenProvider.uuid, kind: event.value }));
-        },
-        [dispatch, tokenProvider],
-    );
-
-    const onSubmit = useCallback(
-        (values: FormValues, form: any) => {
-            if (editMode) {
-                dispatch(
-                    tokenActions.updateToken({
-                        uuid: id!,
-                        updateToken: {
-                            name: '',
-                            kind: '',
-                            connectorUuid: '',
-                            description: values.name!,
-                            attributes: collectFormAttributes(
-                                'token',
-                                [...(tokenProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
-                                values,
-                            ),
-                            customAttributes: collectFormAttributes('customToken', resourceCustomAttributes, values),
-                        },
-                    }),
-                );
-            } else {
-                dispatch(
-                    tokenActions.createToken({
-                        name: values.name!,
-                        connectorUuid: values.tokenProvider!.value,
-                        kind: values.storeKind?.value!,
-                        attributes: collectFormAttributes(
-                            'token',
-                            [...(tokenProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
-                            values,
-                        ),
-                        customAttributes: collectFormAttributes('customToken', resourceCustomAttributes, values),
-                    }),
-                );
-            }
-        },
-        [editMode, dispatch, id, tokenProviderAttributeDescriptors, groupAttributesCallbackAttributes, resourceCustomAttributes],
-    );
-
-    const onCancel = useCallback(() => {
-        navigate(-1);
-    }, [navigate]);
-
-    const submitTitle = useMemo(() => (editMode ? 'Save' : 'Create'), [editMode]);
-
-    const inProgressTitle = useMemo(() => (editMode ? 'Saving...' : 'Creating...'), [editMode]);
-
     const optionsForTokenProviders = useMemo(
         () =>
             tokenProviders?.map((provider) => ({
@@ -220,208 +150,337 @@ export default function TokenForm() {
 
     const defaultValues: FormValues = useMemo(
         () => ({
-            name: editMode ? token?.name || undefined : undefined,
-            tokenProvider: editMode
-                ? token
-                    ? { value: token.connectorUuid || '', label: token.connectorName || '' }
-                    : undefined
-                : undefined,
-            // TODO update this to kind
-            storeKind: editMode ? (token ? { value: tokenDetail?.kind || '', label: tokenDetail?.kind || '' } : undefined) : undefined,
+            name: editMode ? token?.name || '' : '',
+            tokenProvider: editMode ? token?.connectorUuid || '' : '',
+            storeKind: editMode ? tokenDetail?.kind || '' : '',
         }),
         [editMode, token, tokenDetail?.kind],
     );
 
-    const title = useMemo(() => (editMode ? `Edit token ${token?.name}` : 'Create new token'), [editMode, token]);
+    const methods = useForm<FormValues>({
+        defaultValues,
+        mode: 'onChange',
+    });
+
+    const {
+        handleSubmit,
+        control,
+        formState: { isDirty, isSubmitting, isValid },
+        setValue,
+        reset,
+    } = methods;
+
+    const watchedTokenProvider = useWatch({
+        control,
+        name: 'tokenProvider',
+    });
+
+    const watchedStoreKind = useWatch({
+        control,
+        name: 'storeKind',
+    });
+
+    // Helper function to convert validators for react-hook-form
+    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
+        return {
+            validate: (value: any) => {
+                const composed = composeValidators(...validators);
+                return composed(value);
+            },
+        };
+    };
+
+    const onTokenProviderChange = useCallback(
+        (value: string) => {
+            if (!value) return;
+
+            dispatch(tokenActions.clearTokenProviderAttributeDescriptors());
+            dispatch(connectorActions.clearCallbackData());
+            setGroupAttributesCallbackAttributes([]);
+
+            if (!tokenProviders) return;
+            const provider = tokenProviders.find((p) => p.uuid === value);
+
+            if (!provider) return;
+            setTokenProvider(provider);
+            setValue('storeKind', '');
+        },
+        [dispatch, tokenProviders, setValue],
+    );
+
+    useEffect(() => {
+        if (watchedTokenProvider) {
+            onTokenProviderChange(watchedTokenProvider);
+        }
+    }, [watchedTokenProvider, onTokenProviderChange]);
+
+    const onKindChange = useCallback(
+        (value: string) => {
+            if (!value || !tokenProvider) return;
+
+            dispatch(connectorActions.clearCallbackData());
+            setGroupAttributesCallbackAttributes([]);
+            dispatch(tokenActions.getTokenProviderAttributesDescriptors({ uuid: tokenProvider.uuid, kind: value }));
+        },
+        [dispatch, tokenProvider],
+    );
+
+    useEffect(() => {
+        if (watchedStoreKind && tokenProvider) {
+            onKindChange(watchedStoreKind);
+        }
+    }, [watchedStoreKind, tokenProvider, onKindChange]);
+
+    // Reset form values when token is loaded in edit mode
+    useEffect(() => {
+        if (editMode && id && token && token.uuid === id && !isFetchingTokenDetail) {
+            const newDefaultValues: FormValues = {
+                name: token.name || '',
+                tokenProvider: token.connectorUuid || '',
+                storeKind: token.kind || '',
+            };
+            reset(newDefaultValues, { keepDefaultValues: false });
+        } else if (!editMode) {
+            // Reset form when switching to create mode
+            reset({
+                name: '',
+                tokenProvider: '',
+                storeKind: '',
+            });
+        }
+    }, [editMode, token, id, reset, isFetchingTokenDetail]);
+
+    const onSubmit = useCallback(
+        (values: FormValues) => {
+            if (editMode) {
+                dispatch(
+                    tokenActions.updateToken({
+                        uuid: id!,
+                        updateToken: {
+                            name: '',
+                            kind: '',
+                            connectorUuid: '',
+                            description: values.name,
+                            attributes: collectFormAttributes(
+                                'token',
+                                [...(tokenProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
+                                values,
+                            ),
+                            customAttributes: collectFormAttributes('customToken', resourceCustomAttributes, values),
+                        },
+                    }),
+                );
+            } else {
+                dispatch(
+                    tokenActions.createToken({
+                        name: values.name,
+                        connectorUuid: values.tokenProvider,
+                        kind: values.storeKind,
+                        attributes: collectFormAttributes(
+                            'token',
+                            [...(tokenProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
+                            values,
+                        ),
+                        customAttributes: collectFormAttributes('customToken', resourceCustomAttributes, values),
+                    }),
+                );
+            }
+        },
+        [editMode, dispatch, id, tokenProviderAttributeDescriptors, groupAttributesCallbackAttributes, resourceCustomAttributes],
+    );
+
+    const submitTitle = useMemo(() => (editMode ? 'Save' : 'Create'), [editMode]);
+
+    const inProgressTitle = useMemo(() => (editMode ? 'Saving...' : 'Creating...'), [editMode]);
 
     const renderCustomAttributeEditor = useMemo(() => {
         if (isBusy) return <></>;
         return <AttributeEditor id="customToken" attributeDescriptors={resourceCustomAttributes} attributes={token?.customAttributes} />;
     }, [resourceCustomAttributes, token?.customAttributes, isBusy]);
 
+    const wasCreating = useRef(isCreating);
+    const wasUpdating = useRef(isUpdating);
+
+    useEffect(() => {
+        if (wasCreating.current && !isCreating) {
+            if (onSuccess) {
+                onSuccess();
+            }
+        }
+        wasCreating.current = isCreating;
+    }, [isCreating, onSuccess]);
+
+    useEffect(() => {
+        if (wasUpdating.current && !isUpdating) {
+            if (onSuccess) {
+                onSuccess();
+            }
+        }
+        wasUpdating.current = isUpdating;
+    }, [isUpdating, onSuccess]);
+
     return (
-        <Widget title={title} busy={isBusy}>
-            <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
-                {({ handleSubmit, pristine, submitting, values, valid, form }) => (
-                    <BootstrapForm onSubmit={handleSubmit}>
-                        <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="name">Token Name</Label>
-
-                                    <Input
-                                        id="name"
-                                        {...input}
-                                        valid={!meta.error && meta.touched}
-                                        invalid={!!meta.error && meta.touched}
-                                        type="text"
-                                        placeholder="Enter the Certification Token Name"
-                                        disabled={editMode}
-                                    />
-
-                                    <FormFeedback>{meta.error}</FormFeedback>
-                                </FormGroup>
+        <FormProvider {...methods}>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <Widget noBorder busy={isBusy}>
+                    <div className="space-y-4">
+                        <Controller
+                            name="name"
+                            control={control}
+                            rules={buildValidationRules([validateRequired(), validateAlphaNumericWithSpecialChars()])}
+                            render={({ field, fieldState }) => (
+                                <TextInput
+                                    value={field.value}
+                                    onChange={(value) => field.onChange(value)}
+                                    onBlur={field.onBlur}
+                                    id="name"
+                                    type="text"
+                                    placeholder="Enter the Certification Token Name"
+                                    disabled={editMode}
+                                    label="Token Name"
+                                    required
+                                    invalid={fieldState.error && fieldState.isTouched}
+                                    error={
+                                        fieldState.error && fieldState.isTouched
+                                            ? typeof fieldState.error === 'string'
+                                                ? fieldState.error
+                                                : fieldState.error?.message || 'Invalid value'
+                                            : undefined
+                                    }
+                                />
                             )}
-                        </Field>
+                        />
 
                         {!editMode ? (
-                            <Field name="tokenProvider" validate={validateRequired()}>
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Label for="tokenProviderSelect">Cryptography Provider</Label>
-
-                                        <Select
-                                            {...input}
-                                            maxMenuHeight={140}
-                                            inputId="tokenProviderSelect"
-                                            menuPlacement="auto"
-                                            options={optionsForTokenProviders}
-                                            placeholder="Select Cryptography Provider"
-                                            onChange={(event) => {
-                                                onTokenProviderChange(event);
-                                                form.mutators.clearAttributes('token');
-                                                form.mutators.setAttribute('storeKind', undefined);
-                                                input.onChange(event);
-                                            }}
-                                            styles={{
-                                                control: (provided) =>
-                                                    meta.touched && meta.invalid
-                                                        ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
-                                                        : { ...provided },
-                                            }}
-                                        />
-
-                                        <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
-                                            {meta.error}
-                                        </div>
-                                    </FormGroup>
-                                )}
-                            </Field>
+                            <div>
+                                <Controller
+                                    name="tokenProvider"
+                                    control={control}
+                                    rules={buildValidationRules([validateRequired()])}
+                                    render={({ field, fieldState }) => (
+                                        <>
+                                            <Select
+                                                id="tokenProviderSelect"
+                                                label="Cryptography Provider"
+                                                value={field.value || ''}
+                                                onChange={(value) => {
+                                                    field.onChange(value);
+                                                }}
+                                                options={optionsForTokenProviders || []}
+                                                placeholder="Select Cryptography Provider"
+                                                placement="bottom"
+                                            />
+                                            {fieldState.error && fieldState.isTouched && (
+                                                <p className="mt-1 text-sm text-red-600">
+                                                    {typeof fieldState.error === 'string'
+                                                        ? fieldState.error
+                                                        : fieldState.error?.message || 'Invalid value'}
+                                                </p>
+                                            )}
+                                        </>
+                                    )}
+                                />
+                            </div>
                         ) : (
-                            <Field name="tokenProvider" format={(value) => (value ? value.label : '')} validate={validateRequired()}>
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Label for="tokenProvider">Cryptography Provider</Label>
-
-                                        <Input
-                                            id="tokenProvider"
-                                            {...input}
-                                            valid={!meta.error && meta.touched}
-                                            invalid={!!meta.error && meta.touched}
-                                            type="text"
-                                            placeholder="Cryptography Provider Name"
-                                            disabled={editMode}
-                                        />
-                                    </FormGroup>
-                                )}
-                            </Field>
+                            <TextInput
+                                id="tokenProvider"
+                                type="text"
+                                label="Cryptography Provider"
+                                value={token?.connectorName || ''}
+                                disabled
+                                onChange={() => {}}
+                            />
                         )}
 
                         {!editMode && optionsForKinds?.length ? (
-                            <Field name="storeKind" validate={validateRequired()}>
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Label for="storeKindSelect">Kind</Label>
-
-                                        <Select
-                                            {...input}
-                                            inputId="storeKindSelect"
-                                            maxMenuHeight={140}
-                                            menuPlacement="auto"
-                                            options={optionsForKinds}
-                                            placeholder="Select Kind"
-                                            onChange={(event) => {
-                                                onKindChange(event);
-                                                input.onChange(event);
-                                            }}
-                                            styles={{
-                                                control: (provided) =>
-                                                    meta.touched && meta.invalid
-                                                        ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
-                                                        : { ...provided },
-                                            }}
-                                        />
-
-                                        <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
-                                            Required Field
-                                        </div>
-                                    </FormGroup>
-                                )}
-                            </Field>
+                            <div>
+                                <Controller
+                                    name="storeKind"
+                                    control={control}
+                                    rules={buildValidationRules([validateRequired()])}
+                                    render={({ field, fieldState }) => (
+                                        <>
+                                            <Select
+                                                id="storeKindSelect"
+                                                label="Kind"
+                                                value={field.value || ''}
+                                                onChange={(value) => {
+                                                    field.onChange(value);
+                                                }}
+                                                options={optionsForKinds || []}
+                                                placeholder="Select Kind"
+                                                placement="bottom"
+                                            />
+                                            {fieldState.error && fieldState.isTouched && (
+                                                <p className="mt-1 text-sm text-red-600">
+                                                    {typeof fieldState.error === 'string'
+                                                        ? fieldState.error
+                                                        : fieldState.error?.message || 'Invalid value'}
+                                                </p>
+                                            )}
+                                        </>
+                                    )}
+                                />
+                            </div>
                         ) : null}
 
                         {editMode && tokenDetail?.kind ? (
-                            <Field name="storeKind" format={(value) => (value ? value.label : '')}>
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <Label for="storeKind">Kind</Label>
-
-                                        <Input
-                                            {...input}
-                                            valid={!meta.error && meta.touched}
-                                            invalid={!!meta.error && meta.touched}
-                                            type="text"
-                                            placeholder="Token Kind"
-                                            disabled={editMode}
-                                        />
-                                    </FormGroup>
-                                )}
-                            </Field>
+                            <TextInput
+                                id="storeKind"
+                                type="text"
+                                label="Kind"
+                                value={tokenDetail?.kind || ''}
+                                disabled
+                                onChange={() => {}}
+                            />
                         ) : null}
 
-                        <>
-                            <br />
+                        <TabLayout
+                            noBorder
+                            tabs={[
+                                {
+                                    title: 'Connector Attributes',
+                                    content:
+                                        tokenProvider &&
+                                        watchedStoreKind &&
+                                        tokenProviderAttributeDescriptors &&
+                                        tokenProviderAttributeDescriptors.length > 0 ? (
+                                            <AttributeEditor
+                                                id="token"
+                                                attributeDescriptors={tokenProviderAttributeDescriptors}
+                                                attributes={tokenDetail?.attributes}
+                                                connectorUuid={tokenProvider.uuid}
+                                                functionGroupCode={FunctionGroupCode.CryptographyProvider}
+                                                kind={watchedStoreKind}
+                                                groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                                                setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                                            />
+                                        ) : (
+                                            <></>
+                                        ),
+                                },
+                                {
+                                    title: 'Custom Attributes',
+                                    content: renderCustomAttributeEditor,
+                                },
+                            ]}
+                        />
 
-                            <TabLayout
-                                tabs={[
-                                    {
-                                        title: 'Connector Attributes',
-                                        content:
-                                            tokenProvider &&
-                                            values.storeKind &&
-                                            tokenProviderAttributeDescriptors &&
-                                            tokenProviderAttributeDescriptors.length > 0 ? (
-                                                <AttributeEditor
-                                                    id="token"
-                                                    attributeDescriptors={tokenProviderAttributeDescriptors}
-                                                    attributes={tokenDetail?.attributes}
-                                                    connectorUuid={tokenProvider.uuid}
-                                                    functionGroupCode={FunctionGroupCode.CryptographyProvider}
-                                                    kind={values.storeKind.value}
-                                                    groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
-                                                    setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
-                                                />
-                                            ) : (
-                                                <></>
-                                            ),
-                                    },
-                                    {
-                                        title: 'Custom Attributes',
-                                        content: renderCustomAttributeEditor,
-                                    },
-                                ]}
+                        <Container className="flex-row justify-end modal-footer" gap={4}>
+                            <Button variant="outline" onClick={onCancel} disabled={isSubmitting} type="button">
+                                Cancel
+                            </Button>
+                            <ProgressButton
+                                title={submitTitle}
+                                inProgressTitle={inProgressTitle}
+                                inProgress={isSubmitting}
+                                disabled={(editMode ? !isDirty : false) || !isValid}
+                                type="submit"
                             />
-                        </>
-
-                        {
-                            <div className="d-flex justify-content-end">
-                                <ButtonGroup>
-                                    <ProgressButton
-                                        title={submitTitle}
-                                        inProgressTitle={inProgressTitle}
-                                        inProgress={submitting}
-                                        disabled={(editMode ? pristine : false) || !valid}
-                                    />
-
-                                    <Button color="default" onClick={onCancel} disabled={submitting}>
-                                        Cancel
-                                    </Button>
-                                </ButtonGroup>
-                            </div>
-                        }
-                    </BootstrapForm>
-                )}
-            </Form>
-        </Widget>
+                        </Container>
+                    </div>
+                </Widget>
+            </form>
+        </FormProvider>
     );
 }
