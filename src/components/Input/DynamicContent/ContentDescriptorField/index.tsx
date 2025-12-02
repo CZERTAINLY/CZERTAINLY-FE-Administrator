@@ -1,12 +1,16 @@
 import WidgetButtons from 'components/WidgetButtons';
 import { useEffect, useMemo } from 'react';
 
-import { Field, useForm, useFormState } from 'react-final-form';
-import { Button, FormFeedback, FormGroup, Input, InputGroup, Label } from 'reactstrap';
+import { Controller, useFormContext, useWatch } from 'react-hook-form';
+import Button from 'components/Button';
+import Label from 'components/Label';
+import TextInput from 'components/TextInput';
 import { AttributeContentType } from 'types/openapi';
 import { getStepValue } from 'utils/common-utils';
 import { composeValidators, validateRequired } from 'utils/validators';
 import { ContentFieldConfiguration } from '../index';
+import { Plus } from 'lucide-react';
+import cn from 'classnames';
 
 type Props = {
     isList: boolean;
@@ -14,15 +18,15 @@ type Props = {
 };
 
 export default function ContentDescriptorField({ isList, contentType }: Props) {
-    const form = useForm();
-    const formState = useFormState();
-    const contentValues = formState.values['content'];
+    const { control, setValue, watch } = useFormContext();
+    const contentValues = watch('content');
+    const readOnly = watch('readOnly');
 
     useEffect(() => {
         if (!isList && contentValues?.length > 1) {
-            form.change('content', contentValues.slice(0, 1));
+            setValue('content', contentValues.slice(0, 1));
         }
-    }, [isList, contentValues, form]);
+    }, [isList, contentValues, setValue]);
 
     const fieldStepValue = useMemo(() => {
         const stepValue = getStepValue(ContentFieldConfiguration[contentType].type);
@@ -30,56 +34,102 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
     }, [contentType]);
 
     useEffect(() => {
-        if (formState.values.readOnly) {
+        if (readOnly) {
             const updatedContent =
                 Array.isArray(contentValues) && contentValues?.length
                     ? contentValues?.map((content: any) => ({ data: content.data || ContentFieldConfiguration[contentType].initial }))
                     : [{ data: ContentFieldConfiguration[contentType].initial }];
-            form.change('content', updatedContent);
+            setValue('content', updatedContent);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [formState.values.readOnly, contentType]);
+    }, [readOnly, contentType, setValue]);
+
+    // Helper function to convert validators for react-hook-form
+    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
+        return {
+            validate: (value: any) => {
+                const composed = composeValidators(...validators);
+                return composed(value);
+            },
+        };
+    };
 
     return (
         <>
             {contentValues?.map((_contentValue: any, index: number) => {
-                const name = `content[${index}].data`;
+                const name = `content.${index}.data` as const;
 
                 return (
                     ContentFieldConfiguration[contentType].type && (
-                        <Field
+                        <Controller
                             key={name}
                             name={name}
-                            validate={
+                            control={control}
+                            rules={
                                 ContentFieldConfiguration[contentType].validators
-                                    ? composeValidators(...(ContentFieldConfiguration[contentType].validators ?? []), validateRequired())
-                                    : undefined
+                                    ? buildValidationRules([
+                                          ...(ContentFieldConfiguration[contentType].validators ?? []),
+                                          validateRequired(),
+                                      ])
+                                    : buildValidationRules([validateRequired()])
                             }
-                            type={ContentFieldConfiguration[contentType].type}
-                        >
-                            {({ input, meta }) => {
-                                const inputComponent = (
-                                    <Input
-                                        {...input}
-                                        valid={!meta.error && meta.touched}
-                                        invalid={!!meta.error && meta.touched}
-                                        type={ContentFieldConfiguration[contentType].type}
+                            render={({ field, fieldState }) => {
+                                const inputType = ContentFieldConfiguration[contentType].type;
+                                const isCheckbox = inputType === 'checkbox';
+                                const needsStep = inputType === 'number' || inputType === 'datetime-local';
+
+                                const inputComponent = isCheckbox ? (
+                                    <input
+                                        {...field}
+                                        type="checkbox"
+                                        id={name}
+                                        checked={field.value}
+                                        onChange={(e) => field.onChange(e.target.checked)}
+                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                    />
+                                ) : needsStep ? (
+                                    <input
+                                        {...field}
+                                        type={inputType}
                                         id={name}
                                         step={fieldStepValue}
                                         placeholder="Default Content"
+                                        value={field.value || ''}
+                                        className={cn(
+                                            'py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600',
+                                            {
+                                                'border-red-500 focus:border-red-500 focus:ring-red-500':
+                                                    fieldState.error && fieldState.isTouched,
+                                            },
+                                        )}
+                                    />
+                                ) : (
+                                    <TextInput
+                                        {...field}
+                                        id={name}
+                                        type={inputType as 'text' | 'textarea' | 'date' | 'time'}
+                                        placeholder="Default Content"
+                                        invalid={fieldState.error && fieldState.isTouched}
+                                        error={
+                                            fieldState.error && fieldState.isTouched
+                                                ? typeof fieldState.error === 'string'
+                                                    ? fieldState.error
+                                                    : fieldState.error?.message || 'Invalid value'
+                                                : undefined
+                                        }
                                     />
                                 );
-                                const labelComponent = <Label for={name}>Default Content</Label>;
+                                const labelComponent = <Label htmlFor={name}>Default Content</Label>;
                                 const buttonComponent = (
                                     <WidgetButtons
                                         justify="start"
                                         buttons={[
                                             {
                                                 icon: 'trash',
-                                                disabled: formState.values.readOnly && contentValues?.length === 1,
+                                                disabled: readOnly && contentValues?.length === 1,
                                                 tooltip: 'Remove',
                                                 onClick: () => {
-                                                    form.change(
+                                                    setValue(
                                                         'content',
                                                         contentValues.filter(
                                                             (_contentValue: any, filterIndex: number) => index !== filterIndex,
@@ -90,44 +140,53 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
                                         ]}
                                     />
                                 );
-                                const feedbackComponent = <FormFeedback>{meta.error}</FormFeedback>;
+                                const feedbackComponent =
+                                    fieldState.error && fieldState.isTouched ? (
+                                        <p className="mt-1 text-sm text-red-600">
+                                            {typeof fieldState.error === 'string'
+                                                ? fieldState.error
+                                                : fieldState.error?.message || 'Invalid value'}
+                                        </p>
+                                    ) : null;
 
                                 return (
-                                    <FormGroup>
+                                    <div className="mb-4">
                                         {contentType !== AttributeContentType.Boolean ? (
                                             <>
                                                 {labelComponent}
-                                                <InputGroup>
-                                                    {inputComponent}
+                                                <div className="flex items-center gap-2">
+                                                    <div className="flex-1">{inputComponent}</div>
                                                     {buttonComponent}
-                                                    {feedbackComponent}
-                                                </InputGroup>
-                                            </>
-                                        ) : (
-                                            <>
-                                                {inputComponent} {labelComponent}
-                                                {buttonComponent}
+                                                </div>
                                                 {feedbackComponent}
                                             </>
+                                        ) : (
+                                            <div className="flex items-center gap-2">
+                                                {inputComponent}
+                                                {labelComponent}
+                                                {buttonComponent}
+                                                {feedbackComponent}
+                                            </div>
                                         )}
-                                    </FormGroup>
+                                    </div>
                                 );
                             }}
-                        </Field>
+                        />
                     )
                 );
             })}
             {(isList || !contentValues || contentValues.length === 0) && (
                 <Button
-                    color={'default'}
+                    variant="outline"
+                    color="secondary"
                     onClick={() =>
-                        form.change('content', [
+                        setValue('content', [
                             ...(isList ? (contentValues ?? []) : []),
                             { data: ContentFieldConfiguration[contentType].initial },
                         ])
                     }
                 >
-                    <i className={'fa fa-plus'} />
+                    <Plus className="w-4 h-4" />
                     &nbsp;Add Content
                 </Button>
             )}

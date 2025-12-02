@@ -6,7 +6,7 @@ import { ApiClients } from '../../api';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { EntityType, actions as filterActions, selectors } from 'ducks/filters';
 import { useDispatch, useSelector } from 'react-redux';
-import Select, { MultiValue, SingleValue } from 'react-select';
+import Select from 'components/Select';
 import { Button, Col, FormGroup, Input, Label, Row } from 'reactstrap';
 import Badge from 'components/Badge';
 import { Observable } from 'rxjs';
@@ -65,16 +65,12 @@ export default function FilterWidgetRuleAction({
         isEditEnabled: false,
     });
 
-    const [fieldSource, setFieldSource] = useState<SingleValue<{ label: string; value: FilterFieldSource }> | undefined>(undefined);
+    const [fieldSource, setFieldSource] = useState<FilterFieldSource | undefined>(undefined);
 
-    const [filterField, setFilterField] = useState<SingleValue<{ label: string; value: string }> | undefined>(undefined);
+    const [filterField, setFilterField] = useState<string | undefined>(undefined);
 
     const [filterValue, setFilterValue] = useState<
-        | string
-        | object
-        | SingleValue<object | object[] | { label: string; value: object }>
-        | MultiValue<object | object[] | { label: string; value: object }>
-        | undefined
+        string | object | { value: string | number; label: string }[] | { value: string | number; label: string } | undefined
     >(undefined);
 
     const booleanOptions = useMemo(
@@ -99,20 +95,20 @@ export default function FilterWidgetRuleAction({
     );
 
     const currentFields = useMemo(
-        () => availableFilters.find((f) => f.filterFieldSource === fieldSource?.value)?.searchFieldData,
+        () => availableFilters.find((f) => f.filterFieldSource === fieldSource)?.searchFieldData,
         [availableFilters, fieldSource],
     );
 
-    const currentField = useMemo(() => currentFields?.find((f) => f.fieldIdentifier === filterField?.value), [filterField, currentFields]);
+    const currentField = useMemo(() => currentFields?.find((f) => f.fieldIdentifier === filterField), [filterField, currentFields]);
 
     const onUpdateClick = useCallback(() => {
-        if (!fieldSource?.value) return;
-        if (!filterField?.value) return;
+        if (!fieldSource) return;
+        if (!filterField) return;
         if (!filterValue) return;
 
         const newExecution: ExecutionItemRequestModel = {
-            fieldSource: fieldSource?.value,
-            fieldIdentifier: filterField?.value,
+            fieldSource: fieldSource!,
+            fieldIdentifier: filterField!,
             data: filterValue
                 ? typeof filterValue === 'string'
                     ? filterValue
@@ -529,9 +525,11 @@ export default function FilterWidgetRuleAction({
             <Select
                 id="value"
                 options={objectValueOptions}
-                value={filterValue}
-                onChange={(e) => {
-                    setFilterValue(e);
+                value={
+                    Array.isArray(filterValue) ? filterValue : filterValue ? [filterValue as { value: string | number; label: string }] : []
+                }
+                onChange={(values) => {
+                    setFilterValue(currentField?.multiValue ? values || [] : values?.[0] || undefined);
                 }}
                 isMulti={currentField?.multiValue}
                 placeholder="Select filter value from options"
@@ -573,17 +571,16 @@ export default function FilterWidgetRuleAction({
                                     <Label for="groupSelect">Field Source</Label>
                                     <Select
                                         id="group"
-                                        inputId="groupSelect"
                                         options={availableFilters.map((f) => ({
                                             label: getEnumLabel(searchGroupEnum, f.filterFieldSource),
                                             value: f.filterFieldSource,
                                         }))}
-                                        onChange={(e) => {
-                                            setFieldSource(e);
+                                        onChange={(value) => {
+                                            setFieldSource((value as FilterFieldSource) || undefined);
                                             setFilterField(undefined);
                                             setFilterValue(undefined);
                                         }}
-                                        value={fieldSource || null}
+                                        value={fieldSource || ''}
                                         isClearable={true}
                                     />
                                 </FormGroup>
@@ -594,13 +591,12 @@ export default function FilterWidgetRuleAction({
                                     <Label for="fieldSelect">Field</Label>
                                     <Select
                                         id="field"
-                                        inputId="fieldSelect"
                                         options={currentFields?.map((f) => ({ label: f.fieldLabel, value: f.fieldIdentifier }))}
-                                        onChange={(e) => {
-                                            setFilterField(e);
+                                        onChange={(value) => {
+                                            setFilterField((value as string) || undefined);
                                             setFilterValue(undefined);
                                         }}
-                                        value={filterField || null}
+                                        value={filterField || ''}
                                         isDisabled={!fieldSource}
                                         isClearable={true}
                                     />
@@ -638,11 +634,14 @@ export default function FilterWidgetRuleAction({
                                     ) : currentField?.type === FilterFieldType.Boolean ? (
                                         <Select
                                             id="value"
-                                            inputId="valueSelect"
-                                            options={filterField ? booleanOptions : undefined}
-                                            value={filterValue || null}
-                                            onChange={(e) => {
-                                                setFilterValue(e);
+                                            options={
+                                                filterField
+                                                    ? booleanOptions.map((opt) => ({ label: opt.label, value: String(opt.value) }))
+                                                    : []
+                                            }
+                                            value={filterValue ? String(filterValue) : ''}
+                                            onChange={(value) => {
+                                                setFilterValue(value === 'true' ? true : value === 'false' ? false : undefined);
                                             }}
                                             isDisabled={!filterField}
                                         />

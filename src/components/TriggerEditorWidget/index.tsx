@@ -9,8 +9,9 @@ import { Link } from 'react-router';
 import { Resource, TriggerDto, PlatformEnum, ResourceEvent } from 'types/openapi';
 
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
-import { Button } from 'reactstrap';
+import Button from 'components/Button';
 import BooleanBadge from 'components/BooleanBadge/BooleanBadge';
+import { ArrowUp, ArrowDown, Trash2 } from 'lucide-react';
 
 type OptionType = {
     label: string;
@@ -174,34 +175,25 @@ export default function TriggerEditorWidget({ resource, event, selectedTriggers,
                     getEnumLabel(eventNameEnum, trigger.event ?? ''),
                     getEnumLabel(resourceTypeEnum, trigger.resource ?? ''),
                     trigger.description ?? '',
-                    <div key="actions" className="d-flex">
-                        <Button
-                            className="btn btn-link text-danger"
-                            size="sm"
-                            color="danger"
-                            title="Delete Condition Group"
-                            onClick={() => onDeleteTrigger(trigger)}
-                        >
-                            <i className="fa fa-trash" />
+                    <div className="flex">
+                        <Button variant="transparent" title="Delete Trigger" onClick={() => onDeleteTrigger(trigger)}>
+                            <Trash2 size={16} />
                         </Button>
                         <Button
-                            className="btn btn-link"
-                            size="sm"
+                            variant="transparent"
                             title="Move Trigger Up"
                             disabled={moveUpDisabled}
                             onClick={() => onMoveTriggerUp(trigger)}
                         >
-                            <i className="fa fa-arrow-up" />
+                            <ArrowUp size={16} />
                         </Button>
-
                         <Button
-                            className="btn btn-link"
-                            size="sm"
+                            variant="transparent"
                             title="Move Trigger Down"
                             disabled={moveDownDisabled}
                             onClick={() => onMoveTriggerDown(trigger)}
                         >
-                            <i className="fa fa-arrow-down" />
+                            <ArrowDown size={16} />
                         </Button>
                     </div>,
                 ],
@@ -211,7 +203,7 @@ export default function TriggerEditorWidget({ resource, event, selectedTriggers,
 
     return (
         <Widget title="Triggers">
-            {noteText && <p className="text-muted mt-1 ">Note: {noteText}</p>}
+            {noteText && <p className="text-muted mb-2">Note: {noteText}</p>}
             <CustomTable
                 hasHeader={!!triggerTableData.length}
                 data={triggerTableData}
