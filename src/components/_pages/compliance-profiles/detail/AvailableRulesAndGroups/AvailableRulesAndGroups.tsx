@@ -1,6 +1,6 @@
 import Widget from 'components/Widget';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import Select from 'react-select';
+import Select from 'components/Select';
 import { Form as BootstrapForm, Button, Col, Label, Row, ButtonGroup } from 'reactstrap';
 import { ComplianceProfileDtoV2, ComplianceRuleListDto, FunctionGroupCode, PlatformEnum, Resource } from 'types/openapi';
 import { useDispatch, useSelector } from 'react-redux';
@@ -322,27 +322,17 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
                         <div style={{ display: 'flex', alignItems: 'center', width: '100%', gap: '10px' }}>
                             <Select
                                 id="availableRulesSource"
-                                inputId="availableRulesSource"
                                 placeholder="Select..."
-                                maxMenuHeight={140}
                                 options={rulesSourceOptions}
-                                value={rulesSourceOptions.find((opt) => opt.value === availableSelectedRulesSource) || null}
-                                menuPlacement="auto"
-                                onChange={(event) => {
+                                value={availableSelectedRulesSource || ''}
+                                onChange={(value) => {
                                     setSelectedAvailableResourceType('All');
                                     handleClearInput();
-                                    setAvailableSelectedRulesSource((event?.value as 'Internal' | 'Provider') || null);
+                                    setAvailableSelectedRulesSource((value as 'Internal' | 'Provider') || null);
                                     setSelectedAvailableProvider(null);
                                     setSelectedAvailableKind(null);
                                 }}
                                 isClearable
-                                styles={{
-                                    container: (base) => ({
-                                        ...base,
-                                        flex: 1,
-                                        width: '100%',
-                                    }),
-                                }}
                             />
 
                             {availableSelectedRulesSource === 'Internal' && (
@@ -364,15 +354,12 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
                             <Label for="availableProvider">Provider</Label>
                             <Select
                                 id="availableProvider"
-                                inputId="availableProvider"
                                 placeholder="Select..."
-                                maxMenuHeight={140}
                                 options={availableProviderOptions}
-                                value={availableProviderOptions.find((opt) => opt.value === selectedAvailableProvider) || null}
-                                menuPlacement="auto"
-                                onChange={(event) => {
+                                value={selectedAvailableProvider || ''}
+                                onChange={(value) => {
                                     setSelectedAvailableKind(null);
-                                    setSelectedAvailableProvider(event?.value || null);
+                                    setSelectedAvailableProvider((value as string) || null);
                                     handleClearInput();
                                 }}
                                 isClearable

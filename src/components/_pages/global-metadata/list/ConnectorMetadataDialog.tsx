@@ -1,12 +1,15 @@
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, FormGroup, Input, Label } from 'reactstrap';
 import { PlatformEnum } from 'types/openapi';
 import { actions, selectors } from '../../../../ducks/globalMetadata';
 import CustomTable, { TableDataRow, TableHeader } from '../../../CustomTable';
 import Dialog from '../../../Dialog';
 import Spinner from '../../../Spinner';
+import Button from 'components/Button';
+import Select from 'components/Select';
+import Label from 'components/Label';
+import { ArrowUpFromLine } from 'lucide-react';
 
 type Props = {
     show: boolean;
@@ -75,10 +78,10 @@ export default function ConnectorMetadataDialog({ show, setShow }: Props) {
                     getEnumLabel(attributeContentTypeEnum, metadata.contentType),
                     <Button
                         key={metadata.uuid}
-                        color={'primary'}
+                        color="primary"
                         onClick={() => dispatch(actions.promoteConnectorMetadata({ uuid: metadata.uuid, connectorUuid: connectorUuid }))}
                     >
-                        <i className={'fa fa-arrow-circle-up'} />
+                        <ArrowUpFromLine size={16} />
                         &nbsp;Promote
                     </Button>,
                 ],
@@ -95,22 +98,21 @@ export default function ConnectorMetadataDialog({ show, setShow }: Props) {
             size="lg"
             body={
                 <>
-                    <FormGroup>
-                        <Label for="connector">Connector</Label>
-                        <Input
-                            type="select"
+                    <div className="mb-4">
+                        <Select
                             id="connector"
-                            placeholder="Connector"
-                            value={connectorUuid}
-                            onChange={(e) => setConnectorUuid(e.target.value)}
-                        >
-                            {connectorList?.map((connector) => (
-                                <option key={connector.uuid} value={connector.uuid}>
-                                    {connector.name}
-                                </option>
-                            ))}
-                        </Input>
-                    </FormGroup>
+                            label="Connector"
+                            value={connectorUuid || ''}
+                            onChange={(value) => setConnectorUuid(value as string)}
+                            options={
+                                connectorList?.map((connector) => ({
+                                    value: connector.uuid,
+                                    label: connector.name,
+                                })) || []
+                            }
+                            placeholder="Select Connector"
+                        />
+                    </div>
                     {connectorMetadataTableData.length > 0 ? (
                         <CustomTable headers={connectorMetadataTableHeaders} data={connectorMetadataTableData} />
                     ) : (

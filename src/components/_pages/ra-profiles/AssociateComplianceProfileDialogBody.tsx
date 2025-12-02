@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo } from 'react';
-import { Field, Form } from 'react-final-form';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import Select from 'react-select';
-import { Button, ButtonGroup, Form as BootstrapForm, FormGroup, Label } from 'reactstrap';
+import Select from 'components/Select';
+import Button from 'components/Button';
 
-import { mutators } from 'utils/attributes/attributeEditorMutators';
-
+import { buildValidationRules } from 'utils/validators-helper';
 import { validateRequired } from 'utils/validators';
+import cn from 'classnames';
 
 import Spinner from 'components/Spinner';
 
@@ -45,19 +45,28 @@ export default function AssociateComplianceProfileDialogBody({ raProfile, availa
             complianceProfiles
                 .filter((e) => !availableComplianceProfileUuids?.includes(e.uuid))
                 .map((raProfile) => ({
-                    value: raProfile,
+                    value: raProfile.uuid,
                     label: raProfile.name,
                 })),
         [complianceProfiles, availableComplianceProfileUuids],
     );
 
+    const methods = useForm({
+        mode: 'onTouched',
+        defaultValues: {
+            complianceProfiles: undefined as string | undefined,
+        },
+    });
+
+    const { control, handleSubmit, formState } = methods;
+
     const onSubmit = useCallback(
-        (values: any) => {
-            if (!raProfile) return;
+        (values: { complianceProfiles: string | undefined }) => {
+            if (!raProfile || !values.complianceProfiles) return;
 
             dispatch(
                 actions.associateComplianceProfile({
-                    uuid: values.complianceProfiles.value.uuid as string,
+                    uuid: values.complianceProfiles,
                     resource: Resource.RaProfiles,
                     associationObjectUuid: raProfile.uuid,
                     associationObjectName: raProfile.name,
@@ -73,54 +82,56 @@ export default function AssociateComplianceProfileDialogBody({ raProfile, availa
 
     return (
         <>
-            <Form onSubmit={onSubmit} mutators={{ ...mutators() }}>
-                {({ handleSubmit, pristine, submitting, valid }) => (
-                    <BootstrapForm onSubmit={handleSubmit}>
-                        <Field name="complianceProfiles" validate={validateRequired()}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="complianceProfile">Select Compliance profile</Label>
+            <FormProvider {...methods}>
+                <form onSubmit={handleSubmit(onSubmit)}>
+                    <Controller
+                        name="complianceProfiles"
+                        control={control}
+                        rules={buildValidationRules([validateRequired()])}
+                        render={({ field, fieldState }) => (
+                            <div className="mb-4">
+                                <label htmlFor="complianceProfile" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
+                                    Select Compliance profile
+                                </label>
 
-                                    <Select
-                                        {...input}
-                                        maxMenuHeight={140}
-                                        menuPlacement="auto"
-                                        options={optionsForComplianceProfiles}
-                                        placeholder="Select Compliance profile to be associated"
-                                        styles={{
-                                            control: (provided) =>
-                                                meta.touched && meta.invalid
-                                                    ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
-                                                    : { ...provided },
-                                        }}
-                                        id="associate-compliance-profile-select"
-                                        components={{
-                                            Menu: TestableMenu('associate-compliance-profile-select-menu'),
-                                            Control: TestableControl('associate-compliance-profile-select-control'),
-                                        }}
-                                    />
+                                <Select
+                                    id="associate-compliance-profile-select"
+                                    options={optionsForComplianceProfiles}
+                                    value={field.value}
+                                    onChange={(value) => field.onChange(value as string | undefined)}
+                                    placeholder="Select Compliance profile to be associated"
+                                    className={cn({
+                                        'border-red-500': fieldState.error && fieldState.isTouched,
+                                    })}
+                                />
 
-                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
-                                        Required Field
-                                    </div>
-                                </FormGroup>
-                            )}
-                        </Field>
+                                {fieldState.error && fieldState.isTouched && (
+                                    <p className="mt-1 text-sm text-red-600">
+                                        {typeof fieldState.error === 'string'
+                                            ? fieldState.error
+                                            : fieldState.error?.message || 'Required Field'}
+                                    </p>
+                                )}
+                            </div>
+                        )}
+                    />
 
-                        <div style={{ textAlign: 'right' }}>
-                            <ButtonGroup>
-                                <Button type="submit" color="primary" disabled={pristine || submitting || !valid} onClick={handleSubmit}>
-                                    Associate
-                                </Button>
+                    <div className="flex justify-end gap-2">
+                        <Button
+                            type="submit"
+                            color="primary"
+                            disabled={formState.isSubmitting || !formState.isValid}
+                            onClick={handleSubmit(onSubmit)}
+                        >
+                            Associate
+                        </Button>
 
-                                <Button type="button" color="secondary" disabled={submitting} onClick={onClose}>
-                                    Cancel
-                                </Button>
-                            </ButtonGroup>
-                        </div>
-                    </BootstrapForm>
-                )}
-            </Form>
+                        <Button type="button" variant="outline" color="secondary" disabled={formState.isSubmitting} onClick={onClose}>
+                            Cancel
+                        </Button>
+                    </div>
+                </form>
+            </FormProvider>
 
             <Spinner active={isBusy} />
         </>

@@ -2,7 +2,7 @@ import CredentialForm from 'components/_pages/credentials/form';
 import { CustomNode, LegendItem } from 'components/FlowChart';
 import { Edge } from 'reactflow';
 import { AttributeContentType } from 'types/openapi';
-import { ModalSize } from 'components/Dialog';
+import { ModalIcon, ModalSize } from 'components/Dialog';
 
 export enum LockTypeEnum {
     GENERIC,
@@ -125,6 +125,7 @@ export interface GlobalModalModel {
     showSubmitButton?: boolean;
     okButtonCallback?: () => void;
     cancelButtonCallback?: () => void;
+    icon?: ModalIcon;
 }
 
 export interface AddNewAttributeType {

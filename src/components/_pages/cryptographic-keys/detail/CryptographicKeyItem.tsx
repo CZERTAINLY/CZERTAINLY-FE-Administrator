@@ -10,7 +10,7 @@ import { actions, selectors } from 'ducks/cryptographic-keys';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import Select from 'react-select';
+import Select from 'components/Select';
 
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import Badge from 'components/Badge';
@@ -26,6 +26,7 @@ import { keyWithoutTokenInstanceActionNotes } from './constants';
 import { createWidgetDetailHeaders } from 'utils/widget';
 import Button from 'components/Button';
 import { Info } from 'lucide-react';
+import Label from 'components/Label';
 interface Props {
     keyUuid: string;
     tokenInstanceUuid?: string;
@@ -456,15 +457,21 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
     const keyUsageBody = (
         <div>
             <div className="form-group">
-                <label className="form-label">Key Usage</label>
+                <Label htmlFor="field">Key Usage</Label>
                 <Select
                     isMulti={true}
                     id="field"
                     options={keyUsageOptions()}
-                    onChange={(e) => {
-                        setKeyUsages(e.map((item) => item.value));
+                    value={keyUsages.map(
+                        (usage) =>
+                            keyUsageOptions().find((opt) => opt.value === usage) || {
+                                value: usage,
+                                label: getEnumLabel(keyUsageEnum, usage),
+                            },
+                    )}
+                    onChange={(values) => {
+                        setKeyUsages((values || []).map((item) => item.value as KeyUsage));
                     }}
-                    defaultValue={existingUsages()}
                     isClearable={true}
                 />
             </div>
@@ -517,14 +524,14 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 body={
                     <div>
                         <p>You are about to mark the Key as compromised. Is this what you want to do?</p>
-                        <p>
+                        <p className="my-2">
                             <b>Warning:</b> This action cannot be undone.
                         </p>
                         <Select
-                            name="compromiseReason"
                             id="compromiseReason"
                             options={optionForCompromise()}
-                            onChange={(e) => setCompromiseReason(e?.value)}
+                            value={compromiseReason || ''}
+                            onChange={(value) => setCompromiseReason(value as KeyCompromiseReason)}
                         />
                     </div>
                 }

@@ -3,14 +3,14 @@ import Spinner from 'components/Spinner';
 
 import { actions, selectors } from 'ducks/cryptographic-operations';
 import { useCallback, useEffect, useState } from 'react';
-import { Field, Form } from 'react-final-form';
+import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, ButtonGroup, Form as BootstrapForm, FormGroup, Input, Label } from 'reactstrap';
+import Button from 'components/Button';
 import { AttributeDescriptorModel, AttributeRequestModel } from 'types/attributes';
 
-import { mutators } from 'utils/attributes/attributeEditorMutators';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 import TabLayout from '../../../Layout/TabLayout';
+import TextInput from 'components/TextInput';
 
 interface Props {
     tokenUuid?: string;
@@ -56,72 +56,87 @@ export default function RandomDataGeneration({ tokenUuid, visible, onClose }: Pr
         [dispatch, attributes, onClose, tokenUuid, groupAttributesCallbackAttributes],
     );
 
+    const methods = useForm({
+        mode: 'onTouched',
+        defaultValues: {
+            length: '',
+        },
+    });
+
+    const { control, handleSubmit, formState } = methods;
+    const allFormValues = useWatch({ control });
+
+    const handleFormSubmit = (values: any) => {
+        onSubmit(allFormValues);
+    };
+
     if (!tokenUuid) return <></>;
 
     return (
         <>
-            <Form onSubmit={onSubmit} mutators={{ ...mutators() }}>
-                {({ handleSubmit, pristine, submitting, valid }) => (
-                    <BootstrapForm onSubmit={handleSubmit}>
-                        <Field name="length">
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="name">Random Data Length (in bytes)</Label>
-
-                                    <Input
-                                        {...input}
-                                        id="length"
-                                        type="number"
-                                        placeholder="Random Data Length (in bytes)"
-                                        valid={!meta.error && meta.touched}
-                                        invalid={!!meta.error && meta.touched}
-                                    />
-                                </FormGroup>
-                            )}
-                        </Field>
-
-                        {!attributes || attributes.length === 0 ? (
-                            <></>
-                        ) : (
-                            <Field name="Attributes">
-                                {({ input, meta }) => (
-                                    <FormGroup>
-                                        <br />
-
-                                        <TabLayout
-                                            tabs={[
-                                                {
-                                                    title: 'Connector Attributes',
-                                                    content: (
-                                                        <AttributeEditor
-                                                            id="attributes"
-                                                            attributeDescriptors={attributes}
-                                                            groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
-                                                            setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
-                                                        />
-                                                    ),
-                                                },
-                                            ]}
-                                        />
-                                    </FormGroup>
-                                )}
-                            </Field>
+            <FormProvider {...methods}>
+                <form onSubmit={handleSubmit(handleFormSubmit)}>
+                    <Controller
+                        name="length"
+                        control={control}
+                        render={({ field, fieldState }) => (
+                            <TextInput
+                                {...field}
+                                id="length"
+                                type="number"
+                                label="Random Data Length (in bytes)"
+                                placeholder="Random Data Length (in bytes)"
+                                invalid={fieldState.error && fieldState.isTouched}
+                                error={
+                                    fieldState.error && fieldState.isTouched
+                                        ? typeof fieldState.error === 'string'
+                                            ? fieldState.error
+                                            : fieldState.error?.message || 'Invalid value'
+                                        : undefined
+                                }
+                            />
                         )}
+                    />
 
-                        <div style={{ textAlign: 'right' }}>
-                            <ButtonGroup>
-                                <Button type="submit" color="primary" disabled={pristine || submitting || !valid} onClick={handleSubmit}>
-                                    Generate
-                                </Button>
-
-                                <Button type="button" color="secondary" onClick={onClose}>
-                                    Cancel
-                                </Button>
-                            </ButtonGroup>
+                    {!attributes || attributes.length === 0 ? (
+                        <></>
+                    ) : (
+                        <div className="mb-4">
+                            <br />
+                            <TabLayout
+                                tabs={[
+                                    {
+                                        title: 'Connector Attributes',
+                                        content: (
+                                            <AttributeEditor
+                                                id="attributes"
+                                                attributeDescriptors={attributes}
+                                                groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                                                setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                                            />
+                                        ),
+                                    },
+                                ]}
+                            />
                         </div>
-                    </BootstrapForm>
-                )}
-            </Form>
+                    )}
+
+                    <div className="flex justify-end gap-2">
+                        <Button
+                            type="submit"
+                            color="primary"
+                            disabled={formState.isSubmitting || !formState.isValid}
+                            onClick={handleSubmit(handleFormSubmit)}
+                        >
+                            Generate
+                        </Button>
+
+                        <Button type="button" variant="outline" color="secondary" onClick={onClose}>
+                            Cancel
+                        </Button>
+                    </div>
+                </form>
+            </FormProvider>
 
             <Spinner active={isFetchingAttributes} />
         </>

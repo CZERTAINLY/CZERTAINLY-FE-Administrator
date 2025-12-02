@@ -1,7 +1,7 @@
 import Widget from 'components/Widget';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import Select, { ClearIndicatorProps, components } from 'react-select';
+import Select from 'components/Select';
 import { Col, Label, Row, UncontrolledTooltip } from 'reactstrap';
 import { actions, selectors } from 'ducks/compliance-profiles';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
@@ -247,17 +247,6 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
         }
     }, [assignedRulesSource, getListOfKinds]);
 
-    type AssignedRulesSourceClearProps = ClearIndicatorProps<any, false>;
-    const AssignedRulesSourceClear = useCallback(
-        (props: AssignedRulesSourceClearProps) => (
-            <components.ClearIndicator
-                {...props}
-                innerProps={{ ...props.innerProps, 'data-testid': 'assigned-rules-source-clear-button' } as any}
-            />
-        ),
-        [],
-    );
-
     return (
         <Widget
             title="Assigned Rules & Groups"
@@ -270,20 +259,14 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
             <Label for="assignedRulesSource">Rules Source</Label>
             <Select
                 id="assignedRulesSource"
-                inputId="assignedRulesSource"
                 placeholder="Select..."
-                maxMenuHeight={140}
                 options={rulesSourceOptions}
-                value={rulesSourceOptions.find((opt) => opt.value === assignedRulesSource) || null}
-                menuPlacement="auto"
-                onChange={(event) => {
+                value={assignedRulesSource || ''}
+                onChange={(value) => {
                     setAssignedResourceType('All');
-                    setAssignedRulesSource((event?.value as 'Internal' | 'Provider') || null);
+                    setAssignedRulesSource((value as 'Internal' | 'Provider') || null);
                 }}
                 isClearable
-                components={{
-                    ClearIndicator: AssignedRulesSourceClear,
-                }}
             />
             {assignedRulesSource === 'Provider' && (
                 <Row xs="1" sm="1" md="2" lg="2" xl="2" style={{ marginTop: '10px' }}>
@@ -291,14 +274,11 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
                         <Label for="assignedProvider">Provider</Label>
                         <Select
                             id="assignedProvider"
-                            inputId="assignedProvider"
                             placeholder="Select..."
-                            maxMenuHeight={140}
                             options={assignedProvidersList}
-                            value={assignedProvidersList.find((opt) => opt.value === selectedAssignedProvider) || null}
-                            menuPlacement="auto"
-                            onChange={(event) => {
-                                setSelectedAssignedProvider(event?.value || null);
+                            value={selectedAssignedProvider || ''}
+                            onChange={(value) => {
+                                setSelectedAssignedProvider((value as string) || null);
                             }}
                             isClearable
                         />
@@ -307,15 +287,12 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
                         <Label for="assignedKind">Kind</Label>
                         <Select
                             id="assignedKind"
-                            inputId="assignedKind"
                             placeholder="Select..."
-                            maxMenuHeight={140}
                             options={assignedKindsList}
-                            value={assignedKindsList.find((opt) => opt.value === selectedAssignedKind) || null}
-                            onChange={(event) => {
-                                setSelectedAssignedKind(event?.value || null);
+                            value={selectedAssignedKind || ''}
+                            onChange={(value) => {
+                                setSelectedAssignedKind((value as string) || null);
                             }}
-                            menuPlacement="auto"
                             isClearable
                         />
                     </Col>

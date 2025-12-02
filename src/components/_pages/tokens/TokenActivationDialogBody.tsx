@@ -3,12 +3,11 @@ import Spinner from 'components/Spinner';
 
 import { actions, selectors } from 'ducks/tokens';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Field, Form } from 'react-final-form';
+import { FormProvider, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { Form as BootstrapForm, Button, ButtonGroup, FormGroup } from 'reactstrap';
+import Button from 'components/Button';
 import { AttributeDescriptorModel, AttributeRequestModel } from 'types/attributes';
 
-import { mutators } from 'utils/attributes/attributeEditorMutators';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 import TabLayout from '../../Layout/TabLayout';
 
@@ -66,55 +65,60 @@ export default function TokenActivationDialogBody({ tokenUuid, visible, onClose 
         [dispatch, activationAttributes, onClose, tokenUuid, activationGroupAttributesCallbackAttributes],
     );
 
+    const methods = useForm({
+        mode: 'onTouched',
+        defaultValues: {},
+    });
+
+    const { handleSubmit, formState, watch } = methods;
+
+    const onSubmit = (values: any) => {
+        const allValues = watch();
+        onActivateSubmit(allValues);
+    };
+
     if (!tokenUuid) return <></>;
 
     return (
         <>
-            <Form onSubmit={onActivateSubmit} mutators={{ ...mutators() }}>
-                {({ handleSubmit, pristine, submitting, valid }) => (
-                    <BootstrapForm onSubmit={handleSubmit}>
-                        <br />
-                        <TabLayout
-                            tabs={[
-                                {
-                                    title: 'Issue attributes',
-                                    content:
-                                        !activationAttributes || activationAttributes.length === 0 ? (
-                                            <></>
-                                        ) : (
-                                            <Field name="ActivationAttributes">
-                                                {({ input, meta }) => (
-                                                    <FormGroup>
-                                                        <AttributeEditor
-                                                            id="activationAttributes"
-                                                            attributeDescriptors={activationAttributes}
-                                                            groupAttributesCallbackAttributes={activationGroupAttributesCallbackAttributes}
-                                                            setGroupAttributesCallbackAttributes={
-                                                                setActivationGroupAttributesCallbackAttributes
-                                                            }
-                                                        />
-                                                    </FormGroup>
-                                                )}
-                                            </Field>
-                                        ),
-                                },
-                            ]}
-                        />
+            <FormProvider {...methods}>
+                <form onSubmit={handleSubmit(onSubmit)}>
+                    <br />
+                    <TabLayout
+                        tabs={[
+                            {
+                                title: 'Issue attributes',
+                                content:
+                                    !activationAttributes || activationAttributes.length === 0 ? (
+                                        <></>
+                                    ) : (
+                                        <AttributeEditor
+                                            id="activationAttributes"
+                                            attributeDescriptors={activationAttributes}
+                                            groupAttributesCallbackAttributes={activationGroupAttributesCallbackAttributes}
+                                            setGroupAttributesCallbackAttributes={setActivationGroupAttributesCallbackAttributes}
+                                        />
+                                    ),
+                            },
+                        ]}
+                    />
 
-                        <div style={{ textAlign: 'right' }}>
-                            <ButtonGroup>
-                                <Button type="submit" color="primary" disabled={pristine || submitting || !valid} onClick={handleSubmit}>
-                                    Activate
-                                </Button>
+                    <div className="flex justify-end gap-2">
+                        <Button
+                            type="submit"
+                            color="primary"
+                            disabled={formState.isSubmitting || !formState.isValid}
+                            onClick={handleSubmit(onSubmit)}
+                        >
+                            Activate
+                        </Button>
 
-                                <Button type="button" color="secondary" onClick={onClose}>
-                                    Cancel
-                                </Button>
-                            </ButtonGroup>
-                        </div>
-                    </BootstrapForm>
-                )}
-            </Form>
+                        <Button type="button" variant="outline" color="secondary" onClick={onClose}>
+                            Cancel
+                        </Button>
+                    </div>
+                </form>
+            </FormProvider>
 
             <Spinner active={isBusy} />
         </>

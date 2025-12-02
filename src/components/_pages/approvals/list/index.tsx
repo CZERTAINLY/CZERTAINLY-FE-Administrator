@@ -12,8 +12,6 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 import { ApprovalDtoStatusEnum } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { dateFormatter } from 'utils/dateUtil';
-import Container from 'components/Container';
-import Breadcrumb from 'components/Breadcrumb';
 import Button from 'components/Button';
 import { ArrowRight } from 'lucide-react';
 
@@ -295,8 +293,8 @@ export default function ApprovalsList() {
                 body="Are you sure you want to accept the selected Approval?"
                 toggle={() => setApproveApprovalDialogOpen(false)}
                 buttons={[
-                    { color: 'primary', onClick: onApproveApprover, body: 'Yes, approve' },
                     { color: 'secondary', variant: 'outline', onClick: () => setApproveApprovalDialogOpen(false), body: 'Cancel' },
+                    { color: 'primary', onClick: onApproveApprover, body: 'Yes, approve' },
                 ]}
             />
 
@@ -306,8 +304,8 @@ export default function ApprovalsList() {
                 body="Are you sure you want to reject the selected Approval?"
                 toggle={() => setRejectApprovalDialogOpen(false)}
                 buttons={[
-                    { color: 'primary', onClick: onRejectApprover, body: 'Yes, reject' },
                     { color: 'secondary', variant: 'outline', onClick: () => setRejectApprovalDialogOpen(false), body: 'Cancel' },
+                    { color: 'primary', onClick: onRejectApprover, body: 'Yes, reject' },
                 ]}
             />
         </>

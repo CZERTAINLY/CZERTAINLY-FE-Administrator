@@ -1,28 +1,25 @@
 import { useEffect, useMemo } from 'react';
-import { Field, useForm, useFormState } from 'react-final-form';
-import Select from 'react-select';
-import { FormGroup, Label } from 'reactstrap';
+import { Controller, useFormContext, useWatch } from 'react-hook-form';
+import Select from 'components/Select';
 import { CertificateListResponseModel } from 'types/certificate';
 
+import { buildValidationRules } from 'utils/validators-helper';
 import { validateRequired } from 'utils/validators';
+import cn from 'classnames';
 
 interface Props {
     certificates: CertificateListResponseModel[] | undefined;
 }
 
 export default function CertificateField({ certificates }: Props) {
-    const form = useForm();
-    const formState = useFormState();
+    const { control, setValue } = useFormContext();
+    const watchedCertificate = useWatch({ control, name: 'certificate' });
 
     useEffect(() => {
-        if (
-            formState.values['certificate'] &&
-            certificates &&
-            !certificates?.find((c) => c.uuid === formState.values['certificate']?.value)
-        ) {
-            form.change('certificate', undefined);
+        if (watchedCertificate && certificates && !certificates?.find((c) => c.uuid === watchedCertificate)) {
+            setValue('certificate', undefined);
         }
-    }, [certificates, formState.values, form]);
+    }, [certificates, watchedCertificate, setValue]);
 
     const optionsForCertificates = useMemo(() => {
         return certificates?.map((certificate) => ({
@@ -32,22 +29,33 @@ export default function CertificateField({ certificates }: Props) {
     }, [certificates]);
 
     return (
-        <Field name="certificate" type="select" validate={validateRequired()}>
-            {({ input, meta }) => (
-                <FormGroup>
-                    <Label for="certificateSelect">CA Certificate</Label>
+        <Controller
+            name="certificate"
+            control={control}
+            rules={buildValidationRules([validateRequired()])}
+            render={({ field, fieldState }) => (
+                <div className="mb-4">
+                    <label htmlFor="certificateSelect" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
+                        CA Certificate
+                    </label>
                     <Select
-                        {...input}
-                        inputId="certificateSelect"
-                        id="certificate"
-                        maxMenuHeight={140}
-                        menuPlacement="auto"
-                        options={optionsForCertificates}
+                        id="certificateSelect"
+                        options={optionsForCertificates || []}
+                        value={field.value}
+                        onChange={(value) => field.onChange(value as string | undefined)}
                         placeholder="Select to change CA Certificate if needed"
                         isClearable={true}
+                        className={cn({
+                            'border-red-500': fieldState.error && fieldState.isTouched,
+                        })}
                     />
-                </FormGroup>
+                    {fieldState.error && fieldState.isTouched && (
+                        <p className="mt-1 text-sm text-red-600">
+                            {typeof fieldState.error === 'string' ? fieldState.error : fieldState.error?.message || 'Invalid value'}
+                        </p>
+                    )}
+                </div>
             )}
-        </Field>
+        />
     );
 }

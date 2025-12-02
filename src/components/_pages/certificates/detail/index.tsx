@@ -29,16 +29,15 @@ import {
 } from '../../../../types/openapi';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Form } from 'react-final-form';
+import { FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate, useParams } from 'react-router';
+import { Link, useParams } from 'react-router';
 
 import { actions as raProfilesActions, selectors as raProfilesSelectors } from 'ducks/ra-profiles';
-import { Form as BootstrapForm, Button, ButtonGroup, Label } from 'reactstrap';
+import Button from 'components/Button';
 import { AttributeDescriptorModel, AttributeResponseModel } from 'types/attributes';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import { mutators } from 'utils/attributes/attributeEditorMutators';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 import { downloadFile, formatPEM } from 'utils/certificate';
 
@@ -47,7 +46,6 @@ import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import TabLayout from '../../../Layout/TabLayout';
 import Asn1Dialog from '../Asn1Dialog/Asn1Dialog';
 
-import cx from 'classnames';
 import FlowChart, { CustomNode } from 'components/FlowChart';
 import { transformCertificateObjectToNodesAndEdges } from 'ducks/transform/certificates';
 import { Edge } from 'reactflow';
@@ -63,6 +61,94 @@ import Container from 'components/Container';
 import Breadcrumb from 'components/Breadcrumb';
 import CertificateDetailsContent from './CertificateDetailsContent';
 import CertificateRequestContent from './CertificateRequestContent';
+
+interface LocationPushFormProps {
+    onSubmit: (values: any) => void;
+    selectLocationsHeaders: TableHeader[];
+    selectLocationsData: TableDataRow[];
+    selectLocationsCheckedRows: string[];
+    setSelectLocationCheckedRows: (rows: string[]) => void;
+    locationAttributeDescriptors?: AttributeDescriptorModel[];
+    groupAttributesCallbackAttributes: AttributeDescriptorModel[];
+    setGroupAttributesCallbackAttributes: (attributes: AttributeDescriptorModel[]) => void;
+    onCancel: () => void;
+    isPushing: boolean;
+}
+
+function LocationPushForm({
+    onSubmit,
+    selectLocationsHeaders,
+    selectLocationsData,
+    selectLocationsCheckedRows,
+    setSelectLocationCheckedRows,
+    locationAttributeDescriptors,
+    groupAttributesCallbackAttributes,
+    setGroupAttributesCallbackAttributes,
+    onCancel,
+    isPushing,
+}: LocationPushFormProps) {
+    const methods = useForm({
+        mode: 'onTouched',
+        defaultValues: {},
+    });
+
+    const { control, handleSubmit, formState } = methods;
+    const allFormValues = useWatch({ control });
+
+    const handleFormSubmit = (values: any) => {
+        onSubmit(allFormValues);
+    };
+
+    return (
+        <FormProvider {...methods}>
+            <form onSubmit={handleSubmit(handleFormSubmit)}>
+                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">Locations</label>
+
+                <CustomTable
+                    hasPagination={false}
+                    headers={selectLocationsHeaders}
+                    data={selectLocationsData}
+                    hasCheckboxes={true}
+                    multiSelect={false}
+                    onCheckedRowsChanged={(rows) => setSelectLocationCheckedRows(rows as string[])}
+                />
+
+                <br />
+
+                <TabLayout
+                    tabs={[
+                        {
+                            title: 'Location Attributes',
+                            content: locationAttributeDescriptors ? (
+                                <AttributeEditor
+                                    id="locationAttributes"
+                                    attributeDescriptors={locationAttributeDescriptors}
+                                    groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                                    setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                                />
+                            ) : (
+                                <></>
+                            ),
+                        },
+                    ]}
+                />
+
+                <div className="flex justify-end gap-2">
+                    <ProgressButton
+                        title="Push"
+                        inProgressTitle="Pushing..."
+                        inProgress={isPushing}
+                        disabled={selectLocationsCheckedRows.length === 0 || !formState.isValid}
+                    />
+
+                    <Button variant="outline" color="secondary" onClick={onCancel} disabled={isPushing} type="button">
+                        Cancel
+                    </Button>
+                </div>
+            </form>
+        </FormProvider>
+    );
+}
 
 interface ChainDownloadSwitchState {
     isDownloadTriggered: boolean;
@@ -1194,47 +1280,38 @@ export default function CertificateDetail() {
                 toggle={() => setIsAddingRelatedCertificate(false)}
                 buttons={[]}
                 body={
-                    <Form
-                        onSubmit={() => {
-                            onCertificateAssociate(id, selectedCertificate);
+                    <form
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            if (selectedCertificate) {
+                                onCertificateAssociate(id, selectedCertificate);
+                            }
                         }}
                     >
-                        {({ handleSubmit, submitting, valid }) => (
-                            <>
-                                <BootstrapForm onSubmit={handleSubmit}>
-                                    <CertificateList
-                                        hideAdditionalButtons={true}
-                                        hideWidgetButtons={true}
-                                        multiSelect={false}
-                                        isLinkDisabled={true}
-                                        onCheckedRowsChanged={(rows) => {
-                                            setSelectedCertificate(rows[0] as string);
-                                        }}
-                                        withPreservedFilters={false}
-                                    />
-                                    <div className="d-flex align-items-center" style={{ padding: '0 30px' }}>
-                                        <ButtonGroup>
-                                            <ProgressButton
-                                                title="Add"
-                                                inProgressTitle="Adding..."
-                                                inProgress={submitting}
-                                                disabled={!selectedCertificate || !valid || isAlreadyRelatedError}
-                                            />
+                        <CertificateList
+                            hideAdditionalButtons={true}
+                            hideWidgetButtons={true}
+                            multiSelect={false}
+                            isLinkDisabled={true}
+                            onCheckedRowsChanged={(rows) => {
+                                setSelectedCertificate(rows[0] as string);
+                            }}
+                            withPreservedFilters={false}
+                        />
+                        <div className="flex items-center gap-2" style={{ padding: '0 30px' }}>
+                            <ProgressButton
+                                title="Add"
+                                inProgressTitle="Adding..."
+                                inProgress={false}
+                                disabled={!selectedCertificate || isAlreadyRelatedError}
+                            />
 
-                                            <Button
-                                                color="default"
-                                                onClick={() => setIsAddingRelatedCertificate(false)}
-                                                disabled={submitting}
-                                            >
-                                                Cancel
-                                            </Button>
-                                        </ButtonGroup>
-                                        {isAlreadyRelatedError ? <span className="text-danger">Certificate is already related</span> : null}
-                                    </div>
-                                </BootstrapForm>
-                            </>
-                        )}
-                    </Form>
+                            <Button variant="outline" color="secondary" onClick={() => setIsAddingRelatedCertificate(false)} type="button">
+                                Cancel
+                            </Button>
+                        </div>
+                        {isAlreadyRelatedError ? <span className="text-red-600">Certificate is already related</span> : null}
+                    </form>
                 }
             />
 
@@ -1267,62 +1344,18 @@ export default function CertificateDetail() {
                 buttons={[]}
                 body={
                     <>
-                        <Form
-                            onSubmit={(values: any) => {
-                                onAddCertToLocations(values);
-                            }}
-                            mutators={{ ...mutators() }}
-                        >
-                            {({ handleSubmit, submitting, valid }) => (
-                                <BootstrapForm onSubmit={handleSubmit}>
-                                    <Label>Locations</Label>
-
-                                    <CustomTable
-                                        hasPagination={false}
-                                        headers={selectLocationsHeaders}
-                                        data={selectLocationsData}
-                                        hasCheckboxes={true}
-                                        multiSelect={false}
-                                        onCheckedRowsChanged={(rows) => setSelectLocationCheckedRows(rows as string[])}
-                                    />
-
-                                    <br />
-
-                                    <TabLayout
-                                        tabs={[
-                                            {
-                                                title: 'Location Attributes',
-                                                content: locationAttributeDescriptors ? (
-                                                    <AttributeEditor
-                                                        id="locationAttributes"
-                                                        attributeDescriptors={locationAttributeDescriptors}
-                                                        groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
-                                                        setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
-                                                    />
-                                                ) : (
-                                                    <></>
-                                                ),
-                                            },
-                                        ]}
-                                    />
-
-                                    <div className="d-flex justify-content-end">
-                                        <ButtonGroup>
-                                            <ProgressButton
-                                                title="Push"
-                                                inProgressTitle="Pushing..."
-                                                inProgress={submitting}
-                                                disabled={selectLocationsCheckedRows.length === 0 || !valid}
-                                            />
-
-                                            <Button color="default" onClick={() => setAddCertToLocation(false)} disabled={submitting}>
-                                                Cancel
-                                            </Button>
-                                        </ButtonGroup>
-                                    </div>
-                                </BootstrapForm>
-                            )}
-                        </Form>
+                        <LocationPushForm
+                            onSubmit={onAddCertToLocations}
+                            selectLocationsHeaders={selectLocationsHeaders}
+                            selectLocationsData={selectLocationsData}
+                            selectLocationsCheckedRows={selectLocationsCheckedRows}
+                            setSelectLocationCheckedRows={setSelectLocationCheckedRows}
+                            locationAttributeDescriptors={locationAttributeDescriptors}
+                            groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                            setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                            onCancel={() => setAddCertToLocation(false)}
+                            isPushing={isPushingCertificate || isFetchingLocationPushAttributeDescriptors}
+                        />
 
                         <Spinner active={isPushingCertificate || isFetchingLocationPushAttributeDescriptors} />
                     </>

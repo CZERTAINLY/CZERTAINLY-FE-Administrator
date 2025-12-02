@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router';
+import { Link } from 'react-router';
 import { Container, Table } from 'reactstrap';
 
 import { actions, selectors } from 'ducks/cmp-profiles';
@@ -9,6 +9,7 @@ import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import StatusBadge from 'components/StatusBadge';
 import Widget from 'components/Widget';
+import CmpProfileForm from '../form';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { PlatformEnum } from 'types/openapi';
@@ -17,7 +18,6 @@ import Badge from 'components/Badge';
 
 export default function AdministratorsList() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const checkedRows = useSelector(selectors.checkedRows);
     const cmpProfiles = useSelector(selectors.cmpProfiles);
@@ -28,6 +28,7 @@ export default function AdministratorsList() {
     const isDeleting = useSelector(selectors.isDeleting);
     const isBulkDeleting = useSelector(selectors.isBulkDeleting);
     const isUpdating = useSelector(selectors.isUpdating);
+    const isCreating = useSelector(selectors.isCreating);
     const isBulkEnabling = useSelector(selectors.isBulkEnabling);
     const isBulkDisabling = useSelector(selectors.isBulkDisabling);
     const isBulkForceDeleting = useSelector(selectors.isBulkForceDeleting);
@@ -37,6 +38,8 @@ export default function AdministratorsList() {
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [confirmForceDelete, setConfirmForceDelete] = useState<boolean>(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+    const [editingCmpProfileId, setEditingCmpProfileId] = useState<string | undefined>(undefined);
 
     const getFreshData = useCallback(() => {
         dispatch(actions.setCheckedRows({ checkedRows: [] }));
@@ -51,9 +54,37 @@ export default function AdministratorsList() {
         setConfirmForceDelete(bulkDeleteErrorMessages.length > 0);
     }, [bulkDeleteErrorMessages]);
 
+    const wasCreating = useRef(isCreating);
+    const wasUpdating = useRef(isUpdating);
+
+    useEffect(() => {
+        if (wasCreating.current && !isCreating) {
+            setIsAddModalOpen(false);
+            getFreshData();
+        }
+        wasCreating.current = isCreating;
+    }, [isCreating, getFreshData]);
+
+    useEffect(() => {
+        if (wasUpdating.current && !isUpdating) {
+            setEditingCmpProfileId(undefined);
+            getFreshData();
+        }
+        wasUpdating.current = isUpdating;
+    }, [isUpdating, getFreshData]);
+
+    const handleOpenAddModal = useCallback(() => {
+        setIsAddModalOpen(true);
+    }, []);
+
+    const handleCloseAddModal = useCallback(() => {
+        setIsAddModalOpen(false);
+        setEditingCmpProfileId(undefined);
+    }, []);
+
     const onAddClick = useCallback(() => {
-        navigate(`./add`);
-    }, [navigate]);
+        handleOpenAddModal();
+    }, [handleOpenAddModal]);
 
     const onEnableClick = useCallback(() => {
         dispatch(actions.bulkEnableCmpProfiles({ uuids: checkedRows }));
@@ -86,9 +117,7 @@ export default function AdministratorsList() {
                 icon: 'plus',
                 disabled: false,
                 tooltip: 'Create',
-                onClick: () => {
-                    onAddClick();
-                },
+                onClick: handleOpenAddModal,
             },
             {
                 icon: 'trash',
@@ -115,7 +144,7 @@ export default function AdministratorsList() {
                 },
             },
         ],
-        [checkedRows, onAddClick, onEnableClick, onDisableClick],
+        [checkedRows, handleOpenAddModal, onEnableClick, onDisableClick],
     );
 
     const forceDeleteBody = useMemo(
@@ -263,6 +292,14 @@ export default function AdministratorsList() {
                     { color: 'danger', onClick: onForceDeleteConfirmed, body: 'Force delete' },
                     { color: 'secondary', variant: 'outline', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
                 ]}
+            />
+
+            <Dialog
+                isOpen={isAddModalOpen || !!editingCmpProfileId}
+                toggle={handleCloseAddModal}
+                caption={editingCmpProfileId ? 'Edit CMP Profile' : 'Create CMP Profile'}
+                size="xl"
+                body={<CmpProfileForm cmpProfileId={editingCmpProfileId} onCancel={handleCloseAddModal} />}
             />
         </Container>
     );

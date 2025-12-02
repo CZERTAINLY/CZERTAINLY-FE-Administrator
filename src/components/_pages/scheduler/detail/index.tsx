@@ -259,11 +259,7 @@ export default function SchedulerJobDetail() {
                     size="xl"
                     isOpen={cronModalOpen}
                     caption="Select CRON Expression"
-                    body={
-                        <div className="d-flex justify-content-center">
-                            <Cron value={newCronExpression} onChange={handleCronSelectChange} showResultText showResultCron />
-                        </div>
-                    }
+                    body={<Cron value={newCronExpression} onChange={handleCronSelectChange} showResultText showResultCron />}
                     toggle={() => setCronModalOpen(false)}
                     buttons={[
                         {

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
-import Select from 'react-select';
+import Select from 'components/Select';
 import React from 'react';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Widget from 'components/Widget';
@@ -849,11 +849,11 @@ export default function CertificateDetailsContent({ certificate, validationResul
                 body={
                     <div>
                         <Select
-                            maxMenuHeight={140}
-                            menuPlacement="auto"
+                            id="revokeReason"
                             options={certificateRevokeReasonOptions}
                             placeholder={`Select Revocation Reason`}
-                            onChange={(event: any) => setRevokeReason(event?.value as CertificateRevocationReason)}
+                            value={revokeReason || ''}
+                            onChange={(value) => setRevokeReason(value as CertificateRevocationReason)}
                         />
                     </div>
                 }
@@ -866,24 +866,21 @@ export default function CertificateDetailsContent({ certificate, validationResul
 
             <Dialog
                 isOpen={updateGroup}
-                caption={`Update Groups`}
+                caption="Update Groups"
                 body={
-                    <div>
-                        <Select
-                            maxMenuHeight={140}
-                            menuPlacement="auto"
-                            options={groupOptions}
-                            placeholder={`Select Groups`}
-                            value={groups}
-                            onChange={(event) => {
-                                const newGroupsList = event.length ? [...event] : [];
-                                setGroups(newGroupsList);
-                            }}
-                            isMulti
-                        />
-                    </div>
+                    <Select
+                        id="updateGroups"
+                        options={groupOptions}
+                        placeholder={`Select Groups`}
+                        value={groups}
+                        onChange={(values) => {
+                            setGroups(values || []);
+                        }}
+                        isMulti
+                    />
                 }
                 toggle={onCancelGroupUpdate}
+                noBorder
                 buttons={[
                     { color: 'primary', onClick: onUpdateGroup, body: 'Update', disabled: isUpdatingGroup },
                     { color: 'secondary', variant: 'outline', onClick: onCancelGroupUpdate, body: 'Cancel' },
@@ -892,17 +889,18 @@ export default function CertificateDetailsContent({ certificate, validationResul
 
             <Dialog
                 isOpen={updateOwner}
-                caption={`Update Owner`}
+                caption="Update Owner"
                 body={
                     <Select
-                        maxMenuHeight={140}
-                        menuPlacement="auto"
+                        id="updateOwner"
                         options={userOptions}
                         placeholder={`Select Owner`}
-                        onChange={(event) => setOwnerUuid(event?.value)}
+                        value={ownerUuid || ''}
+                        onChange={(value) => setOwnerUuid(value as string)}
                     />
                 }
                 toggle={onCancelOwnerUpdate}
+                noBorder
                 buttons={[
                     { color: 'primary', onClick: onUpdateOwner, body: 'Update', disabled: ownerUuid === undefined || isUpdatingOwner },
                     { color: 'secondary', variant: 'outline', onClick: onCancelOwnerUpdate, body: 'Cancel' },
@@ -915,11 +913,11 @@ export default function CertificateDetailsContent({ certificate, validationResul
                 body={
                     <div>
                         <Select
-                            maxMenuHeight={140}
-                            menuPlacement="auto"
+                            id="updateRaProfile"
                             options={raProfileOptions}
                             placeholder={`Select RA Profile`}
-                            onChange={(event) => updateRaAndAuthorityState(event?.value || '')}
+                            value={raProfile || ''}
+                            onChange={(value) => updateRaAndAuthorityState((value as string) || '')}
                         />
                     </div>
                 }
