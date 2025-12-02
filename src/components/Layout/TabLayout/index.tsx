@@ -1,5 +1,5 @@
 import Tabs from 'components/Tabs';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import Widget from 'components/Widget';
 
 type Props = {

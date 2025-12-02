@@ -15,6 +15,9 @@ import PlatformSettingsForm from '../form';
 // import Container from 'components/Container';
 // import Breadcrumb from 'components/Breadcrumb';
 
+// import Container from 'components/Container';
+// import Breadcrumb from 'components/Breadcrumb';
+
 export default function PlatformSettingsDetail() {
     const dispatch = useDispatch();
 
