@@ -32,5 +32,6 @@ src/*.pem
 src/setupProxy.cjs
 
 # Cypress
+/cypress
 cypress.env.json
 .nyc_output/
