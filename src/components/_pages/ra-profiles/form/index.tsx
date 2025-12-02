@@ -6,36 +6,44 @@ import { actions as authoritiesActions, selectors as authoritiesSelectors } from
 import { actions as connectorActions } from 'ducks/connectors';
 
 import { actions as raProfilesActions, selectors as raProfilesSelectors } from 'ducks/ra-profiles';
-import { FormApi } from 'final-form';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Field, Form } from 'react-final-form';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
-import Select from 'react-select';
-
-import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
+import Select from 'components/Select';
+import Button from 'components/Button';
+import Container from 'components/Container';
 import { AttributeDescriptorModel } from 'types/attributes';
 import { RaProfileResponseModel } from 'types/ra-profiles';
 
-import { mutators } from 'utils/attributes/attributeEditorMutators';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
 import { Resource } from '../../../../types/openapi';
 import TabLayout from '../../../Layout/TabLayout';
+import TextInput from 'components/TextInput';
+import TextArea from 'components/TextArea';
+
+interface RaProfileFormProps {
+    raProfileId?: string;
+    authorityId?: string;
+    onCancel?: () => void;
+    onSuccess?: () => void;
+}
 
 interface FormValues {
     name: string;
     description: string;
-    authority: { value: any; label: string } | undefined;
+    authority: string;
 }
 
-export default function RaProfileForm() {
+export default function RaProfileForm({ raProfileId, authorityId: propAuthorityId, onCancel, onSuccess }: RaProfileFormProps) {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
-    const { id, authorityId } = useParams();
+    const { id: routeId, authorityId: routeAuthorityId } = useParams();
+    const id = raProfileId || routeId;
+    const authorityId = propAuthorityId || routeAuthorityId;
 
     const editMode = useMemo(() => !!id, [id]);
 
@@ -74,33 +82,118 @@ export default function RaProfileForm() {
         }
     }, [dispatch, authorityId]);
 
+    const previousIdRef = useRef<string | undefined>(undefined);
+
     useEffect(() => {
         if (editMode && id && authorityId) {
-            dispatch(raProfilesActions.getRaProfileDetail({ authorityUuid: authorityId, uuid: id }));
+            // Fetch if id changed or if we don't have the correct profile loaded
+            if (previousIdRef.current !== id || !raProfileSelector || raProfileSelector.uuid !== id) {
+                dispatch(raProfilesActions.getRaProfileDetail({ authorityUuid: authorityId, uuid: id }));
+                previousIdRef.current = id;
+            }
+        } else {
+            previousIdRef.current = undefined;
         }
-    }, [dispatch, editMode, id, authorityId]);
+    }, [dispatch, editMode, id, authorityId, raProfileSelector]);
 
     useEffect(() => {
         if (editMode && raProfileSelector?.uuid === id) {
             setRaProfile(raProfileSelector);
         }
-    }, [dispatch, editMode, id, raProfileSelector]);
+    }, [editMode, id, raProfileSelector]);
+
+    const optionsForAuthorities = useMemo(
+        () =>
+            authorities.map((authority) => ({
+                value: authority.uuid,
+                label: authority.name,
+            })),
+        [authorities],
+    );
+
+    const defaultValues: FormValues = useMemo(
+        () => ({
+            name: editMode ? raProfile?.name || '' : '',
+            description: editMode ? raProfile?.description || '' : '',
+            authority: editMode
+                ? raProfile
+                    ? optionsForAuthorities.find((option) => option.value === raProfile.authorityInstanceUuid)?.value || ''
+                    : ''
+                : '',
+        }),
+        [editMode, optionsForAuthorities, raProfile],
+    );
+
+    const methods = useForm<FormValues>({
+        defaultValues,
+        mode: 'onChange',
+    });
+
+    const {
+        handleSubmit,
+        control,
+        formState: { isDirty, isSubmitting, isValid },
+        setValue,
+        getValues,
+        reset,
+    } = methods;
+
+    const watchedAuthority = useWatch({
+        control,
+        name: 'authority',
+    });
+
+    // Reset form values when raProfile is loaded in edit mode
+    useEffect(() => {
+        if (editMode && id && raProfile && raProfile.uuid === id && !isFetchingDetail) {
+            const newDefaultValues: FormValues = {
+                name: raProfile.name || '',
+                description: raProfile.description || '',
+                authority: raProfile.authorityInstanceUuid || authorityId || '',
+            };
+            reset(newDefaultValues, { keepDefaultValues: false });
+        } else if (!editMode) {
+            // Reset form when switching to create mode
+            reset({
+                name: '',
+                description: '',
+                authority: authorityId || '',
+            });
+        }
+    }, [editMode, raProfile, id, reset, isFetchingDetail, authorityId]);
+
+    // Helper function to convert validators for react-hook-form
+    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
+        return {
+            validate: (value: any) => {
+                const composed = composeValidators(...validators);
+                return composed(value);
+            },
+        };
+    };
 
     const onAuthorityChange = useCallback(
-        (authorityUuid: string, form: FormApi<FormValues>) => {
+        (authorityUuid: string) => {
             dispatch(connectorActions.clearCallbackData());
             setGroupAttributesCallbackAttributes([]);
-            form.mutators.clearAttributes('ra-profile');
+            const formValues = getValues();
+            Object.keys(formValues).forEach((key) => {
+                if (key.startsWith('__attributes__ra-profile__')) {
+                    setValue(key as any, undefined);
+                }
+            });
             if (raProfile) setRaProfile({ ...raProfile, attributes: [] });
             dispatch(authoritiesActions.clearRAProfilesAttributesDescriptors());
             dispatch(authoritiesActions.getRAProfilesAttributesDescriptors({ authorityUuid }));
         },
-        [dispatch, raProfile],
+        [dispatch, raProfile, getValues, setValue],
     );
 
-    const onCancelClick = useCallback(() => {
-        navigate(-1);
-    }, [navigate]);
+    useEffect(() => {
+        if (watchedAuthority) {
+            onAuthorityChange(watchedAuthority);
+        }
+    }, [watchedAuthority, onAuthorityChange]);
 
     const onSubmit = useCallback(
         (values: FormValues) => {
@@ -108,8 +201,8 @@ export default function RaProfileForm() {
                 dispatch(
                     raProfilesActions.updateRaProfile({
                         profileUuid: id!,
-                        authorityInstanceUuid: values.authority!.value,
-                        redirect: `../../../raprofiles/detail/${values.authority!.value}/${id}`,
+                        authorityInstanceUuid: values.authority,
+                        redirect: `../../../raprofiles/detail/${values.authority}/${id}`,
                         raProfileEditRequest: {
                             enabled: raProfile!.enabled,
                             description: values.description,
@@ -125,7 +218,7 @@ export default function RaProfileForm() {
             } else {
                 dispatch(
                     raProfilesActions.createRaProfile({
-                        authorityInstanceUuid: values.authority!.value,
+                        authorityInstanceUuid: values.authority,
                         raProfileAddRequest: {
                             name: values.name,
                             description: values.description,
@@ -143,28 +236,6 @@ export default function RaProfileForm() {
         [dispatch, editMode, id, raProfile, raProfileAttributeDescriptors, groupAttributesCallbackAttributes, resourceCustomAttributes],
     );
 
-    const optionsForAuthorities = useMemo(
-        () =>
-            authorities.map((authority) => ({
-                value: authority.uuid,
-                label: authority.name,
-            })),
-        [authorities],
-    );
-
-    const defaultValues: FormValues = useMemo(
-        () => ({
-            name: editMode ? raProfile?.name || '' : '',
-            description: editMode ? raProfile?.description || '' : '',
-            authority: editMode
-                ? raProfile
-                    ? optionsForAuthorities.find((option) => option.value === raProfile.authorityInstanceUuid)
-                    : undefined
-                : undefined,
-        }),
-        [editMode, optionsForAuthorities, raProfile],
-    );
-
     const title = useMemo(() => (editMode ? 'Edit RA Profile' : 'Create RA Profile'), [editMode]);
 
     const renderCustomAttributesEditor = useMemo(() => {
@@ -179,84 +250,90 @@ export default function RaProfileForm() {
     }, [isBusy, raProfile, resourceCustomAttributes]);
 
     return (
-        <Widget title={title} busy={isBusy}>
-            <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
-                {({ handleSubmit, pristine, submitting, valid, form }) => (
-                    <BootstrapForm onSubmit={handleSubmit}>
-                        <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="name">RA Profile Name</Label>
-
-                                    <Input
-                                        {...input}
-                                        id="name"
-                                        type="text"
-                                        placeholder="Enter RA Profile Name"
-                                        valid={!meta.touched || !meta.error}
-                                        invalid={meta.touched && meta.error}
-                                        disabled={editMode}
-                                    />
-
-                                    <FormFeedback>{meta.error}</FormFeedback>
-                                </FormGroup>
+        <FormProvider {...methods}>
+            <form onSubmit={handleSubmit(onSubmit)}>
+                <Widget noBorder busy={isBusy}>
+                    <div className="space-y-4">
+                        <Controller
+                            name="name"
+                            control={control}
+                            rules={buildValidationRules([validateRequired(), validateAlphaNumericWithSpecialChars()])}
+                            render={({ field, fieldState }) => (
+                                <TextInput
+                                    {...field}
+                                    id="name"
+                                    type="text"
+                                    label="RA Profile Name"
+                                    required
+                                    placeholder="Enter RA Profile Name"
+                                    disabled={editMode}
+                                    invalid={fieldState.error && fieldState.isTouched}
+                                    error={
+                                        fieldState.error && fieldState.isTouched
+                                            ? typeof fieldState.error === 'string'
+                                                ? fieldState.error
+                                                : fieldState.error?.message || 'Invalid value'
+                                            : undefined
+                                    }
+                                />
                             )}
-                        </Field>
+                        />
 
-                        <Field name="description" validate={composeValidators(validateLength(0, 300))}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="description">Description</Label>
-
-                                    <Input
-                                        {...input}
-                                        id="description"
-                                        type="textarea"
-                                        className="form-control"
-                                        placeholder="Enter Description / Comment"
-                                        valid={!meta.touched || !meta.error}
-                                        invalid={meta.touched && meta.error}
-                                    />
-
-                                    <FormFeedback>{meta.error}</FormFeedback>
-                                </FormGroup>
+                        <Controller
+                            name="description"
+                            control={control}
+                            rules={buildValidationRules([validateLength(0, 300)])}
+                            render={({ field, fieldState }) => (
+                                <TextArea
+                                    {...field}
+                                    id="description"
+                                    label="Description"
+                                    rows={3}
+                                    placeholder="Enter Description / Comment"
+                                    invalid={fieldState.error && fieldState.isTouched}
+                                    error={
+                                        fieldState.error && fieldState.isTouched
+                                            ? typeof fieldState.error === 'string'
+                                                ? fieldState.error
+                                                : fieldState.error?.message || 'Invalid value'
+                                            : undefined
+                                    }
+                                />
                             )}
-                        </Field>
+                        />
 
-                        <Field name="authority" validate={validateRequired()}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="authoritySelect">Select Authority</Label>
+                        <div>
+                            <Controller
+                                name="authority"
+                                control={control}
+                                rules={buildValidationRules([validateRequired()])}
+                                render={({ field, fieldState }) => (
+                                    <>
+                                        <Select
+                                            id="authoritySelect"
+                                            label="Select Authority"
+                                            value={field.value || ''}
+                                            onChange={(value) => {
+                                                field.onChange(value);
+                                            }}
+                                            options={optionsForAuthorities}
+                                            placeholder="Select to change RA Profile if needed"
+                                            placement="bottom"
+                                        />
+                                        {fieldState.error && fieldState.isTouched && (
+                                            <p className="mt-1 text-sm text-red-600">
+                                                {typeof fieldState.error === 'string'
+                                                    ? fieldState.error
+                                                    : fieldState.error?.message || 'Invalid value'}
+                                            </p>
+                                        )}
+                                    </>
+                                )}
+                            />
+                        </div>
 
-                                    <Select
-                                        inputId="authoritySelect"
-                                        {...input}
-                                        id="authority"
-                                        maxMenuHeight={140}
-                                        menuPlacement="auto"
-                                        options={optionsForAuthorities}
-                                        placeholder="Select to change RA Profile if needed"
-                                        onChange={(event: any) => {
-                                            onAuthorityChange(event.value, form);
-                                            input.onChange(event);
-                                        }}
-                                        styles={{
-                                            control: (provided) =>
-                                                meta.touched && meta.invalid
-                                                    ? { ...provided, border: 'solid 1px red', '&:hover': { border: 'solid 1px red' } }
-                                                    : { ...provided },
-                                        }}
-                                    />
-
-                                    <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
-                                        {meta.error}
-                                    </div>
-                                </FormGroup>
-                            )}
-                        </Field>
-
-                        <br />
                         <TabLayout
+                            noBorder
                             tabs={[
                                 {
                                     title: 'Connector Attributes',
@@ -265,9 +342,7 @@ export default function RaProfileForm() {
                                     ) : (
                                         <AttributeEditor
                                             id="ra-profile"
-                                            callbackParentUuid={
-                                                raProfile?.authorityInstanceUuid || form.getFieldState('authority')?.value?.value
-                                            }
+                                            callbackParentUuid={raProfile?.authorityInstanceUuid || watchedAuthority}
                                             callbackResource={Resource.RaProfiles}
                                             attributeDescriptors={raProfileAttributeDescriptors}
                                             attributes={raProfile?.attributes}
@@ -283,23 +358,21 @@ export default function RaProfileForm() {
                             ]}
                         />
 
-                        <div className="d-flex justify-content-end">
-                            <ButtonGroup>
-                                <ProgressButton
-                                    title={editMode ? 'Update' : 'Create'}
-                                    inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
-                                    inProgress={submitting}
-                                    disabled={pristine || submitting || !valid}
-                                />
-
-                                <Button color="default" onClick={onCancelClick} disabled={submitting}>
-                                    Cancel
-                                </Button>
-                            </ButtonGroup>
-                        </div>
-                    </BootstrapForm>
-                )}
-            </Form>
-        </Widget>
+                        <Container className="flex-row justify-end modal-footer" gap={4}>
+                            <Button variant="outline" onClick={onCancel} disabled={isSubmitting} type="button">
+                                Cancel
+                            </Button>
+                            <ProgressButton
+                                title={editMode ? 'Update' : 'Create'}
+                                inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
+                                inProgress={isSubmitting}
+                                disabled={!isDirty || isSubmitting || !isValid}
+                                type="submit"
+                            />
+                        </Container>
+                    </div>
+                </Widget>
+            </form>
+        </FormProvider>
     );
 }

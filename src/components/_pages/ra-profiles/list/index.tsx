@@ -1,6 +1,6 @@
-import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router';
+import { Link } from 'react-router';
 
 import Badge from 'components/Badge';
 
@@ -10,12 +10,12 @@ import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import StatusBadge from 'components/StatusBadge';
 import Widget from 'components/Widget';
+import RaProfileForm from '../form';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { LockWidgetNameEnum } from 'types/user-interface';
 
 function RaProfileList() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const checkedRows = useSelector(selectors.checkedRows);
     const raProfiles = useSelector(selectors.raProfiles);
@@ -24,6 +24,7 @@ function RaProfileList() {
     const isDeleting = useSelector(selectors.isDeleting);
     const isBulkDeleting = useSelector(selectors.isBulkDeleting);
     const isUpdating = useSelector(selectors.isUpdating);
+    const isCreating = useSelector(selectors.isCreating);
     const isEnabling = useSelector(selectors.isEnabling);
     const isBulkEnabling = useSelector(selectors.isBulkEnabling);
     const isBulkDisabling = useSelector(selectors.isBulkDisabling);
@@ -31,8 +32,10 @@ function RaProfileList() {
     const isBusy = isFetching || isDeleting || isUpdating || isBulkDeleting || isEnabling || isBulkEnabling || isBulkDisabling;
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
-
     const [complianceCheck, setComplianceCheck] = useState<boolean>(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+    const [editingRaProfileId, setEditingRaProfileId] = useState<string | undefined>(undefined);
+    const [editingAuthorityId, setEditingAuthorityId] = useState<string | undefined>(undefined);
 
     const getFreshData = useCallback(() => {
         dispatch(actions.setCheckedRows({ checkedRows: [] }));
@@ -43,9 +46,40 @@ function RaProfileList() {
         getFreshData();
     }, [getFreshData]);
 
+    const wasCreating = useRef(isCreating);
+    const wasUpdating = useRef(isUpdating);
+
+    useEffect(() => {
+        if (wasCreating.current && !isCreating) {
+            setIsAddModalOpen(false);
+            setEditingAuthorityId(undefined);
+            getFreshData();
+        }
+        wasCreating.current = isCreating;
+    }, [isCreating, getFreshData]);
+
+    useEffect(() => {
+        if (wasUpdating.current && !isUpdating) {
+            setEditingRaProfileId(undefined);
+            setEditingAuthorityId(undefined);
+            getFreshData();
+        }
+        wasUpdating.current = isUpdating;
+    }, [isUpdating, getFreshData]);
+
+    const handleOpenAddModal = useCallback(() => {
+        setIsAddModalOpen(true);
+    }, []);
+
+    const handleCloseAddModal = useCallback(() => {
+        setIsAddModalOpen(false);
+        setEditingRaProfileId(undefined);
+        setEditingAuthorityId(undefined);
+    }, []);
+
     const onAddClick = useCallback(() => {
-        navigate(`./add`);
-    }, [navigate]);
+        handleOpenAddModal();
+    }, [handleOpenAddModal]);
 
     const onEnableClick = useCallback(() => {
         dispatch(actions.bulkEnableRaProfiles({ uuids: checkedRows }));
@@ -78,9 +112,7 @@ function RaProfileList() {
                 icon: 'plus',
                 disabled: false,
                 tooltip: 'Create',
-                onClick: () => {
-                    onAddClick();
-                },
+                onClick: handleOpenAddModal,
             },
             {
                 icon: 'trash',
@@ -115,7 +147,7 @@ function RaProfileList() {
                 },
             },
         ],
-        [checkedRows, onAddClick, onEnableClick, onDisableClick],
+        [checkedRows, handleOpenAddModal, onEnableClick, onDisableClick],
     );
 
     const raProfilesTableHeaders: TableHeader[] = useMemo(
@@ -244,6 +276,14 @@ function RaProfileList() {
                     { color: 'primary', onClick: onComplianceCheckConfirmed, body: 'Yes' },
                     { color: 'secondary', variant: 'outline', onClick: () => setComplianceCheck(false), body: 'Cancel' },
                 ]}
+            />
+
+            <Dialog
+                isOpen={isAddModalOpen || !!editingRaProfileId}
+                toggle={handleCloseAddModal}
+                caption={editingRaProfileId ? 'Edit RA Profile' : 'Create RA Profile'}
+                size="xl"
+                body={<RaProfileForm raProfileId={editingRaProfileId} authorityId={editingAuthorityId} onCancel={handleCloseAddModal} />}
             />
         </>
     );

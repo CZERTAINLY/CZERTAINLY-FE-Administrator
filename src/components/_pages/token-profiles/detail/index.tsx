@@ -8,10 +8,11 @@ import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions as tokenProfilesActions, selectors as tokenProfilesSelectors } from 'ducks/token-profiles';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate, useParams } from 'react-router';
-import Select from 'react-select';
+import { Link, useParams } from 'react-router';
+import TokenProfileForm from '../form';
+import Select from 'components/Select';
 
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { Label } from 'reactstrap';
@@ -26,7 +27,6 @@ import Container from 'components/Container';
 
 export default function TokenProfileDetail() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const { id, tokenId } = useParams();
 
@@ -34,12 +34,14 @@ export default function TokenProfileDetail() {
 
     const isFetchingProfile = useSelector(tokenProfilesSelectors.isFetchingDetail);
     const isUpdatingKeyUsage = useSelector(tokenProfilesSelectors.isUpdatingKeyUsage);
+    const isUpdating = useSelector(tokenProfilesSelectors.isUpdating);
 
     const isDeleting = useSelector(tokenProfilesSelectors.isDeleting);
     const isEnabling = useSelector(tokenProfilesSelectors.isEnabling);
     const isDisabling = useSelector(tokenProfilesSelectors.isDisabling);
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
     const [keyUsageUpdate, setKeyUsageUpdate] = useState<boolean>(false);
 
@@ -60,10 +62,24 @@ export default function TokenProfileDetail() {
         getFreshTokenProfileDetails();
     }, [getFreshTokenProfileDetails, id, tokenId]);
 
+    const wasUpdating = useRef(isUpdating);
+
+    useEffect(() => {
+        if (wasUpdating.current && !isUpdating) {
+            setIsEditModalOpen(false);
+            getFreshTokenProfileDetails();
+        }
+        wasUpdating.current = isUpdating;
+    }, [isUpdating, getFreshTokenProfileDetails]);
+
+    const handleCloseEditModal = useCallback(() => {
+        setIsEditModalOpen(false);
+    }, []);
+
     const onEditClick = useCallback(() => {
         if (!tokenProfile) return;
-        navigate(`../../../edit/${tokenProfile.tokenInstanceUuid}/${tokenProfile?.uuid}`, { relative: 'path' });
-    }, [navigate, tokenProfile]);
+        setIsEditModalOpen(true);
+    }, [tokenProfile]);
 
     const onEnableClick = useCallback(() => {
         if (!tokenProfile) return;
@@ -216,10 +232,16 @@ export default function TokenProfileDetail() {
                     isMulti={true}
                     id="field"
                     options={keyUsageOptions()}
-                    onChange={(e) => {
-                        setKeyUsages(e.map((item) => item.value));
+                    value={keyUsages.map(
+                        (usage) =>
+                            keyUsageOptions().find((opt) => opt.value === usage) || {
+                                value: usage,
+                                label: getEnumLabel(keyUsageEnum, usage),
+                            },
+                    )}
+                    onChange={(values) => {
+                        setKeyUsages((values || []).map((item) => item.value as KeyUsage));
                     }}
-                    defaultValue={existingUsages()}
                     isClearable={true}
                 />
             </div>
@@ -299,6 +321,20 @@ export default function TokenProfileDetail() {
                     { color: 'primary', onClick: onUpdateKeyUsageConfirmed, body: 'Update' },
                     { color: 'secondary', variant: 'outline', onClick: () => setKeyUsageUpdate(false), body: 'Cancel' },
                 ]}
+            />
+
+            <Dialog
+                isOpen={isEditModalOpen}
+                toggle={handleCloseEditModal}
+                caption="Edit Token Profile"
+                size="xl"
+                body={
+                    <TokenProfileForm
+                        tokenProfileId={tokenProfile?.uuid}
+                        tokenId={tokenProfile?.tokenInstanceUuid || tokenId}
+                        onCancel={handleCloseEditModal}
+                    />
+                }
             />
         </div>
     );

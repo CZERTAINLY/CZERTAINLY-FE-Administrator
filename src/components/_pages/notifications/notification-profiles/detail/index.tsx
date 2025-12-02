@@ -6,9 +6,10 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions, selectors } from 'ducks/notification-profiles';
 import { actions as notificationActions, selectors as notificationSelectors } from 'ducks/notifications';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate, useParams } from 'react-router';
+import { Link, useParams } from 'react-router';
+import NotificationProfileForm from '../form';
 
 import Badge from 'components/Badge';
 import { PlatformEnum, RecipientType } from 'types/openapi';
@@ -22,10 +23,10 @@ export default function NotificationProfileDetail() {
     const { id, version } = useParams();
 
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const notificationProfile = useSelector(selectors.notificationProfile);
     const isFetchingDetail = useSelector(selectors.isFetchingDetail);
+    const isUpdating = useSelector(selectors.isUpdating);
 
     const notificationInstance = useSelector(notificationSelectors.notificationInstanceDetail);
     const isFetchingNotificationInstanceDetail = useSelector(notificationSelectors.isFetchingNotificationInstanceDetail);
@@ -33,6 +34,7 @@ export default function NotificationProfileDetail() {
     const recipientTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.RecipientType));
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
     const getFreshData = useCallback(() => {
         if (!id || !version) return;
@@ -49,10 +51,24 @@ export default function NotificationProfileDetail() {
         dispatch(notificationActions.getNotificationInstance({ uuid: notificationProfile.notificationInstance.uuid }));
     }, [dispatch, notificationProfile]);
 
+    const wasUpdating = useRef(isUpdating);
+
+    useEffect(() => {
+        if (wasUpdating.current && !isUpdating) {
+            setIsEditModalOpen(false);
+            getFreshData();
+        }
+        wasUpdating.current = isUpdating;
+    }, [isUpdating, getFreshData]);
+
+    const handleCloseEditModal = useCallback(() => {
+        setIsEditModalOpen(false);
+    }, []);
+
     const onEditNotificationProfile = useCallback(() => {
         if (!id || !version) return;
-        navigate(`../notificationprofiles/edit/${id}/${version}`);
-    }, [navigate, id, version]);
+        setIsEditModalOpen(true);
+    }, [id, version]);
 
     const onDeleteNotificationProfile = useCallback(() => {
         setConfirmDelete(true);
@@ -285,6 +301,14 @@ export default function NotificationProfileDetail() {
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
+            />
+
+            <Dialog
+                isOpen={isEditModalOpen}
+                toggle={handleCloseEditModal}
+                caption="Edit Notification Profile"
+                size="xl"
+                body={<NotificationProfileForm notificationProfileId={id} version={version} onCancel={handleCloseEditModal} />}
             />
         </div>
     );
