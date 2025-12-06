@@ -140,6 +140,7 @@ const ExecutionsList = () => {
                     title: 'Information',
                     description: 'Executions is named set of execution items',
                 }}
+                noBorder
             >
                 <CustomTable
                     checkedRows={checkedRows}
