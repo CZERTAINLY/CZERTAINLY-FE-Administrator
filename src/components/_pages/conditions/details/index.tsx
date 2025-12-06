@@ -1,7 +1,7 @@
 import ConditionAndSetFieldExecutionItemsViewer from 'components/ConditionAndSetFieldExecutionItemsViewer';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
-import GoBackButton from 'components/GoBackButton';
+import Breadcrumb from 'components/Breadcrumb';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
@@ -191,10 +191,11 @@ const ConditionDetails = () => {
 
     return (
         <Container className="themed-container" fluid>
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                forcedPath="/rules"
-                text={`${getEnumLabel(resourceTypeEnum, Resource.Conditions)} Inventory`}
+            <Breadcrumb
+                items={[
+                    { label: `${getEnumLabel(resourceTypeEnum, Resource.Conditions)} Inventory`, href: '/rules' },
+                    { label: 'Condition Details' },
+                ]}
             />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>

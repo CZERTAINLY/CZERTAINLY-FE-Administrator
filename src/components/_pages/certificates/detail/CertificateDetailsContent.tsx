@@ -7,7 +7,7 @@ import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Widget from 'components/Widget';
 import Container from 'components/Container';
 import Dialog from 'components/Dialog';
-import SwitchWidget from 'components/SwitchWidget';
+import Switch from 'components/Switch';
 import Badge from 'components/Badge';
 import CertificateStatus from '../CertificateStatus';
 import Asn1Dialog from '../Asn1Dialog/Asn1Dialog';
@@ -243,19 +243,22 @@ export default function CertificateDetailsContent({ certificate, validationResul
         setRaProfileAuthorityUuid(value.split(':#')[1]);
     }, []);
 
-    const switchCallback = useCallback(() => {
-        if (!certificate) return;
-        if (isUpdatingTrustedStatus) return;
+    const switchCallback = useCallback(
+        (checked: boolean) => {
+            if (!certificate) return;
+            if (isUpdatingTrustedStatus) return;
 
-        dispatch(
-            actions.updateCertificateTrustedStatus({
-                uuid: certificate.uuid,
-                updateCertificateTrustedStatusRequest: {
-                    trustedCa: !certificate.trustedCa,
-                },
-            }),
-        );
-    }, [certificate, isUpdatingTrustedStatus, dispatch]);
+            dispatch(
+                actions.updateCertificateTrustedStatus({
+                    uuid: certificate.uuid,
+                    updateCertificateTrustedStatusRequest: {
+                        trustedCa: checked,
+                    },
+                }),
+            );
+        },
+        [certificate, isUpdatingTrustedStatus, dispatch],
+    );
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
@@ -525,7 +528,12 @@ export default function CertificateDetailsContent({ certificate, validationResul
                 id: 'trustedCa',
                 columns: [
                     certificate?.subjectType == CertificateSubjectType.SelfSignedEndEntity ? 'Trusted Self-Signed' : 'Trusted CA',
-                    <SwitchWidget disabled={isUpdatingTrustedStatus} checked={certificate.trustedCa ?? false} onClick={switchCallback} />,
+                    <Switch
+                        id="trustedCa"
+                        disabled={isUpdatingTrustedStatus}
+                        checked={certificate.trustedCa ?? false}
+                        onChange={switchCallback}
+                    />,
                 ],
             });
         }

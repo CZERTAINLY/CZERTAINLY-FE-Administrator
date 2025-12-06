@@ -3,7 +3,7 @@ import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import FlowChart, { CustomNode } from 'components/FlowChart';
 import TabLayout from 'components/Layout/TabLayout';
-import SwitchWidget from 'components/SwitchWidget';
+import Switch from 'components/Switch';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as alertActions } from 'ducks/alerts';
@@ -19,7 +19,7 @@ import Container from 'components/Container';
 import TextInput from 'components/TextInput';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { DeviceType, useDeviceType } from 'utils/common-hooks';
-import GoBackButton from 'components/GoBackButton';
+import Breadcrumb from 'components/Breadcrumb';
 import { Check, X, Pencil, Trash2, Rocket, Zap, Book } from 'lucide-react';
 
 interface SelectChangeValue {
@@ -305,14 +305,15 @@ const TriggerDetails = () => {
                           id: 'ignoreTrigger',
                           columns: [
                               'Ignore Trigger',
-                              <SwitchWidget
+                              <Switch
+                                  id="ignoreTrigger"
                                   checked={triggerDetails.ignoreTrigger}
-                                  onClick={() => {
-                                      if (triggerDetails?.ignoreTrigger) {
+                                  onChange={(checked) => {
+                                      if (checked) {
+                                          setConfirmIgnoreTrigger(true);
+                                      } else {
                                           dispatch(alertActions.info('Please add actions from the actions table'));
                                           triggerHighlight();
-                                      } else {
-                                          setConfirmIgnoreTrigger(true);
                                       }
                                   }}
                               />,
@@ -502,10 +503,11 @@ const TriggerDetails = () => {
 
     return (
         <Container className="themed-container" fluid>
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                forcedPath="/triggers"
-                text={`${getEnumLabel(resourceEnum, Resource.Triggers)} Inventory`}
+            <Breadcrumb
+                items={[
+                    { label: `${getEnumLabel(resourceEnum, Resource.Triggers)} Inventory`, href: '/triggers' },
+                    { label: 'Trigger Details' },
+                ]}
             />
             <TabLayout
                 tabs={[

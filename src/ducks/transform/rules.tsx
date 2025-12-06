@@ -4,7 +4,7 @@ import ConditionsItemsList from 'components/ExecutionConditionItemsList/Conditio
 import ExecutionsItemsList from 'components/ExecutionConditionItemsList/ExecutionsItemsList';
 import { CustomNode } from 'components/FlowChart';
 import ProgressButton from 'components/ProgressButton';
-import SwitchWidget from 'components/SwitchWidget';
+import Switch from 'components/Switch';
 import { actions as alertActions } from 'ducks/alerts';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { EntityType, actions as filterActions } from 'ducks/filters';
@@ -409,12 +409,11 @@ export function useTransformTriggerObjectToNodesAndEdges(
             <div className={cx('flex items-center ')}>
                 <h6>Ignore Trigger :</h6>
                 <div className="ml-1">
-                    <SwitchWidget
+                    <Switch
+                        id="ignoreTrigger"
                         checked={triggerDetails.ignoreTrigger}
-                        onClick={() => {
-                            if (triggerDetails?.ignoreTrigger) {
-                                dispatch(alertActions.info('Please add actions from the Add Actions dropdown'));
-                            } else {
+                        onChange={(checked) => {
+                            if (checked) {
                                 dispatch(
                                     rulesActions.updateTrigger({
                                         triggerUuid: triggerDetails.uuid,
@@ -429,6 +428,8 @@ export function useTransformTriggerObjectToNodesAndEdges(
                                         },
                                     }),
                                 );
+                            } else {
+                                dispatch(alertActions.info('Please add actions from the Add Actions dropdown'));
                             }
                         }}
                     />

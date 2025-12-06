@@ -16,7 +16,7 @@ import ProgressButton from 'components/ProgressButton';
 import { isObjectSame } from 'utils/common-utils';
 import { SettingsPlatformModel } from 'types/settings';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
-import SwitchWidget from 'components/SwitchWidget';
+import Switch from 'components/Switch';
 import { renderExpiringThresholdLabel, renderValidationFrequencyLabel } from 'utils/certificate-validation';
 
 type FormValues = {
@@ -113,7 +113,13 @@ export default function CertificateValidationDialogBody({ raProfile, platformSet
                 id: 'enabled',
                 columns: [
                     'Enable Validation',
-                    <SwitchWidget key="validationEnabled" disabled checked={platformSettings.certificates?.validation?.enabled} />,
+                    <Switch
+                        key="validationEnabled"
+                        id="validationEnabled"
+                        disabled
+                        checked={platformSettings.certificates?.validation?.enabled}
+                        onChange={() => {}}
+                    />,
                 ],
             },
             {

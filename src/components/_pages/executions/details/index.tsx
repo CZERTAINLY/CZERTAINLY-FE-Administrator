@@ -2,7 +2,7 @@ import { SendNotificationExecutionItems } from 'components/_pages/executions/Sen
 import ConditionAndSetFieldExecutionItemsViewer from 'components/ConditionAndSetFieldExecutionItemsViewer';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
-import GoBackButton from 'components/GoBackButton';
+import Breadcrumb from 'components/Breadcrumb';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
@@ -237,10 +237,11 @@ const ExecutionDetails = () => {
 
     return (
         <Container className="themed-container" fluid>
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                forcedPath="/actions"
-                text={`${getEnumLabel(resourceEnum, Resource.Actions)} Inventory`}
+            <Breadcrumb
+                items={[
+                    { label: `${getEnumLabel(resourceEnum, Resource.Actions)} Inventory`, href: '/actions' },
+                    { label: 'Execution Details' },
+                ]}
             />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
