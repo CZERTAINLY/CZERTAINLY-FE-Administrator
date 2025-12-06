@@ -86,11 +86,11 @@ export function getCertificateStatusColor(
         case CertificateState.Archived:
             return '#6c757d';
         case CertificateState.Rejected:
-            return '#eb3349';
+            return '#EF4444';
         case CertificateState.Issued:
             return '#1ab394';
         case CertificateState.Failed:
-            return '#c7182c';
+            return '#EF4444';
         case CertificateState.PendingApproval:
             return '#3754a5';
         case CertificateState.PendingIssue:
@@ -103,11 +103,11 @@ export function getCertificateStatusColor(
         case CertificateValidationStatus.Valid:
             return '#1ab394';
         case CertificateValidationStatus.Expired:
-            return '#eb3349';
+            return '#EF4444';
         case CertificateValidationStatus.Revoked:
             return '#632828';
         case CertificateValidationStatus.Expiring:
-            return '#f37d63';
+            return '#EAB308';
         case CertificateValidationStatus.Invalid:
             return '#131212';
         case CertificateValidationStatus.Inactive:
@@ -120,7 +120,7 @@ export function getCertificateStatusColor(
         case ComplianceStatus.Na:
             return '#6c757d';
         case ComplianceStatus.Nok:
-            return '#eb3349';
+            return '#EF4444';
         case ComplianceStatus.Ok:
             return '#1ab394';
         case ComplianceStatus.NotChecked:
@@ -129,19 +129,19 @@ export function getCertificateStatusColor(
         case ComplianceRuleStatus.Na:
             return '#6c757d';
         case ComplianceRuleStatus.Nok:
-            return '#eb3349';
+            return '#EF4444';
         case ComplianceRuleStatus.Ok:
             return '#1ab394';
 
         case CertificateEventHistoryDtoStatusEnum.Failed:
-            return '#eb3349';
+            return '#EF4444';
         case CertificateEventHistoryDtoStatusEnum.Success:
             return '#1ab394';
 
         case CertificateSubjectType.EndEntity:
             return '#6c757d';
         case CertificateSubjectType.SelfSignedEndEntity:
-            return '#f37d63';
+            return '#EAB308';
         case CertificateSubjectType.IntermediateCa:
             return '#3754a5';
         case CertificateSubjectType.RootCa:

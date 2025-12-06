@@ -12,8 +12,8 @@
     --dark-gray-color: #1f2937;
 
     --status-success-color: #1ab394;
-    --status-danger-color: #eb3349;
-    --status-warning-color: #f37d63;
+    --status-danger-color: #ef4444;
+    --status-warning-color: #eab308;
     --status-dark-color: var(--dark-gray-color);
     --status-light-gray-color: var(--gray-300);
     --status-gray-color: var(--gray-500);
@@ -22,6 +22,20 @@
 }
 
 @import 'tailwindcss';
+
+@theme {
+    --color-blue-50: #e6f4fd;
+    --color-blue-100: #b3dffa;
+    --color-blue-200: #80caf7;
+    --color-blue-300: #4db5f4;
+    --color-blue-400: #1aa0f1;
+    --color-blue-500: #1a8bd4;
+    --color-blue-600: #2798e7;
+    --color-blue-700: #1e7bc7;
+    --color-blue-800: #165ea7;
+    --color-blue-900: #0d4187;
+    --color-blue-950: #052467;
+}
 
 /* Source files to scan for Tailwind classes */
 @source "../src";

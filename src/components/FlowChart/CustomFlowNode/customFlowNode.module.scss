@@ -121,47 +121,47 @@
 
     border: none !important;
     &:hover {
-        background-color: #eb3349ec !important;
+        background-color: #ef4444ec !important;
         border: none;
     }
     &:active {
-        background-color: #eb3349d8 !important;
+        background-color: #ef4444d8 !important;
         border: none;
     }
 }
 
 .expiringStatus {
-    color: #f37d63;
-    border-color: #f37d63;
+    color: #eab308;
+    border-color: #eab308;
 }
 
 .expandButtonExpiring {
-    background-color: #f37d63a6 !important;
+    background-color: #eab308a6 !important;
     border: none !important;
     &:hover {
-        background-color: #f37d63ec !important;
+        background-color: #eab308ec !important;
         border: none;
     }
     &:active {
-        background-color: #f37d63d8 !important;
+        background-color: #eab308d8 !important;
         border: none;
     }
 }
 
 .expiredStatus {
-    color: #eb3349 !important;
-    border-color: #eb3349 !important;
+    color: #ef4444 !important;
+    border-color: #ef4444 !important;
 }
 
 .expandButtonExpired {
-    background-color: #eb3349a4 !important;
+    background-color: #ef4444a4 !important;
     border: none !important;
     &:hover {
-        background-color: #eb3349 !important;
+        background-color: #ef4444 !important;
         border: none;
     }
     &:active {
-        background-color: #eb3349 !important;
+        background-color: #ef4444 !important;
         border: none;
     }
 }
