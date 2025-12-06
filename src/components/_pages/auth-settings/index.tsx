@@ -169,7 +169,7 @@ const AuthenticationSettings = () => {
                           provider.issuerUrl ?? '',
                           renderOAuth2StateBadges(provider),
                           <Button
-                              className="py-0 px-1 ms-2"
+                              className="py-0 px-1 ml-2"
                               variant="transparent"
                               color="primary"
                               title="Detail"

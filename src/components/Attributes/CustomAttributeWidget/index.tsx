@@ -9,7 +9,6 @@ import { Resource } from '../../../types/openapi';
 import ContentValueField from '../../Input/DynamicContent/ContentValueField';
 import Widget from '../../Widget';
 import AttributeViewer, { ATTRIBUTE_VIEWER_TYPE } from '../AttributeViewer';
-// import style from './customAttributeWidget.module.scss';
 import Container from 'components/Container';
 
 export type Props = {

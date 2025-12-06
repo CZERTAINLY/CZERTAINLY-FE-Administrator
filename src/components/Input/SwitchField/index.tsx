@@ -1,5 +1,5 @@
-import { Field } from 'react-final-form';
-import { FormGroup, Input, Label } from 'reactstrap';
+import { Controller, useFormContext } from 'react-hook-form';
+import Label from 'components/Label';
 
 type viewOnly = {
     checked: boolean;
@@ -14,32 +14,47 @@ type Props = {
 };
 
 export default function SwitchField({ id, label, onChange = undefined, disabled = false, viewOnly }: Props) {
-    return !viewOnly ? (
-        <Field name={id} type={'checkbox'}>
-            {({ input }) => (
-                <FormGroup switch style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <Input
-                        {...input}
-                        type="switch"
+    const { control } = useFormContext();
+
+    if (viewOnly) {
+        return (
+            <div className="flex items-center gap-2">
+                <input
+                    type="checkbox"
+                    id={id}
+                    disabled
+                    checked={viewOnly.checked}
+                    className="relative shrink-0 w-[3.25rem] h-7 bg-gray-100 checked:bg-none checked:bg-blue-600 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none appearance-none dark:bg-gray-700 dark:checked:bg-blue-600"
+                />
+                <Label htmlFor={id}>{label}</Label>
+            </div>
+        );
+    }
+
+    return (
+        <Controller
+            name={id}
+            control={control}
+            render={({ field }) => (
+                <div className="flex items-center gap-2">
+                    <input
+                        type="checkbox"
                         id={id}
                         disabled={disabled}
+                        checked={field.value || false}
                         onChange={(e) => {
-                            input.onChange(e);
+                            field.onChange(e.target.checked);
                             if (onChange) {
                                 onChange(e.target.checked);
                             }
                         }}
+                        className="relative shrink-0 w-[3.25rem] h-7 bg-gray-100 checked:bg-none checked:bg-blue-600 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none appearance-none dark:bg-gray-700 dark:checked:bg-blue-600 disabled:opacity-50 disabled:pointer-events-none"
                     />
-                    <Label for={id} style={{ marginBottom: '0' }}>
+                    <Label htmlFor={id} className="mb-0">
                         {label}
                     </Label>
-                </FormGroup>
+                </div>
             )}
-        </Field>
-    ) : (
-        <FormGroup switch>
-            <Input type="switch" id={id} disabled checked={viewOnly.checked} />
-            <Label for={id}>{label}</Label>
-        </FormGroup>
+        />
     );
 }

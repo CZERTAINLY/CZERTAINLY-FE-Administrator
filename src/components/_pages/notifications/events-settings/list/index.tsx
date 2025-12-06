@@ -67,7 +67,7 @@ const EventsList = () => {
                 ),
             },
         ],
-        [resourceOptionsWithEvents],
+        [resourceOptionsWithEvents, selectedResource],
     );
     const headers: TableHeader[] = useMemo(
         () => [

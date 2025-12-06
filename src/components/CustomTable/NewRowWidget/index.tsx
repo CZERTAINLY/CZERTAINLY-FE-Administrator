@@ -1,8 +1,7 @@
 import cx from 'classnames';
 import { useEffect, useState } from 'react';
 import Select from 'components/Select';
-import { Button, ButtonGroup } from 'reactstrap';
-import styles from './NewRowWidget.module.scss';
+import Button from 'components/Button';
 import { Plus } from 'lucide-react';
 interface SelectChangeValue {
     value: string;
@@ -28,7 +27,7 @@ const NewRowWidget = ({ newItemsList, isBusy, onAddClick, immediateAdd, selectHi
     }, [immediateAdd, selectedItems, onAddClick]);
 
     return (
-        <div className="d-flex">
+        <div className="flex">
             <Select
                 onChange={(values) => {
                     setSelectedItems(values || []);
@@ -41,11 +40,10 @@ const NewRowWidget = ({ newItemsList, isBusy, onAddClick, immediateAdd, selectHi
             />
             <div>
                 {selectedItems?.length && !immediateAdd ? (
-                    <ButtonGroup>
+                    <div className="flex gap-2 ml-1">
                         <Button
                             disabled={isBusy}
-                            className={cx('btn btn-link ms-1', styles.addButton)}
-                            size="sm"
+                            variant="transparent"
                             color="secondary"
                             onClick={() => {
                                 onAddClick(selectedItems);
@@ -54,7 +52,7 @@ const NewRowWidget = ({ newItemsList, isBusy, onAddClick, immediateAdd, selectHi
                         >
                             <Plus />
                         </Button>
-                    </ButtonGroup>
+                    </div>
                 ) : null}
             </div>
         </div>

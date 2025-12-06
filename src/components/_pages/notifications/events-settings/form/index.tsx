@@ -5,7 +5,7 @@ import { actions as settingsActions, selectors as settingsSelectors } from 'duck
 
 import { actions as resourceActions, selectors as resourceSelectors } from 'ducks/resource';
 import { useCallback, useEffect, useMemo } from 'react';
-import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 import Select from 'components/Select';
@@ -91,10 +91,9 @@ export default function EventForm() {
         control,
         formState: { isDirty, isSubmitting },
         setValue,
-        watch,
     } = methods;
 
-    const formValues = watch();
+    const formValues = useWatch({ control });
 
     const onSubmit = useCallback(
         (values: FormValues) => {

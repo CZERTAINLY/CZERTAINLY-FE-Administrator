@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router';
-import styles from './GoBackButton.module.scss';
+import { ArrowLeft } from 'lucide-react';
 
 interface GoBackButtonProps {
     className?: string;
@@ -29,14 +29,8 @@ function GoBackButton({ className = '', disabled = false, text = 'Go Back', onCl
     };
 
     return (
-        <button
-            data-testid="go-back-button"
-            style={style}
-            className={`${className} ${styles.goBackButton}`}
-            disabled={disabled}
-            onClick={handleClick}
-        >
-            <i className={`fa fa-arrow-left me-2 ${styles.icon}`} aria-hidden="true" />
+        <button data-testid="go-back-button" style={style} className={`${className}`} disabled={disabled} onClick={handleClick}>
+            <ArrowLeft size={16} aria-hidden="true" />
             {text}
         </button>
     );

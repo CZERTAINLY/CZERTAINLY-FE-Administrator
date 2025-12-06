@@ -2,7 +2,7 @@ import Spinner from 'components/Spinner';
 import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from 'ducks/utilsActuator';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button } from 'reactstrap';
+import Button from 'components/Button';
 import { transformParseCertificateResponseDtoToAsn1String } from '../../../../ducks/transform/utilsCertificate';
 import { actions as utilsCertificateActions, selectors as utilsCertificateSelectors } from '../../../../ducks/utilsCertificate';
 import {
@@ -65,9 +65,9 @@ export default function Asn1Dialog({ content, isCSR }: Props) {
         <>
             <Spinner active={isFetchingDetail || isFetchingCSRDetails} />
             <Button
-                className="btn btn-link p-0"
+                variant="transparent"
+                className="p-0"
                 disabled={!health || isFetchingDetail || isFetchingCSRDetails}
-                size="sm"
                 color="primary"
                 onClick={() => {
                     if (content && health) {

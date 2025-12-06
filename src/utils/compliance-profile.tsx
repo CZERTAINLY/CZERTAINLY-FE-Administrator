@@ -1,9 +1,10 @@
-import { Button } from 'reactstrap';
+import Button from 'components/Button';
 import Badge from 'components/Badge';
 import { TRuleGroupType } from 'types/complianceProfiles';
 import { ComplianceGroupListDto, ComplianceProfileDtoV2, ComplianceRuleListDto, Resource } from 'types/openapi';
 import { ComplianceRuleAvailabilityStatus } from 'types/openapi/models/ComplianceRuleAvailabilityStatus';
 import { capitalize } from 'utils/common-utils';
+import { Info } from 'lucide-react';
 
 export const getComplianceProfileStatusColor = (status: ComplianceRuleAvailabilityStatus) => {
     switch (status) {
@@ -149,15 +150,14 @@ export const getTypeTableColumn = (
                 {capitalize(ruleOrGroup?.entityDetails?.entityType)}{' '}
             </Badge>
             <Button
-                className="btn btn-link"
-                color="white"
+                variant="transparent"
                 title="Rules"
                 onClick={() => {
                     setSelectedEntityDetails(ruleOrGroup);
                     setIsEntityDetailMenuOpen(true);
                 }}
             >
-                <i className="fa fa-info" style={{ color: 'auto' }} />
+                <Info size={16} style={{ color: 'auto' }} />
             </Button>
         </div>
     );

@@ -2,7 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 
-import { Button, ButtonGroup, Container } from 'reactstrap';
+import Button from 'components/Button';
+import Container from 'components/Container';
 
 import ProgressButton from 'components/ProgressButton';
 import Widget from 'components/Widget';
@@ -91,7 +92,7 @@ function RoleForm() {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <Container>
             <Widget title={`${roleSelector?.name || ''} Role Users `} busy={isFetchingRoleDetail || isFetchingUsers || isUpdatingUsers}>
                 <br />
 
@@ -106,14 +107,14 @@ function RoleForm() {
                     }}
                 />
 
-                <div className="d-flex justify-content-end">
-                    <ButtonGroup>
+                <div className="flex justify-end">
+                    <div className="flex gap-2">
                         <ProgressButton title="Save" inProgressTitle="Saving..." inProgress={isUpdatingUsers} onClick={onSubmit} />
 
                         <Button color="default" onClick={onCancel} disabled={isUpdatingUsers}>
                             Cancel
                         </Button>
-                    </ButtonGroup>
+                    </div>
                 </div>
             </Widget>
         </Container>

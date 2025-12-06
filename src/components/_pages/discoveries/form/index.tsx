@@ -291,7 +291,7 @@ export default function DiscoveryForm({ onSuccess, onCancel }: DiscoveryFormProp
                                                             : fieldState.error?.message || 'Invalid value'
                                                         : undefined
                                                 }
-                                                className="pe-10"
+                                                className="pr-10"
                                             />
                                             <button
                                                 type="button"

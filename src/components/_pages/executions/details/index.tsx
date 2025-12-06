@@ -10,8 +10,11 @@ import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rule
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
-import { Button, ButtonGroup, Col, Container, Input, Row } from 'reactstrap';
+import Button from 'components/Button';
+import Container from 'components/Container';
+import TextInput from 'components/TextInput';
 import { ExecutionType, PlatformEnum, Resource } from 'types/openapi';
+import { Check, X, Pencil } from 'lucide-react';
 
 const ExecutionDetails = () => {
     const { id } = useParams();
@@ -146,10 +149,9 @@ const ExecutionDetails = () => {
                               ),
                               <div>
                                   {updateDescriptionEditEnable ? (
-                                      <ButtonGroup>
+                                      <div className="flex gap-2">
                                           <Button
-                                              className="btn btn-link mx-auto"
-                                              size="sm"
+                                              variant="transparent"
                                               color="secondary"
                                               title="Update Description"
                                               onClick={onUpdateDescriptionConfirmed}
@@ -159,11 +161,11 @@ const ExecutionDetails = () => {
                                                   updatedDescription === ''
                                               }
                                           >
-                                              <i className="fa fa-check" />
+                                              <Check size={16} />
                                           </Button>
                                           <Button
-                                              className="btn btn-link mx-auto danger"
-                                              size="sm"
+                                              variant="transparent"
+                                              color="danger"
                                               title="Cancel"
                                               onClick={() => {
                                                   setUpdateDescription(false);
@@ -171,13 +173,12 @@ const ExecutionDetails = () => {
                                               }}
                                               disabled={isUpdatingDetails}
                                           >
-                                              <i className="fa fa-close text-danger" />
+                                              <X size={16} />
                                           </Button>
-                                      </ButtonGroup>
+                                      </div>
                                   ) : (
                                       <Button
-                                          className="btn btn-link mx-auto"
-                                          size="sm"
+                                          variant="transparent"
                                           color="secondary"
                                           title="Update Description"
                                           onClick={() => {
@@ -185,7 +186,7 @@ const ExecutionDetails = () => {
                                           }}
                                           disabled={isUpdatingDetails}
                                       >
-                                          <i className="fa fa-pencil-square-o" />
+                                          <Pencil size={16} />
                                       </Button>
                                   )}
                               </div>,
@@ -215,7 +216,7 @@ const ExecutionDetails = () => {
                 );
             case ExecutionType.SendNotification:
                 return (
-                    <Col>
+                    <div>
                         <SendNotificationExecutionItems
                             mode="detail"
                             isUpdating={isUpdatingDetails}
@@ -229,7 +230,7 @@ const ExecutionDetails = () => {
                                 onUpdateSendNotificationExecutionItems(newItems.map((el) => el.value))
                             }
                         />
-                    </Col>
+                    </div>
                 );
         }
     }, [executionDetails, isUpdatingDetails, onUpdateSendNotificationExecutionItems]);
@@ -241,8 +242,8 @@ const ExecutionDetails = () => {
                 forcedPath="/actions"
                 text={`${getEnumLabel(resourceEnum, Resource.Actions)} Inventory`}
             />
-            <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                <Col>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
                     <Widget
                         refreshAction={getFreshDetails}
                         busy={isBusy}
@@ -252,9 +253,9 @@ const ExecutionDetails = () => {
                     >
                         <CustomTable data={executionDetailsData} headers={executionTableHeaders} />
                     </Widget>
-                </Col>
-            </Row>
-            <Row>{renderExecutionItems()}</Row>
+                </div>
+            </div>
+            <div>{renderExecutionItems()}</div>
             <Dialog
                 isOpen={confirmDelete}
                 caption={`Delete an Execution`}

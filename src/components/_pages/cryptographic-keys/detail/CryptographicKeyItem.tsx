@@ -481,7 +481,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
     return (
         <div className="key-details">
             <div>
-                <h6 className="d-inline-block">
+                <h6 className="inline-block">
                     <Badge key={keyItem.uuid} color="gray">
                         {keyItem.keyAlgorithm}
                     </Badge>

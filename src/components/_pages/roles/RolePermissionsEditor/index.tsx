@@ -3,15 +3,13 @@ import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
+import Checkbox from 'components/Checkbox';
 
 import { actions as authActions, selectors as authSelectors } from 'ducks/auth';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Input } from 'reactstrap';
 import { AuthResourceModel } from 'types/auth';
 import { ObjectPermissionsResponseModel, ResourcePermissionsResponseModel, SubjectPermissionsModel } from 'types/roles';
-
-import style from './style.module.scss';
 
 interface Props {
     submitButtonsGroup: React.ReactNode;
@@ -209,8 +207,8 @@ function RolePermissionsEditor({
             !currentResource ? (
                 <></>
             ) : (
-                <Widget title="Resource Action Permissions" busy={isBusy} className={style.permissionsWidget}>
-                    <label className={style.allPermissions} htmlFor="allPermissions">
+                <Widget title="Resource Action Permissions" busy={isBusy}>
+                    <label htmlFor="allPermissions">
                         <input
                             id="allPermissions"
                             type="checkbox"
@@ -221,7 +219,7 @@ function RolePermissionsEditor({
                         &nbsp;&nbsp;&nbsp;Allow All Permissions
                     </label>
 
-                    <div className={style.action}>
+                    <div>
                         {currentResource.actions.map((action) => (
                             <label key={action.uuid}>
                                 <input
@@ -274,25 +272,23 @@ function RolePermissionsEditor({
     const getObjectRowActions = useCallback(
         (object: ObjectPermissionsResponseModel): React.ReactNode[] =>
             currentResource?.actions.map((action) => (
-                <label
-                    htmlFor={`${object.uuid}_${action.name}`}
+                <div
+                    key={`${object.uuid}_${action.name}`}
                     onClick={(e) => {
                         e.stopPropagation();
                     }}
                     // Add onKeyDown handler to satisfy typescript:S1082 SQ Quality Check.
                     onKeyDown={() => {}}
                 >
-                    <Input
-                        key={`${object.uuid}_${action.name}`}
+                    <Checkbox
                         id={`${object.uuid}_${action.name}`}
-                        type="switch"
                         checked={object.allow.includes(action.name)}
                         disabled={disabled}
-                        onChange={(e) =>
-                            setOLP(currentResource.uuid, object.uuid, object.name, action.name, e.target.checked ? 'allow' : 'deny')
+                        onChange={(checked) =>
+                            setOLP(currentResource.uuid, object.uuid, object.name, action.name, checked ? 'allow' : 'deny')
                         }
                     />
-                </label>
+                </div>
             )) || [],
         [currentResource, disabled, setOLP],
     );
@@ -490,20 +486,15 @@ function RolePermissionsEditor({
                 />
                 &nbsp;&nbsp;&nbsp;Allow All Actions for All Resources
             </label>
-            <div className={style.container}>
-                <div className={style.resources}>{resourceList}</div>
-                <div className={style.permissions}>
-                    <div className={style.permissionsInner}>
+            <div>
+                <div>{resourceList}</div>
+                <div>
+                    <div>
                         {permissionsList}
                         {!currentResource?.objectAccess ? (
                             <></>
                         ) : (
-                            <Widget
-                                title="Object Action Permissions"
-                                busy={isFetchingObjects}
-                                widgetButtons={buttons}
-                                className={style.permissionsWidget}
-                            >
+                            <Widget title="Object Action Permissions" busy={isFetchingObjects} widgetButtons={buttons}>
                                 <br />
 
                                 <CustomTable
@@ -516,7 +507,7 @@ function RolePermissionsEditor({
                         )}
                     </div>
 
-                    {resources !== undefined && <div className="d-flex justify-content-end">{submitButtonsGroup}</div>}
+                    {resources !== undefined && <div className="flex justify-end">{submitButtonsGroup}</div>}
                 </div>
             </div>
             <Dialog

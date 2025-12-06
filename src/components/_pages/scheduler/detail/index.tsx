@@ -14,16 +14,91 @@ import { LockWidgetNameEnum } from 'types/user-interface';
 import { getStrongFromCronExpression } from 'utils/dateUtil';
 import Cron from 'react-cron-generator';
 import { validateQuartzCronExpression, validateRequired } from 'utils/validators';
-import TextField from 'components/Input/TextField';
-import { Form } from 'react-final-form';
+import { buildValidationRules } from 'utils/validators-helper';
+import TextInput from 'components/TextInput';
+import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
+import { Clock, Info } from 'lucide-react';
 import SchedulerJobHistory from './SchedulerJobHistory';
 import { createWidgetDetailHeaders } from 'utils/widget';
 import Breadcrumb from 'components/Breadcrumb';
 import Container from 'components/Container';
+import Button from 'components/Button';
 
 interface EditFormValues {
     cronExpression: string | undefined;
 }
+
+const CronExpressionForm = ({
+    newCronExpression,
+    originalCronExpression,
+    onSave,
+    onCancel,
+    onOpenCronModal,
+}: {
+    newCronExpression: string;
+    originalCronExpression: string;
+    onSave: (values: EditFormValues) => void;
+    onCancel: () => void;
+    onOpenCronModal: () => void;
+}) => {
+    const methods = useForm<EditFormValues>({
+        mode: 'onTouched',
+        defaultValues: { cronExpression: newCronExpression },
+    });
+
+    const { handleSubmit, formState, reset, control } = methods;
+    const cronExpressionValue = useWatch({ control, name: 'cronExpression' });
+
+    useEffect(() => {
+        reset({ cronExpression: newCronExpression });
+    }, [newCronExpression, reset]);
+
+    return (
+        <FormProvider {...methods}>
+            <form onSubmit={handleSubmit(onSave)}>
+                <Controller
+                    name="cronExpression"
+                    control={control}
+                    rules={buildValidationRules([validateRequired(), validateQuartzCronExpression(cronExpressionValue)])}
+                    render={({ field, fieldState }) => (
+                        <div>
+                            <div className="relative">
+                                <TextInput
+                                    id="cronExpression"
+                                    label="Cron Expression"
+                                    value={field.value}
+                                    onChange={field.onChange}
+                                    onBlur={field.onBlur}
+                                    invalid={!!fieldState.error && fieldState.isTouched}
+                                    error={fieldState.error?.message}
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    onClick={onOpenCronModal}
+                                    className="absolute right-2 top-[38px] p-2 text-gray-500 hover:text-gray-700"
+                                >
+                                    <Clock size={16} />
+                                </button>
+                            </div>
+                            {getStrongFromCronExpression(cronExpressionValue) && (
+                                <p className="mt-1 text-sm text-gray-600">{getStrongFromCronExpression(cronExpressionValue)}</p>
+                            )}
+                        </div>
+                    )}
+                />
+                <div className="flex justify-between mt-3">
+                    <Button type="submit" disabled={formState.isSubmitting || !formState.isValid}>
+                        Save
+                    </Button>
+                    <Button type="button" variant="outline" color="secondary" onClick={onCancel}>
+                        Cancel
+                    </Button>
+                </div>
+            </form>
+        </FormProvider>
+    );
+};
 
 export default function SchedulerJobDetail() {
     const dispatch = useDispatch();
@@ -173,7 +248,11 @@ export default function SchedulerJobDetail() {
                               'Cron Expression',
                               <>
                                   {schedulerJob.cronExpression}&nbsp;
-                                  <i className="fa fa-info-circle" title={getStrongFromCronExpression(schedulerJob.cronExpression)}></i>
+                                  <Info
+                                      size={16}
+                                      className="inline-block"
+                                      title={getStrongFromCronExpression(schedulerJob.cronExpression)}
+                                  />
                               </>,
                           ],
                       },
@@ -218,38 +297,15 @@ export default function SchedulerJobDetail() {
                     isOpen={editCronOpen}
                     caption="Edit CRON Expression"
                     body={
-                        <Form
-                            onSubmit={handleCronSave}
-                            initialValues={{ cronExpression: newCronExpression }}
-                            render={({ handleSubmit, values }) => (
-                                <form onSubmit={handleSubmit}>
-                                    <TextField
-                                        id="cronExpression"
-                                        label="Cron Expression"
-                                        validators={[validateRequired(), validateQuartzCronExpression(values.cronExpression)]}
-                                        description={getStrongFromCronExpression(values.cronExpression)}
-                                        inputGroupIcon={{
-                                            icon: 'fa fa-stopwatch',
-                                            onClick: () => setCronModalOpen(true),
-                                        }}
-                                    />
-                                    <div className="d-flex justify-content-between mt-3">
-                                        <button type="submit" className="btn btn-primary">
-                                            Save
-                                        </button>
-                                        <button
-                                            type="button"
-                                            className="btn btn-secondary"
-                                            onClick={() => {
-                                                setNewCronExpression(originalCronExpression);
-                                                setEditCronOpen(false);
-                                            }}
-                                        >
-                                            Cancel
-                                        </button>
-                                    </div>
-                                </form>
-                            )}
+                        <CronExpressionForm
+                            newCronExpression={newCronExpression}
+                            originalCronExpression={originalCronExpression}
+                            onSave={handleCronSave}
+                            onCancel={() => {
+                                setNewCronExpression(originalCronExpression);
+                                setEditCronOpen(false);
+                            }}
+                            onOpenCronModal={() => setCronModalOpen(true)}
                         />
                     }
                     toggle={() => setEditCronOpen(false)}

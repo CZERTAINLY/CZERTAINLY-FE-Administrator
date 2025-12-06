@@ -9,9 +9,10 @@ interface Props {
     children: React.ReactNode;
     style?: React.CSSProperties;
     className?: string;
+    title?: string;
 }
 
-function Switch({ color = 'secondary', onClick, onRemove, children, style, className }: Props) {
+function Switch({ color = 'secondary', onClick, onRemove, children, style, className, title }: Props) {
     const colorClasses = {
         gray: 'bg-gray-800 text-white dark:bg-white dark:text-neutral-800',
         secondary: 'bg-gray-500 text-white',
@@ -34,6 +35,7 @@ function Switch({ color = 'secondary', onClick, onRemove, children, style, class
                 className,
             )}
             style={style}
+            title={title}
         >
             {children}
             {onRemove && (

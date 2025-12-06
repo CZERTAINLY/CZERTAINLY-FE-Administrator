@@ -8,7 +8,8 @@ import { selectors as complianceProfilesSelectors, actions as complianceProfiles
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { ComplianceRuleStatus, ComplianceStatus, Resource } from 'types/openapi';
 import { useCallback, useEffect, useMemo } from 'react';
-import { Button } from 'reactstrap';
+import Button from 'components/Button';
+import { Info } from 'lucide-react';
 import { AttributeResponseModel } from 'types/attributes';
 
 type Props = {
@@ -62,14 +63,13 @@ export default function ComplianceCheckResultWidget({ widgetLockName, objectUuid
                 rule.kind || '',
                 rule.attributes?.length ? (
                     <Button
-                        className="btn btn-link"
-                        color="white"
+                        variant="transparent"
                         title="Attributes"
                         onClick={() => {
                             setSelectedAttributesInfo((rule.attributes || []) as AttributeResponseModel[]);
                         }}
                     >
-                        <i className="fa fa-info" style={{ color: 'auto' }} />
+                        <Info size={16} style={{ color: 'auto' }} />
                     </Button>
                 ) : (
                     ''

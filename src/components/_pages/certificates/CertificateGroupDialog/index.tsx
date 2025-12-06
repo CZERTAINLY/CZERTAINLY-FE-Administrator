@@ -7,7 +7,6 @@ import { actions } from 'ducks/certificates';
 import Select from 'components/Select';
 
 import Spinner from 'components/Spinner';
-import { FormGroup } from 'reactstrap';
 import Button from 'components/Button';
 import Container from 'components/Container';
 
@@ -52,7 +51,7 @@ export default function CertificateGroupDialog({ uuids, onCancel, onUpdate }: Pr
 
     return (
         <>
-            <FormGroup>
+            <div className="mb-4">
                 <Select
                     id="group"
                     options={groupOptions}
@@ -63,7 +62,7 @@ export default function CertificateGroupDialog({ uuids, onCancel, onUpdate }: Pr
                         setSelectedGroups(values || []);
                     }}
                 />
-            </FormGroup>
+            </div>
 
             <Container className="flex-row justify-end modal-footer" gap={4}>
                 <Button color="danger" onClick={removeGroup} title="Remove groups from selected certificates">

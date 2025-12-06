@@ -7,7 +7,9 @@ import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { EntityType, actions as filterActions, selectors } from 'ducks/filters';
 import { useDispatch, useSelector } from 'react-redux';
 import Select from 'components/Select';
-import { Button, Col, FormGroup, Input, Label, Row } from 'reactstrap';
+import Button from 'components/Button';
+import Label from 'components/Label';
+import TextInput from 'components/TextInput';
 import Badge from 'components/Badge';
 import { Observable } from 'rxjs';
 import { SearchFieldListModel } from 'types/certificate';
@@ -21,7 +23,6 @@ import {
     getFormattedDateTime,
     getFormattedUtc,
 } from 'utils/dateUtil';
-import styles from './FilterWidgetRuleAction.module.scss';
 
 interface CurrentActionOptions {
     label: string;
@@ -547,11 +548,7 @@ export default function FilterWidgetRuleAction({
                     <b>{fieldSource && getEnumLabel(searchGroupEnum, fieldSource)}&nbsp;</b>'{label}
                     '&nbsp;to&nbsp;
                     {value}
-                    {!disableBadgeRemove && (
-                        <span className={styles.filterBadgeSpan} onClick={() => onRemoveFilterClick(itemNumber)}>
-                            &times;
-                        </span>
-                    )}
+                    {!disableBadgeRemove && <span onClick={() => onRemoveFilterClick(itemNumber)}>&times;</span>}
                 </React.Fragment>
             );
         },
@@ -565,103 +562,85 @@ export default function FilterWidgetRuleAction({
             <Widget title={title} busy={isFetchingAvailableFilters} titleSize="larger">
                 <div id="unselectFilters" onClick={onUnselectFiltersClick}>
                     <div style={{ width: '99%', borderBottom: 'solid 1px silver', marginBottom: '1rem' }}>
-                        <Row>
-                            <Col>
-                                <FormGroup>
-                                    <Label for="groupSelect">Field Source</Label>
-                                    <Select
-                                        id="group"
-                                        options={availableFilters.map((f) => ({
-                                            label: getEnumLabel(searchGroupEnum, f.filterFieldSource),
-                                            value: f.filterFieldSource,
-                                        }))}
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div>
+                                <Label htmlFor="groupSelect">Field Source</Label>
+                                <Select
+                                    id="group"
+                                    options={availableFilters.map((f) => ({
+                                        label: getEnumLabel(searchGroupEnum, f.filterFieldSource),
+                                        value: f.filterFieldSource,
+                                    }))}
+                                    onChange={(value) => {
+                                        setFieldSource((value as FilterFieldSource) || undefined);
+                                        setFilterField(undefined);
+                                        setFilterValue(undefined);
+                                    }}
+                                    value={fieldSource || ''}
+                                    isClearable={true}
+                                />
+                            </div>
+
+                            <div>
+                                <Label htmlFor="fieldSelect">Field</Label>
+                                <Select
+                                    id="field"
+                                    options={currentFields?.map((f) => ({ label: f.fieldLabel, value: f.fieldIdentifier }))}
+                                    onChange={(value) => {
+                                        setFilterField((value as string) || undefined);
+                                        setFilterValue(undefined);
+                                    }}
+                                    value={filterField || ''}
+                                    isDisabled={!fieldSource}
+                                    isClearable={true}
+                                />
+                            </div>
+
+                            <div>
+                                <Label htmlFor="valueSelect">Value</Label>
+                                {currentField?.type === undefined ||
+                                currentField?.type === FilterFieldType.String ||
+                                currentField?.type === FilterFieldType.Date ||
+                                currentField?.type === FilterFieldType.Number ? (
+                                    <TextInput
+                                        id="valueSelect"
+                                        type={
+                                            currentField?.attributeContentType && checkIfFieldAttributeTypeIsDate(currentField)
+                                                ? getFormTypeFromAttributeContentType(currentField?.attributeContentType)
+                                                : currentField?.type
+                                                  ? getFormTypeFromFilterFieldType(currentField?.type)
+                                                  : 'text'
+                                        }
+                                        value={filterValue?.toString() || ''}
                                         onChange={(value) => {
-                                            setFieldSource((value as FilterFieldSource) || undefined);
-                                            setFilterField(undefined);
-                                            setFilterValue(undefined);
+                                            setFilterValue(JSON.parse(JSON.stringify(value)));
                                         }}
-                                        value={fieldSource || ''}
-                                        isClearable={true}
+                                        placeholder="Enter filter value"
+                                        disabled={!filterField}
                                     />
-                                </FormGroup>
-                            </Col>
-
-                            <Col>
-                                <FormGroup>
-                                    <Label for="fieldSelect">Field</Label>
+                                ) : currentField?.type === FilterFieldType.Boolean ? (
                                     <Select
-                                        id="field"
-                                        options={currentFields?.map((f) => ({ label: f.fieldLabel, value: f.fieldIdentifier }))}
+                                        id="value"
+                                        options={
+                                            filterField ? booleanOptions.map((opt) => ({ label: opt.label, value: String(opt.value) })) : []
+                                        }
+                                        value={filterValue ? String(filterValue) : ''}
                                         onChange={(value) => {
-                                            setFilterField((value as string) || undefined);
-                                            setFilterValue(undefined);
+                                            setFilterValue(value === 'true' ? true : value === 'false' ? false : undefined);
                                         }}
-                                        value={filterField || ''}
-                                        isDisabled={!fieldSource}
-                                        isClearable={true}
+                                        isDisabled={!filterField}
                                     />
-                                </FormGroup>
-                            </Col>
+                                ) : (
+                                    renderObjectValueSelector
+                                )}
+                            </div>
 
-                            <Col>
-                                <FormGroup>
-                                    <Label for="valueSelect">Value</Label>
-                                    {currentField?.type === undefined ||
-                                    currentField?.type === FilterFieldType.String ||
-                                    currentField?.type === FilterFieldType.Date ||
-                                    currentField?.type === FilterFieldType.Number ? (
-                                        <Input
-                                            id="valueSelect"
-                                            type={
-                                                currentField?.attributeContentType && checkIfFieldAttributeTypeIsDate(currentField)
-                                                    ? getFormTypeFromAttributeContentType(currentField?.attributeContentType)
-                                                    : currentField?.type
-                                                      ? getFormTypeFromFilterFieldType(currentField?.type)
-                                                      : 'text'
-                                            }
-                                            step={
-                                                currentField?.attributeContentType
-                                                    ? getStepValue(currentField?.attributeContentType)
-                                                    : undefined
-                                            }
-                                            value={filterValue?.toString() || ''}
-                                            onChange={(e) => {
-                                                setFilterValue(JSON.parse(JSON.stringify(e.target.value)));
-                                            }}
-                                            placeholder="Enter filter value"
-                                            disabled={!filterField}
-                                        />
-                                    ) : currentField?.type === FilterFieldType.Boolean ? (
-                                        <Select
-                                            id="value"
-                                            options={
-                                                filterField
-                                                    ? booleanOptions.map((opt) => ({ label: opt.label, value: String(opt.value) }))
-                                                    : []
-                                            }
-                                            value={filterValue ? String(filterValue) : ''}
-                                            onChange={(value) => {
-                                                setFilterValue(value === 'true' ? true : value === 'false' ? false : undefined);
-                                            }}
-                                            isDisabled={!filterField}
-                                        />
-                                    ) : (
-                                        renderObjectValueSelector
-                                    )}
-                                </FormGroup>
-                            </Col>
-
-                            <Col md="auto">
-                                <Button
-                                    style={{ width: '7em', marginTop: '2em' }}
-                                    color="primary"
-                                    onClick={onUpdateClick}
-                                    disabled={isUpdateButtonDisabled}
-                                >
+                            <div className="flex items-end">
+                                <Button className="w-full" color="primary" onClick={onUpdateClick} disabled={isUpdateButtonDisabled}>
                                     {selectedFilter.filterNumber === -1 ? 'Add' : 'Update'}
                                 </Button>
-                            </Col>
-                        </Row>
+                            </div>
+                        </div>
                     </div>
 
                     {actions.map((f, i) => {
@@ -704,7 +683,6 @@ export default function FilterWidgetRuleAction({
                                     : '';
                         return (
                             <Badge
-                                className={styles.filterBadge}
                                 key={i}
                                 onClick={() => toggleFilter(i)}
                                 color={selectedFilter.filterNumber === i ? 'primary' : 'secondary'}

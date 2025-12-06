@@ -14,11 +14,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 import { Edge } from 'reactflow';
-import { Button, ButtonGroup, Col, Container, Input, Row } from 'reactstrap';
+import Button from 'components/Button';
+import Container from 'components/Container';
+import TextInput from 'components/TextInput';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { DeviceType, useDeviceType } from 'utils/common-hooks';
-import styles from './triggerDetails.module.scss';
 import GoBackButton from 'components/GoBackButton';
+import { Check, X, Pencil, Trash2, Rocket, Zap, Book } from 'lucide-react';
 
 interface SelectChangeValue {
     value: string;
@@ -334,9 +336,9 @@ const TriggerDetails = () => {
                           columns: [
                               'Description',
                               updateDescriptionEditEnable ? (
-                                  <Input
+                                  <TextInput
                                       value={updatedDescription}
-                                      onChange={(e) => setUpdatedDescription(e.target.value)}
+                                      onChange={(value) => setUpdatedDescription(value)}
                                       placeholder="Enter Description"
                                   />
                               ) : (
@@ -344,10 +346,9 @@ const TriggerDetails = () => {
                               ),
                               <div>
                                   {updateDescriptionEditEnable ? (
-                                      <ButtonGroup>
+                                      <div className="flex gap-2">
                                           <Button
-                                              className="btn btn-link mx-auto"
-                                              size="sm"
+                                              variant="transparent"
                                               color="secondary"
                                               title="Update Description"
                                               onClick={onUpdateDescriptionConfirmed}
@@ -357,11 +358,11 @@ const TriggerDetails = () => {
                                                   updatedDescription === ''
                                               }
                                           >
-                                              <i className="fa fa-check" />
+                                              <Check size={16} />
                                           </Button>
                                           <Button
-                                              className="btn btn-link mx-auto danger"
-                                              size="sm"
+                                              variant="transparent"
+                                              color="danger"
                                               title="Cancel"
                                               disabled={isUpdatingTrigger}
                                               onClick={() => {
@@ -369,20 +370,19 @@ const TriggerDetails = () => {
                                                   setUpdatedDescription(triggerDetails?.description || '');
                                               }}
                                           >
-                                              <i className="fa fa-close text-danger" />
+                                              <X size={16} />
                                           </Button>
-                                      </ButtonGroup>
+                                      </div>
                                   ) : (
                                       <Button
-                                          className="btn btn-link mx-auto"
-                                          size="sm"
+                                          variant="transparent"
                                           color="secondary"
                                           title="Update Description"
                                           onClick={() => {
                                               setUpdateDescription(true);
                                           }}
                                       >
-                                          <i className="fa fa-pencil-square-o" />
+                                          <Pencil size={16} />
                                       </Button>
                                   )}
                               </div>,
@@ -434,8 +434,7 @@ const TriggerDetails = () => {
                           <Link to={`../../actions/detail/${action.uuid}`}>{action.name}</Link>,
                           action.description || '',
                           <Button
-                              className="btn btn-link text-danger"
-                              size="sm"
+                              variant="transparent"
                               color="danger"
                               title={
                                   isDeleteDisabled
@@ -447,7 +446,7 @@ const TriggerDetails = () => {
                               }}
                               disabled={isDeleteDisabled}
                           >
-                              <i className="fa fa-trash" />
+                              <Trash2 size={16} />
                           </Button>,
                       ],
                   };
@@ -485,8 +484,7 @@ const TriggerDetails = () => {
                               <Link to={`../../rules/detail/${rule.uuid}`}>{rule.name}</Link>,
                               rule.description || '',
                               <Button
-                                  className="btn btn-link text-danger"
-                                  size="sm"
+                                  variant="transparent"
                                   color="danger"
                                   title="Delete Rule"
                                   onClick={() => {
@@ -494,7 +492,7 @@ const TriggerDetails = () => {
                                   }}
                                   disabled={isUpdatingTrigger}
                               >
-                                  <i className="fa fa-trash" />
+                                  <Trash2 size={16} />
                               </Button>,
                           ],
                       };
@@ -515,8 +513,8 @@ const TriggerDetails = () => {
                         title: 'Trigger Details',
                         content: (
                             <Widget>
-                                <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                                    <Col>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
                                         <Widget
                                             refreshAction={getFreshDetails}
                                             busy={isBusy}
@@ -526,8 +524,8 @@ const TriggerDetails = () => {
                                         >
                                             <CustomTable data={triggerDetailsData} headers={triggerDetailHeader} />
                                         </Widget>
-                                    </Col>
-                                    <Col>
+                                    </div>
+                                    <div>
                                         <Widget
                                             busy={isBusy}
                                             title="Actions"
@@ -536,7 +534,6 @@ const TriggerDetails = () => {
                                                 title: 'Information',
                                                 description: 'Actions is named set of actions for selected trigger',
                                             }}
-                                            className={cx({ [styles.highLightWidget]: highlight === true })}
                                         >
                                             <CustomTable
                                                 data={actionsData}
@@ -548,10 +545,10 @@ const TriggerDetails = () => {
                                                 }}
                                             />
                                         </Widget>
-                                    </Col>
-                                </Row>
-                                <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                                    <Col>
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                    <div>
                                         <Widget busy={isBusy} title="Rules" titleSize="large">
                                             <CustomTable
                                                 data={rulesData}
@@ -563,8 +560,8 @@ const TriggerDetails = () => {
                                                 }}
                                             />
                                         </Widget>
-                                    </Col>
-                                </Row>
+                                    </div>
+                                </div>
                             </Widget>
                         ),
                     },

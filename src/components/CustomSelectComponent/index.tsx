@@ -1,7 +1,6 @@
-import cx from 'classnames';
 import { MenuProps, components } from 'react-select';
-import { Button } from 'reactstrap';
-import style from './CustomSelectComponent.module.scss';
+import Button from 'components/Button';
+import { Plus } from 'lucide-react';
 
 interface CustomSelectComponentProps extends MenuProps {
     onAddNew: () => void;
@@ -11,9 +10,9 @@ const CustomSelectComponent: React.FC<CustomSelectComponentProps> = ({ onAddNew,
     return (
         <components.Menu {...props}>
             {props.children}
-            <div className="d-flex justify-content-start ps-2 py-2">
-                <Button color="white" className={style.customSelectAddButton} onClick={onAddNew}>
-                    <i className={cx('fa fa-add', style.customSelectAddIcon)} />
+            <div className="flex justify-start pl-2 py-2">
+                <Button variant="transparent" onClick={onAddNew}>
+                    <Plus size={16} />
                 </Button>
             </div>
         </components.Menu>

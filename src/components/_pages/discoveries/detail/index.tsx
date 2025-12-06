@@ -12,7 +12,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 
-import { Col, Label, Row } from 'reactstrap';
+import Label from 'components/Label';
 
 import CustomAttributeWidget from 'components/Attributes/CustomAttributeWidget';
 import TabLayout from 'components/Layout/TabLayout';

@@ -10,12 +10,14 @@ import Container from 'components/Container';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router';
-import { Button, Input } from 'reactstrap';
+import Button from 'components/Button';
+import TextArea from 'components/TextArea';
 import { ApproverType, ProfileApprovalStepModel } from 'types/approval-profiles';
 import { DetailApprovalStepModel } from 'types/approvals';
 import { ApprovalDetailDtoStatusEnum, PlatformEnum, Resource } from 'types/openapi';
 import { dateFormatter } from 'utils/dateUtil';
 import { createWidgetDetailHeaders } from 'utils/widget';
+import { ArrowRightCircle } from 'lucide-react';
 
 export default function ApprovalDetails() {
     const dispatch = useDispatch();
@@ -139,14 +141,13 @@ export default function ApprovalDetails() {
                               <>
                                   <StatusBadge textStatus={approvalDetails.status} />
                                   <Button
-                                      color="white"
-                                      size="sm"
-                                      className="p-0 ms-1"
+                                      variant="transparent"
+                                      className="p-0 ml-1"
                                       onClick={() => {
                                           navigate(`../../${approvalDetails.resource}/detail/${approvalDetails.objectUuid}`);
                                       }}
                                   >
-                                      <i className="fa fa-circle-arrow-right"></i>
+                                      <ArrowRightCircle size={16} />
                                   </Button>
                               </>,
                           ],
@@ -304,7 +305,7 @@ export default function ApprovalDetails() {
                     body={
                         <div>
                             <span>Comment (optional) :</span>
-                            <Input type="textarea" value={comment} onChange={(e) => setcomment(e.currentTarget.value)} />
+                            <TextArea value={comment} onChange={(value) => setcomment(value)} />
                         </div>
                     }
                     caption="Accept approval?"
@@ -322,7 +323,7 @@ export default function ApprovalDetails() {
                     body={
                         <div>
                             <span>Comment (optional) :</span>
-                            <Input type="textarea" value={comment} onChange={(e) => setcomment(e.currentTarget.value)} />
+                            <TextArea value={comment} onChange={(value) => setcomment(value)} />
                         </div>
                     }
                     buttons={[

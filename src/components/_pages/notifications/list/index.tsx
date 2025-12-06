@@ -9,10 +9,12 @@ import { TableDataRow, TableHeader } from 'components/CustomTable';
 import PagedList from 'components/PagedList/PagedList';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { useNavigate } from 'react-router';
-import { Button, Container } from 'reactstrap';
+import Button from 'components/Button';
+import Container from 'components/Container';
 import { SearchRequestModel } from 'types/certificate';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { dateFormatter } from 'utils/dateUtil';
+import { ArrowRightCircle } from 'lucide-react';
 
 function NotificationsList() {
     const dispatch = useDispatch();
@@ -66,7 +68,7 @@ function NotificationsList() {
                     dateFormatter(notification.sentAt),
                     <div
                         key={notification.uuid}
-                        className={notification.readAt ? '' : 'fw-bolder'}
+                        className={notification.readAt ? '' : 'font-extrabold'}
                         onClick={(event) => {
                             event.stopPropagation();
                             if (!notification.readAt) {
@@ -77,8 +79,7 @@ function NotificationsList() {
                         {notification.message}
                         {notification.targetObjectType && notification.targetObjectIdentification && (
                             <Button
-                                color="white"
-                                size="sm"
+                                variant="transparent"
                                 className={'px-1 m-0'}
                                 onClick={() => {
                                     navigate(
@@ -88,7 +89,7 @@ function NotificationsList() {
                                     );
                                 }}
                             >
-                                <i className="fa fa-circle-arrow-right"></i>
+                                <ArrowRightCircle size={16} />
                             </Button>
                         )}
                     </div>,

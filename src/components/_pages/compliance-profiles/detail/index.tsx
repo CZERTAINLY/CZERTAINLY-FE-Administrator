@@ -19,6 +19,7 @@ import { capitalize } from 'utils/common-utils';
 import TabLayout from 'components/Layout/TabLayout';
 import AttributeViewer from 'components/Attributes/AttributeViewer';
 import { AttributeResponseModel } from 'types/attributes';
+import { Info } from 'lucide-react';
 import AssignedRulesAndGroup from 'components/_pages/compliance-profiles/detail/AssignedRulesAndGroup/AssignedRulesAndGroup';
 import AvailableRulesAndGroups from 'components/_pages/compliance-profiles/detail/AvailableRulesAndGroups/AvailableRulesAndGroups';
 import { getComplianceProfileStatusColor } from 'utils/compliance-profile';
@@ -248,8 +249,7 @@ export default function ComplianceProfileDetail() {
                         'Attributes',
                         rule.attributes?.length ? (
                             <Button
-                                className="btn btn-link"
-                                color="white"
+                                variant="transparent"
                                 title="Rules"
                                 onClick={() => {
                                     setGroupRuleAttributeData({
@@ -258,7 +258,7 @@ export default function ComplianceProfileDetail() {
                                     });
                                 }}
                             >
-                                <i className="fa fa-info" style={{ color: 'auto' }} />
+                                <Info size={16} style={{ color: 'auto' }} />
                             </Button>
                         ) : (
                             'No attributes'
@@ -444,8 +444,8 @@ export default function ComplianceProfileDetail() {
                 toggle={() => setComplianceCheck(false)}
                 noBorder
                 buttons={[
+                    { color: 'primary', variant: 'outline', onClick: () => setComplianceCheck(false), body: 'Cancel' },
                     { color: 'primary', onClick: onComplianceCheck, body: 'Yes' },
-                    { color: 'secondary', variant: 'outline', onClick: () => setComplianceCheck(false), body: 'Cancel' },
                 ]}
                 dataTestId="compliance-check-dialog"
             />

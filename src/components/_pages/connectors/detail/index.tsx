@@ -23,7 +23,6 @@ import { ConnectorStatus, HealthStatus, PlatformEnum, Resource } from '../../../
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 
 import { LockWidgetNameEnum } from 'types/user-interface';
-import styles from './connectorDetails.module.scss';
 import Breadcrumb from 'components/Breadcrumb';
 import Container from 'components/Container';
 import { CircleCheck, CircleAlert, CircleHelp } from 'lucide-react';
@@ -262,7 +261,7 @@ export default function ConnectorDetail() {
                     functionGroup.name,
                     <>
                         {functionGroup.kinds?.map((kind) => (
-                            <div key={kind} className={styles.kind}>
+                            <div key={kind}>
                                 <Badge color="secondary">{kind}</Badge>
                             </div>
                         ))}

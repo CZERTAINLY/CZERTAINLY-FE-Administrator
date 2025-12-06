@@ -9,7 +9,7 @@ import { actions, selectors } from 'ducks/authorities';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
-import { Label } from 'reactstrap';
+import Label from 'components/Label';
 import AuthorityForm from '../form';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { PlatformEnum, Resource } from '../../../../types/openapi';

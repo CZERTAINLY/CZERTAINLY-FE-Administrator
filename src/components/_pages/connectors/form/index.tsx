@@ -492,7 +492,7 @@ export default function ConnectorForm({ connectorId, onCancel, onSuccess }: Conn
                                             title={attributeFieldNameTransform[functionGroup?.name || ''] || functionGroup?.name}
                                             titleSize="large"
                                             widgetExtraTopNode={
-                                                <div className="flex flex-wrap gap-2 ms-auto">
+                                                <div className="flex flex-wrap gap-2 ml-auto">
                                                     {functionGroup.kinds.map((kinds, index) => (
                                                         <Badge key={index} color="secondary">
                                                             {kinds}

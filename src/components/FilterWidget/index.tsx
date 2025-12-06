@@ -8,7 +8,6 @@ import { EntityType, actions, selectors } from 'ducks/filters';
 import { useDispatch, useSelector } from 'react-redux';
 import Select, { SingleValue, MultiValue } from 'components/Select';
 import TextInput from 'components/TextInput';
-import { FormText, Input } from 'reactstrap';
 import { Observable } from 'rxjs';
 import { SearchFieldListModel, SearchFilterModel } from 'types/certificate';
 import {
@@ -452,16 +451,16 @@ export default function FilterWidget({
         function renderDurationInput() {
             return (
                 <>
-                    <Input
+                    <TextInput
                         id="valueSelect"
                         type="text"
                         value={filterValue?.toString() ?? ''}
-                        onChange={(e) => {
-                            setFilterValue(JSON.parse(JSON.stringify(e.target.value)));
+                        onChange={(value) => {
+                            setFilterValue(JSON.parse(JSON.stringify(value)));
                         }}
                         placeholder="eg. 2d 30m"
                     />
-                    <FormText>Duration in format: 0d 0h 0m 0s</FormText>
+                    <p className="mt-1 text-sm text-gray-600">Duration in format: 0d 0h 0m 0s</p>
                 </>
             );
         }
@@ -500,11 +499,7 @@ export default function FilterWidget({
                         disabled={!filterField || !filterCondition || noValue[filterCondition.value]}
                         invalid={isRegex && !!regexError}
                     />
-                    {isRegex && regexError && (
-                        <FormText color="danger" style={{ fontSize: '0.875rem', marginTop: '0.25rem' }}>
-                            {regexError}
-                        </FormText>
-                    )}
+                    {isRegex && regexError && <p className="mt-1 text-sm text-red-600">{regexError}</p>}
                 </>
             );
         }
@@ -541,22 +536,14 @@ export default function FilterWidget({
             const displayValue = isNaN(numericValue) ? '' : numericValue;
 
             return (
-                <Input
+                <TextInput
                     id="valueSelect"
                     type="number"
-                    step="1"
-                    value={displayValue}
-                    onChange={(e) => {
-                        const value = e.target.value;
+                    value={displayValue.toString()}
+                    onChange={(value) => {
                         // Only allow integer values
                         if (value === '' || /^\d+$/.test(value)) {
                             setFilterValue(value === '' ? undefined : Number(value));
-                        }
-                    }}
-                    onKeyDown={(e) => {
-                        // Prevent decimal point, minus, and other non-integer characters
-                        if (['.', '-', 'e', 'E'].includes(e.key)) {
-                            e.preventDefault();
                         }
                     }}
                     placeholder="Enter filter value"

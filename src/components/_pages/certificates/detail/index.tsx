@@ -48,6 +48,7 @@ import Asn1Dialog from '../Asn1Dialog/Asn1Dialog';
 
 import FlowChart, { CustomNode } from 'components/FlowChart';
 import { transformCertificateObjectToNodesAndEdges } from 'ducks/transform/certificates';
+import { Info } from 'lucide-react';
 import { Edge } from 'reactflow';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { DeviceType, useCopyToClipboard, useDeviceType } from 'utils/common-hooks';
@@ -528,8 +529,12 @@ export default function CertificateDetail() {
                               <div style={{ wordBreak: 'break-all' }}>{history.message}</div>,
 
                               history.additionalInformation ? (
-                                  <Button color="white" onClick={() => setCurrentInfoId(history.uuid)} title="Show Additional Information">
-                                      <i className="fa fa-info-circle" aria-hidden="true"></i>
+                                  <Button
+                                      variant="transparent"
+                                      onClick={() => setCurrentInfoId(history.uuid)}
+                                      title="Show Additional Information"
+                                  >
+                                      <Info size={16} aria-hidden="true" />
                                   </Button>
                               ) : (
                                   ''
@@ -634,7 +639,7 @@ export default function CertificateDetail() {
             id: 'validationStatus',
             columns: [
                 <div key="validationStatus">
-                    <span className="fw-bold">Validation Result</span>{' '}
+                    <span className="font-bold">Validation Result</span>{' '}
                     {validationResult?.validationTimestamp ? `(${dateFormatter(validationResult?.validationTimestamp)})` : ''}
                 </div>,
                 validationResult?.resultStatus ? <CertificateStatus status={validationResult?.resultStatus}></CertificateStatus> : <></>,

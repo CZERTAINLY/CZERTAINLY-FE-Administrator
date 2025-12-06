@@ -36,7 +36,8 @@ import {
 } from 'types/openapi';
 import { CertificateState as CertStatus, CertificateProtocol, CertificateValidationStatus } from 'types/openapi';
 import CertificateDownloadForm from './CertificateDownloadForm';
-import { Button } from 'reactstrap';
+import Button from 'components/Button';
+import { Pencil, Trash2 } from 'lucide-react';
 
 interface SelectChangeValue {
     value: string;
@@ -653,11 +654,10 @@ export default function CertificateDetailsContent({ certificate, validationResul
                           ) : (
                               (certificate.owner ?? 'Unassigned')
                           ),
-                          <div className="d-flex">
+                          <div className="flex">
                               <Button
                                   disabled={isCertificateArchived}
-                                  className="btn btn-link"
-                                  size="sm"
+                                  variant="transparent"
                                   color="secondary"
                                   onClick={() => {
                                       setOwnerUuid(undefined);
@@ -665,13 +665,12 @@ export default function CertificateDetailsContent({ certificate, validationResul
                                   }}
                                   title="Update Owner"
                               >
-                                  <i className="fa fa-pencil-square-o" />
+                                  <Pencil size={16} />
                               </Button>
 
                               <Button
-                                  className="btn btn-link"
-                                  size="sm"
-                                  color="secondary"
+                                  variant="transparent"
+                                  color="danger"
                                   disabled={!certificate?.ownerUuid || isCertificateArchived}
                                   onClick={() => {
                                       if (!certificate?.ownerUuid || !certificate?.uuid) return;
@@ -682,7 +681,7 @@ export default function CertificateDetailsContent({ certificate, validationResul
                                       );
                                   }}
                               >
-                                  <i className="fa fa-trash text-danger" />
+                                  <Trash2 size={16} />
                               </Button>
                           </div>,
                       ],
@@ -699,21 +698,19 @@ export default function CertificateDetailsContent({ certificate, validationResul
                                     </React.Fragment>
                                 ))
                               : 'Unassigned',
-                          <div className="d-flex">
+                          <div className="flex">
                               <Button
                                   disabled={isCertificateArchived}
-                                  className="btn btn-link"
-                                  size="sm"
+                                  variant="transparent"
                                   color="secondary"
                                   onClick={() => setUpdateGroup(true)}
                                   title="Update Group"
                               >
-                                  <i className="fa fa-pencil-square-o" />
+                                  <Pencil size={16} />
                               </Button>
                               <Button
-                                  className="btn btn-link"
-                                  size="sm"
-                                  color="secondary"
+                                  variant="transparent"
+                                  color="danger"
                                   disabled={!certificate?.groups?.length || isCertificateArchived}
                                   onClick={() => {
                                       if (!certificate?.uuid) return;
@@ -724,7 +721,7 @@ export default function CertificateDetailsContent({ certificate, validationResul
                                       );
                                   }}
                               >
-                                  <i className="fa fa-trash text-danger" />
+                                  <Trash2 size={16} />
                               </Button>
                           </div>,
                       ],
@@ -742,21 +739,19 @@ export default function CertificateDetailsContent({ certificate, validationResul
                           ) : (
                               'Unassigned'
                           ),
-                          <div className="d-flex">
+                          <div className="flex">
                               <Button
                                   disabled={isCertificateArchived}
-                                  className="btn btn-link"
-                                  size="sm"
+                                  variant="transparent"
                                   color="secondary"
                                   onClick={() => setUpdateRaProfile(true)}
                                   title="Update RA Profile"
                               >
-                                  <i className="fa fa-pencil-square-o" />
+                                  <Pencil size={16} />
                               </Button>
                               <Button
-                                  className="btn btn-link"
-                                  size="sm"
-                                  color="secondary"
+                                  variant="transparent"
+                                  color="danger"
                                   disabled={!certificate?.raProfile?.uuid || isCertificateArchived}
                                   onClick={() => {
                                       if (!certificate?.raProfile?.authorityInstanceUuid || !certificate?.uuid) return;
@@ -767,7 +762,7 @@ export default function CertificateDetailsContent({ certificate, validationResul
                                       );
                                   }}
                               >
-                                  <i className="fa fa-trash text-danger" />
+                                  <Trash2 size={16} />
                               </Button>
                           </div>,
                       ],

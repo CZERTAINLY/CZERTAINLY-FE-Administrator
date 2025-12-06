@@ -15,7 +15,7 @@ import TokenProfileForm from '../form';
 import Select from 'components/Select';
 
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import { Label } from 'reactstrap';
+import Label from 'components/Label';
 import Badge from 'components/Badge';
 import { KeyUsage, PlatformEnum, Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';

@@ -5,10 +5,11 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 import { Handle, Position } from 'reactflow';
-import { Button, Collapse } from 'reactstrap';
+import Button from 'components/Button';
 import { EntityNodeProps } from 'types/flowchart';
 import { CertificateValidationStatus } from 'types/openapi';
 import { useCopyToClipboard } from 'utils/common-hooks';
+import { Plus, Minus, Trash2, Copy, ChevronDown, ChevronUp } from 'lucide-react';
 import style from './customFlowNode.module.scss';
 
 export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, id }: EntityNodeProps) {
@@ -155,7 +156,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
     return (
         <>
             <Handle hidden={data.handleHide === 'target'} className={cx(style.handleUp)} type="target" position={Position.Top} />
-            <div className="d-flex align-items-start">
+            <div className="flex items-start">
                 <div
                     // style={{ width: '500px' }}
                     className={cx(
@@ -175,7 +176,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                 >
                     {selected && (
                         <div className={style.expandButtonContainer}>
-                            <div className="d-flex flex-column">
+                            <div className="flex flex-col">
                                 {data.otherProperties && (
                                     <Button
                                         color="primary"
@@ -183,7 +184,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                                         className={cx(style.nodeButton, getExpandButtonStatusClasses())}
                                     >
                                         {/* <span className="mx-auto">{status}</span> */}
-                                        <i className={cx('fa ', { 'fa-chevron-down': !isNodeExpanded, 'fa-chevron-up': isNodeExpanded })} />
+                                        {isNodeExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                                     </Button>
                                 )}
 
@@ -216,13 +217,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                                         title="Add connections to this node"
                                         onClick={() => setAddNodeContentCollapse(!addNodeContentCollapse)}
                                     >
-                                        {/* <i className={cx('fa fa-plus')} /> */}
-                                        <i
-                                            className={cx('fa ', {
-                                                'fa-plus': !addNodeContentCollapse,
-                                                'fa-minus': addNodeContentCollapse,
-                                            })}
-                                        />
+                                        {!addNodeContentCollapse ? <Plus size={16} /> : <Minus size={16} />}
                                     </Button>
                                 )}
 
@@ -262,20 +257,20 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                                         }}
                                         title="Delete this node"
                                     >
-                                        <i className={cx('fa fa-trash text-white')} />
+                                        <Trash2 size={16} className="text-white" />
                                     </Button>
                                 )}
                             </div>
                         </div>
                     )}
-                    <div className="d-flex my-1">
+                    <div className="flex my-1">
                         <i className={cx(style.iconStyle, data.icon, getStatusClasses())}></i>
 
-                        <h6 className={cx(style.customNodeCardTitle, 'my-auto ms-2')}>{data.customNodeCardTitle}</h6>
+                        <h6 className={cx(style.customNodeCardTitle, 'my-auto ml-2')}>{data.customNodeCardTitle}</h6>
                     </div>
 
                     {data.redirectUrl && data.entityLabel ? (
-                        <div className={cx('d-flex ms-2', style.entityLabel)}>
+                        <div className={cx('flex ml-2', style.entityLabel)}>
                             <h6>Entity Name :</h6>
                             &nbsp;
                             <Link to={data.redirectUrl}>
@@ -283,7 +278,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                             </Link>
                         </div>
                     ) : data.entityLabel ? (
-                        <div className={cx('d-flex ms-2', style.entityLabel)}>
+                        <div className={cx('flex ml-2', style.entityLabel)}>
                             <h6>Entity Name :</h6>
                             &nbsp;
                             <h6>{data.entityLabel}</h6>
@@ -292,7 +287,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                         <div className="mt-4" />
                     )}
                     {data.description && (
-                        <div className="d-flex ms-2">
+                        <div className="flex ml-2">
                             <h6>Description :</h6>
                             &nbsp;
                             <h6>{data.description}</h6>
@@ -301,15 +296,11 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
 
                     {data.otherProperties && (
                         <>
-                            <Collapse
-                                isOpen={isNodeExpanded}
-                                // onEntered={onEntered} onExited={onExited}
-                                className="w-100"
-                            >
+                            <div className={cx('w-full', { hidden: !isNodeExpanded })}>
                                 <div className={cx(style.listContainer, { [style.listContainerDragging]: dragging })}>
-                                    <ul className={cx('list-group p-1')}>
+                                    <ul className={cx('p-1')}>
                                         {data.otherProperties.map((property, index) => (
-                                            <li key={index} className="list-group-item text-wrap p-0 ps-1">
+                                            <li key={index} className="text-wrap p-0 pl-1">
                                                 {property?.propertyName && (
                                                     <span className={style.propertyName}>{property.propertyName} : </span>
                                                 )}
@@ -317,7 +308,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                                                     <span className={style.propertyValue}>{property.propertyValue}</span>
                                                 )}
                                                 {property?.copyable && property?.propertyValue && (
-                                                    <i
+                                                    <span
                                                         onClick={() => {
                                                             if (typeof property.propertyValue === 'string') {
                                                                 copyToClipboard(
@@ -327,15 +318,17 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                                                                 );
                                                             }
                                                         }}
-                                                        className="fa fa-copy ms-2"
-                                                    />
+                                                        className="ml-2 cursor-pointer"
+                                                    >
+                                                        <Copy size={14} />
+                                                    </span>
                                                 )}
                                                 {property?.propertyContent && <>{property.propertyContent}</>}
                                             </li>
                                         ))}
                                     </ul>
                                 </div>
-                            </Collapse>
+                            </div>
                         </>
                     )}
 
@@ -345,9 +338,9 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                         </div>
                     )}
 
-                    <Collapse isOpen={addNodeContentCollapse}>
+                    <div className={cx({ hidden: !addNodeContentCollapse })}>
                         <div className={style.addContentContainer}>{data.addButtonContent}</div>
-                    </Collapse>
+                    </div>
                 </div>
             </div>
 

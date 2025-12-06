@@ -2,7 +2,7 @@ import Widget from 'components/Widget';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Select from 'components/Select';
-import { Col, Label, Row, UncontrolledTooltip } from 'reactstrap';
+import Label from 'components/Label';
 import { actions, selectors } from 'ducks/compliance-profiles';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { ComplianceProfileDtoV2, ComplianceRuleAvailabilityStatus, PlatformEnum, Resource } from 'types/openapi';
@@ -85,9 +85,14 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
                                 {capitalize(ruleOrGroup.availabilityStatus as ComplianceRuleAvailabilityStatus)}
                             </Badge>
                             {ruleOrGroup.updatedReason && (
-                                <UncontrolledTooltip target={`status-${ruleOrGroup.uuid.replaceAll('-', '_')}`}>
-                                    {truncateText(capitalize(ruleOrGroup.updatedReason), 100)}
-                                </UncontrolledTooltip>
+                                <div className="hs-tooltip inline-block">
+                                    <div
+                                        className="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 invisible transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded shadow-sm dark:bg-neutral-700"
+                                        role="tooltip"
+                                    >
+                                        {truncateText(capitalize(ruleOrGroup.updatedReason), 100)}
+                                    </div>
+                                </div>
                             )}
                         </div>,
                         getTypeTableColumn(ruleOrGroup, setSelectedEntityDetails, setIsEntityDetailMenuOpen),
@@ -256,7 +261,7 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
             lockSize="large"
             dataTestId="assigned-rules-and-group-widget"
         >
-            <Label for="assignedRulesSource">Rules Source</Label>
+            <Label htmlFor="assignedRulesSource">Rules Source</Label>
             <Select
                 id="assignedRulesSource"
                 placeholder="Select..."
@@ -269,9 +274,9 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
                 isClearable
             />
             {assignedRulesSource === 'Provider' && (
-                <Row xs="1" sm="1" md="2" lg="2" xl="2" style={{ marginTop: '10px' }}>
-                    <Col>
-                        <Label for="assignedProvider">Provider</Label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2.5">
+                    <div>
+                        <Label htmlFor="assignedProvider">Provider</Label>
                         <Select
                             id="assignedProvider"
                             placeholder="Select..."
@@ -282,9 +287,9 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
                             }}
                             isClearable
                         />
-                    </Col>
-                    <Col>
-                        <Label for="assignedKind">Kind</Label>
+                    </div>
+                    <div>
+                        <Label htmlFor="assignedKind">Kind</Label>
                         <Select
                             id="assignedKind"
                             placeholder="Select..."
@@ -295,8 +300,8 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
                             }}
                             isClearable
                         />
-                    </Col>
-                </Row>
+                    </div>
+                </div>
             )}
             <ResourceBadges
                 resources={assignedRulesAndGroupsResources}

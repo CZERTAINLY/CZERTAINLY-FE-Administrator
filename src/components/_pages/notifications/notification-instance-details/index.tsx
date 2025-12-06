@@ -8,7 +8,8 @@ import { actions as notificationsActions, selectors as notificationsSelectors } 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router';
-import { Container, Label } from 'reactstrap';
+import Container from 'components/Container';
+import Label from 'components/Label';
 import { getEditAndDeleteWidgetButtons, createWidgetDetailHeaders } from 'utils/widget';
 
 const NotificationInstanceDetails = () => {

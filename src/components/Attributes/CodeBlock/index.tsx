@@ -3,7 +3,8 @@ import hljs from 'highlight.js';
 import 'highlight.js/styles/github.css';
 import parse from 'html-react-parser';
 import { useState } from 'react';
-import { Button } from 'reactstrap';
+import Button from 'components/Button';
+import { Info } from 'lucide-react';
 import { base64ToUtf8 } from 'utils/common-utils';
 import { CodeBlockAttributeContentModel } from '../../../types/attributes';
 import { ProgrammingLanguageEnum } from '../../../types/openapi';
@@ -28,8 +29,8 @@ export default function CodeBlock({ content }: Props) {
     return (
         <>
             {content.data.language}&nbsp;
-            <Button className="btn btn-link p-0 ms-2" color="white" title={content.data.language} onClick={() => setShowDialog(true)}>
-                <i className="fa fa-info" style={{ color: 'auto', marginBottom: '9px', fontSize: '14px' }} />
+            <Button variant="transparent" title={content.data.language} onClick={() => setShowDialog(true)}>
+                <Info size={14} />
             </Button>
             <Dialog
                 isOpen={showDialog}

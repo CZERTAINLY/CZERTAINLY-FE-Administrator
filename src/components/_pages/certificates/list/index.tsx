@@ -28,7 +28,7 @@ import CertificateOwnerDialog from '../CertificateOwnerDialog';
 import CertificateRAProfileDialog from '../CertificateRAProfileDialog';
 import CertificateStatus from '../CertificateStatus';
 import CertificateUploadDialog from '../CertificateUploadDialog';
-import { Download, Plug, Plus } from 'lucide-react';
+import { Download, Plug, Plus, KeyRound } from 'lucide-react';
 import Switch from 'components/Switch';
 import CertificateEdit from '../form';
 
@@ -335,7 +335,7 @@ export default function CertificateList({
                         <CertificateStatus status={certificate.validationStatus} asIcon={true} />,
                         certificate.complianceStatus ? <CertificateStatus status={certificate.complianceStatus} asIcon={true} /> : '',
 
-                        certificate.privateKeyAvailability ? <i className="fa fa-key" aria-hidden="true"></i> : '',
+                        certificate.privateKeyAvailability ? <KeyRound size={16} aria-hidden="true" /> : '',
                         selectCertsOnly || isLinkDisabled ? (
                             certificate.commonName || '(empty)'
                         ) : (

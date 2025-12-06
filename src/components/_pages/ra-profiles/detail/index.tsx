@@ -669,7 +669,6 @@ export default function RaProfileDetail() {
                     'ACME',
                     <StatusBadge enabled={acmeDetails ? (acmeDetails.acmeAvailable ? true : false) : false} />,
                     <ProgressButton
-                        className="btn btn-primary btn-sm"
                         type="button"
                         title={acmeDetails?.acmeAvailable ? 'Deactivate' : 'Activate'}
                         inProgressTitle={acmeDetails?.acmeAvailable ? 'Deactivating...' : 'Activating...'}
@@ -724,7 +723,6 @@ export default function RaProfileDetail() {
                     'SCEP',
                     <StatusBadge enabled={scepDetails ? (scepDetails.scepAvailable ? true : false) : false} />,
                     <ProgressButton
-                        className="btn btn-primary btn-sm"
                         type="button"
                         title={scepDetails?.scepAvailable ? 'Deactivate' : 'Activate'}
                         inProgressTitle={scepDetails?.scepAvailable ? 'Deactivating...' : 'Activating...'}
@@ -767,7 +765,6 @@ export default function RaProfileDetail() {
                     'CMP',
                     <StatusBadge enabled={cmpDetails ? (cmpDetails.cmpAvailable ? true : false) : false} />,
                     <ProgressButton
-                        className="btn btn-primary btn-sm"
                         type="button"
                         title={cmpDetails?.cmpAvailable ? 'Deactivate' : 'Activate'}
                         inProgressTitle={cmpDetails?.cmpAvailable ? 'Deactivating...' : 'Activating...'}
@@ -1164,8 +1161,8 @@ export default function RaProfileDetail() {
                 toggle={() => setComplianceCheck(false)}
                 noBorder
                 buttons={[
+                    { color: 'primary', variant: 'outline', onClick: () => setComplianceCheck(false), body: 'Cancel' },
                     { color: 'primary', onClick: onComplianceCheck, body: 'Yes' },
-                    { color: 'secondary', variant: 'outline', onClick: () => setComplianceCheck(false), body: 'Cancel' },
                 ]}
             />
 
@@ -1206,8 +1203,8 @@ export default function RaProfileDetail() {
                             from RA profile {raProfile?.name}. Is this what you want to do?
                         </p>
                         <p>
-                            <b className="text-danger">Warning:</b> This will remove approval process for all certificate actions on this RA
-                            profile.
+                            <b className="text-red-600">Warning:</b> This will remove approval process for all certificate actions on this
+                            RA profile.
                         </p>
                     </div>
                 }

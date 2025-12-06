@@ -29,7 +29,6 @@ import { RaProfileSimplifiedModel } from 'types/ra-profiles';
 import { collectFormAttributes, mapProfileAttribute, transformAttributes } from 'utils/attributes/attributes';
 import { isObjectSame } from 'utils/common-utils';
 import { composeValidators, validateAlphaNumericWithoutAccents, validateLength, validateRequired } from 'utils/validators';
-import styles from './cmpForm.module.scss';
 import useAttributeEditor, { buildGroups, buildOwner, buildSelectedOption } from 'utils/widget';
 import CertificateAssociationsFormWidget from 'components/CertificateAssociationsFormWidget/CertificateAssociationsFormWidget';
 import { deepEqual } from 'utils/deep-equal';

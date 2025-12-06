@@ -8,8 +8,10 @@ import Spinner from 'components/Spinner';
 
 import { actions, selectors } from 'ducks/ra-profiles';
 import { RaProfileResponseModel } from 'types/ra-profiles';
-import TextField from 'components/Input/TextField';
+import TextInput from 'components/TextInput';
 import SwitchField from 'components/Input/SwitchField';
+import { Controller } from 'react-hook-form';
+import { buildValidationRules } from 'utils/validators-helper';
 import ProgressButton from 'components/ProgressButton';
 import { isObjectSame } from 'utils/common-utils';
 import { SettingsPlatformModel } from 'types/settings';
@@ -49,8 +51,8 @@ export default function CertificateValidationDialogBody({ raProfile, platformSet
         return {
             usePlatformSettings: raProfile.certificateValidationSettings.usePlatformSettings,
             enabled: raProfile.certificateValidationSettings.enabled,
-            frequency: raProfile.certificateValidationSettings.frequency?.toString(),
-            expiringThreshold: raProfile.certificateValidationSettings.expiringThreshold?.toString(),
+            frequency: raProfile.certificateValidationSettings.frequency,
+            expiringThreshold: raProfile.certificateValidationSettings.expiringThreshold,
         };
     }, [raProfile]);
 
@@ -149,19 +151,50 @@ export default function CertificateValidationDialogBody({ raProfile, platformSet
                             <SwitchField id="enabled" label="Enable Certificate Validation" />
                             {watchedEnabled && (
                                 <>
-                                    <TextField
-                                        id="frequency"
-                                        label="Validation Frequency"
-                                        description="Validation frequency of certificates specified in days."
-                                        validators={[validateNonZeroInteger(), validatePositiveInteger()]}
-                                        inputType="number"
+                                    <Controller
+                                        name="frequency"
+                                        control={control}
+                                        rules={buildValidationRules([validateNonZeroInteger(), validatePositiveInteger()])}
+                                        render={({ field, fieldState }) => (
+                                            <div>
+                                                <TextInput
+                                                    id="frequency"
+                                                    label="Validation Frequency"
+                                                    value={field.value?.toString() || ''}
+                                                    onChange={(value) => field.onChange(value ? Number(value) : undefined)}
+                                                    onBlur={field.onBlur}
+                                                    type="number"
+                                                    invalid={!!fieldState.error && fieldState.isTouched}
+                                                    error={fieldState.error?.message}
+                                                />
+                                                <p className="mt-1 text-sm text-gray-600">
+                                                    Validation frequency of certificates specified in days.
+                                                </p>
+                                            </div>
+                                        )}
                                     />
-                                    <TextField
-                                        id="expiringThreshold"
-                                        label="Expiring Threshold"
-                                        description="How many days before expiration should certificate's validation status change to Expiring."
-                                        validators={[validateNonZeroInteger(), validatePositiveInteger()]}
-                                        inputType="number"
+                                    <Controller
+                                        name="expiringThreshold"
+                                        control={control}
+                                        rules={buildValidationRules([validateNonZeroInteger(), validatePositiveInteger()])}
+                                        render={({ field, fieldState }) => (
+                                            <div>
+                                                <TextInput
+                                                    id="expiringThreshold"
+                                                    label="Expiring Threshold"
+                                                    value={field.value?.toString() || ''}
+                                                    onChange={(value) => field.onChange(value ? Number(value) : undefined)}
+                                                    onBlur={field.onBlur}
+                                                    type="number"
+                                                    invalid={!!fieldState.error && fieldState.isTouched}
+                                                    error={fieldState.error?.message}
+                                                />
+                                                <p className="mt-1 text-sm text-gray-600">
+                                                    How many days before expiration should certificate's validation status change to
+                                                    Expiring.
+                                                </p>
+                                            </div>
+                                        )}
                                     />
                                 </>
                             )}

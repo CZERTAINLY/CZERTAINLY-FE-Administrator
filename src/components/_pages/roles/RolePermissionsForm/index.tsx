@@ -2,7 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 
-import { Button, ButtonGroup, Container } from 'reactstrap';
+import Button from 'components/Button';
+import Container from 'components/Container';
 
 import ProgressButton from 'components/ProgressButton';
 import Widget from 'components/Widget';
@@ -12,8 +13,6 @@ import { actions as rolesActions, selectors as rolesSelectors } from 'ducks/role
 
 import { SubjectPermissionsModel } from 'types/roles';
 import RolePermissionsEditor from '../RolePermissionsEditor';
-
-import style from './style.module.scss';
 
 function RoleForm() {
     const dispatch = useDispatch();
@@ -97,14 +96,10 @@ function RoleForm() {
     }, [navigate]);
 
     return (
-        <Container className="themed-container fixed-screen-height-container" fluid>
+        <Container className="fixed-screen-height-container">
             <Widget
                 title={`${roleSelector?.name || ''} Role Permissions`}
                 busy={isFetchingRoleDetail || isFetchingPermissions || isFetchingResources || isUpdatingRolePermissions}
-                className={style.widget}
-                innerContainerProps={{
-                    className: style.innerContainer,
-                }}
             >
                 <RolePermissionsEditor
                     resources={resourcesSelector}
@@ -114,7 +109,7 @@ function RoleForm() {
                         setPermissions(perms);
                     }}
                     submitButtonsGroup={
-                        <ButtonGroup>
+                        <div className="flex gap-2">
                             <ProgressButton
                                 title="Save"
                                 inProgressTitle="Saving..."
@@ -123,10 +118,10 @@ function RoleForm() {
                                 onClick={onSubmit}
                             />
 
-                            <Button color="default" onClick={onCancel} disabled={isCreatingRole || isUpdatingRole}>
+                            <Button variant="outline" onClick={onCancel} disabled={isCreatingRole || isUpdatingRole}>
                                 Cancel
                             </Button>
-                        </ButtonGroup>
+                        </div>
                     }
                 />
             </Widget>
