@@ -27,7 +27,10 @@ function Tabs({ tabs, selectedTab, onTabChange }: Props) {
                     data-hs-tab={`#pills-on-gray-color-${index}`}
                     aria-controls={`pills-on-gray-color-${index}`}
                     role="tab"
-                    onClick={() => onTabChange(index)}
+                    onClick={() => {
+                        onTabChange(index);
+                        tab.onClick?.();
+                    }}
                 >
                     {tab.title}
                 </button>
