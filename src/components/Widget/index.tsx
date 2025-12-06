@@ -23,7 +23,7 @@ interface Props {
     title?: string;
     titleLink?: string;
     titleSize?: 'small' | 'medium' | 'large' | 'larger';
-    titleBoldness?: 'normal' | 'bold' | 'bolder';
+    titleBoldness?: 'normal' | 'bold' | 'semi-bold';
     className?: string;
     children?: React.ReactNode | React.ReactNode[];
     busy?: boolean;
@@ -70,7 +70,7 @@ function Widget({
                 className={cn(
                     '',
                     { 'font-bold': titleBoldness === 'bold' },
-                    { 'font-extrabold': titleBoldness === 'bolder' },
+                    { 'font-semibold': titleBoldness === 'semi-bold' },
                     { 'font-normal': titleBoldness === 'normal' },
                     { 'text-base': titleSize === 'medium' },
                     { 'text-lg font-bold': titleSize === 'large' },
@@ -82,11 +82,18 @@ function Widget({
             </h5>
         ) : null;
 
-    const renderTitle = () => (titleLink ? <Link to={titleLink}>{getTitleText()}</Link> : getTitleText());
+    const renderTitle = () =>
+        titleLink ? (
+            <Link to={titleLink} className="text-blue-600">
+                {getTitleText()}
+            </Link>
+        ) : (
+            getTitleText()
+        );
 
     const renderRefreshButton = () =>
         refreshAction ? (
-            <Button onClick={refreshAction} data-testid="refresh-icon" variant="transparent">
+            <Button onClick={refreshAction} data-testid="refresh-icon" variant="transparent" title="Refresh">
                 <RefreshCw size={16} />
             </Button>
         ) : null;

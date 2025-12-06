@@ -16,6 +16,7 @@ import { isObjectSame } from 'utils/common-utils';
 import { EventSettingsDto, PlatformEnum, Resource, ResourceEvent } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import TriggerEditorWidget from 'components/TriggerEditorWidget';
+import Label from 'components/Label';
 
 interface FormValues {
     event: string;
@@ -144,9 +145,9 @@ export default function EventForm() {
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                     <Widget title={'Edit Event'} busy={isBusy} widgetLockName={LockWidgetNameEnum.EventSettings}>
                         <div>
-                            <label htmlFor="event" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
+                            <Label htmlFor="event" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
                                 Event Name
-                            </label>
+                            </Label>
                             <Select
                                 id="event"
                                 value={formValues.event || ''}
@@ -158,9 +159,9 @@ export default function EventForm() {
                         </div>
 
                         <div>
-                            <label htmlFor="resource" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
+                            <Label htmlFor="resource" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
                                 Resource
-                            </label>
+                            </Label>
                             <Select
                                 id="resource"
                                 value={formValues.resource || ''}

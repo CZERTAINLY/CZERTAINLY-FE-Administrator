@@ -9,11 +9,13 @@ interface Props {
     title?: string;
     children?: React.ReactNode;
     required?: boolean;
+    className?: string;
 }
 
-function Label({ htmlFor, title, children, required }: Props) {
+function Label({ htmlFor, title, children, required, className }: Props) {
+    const defaultClasses = 'block text-base text-left font-medium mb-2 text-center dark:text-white';
     return (
-        <label htmlFor={htmlFor} className="block text-sm text-left font-medium mb-2 text-center dark:text-white">
+        <label htmlFor={htmlFor} className={cn(defaultClasses, className)}>
             {title || children}
             {required && <span className="text-red-500"> *</span>}
         </label>

@@ -62,6 +62,7 @@ import Container from 'components/Container';
 import Breadcrumb from 'components/Breadcrumb';
 import CertificateDetailsContent from './CertificateDetailsContent';
 import CertificateRequestContent from './CertificateRequestContent';
+import Label from 'components/Label';
 
 interface LocationPushFormProps {
     onSubmit: (values: any) => void;
@@ -103,7 +104,7 @@ function LocationPushForm({
     return (
         <FormProvider {...methods}>
             <form onSubmit={handleSubmit(handleFormSubmit)}>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">Locations</label>
+                <Label htmlFor="locations">Locations</Label>
 
                 <CustomTable
                     hasPagination={false}
@@ -113,8 +114,6 @@ function LocationPushForm({
                     multiSelect={false}
                     onCheckedRowsChanged={(rows) => setSelectLocationCheckedRows(rows as string[])}
                 />
-
-                <br />
 
                 <TabLayout
                     tabs={[
@@ -134,7 +133,7 @@ function LocationPushForm({
                     ]}
                 />
 
-                <div className="flex justify-end gap-2">
+                <Container className="flex-row justify-end modal-footer" gap={4}>
                     <ProgressButton
                         title="Push"
                         inProgressTitle="Pushing..."
@@ -145,7 +144,7 @@ function LocationPushForm({
                     <Button variant="outline" color="secondary" onClick={onCancel} disabled={isPushing} type="button">
                         Cancel
                     </Button>
-                </div>
+                </Container>
             </form>
         </FormProvider>
     );

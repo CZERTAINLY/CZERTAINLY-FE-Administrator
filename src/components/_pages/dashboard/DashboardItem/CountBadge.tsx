@@ -10,7 +10,7 @@ interface Props {
 
 function CountBadge({ data, title, link, extraComponent }: Props) {
     return (
-        <Widget titleLink={link} title={title} className="h-full">
+        <Widget titleLink={link} title={title} className="h-full" titleBoldness="semi-bold" titleSize="large">
             <div className="text-3xl">{data}</div>
             {extraComponent && <div className="mt-4">{extraComponent}</div>}
         </Widget>

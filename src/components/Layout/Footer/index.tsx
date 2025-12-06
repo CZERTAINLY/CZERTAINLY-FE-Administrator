@@ -8,7 +8,7 @@ interface Props {
 
 function Footer({ className }: Props) {
     return (
-        <footer className="py-4">
+        <footer className="py-4 pt-12">
             <div className="text-sm font-semibold">
                 <span>© 2018-{new Date().getFullYear()} &nbsp;CZERTAINLY s.r.o. </span>
                 <span className="mx-2">·</span>

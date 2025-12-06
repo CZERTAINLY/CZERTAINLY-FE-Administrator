@@ -50,7 +50,7 @@ function Dashboard() {
 
     return (
         <div>
-            <div className="flex flex-row gap-4 md:gap-8 mb-4 md:mb-8">
+            <div className="flex flex-row gap-4 md:gap-8 mb-4 md:mb-8 flex-wrap">
                 <div className="flex-1">
                     <CountBadge
                         data={dashboard?.totalCertificates}
@@ -62,6 +62,7 @@ function Dashboard() {
                                 id="archived-switch"
                                 checked={isIncludeArchived}
                                 onChange={() => dispatch(certificatesActions.setIncludeArchived(!isIncludeArchived))}
+                                labelClassName="!text-gray-500 text-base"
                             />
                         }
                     />

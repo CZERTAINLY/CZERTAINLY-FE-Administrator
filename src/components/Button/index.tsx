@@ -1,4 +1,5 @@
 import cn from 'classnames';
+import Tooltip from 'components/Tooltip';
 
 export type ButtonVariant = 'solid' | 'outline' | 'transparent';
 
@@ -74,18 +75,27 @@ function Button({
     //     secondary: '',
     // };
 
-    return (
+    const buttonElement = (
         <button
             type={type}
             id={id}
             className={cn(baseButton, buttonClasses[variant], colorClasses[variant][color], className)}
             onClick={onClick}
             disabled={disabled}
-            title={title}
         >
             {children}
         </button>
     );
+
+    if (title) {
+        return (
+            <Tooltip content={title} placement="bottom">
+                {buttonElement}
+            </Tooltip>
+        );
+    }
+
+    return buttonElement;
 }
 
 export default Button;

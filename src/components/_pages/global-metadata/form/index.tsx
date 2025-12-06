@@ -15,6 +15,8 @@ import { GlobalMetadataCreateRequestModel, GlobalMetadataUpdateRequestModel } fr
 import { AttributeContentType, PlatformEnum } from 'types/openapi';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
 import Select from 'components/Select';
+import Label from 'components/Label';
+
 interface GlobalMetadataFormProps {
     globalMetadataId?: string;
     onCancel?: () => void;
@@ -198,9 +200,9 @@ export default function GlobalMetadataForm({ globalMetadataId, onCancel, onSucce
                         />
 
                         <div>
-                            <label htmlFor="contentType" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
+                            <Label htmlFor="contentType" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
                                 Content Type <span className="text-red-500">*</span>
-                            </label>
+                            </Label>
                             <Controller
                                 name="contentType"
                                 control={control}

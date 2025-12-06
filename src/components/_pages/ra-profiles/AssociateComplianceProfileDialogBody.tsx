@@ -9,6 +9,7 @@ import { validateRequired } from 'utils/validators';
 import cn from 'classnames';
 
 import Spinner from 'components/Spinner';
+import Label from 'components/Label';
 
 import { actions, selectors } from 'ducks/compliance-profiles';
 import { RaProfileResponseModel } from 'types/ra-profiles';
@@ -90,9 +91,9 @@ export default function AssociateComplianceProfileDialogBody({ raProfile, availa
                         rules={buildValidationRules([validateRequired()])}
                         render={({ field, fieldState }) => (
                             <div className="mb-4">
-                                <label htmlFor="complianceProfile" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
+                                <Label htmlFor="complianceProfile" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
                                     Select Compliance profile
-                                </label>
+                                </Label>
 
                                 <Select
                                     id="associate-compliance-profile-select"

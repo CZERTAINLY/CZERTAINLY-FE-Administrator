@@ -4,6 +4,7 @@ import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import Checkbox from 'components/Checkbox';
+import Label from 'components/Label';
 
 import { actions as authActions, selectors as authSelectors } from 'ducks/auth';
 import React, { useCallback, useMemo, useState } from 'react';
@@ -208,7 +209,7 @@ function RolePermissionsEditor({
                 <></>
             ) : (
                 <Widget title="Resource Action Permissions" busy={isBusy}>
-                    <label htmlFor="allPermissions">
+                    <Label htmlFor="allPermissions" className="!block !text-base !font-medium !mb-0 !text-left">
                         <input
                             id="allPermissions"
                             type="checkbox"
@@ -217,11 +218,11 @@ function RolePermissionsEditor({
                             onChange={(e) => allowAllActions(currentResource, e.target.checked)}
                         />
                         &nbsp;&nbsp;&nbsp;Allow All Permissions
-                    </label>
+                    </Label>
 
                     <div>
                         {currentResource.actions.map((action) => (
-                            <label key={action.uuid}>
+                            <Label key={action.uuid} className="!block !text-base !font-medium !mb-0 !text-left">
                                 <input
                                     type="checkbox"
                                     checked={
@@ -237,7 +238,7 @@ function RolePermissionsEditor({
                                     onChange={(e) => allowAction(currentResource, action.name, e.target.checked)}
                                 />
                                 &nbsp;&nbsp;&nbsp;{action.displayName}
-                            </label>
+                            </Label>
                         ))}
                     </div>
                 </Widget>
@@ -473,7 +474,7 @@ function RolePermissionsEditor({
 
     return (
         <>
-            <label htmlFor="allResources">
+            <Label htmlFor="allResources" className="!block !text-base !font-medium !mb-0 !text-left">
                 <input
                     id="allResources"
                     type="checkbox"
@@ -485,7 +486,7 @@ function RolePermissionsEditor({
                     }}
                 />
                 &nbsp;&nbsp;&nbsp;Allow All Actions for All Resources
-            </label>
+            </Label>
             <div>
                 <div>{resourceList}</div>
                 <div>

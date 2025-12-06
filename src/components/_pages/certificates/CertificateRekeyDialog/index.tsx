@@ -23,6 +23,7 @@ import { collectFormAttributes } from 'utils/attributes/attributes';
 import { buildValidationRules } from 'utils/validators-helper';
 import { validateRequired } from 'utils/validators';
 import cn from 'classnames';
+import Label from 'components/Label';
 
 import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from 'ducks/utilsActuator';
 import { ParseRequestRequestDtoParseTypeEnum } from 'types/openapi/utils';
@@ -315,9 +316,9 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
                         control={control}
                         render={({ field, fieldState }) => (
                             <div className="mb-4">
-                                <label htmlFor="uploadCsr" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
+                                <Label htmlFor="uploadCsr" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
                                     Key Source
-                                </label>
+                                </Label>
                                 <Select
                                     id="uploadCsr"
                                     options={inputOptions}

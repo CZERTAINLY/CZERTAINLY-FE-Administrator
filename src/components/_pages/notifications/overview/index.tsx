@@ -61,7 +61,7 @@ function NotificationsOverview() {
         <Dropdown
             title={
                 <div className="flex items-center gap-2 text-white">
-                    <Bell size={24} />
+                    <Bell size={24} strokeWidth={1.5} />
                     <span className="sr-only">Notifications</span>
                 </div>
             }

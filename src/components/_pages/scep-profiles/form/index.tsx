@@ -30,6 +30,7 @@ import useAttributeEditor, { buildGroups, buildOwner } from 'utils/widget';
 import CertificateAssociationsFormWidget from 'components/CertificateAssociationsFormWidget/CertificateAssociationsFormWidget';
 import { deepEqual } from 'utils/deep-equal';
 import TextInput from 'components/TextInput';
+import Label from 'components/Label';
 
 interface ScepProfileFormProps {
     scepProfileId?: string;
@@ -487,9 +488,9 @@ export default function ScepProfileForm({ scepProfileId, onCancel, onSuccess }: 
                     />
 
                     <div>
-                        <label htmlFor="challengePassword" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
+                        <Label htmlFor="challengePassword" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
                             Challenge Password {requiresChallengePassword && <span className="text-red-500">*</span>}
-                        </label>
+                        </Label>
                         <Controller
                             name="challengePassword"
                             control={control}
@@ -572,9 +573,9 @@ export default function ScepProfileForm({ scepProfileId, onCancel, onSuccess }: 
                     />
 
                     <div>
-                        <label htmlFor="intuneTenant" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
+                        <Label htmlFor="intuneTenant" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
                             Intune Tenant {watchedEnableIntune && <span className="text-red-500">*</span>}
-                        </label>
+                        </Label>
                         <Controller
                             name="intuneTenant"
                             control={control}
@@ -599,9 +600,9 @@ export default function ScepProfileForm({ scepProfileId, onCancel, onSuccess }: 
                     </div>
 
                     <div>
-                        <label htmlFor="intuneApplicationId" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
+                        <Label htmlFor="intuneApplicationId" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
                             Intune Application ID {watchedEnableIntune && <span className="text-red-500">*</span>}
-                        </label>
+                        </Label>
                         <Controller
                             name="intuneApplicationId"
                             control={control}
@@ -626,9 +627,9 @@ export default function ScepProfileForm({ scepProfileId, onCancel, onSuccess }: 
                     </div>
 
                     <div>
-                        <label htmlFor="intuneApplicationKey" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
+                        <Label htmlFor="intuneApplicationKey" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
                             Intune Application Key {watchedEnableIntune && <span className="text-red-500">*</span>}
-                        </label>
+                        </Label>
                         <Controller
                             name="intuneApplicationKey"
                             control={control}
