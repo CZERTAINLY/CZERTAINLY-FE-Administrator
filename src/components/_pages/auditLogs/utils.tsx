@@ -207,8 +207,8 @@ export const createAuditLogsList = (
             renderResource(log.affiliatedResource, resourceEnum, navigate),
             getEnumLabel(operationEnum, log.operation),
             getEnumLabel(operationResultEnum, log.operationResult),
-            <Button key={`${log.id}-info-button`} variant="transparent" title="Detail" onClick={() => onInfoClick(log)}>
-                <Info size={14} style={{ color: 'auto', marginBottom: '9.5px', marginLeft: '4px' }} />
+            <Button key={`${log.id}-info-button`} variant="transparent" title="Detail" onClick={() => onInfoClick(log)} className="!p-1">
+                <Info size={14} />
             </Button>,
         ],
     }));

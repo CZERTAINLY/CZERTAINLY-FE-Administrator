@@ -12,14 +12,28 @@ interface Props {
     error?: string;
     className?: string;
     required?: boolean;
+    timePicker?: boolean;
 }
 
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const WEEKDAYS = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
 
-function DatePicker({ value, onChange, onBlur, disabled, id, invalid, error, className, required }: Props) {
+function DatePicker({ value, onChange, onBlur, disabled, id, invalid, error, className, required, timePicker = false }: Props) {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedDate, setSelectedDate] = useState<Date | null>(value ? new Date(value) : null);
+    const [selectedTime, setSelectedTime] = useState<{ hours: number; minutes: number; seconds: number }>(() => {
+        if (value && timePicker) {
+            const date = new Date(value);
+            if (!isNaN(date.getTime())) {
+                return {
+                    hours: date.getHours(),
+                    minutes: date.getMinutes(),
+                    seconds: date.getSeconds(),
+                };
+            }
+        }
+        return { hours: 0, minutes: 0, seconds: 0 };
+    });
     const [currentMonth, setCurrentMonth] = useState(selectedDate ? selectedDate.getMonth() : new Date().getMonth());
     const [currentYear, setCurrentYear] = useState(selectedDate ? selectedDate.getFullYear() : new Date().getFullYear());
     const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number } | null>(null);
@@ -32,8 +46,13 @@ function DatePicker({ value, onChange, onBlur, disabled, id, invalid, error, cla
         const day = String(selectedDate.getDate()).padStart(2, '0');
         const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
         const year = selectedDate.getFullYear();
-        return `${day}.${month}.${year}`;
-    }, [selectedDate]);
+        const dateStr = `${day}.${month}.${year}`;
+        if (timePicker) {
+            const timeStr = `${String(selectedTime.hours).padStart(2, '0')}:${String(selectedTime.minutes).padStart(2, '0')}:${String(selectedTime.seconds).padStart(2, '0')}`;
+            return `${dateStr} ${timeStr}`;
+        }
+        return dateStr;
+    }, [selectedDate, selectedTime, timePicker]);
 
     useEffect(() => {
         if (value) {
@@ -42,11 +61,21 @@ function DatePicker({ value, onChange, onBlur, disabled, id, invalid, error, cla
                 setSelectedDate(date);
                 setCurrentMonth(date.getMonth());
                 setCurrentYear(date.getFullYear());
+                if (timePicker) {
+                    setSelectedTime({
+                        hours: date.getHours(),
+                        minutes: date.getMinutes(),
+                        seconds: date.getSeconds(),
+                    });
+                }
             }
         } else {
             setSelectedDate(null);
+            if (timePicker) {
+                setSelectedTime({ hours: 0, minutes: 0, seconds: 0 });
+            }
         }
-    }, [value]);
+    }, [value, timePicker]);
 
     useEffect(() => {
         if (isOpen && inputRef.current) {
@@ -126,12 +155,44 @@ function DatePicker({ value, onChange, onBlur, disabled, id, invalid, error, cla
 
     const handleDateSelect = (day: number) => {
         const newDate = new Date(currentYear, currentMonth, day);
+        if (timePicker) {
+            newDate.setHours(selectedTime.hours, selectedTime.minutes, selectedTime.seconds);
+        }
         setSelectedDate(newDate);
         const year = newDate.getFullYear();
         const month = String(newDate.getMonth() + 1).padStart(2, '0');
         const dayStr = String(newDate.getDate()).padStart(2, '0');
-        const formattedDate = `${year}-${month}-${dayStr}`;
+        let formattedDate = `${year}-${month}-${dayStr}`;
+        if (timePicker) {
+            const timeStr = `${String(selectedTime.hours).padStart(2, '0')}:${String(selectedTime.minutes).padStart(2, '0')}:${String(selectedTime.seconds).padStart(2, '0')}`;
+            formattedDate = `${formattedDate}T${timeStr}`;
+        }
         onChange(formattedDate);
+        if (!timePicker) {
+            setIsOpen(false);
+            if (onBlur) {
+                onBlur();
+            }
+        }
+    };
+
+    const handleTimeChange = (type: 'hours' | 'minutes' | 'seconds', value: number) => {
+        const newTime = { ...selectedTime, [type]: value };
+        setSelectedTime(newTime);
+        if (selectedDate) {
+            const newDate = new Date(selectedDate);
+            newDate.setHours(newTime.hours, newTime.minutes, newTime.seconds);
+            setSelectedDate(newDate);
+            const year = newDate.getFullYear();
+            const month = String(newDate.getMonth() + 1).padStart(2, '0');
+            const dayStr = String(newDate.getDate()).padStart(2, '0');
+            const timeStr = `${String(newTime.hours).padStart(2, '0')}:${String(newTime.minutes).padStart(2, '0')}:${String(newTime.seconds).padStart(2, '0')}`;
+            const formattedDate = `${year}-${month}-${dayStr}T${timeStr}`;
+            onChange(formattedDate);
+        }
+    };
+
+    const handleConfirm = () => {
         setIsOpen(false);
         if (onBlur) {
             onBlur();
@@ -237,7 +298,7 @@ function DatePicker({ value, onChange, onBlur, disabled, id, invalid, error, cla
                     disabled={disabled}
                     id={id}
                     onClick={() => !disabled && setIsOpen(!isOpen)}
-                    placeholder="dd.mm.yyyy"
+                    placeholder={timePicker ? 'dd.mm.yyyy 00:00:00' : 'dd.mm.yyyy'}
                     className={cn(
                         'py-2.5 sm:py-3 pl-10 pr-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600 cursor-pointer',
                         {
@@ -361,6 +422,61 @@ function DatePicker({ value, onChange, onBlur, disabled, id, invalid, error, cla
                             </div>
                         ))}
                     </div>
+
+                    {/* Time Picker */}
+                    {timePicker && (
+                        <div className="border-t border-gray-200 dark:border-neutral-700 p-3">
+                            <div className="flex items-center justify-center gap-2">
+                                <label className="text-sm font-medium text-gray-700 dark:text-neutral-300">Time:</label>
+                                <div className="flex items-center gap-1">
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        max="23"
+                                        value={selectedTime.hours}
+                                        onChange={(e) => {
+                                            const val = parseInt(e.target.value) || 0;
+                                            handleTimeChange('hours', Math.max(0, Math.min(23, val)));
+                                        }}
+                                        className="w-12 px-2 py-1 text-sm border border-gray-300 rounded-md text-center focus:outline-hidden focus:ring-2 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-600 dark:text-neutral-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                    />
+                                    <span className="text-gray-500 dark:text-neutral-400">:</span>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        max="59"
+                                        value={selectedTime.minutes}
+                                        onChange={(e) => {
+                                            const val = parseInt(e.target.value) || 0;
+                                            handleTimeChange('minutes', Math.max(0, Math.min(59, val)));
+                                        }}
+                                        className="w-12 px-2 py-1 text-sm border border-gray-300 rounded-md text-center focus:outline-hidden focus:ring-2 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-600 dark:text-neutral-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                    />
+                                    <span className="text-gray-500 dark:text-neutral-400">:</span>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        max="59"
+                                        value={selectedTime.seconds}
+                                        onChange={(e) => {
+                                            const val = parseInt(e.target.value) || 0;
+                                            handleTimeChange('seconds', Math.max(0, Math.min(59, val)));
+                                        }}
+                                        className="w-12 px-2 py-1 text-sm border border-gray-300 rounded-md text-center focus:outline-hidden focus:ring-2 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-600 dark:text-neutral-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                    />
+                                </div>
+                            </div>
+                            <div className="flex justify-end mt-3">
+                                <button
+                                    type="button"
+                                    onClick={handleConfirm}
+                                    className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-hidden focus:ring-2 focus:ring-blue-500 dark:bg-blue-500 dark:hover:bg-blue-600"
+                                >
+                                    Confirm
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
             {error && <p className="mt-1 text-sm text-red-600">{error}</p>}

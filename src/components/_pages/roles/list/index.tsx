@@ -4,17 +4,18 @@ import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import RoleForm from '../RoleForm';
+import RoleUsersForm from '../RoleUsersForm';
+import RolePermissionsForm from '../RolePermissionsForm';
 
 import { actions, selectors } from 'ducks/roles';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router';
+import { Link } from 'react-router';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import Badge from 'components/Badge';
 
 export default function RolesList() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const checkedRows = useSelector(selectors.rolesListCheckedRows);
     const roles = useSelector(selectors.roles);
@@ -29,6 +30,9 @@ export default function RolesList() {
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
     const [editingRoleId, setEditingRoleId] = useState<string | undefined>(undefined);
+    const [isEditUsersModalOpen, setIsEditUsersModalOpen] = useState<boolean>(false);
+    const [isEditPermissionsModalOpen, setIsEditPermissionsModalOpen] = useState<boolean>(false);
+    const [selectedRoleId, setSelectedRoleId] = useState<string | undefined>(undefined);
 
     const getFreshData = useCallback(() => {
         dispatch(actions.setRolesListCheckedRows({ checkedRows: [] }));
@@ -73,13 +77,27 @@ export default function RolesList() {
 
     const onEditRoleUsersClick = useCallback(() => {
         if (checkedRows.length !== 1) return;
-        navigate(`./users/${checkedRows[0]}`);
-    }, [checkedRows, navigate]);
+        setSelectedRoleId(checkedRows[0]);
+        setIsEditUsersModalOpen(true);
+    }, [checkedRows]);
+
+    const handleCloseUsersModal = useCallback(() => {
+        setIsEditUsersModalOpen(false);
+        setSelectedRoleId(undefined);
+        getFreshData();
+    }, [getFreshData]);
 
     const onEditRolePermissionsClick = useCallback(() => {
         if (checkedRows.length !== 1) return;
-        navigate(`./permissions/${checkedRows[0]}`);
-    }, [checkedRows, navigate]);
+        setSelectedRoleId(checkedRows[0]);
+        setIsEditPermissionsModalOpen(true);
+    }, [checkedRows]);
+
+    const handleClosePermissionsModal = useCallback(() => {
+        setIsEditPermissionsModalOpen(false);
+        setSelectedRoleId(undefined);
+        getFreshData();
+    }, [getFreshData]);
 
     const onDeleteConfirmed = useCallback(() => {
         setConfirmDelete(false);
@@ -230,6 +248,28 @@ export default function RolesList() {
                 caption={editingRoleId ? 'Edit Role' : 'Create Role'}
                 size="xl"
                 body={<RoleForm roleId={editingRoleId} onCancel={handleCloseAddModal} />}
+            />
+
+            <Dialog
+                isOpen={isEditUsersModalOpen}
+                toggle={handleCloseUsersModal}
+                caption="Edit Role Users"
+                size="xl"
+                body={<RoleUsersForm roleId={selectedRoleId} onCancel={handleCloseUsersModal} onSuccess={handleCloseUsersModal} />}
+            />
+
+            <Dialog
+                isOpen={isEditPermissionsModalOpen}
+                toggle={handleClosePermissionsModal}
+                caption="Edit Role Permissions"
+                size="xl"
+                body={
+                    <RolePermissionsForm
+                        roleId={selectedRoleId}
+                        onCancel={handleClosePermissionsModal}
+                        onSuccess={handleClosePermissionsModal}
+                    />
+                }
             />
         </div>
     );

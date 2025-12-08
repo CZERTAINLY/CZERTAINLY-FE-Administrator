@@ -249,21 +249,23 @@ const FlowChartContent = ({
     return (
         <Widget busy={busy}>
             {flowChartTitle && <h5 className="text-gray-500">{flowChartTitle}</h5>}
-            <ReactFlow
-                nodes={flowChartNodesState}
-                proOptions={{ hideAttribution: true }}
-                edges={flowChartEdgesState}
-                onNodesChange={onNodesChange}
-                onEdgesChange={onEdgesChange}
-                nodeTypes={nodeTypes}
-                fitView={!defaultViewport}
-                defaultViewport={defaultViewport}
-                defaultEdgeOptions={defaultEdgeOptions}
-                edgeTypes={edgeTypes}
-            >
-                <Controls />
-                <Background variant={BackgroundVariant.Dots} gap={16} size={1} />
-            </ReactFlow>
+            <div className="w-full h-[70vh]">
+                <ReactFlow
+                    nodes={flowChartNodesState}
+                    proOptions={{ hideAttribution: true }}
+                    edges={flowChartEdgesState}
+                    onNodesChange={onNodesChange}
+                    onEdgesChange={onEdgesChange}
+                    nodeTypes={nodeTypes}
+                    fitView={!defaultViewport}
+                    defaultViewport={defaultViewport}
+                    defaultEdgeOptions={defaultEdgeOptions}
+                    edgeTypes={edgeTypes}
+                >
+                    <Controls />
+                    <Background variant={BackgroundVariant.Dots} gap={16} size={1} />
+                </ReactFlow>
+            </div>
 
             {legends && <LegendComponent legends={legends} />}
         </Widget>

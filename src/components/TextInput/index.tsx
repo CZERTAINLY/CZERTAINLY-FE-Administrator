@@ -45,7 +45,6 @@ function TextInput({
                     value={value}
                     onChange={onChange}
                     onBlur={onBlur}
-                    placeholder={placeholder}
                     disabled={disabled}
                     id={id}
                     invalid={invalid}

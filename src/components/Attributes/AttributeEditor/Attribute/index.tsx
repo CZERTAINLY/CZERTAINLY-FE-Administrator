@@ -7,6 +7,7 @@ import { Controller, useFormContext, useWatch } from 'react-hook-form';
 import Select from 'components/Select';
 import Label from 'components/Label';
 import TextInput from 'components/TextInput';
+import DatePicker from 'components/DatePicker';
 import Editor from 'react-simple-code-editor';
 import cn from 'classnames';
 import {
@@ -548,21 +549,30 @@ export function Attribute({
                             ) : (
                                 <>
                                     {descriptor.contentType === AttributeContentType.Datetime ? (
-                                        <input
-                                            {...field}
+                                        <DatePicker
                                             id={name}
-                                            type="datetime-local"
-                                            placeholder={`Enter ${descriptor.properties.label}`}
+                                            value={
+                                                field.value
+                                                    ? field.value.includes('T')
+                                                        ? field.value
+                                                        : field.value.replace(' ', 'T')
+                                                    : undefined
+                                            }
+                                            onChange={(value) => {
+                                                field.onChange(value);
+                                            }}
+                                            onBlur={field.onBlur}
                                             disabled={descriptor.properties.readOnly || busy}
-                                            value={transformInputValue(field.value) || ''}
-                                            step={getStepValue(descriptor.contentType)}
-                                            className={cn(
-                                                'py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600',
-                                                {
-                                                    'border-red-500 focus:border-red-500 focus:ring-red-500':
-                                                        fieldState.isTouched && fieldState.invalid,
-                                                },
-                                            )}
+                                            invalid={fieldState.isTouched && !!fieldState.invalid}
+                                            error={
+                                                fieldState.isTouched && fieldState.invalid
+                                                    ? typeof fieldState.error === 'string'
+                                                        ? fieldState.error
+                                                        : fieldState.error?.message || 'Invalid value'
+                                                    : undefined
+                                            }
+                                            required={descriptor.properties.required}
+                                            timePicker
                                         />
                                     ) : (
                                         <TextInput

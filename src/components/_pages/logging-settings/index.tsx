@@ -261,7 +261,7 @@ const LoggingSetting = () => {
                                         id="logAllModules"
                                         checked={field.value}
                                         onChange={field.onChange}
-                                        label="Collect logs for all modules"
+                                        secondaryLabel="Collect logs for all modules"
                                     />
                                 )}
                             />
@@ -299,49 +299,51 @@ const LoggingSetting = () => {
                         </div>
                     </Widget>
                     <Widget title="Resource Logging">
-                        <Controller
-                            name="logAllResources"
-                            control={auditControl}
-                            render={({ field }) => (
-                                <Switch
-                                    id="logAllResources"
-                                    checked={field.value}
-                                    onChange={field.onChange}
-                                    label="Collect logs for all resources"
+                        <div className="space-y-4">
+                            <Controller
+                                name="logAllResources"
+                                control={auditControl}
+                                render={({ field }) => (
+                                    <Switch
+                                        id="logAllResources"
+                                        checked={field.value}
+                                        onChange={field.onChange}
+                                        secondaryLabel="Collect logs for all resources"
+                                    />
+                                )}
+                            />
+                            {!auditFormValues.logAllResources ? (
+                                <Controller
+                                    name="loggedResources"
+                                    control={auditControl}
+                                    render={({ field }) => (
+                                        <Select
+                                            id="loggedResources"
+                                            label="Select Resources to Log"
+                                            options={resourceSelectorItems.map((item) => ({ value: item.value, label: item.label }))}
+                                            value={field.value || []}
+                                            onChange={(value) => field.onChange(value)}
+                                            isMulti
+                                        />
+                                    )}
+                                />
+                            ) : (
+                                <Controller
+                                    name="ignoredResources"
+                                    control={auditControl}
+                                    render={({ field }) => (
+                                        <Select
+                                            id="ignoredResources"
+                                            label="Select Resources to Ignore"
+                                            options={resourceSelectorItems.map((item) => ({ value: item.value, label: item.label }))}
+                                            value={field.value || []}
+                                            onChange={(value) => field.onChange(value)}
+                                            isMulti
+                                        />
+                                    )}
                                 />
                             )}
-                        />
-                        {!auditFormValues.logAllResources ? (
-                            <Controller
-                                name="loggedResources"
-                                control={auditControl}
-                                render={({ field }) => (
-                                    <Select
-                                        id="loggedResources"
-                                        label="Select Resources to Log"
-                                        options={resourceSelectorItems.map((item) => ({ value: item.value, label: item.label }))}
-                                        value={field.value || []}
-                                        onChange={(value) => field.onChange(value)}
-                                        isMulti
-                                    />
-                                )}
-                            />
-                        ) : (
-                            <Controller
-                                name="ignoredResources"
-                                control={auditControl}
-                                render={({ field }) => (
-                                    <Select
-                                        id="ignoredResources"
-                                        label="Select Resources to Ignore"
-                                        options={resourceSelectorItems.map((item) => ({ value: item.value, label: item.label }))}
-                                        value={field.value || []}
-                                        onChange={(value) => field.onChange(value)}
-                                        isMulti
-                                    />
-                                )}
-                            />
-                        )}
+                        </div>
                     </Widget>
 
                     <Controller
@@ -361,7 +363,9 @@ const LoggingSetting = () => {
                     <Controller
                         name="verbose"
                         control={auditControl}
-                        render={({ field }) => <Switch id="verbose" checked={field.value} onChange={field.onChange} label="Verbose" />}
+                        render={({ field }) => (
+                            <Switch id="verbose" checked={field.value} onChange={field.onChange} secondaryLabel="Verbose" />
+                        )}
                     />
                     <div className="flex justify-end">
                         <ProgressButton
@@ -396,20 +400,20 @@ const LoggingSetting = () => {
             <FormProvider {...eventFormMethods}>
                 <form onSubmit={eventHandleSubmit(onEventFormSubmit)} className="mt-2 space-y-4">
                     <Widget title="Module Logging">
-                        <Controller
-                            name="logAllModules"
-                            control={eventControl}
-                            render={({ field }) => (
-                                <Switch
-                                    id="logAllModules"
-                                    checked={field.value}
-                                    onChange={field.onChange}
-                                    label="Collect logs for all modules"
-                                />
-                            )}
-                        />
-                        {!eventFormValues.logAllModules ? (
-                            <div className="mb-4">
+                        <div className="space-y-4">
+                            <Controller
+                                name="logAllModules"
+                                control={eventControl}
+                                render={({ field }) => (
+                                    <Switch
+                                        id="logAllModules"
+                                        checked={field.value}
+                                        onChange={field.onChange}
+                                        secondaryLabel="Collect logs for all modules"
+                                    />
+                                )}
+                            />
+                            {!eventFormValues.logAllModules ? (
                                 <Controller
                                     name="loggedModules"
                                     control={eventControl}
@@ -424,9 +428,7 @@ const LoggingSetting = () => {
                                         />
                                     )}
                                 />
-                            </div>
-                        ) : (
-                            <div className="mb-4">
+                            ) : (
                                 <Controller
                                     name="ignoredModules"
                                     control={eventControl}
@@ -441,24 +443,24 @@ const LoggingSetting = () => {
                                         />
                                     )}
                                 />
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </Widget>
                     <Widget title="Resource Logging">
-                        <Controller
-                            name="logAllResources"
-                            control={eventControl}
-                            render={({ field }) => (
-                                <Switch
-                                    id="logAllResources"
-                                    checked={field.value}
-                                    onChange={field.onChange}
-                                    label="Collect logs for all resources"
-                                />
-                            )}
-                        />
-                        {!eventFormValues.logAllResources ? (
-                            <div className="mb-4">
+                        <div className="space-y-4">
+                            <Controller
+                                name="logAllResources"
+                                control={eventControl}
+                                render={({ field }) => (
+                                    <Switch
+                                        id="logAllResources"
+                                        checked={field.value}
+                                        onChange={field.onChange}
+                                        secondaryLabel="Collect logs for all resources"
+                                    />
+                                )}
+                            />
+                            {!eventFormValues.logAllResources ? (
                                 <Controller
                                     name="loggedResources"
                                     control={eventControl}
@@ -473,9 +475,7 @@ const LoggingSetting = () => {
                                         />
                                     )}
                                 />
-                            </div>
-                        ) : (
-                            <div className="mb-4">
+                            ) : (
                                 <Controller
                                     name="ignoredResources"
                                     control={eventControl}
@@ -490,10 +490,10 @@ const LoggingSetting = () => {
                                         />
                                     )}
                                 />
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </Widget>
-                    <div className="flex justify-end gap-2 mt-4">
+                    <div className="flex justify-end mt-4">
                         <ProgressButton
                             title={'Apply'}
                             inProgressTitle={'Applying..'}

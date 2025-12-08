@@ -126,7 +126,7 @@ function AuditLogs() {
             entity={EntityType.AUDIT_LOG}
             onListCallback={onListCallback}
             getAvailableFiltersApi={useCallback((apiClients: ApiClients) => apiClients.auditLogs.getSearchableFieldInformation5(), [])}
-            addHidden={true}
+            addHidden
             hasCheckboxes={false}
             additionalButtons={buttons}
             headers={auditLogsRowHeaders}
