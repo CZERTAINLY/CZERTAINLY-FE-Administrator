@@ -24,6 +24,7 @@ interface Props {
     titleLink?: string;
     titleSize?: 'small' | 'medium' | 'large' | 'larger';
     titleBoldness?: 'normal' | 'bold' | 'semi-bold';
+    titleColor?: string;
     className?: string;
     children?: React.ReactNode | React.ReactNode[];
     busy?: boolean;
@@ -46,6 +47,7 @@ function Widget({
     titleSize = 'medium',
     widgetButtons,
     titleBoldness = 'bold',
+    titleColor = 'var(--dark-gray-color)',
     className,
     children = [],
     busy = false,
@@ -68,7 +70,7 @@ function Widget({
         title ? (
             <h5
                 className={cn(
-                    'text-[var(--dark-gray-color)]',
+                    `text-[${titleColor}]`,
                     { 'font-bold': titleBoldness === 'bold' },
                     { 'font-semibold': titleBoldness === 'semi-bold' },
                     { 'font-normal': titleBoldness === 'normal' },

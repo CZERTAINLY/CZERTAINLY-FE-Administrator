@@ -517,7 +517,7 @@ function CustomTable({
                     <div className={cn('overflow-x-auto rounded-md', { 'border border-gray-100': hasHeader })}>
                         <div className="min-w-full inline-block align-middle">
                             <div className="overflow-hidden">
-                                <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
+                                <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-700 bg-white">
                                     {hasHeader && (
                                         <thead className="bg-gray-50 dark:bg-neutral-700">
                                             <tr>{header}</tr>

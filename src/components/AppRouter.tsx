@@ -87,7 +87,6 @@ import UsersList from './_pages/users/list';
 
 import NotificationsList from './_pages/notifications/list';
 import NotificationInstanceDetail from './_pages/notifications/notification-instance-details';
-import NotificationInstanceForm from './_pages/notifications/notification-instance-form';
 import EventsSettings from './_pages/notifications/events-settings';
 
 import NotificationProfileDetail from './_pages/notifications/notification-profiles/detail';
@@ -289,8 +288,6 @@ export default function AppRouter() {
                     <Route path={`/notifications`} element={<NotificationsList />} />
                     <Route path={`/events`} element={<EventsSettings />} />
                     <Route path={`/notificationinstances/detail/:id`} element={<NotificationInstanceDetail />} />
-                    <Route path={`/notificationinstances/add`} element={<NotificationInstanceForm />} />
-                    <Route path={`/notificationinstances/edit/:id`} element={<NotificationInstanceForm />} />
 
                     <Route path={`/notificationprofiles`} element={<NotificationProfilesList />} />
                     <Route path={`/notificationprofiles/detail/:id/:version`} element={<NotificationProfileDetail />} />

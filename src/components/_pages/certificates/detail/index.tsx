@@ -1113,7 +1113,6 @@ export default function CertificateDetail() {
                         content: (
                             <Container>
                                 <Widget title="Metadata" titleSize="large" widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}>
-                                    <br />
                                     <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={certificate?.metadata} />
                                 </Widget>
 
