@@ -186,7 +186,7 @@ export default function ContentValueField({ id, descriptor, initialContent, onSu
                 ) : (
                     <TextInput
                         id={descriptor.name}
-                        type={inputType as 'text' | 'number' | 'email' | 'password' | 'date' | 'time'}
+                        type={inputType as 'text' | 'textarea' | 'number' | 'email' | 'password' | 'date' | 'time'}
                         disabled={descriptor.properties.readOnly}
                         value={displayValue || ''}
                         onChange={(value) => field.onChange(value)}

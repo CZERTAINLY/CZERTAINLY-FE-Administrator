@@ -145,7 +145,7 @@ const RulesList = () => {
     return (
         <>
             <Widget
-                titleSize="larger"
+                titleSize="large"
                 title="Rules"
                 refreshAction={getFreshList}
                 busy={isBusy}

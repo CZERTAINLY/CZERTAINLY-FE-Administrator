@@ -131,7 +131,7 @@ const ExecutionsList = () => {
     return (
         <>
             <Widget
-                titleSize="larger"
+                titleSize="large"
                 title="Executions"
                 refreshAction={getFreshListActionGroups}
                 busy={isBusy}

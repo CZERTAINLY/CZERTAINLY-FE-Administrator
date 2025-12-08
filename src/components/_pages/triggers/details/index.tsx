@@ -20,7 +20,8 @@ import TextInput from 'components/TextInput';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { DeviceType, useDeviceType } from 'utils/common-hooks';
 import Breadcrumb from 'components/Breadcrumb';
-import { Check, X, Pencil, Trash2, Rocket, Zap, Book } from 'lucide-react';
+import { Check, X, Trash2, Rocket, Zap, Book } from 'lucide-react';
+import EditIcon from 'components/icons/EditIcon';
 
 interface SelectChangeValue {
     value: string;
@@ -383,7 +384,7 @@ const TriggerDetails = () => {
                                               setUpdateDescription(true);
                                           }}
                                       >
-                                          <Pencil size={16} />
+                                          <EditIcon size={16} />
                                       </Button>
                                   )}
                               </div>,
@@ -590,7 +591,7 @@ const TriggerDetails = () => {
                                     },
 
                                     {
-                                        color: '#7fa2c1',
+                                        color: '#2798E7',
                                         icon: 'fa fa-book',
                                         label: 'Rule',
                                     },

@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 import Button from 'components/Button';
 import Container from 'components/Container';
-import Switch from 'components/Switch';
+import Checkbox from 'components/Checkbox';
 import TextInput from 'components/TextInput';
 import { GlobalMetadataCreateRequestModel, GlobalMetadataUpdateRequestModel } from 'types/globalMetadata';
 import { AttributeContentType, PlatformEnum } from 'types/openapi';
@@ -257,7 +257,9 @@ export default function GlobalMetadataForm({ globalMetadataId, onCancel, onSucce
                         <Controller
                             name="visible"
                             control={control}
-                            render={({ field }) => <Switch id="visible" checked={field.value} onChange={field.onChange} label="Visible" />}
+                            render={({ field }) => (
+                                <Checkbox id="visible" checked={field.value ?? false} onChange={field.onChange} label="Visible" />
+                            )}
                         />
 
                         <Container className="flex-row justify-end modal-footer" gap={4}>

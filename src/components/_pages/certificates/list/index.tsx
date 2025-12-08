@@ -28,7 +28,7 @@ import CertificateOwnerDialog from '../CertificateOwnerDialog';
 import CertificateRAProfileDialog from '../CertificateRAProfileDialog';
 import CertificateStatus from '../CertificateStatus';
 import CertificateUploadDialog from '../CertificateUploadDialog';
-import { Download, Plug, Plus, KeyRound } from 'lucide-react';
+import { ArrowDownToLine, Plug, Plus, KeyRound } from 'lucide-react';
 import Switch from 'components/Switch';
 import CertificateEdit from '../form';
 
@@ -125,7 +125,7 @@ export default function CertificateList({
     const downloadDropDown = useMemo(
         () => (
             <Dropdown
-                title={<Download size={16} />}
+                title={<ArrowDownToLine size={16} />}
                 btnStyle="transparent"
                 // maxWidth={100}
                 disabled={checkedRows.length === 0}
@@ -335,7 +335,7 @@ export default function CertificateList({
                         <CertificateStatus status={certificate.validationStatus} asIcon={true} />,
                         certificate.complianceStatus ? <CertificateStatus status={certificate.complianceStatus} asIcon={true} /> : '',
 
-                        certificate.privateKeyAvailability ? <KeyRound size={16} aria-hidden="true" /> : '',
+                        certificate.privateKeyAvailability ? <KeyRound size={16} aria-hidden="true" strokeWidth={1.5} /> : '',
                         selectCertsOnly || isLinkDisabled ? (
                             certificate.commonName || '(empty)'
                         ) : (
@@ -500,7 +500,6 @@ export default function CertificateList({
                 buttons={[]}
                 icon="users"
                 size="md"
-                noBorder
             />
 
             <Dialog
@@ -518,7 +517,6 @@ export default function CertificateList({
                 buttons={[]}
                 icon="user"
                 size="md"
-                noBorder
             />
 
             <Dialog
@@ -527,8 +525,8 @@ export default function CertificateList({
                 body="Update Entity"
                 toggle={() => setUpdateEntity(false)}
                 buttons={[
-                    { color: 'primary', onClick: () => {}, body: 'Update' },
                     { color: 'secondary', variant: 'outline', onClick: () => setUpdateEntity(false), body: 'Cancel' },
+                    { color: 'primary', onClick: () => {}, body: 'Update' },
                 ]}
             />
 
@@ -545,7 +543,6 @@ export default function CertificateList({
                 toggle={() => setUpdateRaProfile(false)}
                 buttons={[]}
                 size="md"
-                noBorder
                 icon={<Plug size={26} strokeWidth={1} />}
             />
         </>

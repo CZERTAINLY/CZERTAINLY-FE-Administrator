@@ -14,7 +14,7 @@ import Badge from 'components/Badge';
 import { SearchRequestModel } from 'types/certificate';
 import { PlatformEnum, SchedulerJobExecutionStatus } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import { Info, ArrowRightCircle } from 'lucide-react';
+import { Info, ArrowRight } from 'lucide-react';
 import { dateFormatter, timeFormatter } from 'utils/dateUtil';
 
 interface Props {
@@ -71,7 +71,7 @@ function SchedulerJobHistory({ uuid }: Props) {
                     history.startTime && history.endTime
                         ? timeFormatter(new Date(history.endTime).valueOf() - new Date(history.startTime).valueOf())
                         : '',
-                    <>
+                    <div className="flex items-center gap-1">
                         <Badge
                             color={
                                 history.status === SchedulerJobExecutionStatus.Failed
@@ -86,19 +86,19 @@ function SchedulerJobHistory({ uuid }: Props) {
                         {history.resultMessage && (
                             <Button
                                 variant="transparent"
-                                className="p-1"
+                                className="!p-1"
                                 onClick={() => {
                                     setMessage(history.resultMessage ?? '');
                                     setShowMessage(true);
                                 }}
                             >
-                                <Info size={16} />
+                                <Info size={16} strokeWidth={1.5} />
                             </Button>
                         )}
                         {history.resultObjectType && history.resultObjectIdentification ? (
                             <Button
                                 variant="transparent"
-                                className={history.resultMessage ? 'p-0' : 'p-1'}
+                                className="!p-1"
                                 onClick={() => {
                                     navigate(
                                         `../../${history.resultObjectType}/detail/${history.resultObjectIdentification?.reduce(
@@ -107,12 +107,12 @@ function SchedulerJobHistory({ uuid }: Props) {
                                     );
                                 }}
                             >
-                                <ArrowRightCircle size={16} />
+                                <ArrowRight size={16} strokeWidth={1.5} />
                             </Button>
                         ) : (
                             ''
                         )}
-                    </>,
+                    </div>,
                 ],
             })),
         [schedulerJobHistory, schedulerJobExecutionStatusEnum, navigate],

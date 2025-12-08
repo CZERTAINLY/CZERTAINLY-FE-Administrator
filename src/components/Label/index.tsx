@@ -13,7 +13,7 @@ interface Props {
 }
 
 function Label({ htmlFor, title, children, required, className }: Props) {
-    const defaultClasses = 'block text-base text-left font-medium mb-2 text-center dark:text-white';
+    const defaultClasses = 'block text-left text-sm font-medium mb-2 text-center dark:text-white text-[var(--dark-gray-color)]';
     return (
         <label htmlFor={htmlFor} className={cn(defaultClasses, className)}>
             {title || children}

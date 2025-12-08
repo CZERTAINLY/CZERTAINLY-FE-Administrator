@@ -56,18 +56,19 @@ export default function CertificateGroupDialog({ uuids, onCancel, onUpdate }: Pr
                     }))}
                     value={selectedRaProfile || ''}
                     onChange={(value) => setSelectedRaProfile(value as string)}
+                    label="RA Profile"
                 />
             </div>
 
             <Container className="flex-row justify-end modal-footer" gap={4}>
+                <Button color="secondary" variant="outline" onClick={onCancel} className="mr-auto">
+                    Cancel
+                </Button>
                 <Button color="danger" onClick={removeRaprofile}>
                     Remove
                 </Button>
                 <Button color="primary" onClick={updateRaProfile} disabled={!selectedRaProfile}>
                     Update
-                </Button>
-                <Button color="secondary" variant="outline" onClick={onCancel} className="ml-auto">
-                    Cancel
                 </Button>
             </Container>
 

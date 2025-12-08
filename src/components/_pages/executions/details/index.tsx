@@ -14,7 +14,8 @@ import Button from 'components/Button';
 import Container from 'components/Container';
 import TextInput from 'components/TextInput';
 import { ExecutionType, PlatformEnum, Resource } from 'types/openapi';
-import { Check, X, Pencil } from 'lucide-react';
+import { Check, X } from 'lucide-react';
+import EditIcon from 'components/icons/EditIcon';
 
 const ExecutionDetails = () => {
     const { id } = useParams();
@@ -186,7 +187,7 @@ const ExecutionDetails = () => {
                                           }}
                                           disabled={isUpdatingDetails}
                                       >
-                                          <Pencil size={16} />
+                                          <EditIcon size={16} />
                                       </Button>
                                   )}
                               </div>,

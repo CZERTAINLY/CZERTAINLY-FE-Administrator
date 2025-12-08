@@ -55,7 +55,7 @@ export default function CertificateAssociationsFormWidget({
 
     return (
         <Widget title="Default Certificate associations">
-            <div>
+            <div className="space-y-4">
                 <Controller
                     name="owner"
                     control={control}
@@ -74,9 +74,6 @@ export default function CertificateAssociationsFormWidget({
                         />
                     )}
                 />
-            </div>
-
-            <div>
                 <Controller
                     name="groups"
                     control={control}
@@ -96,9 +93,11 @@ export default function CertificateAssociationsFormWidget({
                         />
                     )}
                 />
-            </div>
 
-            <Widget title="Custom Attributes">{renderCustomAttributes}</Widget>
+                <Widget noBorder title="Custom Attributes">
+                    {renderCustomAttributes}
+                </Widget>
+            </div>
         </Widget>
     );
 }

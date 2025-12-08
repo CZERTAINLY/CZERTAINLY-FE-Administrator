@@ -5,6 +5,8 @@ import NewRowWidget, { NewRowWidgetProps } from './NewRowWidget';
 import Select from 'components/Select';
 import Pagination from 'components/Pagination';
 import Checkbox from 'components/Checkbox';
+import Dialog from 'components/Dialog';
+import Button from 'components/Button';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import cn from 'classnames';
 
@@ -50,6 +52,7 @@ interface Props {
     onPageSizeChanged?: (pageSize: number) => void;
     onPageChanged?: (page: number) => void;
     newRowWidgetProps?: NewRowWidgetProps;
+    columnForDetail?: string;
 }
 
 const emptyCheckedRows: (string | number)[] = [];
@@ -70,6 +73,7 @@ function CustomTable({
     onPageSizeChanged,
     onPageChanged,
     newRowWidgetProps,
+    columnForDetail,
 }: Props) {
     const [tblHeaders, setTblHeaders] = useState<TableHeader[]>();
     const [tblData, setTblData] = useState<TableDataRow[]>(data);
@@ -83,6 +87,7 @@ function CustomTable({
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
     const [expandedRow, setExpandedRow] = useState<string | number>();
+    const [dialogOpenRowId, setDialogOpenRowId] = useState<string | number | undefined>();
 
     useEffect(() => {
         setTblCheckedRows(checkedRows || emptyCheckedRows);
@@ -339,14 +344,16 @@ function CustomTable({
         const columns = tblHeaders ? [...tblHeaders] : [];
 
         if (hasCheckboxes) columns.unshift({ id: '__checkbox__', content: '', sortable: false, width: '0%' });
-        if (hasDetails) columns.unshift({ id: 'details', content: '', sortable: false, width: '1%' });
         return columns.map((header) => (
             <Fragment key={header.id}>
                 <th
                     scope="col"
-                    className={cn('p-2 text-start text-xs font-medium text-gray-500 uppercase dark:text-neutral-400', {
-                        'cursor-pointer': header.sortable,
-                    })}
+                    className={cn(
+                        'p-2.5 text-start text-xs font-medium text-gray-500 uppercase dark:text-neutral-400 !color-[#6B7280] bg-[#F8FAFC] whitespace-nowrap',
+                        {
+                            'cursor-pointer': header.sortable,
+                        },
+                    )}
                     data-id={header.id}
                     {...(header.sortable ? { onClick: onColumnSortClick } : {})}
                     style={{ ...(header.width ? { width: header.width } : {}), ...(header.align ? { textAlign: header.align } : {}) }}
@@ -359,7 +366,7 @@ function CustomTable({
                                 id={`${header.id}__checkbox__`}
                             />
                         ) : (
-                            <>&nbsp;</>
+                            <div>&nbsp;</div>
                         )
                     ) : header.sortable ? (
                         <div className="flex items-center gap-1">
@@ -373,17 +380,7 @@ function CustomTable({
                 </th>
             </Fragment>
         ));
-    }, [
-        tblHeaders,
-        hasCheckboxes,
-        hasDetails,
-        onColumnSortClick,
-        hasAllCheckBox,
-        multiSelect,
-        checkAllChecked,
-        onCheckAllCheckboxClick,
-        getSortIcon,
-    ]);
+    }, [tblHeaders, hasCheckboxes, onColumnSortClick, hasAllCheckBox, multiSelect, checkAllChecked, onCheckAllCheckboxClick, getSortIcon]);
 
     const getRowStyle = useCallback((row: TableDataRow) => {
         if (!row.options) return undefined;
@@ -415,30 +412,11 @@ function CustomTable({
                         style={getRowStyle(row)}
                         data-id={row.id}
                     >
-                        {!hasDetails ? (
-                            <></>
-                        ) : !row.detailColumns || row.detailColumns.length === 0 ? (
-                            <td></td>
-                        ) : (
-                            <td
-                                id="show-detail-more-column"
-                                key="show-detail-more-column"
-                                className="px-2 py-2 whitespace-nowrap text-xs font-medium text-gray-800 dark:text-neutral-200"
-                            >
-                                {expandedRow === row.id ? (
-                                    <ChevronUp size={16} className="text-[var(--status-light-gray-color)]" />
-                                ) : (
-                                    <ChevronDown size={16} className="text-[var(--status-light-gray-color)]" />
-                                )}
-                            </td>
-                        )}
                         {hasCheckboxes && (
-                            <td className="p-2">
+                            <td className="p-2.5">
                                 <Checkbox
                                     checked={tblCheckedRows.includes(row.id)}
                                     onChange={(value) => {
-                                        console.log('1111111value', value);
-                                        console.log('1111111row.id', row.id);
                                         onRowCheckboxClick(value, row.id.toString());
                                     }}
                                     id={`${row.id}__checkbox__`}
@@ -446,43 +424,40 @@ function CustomTable({
                             </td>
                         )}
 
-                        {row.columns.map((column, index) => (
-                            <td
-                                key={index}
-                                style={tblHeaders && tblHeaders[index]?.align ? { textAlign: tblHeaders[index]?.align } : {}}
-                                className="px-1 py-2 whitespace-nowrap text-xs font-medium text-gray-800 dark:text-neutral-200"
-                            >
-                                <div>{column ? column : <></>}</div>
-                            </td>
-                        ))}
+                        {row.columns.map((column, index) => {
+                            const isFirstColumn = index === 0;
+                            const shouldShowButton = hasDetails && isFirstColumn && row.detailColumns && row.detailColumns.length > 0;
+
+                            return (
+                                <td
+                                    key={index}
+                                    style={tblHeaders && tblHeaders[index]?.align ? { textAlign: tblHeaders[index]?.align } : {}}
+                                    className="px-2.5 py-2 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200"
+                                >
+                                    {shouldShowButton ? (
+                                        <Button
+                                            variant="transparent"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setDialogOpenRowId(row.id);
+                                            }}
+                                            className="!p-0 hover:bg-transparent text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 p-0 h-auto font-medium"
+                                        >
+                                            {column}
+                                        </Button>
+                                    ) : (
+                                        <div>{column ? column : <></>}</div>
+                                    )}
+                                </td>
+                            );
+                        })}
                     </tr>
-                    {hasDetails && (
-                        <tr key={`trd${row.id}`}>
-                            {row.detailColumns &&
-                                expandedRow === row.id &&
-                                (row.detailColumns.length === 1 ? (
-                                    <td className="px-2 py-2 whitespace-nowrap text-xs font-medium text-gray-800 dark:text-neutral-200">
-                                        {row.detailColumns[0]}
-                                    </td>
-                                ) : (
-                                    row.detailColumns.map((e, index) => {
-                                        return (
-                                            <td
-                                                key={index}
-                                                className="px-2 py-2 whitespace-nowrap text-xs font-medium text-gray-800 dark:text-neutral-200"
-                                            >
-                                                <div>{e}</div>
-                                            </td>
-                                        );
-                                    })
-                                ))}
-                        </tr>
-                    )}
                 </Fragment>
             ));
     }, [
         tblData,
         hasPagination,
+        hasDetails,
         pageSize,
         paginationData,
         page,
@@ -490,15 +465,41 @@ function CustomTable({
         onRowToggleSelection,
         tblCheckedRows,
         onRowCheckboxClick,
-        hasDetails,
-        expandedRow,
         tblHeaders,
         getRowStyle,
     ]);
 
+    const detailDialogRow = useMemo(() => {
+        return tblData.find((row) => row.id === dialogOpenRowId);
+    }, [tblData, dialogOpenRowId]);
+
+    const detailDialogContent = useMemo(() => {
+        if (!detailDialogRow || !detailDialogRow.detailColumns || detailDialogRow.detailColumns.length === 0) {
+            return null;
+        }
+
+        // Create default headers without using parent table headers
+        const detailHeaders: TableHeader[] = detailDialogRow.detailColumns.map((_, index) => ({
+            id: `detail-${index}`,
+            content: '',
+            sortable: false,
+        }));
+
+        // Create data rows for detail table - if detailColumns.length === 1, it spans all columns
+        // Otherwise, each detailColumn maps to its corresponding column
+        const detailData: TableDataRow[] = [
+            {
+                id: 'detail-row',
+                columns: detailDialogRow.detailColumns,
+            },
+        ];
+
+        return <CustomTable headers={detailHeaders} data={detailData} hasHeader={false} hasPagination={false} />;
+    }, [detailDialogRow]);
+
     return (
         <div data-testid="custom-table">
-            {canSearch && (
+            {canSearch && tblData?.length > 0 && (
                 <div className="flex justify-end mb-3">
                     <div className="max-w-sm">
                         <input
@@ -530,7 +531,7 @@ function CustomTable({
                 </div>
             )}
             {hasPagination && (
-                <div className="flex justify-between items-center gap-2">
+                <div className="flex justify-between items-center gap-2 mt-6">
                     <div>
                         {tblData?.length > 0 && (
                             <Select
@@ -590,6 +591,27 @@ function CustomTable({
                     isBusy={newRowWidgetProps.isBusy}
                     newItemsList={newRowWidgetProps.newItemsList}
                     onAddClick={newRowWidgetProps.onAddClick}
+                />
+            )}
+            {hasDetails && detailDialogRow && (
+                <Dialog
+                    isOpen={!!dialogOpenRowId}
+                    toggle={() => setDialogOpenRowId(undefined)}
+                    caption={
+                        typeof detailDialogRow.columns[0] === 'string'
+                            ? detailDialogRow.columns[0]
+                            : jsxInnerText(detailDialogRow.columns[0] as React.ReactNode)
+                    }
+                    body={detailDialogContent}
+                    size="xl"
+                    buttons={[
+                        {
+                            color: 'secondary',
+                            variant: 'outline',
+                            onClick: () => setDialogOpenRowId(undefined),
+                            body: 'Close',
+                        },
+                    ]}
                 />
             )}
         </div>

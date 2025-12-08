@@ -43,12 +43,10 @@ export default function AdministratorsList() {
     }, [dispatch]);
 
     useEffect(() => {
-        console.log('11111', 11111);
         getFreshData();
     }, [getFreshData]);
 
     useEffect(() => {
-        console.log('22222', 22222);
         setConfirmForceDelete(bulkDeleteErrorMessages.length > 0);
     }, [bulkDeleteErrorMessages]);
 
@@ -56,7 +54,6 @@ export default function AdministratorsList() {
     const wasUpdating = useRef(isUpdating);
 
     useEffect(() => {
-        console.log('33333', 33333);
         if (wasCreating.current && !isCreating) {
             setIsAddModalOpen(false);
             getFreshData();
@@ -65,7 +62,6 @@ export default function AdministratorsList() {
     }, [isCreating, getFreshData]);
 
     useEffect(() => {
-        console.log('44444', 44444);
         if (wasUpdating.current && !isUpdating) {
             setEditingAcmeProfileId(undefined);
             getFreshData();

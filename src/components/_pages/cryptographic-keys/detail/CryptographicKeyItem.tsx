@@ -513,8 +513,8 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                 ]}
             />
 
@@ -523,8 +523,8 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 caption={`Compromised Key`}
                 body={
                     <div>
-                        <p>You are about to mark the Key as compromised. Is this what you want to do?</p>
-                        <p className="my-2">
+                        <p className="text-center">You are about to mark the Key as compromised. Is this what you want to do?</p>
+                        <p className="mt-2 mb-4 text-center">
                             <b>Warning:</b> This action cannot be undone.
                         </p>
                         <Select
@@ -537,8 +537,8 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 }
                 toggle={() => setConfirmCompromise(false)}
                 buttons={[
-                    { color: 'danger', onClick: onCompromise, body: 'Yes' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmCompromise(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onCompromise, body: 'Yes' },
                 ]}
             />
 
@@ -557,8 +557,8 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 toggle={() => setConfirmDestroy(false)}
                 icon="destroy"
                 buttons={[
-                    { color: 'danger', onClick: onDestroy, body: 'Destroy' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDestroy(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDestroy, body: 'Destroy' },
                 ]}
             />
 
@@ -620,10 +620,9 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 body={keyUsageBody}
                 toggle={() => setKeyUsageUpdate(false)}
                 size="md"
-                noBorder
                 buttons={[
-                    { color: 'primary', onClick: onUpdateKeyUsageConfirmed, body: 'Update' },
                     { color: 'secondary', variant: 'outline', onClick: () => setKeyUsageUpdate(false), body: 'Cancel' },
+                    { color: 'primary', onClick: onUpdateKeyUsageConfirmed, body: 'Update' },
                 ]}
             />
         </div>

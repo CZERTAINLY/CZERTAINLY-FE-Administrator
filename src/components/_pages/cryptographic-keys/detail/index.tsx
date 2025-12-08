@@ -413,8 +413,8 @@ export default function CryptographicKeyDetail() {
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                 ]}
             />
             <Dialog
@@ -424,8 +424,8 @@ export default function CryptographicKeyDetail() {
                 noBorder
                 body={
                     <div>
-                        <p>You are about to mark the Key as compromised. Is this what you want to do?</p>
-                        <p className="my-2">
+                        <p className="text-center">You are about to mark the Key as compromised. Is this what you want to do?</p>
+                        <p className="mt-2 mb-4 text-center">
                             <b>Warning:</b> This action cannot be undone.
                         </p>
                         <Select
@@ -438,8 +438,8 @@ export default function CryptographicKeyDetail() {
                 }
                 toggle={() => setConfirmCompromise(false)}
                 buttons={[
-                    { color: 'danger', onClick: onCompromise, body: 'Yes' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmCompromise(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onCompromise, body: 'Yes' },
                 ]}
             />
             <Dialog
@@ -454,8 +454,8 @@ export default function CryptographicKeyDetail() {
                 toggle={() => setConfirmDestroy(false)}
                 icon="destroy"
                 buttons={[
-                    { color: 'danger', onClick: onDestroy, body: 'Destroy' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDestroy(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDestroy, body: 'Destroy' },
                 ]}
             />
             <Dialog

@@ -350,8 +350,8 @@ function CryptographicKeyList() {
                 caption={`Compromise ${checkedRows.length > 1 ? 'Keys' : 'Key'}`}
                 body={
                     <div>
-                        <p>You are about to mark the Key as compromised. Is this what you want to do?</p>
-                        <p className="my-2">
+                        <p className="text-center">You are about to mark the Key as compromised. Is this what you want to do?</p>
+                        <p className="mt-2 mb-4 text-center">
                             <b>Warning:</b> This action cannot be undone.
                         </p>
                         <Select
@@ -365,8 +365,8 @@ function CryptographicKeyList() {
                 toggle={() => setConfirmCompromise(false)}
                 size="md"
                 buttons={[
-                    { color: 'danger', onClick: onCompromise, body: 'Yes' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmCompromise(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onCompromise, body: 'Yes' },
                 ]}
             />
             <Dialog
@@ -376,8 +376,8 @@ function CryptographicKeyList() {
                 toggle={() => setConfirmDestroy(false)}
                 icon="destroy"
                 buttons={[
-                    { color: 'danger', onClick: onDestroy, body: 'Destroy' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDestroy(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDestroy, body: 'Destroy' },
                 ]}
             />
             <Dialog
@@ -386,9 +386,8 @@ function CryptographicKeyList() {
                 body={keyUsageBody}
                 toggle={() => setKeyUsageUpdate(false)}
                 size="md"
-                noBorder
                 buttons={[
-                    { color: 'primary', variant: 'outline', onClick: () => setKeyUsageUpdate(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setKeyUsageUpdate(false), body: 'Cancel' },
                     { color: 'primary', onClick: onUpdateKeyUsageConfirmed, body: 'Update' },
                 ]}
             />

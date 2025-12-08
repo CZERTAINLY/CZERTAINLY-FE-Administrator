@@ -14,7 +14,8 @@ import { PlatformEnum, Resource } from 'types/openapi';
 import Button from 'components/Button';
 import Container from 'components/Container';
 import TextInput from 'components/TextInput';
-import { Check, X, PencilLine, Trash2 } from 'lucide-react';
+import { Check, X, Trash2 } from 'lucide-react';
+import EditIcon from 'components/icons/EditIcon';
 interface SelectChangeValue {
     value: string;
     label: string;
@@ -227,7 +228,7 @@ const RuleDetails = () => {
                                               setUpdateDescription(true);
                                           }}
                                       >
-                                          <PencilLine size={16} />
+                                          <EditIcon size={16} />
                                       </Button>
                                   )}
                               </div>,

@@ -10,9 +10,10 @@ interface Props {
     style?: React.CSSProperties;
     className?: string;
     title?: string;
+    size?: 'small' | 'medium' | 'large';
 }
 
-function Switch({ color = 'secondary', onClick, onRemove, children, style, className, title }: Props) {
+function Switch({ color = 'secondary', onClick, onRemove, children, style, className, title, size = 'small' }: Props) {
     const colorClasses = {
         gray: 'bg-gray-800 text-white dark:bg-white dark:text-neutral-800',
         secondary: 'bg-gray-500 text-white',
@@ -27,10 +28,13 @@ function Switch({ color = 'secondary', onClick, onRemove, children, style, class
         <span
             onClick={onClick}
             className={cn(
-                'inline-flex items-center justify-center gap-x-1.5 py-0.5 px-1.5 rounded-md text-xs font-medium min-w-[24px]',
+                'preline-badge inline-flex items-center justify-center gap-x-1.5 rounded-md font-medium min-w-[24px]',
                 colorClasses[color],
                 {
                     'cursor-pointer': !!onClick,
+                    'text-xs py-0.5 px-1.5': size === 'small',
+                    'text-xs py-1.5 px-2.5': size === 'medium',
+                    'text-sm py-2 px-3': size === 'large',
                 },
                 className,
             )}

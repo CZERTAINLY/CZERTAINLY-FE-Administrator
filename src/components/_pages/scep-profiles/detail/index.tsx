@@ -2,7 +2,6 @@ import AttributeViewer from 'components/Attributes/AttributeViewer';
 import CustomAttributeWidget from 'components/Attributes/CustomAttributeWidget';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
-import SwitchField from 'components/Input/SwitchField';
 import StatusBadge from 'components/StatusBadge';
 import Widget from 'components/Widget';
 

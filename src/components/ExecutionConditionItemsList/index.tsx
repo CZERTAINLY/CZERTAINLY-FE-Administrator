@@ -79,7 +79,7 @@ const ConditionsExecutionsList = ({
     }, [ruleConditions, actionExecutions, isBusy]);
 
     return (
-        <Widget title={widgetTitle} titleSize="larger" busy={isBusy}>
+        <Widget title={widgetTitle} titleSize="large" busy={isBusy}>
             <div>{renderListData}</div>
         </Widget>
     );

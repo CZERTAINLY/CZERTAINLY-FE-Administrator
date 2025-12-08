@@ -88,18 +88,15 @@ export default function ComplianceCheckResultWidget({ widgetLockName, objectUuid
             refreshAction={getFreshComplianceCheckResult}
             dataTestId="compliance-status-widget"
         >
-            <br />
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <span>Status:</span>
-                    <span>
-                        <CertificateStatus status={(complianceCheckResult?.status as ComplianceStatus) || ''} />
-                    </span>
+                    <CertificateStatus badgeSize="medium" status={(complianceCheckResult?.status as ComplianceStatus) || ''} />
                 </div>
                 {complianceCheckResult?.timestamp && (
                     <>
-                        <div style={{ width: '1px', height: '10px', backgroundColor: '#6c757d' }} />
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <div style={{ width: '1px', height: '20px', backgroundColor: '#E5E7EB' }} />
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                             <span>Checked:</span>
                             <span>{dateFormatter(complianceCheckResult?.timestamp || '')}</span>
                         </div>
@@ -112,7 +109,6 @@ export default function ComplianceCheckResultWidget({ widgetLockName, objectUuid
                     <span>{complianceCheckResult?.message}</span>
                 </div>
             )}
-            <br />
             <CustomTable headers={complianceHeaders} data={complianceData} hasPagination={true} />
         </Widget>
     );

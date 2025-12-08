@@ -275,7 +275,7 @@ export default function ComplianceProfileDetail() {
 
     const entityDetailMenuContent = useMemo(
         () => (
-            <Widget titleSize="larger" busy={selectedEntityDetails?.entityDetails?.entityType === 'group' ? isFetchingGroupRules : false}>
+            <Widget titleSize="large" busy={selectedEntityDetails?.entityDetails?.entityType === 'group' ? isFetchingGroupRules : false}>
                 {selectedEntityDetails?.entityDetails?.entityType === 'rule' && (
                     <TabLayout
                         tabs={[
@@ -431,8 +431,8 @@ export default function ComplianceProfileDetail() {
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                 ]}
                 dataTestId="delete-confirmation-dialog"
             />

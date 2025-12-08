@@ -304,8 +304,8 @@ export default function TokenProfileDetail() {
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                 ]}
             />
 
@@ -315,10 +315,9 @@ export default function TokenProfileDetail() {
                 body={keyUsageBody}
                 toggle={() => setKeyUsageUpdate(false)}
                 size="md"
-                noBorder
                 buttons={[
-                    { color: 'primary', onClick: onUpdateKeyUsageConfirmed, body: 'Update' },
                     { color: 'secondary', variant: 'outline', onClick: () => setKeyUsageUpdate(false), body: 'Cancel' },
+                    { color: 'primary', onClick: onUpdateKeyUsageConfirmed, body: 'Update' },
                 ]}
             />
 

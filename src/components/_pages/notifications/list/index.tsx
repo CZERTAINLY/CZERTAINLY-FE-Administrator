@@ -10,11 +10,10 @@ import PagedList from 'components/PagedList/PagedList';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { useNavigate } from 'react-router';
 import Button from 'components/Button';
-import Container from 'components/Container';
 import { SearchRequestModel } from 'types/certificate';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { dateFormatter } from 'utils/dateUtil';
-import { ArrowRightCircle } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 function NotificationsList() {
     const dispatch = useDispatch();
@@ -68,7 +67,7 @@ function NotificationsList() {
                     dateFormatter(notification.sentAt),
                     <div
                         key={notification.uuid}
-                        className={notification.readAt ? '' : 'font-extrabold'}
+                        className={notification.readAt ? '' : 'font-semibold'}
                         onClick={(event) => {
                             event.stopPropagation();
                             if (!notification.readAt) {
@@ -79,8 +78,8 @@ function NotificationsList() {
                         {notification.message}
                         {notification.targetObjectType && notification.targetObjectIdentification && (
                             <Button
-                                variant="transparent"
-                                className={'px-1 m-0'}
+                                color="secondary"
+                                className="ml-2 !rounded-full !p-0.5 relative top-[-1px]"
                                 onClick={() => {
                                     navigate(
                                         `/${notification.targetObjectType}/detail/${notification.targetObjectIdentification?.reduce(
@@ -89,7 +88,7 @@ function NotificationsList() {
                                     );
                                 }}
                             >
-                                <ArrowRightCircle size={16} />
+                                <ArrowRight size={10} strokeWidth={3} />
                             </Button>
                         )}
                     </div>,
@@ -104,27 +103,26 @@ function NotificationsList() {
     );
 
     return (
-        <Container className="themed-container" fluid>
-            <PagedList
-                entity={EntityType.NOTIFICATIONS}
-                onListCallback={onListCallback}
-                onDeleteCallback={(uuids) =>
-                    uuids.length > 1
-                        ? dispatch(actions.bulkDeleteNotification({ uuids }))
-                        : dispatch(actions.deleteNotification({ uuid: uuids[0] }))
-                }
-                headers={notificationsRowHeaders}
-                data={notificationsList}
-                isBusy={isBusy}
-                addHidden={true}
-                title="List of notifications"
-                entityNameSingular="a Notification"
-                entityNamePlural="Notifications"
-                pageWidgetLockName={LockWidgetNameEnum.ListOfNotifications}
-                additionalButtons={buttons}
-                hasDetails={true}
-            />
-        </Container>
+        <PagedList
+            entity={EntityType.NOTIFICATIONS}
+            onListCallback={onListCallback}
+            onDeleteCallback={(uuids) =>
+                uuids.length > 1
+                    ? dispatch(actions.bulkDeleteNotification({ uuids }))
+                    : dispatch(actions.deleteNotification({ uuid: uuids[0] }))
+            }
+            headers={notificationsRowHeaders}
+            data={notificationsList}
+            isBusy={isBusy}
+            addHidden
+            title="List of notifications"
+            entityNameSingular="a Notification"
+            entityNamePlural="Notifications"
+            pageWidgetLockName={LockWidgetNameEnum.ListOfNotifications}
+            additionalButtons={buttons}
+            hasDetails
+            columnForDetail="message"
+        />
     );
 }
 

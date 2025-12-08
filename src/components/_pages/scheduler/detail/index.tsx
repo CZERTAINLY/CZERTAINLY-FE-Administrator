@@ -8,7 +8,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 import Badge from 'components/Badge';
-import SwitchField from 'components/Input/SwitchField';
+import Switch from 'components/Switch';
 import { PlatformEnum, Resource, SchedulerJobExecutionStatus } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { getStrongFromCronExpression } from 'utils/dateUtil';
@@ -215,15 +215,15 @@ export default function SchedulerJobDetail() {
                       },
                       {
                           id: 'oneTime',
-                          columns: ['One Time Only', <SwitchField label="" viewOnly={{ checked: schedulerJob.oneTime }} id="oneTime" />],
+                          columns: ['One Time Only', <Switch checked={schedulerJob.oneTime} onChange={() => {}} id="oneTime" disabled />],
                       },
                       {
                           id: 'system',
-                          columns: ['System Job', <SwitchField label="" viewOnly={{ checked: schedulerJob.system }} id="system" />],
+                          columns: ['System Job', <Switch checked={schedulerJob.system} onChange={() => {}} id="system" disabled />],
                       },
                       {
                           id: 'enabled',
-                          columns: ['Enabled', <SwitchField label="" viewOnly={{ checked: schedulerJob.enabled }} id="enabled" />],
+                          columns: ['Enabled', <Switch checked={schedulerJob.enabled} onChange={() => {}} id="enabled" disabled />],
                       },
                       {
                           id: 'status',
@@ -248,11 +248,9 @@ export default function SchedulerJobDetail() {
                               'Cron Expression',
                               <>
                                   {schedulerJob.cronExpression}&nbsp;
-                                  <Info
-                                      size={16}
-                                      className="inline-block"
-                                      title={getStrongFromCronExpression(schedulerJob.cronExpression)}
-                                  />
+                                  <span title={getStrongFromCronExpression(schedulerJob.cronExpression)}>
+                                      <Info size={16} className="inline-block" />
+                                  </span>
                               </>,
                           ],
                       },
@@ -288,8 +286,8 @@ export default function SchedulerJobDetail() {
                     toggle={() => setConfirmDelete(false)}
                     icon="delete"
                     buttons={[
-                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                         { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     ]}
                 />
                 <Dialog

@@ -37,7 +37,8 @@ import {
 import { CertificateState as CertStatus, CertificateProtocol, CertificateValidationStatus } from 'types/openapi';
 import CertificateDownloadForm from './CertificateDownloadForm';
 import Button from 'components/Button';
-import { Pencil, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
+import EditIcon from 'components/icons/EditIcon';
 
 interface SelectChangeValue {
     value: string;
@@ -673,12 +674,11 @@ export default function CertificateDetailsContent({ certificate, validationResul
                                   }}
                                   title="Update Owner"
                               >
-                                  <Pencil size={16} />
+                                  <EditIcon size={16} />
                               </Button>
 
                               <Button
                                   variant="transparent"
-                                  color="danger"
                                   disabled={!certificate?.ownerUuid || isCertificateArchived}
                                   onClick={() => {
                                       if (!certificate?.ownerUuid || !certificate?.uuid) return;
@@ -714,7 +714,7 @@ export default function CertificateDetailsContent({ certificate, validationResul
                                   onClick={() => setUpdateGroup(true)}
                                   title="Update Group"
                               >
-                                  <Pencil size={16} />
+                                  <EditIcon size={16} />
                               </Button>
                               <Button
                                   variant="transparent"
@@ -755,7 +755,7 @@ export default function CertificateDetailsContent({ certificate, validationResul
                                   onClick={() => setUpdateRaProfile(true)}
                                   title="Update RA Profile"
                               >
-                                  <Pencil size={16} />
+                                  <EditIcon size={16} />
                               </Button>
                               <Button
                                   variant="transparent"
@@ -818,8 +818,8 @@ export default function CertificateDetailsContent({ certificate, validationResul
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                 ]}
             />
 
@@ -835,36 +835,40 @@ export default function CertificateDetailsContent({ certificate, validationResul
                 }
                 toggle={() => setRenew(false)}
                 buttons={[]}
+                icon="refresh"
+                size="xl"
             />
 
             <Dialog
-                size="lg"
                 isOpen={rekey}
                 caption={`Rekey Certificate`}
                 body={<CertificateRekeyDialog onCancel={() => setRekey(false)} certificate={certificate} />}
                 toggle={() => setRekey(false)}
                 buttons={[]}
+                icon="shuffle"
+                size="xl"
             />
 
             <Dialog
                 isOpen={revoke}
                 caption={`Revoke Certificate`}
                 body={
-                    <div>
-                        <Select
-                            id="revokeReason"
-                            options={certificateRevokeReasonOptions}
-                            placeholder={`Select Revocation Reason`}
-                            value={revokeReason || ''}
-                            onChange={(value) => setRevokeReason(value as CertificateRevocationReason)}
-                        />
-                    </div>
+                    <Select
+                        id="revokeReason"
+                        options={certificateRevokeReasonOptions}
+                        placeholder={`Select Revocation Reason`}
+                        value={revokeReason || ''}
+                        onChange={(value) => setRevokeReason(value as CertificateRevocationReason)}
+                        label="Revocation Reason"
+                    />
                 }
                 toggle={() => setRevoke(false)}
+                icon="minus"
                 buttons={[
-                    { color: 'primary', onClick: onRevoke, body: 'Revoke' },
                     { color: 'secondary', variant: 'outline', onClick: () => setRevoke(false), body: 'Cancel' },
+                    { color: 'primary', onClick: onRevoke, body: 'Revoke' },
                 ]}
+                size="lg"
             />
 
             <Dialog
@@ -883,10 +887,9 @@ export default function CertificateDetailsContent({ certificate, validationResul
                     />
                 }
                 toggle={onCancelGroupUpdate}
-                noBorder
                 buttons={[
-                    { color: 'primary', onClick: onUpdateGroup, body: 'Update', disabled: isUpdatingGroup },
                     { color: 'secondary', variant: 'outline', onClick: onCancelGroupUpdate, body: 'Cancel' },
+                    { color: 'primary', onClick: onUpdateGroup, body: 'Update', disabled: isUpdatingGroup },
                 ]}
             />
 
@@ -902,11 +905,12 @@ export default function CertificateDetailsContent({ certificate, validationResul
                         onChange={(value) => setOwnerUuid(value as string)}
                     />
                 }
+                icon="user"
+                size="md"
                 toggle={onCancelOwnerUpdate}
-                noBorder
                 buttons={[
-                    { color: 'primary', onClick: onUpdateOwner, body: 'Update', disabled: ownerUuid === undefined || isUpdatingOwner },
                     { color: 'secondary', variant: 'outline', onClick: onCancelOwnerUpdate, body: 'Cancel' },
+                    { color: 'primary', onClick: onUpdateOwner, body: 'Update', disabled: ownerUuid === undefined || isUpdatingOwner },
                 ]}
             />
 
@@ -921,18 +925,19 @@ export default function CertificateDetailsContent({ certificate, validationResul
                             placeholder={`Select RA Profile`}
                             value={raProfile || ''}
                             onChange={(value) => updateRaAndAuthorityState((value as string) || '')}
+                            label="RA Profile"
                         />
                     </div>
                 }
                 toggle={onCancelRaProfileUpdate}
                 buttons={[
+                    { color: 'secondary', variant: 'outline', onClick: onCancelRaProfileUpdate, body: 'Cancel' },
                     {
                         color: 'primary',
                         onClick: onUpdateRaProfile,
                         body: 'Update',
                         disabled: raProfile === undefined || isUpdatingRaProfile,
                     },
-                    { color: 'secondary', variant: 'outline', onClick: onCancelRaProfileUpdate, body: 'Cancel' },
                 ]}
             />
         </>

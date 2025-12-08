@@ -75,7 +75,7 @@ export function SendNotificationExecutionItems({ mode, isUpdating, notificationP
     );
 
     return (
-        <Widget title="Execution Items" busy={isFetchingList || isUpdating} titleSize="larger">
+        <Widget title="Execution Items" busy={isFetchingList || isUpdating} titleSize="large">
             <div style={{ width: '99%', borderBottom: 'solid 1px silver', marginBottom: '1rem' }}>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div className="md:col-span-3">

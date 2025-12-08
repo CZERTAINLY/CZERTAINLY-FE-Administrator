@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { FormProvider, useForm, useWatch } from 'react-hook-form';
+import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import Button from 'components/Button';
 import { validateNonZeroInteger, validatePositiveInteger } from 'utils/validators';
@@ -9,14 +9,12 @@ import Spinner from 'components/Spinner';
 import { actions, selectors } from 'ducks/ra-profiles';
 import { RaProfileResponseModel } from 'types/ra-profiles';
 import TextInput from 'components/TextInput';
-import SwitchField from 'components/Input/SwitchField';
-import { Controller } from 'react-hook-form';
+import Switch from 'components/Switch';
 import { buildValidationRules } from 'utils/validators-helper';
 import ProgressButton from 'components/ProgressButton';
 import { isObjectSame } from 'utils/common-utils';
 import { SettingsPlatformModel } from 'types/settings';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
-import Switch from 'components/Switch';
 import { renderExpiringThresholdLabel, renderValidationFrequencyLabel } from 'utils/certificate-validation';
 
 type FormValues = {
@@ -144,7 +142,18 @@ export default function CertificateValidationDialogBody({ raProfile, platformSet
         <>
             <FormProvider {...methods}>
                 <form onSubmit={handleSubmit(onSubmit)} className="mt-2">
-                    <SwitchField id="usePlatformSettings" label="Use Platform Certificate Validation Settings" />
+                    <Controller
+                        name="usePlatformSettings"
+                        control={control}
+                        render={({ field }) => (
+                            <Switch
+                                id="usePlatformSettings"
+                                label="Use Platform Certificate Validation Settings"
+                                checked={field.value || false}
+                                onChange={field.onChange}
+                            />
+                        )}
+                    />
                     {watchedUsePlatformSettings ? (
                         <>
                             <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
@@ -154,7 +163,18 @@ export default function CertificateValidationDialogBody({ raProfile, platformSet
                         </>
                     ) : (
                         <>
-                            <SwitchField id="enabled" label="Enable Certificate Validation" />
+                            <Controller
+                                name="enabled"
+                                control={control}
+                                render={({ field }) => (
+                                    <Switch
+                                        id="enabled"
+                                        label="Enable Certificate Validation"
+                                        checked={field.value || false}
+                                        onChange={field.onChange}
+                                    />
+                                )}
+                            />
                             {watchedEnabled && (
                                 <>
                                     <Controller

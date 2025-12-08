@@ -167,7 +167,7 @@ const TriggerList = () => {
     return (
         <>
             <Widget
-                titleSize="larger"
+                titleSize="large"
                 title="Triggers"
                 refreshAction={getFreshList}
                 busy={isBusy}

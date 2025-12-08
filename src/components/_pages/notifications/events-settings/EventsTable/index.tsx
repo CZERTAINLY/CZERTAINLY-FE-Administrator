@@ -311,7 +311,7 @@ const EventsTable = ({ mode, resource, resourceUuid, widgetLocks }: Props) => {
             <Widget
                 title={textContent.title}
                 refreshAction={mode === 'association' ? fetchEventAssociations : fetchEventsSettings}
-                titleSize="larger"
+                titleSize="large"
                 widgetButtons={buttons}
                 widgetLockName={widgetLocks}
                 lockSize="large"

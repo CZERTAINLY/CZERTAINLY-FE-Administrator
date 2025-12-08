@@ -86,7 +86,7 @@ const colorMapByDaysOfExpiration: { [key: string]: string } = {
     '30': '#EAB308',
     '60': '#14B8A6',
     '90': '#2798E7',
-    More: '#1ab394',
+    More: '#14B8A6',
     Expired: '#EF4444',
 };
 

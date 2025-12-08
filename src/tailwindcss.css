@@ -11,7 +11,7 @@
     --main-background-color: #f8fafc;
     --dark-gray-color: #1f2937;
 
-    --status-success-color: #1ab394;
+    --status-success-color: #14b8a6;
     --status-danger-color: #ef4444;
     --status-warning-color: #eab308;
     --status-dark-color: var(--dark-gray-color);
@@ -56,6 +56,11 @@ button {
 
 table a {
     color: var(--primary-blue-color);
+    font-weight: 600;
+}
+
+table .preline-badge {
+    font-size: 10px;
 }
 
 .modal-footer {

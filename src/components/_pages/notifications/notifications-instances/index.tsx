@@ -113,7 +113,7 @@ const NotificationInstanceList = () => {
     return (
         <>
             <Widget
-                titleSize="larger"
+                titleSize="large"
                 title="Notification Store"
                 refreshAction={getFreshNotificationInstances}
                 busy={isBusy}

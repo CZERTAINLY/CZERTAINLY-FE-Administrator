@@ -17,12 +17,12 @@ export interface Props {
 }
 
 const baseButton =
-    'py-2.5 px-3.5 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden border';
+    'inline-flex items-center gap-x-2 text-sm font-medium rounded-lg disabled:opacity-35 disabled:pointer-events-none focus:outline-hidden border';
 
 const buttonClasses = {
-    solid: '',
-    outline: '',
-    transparent: '!p-2 border-transparent dark:text-white',
+    solid: 'py-2.5 px-3.5',
+    outline: 'py-2.5 px-3.5',
+    transparent: 'p-2 border-transparent dark:text-white',
 };
 
 const colorClasses = {
@@ -89,7 +89,7 @@ function Button({
 
     if (title) {
         return (
-            <Tooltip content={title} placement="bottom">
+            <Tooltip content={title} disabled={disabled}>
                 {buttonElement}
             </Tooltip>
         );

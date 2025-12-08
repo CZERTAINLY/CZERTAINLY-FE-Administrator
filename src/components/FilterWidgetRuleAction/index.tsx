@@ -559,7 +559,7 @@ export default function FilterWidgetRuleAction({
 
     return (
         <>
-            <Widget title={title} busy={isFetchingAvailableFilters} titleSize="larger">
+            <Widget title={title} busy={isFetchingAvailableFilters} titleSize="large">
                 <div id="unselectFilters" onClick={onUnselectFiltersClick}>
                     <div style={{ width: '99%', borderBottom: 'solid 1px silver', marginBottom: '1rem' }}>
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

@@ -32,7 +32,7 @@ function NotificationsOverview() {
                               >
                                   <Check size={16} />
                               </Button>
-                              <div className="">
+                              <div>
                                   <span className="text-sm leading-[16px] font-medium text-gray-800 mr-2">{notification.message}</span>
                                   <span className="text-xs leading-[16px] text-gray-500 mr-2">{formatTimeAgo(notification.sentAt)}</span>
                                   <Button

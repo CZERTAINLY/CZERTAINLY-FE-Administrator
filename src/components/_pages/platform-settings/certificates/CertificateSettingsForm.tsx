@@ -144,7 +144,6 @@ const CertificateSettingsForm = ({ onCancel, onSuccess }: CertificateSettingsFor
                 {watchedEnabled && (
                     <>
                         <div>
-                            <p className="text-sm text-gray-500 mb-2">Validation frequency of certificates specified in days.</p>
                             <Controller
                                 name="frequency"
                                 control={control}
@@ -166,11 +165,9 @@ const CertificateSettingsForm = ({ onCancel, onSuccess }: CertificateSettingsFor
                                     />
                                 )}
                             />
+                            <p className="text-sm text-gray-500 mt-2">Validation frequency of certificates specified in days.</p>
                         </div>
                         <div>
-                            <p className="text-sm text-gray-500 mb-2">
-                                How many days before expiration should certificate's validation status change to Expiring.
-                            </p>
                             <Controller
                                 name="expiringThreshold"
                                 control={control}
@@ -192,6 +189,9 @@ const CertificateSettingsForm = ({ onCancel, onSuccess }: CertificateSettingsFor
                                     />
                                 )}
                             />
+                            <p className="text-sm text-gray-500 mt-2">
+                                How many days before expiration should certificate's validation status change to Expiring.
+                            </p>
                         </div>
                     </>
                 )}

@@ -152,7 +152,7 @@ const ConditionsList = () => {
     return (
         <>
             <Widget
-                titleSize="larger"
+                titleSize="large"
                 title="Conditions"
                 refreshAction={getFreshListConditionGroups}
                 busy={isBusy}

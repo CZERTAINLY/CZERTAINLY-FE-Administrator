@@ -162,6 +162,9 @@ const UtilsSettingsForm = ({ onCancel, onSuccess }: UtilsSettingsFormProps = {})
                 />
 
                 <Container className="flex-row justify-end modal-footer" gap={4}>
+                    <Button variant="outline" onClick={onCancel} disabled={isSubmitting || isBusy} type="button">
+                        Cancel
+                    </Button>
                     <ProgressButton
                         title={'Save'}
                         inProgressTitle={'Saving...'}
@@ -169,9 +172,6 @@ const UtilsSettingsForm = ({ onCancel, onSuccess }: UtilsSettingsFormProps = {})
                         disabled={!isDirty || isSubmitting || !isValid || isBusy}
                         type="submit"
                     />
-                    <Button variant="outline" onClick={onCancel} disabled={isSubmitting || isBusy} type="button">
-                        Cancel
-                    </Button>
                 </Container>
             </form>
         </FormProvider>

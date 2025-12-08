@@ -652,6 +652,7 @@ export default function FilterWidget({
                                 !filterField || !filterCondition || !isValidValue || (!noValue[filterCondition.value] && !filterValue)
                             }
                             onClick={onUpdateFilterClick}
+                            className="py-3 min-w-[62px]"
                         >
                             {selectedFilter === -1 ? 'Add' : 'Update'}
                         </Button>

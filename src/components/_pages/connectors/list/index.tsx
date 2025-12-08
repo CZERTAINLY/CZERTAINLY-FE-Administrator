@@ -297,20 +297,26 @@ export default function ConnectorList() {
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                 ]}
             />
 
             <Dialog
                 isOpen={confirmAuthorize}
                 caption={`Approve ${checkedRows.length > 1 ? 'Connectors' : 'a Connector'}`}
-                body={`You are about to approve a ${checkedRows.length > 1 ? 'Connectors' : 'a Connector'}. Is this what you want to do?`}
+                body={
+                    <span className="text-center">
+                        You are about to approve a ${checkedRows.length > 1 ? 'Connectors' : 'a Connector'}. Is this what you want to do?
+                    </span>
+                }
                 toggle={() => setConfirmAuthorize(false)}
                 buttons={[
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmAuthorize(false), body: 'Cancel' },
-                    { color: 'danger', onClick: onAuthorizeConfirmed, body: 'Yes, approve' },
+                    { color: 'primary', onClick: onAuthorizeConfirmed, body: 'Approve' },
                 ]}
+                noBorder
+                icon="check"
             />
 
             <Dialog

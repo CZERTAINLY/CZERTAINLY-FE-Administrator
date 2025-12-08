@@ -2,7 +2,8 @@ import { useCallback, useState, useRef } from 'react';
 import Spinner from 'components/Spinner';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import Button from 'components/Button';
-import { Check, X, Pencil } from 'lucide-react';
+import { Check, X } from 'lucide-react';
+import EditIcon from 'components/icons/EditIcon';
 import cn from 'classnames';
 
 export interface EditableTableCellProps<TValue> {
@@ -183,7 +184,7 @@ const EditableTableCell = <TValue,>({
                 }}
                 disabled={busy}
             >
-                <Pencil size={16} />
+                <EditIcon size={16} />
             </Button>
         </div>
     );

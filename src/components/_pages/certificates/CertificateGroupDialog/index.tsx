@@ -58,6 +58,7 @@ export default function CertificateGroupDialog({ uuids, onCancel, onUpdate }: Pr
                     value={selectedGroups || []}
                     placeholder="Select groups"
                     isMulti
+                    label="Groups"
                     onChange={(values) => {
                         setSelectedGroups(values || []);
                     }}
@@ -65,6 +66,9 @@ export default function CertificateGroupDialog({ uuids, onCancel, onUpdate }: Pr
             </div>
 
             <Container className="flex-row justify-end modal-footer" gap={4}>
+                <Button color="secondary" variant="outline" onClick={onCancel} className="mr-auto">
+                    Cancel
+                </Button>
                 <Button color="danger" onClick={removeGroup} title="Remove groups from selected certificates">
                     Remove
                 </Button>
@@ -75,9 +79,6 @@ export default function CertificateGroupDialog({ uuids, onCancel, onUpdate }: Pr
                     title="Update groups for selected certificates"
                 >
                     Update
-                </Button>
-                <Button color="secondary" variant="outline" onClick={onCancel} className="ml-auto">
-                    Cancel
                 </Button>
             </Container>
 

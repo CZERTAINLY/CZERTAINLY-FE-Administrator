@@ -16,6 +16,7 @@ import FileUpload from '../../../Input/FileUpload/FileUpload';
 import TabLayout from '../../../Layout/TabLayout';
 import ProgressButton from '../../../ProgressButton';
 import Button from 'components/Button';
+import Container from 'components/Container';
 
 interface FormValues {}
 
@@ -70,7 +71,7 @@ export default function CertificateUploadDialog({ onCancel, onUpload, okButtonTi
     return (
         <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)}>
-                <div>
+                <div className="space-y-4">
                     <FileUpload
                         editable
                         fileType={'certificate'}
@@ -87,16 +88,10 @@ export default function CertificateUploadDialog({ onCancel, onUpload, okButtonTi
                         }}
                     />
 
-                    {certificate && (
-                        <>
-                            <br />
-                            <CertificateAttributes certificate={certificate} />
-                        </>
-                    )}
-
-                    <br />
+                    {certificate && <CertificateAttributes certificate={certificate} />}
 
                     <TabLayout
+                        noBorder
                         tabs={[
                             {
                                 title: 'Custom Attributes',
@@ -110,19 +105,17 @@ export default function CertificateUploadDialog({ onCancel, onUpload, okButtonTi
                         ]}
                     />
 
-                    <br />
-
-                    <div className="flex gap-4 justify-center">
+                    <Container className="flex-row justify-end modal-footer" gap={4}>
+                        <Button color="secondary" variant="outline" onClick={onCancel} disabled={formState.isSubmitting} type="button">
+                            Cancel
+                        </Button>
                         <ProgressButton
                             title={okButtonTitle}
                             inProgressTitle={okButtonTitle}
                             inProgress={formState.isSubmitting}
                             disabled={!formState.isValid || !fileContent}
                         />
-                        <Button color="secondary" variant="outline" onClick={onCancel} disabled={formState.isSubmitting} type="button">
-                            Cancel
-                        </Button>
-                    </div>
+                    </Container>
                 </div>
             </form>
         </FormProvider>

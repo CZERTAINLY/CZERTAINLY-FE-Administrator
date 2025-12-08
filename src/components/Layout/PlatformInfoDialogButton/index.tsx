@@ -99,6 +99,14 @@ const PlatformInfoDialogLink = () => {
                 body={isFetching ? <Spinner active /> : content}
                 size="lg"
                 icon="info"
+                buttons={[
+                    {
+                        color: 'secondary',
+                        body: 'Close',
+                        variant: 'outline',
+                        onClick: () => setIsOpen(false),
+                    },
+                ]}
             />
         </>
     );

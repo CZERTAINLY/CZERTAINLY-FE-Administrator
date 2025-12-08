@@ -92,7 +92,7 @@ const PushCertificateForm = ({
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <AttributeEditor
                     id="pushAttributes"
-                    attributeDescriptors={pushAttributeDescriptors}
+                    attributeDescriptors={pushAttributeDescriptors || []}
                     groupAttributesCallbackAttributes={pushGroupAttributesCallbackAttributes}
                     setGroupAttributesCallbackAttributes={setPushGroupAttributesCallbackAttributes}
                 />
@@ -262,7 +262,7 @@ const IssueCertificateForm = ({
                         },
                         {
                             title: 'Certificate Custom Attributes',
-                            content: <AttributeEditor id="customCertificate" attributeDescriptors={resourceCustomAttributes} />,
+                            content: <AttributeEditor id="customCertificate" attributeDescriptors={resourceCustomAttributes || []} />,
                         },
                     ]}
                 />
@@ -809,7 +809,7 @@ export default function LocationDetail() {
                             <PushCertificateForm
                                 selectedCerts={selectedCerts}
                                 location={location}
-                                pushAttributeDescriptors={pushAttributeDescriptors!}
+                                pushAttributeDescriptors={pushAttributeDescriptors || []}
                                 pushGroupAttributesCallbackAttributes={pushGroupAttributesCallbackAttributes}
                                 setPushGroupAttributesCallbackAttributes={setPushGroupAttributesCallbackAttributes}
                                 isPushingCertificate={isPushingCertificate}

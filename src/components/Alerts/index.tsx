@@ -12,7 +12,7 @@ function Alerts() {
     const dispatch = useDispatch();
 
     return (
-        <Container className="sticky bottom-12 !gap-2 z-9999">
+        <Container className="sticky bottom-12 !gap-2 z-9999 w-[calc(100%+2rem)] ml-[-1rem]">
             {alerts.map((alert) => (
                 <div
                     key={alert.id}
@@ -28,11 +28,18 @@ function Alerts() {
                     tabIndex={-1}
                     aria-labelledby="hs-soft-color-warning-label"
                 >
-                    <div className="absolute top-4 left-4 translate-y-[3px]">
+                    <div className="absolute top-5 left-4 translate-y-[2px]">
                         {alert.color === 'success' ? <CircleCheck size={14} /> : <CircleX size={14} />}
                     </div>
-                    <span id="hs-soft-color-warning-label" dangerouslySetInnerHTML={{ __html: alert.message }} />
-                    <button className="absolute top-2 right-2 translate-y-[3px]" onClick={() => dispatch(actions.dismiss(alert.id))}>
+                    <span
+                        id="hs-soft-color-warning-label"
+                        className="text-lg font-semibold"
+                        dangerouslySetInnerHTML={{ __html: alert.message }}
+                    />
+                    <button
+                        className="absolute top-2 right-2 translate-y-[3px] text-[var(--status-success-color)]"
+                        onClick={() => dispatch(actions.dismiss(alert.id))}
+                    >
                         <X size={14} />
                     </button>
                 </div>

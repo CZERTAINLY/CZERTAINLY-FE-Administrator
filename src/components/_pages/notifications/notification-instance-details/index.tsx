@@ -177,7 +177,7 @@ const NotificationInstanceDetails = () => {
                 widgetButtons={buttons}
                 refreshAction={getFreshNotificationInstanceDetail}
                 title="Notification Instance Details"
-                titleSize="larger"
+                titleSize="large"
                 busy={isBusy}
             >
                 <br />
@@ -186,7 +186,7 @@ const NotificationInstanceDetails = () => {
             </Widget>
 
             {notificationInstance?.attributes?.length ? (
-                <Widget title="Attributes" busy={isFetchingNotificationInstanceDetail} titleSize="larger">
+                <Widget title="Attributes" busy={isFetchingNotificationInstanceDetail} titleSize="large">
                     <br />
                     <Label>Notification Instance Attributes</Label>
 
@@ -196,7 +196,7 @@ const NotificationInstanceDetails = () => {
                 <></>
             )}
             {notificationInstance?.attributeMappings?.length ? (
-                <Widget title="Attribute Mappings" busy={isFetchingNotificationInstanceDetail} titleSize="larger">
+                <Widget title="Attribute Mappings" busy={isFetchingNotificationInstanceDetail} titleSize="large">
                     <br />
                     <Label>Notification Instance Attribute Mappings</Label>
 

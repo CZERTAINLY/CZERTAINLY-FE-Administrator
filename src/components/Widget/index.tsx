@@ -68,7 +68,7 @@ function Widget({
         title ? (
             <h5
                 className={cn(
-                    '',
+                    'text-[var(--dark-gray-color)]',
                     { 'font-bold': titleBoldness === 'bold' },
                     { 'font-semibold': titleBoldness === 'semi-bold' },
                     { 'font-normal': titleBoldness === 'normal' },
@@ -134,7 +134,7 @@ function Widget({
             id={id}
         >
             {hasHeaderContent && (
-                <div className={cn('flex items-center justify-between flex-wrap gap-2', { 'mb-4': !!widgetLock || !!children })}>
+                <div className={cn('flex items-center justify-between flex-wrap gap-2', { 'mb-3': !!widgetLock || !!children })}>
                     <div className="flex items-center gap-2">
                         {renderTitle()}
                         {renderRefreshButton()}
@@ -149,15 +149,12 @@ function Widget({
 
             {widgetInfoCard && (
                 <div
-                    className={cn('overflow-hidden transition-all duration-300 ease-in-out', {
+                    className={cn('overflow-hidden transition-all duration-300 ease-in-out my-2', {
                         'max-h-0 opacity-0': !showWidgetInfo,
                         'max-h-[1000px] opacity-100': showWidgetInfo,
                     })}
                 >
-                    <div className="my-2 bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg">
-                        <div className="px-4 py-3 border-b border-gray-200 dark:border-neutral-700">
-                            <h3 className="text-sm font-semibold text-gray-800 dark:text-white">{widgetInfoCard.title}</h3>
-                        </div>
+                    <div className="my-2 border border-gray-200 dark:border-neutral-700 rounded-lg">
                         {widgetInfoCard.heading && (
                             <h2 className="px-4 pt-3 mb-0 text-base font-semibold text-gray-800 dark:text-white">
                                 {widgetInfoCard.heading}
@@ -165,7 +162,9 @@ function Widget({
                         )}
                         <div className="px-4 py-3">
                             {widgetInfoCard.description && (
-                                <p className="text-sm text-gray-700 dark:text-neutral-300 mb-0">{widgetInfoCard.description}</p>
+                                <p className="text-sm text-gray-700 dark:text-neutral-300 mb-0">
+                                    {widgetInfoCard.title}: {widgetInfoCard.description}
+                                </p>
                             )}
 
                             {widgetInfoCard.notesList && (

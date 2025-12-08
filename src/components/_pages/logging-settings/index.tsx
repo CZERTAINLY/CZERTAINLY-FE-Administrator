@@ -524,7 +524,7 @@ const LoggingSetting = () => {
         <Container>
             <Widget
                 title="Logging Settings"
-                titleSize="larger"
+                titleSize="large"
                 busy={isBusy}
                 refreshAction={getFreshLoggingSettings}
                 widgetLockName={LockWidgetNameEnum.LoggingSettings}

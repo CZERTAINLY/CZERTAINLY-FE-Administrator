@@ -88,7 +88,7 @@ export function getCertificateStatusColor(
         case CertificateState.Rejected:
             return '#EF4444';
         case CertificateState.Issued:
-            return '#1ab394';
+            return '#14B8A6';
         case CertificateState.Failed:
             return '#EF4444';
         case CertificateState.PendingApproval:
@@ -101,7 +101,7 @@ export function getCertificateStatusColor(
             return '#632828';
 
         case CertificateValidationStatus.Valid:
-            return '#1ab394';
+            return '#14B8A6';
         case CertificateValidationStatus.Expired:
             return '#EF4444';
         case CertificateValidationStatus.Revoked:
@@ -109,11 +109,11 @@ export function getCertificateStatusColor(
         case CertificateValidationStatus.Expiring:
             return '#EAB308';
         case CertificateValidationStatus.Invalid:
-            return '#131212';
+            return '#1F2937';
         case CertificateValidationStatus.Inactive:
             return '#6c757d';
         case CertificateValidationStatus.NotChecked:
-            return '#7fa2c1';
+            return '#2798E7';
         case CertificateValidationStatus.Failed:
             return '#9c0012';
 
@@ -122,21 +122,21 @@ export function getCertificateStatusColor(
         case ComplianceStatus.Nok:
             return '#EF4444';
         case ComplianceStatus.Ok:
-            return '#1ab394';
+            return '#14B8A6';
         case ComplianceStatus.NotChecked:
-            return '#7fa2c1';
+            return '#2798E7';
 
         case ComplianceRuleStatus.Na:
             return '#6c757d';
         case ComplianceRuleStatus.Nok:
             return '#EF4444';
         case ComplianceRuleStatus.Ok:
-            return '#1ab394';
+            return '#14B8A6';
 
         case CertificateEventHistoryDtoStatusEnum.Failed:
             return '#EF4444';
         case CertificateEventHistoryDtoStatusEnum.Success:
-            return '#1ab394';
+            return '#14B8A6';
 
         case CertificateSubjectType.EndEntity:
             return '#6c757d';
@@ -145,7 +145,7 @@ export function getCertificateStatusColor(
         case CertificateSubjectType.IntermediateCa:
             return '#3754a5';
         case CertificateSubjectType.RootCa:
-            return '#1ab394';
+            return '#14B8A6';
 
         default:
             return '#6c757d';

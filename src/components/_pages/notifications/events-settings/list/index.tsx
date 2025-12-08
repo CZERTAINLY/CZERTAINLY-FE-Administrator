@@ -120,7 +120,7 @@ const EventsList = () => {
         <Widget
             title="List of Events"
             refreshAction={getEvents}
-            titleSize="larger"
+            titleSize="large"
             widgetButtons={buttons}
             widgetLockName={LockWidgetNameEnum.EventSettings}
             lockSize="large"

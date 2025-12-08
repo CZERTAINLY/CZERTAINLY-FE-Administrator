@@ -219,7 +219,7 @@ const AuthenticationSettings = () => {
                                 title="OAuth2 Providers"
                                 widgetButtons={providersButtons}
                                 refreshAction={getAuthenticationSettings}
-                                titleSize="larger"
+                                titleSize="large"
                                 widgetLockName={LockWidgetNameEnum.AuthenticationSettings}
                                 lockSize="large"
                                 busy={isBusy}
@@ -233,7 +233,7 @@ const AuthenticationSettings = () => {
                         content: (
                             <Widget
                                 title="Authentication Settings"
-                                titleSize="larger"
+                                titleSize="large"
                                 refreshAction={getAuthenticationSettings}
                                 busy={isBusy}
                                 widgetLockName={LockWidgetNameEnum.AuthenticationSettings}
