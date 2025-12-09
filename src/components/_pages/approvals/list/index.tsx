@@ -175,19 +175,18 @@ export default function ApprovalsList() {
             columns: [
                 <Link to={`./detail/${approval.approvalUuid}`}>{approval.approvalUuid}</Link>,
                 <Link to={`../../../approvalprofiles/detail/${approval.approvalProfileUuid}`}>{approval.approvalProfileName}</Link>,
-                (
-                    <>
-                        <StatusBadge textStatus={approval.status} />
-                        <Button
-                            color="transparent"
-                            onClick={() => {
-                                navigate(`../../${approval.resource}/detail/${approval.objectUuid}`);
-                            }}
-                        >
-                            <ArrowRight size={16} />
-                        </Button>
-                    </>
-                ) || '',
+                <div className="flex items-center gap-1">
+                    <StatusBadge textStatus={approval.status} />
+                    <Button
+                        variant="transparent"
+                        className="!p-1"
+                        onClick={() => {
+                            navigate(`../../${approval.resource}/detail/${approval.objectUuid}`);
+                        }}
+                    >
+                        <ArrowRight size={16} strokeWidth={1.5} />
+                    </Button>
+                </div>,
                 approval.creatorUsername ? (
                     <Link to={`../users/detail/${approval.creatorUuid}`}>{approval.creatorUsername ?? 'Unassigned'}</Link>
                 ) : (

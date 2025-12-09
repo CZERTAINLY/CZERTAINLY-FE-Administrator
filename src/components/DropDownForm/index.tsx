@@ -2,6 +2,7 @@ import ProgressButton from 'components/ProgressButton';
 import Button from 'components/Button';
 import Select from 'components/Select';
 import { useForm, Controller } from 'react-hook-form';
+import Container from 'components/Container';
 
 interface DropDownOptions {
     label: string;
@@ -58,18 +59,17 @@ const DropDownListForm = ({ onSubmit, onClose, dropDownOptionsList, isBusy = fal
                         }}
                     />
                 ))}
-                <div className="flex justify-center items-center gap-4">
+                <Container className="flex-row justify-end modal-footer" gap={4}>
+                    <Button variant="outline" color="secondary" disabled={isBusy} onClick={onClose}>
+                        Close
+                    </Button>
                     <ProgressButton
                         inProgress={isBusy}
                         title={isBusy ? 'Submitting' : 'Submit'}
                         type="submit"
                         disabled={!isDirty || isBusy || !isValid}
                     />
-
-                    <Button variant="outline" color="secondary" disabled={isBusy} onClick={onClose}>
-                        Close
-                    </Button>
-                </div>
+                </Container>
             </form>
         </div>
     );

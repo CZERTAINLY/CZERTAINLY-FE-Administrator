@@ -1,5 +1,4 @@
 import { useCallback, useRef, useState } from 'react';
-import styles from './MultipleValueTextInput.module.scss';
 
 type Props = {
     id?: string;
@@ -84,28 +83,13 @@ export default function MultipleValueTextInput({
         [value, onChange],
     );
 
-    const containerClass = cx(
-        styles.container,
-        { 'is-valid': isValid },
-        { 'is-invalid': isInvalid },
-        { [styles['is-valid']]: isValid },
-        { [styles['is-invalid']]: isInvalid },
-    );
-
     return (
-        <div className={containerClass}>
+        <div>
             {value.map((val) => (
-                <span key={val} className={styles.tag}>
+                <span key={val}>
                     {val}
-                    <button type="button" onClick={() => handleRemoveTag(val)} className={styles.removeButton}>
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={2}
-                            stroke="currentColor"
-                            className={styles.svgIcon}
-                        >
+                    <button type="button" onClick={() => handleRemoveTag(val)}>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
@@ -120,7 +104,6 @@ export default function MultipleValueTextInput({
                 onBlur={onBlur}
                 onKeyDown={handleKeyDown}
                 placeholder={value.length === 0 ? placeholder : ''}
-                className={styles.input}
             />
         </div>
     );

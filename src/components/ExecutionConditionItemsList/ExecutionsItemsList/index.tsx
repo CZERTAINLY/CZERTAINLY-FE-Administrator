@@ -4,12 +4,11 @@ import { EntityType, selectors } from 'ducks/filters';
 import { selectors as rulesSelectors } from 'ducks/rules';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { Spinner } from 'reactstrap';
+import Spinner from 'components/Spinner';
 import Badge from 'components/Badge';
 import { AttributeContentType, ExecutionType, FilterFieldType, PlatformEnum } from 'types/openapi';
 import { ExecutionItemModel } from 'types/rules';
 import { getFormattedDate, getFormattedDateTime } from 'utils/dateUtil';
-import styles from './executionsItemsList.module.scss';
 
 interface ExecutionsItemsListProps {
     executionItems: ExecutionItemModel[];
@@ -99,7 +98,7 @@ const ExecutionsItemsList = ({
                       : '';
 
             return (
-                <Badge className={styles.groupConditionBadge} key={i.toString() + label + value}>
+                <Badge key={i.toString() + label + value}>
                     <>
                         <b>{f?.fieldSource && getEnumLabel(searchGroupEnum, f?.fieldSource)}&nbsp;</b>'{label}
                         '&nbsp;to&nbsp;
@@ -114,7 +113,7 @@ const ExecutionsItemsList = ({
         if (!executionItems) return null;
         return executionItems.map((f, i) => {
             return (
-                <Badge className={styles.groupConditionBadge} key={i.toString() + f.notificationProfileUuid}>
+                <Badge key={i.toString() + f.notificationProfileUuid}>
                     <span>Send notifications to:&nbsp;</span>
                     <b>{f.notificationProfileName}&nbsp;</b>
                 </Badge>
@@ -184,8 +183,8 @@ const ExecutionsItemsList = ({
                       : '';
 
             return (
-                <div key={i.toString() + label + value} className="mt-2 me-1">
-                    <span className={styles.groupSmallerBadge}>
+                <div key={i.toString() + label + value} className="mt-2 mr-1">
+                    <span>
                         <b>{f?.fieldSource && getEnumLabel(searchGroupEnum, f?.fieldSource)}&nbsp;</b>'{label}
                         '&nbsp;to&nbsp;
                         {value}
@@ -198,8 +197,8 @@ const ExecutionsItemsList = ({
     const renderSmallerSendNotificationExecutionsBadges = useCallback(() => {
         return executionItems.map((f, i) => {
             return (
-                <div key={i} className="mt-2 me-1">
-                    <span className={styles.groupSmallerBadge}>
+                <div key={i} className="mt-2 mr-1">
+                    <span>
                         <span>Send notifications to:&nbsp;</span>
                         <b>{f.notificationProfileName}&nbsp;</b>
                     </span>
@@ -222,13 +221,13 @@ const ExecutionsItemsList = ({
 
     return smallerBadges ? (
         <div>
-            <h6 className={cx('text-muted', styles.groupConditionTitle)}>{`${executionName}'s Execution Items`}</h6>
-            <div className="d-flex flex-wrap">{renderSmallerExecutionsBadges()}</div>
+            <h6 className="text-gray-500">{`${executionName}'s Execution Items`}</h6>
+            <div className="flex flex-wrap">{renderSmallerExecutionsBadges()}</div>
         </div>
     ) : (
-        <div className={styles.groupConditionContainerDiv} key={executionUuid}>
-            <h6 className={cx('text-muted', styles.groupConditionTitle)}>{`${executionName}`}</h6>
-            <div className="ms-3">{renderActionBadges()}</div>
+        <div key={executionUuid}>
+            <h6 className="text-gray-500">{`${executionName}`}</h6>
+            <div className="ml-3">{renderActionBadges()}</div>
         </div>
     );
 };

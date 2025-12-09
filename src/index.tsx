@@ -6,6 +6,7 @@ import 'reactflow/dist/style.css';
 import 'preline/dist/preline.js';
 import './tailwindcss.css';
 import App from './App';
+import '@preline/tooltip';
 
 const container = document.getElementById('root')!;
 const root = createRoot(container);

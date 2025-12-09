@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import ConditionFormFilter from 'components/ConditionFormFilter';
 import { actions as complianceActions, selectors as complianceSelectors } from 'ducks/compliance-profiles';
 import cn from 'classnames';
+import Label from 'components/Label';
 
 type Props = {
     rule?: ComplianceRuleListDto;
@@ -130,9 +131,9 @@ export default function InternalRuleForm({ rule, onCancel }: Props) {
                     rules={buildValidationRules([validateRequired()])}
                     render={({ field, fieldState }) => (
                         <div className="mb-4">
-                            <label htmlFor="name" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
+                            <Label htmlFor="name" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
                                 Internal Rule Name
-                            </label>
+                            </Label>
                             <input
                                 {...field}
                                 id="name"
@@ -159,9 +160,9 @@ export default function InternalRuleForm({ rule, onCancel }: Props) {
                     rules={buildValidationRules([composeValidators(validateLength(0, 300))])}
                     render={({ field, fieldState }) => (
                         <div className="mb-4">
-                            <label htmlFor="description" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
+                            <Label htmlFor="description" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
                                 Description
-                            </label>
+                            </Label>
                             <input
                                 {...field}
                                 id="description"
@@ -188,9 +189,9 @@ export default function InternalRuleForm({ rule, onCancel }: Props) {
                     rules={buildValidationRules([validateRequired()])}
                     render={({ field, fieldState }) => (
                         <div className="mb-4">
-                            <label htmlFor="resource" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
+                            <Label htmlFor="resource" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
                                 Resource
-                            </label>
+                            </Label>
                             <Select
                                 id="resourceSelect"
                                 options={selectOptions}

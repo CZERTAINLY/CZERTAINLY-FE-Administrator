@@ -3,7 +3,7 @@ import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import FlowChart, { CustomNode } from 'components/FlowChart';
 import TabLayout from 'components/Layout/TabLayout';
-import SwitchWidget from 'components/SwitchWidget';
+import Switch from 'components/Switch';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as alertActions } from 'ducks/alerts';
@@ -14,11 +14,14 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 import { Edge } from 'reactflow';
-import { Button, ButtonGroup, Col, Container, Input, Row } from 'reactstrap';
+import Button from 'components/Button';
+import Container from 'components/Container';
+import TextInput from 'components/TextInput';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { DeviceType, useDeviceType } from 'utils/common-hooks';
-import styles from './triggerDetails.module.scss';
-import GoBackButton from 'components/GoBackButton';
+import Breadcrumb from 'components/Breadcrumb';
+import { Check, X, Trash2 } from 'lucide-react';
+import EditIcon from 'components/icons/EditIcon';
 
 interface SelectChangeValue {
     value: string;
@@ -303,14 +306,15 @@ const TriggerDetails = () => {
                           id: 'ignoreTrigger',
                           columns: [
                               'Ignore Trigger',
-                              <SwitchWidget
+                              <Switch
+                                  id="ignoreTrigger"
                                   checked={triggerDetails.ignoreTrigger}
-                                  onClick={() => {
-                                      if (triggerDetails?.ignoreTrigger) {
+                                  onChange={(checked) => {
+                                      if (checked) {
+                                          setConfirmIgnoreTrigger(true);
+                                      } else {
                                           dispatch(alertActions.info('Please add actions from the actions table'));
                                           triggerHighlight();
-                                      } else {
-                                          setConfirmIgnoreTrigger(true);
                                       }
                                   }}
                               />,
@@ -334,9 +338,9 @@ const TriggerDetails = () => {
                           columns: [
                               'Description',
                               updateDescriptionEditEnable ? (
-                                  <Input
+                                  <TextInput
                                       value={updatedDescription}
-                                      onChange={(e) => setUpdatedDescription(e.target.value)}
+                                      onChange={(value) => setUpdatedDescription(value)}
                                       placeholder="Enter Description"
                                   />
                               ) : (
@@ -344,10 +348,9 @@ const TriggerDetails = () => {
                               ),
                               <div>
                                   {updateDescriptionEditEnable ? (
-                                      <ButtonGroup>
+                                      <div className="flex gap-2">
                                           <Button
-                                              className="btn btn-link mx-auto"
-                                              size="sm"
+                                              variant="transparent"
                                               color="secondary"
                                               title="Update Description"
                                               onClick={onUpdateDescriptionConfirmed}
@@ -357,11 +360,11 @@ const TriggerDetails = () => {
                                                   updatedDescription === ''
                                               }
                                           >
-                                              <i className="fa fa-check" />
+                                              <Check size={16} />
                                           </Button>
                                           <Button
-                                              className="btn btn-link mx-auto danger"
-                                              size="sm"
+                                              variant="transparent"
+                                              color="danger"
                                               title="Cancel"
                                               disabled={isUpdatingTrigger}
                                               onClick={() => {
@@ -369,20 +372,19 @@ const TriggerDetails = () => {
                                                   setUpdatedDescription(triggerDetails?.description || '');
                                               }}
                                           >
-                                              <i className="fa fa-close text-danger" />
+                                              <X size={16} />
                                           </Button>
-                                      </ButtonGroup>
+                                      </div>
                                   ) : (
                                       <Button
-                                          className="btn btn-link mx-auto"
-                                          size="sm"
+                                          variant="transparent"
                                           color="secondary"
                                           title="Update Description"
                                           onClick={() => {
                                               setUpdateDescription(true);
                                           }}
                                       >
-                                          <i className="fa fa-pencil-square-o" />
+                                          <EditIcon size={16} />
                                       </Button>
                                   )}
                               </div>,
@@ -434,8 +436,7 @@ const TriggerDetails = () => {
                           <Link to={`../../actions/detail/${action.uuid}`}>{action.name}</Link>,
                           action.description || '',
                           <Button
-                              className="btn btn-link text-danger"
-                              size="sm"
+                              variant="transparent"
                               color="danger"
                               title={
                                   isDeleteDisabled
@@ -447,7 +448,7 @@ const TriggerDetails = () => {
                               }}
                               disabled={isDeleteDisabled}
                           >
-                              <i className="fa fa-trash" />
+                              <Trash2 size={16} />
                           </Button>,
                       ],
                   };
@@ -485,8 +486,7 @@ const TriggerDetails = () => {
                               <Link to={`../../rules/detail/${rule.uuid}`}>{rule.name}</Link>,
                               rule.description || '',
                               <Button
-                                  className="btn btn-link text-danger"
-                                  size="sm"
+                                  variant="transparent"
                                   color="danger"
                                   title="Delete Rule"
                                   onClick={() => {
@@ -494,7 +494,7 @@ const TriggerDetails = () => {
                                   }}
                                   disabled={isUpdatingTrigger}
                               >
-                                  <i className="fa fa-trash" />
+                                  <Trash2 size={16} />
                               </Button>,
                           ],
                       };
@@ -504,10 +504,11 @@ const TriggerDetails = () => {
 
     return (
         <Container className="themed-container" fluid>
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                forcedPath="/triggers"
-                text={`${getEnumLabel(resourceEnum, Resource.Triggers)} Inventory`}
+            <Breadcrumb
+                items={[
+                    { label: `${getEnumLabel(resourceEnum, Resource.Triggers)} Inventory`, href: '/triggers' },
+                    { label: 'Trigger Details' },
+                ]}
             />
             <TabLayout
                 tabs={[
@@ -515,8 +516,8 @@ const TriggerDetails = () => {
                         title: 'Trigger Details',
                         content: (
                             <Widget>
-                                <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                                    <Col>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
                                         <Widget
                                             refreshAction={getFreshDetails}
                                             busy={isBusy}
@@ -526,8 +527,8 @@ const TriggerDetails = () => {
                                         >
                                             <CustomTable data={triggerDetailsData} headers={triggerDetailHeader} />
                                         </Widget>
-                                    </Col>
-                                    <Col>
+                                    </div>
+                                    <div>
                                         <Widget
                                             busy={isBusy}
                                             title="Actions"
@@ -536,7 +537,6 @@ const TriggerDetails = () => {
                                                 title: 'Information',
                                                 description: 'Actions is named set of actions for selected trigger',
                                             }}
-                                            className={cx({ [styles.highLightWidget]: highlight === true })}
                                         >
                                             <CustomTable
                                                 data={actionsData}
@@ -548,10 +548,10 @@ const TriggerDetails = () => {
                                                 }}
                                             />
                                         </Widget>
-                                    </Col>
-                                </Row>
-                                <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                                    <Col>
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                    <div>
                                         <Widget busy={isBusy} title="Rules" titleSize="large">
                                             <CustomTable
                                                 data={rulesData}
@@ -563,8 +563,8 @@ const TriggerDetails = () => {
                                                 }}
                                             />
                                         </Widget>
-                                    </Col>
-                                </Row>
+                                    </div>
+                                </div>
                             </Widget>
                         ),
                     },
@@ -591,7 +591,7 @@ const TriggerDetails = () => {
                                     },
 
                                     {
-                                        color: '#7fa2c1',
+                                        color: '#2798E7',
                                         icon: 'fa fa-book',
                                         label: 'Rule',
                                     },

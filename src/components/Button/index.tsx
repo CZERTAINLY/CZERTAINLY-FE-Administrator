@@ -1,4 +1,5 @@
 import cn from 'classnames';
+import Tooltip from 'components/Tooltip';
 
 export type ButtonVariant = 'solid' | 'outline' | 'transparent';
 
@@ -16,12 +17,12 @@ export interface Props {
 }
 
 const baseButton =
-    'py-2.5 px-3.5 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden border';
+    'inline-flex items-center gap-x-2 text-sm font-medium rounded-lg disabled:opacity-35 disabled:pointer-events-none focus:outline-hidden border';
 
 const buttonClasses = {
-    solid: '',
-    outline: '',
-    transparent: '!p-2 border-transparent dark:text-white',
+    solid: 'py-2.5 px-3.5',
+    outline: 'py-2.5 px-3.5',
+    transparent: 'p-2 border-transparent dark:text-white',
 };
 
 const colorClasses = {
@@ -74,18 +75,27 @@ function Button({
     //     secondary: '',
     // };
 
-    return (
+    const buttonElement = (
         <button
             type={type}
             id={id}
             className={cn(baseButton, buttonClasses[variant], colorClasses[variant][color], className)}
             onClick={onClick}
             disabled={disabled}
-            title={title}
         >
             {children}
         </button>
     );
+
+    if (title) {
+        return (
+            <Tooltip content={title} disabled={disabled}>
+                {buttonElement}
+            </Tooltip>
+        );
+    }
+
+    return buttonElement;
 }
 
 export default Button;

@@ -13,12 +13,12 @@ import { LockWidgetNameEnum } from 'types/user-interface';
 import { PlatformEnum, Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import { createWidgetDetailHeaders } from 'utils/widget';
-import GoBackButton from 'components/GoBackButton';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { capitalize } from 'utils/common-utils';
 import TabLayout from 'components/Layout/TabLayout';
 import AttributeViewer from 'components/Attributes/AttributeViewer';
 import { AttributeResponseModel } from 'types/attributes';
+import { Info } from 'lucide-react';
 import AssignedRulesAndGroup from 'components/_pages/compliance-profiles/detail/AssignedRulesAndGroup/AssignedRulesAndGroup';
 import AvailableRulesAndGroups from 'components/_pages/compliance-profiles/detail/AvailableRulesAndGroups/AvailableRulesAndGroups';
 import { getComplianceProfileStatusColor } from 'utils/compliance-profile';
@@ -248,8 +248,7 @@ export default function ComplianceProfileDetail() {
                         'Attributes',
                         rule.attributes?.length ? (
                             <Button
-                                className="btn btn-link"
-                                color="white"
+                                variant="transparent"
                                 title="Rules"
                                 onClick={() => {
                                     setGroupRuleAttributeData({
@@ -258,7 +257,7 @@ export default function ComplianceProfileDetail() {
                                     });
                                 }}
                             >
-                                <i className="fa fa-info" style={{ color: 'auto' }} />
+                                <Info size={16} style={{ color: 'auto' }} />
                             </Button>
                         ) : (
                             'No attributes'
@@ -276,7 +275,7 @@ export default function ComplianceProfileDetail() {
 
     const entityDetailMenuContent = useMemo(
         () => (
-            <Widget titleSize="larger" busy={selectedEntityDetails?.entityDetails?.entityType === 'group' ? isFetchingGroupRules : false}>
+            <Widget titleSize="large" busy={selectedEntityDetails?.entityDetails?.entityType === 'group' ? isFetchingGroupRules : false}>
                 {selectedEntityDetails?.entityDetails?.entityType === 'rule' && (
                     <TabLayout
                         tabs={[
@@ -432,8 +431,8 @@ export default function ComplianceProfileDetail() {
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                 ]}
                 dataTestId="delete-confirmation-dialog"
             />
@@ -444,8 +443,8 @@ export default function ComplianceProfileDetail() {
                 toggle={() => setComplianceCheck(false)}
                 noBorder
                 buttons={[
+                    { color: 'primary', variant: 'outline', onClick: () => setComplianceCheck(false), body: 'Cancel' },
                     { color: 'primary', onClick: onComplianceCheck, body: 'Yes' },
-                    { color: 'secondary', variant: 'outline', onClick: () => setComplianceCheck(false), body: 'Cancel' },
                 ]}
                 dataTestId="compliance-check-dialog"
             />

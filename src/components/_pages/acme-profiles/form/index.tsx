@@ -16,7 +16,7 @@ import { useParams } from 'react-router';
 import Select from 'components/Select';
 import Button from 'components/Button';
 import Container from 'components/Container';
-import Switch from 'components/Switch';
+import Checkbox from 'components/Checkbox';
 import TextInput from 'components/TextInput';
 import TextArea from 'components/TextArea';
 import { AcmeProfileAddRequestModel, AcmeProfileEditRequestModel, AcmeProfileResponseModel } from 'types/acme-profiles';
@@ -357,69 +357,81 @@ export default function AcmeProfileForm({ acmeProfileId, onCancel, onSuccess }: 
     const allFormValues = useWatch({ control });
     const isEqual = useMemo(() => deepEqual(defaultValues, allFormValues), [defaultValues, allFormValues]);
 
+    const lastResetProfileIdRef = useRef<string | undefined>(undefined);
+    const lastResetEditModeRef = useRef<boolean | undefined>(undefined);
+
     // Reset form values when acmeProfile is loaded in edit mode
     useEffect(() => {
         if (editMode && id && acmeProfile && acmeProfile.uuid === id && !isFetchingDetail && optionsForRaProfiles.length > 0) {
-            const initialAssociatedAttributes = mapProfileAttribute(
-                acmeProfile,
-                multipleResourceCustomAttributes,
-                Resource.Certificates,
-                'certificateAssociations.customAttributes',
-                '__attributes__certificateAssociatedAttributes__',
-            );
+            // Only reset if the profile ID changed or we haven't reset yet
+            if (lastResetProfileIdRef.current !== id || lastResetEditModeRef.current !== editMode) {
+                const initialAssociatedAttributes = mapProfileAttribute(
+                    acmeProfile,
+                    multipleResourceCustomAttributes,
+                    Resource.Certificates,
+                    'certificateAssociations.customAttributes',
+                    '__attributes__certificateAssociatedAttributes__',
+                );
 
-            const initialCustomAttributes = mapProfileAttribute(
-                acmeProfile,
-                multipleResourceCustomAttributes,
-                Resource.AcmeProfiles,
-                'customAttributes',
-                '__attributes__customAcmeProfile__',
-            );
+                const initialCustomAttributes = mapProfileAttribute(
+                    acmeProfile,
+                    multipleResourceCustomAttributes,
+                    Resource.AcmeProfiles,
+                    'customAttributes',
+                    '__attributes__customAcmeProfile__',
+                );
 
-            const transformedInitialAssociatedAttributes = transformAttributes(initialAssociatedAttributes ?? []);
-            const transformedInitialCustomAttributes = transformAttributes(initialCustomAttributes ?? []);
+                const transformedInitialAssociatedAttributes = transformAttributes(initialAssociatedAttributes ?? []);
+                const transformedInitialCustomAttributes = transformAttributes(initialCustomAttributes ?? []);
 
-            const newDefaultValues: FormValues = {
-                name: acmeProfile.name || '',
-                description: acmeProfile.description || '',
-                dnsIpAddress: acmeProfile.dnsResolverIp || '',
-                dnsPort: acmeProfile.dnsResolverPort || '',
-                retryInterval: acmeProfile.retryInterval?.toString() || '30',
-                orderValidity: acmeProfile.validity?.toString() || '36000',
-                termsUrl: acmeProfile.termsOfServiceUrl || '',
-                webSite: acmeProfile.websiteUrl || '',
-                termsChangeUrl: acmeProfile.termsOfServiceChangeUrl || '',
-                disableOrders: acmeProfile.termsOfServiceChangeDisable || false,
-                requireTermsOfService: acmeProfile.requireTermsOfService || false,
-                requireContact: acmeProfile.requireContact || false,
-                raProfile: optionsForRaProfiles.find((ra) => ra.value === acmeProfile.raProfile?.uuid)?.value || '',
-                owner: buildOwner(userOptions, acmeProfile.certificateAssociations?.ownerUuid)?.value || '',
-                groups: buildGroups(groupOptions, acmeProfile.certificateAssociations?.groupUuids) || [],
-                deletedAttributes: [],
-                ...transformedInitialAssociatedAttributes,
-                ...transformedInitialCustomAttributes,
-            };
-            reset(newDefaultValues, { keepDefaultValues: false });
+                const newDefaultValues: FormValues = {
+                    name: acmeProfile.name || '',
+                    description: acmeProfile.description || '',
+                    dnsIpAddress: acmeProfile.dnsResolverIp || '',
+                    dnsPort: acmeProfile.dnsResolverPort || '',
+                    retryInterval: acmeProfile.retryInterval?.toString() || '30',
+                    orderValidity: acmeProfile.validity?.toString() || '36000',
+                    termsUrl: acmeProfile.termsOfServiceUrl || '',
+                    webSite: acmeProfile.websiteUrl || '',
+                    termsChangeUrl: acmeProfile.termsOfServiceChangeUrl || '',
+                    disableOrders: acmeProfile.termsOfServiceChangeDisable || false,
+                    requireTermsOfService: acmeProfile.requireTermsOfService || false,
+                    requireContact: acmeProfile.requireContact || false,
+                    raProfile: optionsForRaProfiles.find((ra) => ra.value === acmeProfile.raProfile?.uuid)?.value || '',
+                    owner: buildOwner(userOptions, acmeProfile.certificateAssociations?.ownerUuid)?.value || '',
+                    groups: buildGroups(groupOptions, acmeProfile.certificateAssociations?.groupUuids) || [],
+                    deletedAttributes: [],
+                    ...transformedInitialAssociatedAttributes,
+                    ...transformedInitialCustomAttributes,
+                };
+                reset(newDefaultValues, { keepDefaultValues: false });
+                lastResetProfileIdRef.current = id;
+                lastResetEditModeRef.current = editMode;
+            }
         } else if (!editMode) {
-            // Reset form when switching to create mode
-            reset({
-                name: '',
-                description: '',
-                dnsIpAddress: '',
-                dnsPort: '',
-                retryInterval: '30',
-                orderValidity: '36000',
-                termsUrl: '',
-                webSite: '',
-                termsChangeUrl: '',
-                disableOrders: false,
-                requireTermsOfService: false,
-                requireContact: false,
-                raProfile: '',
-                owner: '',
-                groups: [],
-                deletedAttributes: [],
-            });
+            // Reset form when switching to create mode (only if we were in edit mode before)
+            if (lastResetEditModeRef.current === true) {
+                reset({
+                    name: '',
+                    description: '',
+                    dnsIpAddress: '',
+                    dnsPort: '',
+                    retryInterval: '30',
+                    orderValidity: '36000',
+                    termsUrl: '',
+                    webSite: '',
+                    termsChangeUrl: '',
+                    disableOrders: false,
+                    requireTermsOfService: false,
+                    requireContact: false,
+                    raProfile: '',
+                    owner: '',
+                    groups: [],
+                    deletedAttributes: [],
+                });
+                lastResetProfileIdRef.current = undefined;
+                lastResetEditModeRef.current = editMode;
+            }
         }
     }, [
         editMode,
@@ -694,9 +706,9 @@ export default function AcmeProfileForm({ acmeProfileId, onCancel, onSuccess }: 
                                             name="disableOrders"
                                             control={control}
                                             render={({ field }) => (
-                                                <Switch
+                                                <Checkbox
                                                     id="disableOrders"
-                                                    checked={field.value}
+                                                    checked={field.value ?? false}
                                                     onChange={field.onChange}
                                                     label="Disable new Orders (Changes in Terms of Service)"
                                                 />
@@ -704,33 +716,33 @@ export default function AcmeProfileForm({ acmeProfileId, onCancel, onSuccess }: 
                                         />
                                     </>
                                 )}
+
+                                <Controller
+                                    name="requireTermsOfService"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Checkbox
+                                            id="requireTermsOfService"
+                                            checked={field.value ?? false}
+                                            onChange={field.onChange}
+                                            label="Require agree on Terms Of Service for new account"
+                                        />
+                                    )}
+                                />
+
+                                <Controller
+                                    name="requireContact"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Checkbox
+                                            id="requireContact"
+                                            checked={field.value ?? false}
+                                            onChange={field.onChange}
+                                            label="Require contact information for new Accounts"
+                                        />
+                                    )}
+                                />
                             </div>
-
-                            <Controller
-                                name="requireTermsOfService"
-                                control={control}
-                                render={({ field }) => (
-                                    <Switch
-                                        id="requireTermsOfService"
-                                        checked={field.value}
-                                        onChange={field.onChange}
-                                        label="Require agree on Terms Of Service for new account"
-                                    />
-                                )}
-                            />
-
-                            <Controller
-                                name="requireContact"
-                                control={control}
-                                render={({ field }) => (
-                                    <Switch
-                                        id="requireContact"
-                                        checked={field.value}
-                                        onChange={field.onChange}
-                                        label="Require contact information for new Accounts"
-                                    />
-                                )}
-                            />
                         </Widget>
 
                         <Widget
@@ -762,6 +774,7 @@ export default function AcmeProfileForm({ acmeProfileId, onCancel, onSuccess }: 
                                     )}
                                 />
                                 <TabLayout
+                                    noBorder
                                     tabs={[
                                         {
                                             title: 'Issue Attributes',

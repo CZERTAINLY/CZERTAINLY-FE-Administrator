@@ -11,7 +11,7 @@ interface Props {
 
 function Tabs({ tabs, selectedTab, onTabChange }: Props) {
     return (
-        <nav className="flex gap-x-1" aria-label="Tabs" role="tablist" aria-orientation="horizontal">
+        <nav className="flex gap-x-1 overflow-x-auto" aria-label="Tabs" role="tablist" aria-orientation="horizontal">
             {tabs.map((tab, index) => (
                 <button
                     key={index}
@@ -27,7 +27,10 @@ function Tabs({ tabs, selectedTab, onTabChange }: Props) {
                     data-hs-tab={`#pills-on-gray-color-${index}`}
                     aria-controls={`pills-on-gray-color-${index}`}
                     role="tab"
-                    onClick={() => onTabChange(index)}
+                    onClick={() => {
+                        onTabChange(index);
+                        tab.onClick?.();
+                    }}
                 >
                     {tab.title}
                 </button>

@@ -9,12 +9,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 import Button from 'components/Button';
 import Container from 'components/Container';
-import Switch from 'components/Switch';
+import Checkbox from 'components/Checkbox';
 import TextInput from 'components/TextInput';
 import { GlobalMetadataCreateRequestModel, GlobalMetadataUpdateRequestModel } from 'types/globalMetadata';
 import { AttributeContentType, PlatformEnum } from 'types/openapi';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
 import Select from 'components/Select';
+import Label from 'components/Label';
+
 interface GlobalMetadataFormProps {
     globalMetadataId?: string;
     onCancel?: () => void;
@@ -198,9 +200,9 @@ export default function GlobalMetadataForm({ globalMetadataId, onCancel, onSucce
                         />
 
                         <div>
-                            <label htmlFor="contentType" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
+                            <Label htmlFor="contentType" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
                                 Content Type <span className="text-red-500">*</span>
-                            </label>
+                            </Label>
                             <Controller
                                 name="contentType"
                                 control={control}
@@ -255,7 +257,9 @@ export default function GlobalMetadataForm({ globalMetadataId, onCancel, onSucce
                         <Controller
                             name="visible"
                             control={control}
-                            render={({ field }) => <Switch id="visible" checked={field.value} onChange={field.onChange} label="Visible" />}
+                            render={({ field }) => (
+                                <Checkbox id="visible" checked={field.value ?? false} onChange={field.onChange} label="Visible" />
+                            )}
                         />
 
                         <Container className="flex-row justify-end modal-footer" gap={4}>

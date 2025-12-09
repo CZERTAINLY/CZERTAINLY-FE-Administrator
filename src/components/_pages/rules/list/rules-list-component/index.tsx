@@ -13,7 +13,6 @@ import { PlatformEnum, Resource } from 'types/openapi';
 
 import { useRuleEvaluatorResourceOptions } from 'utils/rules';
 import RulesForm from '../../form';
-import styles from './ruleList.module.scss';
 
 const RulesList = () => {
     const rules = useSelector(rulesSelectors.rules);
@@ -146,7 +145,7 @@ const RulesList = () => {
     return (
         <>
             <Widget
-                titleSize="larger"
+                titleSize="large"
                 title="Rules"
                 refreshAction={getFreshList}
                 busy={isBusy}

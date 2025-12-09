@@ -11,7 +11,7 @@ import { useParams } from 'react-router';
 import Select from 'components/Select';
 import Button from 'components/Button';
 import Container from 'components/Container';
-import Switch from 'components/Switch';
+import Checkbox from 'components/Checkbox';
 import TextInput from 'components/TextInput';
 import { CustomAttributeCreateRequestModel, CustomAttributeUpdateRequestModel } from 'types/customAttributes';
 import { AttributeContentType, PlatformEnum } from 'types/openapi';
@@ -278,7 +278,7 @@ export default function CustomAttributeForm({ customAttributeId, onCancel, onSuc
                                 name="required"
                                 control={control}
                                 render={({ field }) => (
-                                    <Switch id="required" checked={field.value} onChange={field.onChange} label="Required" />
+                                    <Checkbox id="required" checked={field.value ?? false} onChange={field.onChange} label="Required" />
                                 )}
                             />
 
@@ -286,7 +286,7 @@ export default function CustomAttributeForm({ customAttributeId, onCancel, onSuc
                                 name="readOnly"
                                 control={control}
                                 render={({ field }) => (
-                                    <Switch id="readOnly" checked={field.value} onChange={field.onChange} label="Read Only" />
+                                    <Checkbox id="readOnly" checked={field.value ?? false} onChange={field.onChange} label="Read Only" />
                                 )}
                             />
 
@@ -294,9 +294,9 @@ export default function CustomAttributeForm({ customAttributeId, onCancel, onSuc
                                 name="list"
                                 control={control}
                                 render={({ field }) => (
-                                    <Switch
+                                    <Checkbox
                                         id="list"
-                                        checked={field.value}
+                                        checked={field.value ?? false}
                                         onChange={(checked) => {
                                             field.onChange(checked);
                                             if (!checked) {
@@ -312,9 +312,9 @@ export default function CustomAttributeForm({ customAttributeId, onCancel, onSuc
                                 name="multiSelect"
                                 control={control}
                                 render={({ field }) => (
-                                    <Switch
+                                    <Checkbox
                                         id="multiSelect"
-                                        checked={field.value}
+                                        checked={field.value ?? false}
                                         onChange={field.onChange}
                                         label="Multi Select"
                                         disabled={!watchedList}

@@ -7,7 +7,7 @@ import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Widget from 'components/Widget';
 import Container from 'components/Container';
 import Dialog from 'components/Dialog';
-import SwitchWidget from 'components/SwitchWidget';
+import Switch from 'components/Switch';
 import Badge from 'components/Badge';
 import CertificateStatus from '../CertificateStatus';
 import Asn1Dialog from '../Asn1Dialog/Asn1Dialog';
@@ -36,7 +36,9 @@ import {
 } from 'types/openapi';
 import { CertificateState as CertStatus, CertificateProtocol, CertificateValidationStatus } from 'types/openapi';
 import CertificateDownloadForm from './CertificateDownloadForm';
-import { Button } from 'reactstrap';
+import Button from 'components/Button';
+import { Trash2 } from 'lucide-react';
+import EditIcon from 'components/icons/EditIcon';
 
 interface SelectChangeValue {
     value: string;
@@ -242,19 +244,22 @@ export default function CertificateDetailsContent({ certificate, validationResul
         setRaProfileAuthorityUuid(value.split(':#')[1]);
     }, []);
 
-    const switchCallback = useCallback(() => {
-        if (!certificate) return;
-        if (isUpdatingTrustedStatus) return;
+    const switchCallback = useCallback(
+        (checked: boolean) => {
+            if (!certificate) return;
+            if (isUpdatingTrustedStatus) return;
 
-        dispatch(
-            actions.updateCertificateTrustedStatus({
-                uuid: certificate.uuid,
-                updateCertificateTrustedStatusRequest: {
-                    trustedCa: !certificate.trustedCa,
-                },
-            }),
-        );
-    }, [certificate, isUpdatingTrustedStatus, dispatch]);
+            dispatch(
+                actions.updateCertificateTrustedStatus({
+                    uuid: certificate.uuid,
+                    updateCertificateTrustedStatusRequest: {
+                        trustedCa: checked,
+                    },
+                }),
+            );
+        },
+        [certificate, isUpdatingTrustedStatus, dispatch],
+    );
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
@@ -524,7 +529,12 @@ export default function CertificateDetailsContent({ certificate, validationResul
                 id: 'trustedCa',
                 columns: [
                     certificate?.subjectType == CertificateSubjectType.SelfSignedEndEntity ? 'Trusted Self-Signed' : 'Trusted CA',
-                    <SwitchWidget disabled={isUpdatingTrustedStatus} checked={certificate.trustedCa ?? false} onClick={switchCallback} />,
+                    <Switch
+                        id="trustedCa"
+                        disabled={isUpdatingTrustedStatus}
+                        checked={certificate.trustedCa ?? false}
+                        onChange={switchCallback}
+                    />,
                 ],
             });
         }
@@ -653,11 +663,10 @@ export default function CertificateDetailsContent({ certificate, validationResul
                           ) : (
                               (certificate.owner ?? 'Unassigned')
                           ),
-                          <div className="d-flex">
+                          <div className="flex">
                               <Button
                                   disabled={isCertificateArchived}
-                                  className="btn btn-link"
-                                  size="sm"
+                                  variant="transparent"
                                   color="secondary"
                                   onClick={() => {
                                       setOwnerUuid(undefined);
@@ -665,13 +674,11 @@ export default function CertificateDetailsContent({ certificate, validationResul
                                   }}
                                   title="Update Owner"
                               >
-                                  <i className="fa fa-pencil-square-o" />
+                                  <EditIcon size={16} />
                               </Button>
 
                               <Button
-                                  className="btn btn-link"
-                                  size="sm"
-                                  color="secondary"
+                                  variant="transparent"
                                   disabled={!certificate?.ownerUuid || isCertificateArchived}
                                   onClick={() => {
                                       if (!certificate?.ownerUuid || !certificate?.uuid) return;
@@ -682,7 +689,7 @@ export default function CertificateDetailsContent({ certificate, validationResul
                                       );
                                   }}
                               >
-                                  <i className="fa fa-trash text-danger" />
+                                  <Trash2 size={16} />
                               </Button>
                           </div>,
                       ],
@@ -699,21 +706,19 @@ export default function CertificateDetailsContent({ certificate, validationResul
                                     </React.Fragment>
                                 ))
                               : 'Unassigned',
-                          <div className="d-flex">
+                          <div className="flex">
                               <Button
                                   disabled={isCertificateArchived}
-                                  className="btn btn-link"
-                                  size="sm"
+                                  variant="transparent"
                                   color="secondary"
                                   onClick={() => setUpdateGroup(true)}
                                   title="Update Group"
                               >
-                                  <i className="fa fa-pencil-square-o" />
+                                  <EditIcon size={16} />
                               </Button>
                               <Button
-                                  className="btn btn-link"
-                                  size="sm"
-                                  color="secondary"
+                                  variant="transparent"
+                                  color="danger"
                                   disabled={!certificate?.groups?.length || isCertificateArchived}
                                   onClick={() => {
                                       if (!certificate?.uuid) return;
@@ -724,7 +729,7 @@ export default function CertificateDetailsContent({ certificate, validationResul
                                       );
                                   }}
                               >
-                                  <i className="fa fa-trash text-danger" />
+                                  <Trash2 size={16} />
                               </Button>
                           </div>,
                       ],
@@ -742,21 +747,19 @@ export default function CertificateDetailsContent({ certificate, validationResul
                           ) : (
                               'Unassigned'
                           ),
-                          <div className="d-flex">
+                          <div className="flex">
                               <Button
                                   disabled={isCertificateArchived}
-                                  className="btn btn-link"
-                                  size="sm"
+                                  variant="transparent"
                                   color="secondary"
                                   onClick={() => setUpdateRaProfile(true)}
                                   title="Update RA Profile"
                               >
-                                  <i className="fa fa-pencil-square-o" />
+                                  <EditIcon size={16} />
                               </Button>
                               <Button
-                                  className="btn btn-link"
-                                  size="sm"
-                                  color="secondary"
+                                  variant="transparent"
+                                  color="danger"
                                   disabled={!certificate?.raProfile?.uuid || isCertificateArchived}
                                   onClick={() => {
                                       if (!certificate?.raProfile?.authorityInstanceUuid || !certificate?.uuid) return;
@@ -767,7 +770,7 @@ export default function CertificateDetailsContent({ certificate, validationResul
                                       );
                                   }}
                               >
-                                  <i className="fa fa-trash text-danger" />
+                                  <Trash2 size={16} />
                               </Button>
                           </div>,
                       ],
@@ -815,8 +818,8 @@ export default function CertificateDetailsContent({ certificate, validationResul
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                 ]}
             />
 
@@ -832,36 +835,40 @@ export default function CertificateDetailsContent({ certificate, validationResul
                 }
                 toggle={() => setRenew(false)}
                 buttons={[]}
+                icon="refresh"
+                size="xl"
             />
 
             <Dialog
-                size="lg"
                 isOpen={rekey}
                 caption={`Rekey Certificate`}
                 body={<CertificateRekeyDialog onCancel={() => setRekey(false)} certificate={certificate} />}
                 toggle={() => setRekey(false)}
                 buttons={[]}
+                icon="shuffle"
+                size="xl"
             />
 
             <Dialog
                 isOpen={revoke}
                 caption={`Revoke Certificate`}
                 body={
-                    <div>
-                        <Select
-                            id="revokeReason"
-                            options={certificateRevokeReasonOptions}
-                            placeholder={`Select Revocation Reason`}
-                            value={revokeReason || ''}
-                            onChange={(value) => setRevokeReason(value as CertificateRevocationReason)}
-                        />
-                    </div>
+                    <Select
+                        id="revokeReason"
+                        options={certificateRevokeReasonOptions}
+                        placeholder={`Select Revocation Reason`}
+                        value={revokeReason || ''}
+                        onChange={(value) => setRevokeReason(value as CertificateRevocationReason)}
+                        label="Revocation Reason"
+                    />
                 }
                 toggle={() => setRevoke(false)}
+                icon="minus"
                 buttons={[
-                    { color: 'primary', onClick: onRevoke, body: 'Revoke' },
                     { color: 'secondary', variant: 'outline', onClick: () => setRevoke(false), body: 'Cancel' },
+                    { color: 'primary', onClick: onRevoke, body: 'Revoke' },
                 ]}
+                size="lg"
             />
 
             <Dialog
@@ -880,10 +887,9 @@ export default function CertificateDetailsContent({ certificate, validationResul
                     />
                 }
                 toggle={onCancelGroupUpdate}
-                noBorder
                 buttons={[
-                    { color: 'primary', onClick: onUpdateGroup, body: 'Update', disabled: isUpdatingGroup },
                     { color: 'secondary', variant: 'outline', onClick: onCancelGroupUpdate, body: 'Cancel' },
+                    { color: 'primary', onClick: onUpdateGroup, body: 'Update', disabled: isUpdatingGroup },
                 ]}
             />
 
@@ -899,11 +905,12 @@ export default function CertificateDetailsContent({ certificate, validationResul
                         onChange={(value) => setOwnerUuid(value as string)}
                     />
                 }
+                icon="user"
+                size="md"
                 toggle={onCancelOwnerUpdate}
-                noBorder
                 buttons={[
-                    { color: 'primary', onClick: onUpdateOwner, body: 'Update', disabled: ownerUuid === undefined || isUpdatingOwner },
                     { color: 'secondary', variant: 'outline', onClick: onCancelOwnerUpdate, body: 'Cancel' },
+                    { color: 'primary', onClick: onUpdateOwner, body: 'Update', disabled: ownerUuid === undefined || isUpdatingOwner },
                 ]}
             />
 
@@ -918,18 +925,19 @@ export default function CertificateDetailsContent({ certificate, validationResul
                             placeholder={`Select RA Profile`}
                             value={raProfile || ''}
                             onChange={(value) => updateRaAndAuthorityState((value as string) || '')}
+                            label="RA Profile"
                         />
                     </div>
                 }
                 toggle={onCancelRaProfileUpdate}
                 buttons={[
+                    { color: 'secondary', variant: 'outline', onClick: onCancelRaProfileUpdate, body: 'Cancel' },
                     {
                         color: 'primary',
                         onClick: onUpdateRaProfile,
                         body: 'Update',
                         disabled: raProfile === undefined || isUpdatingRaProfile,
                     },
-                    { color: 'secondary', variant: 'outline', onClick: onCancelRaProfileUpdate, body: 'Cancel' },
                 ]}
             />
         </>

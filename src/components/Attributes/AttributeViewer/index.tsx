@@ -20,6 +20,8 @@ import ContentValueField from '../../Input/DynamicContent/ContentValueField';
 import WidgetButtons, { WidgetButtonProps } from '../../WidgetButtons';
 import { InfoIcon } from 'lucide-react';
 import Button from 'components/Button';
+import Popover from 'components/Popover';
+import Widget from 'components/Widget';
 
 export enum ATTRIBUTE_VIEWER_TYPE {
     ATTRIBUTE,
@@ -179,24 +181,17 @@ export default function AttributeViewer({
 
             if ('sourceObjects' in attribute && attribute.sourceObjects.length > 0 && resource) {
                 return (
-                    <Button
-                        data-testid="source-button"
-                        variant="transparent"
-                        title="Source objects"
-                        onClick={() => {
-                            dispatch(
-                                userInterfaceActions.showGlobalModal({
-                                    content: <CustomTable headers={headers} data={attribute.sourceObjects.map(createData)} />,
-                                    isOpen: true,
-                                    showCloseButton: true,
-                                    title: 'Source objects',
-                                    size: 'lg',
-                                }),
-                            );
-                        }}
+                    <Popover
+                        content={
+                            <Widget title="Source objects" noBorder className="!bg-[#F7F6F2]">
+                                <CustomTable headers={headers} data={attribute.sourceObjects.map(createData)} />
+                            </Widget>
+                        }
                     >
-                        <InfoIcon size={16} />
-                    </Button>
+                        <Button data-testid="source-button" variant="transparent" className="!p-1 ml-1 relative top-[3px]">
+                            <InfoIcon size={16} />
+                        </Button>
+                    </Popover>
                 );
             }
             return null;

@@ -7,14 +7,13 @@ import {
     X,
     Check,
     Plug,
-    PencilLine,
     History,
     XCircle,
     Upload,
-    Download,
+    ArrowDownToLine,
     Users,
     User,
-    Box,
+    Boxes,
     Repeat2,
     MinusSquare,
     Info,
@@ -35,10 +34,11 @@ import {
     Link,
     Recycle,
     Archive,
-    ArchiveRestore,
+    PackageOpen,
     SquareMinus,
 } from 'lucide-react';
 import Button from 'components/Button';
+import EditIcon from 'components/icons/EditIcon';
 
 export type IconName =
     | 'plus'
@@ -103,14 +103,14 @@ const getIcon = (icon: IconName, size: number = 20): React.ReactNode => {
         times: X,
         check: Check,
         plug: Plug,
-        pencil: PencilLine,
+        pencil: EditIcon,
         history: History,
         'cross-circle': XCircle,
         upload: Upload,
-        download: Download,
+        download: ArrowDownToLine,
         group: Users,
         user: User,
-        cubes: Box,
+        cubes: Boxes,
         retweet: Repeat2,
         'minus-square': MinusSquare,
         push: ArrowUpCircle,
@@ -134,7 +134,7 @@ const getIcon = (icon: IconName, size: number = 20): React.ReactNode => {
         recycle: Recycle,
         rekey: Shuffle,
         archive: Archive,
-        unarchive: ArchiveRestore,
+        unarchive: PackageOpen,
     };
 
     const IconComponent = iconMap[icon];

@@ -14,7 +14,6 @@ import Badge from 'components/Badge';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { getEditAndDeleteWidgetButtons, createWidgetDetailHeaders } from 'utils/widget';
-import GoBackButton from 'components/GoBackButton';
 import Container from 'components/Container';
 import Breadcrumb from 'components/Breadcrumb';
 import GlobalMetadataForm from '../form';

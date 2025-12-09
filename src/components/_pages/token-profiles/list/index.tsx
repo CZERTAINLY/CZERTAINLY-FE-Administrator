@@ -316,8 +316,8 @@ function TokenProfileList() {
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                 ]}
             />
 
@@ -327,10 +327,9 @@ function TokenProfileList() {
                 body={keyUsageBody}
                 toggle={() => setKeyUsageUpdate(false)}
                 size="md"
-                noBorder
                 buttons={[
-                    { color: 'primary', onClick: onUpdateKeyUsageConfirmed, body: 'Update' },
                     { color: 'secondary', variant: 'outline', onClick: () => setKeyUsageUpdate(false), body: 'Cancel' },
+                    { color: 'primary', onClick: onUpdateKeyUsageConfirmed, body: 'Update' },
                 ]}
             />
 

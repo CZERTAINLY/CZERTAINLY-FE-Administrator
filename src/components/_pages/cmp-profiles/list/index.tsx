@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
-import { Container, Table } from 'reactstrap';
+import Container from 'components/Container';
 
 import { actions, selectors } from 'ducks/cmp-profiles';
 
@@ -152,27 +152,29 @@ export default function AdministratorsList() {
             <div>
                 <div>Failed to delete {checkedRows.length > 1 ? 'CMP Profiles' : 'an CMP Profile'}. Please find the details below:</div>
 
-                <Table className="table-hover" size="sm">
+                <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
                     <thead>
                         <tr>
-                            <th>
+                            <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
                                 <b>Name</b>
                             </th>
-                            <th>
+                            <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
                                 <b>Dependencies</b>
                             </th>
                         </tr>
                     </thead>
 
-                    <tbody>
+                    <tbody className="divide-y divide-gray-200 dark:divide-neutral-700">
                         {bulkDeleteErrorMessages?.map((message) => (
-                            <tr>
-                                <td>{message.name}</td>
-                                <td>{message.message}</td>
+                            <tr className="hover:bg-gray-50 dark:hover:bg-neutral-800">
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200">{message.name}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200">
+                                    {message.message}
+                                </td>
                             </tr>
                         ))}
                     </tbody>
-                </Table>
+                </table>
             </div>
         ),
         [bulkDeleteErrorMessages, checkedRows.length],
@@ -252,7 +254,7 @@ export default function AdministratorsList() {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <Container>
             <Widget
                 title="List of CMP Profiles"
                 busy={isBusy}

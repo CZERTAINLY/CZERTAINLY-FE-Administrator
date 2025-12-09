@@ -2,7 +2,6 @@ import { useCallback } from 'react';
 import { useSearchParams } from 'react-router';
 
 import logo from '../../resources/images/czertainly_logo.svg';
-import style from './style.module.scss';
 
 export default function AppLogin() {
     const [searchParams] = useSearchParams();
@@ -13,7 +12,7 @@ export default function AppLogin() {
     }, [searchParams]);
 
     return (
-        <div className={style.container}>
+        <div>
             <img src={logo} alt="Czertainly" />
             <h3>You are not authorized to view this page</h3>
             <p>If you believe you should have access, check your client certificate or try another login method.</p>

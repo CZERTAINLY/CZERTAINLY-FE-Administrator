@@ -15,13 +15,12 @@ import TokenProfileForm from '../form';
 import Select from 'components/Select';
 
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import { Label } from 'reactstrap';
+import Label from 'components/Label';
 import Badge from 'components/Badge';
 import { KeyUsage, PlatformEnum, Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import { createWidgetDetailHeaders } from 'utils/widget';
-import GoBackButton from 'components/GoBackButton';
 import Breadcrumb from 'components/Breadcrumb';
 import Container from 'components/Container';
 
@@ -305,8 +304,8 @@ export default function TokenProfileDetail() {
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                 ]}
             />
 
@@ -316,10 +315,9 @@ export default function TokenProfileDetail() {
                 body={keyUsageBody}
                 toggle={() => setKeyUsageUpdate(false)}
                 size="md"
-                noBorder
                 buttons={[
-                    { color: 'primary', onClick: onUpdateKeyUsageConfirmed, body: 'Update' },
                     { color: 'secondary', variant: 'outline', onClick: () => setKeyUsageUpdate(false), body: 'Cancel' },
+                    { color: 'primary', onClick: onUpdateKeyUsageConfirmed, body: 'Update' },
                 ]}
             />
 

@@ -6,6 +6,7 @@ import { CertificateListResponseModel } from 'types/certificate';
 import { buildValidationRules } from 'utils/validators-helper';
 import { validateRequired } from 'utils/validators';
 import cn from 'classnames';
+import Label from 'components/Label';
 
 interface Props {
     certificates: CertificateListResponseModel[] | undefined;
@@ -35,9 +36,9 @@ export default function CertificateField({ certificates }: Props) {
             rules={buildValidationRules([validateRequired()])}
             render={({ field, fieldState }) => (
                 <div className="mb-4">
-                    <label htmlFor="certificateSelect" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
+                    <Label htmlFor="certificateSelect" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
                         CA Certificate
-                    </label>
+                    </Label>
                     <Select
                         id="certificateSelect"
                         options={optionsForCertificates || []}

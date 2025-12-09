@@ -9,6 +9,7 @@ import WidgetButtons from '../../../WidgetButtons';
 import { ContentFieldConfiguration } from '../index';
 import Select from 'components/Select';
 import TextInput from 'components/TextInput';
+import DatePicker from 'components/DatePicker';
 import Container from 'components/Container';
 import cn from 'classnames';
 
@@ -155,7 +156,8 @@ export default function ContentValueField({ id, descriptor, initialContent, onSu
                 console.log('field', field);
                 const inputContent = getFieldContent(field);
                 const inputType = ContentFieldConfiguration[descriptor.contentType].type;
-                const needsStep = inputType === 'number' || inputType === 'datetime-local';
+                const isDateTime = inputType === 'datetime-local';
+                const needsStep = inputType === 'number';
                 const displayValue =
                     descriptor.contentType === AttributeContentType.Datetime ? getFormattedDateTime(field.value) : field.value;
 
@@ -167,6 +169,26 @@ export default function ContentValueField({ id, descriptor, initialContent, onSu
                         isMulti={descriptor.properties.multiSelect}
                         disabled={descriptor.properties.readOnly}
                         isClearable={!descriptor.properties.required}
+                    />
+                ) : isDateTime ? (
+                    <DatePicker
+                        id={descriptor.name}
+                        value={field.value ? (field.value.includes('T') ? field.value : field.value.replace(' ', 'T')) : undefined}
+                        onChange={(value) => {
+                            field.onChange(value);
+                        }}
+                        onBlur={field.onBlur}
+                        disabled={descriptor.properties.readOnly}
+                        invalid={fieldState.isTouched && !!fieldState.invalid}
+                        error={
+                            fieldState.isTouched && fieldState.invalid
+                                ? typeof fieldState.error === 'string'
+                                    ? fieldState.error
+                                    : fieldState.error?.message || 'Invalid value'
+                                : undefined
+                        }
+                        required={descriptor.properties.required}
+                        timePicker
                     />
                 ) : needsStep ? (
                     <input
@@ -186,7 +208,7 @@ export default function ContentValueField({ id, descriptor, initialContent, onSu
                 ) : (
                     <TextInput
                         id={descriptor.name}
-                        type={inputType as 'text' | 'number' | 'email' | 'password' | 'date' | 'time'}
+                        type={inputType as 'text' | 'textarea' | 'number' | 'email' | 'password' | 'date' | 'time'}
                         disabled={descriptor.properties.readOnly}
                         value={displayValue || ''}
                         onChange={(value) => field.onChange(value)}

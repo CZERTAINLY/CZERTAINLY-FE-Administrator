@@ -89,7 +89,7 @@ export const renderConditionItems = (
         }
 
         return (
-            <div key={condition.fieldIdentifier} className="mt-2 me-1" style={style}>
+            <div key={condition.fieldIdentifier} className="mt-2 mr-1" style={style}>
                 <span title={title} className={className}>
                     <b>{getEnumLabel(searchGroupEnum, condition.fieldSource)}&nbsp;</b>'{label}'&nbsp;
                     {getEnumLabel(filterConditionOperatorEnum, condition.operator)}&nbsp;

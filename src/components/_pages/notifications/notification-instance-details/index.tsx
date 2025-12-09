@@ -8,8 +8,10 @@ import { actions as notificationsActions, selectors as notificationsSelectors } 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router';
-import { Container, Label } from 'reactstrap';
+import Container from 'components/Container';
+import Label from 'components/Label';
 import { getEditAndDeleteWidgetButtons, createWidgetDetailHeaders } from 'utils/widget';
+import NotificationInstanceForm from '../notification-instance-form';
 
 const NotificationInstanceDetails = () => {
     const { id } = useParams();
@@ -22,10 +24,15 @@ const NotificationInstanceDetails = () => {
     const customAttributes = useSelector(customAttributesSelectors.customAttributes);
     const isFetchingNotificationInstanceDetail = useSelector(notificationsSelectors.isFetchingNotificationInstanceDetail);
     const isDeleting = useSelector(notificationsSelectors.isDeleting);
+    const isUpdating = useSelector(notificationsSelectors.isEditingNotificationInstance);
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
-    const isBusy = useMemo(() => isFetchingNotificationInstanceDetail || isDeleting, [isFetchingNotificationInstanceDetail, isDeleting]);
+    const isBusy = useMemo(
+        () => isFetchingNotificationInstanceDetail || isDeleting || isUpdating,
+        [isFetchingNotificationInstanceDetail, isDeleting, isUpdating],
+    );
 
     const onDeleteConfirmed = useCallback(() => {
         if (!notificationInstance) return;
@@ -64,9 +71,13 @@ const NotificationInstanceDetails = () => {
     }, [dispatch, notificationInstance]);
 
     const onEditClick = useCallback(() => {
-        if (!id) return;
-        navigate(`../../../notificationinstances/edit/${id}`);
-    }, [navigate, id]);
+        setIsEditModalOpen(true);
+    }, []);
+
+    const handleCloseEditModal = useCallback(() => {
+        setIsEditModalOpen(false);
+        getFreshNotificationInstanceDetail();
+    }, [getFreshNotificationInstanceDetail]);
 
     const buttons: WidgetButtonProps[] = useMemo(() => getEditAndDeleteWidgetButtons(onEditClick, setConfirmDelete), [onEditClick]);
 
@@ -176,7 +187,7 @@ const NotificationInstanceDetails = () => {
                 widgetButtons={buttons}
                 refreshAction={getFreshNotificationInstanceDetail}
                 title="Notification Instance Details"
-                titleSize="larger"
+                titleSize="large"
                 busy={isBusy}
             >
                 <br />
@@ -185,7 +196,7 @@ const NotificationInstanceDetails = () => {
             </Widget>
 
             {notificationInstance?.attributes?.length ? (
-                <Widget title="Attributes" busy={isFetchingNotificationInstanceDetail} titleSize="larger">
+                <Widget title="Attributes" busy={isFetchingNotificationInstanceDetail} titleSize="large">
                     <br />
                     <Label>Notification Instance Attributes</Label>
 
@@ -195,7 +206,7 @@ const NotificationInstanceDetails = () => {
                 <></>
             )}
             {notificationInstance?.attributeMappings?.length ? (
-                <Widget title="Attribute Mappings" busy={isFetchingNotificationInstanceDetail} titleSize="larger">
+                <Widget title="Attribute Mappings" busy={isFetchingNotificationInstanceDetail} titleSize="large">
                     <br />
                     <Label>Notification Instance Attribute Mappings</Label>
 
@@ -214,6 +225,19 @@ const NotificationInstanceDetails = () => {
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
+            />
+            <Dialog
+                isOpen={isEditModalOpen}
+                toggle={handleCloseEditModal}
+                caption="Edit Notification Instance"
+                size="xl"
+                body={
+                    <NotificationInstanceForm
+                        notificationInstanceId={id}
+                        onCancel={handleCloseEditModal}
+                        onSuccess={handleCloseEditModal}
+                    />
+                }
             />
         </Container>
     );

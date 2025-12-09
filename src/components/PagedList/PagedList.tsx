@@ -33,6 +33,7 @@ interface Props {
     hideWidgetButtons?: boolean;
     hasCheckboxes?: boolean;
     hasDetails?: boolean;
+    columnForDetail?: string;
     extraFilterComponent?: React.ReactNode;
 }
 
@@ -55,6 +56,7 @@ function PagedList({
     hideWidgetButtons = false,
     hasCheckboxes = true,
     hasDetails = false,
+    columnForDetail,
     extraFilterComponent,
 }: Props) {
     const dispatch = useDispatch();
@@ -158,7 +160,7 @@ function PagedList({
                 widgetLockName={pageWidgetLockName}
                 refreshAction={getFreshData}
                 widgetButtons={buttons}
-                titleSize="larger"
+                titleSize="large"
                 hideWidgetButtons={hideWidgetButtons}
             >
                 <CustomTable
@@ -166,7 +168,8 @@ function PagedList({
                     data={data}
                     hasCheckboxes={hasCheckboxes}
                     hasDetails={hasDetails}
-                    hasPagination={true}
+                    columnForDetail={columnForDetail}
+                    hasPagination
                     multiSelect={multiSelect}
                     paginationData={paginationData}
                     onPageChanged={setPageNumber}
@@ -184,8 +187,8 @@ function PagedList({
                     toggle={() => setConfirmDelete(false)}
                     icon="delete"
                     buttons={[
-                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                         { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     ]}
                 />
             )}

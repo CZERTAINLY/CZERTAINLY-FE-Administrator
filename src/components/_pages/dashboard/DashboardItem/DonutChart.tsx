@@ -31,17 +31,21 @@ function DonutChart({ title, colorOptions, data = {}, entity, redirect, onSetFil
             type: 'solid',
         },
         dataLabels: {
+            enabled: false,
             formatter: function (val: any, opts: any) {
                 return opts.w.config.series[opts.seriesIndex];
             },
         },
         chart: {
+            width: 100,
+            height: 100,
             toolbar: {
                 show: true,
                 offsetX: 0,
                 offsetY: -40,
                 tools: {
-                    download: true,
+                    download:
+                        '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu-icon lucide-menu"><path d="M4 5h16"/><path d="M4 12h16"/><path d="M4 19h16"/></svg>',
                 },
             },
             events: {
@@ -53,6 +57,23 @@ function DonutChart({ title, colorOptions, data = {}, entity, redirect, onSetFil
                 },
             },
         },
+        legend: {
+            show: true,
+            fontSize: '16px',
+            fontWeight: 500,
+            // labels: {
+            //   colors: '#e5e7eb',   // tailwind slate-200-ish
+            // },
+            markers: {
+                size: 4,
+                offsetX: -10,
+            },
+        },
+        tooltip: {
+            marker: {
+                show: true,
+            },
+        },
     };
 
     if (colorOptions) {
@@ -60,7 +81,7 @@ function DonutChart({ title, colorOptions, data = {}, entity, redirect, onSetFil
     }
 
     return (
-        <Widget title={title} titleBoldness="bold" className="flex-1">
+        <Widget title={title} titleBoldness="bold" className="flex-1 w-1/2 lg:w-1/3 xl:w-1/4">
             <ReactApexChart options={options} series={getValues(data)} type="donut" height="100%" width="100%" />
         </Widget>
     );

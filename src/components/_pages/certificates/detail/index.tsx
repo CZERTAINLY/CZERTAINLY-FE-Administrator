@@ -48,6 +48,7 @@ import Asn1Dialog from '../Asn1Dialog/Asn1Dialog';
 
 import FlowChart, { CustomNode } from 'components/FlowChart';
 import { transformCertificateObjectToNodesAndEdges } from 'ducks/transform/certificates';
+import { Info } from 'lucide-react';
 import { Edge } from 'reactflow';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { DeviceType, useCopyToClipboard, useDeviceType } from 'utils/common-hooks';
@@ -61,6 +62,7 @@ import Container from 'components/Container';
 import Breadcrumb from 'components/Breadcrumb';
 import CertificateDetailsContent from './CertificateDetailsContent';
 import CertificateRequestContent from './CertificateRequestContent';
+import Label from 'components/Label';
 
 interface LocationPushFormProps {
     onSubmit: (values: any) => void;
@@ -102,7 +104,7 @@ function LocationPushForm({
     return (
         <FormProvider {...methods}>
             <form onSubmit={handleSubmit(handleFormSubmit)}>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">Locations</label>
+                <Label htmlFor="locations">Locations</Label>
 
                 <CustomTable
                     hasPagination={false}
@@ -112,8 +114,6 @@ function LocationPushForm({
                     multiSelect={false}
                     onCheckedRowsChanged={(rows) => setSelectLocationCheckedRows(rows as string[])}
                 />
-
-                <br />
 
                 <TabLayout
                     tabs={[
@@ -133,7 +133,7 @@ function LocationPushForm({
                     ]}
                 />
 
-                <div className="flex justify-end gap-2">
+                <Container className="flex-row justify-end modal-footer" gap={4}>
                     <ProgressButton
                         title="Push"
                         inProgressTitle="Pushing..."
@@ -144,7 +144,7 @@ function LocationPushForm({
                     <Button variant="outline" color="secondary" onClick={onCancel} disabled={isPushing} type="button">
                         Cancel
                     </Button>
-                </div>
+                </Container>
             </form>
         </FormProvider>
     );
@@ -528,8 +528,12 @@ export default function CertificateDetail() {
                               <div style={{ wordBreak: 'break-all' }}>{history.message}</div>,
 
                               history.additionalInformation ? (
-                                  <Button color="white" onClick={() => setCurrentInfoId(history.uuid)} title="Show Additional Information">
-                                      <i className="fa fa-info-circle" aria-hidden="true"></i>
+                                  <Button
+                                      variant="transparent"
+                                      onClick={() => setCurrentInfoId(history.uuid)}
+                                      title="Show Additional Information"
+                                  >
+                                      <Info size={16} aria-hidden="true" />
                                   </Button>
                               ) : (
                                   ''
@@ -634,7 +638,7 @@ export default function CertificateDetail() {
             id: 'validationStatus',
             columns: [
                 <div key="validationStatus">
-                    <span className="fw-bold">Validation Result</span>{' '}
+                    <span className="font-bold">Validation Result</span>{' '}
                     {validationResult?.validationTimestamp ? `(${dateFormatter(validationResult?.validationTimestamp)})` : ''}
                 </div>,
                 validationResult?.resultStatus ? <CertificateStatus status={validationResult?.resultStatus}></CertificateStatus> : <></>,
@@ -1109,7 +1113,6 @@ export default function CertificateDetail() {
                         content: (
                             <Container>
                                 <Widget title="Metadata" titleSize="large" widgetLockName={LockWidgetNameEnum.CertificateDetailsWidget}>
-                                    <br />
                                     <AttributeViewer viewerType={ATTRIBUTE_VIEWER_TYPE.METADATA} metadata={certificate?.metadata} />
                                 </Widget>
 

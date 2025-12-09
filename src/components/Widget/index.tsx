@@ -23,7 +23,8 @@ interface Props {
     title?: string;
     titleLink?: string;
     titleSize?: 'small' | 'medium' | 'large' | 'larger';
-    titleBoldness?: 'normal' | 'bold' | 'bolder';
+    titleBoldness?: 'normal' | 'bold' | 'semi-bold';
+    titleColor?: string;
     className?: string;
     children?: React.ReactNode | React.ReactNode[];
     busy?: boolean;
@@ -46,6 +47,7 @@ function Widget({
     titleSize = 'medium',
     widgetButtons,
     titleBoldness = 'bold',
+    titleColor = 'var(--dark-gray-color)',
     className,
     children = [],
     busy = false,
@@ -68,9 +70,9 @@ function Widget({
         title ? (
             <h5
                 className={cn(
-                    '',
+                    `text-[${titleColor}]`,
                     { 'font-bold': titleBoldness === 'bold' },
-                    { 'font-extrabold': titleBoldness === 'bolder' },
+                    { 'font-semibold': titleBoldness === 'semi-bold' },
                     { 'font-normal': titleBoldness === 'normal' },
                     { 'text-base': titleSize === 'medium' },
                     { 'text-lg font-bold': titleSize === 'large' },
@@ -82,11 +84,18 @@ function Widget({
             </h5>
         ) : null;
 
-    const renderTitle = () => (titleLink ? <Link to={titleLink}>{getTitleText()}</Link> : getTitleText());
+    const renderTitle = () =>
+        titleLink ? (
+            <Link to={titleLink} className="text-blue-600">
+                {getTitleText()}
+            </Link>
+        ) : (
+            getTitleText()
+        );
 
     const renderRefreshButton = () =>
         refreshAction ? (
-            <Button onClick={refreshAction} data-testid="refresh-icon" variant="transparent">
+            <Button onClick={refreshAction} data-testid="refresh-icon" variant="transparent" title="Refresh">
                 <RefreshCw size={16} />
             </Button>
         ) : null;
@@ -127,7 +136,7 @@ function Widget({
             id={id}
         >
             {hasHeaderContent && (
-                <div className={cn('flex items-center justify-between flex-wrap gap-2', { 'mb-4': !!widgetLock || !!children })}>
+                <div className={cn('flex items-center justify-between flex-wrap gap-2', { 'mb-3': !!widgetLock || !!children })}>
                     <div className="flex items-center gap-2">
                         {renderTitle()}
                         {renderRefreshButton()}
@@ -142,15 +151,12 @@ function Widget({
 
             {widgetInfoCard && (
                 <div
-                    className={cn('overflow-hidden transition-all duration-300 ease-in-out', {
+                    className={cn('overflow-hidden transition-all duration-300 ease-in-out my-2', {
                         'max-h-0 opacity-0': !showWidgetInfo,
                         'max-h-[1000px] opacity-100': showWidgetInfo,
                     })}
                 >
-                    <div className="my-2 bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg">
-                        <div className="px-4 py-3 border-b border-gray-200 dark:border-neutral-700">
-                            <h3 className="text-sm font-semibold text-gray-800 dark:text-white">{widgetInfoCard.title}</h3>
-                        </div>
+                    <div className="my-2 border border-gray-200 dark:border-neutral-700 rounded-lg">
                         {widgetInfoCard.heading && (
                             <h2 className="px-4 pt-3 mb-0 text-base font-semibold text-gray-800 dark:text-white">
                                 {widgetInfoCard.heading}
@@ -158,7 +164,9 @@ function Widget({
                         )}
                         <div className="px-4 py-3">
                             {widgetInfoCard.description && (
-                                <p className="text-sm text-gray-700 dark:text-neutral-300 mb-0">{widgetInfoCard.description}</p>
+                                <p className="text-sm text-gray-700 dark:text-neutral-300 mb-0">
+                                    {widgetInfoCard.title}: {widgetInfoCard.description}
+                                </p>
                             )}
 
                             {widgetInfoCard.notesList && (

@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { actions, selectors } from 'ducks/notifications';
@@ -24,15 +24,15 @@ function NotificationsOverview() {
             overviewNotifications.length === 0
                 ? 'No unread notifications'
                 : overviewNotifications.map((notification, index) => (
-                      <>
-                          <div className="flex items-start gap-1 mb-2" key={notification.uuid}>
+                      <React.Fragment key={notification.uuid}>
+                          <div className="flex items-start gap-1 mb-2">
                               <Button
                                   variant="transparent"
                                   onClick={() => dispatch(actions.markAsReadNotification({ uuid: notification.uuid }))}
                               >
                                   <Check size={16} />
                               </Button>
-                              <div className="">
+                              <div>
                                   <span className="text-sm leading-[16px] font-medium text-gray-800 mr-2">{notification.message}</span>
                                   <span className="text-xs leading-[16px] text-gray-500 mr-2">{formatTimeAgo(notification.sentAt)}</span>
                                   <Button
@@ -52,7 +52,7 @@ function NotificationsOverview() {
                               </div>
                           </div>
                           {index < overviewNotifications.length - 1 && <hr className="border-gray-200 mb-2" />}
-                      </>
+                      </React.Fragment>
                   )),
         [overviewNotifications, dispatch, navigate],
     );
@@ -61,7 +61,7 @@ function NotificationsOverview() {
         <Dropdown
             title={
                 <div className="flex items-center gap-2 text-white">
-                    <Bell size={24} />
+                    <Bell size={24} strokeWidth={1.5} />
                     <span className="sr-only">Notifications</span>
                 </div>
             }

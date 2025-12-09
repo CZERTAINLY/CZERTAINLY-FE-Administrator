@@ -1,4 +1,5 @@
 import cn from 'classnames';
+import Label from 'components/Label';
 
 interface Props {
     checked: boolean;
@@ -21,9 +22,9 @@ function Checkbox({ checked, onChange, id, label, disabled = false }: Props) {
                 className="border-gray-200 rounded-sm text-blue-600 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800"
                 disabled={disabled}
             />
-            <label htmlFor={id} className={cn('ml-2', { 'sr-only': !label })}>
+            <Label htmlFor={id} className={cn('ml-2 !mb-0', { 'sr-only': !label })}>
                 {label || 'Checkbox'}
-            </label>
+            </Label>
         </div>
     );
 }

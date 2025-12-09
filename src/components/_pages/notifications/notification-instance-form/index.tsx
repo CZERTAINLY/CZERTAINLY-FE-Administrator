@@ -5,10 +5,10 @@ import Widget from 'components/Widget';
 import { selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { actions as connectorActions } from 'ducks/connectors';
 import { selectors as notificationSelectors, actions as notificationsActions } from 'ducks/notifications';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router';
+import { useParams } from 'react-router';
 import Select from 'components/Select';
 import Button from 'components/Button';
 import { AttributeDescriptorModel, AttributeMappingModel, isCustomAttributeModel, isDataAttributeModel } from 'types/attributes';
@@ -19,6 +19,7 @@ import { composeValidators, validateAlphaNumericWithoutAccents, validateLength, 
 import { buildValidationRules } from 'utils/validators-helper';
 import TextInput from 'components/TextInput';
 import TextArea from 'components/TextArea';
+import Container from 'components/Container';
 
 interface FormValues {
     name: string;
@@ -30,10 +31,16 @@ interface FormValues {
     attributeMappings: any[];
 }
 
-const NotificationInstanceForm = () => {
+interface NotificationInstanceFormProps {
+    notificationInstanceId?: string;
+    onCancel?: () => void;
+    onSuccess?: () => void;
+}
+
+const NotificationInstanceForm = ({ notificationInstanceId, onCancel, onSuccess }: NotificationInstanceFormProps = {}) => {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
-    const { id } = useParams();
+    const { id: routeId } = useParams();
+    const id = notificationInstanceId || routeId;
 
     const notificationInstanceProviders = useSelector(notificationSelectors.notificationInstanceProviders);
     const notificationProviderAttributesDescriptors = useSelector(notificationSelectors.notificationProviderAttributesDescriptors);
@@ -174,10 +181,27 @@ const NotificationInstanceForm = () => {
         }
     };
 
-    const onCancel = useCallback(() => {
+    const handleCancel = useCallback(() => {
         clearNotificationInstanceDetail();
-        navigate(-1);
-    }, [navigate, clearNotificationInstanceDetail]);
+        onCancel?.();
+    }, [clearNotificationInstanceDetail, onCancel]);
+
+    const wasCreating = useRef(isCreatingNotificationInstance);
+    const wasUpdating = useRef(isEditingNotificationInstance);
+
+    useEffect(() => {
+        if (wasCreating.current && !isCreatingNotificationInstance) {
+            onSuccess?.();
+        }
+        wasCreating.current = isCreatingNotificationInstance;
+    }, [isCreatingNotificationInstance, onSuccess, editMode]);
+
+    useEffect(() => {
+        if (wasUpdating.current && !isEditingNotificationInstance) {
+            onSuccess?.();
+        }
+        wasUpdating.current = isEditingNotificationInstance;
+    }, [isEditingNotificationInstance, onSuccess, editMode]);
 
     const optionsForNotificationProviders = useMemo(
         () =>
@@ -268,8 +292,6 @@ const NotificationInstanceForm = () => {
             setSelectedCustomAttributes(selectedCustomAttributesFetched);
         }
     }, [notificationDetails, optionsForNotificationProviders, kindOptions, editMode]);
-
-    const widgetTitle = useMemo(() => (editMode ? 'Update Notification Instance' : 'Add Notification Instance'), [editMode]);
 
     const handleMappingAttributeChange = (
         event: { value: string; label: string } | undefined,
@@ -369,15 +391,15 @@ const NotificationInstanceForm = () => {
     const isValid = formState.isValid && validateAttributes();
 
     return (
-        <Widget title={widgetTitle} busy={isBusy} dataTestId="notification-instance-form">
+        <Widget noBorder busy={isBusy} dataTestId="notification-instance-form">
             <FormProvider {...methods}>
                 <form onSubmit={handleSubmit(onSubmit)}>
-                    <Controller
-                        name="name"
-                        control={control}
-                        rules={buildValidationRules([validateRequired(), validateAlphaNumericWithoutAccents()])}
-                        render={({ field, fieldState }) => (
-                            <div className="mb-4">
+                    <div className="space-y-4">
+                        <Controller
+                            name="name"
+                            control={control}
+                            rules={buildValidationRules([validateRequired(), validateAlphaNumericWithoutAccents()])}
+                            render={({ field, fieldState }) => (
                                 <TextInput
                                     {...field}
                                     disabled={editMode}
@@ -395,16 +417,14 @@ const NotificationInstanceForm = () => {
                                             : undefined
                                     }
                                 />
-                            </div>
-                        )}
-                    />
+                            )}
+                        />
 
-                    <Controller
-                        name="description"
-                        control={control}
-                        rules={buildValidationRules([validateLength(0, 300)])}
-                        render={({ field, fieldState }) => (
-                            <div className="mb-4">
+                        <Controller
+                            name="description"
+                            control={control}
+                            rules={buildValidationRules([validateLength(0, 300)])}
+                            render={({ field, fieldState }) => (
                                 <TextArea
                                     {...field}
                                     id="description"
@@ -421,126 +441,135 @@ const NotificationInstanceForm = () => {
                                             : undefined
                                     }
                                 />
-                            </div>
-                        )}
-                    />
-
-                    <Controller
-                        name="connectorUuid"
-                        control={control}
-                        rules={buildValidationRules([validateRequired()])}
-                        render={({ field, fieldState }) => (
-                            <div className="mb-4">
-                                <Select
-                                    id="notificationInstanceProviderSelect"
-                                    options={optionsForNotificationProviders || []}
-                                    value={selectedNotificationInstanceProvider || ''}
-                                    onChange={(value) => {
-                                        const uuid = value as string | undefined;
-                                        field.onChange(uuid || '');
-                                        onInstanceNotificationProviderChange(uuid);
-                                    }}
-                                    placeholder="Select Notification Instance Provider"
-                                    isClearable={true}
-                                    disabled={editMode}
-                                    label="Notification Instance Provider"
-                                    required
-                                />
-                                {fieldState.error && fieldState.isTouched && (
-                                    <p className="mt-1 text-sm text-red-600">
-                                        {typeof fieldState.error === 'string'
-                                            ? fieldState.error
-                                            : fieldState.error?.message || 'Invalid value'}
-                                    </p>
-                                )}
-                            </div>
-                        )}
-                    />
-
-                    <Controller
-                        name="kind"
-                        control={control}
-                        rules={buildValidationRules([validateRequired()])}
-                        render={({ field, fieldState }) => (
-                            <div className="mb-4">
-                                <Select
-                                    id="kindSelect"
-                                    options={kindOptions || []}
-                                    value={selectedKind || ''}
-                                    onChange={(value) => {
-                                        const kind = value as string | undefined;
-                                        field.onChange(kind || '');
-                                        onNotificationInstanceKindChange(kind);
-                                    }}
-                                    placeholder="Select Notification Instance Kind"
-                                    isClearable={true}
-                                    disabled={editMode}
-                                    label="Notification Instance Kind"
-                                    required
-                                />
-                                {fieldState.error && fieldState.isTouched && (
-                                    <p className="mt-1 text-sm text-red-600">
-                                        {typeof fieldState.error === 'string'
-                                            ? fieldState.error
-                                            : fieldState.error?.message || 'Invalid value'}
-                                    </p>
-                                )}
-                            </div>
-                        )}
-                    />
-
-                    <TabLayout
-                        tabs={[
-                            {
-                                title: 'Connector Attributes',
-                                content: renderAttributeEditor(selectedKind),
-                            },
-                            {
-                                title: 'Attribute Mappings',
-                                content: mappingAttributes?.length ? (
-                                    <Widget>
-                                        {mappingAttributes.map((mappingAttribute, i) => (
-                                            <div key={mappingAttribute.uuid} className="mb-4">
-                                                <Select
-                                                    id={`attributeMappings[${i}].${mappingAttribute.name}`}
-                                                    options={getContentTypeOptions(mappingAttribute.contentType)}
-                                                    value={selectedCustomAttributes?.[i]?.value}
-                                                    onChange={(value) => {
-                                                        const option = getContentTypeOptions(mappingAttribute.contentType).find(
-                                                            (opt) => opt.value === value,
-                                                        );
-                                                        if (option) {
-                                                            handleMappingAttributeChange(
-                                                                option,
-                                                                i,
-                                                                mappingAttribute.uuid,
-                                                                mappingAttribute.name,
-                                                            );
-                                                        }
-                                                    }}
-                                                    placeholder={`Select Custom Attribute for ${mappingAttribute.name}`}
-                                                    label={`${mappingAttribute.name} (${mappingAttribute.contentType})`}
-                                                />
-                                                <p className="mt-1 text-sm text-gray-500">{mappingAttribute?.description}</p>
-                                            </div>
-                                        ))}
-                                    </Widget>
-                                ) : (
-                                    <></>
-                                ),
-                            },
-                        ]}
-                    />
-
-                    <div className="flex justify-end gap-2 mt-4">
-                        <Button variant="outline" color="secondary" onClick={onCancel} disabled={formState.isSubmitting} type="button">
-                            Cancel
-                        </Button>
-                        <ProgressButton
-                            title={submitTitle}
-                            inProgress={formState.isSubmitting}
-                            disabled={!isValid || isCreatingNotificationInstance || formState.isSubmitting || isEditingNotificationInstance}
+                            )}
                         />
+
+                        <Controller
+                            name="connectorUuid"
+                            control={control}
+                            rules={buildValidationRules([validateRequired()])}
+                            render={({ field, fieldState }) => (
+                                <>
+                                    <Select
+                                        id="notificationInstanceProviderSelect"
+                                        options={optionsForNotificationProviders || []}
+                                        value={selectedNotificationInstanceProvider || ''}
+                                        onChange={(value) => {
+                                            const uuid = value as string | undefined;
+                                            field.onChange(uuid || '');
+                                            onInstanceNotificationProviderChange(uuid);
+                                        }}
+                                        placeholder="Select Notification Instance Provider"
+                                        isClearable={true}
+                                        disabled={editMode}
+                                        label="Notification Instance Provider"
+                                        required
+                                    />
+                                    {fieldState.error && fieldState.isTouched && (
+                                        <p className="mt-1 text-sm text-red-600">
+                                            {typeof fieldState.error === 'string'
+                                                ? fieldState.error
+                                                : fieldState.error?.message || 'Invalid value'}
+                                        </p>
+                                    )}
+                                </>
+                            )}
+                        />
+
+                        <Controller
+                            name="kind"
+                            control={control}
+                            rules={buildValidationRules([validateRequired()])}
+                            render={({ field, fieldState }) => (
+                                <>
+                                    <Select
+                                        id="kindSelect"
+                                        options={kindOptions || []}
+                                        value={selectedKind || ''}
+                                        onChange={(value) => {
+                                            const kind = value as string | undefined;
+                                            field.onChange(kind || '');
+                                            onNotificationInstanceKindChange(kind);
+                                        }}
+                                        placeholder="Select Notification Instance Kind"
+                                        isClearable={true}
+                                        disabled={editMode}
+                                        label="Notification Instance Kind"
+                                        required
+                                    />
+                                    {fieldState.error && fieldState.isTouched && (
+                                        <p className="mt-1 text-sm text-red-600">
+                                            {typeof fieldState.error === 'string'
+                                                ? fieldState.error
+                                                : fieldState.error?.message || 'Invalid value'}
+                                        </p>
+                                    )}
+                                </>
+                            )}
+                        />
+
+                        <TabLayout
+                            noBorder
+                            tabs={[
+                                {
+                                    title: 'Connector Attributes',
+                                    content: renderAttributeEditor(selectedKind),
+                                },
+                                {
+                                    title: 'Attribute Mappings',
+                                    content: mappingAttributes?.length ? (
+                                        <Widget>
+                                            {mappingAttributes.map((mappingAttribute, i) => (
+                                                <div key={mappingAttribute.uuid} className="mb-4">
+                                                    <Select
+                                                        id={`attributeMappings[${i}].${mappingAttribute.name}`}
+                                                        options={getContentTypeOptions(mappingAttribute.contentType)}
+                                                        value={selectedCustomAttributes?.[i]?.value}
+                                                        onChange={(value) => {
+                                                            const option = getContentTypeOptions(mappingAttribute.contentType).find(
+                                                                (opt) => opt.value === value,
+                                                            );
+                                                            if (option) {
+                                                                handleMappingAttributeChange(
+                                                                    option,
+                                                                    i,
+                                                                    mappingAttribute.uuid,
+                                                                    mappingAttribute.name,
+                                                                );
+                                                            }
+                                                        }}
+                                                        placeholder={`Select Custom Attribute for ${mappingAttribute.name}`}
+                                                        label={`${mappingAttribute.name} (${mappingAttribute.contentType})`}
+                                                    />
+                                                    <p className="mt-1 text-sm text-gray-500">{mappingAttribute?.description}</p>
+                                                </div>
+                                            ))}
+                                        </Widget>
+                                    ) : (
+                                        <></>
+                                    ),
+                                },
+                            ]}
+                        />
+
+                        <Container className="flex-row justify-end modal-footer" gap={4}>
+                            <Button
+                                variant="outline"
+                                color="secondary"
+                                onClick={handleCancel}
+                                disabled={formState.isSubmitting}
+                                type="button"
+                            >
+                                Cancel
+                            </Button>
+                            <ProgressButton
+                                title={submitTitle}
+                                inProgress={formState.isSubmitting}
+                                disabled={
+                                    !isValid || isCreatingNotificationInstance || formState.isSubmitting || isEditingNotificationInstance
+                                }
+                            />
+                        </Container>
                     </div>
                 </form>
             </FormProvider>

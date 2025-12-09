@@ -1,6 +1,20 @@
 import cn from 'classnames';
 import Button, { ButtonColor, ButtonVariant } from 'components/Button';
-import { Trash2, Info, AlertTriangle, X, ArrowUpFromLine, Users, User, CircleMinus, ArrowDownToLine } from 'lucide-react';
+import {
+    Trash2,
+    Info,
+    AlertTriangle,
+    X,
+    ArrowUpFromLine,
+    Users,
+    User,
+    CircleMinus,
+    ArrowDownToLine,
+    Repeat2,
+    Shuffle,
+    SquareMinus,
+    Check,
+} from 'lucide-react';
 import cx from 'classnames';
 import { useEffect } from 'react';
 
@@ -53,6 +67,7 @@ export default function Dialog({ isOpen, toggle, caption, body, buttons, size = 
         const iconColor = {
             delete: '#991B1B',
             destroy: '#991B1B',
+            check: '#115E59',
         };
         let iconElement = null;
         const buttonProps = {
@@ -84,6 +99,18 @@ export default function Dialog({ isOpen, toggle, caption, body, buttons, size = 
             case 'download':
                 iconElement = <ArrowDownToLine {...buttonProps} />;
                 break;
+            case 'refresh':
+                iconElement = <Repeat2 {...buttonProps} />;
+                break;
+            case 'shuffle':
+                iconElement = <Shuffle {...buttonProps} />;
+                break;
+            case 'minus':
+                iconElement = <SquareMinus {...buttonProps} />;
+                break;
+            case 'check':
+                iconElement = <Check {...buttonProps} />;
+                break;
             default:
                 iconElement = icon as React.ReactNode;
                 break;
@@ -91,7 +118,12 @@ export default function Dialog({ isOpen, toggle, caption, body, buttons, size = 
 
         return (
             <div
-                className="w-12 h-12 m-2 mb-4 bg-current/12 rounded-full flex items-center justify-center relative z-1 after:content-[''] after:absolute after:w-16 after:h-16 after:bg-current/6 after:rounded-full after:-z-10 after:left-1/2 after:top-1/2 after:-translate-x-1/2 after:-translate-y-1/2"
+                className={cn(
+                    'w-12 h-12 m-2 mb-4 bg-current/12 rounded-full flex items-center justify-center relative z-1 after:content-[""] after:absolute after:w-16 after:h-16 after:bg-current/6 after:rounded-full after:-z-10 after:left-1/2 after:top-1/2 after:-translate-x-1/2 after:-translate-y-1/2',
+                    {
+                        '!bg-[#CCFBF1] after:!bg-[#CCFBF1] after:!opacity-30': icon === 'check',
+                    },
+                )}
                 style={{ color: iconColor[icon as keyof typeof iconColor] || '#6B7280' }}
             >
                 {iconElement}
@@ -102,73 +134,83 @@ export default function Dialog({ isOpen, toggle, caption, body, buttons, size = 
     const hideBorders = icon === 'delete' || icon === 'destroy' || noBorder;
 
     return (
-        <>
-            {isOpen && (
-                <div className="fixed inset-0 bg-black/50 z-[79] transition-opacity duration-200" onClick={toggle} aria-hidden="true" />
-            )}
-            <div
-                id="hs-scale-animation-modal"
-                className={cx('hs-overlay size-full fixed top-0 start-0 z-[80] overflow-x-hidden overflow-y-auto', {
+        <div
+            id="hs-scale-animation-modal"
+            className={cx(
+                'hs-overlay size-full fixed top-0 start-0 z-[80] overflow-x-hidden overflow-y-auto',
+                {
                     hidden: !isOpen,
                     'pointer-events-auto': isOpen,
                     'pointer-events-none': !isOpen,
-                })}
-                role="dialog"
-                tabIndex={-1}
-                aria-labelledby="hs-scale-animation-modal-label"
-                data-testid={dataTestId}
+                },
+                isOpen &&
+                    'after:content-[""] after:fixed after:inset-0 after:bg-black/50 after:transition-opacity after:duration-200 after:-z-[1]',
+            )}
+            role="dialog"
+            tabIndex={-1}
+            aria-labelledby="hs-scale-animation-modal-label"
+            data-testid={dataTestId}
+            onClick={(e) => {
+                if (e.target === e.currentTarget && toggle) {
+                    toggle();
+                }
+            }}
+        >
+            <div
+                className={cx(
+                    'hs-overlay-animation-target ease-in-out transition-all duration-200 m-3 sm:mx-auto min-h-[calc(100%-56px)] flex items-center',
+                    sizeClasses[size || 'sm'],
+                    {
+                        'scale-100 opacity-100': isOpen,
+                        'scale-95 opacity-0': !isOpen,
+                    },
+                )}
             >
-                <div
-                    className={cx(
-                        'hs-overlay-animation-target ease-in-out transition-all duration-200 m-3 sm:mx-auto min-h-[calc(100%-56px)] flex items-center',
-                        sizeClasses[size || 'sm'],
-                        {
-                            'scale-100 opacity-100': isOpen,
-                            'scale-95 opacity-0': !isOpen,
-                        },
-                    )}
-                >
-                    <div className="w-full flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl pointer-events-auto dark:bg-neutral-800 dark:border-neutral-700 dark:shadow-neutral-700/70 p-4 md:p-8 !pb-0 relative overflow-visible">
-                        <Button variant="transparent" onClick={toggle} className="absolute right-2 top-2">
-                            <X size={16} />
-                        </Button>
-                        <div
-                            className={cx('flex flex-col justify-center pb-4 dark:border-neutral-700', {
-                                'border-b border-gray-200': !hideBorders,
-                                'items-center': !!icon,
-                            })}
-                        >
-                            {renderIcon()}
-                            <h3 id="hs-scale-animation-modal-label" className="font-bold text-gray-800 dark:text-white text-2xl">
-                                {caption}
-                            </h3>
-                        </div>
-                        <div className={cn('pt-4 text-gray-800 dark:text-white overflow-visible', { 'pb-4': !!buttons?.length })}>
-                            {body}
-                        </div>
-                        {buttons && buttons.length > 0 && (
-                            <div
-                                className={cx(
-                                    'flex justify-end items-center gap-4 py-4 mt-2 dark:border-neutral-700 border-t border-gray-200 modal-footer',
-                                )}
-                            >
-                                {buttons.map((button, index) => (
-                                    <Button
-                                        key={index}
-                                        color={button.color}
-                                        onClick={() => button.onClick()}
-                                        disabled={button.disabled || false}
-                                        data-hs-overlay="#hs-scale-animation-modal"
-                                        variant={button.variant}
-                                    >
-                                        {button.body}
-                                    </Button>
-                                ))}
-                            </div>
-                        )}
+                <div className="w-full flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl pointer-events-auto dark:bg-neutral-800 dark:border-neutral-700 dark:shadow-neutral-700/70 p-4 md:p-8 !pb-0 relative overflow-visible">
+                    <Button variant="transparent" onClick={toggle} className="absolute right-2 top-2">
+                        <X size={16} />
+                    </Button>
+                    <div
+                        className={cx('flex flex-col justify-center dark:border-neutral-700', {
+                            'border-b border-gray-200 pb-4': !hideBorders,
+                            'items-center': !!icon,
+                        })}
+                    >
+                        {renderIcon()}
+                        <h3 id="hs-scale-animation-modal-label" className="font-bold text-gray-800 dark:text-white text-2xl">
+                            {caption}
+                        </h3>
                     </div>
+                    <div
+                        className={cn('pt-4 text-gray-500 dark:text-white overflow-visible', {
+                            'pb-4': !!buttons?.length,
+                            'text-center': icon === 'delete' || icon === 'destroy',
+                        })}
+                    >
+                        {body}
+                    </div>
+                    {buttons && buttons.length > 0 && (
+                        <div
+                            className={cx(
+                                'flex justify-end items-center gap-4 py-4 mt-2 dark:border-neutral-700 border-t border-gray-200 modal-footer',
+                            )}
+                        >
+                            {buttons.map((button, index) => (
+                                <Button
+                                    key={index}
+                                    color={button.color}
+                                    onClick={() => button.onClick()}
+                                    disabled={button.disabled || false}
+                                    data-hs-overlay="#hs-scale-animation-modal"
+                                    variant={button.variant}
+                                >
+                                    {button.body}
+                                </Button>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
-        </>
+        </div>
     );
 }

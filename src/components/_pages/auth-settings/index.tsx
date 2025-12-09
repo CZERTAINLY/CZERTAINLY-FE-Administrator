@@ -169,7 +169,7 @@ const AuthenticationSettings = () => {
                           provider.issuerUrl ?? '',
                           renderOAuth2StateBadges(provider),
                           <Button
-                              className="py-0 px-1 ms-2"
+                              className="py-0 px-1 ml-2"
                               variant="transparent"
                               color="primary"
                               title="Detail"
@@ -219,7 +219,7 @@ const AuthenticationSettings = () => {
                                 title="OAuth2 Providers"
                                 widgetButtons={providersButtons}
                                 refreshAction={getAuthenticationSettings}
-                                titleSize="larger"
+                                titleSize="large"
                                 widgetLockName={LockWidgetNameEnum.AuthenticationSettings}
                                 lockSize="large"
                                 busy={isBusy}
@@ -233,7 +233,7 @@ const AuthenticationSettings = () => {
                         content: (
                             <Widget
                                 title="Authentication Settings"
-                                titleSize="larger"
+                                titleSize="large"
                                 refreshAction={getAuthenticationSettings}
                                 busy={isBusy}
                                 widgetLockName={LockWidgetNameEnum.AuthenticationSettings}

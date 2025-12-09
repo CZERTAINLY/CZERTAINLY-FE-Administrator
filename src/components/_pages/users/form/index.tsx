@@ -455,7 +455,7 @@ function UserForm({ userId, onCancel, onSuccess }: UserFormProps) {
     const enableCheckButton = useMemo(
         () =>
             editMode ? null : (
-                <div className="ms-auto">
+                <div className="ml-auto">
                     <Controller
                         name="enabled"
                         control={control}

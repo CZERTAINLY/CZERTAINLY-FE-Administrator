@@ -2,7 +2,7 @@ import { ApiClients } from '../../../../api';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import ConditionsExecutionsList from 'components/ExecutionConditionItemsList';
-import GoBackButton from 'components/GoBackButton';
+import Breadcrumb from 'components/Breadcrumb';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
@@ -10,8 +10,11 @@ import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rule
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
-import { Button, ButtonGroup, Col, Container, Input, Row } from 'reactstrap';
+import Button from 'components/Button';
+import Container from 'components/Container';
 import { PlatformEnum, Resource } from 'types/openapi';
+import { Check, X, Trash2 } from 'lucide-react';
+import EditIcon from 'components/icons/EditIcon';
 interface SelectChangeValue {
     value: string;
     label: string;
@@ -186,10 +189,9 @@ const RuleDetails = () => {
                               ),
                               <div>
                                   {updateDescriptionEditEnable ? (
-                                      <ButtonGroup>
+                                      <div className="flex gap-2">
                                           <Button
-                                              className="btn btn-link mx-auto"
-                                              size="sm"
+                                              variant="transparent"
                                               color="secondary"
                                               title="Update Description"
                                               onClick={onUpdateDescriptionConfirmed}
@@ -199,11 +201,11 @@ const RuleDetails = () => {
                                                   updatedDescription === ''
                                               }
                                           >
-                                              <i className="fa fa-check" />
+                                              <Check size={16} />
                                           </Button>
                                           <Button
-                                              className="btn btn-link mx-auto danger"
-                                              size="sm"
+                                              variant="transparent"
+                                              color="danger"
                                               title="Cancel"
                                               disabled={isUpdatingRule}
                                               onClick={() => {
@@ -211,20 +213,19 @@ const RuleDetails = () => {
                                                   setUpdatedDescription(ruleDetails?.description || '');
                                               }}
                                           >
-                                              <i className="fa fa-close text-danger" />
+                                              <X size={16} />
                                           </Button>
-                                      </ButtonGroup>
+                                      </div>
                                   ) : (
                                       <Button
-                                          className="btn btn-link mx-auto"
-                                          size="sm"
+                                          variant="transparent"
                                           color="secondary"
                                           title="Update Description"
                                           onClick={() => {
                                               setUpdateDescription(true);
                                           }}
                                       >
-                                          <i className="fa fa-pencil-square-o" />
+                                          <EditIcon size={16} />
                                       </Button>
                                   )}
                               </div>,
@@ -276,8 +277,7 @@ const RuleDetails = () => {
                           getEnumLabel(conditionTypeEnum, condition.type),
                           condition.description || '',
                           <Button
-                              className="btn btn-link text-danger"
-                              size="sm"
+                              variant="transparent"
                               color="danger"
                               title={
                                   isDeleteDisabled
@@ -289,7 +289,7 @@ const RuleDetails = () => {
                               }}
                               disabled={isDeleteDisabled}
                           >
-                              <i className="fa fa-trash" />
+                              <Trash2 size={16} />
                           </Button>,
                       ],
                   };
@@ -316,18 +316,19 @@ const RuleDetails = () => {
 
     return (
         <Container className="themed-container" fluid>
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                forcedPath="/rules"
-                text={`${getEnumLabel(resourceTypeEnum, Resource.Rules)} Inventory`}
+            <Breadcrumb
+                items={[
+                    { label: `${getEnumLabel(resourceTypeEnum, Resource.Rules)} Inventory`, href: '/rules' },
+                    { label: 'Rule Details' },
+                ]}
             />
-            <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                <Col>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
                     <Widget refreshAction={getFreshDetails} busy={isBusy} title="Rule Details" titleSize="large" widgetButtons={buttons}>
                         <CustomTable data={ruleDetailsData} headers={ruleTableHeaders} />
                     </Widget>
-                </Col>
-                <Col>
+                </div>
+                <div>
                     <Widget
                         busy={isBusy}
                         title="Conditions"
@@ -347,8 +348,8 @@ const RuleDetails = () => {
                             }}
                         />
                     </Widget>
-                </Col>
-            </Row>
+                </div>
+            </div>
             {renderRuleConditions}
             <Dialog
                 isOpen={confirmDelete}

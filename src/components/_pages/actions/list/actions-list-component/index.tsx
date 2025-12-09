@@ -145,7 +145,7 @@ const ActionsList = () => {
     return (
         <>
             <Widget
-                titleSize="larger"
+                titleSize="large"
                 title="Actions"
                 busy={isBusy}
                 refreshAction={getFreshList}
@@ -154,6 +154,7 @@ const ActionsList = () => {
                     title: 'Information',
                     description: 'Actions are combination of Executions',
                 }}
+                noBorder
             >
                 <CustomTable
                     checkedRows={checkedRows}

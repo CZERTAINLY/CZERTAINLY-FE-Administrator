@@ -45,7 +45,7 @@ export default function RaProfileForm({ raProfileId, authorityId: propAuthorityI
     const id = raProfileId || routeId;
     const authorityId = propAuthorityId || routeAuthorityId;
 
-    const editMode = useMemo(() => !!id, [id]);
+    const editMode = !!id;
 
     const raProfileSelector = useSelector(raProfilesSelectors.raProfile);
 
@@ -62,7 +62,7 @@ export default function RaProfileForm({ raProfileId, authorityId: propAuthorityI
 
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
 
-    const [raProfile, setRaProfile] = useState<RaProfileResponseModel>();
+    const [localProfileModifications, setLocalProfileModifications] = useState<Partial<RaProfileResponseModel>>({});
 
     const isBusy = useMemo(
         () => isFetchingDetail || isCreating || isUpdating || isFetchingAuthorityRAProfileAttributes || isFetchingResourceCustomAttributes,
@@ -90,17 +90,21 @@ export default function RaProfileForm({ raProfileId, authorityId: propAuthorityI
             if (previousIdRef.current !== id || !raProfileSelector || raProfileSelector.uuid !== id) {
                 dispatch(raProfilesActions.getRaProfileDetail({ authorityUuid: authorityId, uuid: id }));
                 previousIdRef.current = id;
+                setLocalProfileModifications({}); // Reset local modifications when fetching new profile
             }
         } else {
             previousIdRef.current = undefined;
+            setLocalProfileModifications({});
         }
     }, [dispatch, editMode, id, authorityId, raProfileSelector]);
 
-    useEffect(() => {
+    // Derive raProfile from raProfileSelector and merge with local modifications
+    const raProfile = useMemo(() => {
         if (editMode && raProfileSelector?.uuid === id) {
-            setRaProfile(raProfileSelector);
+            return { ...raProfileSelector, ...localProfileModifications };
         }
-    }, [editMode, id, raProfileSelector]);
+        return undefined;
+    }, [editMode, id, raProfileSelector, localProfileModifications]);
 
     const optionsForAuthorities = useMemo(
         () =>
@@ -182,11 +186,11 @@ export default function RaProfileForm({ raProfileId, authorityId: propAuthorityI
                     setValue(key as any, undefined);
                 }
             });
-            if (raProfile) setRaProfile({ ...raProfile, attributes: [] });
+            setLocalProfileModifications({ attributes: [] });
             dispatch(authoritiesActions.clearRAProfilesAttributesDescriptors());
             dispatch(authoritiesActions.getRAProfilesAttributesDescriptors({ authorityUuid }));
         },
-        [dispatch, raProfile, getValues, setValue],
+        [dispatch, getValues, setValue],
     );
 
     useEffect(() => {

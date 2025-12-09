@@ -3,10 +3,10 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Select from 'components/Select';
 import { Fragment } from 'react/jsx-runtime';
-import { Row, Col, FormGroup, Label, Button } from 'reactstrap';
+import Button from 'components/Button';
+import Label from 'components/Label';
 import Badge from 'components/Badge';
 import { selectors as notificationProfileSelectors, actions as notificationProfileActions } from 'ducks/notification-profiles';
-import styles from './styles.module.scss';
 
 interface SelectChangeValue {
     value: string;
@@ -67,11 +67,7 @@ export function SendNotificationExecutionItems({ mode, isUpdating, notificationP
                 <Fragment key={itemNumber}>
                     <span>Send notifications to:&nbsp;</span>
                     <b>{label}&nbsp;</b>
-                    {!disableBadgeRemove && (
-                        <button className={styles.filterBadgeButton} onClick={() => onRemoveProfileClick(value)}>
-                            &times;
-                        </button>
-                    )}
+                    {!disableBadgeRemove && <button onClick={() => onRemoveProfileClick(value)}>&times;</button>}
                 </Fragment>
             );
         },
@@ -79,46 +75,44 @@ export function SendNotificationExecutionItems({ mode, isUpdating, notificationP
     );
 
     return (
-        <Widget title="Execution Items" busy={isFetchingList || isUpdating} titleSize="larger">
+        <Widget title="Execution Items" busy={isFetchingList || isUpdating} titleSize="large">
             <div style={{ width: '99%', borderBottom: 'solid 1px silver', marginBottom: '1rem' }}>
-                <Row>
-                    <Col>
-                        <FormGroup>
-                            <Label for="fieldSelectInput">Notification Profile</Label>
-                            <Select
-                                id="field"
-                                placeholder="Select Notification Profile"
-                                options={profileSelectOptions}
-                                onChange={(value) => {
-                                    setSelectedProfile(
-                                        value
-                                            ? {
-                                                  value: value as string,
-                                                  label: profileSelectOptions.find((opt) => opt.value === value)?.label || '',
-                                              }
-                                            : null,
-                                    );
-                                }}
-                                value={selectedProfile?.value || ''}
-                            />
-                        </FormGroup>
-                    </Col>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="md:col-span-3">
+                        <Label htmlFor="fieldSelectInput">Notification Profile</Label>
+                        <Select
+                            id="field"
+                            placeholder="Select Notification Profile"
+                            options={profileSelectOptions}
+                            onChange={(value) => {
+                                setSelectedProfile(
+                                    value
+                                        ? {
+                                              value: value as string,
+                                              label: profileSelectOptions.find((opt) => opt.value === value)?.label || '',
+                                          }
+                                        : null,
+                                );
+                            }}
+                            value={selectedProfile?.value || ''}
+                        />
+                    </div>
 
-                    <Col md="auto">
+                    <div className="flex items-end">
                         <Button
-                            style={{ width: '7em', marginTop: '2em' }}
+                            className="w-full"
                             color="primary"
                             disabled={isFetchingList || !selectedProfile}
                             onClick={onAddProfileClick}
                         >
                             Add
                         </Button>
-                    </Col>
-                </Row>
+                    </div>
+                </div>
             </div>
 
             {selectedProfiles.map((profile, i) => (
-                <Badge className={styles.filterBadge} key={profile.value + i}>
+                <Badge key={profile.value + i}>
                     {getBadgeContent(i, profile.label, profile.value, selectedProfiles.length <= 1 && mode === 'detail')}
                 </Badge>
             ))}

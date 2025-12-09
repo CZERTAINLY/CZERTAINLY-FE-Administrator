@@ -22,7 +22,6 @@ import { CertificateRequestFormat, KeyType } from 'types/openapi';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 import { buildValidationRules } from 'utils/validators-helper';
 import { validateRequired } from 'utils/validators';
-import cn from 'classnames';
 
 import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from 'ducks/utilsActuator';
 import { ParseRequestRequestDtoParseTypeEnum } from 'types/openapi/utils';
@@ -34,8 +33,9 @@ import {
 import CertificateAttributes from '../../../CertificateAttributes';
 import FileUpload from '../../../Input/FileUpload/FileUpload';
 import TabLayout from 'components/Layout/TabLayout';
-import SwitchField from 'components/Input/SwitchField';
+import Switch from 'components/Switch';
 import { isObjectSame } from 'utils/common-utils';
+import Container from 'components/Container';
 
 interface FormValues {
     pkcs10: File | null;
@@ -309,233 +309,242 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
     return (
         <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)}>
-                <Widget title="Rekey Certificate" busy={rekeying || isFetchingCsrAttributes || isFetchingSignatureAttributes}>
-                    <Controller
-                        name="uploadCsr"
-                        control={control}
-                        render={({ field, fieldState }) => (
-                            <div className="mb-4">
-                                <label htmlFor="uploadCsr" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
-                                    Key Source
-                                </label>
-                                <Select
-                                    id="uploadCsr"
-                                    options={inputOptions}
-                                    value={field.value ? inputOptions.find((opt) => opt.value === String(field.value))?.value || '' : ''}
-                                    onChange={(value) => {
-                                        const boolValue = value === 'true';
-                                        field.onChange(boolValue);
-                                    }}
-                                    placeholder="Select Key Source"
-                                />
-                                {fieldState.error && fieldState.isTouched && (
-                                    <p className="mt-1 text-sm text-red-600">
-                                        {typeof fieldState.error === 'string'
-                                            ? fieldState.error
-                                            : fieldState.error?.message || 'Invalid value'}
-                                    </p>
-                                )}
-                            </div>
-                        )}
-                    />
-                </Widget>
-
-                <Widget title="Request Properties">
-                    {watchedUploadCsr && certificate?.raProfile ? (
-                        <>
-                            <FileUpload
-                                fileType={'CSR'}
-                                editable
-                                onFileContentLoaded={(fileContent) => {
-                                    setFileContent(fileContent);
-                                    if (health) {
-                                        dispatch(
-                                            utilsCertificateRequestActions.parseCertificateRequest({
-                                                content: fileContent,
-                                                requestParseType: ParseRequestRequestDtoParseTypeEnum.Basic,
-                                            }),
-                                        );
-                                    }
-                                }}
-                            />
-
-                            {certificateRequest && (
-                                <>
-                                    <br />
-                                    <CertificateAttributes csr={true} certificate={certificateRequest} />
-                                </>
-                            )}
-                        </>
-                    ) : (
-                        <></>
-                    )}
-
-                    <br />
-
-                    {watchedUploadCsr !== undefined && !watchedUploadCsr ? (
-                        <>
-                            <Controller
-                                name="tokenProfile"
-                                control={control}
-                                rules={buildValidationRules([validateRequired()])}
-                                render={({ field, fieldState }) => (
-                                    <div className="mb-4">
-                                        <Select
-                                            id="tokenProfile"
-                                            options={tokenProfileOptions}
-                                            value={field.value || ''}
-                                            onChange={(value) => {
-                                                const uuid = value as string | undefined;
-                                                field.onChange(uuid);
-                                                if (uuid) {
-                                                    onTokenProfileChange(uuid, 'normal');
-                                                }
-                                            }}
-                                            placeholder="Select Token Profile"
-                                            label="Token Profile"
-                                        />
-                                        {fieldState.error && fieldState.isTouched && (
-                                            <p className="mt-1 text-sm text-red-600">
-                                                {typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'}
-                                            </p>
-                                        )}
-                                    </div>
-                                )}
-                            />
-
-                            <Controller
-                                name="key"
-                                control={control}
-                                rules={buildValidationRules([validateRequired()])}
-                                render={({ field, fieldState }) => (
-                                    <div className="mb-4">
-                                        <Select
-                                            id="keySelect"
-                                            options={keyOptions}
-                                            value={field.value?.uuid || ''}
-                                            onChange={(value) => {
-                                                const uuid = value as string | undefined;
-                                                const key = uuid ? keyUuidToKeyMap.get(uuid) : undefined;
-                                                field.onChange(key);
-                                                if (key) {
-                                                    onKeyChange(key, 'normal');
-                                                }
-                                            }}
-                                            placeholder="Select Key"
-                                            label="Select Key"
-                                        />
-                                        {fieldState.error && fieldState.isTouched && (
-                                            <p className="mt-1 text-sm text-red-600">
-                                                {typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'}
-                                            </p>
-                                        )}
-                                    </div>
-                                )}
-                            />
-
-                            {watchedKey && (
-                                <SwitchField
-                                    id="includeAltKey"
-                                    label="Include Alternative Key"
-                                    disabled={!!defaultValues.altKey || !!defaultValues.altTokenProfile}
-                                />
-                            )}
-
-                            {watchedIncludeAltKey && (
-                                <>
-                                    <Controller
-                                        name="altTokenProfile"
-                                        control={control}
-                                        rules={buildValidationRules([validateRequired()])}
-                                        render={({ field, fieldState }) => (
-                                            <div className="mb-4">
-                                                <Select
-                                                    id="altTokenProfileSelect"
-                                                    options={tokenProfileOptions}
-                                                    value={field.value || ''}
-                                                    onChange={(value) => {
-                                                        const uuid = value as string | undefined;
-                                                        field.onChange(uuid);
-                                                        if (uuid) {
-                                                            onTokenProfileChange(uuid, 'alt');
-                                                        }
-                                                    }}
-                                                    placeholder="Select Alternative Token Profile"
-                                                    label="Alternative Token Profile"
-                                                />
-                                                {fieldState.error && fieldState.isTouched && (
-                                                    <p className="mt-1 text-sm text-red-600">
-                                                        {typeof fieldState.error === 'string'
-                                                            ? fieldState.error
-                                                            : fieldState.error?.message || 'Invalid value'}
-                                                    </p>
-                                                )}
-                                            </div>
-                                        )}
+                <div className="space-y-4">
+                    <Widget noBorder busy={rekeying || isFetchingCsrAttributes || isFetchingSignatureAttributes}>
+                        <Controller
+                            name="uploadCsr"
+                            control={control}
+                            render={({ field, fieldState }) => (
+                                <div className="mb-4">
+                                    <Select
+                                        id="uploadCsr"
+                                        options={inputOptions}
+                                        value={
+                                            field.value ? inputOptions.find((opt) => opt.value === String(field.value))?.value || '' : ''
+                                        }
+                                        onChange={(value) => {
+                                            const boolValue = value === 'true';
+                                            field.onChange(boolValue);
+                                        }}
+                                        placeholder="Select Key Source"
+                                        label="Key Source"
                                     />
-
-                                    <Controller
-                                        name="altKey"
-                                        control={control}
-                                        rules={buildValidationRules([validateRequired()])}
-                                        render={({ field, fieldState }) => (
-                                            <div className="mb-4">
-                                                <Select
-                                                    id="altKeySelect"
-                                                    options={
-                                                        watchedValues.tokenProfile === watchedValues.altTokenProfile &&
-                                                        altKeyOptions.length === 0
-                                                            ? keyOptions
-                                                            : altKeyOptions
-                                                    }
-                                                    value={field.value?.uuid || ''}
-                                                    onChange={(value) => {
-                                                        const uuid = value as string | undefined;
-                                                        const key = uuid ? keyUuidToKeyMap.get(uuid) : undefined;
-                                                        field.onChange(key);
-                                                        if (key) {
-                                                            onKeyChange(key, 'alt');
-                                                        }
-                                                    }}
-                                                    label="Select Alternative Key"
-                                                    placeholder="Select Alternative Key"
-                                                />
-                                                {fieldState.error && fieldState.isTouched && (
-                                                    <p className="mt-1 text-sm text-red-600">
-                                                        {typeof fieldState.error === 'string'
-                                                            ? fieldState.error
-                                                            : fieldState.error?.message || 'Invalid value'}
-                                                    </p>
-                                                )}
-                                            </div>
-                                        )}
-                                    />
-                                </>
+                                    {fieldState.error && fieldState.isTouched && (
+                                        <p className="mt-1 text-sm text-red-600">
+                                            {typeof fieldState.error === 'string'
+                                                ? fieldState.error
+                                                : fieldState.error?.message || 'Invalid value'}
+                                        </p>
+                                    )}
+                                </div>
                             )}
-
-                            {getSignatureAttributesTabs().length ? <TabLayout tabs={getSignatureAttributesTabs()} /> : <></>}
-                        </>
-                    ) : (
-                        <></>
-                    )}
-
-                    <div className="flex justify-end gap-2">
-                        <ProgressButton
-                            title="Rekey"
-                            inProgressTitle="Rekeying..."
-                            inProgress={formState.isSubmitting || rekeying}
-                            disabled={!formState.isValid || !isRekeyAllowed()}
                         />
+                    </Widget>
 
-                        <Button variant="outline" color="secondary" onClick={onCancel} disabled={formState.isSubmitting} type="button">
-                            Cancel
-                        </Button>
-                    </div>
-                </Widget>
+                    <Widget title="Request Properties" noBorder titleSize="large">
+                        {watchedUploadCsr && certificate?.raProfile ? (
+                            <>
+                                <FileUpload
+                                    fileType={'CSR'}
+                                    editable
+                                    onFileContentLoaded={(fileContent) => {
+                                        setFileContent(fileContent);
+                                        if (health) {
+                                            dispatch(
+                                                utilsCertificateRequestActions.parseCertificateRequest({
+                                                    content: fileContent,
+                                                    requestParseType: ParseRequestRequestDtoParseTypeEnum.Basic,
+                                                }),
+                                            );
+                                        }
+                                    }}
+                                />
+
+                                {certificateRequest && (
+                                    <>
+                                        <br />
+                                        <CertificateAttributes csr={true} certificate={certificateRequest} />
+                                    </>
+                                )}
+                            </>
+                        ) : (
+                            <></>
+                        )}
+
+                        <br />
+
+                        {watchedUploadCsr !== undefined && !watchedUploadCsr ? (
+                            <>
+                                <Controller
+                                    name="tokenProfile"
+                                    control={control}
+                                    rules={buildValidationRules([validateRequired()])}
+                                    render={({ field, fieldState }) => (
+                                        <div className="mb-4">
+                                            <Select
+                                                id="tokenProfile"
+                                                options={tokenProfileOptions}
+                                                value={field.value || ''}
+                                                onChange={(value) => {
+                                                    const uuid = value as string | undefined;
+                                                    field.onChange(uuid);
+                                                    if (uuid) {
+                                                        onTokenProfileChange(uuid, 'normal');
+                                                    }
+                                                }}
+                                                placeholder="Select Token Profile"
+                                                label="Token Profile"
+                                            />
+                                            {fieldState.error && fieldState.isTouched && (
+                                                <p className="mt-1 text-sm text-red-600">
+                                                    {typeof fieldState.error === 'string'
+                                                        ? fieldState.error
+                                                        : fieldState.error?.message || 'Invalid value'}
+                                                </p>
+                                            )}
+                                        </div>
+                                    )}
+                                />
+
+                                <Controller
+                                    name="key"
+                                    control={control}
+                                    rules={buildValidationRules([validateRequired()])}
+                                    render={({ field, fieldState }) => (
+                                        <div className="mb-4">
+                                            <Select
+                                                id="keySelect"
+                                                options={keyOptions}
+                                                value={field.value?.uuid || ''}
+                                                onChange={(value) => {
+                                                    const uuid = value as string | undefined;
+                                                    const key = uuid ? keyUuidToKeyMap.get(uuid) : undefined;
+                                                    field.onChange(key);
+                                                    if (key) {
+                                                        onKeyChange(key, 'normal');
+                                                    }
+                                                }}
+                                                placeholder="Select Key"
+                                                label="Select Key"
+                                            />
+                                            {fieldState.error && fieldState.isTouched && (
+                                                <p className="mt-1 text-sm text-red-600">
+                                                    {typeof fieldState.error === 'string'
+                                                        ? fieldState.error
+                                                        : fieldState.error?.message || 'Invalid value'}
+                                                </p>
+                                            )}
+                                        </div>
+                                    )}
+                                />
+
+                                {watchedKey && (
+                                    <Controller
+                                        name="includeAltKey"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <Switch
+                                                id="includeAltKey"
+                                                label="Include Alternative Key"
+                                                checked={field.value || false}
+                                                onChange={field.onChange}
+                                                disabled={!!defaultValues.altKey || !!defaultValues.altTokenProfile}
+                                            />
+                                        )}
+                                    />
+                                )}
+
+                                {watchedIncludeAltKey && (
+                                    <>
+                                        <Controller
+                                            name="altTokenProfile"
+                                            control={control}
+                                            rules={buildValidationRules([validateRequired()])}
+                                            render={({ field, fieldState }) => (
+                                                <div className="mb-4">
+                                                    <Select
+                                                        id="altTokenProfileSelect"
+                                                        options={tokenProfileOptions}
+                                                        value={field.value || ''}
+                                                        onChange={(value) => {
+                                                            const uuid = value as string | undefined;
+                                                            field.onChange(uuid);
+                                                            if (uuid) {
+                                                                onTokenProfileChange(uuid, 'alt');
+                                                            }
+                                                        }}
+                                                        placeholder="Select Alternative Token Profile"
+                                                        label="Alternative Token Profile"
+                                                    />
+                                                    {fieldState.error && fieldState.isTouched && (
+                                                        <p className="mt-1 text-sm text-red-600">
+                                                            {typeof fieldState.error === 'string'
+                                                                ? fieldState.error
+                                                                : fieldState.error?.message || 'Invalid value'}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            )}
+                                        />
+
+                                        <Controller
+                                            name="altKey"
+                                            control={control}
+                                            rules={buildValidationRules([validateRequired()])}
+                                            render={({ field, fieldState }) => (
+                                                <div className="mb-4">
+                                                    <Select
+                                                        id="altKeySelect"
+                                                        options={
+                                                            watchedValues.tokenProfile === watchedValues.altTokenProfile &&
+                                                            altKeyOptions.length === 0
+                                                                ? keyOptions
+                                                                : altKeyOptions
+                                                        }
+                                                        value={field.value?.uuid || ''}
+                                                        onChange={(value) => {
+                                                            const uuid = value as string | undefined;
+                                                            const key = uuid ? keyUuidToKeyMap.get(uuid) : undefined;
+                                                            field.onChange(key);
+                                                            if (key) {
+                                                                onKeyChange(key, 'alt');
+                                                            }
+                                                        }}
+                                                        label="Select Alternative Key"
+                                                        placeholder="Select Alternative Key"
+                                                    />
+                                                    {fieldState.error && fieldState.isTouched && (
+                                                        <p className="mt-1 text-sm text-red-600">
+                                                            {typeof fieldState.error === 'string'
+                                                                ? fieldState.error
+                                                                : fieldState.error?.message || 'Invalid value'}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            )}
+                                        />
+                                    </>
+                                )}
+
+                                {getSignatureAttributesTabs().length ? <TabLayout noBorder tabs={getSignatureAttributesTabs()} /> : <></>}
+                            </>
+                        ) : (
+                            <></>
+                        )}
+
+                        <Container className="flex-row justify-end modal-footer" gap={4}>
+                            <Button variant="outline" color="secondary" onClick={onCancel} disabled={formState.isSubmitting} type="button">
+                                Cancel
+                            </Button>
+                            <ProgressButton
+                                title="Rekey"
+                                inProgressTitle="Rekeying..."
+                                inProgress={formState.isSubmitting || rekeying}
+                                disabled={!formState.isValid || !isRekeyAllowed()}
+                            />
+                        </Container>
+                    </Widget>
+                </div>
             </form>
         </FormProvider>
     );

@@ -4,7 +4,6 @@ import { useDispatch } from 'react-redux';
 import { actions } from 'ducks/certificates';
 
 import Select from 'components/Select';
-import { FormGroup } from 'reactstrap';
 import Button from 'components/Button';
 import { UserResponseModel } from 'types/users';
 import Container from 'components/Container';
@@ -50,26 +49,27 @@ export default function CertificateOwnerDialog({ uuids, onCancel, onUpdate, user
 
     return (
         <>
-            <FormGroup>
+            <div className="mb-4">
                 <Select
                     id="certificateOwner"
                     options={userOptions}
                     placeholder={`Select Owner`}
                     value={ownerUuid || ''}
                     onChange={(value) => setOwnerUuid(value as string)}
+                    label="Owner"
                 />
-            </FormGroup>
+            </div>
 
             <Container className="flex-row justify-end modal-footer" gap={4}>
+                <Button color="secondary" variant="outline" onClick={onCancel} className="mr-auto">
+                    Cancel
+                </Button>
                 <Button color="danger" onClick={removeOwner}>
                     Remove
                 </Button>
 
                 <Button color="primary" onClick={updateOwner} disabled={!ownerUuid}>
                     Update
-                </Button>
-                <Button color="secondary" variant="outline" onClick={onCancel} className="ml-auto">
-                    Cancel
                 </Button>
             </Container>
         </>

@@ -30,6 +30,7 @@ import useAttributeEditor, { buildGroups, buildOwner } from 'utils/widget';
 import CertificateAssociationsFormWidget from 'components/CertificateAssociationsFormWidget/CertificateAssociationsFormWidget';
 import { deepEqual } from 'utils/deep-equal';
 import TextInput from 'components/TextInput';
+import Label from 'components/Label';
 
 interface ScepProfileFormProps {
     scepProfileId?: string;
@@ -318,8 +319,6 @@ export default function ScepProfileForm({ scepProfileId, onCancel, onSuccess }: 
         }
     }, [watchedRaProfile, onRaProfileChange]);
 
-    const title = useMemo(() => (editMode ? 'Edit SCEP Profile' : 'Create SCEP Profile'), [editMode]);
-
     const renderCertificateAssociatedAttributesEditor = useAttributeEditor({
         isBusy,
         id: 'certificateAssociatedAttributes',
@@ -328,6 +327,9 @@ export default function ScepProfileForm({ scepProfileId, onCancel, onSuccess }: 
         multipleResourceCustomAttributes,
         withRemoveAction: true,
     });
+
+    const lastResetProfileIdRef = useRef<string | undefined>(undefined);
+    const lastResetEditModeRef = useRef<boolean | undefined>(undefined);
 
     // Reset form values when scepProfile is loaded in edit mode
     useEffect(() => {
@@ -339,63 +341,73 @@ export default function ScepProfileForm({ scepProfileId, onCancel, onSuccess }: 
             !isFetchingDetail &&
             optionsForRaProfiles.length > 0
         ) {
-            const initialAssociatedAttributes = mapProfileAttribute(
-                scepProfileSelector,
-                multipleResourceCustomAttributes,
-                Resource.Certificates,
-                'certificateAssociations.customAttributes',
-                '__attributes__certificateAssociatedAttributes__',
-            );
-            const initialCustomAttributes = mapProfileAttribute(
-                scepProfileSelector,
-                multipleResourceCustomAttributes,
-                Resource.ScepProfiles,
-                'customAttributes',
-                '__attributes__customScepProfile__',
-            );
+            // Only reset if the profile ID changed or we haven't reset yet
+            if (lastResetProfileIdRef.current !== id || lastResetEditModeRef.current !== editMode) {
+                const initialAssociatedAttributes = mapProfileAttribute(
+                    scepProfileSelector,
+                    multipleResourceCustomAttributes,
+                    Resource.Certificates,
+                    'certificateAssociations.customAttributes',
+                    '__attributes__certificateAssociatedAttributes__',
+                );
+                const initialCustomAttributes = mapProfileAttribute(
+                    scepProfileSelector,
+                    multipleResourceCustomAttributes,
+                    Resource.ScepProfiles,
+                    'customAttributes',
+                    '__attributes__customScepProfile__',
+                );
 
-            const transformedInitialAssociatedAttributes = transformAttributes(initialAssociatedAttributes ?? []);
-            const transformedInitialCustomAttributes = transformAttributes(initialCustomAttributes ?? []);
+                const transformedInitialAssociatedAttributes = transformAttributes(initialAssociatedAttributes ?? []);
+                const transformedInitialCustomAttributes = transformAttributes(initialCustomAttributes ?? []);
 
-            const newDefaultValues: FormValues = {
-                name: scepProfileSelector.name || '',
-                description: scepProfileSelector.description || '',
-                renewalThreshold: (scepProfileSelector.renewThreshold || 0).toString(),
-                includeCaCertificate: scepProfileSelector.includeCaCertificate || false,
-                includeCaCertificateChain: scepProfileSelector.includeCaCertificateChain || false,
-                enableIntune: scepProfileSelector.enableIntune ?? false,
-                intuneTenant: scepProfileSelector.intuneTenant ?? '',
-                intuneApplicationId: scepProfileSelector.intuneApplicationId ?? '',
-                intuneApplicationKey: '',
-                challengePassword: '',
-                raProfile: optionsForRaProfiles.find((raProfile) => raProfile.value === scepProfileSelector.raProfile?.uuid)?.value || '',
-                certificate: scepProfileSelector.caCertificate ? scepProfileSelector.caCertificate.uuid : '',
-                owner: buildOwner(userOptions, scepProfileSelector.certificateAssociations?.ownerUuid)?.value || '',
-                groups: buildGroups(groupOptions, scepProfileSelector.certificateAssociations?.groupUuids) || [],
-                deletedAttributes: [],
-                ...transformedInitialAssociatedAttributes,
-                ...transformedInitialCustomAttributes,
-            };
-            reset(newDefaultValues, { keepDefaultValues: false });
+                const newDefaultValues: FormValues = {
+                    name: scepProfileSelector.name || '',
+                    description: scepProfileSelector.description || '',
+                    renewalThreshold: (scepProfileSelector.renewThreshold || 0).toString(),
+                    includeCaCertificate: scepProfileSelector.includeCaCertificate || false,
+                    includeCaCertificateChain: scepProfileSelector.includeCaCertificateChain || false,
+                    enableIntune: scepProfileSelector.enableIntune ?? false,
+                    intuneTenant: scepProfileSelector.intuneTenant ?? '',
+                    intuneApplicationId: scepProfileSelector.intuneApplicationId ?? '',
+                    intuneApplicationKey: '',
+                    challengePassword: '',
+                    raProfile:
+                        optionsForRaProfiles.find((raProfile) => raProfile.value === scepProfileSelector.raProfile?.uuid)?.value || '',
+                    certificate: scepProfileSelector.caCertificate ? scepProfileSelector.caCertificate.uuid : '',
+                    owner: buildOwner(userOptions, scepProfileSelector.certificateAssociations?.ownerUuid)?.value || '',
+                    groups: buildGroups(groupOptions, scepProfileSelector.certificateAssociations?.groupUuids) || [],
+                    deletedAttributes: [],
+                    ...transformedInitialAssociatedAttributes,
+                    ...transformedInitialCustomAttributes,
+                };
+                reset(newDefaultValues, { keepDefaultValues: false });
+                lastResetProfileIdRef.current = id;
+                lastResetEditModeRef.current = editMode;
+            }
         } else if (!editMode) {
-            // Reset form when switching to create mode
-            reset({
-                name: '',
-                description: '',
-                renewalThreshold: '0',
-                includeCaCertificate: false,
-                includeCaCertificateChain: false,
-                enableIntune: false,
-                intuneTenant: '',
-                intuneApplicationId: '',
-                intuneApplicationKey: '',
-                challengePassword: '',
-                raProfile: '',
-                certificate: '',
-                owner: '',
-                groups: [],
-                deletedAttributes: [],
-            });
+            // Reset form when switching to create mode (only if we were in edit mode before)
+            if (lastResetEditModeRef.current === true) {
+                reset({
+                    name: '',
+                    description: '',
+                    renewalThreshold: '0',
+                    includeCaCertificate: false,
+                    includeCaCertificateChain: false,
+                    enableIntune: false,
+                    intuneTenant: '',
+                    intuneApplicationId: '',
+                    intuneApplicationKey: '',
+                    challengePassword: '',
+                    raProfile: '',
+                    certificate: '',
+                    owner: '',
+                    groups: [],
+                    deletedAttributes: [],
+                });
+                lastResetProfileIdRef.current = undefined;
+                lastResetEditModeRef.current = editMode;
+            }
         }
     }, [
         editMode,
@@ -440,151 +452,19 @@ export default function ScepProfileForm({ scepProfileId, onCancel, onSuccess }: 
         <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <Widget noBorder busy={isBusy}>
-                    <Controller
-                        name="name"
-                        control={control}
-                        rules={buildValidationRules([validateRequired(), validateAlphaNumericWithoutAccents()])}
-                        render={({ field, fieldState }) => (
-                            <TextInput
-                                {...field}
-                                id="name"
-                                type="text"
-                                label="SCEP Profile Name"
-                                required
-                                disabled={editMode}
-                                invalid={fieldState.error && fieldState.isTouched}
-                                error={
-                                    fieldState.error && fieldState.isTouched
-                                        ? typeof fieldState.error === 'string'
-                                            ? fieldState.error
-                                            : fieldState.error?.message || 'Invalid value'
-                                        : undefined
-                                }
-                            />
-                        )}
-                    />
-
-                    <Controller
-                        name="description"
-                        control={control}
-                        rules={buildValidationRules([validateLength(0, 300)])}
-                        render={({ field, fieldState }) => (
-                            <TextInput
-                                {...field}
-                                id="description"
-                                type="text"
-                                label="Description"
-                                invalid={fieldState.error && fieldState.isTouched}
-                                error={
-                                    fieldState.error && fieldState.isTouched
-                                        ? typeof fieldState.error === 'string'
-                                            ? fieldState.error
-                                            : fieldState.error?.message || 'Invalid value'
-                                        : undefined
-                                }
-                            />
-                        )}
-                    />
-
-                    <div>
-                        <label htmlFor="challengePassword" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
-                            Challenge Password {requiresChallengePassword && <span className="text-red-500">*</span>}
-                        </label>
+                    <div className="space-y-4">
                         <Controller
-                            name="challengePassword"
+                            name="name"
                             control={control}
-                            rules={requiresChallengePassword ? buildValidationRules([validateRequired()]) : buildValidationRules([])}
+                            rules={buildValidationRules([validateRequired(), validateAlphaNumericWithoutAccents()])}
                             render={({ field, fieldState }) => (
                                 <TextInput
                                     {...field}
-                                    id="challengePassword"
-                                    type="password"
-                                    invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
-                                />
-                            )}
-                        />
-                    </div>
-
-                    <div>
-                        <p className="text-sm text-gray-500 mb-2">Minimum expiry days to allow renewal of certificate.</p>
-                        <Controller
-                            name="renewalThreshold"
-                            control={control}
-                            rules={buildValidationRules([validateInteger()])}
-                            render={({ field, fieldState }) => (
-                                <TextInput
-                                    {...field}
-                                    id="renewalThreshold"
-                                    type="number"
-                                    label="Renewal Threshold"
-                                    invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
-                                />
-                            )}
-                        />
-                    </div>
-
-                    <Controller
-                        name="includeCaCertificate"
-                        control={control}
-                        render={({ field }) => (
-                            <Switch
-                                id="includeCaCertificate"
-                                checked={field.value}
-                                onChange={field.onChange}
-                                label="Include CA Certificate"
-                            />
-                        )}
-                    />
-
-                    <Controller
-                        name="includeCaCertificateChain"
-                        control={control}
-                        render={({ field }) => (
-                            <Switch
-                                id="includeCaCertificateChain"
-                                checked={field.value}
-                                onChange={field.onChange}
-                                label="Include CA Certificate Chain"
-                            />
-                        )}
-                    />
-
-                    <Controller
-                        name="enableIntune"
-                        control={control}
-                        render={({ field }) => (
-                            <Switch id="enableIntune" checked={field.value} onChange={field.onChange} label="Enable Intune" />
-                        )}
-                    />
-
-                    <div>
-                        <label htmlFor="intuneTenant" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
-                            Intune Tenant {watchedEnableIntune && <span className="text-red-500">*</span>}
-                        </label>
-                        <Controller
-                            name="intuneTenant"
-                            control={control}
-                            rules={watchedEnableIntune ? buildValidationRules([validateRequired()]) : buildValidationRules([])}
-                            render={({ field, fieldState }) => (
-                                <TextInput
-                                    {...field}
-                                    id="intuneTenant"
+                                    id="name"
                                     type="text"
-                                    disabled={!watchedEnableIntune}
+                                    label="SCEP Profile Name"
+                                    required
+                                    disabled={editMode}
                                     invalid={fieldState.error && fieldState.isTouched}
                                     error={
                                         fieldState.error && fieldState.isTouched
@@ -596,22 +476,17 @@ export default function ScepProfileForm({ scepProfileId, onCancel, onSuccess }: 
                                 />
                             )}
                         />
-                    </div>
 
-                    <div>
-                        <label htmlFor="intuneApplicationId" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
-                            Intune Application ID {watchedEnableIntune && <span className="text-red-500">*</span>}
-                        </label>
                         <Controller
-                            name="intuneApplicationId"
+                            name="description"
                             control={control}
-                            rules={watchedEnableIntune ? buildValidationRules([validateRequired()]) : buildValidationRules([])}
+                            rules={buildValidationRules([validateLength(0, 300)])}
                             render={({ field, fieldState }) => (
                                 <TextInput
                                     {...field}
-                                    id="intuneApplicationId"
+                                    id="description"
                                     type="text"
-                                    disabled={!watchedEnableIntune}
+                                    label="Description"
                                     invalid={fieldState.error && fieldState.isTouched}
                                     error={
                                         fieldState.error && fieldState.isTouched
@@ -623,114 +498,253 @@ export default function ScepProfileForm({ scepProfileId, onCancel, onSuccess }: 
                                 />
                             )}
                         />
-                    </div>
 
-                    <div>
-                        <label htmlFor="intuneApplicationKey" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
-                            Intune Application Key {watchedEnableIntune && <span className="text-red-500">*</span>}
-                        </label>
-                        <Controller
-                            name="intuneApplicationKey"
-                            control={control}
-                            rules={watchedEnableIntune ? buildValidationRules([validateRequired()]) : buildValidationRules([])}
-                            render={({ field, fieldState }) => (
-                                <TextInput
-                                    {...field}
-                                    id="intuneApplicationKey"
-                                    type="password"
-                                    disabled={!watchedEnableIntune}
-                                    invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
-                                />
-                            )}
-                        />
-                    </div>
-
-                    <CertificateField certificates={certificates} />
-
-                    <Widget
-                        title="RA Profile Configuration"
-                        busy={isFetchingRaProfilesList || isFetchingIssuanceAttributes || isFetchingResourceCustomAttributes}
-                    >
                         <div>
+                            <Label htmlFor="challengePassword" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
+                                Challenge Password {requiresChallengePassword && <span className="text-red-500">*</span>}
+                            </Label>
                             <Controller
-                                name="raProfile"
+                                name="challengePassword"
                                 control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        id="raProfileSelect"
-                                        label="Default RA Profile"
-                                        value={field.value || ''}
-                                        onChange={(value) => {
-                                            field.onChange(value);
-                                        }}
-                                        options={optionsForRaProfiles || []}
-                                        placeholder="Select to change RA Profile if needed"
-                                        isClearable
-                                        placement="bottom"
+                                rules={requiresChallengePassword ? buildValidationRules([validateRequired()]) : buildValidationRules([])}
+                                render={({ field, fieldState }) => (
+                                    <TextInput
+                                        {...field}
+                                        id="challengePassword"
+                                        type="password"
+                                        invalid={fieldState.error && fieldState.isTouched}
+                                        error={
+                                            fieldState.error && fieldState.isTouched
+                                                ? typeof fieldState.error === 'string'
+                                                    ? fieldState.error
+                                                    : fieldState.error?.message || 'Invalid value'
+                                                : undefined
+                                        }
                                     />
                                 )}
                             />
                         </div>
 
-                        <TabLayout
-                            tabs={[
-                                {
-                                    title: 'Issue Attributes',
-                                    content:
-                                        !raProfile || !raProfileIssuanceAttrDescs || raProfileIssuanceAttrDescs.length === 0 ? (
-                                            <></>
-                                        ) : (
-                                            <AttributeEditor
-                                                id="issuanceAttributes"
-                                                attributeDescriptors={raProfileIssuanceAttrDescs}
-                                                attributes={scepProfile?.issueCertificateAttributes}
-                                                groupAttributesCallbackAttributes={issueGroupAttributesCallbackAttributes}
-                                                setGroupAttributesCallbackAttributes={setIssueGroupAttributesCallbackAttributes}
-                                            />
-                                        ),
-                                },
-                                {
-                                    title: 'Custom Attributes',
-                                    content: (
-                                        <AttributeEditor
-                                            id="customScepProfile"
-                                            attributeDescriptors={multipleResourceCustomAttributes[Resource.ScepProfiles] || []}
-                                            attributes={scepProfile?.customAttributes}
+                        <div>
+                            <p className="text-sm text-gray-500 mb-2">Minimum expiry days to allow renewal of certificate.</p>
+                            <Controller
+                                name="renewalThreshold"
+                                control={control}
+                                rules={buildValidationRules([validateInteger()])}
+                                render={({ field, fieldState }) => (
+                                    <TextInput
+                                        {...field}
+                                        id="renewalThreshold"
+                                        type="number"
+                                        label="Renewal Threshold"
+                                        invalid={fieldState.error && fieldState.isTouched}
+                                        error={
+                                            fieldState.error && fieldState.isTouched
+                                                ? typeof fieldState.error === 'string'
+                                                    ? fieldState.error
+                                                    : fieldState.error?.message || 'Invalid value'
+                                                : undefined
+                                        }
+                                    />
+                                )}
+                            />
+                        </div>
+
+                        <Controller
+                            name="includeCaCertificate"
+                            control={control}
+                            render={({ field }) => (
+                                <Switch
+                                    id="includeCaCertificate"
+                                    checked={field.value}
+                                    onChange={field.onChange}
+                                    secondaryLabel="Include CA Certificate"
+                                />
+                            )}
+                        />
+
+                        <Controller
+                            name="includeCaCertificateChain"
+                            control={control}
+                            render={({ field }) => (
+                                <Switch
+                                    id="includeCaCertificateChain"
+                                    checked={field.value}
+                                    onChange={field.onChange}
+                                    secondaryLabel="Include CA Certificate Chain"
+                                />
+                            )}
+                        />
+
+                        <Controller
+                            name="enableIntune"
+                            control={control}
+                            render={({ field }) => (
+                                <Switch id="enableIntune" checked={field.value} onChange={field.onChange} secondaryLabel="Enable Intune" />
+                            )}
+                        />
+
+                        <div>
+                            <Label htmlFor="intuneTenant" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
+                                Intune Tenant {watchedEnableIntune && <span className="text-red-500">*</span>}
+                            </Label>
+                            <Controller
+                                name="intuneTenant"
+                                control={control}
+                                rules={watchedEnableIntune ? buildValidationRules([validateRequired()]) : buildValidationRules([])}
+                                render={({ field, fieldState }) => (
+                                    <TextInput
+                                        {...field}
+                                        id="intuneTenant"
+                                        type="text"
+                                        disabled={!watchedEnableIntune}
+                                        invalid={fieldState.error && fieldState.isTouched}
+                                        error={
+                                            fieldState.error && fieldState.isTouched
+                                                ? typeof fieldState.error === 'string'
+                                                    ? fieldState.error
+                                                    : fieldState.error?.message || 'Invalid value'
+                                                : undefined
+                                        }
+                                    />
+                                )}
+                            />
+                        </div>
+
+                        <div>
+                            <Label htmlFor="intuneApplicationId" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
+                                Intune Application ID {watchedEnableIntune && <span className="text-red-500">*</span>}
+                            </Label>
+                            <Controller
+                                name="intuneApplicationId"
+                                control={control}
+                                rules={watchedEnableIntune ? buildValidationRules([validateRequired()]) : buildValidationRules([])}
+                                render={({ field, fieldState }) => (
+                                    <TextInput
+                                        {...field}
+                                        id="intuneApplicationId"
+                                        type="text"
+                                        disabled={!watchedEnableIntune}
+                                        invalid={fieldState.error && fieldState.isTouched}
+                                        error={
+                                            fieldState.error && fieldState.isTouched
+                                                ? typeof fieldState.error === 'string'
+                                                    ? fieldState.error
+                                                    : fieldState.error?.message || 'Invalid value'
+                                                : undefined
+                                        }
+                                    />
+                                )}
+                            />
+                        </div>
+
+                        <div>
+                            <Label htmlFor="intuneApplicationKey" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
+                                Intune Application Key {watchedEnableIntune && <span className="text-red-500">*</span>}
+                            </Label>
+                            <Controller
+                                name="intuneApplicationKey"
+                                control={control}
+                                rules={watchedEnableIntune ? buildValidationRules([validateRequired()]) : buildValidationRules([])}
+                                render={({ field, fieldState }) => (
+                                    <TextInput
+                                        {...field}
+                                        id="intuneApplicationKey"
+                                        type="password"
+                                        disabled={!watchedEnableIntune}
+                                        invalid={fieldState.error && fieldState.isTouched}
+                                        error={
+                                            fieldState.error && fieldState.isTouched
+                                                ? typeof fieldState.error === 'string'
+                                                    ? fieldState.error
+                                                    : fieldState.error?.message || 'Invalid value'
+                                                : undefined
+                                        }
+                                    />
+                                )}
+                            />
+                        </div>
+
+                        <CertificateField certificates={certificates} />
+
+                        <Widget
+                            title="RA Profile Configuration"
+                            busy={isFetchingRaProfilesList || isFetchingIssuanceAttributes || isFetchingResourceCustomAttributes}
+                        >
+                            <div className="space-y-4">
+                                <Controller
+                                    name="raProfile"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Select
+                                            id="raProfileSelect"
+                                            label="Default RA Profile"
+                                            value={field.value || ''}
+                                            onChange={(value) => {
+                                                field.onChange(value);
+                                            }}
+                                            options={optionsForRaProfiles || []}
+                                            placeholder="Select to change RA Profile if needed"
+                                            isClearable
+                                            placement="bottom"
                                         />
-                                    ),
-                                },
-                            ]}
+                                    )}
+                                />
+
+                                <TabLayout
+                                    noBorder
+                                    tabs={[
+                                        {
+                                            title: 'Issue Attributes',
+                                            content:
+                                                !raProfile || !raProfileIssuanceAttrDescs || raProfileIssuanceAttrDescs.length === 0 ? (
+                                                    <></>
+                                                ) : (
+                                                    <AttributeEditor
+                                                        id="issuanceAttributes"
+                                                        attributeDescriptors={raProfileIssuanceAttrDescs}
+                                                        attributes={scepProfile?.issueCertificateAttributes}
+                                                        groupAttributesCallbackAttributes={issueGroupAttributesCallbackAttributes}
+                                                        setGroupAttributesCallbackAttributes={setIssueGroupAttributesCallbackAttributes}
+                                                    />
+                                                ),
+                                        },
+                                        {
+                                            title: 'Custom Attributes',
+                                            content: (
+                                                <AttributeEditor
+                                                    id="customScepProfile"
+                                                    attributeDescriptors={multipleResourceCustomAttributes[Resource.ScepProfiles] || []}
+                                                    attributes={scepProfile?.customAttributes}
+                                                />
+                                            ),
+                                        },
+                                    ]}
+                                />
+                            </div>
+                        </Widget>
+
+                        <CertificateAssociationsFormWidget
+                            userOptions={userOptions}
+                            groupOptions={groupOptions}
+                            setUserOptions={setUserOptions}
+                            setGroupOptions={setGroupOptions}
+                            renderCustomAttributes={renderCertificateAssociatedAttributesEditor}
                         />
-                    </Widget>
 
-                    <CertificateAssociationsFormWidget
-                        userOptions={userOptions}
-                        groupOptions={groupOptions}
-                        setUserOptions={setUserOptions}
-                        setGroupOptions={setGroupOptions}
-                        renderCustomAttributes={renderCertificateAssociatedAttributesEditor}
-                    />
-
-                    <Container className="flex-row justify-end mt-4">
-                        <ProgressButton
-                            title={editMode ? 'Update' : 'Create'}
-                            inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
-                            inProgress={isSubmitting}
-                            disabled={isEqual || isSubmitting || !isValid}
-                            type="submit"
-                        />
-
-                        <Button variant="outline" onClick={onCancel} disabled={isSubmitting} type="button">
-                            Cancel
-                        </Button>
-                    </Container>
+                        <Container className="flex-row justify-end modal-footer" gap={4}>
+                            <Button variant="outline" onClick={onCancel} disabled={isSubmitting} type="button">
+                                Cancel
+                            </Button>
+                            <ProgressButton
+                                title={editMode ? 'Update' : 'Create'}
+                                inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
+                                inProgress={isSubmitting}
+                                disabled={isEqual || isSubmitting || !isValid}
+                                type="submit"
+                            />
+                        </Container>
+                    </div>
                 </Widget>
             </form>
         </FormProvider>

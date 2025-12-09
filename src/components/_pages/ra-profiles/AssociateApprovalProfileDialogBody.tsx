@@ -10,6 +10,7 @@ import { RaProfileResponseModel } from 'types/ra-profiles';
 import { buildValidationRules } from 'utils/validators-helper';
 import { validateRequired } from 'utils/validators';
 import cn from 'classnames';
+import Label from 'components/Label';
 
 interface Props {
     visible: boolean;
@@ -77,12 +78,12 @@ const AssociateApprovalProfileDialogBody = ({ raProfile, visible, onClose, avail
                         rules={buildValidationRules([validateRequired()])}
                         render={({ field, fieldState }) => (
                             <div className="mb-4">
-                                <label
+                                <Label
                                     htmlFor="approvalProfileSelect"
                                     className="block text-sm font-medium mb-2 text-gray-700 dark:text-white"
                                 >
                                     Select Approval profile
-                                </label>
+                                </Label>
 
                                 <Select
                                     id="approvalProfileSelect"

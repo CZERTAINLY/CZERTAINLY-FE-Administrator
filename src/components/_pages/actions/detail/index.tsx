@@ -2,7 +2,7 @@ import { ApiClients } from '../../../../api';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import ConditionsExecutionsList from 'components/ExecutionConditionItemsList';
-import GoBackButton from 'components/GoBackButton';
+import Breadcrumb from 'components/Breadcrumb';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
@@ -14,7 +14,8 @@ import { PlatformEnum, Resource } from 'types/openapi';
 import Button from 'components/Button';
 import Container from 'components/Container';
 import TextInput from 'components/TextInput';
-import { Check, X, PencilLine, Trash2 } from 'lucide-react';
+import { Check, X, Trash2 } from 'lucide-react';
+import EditIcon from 'components/icons/EditIcon';
 interface SelectChangeValue {
     value: string;
     label: string;
@@ -227,7 +228,7 @@ const RuleDetails = () => {
                                               setUpdateDescription(true);
                                           }}
                                       >
-                                          <PencilLine size={16} />
+                                          <EditIcon size={16} />
                                       </Button>
                                   )}
                               </div>,
@@ -319,10 +320,11 @@ const RuleDetails = () => {
 
     return (
         <Container className="themed-container">
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                forcedPath="/actions"
-                text={`${getEnumLabel(resourceTypeEnum, Resource.Actions)} Inventory`}
+            <Breadcrumb
+                items={[
+                    { label: `${getEnumLabel(resourceTypeEnum, Resource.Actions)} Inventory`, href: '/actions' },
+                    { label: 'Action Details' },
+                ]}
             />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>

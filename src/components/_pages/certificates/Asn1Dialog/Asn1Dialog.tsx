@@ -2,7 +2,7 @@ import Spinner from 'components/Spinner';
 import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from 'ducks/utilsActuator';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button } from 'reactstrap';
+import Button from 'components/Button';
 import { transformParseCertificateResponseDtoToAsn1String } from '../../../../ducks/transform/utilsCertificate';
 import { actions as utilsCertificateActions, selectors as utilsCertificateSelectors } from '../../../../ducks/utilsCertificate';
 import {
@@ -65,10 +65,8 @@ export default function Asn1Dialog({ content, isCSR }: Props) {
         <>
             <Spinner active={isFetchingDetail || isFetchingCSRDetails} />
             <Button
-                className="btn btn-link p-0"
+                variant="transparent"
                 disabled={!health || isFetchingDetail || isFetchingCSRDetails}
-                size="sm"
-                color="primary"
                 onClick={() => {
                     if (content && health) {
                         if (!isCSR) {
@@ -89,16 +87,17 @@ export default function Asn1Dialog({ content, isCSR }: Props) {
                     }
                 }}
                 title="Show ASN.1 Structure"
+                className="text-[var(--primary-blue-color)] !p-0 hover:bg-transparent"
             >
                 Show
             </Button>
             <Dialog
                 isOpen={!!asn1}
-                size={'lg'}
+                size="xl"
                 caption="ASN.1 Structure"
-                body={<pre>{asn1}</pre>}
+                body={<pre className="text-sm overflow-x-auto text-[var(--dark-gray-color)]">{asn1}</pre>}
                 toggle={onClose}
-                buttons={[{ color: 'primary', onClick: onClose, body: 'Close' }]}
+                buttons={[{ color: 'secondary', variant: 'outline', onClick: onClose, body: 'Close' }]}
             />
         </>
     );

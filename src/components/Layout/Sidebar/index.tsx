@@ -7,7 +7,7 @@ import {
     Award,
     ChevronDown,
     HomeIcon,
-    KeyIcon,
+    KeyRound,
     SearchCheck,
     Link,
     CircleUser,
@@ -47,29 +47,35 @@ type MenuItemMapping = {
 const menuItemMappings: MenuItemMapping[] = [
     {
         _key: '/dashboard',
-        icon: <HomeIcon size={16} />,
+        icon: <HomeIcon size={16} strokeWidth={1.5} />,
         header: 'Dashboard',
         headerLink: '/dashboard',
         requiredResources: [Resource.Certificates, Resource.RaProfiles, Resource.Discoveries, Resource.Groups],
     },
     {
         _key: '/certificates',
-        icon: <Award size={16} />,
+        icon: <Award size={16} strokeWidth={1.5} />,
         header: 'Certificates',
         headerLink: '/certificates',
         requiredResources: [Resource.Certificates],
     },
-    { _key: '/keys', icon: <KeyIcon size={16} />, header: 'Keys', headerLink: '/keys', requiredResources: [Resource.Keys] },
+    {
+        _key: '/keys',
+        icon: <KeyRound size={16} strokeWidth={1.5} />,
+        header: 'Keys',
+        headerLink: '/keys',
+        requiredResources: [Resource.Keys],
+    },
     {
         _key: '/discovery',
-        icon: <SearchCheck size={16} />,
+        icon: <SearchCheck size={16} strokeWidth={1.5} />,
         header: 'Discoveries',
         headerLink: '/discoveries',
         requiredResources: [Resource.Discoveries],
     },
     {
         _key: '/connectors',
-        icon: <Link size={16} />,
+        icon: <Link size={16} strokeWidth={1.5} />,
         header: 'Connectors',
         headerLink: '/connectors',
         requiredResources: [Resource.Connectors],
@@ -77,7 +83,7 @@ const menuItemMappings: MenuItemMapping[] = [
 
     {
         _key: 'accessControl',
-        icon: <CircleUser size={16} />,
+        icon: <CircleUser size={16} strokeWidth={1.5} />,
         header: 'Access Control',
         children: [
             { _key: '/users', name: 'Users', link: '/users', requiredResources: [Resource.Users] },
@@ -86,7 +92,7 @@ const menuItemMappings: MenuItemMapping[] = [
     },
     {
         _key: 'profiles',
-        icon: <Users size={16} />,
+        icon: <Users size={16} strokeWidth={1.5} />,
         header: 'Profiles',
         children: [
             {
@@ -118,7 +124,7 @@ const menuItemMappings: MenuItemMapping[] = [
 
     {
         _key: 'inventory',
-        icon: <Table size={16} />,
+        icon: <Table size={16} strokeWidth={1.5} />,
         header: 'Inventory',
         children: [
             { _key: '/credentials', name: 'Credentials', link: '/credentials', requiredResources: [Resource.Credentials] },
@@ -132,7 +138,7 @@ const menuItemMappings: MenuItemMapping[] = [
 
     {
         _key: 'protocols',
-        icon: <ListChecks size={16} />,
+        icon: <ListChecks size={16} strokeWidth={1.5} />,
         header: 'Protocols',
         children: [
             {
@@ -149,7 +155,7 @@ const menuItemMappings: MenuItemMapping[] = [
 
     {
         _key: 'approvals',
-        icon: <CircleCheckBig size={16} />,
+        icon: <CircleCheckBig size={16} strokeWidth={1.5} />,
         header: 'Approvals',
         children: [
             {
@@ -167,11 +173,17 @@ const menuItemMappings: MenuItemMapping[] = [
         ],
     },
 
-    { _key: '/jobs', icon: <Calendar size={16} />, header: 'Scheduler', headerLink: '/jobs', requiredResources: [Resource.Jobs] },
+    {
+        _key: '/jobs',
+        icon: <Calendar size={16} strokeWidth={1.5} />,
+        header: 'Scheduler',
+        headerLink: '/jobs',
+        requiredResources: [Resource.Jobs],
+    },
 
     {
         _key: 'settings',
-        icon: <Settings size={16} />,
+        icon: <Settings size={16} strokeWidth={1.5} />,
         header: 'Settings',
         children: [
             { _key: '/settings', name: 'Platform', link: '/settings', requiredResources: [Resource.Settings] },
@@ -201,14 +213,14 @@ const menuItemMappings: MenuItemMapping[] = [
 
     {
         _key: '/auditlogs',
-        icon: <FileJson2 size={16} />,
+        icon: <FileJson2 size={16} strokeWidth={1.5} />,
         header: 'Audit Logs',
         headerLink: '/auditlogs',
         requiredResources: [Resource.AuditLogs],
     },
     {
         _key: 'workflows',
-        icon: <Split size={16} />,
+        icon: <Split size={16} strokeWidth={1.5} />,
         header: 'Workflows',
         children: [
             // { _key: '/conditions', name: 'Conditions', link: '/conditions' },
@@ -298,7 +310,7 @@ export default function Sidebar({ allowedResources }: Props) {
                 <li key={mapping.header} className={cx('flex justify-center', { 'flex-col': menuSize != 'small' })}>
                     <Button
                         variant="transparent"
-                        className={cx('!px-3.5 !py-2.5 border-none justify-between h-[40px]', {
+                        className={cx('!px-4 !py-2 border-none justify-between h-[38px]', {
                             'flex w-full items-center': menuSize != 'small',
                         })}
                         onClick={() => {
@@ -314,26 +326,29 @@ export default function Sidebar({ allowedResources }: Props) {
                             {mapping.icon}
                             <span className={cx('text-sm', { 'sr-only': menuSize === 'small' })}>{mapping.header}</span>
                         </div>
-                        {menuSize != 'small' && <ChevronDown size={20} className={cx({ isActive: 'rotate-180' })} />}
+                        {menuSize != 'small' && <ChevronDown strokeWidth={1.5} size={16} className={cx({ isActive: 'rotate-180' })} />}
                     </Button>
                     <ul
                         className={cx(
-                            `transition-[max-height] duration-300 ease-in-out overflow-hidden relative before:content-[''] before:absolute before:left-6 before:top-0 before:h-[calc(100%-20px)] before:w-0.5 before:bg-gray-200`,
+                            `transition-[max-height] duration-300 ease-in-out overflow-hidden relative before:content-[''] before:absolute before:left-6 before:top-0 before:h-full before:w-0.5 before:bg-gray-200`,
                             {
                                 'w-0': !isActive,
                             },
                         )}
                         style={{
-                            maxHeight: isActive ? `${40 * mapping.children.length}px` : 0,
+                            maxHeight: isActive ? `${38 * mapping.children.length}px` : 0,
                         }}
                         id={mapping._key}
                     >
-                        {mapping.children.map((child) => (
-                            <li key={child.name}>
+                        {mapping.children.map((child, index) => (
+                            <li key={child.name} className={cx({ 'mb-2': index === mapping.children.length - 1 })}>
                                 <NavLink
                                     to={child.link}
                                     className={({ isActive }) =>
-                                        cx('block px-4 ml-8 py-2 no-underline hover:bg-gray-200 rounded-lg', isActive && 'text-blue-600')
+                                        cx(
+                                            'block px-4 ml-8 py-2 no-underline hover:bg-gray-200 rounded-lg h-[38px] items-center',
+                                            isActive && 'text-blue-600',
+                                        )
                                     }
                                 >
                                     {child.name}
@@ -355,7 +370,7 @@ export default function Sidebar({ allowedResources }: Props) {
                         }
                     }}
                     className={({ isActive }) =>
-                        cx('flex px-3.5 py-2.5 no-underline hover:bg-gray-200 rounded-lg h-[40px] items-center dark:text-white', {
+                        cx('flex px-4 py-2 no-underline hover:bg-gray-200 rounded-lg h-[38px] items-center dark:text-white', {
                             'text-blue-600': isActive,
                             'w-full gap-x-2': menuSize !== 'small',
                         })
@@ -389,12 +404,12 @@ export default function Sidebar({ allowedResources }: Props) {
             <div className="flex justify-center pt-4">
                 <Button
                     variant="transparent"
-                    className={cx('inline-flex px-3.5 py-2.5 border-none', {
+                    className={cx('inline-flex px-4 py-2 border-none', {
                         'w-full gap-x-2': menuSize !== 'small',
                     })}
                     onClick={() => toggleMenuSize()}
                 >
-                    <ArrowRightToLine size={20} className={cx(menuSize === 'large' && 'rotate-180')} />
+                    <ArrowRightToLine strokeWidth={1} size={24} className={cx(menuSize === 'large' && 'rotate-180')} />
                     <span className={cx({ 'sr-only': menuSize === 'small' })}>Collapse</span>
                 </Button>
             </div>

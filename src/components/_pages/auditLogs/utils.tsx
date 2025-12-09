@@ -2,10 +2,11 @@ import { TableHeader } from 'components/CustomTable';
 import { auditLogsTypeMapping } from './mapping';
 import { getEnumLabel } from 'ducks/enums';
 import { Link } from 'react-router';
-import { Button } from 'reactstrap';
+import Button from 'components/Button';
 import { EnumItemDto } from 'types/enums';
 import { AuditLogDto } from 'types/openapi';
 import { dateFormatter } from 'utils/dateUtil';
+import { ArrowRightCircle, Info } from 'lucide-react';
 
 /** Shared small renderer used by both actor/resource to avoid duplicate blocks */
 const renderTypeWithOptionalNav = (
@@ -27,15 +28,9 @@ const renderTypeWithOptionalNav = (
             additional = <Link to={path}> {name}</Link>;
         } else {
             additional = (
-                <Button
-                    title={buttonTitle ?? 'Go to details'}
-                    color="white"
-                    size="sm"
-                    className="p-0 ms-1"
-                    onClick={() => navigate?.(path)}
-                >
+                <Button title={buttonTitle ?? 'Go to details'} variant="transparent" onClick={() => navigate?.(path)}>
                     {' '}
-                    <i className="fa fa-circle-arrow-right"></i>
+                    <ArrowRightCircle size={16} />
                 </Button>
             );
         }
@@ -212,14 +207,8 @@ export const createAuditLogsList = (
             renderResource(log.affiliatedResource, resourceEnum, navigate),
             getEnumLabel(operationEnum, log.operation),
             getEnumLabel(operationResultEnum, log.operationResult),
-            <Button
-                key={`${log.id}-info-button`}
-                className="btn btn-link p-0 ms-2"
-                color="white"
-                title="Detail"
-                onClick={() => onInfoClick(log)}
-            >
-                <i className="fa fa-info" style={{ color: 'auto', marginBottom: '9.5px', marginLeft: '4px', fontSize: '14px' }} />
+            <Button key={`${log.id}-info-button`} variant="transparent" title="Detail" onClick={() => onInfoClick(log)} className="!p-1">
+                <Info size={14} />
             </Button>,
         ],
     }));

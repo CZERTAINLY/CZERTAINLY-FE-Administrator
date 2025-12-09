@@ -1,4 +1,5 @@
 import Badge from 'components/Badge';
+import { Circle } from 'lucide-react';
 import { CertificateEventHistoryDtoStatusEnum, KeyEventHistoryDtoStatusEnum } from 'types/openapi';
 
 interface Props {
@@ -16,7 +17,7 @@ function KeyStatus({ status, asIcon = false }: Props) {
 
     const { color, text } = status ? statusMap[status] || _default : _default;
 
-    return asIcon ? <i title={text} className={`fa fa-circle text-${color}`} /> : <Badge color={color}>{text}</Badge>;
+    return asIcon ? <Circle size={12} title={text} className={`text-${color}`} fill="currentColor" /> : <Badge color={color}>{text}</Badge>;
 }
 
 export default KeyStatus;

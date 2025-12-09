@@ -14,9 +14,9 @@ import { PlatformEnum, Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { getAttributeContent } from 'utils/attributes/attributes';
 import { useCopyToClipboard } from 'utils/common-hooks';
-import styles from './customAttribute.module.scss';
 import { createWidgetDetailHeaders } from 'utils/widget';
 import Breadcrumb from 'components/Breadcrumb';
+import { Copy } from 'lucide-react';
 import CustomAttributeForm from '../form';
 
 export default function CustomAttributeDetail() {
@@ -167,11 +167,7 @@ export default function CustomAttributeDetail() {
                               'Content',
                               <>
                                   {getAttributeContent(customAttribute.contentType, customAttribute.content)}
-                                  {customAttribute?.content?.length ? (
-                                      <i className={cx('fa fa-copy', styles.copyCustomContentButton)} onClick={onContentCopyClick} />
-                                  ) : (
-                                      <> </>
-                                  )}
+                                  {customAttribute?.content?.length ? <Copy size={16} onClick={onContentCopyClick} /> : <> </>}
                               </>,
                           ],
                       },
@@ -219,8 +215,8 @@ export default function CustomAttributeDetail() {
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                 ]}
             />
 

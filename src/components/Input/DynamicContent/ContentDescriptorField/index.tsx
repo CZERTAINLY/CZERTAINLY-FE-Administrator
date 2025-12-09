@@ -5,6 +5,7 @@ import { Controller, useFormContext, useWatch } from 'react-hook-form';
 import Button from 'components/Button';
 import Label from 'components/Label';
 import TextInput from 'components/TextInput';
+import DatePicker from 'components/DatePicker';
 import { AttributeContentType } from 'types/openapi';
 import { getStepValue } from 'utils/common-utils';
 import { composeValidators, validateRequired } from 'utils/validators';
@@ -76,7 +77,8 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
                             render={({ field, fieldState }) => {
                                 const inputType = ContentFieldConfiguration[contentType].type;
                                 const isCheckbox = inputType === 'checkbox';
-                                const needsStep = inputType === 'number' || inputType === 'datetime-local';
+                                const isDateTime = inputType === 'datetime-local';
+                                const needsStep = inputType === 'number';
 
                                 const inputComponent = isCheckbox ? (
                                     <input
@@ -86,6 +88,31 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
                                         checked={field.value}
                                         onChange={(e) => field.onChange(e.target.checked)}
                                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                    />
+                                ) : isDateTime ? (
+                                    <DatePicker
+                                        id={name}
+                                        value={
+                                            field.value
+                                                ? field.value.includes('T')
+                                                    ? field.value
+                                                    : field.value.replace(' ', 'T')
+                                                : undefined
+                                        }
+                                        onChange={(value) => {
+                                            field.onChange(value);
+                                        }}
+                                        onBlur={field.onBlur}
+                                        invalid={fieldState.error && fieldState.isTouched}
+                                        error={
+                                            fieldState.error && fieldState.isTouched
+                                                ? typeof fieldState.error === 'string'
+                                                    ? fieldState.error
+                                                    : fieldState.error?.message || 'Invalid value'
+                                                : undefined
+                                        }
+                                        required
+                                        timePicker
                                     />
                                 ) : needsStep ? (
                                     <input

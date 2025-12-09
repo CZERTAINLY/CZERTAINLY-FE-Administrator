@@ -48,6 +48,7 @@ export default function GlobalModal() {
     if (showCloseButton) {
         buttons.push({
             color: 'secondary',
+            variant: 'outline',
             onClick: () => dispatch(actions.resetState()),
             body: 'Close',
         });

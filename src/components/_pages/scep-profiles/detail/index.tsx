@@ -2,7 +2,6 @@ import AttributeViewer from 'components/Attributes/AttributeViewer';
 import CustomAttributeWidget from 'components/Attributes/CustomAttributeWidget';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
-import SwitchField from 'components/Input/SwitchField';
 import StatusBadge from 'components/StatusBadge';
 import Widget from 'components/Widget';
 
@@ -11,7 +10,6 @@ import CertificateStatus from 'components/_pages/certificates/CertificateStatus'
 
 import { actions, selectors } from 'ducks/scep-profiles';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 import ScepProfileForm from '../form';

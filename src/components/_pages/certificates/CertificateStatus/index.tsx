@@ -19,9 +19,10 @@ interface Props {
         | ComplianceRuleStatus
         | CertificateSubjectType;
     asIcon?: boolean;
+    badgeSize?: 'small' | 'medium' | 'large';
 }
 
-function CertificateStatus({ status, asIcon = false }: Props) {
+function CertificateStatus({ status, badgeSize = 'small', asIcon = false }: Props) {
     const getStatusText = useGetStatusText();
 
     const color = getCertificateStatusColor(status);
@@ -30,7 +31,9 @@ function CertificateStatus({ status, asIcon = false }: Props) {
     return asIcon ? (
         <span title={capitalize(text)} className="w-3 h-3 rounded-full inline-block" style={{ backgroundColor: color }} />
     ) : (
-        <Badge style={{ backgroundColor: color }}>{capitalize(text)}</Badge>
+        <Badge size={badgeSize} style={{ backgroundColor: color }}>
+            {capitalize(text)}
+        </Badge>
     );
 }
 

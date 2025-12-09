@@ -5,7 +5,7 @@ import { actions as settingsActions, selectors as settingsSelectors } from 'duck
 
 import { actions as resourceActions, selectors as resourceSelectors } from 'ducks/resource';
 import { useCallback, useEffect, useMemo } from 'react';
-import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 import Select from 'components/Select';
@@ -16,6 +16,7 @@ import { isObjectSame } from 'utils/common-utils';
 import { EventSettingsDto, PlatformEnum, Resource, ResourceEvent } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import TriggerEditorWidget from 'components/TriggerEditorWidget';
+import Label from 'components/Label';
 
 interface FormValues {
     event: string;
@@ -91,10 +92,9 @@ export default function EventForm() {
         control,
         formState: { isDirty, isSubmitting },
         setValue,
-        watch,
     } = methods;
 
-    const formValues = watch();
+    const formValues = useWatch({ control });
 
     const onSubmit = useCallback(
         (values: FormValues) => {
@@ -145,9 +145,9 @@ export default function EventForm() {
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                     <Widget title={'Edit Event'} busy={isBusy} widgetLockName={LockWidgetNameEnum.EventSettings}>
                         <div>
-                            <label htmlFor="event" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
+                            <Label htmlFor="event" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
                                 Event Name
-                            </label>
+                            </Label>
                             <Select
                                 id="event"
                                 value={formValues.event || ''}
@@ -159,9 +159,9 @@ export default function EventForm() {
                         </div>
 
                         <div>
-                            <label htmlFor="resource" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
+                            <Label htmlFor="resource" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
                                 Resource
-                            </label>
+                            </Label>
                             <Select
                                 id="resource"
                                 value={formValues.resource || ''}

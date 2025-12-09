@@ -131,7 +131,7 @@ const ExecutionsList = () => {
     return (
         <>
             <Widget
-                titleSize="larger"
+                titleSize="large"
                 title="Executions"
                 refreshAction={getFreshListActionGroups}
                 busy={isBusy}
@@ -140,6 +140,7 @@ const ExecutionsList = () => {
                     title: 'Information',
                     description: 'Executions is named set of execution items',
                 }}
+                noBorder
             >
                 <CustomTable
                     checkedRows={checkedRows}

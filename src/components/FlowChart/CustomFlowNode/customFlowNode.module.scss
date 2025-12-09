@@ -1,5 +1,3 @@
-@import '/src/resources/styles/app';
-
 .customNodeBackground {
     position: relative;
     background-color: white;
@@ -30,7 +28,7 @@
     display: flex;
     align-items: center;
     margin-bottom: 0.5rem;
-    color: $brand-primary;
+    color: #2798e7;
 }
 
 .handleUp {
@@ -46,14 +44,14 @@
 }
 
 .customNodeCardTitle {
-    color: $gray-500;
+    color: #6b7280;
     font-weight: bold;
     font-size: medium;
 }
 
 .entityLabel {
     font-weight: bold;
-    color: $gray-600 !important;
+    color: #4b5563 !important;
     font-size: medium;
     min-width: 0;
     flex-shrink: 1;
@@ -72,31 +70,31 @@
     overflow: auto;
     width: 100%;
     scrollbar-width: thin;
-    scrollbar-color: $gray-400 $gray-200;
+    scrollbar-color: #9ca3af #e5e7eb;
     &::-webkit-scrollbar {
         width: 8px;
         height: 8px;
     }
 
     &::-webkit-scrollbar-thumb {
-        background-color: $gray-400;
+        background-color: #9ca3af;
         border-radius: 4px;
     }
 
     &::-webkit-scrollbar-track {
-        background-color: $gray-200;
+        background-color: #e5e7eb;
         border-radius: 4px;
     }
 }
 
 .propertyName {
     font-weight: bold;
-    color: $gray-500;
+    color: #6b7280;
 }
 
 .propertyValue {
     font-weight: 500;
-    color: $gray-600;
+    color: #4b5563;
     word-wrap: break-word;
 }
 .mainNodeBody {
@@ -123,47 +121,47 @@
 
     border: none !important;
     &:hover {
-        background-color: #eb3349ec !important;
+        background-color: #ef4444ec !important;
         border: none;
     }
     &:active {
-        background-color: #eb3349d8 !important;
+        background-color: #ef4444d8 !important;
         border: none;
     }
 }
 
 .expiringStatus {
-    color: #f37d63;
-    border-color: #f37d63;
+    color: #eab308;
+    border-color: #eab308;
 }
 
 .expandButtonExpiring {
-    background-color: #f37d63a6 !important;
+    background-color: #eab308a6 !important;
     border: none !important;
     &:hover {
-        background-color: #f37d63ec !important;
+        background-color: #eab308ec !important;
         border: none;
     }
     &:active {
-        background-color: #f37d63d8 !important;
+        background-color: #eab308d8 !important;
         border: none;
     }
 }
 
 .expiredStatus {
-    color: #eb3349 !important;
-    border-color: #eb3349 !important;
+    color: #ef4444 !important;
+    border-color: #ef4444 !important;
 }
 
 .expandButtonExpired {
-    background-color: #eb3349a4 !important;
+    background-color: #ef4444a4 !important;
     border: none !important;
     &:hover {
-        background-color: #eb3349 !important;
+        background-color: #ef4444 !important;
         border: none;
     }
     &:active {
-        background-color: #eb3349 !important;
+        background-color: #ef4444 !important;
         border: none;
     }
 }
@@ -208,8 +206,8 @@
 
 .notCheckedStatus,
 .rulesGroupNodeStatus {
-    color: #7fa2c1 !important;
-    border-color: #7fa2c1 !important;
+    color: #2798e7 !important;
+    border-color: #2798e7 !important;
 }
 
 .expandButtonNotChecked,

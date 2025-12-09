@@ -3,6 +3,8 @@ import React, { useCallback, useState } from 'react';
 
 import Label from 'components/Label';
 import TextInput from 'components/TextInput';
+import TextArea from 'components/TextArea';
+import Button from 'components/Button';
 
 interface Props {
     onFileContentLoaded: (fileContent: string) => void;
@@ -66,8 +68,7 @@ export default function FileUpload({ id = '', fileType = '', editable, onFileCon
     const onFileDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => e.preventDefault(), []);
 
     const onFileInputTextChanged = useCallback(
-        (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-            const fileContentLatest = e.target.value;
+        (fileContentLatest: string) => {
             setFileContent(fileContentLatest);
 
             if (!fileContentLatest.length || fileContentLatest === fileContent) return;
@@ -79,14 +80,9 @@ export default function FileUpload({ id = '', fileType = '', editable, onFileCon
     );
 
     return (
-        <div
-            className="border-2 border-dashed border-gray-200 rounded-lg p-4 dark:border-neutral-700"
-            onDrop={onFileDrop}
-            onDragOver={onFileDragOver}
-        >
+        <div onDrop={onFileDrop} onDragOver={onFileDragOver}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
-                    <Label htmlFor={`${id}__fileUpload__fileName`}>File name</Label>
                     <TextInput
                         id={`${id}__fileUpload__fileName`}
                         type="text"
@@ -94,12 +90,11 @@ export default function FileUpload({ id = '', fileType = '', editable, onFileCon
                         disabled
                         value={fileName}
                         onChange={() => {}}
-                        className="text-center"
+                        label="File name"
                     />
                 </div>
 
                 <div>
-                    <Label htmlFor={`${id}__fileUpload__contentType`}>Content type</Label>
                     <TextInput
                         id={`${id}__fileUpload__contentType`}
                         type="text"
@@ -107,24 +102,22 @@ export default function FileUpload({ id = '', fileType = '', editable, onFileCon
                         disabled
                         value={contentType}
                         onChange={() => {}}
-                        className="text-center"
+                        label="Content type"
                     />
                 </div>
             </div>
 
             {showContent && (
                 <div className="mb-4">
-                    <Label htmlFor={`${id}__fileUpload__fileContent`}>File content</Label>
-                    <textarea
+                    <TextArea
                         id={`${id}__fileUpload__fileContent`}
+                        label="File content"
                         rows={3}
                         placeholder={`Select or drag & drop ${fileType} file or paste file content in the text area.`}
-                        readOnly={!editable}
+                        disabled={!editable}
                         value={fileContent}
                         onChange={onFileInputTextChanged}
-                        className={`py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600 ${
-                            !editable ? 'bg-gray-50 dark:bg-neutral-800' : ''
-                        }`}
+                        className={!editable ? 'bg-gray-50 dark:bg-neutral-800' : ''}
                     />
                 </div>
             )}
@@ -133,12 +126,11 @@ export default function FileUpload({ id = '', fileType = '', editable, onFileCon
                 Select or drag &amp; drop {fileType} file to drop zone or paste file content in the text area.
             </div>
             <div>
-                <label
-                    htmlFor={`${id}__fileUpload__file`}
-                    className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-lg hover:bg-gray-50 cursor-pointer dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
-                >
-                    Select file...
-                </label>
+                <Label htmlFor={`${id}__fileUpload__file`} className="cursor-pointer">
+                    <Button variant="transparent" color="secondary" onClick={() => {}} className="pointer-events-none">
+                        Select file...
+                    </Button>
+                </Label>
                 <input id={`${id}__fileUpload__file`} type="file" className="hidden" onChange={onFileChanged} />
             </div>
         </div>

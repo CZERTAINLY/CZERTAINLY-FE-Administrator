@@ -1,5 +1,7 @@
 import cn from 'classnames';
 import Label from 'components/Label';
+import DatePicker from 'components/DatePicker';
+import TextArea from 'components/TextArea';
 
 interface Props {
     value?: string;
@@ -8,7 +10,7 @@ interface Props {
     placeholder?: string;
     disabled?: boolean;
     id?: string;
-    type?: 'text' | 'number' | 'email' | 'password' | 'date' | 'time';
+    type?: 'text' | 'textarea' | 'number' | 'email' | 'password' | 'date' | 'time';
     invalid?: boolean;
     error?: string;
     label?: string;
@@ -30,6 +32,54 @@ function TextInput({
     className,
     required = false,
 }: Props) {
+    console.log('type', type);
+    if (type === 'date') {
+        return (
+            <>
+                {label && (
+                    <Label htmlFor={id} required={required}>
+                        {label}
+                    </Label>
+                )}
+                <DatePicker
+                    value={value}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    disabled={disabled}
+                    id={id}
+                    invalid={invalid}
+                    error={error}
+                    className={className}
+                    required={required}
+                />
+            </>
+        );
+    }
+
+    if (type === 'textarea') {
+        return (
+            <>
+                {label && (
+                    <Label htmlFor={id} required={required}>
+                        {label}
+                    </Label>
+                )}
+                <TextArea
+                    value={value}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    placeholder={placeholder}
+                    disabled={disabled}
+                    id={id}
+                    invalid={invalid}
+                    error={error}
+                    className={className}
+                    required={required}
+                />
+            </>
+        );
+    }
+
     return (
         <>
             {label && (

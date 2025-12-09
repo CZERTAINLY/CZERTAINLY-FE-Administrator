@@ -19,6 +19,7 @@ import { buildValidationRules } from 'utils/validators-helper';
 import { validateRequired } from 'utils/validators';
 import TabLayout from '../../Layout/TabLayout';
 import cn from 'classnames';
+import Label from 'components/Label';
 
 export enum Protocol {
     ACME = 'ACME',
@@ -244,9 +245,9 @@ export default function ProtocolActivationDialogBody({ protocol, raProfileUuid, 
                         rules={buildValidationRules([validateRequired()])}
                         render={({ field, fieldState }) => (
                             <div className="mb-4">
-                                <label htmlFor="profilesSelect" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
+                                <Label htmlFor="profilesSelect" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
                                     {`Select ${protocol} profile`}
-                                </label>
+                                </Label>
 
                                 <Select
                                     id="profilesSelect"

@@ -2,7 +2,6 @@ import Widget from 'components/Widget';
 import dagre from 'dagre';
 import { useCallback, useEffect } from 'react';
 
-import cx from 'classnames';
 import { actions as userInterfaceActions, selectors as userInterfaceSelectors } from 'ducks/user-interface';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -25,7 +24,6 @@ import 'reactflow/dist/style.css';
 import { CustomNodeData } from 'types/flowchart';
 import FloatingEdge from './CustomEdge';
 import CustomFlowNode from './CustomFlowNode';
-import style from './flowChart.module.scss';
 import LegendComponent from './LegendWidget';
 const nodeTypes = { customFlowNode: CustomFlowNode };
 
@@ -249,9 +247,9 @@ const FlowChartContent = ({
     }, [dispatch]);
 
     return (
-        <Widget className={style.flowWidget} busy={busy}>
-            {flowChartTitle && <h5 className="text-muted">{flowChartTitle}</h5>}
-            <div className={cx(style.flowChartContainer, style.floatingEdges)}>
+        <Widget busy={busy}>
+            {flowChartTitle && <h5 className="text-gray-500">{flowChartTitle}</h5>}
+            <div className="w-full h-[70vh]">
                 <ReactFlow
                     nodes={flowChartNodesState}
                     proOptions={{ hideAttribution: true }}
