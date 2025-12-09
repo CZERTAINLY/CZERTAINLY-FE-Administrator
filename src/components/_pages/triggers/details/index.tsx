@@ -20,7 +20,7 @@ import TextInput from 'components/TextInput';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { DeviceType, useDeviceType } from 'utils/common-hooks';
 import Breadcrumb from 'components/Breadcrumb';
-import { Check, X, Trash2, Rocket, Zap, Book } from 'lucide-react';
+import { Check, X, Trash2 } from 'lucide-react';
 import EditIcon from 'components/icons/EditIcon';
 
 interface SelectChangeValue {

@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import { ReactNode, cloneElement, isValidElement, useEffect } from 'react';
+import { ReactNode, useEffect } from 'react';
 
 // export type TooltipPlacement = 'top' | 'bottom' | 'left' | 'right' | 'auto';
 export type TooltipPlacement = 'bottom';

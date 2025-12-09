@@ -217,14 +217,6 @@ function DatePicker({ value, onChange, onBlur, disabled, id, invalid, error, cla
         }
     };
 
-    const handleMonthChange = (monthIndex: number) => {
-        setCurrentMonth(monthIndex);
-    };
-
-    const handleYearChange = (year: number) => {
-        setCurrentYear(year);
-    };
-
     const generateYearOptions = () => {
         const currentYearValue = new Date().getFullYear();
         const years = [];
@@ -256,8 +248,6 @@ function DatePicker({ value, onChange, onBlur, disabled, id, invalid, error, cla
 
         // Add days from next month to fill the grid
         const remainingCells = 42 - days.length; // 6 rows * 7 days = 42
-        const nextMonth = currentMonth === 11 ? 0 : currentMonth + 1;
-        const nextYear = currentMonth === 11 ? currentYear + 1 : currentYear;
         for (let day = 1; day <= remainingCells; day++) {
             days.push({ day, isCurrentMonth: false, isNextMonth: true });
         }
@@ -282,7 +272,6 @@ function DatePicker({ value, onChange, onBlur, disabled, id, invalid, error, cla
     };
 
     const calendarRows = renderCalendarDays();
-    const yearOptions = generateYearOptions();
 
     return (
         <div ref={containerRef} className={cn('relative', className)}>
@@ -394,7 +383,6 @@ function DatePicker({ value, onChange, onBlur, disabled, id, invalid, error, cla
                                 {row.map((dayInfo, dayIndex) => {
                                     const { day, isCurrentMonth } = dayInfo;
                                     const isSelected = isSelectedDate(day, isCurrentMonth);
-                                    const isTodayDate = isToday(day, isCurrentMonth);
 
                                     return (
                                         <div key={`${rowIndex}-${dayIndex}`}>

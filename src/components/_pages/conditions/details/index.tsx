@@ -11,7 +11,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 import Button from 'components/Button';
 import Container from 'components/Container';
-import TextInput from 'components/TextInput';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { Check, X } from 'lucide-react';
 import EditIcon from 'components/icons/EditIcon';

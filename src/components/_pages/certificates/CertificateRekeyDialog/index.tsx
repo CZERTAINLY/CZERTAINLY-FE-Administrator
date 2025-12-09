@@ -22,8 +22,6 @@ import { CertificateRequestFormat, KeyType } from 'types/openapi';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 import { buildValidationRules } from 'utils/validators-helper';
 import { validateRequired } from 'utils/validators';
-import cn from 'classnames';
-import Label from 'components/Label';
 
 import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from 'ducks/utilsActuator';
 import { ParseRequestRequestDtoParseTypeEnum } from 'types/openapi/utils';
