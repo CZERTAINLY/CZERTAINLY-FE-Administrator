@@ -46,7 +46,7 @@ function Header({ sidebarToggle }: Props) {
                                     xmlnsXlink="http://www.w3.org/1999/xlink"
                                     className="mr-3"
                                 >
-                                    <g clip-path="url(#clip0_221062_91352)">
+                                    <g clipPath="url(#clip0_221062_91352)">
                                         <rect width="38" height="38" fill="url(#pattern0_221062_91352)" />
                                     </g>
                                     <defs>

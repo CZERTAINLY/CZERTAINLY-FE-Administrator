@@ -5,12 +5,11 @@ import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import RoleForm from '../RoleForm';
 import RoleUsersForm from '../RoleUsersForm';
-import RolePermissionsForm from '../RolePermissionsForm';
 
 import { actions, selectors } from 'ducks/roles';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router';
+import { useParams, useNavigate } from 'react-router';
 
 import Badge from 'components/Badge';
 import { LockWidgetNameEnum } from 'types/user-interface';
@@ -18,7 +17,7 @@ import { PlatformEnum, Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import BooleanBadge from 'components/BooleanBadge/BooleanBadge';
 import { createWidgetDetailHeaders } from 'utils/widget';
-import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { selectors as enumSelectors } from 'ducks/enums';
 import Breadcrumb from 'components/Breadcrumb';
 import Container from 'components/Container';
 import Checkbox from 'components/Checkbox';
@@ -26,6 +25,7 @@ import Checkbox from 'components/Checkbox';
 export default function UserDetail() {
     const dispatch = useDispatch();
 
+    const navigate = useNavigate();
     const { id } = useParams();
 
     const role = useSelector(selectors.role);
@@ -38,7 +38,6 @@ export default function UserDetail() {
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
     const [isEditUsersModalOpen, setIsEditUsersModalOpen] = useState<boolean>(false);
-    const [isEditPermissionsModalOpen, setIsEditPermissionsModalOpen] = useState<boolean>(false);
 
     const memoizedRole = useMemo(() => role, [role]);
 
@@ -93,14 +92,8 @@ export default function UserDetail() {
     }, [getFreshDetails]);
 
     const onEditRolePermissionsClick = useCallback(() => {
-        setIsEditPermissionsModalOpen(true);
-    }, []);
-
-    const handleClosePermissionsModal = useCallback(() => {
-        setIsEditPermissionsModalOpen(false);
-        getFreshDetails();
-        getFreshPermissions();
-    }, [getFreshDetails, getFreshPermissions]);
+        navigate(`../../roles/permissions/${role?.uuid}`);
+    }, [navigate, role?.uuid]);
 
     const onDeleteConfirmed = useCallback(() => {
         if (!role) return;
@@ -268,7 +261,6 @@ export default function UserDetail() {
                           !resource.objects || resource.objects.length === 0
                               ? undefined
                               : [
-                                    <></>,
                                     resource.objects.map((object) => <div key={object.name}>{object.name}</div>),
                                     <></>,
                                     resource.objects.map((object) => (
@@ -336,7 +328,7 @@ export default function UserDetail() {
                             ) : (
                                 <>
                                     <p className="text-sm mt-4 mb-2">List of allowed resources</p>
-                                    <CustomTable headers={permsHeaders} data={permsData} hasDetails={true} />
+                                    <CustomTable headers={permsHeaders} data={permsData} detailHeaders={permsHeaders} hasDetails />
                                 </>
                             )}
                         </>
@@ -350,8 +342,8 @@ export default function UserDetail() {
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[
+                    { color: 'primary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                     { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
-                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
@@ -369,20 +361,6 @@ export default function UserDetail() {
                 caption="Edit Role Users"
                 size="xl"
                 body={<RoleUsersForm roleId={role?.uuid} onCancel={handleCloseUsersModal} onSuccess={handleCloseUsersModal} />}
-            />
-
-            <Dialog
-                isOpen={isEditPermissionsModalOpen}
-                toggle={handleClosePermissionsModal}
-                caption="Edit Role Permissions"
-                size="xl"
-                body={
-                    <RolePermissionsForm
-                        roleId={role?.uuid}
-                        onCancel={handleClosePermissionsModal}
-                        onSuccess={handleClosePermissionsModal}
-                    />
-                }
             />
         </div>
     );

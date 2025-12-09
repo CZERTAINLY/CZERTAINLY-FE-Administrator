@@ -6,21 +6,20 @@ import Container from 'components/Container';
 
 import ProgressButton from 'components/ProgressButton';
 import Widget from 'components/Widget';
+import { useNavigate, useParams } from 'react-router';
 
+import Breadcrumb from 'components/Breadcrumb';
 import { actions as authActions, selectors as authSelectors } from 'ducks/auth';
 import { actions as rolesActions, selectors as rolesSelectors } from 'ducks/roles';
 
 import { SubjectPermissionsModel } from 'types/roles';
 import RolePermissionsEditor from '../RolePermissionsEditor';
 
-interface RolePermissionsFormProps {
-    roleId?: string;
-    onCancel?: () => void;
-    onSuccess?: () => void;
-}
-
-function RolePermissionsForm({ roleId, onCancel, onSuccess }: RolePermissionsFormProps = {}) {
+function RolePermissionsForm() {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const { id } = useParams();
 
     const roleSelector = useSelector(rolesSelectors.role);
     const rolePermissionsSelector = useSelector(rolesSelectors.permissions);
@@ -48,28 +47,26 @@ function RolePermissionsForm({ roleId, onCancel, onSuccess }: RolePermissionsFor
 
     useEffect(() => {
         if (wasUpdating.current && !isUpdatingRolePermissions) {
-            if (onSuccess) {
-                onSuccess();
-            }
+            navigate(-1);
         }
         wasUpdating.current = isUpdatingRolePermissions;
-    }, [isUpdatingRolePermissions, onSuccess]);
+    }, [isUpdatingRolePermissions, navigate]);
 
     /* Load role && role permissions */
 
     useEffect(() => {
-        if (!roleId || (roleSelector && roleSelector.uuid === roleId)) return;
+        if (!id || (roleSelector && roleSelector.uuid === id)) return;
 
-        dispatch(rolesActions.getDetail({ uuid: roleId }));
-        dispatch(rolesActions.getPermissions({ uuid: roleId }));
-    }, [dispatch, roleId, roleSelector]);
+        dispatch(rolesActions.getDetail({ uuid: id }));
+        dispatch(rolesActions.getPermissions({ uuid: id }));
+    }, [dispatch, id, roleSelector]);
 
     /* Set role permissions */
 
     useEffect(() => {
-        if (!rolePermissionsSelector || rolePermissionsSelector.uuid !== roleId) return;
+        if (!rolePermissionsSelector || rolePermissionsSelector.uuid !== id) return;
         setPermissions(rolePermissionsSelector.permissions);
-    }, [roleId, rolePermissionsSelector]);
+    }, [id, rolePermissionsSelector]);
 
     const patchPermissions = useCallback(
         (outPerms: SubjectPermissionsModel) => {
@@ -98,19 +95,23 @@ function RolePermissionsForm({ roleId, onCancel, onSuccess }: RolePermissionsFor
     );
 
     const handleSubmit = useCallback(() => {
-        if (!roleId) return;
+        if (!id) return;
         const perms = patchPermissions(permissions!);
-        dispatch(rolesActions.updatePermissions({ uuid: roleId, permissions: perms }));
-    }, [dispatch, roleId, patchPermissions, permissions]);
+        dispatch(rolesActions.updatePermissions({ uuid: id, permissions: perms }));
+    }, [dispatch, id, patchPermissions, permissions]);
 
     const handleCancel = useCallback(() => {
-        if (onCancel) {
-            onCancel();
-        }
-    }, [onCancel]);
+        navigate(-1);
+    }, [navigate]);
 
     return (
-        <Container className="fixed-screen-height-container">
+        <>
+            <Breadcrumb
+                items={[
+                    { label: 'Roles', href: '/roles' },
+                    { label: roleSelector?.name || 'Role Permissions', href: '' },
+                ]}
+            />
             <Widget
                 title={`${roleSelector?.name || ''} Role Permissions`}
                 busy={isFetchingRoleDetail || isFetchingPermissions || isFetchingResources || isUpdatingRolePermissions}
@@ -123,7 +124,10 @@ function RolePermissionsForm({ roleId, onCancel, onSuccess }: RolePermissionsFor
                         setPermissions(perms);
                     }}
                     submitButtonsGroup={
-                        <div className="flex gap-2">
+                        <Container className="flex-row justify-end" gap={4}>
+                            <Button variant="outline" onClick={handleCancel} disabled={isCreatingRole || isUpdatingRole}>
+                                Cancel
+                            </Button>
                             <ProgressButton
                                 title="Save"
                                 inProgressTitle="Saving..."
@@ -131,15 +135,11 @@ function RolePermissionsForm({ roleId, onCancel, onSuccess }: RolePermissionsFor
                                 disabled={isCreatingRole || isUpdatingRole || roleSelector?.systemRole}
                                 onClick={handleSubmit}
                             />
-
-                            <Button variant="outline" onClick={handleCancel} disabled={isCreatingRole || isUpdatingRole}>
-                                Cancel
-                            </Button>
-                        </div>
+                        </Container>
                     }
                 />
             </Widget>
-        </Container>
+        </>
     );
 }
 

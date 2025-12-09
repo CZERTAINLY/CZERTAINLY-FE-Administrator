@@ -7,7 +7,6 @@ import Pagination from 'components/Pagination';
 import Checkbox from 'components/Checkbox';
 import Dialog from 'components/Dialog';
 import Button from 'components/Button';
-import { ChevronDown, ChevronUp } from 'lucide-react';
 import cn from 'classnames';
 
 export interface TableHeader {
@@ -53,6 +52,7 @@ interface Props {
     onPageChanged?: (page: number) => void;
     newRowWidgetProps?: NewRowWidgetProps;
     columnForDetail?: string;
+    detailHeaders?: TableHeader[];
 }
 
 const emptyCheckedRows: (string | number)[] = [];
@@ -73,6 +73,7 @@ function CustomTable({
     onPageSizeChanged,
     onPageChanged,
     newRowWidgetProps,
+    detailHeaders,
     columnForDetail,
 }: Props) {
     const [tblHeaders, setTblHeaders] = useState<TableHeader[]>();
@@ -478,24 +479,31 @@ function CustomTable({
             return null;
         }
 
-        // Create default headers without using parent table headers
-        const detailHeaders: TableHeader[] = detailDialogRow.detailColumns.map((_, index) => ({
-            id: `detail-${index}`,
-            content: '',
-            sortable: false,
-        }));
+        const detailTableHeaders: TableHeader[] =
+            detailHeaders && detailHeaders.length === detailDialogRow.detailColumns.length
+                ? detailHeaders
+                : detailDialogRow.detailColumns.map((_, index) => ({
+                      id: `detail-${index}`,
+                      content: '',
+                      sortable: false,
+                  }));
 
-        // Create data rows for detail table - if detailColumns.length === 1, it spans all columns
-        // Otherwise, each detailColumn maps to its corresponding column
+        const processedColumns = detailDialogRow.detailColumns.map((col, index) => {
+            if (Array.isArray(col)) {
+                return <div key={`detail-col-${index}`}>{col}</div>;
+            }
+            return col;
+        });
+
         const detailData: TableDataRow[] = [
             {
                 id: 'detail-row',
-                columns: detailDialogRow.detailColumns,
+                columns: processedColumns,
             },
         ];
 
-        return <CustomTable headers={detailHeaders} data={detailData} hasHeader={false} hasPagination={false} />;
-    }, [detailDialogRow]);
+        return <CustomTable headers={detailTableHeaders} data={detailData} hasHeader={!!detailHeaders} hasPagination={false} />;
+    }, [detailDialogRow, detailHeaders]);
 
     return (
         <div data-testid="custom-table">

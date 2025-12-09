@@ -10,12 +10,13 @@ import RolePermissionsForm from '../RolePermissionsForm';
 import { actions, selectors } from 'ducks/roles';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import Badge from 'components/Badge';
 
 export default function RolesList() {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const checkedRows = useSelector(selectors.rolesListCheckedRows);
     const roles = useSelector(selectors.roles);
@@ -31,7 +32,6 @@ export default function RolesList() {
     const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
     const [editingRoleId, setEditingRoleId] = useState<string | undefined>(undefined);
     const [isEditUsersModalOpen, setIsEditUsersModalOpen] = useState<boolean>(false);
-    const [isEditPermissionsModalOpen, setIsEditPermissionsModalOpen] = useState<boolean>(false);
     const [selectedRoleId, setSelectedRoleId] = useState<string | undefined>(undefined);
 
     const getFreshData = useCallback(() => {
@@ -89,15 +89,8 @@ export default function RolesList() {
 
     const onEditRolePermissionsClick = useCallback(() => {
         if (checkedRows.length !== 1) return;
-        setSelectedRoleId(checkedRows[0]);
-        setIsEditPermissionsModalOpen(true);
-    }, [checkedRows]);
-
-    const handleClosePermissionsModal = useCallback(() => {
-        setIsEditPermissionsModalOpen(false);
-        setSelectedRoleId(undefined);
-        getFreshData();
-    }, [getFreshData]);
+        navigate(`./permissions/${checkedRows[0]}`);
+    }, [checkedRows, navigate]);
 
     const onDeleteConfirmed = useCallback(() => {
         setConfirmDelete(false);
@@ -256,20 +249,6 @@ export default function RolesList() {
                 caption="Edit Role Users"
                 size="xl"
                 body={<RoleUsersForm roleId={selectedRoleId} onCancel={handleCloseUsersModal} onSuccess={handleCloseUsersModal} />}
-            />
-
-            <Dialog
-                isOpen={isEditPermissionsModalOpen}
-                toggle={handleClosePermissionsModal}
-                caption="Edit Role Permissions"
-                size="xl"
-                body={
-                    <RolePermissionsForm
-                        roleId={selectedRoleId}
-                        onCancel={handleClosePermissionsModal}
-                        onSuccess={handleClosePermissionsModal}
-                    />
-                }
             />
         </div>
     );
