@@ -3,6 +3,7 @@ import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import Checkbox from 'components/Checkbox';
 import Button from 'components/Button';
+import SimpleBar from 'simplebar-react';
 import { Plus, Trash2, Check, X } from 'lucide-react';
 
 import { actions as authActions, selectors as authSelectors } from 'ducks/auth';
@@ -497,7 +498,9 @@ function RolePermissionsEditor({
 
             <div className="flex gap-4">
                 <div className="w-46 flex-shrink-0">
-                    <div className="space-y-2 max-h-[calc(100vh-400px)] overflow-y-auto">{resourceList}</div>
+                    <SimpleBar forceVisible="y" style={{ maxHeight: 'calc(100vh - 420px)' }}>
+                        <div className="space-y-2">{resourceList}</div>
+                    </SimpleBar>
                 </div>
 
                 <div className="flex-1 min-w-0">

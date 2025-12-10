@@ -7,6 +7,7 @@ import Pagination from 'components/Pagination';
 import Checkbox from 'components/Checkbox';
 import Dialog from 'components/Dialog';
 import Button from 'components/Button';
+import SimpleBar from 'simplebar-react';
 import cn from 'classnames';
 
 export interface TableHeader {
@@ -522,20 +523,22 @@ function CustomTable({
             )}
             {body?.length > 0 && (
                 <div className="py-2">
-                    <div className={cn('overflow-x-auto rounded-md', { 'border border-gray-100': hasHeader })}>
-                        <div className="min-w-full inline-block align-middle">
-                            <div className="overflow-hidden">
-                                <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-700 bg-white">
-                                    {hasHeader && (
-                                        <thead className="bg-gray-50 dark:bg-neutral-700">
-                                            <tr>{header}</tr>
-                                        </thead>
-                                    )}
-                                    <tbody className="divide-y divide-gray-200 dark:divide-neutral-700">{body}</tbody>
-                                </table>
+                    <SimpleBar forceVisible="x">
+                        <div className={cn('rounded-md', { 'border border-gray-100': hasHeader })}>
+                            <div className="min-w-full inline-block align-middle">
+                                <div className="overflow-hidden">
+                                    <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-700 bg-white">
+                                        {hasHeader && (
+                                            <thead className="bg-gray-50 dark:bg-neutral-700">
+                                                <tr>{header}</tr>
+                                            </thead>
+                                        )}
+                                        <tbody className="divide-y divide-gray-200 dark:divide-neutral-700">{body}</tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </SimpleBar>
                 </div>
             )}
             {hasPagination && (
