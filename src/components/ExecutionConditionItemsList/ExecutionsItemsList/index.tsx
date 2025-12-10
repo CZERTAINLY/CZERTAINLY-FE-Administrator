@@ -1,4 +1,3 @@
-import cx from 'classnames';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { EntityType, selectors } from 'ducks/filters';
 import { selectors as rulesSelectors } from 'ducks/rules';
@@ -100,7 +99,7 @@ const ExecutionsItemsList = ({
             return (
                 <Badge key={i.toString() + label + value}>
                     <>
-                        <b>{f?.fieldSource && getEnumLabel(searchGroupEnum, f?.fieldSource)}&nbsp;</b>'{label}
+                        {f?.fieldSource && getEnumLabel(searchGroupEnum, f?.fieldSource)}&nbsp;'{label}
                         '&nbsp;to&nbsp;
                         {value}
                     </>
@@ -115,7 +114,7 @@ const ExecutionsItemsList = ({
             return (
                 <Badge key={i.toString() + f.notificationProfileUuid}>
                     <span>Send notifications to:&nbsp;</span>
-                    <b>{f.notificationProfileName}&nbsp;</b>
+                    {f.notificationProfileName}&nbsp;
                 </Badge>
             );
         });
@@ -185,7 +184,7 @@ const ExecutionsItemsList = ({
             return (
                 <div key={i.toString() + label + value} className="mt-2 mr-1">
                     <span>
-                        <b>{f?.fieldSource && getEnumLabel(searchGroupEnum, f?.fieldSource)}&nbsp;</b>'{label}
+                        {f?.fieldSource && getEnumLabel(searchGroupEnum, f?.fieldSource)}&nbsp;'{label}
                         '&nbsp;to&nbsp;
                         {value}
                     </span>
@@ -200,7 +199,7 @@ const ExecutionsItemsList = ({
                 <div key={i} className="mt-2 mr-1">
                     <span>
                         <span>Send notifications to:&nbsp;</span>
-                        <b>{f.notificationProfileName}&nbsp;</b>
+                        {f.notificationProfileName}&nbsp;
                     </span>
                 </div>
             );
@@ -217,17 +216,17 @@ const ExecutionsItemsList = ({
         }
     }, [executionType, renderSmallerSendNotificationExecutionsBadges, renderSmallerSetFieldExecutionsBadges]);
 
-    if (isLoading) return <Spinner color="gray" active={isFetchingConditionDetails} />;
+    if (isLoading) return <Spinner active={isFetchingConditionDetails} />;
 
     return smallerBadges ? (
-        <div>
+        <div className="flex gap-2 items-center">
             <h6 className="text-gray-500">{`${executionName}'s Execution Items`}</h6>
             <div className="flex flex-wrap">{renderSmallerExecutionsBadges()}</div>
         </div>
     ) : (
-        <div key={executionUuid}>
+        <div key={executionUuid} className="flex gap-2 items-center">
             <h6 className="text-gray-500">{`${executionName}`}</h6>
-            <div className="ml-3">{renderActionBadges()}</div>
+            {renderActionBadges()}
         </div>
     );
 };

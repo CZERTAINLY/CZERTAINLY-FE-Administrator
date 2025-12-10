@@ -1283,14 +1283,7 @@ export default function CertificateDetail() {
                 toggle={() => setIsAddingRelatedCertificate(false)}
                 buttons={[]}
                 body={
-                    <form
-                        onSubmit={(e) => {
-                            e.preventDefault();
-                            if (selectedCertificate) {
-                                onCertificateAssociate(id, selectedCertificate);
-                            }
-                        }}
-                    >
+                    <>
                         <CertificateList
                             hideAdditionalButtons={true}
                             hideWidgetButtons={true}
@@ -1301,20 +1294,26 @@ export default function CertificateDetail() {
                             }}
                             withPreservedFilters={false}
                         />
-                        <div className="flex items-center gap-2" style={{ padding: '0 30px' }}>
+                        <Container className="flex-row justify-end modal-footer" gap={4}>
                             <ProgressButton
                                 title="Add"
                                 inProgressTitle="Adding..."
                                 inProgress={false}
                                 disabled={!selectedCertificate || isAlreadyRelatedError}
+                                type="button"
+                                onClick={() => {
+                                    if (selectedCertificate) {
+                                        onCertificateAssociate(id, selectedCertificate);
+                                    }
+                                }}
                             />
 
                             <Button variant="outline" color="secondary" onClick={() => setIsAddingRelatedCertificate(false)} type="button">
                                 Cancel
                             </Button>
-                        </div>
+                        </Container>
                         {isAlreadyRelatedError ? <span className="text-red-600">Certificate is already related</span> : null}
-                    </form>
+                    </>
                 }
             />
 

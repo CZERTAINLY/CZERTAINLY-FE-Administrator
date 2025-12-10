@@ -81,7 +81,7 @@ export const renderConditionItems = (
         if (variant === 'badge') {
             return (
                 <Badge key={condition.fieldIdentifier} title={title} className={className} style={style}>
-                    <b>{getEnumLabel(searchGroupEnum, condition.fieldSource)}&nbsp;</b>'{label}'&nbsp;
+                    {getEnumLabel(searchGroupEnum, condition.fieldSource)}&nbsp;'{label}'&nbsp;
                     {getEnumLabel(filterConditionOperatorEnum, condition.operator)}&nbsp;
                     {value}
                 </Badge>
@@ -91,7 +91,7 @@ export const renderConditionItems = (
         return (
             <div key={condition.fieldIdentifier} className="mt-2 mr-1" style={style}>
                 <span title={title} className={className}>
-                    <b>{getEnumLabel(searchGroupEnum, condition.fieldSource)}&nbsp;</b>'{label}'&nbsp;
+                    {getEnumLabel(searchGroupEnum, condition.fieldSource)}&nbsp;'{label}'&nbsp;
                     {getEnumLabel(filterConditionOperatorEnum, condition.operator)}&nbsp;
                     {value}
                 </span>

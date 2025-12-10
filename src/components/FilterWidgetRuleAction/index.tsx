@@ -561,40 +561,36 @@ export default function FilterWidgetRuleAction({
         <>
             <Widget title={title} busy={isFetchingAvailableFilters} titleSize="large">
                 <div id="unselectFilters" onClick={onUnselectFiltersClick}>
-                    <div style={{ width: '99%', borderBottom: 'solid 1px silver', marginBottom: '1rem' }}>
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <div>
-                                <Label htmlFor="groupSelect">Field Source</Label>
-                                <Select
-                                    id="group"
-                                    options={availableFilters.map((f) => ({
-                                        label: getEnumLabel(searchGroupEnum, f.filterFieldSource),
-                                        value: f.filterFieldSource,
-                                    }))}
-                                    onChange={(value) => {
-                                        setFieldSource((value as FilterFieldSource) || undefined);
-                                        setFilterField(undefined);
-                                        setFilterValue(undefined);
-                                    }}
-                                    value={fieldSource || ''}
-                                    isClearable={true}
-                                />
-                            </div>
+                    <div className="flex flex-row gap-2 mb-4 items-end">
+                        <div className="grid grid-cols-4 gap-2 w-full">
+                            <Select
+                                id="group"
+                                options={availableFilters.map((f) => ({
+                                    label: getEnumLabel(searchGroupEnum, f.filterFieldSource),
+                                    value: f.filterFieldSource,
+                                }))}
+                                onChange={(value) => {
+                                    setFieldSource((value as FilterFieldSource) || undefined);
+                                    setFilterField(undefined);
+                                    setFilterValue(undefined);
+                                }}
+                                value={fieldSource || ''}
+                                isClearable
+                                label="Field Source"
+                            />
 
-                            <div>
-                                <Label htmlFor="fieldSelect">Field</Label>
-                                <Select
-                                    id="field"
-                                    options={currentFields?.map((f) => ({ label: f.fieldLabel, value: f.fieldIdentifier }))}
-                                    onChange={(value) => {
-                                        setFilterField((value as string) || undefined);
-                                        setFilterValue(undefined);
-                                    }}
-                                    value={filterField || ''}
-                                    isDisabled={!fieldSource}
-                                    isClearable={true}
-                                />
-                            </div>
+                            <Select
+                                id="field"
+                                options={currentFields?.map((f) => ({ label: f.fieldLabel, value: f.fieldIdentifier }))}
+                                onChange={(value) => {
+                                    setFilterField((value as string) || undefined);
+                                    setFilterValue(undefined);
+                                }}
+                                value={filterField || ''}
+                                isDisabled={!fieldSource}
+                                isClearable
+                                label="Field"
+                            />
 
                             <div>
                                 <Label htmlFor="valueSelect">Value</Label>
@@ -636,61 +632,70 @@ export default function FilterWidgetRuleAction({
                             </div>
 
                             <div className="flex items-end">
-                                <Button className="w-full" color="primary" onClick={onUpdateClick} disabled={isUpdateButtonDisabled}>
+                                <Button
+                                    color="primary"
+                                    className="py-3 min-w-[62px]"
+                                    onClick={onUpdateClick}
+                                    disabled={isUpdateButtonDisabled}
+                                >
                                     {selectedFilter.filterNumber === -1 ? 'Add' : 'Update'}
                                 </Button>
                             </div>
                         </div>
                     </div>
 
-                    {actions.map((f, i) => {
-                        const field = availableFilters
-                            .find((a) => a.filterFieldSource === f.fieldSource)
-                            ?.searchFieldData?.find((s) => s.fieldIdentifier === f.fieldIdentifier);
-                        const label = field ? field.fieldLabel : f.fieldIdentifier;
-                        const value =
-                            field && field.type === FilterFieldType.Boolean
-                                ? `'${booleanOptions.find((b) => !!f.data === b.value)?.label}'`
-                                : Array.isArray(f.data)
-                                  ? `${f.data
-                                        .map(
-                                            (v) =>
-                                                `'${
-                                                    field?.platformEnum
-                                                        ? platformEnums[field.platformEnum][v]?.label
-                                                        : v?.name
-                                                          ? v.name
-                                                          : field && checkIfFieldAttributeTypeIsDate(field)
-                                                            ? v?.label
-                                                                ? getFormattedDateTime(v?.label)
-                                                                : getFormattedDateTime(v)
-                                                            : v?.label
-                                                              ? v.label
-                                                              : v
-                                                }'`,
-                                        )
-                                        .join(', ')}`
-                                  : f.data
-                                    ? `'${
-                                          field?.platformEnum
-                                              ? platformEnums[field.platformEnum][f.data as unknown as string]?.label
-                                              : field && field.attributeContentType === AttributeContentType.Date
-                                                ? getFormattedDate(f.data as unknown as string)
-                                                : field && field.attributeContentType === AttributeContentType.Datetime
-                                                  ? getFormattedDateTime(f.data as unknown as string)
-                                                  : f.data
-                                      }'`
-                                    : '';
-                        return (
-                            <Badge
-                                key={i}
-                                onClick={() => toggleFilter(i)}
-                                color={selectedFilter.filterNumber === i ? 'primary' : 'secondary'}
-                            >
-                                {!isFetchingAvailableFilters && !busyBadges && <>{renderBadgeContent(i, value, label, f.fieldSource)}</>}
-                            </Badge>
-                        );
-                    })}
+                    <div className="flex gap-2">
+                        {actions.map((f, i) => {
+                            const field = availableFilters
+                                .find((a) => a.filterFieldSource === f.fieldSource)
+                                ?.searchFieldData?.find((s) => s.fieldIdentifier === f.fieldIdentifier);
+                            const label = field ? field.fieldLabel : f.fieldIdentifier;
+                            const value =
+                                field && field.type === FilterFieldType.Boolean
+                                    ? `'${booleanOptions.find((b) => !!f.data === b.value)?.label}'`
+                                    : Array.isArray(f.data)
+                                      ? `${f.data
+                                            .map(
+                                                (v) =>
+                                                    `'${
+                                                        field?.platformEnum
+                                                            ? platformEnums[field.platformEnum][v]?.label
+                                                            : v?.name
+                                                              ? v.name
+                                                              : field && checkIfFieldAttributeTypeIsDate(field)
+                                                                ? v?.label
+                                                                    ? getFormattedDateTime(v?.label)
+                                                                    : getFormattedDateTime(v)
+                                                                : v?.label
+                                                                  ? v.label
+                                                                  : v
+                                                    }'`,
+                                            )
+                                            .join(', ')}`
+                                      : f.data
+                                        ? `'${
+                                              field?.platformEnum
+                                                  ? platformEnums[field.platformEnum][f.data as unknown as string]?.label
+                                                  : field && field.attributeContentType === AttributeContentType.Date
+                                                    ? getFormattedDate(f.data as unknown as string)
+                                                    : field && field.attributeContentType === AttributeContentType.Datetime
+                                                      ? getFormattedDateTime(f.data as unknown as string)
+                                                      : f.data
+                                          }'`
+                                        : '';
+                            return (
+                                <Badge
+                                    key={i}
+                                    onClick={() => toggleFilter(i)}
+                                    color={selectedFilter.filterNumber === i ? 'primary' : 'secondary'}
+                                >
+                                    {!isFetchingAvailableFilters && !busyBadges && (
+                                        <>{renderBadgeContent(i, value, label, f.fieldSource)}</>
+                                    )}
+                                </Badge>
+                            );
+                        })}
+                    </div>
                 </div>
             </Widget>
         </>

@@ -657,74 +657,78 @@ export default function FilterWidget({
                             {selectedFilter === -1 ? 'Add' : 'Update'}
                         </Button>
                     </div>
-                    {currentFilters.map((f, i) => {
-                        const field = availableFilters
-                            .find((a) => a.filterFieldSource === f.fieldSource)
-                            ?.searchFieldData?.find((s) => s.fieldIdentifier === f.fieldIdentifier);
-                        const label = field ? field.fieldLabel : f.fieldIdentifier;
-                        let value = '';
+                    <div className="flex gap-2">
+                        {currentFilters.map((f, i) => {
+                            const field = availableFilters
+                                .find((a) => a.filterFieldSource === f.fieldSource)
+                                ?.searchFieldData?.find((s) => s.fieldIdentifier === f.fieldIdentifier);
+                            const label = field ? field.fieldLabel : f.fieldIdentifier;
+                            let value = '';
 
-                        function mapArrayValue(v: any) {
-                            if (field?.platformEnum) {
-                                return platformEnums[field.platformEnum][v]?.label;
+                            function mapArrayValue(v: any) {
+                                if (field?.platformEnum) {
+                                    return platformEnums[field.platformEnum][v]?.label;
+                                }
+                                if (v?.name) return v.name;
+                                if (field?.type && checkIfFieldTypeIsDate(field.type) && checkIfFieldOperatorIsInterval(f.condition))
+                                    return getIso8601StringFromDurationString(v as string);
+                                if (field && field?.attributeContentType === AttributeContentType.Date) return getFormattedDate(v);
+                                if (field && field?.attributeContentType === AttributeContentType.Datetime) return getFormattedDateTime(v);
+                                return v;
                             }
-                            if (v?.name) return v.name;
-                            if (field?.type && checkIfFieldTypeIsDate(field.type) && checkIfFieldOperatorIsInterval(f.condition))
-                                return getIso8601StringFromDurationString(v as string);
-                            if (field && field?.attributeContentType === AttributeContentType.Date) return getFormattedDate(v);
-                            if (field && field?.attributeContentType === AttributeContentType.Datetime) return getFormattedDateTime(v);
-                            return v;
-                        }
 
-                        function mapValue() {
-                            if (!f.value) {
-                                return '';
-                            }
-                            if (typeof f.value === 'number') {
+                            function mapValue() {
+                                if (!f.value) {
+                                    return '';
+                                }
+                                if (typeof f.value === 'number') {
+                                    return f.value;
+                                }
+                                if (field?.type && checkIfFieldTypeIsDate(field.type) && checkIfFieldOperatorIsInterval(f.condition)) {
+                                    return getDurationStringFromIso8601String(f.value as unknown as string);
+                                }
+                                if (field?.platformEnum) {
+                                    return platformEnums[field.platformEnum][f.value as unknown as string]?.label;
+                                }
+                                if (
+                                    (field && field?.attributeContentType === AttributeContentType.Date) ||
+                                    (field?.type === FilterFieldType.Date && field?.attributeContentType !== AttributeContentType.Datetime)
+                                ) {
+                                    return getFormattedDate(f.value as unknown as string);
+                                }
+                                if (
+                                    (field && field?.attributeContentType === AttributeContentType.Datetime) ||
+                                    field?.type === FilterFieldType.Datetime
+                                ) {
+                                    return getFormattedDateTime(f.value as unknown as string);
+                                }
                                 return f.value;
                             }
-                            if (field?.type && checkIfFieldTypeIsDate(field.type) && checkIfFieldOperatorIsInterval(f.condition)) {
-                                return getDurationStringFromIso8601String(f.value as unknown as string);
+                            if (field && field.type === FilterFieldType.Boolean) {
+                                value = `'${booleanOptions.find((b) => !!f.value === b.value)?.label}'`;
+                            } else if (Array.isArray(f.value)) {
+                                value = `'${f.value.map((v) => mapArrayValue(v)).join(' OR ')}'`;
+                            } else {
+                                value = `'${mapValue()}'`;
                             }
-                            if (field?.platformEnum) {
-                                return platformEnums[field.platformEnum][f.value as unknown as string]?.label;
-                            }
-                            if (
-                                (field && field?.attributeContentType === AttributeContentType.Date) ||
-                                (field?.type === FilterFieldType.Date && field?.attributeContentType !== AttributeContentType.Datetime)
-                            ) {
-                                return getFormattedDate(f.value as unknown as string);
-                            }
-                            if (
-                                (field && field?.attributeContentType === AttributeContentType.Datetime) ||
-                                field?.type === FilterFieldType.Datetime
-                            ) {
-                                return getFormattedDateTime(f.value as unknown as string);
-                            }
-                            return f.value;
-                        }
-                        if (field && field.type === FilterFieldType.Boolean) {
-                            value = `'${booleanOptions.find((b) => !!f.value === b.value)?.label}'`;
-                        } else if (Array.isArray(f.value)) {
-                            value = `'${f.value.map((v) => mapArrayValue(v)).join(' OR ')}'`;
-                        } else {
-                            value = `'${mapValue()}'`;
-                        }
-                        return (
-                            <Badge
-                                key={f.fieldIdentifier + i}
-                                onClick={() => toggleFilter(i)}
-                                color={selectedFilter === i ? 'primary' : 'secondary'}
-                                onRemove={() => {
-                                    if (disableBadgeRemove) return;
-                                    onRemoveFilterClick(i);
-                                }}
-                                size="medium"
-                            >
-                                {!isFetchingAvailableFilters && !busyBadges && getBadgeContent(i, f.fieldSource, f.condition, label, value)}
-                            </Badge>
-                        );
-                    })}
+                            return (
+                                <Badge
+                                    key={f.fieldIdentifier + i}
+                                    onClick={() => toggleFilter(i)}
+                                    color={selectedFilter === i ? 'primary' : 'secondary'}
+                                    onRemove={() => {
+                                        if (disableBadgeRemove) return;
+                                        onRemoveFilterClick(i);
+                                    }}
+                                    size="medium"
+                                >
+                                    {!isFetchingAvailableFilters &&
+                                        !busyBadges &&
+                                        getBadgeContent(i, f.fieldSource, f.condition, label, value)}
+                                </Badge>
+                            );
+                        })}
+                    </div>
                 </div>
                 {extraFilterComponent && (
                     <>

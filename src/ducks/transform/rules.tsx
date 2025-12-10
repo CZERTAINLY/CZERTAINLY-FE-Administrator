@@ -590,13 +590,15 @@ export function useTransformTriggerObjectToNodesAndEdges(
                                 {
                                     propertyName: 'Condition Items',
                                     propertyContent: (
-                                        <ConditionsItemsList
-                                            conditionName={condition.name}
-                                            conditionUuid={condition.uuid}
-                                            conditionItems={condition.items}
-                                            key={condition.uuid}
-                                            smallerBadges
-                                        />
+                                        <div className="flex flex-col gap-2">
+                                            <ConditionsItemsList
+                                                conditionName={condition.name}
+                                                conditionUuid={condition.uuid}
+                                                conditionItems={condition.items}
+                                                key={condition.uuid}
+                                                smallerBadges
+                                            />
+                                        </div>
                                     ),
                                 },
                             ],
@@ -741,14 +743,16 @@ export function useTransformTriggerObjectToNodesAndEdges(
                                 {
                                     propertyName: 'Execution Items',
                                     propertyContent: (
-                                        <ExecutionsItemsList
-                                            executionItems={execution.items}
-                                            key={execution.uuid}
-                                            executionName={execution.name}
-                                            executionType={execution.type}
-                                            executionUuid={execution.uuid}
-                                            smallerBadges
-                                        />
+                                        <div className="flex flex-col gap-2">
+                                            <ExecutionsItemsList
+                                                executionItems={execution.items}
+                                                key={execution.uuid}
+                                                executionName={execution.name}
+                                                executionType={execution.type}
+                                                executionUuid={execution.uuid}
+                                                smallerBadges
+                                            />
+                                        </div>
                                     ),
                                 },
                             ],

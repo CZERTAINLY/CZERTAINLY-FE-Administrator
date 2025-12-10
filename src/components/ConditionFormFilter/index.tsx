@@ -33,7 +33,7 @@ const ConditionFormFilter = ({ resource, formType, includeIgnoreAction }: Condit
             <div>
                 <FilterWidgetRuleAction
                     entity={EntityType.ACTIONS}
-                    title={'Execution Items'}
+                    title="Execution Items"
                     getAvailableFiltersApi={(apiClients: ApiClients) =>
                         apiClients.resources.listResourceRuleFilterFields({
                             resource,

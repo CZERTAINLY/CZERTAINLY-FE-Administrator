@@ -32,24 +32,18 @@ const LegendComponent: React.FC<LegendComponentProps> = ({ legends }) => {
     if (!legends.length) return null;
 
     return (
-        <div>
-            <div>
-                {legends.map((legend, index) => {
-                    const IconComponent = iconMap[legend.icon];
-                    return (
-                        <div key={index}>
-                            <div style={{ color: legend.color }} onClick={legend.onClick}>
-                                {IconComponent ? (
-                                    <IconComponent size={16} color={legend.color} />
-                                ) : (
-                                    <i className={legend.icon} style={{ padding: '5px' }} />
-                                )}
-                            </div>
-                            <span>{legend.label}</span>
+        <div className="flex gap-4 justify-end">
+            {legends.map((legend, index) => {
+                const IconComponent = iconMap[legend.icon];
+                return (
+                    <div key={index} className="flex items-center gap-2">
+                        <div style={{ color: legend.color }} onClick={legend.onClick}>
+                            {IconComponent ? <IconComponent size={16} color={legend.color} /> : 'No icon'}
                         </div>
-                    );
-                })}
-            </div>
+                        <span>{legend.label}</span>
+                    </div>
+                );
+            })}
         </div>
     );
 };
