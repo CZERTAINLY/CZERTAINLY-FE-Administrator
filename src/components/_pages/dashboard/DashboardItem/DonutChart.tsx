@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { SearchFilterModel } from 'types/certificate';
 import { DashboardDict } from 'types/statisticsDashboard';
-import { getValues, useGetLabels } from 'utils/dashboard';
+import { getValues, useGetLabels, getDefaultColors } from 'utils/dashboard';
 
 export interface ColorOptions {
     colors: string[];
@@ -40,7 +40,7 @@ function DonutChart({ title, colorOptions, data = {}, entity, redirect, onSetFil
             width: 100,
             height: 100,
             toolbar: {
-                show: true,
+                show: false,
                 offsetX: 0,
                 offsetY: -40,
                 tools: {
@@ -58,20 +58,47 @@ function DonutChart({ title, colorOptions, data = {}, entity, redirect, onSetFil
             },
         },
         legend: {
-            show: true,
-            fontSize: '16px',
-            fontWeight: 500,
-            // labels: {
-            //   colors: '#e5e7eb',   // tailwind slate-200-ish
-            // },
-            markers: {
-                size: 4,
-                offsetX: -10,
+            show: false,
+        },
+        plotOptions: {
+            pie: {
+                expandOnClick: false,
             },
         },
         tooltip: {
-            marker: {
-                show: true,
+            enabled: true,
+            custom: function ({ series, seriesIndex, dataPointIndex, w }: any) {
+                const label = w.globals.labels[seriesIndex];
+                const value = series[seriesIndex];
+                const color = w.globals.colors[seriesIndex];
+
+                return `
+                    <div class="py-1 px-2 bg-[var(--tooltip-background-color)] text-xs font-medium text-white shadow-2xs dark:bg-neutral-700 border-[var(--tooltip-background-color)]">
+                        <div class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full" style="background-color: ${color}"></div>
+                            <span>${label}: ${value}</span>
+                        </div>
+                    </div>
+                `;
+            },
+            style: {
+                fontSize: '14px',
+                fontFamily: 'inherit',
+            },
+            theme: 'light',
+            cssClass: 'apexcharts-custom-tooltip',
+        },
+        markers: {
+            size: 4,
+            hover: {
+                sizeOffset: 0,
+            },
+        },
+        states: {
+            active: {
+                filter: {
+                    type: 'none',
+                },
             },
         },
     };
@@ -80,9 +107,38 @@ function DonutChart({ title, colorOptions, data = {}, entity, redirect, onSetFil
         options.colors = colorOptions.colors;
     }
 
+    const values = getValues(data);
+    const chartLabels = useGetLabels(data);
+    const chartColors = colorOptions?.colors || getDefaultColors();
+
     return (
-        <Widget title={title} titleBoldness="bold" className="flex-1 w-1/2 lg:w-1/3 xl:w-1/4">
-            <ReactApexChart options={options} series={getValues(data)} type="donut" height="100%" width="100%" />
+        <Widget title={title} titleBoldness="bold" className="flex-1">
+            <div className="flex gap-4 items-center h-[130px]">
+                <div className="flex-shrink-0">
+                    <ReactApexChart options={options} series={values} type="donut" height={110} width={110} />
+                </div>
+
+                <div className="flex-1 flex justify-end h-full">
+                    <div className="space-y-1.5 h-full max-w-[140px] overflow-y-auto">
+                        {chartLabels.map((label, index) => (
+                            <div
+                                key={label}
+                                className="flex items-center gap-3 cursor-pointer"
+                                onClick={() => {
+                                    dispatch(actions.setCurrentFilters({ entity, currentFilters: onLegendClick(index, chartLabels) }));
+                                    navigate(redirect);
+                                }}
+                            >
+                                <div
+                                    className="w-2 h-2 rounded-full flex-shrink-0"
+                                    style={{ backgroundColor: chartColors[index] || '#6B7280' }}
+                                />
+                                <span className="text-md text-one-row-ellipsis">{label}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
         </Widget>
     );
 }

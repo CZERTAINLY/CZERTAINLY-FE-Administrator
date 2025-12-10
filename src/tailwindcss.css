@@ -10,6 +10,7 @@
     --sidebar-width: 84px;
     --main-background-color: #f8fafc;
     --dark-gray-color: #1f2937;
+    --tooltip-background-color: #111827;
 
     --status-success-color: #14b8a6;
     --status-danger-color: #ef4444;
@@ -72,4 +73,16 @@ table .preline-badge {
     padding-bottom: 1rem;
     padding-top: 1rem;
     border-radius: 0 0 1rem 1rem;
+}
+
+.text-one-row-ellipsis {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.apexcharts-custom-tooltip {
+    border: none !important;
+    outline: none !important;
+    padding: 0 !important;
 }

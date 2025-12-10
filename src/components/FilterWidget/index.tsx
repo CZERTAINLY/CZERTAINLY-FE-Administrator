@@ -719,6 +719,7 @@ export default function FilterWidget({
                                     if (disableBadgeRemove) return;
                                     onRemoveFilterClick(i);
                                 }}
+                                size="medium"
                             >
                                 {!isFetchingAvailableFilters && !busyBadges && getBadgeContent(i, f.fieldSource, f.condition, label, value)}
                             </Badge>
