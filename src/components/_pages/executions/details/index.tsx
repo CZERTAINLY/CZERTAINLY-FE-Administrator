@@ -237,7 +237,7 @@ const ExecutionDetails = () => {
     }, [executionDetails, isUpdatingDetails, onUpdateSendNotificationExecutionItems]);
 
     return (
-        <Container className="themed-container" fluid>
+        <Container>
             <Breadcrumb
                 items={[
                     { label: `${getEnumLabel(resourceEnum, Resource.Actions)} Inventory`, href: '/actions' },
