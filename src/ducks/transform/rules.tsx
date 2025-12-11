@@ -1,5 +1,5 @@
 import { ApiClients } from '../../api';
-import cx from 'classnames';
+import cn from 'classnames';
 import ConditionsItemsList from 'components/ExecutionConditionItemsList/ConditionsItemsList';
 import ExecutionsItemsList from 'components/ExecutionConditionItemsList/ExecutionsItemsList';
 import { CustomNode } from 'components/FlowChart';
@@ -406,7 +406,7 @@ export function useTransformTriggerObjectToNodesAndEdges(
 
     otherPropertiesCurrentCertificate.push({
         propertyContent: (
-            <div className={cx('flex items-center ')}>
+            <div className={cn('flex items-center ')}>
                 <h6>Ignore Trigger :</h6>
                 <div className="ml-1">
                     <Switch

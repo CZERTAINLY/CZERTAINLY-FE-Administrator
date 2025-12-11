@@ -1,4 +1,4 @@
-import cx from 'classnames';
+import cn from 'classnames';
 import { actions as alertActions } from 'ducks/alerts';
 import { actions as userInterfaceActions, selectors as userInterfaceSelectors } from 'ducks/user-interface';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -174,10 +174,10 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
 
         if (!IconComponent) {
             // Default to FileText if icon not found
-            return <FileText size={24} className={cx(getStatusClasses())} />;
+            return <FileText size={24} className={cn(getStatusClasses())} />;
         }
 
-        return <IconComponent size={24} className={cx(getStatusClasses())} />;
+        return <IconComponent size={24} className={cn(getStatusClasses())} />;
     };
 
     // TODO: use only for certificates not for rules
@@ -243,11 +243,11 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
 
     return (
         <>
-            <Handle hidden={data.handleHide === 'target'} className={cx(style.handleUp)} type="target" position={Position.Top} />
+            <Handle hidden={data.handleHide === 'target'} className={cn(style.handleUp)} type="target" position={Position.Top} />
             <div className="flex items-start">
                 <div
                     // style={{ width: '500px' }}
-                    className={cx(
+                    className={cn(
                         // style.customNodeBackground,
                         { [style.customNodeBackground]: !data.formContent },
                         { [style.selectedBackground]: dragging },
@@ -269,7 +269,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                                     <Button
                                         color="primary"
                                         onClick={expandToggle}
-                                        className={cx(style.nodeButton, getExpandButtonStatusClasses())}
+                                        className={cn(style.nodeButton, getExpandButtonStatusClasses())}
                                     >
                                         {/* <span className="mx-auto">{status}</span> */}
                                         {isNodeExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
@@ -283,7 +283,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                                             // setShowHiddenNodes(!expandedHiddenNodeId);
                                             toggleHiddenNodes();
                                         }}
-                                        className={cx('mt-1', style.nodeButton, getExpandButtonStatusClasses())}
+                                        className={cn('mt-1', style.nodeButton, getExpandButtonStatusClasses())}
                                     >
                                         {/* <span className="mx-auto">{status}</span> */}
                                         {expandedHiddenNodeId !== id ? <Eye size={16} /> : <EyeOff size={16} />}
@@ -295,7 +295,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                                 {data.addButtonContent && (
                                     <Button
                                         color="primary"
-                                        className={cx('mt-1', style.nodeButton, style.addButton)}
+                                        className={cn('mt-1', style.nodeButton, style.addButton)}
                                         // onClick={data.addButtonContent}
                                         title="Add connections to this node"
                                         onClick={() => setAddNodeContentCollapse(!addNodeContentCollapse)}
@@ -307,7 +307,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                                 {data.deleteAction && (
                                     <Button
                                         color="danger"
-                                        className={cx('mt-1', style.nodeButton, style.deleteButton)}
+                                        className={cn('mt-1', style.nodeButton, style.deleteButton)}
                                         onClick={() => {
                                             if (data.deleteAction) {
                                                 switch (data.deleteAction.disableCondition) {
@@ -348,11 +348,11 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                     )}
                     <div className="flex items-center mb-2">
                         <div className="mr-2">{getIconComponent()}</div>
-                        <h6 className={cx(style.customNodeCardTitle)}>{data.customNodeCardTitle}</h6>
+                        <h6 className={cn(style.customNodeCardTitle)}>{data.customNodeCardTitle}</h6>
                     </div>
 
                     {data.redirectUrl && data.entityLabel ? (
-                        <div className={cx('flex font-medium text-[#64748b]', style.entityLabel)}>
+                        <div className={cn('flex font-medium text-[#64748b]', style.entityLabel)}>
                             <h6>Entity Name:</h6>
                             &nbsp;
                             <Link to={data.redirectUrl}>
@@ -360,7 +360,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                             </Link>
                         </div>
                     ) : data.entityLabel ? (
-                        <div className={cx('flex font-medium text-[#64748b]', style.entityLabel)}>
+                        <div className={cn('flex font-medium text-[#64748b]', style.entityLabel)}>
                             <h6>Entity Name:</h6>
                             &nbsp;
                             <h6>{data.entityLabel}</h6>
@@ -378,9 +378,9 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
 
                     {data.otherProperties && (
                         <>
-                            <div className={cx('w-full', { hidden: !isNodeExpanded })}>
-                                <div className={cx(style.listContainer, { [style.listContainerDragging]: dragging })}>
-                                    <ul className={cx('p-1')}>
+                            <div className={cn('w-full', { hidden: !isNodeExpanded })}>
+                                <div className={cn(style.listContainer, { [style.listContainerDragging]: dragging })}>
+                                    <ul className={cn('p-1')}>
                                         {data.otherProperties.map((property, index) => (
                                             <li key={index} className="text-wrap p-0 pl-1">
                                                 {property?.propertyName && (
@@ -418,7 +418,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                         </div>
                     )}
 
-                    <div className={cx({ hidden: !addNodeContentCollapse })}>
+                    <div className={cn({ hidden: !addNodeContentCollapse })}>
                         <div className={style.addContentContainer}>{data.addButtonContent}</div>
                     </div>
                 </div>

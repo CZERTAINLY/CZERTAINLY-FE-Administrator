@@ -1,4 +1,4 @@
-import cx from 'classnames';
+import cn from 'classnames';
 import Container from 'components/Container';
 import { LockTypeEnum } from 'types/user-interface';
 import { Info, TriangleAlert, Home, Lock, Wifi, Database, Server } from 'lucide-react';
@@ -69,11 +69,11 @@ const WidgetLock = ({
         <Container>
             <div className="grid grid-cols-12">
                 <div className={`col-span-12 ${getMainColWidthLg()} text-center`}>
-                    <div className={cx('bg-gray-100 dark:bg-gray-800 rounded-lg p-6')}>
+                    <div className={cn('bg-gray-100 dark:bg-gray-800 rounded-lg p-6')}>
                         <div className="grid grid-cols-12 gap-4">
                             <div className="col-span-12 xl:col-start-2 xl:col-span-3 flex items-center justify-center">{getIcon()}</div>
                             <div className="col-span-12 xl:col-span-8">
-                                <h5 className={cx('flex justify-center items-center gap-2')}>
+                                <h5 className={cn('flex justify-center items-center gap-2')}>
                                     {lockTitle}
                                     {lockDetails && renderPopOver()}
                                 </h5>

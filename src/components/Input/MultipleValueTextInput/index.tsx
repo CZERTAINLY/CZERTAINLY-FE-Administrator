@@ -9,7 +9,7 @@ type Props = {
     isValid?: boolean;
     isInvalid?: boolean;
 };
-import cx from 'classnames';
+import cn from 'classnames';
 
 export default function MultipleValueTextInput({
     id,

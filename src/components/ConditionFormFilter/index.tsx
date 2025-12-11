@@ -1,5 +1,5 @@
 import { ApiClients } from '../../api';
-import cx from 'classnames';
+import cn from 'classnames';
 import FilterWidget from 'components/FilterWidget';
 import FilterWidgetRuleAction from 'components/FilterWidgetRuleAction';
 import { ExecutionFormValues } from 'components/_pages/executions/form';

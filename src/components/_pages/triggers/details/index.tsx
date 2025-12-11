@@ -1,4 +1,4 @@
-import cx from 'classnames';
+import cn from 'classnames';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import FlowChart, { CustomNode } from 'components/FlowChart';
