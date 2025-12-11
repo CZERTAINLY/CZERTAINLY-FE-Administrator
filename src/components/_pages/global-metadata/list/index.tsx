@@ -77,7 +77,7 @@ export default function GlobalMetadataList() {
                 content: 'Name',
                 sortable: true,
                 sort: 'asc',
-                width: '20%',
+                width: '40%',
             },
             {
                 id: 'contentType',

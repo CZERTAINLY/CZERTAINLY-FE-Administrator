@@ -113,7 +113,7 @@ function CredentialList() {
                 sortable: true,
                 sort: 'asc',
                 id: 'adminName',
-                width: '15%',
+                width: '50%',
             },
             {
                 content: 'Kind',
@@ -126,7 +126,7 @@ function CredentialList() {
                 content: 'Credential Provider',
                 sortable: true,
                 id: 'credentialProviderName',
-                width: '25%',
+                width: '30%',
                 align: 'center',
             },
         ],
@@ -163,8 +163,6 @@ function CredentialList() {
                 titleSize="large"
                 refreshAction={getFreshData}
             >
-                <br />
-
                 <CustomTable
                     headers={credentialRowHeaders}
                     data={credentialsData}

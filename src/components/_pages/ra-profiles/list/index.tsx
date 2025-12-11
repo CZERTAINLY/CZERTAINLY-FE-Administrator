@@ -157,12 +157,13 @@ function RaProfileList() {
                 content: 'Name',
                 sortable: true,
                 sort: 'asc',
-                width: '15%',
+                width: '20%',
             },
             {
                 id: 'description',
                 content: 'Description',
                 sortable: true,
+                width: '38%',
             },
             {
                 id: 'authority',

@@ -126,21 +126,21 @@ function AuthorityList() {
                 sortable: true,
                 sort: 'asc',
                 id: 'authorityName',
-                width: 'auto',
+                width: '60%',
             },
             {
                 content: 'Authority Provider',
                 align: 'center',
                 sortable: true,
                 id: 'auhtorityProvider',
-                width: '15%',
+                width: '20%',
             },
             {
                 content: 'Kinds',
                 align: 'center',
                 sortable: true,
                 id: 'kinds',
-                width: '15%',
+                width: '20%',
             },
         ],
         [],
@@ -209,8 +209,6 @@ function AuthorityList() {
                 titleSize="large"
                 refreshAction={getFreshData}
             >
-                <br />
-
                 <CustomTable
                     headers={authoritiesRowHeaders}
                     data={authorityList}

@@ -96,7 +96,7 @@ export default function CustomAttributesList() {
                 content: 'Name',
                 sortable: true,
                 sort: 'asc',
-                width: '8%',
+                width: '40%',
             },
             {
                 id: 'status',
