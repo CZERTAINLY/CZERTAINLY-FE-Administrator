@@ -10,15 +10,10 @@
     width: 400px;
     min-height: 55px;
     border-style: solid;
-    border-color: #3754a566;
+    border-color: #a5b4fc;
     border-width: 2px;
     text-align: left;
     z-index: 1;
-    box-shadow:
-        2.25px 2.25px 0.75px -0.75px rgba(0, 0, 0, 0.15),
-        1.5px 1.5px 0.75px 0px rgba(0, 0, 0, 0.105),
-        0.75px 0.75px 2.25px 0px rgba(0, 0, 0, 0.09);
-
     transition: width 0.3s ease-in-out; /* Smooth transition for width changes */
 }
 
@@ -44,19 +39,14 @@
 }
 
 .customNodeCardTitle {
-    color: #6b7280;
-    font-weight: bold;
-    font-size: medium;
+    color: var(--dark-gray-color);
+    font-weight: 700;
+    font-size: 18px;
 }
 
-.entityLabel {
-    font-weight: bold;
-    color: #4b5563 !important;
-    font-size: medium;
-    min-width: 0;
-    flex-shrink: 1;
-    width: calc(100% - 0.5rem);
-    display: flex;
+.entityLabel a {
+    color: var(--primary-blue-color);
+    font-weight: 600;
 }
 
 .entityLabel > * {
@@ -87,16 +77,6 @@
     }
 }
 
-.propertyName {
-    font-weight: bold;
-    color: #6b7280;
-}
-
-.propertyValue {
-    font-weight: 500;
-    color: #4b5563;
-    word-wrap: break-word;
-}
 .mainNodeBody {
     border-width: 4px;
     // border-color: $czertainly-blue;
@@ -168,8 +148,11 @@
 
 .validStatus,
 .actionGroupNodeStatus {
-    color: #1ab394e1 !important;
-    border-color: #1ab394e1 !important;
+    color: #15803d !important;
+    border-color: #15803d !important;
+    .certificate-icon {
+        color: #15803d !important;
+    }
 }
 
 .expandButtonValid,
@@ -187,8 +170,9 @@
 }
 
 .invalidStatus {
-    color: #131212 !important;
-    border-color: #131212 !important;
+    color: var(--color) !important;
+    border-color: var(--color) !important;
+    border-width: 2px;
 }
 
 .expandButtonInvalid {
@@ -297,12 +281,12 @@
 }
 
 .unknownStatus {
-    color: #3754a566;
-    border-color: #3754a566;
+    color: #a5b4fc;
+    border-color: #a5b4fc;
 }
 
 .expandButtonUnknown {
-    background-color: #3754a566 !important;
+    background-color: #a5b4fc !important;
     border: none !important;
     &:hover {
         background-color: #3754a5ec !important;
@@ -315,7 +299,7 @@
 }
 
 .addButton {
-    background-color: #3754a566 !important;
+    background-color: #a5b4fc !important;
     border: none !important;
     &:hover {
         background-color: #3754a5ec !important;
@@ -346,14 +330,10 @@
     width: 350px;
     min-height: 55px;
     // border-style: solid;
-    // border-color: #3754a566;
+    // border-color: #A5B4FC;
     // border-width: 2px;
     text-align: left;
     z-index: 2;
-    // box-shadow:
-    //     2.25px 2.25px 0.75px -0.75px rgba(0, 0, 0, 0.15),
-    //     1.5px 1.5px 0.75px 0px rgba(0, 0, 0, 0.105),
-    //     0.75px 0.75px 2.25px 0px rgba(0, 0, 0, 0.09);
 }
 
 .expandedNode {

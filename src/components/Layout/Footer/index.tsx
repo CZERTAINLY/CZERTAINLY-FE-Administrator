@@ -1,4 +1,4 @@
-// import cx from 'classnames';
+// import cn from 'classnames';
 
 import PlatformInfoDialogButton from 'components/Layout/PlatformInfoDialogButton';
 

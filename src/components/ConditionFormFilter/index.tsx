@@ -1,5 +1,5 @@
 import { ApiClients } from '../../api';
-import cx from 'classnames';
+import cn from 'classnames';
 import FilterWidget from 'components/FilterWidget';
 import FilterWidgetRuleAction from 'components/FilterWidgetRuleAction';
 import { ExecutionFormValues } from 'components/_pages/executions/form';
@@ -33,7 +33,7 @@ const ConditionFormFilter = ({ resource, formType, includeIgnoreAction }: Condit
             <div>
                 <FilterWidgetRuleAction
                     entity={EntityType.ACTIONS}
-                    title={'Execution Items'}
+                    title="Execution Items"
                     getAvailableFiltersApi={(apiClients: ApiClients) =>
                         apiClients.resources.listResourceRuleFilterFields({
                             resource,

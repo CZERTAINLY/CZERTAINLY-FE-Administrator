@@ -7,7 +7,7 @@ import Pagination from 'components/Pagination';
 import Checkbox from 'components/Checkbox';
 import Dialog from 'components/Dialog';
 import Button from 'components/Button';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import SimpleBar from 'simplebar-react';
 import cn from 'classnames';
 
 export interface TableHeader {
@@ -53,6 +53,7 @@ interface Props {
     onPageChanged?: (page: number) => void;
     newRowWidgetProps?: NewRowWidgetProps;
     columnForDetail?: string;
+    detailHeaders?: TableHeader[];
 }
 
 const emptyCheckedRows: (string | number)[] = [];
@@ -73,6 +74,7 @@ function CustomTable({
     onPageSizeChanged,
     onPageChanged,
     newRowWidgetProps,
+    detailHeaders,
     columnForDetail,
 }: Props) {
     const [tblHeaders, setTblHeaders] = useState<TableHeader[]>();
@@ -369,7 +371,7 @@ function CustomTable({
                             <div>&nbsp;</div>
                         )
                     ) : header.sortable ? (
-                        <div className="flex items-center gap-1">
+                        <div className={cn('flex items-center gap-1', { 'justify-center': header.align === 'center' })}>
                             {header.content}
                             &nbsp;
                             {getSortIcon(header.sort)}
@@ -478,24 +480,31 @@ function CustomTable({
             return null;
         }
 
-        // Create default headers without using parent table headers
-        const detailHeaders: TableHeader[] = detailDialogRow.detailColumns.map((_, index) => ({
-            id: `detail-${index}`,
-            content: '',
-            sortable: false,
-        }));
+        const detailTableHeaders: TableHeader[] =
+            detailHeaders && detailHeaders.length === detailDialogRow.detailColumns.length
+                ? detailHeaders
+                : detailDialogRow.detailColumns.map((_, index) => ({
+                      id: `detail-${index}`,
+                      content: '',
+                      sortable: false,
+                  }));
 
-        // Create data rows for detail table - if detailColumns.length === 1, it spans all columns
-        // Otherwise, each detailColumn maps to its corresponding column
+        const processedColumns = detailDialogRow.detailColumns.map((col, index) => {
+            if (Array.isArray(col)) {
+                return <div key={`detail-col-${index}`}>{col}</div>;
+            }
+            return col;
+        });
+
         const detailData: TableDataRow[] = [
             {
                 id: 'detail-row',
-                columns: detailDialogRow.detailColumns,
+                columns: processedColumns,
             },
         ];
 
-        return <CustomTable headers={detailHeaders} data={detailData} hasHeader={false} hasPagination={false} />;
-    }, [detailDialogRow]);
+        return <CustomTable headers={detailTableHeaders} data={detailData} hasHeader={!!detailHeaders} hasPagination={false} />;
+    }, [detailDialogRow, detailHeaders]);
 
     return (
         <div data-testid="custom-table">
@@ -514,20 +523,22 @@ function CustomTable({
             )}
             {body?.length > 0 && (
                 <div className="py-2">
-                    <div className={cn('overflow-x-auto rounded-md', { 'border border-gray-100': hasHeader })}>
-                        <div className="min-w-full inline-block align-middle">
-                            <div className="overflow-hidden">
-                                <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-700 bg-white">
-                                    {hasHeader && (
-                                        <thead className="bg-gray-50 dark:bg-neutral-700">
-                                            <tr>{header}</tr>
-                                        </thead>
-                                    )}
-                                    <tbody className="divide-y divide-gray-200 dark:divide-neutral-700">{body}</tbody>
-                                </table>
+                    <SimpleBar forceVisible="x">
+                        <div className={cn('rounded-md', { 'border border-gray-100': hasHeader })}>
+                            <div className="min-w-full inline-block align-middle">
+                                <div className="overflow-hidden">
+                                    <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-700 bg-white">
+                                        {hasHeader && (
+                                            <thead className="bg-gray-50 dark:bg-neutral-700">
+                                                <tr>{header}</tr>
+                                            </thead>
+                                        )}
+                                        <tbody className="divide-y divide-gray-200 dark:divide-neutral-700">{body}</tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </SimpleBar>
                 </div>
             )}
             {hasPagination && (

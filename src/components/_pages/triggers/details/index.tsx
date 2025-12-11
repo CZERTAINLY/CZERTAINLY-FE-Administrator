@@ -1,4 +1,4 @@
-import cx from 'classnames';
+import cn from 'classnames';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import FlowChart, { CustomNode } from 'components/FlowChart';
@@ -45,8 +45,6 @@ const TriggerDetails = () => {
     const [highlight, setHighlight] = useState(false);
     const deviceType = useDeviceType();
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
-    const [triggerNodes, setTriggerNodes] = useState<CustomNode[]>([]);
-    const [triggerEdges, setTriggerEdges] = useState<Edge[]>([]);
 
     const defaultViewport = useMemo(
         () => ({
@@ -503,7 +501,7 @@ const TriggerDetails = () => {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <div>
             <Breadcrumb
                 items={[
                     { label: `${getEnumLabel(resourceEnum, Resource.Triggers)} Inventory`, href: '/triggers' },
@@ -515,7 +513,7 @@ const TriggerDetails = () => {
                     {
                         title: 'Trigger Details',
                         content: (
-                            <Widget>
+                            <Widget noBorder>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <Widget
@@ -624,7 +622,7 @@ const TriggerDetails = () => {
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmIgnoreTrigger(false), body: 'Cancel' },
                 ]}
             />
-        </Container>
+        </div>
     );
 };
 

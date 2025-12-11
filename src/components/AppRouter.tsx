@@ -72,7 +72,6 @@ import PlatformSettingsDetail from './_pages/platform-settings/detail';
 import RoleDetail from './_pages/roles/detail';
 import RolesList from './_pages/roles/list';
 import RolePermissions from './_pages/roles/RolePermissionsForm';
-import RoleUsers from './_pages/roles/RoleUsersForm';
 
 import TokenProfileDetail from './_pages/token-profiles/detail';
 import TokenProfileList from './_pages/token-profiles/list';
@@ -137,7 +136,6 @@ export default function AppRouter() {
                     <Route path={`/${Resource.Roles.toLowerCase()}`} element={<RolesList />} />
                     <Route path={`/${Resource.Roles.toLowerCase()}/list`} element={<Navigate to={`/${Resource.Roles.toLowerCase()}`} />} />
                     <Route path={`/${Resource.Roles.toLowerCase()}/detail/:id`} element={<RoleDetail />} />
-                    <Route path={`/${Resource.Roles.toLowerCase()}/users/:id`} element={<RoleUsers />} />
                     <Route path={`/${Resource.Roles.toLowerCase()}/permissions/:id`} element={<RolePermissions />} />
 
                     <Route path={`/${Resource.Certificates.toLowerCase()}`} element={<CertificatesList />} />

@@ -15,7 +15,6 @@ import {
     SquareMinus,
     Check,
 } from 'lucide-react';
-import cx from 'classnames';
 import { useEffect } from 'react';
 
 export type ModalSize = 'sm' | 'md' | 'lg' | 'xl';
@@ -136,7 +135,7 @@ export default function Dialog({ isOpen, toggle, caption, body, buttons, size = 
     return (
         <div
             id="hs-scale-animation-modal"
-            className={cx(
+            className={cn(
                 'hs-overlay size-full fixed top-0 start-0 z-[80] overflow-x-hidden overflow-y-auto',
                 {
                     hidden: !isOpen,
@@ -157,7 +156,7 @@ export default function Dialog({ isOpen, toggle, caption, body, buttons, size = 
             }}
         >
             <div
-                className={cx(
+                className={cn(
                     'hs-overlay-animation-target ease-in-out transition-all duration-200 m-3 sm:mx-auto min-h-[calc(100%-56px)] flex items-center',
                     sizeClasses[size || 'sm'],
                     {
@@ -171,7 +170,7 @@ export default function Dialog({ isOpen, toggle, caption, body, buttons, size = 
                         <X size={16} />
                     </Button>
                     <div
-                        className={cx('flex flex-col justify-center dark:border-neutral-700', {
+                        className={cn('flex flex-col justify-center dark:border-neutral-700', {
                             'border-b border-gray-200 pb-4': !hideBorders,
                             'items-center': !!icon,
                         })}
@@ -191,7 +190,7 @@ export default function Dialog({ isOpen, toggle, caption, body, buttons, size = 
                     </div>
                     {buttons && buttons.length > 0 && (
                         <div
-                            className={cx(
+                            className={cn(
                                 'flex justify-end items-center gap-4 py-4 mt-2 dark:border-neutral-700 border-t border-gray-200 modal-footer',
                             )}
                         >

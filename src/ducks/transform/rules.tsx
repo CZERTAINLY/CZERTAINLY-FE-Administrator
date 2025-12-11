@@ -1,5 +1,5 @@
 import { ApiClients } from '../../api';
-import cx from 'classnames';
+import cn from 'classnames';
 import ConditionsItemsList from 'components/ExecutionConditionItemsList/ConditionsItemsList';
 import ExecutionsItemsList from 'components/ExecutionConditionItemsList/ExecutionsItemsList';
 import { CustomNode } from 'components/FlowChart';
@@ -406,7 +406,7 @@ export function useTransformTriggerObjectToNodesAndEdges(
 
     otherPropertiesCurrentCertificate.push({
         propertyContent: (
-            <div className={cx('flex items-center ')}>
+            <div className={cn('flex items-center ')}>
                 <h6>Ignore Trigger :</h6>
                 <div className="ml-1">
                     <Switch
@@ -590,13 +590,15 @@ export function useTransformTriggerObjectToNodesAndEdges(
                                 {
                                     propertyName: 'Condition Items',
                                     propertyContent: (
-                                        <ConditionsItemsList
-                                            conditionName={condition.name}
-                                            conditionUuid={condition.uuid}
-                                            conditionItems={condition.items}
-                                            key={condition.uuid}
-                                            smallerBadges
-                                        />
+                                        <div className="flex flex-col gap-2">
+                                            <ConditionsItemsList
+                                                conditionName={condition.name}
+                                                conditionUuid={condition.uuid}
+                                                conditionItems={condition.items}
+                                                key={condition.uuid}
+                                                smallerBadges
+                                            />
+                                        </div>
                                     ),
                                 },
                             ],
@@ -741,14 +743,16 @@ export function useTransformTriggerObjectToNodesAndEdges(
                                 {
                                     propertyName: 'Execution Items',
                                     propertyContent: (
-                                        <ExecutionsItemsList
-                                            executionItems={execution.items}
-                                            key={execution.uuid}
-                                            executionName={execution.name}
-                                            executionType={execution.type}
-                                            executionUuid={execution.uuid}
-                                            smallerBadges
-                                        />
+                                        <div className="flex flex-col gap-2">
+                                            <ExecutionsItemsList
+                                                executionItems={execution.items}
+                                                key={execution.uuid}
+                                                executionName={execution.name}
+                                                executionType={execution.type}
+                                                executionUuid={execution.uuid}
+                                                smallerBadges
+                                            />
+                                        </div>
                                     ),
                                 },
                             ],

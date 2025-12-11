@@ -1,4 +1,3 @@
-import cx from 'classnames';
 import { selectors as enumSelectors } from 'ducks/enums';
 import { EntityType, selectors } from 'ducks/filters';
 import { selectors as rulesSelectors } from 'ducks/rules';
@@ -29,10 +28,10 @@ const ConditionsItemsList = ({ conditionItems = [], conditionName, conditionUuid
         [isFetchingAvailableFiltersConditions, isFetchingConditionDetails],
     );
 
-    if (isLoading) return <Spinner color="gray" active={isFetchingConditionDetails} />;
+    if (isLoading) return <Spinner active={isFetchingConditionDetails} />;
 
     return smallerBadges ? (
-        <div>
+        <div className="flex gap-2 items-center">
             <h6 className="text-gray-500">{`${conditionName}'s Condition Items`}</h6>
             <div className="flex flex-wrap">
                 {renderConditionItems(
@@ -41,25 +40,23 @@ const ConditionsItemsList = ({ conditionItems = [], conditionName, conditionUuid
                     platformEnums,
                     searchGroupEnum,
                     filterConditionOperatorEnum,
-                    undefined,
+                    '',
                     'small',
                 )}
             </div>
         </div>
     ) : (
-        <div key={conditionUuid}>
+        <div key={conditionUuid} className="flex gap-2 items-center">
             <h6 className="text-gray-500">{`${conditionName}`}</h6>
-            <div className="ml-3">
-                {renderConditionItems(
-                    conditionItems,
-                    availableFilters,
-                    platformEnums,
-                    searchGroupEnum,
-                    filterConditionOperatorEnum,
-                    undefined,
-                    'badge',
-                )}
-            </div>
+            {renderConditionItems(
+                conditionItems,
+                availableFilters,
+                platformEnums,
+                searchGroupEnum,
+                filterConditionOperatorEnum,
+                '',
+                'badge',
+            )}
         </div>
     );
 };

@@ -1,3 +1,5 @@
+@import 'simplebar-react/dist/simplebar.min.css';
+
 :root {
     font-family: 'Inter', sans-serif;
     font-optical-sizing: auto;
@@ -10,6 +12,7 @@
     --sidebar-width: 84px;
     --main-background-color: #f8fafc;
     --dark-gray-color: #1f2937;
+    --tooltip-background-color: #111827;
 
     --status-success-color: #14b8a6;
     --status-danger-color: #ef4444;
@@ -73,3 +76,76 @@ table .preline-badge {
     padding-top: 1rem;
     border-radius: 0 0 1rem 1rem;
 }
+
+.text-one-row-ellipsis {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.apexcharts-custom-tooltip {
+    border: none !important;
+    outline: none !important;
+    padding: 0 !important;
+}
+
+.react-flow__controls {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.react-flow__controls-button {
+    border: 1px solid #6b7280;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+    transition: all 0.2s ease;
+    box-shadow: none;
+}
+
+.react-flow__controls-button:not(:last-child) {
+    border-bottom: none !important;
+}
+.react-flow__controls-button:hover {
+    background: #f3f4f6;
+}
+
+.react-flow__controls-button:active {
+    background: #f3f4f6;
+}
+
+.react-flow__controls-button svg {
+    stroke-width: 1.5;
+    fill: currentColor;
+    max-width: 16px;
+    max-height: 16px;
+}
+/* .react-flow__controls-interactive {
+    position: relative;
+}
+.react-flow__controls-interactive:after {
+    content: '';
+    display: block;
+    width: 16px;
+    height: 16px;
+    background-image: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12.6667 7.33331H3.33333C2.59695 7.33331 2 7.93027 2 8.66665V13.3333C2 14.0697 2.59695 14.6666 3.33333 14.6666H12.6667C13.403 14.6666 14 14.0697 14 13.3333V8.66665C14 7.93027 13.403 7.33331 12.6667 7.33331Z' stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M4.66666 7.33331V4.66665C4.66583 3.84001 4.97218 3.04256 5.52624 2.42909C6.0803 1.81563 6.84254 1.42992 7.66499 1.34684C8.48744 1.26376 9.31142 1.48925 9.97697 1.97952C10.6425 2.4698 11.1022 3.18988 11.2667 3.99998' stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    fill: currentColor;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.react-flow__controls-interactive svg {
+    display: none;
+} */

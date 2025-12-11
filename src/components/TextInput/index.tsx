@@ -32,7 +32,6 @@ function TextInput({
     className,
     required = false,
 }: Props) {
-    console.log('type', type);
     if (type === 'date') {
         return (
             <>

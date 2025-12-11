@@ -65,7 +65,6 @@ const ConditionsExecutionsList = ({
         } else if (actionExecutions?.length) {
             return actionExecutions.map((execution, i) => (
                 <React.Fragment key={execution.uuid}>
-                    <hr />
                     <ExecutionsItemsList
                         executionName={execution.name}
                         executionUuid={execution.uuid}
@@ -80,7 +79,7 @@ const ConditionsExecutionsList = ({
 
     return (
         <Widget title={widgetTitle} titleSize="large" busy={isBusy}>
-            <div>{renderListData}</div>
+            <div className="flex flex-col gap-2">{renderListData}</div>
         </Widget>
     );
 };

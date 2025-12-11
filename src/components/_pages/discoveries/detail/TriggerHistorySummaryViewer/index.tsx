@@ -1,4 +1,4 @@
-import cx from 'classnames';
+import cn from 'classnames';
 import { useCallback, useMemo } from 'react';
 import { TriggerHistoryObjectSummaryModel, TriggerHistoryObjectTriggerSummaryModel } from 'types/rules';
 interface TriggerHistorySummaryProps {

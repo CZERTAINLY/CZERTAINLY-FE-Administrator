@@ -10,7 +10,6 @@ import { useNavigate, useParams } from 'react-router';
 
 import Button from 'components/Button';
 import Container from 'components/Container';
-import Label from 'components/Label';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateEmail, validateLength, validateRequired } from 'utils/validators';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
 import { Resource } from '../../../../types/openapi';
@@ -33,9 +32,9 @@ interface FormValues {
 
 function RoleForm({ roleId, onCancel, onSuccess }: RoleFormProps) {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
-    const { id: routeId } = useParams();
-    const id = roleId || routeId;
+    const { id } = useParams();
 
     const editMode = useMemo(() => !!id, [id]);
 
@@ -57,15 +56,9 @@ function RoleForm({ roleId, onCancel, onSuccess }: RoleFormProps) {
 
     useEffect(() => {
         if (editMode && id) {
-            // Fetch if id changed or if we don't have the correct role loaded
-            if (previousIdRef.current !== id || !roleSelector || roleSelector.uuid !== id) {
-                dispatch(rolesActions.getDetail({ uuid: id }));
-                previousIdRef.current = id;
-            }
-        } else {
-            previousIdRef.current = undefined;
+            dispatch(rolesActions.getDetail({ uuid: id }));
         }
-    }, [dispatch, editMode, id, roleSelector]);
+    }, [dispatch, editMode, id]);
 
     const defaultValues: FormValues = useMemo(
         () => ({
@@ -158,6 +151,8 @@ function RoleForm({ roleId, onCancel, onSuccess }: RoleFormProps) {
     const submitTitle = useMemo(() => (editMode ? 'Save' : 'Create'), [editMode]);
 
     const inProgressTitle = useMemo(() => (editMode ? 'Saving...' : 'Creating...'), [editMode]);
+
+    const title = useMemo(() => (editMode ? 'Edit Role' : 'Add Role'), [editMode]);
 
     const renderCustomAttributesEditor = useMemo(() => {
         if (isBusy) return <></>;
@@ -253,7 +248,7 @@ function RoleForm({ roleId, onCancel, onSuccess }: RoleFormProps) {
                             ]}
                         />
                         <Container className="flex-row justify-end modal-footer" gap={4}>
-                            <Button variant="outline" onClick={onCancel} disabled={isSubmitting} type="button">
+                            <Button variant="outline" onClick={() => navigate(-1)} disabled={isSubmitting} type="button">
                                 Cancel
                             </Button>
                             <ProgressButton
