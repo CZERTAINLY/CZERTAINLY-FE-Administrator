@@ -371,7 +371,7 @@ function CustomTable({
                             <div>&nbsp;</div>
                         )
                     ) : header.sortable ? (
-                        <div className="flex items-center gap-1">
+                        <div className={cn('flex items-center gap-1', { 'justify-center': header.align === 'center' })}>
                             {header.content}
                             &nbsp;
                             {getSortIcon(header.sort)}
