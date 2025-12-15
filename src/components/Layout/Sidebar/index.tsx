@@ -384,34 +384,61 @@ export default function Sidebar({ allowedResources }: Props) {
         );
     }
     return (
-        <SimpleBar
-            forceVisible="y"
-            style={{
-                height: 'calc(100vh - var(--header-height))',
-                width: 'var(--sidebar-width)',
-                position: 'sticky',
-                top: 'var(--header-height)',
-                zIndex: 10,
-            }}
-        >
-            <div className="p-4 w-full h-full dark:bg-neutral-900">
-                <nav className="pb-4">
-                    <ul className="list-none m-0 flex flex-col gap-y-1">{allowedMenuItems.map((item) => renderMenuItem(item))}</ul>
-                </nav>
-                <hr className="border-gray-200" />
-                <div className="flex justify-center pt-4">
-                    <Button
-                        variant="transparent"
-                        className={cn('inline-flex px-4 py-2 border-none', {
-                            'w-full gap-x-2': menuSize !== 'small',
-                        })}
-                        onClick={() => toggleMenuSize()}
+        <>
+            {menuSize === 'flying' && (
+                <div
+                    className={cn(
+                        'fixed top-[var(--header-height)] left-0 h-[calc(100vh-var(--header-height))] bg-white shadow-lg w-[260px] z-50',
+                        {},
+                    )}
+                    onMouseLeave={() => {
+                        setMenuSize('small');
+                        setOpenMenuItems([]);
+                    }}
+                >
+                    <SimpleBar
+                        forceVisible="y"
+                        style={{
+                            height: '100%',
+                            width: '100%',
+                        }}
                     >
-                        <ArrowRightToLine strokeWidth={1} size={24} className={cn(menuSize === 'large' && 'rotate-180')} />
-                        <span className={cn({ 'sr-only': menuSize === 'small' })}>Collapse</span>
-                    </Button>
+                        <nav className="p-4">
+                            <ul className="list-none m-0 flex flex-col gap-y-1">{allowedMenuItems.map((item) => renderMenuItem(item))}</ul>
+                        </nav>
+                    </SimpleBar>
                 </div>
-            </div>
-        </SimpleBar>
+            )}
+            <SimpleBar
+                forceVisible="y"
+                style={{
+                    height: 'calc(100vh - var(--header-height))',
+                    width: 'var(--sidebar-width)',
+                    position: 'sticky',
+                    top: 'var(--header-height)',
+                    zIndex: 10,
+                }}
+            >
+                <div className="p-4 w-full h-full dark:bg-neutral-900">
+                    <nav className="pb-4">
+                        <ul className="list-none m-0 flex flex-col gap-y-1">{allowedMenuItems.map((item) => renderMenuItem(item))}</ul>
+                    </nav>
+
+                    <hr className="border-gray-200" />
+                    <div className="flex justify-center pt-4">
+                        <Button
+                            variant="transparent"
+                            className={cn('inline-flex px-4 py-2 border-none', {
+                                'w-full gap-x-2': menuSize !== 'small',
+                            })}
+                            onClick={() => toggleMenuSize()}
+                        >
+                            <ArrowRightToLine strokeWidth={1} size={24} className={cn(menuSize === 'large' && 'rotate-180')} />
+                            <span className={cn({ 'sr-only': menuSize === 'small' })}>Collapse</span>
+                        </Button>
+                    </div>
+                </div>
+            </SimpleBar>
+        </>
     );
 }
