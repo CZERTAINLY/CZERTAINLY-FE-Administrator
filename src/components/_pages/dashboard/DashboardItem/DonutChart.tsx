@@ -1,9 +1,9 @@
 import Widget from 'components/Widget';
+import SimpleBar from 'components/SimpleBar';
 import { EntityType, actions } from 'ducks/filters';
 import ReactApexChart from 'react-apexcharts';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
-import SimpleBar from 'simplebar-react';
 import { SearchFilterModel } from 'types/certificate';
 import { DashboardDict } from 'types/statisticsDashboard';
 import { getValues, useGetLabels, getDefaultColors } from 'utils/dashboard';
@@ -100,11 +100,11 @@ function DonutChart({ title, colorOptions, data = {}, entity, redirect, onSetFil
 
     return (
         <Widget title={title} titleBoldness="bold" className="flex-1">
-            <div className="flex gap-4 items-center h-full">
+            <div className="grid grid-cols-[130px_1fr] gap-4 h-full">
                 <div className="flex-shrink-0">
                     <ReactApexChart options={options} series={values} type="donut" height={110} width={110} />
                 </div>
-                <SimpleBar forceVisible="y" style={{ height: '130px', width: '100%' }}>
+                <SimpleBar forceVisible="y" style={{ height: '130px' }}>
                     <div className="flex-1 flex justify-end">
                         <div className="space-y-1.5 h-full max-w-[140px] overflow-y-auto">
                             {chartLabels.map((label, index) => (
