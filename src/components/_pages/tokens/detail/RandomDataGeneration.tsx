@@ -122,6 +122,9 @@ export default function RandomDataGeneration({ tokenUuid, visible, onClose }: Pr
                     )}
 
                     <div className="flex justify-end gap-2">
+                        <Button type="button" variant="outline" onClick={onClose}>
+                            Cancel
+                        </Button>
                         <Button
                             type="submit"
                             color="primary"
@@ -129,10 +132,6 @@ export default function RandomDataGeneration({ tokenUuid, visible, onClose }: Pr
                             onClick={handleSubmit(handleFormSubmit)}
                         >
                             Generate
-                        </Button>
-
-                        <Button type="button" variant="outline" color="secondary" onClick={onClose}>
-                            Cancel
                         </Button>
                     </div>
                 </form>

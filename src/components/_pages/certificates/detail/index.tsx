@@ -134,16 +134,15 @@ function LocationPushForm({
                 />
 
                 <Container className="flex-row justify-end modal-footer" gap={4}>
+                    <Button variant="outline" onClick={onCancel} disabled={isPushing} type="button">
+                        Cancel
+                    </Button>
                     <ProgressButton
                         title="Push"
                         inProgressTitle="Pushing..."
                         inProgress={isPushing}
                         disabled={selectLocationsCheckedRows.length === 0 || !formState.isValid}
                     />
-
-                    <Button variant="outline" color="secondary" onClick={onCancel} disabled={isPushing} type="button">
-                        Cancel
-                    </Button>
                 </Container>
             </form>
         </FormProvider>

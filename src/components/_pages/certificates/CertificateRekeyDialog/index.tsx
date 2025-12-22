@@ -533,7 +533,7 @@ export default function CertificateRekeyDialog({ onCancel, certificate }: props)
                         )}
 
                         <Container className="flex-row justify-end modal-footer" gap={4}>
-                            <Button variant="outline" color="secondary" onClick={onCancel} disabled={formState.isSubmitting} type="button">
+                            <Button variant="outline" onClick={onCancel} disabled={formState.isSubmitting} type="button">
                                 Cancel
                             </Button>
                             <ProgressButton

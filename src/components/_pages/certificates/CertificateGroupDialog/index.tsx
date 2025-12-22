@@ -66,7 +66,7 @@ export default function CertificateGroupDialog({ uuids, onCancel, onUpdate }: Pr
             </div>
 
             <Container className="flex-row justify-end modal-footer" gap={4}>
-                <Button color="secondary" variant="outline" onClick={onCancel} className="mr-auto">
+                <Button variant="outline" onClick={onCancel} className="mr-auto">
                     Cancel
                 </Button>
                 <Button color="danger" onClick={removeGroup} title="Remove groups from selected certificates">

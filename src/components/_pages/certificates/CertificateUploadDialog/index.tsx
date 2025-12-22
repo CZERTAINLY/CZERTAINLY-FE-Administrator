@@ -106,7 +106,7 @@ export default function CertificateUploadDialog({ onCancel, onUpload, okButtonTi
                     />
 
                     <Container className="flex-row justify-end modal-footer" gap={4}>
-                        <Button color="secondary" variant="outline" onClick={onCancel} disabled={formState.isSubmitting} type="button">
+                        <Button variant="outline" onClick={onCancel} disabled={formState.isSubmitting} type="button">
                             Cancel
                         </Button>
                         <ProgressButton

@@ -60,7 +60,7 @@ const DropDownListForm = ({ onSubmit, onClose, dropDownOptionsList, isBusy = fal
                     />
                 ))}
                 <Container className="flex-row justify-end modal-footer" gap={4}>
-                    <Button variant="outline" color="secondary" disabled={isBusy} onClick={onClose}>
+                    <Button variant="outline" disabled={isBusy} onClick={onClose}>
                         Close
                     </Button>
                     <ProgressButton

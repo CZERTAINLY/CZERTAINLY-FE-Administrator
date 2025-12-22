@@ -88,11 +88,11 @@ const CronExpressionForm = ({
                     )}
                 />
                 <div className="flex justify-between mt-3">
+                    <Button type="button" variant="outline" onClick={onCancel}>
+                        Cancel
+                    </Button>
                     <Button type="submit" disabled={formState.isSubmitting || !formState.isValid}>
                         Save
-                    </Button>
-                    <Button type="button" variant="outline" color="secondary" onClick={onCancel}>
-                        Cancel
                     </Button>
                 </div>
             </form>
