@@ -26,10 +26,13 @@ function Dropdown({ title, items, disabled = false, btnStyle, className, menuCla
         if (typeof window !== 'undefined' && (window as any).HSStaticMethods) {
             (window as any).HSStaticMethods.autoInit();
         }
-    }, []);
+    }, [disabled]);
 
     return (
-        <div className={cn('hs-dropdown [--auto-close:inside] relative inline-flex', className)}>
+        <div
+            key={disabled ? 'dropdown-disabled' : 'dropdown-enabled'}
+            className={cn('hs-dropdown [--auto-close:inside] relative inline-flex z-10', className)}
+        >
             <button
                 id="hs-dropdown-default"
                 type="button"
