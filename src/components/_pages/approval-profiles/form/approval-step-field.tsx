@@ -345,24 +345,23 @@ export default function ApprovalStepField({ approvalSteps }: Props) {
                     </div>
                 ),
                 content: renderApprovalSteps(index),
+                onClick: () => setSelectedTab(index),
             })),
         [approvalSteps, renderApprovalSteps, handleRemoveStepClick],
     );
 
     return (
-        <>
-            <TabLayout
-                noBorder
-                tabs={[
-                    ...tabs,
-                    {
-                        title: <Plus size={16} onClick={() => handleAddStepClick()} />,
-                        content: <></>,
-                        onClick: () => handleAddStepClick(),
-                    },
-                ]}
-                selectedTab={selectedTab}
-            />
-        </>
+        <TabLayout
+            noBorder
+            tabs={[
+                ...tabs,
+                {
+                    title: <Plus size={16} onClick={() => handleAddStepClick()} />,
+                    content: <></>,
+                    onClick: () => handleAddStepClick(),
+                },
+            ]}
+            selectedTab={selectedTab}
+        />
     );
 }
