@@ -61,40 +61,36 @@ const CronExpressionForm = ({
                     control={control}
                     rules={buildValidationRules([validateRequired(), validateQuartzCronExpression(cronExpressionValue)])}
                     render={({ field, fieldState }) => (
-                        <div>
-                            <div className="relative">
-                                <TextInput
-                                    id="cronExpression"
-                                    label="Cron Expression"
-                                    value={field.value}
-                                    onChange={field.onChange}
-                                    onBlur={field.onBlur}
-                                    invalid={!!fieldState.error && fieldState.isTouched}
-                                    error={fieldState.error?.message}
-                                    required
-                                />
-                                <button
-                                    type="button"
-                                    onClick={onOpenCronModal}
-                                    className="absolute right-2 top-[38px] p-2 text-gray-500 hover:text-gray-700"
-                                >
-                                    <Clock size={16} />
-                                </button>
-                            </div>
+                        <div className="mb-4 space-y-4">
+                            <TextInput
+                                id="cronExpression"
+                                label="Cron Expression"
+                                value={field.value}
+                                onChange={field.onChange}
+                                onBlur={field.onBlur}
+                                invalid={!!fieldState.error && fieldState.isTouched}
+                                error={fieldState.error?.message}
+                                required
+                                buttonRight={
+                                    <button type="button" onClick={onOpenCronModal}>
+                                        <Clock size={16} />
+                                    </button>
+                                }
+                            />
                             {getStrongFromCronExpression(cronExpressionValue) && (
-                                <p className="mt-1 text-sm text-gray-600">{getStrongFromCronExpression(cronExpressionValue)}</p>
+                                <p className="mt-1 text-sm color-gray-600">{getStrongFromCronExpression(cronExpressionValue)}</p>
                             )}
                         </div>
                     )}
                 />
-                <div className="flex justify-between mt-3">
+                <Container className="flex-row justify-end modal-footer" gap={4}>
                     <Button type="button" variant="outline" onClick={onCancel}>
                         Cancel
                     </Button>
                     <Button type="submit" disabled={formState.isSubmitting || !formState.isValid}>
                         Save
                     </Button>
-                </div>
+                </Container>
             </form>
         </FormProvider>
     );
@@ -313,16 +309,13 @@ export default function SchedulerJobDetail() {
                     size="xl"
                     isOpen={cronModalOpen}
                     caption="Select CRON Expression"
-                    body={<Cron value={newCronExpression} onChange={handleCronSelectChange} showResultText showResultCron />}
+                    body={
+                        <div className="preline-cron-wrapper">
+                            <Cron value={newCronExpression} onChange={handleCronSelectChange} showResultText showResultCron />
+                        </div>
+                    }
                     toggle={() => setCronModalOpen(false)}
                     buttons={[
-                        {
-                            color: 'primary',
-                            onClick: () => {
-                                setCronModalOpen(false);
-                            },
-                            body: 'Ok',
-                        },
                         {
                             color: 'secondary',
                             variant: 'outline',
@@ -331,6 +324,13 @@ export default function SchedulerJobDetail() {
                                 setCronModalOpen(false);
                             },
                             body: 'Cancel',
+                        },
+                        {
+                            color: 'primary',
+                            onClick: () => {
+                                setCronModalOpen(false);
+                            },
+                            body: 'Ok',
                         },
                     ]}
                 />

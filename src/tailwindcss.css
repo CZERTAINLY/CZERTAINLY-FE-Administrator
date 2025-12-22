@@ -149,3 +149,68 @@ table .preline-badge {
 .react-flow__controls-interactive svg {
     display: none;
 } */
+
+.preline-cron-wrapper {
+    @apply space-y-4;
+}
+
+.preline-cron-wrapper .cron_builder {
+    @apply max-w-none border-none p-0 m-0 bg-transparent;
+}
+.preline-cron-wrapper .nav-tabs {
+    margin: -10px;
+}
+
+.preline-cron-wrapper .nav-item {
+    /* @apply border-none p-0; */
+}
+
+.preline-cron-wrapper .nav-link {
+    background: transparent;
+    padding: 10px;
+    color: var(--dark-gray-color) !important;
+    @apply font-medium !rounded-lg border-none;
+}
+.preline-cron-wrapper .nav-link:hover {
+    background: #f3f4f6;
+}
+
+.preline-cron-wrapper .nav-link.active {
+    background: #e5e7eb !important;
+}
+
+.preline-cron-wrapper .cron_builder_bordering {
+    @apply border-none p-0 mx-0 my-4 bg-transparent;
+}
+.preline-cron-wrapper .cron_builder_bordering .well {
+    border-color: #e5e7eb;
+    color: var(--dark-gray-color);
+    @apply bg-transparent shadow-none rounded-lg font-semibold;
+}
+.preline-cron-wrapper .cron_builder_bordering .tab-content {
+    @apply p-0 m-0 bg-transparent;
+}
+.preline-cron-wrapper .cron_builder_bordering .text_align_left {
+    line-height: 2.5;
+}
+.preline-cron-wrapper .cron_builder_bordering input:not([type='radio']),
+.preline-cron-wrapper .cron_builder_bordering input:not([type='checkbox']) {
+    min-height: unset;
+    @apply py-2.5 sm:py-3 px-4 border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600;
+}
+.preline-cron-wrapper .cron_builder_bordering input[type='radio'],
+.preline-cron-wrapper .cron_builder_bordering input[type='checkbox'] {
+    font-size: 0;
+    @apply p-2 rounded-full cursor-pointer;
+}
+.preline-cron-wrapper .cron_builder_bordering select {
+    color: var(--dark-gray-color);
+    @apply py-2.5 sm:py-3 px-4 border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600;
+}
+.preline-cron-wrapper .cron-builder-bg {
+    background: #6b7280;
+    @apply rounded-lg p-3 text-white font-semibold m-0;
+}
+.preline-cron-wrapper .cron-builder-bg:not(:last-child) {
+    @apply mb-4;
+}

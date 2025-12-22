@@ -12,7 +12,6 @@ import { actions as rulesActions } from 'ducks/rules';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router';
 import Select from 'components/Select';
 import Button from 'components/Button';
 import Container from 'components/Container';
@@ -48,7 +47,6 @@ interface FormValues {
 
 export default function DiscoveryForm({ onSuccess, onCancel }: DiscoveryFormProps) {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const discoveryProviders = useSelector(discoverySelectors.discoveryProviders);
     const discoveryProviderAttributeDescriptors = useSelector(discoverySelectors.discoveryProviderAttributeDescriptors);
@@ -299,19 +297,21 @@ export default function DiscoveryForm({ onSuccess, onCancel }: DiscoveryFormProp
                                                     dispatch(
                                                         userInterfaceActions.showGlobalModal({
                                                             content: (
-                                                                <Cron
-                                                                    value={field.value}
-                                                                    onChange={(e) => {
-                                                                        dispatch(
-                                                                            userInterfaceActions.setOkButtonCallback(() => {
-                                                                                dispatch(userInterfaceActions.hideGlobalModal());
-                                                                                setValue('cronExpression', e);
-                                                                            }),
-                                                                        );
-                                                                    }}
-                                                                    showResultText={true}
-                                                                    showResultCron={true}
-                                                                />
+                                                                <div className="preline-cron-wrapper">
+                                                                    <Cron
+                                                                        value={field.value}
+                                                                        onChange={(e) => {
+                                                                            dispatch(
+                                                                                userInterfaceActions.setOkButtonCallback(() => {
+                                                                                    dispatch(userInterfaceActions.hideGlobalModal());
+                                                                                    setValue('cronExpression', e);
+                                                                                }),
+                                                                            );
+                                                                        }}
+                                                                        showResultText={true}
+                                                                        showResultCron={true}
+                                                                    />
+                                                                </div>
                                                             ),
                                                             showCancelButton: true,
                                                             okButtonCallback: () => {
