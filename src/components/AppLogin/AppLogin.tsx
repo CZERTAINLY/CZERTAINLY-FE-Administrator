@@ -1,7 +1,5 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useSearchParams } from 'react-router';
-
-import logo from '../../resources/images/czertainly_logo.svg';
 
 export default function AppLogin() {
     const [searchParams] = useSearchParams();
@@ -11,12 +9,9 @@ export default function AppLogin() {
         window.location.href = `${__ENV__.LOGIN_URL}?redirect=${redirect}`;
     }, [searchParams]);
 
-    return (
-        <div>
-            <img src={logo} alt="Czertainly" />
-            <h3>You are not authorized to view this page</h3>
-            <p>If you believe you should have access, check your client certificate or try another login method.</p>
-            <button onClick={() => redirect()}>Login</button>
-        </div>
-    );
+    useEffect(() => {
+        redirect();
+    }, [redirect]);
+
+    return null;
 }
