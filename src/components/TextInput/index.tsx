@@ -98,6 +98,7 @@ function TextInput({
                         },
                         {
                             'bg-[#F8FAFC]': disabled,
+                            'pr-10': !!buttonRight,
                         },
                         className,
                     )}

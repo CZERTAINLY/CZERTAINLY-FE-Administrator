@@ -262,12 +262,14 @@ function ApprovalProfileForm({ approvalProfileId, onCancel, onSuccess }: Approva
                         />
 
                         <ApprovalStepField
-                            approvalSteps={
-                                formValues.approvalSteps?.map((step, index) => ({
-                                    ...step,
-                                    order: step.order ?? index + 1,
-                                })) ?? []
-                            }
+                            approvalSteps={useMemo(
+                                () =>
+                                    formValues.approvalSteps?.map((step, index) => ({
+                                        ...step,
+                                        order: step.order ?? index + 1,
+                                    })) ?? [],
+                                [formValues.approvalSteps],
+                            )}
                             inProgress={isSubmitting}
                             onCancelClick={handleCancel}
                         />

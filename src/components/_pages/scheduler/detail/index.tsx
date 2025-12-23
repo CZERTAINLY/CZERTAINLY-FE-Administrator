@@ -72,13 +72,18 @@ const CronExpressionForm = ({
                                 error={fieldState.error?.message}
                                 required
                                 buttonRight={
-                                    <button type="button" onClick={onOpenCronModal}>
+                                    <button
+                                        type="button"
+                                        onClick={onOpenCronModal}
+                                        aria-label="Open cron expression builder"
+                                        title="Open cron expression builder"
+                                    >
                                         <Clock size={16} />
                                     </button>
                                 }
                             />
                             {getStrongFromCronExpression(cronExpressionValue) && (
-                                <p className="mt-1 text-sm color-gray-600">{getStrongFromCronExpression(cronExpressionValue)}</p>
+                                <p className="mt-1 text-sm text-gray-600">{getStrongFromCronExpression(cronExpressionValue)}</p>
                             )}
                         </div>
                     )}
