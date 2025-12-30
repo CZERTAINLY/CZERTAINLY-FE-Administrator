@@ -10,6 +10,7 @@ import { AttributeDescriptorModel, AttributeRequestModel } from 'types/attribute
 
 import { collectFormAttributes } from 'utils/attributes/attributes';
 import TabLayout from '../../Layout/TabLayout';
+import Container from 'components/Container';
 
 interface Props {
     tokenUuid?: string;
@@ -103,7 +104,10 @@ export default function TokenActivationDialogBody({ tokenUuid, visible, onClose 
                         ]}
                     />
 
-                    <div className="flex justify-end gap-2">
+                    <Container className="flex-row justify-end modal-footer" gap={4}>
+                        <Button type="button" variant="outline" onClick={onClose}>
+                            Cancel
+                        </Button>
                         <Button
                             type="submit"
                             color="primary"
@@ -112,11 +116,7 @@ export default function TokenActivationDialogBody({ tokenUuid, visible, onClose 
                         >
                             Activate
                         </Button>
-
-                        <Button type="button" variant="outline" color="secondary" onClick={onClose}>
-                            Cancel
-                        </Button>
-                    </div>
+                    </Container>
                 </form>
             </FormProvider>
 

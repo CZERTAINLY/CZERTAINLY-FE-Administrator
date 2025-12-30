@@ -109,11 +109,11 @@ function ApprovalProfileForm({ approvalProfileId, onCancel, onSuccess }: Approva
     };
 
     const validateApprovalSteps = useCallback((values: ProfileApprovalRequestModel) => {
-        const inValidSteps = values.approvalSteps.some((step) => {
+        const hasInvalidSteps = values.approvalSteps.some((step) => {
             const { roleUuid, groupUuid, userUuid } = step;
             return !roleUuid && !groupUuid && !userUuid;
         });
-        return inValidSteps ? undefined : 'Approval Steps are not valid';
+        return hasInvalidSteps ? 'Approval Steps are not valid' : undefined;
     }, []);
 
     const onSubmit = useCallback(
@@ -262,7 +262,14 @@ function ApprovalProfileForm({ approvalProfileId, onCancel, onSuccess }: Approva
                         />
 
                         <ApprovalStepField
-                            approvalSteps={formValues.approvalSteps}
+                            approvalSteps={useMemo(
+                                () =>
+                                    formValues.approvalSteps?.map((step, index) => ({
+                                        ...step,
+                                        order: step.order ?? index + 1,
+                                    })) ?? [],
+                                [formValues.approvalSteps],
+                            )}
                             inProgress={isSubmitting}
                             onCancelClick={handleCancel}
                         />

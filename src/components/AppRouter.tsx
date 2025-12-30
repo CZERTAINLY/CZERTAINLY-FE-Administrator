@@ -108,10 +108,9 @@ import RulesList from './_pages/rules/list';
 import SchedulerJobDetail from './_pages/scheduler/detail';
 import SchedulerJobsList from './_pages/scheduler/list';
 
-import AppLogin from './AppLogin/AppLogin';
 import AppRedirect from './AppRedirect';
 import Layout from './Layout';
-import Spinner from './Spinner';
+// import Spinner from './Spinner';
 
 import { Resource } from 'types/openapi';
 import CustomOIDList from 'components/_pages/custom-oid/list';
@@ -325,11 +324,7 @@ export default function AppRouter() {
         <HashRouter>
             <AppRedirect />
 
-            <Routes>
-                <Route path="/login" element={<AppLogin />} />
-
-                {profile ? appRoutes : <Route path="*" element={null} />}
-            </Routes>
+            <Routes>{profile ? appRoutes : <Route path="*" element={null} />}</Routes>
         </HashRouter>
     );
 }

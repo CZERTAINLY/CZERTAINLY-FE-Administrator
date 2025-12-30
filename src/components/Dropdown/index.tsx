@@ -26,10 +26,14 @@ function Dropdown({ title, items, disabled = false, btnStyle, className, menuCla
         if (typeof window !== 'undefined' && (window as any).HSStaticMethods) {
             (window as any).HSStaticMethods.autoInit();
         }
-    }, []);
+    }, [disabled]);
 
     return (
-        <div className={cn('hs-dropdown [--auto-close:inside] relative inline-flex', className)}>
+        <div
+            // we need this key to force a re-render when the disabled state changes otherwise the dropdown will not work correctly
+            key={disabled ? 'dropdown-disabled' : 'dropdown-enabled'}
+            className={cn('hs-dropdown [--auto-close:inside] relative inline-flex z-10', className)}
+        >
             <button
                 id="hs-dropdown-default"
                 type="button"

@@ -183,7 +183,7 @@ export default function ScepProfiles() {
                 content: 'Name',
                 sortable: true,
                 sort: 'asc',
-                width: '10%',
+                width: '30%',
             },
             {
                 id: 'description',
@@ -195,7 +195,7 @@ export default function ScepProfiles() {
                 id: 'raProfileName',
                 content: 'RA Profile Name',
                 sortable: true,
-                width: '10%',
+                width: '13%',
                 align: 'center',
             },
             {
@@ -209,7 +209,7 @@ export default function ScepProfiles() {
                 id: 'scepUrl',
                 content: 'SCEP URL',
                 sortable: true,
-                width: '10%',
+                width: '33%',
                 align: 'center',
             },
             {
