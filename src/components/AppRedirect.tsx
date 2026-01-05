@@ -24,9 +24,9 @@ export default function AppRedirect() {
         const url = window.location.toString().substring(window.location.origin.length);
         if (!url.includes('/#/login?redirect=')) {
             const redirect = encodeURIComponent(url);
-            window.location.href = `${__ENV__.LOGIN_URL}?redirect=${redirect}`;
+            navigate(`/login?redirect=${redirect}`);
         }
-    }, [dispatch, unauthorized]);
+    }, [dispatch, navigate, unauthorized]);
 
     useEffect(() => {
         if (!redirectUrl) return;
