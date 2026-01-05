@@ -145,6 +145,7 @@ const RulesList = () => {
     return (
         <>
             <Widget
+                noBorder
                 titleSize="large"
                 title="Rules"
                 refreshAction={getFreshList}

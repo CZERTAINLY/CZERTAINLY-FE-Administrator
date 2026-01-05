@@ -8,8 +8,7 @@ import Dialog from '../../../Dialog';
 import Spinner from '../../../Spinner';
 import Button from 'components/Button';
 import Select from 'components/Select';
-import Label from 'components/Label';
-import { ArrowUpFromLine } from 'lucide-react';
+import { CircleArrowUp } from 'lucide-react';
 
 type Props = {
     show: boolean;
@@ -80,9 +79,10 @@ export default function ConnectorMetadataDialog({ show, setShow }: Props) {
                         key={metadata.uuid}
                         color="primary"
                         onClick={() => dispatch(actions.promoteConnectorMetadata({ uuid: metadata.uuid, connectorUuid: connectorUuid }))}
+                        className="!py-2"
                     >
-                        <ArrowUpFromLine size={16} />
-                        &nbsp;Promote
+                        <CircleArrowUp size={16} />
+                        Promote
                     </Button>,
                 ],
             }));

@@ -1,9 +1,9 @@
 import Widget from 'components/Widget';
-import SimpleBar from 'components/SimpleBar';
 import { EntityType, actions } from 'ducks/filters';
 import ReactApexChart from 'react-apexcharts';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
+import SimpleBar from 'simplebar-react';
 import { SearchFilterModel } from 'types/certificate';
 import { DashboardDict } from 'types/statisticsDashboard';
 import { getValues, useGetLabels, getDefaultColors } from 'utils/dashboard';

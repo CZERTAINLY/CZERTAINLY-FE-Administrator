@@ -124,6 +124,7 @@ const NotificationInstanceList = () => {
     return (
         <>
             <Widget
+                noBorder
                 titleSize="large"
                 title="Notification Store"
                 refreshAction={getFreshNotificationInstances}

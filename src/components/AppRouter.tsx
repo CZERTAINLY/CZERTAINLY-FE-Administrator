@@ -18,8 +18,10 @@ import AcmeProfilesList from './_pages/acme-profiles/list';
 
 import AuthorityDetail from './_pages/authorities/detail';
 import AuthoritiesList from './_pages/authorities/list';
+import AuthorityForm from './_pages/authorities/form';
 
 import CertificateDetail from './_pages/certificates/detail';
+import CertificateEdit from './_pages/certificates/form';
 import CertificatesList from './_pages/certificates/list';
 
 import ComplianceProfileDetail from './_pages/compliance-profiles/detail';
@@ -115,6 +117,7 @@ import Layout from './Layout';
 import { Resource } from 'types/openapi';
 import CustomOIDList from 'components/_pages/custom-oid/list';
 import CustomOIDDetail from 'components/_pages/custom-oid/detail';
+import Login from './_pages/login';
 
 export default function AppRouter() {
     const profile = useSelector(selectors.profile);
@@ -143,6 +146,7 @@ export default function AppRouter() {
                         element={<Navigate to={`/${Resource.Certificates.toLowerCase()}`} />}
                     />
                     <Route path={`/${Resource.Certificates.toLowerCase()}/detail/:id`} element={<CertificateDetail />} />
+                    <Route path={`/${Resource.Certificates.toLowerCase()}/add`} element={<CertificateEdit />} />
 
                     <Route path={`/${Resource.Connectors.toLowerCase()}`} element={<ConnectorsList />} />
                     <Route
@@ -164,6 +168,8 @@ export default function AppRouter() {
                         element={<Navigate to={`/${Resource.Authorities.toLowerCase()}`} />}
                     />
                     <Route path={`/${Resource.Authorities.toLowerCase()}/detail/:id`} element={<AuthorityDetail />} />
+                    <Route path={`/${Resource.Authorities.toLowerCase()}/add`} element={<AuthorityForm />} />
+                    <Route path={`/${Resource.Authorities.toLowerCase()}/edit/:id`} element={<AuthorityForm />} />
 
                     <Route path={`/${Resource.RaProfiles.toLowerCase()}`} element={<RaProfilesList />} />
                     <Route
@@ -324,7 +330,10 @@ export default function AppRouter() {
         <HashRouter>
             <AppRedirect />
 
-            <Routes>{profile ? appRoutes : <Route path="*" element={null} />}</Routes>
+            <Routes>
+                <Route path="/login" element={<Login />} />
+                {profile ? appRoutes : <Route path="*" element={null} />}
+            </Routes>
         </HashRouter>
     );
 }

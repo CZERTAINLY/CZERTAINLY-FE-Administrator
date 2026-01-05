@@ -278,6 +278,7 @@ export default function ComplianceProfileDetail() {
             <Widget titleSize="large" busy={selectedEntityDetails?.entityDetails?.entityType === 'group' ? isFetchingGroupRules : false}>
                 {selectedEntityDetails?.entityDetails?.entityType === 'rule' && (
                     <TabLayout
+                        noBorder
                         tabs={[
                             {
                                 title: 'Details',
@@ -315,6 +316,7 @@ export default function ComplianceProfileDetail() {
                 )}
                 {selectedEntityDetails?.entityDetails?.entityType === 'group' && (
                     <TabLayout
+                        noBorder
                         tabs={[
                             {
                                 title: 'Details',
@@ -460,7 +462,14 @@ export default function ComplianceProfileDetail() {
                 }
                 body={entityDetailMenuContent}
                 toggle={() => setIsEntityDetailMenuOpen(false)}
-                buttons={[]}
+                buttons={[
+                    {
+                        color: 'secondary',
+                        variant: 'outline',
+                        onClick: () => setIsEntityDetailMenuOpen(false),
+                        body: 'Close',
+                    },
+                ]}
                 size="lg"
                 dataTestId="entity-detail-menu"
             />
@@ -491,8 +500,8 @@ export default function ComplianceProfileDetail() {
                 }
                 toggle={() => dispatch(actions.clearDeleteErrorMessages())}
                 buttons={[
-                    { color: 'danger', onClick: onForceDeleteComplianceProfile, body: 'Force' },
                     { color: 'secondary', variant: 'outline', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
+                    { color: 'danger', onClick: onForceDeleteComplianceProfile, body: 'Force' },
                 ]}
                 dataTestId="delete-error-dialog"
             />
