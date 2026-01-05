@@ -38,7 +38,7 @@ import RenderTokenProfile from 'components/_pages/certificates/form/RenderTokenP
 import Select from 'components/Select';
 import Switch from 'components/Switch';
 import Container from 'components/Container';
-import Label from 'components/Label';
+import Breadcrumb from 'components/Breadcrumb';
 
 type CertificateFormValues = {
     raProfileUuid: string;
@@ -58,6 +58,7 @@ interface CertificateFormProps {
 
 export default function CertificateForm({ onCancel }: CertificateFormProps = {}) {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const raProfiles = useSelector(raProfileSelectors.raProfiles);
     const issuanceAttributeDescriptors = useSelector(certificateSelectors.issuanceAttributes);
@@ -276,225 +277,238 @@ export default function CertificateForm({ onCancel }: CertificateFormProps = {})
     );
 
     return (
-        <FormProvider {...methods}>
-            <form onSubmit={submitHandler} noValidate>
-                <div className="space-y-4">
-                    <Widget noBorder busy={issuingCertificate || isFetchingResourceCustomAttributes}>
-                        <div className="space-y-4">
-                            <Controller
-                                control={control}
-                                name="raProfileUuid"
-                                rules={{ required: true }}
-                                render={({ field: { value, onChange }, fieldState: { error } }) => (
-                                    <Select
-                                        id="raProfile"
-                                        options={raProfileOptions}
-                                        placeholder="Select RA Profile"
-                                        value={value ?? ''}
-                                        label="RA Profile"
-                                        onChange={(selected) => {
-                                            const uuid = (selected ?? '') as string;
-                                            onChange(uuid);
-                                            onRaProfileChange(uuid);
-                                            setValue('tokenProfileUuid', undefined);
-                                            setValue('keyUuid', undefined);
-                                            setValue('includeAltKey', false);
-                                            setValue('altTokenProfileUuid', undefined);
-                                            setValue('altKeyUuid', undefined);
-                                        }}
-                                        error={error && 'RA Profile is required'}
-                                    />
-                                )}
-                            />
-
-                            <Controller
-                                control={control}
-                                name="uploadCsrSource"
-                                rules={{ required: true }}
-                                render={({ field: { value, onChange }, fieldState: { error } }) => (
-                                    <Select
-                                        id="uploadCsr"
-                                        options={keySourceOptions}
-                                        placeholder="Select Key Source"
-                                        value={value ?? ''}
-                                        label="Key Source"
-                                        required
-                                        onChange={(selected) => {
-                                            const source = (selected ?? '') as 'external' | 'existing';
-                                            onChange(source);
-                                            if (source === 'external') {
+        <div>
+            <Breadcrumb
+                items={[
+                    { label: 'Certificates', href: '/certificates/list' },
+                    { label: 'Add Certificate', href: '' },
+                ]}
+            />
+            <FormProvider {...methods}>
+                <form onSubmit={submitHandler} noValidate>
+                    <div className="space-y-4">
+                        <Widget title="Add Certificate" busy={issuingCertificate || isFetchingResourceCustomAttributes}>
+                            <div className="space-y-4">
+                                <Controller
+                                    control={control}
+                                    name="raProfileUuid"
+                                    rules={{ required: true }}
+                                    render={({ field: { value, onChange }, fieldState: { error } }) => (
+                                        <Select
+                                            id="raProfile"
+                                            options={raProfileOptions}
+                                            placeholder="Select RA Profile"
+                                            value={value ?? ''}
+                                            label="RA Profile"
+                                            onChange={(selected) => {
+                                                const uuid = (selected ?? '') as string;
+                                                onChange(uuid);
+                                                onRaProfileChange(uuid);
                                                 setValue('tokenProfileUuid', undefined);
                                                 setValue('keyUuid', undefined);
                                                 setValue('includeAltKey', false);
                                                 setValue('altTokenProfileUuid', undefined);
                                                 setValue('altKeyUuid', undefined);
-                                            }
-                                        }}
-                                        error={error && 'Key Source is required'}
-                                    />
-                                )}
-                            />
-                        </div>
-                    </Widget>
-
-                    <Widget title="Request Properties" busy={issuingCertificate || isFetchingResourceCustomAttributes}>
-                        {isExternalSource && selectedRaProfile ? (
-                            <>
-                                <FileUpload
-                                    editable
-                                    fileType={'CSR'}
-                                    onFileContentLoaded={(uploadedContent) => {
-                                        setFileContent(uploadedContent);
-                                        if (health) {
-                                            dispatch(
-                                                utilsCertificateRequestActions.parseCertificateRequest({
-                                                    content: uploadedContent,
-                                                    requestParseType: ParseRequestRequestDtoParseTypeEnum.Basic,
-                                                }),
-                                            );
-                                        }
-                                    }}
+                                            }}
+                                            error={error && 'RA Profile is required'}
+                                        />
+                                    )}
                                 />
 
-                                {certificate && <CertificateAttributes csr certificate={certificate} />}
-                            </>
-                        ) : null}
-
-                        {isExistingKeySource && selectedRaProfile ? (
-                            <div className="space-y-4">
-                                <RenderTokenProfile type="normal" name="tokenProfileUuid" />
-                                <RenderRequestKey type="normal" name="keyUuid" tokenProfileField="tokenProfileUuid" />
-
-                                {tokenProfileUuid ? (
-                                    <Controller
-                                        control={control}
-                                        name="includeAltKey"
-                                        render={({ field: { value, onChange } }) => (
-                                            <Switch
-                                                id="includeAltKey"
-                                                label="Include Alternative Key"
-                                                checked={value ?? false}
-                                                onChange={(checked) => {
-                                                    onChange(checked);
-                                                    if (!checked) {
-                                                        setValue('altTokenProfileUuid', undefined);
-                                                        setValue('altKeyUuid', undefined);
-                                                    }
-                                                }}
-                                            />
-                                        )}
-                                    />
-                                ) : null}
-
-                                {includeAltKey ? (
-                                    <>
-                                        <RenderTokenProfile type="alt" name="altTokenProfileUuid" />
-                                        <RenderRequestKey type="alt" name="altKeyUuid" tokenProfileField="altTokenProfileUuid" />
-                                    </>
-                                ) : null}
-
-                                {tokenProfileUuid ? (
-                                    <TabLayout
-                                        tabs={[
-                                            {
-                                                title: 'Request Attributes',
-                                                content: (
-                                                    <AttributeEditor
-                                                        id="csrAttributes"
-                                                        attributeDescriptors={csrAttributeDescriptors ?? []}
-                                                        groupAttributesCallbackAttributes={csrAttributesCallbackAttributes}
-                                                        setGroupAttributesCallbackAttributes={setCsrAttributesCallbackAttributes}
-                                                        onValuesChange={(values) => handleAttributeValuesChange('csrAttributes', values)}
-                                                    />
-                                                ),
-                                            },
-                                            {
-                                                title: 'Signature Attributes',
-                                                content: (
-                                                    <AttributeEditor
-                                                        id="signatureAttributes"
-                                                        attributeDescriptors={signatureAttributeDescriptors ?? []}
-                                                        groupAttributesCallbackAttributes={signatureAttributesCallbackAttributes}
-                                                        setGroupAttributesCallbackAttributes={setSignatureAttributesCallbackAttributes}
-                                                        onValuesChange={(values) =>
-                                                            handleAttributeValuesChange('signatureAttributes', values)
-                                                        }
-                                                    />
-                                                ),
-                                            },
-                                            ...(includeAltKey && altTokenProfileUuid
-                                                ? [
-                                                      {
-                                                          title: 'Alternative Signature Attributes',
-                                                          content: (
-                                                              <AttributeEditor
-                                                                  id="altSignatureAttributes"
-                                                                  attributeDescriptors={altSignatureAttributeDescriptors ?? []}
-                                                                  groupAttributesCallbackAttributes={
-                                                                      altSignatureAttributesCallbackAttributes
-                                                                  }
-                                                                  setGroupAttributesCallbackAttributes={
-                                                                      setAltSignatureAttributesCallbackAttributes
-                                                                  }
-                                                                  onValuesChange={(values) =>
-                                                                      handleAttributeValuesChange('altSignatureAttributes', values)
-                                                                  }
-                                                              />
-                                                          ),
-                                                      },
-                                                  ]
-                                                : []),
-                                        ]}
-                                    />
-                                ) : null}
+                                <Controller
+                                    control={control}
+                                    name="uploadCsrSource"
+                                    rules={{ required: true }}
+                                    render={({ field: { value, onChange }, fieldState: { error } }) => (
+                                        <Select
+                                            id="uploadCsr"
+                                            options={keySourceOptions}
+                                            placeholder="Select Key Source"
+                                            value={value ?? ''}
+                                            label="Key Source"
+                                            required
+                                            onChange={(selected) => {
+                                                const source = (selected ?? '') as 'external' | 'existing';
+                                                onChange(source);
+                                                if (source === 'external') {
+                                                    setValue('tokenProfileUuid', undefined);
+                                                    setValue('keyUuid', undefined);
+                                                    setValue('includeAltKey', false);
+                                                    setValue('altTokenProfileUuid', undefined);
+                                                    setValue('altKeyUuid', undefined);
+                                                }
+                                            }}
+                                            error={error && 'Key Source is required'}
+                                        />
+                                    )}
+                                />
                             </div>
-                        ) : null}
-                    </Widget>
+                        </Widget>
 
-                    <Widget noBorder busy={issuingCertificate || isFetchingResourceCustomAttributes}>
-                        <TabLayout
-                            noBorder
-                            tabs={[
-                                {
-                                    title: 'Connector Attributes',
-                                    content: (
-                                        <AttributeEditor
-                                            id="issuance_attributes"
-                                            attributeDescriptors={issuanceAttributeDescriptors[selectedRaProfileUuid || ''] || []}
-                                            callbackParentUuid={selectedRaProfile?.authorityInstanceUuid}
-                                            callbackResource={Resource.RaProfiles}
-                                            groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
-                                            setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
-                                            onValuesChange={(values) => handleAttributeValuesChange('issuance_attributes', values)}
+                        <Widget title="Request Properties" busy={issuingCertificate || isFetchingResourceCustomAttributes}>
+                            {isExternalSource && selectedRaProfile ? (
+                                <>
+                                    <FileUpload
+                                        editable
+                                        fileType={'CSR'}
+                                        onFileContentLoaded={(uploadedContent) => {
+                                            setFileContent(uploadedContent);
+                                            if (health) {
+                                                dispatch(
+                                                    utilsCertificateRequestActions.parseCertificateRequest({
+                                                        content: uploadedContent,
+                                                        requestParseType: ParseRequestRequestDtoParseTypeEnum.Basic,
+                                                    }),
+                                                );
+                                            }
+                                        }}
+                                    />
+
+                                    {certificate && <CertificateAttributes csr certificate={certificate} />}
+                                </>
+                            ) : null}
+
+                            {isExistingKeySource && selectedRaProfile ? (
+                                <div className="space-y-4">
+                                    <RenderTokenProfile type="normal" name="tokenProfileUuid" />
+                                    <RenderRequestKey type="normal" name="keyUuid" tokenProfileField="tokenProfileUuid" />
+
+                                    {tokenProfileUuid ? (
+                                        <Controller
+                                            control={control}
+                                            name="includeAltKey"
+                                            render={({ field: { value, onChange } }) => (
+                                                <Switch
+                                                    id="includeAltKey"
+                                                    label="Include Alternative Key"
+                                                    checked={value ?? false}
+                                                    onChange={(checked) => {
+                                                        onChange(checked);
+                                                        if (!checked) {
+                                                            setValue('altTokenProfileUuid', undefined);
+                                                            setValue('altKeyUuid', undefined);
+                                                        }
+                                                    }}
+                                                />
+                                            )}
                                         />
-                                    ),
-                                },
-                                {
-                                    title: 'Custom Attributes',
-                                    content: (
-                                        <AttributeEditor
-                                            id="customCertificate"
-                                            attributeDescriptors={resourceCustomAttributes}
-                                            attributes={selectedRaProfile?.customAttributes}
-                                            onValuesChange={(values) => handleAttributeValuesChange('customCertificate', values)}
+                                    ) : null}
+
+                                    {includeAltKey ? (
+                                        <>
+                                            <RenderTokenProfile type="alt" name="altTokenProfileUuid" />
+                                            <RenderRequestKey type="alt" name="altKeyUuid" tokenProfileField="altTokenProfileUuid" />
+                                        </>
+                                    ) : null}
+
+                                    {tokenProfileUuid ? (
+                                        <TabLayout
+                                            tabs={[
+                                                {
+                                                    title: 'Request Attributes',
+                                                    content: (
+                                                        <AttributeEditor
+                                                            id="csrAttributes"
+                                                            attributeDescriptors={csrAttributeDescriptors ?? []}
+                                                            groupAttributesCallbackAttributes={csrAttributesCallbackAttributes}
+                                                            setGroupAttributesCallbackAttributes={setCsrAttributesCallbackAttributes}
+                                                            onValuesChange={(values) =>
+                                                                handleAttributeValuesChange('csrAttributes', values)
+                                                            }
+                                                        />
+                                                    ),
+                                                },
+                                                {
+                                                    title: 'Signature Attributes',
+                                                    content: (
+                                                        <AttributeEditor
+                                                            id="signatureAttributes"
+                                                            attributeDescriptors={signatureAttributeDescriptors ?? []}
+                                                            groupAttributesCallbackAttributes={signatureAttributesCallbackAttributes}
+                                                            setGroupAttributesCallbackAttributes={setSignatureAttributesCallbackAttributes}
+                                                            onValuesChange={(values) =>
+                                                                handleAttributeValuesChange('signatureAttributes', values)
+                                                            }
+                                                        />
+                                                    ),
+                                                },
+                                                ...(includeAltKey && altTokenProfileUuid
+                                                    ? [
+                                                          {
+                                                              title: 'Alternative Signature Attributes',
+                                                              content: (
+                                                                  <AttributeEditor
+                                                                      id="altSignatureAttributes"
+                                                                      attributeDescriptors={altSignatureAttributeDescriptors ?? []}
+                                                                      groupAttributesCallbackAttributes={
+                                                                          altSignatureAttributesCallbackAttributes
+                                                                      }
+                                                                      setGroupAttributesCallbackAttributes={
+                                                                          setAltSignatureAttributesCallbackAttributes
+                                                                      }
+                                                                      onValuesChange={(values) =>
+                                                                          handleAttributeValuesChange('altSignatureAttributes', values)
+                                                                      }
+                                                                  />
+                                                              ),
+                                                          },
+                                                      ]
+                                                    : []),
+                                            ]}
                                         />
-                                    ),
-                                },
-                            ]}
-                        />
-                    </Widget>
-                    <Container className="flex-row justify-end modal-footer" gap={4}>
-                        <div className="flex gap-2">
-                            {onCancel && (
-                                <Button variant="outline" onClick={onCancel} disabled={issuingCertificate} type="button">
+                                    ) : null}
+                                </div>
+                            ) : null}
+                        </Widget>
+
+                        <Widget busy={issuingCertificate || isFetchingResourceCustomAttributes}>
+                            <TabLayout
+                                noBorder
+                                tabs={[
+                                    {
+                                        title: 'Connector Attributes',
+                                        content: (
+                                            <AttributeEditor
+                                                id="issuance_attributes"
+                                                attributeDescriptors={issuanceAttributeDescriptors[selectedRaProfileUuid || ''] || []}
+                                                callbackParentUuid={selectedRaProfile?.authorityInstanceUuid}
+                                                callbackResource={Resource.RaProfiles}
+                                                groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                                                setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                                                onValuesChange={(values) => handleAttributeValuesChange('issuance_attributes', values)}
+                                            />
+                                        ),
+                                    },
+                                    {
+                                        title: 'Custom Attributes',
+                                        content: (
+                                            <AttributeEditor
+                                                id="customCertificate"
+                                                attributeDescriptors={resourceCustomAttributes}
+                                                attributes={selectedRaProfile?.customAttributes}
+                                                onValuesChange={(values) => handleAttributeValuesChange('customCertificate', values)}
+                                            />
+                                        ),
+                                    },
+                                ]}
+                            />
+                        </Widget>
+                        <Container className="flex-row justify-end modal-footer" gap={4}>
+                            <div className="flex gap-2">
+                                <Button
+                                    variant="outline"
+                                    onClick={onCancel || (() => navigate(-1))}
+                                    disabled={issuingCertificate}
+                                    type="button"
+                                >
                                     Cancel
                                 </Button>
-                            )}
-                            <ProgressButton title="Create" inProgressTitle="Creating" inProgress={issuingCertificate} />
-                        </div>
-                    </Container>
-                </div>
-            </form>
-        </FormProvider>
+                                <ProgressButton title="Create" inProgressTitle="Creating" inProgress={issuingCertificate} />
+                            </div>
+                        </Container>
+                    </div>
+                </form>
+            </FormProvider>
+        </div>
     );
 }

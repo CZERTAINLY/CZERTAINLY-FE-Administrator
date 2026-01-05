@@ -244,11 +244,6 @@ export default function CmpProfileForm({ cmpProfileId, onCancel, onSuccess }: Cm
         name: 'responseProtectionMethod',
     });
 
-    const watchedRaProfileUuid = useWatch({
-        control,
-        name: 'raProfileUuid',
-    });
-
     useEffect(() => {
         if (watchedResponseProtectionMethod === ProtectionMethod.Signature) {
             if (!cmpSigningCertificates || cmpSigningCertificates.length === 0) dispatch(cmpProfileActions.listCmpSigningCertificates());
@@ -522,12 +517,6 @@ export default function CmpProfileForm({ cmpProfileId, onCancel, onSuccess }: Cm
         [dispatch, cmpProfile, raProfilesOptions, getValues, setValue],
     );
 
-    useEffect(() => {
-        if (watchedRaProfileUuid) {
-            onRaProfileChange(watchedRaProfileUuid);
-        }
-    }, [watchedRaProfileUuid, onRaProfileChange]);
-
     const renderCustomAttributeEditor = useMemo(() => {
         // if (isBusy) return <></>;
         return (
@@ -576,7 +565,7 @@ export default function CmpProfileForm({ cmpProfileId, onCancel, onSuccess }: Cm
     const allFormValues = useWatch({ control });
     const isEqual = useMemo(() => deepEqual(defaultValues, allFormValues), [defaultValues, allFormValues]);
 
-    const selectedRaProfile = raProfilesOptions.find((raProfile) => raProfile.value.uuid === watchedRaProfileUuid);
+    const selectedRaProfile = raProfilesOptions.find((raProfile) => raProfile.value.uuid === allFormValues?.raProfileUuid);
 
     return (
         <>
@@ -674,7 +663,7 @@ export default function CmpProfileForm({ cmpProfileId, onCancel, onSuccess }: Cm
                                     </div>
                                 </Widget>
                                 <Widget title="Request Configuration">
-                                    <div>
+                                    <div className="space-y-4">
                                         <Controller
                                             name="requestProtectionMethod"
                                             control={control}
@@ -706,32 +695,32 @@ export default function CmpProfileForm({ cmpProfileId, onCancel, onSuccess }: Cm
                                                 </>
                                             )}
                                         />
+                                        {watchedRequestProtectionMethod === ProtectionMethod.SharedSecret && (
+                                            <Controller
+                                                name="sharedSecret"
+                                                control={control}
+                                                rules={buildValidationRules([validateRequired()])}
+                                                render={({ field, fieldState }) => (
+                                                    <TextInput
+                                                        {...field}
+                                                        id="sharedSecret"
+                                                        type="password"
+                                                        label="Shared Secret"
+                                                        required
+                                                        placeholder="Shared Secret"
+                                                        invalid={fieldState.error && fieldState.isTouched}
+                                                        error={
+                                                            fieldState.error && fieldState.isTouched
+                                                                ? typeof fieldState.error === 'string'
+                                                                    ? fieldState.error
+                                                                    : fieldState.error?.message || 'Invalid value'
+                                                                : undefined
+                                                        }
+                                                    />
+                                                )}
+                                            />
+                                        )}
                                     </div>
-                                    {watchedRequestProtectionMethod === ProtectionMethod.SharedSecret && (
-                                        <Controller
-                                            name="sharedSecret"
-                                            control={control}
-                                            rules={buildValidationRules([validateRequired()])}
-                                            render={({ field, fieldState }) => (
-                                                <TextInput
-                                                    {...field}
-                                                    id="sharedSecret"
-                                                    type="password"
-                                                    label="Shared Secret"
-                                                    required
-                                                    placeholder="Shared Secret"
-                                                    invalid={fieldState.error && fieldState.isTouched}
-                                                    error={
-                                                        fieldState.error && fieldState.isTouched
-                                                            ? typeof fieldState.error === 'string'
-                                                                ? fieldState.error
-                                                                : fieldState.error?.message || 'Invalid value'
-                                                            : undefined
-                                                    }
-                                                />
-                                            )}
-                                        />
-                                    )}
                                 </Widget>
 
                                 <Widget title="Response Configuration">
@@ -822,6 +811,7 @@ export default function CmpProfileForm({ cmpProfileId, onCancel, onSuccess }: Cm
                                                     value={field.value || ''}
                                                     onChange={(value) => {
                                                         field.onChange(value);
+                                                        onRaProfileChange(typeof value === 'string' ? value : value?.toString() || '');
                                                     }}
                                                     options={raProfilesOptions.map((opt) => ({
                                                         value: opt.value.uuid,
@@ -883,28 +873,27 @@ export default function CmpProfileForm({ cmpProfileId, onCancel, onSuccess }: Cm
                                     setUserOptions={setUserOptions}
                                     setGroupOptions={setGroupOptions}
                                 />
-
-                                <Container className="flex-row justify-end" gap={4}>
-                                    <Button variant="outline" onClick={onCancel} disabled={isSubmitting} type="button">
-                                        Cancel
-                                    </Button>
-                                    <ProgressButton
-                                        title={editMode ? 'Update' : 'Create'}
-                                        inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
-                                        inProgress={isSubmitting}
-                                        disabled={
-                                            isEqual ||
-                                            isSubmitting ||
-                                            !isValid ||
-                                            isBusy ||
-                                            !formValues.requestProtectionMethod ||
-                                            !formValues.responseProtectionMethod ||
-                                            areDefaultValuesSame(formValues)
-                                        }
-                                        type="submit"
-                                    />
-                                </Container>
                             </div>
+                            <Container className="flex-row justify-end modal-footer" gap={4}>
+                                <Button variant="outline" onClick={onCancel} disabled={isSubmitting} type="button">
+                                    Cancel
+                                </Button>
+                                <ProgressButton
+                                    title={editMode ? 'Update' : 'Create'}
+                                    inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
+                                    inProgress={isSubmitting}
+                                    disabled={
+                                        isEqual ||
+                                        isSubmitting ||
+                                        !isValid ||
+                                        isBusy ||
+                                        !formValues.requestProtectionMethod ||
+                                        !formValues.responseProtectionMethod ||
+                                        areDefaultValuesSame(formValues)
+                                    }
+                                    type="submit"
+                                />
+                            </Container>
                         </Widget>
                     </form>
                 </FormProvider>

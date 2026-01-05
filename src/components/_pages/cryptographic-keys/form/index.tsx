@@ -52,7 +52,7 @@ interface FormValues {
     owner?: string | undefined;
 }
 
-export default function CryptographicKeyForm({ keyId, onSuccess, onCancel }: CryptographicKeyFormProps) {
+export default function CryptographicKeyForm({ keyId, onSuccess, onCancel, usesGlobalModal = false }: CryptographicKeyFormProps) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -212,9 +212,9 @@ export default function CryptographicKeyForm({ keyId, onSuccess, onCancel }: Cry
         if (onCancel) {
             onCancel();
         } else {
-            navigate(-1);
+            dispatch(userInterfaceActions.resetState());
         }
-    }, [navigate, onCancel]);
+    }, [dispatch, onCancel]);
 
     const onSubmit = useCallback(
         (values: FormValues) => {
@@ -253,7 +253,7 @@ export default function CryptographicKeyForm({ keyId, onSuccess, onCancel }: Cry
                             ),
                             customAttributes: collectFormAttributes('customCryptographicKey', resourceCustomAttributes, values),
                         },
-                        usesGlobalModal: false,
+                        usesGlobalModal: usesGlobalModal,
                     }),
                 );
                 onSuccess?.();
@@ -268,6 +268,7 @@ export default function CryptographicKeyForm({ keyId, onSuccess, onCancel }: Cry
             resourceCustomAttributes,
             tokenProfiles,
             onSuccess,
+            usesGlobalModal,
         ],
     );
 

@@ -222,11 +222,6 @@ export default function AcmeProfileForm({ acmeProfileId, onCancel, onSuccess }: 
         reset,
     } = methods;
 
-    const watchedRaProfile = useWatch({
-        control,
-        name: 'raProfile',
-    });
-
     // Helper function to convert validators for react-hook-form
     const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
         return {
@@ -329,12 +324,6 @@ export default function AcmeProfileForm({ acmeProfileId, onCancel, onSuccess }: 
         },
         [dispatch, raProfiles, acmeProfile, getValues, setValue],
     );
-
-    useEffect(() => {
-        if (watchedRaProfile) {
-            onRaProfileChange(watchedRaProfile);
-        }
-    }, [watchedRaProfile, onRaProfileChange]);
 
     const renderCustomAttributeEditor = useAttributeEditor({
         isBusy,
@@ -765,6 +754,7 @@ export default function AcmeProfileForm({ acmeProfileId, onCancel, onSuccess }: 
                                             value={field.value || ''}
                                             onChange={(value) => {
                                                 field.onChange(value);
+                                                onRaProfileChange(typeof value === 'string' ? value : value?.toString() || '');
                                             }}
                                             options={optionsForRaProfiles || []}
                                             placeholder="Select to change RA Profile if needed"

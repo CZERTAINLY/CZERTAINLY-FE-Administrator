@@ -8,7 +8,7 @@ import { EntityType } from 'ducks/filters';
 import { selectors as pagingSelectors } from 'ducks/paging';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 
@@ -30,7 +30,7 @@ import CertificateStatus from '../CertificateStatus';
 import CertificateUploadDialog from '../CertificateUploadDialog';
 import { ArrowDownToLine, Plug, Plus, KeyRound } from 'lucide-react';
 import Switch from 'components/Switch';
-import CertificateEdit from '../form';
+import { Resource } from '../../../../types/openapi';
 
 interface Props {
     selectCertsOnly?: boolean;
@@ -52,6 +52,7 @@ export default function CertificateList({
     withPreservedFilters = true,
 }: Props) {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const certificates = useSelector(selectors.certificates);
     const checkedRows = useSelector(pagingSelectors.checkedRows(EntityType.CERTIFICATE));
@@ -74,7 +75,6 @@ export default function CertificateList({
     const currentFilters = useSelector(filterSelectors.currentFilters(EntityType.CERTIFICATE));
     const preservedFilters = useSelector(filterSelectors.preservedFilters(EntityType.CERTIFICATE));
     const [upload, setUpload] = useState<boolean>(false);
-    const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
     const [updateGroup, setUpdateGroup] = useState<boolean>(false);
     const [updateOwner, setUpdateOwner] = useState<boolean>(false);
     const [updateEntity, setUpdateEntity] = useState<boolean>(false);
@@ -156,14 +156,6 @@ export default function CertificateList({
         dispatch(actions.bulkUnarchiveCertificate({ uuids: checkedRows, filters: appliedFilters }));
     }, [dispatch, checkedRows, appliedFilters]);
 
-    const handleOpenAddModal = useCallback(() => {
-        setIsAddModalOpen(true);
-    }, []);
-
-    const handleCloseAddModal = useCallback(() => {
-        setIsAddModalOpen(false);
-    }, []);
-
     const buttons: WidgetButtonProps[] = useMemo(
         () =>
             selectCertsOnly
@@ -175,7 +167,7 @@ export default function CertificateList({
                           tooltip: 'Add Certificate',
                           onClick: (event) => {
                               event.preventDefault();
-                              handleOpenAddModal();
+                              navigate(`/${Resource.Certificates.toLowerCase()}/add`);
                           },
                           id: 'add-certificate',
                       },
@@ -232,7 +224,7 @@ export default function CertificateList({
                           onClick: onUnarchiveClick,
                       },
                   ],
-        [checkedRows.length, downloadDropDown, selectCertsOnly, getUserList, onArchiveClick, onUnarchiveClick, handleOpenAddModal],
+        [checkedRows.length, downloadDropDown, selectCertsOnly, getUserList, onArchiveClick, onUnarchiveClick, navigate],
     );
 
     const certificatesRowHeaders: TableHeader[] = useMemo(
@@ -464,16 +456,6 @@ export default function CertificateList({
                         onChange={() => dispatch(actions.setIncludeArchived(!isIncludeArchived))}
                     />
                 }
-            />
-
-            <Dialog
-                isOpen={isAddModalOpen}
-                caption="Add new Certificate"
-                body={<CertificateEdit onCancel={handleCloseAddModal} />}
-                toggle={handleCloseAddModal}
-                buttons={[]}
-                size="xl"
-                icon={<Plus size={26} strokeWidth={1} />}
             />
 
             <Dialog
