@@ -8,9 +8,8 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions, selectors } from 'ducks/authorities';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useParams } from 'react-router';
+import { Link, useNavigate, useParams } from 'react-router';
 import Label from 'components/Label';
-import AuthorityForm from '../form';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { PlatformEnum, Resource } from '../../../../types/openapi';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
@@ -21,6 +20,7 @@ import Breadcrumb from 'components/Breadcrumb';
 
 export default function AuthorityDetail() {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const { id } = useParams();
 
@@ -33,7 +33,6 @@ export default function AuthorityDetail() {
     const deleteErrorMessage = useSelector(selectors.deleteErrorMessage);
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
-    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
     const isBusy = useMemo(() => isFetching || isDeleting, [isFetching, isDeleting]);
 
@@ -47,28 +46,10 @@ export default function AuthorityDetail() {
         getFreshAuthorityDetails();
     }, [getFreshAuthorityDetails, id]);
 
-    const wasUpdating = useRef(isUpdating);
-
-    useEffect(() => {
-        if (wasUpdating.current && !isUpdating) {
-            setIsEditModalOpen(false);
-            getFreshAuthorityDetails();
-        }
-        wasUpdating.current = isUpdating;
-    }, [isUpdating, getFreshAuthorityDetails]);
-
-    const handleOpenEditModal = useCallback(() => {
-        if (!authority) return;
-        setIsEditModalOpen(true);
-    }, [authority]);
-
-    const handleCloseEditModal = useCallback(() => {
-        setIsEditModalOpen(false);
-    }, []);
-
     const onEditClick = useCallback(() => {
-        handleOpenEditModal();
-    }, [handleOpenEditModal]);
+        if (!authority) return;
+        navigate(`/authorities/edit/${authority.uuid}`);
+    }, [authority, navigate]);
 
     const onDeleteConfirmed = useCallback(() => {
         if (!authority) return;
@@ -190,14 +171,6 @@ export default function AuthorityDetail() {
                             body: 'Cancel',
                         },
                     ]}
-                />
-
-                <Dialog
-                    isOpen={isEditModalOpen}
-                    toggle={handleCloseEditModal}
-                    caption="Edit Authority"
-                    size="xl"
-                    body={<AuthorityForm authorityId={authority?.uuid} onCancel={handleCloseEditModal} onSuccess={handleCloseEditModal} />}
                 />
             </Container>
         </div>
