@@ -449,7 +449,7 @@ export function Attribute({
                                 )}
                             />
                         </div>
-                        <div className="ml-4">
+                        <div className="ml-4 flex items-center">
                             <label
                                 htmlFor={name}
                                 className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-lg hover:bg-gray-50 cursor-pointer dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
