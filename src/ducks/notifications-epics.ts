@@ -116,6 +116,7 @@ const markAsReadNotification: AppEpic = (action$, state$, deps) => {
                     of(
                         slice.actions.markAsReadNotificationSuccess({ uuid: action.payload.uuid }),
                         slice.actions.listOverviewNotifications(),
+                        alertActions.success('Notification marked as read successfully'),
                     ),
                 ),
 
@@ -369,6 +370,7 @@ const bulkMarkNotificationAsRead: AppEpic = (action$, state$, deps) => {
                     of(
                         slice.actions.bulkMarkNotificationAsReadSuccess({ markedNotificationUuids: action.payload.uuids }),
                         slice.actions.listOverviewNotifications(),
+                        alertActions.success(`Notifications marked as read successfully`),
                     ),
                 ),
 
