@@ -58,7 +58,6 @@ interface FormValues {
 
 export default function ScepProfileForm({ scepProfileId, onCancel, onSuccess }: ScepProfileFormProps) {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const { id: routeId } = useParams();
     const id = scepProfileId || routeId;
@@ -209,11 +208,6 @@ export default function ScepProfileForm({ scepProfileId, onCancel, onSuccess }: 
         name: 'enableIntune',
     });
 
-    const watchedRaProfile = useWatch({
-        control,
-        name: 'raProfile',
-    });
-
     const watchedCertificate = useWatch({
         control,
         name: 'certificate',
@@ -312,12 +306,6 @@ export default function ScepProfileForm({ scepProfileId, onCancel, onSuccess }: 
         },
         [dispatch, raProfiles, scepProfile, getValues, setValue],
     );
-
-    useEffect(() => {
-        if (watchedRaProfile) {
-            onRaProfileChange(watchedRaProfile);
-        }
-    }, [watchedRaProfile, onRaProfileChange]);
 
     const renderCertificateAssociatedAttributesEditor = useAttributeEditor({
         isBusy,
@@ -682,6 +670,8 @@ export default function ScepProfileForm({ scepProfileId, onCancel, onSuccess }: 
                                             value={field.value || ''}
                                             onChange={(value) => {
                                                 field.onChange(value);
+                                                // Call onRaProfileChange directly when user changes the value
+                                                onRaProfileChange(typeof value === 'string' ? value : value?.toString() || '');
                                             }}
                                             options={optionsForRaProfiles || []}
                                             placeholder="Select to change RA Profile if needed"

@@ -6,6 +6,7 @@ import { actions as connectorActions } from 'ducks/connectors';
 
 import { actions as tokenProfilesActions, selectors as tokenProfilesSelectors } from 'ducks/token-profiles';
 import { actions as tokensActions, selectors as tokensSelectors } from 'ducks/tokens';
+import { actions as userInterfaceActions } from 'ducks/user-interface';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -31,6 +32,7 @@ interface TokenProfileFormProps {
     tokenId?: string;
     onCancel?: () => void;
     onSuccess?: () => void;
+    usesGlobalModal?: boolean;
 }
 
 interface FormValues {
@@ -40,7 +42,13 @@ interface FormValues {
     usages: { value: KeyUsage; label: string }[];
 }
 
-export default function TokenProfileForm({ tokenProfileId, tokenId: propTokenId, onCancel, onSuccess }: TokenProfileFormProps) {
+export default function TokenProfileForm({
+    tokenProfileId,
+    tokenId: propTokenId,
+    onCancel,
+    onSuccess,
+    usesGlobalModal = false,
+}: TokenProfileFormProps) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -193,12 +201,6 @@ export default function TokenProfileForm({ tokenProfileId, tokenId: propTokenId,
         [dispatch, getValues, setValue],
     );
 
-    useEffect(() => {
-        if (watchedToken) {
-            onTokenChange(watchedToken);
-        }
-    }, [watchedToken, onTokenChange]);
-
     const onSubmit = useCallback(
         (values: FormValues) => {
             if (editMode) {
@@ -206,7 +208,8 @@ export default function TokenProfileForm({ tokenProfileId, tokenId: propTokenId,
                     tokenProfilesActions.updateTokenProfile({
                         profileUuid: id!,
                         tokenInstanceUuid: values.token,
-                        redirect: `../../../tokenprofiles/detail/${values.token}/${id}`,
+                        redirect: usesGlobalModal ? undefined : `../../../tokenprofiles/detail/${values.token}/${id}`,
+                        usesGlobalModal,
                         tokenProfileEditRequest: {
                             enabled: tokenProfile!.enabled,
                             description: values.description,
@@ -235,7 +238,7 @@ export default function TokenProfileForm({ tokenProfileId, tokenId: propTokenId,
                             customAttributes: collectFormAttributes('customTokenProfile', resourceCustomAttributes, values),
                             usage: values.usages.map((item) => item.value),
                         },
-                        usesGlobalModal: false,
+                        usesGlobalModal,
                     }),
                 );
             }
@@ -248,6 +251,7 @@ export default function TokenProfileForm({ tokenProfileId, tokenId: propTokenId,
             tokenProfileAttributeDescriptors,
             groupAttributesCallbackAttributes,
             resourceCustomAttributes,
+            usesGlobalModal,
         ],
     );
 
@@ -339,6 +343,7 @@ export default function TokenProfileForm({ tokenProfileId, tokenId: propTokenId,
                                             value={field.value || ''}
                                             onChange={(value) => {
                                                 field.onChange(value);
+                                                onTokenChange(typeof value === 'string' ? value : value?.toString() || '');
                                             }}
                                             options={optionsForTokens}
                                             placeholder="Select to change Token if needed"
@@ -413,7 +418,18 @@ export default function TokenProfileForm({ tokenProfileId, tokenId: propTokenId,
                         />
 
                         <Container className="flex-row justify-end modal-footer" gap={4}>
-                            <Button variant="outline" onClick={onCancel} disabled={isSubmitting} type="button">
+                            <Button
+                                variant="outline"
+                                onClick={() => {
+                                    if (onCancel) {
+                                        onCancel();
+                                    } else {
+                                        dispatch(userInterfaceActions.resetState());
+                                    }
+                                }}
+                                disabled={isSubmitting}
+                                type="button"
+                            >
                                 Cancel
                             </Button>
                             <ProgressButton

@@ -309,6 +309,7 @@ const EventsTable = ({ mode, resource, resourceUuid, widgetLocks }: Props) => {
     return (
         <>
             <Widget
+                noBorder
                 title={textContent.title}
                 refreshAction={mode === 'association' ? fetchEventAssociations : fetchEventsSettings}
                 titleSize="large"

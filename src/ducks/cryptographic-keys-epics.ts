@@ -160,7 +160,7 @@ const createCryptographicKey: AppEpic = (action$, state$, deps) => {
                                     uuid: obj.uuid,
                                     tokenInstanceUuid: action.payload.tokenInstanceUuid,
                                 }),
-                                userInterfaceActions.hideGlobalModal(),
+                                userInterfaceActions.resetState(),
                                 slice.actions.listCryptographicKeyPairs({
                                     tokenProfileUuid: action.payload.tokenProfileUuid,
                                 }),

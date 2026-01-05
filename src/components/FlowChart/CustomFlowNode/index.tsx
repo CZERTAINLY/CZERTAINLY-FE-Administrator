@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 import { Handle, Position } from 'reactflow';
 import Button from 'components/Button';
+import CustomTable from 'components/CustomTable';
 import { EntityNodeProps } from 'types/flowchart';
 import { CertificateValidationStatus } from 'types/openapi';
 import { useCopyToClipboard } from 'utils/common-hooks';
@@ -14,8 +15,8 @@ import {
     Minus,
     Trash2,
     Copy,
-    ChevronDown,
-    ChevronUp,
+    ArrowDown,
+    ArrowUp,
     Award,
     FileText,
     User,
@@ -32,7 +33,6 @@ import {
     Eye,
     EyeOff,
 } from 'lucide-react';
-import style from './customFlowNode.module.scss';
 
 export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, id }: EntityNodeProps) {
     const [isNodeExpanded, setIsNodeExpanded] = useState(data.expandedByDefault ?? false);
@@ -174,105 +174,101 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
 
         if (!IconComponent) {
             // Default to FileText if icon not found
-            return <FileText size={24} className={cn(getStatusClasses())} />;
+            return <FileText size={24} className={getStatusClasses()} />;
         }
 
-        return <IconComponent size={24} className={cn(getStatusClasses())} />;
+        return <IconComponent size={24} className={getStatusClasses()} />;
     };
 
     // TODO: use only for certificates not for rules
     const getStatusClasses = () => {
         switch (data?.certificateNodeData?.certificateNodeValidationStatus) {
             case CertificateValidationStatus.Valid:
-                return style.validStatus;
+                return 'text-green-700 border-green-700 [&_.certificate-icon]:text-green-700';
             case CertificateValidationStatus.Expired:
-                return style.expiredStatus;
+                return 'text-red-500 border-red-500';
             case CertificateValidationStatus.Revoked:
-                return style.revokedStatus;
+                return 'text-[#632828] border-[#632828]';
             case CertificateValidationStatus.Invalid:
-                return style.invalidStatus;
+                return 'text-gray-900 border-gray-900 border-2';
             case CertificateValidationStatus.NotChecked:
-                return style.notCheckedStatus;
+                return 'text-blue-600 border-blue-600';
             case CertificateValidationStatus.Inactive:
-                return style.inactiveStatus;
+                return 'text-gray-500 border-gray-500';
             case CertificateValidationStatus.Expiring:
-                return style.expiringStatus;
+                return 'text-yellow-500 border-yellow-500';
             case CertificateValidationStatus.Failed:
-                return style.failedStatus;
+                return 'text-[#9c0012] border-[#9c0012]';
         }
 
         switch (data?.group) {
             case 'rules':
-                return style.rulesGroupNodeStatus;
+                return 'text-blue-600 border-blue-600';
             case 'actions':
-                return style.actionGroupNodeStatus;
+                return 'text-green-700 border-green-700 [&_.certificate-icon]:text-green-700';
         }
 
-        return style.unknownStatus;
+        return 'text-indigo-300 border-indigo-300';
     };
 
     // TODO: use only for certificates not for rules
     const getExpandButtonStatusClasses = () => {
         switch (data?.certificateNodeData?.certificateNodeValidationStatus) {
             case CertificateValidationStatus.Valid:
-                return style.expandButtonValid;
+                return '!bg-[#1ab3949f] !border-none hover:!bg-[#1ab394ec] active:!bg-[#1ab394d8]';
             case CertificateValidationStatus.Expired:
-                return style.expandButtonExpired;
+                return '!bg-[#ef4444a4] !border-none hover:!bg-red-500 active:!bg-red-500';
             case CertificateValidationStatus.Revoked:
-                return style.expandButtonRevoked;
+                return '!bg-[#632828b7] !border-none hover:!bg-[#632828] active:!bg-[#632828]';
             case CertificateValidationStatus.Expiring:
-                return style.expandButtonExpiring;
+                return '!bg-[#eab308a6] !border-none hover:!bg-[#eab308ec] active:!bg-[#eab308d8]';
             case CertificateValidationStatus.Invalid:
-                return style.expandButtonInvalid;
+                return '!bg-[#131212a3] !border-none hover:!bg-[#131212ec] active:!bg-[#131212d8]';
             case CertificateValidationStatus.NotChecked:
-                return style.expandButtonNotChecked;
+                return '!bg-[#7fa2c1a1] !border-none hover:!bg-[#7fa2c1ec] active:!bg-[#7fa2c1d8]';
             case CertificateValidationStatus.Failed:
-                return style.expandButtonFailed;
+                return '!bg-[#9c0012a2] !border-none hover:!bg-[#9c0012ec] active:!bg-[#9c0012d8]';
             case CertificateValidationStatus.Inactive:
-                return style.expandButtonInactive;
+                return '!bg-[#6c757da0] !border-none hover:!bg-[#6c757dec] active:!bg-[#6c757dd8]';
         }
         switch (data?.group) {
             case 'rules':
-                return style.rulesGroupNodeExpandButton;
+                return '!bg-[#7fa2c1a1] !border-none hover:!bg-[#7fa2c1ec] active:!bg-[#7fa2c1d8]';
             case 'actions':
-                return style.actionsGroupNodeExpandButton;
+                return '!bg-[#1ab3949f] !border-none hover:!bg-[#1ab394ec] active:!bg-[#1ab394d8]';
         }
 
-        return style.expandButtonUnknown;
+        return '!bg-indigo-300 !border-none hover:!bg-[#3754a5ec] active:!bg-[#3754a5d8]';
     };
 
     return (
         <>
-            <Handle hidden={data.handleHide === 'target'} className={cn(style.handleUp)} type="target" position={Position.Top} />
+            <Handle hidden={data.handleHide === 'target'} className="opacity-0" type="target" position={Position.Top} />
             <div className="flex items-start">
                 <div
-                    // style={{ width: '500px' }}
                     className={cn(
-                        // style.customNodeBackground,
-                        { [style.customNodeBackground]: !data.formContent },
-                        { [style.selectedBackground]: dragging },
-                        {
-                            [style.mainNodeBody]: data.isMainNode,
-                            [style.groupNode]: data.group,
-                            [style.hiddenStatus]: thisNodeState?.hidden !== undefined,
-                        },
+                        'relative bg-white p-2 pb-[0.9rem] rounded-[10px] flex flex-col items-start w-[400px] min-h-[55px] border-2 border-indigo-300 text-left z-[1] transition-[width] duration-300 ease-in-out',
+                        { 'bg-gray-200': dragging },
+                        { 'border-4': data.isMainNode },
+                        { 'w-[242.5px]': data.group || thisNodeState?.hidden !== undefined },
                         getStatusClasses(),
-                        {
-                            [style.expandedNode]: isNodeExpanded,
-                        },
+                        { 'w-[600px]': isNodeExpanded },
                     )}
                 >
                     {selected && (
-                        <div className={style.expandButtonContainer}>
+                        <div className="absolute top-0 -right-10">
                             <div className="flex flex-col">
                                 {data.otherProperties && (
                                     <Button
                                         color="primary"
                                         onClick={expandToggle}
-                                        className={cn(style.nodeButton, getExpandButtonStatusClasses())}
+                                        className={cn(
+                                            '!rounded-full !w-[26px] !h-[26px] !p-0 !text-[10px]',
+                                            getExpandButtonStatusClasses(),
+                                        )}
                                     >
-                                        {/* <span className="mx-auto">{status}</span> */}
-                                        {isNodeExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                                        <span className="sr-only">{isNodeExpanded ? 'Collapse' : 'Expand'}</span>
+                                        {isNodeExpanded ? <ArrowUp width="100%" height="70%" /> : <ArrowDown width="100%" height="70%" />}
                                     </Button>
                                 )}
 
@@ -283,7 +279,10 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                                             // setShowHiddenNodes(!expandedHiddenNodeId);
                                             toggleHiddenNodes();
                                         }}
-                                        className={cn('mt-1', style.nodeButton, getExpandButtonStatusClasses())}
+                                        className={cn(
+                                            'mt-1 !rounded-full !w-[26px] !h-[26px] !p-0 !text-[10px]',
+                                            getExpandButtonStatusClasses(),
+                                        )}
                                     >
                                         {/* <span className="mx-auto">{status}</span> */}
                                         {expandedHiddenNodeId !== id ? <Eye size={16} /> : <EyeOff size={16} />}
@@ -295,7 +294,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                                 {data.addButtonContent && (
                                     <Button
                                         color="primary"
-                                        className={cn('mt-1', style.nodeButton, style.addButton)}
+                                        className="mt-1 !rounded-full !w-[26px] !h-[26px] !p-0 !text-[10px] !bg-indigo-300 !border-none hover:!bg-[#3754a5ec] active:!bg-[#3754a5d8]"
                                         // onClick={data.addButtonContent}
                                         title="Add connections to this node"
                                         onClick={() => setAddNodeContentCollapse(!addNodeContentCollapse)}
@@ -307,7 +306,7 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                                 {data.deleteAction && (
                                     <Button
                                         color="danger"
-                                        className={cn('mt-1', style.nodeButton, style.deleteButton)}
+                                        className="mt-1 !rounded-full !w-[26px] !h-[26px] !p-0 !text-[10px] !bg-[#e37582] !border-none hover:!bg-[#ef4444ec] active:!bg-[#ef4444d8]"
                                         onClick={() => {
                                             if (data.deleteAction) {
                                                 switch (data.deleteAction.disableCondition) {
@@ -348,19 +347,19 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                     )}
                     <div className="flex items-center mb-2">
                         <div className="mr-2">{getIconComponent()}</div>
-                        <h6 className={cn(style.customNodeCardTitle)}>{data.customNodeCardTitle}</h6>
+                        <h6 className="text-[var(--dark-gray-color)] font-bold text-lg">{data.customNodeCardTitle}</h6>
                     </div>
 
                     {data.redirectUrl && data.entityLabel ? (
-                        <div className={cn('flex font-medium text-[#64748b]', style.entityLabel)}>
+                        <div className="flex font-medium text-[#64748b] [&>*]:min-w-0 [&>*]:flex-shrink [&>*]:break-words">
                             <h6>Entity Name:</h6>
                             &nbsp;
-                            <Link to={data.redirectUrl}>
+                            <Link to={data.redirectUrl} className="text-[var(--primary-blue-color)] font-semibold">
                                 <h6 className="text-wrap">{data.entityLabel}</h6>
                             </Link>
                         </div>
                     ) : data.entityLabel ? (
-                        <div className={cn('flex font-medium text-[#64748b]', style.entityLabel)}>
+                        <div className="flex font-medium text-[#64748b] [&>*]:min-w-0 [&>*]:flex-shrink [&>*]:break-words">
                             <h6>Entity Name:</h6>
                             &nbsp;
                             <h6>{data.entityLabel}</h6>
@@ -377,39 +376,65 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                     )}
 
                     {data.otherProperties && (
-                        <>
-                            <div className={cn('w-full', { hidden: !isNodeExpanded })}>
-                                <div className={cn(style.listContainer, { [style.listContainerDragging]: dragging })}>
-                                    <ul className={cn('p-1')}>
-                                        {data.otherProperties.map((property, index) => (
-                                            <li key={index} className="text-wrap p-0 pl-1">
-                                                {property?.propertyName && (
-                                                    <span className="font-medium text-[#64748B]">{property.propertyName}: </span>
-                                                )}
-                                                {property?.propertyValue && <span>{property.propertyValue}</span>}
-                                                {property?.copyable && property?.propertyValue && (
-                                                    <span
-                                                        onClick={() => {
-                                                            if (typeof property.propertyValue === 'string') {
-                                                                copyToClipboard(
-                                                                    property.propertyValue,
-                                                                    `${property.propertyName} copied to clipboard`,
-                                                                    `Failed to copy ${property.propertyName} to clipboard`,
-                                                                );
-                                                            }
-                                                        }}
-                                                        className="cursor-pointer"
-                                                    >
-                                                        <Copy size={14} />
-                                                    </span>
-                                                )}
-                                                {property?.propertyContent && <>{property.propertyContent}</>}
-                                            </li>
-                                        ))}
-                                    </ul>
+                        <div className={cn('w-full py-2', { hidden: !isNodeExpanded })}>
+                            <div className="max-h-[150px]overflow-auto w-full [scrollbar-width:thin] [scrollbar-color:#9ca3af_#e5e7eb] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-thumb]:rounded [&::-webkit-scrollbar-track]:bg-gray-200 [&::-webkit-scrollbar-track]:rounded">
+                                <div className="border border-gray-100 rounded-md">
+                                    <CustomTable
+                                        headers={[
+                                            {
+                                                id: 'property',
+                                                content: 'Property',
+                                                align: 'left',
+                                            },
+                                            {
+                                                id: 'value',
+                                                content: 'Value',
+                                                align: 'left',
+                                            },
+                                        ]}
+                                        data={data.otherProperties.map((property, index) => {
+                                            const valueContent = (
+                                                <div className="flex items-center gap-2 text-wrap">
+                                                    {property?.propertyValue && <span>{property.propertyValue}</span>}
+                                                    {property?.copyable && property?.propertyValue && (
+                                                        <span
+                                                            onClick={() => {
+                                                                if (typeof property.propertyValue === 'string') {
+                                                                    copyToClipboard(
+                                                                        property.propertyValue,
+                                                                        `${property.propertyName} copied to clipboard`,
+                                                                        `Failed to copy ${property.propertyName} to clipboard`,
+                                                                    );
+                                                                }
+                                                            }}
+                                                            className="cursor-pointer"
+                                                        >
+                                                            <Copy size={14} />
+                                                        </span>
+                                                    )}
+                                                    {property?.propertyContent && <>{property.propertyContent}</>}
+                                                </div>
+                                            );
+
+                                            return {
+                                                id: index,
+                                                columns: [
+                                                    property?.propertyName ? (
+                                                        <span className="font-medium text-[#64748B]">{property.propertyName}</span>
+                                                    ) : (
+                                                        ''
+                                                    ),
+                                                    valueContent,
+                                                ],
+                                            };
+                                        })}
+                                        hasHeader={false}
+                                        hasCheckboxes={false}
+                                        hasPagination={false}
+                                    />
                                 </div>
                             </div>
-                        </>
+                        </div>
                     )}
 
                     {data?.formContent && (
@@ -419,13 +444,15 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
                     )}
 
                     <div className={cn({ hidden: !addNodeContentCollapse })}>
-                        <div className={style.addContentContainer}>{data.addButtonContent}</div>
+                        <div className="bg-white p-2 pb-[0.9rem] rounded-[10px] flex flex-col items-start w-[350px] min-h-[55px] text-left z-[2]">
+                            {data.addButtonContent}
+                        </div>
                     </div>
                 </div>
             </div>
 
             {/* <Collapse isOpen={addNodeContentCollapse}>hiiiiiiii</Collapse> */}
-            <Handle hidden={data.handleHide === 'source'} className={style.handleDown} type="source" position={Position.Bottom} id="a" />
+            <Handle hidden={data.handleHide === 'source'} className="opacity-0" type="source" position={Position.Bottom} id="a" />
         </>
     );
 }

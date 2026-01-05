@@ -347,7 +347,7 @@ export default function Sidebar({ allowedResources }: Props) {
                                     to={child.link}
                                     className={({ isActive }) =>
                                         cn(
-                                            'block px-4 ml-8 py-2 no-underline hover:bg-gray-200 rounded-lg h-[38px] items-center',
+                                            'font-medium text-sm block px-4 ml-8 py-2 no-underline hover:bg-gray-200 rounded-lg h-[38px] items-center',
                                             isActive && 'text-blue-600',
                                         )
                                     }
@@ -371,7 +371,7 @@ export default function Sidebar({ allowedResources }: Props) {
                         }
                     }}
                     className={({ isActive }) =>
-                        cn('flex px-4 py-2 no-underline hover:bg-gray-200 rounded-lg h-[38px] items-center dark:text-white', {
+                        cn('font-medium flex px-4 py-2 no-underline hover:bg-gray-200 rounded-lg h-[38px] items-center dark:text-white', {
                             'text-blue-600': isActive,
                             'w-full gap-x-2': menuSize !== 'small',
                         })

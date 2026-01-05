@@ -75,7 +75,7 @@ const RenderRequestKey = ({ type, name, tokenProfileField }: Props) => {
     const handleAddNewKey = useCallback(() => {
         dispatch(
             userInterfaceActions.showGlobalModal({
-                content: <CryptographicKeyForm />,
+                content: <CryptographicKeyForm usesGlobalModal />,
                 isOpen: true,
                 size: 'lg',
                 title: 'Add New Key',

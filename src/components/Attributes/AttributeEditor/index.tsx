@@ -954,7 +954,7 @@ function AttributeEditorInner({
 
         groupedAttributesDescriptorsKeys.forEach((group, i, arr) => {
             attrs.push(
-                <Widget key={group} title={group === '__' ? '' : group} busy={isRunningCb}>
+                <Widget noBorder key={group} title={group === '__' ? '' : group} busy={isRunningCb}>
                     {groupedAttributesDescriptors[group].map((descriptor, index) => (
                         <div key={descriptor.name} className="mb-4">
                             <Attribute

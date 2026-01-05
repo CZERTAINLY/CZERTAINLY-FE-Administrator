@@ -44,7 +44,7 @@ const RenderTokenProfile = ({ type, name }: Props) => {
     const handleAddNew = useCallback(() => {
         dispatch(
             userInterfaceActions.showGlobalModal({
-                content: <TokenProfileForm />,
+                content: <TokenProfileForm usesGlobalModal />,
                 isOpen: true,
                 size: 'lg',
                 title: 'Add New Token Profile',

@@ -17,10 +17,13 @@ import { useNavigate, useParams } from 'react-router';
 import Select from 'components/Select';
 import Button from 'components/Button';
 import Container from 'components/Container';
+import Breadcrumb from 'components/Breadcrumb';
 import { AttributeDescriptorModel } from 'types/attributes';
 import { AuthorityResponseModel } from 'types/authorities';
 import { ConnectorResponseModel } from 'types/connectors';
-import { FunctionGroupCode, Resource } from 'types/openapi';
+import { FunctionGroupCode, PlatformEnum, Resource } from 'types/openapi';
+import { getEnumLabel } from 'ducks/enums';
+import { selectors as enumSelectors } from 'ducks/enums';
 
 import { collectFormAttributes } from 'utils/attributes/attributes';
 
@@ -40,11 +43,14 @@ interface FormValues {
 
 export default function AuthorityForm({ authorityId, onCancel, onSuccess }: AuthorityFormProps) {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const { id: routeId } = useParams();
     const id = authorityId || routeId;
 
     const editMode = useMemo(() => !!id, [id]);
+
+    const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
 
     const authoritySelector = useSelector(authoritySelectors.authority);
     const authorityProviders = useSelector(authoritySelectors.authorityProviders);
@@ -89,6 +95,7 @@ export default function AuthorityForm({ authorityId, onCancel, onSuccess }: Auth
     }, [dispatch]);
 
     const previousIdRef = useRef<string | undefined>(undefined);
+    const fetchedDescriptorsRef = useRef<string | undefined>(undefined);
 
     useEffect(() => {
         if (editMode && id) {
@@ -96,9 +103,11 @@ export default function AuthorityForm({ authorityId, onCancel, onSuccess }: Auth
             if (previousIdRef.current !== id || !authoritySelector || authoritySelector.uuid !== id) {
                 dispatch(authorityActions.getAuthorityDetail({ uuid: id }));
                 previousIdRef.current = id;
+                fetchedDescriptorsRef.current = undefined;
             }
         } else {
             previousIdRef.current = undefined;
+            fetchedDescriptorsRef.current = undefined;
         }
     }, [dispatch, editMode, id, authoritySelector]);
 
@@ -109,29 +118,59 @@ export default function AuthorityForm({ authorityId, onCancel, onSuccess }: Auth
     }, [authoritySelector, editMode, id]);
 
     useEffect(() => {
-        if (!authorityProvider && editMode && authoritySelector?.uuid === id && authorityProviders && authorityProviders.length > 0) {
-            if (!authoritySelector!.connectorUuid) {
+        if (
+            editMode &&
+            authoritySelector &&
+            authoritySelector.uuid === id &&
+            !isFetchingAuthorityDetail &&
+            !isFetchingAuthorityProviders &&
+            !isFetchingAttributeDescriptors &&
+            authorityProviders &&
+            authorityProviders.length > 0
+        ) {
+            if (!authoritySelector.connectorUuid) {
                 dispatch(alertActions.error('Authority provider was probably deleted'));
                 return;
             }
 
-            const provider = authorityProviders.find((p) => p.uuid === authoritySelector!.connectorUuid);
+            const provider = authorityProviders.find((p) => p.uuid === authoritySelector.connectorUuid);
 
             if (provider) {
-                setAuthorityProvider(provider);
-                const functionGroup = provider.functionGroups[0].functionGroupCode;
-                dispatch(
-                    authorityActions.getAuthorityProviderAttributesDescriptors({
-                        uuid: authoritySelector!.connectorUuid,
-                        kind: authoritySelector!.kind,
-                        functionGroup,
-                    }),
-                );
+                if (!authorityProvider || authorityProvider.uuid !== provider.uuid) {
+                    setAuthorityProvider(provider);
+                }
+                const descriptorKey = `${authoritySelector.connectorUuid}-${authoritySelector.kind}`;
+                if (
+                    authoritySelector.kind &&
+                    fetchedDescriptorsRef.current !== descriptorKey &&
+                    (!authorityProviderAttributeDescriptors || authorityProviderAttributeDescriptors.length === 0)
+                ) {
+                    const functionGroup = provider.functionGroups[0].functionGroupCode;
+                    fetchedDescriptorsRef.current = descriptorKey;
+                    dispatch(
+                        authorityActions.getAuthorityProviderAttributesDescriptors({
+                            uuid: authoritySelector.connectorUuid,
+                            kind: authoritySelector.kind,
+                            functionGroup,
+                        }),
+                    );
+                }
             } else {
                 dispatch(alertActions.error('Authority provider not found'));
             }
         }
-    }, [authorityProvider, dispatch, editMode, authoritySelector, authorityProviders, isFetchingAuthorityProviders, id]);
+    }, [
+        dispatch,
+        editMode,
+        authoritySelector,
+        authorityProviders,
+        isFetchingAuthorityProviders,
+        isFetchingAuthorityDetail,
+        isFetchingAttributeDescriptors,
+        id,
+        authorityProvider,
+        authorityProviderAttributeDescriptors,
+    ]);
 
     const optionsForAuthorityProviders = useMemo(
         () =>
@@ -208,10 +247,10 @@ export default function AuthorityForm({ authorityId, onCancel, onSuccess }: Auth
     );
 
     useEffect(() => {
-        if (watchedAuthorityProvider) {
+        if (watchedAuthorityProvider && !editMode) {
             onAuthorityProviderChange(watchedAuthorityProvider);
         }
-    }, [watchedAuthorityProvider, onAuthorityProviderChange]);
+    }, [watchedAuthorityProvider, onAuthorityProviderChange, editMode]);
 
     const onKindChange = useCallback(
         (value: string) => {
@@ -232,10 +271,10 @@ export default function AuthorityForm({ authorityId, onCancel, onSuccess }: Auth
     );
 
     useEffect(() => {
-        if (watchedStoreKind && authorityProvider) {
+        if (watchedStoreKind && authorityProvider && !editMode) {
             onKindChange(watchedStoreKind);
         }
-    }, [watchedStoreKind, authorityProvider, onKindChange]);
+    }, [watchedStoreKind, authorityProvider, onKindChange, editMode]);
 
     // Reset form values when authority is loaded in edit mode
     useEffect(() => {
@@ -247,7 +286,6 @@ export default function AuthorityForm({ authorityId, onCancel, onSuccess }: Auth
             };
             reset(newDefaultValues, { keepDefaultValues: false });
         } else if (!editMode) {
-            // Reset form when switching to create mode
             reset({
                 name: '',
                 authorityProvider: '',
@@ -256,7 +294,6 @@ export default function AuthorityForm({ authorityId, onCancel, onSuccess }: Auth
         }
     }, [editMode, authority, id, reset, isFetchingAuthorityDetail]);
 
-    // Helper function to convert validators for react-hook-form
     const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
         return {
             validate: (value: any) => {
@@ -305,8 +342,6 @@ export default function AuthorityForm({ authorityId, onCancel, onSuccess }: Auth
 
     const inProgressTitle = useMemo(() => (editMode ? 'Saving...' : 'Creating...'), [editMode]);
 
-    const title = useMemo(() => (editMode ? `Edit authority ${authority?.name}` : 'Create new authority'), [editMode, authority]);
-
     const renderCustomAttributeEditor = useMemo(() => {
         if (isBusy) return <></>;
         return (
@@ -340,160 +375,182 @@ export default function AuthorityForm({ authorityId, onCancel, onSuccess }: Auth
     }, [isUpdating, onSuccess]);
 
     return (
-        <FormProvider {...methods}>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                <Widget noBorder busy={isBusy}>
-                    <div className="space-y-4">
-                        <Controller
-                            name="name"
-                            control={control}
-                            rules={buildValidationRules([validateRequired(), validateAlphaNumericWithSpecialChars()])}
-                            render={({ field, fieldState }) => (
-                                <TextInput
-                                    value={field.value}
-                                    onChange={(value) => field.onChange(value)}
-                                    onBlur={field.onBlur}
-                                    id="name"
-                                    type="text"
-                                    placeholder="Enter the Certification Authority Name"
-                                    disabled={editMode}
-                                    label="Certification Authority Name"
-                                    required
-                                    invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
-                                />
-                            )}
-                        />
-
-                        {!editMode ? (
-                            <div>
+        <div>
+            <Breadcrumb
+                items={[
+                    { label: `${getEnumLabel(resourceEnum, Resource.Authorities)} Inventory`, href: '/authorities' },
+                    { label: editMode ? `Edit Authority` : 'Create Authority', href: '' },
+                ]}
+            />
+            <Container>
+                <FormProvider {...methods}>
+                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                        <Widget busy={isBusy}>
+                            <div className="space-y-4">
                                 <Controller
-                                    name="authorityProvider"
+                                    name="name"
                                     control={control}
-                                    rules={buildValidationRules([validateRequired()])}
+                                    rules={buildValidationRules([validateRequired(), validateAlphaNumericWithSpecialChars()])}
                                     render={({ field, fieldState }) => (
-                                        <>
-                                            <Select
-                                                id="authorityProviderSelect"
-                                                label="Authority Provider"
-                                                value={field.value || ''}
-                                                onChange={(value) => {
-                                                    field.onChange(value);
-                                                }}
-                                                options={optionsForAuthorityProviders || []}
-                                                placeholder="Select Authority Provider"
-                                                placement="bottom"
-                                            />
-                                            {fieldState.error && fieldState.isTouched && (
-                                                <p className="mt-1 text-sm text-red-600">
-                                                    {typeof fieldState.error === 'string'
+                                        <TextInput
+                                            value={field.value}
+                                            onChange={(value) => field.onChange(value)}
+                                            onBlur={field.onBlur}
+                                            id="name"
+                                            type="text"
+                                            placeholder="Enter the Certification Authority Name"
+                                            disabled={editMode}
+                                            label="Certification Authority Name"
+                                            required
+                                            invalid={fieldState.error && fieldState.isTouched}
+                                            error={
+                                                fieldState.error && fieldState.isTouched
+                                                    ? typeof fieldState.error === 'string'
                                                         ? fieldState.error
-                                                        : fieldState.error?.message || 'Invalid value'}
-                                                </p>
-                                            )}
-                                        </>
+                                                        : fieldState.error?.message || 'Invalid value'
+                                                    : undefined
+                                            }
+                                        />
                                     )}
                                 />
-                            </div>
-                        ) : (
-                            <TextInput
-                                id="authorityProvider"
-                                type="text"
-                                label="Authority Provider"
-                                value={authority?.connectorName || ''}
-                                disabled
-                                onChange={() => {}}
-                            />
-                        )}
 
-                        {!editMode && optionsForKinds?.length ? (
-                            <div>
-                                <Controller
-                                    name="storeKind"
-                                    control={control}
-                                    rules={buildValidationRules([validateRequired()])}
-                                    render={({ field, fieldState }) => (
-                                        <>
-                                            <Select
-                                                id="storeKindSelect"
-                                                label="Kind"
-                                                value={field.value || ''}
-                                                onChange={(value) => {
-                                                    field.onChange(value);
-                                                }}
-                                                options={optionsForKinds || []}
-                                                placeholder="Select Kind"
-                                                placement="bottom"
-                                            />
-                                            {fieldState.error && fieldState.isTouched && (
-                                                <p className="mt-1 text-sm text-red-600">
-                                                    {typeof fieldState.error === 'string'
-                                                        ? fieldState.error
-                                                        : fieldState.error?.message || 'Invalid value'}
-                                                </p>
+                                {!editMode ? (
+                                    <div>
+                                        <Controller
+                                            name="authorityProvider"
+                                            control={control}
+                                            rules={buildValidationRules([validateRequired()])}
+                                            render={({ field, fieldState }) => (
+                                                <>
+                                                    <Select
+                                                        id="authorityProviderSelect"
+                                                        label="Authority Provider"
+                                                        value={field.value || ''}
+                                                        onChange={(value) => {
+                                                            field.onChange(value);
+                                                        }}
+                                                        options={optionsForAuthorityProviders || []}
+                                                        placeholder="Select Authority Provider"
+                                                        placement="bottom"
+                                                    />
+                                                    {fieldState.error && fieldState.isTouched && (
+                                                        <p className="mt-1 text-sm text-red-600">
+                                                            {typeof fieldState.error === 'string'
+                                                                ? fieldState.error
+                                                                : fieldState.error?.message || 'Invalid value'}
+                                                        </p>
+                                                    )}
+                                                </>
                                             )}
-                                        </>
-                                    )}
+                                        />
+                                    </div>
+                                ) : (
+                                    <TextInput
+                                        id="authorityProvider"
+                                        type="text"
+                                        label="Authority Provider"
+                                        value={authority?.connectorName || ''}
+                                        disabled
+                                        onChange={() => {}}
+                                    />
+                                )}
+
+                                {!editMode && optionsForKinds?.length ? (
+                                    <div>
+                                        <Controller
+                                            name="storeKind"
+                                            control={control}
+                                            rules={buildValidationRules([validateRequired()])}
+                                            render={({ field, fieldState }) => (
+                                                <>
+                                                    <Select
+                                                        id="storeKindSelect"
+                                                        label="Kind"
+                                                        value={field.value || ''}
+                                                        onChange={(value) => {
+                                                            field.onChange(value);
+                                                        }}
+                                                        options={optionsForKinds || []}
+                                                        placeholder="Select Kind"
+                                                        placement="bottom"
+                                                    />
+                                                    {fieldState.error && fieldState.isTouched && (
+                                                        <p className="mt-1 text-sm text-red-600">
+                                                            {typeof fieldState.error === 'string'
+                                                                ? fieldState.error
+                                                                : fieldState.error?.message || 'Invalid value'}
+                                                        </p>
+                                                    )}
+                                                </>
+                                            )}
+                                        />
+                                    </div>
+                                ) : null}
+
+                                {editMode && authority?.kind ? (
+                                    <TextInput
+                                        id="storeKind"
+                                        type="text"
+                                        label="Kind"
+                                        value={authority?.kind || ''}
+                                        disabled
+                                        onChange={() => {}}
+                                    />
+                                ) : null}
+
+                                <TabLayout
+                                    noBorder
+                                    tabs={[
+                                        {
+                                            title: 'Connector Attributes',
+                                            content:
+                                                authorityProvider &&
+                                                watchedStoreKind &&
+                                                authorityProviderAttributeDescriptors &&
+                                                authorityProviderAttributeDescriptors.length > 0 ? (
+                                                    <AttributeEditor
+                                                        id="authority"
+                                                        attributeDescriptors={authorityProviderAttributeDescriptors}
+                                                        attributes={authority?.attributes}
+                                                        connectorUuid={authorityProvider.uuid}
+                                                        functionGroupCode={FunctionGroupCode.AuthorityProvider}
+                                                        kind={watchedStoreKind}
+                                                        groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
+                                                        setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                                                    />
+                                                ) : (
+                                                    <></>
+                                                ),
+                                        },
+                                        {
+                                            title: 'Custom Attributes',
+                                            content: renderCustomAttributeEditor,
+                                        },
+                                    ]}
                                 />
+
+                                <Container className="flex-row justify-end modal-footer" gap={4}>
+                                    <Button
+                                        variant="outline"
+                                        onClick={onCancel || (() => navigate(-1))}
+                                        disabled={isSubmitting}
+                                        type="button"
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <ProgressButton
+                                        title={submitTitle}
+                                        inProgressTitle={inProgressTitle}
+                                        inProgress={isSubmitting}
+                                        disabled={(editMode ? !isDirty : false) || !isValid}
+                                        type="submit"
+                                    />
+                                </Container>
                             </div>
-                        ) : null}
-
-                        {editMode && authority?.kind ? (
-                            <TextInput id="storeKind" type="text" label="Kind" value={authority?.kind || ''} disabled onChange={() => {}} />
-                        ) : null}
-
-                        <TabLayout
-                            noBorder
-                            tabs={[
-                                {
-                                    title: 'Connector Attributes',
-                                    content:
-                                        authorityProvider &&
-                                        watchedStoreKind &&
-                                        authorityProviderAttributeDescriptors &&
-                                        authorityProviderAttributeDescriptors.length > 0 ? (
-                                            <AttributeEditor
-                                                id="authority"
-                                                attributeDescriptors={authorityProviderAttributeDescriptors}
-                                                attributes={authority?.attributes}
-                                                connectorUuid={authorityProvider.uuid}
-                                                functionGroupCode={FunctionGroupCode.AuthorityProvider}
-                                                kind={watchedStoreKind}
-                                                groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
-                                                setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
-                                            />
-                                        ) : (
-                                            <></>
-                                        ),
-                                },
-                                {
-                                    title: 'Custom Attributes',
-                                    content: renderCustomAttributeEditor,
-                                },
-                            ]}
-                        />
-
-                        <Container className="flex-row justify-end modal-footer" gap={4}>
-                            <Button variant="outline" onClick={onCancel} disabled={isSubmitting} type="button">
-                                Cancel
-                            </Button>
-                            <ProgressButton
-                                title={submitTitle}
-                                inProgressTitle={inProgressTitle}
-                                inProgress={isSubmitting}
-                                disabled={(editMode ? !isDirty : false) || !isValid}
-                                type="submit"
-                            />
-                        </Container>
-                    </div>
-                </Widget>
-            </form>
-        </FormProvider>
+                        </Widget>
+                    </form>
+                </FormProvider>
+            </Container>
+        </div>
     );
 }

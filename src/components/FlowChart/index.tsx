@@ -248,7 +248,7 @@ const FlowChartContent = ({
 
     return (
         <Widget busy={busy}>
-            {flowChartTitle && <h5 className="text-gray-500">{flowChartTitle}</h5>}
+            {flowChartTitle && <h5 className="text-lg font-bold mb-4">{flowChartTitle}</h5>}
             <div className="w-full h-[70vh]">
                 <ReactFlow
                     nodes={flowChartNodesState}

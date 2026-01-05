@@ -307,6 +307,14 @@ export default function TokenDetail() {
                     toggle={() => setRandomDataGeneration(false)}
                     buttons={[]}
                 />
+
+                <Dialog
+                    isOpen={isEditModalOpen}
+                    toggle={handleCloseEditModal}
+                    caption="Edit Token"
+                    size="xl"
+                    body={<TokenForm tokenId={token?.uuid} onCancel={handleCloseEditModal} onSuccess={handleCloseEditModal} />}
+                />
             </Container>
         </div>
     );

@@ -8,7 +8,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router';
+import { useParams } from 'react-router';
 
 import Select from 'components/Select';
 import Button from 'components/Button';
@@ -25,7 +25,6 @@ import { actions as customAttributesActions, selectors as customAttributesSelect
 import { actions as userInterfaceActions } from '../../../../ducks/user-interface';
 import { FunctionGroupCode, Resource } from '../../../../types/openapi';
 import TabLayout from '../../../Layout/TabLayout';
-import Label from 'components/Label';
 
 interface CredentialFormProps {
     credentialId?: string;
@@ -61,6 +60,7 @@ export default function CredentialForm({ credentialId, onCancel, onSuccess, uses
     const isUpdating = useSelector(selectors.isUpdating);
 
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
+    const [attributeValuesMap, setAttributeValuesMap] = useState<Record<string, Record<string, any>>>({});
 
     const [credential, setCredential] = useState<CredentialResponseModel>();
     const [credentialProvider, setCredentialProvider] = useState<ConnectorResponseModel>();
@@ -84,6 +84,7 @@ export default function CredentialForm({ credentialId, onCancel, onSuccess, uses
     );
 
     const previousIdRef = useRef<string | undefined>(undefined);
+    const fetchedDescriptorsKeyRef = useRef<string | undefined>(undefined);
 
     useEffect(() => {
         if (editMode && id) {
@@ -149,8 +150,30 @@ export default function CredentialForm({ credentialId, onCancel, onSuccess, uses
         [dispatch, credentialProvider],
     );
 
+    const combinedAttributeValues = useMemo(
+        () =>
+            Object.values(attributeValuesMap).reduce<Record<string, any>>((acc, current) => {
+                return { ...acc, ...current };
+            }, {}),
+        [attributeValuesMap],
+    );
+
+    const handleAttributeValuesChange = useCallback((editorId: string, values: Record<string, any> | null) => {
+        setAttributeValuesMap((prev) => {
+            const next = { ...prev };
+            if (values === null) {
+                delete next[editorId];
+            } else {
+                next[editorId] = values;
+            }
+            return next;
+        });
+    }, []);
+
     const onSubmit = useCallback(
         (values: FormValues) => {
+            const combinedValues = { ...values, ...combinedAttributeValues };
+
             if (editMode) {
                 dispatch(
                     actions.updateCredential({
@@ -159,9 +182,9 @@ export default function CredentialForm({ credentialId, onCancel, onSuccess, uses
                             attributes: collectFormAttributes(
                                 'credential',
                                 [...(credentialProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
-                                values,
+                                combinedValues,
                             ),
-                            customAttributes: collectFormAttributes('customCredential', resourceCustomAttributes, values),
+                            customAttributes: collectFormAttributes('customCredential', resourceCustomAttributes, combinedValues),
                         },
                     }),
                 );
@@ -176,9 +199,9 @@ export default function CredentialForm({ credentialId, onCancel, onSuccess, uses
                             attributes: collectFormAttributes(
                                 'credential',
                                 [...(credentialProviderAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],
-                                values,
+                                combinedValues,
                             ),
-                            customAttributes: collectFormAttributes('customCredential', resourceCustomAttributes, values),
+                            customAttributes: collectFormAttributes('customCredential', resourceCustomAttributes, combinedValues),
                         },
                     }),
                 );
@@ -192,6 +215,7 @@ export default function CredentialForm({ credentialId, onCancel, onSuccess, uses
             groupAttributesCallbackAttributes,
             resourceCustomAttributes,
             usesGlobalModal,
+            combinedAttributeValues,
         ],
     );
 
@@ -260,6 +284,27 @@ export default function CredentialForm({ credentialId, onCancel, onSuccess, uses
         name: 'credentialProvider',
     });
 
+    useEffect(() => {
+        if (watchedCredentialProvider && !editMode) {
+            onCredentialProviderChange(watchedCredentialProvider);
+        }
+    }, [watchedCredentialProvider, onCredentialProviderChange, editMode]);
+
+    useEffect(() => {
+        if (watchedStoreKind && watchedCredentialProvider && !editMode && credentialProviders) {
+            const provider = credentialProviders.find((p) => p.uuid === watchedCredentialProvider);
+            if (provider) {
+                const key = `${provider.uuid}-${watchedStoreKind}`;
+                if (fetchedDescriptorsKeyRef.current !== key) {
+                    dispatch(connectorActions.clearCallbackData());
+                    setGroupAttributesCallbackAttributes([]);
+                    dispatch(actions.getCredentialProviderAttributesDescriptors({ uuid: provider.uuid, kind: watchedStoreKind }));
+                    fetchedDescriptorsKeyRef.current = key;
+                }
+            }
+        }
+    }, [watchedStoreKind, watchedCredentialProvider, credentialProviders, dispatch, editMode]);
+
     // Reset form values when credential is loaded in edit mode
     useEffect(() => {
         if (editMode && id && credential && credential.uuid === id && !isFetchingCredentialDetail) {
@@ -289,8 +334,6 @@ export default function CredentialForm({ credentialId, onCancel, onSuccess, uses
         };
     };
 
-    const title = useMemo(() => (editMode ? 'Edit Credential' : 'Create Credential'), [editMode]);
-
     const renderCustomAttributesEditor = useCallback(() => {
         if (isBusy) return <></>;
         return (
@@ -298,9 +341,10 @@ export default function CredentialForm({ credentialId, onCancel, onSuccess, uses
                 id="customCredential"
                 attributeDescriptors={resourceCustomAttributes}
                 attributes={credential?.customAttributes}
+                onValuesChange={(values) => handleAttributeValuesChange('customCredential', values)}
             />
         );
-    }, [resourceCustomAttributes, credential, isBusy]);
+    }, [resourceCustomAttributes, credential, isBusy, handleAttributeValuesChange]);
 
     const wasCreating = useRef(isCreating);
     const wasUpdating = useRef(isUpdating);
@@ -366,8 +410,8 @@ export default function CredentialForm({ credentialId, onCancel, onSuccess, uses
                                                 label="Credential Provider"
                                                 value={field.value || ''}
                                                 onChange={(value) => {
-                                                    onCredentialProviderChange(value as string);
                                                     field.onChange(value);
+                                                    onCredentialProviderChange(value as string);
                                                 }}
                                                 options={optionsForCredentialProviders || []}
                                                 placeholder="Select Credential Provider"
@@ -408,8 +452,8 @@ export default function CredentialForm({ credentialId, onCancel, onSuccess, uses
                                                 label="Kind"
                                                 value={field.value || ''}
                                                 onChange={(value) => {
-                                                    onKindChange(value as string);
                                                     field.onChange(value);
+                                                    // onKindChange will be triggered by useEffect when credentialProvider is set
                                                 }}
                                                 options={optionsForKinds || []}
                                                 placeholder="Select Kind"
@@ -451,6 +495,7 @@ export default function CredentialForm({ credentialId, onCancel, onSuccess, uses
                                                 attributes={credential?.attributes}
                                                 groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
                                                 setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                                                onValuesChange={(values) => handleAttributeValuesChange('credential', values)}
                                             />
                                         ) : (
                                             <></>

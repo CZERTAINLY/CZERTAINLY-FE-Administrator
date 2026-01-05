@@ -8,6 +8,7 @@ import Select from 'components/Select';
 import Label from 'components/Label';
 import TextInput from 'components/TextInput';
 import DatePicker from 'components/DatePicker';
+import Switch from 'components/Switch';
 import Editor from 'react-simple-code-editor';
 import cn from 'classnames';
 import {
@@ -59,6 +60,18 @@ export function Attribute({
             setIsAddNewAttributeValue(addNewAttributeValue);
         }
     }, [descriptor]);
+
+    const handleAddNew = useCallback(() => {
+        if (!addNewAttributeValue) return;
+        dispatch(
+            userInterfaceActions.showGlobalModal({
+                content: addNewAttributeValue.content,
+                isOpen: true,
+                size: 'lg',
+                title: `Add New ${addNewAttributeValue.name}`,
+            }),
+        );
+    }, [dispatch, addNewAttributeValue]);
 
     const onUserInteraction = useCallback(() => {
         if (userInteractionRef) {
@@ -238,10 +251,22 @@ export function Attribute({
                     };
 
                     // Convert options to the format expected by custom Select component
-                    const selectOptions = (options || []).map((opt) => ({
+                    const baseSelectOptions = (options || []).map((opt) => ({
                         value: typeof opt.value === 'object' && opt.value !== null ? JSON.stringify(opt.value) : opt.value,
                         label: opt.label || String(opt.value),
                     }));
+
+                    // Add "+" option for Add New functionality if available
+                    const selectOptions = addNewAttributeValue
+                        ? [
+                              ...baseSelectOptions,
+                              {
+                                  label: '+',
+                                  value: '__add_new__',
+                                  disabled: false,
+                              },
+                          ]
+                        : baseSelectOptions;
 
                     const selectValue = getSelectValue();
 
@@ -256,47 +281,53 @@ export function Attribute({
                             )}
                             <div style={{ display: 'flex', alignItems: 'center' }}>
                                 <div style={{ flex: 1, position: 'relative' }}>
-                                    <Select
-                                        id={`${name}Select`}
-                                        value={selectValue}
-                                        onChange={(newValue: string | number | { value: string | number; label: string }[]) => {
-                                            if (descriptor.properties.multiSelect) {
-                                                // For multi-select, newValue is { value, label }[]
-                                                field.onChange(newValue as { value: string | number; label: string }[]);
-                                            } else {
+                                    {descriptor.properties.multiSelect ? (
+                                        <Select
+                                            id={`${name}Select`}
+                                            value={selectValue as { value: string | number; label: string }[]}
+                                            onChange={(newValue) => {
+                                                if (Array.isArray(newValue) && newValue.some((v) => v.value === '__add_new__')) {
+                                                    handleAddNew();
+                                                    // Remove the "__add_new__" option from the selection
+                                                    const filteredValue = newValue.filter((v) => v.value !== '__add_new__');
+                                                    field.onChange(filteredValue.length > 0 ? filteredValue : undefined);
+                                                    return;
+                                                }
+                                                field.onChange(newValue);
+                                                onUserInteraction();
+                                            }}
+                                            options={selectOptions}
+                                            placeholder={`Select ${descriptor.properties.label}`}
+                                            isDisabled={descriptor.properties.readOnly || busy}
+                                            isMulti={true}
+                                            isClearable={!descriptor.properties.required}
+                                            className={fieldState.isTouched && fieldState.invalid ? 'border-red-500' : ''}
+                                        />
+                                    ) : (
+                                        <Select
+                                            id={`${name}Select`}
+                                            value={selectValue as string | number}
+                                            onChange={(newValue) => {
+                                                // Handle Add New option
+                                                if (newValue === '__add_new__') {
+                                                    handleAddNew();
+                                                    return;
+                                                }
                                                 // For single select, find the full option object
                                                 const fullOption = options?.find((opt) => {
                                                     const optValue = typeof opt.value === 'object' ? JSON.stringify(opt.value) : opt.value;
                                                     return optValue === newValue;
                                                 });
                                                 field.onChange(fullOption || newValue);
-                                            }
-                                            onUserInteraction();
-                                        }}
-                                        options={selectOptions}
-                                        placeholder={`Select ${descriptor.properties.label}`}
-                                        isDisabled={descriptor.properties.readOnly || busy}
-                                        isMulti={descriptor.properties.multiSelect}
-                                        isClearable={!descriptor.properties.required}
-                                        className={fieldState.isTouched && fieldState.invalid ? 'border-red-500' : ''}
-                                    />
-                                    {addNewAttributeValue && (
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                dispatch(
-                                                    userInterfaceActions.showGlobalModal({
-                                                        content: addNewAttributeValue.content,
-                                                        isOpen: true,
-                                                        size: 'lg',
-                                                        title: `Add New ${addNewAttributeValue.name}`,
-                                                    }),
-                                                );
+                                                onUserInteraction();
                                             }}
-                                            className="ml-2 px-3 py-1.5 text-sm font-medium text-blue-600 bg-white border border-blue-600 rounded-lg hover:bg-blue-50 dark:text-blue-500 dark:border-blue-500 dark:hover:bg-blue-900/20"
-                                        >
-                                            Add New
-                                        </button>
+                                            options={selectOptions}
+                                            placeholder={`Select ${descriptor.properties.label}`}
+                                            isDisabled={descriptor.properties.readOnly || busy}
+                                            isMulti={false}
+                                            isClearable={!descriptor.properties.required}
+                                            className={fieldState.isTouched && fieldState.invalid ? 'border-red-500' : ''}
+                                        />
                                     )}
                                 </div>
                                 {deleteButton}
@@ -418,7 +449,7 @@ export function Attribute({
                                 )}
                             />
                         </div>
-                        <div className="ml-4">
+                        <div className="ml-4 flex items-center">
                             <label
                                 htmlFor={name}
                                 className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-lg hover:bg-gray-50 cursor-pointer dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
@@ -513,18 +544,14 @@ export function Attribute({
                         )}
                         <div className="flex items-center">
                             {descriptor.contentType === AttributeContentType.Boolean ? (
-                                <div className="flex items-center gap-2">
-                                    <input
+                                <div className="flex items-center mb-3">
+                                    <Switch
                                         id={name}
-                                        type="checkbox"
                                         checked={transformInputValue(field.value) ?? false}
-                                        onChange={(e) => field.onChange(e.target.checked)}
+                                        onChange={(checked) => field.onChange(checked)}
                                         disabled={descriptor.properties.readOnly || busy}
-                                        className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700"
+                                        secondaryLabel={descriptor.properties.label}
                                     />
-                                    <Label htmlFor={name} required={descriptor.properties.required}>
-                                        {descriptor.properties.label}
-                                    </Label>
                                     {deleteButton}
                                 </div>
                             ) : descriptor.contentType === AttributeContentType.Text ? (

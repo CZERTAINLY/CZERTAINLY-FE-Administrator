@@ -152,6 +152,7 @@ const ConditionsList = () => {
     return (
         <>
             <Widget
+                noBorder
                 titleSize="large"
                 title="Conditions"
                 refreshAction={getFreshListConditionGroups}

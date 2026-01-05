@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { Outlet } from 'react-router';
 
 import Alerts from 'components/Alerts';
+import ErrorBoundary from 'components/ErrorBoundary';
 import GlobalModal from 'components/GlobalModal';
 import Footer from 'components/Layout/Footer';
 import Header from 'components/Layout/Header';
@@ -22,7 +23,9 @@ function Layout() {
             <div className="flex">
                 <Sidebar allowedResources={profile?.permissions.allowedListings} />
                 <main className="flex flex-col bg-[var(--main-background-color)] w-[calc(100%-var(--sidebar-width))] p-4 md:p-8 !pb-0 dark:bg-gray-900">
-                    <Outlet />
+                    <ErrorBoundary>
+                        <Outlet />
+                    </ErrorBoundary>
                     <div className="grow-1" />
                     <Alerts />
                     <Footer />
