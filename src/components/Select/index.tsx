@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import Label from 'components/Label';
 
 export type SingleValue<T> = T | undefined;
@@ -55,17 +55,57 @@ function Select({
     error,
 }: Props) {
     const selectRef = useRef<HTMLSelectElement>(null);
+    const previousOptionsRef = useRef<string>('');
+    const previousValueRef = useRef<string | number | { value: string | number; label: string }[] | undefined>(undefined);
+    const isInitializedRef = useRef(false);
 
-    // Render the select component
+    const optionsKey = useMemo(() => {
+        return JSON.stringify(options?.map((opt) => ({ value: opt.value, label: opt.label, disabled: opt.disabled })));
+    }, [options]);
+
     useEffect(() => {
-        if (selectRef.current && (window as any).HSSelect) {
+        if (!selectRef.current || !(window as any).HSSelect) return;
+
+        const optionsChanged = previousOptionsRef.current !== optionsKey;
+        const valueChanged = previousValueRef.current !== value;
+
+        if (optionsChanged) {
             const instance = (window as any).HSSelect.getInstance(selectRef.current);
             if (instance) {
+                const isOpen = instance.isOpened && typeof instance.isOpened === 'function' && instance.isOpened();
+                if (isOpen) {
+                    previousOptionsRef.current = optionsKey;
+                    previousValueRef.current = value;
+                    return;
+                }
                 instance.destroy();
+                isInitializedRef.current = false;
             }
-            (window as any).HSSelect.autoInit();
+
+            const frameId = requestAnimationFrame(() => {
+                if (selectRef.current && (window as any).HSSelect) {
+                    (window as any).HSSelect.autoInit();
+                    isInitializedRef.current = true;
+                }
+            });
+
+            previousOptionsRef.current = optionsKey;
+            previousValueRef.current = value;
+
+            return () => cancelAnimationFrame(frameId);
+        } else if (!isInitializedRef.current) {
+            const frameId = requestAnimationFrame(() => {
+                if (selectRef.current && (window as any).HSSelect) {
+                    (window as any).HSSelect.autoInit();
+                    isInitializedRef.current = true;
+                }
+            });
+            previousValueRef.current = value;
+            return () => cancelAnimationFrame(frameId);
+        } else {
+            previousValueRef.current = value;
         }
-    }, [options, value]);
+    }, [optionsKey, value]);
 
     const hasOptions = options && options.length > 0;
 
