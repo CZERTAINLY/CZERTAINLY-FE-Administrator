@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { actions, selectors } from 'ducks/notifications';
 
-import { ArrowRight, Bell, Check } from 'lucide-react';
+import { ArrowRight, Bell, BellDot, Check } from 'lucide-react';
 import Dropdown from 'components/Dropdown';
 import { useNavigate, Link } from 'react-router';
 import Button from 'components/Button';
@@ -57,11 +57,17 @@ function NotificationsOverview() {
         [overviewNotifications, dispatch, navigate],
     );
 
+    const hasNewMessages = overviewNotifications.length > 0;
+
     return (
         <Dropdown
             title={
                 <div className="flex items-center gap-2 text-white">
-                    <Bell size={24} strokeWidth={1.5} />
+                    {hasNewMessages ? (
+                        <BellDot size={24} strokeWidth={1.5} className="[&_circle]:fill-yellow-500 [&_circle]:stroke-yellow-500" />
+                    ) : (
+                        <Bell size={24} strokeWidth={1.5} />
+                    )}
                     <span className="sr-only">Notifications</span>
                 </div>
             }
