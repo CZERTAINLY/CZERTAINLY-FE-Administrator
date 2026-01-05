@@ -19,7 +19,7 @@
     --status-warning-color: #eab308;
     --status-dark-color: var(--dark-gray-color);
     --status-light-gray-color: var(--gray-300);
-    --status-gray-color: var(--gray-500);
+    --status-gray-color: var(--color-gray-500);
     --status-info-color: #2798e7;
     --modal-footer-background-color: var(--gray-100);
 }
@@ -99,14 +99,14 @@ table .preline-badge {
 }
 
 .react-flow__controls-button {
-    border: 1px solid var(--gray-500);
+    border: 1px solid var(--color-gray-500);
     width: 38px;
     height: 38px;
     padding: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--gray-500);
+    color: var(--color-gray-500);
     transition: all 0.2s ease;
     box-shadow: none;
 }

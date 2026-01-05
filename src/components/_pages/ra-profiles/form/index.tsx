@@ -193,12 +193,6 @@ export default function RaProfileForm({ raProfileId, authorityId: propAuthorityI
         [dispatch, getValues, setValue],
     );
 
-    useEffect(() => {
-        if (watchedAuthority) {
-            onAuthorityChange(watchedAuthority);
-        }
-    }, [watchedAuthority, onAuthorityChange]);
-
     const onSubmit = useCallback(
         (values: FormValues) => {
             if (editMode) {
@@ -319,6 +313,7 @@ export default function RaProfileForm({ raProfileId, authorityId: propAuthorityI
                                             value={field.value || ''}
                                             onChange={(value) => {
                                                 field.onChange(value);
+                                                onAuthorityChange(typeof value === 'string' ? value : value?.toString() || '');
                                             }}
                                             options={optionsForAuthorities}
                                             placeholder="Select to change RA Profile if needed"
@@ -346,7 +341,7 @@ export default function RaProfileForm({ raProfileId, authorityId: propAuthorityI
                                     ) : (
                                         <AttributeEditor
                                             id="ra-profile"
-                                            callbackParentUuid={raProfile?.authorityInstanceUuid || watchedAuthority}
+                                            callbackParentUuid={raProfile?.authorityInstanceUuid || watchedAuthority || ''}
                                             callbackResource={Resource.RaProfiles}
                                             attributeDescriptors={raProfileAttributeDescriptors}
                                             attributes={raProfile?.attributes}

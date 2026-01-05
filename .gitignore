@@ -35,3 +35,8 @@ src/setupProxy.cjs
 /cypress
 cypress.env.json
 .nyc_output/
+
+# Playwright
+/playwright-report/
+/playwright/.cache/
+/test-results/
