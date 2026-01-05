@@ -61,6 +61,8 @@ export default function Dialog({ isOpen, toggle, caption, body, buttons, size = 
         };
     }, [isOpen]);
 
+    if (!isOpen) return null;
+
     const renderIcon = () => {
         if (!icon) return null;
         const iconColor = {
