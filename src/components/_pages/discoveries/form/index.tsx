@@ -4,7 +4,6 @@ import ProgressButton from 'components/ProgressButton';
 import Widget from 'components/Widget';
 import Switch from 'components/Switch';
 import { actions as connectorActions } from 'ducks/connectors';
-import { actions as userInterfaceActions } from 'ducks/user-interface';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { actions as discoveryActions, selectors as discoverySelectors } from 'ducks/discoveries';
 import { actions as rulesActions } from 'ducks/rules';
@@ -16,8 +15,9 @@ import Select from 'components/Select';
 import Button from 'components/Button';
 import Container from 'components/Container';
 import Label from 'components/Label';
+import Dialog from 'components/Dialog';
 import Cron from 'react-cron-generator';
-import { Timer } from 'lucide-react';
+import { Clock } from 'lucide-react';
 
 import { AttributeDescriptorModel } from 'types/attributes';
 import { ConnectorResponseModel } from 'types/connectors';
@@ -60,6 +60,8 @@ export default function DiscoveryForm({ onSuccess, onCancel }: DiscoveryFormProp
     const [init, setInit] = useState(true);
     const [groupAttributesCallbackAttributes, setGroupAttributesCallbackAttributes] = useState<AttributeDescriptorModel[]>([]);
     const [discoveryProvider, setDiscoveryProvider] = useState<ConnectorResponseModel>();
+    const [cronModalOpen, setCronModalOpen] = useState(false);
+    const [originalCronExpression, setOriginalCronExpression] = useState<string | undefined>(undefined);
 
     const isBusy = useMemo(
         () =>
@@ -224,6 +226,18 @@ export default function DiscoveryForm({ onSuccess, onCancel }: DiscoveryFormProp
         setValue('triggers', undefined);
     }, [watchedStoreKind, setValue, getValues]);
 
+    const handleCronSelectChange = useCallback(
+        (value: string) => {
+            setValue('cronExpression', value);
+        },
+        [setValue],
+    );
+
+    const onOpenCronModal = useCallback(() => {
+        setOriginalCronExpression(watchedCronExpression);
+        setCronModalOpen(true);
+    }, [watchedCronExpression]);
+
     return (
         <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -272,69 +286,34 @@ export default function DiscoveryForm({ onSuccess, onCancel }: DiscoveryFormProp
                                 control={control}
                                 rules={buildValidationRules([validateRequired(), validateQuartzCronExpression(watchedCronExpression)])}
                                 render={({ field, fieldState }) => (
-                                    <>
-                                        <div className="relative">
-                                            <TextInput
-                                                {...field}
-                                                id="cronExpression"
-                                                type="text"
-                                                label="Cron Expression"
-                                                required
-                                                placeholder="Enter Cron Expression"
-                                                invalid={fieldState.error && fieldState.isTouched}
-                                                error={
-                                                    fieldState.error && fieldState.isTouched
-                                                        ? typeof fieldState.error === 'string'
-                                                            ? fieldState.error
-                                                            : fieldState.error?.message || 'Invalid value'
-                                                        : undefined
-                                                }
-                                                className="pr-10"
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    dispatch(
-                                                        userInterfaceActions.showGlobalModal({
-                                                            content: (
-                                                                <div className="preline-cron-wrapper">
-                                                                    <Cron
-                                                                        value={field.value}
-                                                                        onChange={(e) => {
-                                                                            dispatch(
-                                                                                userInterfaceActions.setOkButtonCallback(() => {
-                                                                                    dispatch(userInterfaceActions.hideGlobalModal());
-                                                                                    setValue('cronExpression', e);
-                                                                                }),
-                                                                            );
-                                                                        }}
-                                                                        showResultText={true}
-                                                                        showResultCron={true}
-                                                                    />
-                                                                </div>
-                                                            ),
-                                                            showCancelButton: true,
-                                                            okButtonCallback: () => {
-                                                                dispatch(userInterfaceActions.hideGlobalModal());
-                                                            },
-                                                            showOkButton: true,
-                                                            isOpen: true,
-                                                            size: 'lg',
-                                                            title: 'Select Cron timings',
-                                                        }),
-                                                    );
-                                                }}
-                                                className="absolute top-1/2 end-3 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-neutral-400 dark:hover:text-neutral-200"
-                                            >
-                                                <Timer size={16} />
-                                            </button>
-                                        </div>
-                                        {watchedCronExpression && (
-                                            <p className="mt-1 text-sm text-gray-500 dark:text-neutral-400">
+                                    <div className="mb-4 space-y-4">
+                                        <TextInput
+                                            id="cronExpression"
+                                            label="Cron Expression"
+                                            value={field.value}
+                                            onChange={field.onChange}
+                                            onBlur={field.onBlur}
+                                            invalid={!!fieldState.error && fieldState.isTouched}
+                                            error={fieldState.error?.message}
+                                            required
+                                            placeholder="Enter Cron Expression"
+                                            buttonRight={
+                                                <button
+                                                    type="button"
+                                                    onClick={onOpenCronModal}
+                                                    aria-label="Open cron expression builder"
+                                                    title="Open cron expression builder"
+                                                >
+                                                    <Clock size={16} />
+                                                </button>
+                                            }
+                                        />
+                                        {getStrongFromCronExpression(watchedCronExpression) && (
+                                            <p className="mt-1 text-sm text-gray-600">
                                                 {getStrongFromCronExpression(watchedCronExpression)}
                                             </p>
                                         )}
-                                    </>
+                                    </div>
                                 )}
                             />
 
@@ -499,6 +478,38 @@ export default function DiscoveryForm({ onSuccess, onCancel }: DiscoveryFormProp
                     />
                 </Container>
             </form>
+
+            <Dialog
+                size="xl"
+                isOpen={cronModalOpen}
+                caption="Select CRON Expression"
+                body={
+                    <div className="preline-cron-wrapper">
+                        <Cron value={watchedCronExpression || ''} onChange={handleCronSelectChange} showResultText showResultCron />
+                    </div>
+                }
+                toggle={() => setCronModalOpen(false)}
+                buttons={[
+                    {
+                        color: 'secondary',
+                        variant: 'outline',
+                        onClick: () => {
+                            if (originalCronExpression !== undefined) {
+                                setValue('cronExpression', originalCronExpression);
+                            }
+                            setCronModalOpen(false);
+                        },
+                        body: 'Cancel',
+                    },
+                    {
+                        color: 'primary',
+                        onClick: () => {
+                            setCronModalOpen(false);
+                        },
+                        body: 'Ok',
+                    },
+                ]}
+            />
         </FormProvider>
     );
 }
