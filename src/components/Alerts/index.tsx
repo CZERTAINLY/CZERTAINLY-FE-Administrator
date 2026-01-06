@@ -12,10 +12,11 @@ function Alerts() {
     const dispatch = useDispatch();
 
     return (
-        <Container className="sticky bottom-12 !gap-2 z-9999 w-[calc(100%+2rem)] ml-[-1rem]">
+        <Container className="sticky bottom-12 !gap-2 z-9999 w-[calc(100%+2rem)] ml-[-1rem]" data-testid="alerts-container">
             {alerts.map((alert) => (
                 <div
                     key={alert.id}
+                    data-testid={`alert-${alert.id}`}
                     className={cn('mt-2 text-sm border rounded-lg px-10 py-4 relative transition-opacity duration-[3000ms]', {
                         'bg-teal-100 text-teal-800 border-teal-200 dark:bg-teal-800/10 dark:border-teal-900 dark:text-teal-500':
                             alert.color === 'success',

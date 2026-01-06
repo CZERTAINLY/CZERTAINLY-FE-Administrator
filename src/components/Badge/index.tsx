@@ -11,9 +11,10 @@ interface Props {
     className?: string;
     title?: string;
     size?: 'small' | 'medium' | 'large';
+    dataTestId?: string;
 }
 
-function Switch({ color = 'secondary', onClick, onRemove, children, style, className, title, size = 'small' }: Props) {
+function Badge({ color = 'secondary', onClick, onRemove, children, style, className, title, size = 'small', dataTestId }: Props) {
     const colorClasses = {
         gray: 'bg-gray-800 text-white dark:bg-white dark:text-neutral-800',
         secondary: 'bg-gray-500 text-white',
@@ -27,6 +28,7 @@ function Switch({ color = 'secondary', onClick, onRemove, children, style, class
     return (
         <span
             onClick={onClick}
+            data-testid={dataTestId || 'badge'}
             className={cn(
                 'preline-badge inline-flex items-center justify-center gap-x-1.5 rounded-md font-medium min-w-[24px]',
                 colorClasses[color],
@@ -70,4 +72,4 @@ function Switch({ color = 'secondary', onClick, onRemove, children, style, class
     );
 }
 
-export default Switch;
+export default Badge;

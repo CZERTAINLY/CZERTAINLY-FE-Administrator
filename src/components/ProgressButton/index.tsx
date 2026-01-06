@@ -11,6 +11,7 @@ interface Props {
     className?: string;
     type?: 'submit' | 'reset' | 'button';
     onClick?: () => void;
+    dataTestId?: string;
 }
 
 function ProgressButton({
@@ -21,15 +22,19 @@ function ProgressButton({
     color = 'primary',
     type = 'submit',
     onClick,
+    dataTestId,
 }: Props) {
+    const buttonProps = {
+        color,
+        disabled: disabled || inProgress,
+        onClick,
+        className: cn('relative', { 'opacity-50': inProgress }),
+        type,
+        'data-testid': dataTestId || 'progress-button',
+    } as any;
+
     return (
-        <Button
-            color={color}
-            disabled={disabled || inProgress}
-            onClick={onClick}
-            className={cn('relative', { 'opacity-50': inProgress })}
-            type={type}
-        >
+        <Button {...buttonProps}>
             {inProgress ? (
                 <div>
                     <Spinner color="light" size="sm" />

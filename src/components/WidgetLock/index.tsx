@@ -8,6 +8,7 @@ interface Props {
     lockText?: string;
     lockDetails?: string;
     lockType?: LockTypeEnum;
+    dataTestId?: string;
 }
 
 // TODO: Add a refresh button
@@ -17,6 +18,7 @@ const WidgetLock = ({
     lockText = 'There was some issue please try again later',
     lockType = LockTypeEnum.GENERIC,
     lockDetails,
+    dataTestId,
 }: Props) => {
     const getIcon = () => {
         const iconSize = size === 'small' ? 24 : size === 'normal' ? 32 : 48;
@@ -67,7 +69,7 @@ const WidgetLock = ({
 
     return (
         <Container>
-            <div className="grid grid-cols-12">
+            <div className="grid grid-cols-12" data-testid={dataTestId || 'widget-lock'}>
                 <div className={`col-span-12 ${getMainColWidthLg()} text-center`}>
                     <div className={cn('bg-gray-100 dark:bg-gray-800 rounded-lg p-6')}>
                         <div className="grid grid-cols-12 gap-4">

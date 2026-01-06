@@ -1,7 +1,7 @@
 import 'jszip';
 
 import { Buffer } from 'buffer';
-import { saveAs } from 'file-saver';
+import saveAs from 'file-saver';
 
 import JSZip from 'jszip';
 import { CertificateContentResponseModel, CertificateDetailResponseModel } from 'types/certificate';

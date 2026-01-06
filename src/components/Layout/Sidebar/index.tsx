@@ -378,7 +378,7 @@ export default function Sidebar({ allowedResources }: Props) {
                     }
                 >
                     {mapping.icon}
-                    <span className={cn('text-sm', { 'sr-only': menuSize === 'small' })}>{mapping.header}</span>
+                    <span className={cn('text-sm font-medium', { 'sr-only': menuSize === 'small' })}>{mapping.header}</span>
                 </NavLink>
             </li>
         );
