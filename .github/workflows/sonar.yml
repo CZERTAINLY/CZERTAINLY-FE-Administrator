@@ -79,7 +79,12 @@ jobs:
           npm ci
           npm run lint
           npm run build
-          npx cypress run --component
+          
+          # Playwright (Component Tests)
+          npx playwright install --with-deps
+          npx playwright test -c playwright-ct.config.ts
+          
+          # Coverage -> lcov for Sonar
           npx nyc report --reporter=lcov --report-dir=coverage
 
       - name: SonarCloud Scan
