@@ -26,7 +26,7 @@ test.describe('TextInput', () => {
 
         const input = component.getByRole('textbox');
         await input.fill('New text');
-        expect(newValue).toBe('New text');
+        await expect.poll(() => newValue, { timeout: 2000 }).toBe('New text');
     });
 
     test('should display placeholder', async ({ mount }) => {
