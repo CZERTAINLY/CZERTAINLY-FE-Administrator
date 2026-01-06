@@ -22,9 +22,12 @@ function Header({ sidebarToggle }: Props) {
     const navigate = useNavigate();
 
     return (
-        <header className="flex items-center justify-between sticky top-0 left-0 w-full z-50 bg-blue-500 px-4 py-2 h-[var(--header-height)]">
-            <Link to="/dashboard">
-                <img src={logo} alt="CZERTAINLY Logo" className="h-9" />
+        <header
+            className="flex items-center justify-between sticky top-0 left-0 w-full z-50 bg-blue-500 px-4 py-2 h-[var(--header-height)]"
+            data-testid="header"
+        >
+            <Link to="/dashboard" data-testid="header-logo-link">
+                <img src={logo} alt="CZERTAINLY Logo" className="h-9" data-testid="header-logo" />
             </Link>
             <div className="flex items-center gap-2">
                 <div className="flex items-center gap-2 text-white hidden">

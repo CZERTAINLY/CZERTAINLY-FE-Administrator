@@ -16,6 +16,7 @@ import { Resource } from 'types/openapi';
 import { isObjectSame } from 'utils/common-utils';
 import { useRuleEvaluatorResourceOptions } from 'utils/rules';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
+import ConditionFormFilter from 'components/ConditionFormFilter';
 
 export interface ruleFormValues {
     name: string;
@@ -261,9 +262,9 @@ const RulesForm = ({ onCancel, onSuccess }: RulesFormProps = {}) => {
                                 )}
                             />
                         </div>
-                        {/* {watchedResource && watchedResource !== Resource.None && (
+                        {watchedResource && watchedResource !== Resource.None && (
                             <ConditionFormFilter formType="conditionItem" resource={watchedResource as Resource} />
-                        )} */}
+                        )}
 
                         <Container className="flex-row justify-end modal-footer" gap={4}>
                             <Button variant="outline" onClick={onCancel} disabled={isSubmitting} type="button">

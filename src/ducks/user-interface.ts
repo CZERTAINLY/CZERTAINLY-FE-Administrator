@@ -32,7 +32,7 @@ export const initialState: State = {
         okButtonCallback: undefined,
         cancelButtonCallback: undefined,
     },
-    theme: (localStorage.getItem('theme') as 'light' | 'dark') || 'light',
+    theme: (typeof window !== 'undefined' && window.localStorage ? (localStorage.getItem('theme') as 'light' | 'dark') : null) || 'light',
 };
 
 export const slice = createSlice({

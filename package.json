@@ -53,6 +53,9 @@
         "build": "vite build",
         "serve": "vite preview",
         "lint": "eslint ./src && prettier --check \"**/**.{ts,js,cjs,tsx}\" \"*.{json,md,yml}\"",
+        "test": "playwright test -c playwright-ct.config.ts --project=chromium",
+        "test:ui": "playwright test -c playwright-ct.config.ts --ui",
+        "test:debug": "playwright test -c playwright-ct.config.ts --debug",
         "prepare": "husky",
         "generate-types": "openapi-generator-cli generate --generator-key typescript-rxjs-remote && prettier --write \"src/types/openapi/apis/*.ts\" && prettier --write \"src/types/openapi/models/*.ts\"",
         "generate-types-local": "openapi-generator-cli generate --generator-key typescript-rxjs-local && prettier --write \"src/types/openapi/apis/*.ts\" && prettier --write \"src/types/openapi/models/*.ts\"",
@@ -79,6 +82,8 @@
     "devDependencies": {
         "@cypress/code-coverage": "^3.14.7",
         "@openapitools/openapi-generator-cli": "^2.25.0",
+        "@playwright/experimental-ct-react": "^1.57.0",
+        "@playwright/test": "^1.57.0",
         "@tailwindcss/forms": "^0.5.10",
         "@types/dagre": "^0.7.53",
         "@types/file-saver": "^2.0.7",

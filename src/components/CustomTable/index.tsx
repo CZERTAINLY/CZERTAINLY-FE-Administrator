@@ -521,7 +521,7 @@ function CustomTable({
                     </div>
                 </div>
             )}
-            {body?.length > 0 && (
+            {(hasHeader || body?.length > 0) && (
                 <div className="py-2">
                     <SimpleBar forceVisible="x">
                         <div className={cn('rounded-md', { 'border border-gray-100': hasHeader })}>

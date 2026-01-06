@@ -61,7 +61,8 @@ function Widget({
     dataTestId,
     noBorder = false,
 }: Props) {
-    const widgetLock = useSelector(selectors.selectWidgetLocks).find(
+    const widgetLocks = useSelector(selectors.selectWidgetLocks) || [];
+    const widgetLock = widgetLocks.find(
         (lock) => lock.widgetName === widgetLockName || (Array.isArray(widgetLockName) && widgetLockName.includes(lock.widgetName)),
     );
     const [showWidgetInfo, setShowWidgetInfo] = useState(false);

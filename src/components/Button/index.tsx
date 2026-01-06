@@ -14,6 +14,7 @@ export interface Props {
     className?: string;
     title?: string;
     type?: 'submit' | 'reset' | 'button';
+    'data-testid'?: string;
 }
 
 const baseButton =
@@ -66,6 +67,7 @@ function Button({
     color = 'primary',
     title,
     type = 'button',
+    'data-testid': dataTestId,
 }: Props) {
     // const buttonClasses = {
     //     solid: 'py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent focus:outline-hidden focus:outline-hidden disabled:opacity-50 disabled:pointer-events-none',
@@ -88,6 +90,7 @@ function Button({
             className={cn(baseButton, buttonClasses[variant], colorClasses[variant][color], className)}
             onClick={onClick}
             disabled={disabled}
+            data-testid={dataTestId}
         >
             {children}
         </button>

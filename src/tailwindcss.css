@@ -40,8 +40,8 @@
     --color-blue-950: #052467;
 }
 
-/* Source files to scan for Tailwind classes */
-@source "../src";
+/* (optional) explicit sources */
+@source "../src/**/*.{ts,tsx,js,jsx,html}";
 
 /* Light mode by default, dark mode with .dark class */
 @custom-variant dark (&:where(.dark, .dark *));
