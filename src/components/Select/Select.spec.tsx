@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/experimental-ct-react';
+import { test, expect } from '../../../playwright/ct-test';
 import Select from './index';
 
 test.describe('Select', () => {

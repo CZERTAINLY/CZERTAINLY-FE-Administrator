@@ -610,7 +610,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                 caption={`Key Data`}
                 body={<div style={{ lineBreak: 'anywhere' }}>{keyItem.keyData}</div>}
                 toggle={() => setDisplayKeyData(false)}
-                buttons={[]}
+                buttons={[{ color: 'secondary', variant: 'outline', onClick: () => setDisplayKeyData(false), body: 'Close' }]}
                 size="lg"
             />
 

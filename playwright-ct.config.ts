@@ -30,9 +30,19 @@ export default defineConfig({
                 include: ['react-hook-form'],
             },
             build: {
+                sourcemap: 'inline',
+                minify: false,
+                rollupOptions: {
+                    output: {
+                        sourcemapExcludeSources: false, // щоб sourcesContent не викидалось
+                    },
+                },
                 commonjsOptions: {
                     include: [/react-hook-form/, /node_modules/],
                 },
+            },
+            esbuild: {
+                sourcemap: true,
             },
         },
     },
@@ -40,5 +50,23 @@ export default defineConfig({
         { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
         { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
         { name: 'webkit', use: { ...devices['Desktop Safari'] } },
+    ],
+    reporter: [
+        ['list'],
+        [
+            'monocart-reporter',
+            {
+                name: 'CT Report',
+                outputFile: './monocart-report/index.html',
+                coverage: {
+                    outputDir: './coverage',
+                    reports: [['lcovonly', { file: 'lcov.info' }], 'text-summary'],
+                    sourceFilter: (sourcePath: string) => {
+                        const p = sourcePath.replaceAll('\\', '/');
+                        return p.includes('/src/') && !p.includes('/src/**/*.spec.') && !p.includes('/node_modules/');
+                    },
+                },
+            },
+        ],
     ],
 });
