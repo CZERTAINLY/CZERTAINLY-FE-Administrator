@@ -575,6 +575,7 @@ export default function CryptographicKeyItem({ keyUuid, tokenInstanceUuid, token
                     algorithm: keyItem.keyAlgorithm,
                     tokenProfileUuid: tokenProfileUuid,
                 })}
+                size="xl"
                 toggle={() => setSignData(false)}
                 buttons={[]}
             />

@@ -557,7 +557,7 @@ function CustomTable({
                         )}
                     </div>
 
-                    {tblData?.length > 1 && paginationData && (
+                    {tblData?.length > 1 && (paginationData || totalPages > 1) && (
                         <Pagination
                             page={paginationData?.page || page}
                             totalPages={paginationData?.totalPages || totalPages}
