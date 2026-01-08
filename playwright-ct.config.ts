@@ -69,7 +69,18 @@ export default defineConfig({
                 coverage: {
                     outputDir: './coverage',
                     reports: [['lcovonly', { file: 'lcov.info' }], 'text-summary'],
-                    sourceFilter: (p: string) => p.replace(/\\/g, '/').includes('src/components/'),
+                    sourceFilter: (p: string) => {
+                        if (!p) return false;
+
+                        p = p.replaceAll('\\', '/');
+
+                        if (p.startsWith('localhost-')) return false;
+                        if (p.includes('/assets/') || p.includes('assets/')) return false;
+                        if (p.endsWith('.css')) return false;
+                        if (p.includes('node_modules')) return false;
+
+                        return /^src\/.*\.(ts|tsx|js|jsx)$/.test(p);
+                    },
                 },
             },
         ],

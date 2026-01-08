@@ -59,6 +59,7 @@
         "test:webkit": "playwright test -c playwright-ct.config.ts --project=webkit",
         "test:ui": "playwright test -c playwright-ct.config.ts --ui",
         "test:debug": "playwright test -c playwright-ct.config.ts --debug",
+        "test:cov": "playwright test -c playwright-ct.config.ts --project=chromium && node scripts/clean-lcov.js",
         "prepare": "husky",
         "generate-types": "openapi-generator-cli generate --generator-key typescript-rxjs-remote && prettier --write \"src/types/openapi/apis/*.ts\" && prettier --write \"src/types/openapi/models/*.ts\"",
         "generate-types-local": "openapi-generator-cli generate --generator-key typescript-rxjs-local && prettier --write \"src/types/openapi/apis/*.ts\" && prettier --write \"src/types/openapi/models/*.ts\"",
