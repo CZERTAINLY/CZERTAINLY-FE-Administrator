@@ -34,7 +34,7 @@ export default defineConfig({
                 minify: false,
                 rollupOptions: {
                     output: {
-                        sourcemapExcludeSources: false, // щоб sourcesContent не викидалось
+                        sourcemapExcludeSources: false,
                     },
                 },
                 commonjsOptions: {
