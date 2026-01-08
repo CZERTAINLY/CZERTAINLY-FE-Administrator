@@ -58,13 +58,18 @@ export default defineConfig({
             {
                 name: 'CT Report',
                 outputFile: './monocart-report/index.html',
+                sourcePath: (filePath: string) => {
+                    const fp = filePath.replace(/\\/g, '/');
+                    const m = fp.match(/(^|\/)(src\/.*)$/);
+                    if (m) return m[2];
+                    const cwd = process.cwd().replace(/\\/g, '/');
+                    if (fp.startsWith(cwd + '/')) return fp.slice(cwd.length + 1);
+                    return fp;
+                },
                 coverage: {
                     outputDir: './coverage',
                     reports: [['lcovonly', { file: 'lcov.info' }], 'text-summary'],
-                    sourceFilter: (sourcePath: string) => {
-                        const p = sourcePath.replaceAll('\\', '/');
-                        return p.includes('/src/') && !p.includes('/src/**/*.spec.') && !p.includes('/node_modules/');
-                    },
+                    sourceFilter: (p: string) => p.replace(/\\/g, '/').includes('src/components/'),
                 },
             },
         ],
