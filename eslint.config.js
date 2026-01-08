@@ -12,8 +12,6 @@ export default [
             'github/',
             'build/',
             'config-overrides.js',
-            'cypress.config.js',
-            'cypress/support',
             'src/setupProxy.cjs',
         ],
     },

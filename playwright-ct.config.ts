@@ -30,9 +30,19 @@ export default defineConfig({
                 include: ['react-hook-form'],
             },
             build: {
+                sourcemap: 'inline',
+                minify: false,
+                rollupOptions: {
+                    output: {
+                        sourcemapExcludeSources: false,
+                    },
+                },
                 commonjsOptions: {
                     include: [/react-hook-form/, /node_modules/],
                 },
+            },
+            esbuild: {
+                sourcemap: true,
             },
         },
     },
@@ -40,5 +50,39 @@ export default defineConfig({
         { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
         { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
         { name: 'webkit', use: { ...devices['Desktop Safari'] } },
+    ],
+    reporter: [
+        ['list'],
+        [
+            'monocart-reporter',
+            {
+                name: 'CT Report',
+                outputFile: './monocart-report/index.html',
+                sourcePath: (filePath: string) => {
+                    const fp = filePath.replace(/\\/g, '/');
+                    const m = fp.match(/(^|\/)(src\/.*)$/);
+                    if (m) return m[2];
+                    const cwd = process.cwd().replace(/\\/g, '/');
+                    if (fp.startsWith(cwd + '/')) return fp.slice(cwd.length + 1);
+                    return fp;
+                },
+                coverage: {
+                    outputDir: './coverage',
+                    reports: [['lcovonly', { file: 'lcov.info' }], 'text-summary'],
+                    sourceFilter: (p: string) => {
+                        if (!p) return false;
+
+                        p = p.replaceAll('\\', '/');
+
+                        if (p.startsWith('localhost-')) return false;
+                        if (p.includes('/assets/') || p.includes('assets/')) return false;
+                        if (p.endsWith('.css')) return false;
+                        if (p.includes('node_modules')) return false;
+
+                        return /^src\/.*\.(ts|tsx|js|jsx)$/.test(p);
+                    },
+                },
+            },
+        ],
     ],
 });

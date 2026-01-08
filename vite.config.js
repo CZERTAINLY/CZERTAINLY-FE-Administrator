@@ -49,10 +49,9 @@ export default defineConfig(async () => {
                 failOnWarning: true,
             }),
             istanbul({
-                cypress: true, // enable during Cypress runs
                 requireEnv: false, // or set via env var
                 include: ['src/**/*'],
-                exclude: ['cypress/**/*', 'node_modules/**/*'],
+                exclude: ['node_modules/**/*'],
             }),
             tailwindcss(),
         ],

@@ -340,9 +340,6 @@ export default function CryptographicKeyDetail() {
             (a, b) => Object.values(KeyType).indexOf(a.type) - Object.values(KeyType).indexOf(b.type),
         );
 
-        const keyTab = keyItems.findIndex((item) => item.uuid === keyItemUuid);
-        setSelectedTab(keyTab < 0 ? 0 : keyTab);
-
         const tabs = keyItems.map((item, i) => ({
             title: getEnumLabel(keyTypeEnum, item.type),
             onClick: () => setSelectedTab(i),
@@ -360,8 +357,18 @@ export default function CryptographicKeyDetail() {
             ),
         }));
         return { tabs };
-    }, [cryptographicKey, isBusy, isFetchingHistory, keyTypeEnum, keyItemUuid]);
+    }, [cryptographicKey, isBusy, isFetchingHistory, keyTypeEnum]);
 
+    useEffect(() => {
+        if (cryptographicKey?.items) {
+            const keyItems = [...cryptographicKey.items].sort(
+                (a, b) => Object.values(KeyType).indexOf(a.type) - Object.values(KeyType).indexOf(b.type),
+            );
+            const keyTab = keyItems.findIndex((item) => item.uuid === keyItemUuid);
+            setSelectedTab(keyTab < 0 ? 0 : keyTab);
+        }
+    }, [cryptographicKey, keyItemUuid]);
+    console.log('itemTabs', itemTabs);
     return (
         <>
             <Breadcrumb
