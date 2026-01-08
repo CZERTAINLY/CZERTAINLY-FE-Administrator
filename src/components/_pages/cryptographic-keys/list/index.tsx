@@ -52,8 +52,6 @@ function CryptographicKeyList() {
 
     const [isAddOpen, setIsAddOpen] = useState<boolean>(false);
 
-    const [editingId, setEditingId] = useState<string | undefined>(undefined);
-
     useEffect(() => {
         dispatch(actions.clearDeleteErrorMessages());
     }, [dispatch]);
@@ -309,7 +307,6 @@ function CryptographicKeyList() {
 
     const handleFormSuccess = useCallback(() => {
         setIsAddOpen(false);
-        setEditingId(undefined);
         onListCallback({ itemsPerPage: 10, pageNumber: 1, filters: [] });
     }, [onListCallback]);
 
@@ -335,12 +332,11 @@ function CryptographicKeyList() {
                 addHidden
             />
             <Dialog
-                isOpen={isAddOpen || !!editingId}
-                caption={editingId ? 'Edit Key' : 'Create Key'}
-                body={<CryptographicKeyForm keyId={editingId} onSuccess={handleFormSuccess} />}
+                isOpen={isAddOpen}
+                caption="Create Key"
+                body={<CryptographicKeyForm onSuccess={handleFormSuccess} onCancel={() => setIsAddOpen(false)} />}
                 toggle={() => {
                     setIsAddOpen(false);
-                    setEditingId(undefined);
                 }}
                 size="xl"
                 buttons={[]}
