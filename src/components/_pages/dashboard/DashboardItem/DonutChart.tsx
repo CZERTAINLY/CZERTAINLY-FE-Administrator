@@ -100,11 +100,11 @@ function DonutChart({ title, colorOptions, data = {}, entity, redirect, onSetFil
 
     return (
         <Widget title={title} titleBoldness="bold" className="flex-1">
-            <div className="grid grid-cols-[130px_1fr] gap-4 h-full">
-                <div className="flex-shrink-0">
+            <div className="flex align-center justify-center h-full">
+                <div className="flex-shrink-0 pr-[30px]">
                     <ReactApexChart options={options} series={values} type="donut" height={110} width={110} />
                 </div>
-                <SimpleBar forceVisible="y" style={{ height: '130px' }}>
+                <SimpleBar forceVisible="y" style={{ height: '130px', width: 'calc(100% - 140px)' }}>
                     <div className="flex-1 flex justify-end">
                         <div className="space-y-1.5 h-full max-w-[140px] overflow-y-auto">
                             {chartLabels.map((label, index) => (
