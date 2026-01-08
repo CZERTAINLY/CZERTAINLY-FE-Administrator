@@ -13,6 +13,8 @@ import { collectFormAttributes } from 'utils/attributes/attributes';
 import FileUpload from '../../../Input/FileUpload/FileUpload';
 import TabLayout from '../../../Layout/TabLayout';
 import Container from 'components/Container';
+import Widget from 'components/Widget';
+
 interface Props {
     tokenUuid?: string;
     tokenProfileUuid?: string;
@@ -127,26 +129,24 @@ export default function SignVerifyData({ tokenUuid, tokenProfileUuid, keyUuid, k
         <>
             <FormProvider {...methods}>
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                    <div>
-                        <Label htmlFor="data">Data</Label>
+                    <Widget title="Data" titleSize="large">
                         <FileUpload
                             id="data"
                             editable
                             fileType={'data'}
                             onFileContentLoaded={(fileContent) => setFileContent(fileContent)}
                         />
-                    </div>
+                    </Widget>
 
                     {action === 'verify' ? (
-                        <div>
-                            <Label htmlFor="signatureFileName">Signature</Label>
+                        <Widget title="Signature" titleSize="large">
                             <FileUpload
                                 editable
                                 id="signature"
                                 fileType={'signature'}
                                 onFileContentLoaded={(fileContent) => setSignatureContent(fileContent)}
                             />
-                        </div>
+                        </Widget>
                     ) : null}
 
                     {attributes && attributes.length > 0 && (

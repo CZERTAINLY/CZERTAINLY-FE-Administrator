@@ -16,25 +16,33 @@ type Props = {
 };
 
 export default function TabLayout({ tabs, onlyActiveTabContent = true, selectedTab, noBorder = false }: Props) {
-    const [activeTab, setActiveTab] = useState(selectedTab || 0);
+    const [activeTab, setActiveTab] = useState(selectedTab ?? 0);
 
     const memoizedTabs = useMemo(() => {
         return tabs.filter((e) => !e.hidden);
     }, [tabs]);
 
+    const currentTab = selectedTab !== undefined ? selectedTab : activeTab;
+
     useEffect(() => {
-        if (selectedTab !== undefined && selectedTab !== activeTab) {
+        if (selectedTab !== undefined) {
             setActiveTab(selectedTab);
-        } else if (tabs.length <= activeTab) {
+        } else if (tabs.length > 0 && activeTab >= tabs.length) {
             setActiveTab(0);
         }
-    }, [activeTab, tabs, selectedTab]);
+    }, [selectedTab, tabs.length, activeTab]);
+
+    const handleTabChange = (tab: number) => {
+        if (selectedTab === undefined) {
+            setActiveTab(tab);
+        }
+    };
 
     return (
         <Widget noBorder={noBorder}>
-            <Tabs tabs={memoizedTabs} selectedTab={activeTab} onTabChange={setActiveTab} />
+            <Tabs tabs={memoizedTabs} selectedTab={currentTab} onTabChange={handleTabChange} />
             <hr className="my-4 border-gray-200" />
-            {memoizedTabs.map((t, i) => (onlyActiveTabContent === false || activeTab === i ? <div key={i}>{t.content}</div> : null))}
+            {memoizedTabs.map((t, i) => (onlyActiveTabContent === false || currentTab === i ? <div key={i}>{t.content}</div> : null))}
         </Widget>
     );
 }
