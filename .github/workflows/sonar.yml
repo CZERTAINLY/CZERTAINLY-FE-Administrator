@@ -84,7 +84,7 @@ jobs:
           npm run build
 
           # Playwright deps
-          npx playwright install-deps chromium
+          npx playwright install --with-deps
 
           # Run tests on Chromium WITH coverage (only chromium contributes to lcov)
           # If your coverage is enabled differently, adjust/remove COVERAGE=1
