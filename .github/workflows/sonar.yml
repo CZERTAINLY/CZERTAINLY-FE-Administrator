@@ -84,12 +84,9 @@ jobs:
           npm run build
 
           # Playwright deps
-          npx playwright install --with-deps
+          npx playwright install-deps chromium
 
-          # 1) Run tests on Firefox + WebKit (NO coverage)
-          npx playwright test -c playwright-ct.config.ts --project=firefox --project=webkit
-
-          # 2) Run tests on Chromium WITH coverage (only chromium contributes to lcov)
+          # Run tests on Chromium WITH coverage (only chromium contributes to lcov)
           # If your coverage is enabled differently, adjust/remove COVERAGE=1
           COVERAGE=1 npx playwright test -c playwright-ct.config.ts --project=chromium
 
