@@ -508,7 +508,7 @@ function CustomTable({
 
     return (
         <div data-testid="custom-table">
-            {canSearch && tblData?.length > 0 && (
+            {canSearch && (
                 <div className="flex justify-end mb-3">
                     <div className="max-w-sm">
                         <input
