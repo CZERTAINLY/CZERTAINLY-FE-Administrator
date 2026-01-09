@@ -665,10 +665,10 @@ export function Attribute({
                 id={`${descriptor.name}Info`}
                 className="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl dark:bg-neutral-900 dark:border-neutral-700 dark:shadow-neutral-700/70"
             >
-                <div className="px-4 md:px-5 pt-4 md:pt-5 pb-2 border-b border-gray-200 dark:border-neutral-700">
-                    <h3 className="text-lg font-bold text-gray-800 dark:text-white">{descriptor.properties.label}</h3>
+                <div className="p-4 border-b border-gray-200 dark:border-neutral-700">
+                    <h3 className="text-gray-800 dark:text-white text-sm">{descriptor.properties.label}</h3>
                 </div>
-                <div className="px-4 md:px-5 py-4 md:py-5">
+                <div className="p-4 text-sm text-[var(--dark-gray-color)] server-content">
                     {parse(
                         DOMPurify.sanitize(
                             marked.parse(getAttributeContent(descriptor.contentType, descriptor.content).toString()) as string,

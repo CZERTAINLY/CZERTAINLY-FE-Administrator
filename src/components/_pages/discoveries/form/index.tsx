@@ -81,7 +81,6 @@ export default function DiscoveryForm({ onSuccess, onCancel }: DiscoveryFormProp
 
     useEffect(() => {
         if (init) {
-            dispatch(discoveryActions.resetState());
             setInit(false);
             dispatch(connectorActions.clearCallbackData());
             dispatch(discoveryActions.listDiscoveryProviders());
@@ -214,17 +213,12 @@ export default function DiscoveryForm({ onSuccess, onCancel }: DiscoveryFormProp
         };
     };
 
-    // Clear attributes when discovery provider changes
+    // Automatically load attributes when kind changes
     useEffect(() => {
-        const formValues = getValues();
-        Object.keys(formValues).forEach((key) => {
-            if (key.startsWith('__attributes__discovery__')) {
-                (setValue as any)(key, undefined);
-            }
-        });
-        setValue('storeKind', undefined);
-        setValue('triggers', undefined);
-    }, [watchedStoreKind, setValue, getValues]);
+        if (watchedStoreKind && discoveryProvider) {
+            onKindChange(watchedStoreKind);
+        }
+    }, [watchedStoreKind, discoveryProvider, onKindChange]);
 
     const handleCronSelectChange = useCallback(
         (value: string) => {
