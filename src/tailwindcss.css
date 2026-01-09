@@ -22,6 +22,7 @@
     --status-gray-color: var(--color-gray-500);
     --status-info-color: #2798e7;
     --modal-footer-background-color: var(--gray-100);
+    --code-color: #be185d;
 }
 
 @import 'tailwindcss';
@@ -207,4 +208,27 @@ table .preline-badge {
 }
 .preline-cron-wrapper .cron-builder-bg:not(:last-child) {
     @apply mb-4;
+}
+
+.server-content {
+    color: var(--dark-gray-color);
+}
+.server-content ul {
+    list-style-type: disc;
+    padding: 10px 0 10px 20px;
+}
+.server-content ol {
+    list-style-type: decimal;
+    padding-left: 20px;
+}
+.server-content li {
+    margin-bottom: 5px;
+}
+.server-content p {
+    margin-bottom: 5px;
+}
+.server-content code {
+    color: var(--code-color);
+    font-family: inherit;
+    font-weight: 600;
 }

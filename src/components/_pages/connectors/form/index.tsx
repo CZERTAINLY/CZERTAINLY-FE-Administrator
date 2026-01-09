@@ -468,7 +468,7 @@ export default function ConnectorForm({ connectorId, onCancel, onSuccess }: Conn
                         variant="solid"
                         color="primary"
                         onClick={() => onConnectClick(getValues())}
-                        disabled={isSubmitting || isConnecting || isReconnecting}
+                        disabled={isSubmitting || isConnecting || isReconnecting || !watchedUrl || !isValid}
                         type="button"
                     >
                         {isConnecting || isReconnecting ? connectProgressTitle : connectTitle}

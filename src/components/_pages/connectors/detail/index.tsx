@@ -8,6 +8,7 @@ import ConnectorForm from '../form';
 
 import { actions, selectors } from 'ducks/connectors';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { actions as userInterfaceActions } from 'ducks/user-interface';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
@@ -69,6 +70,7 @@ export default function ConnectorDetail() {
 
     const getFreshConnectorAttributesDesc = useCallback(() => {
         if (!id) return;
+        dispatch(userInterfaceActions.removeWidgetLock(LockWidgetNameEnum.ConnectorAttributes));
         dispatch(actions.getConnectorAllAttributesDescriptors({ uuid: id }));
     }, [id, dispatch]);
 
