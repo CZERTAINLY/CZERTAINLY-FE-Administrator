@@ -1,7 +1,6 @@
 import TabLayout from 'components/Layout/TabLayout';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
-import { Container } from 'reactstrap';
 import ActionsListComponent from './actions-list-component';
 import ExecutionsListComponent from './executions-list-component';
 
@@ -16,26 +15,22 @@ const RulesList = () => {
     }, [tabIndex]);
 
     return (
-        <Container className="themed-container" fluid>
-            <>
-                <TabLayout
-                    selectedTab={activeTab}
-                    onlyActiveTabContent
-                    tabs={[
-                        {
-                            title: 'Actions',
-                            content: <ActionsListComponent />,
-                            onClick: () => setActiveTab(0),
-                        },
-                        {
-                            title: 'Executions',
-                            content: <ExecutionsListComponent />,
-                            onClick: () => setActiveTab(1),
-                        },
-                    ]}
-                />
-            </>
-        </Container>
+        <TabLayout
+            selectedTab={activeTab}
+            onlyActiveTabContent
+            tabs={[
+                {
+                    title: 'Actions',
+                    content: <ActionsListComponent />,
+                    onClick: () => setActiveTab(0),
+                },
+                {
+                    title: 'Executions',
+                    content: <ExecutionsListComponent />,
+                    onClick: () => setActiveTab(1),
+                },
+            ]}
+        />
     );
 };
 

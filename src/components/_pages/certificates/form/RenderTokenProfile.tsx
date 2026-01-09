@@ -1,86 +1,83 @@
-import CustomSelectComponent from 'components/CustomSelectComponent';
+import Select from 'components/Select';
+import Label from 'components/Label';
 import { actions as keyActions } from 'ducks/cryptographic-keys';
 import { selectors as tokenProfileSelectors } from 'ducks/token-profiles';
 import { useCallback, useMemo } from 'react';
-import { Field } from 'react-final-form';
+import { Controller, useFormContext } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import Select, { GroupBase, MenuProps, SingleValue } from 'react-select';
-import { FormFeedback, FormGroup, Label } from 'reactstrap';
-import { validateRequired } from 'utils/validators';
 import { actions as userInterfaceActions } from '../../../../ducks/user-interface';
-import { TokenProfileResponseModel } from 'types/token-profiles';
 import TokenProfileForm from 'components/_pages/token-profiles/form';
 
-const RenderTokenProfile = ({ type }: { type: 'alt' | 'normal' }) => {
-    const tokenProfiles = useSelector(tokenProfileSelectors.tokenProfiles);
-    const isAltToken = type === 'alt';
-    const dispatch = useDispatch();
+type Props = {
+    type: 'alt' | 'normal';
+    name: string;
+};
 
-    const onTokenProfileChange = useCallback(
-        (event: SingleValue<{ label: string; value: TokenProfileResponseModel }>, type: 'alt' | 'normal') => {
-            if (!event) return;
-            dispatch(keyActions.listCryptographicKeyPairs({ tokenProfileUuid: event.value.uuid, store: type }));
-        },
-        [dispatch],
-    );
+const RenderTokenProfile = ({ type, name }: Props) => {
+    const dispatch = useDispatch();
+    const { control } = useFormContext();
+    const tokenProfiles = useSelector(tokenProfileSelectors.tokenProfiles);
 
     const tokenProfileOptions = useMemo(
-        () =>
-            tokenProfiles.map((tokenProfile) => ({
+        () => [
+            ...tokenProfiles.map((tokenProfile) => ({
                 label: tokenProfile.name,
-                value: tokenProfile,
+                value: tokenProfile.uuid,
             })),
+            {
+                label: '+',
+                value: '__add_new__',
+                disabled: false,
+            },
+        ],
         [tokenProfiles],
     );
 
-    const renderTokenSelectMenu = useCallback(
-        (props: MenuProps<any, false, GroupBase<any>>) => (
-            <CustomSelectComponent
-                onAddNew={() => {
-                    dispatch(
-                        userInterfaceActions.showGlobalModal({
-                            content: <TokenProfileForm usesGlobalModal />,
-                            isOpen: true,
-                            size: 'lg',
-                            title: 'Add New Token Profile',
-                        }),
-                    );
-                }}
-                {...props}
-            />
-        ),
-        [dispatch],
+    const handleTokenProfileChange = useCallback(
+        (tokenProfileUuid: string | number | undefined) => {
+            if (!tokenProfileUuid || typeof tokenProfileUuid !== 'string') return;
+            dispatch(keyActions.listCryptographicKeyPairs({ tokenProfileUuid, store: type }));
+        },
+        [dispatch, type],
     );
 
+    const handleAddNew = useCallback(() => {
+        dispatch(
+            userInterfaceActions.showGlobalModal({
+                content: <TokenProfileForm usesGlobalModal />,
+                isOpen: true,
+                size: 'lg',
+                title: 'Add New Token Profile',
+            }),
+        );
+    }, [dispatch]);
+
     return (
-        <Field name={isAltToken ? 'altTokenProfile' : 'tokenProfile'} validate={validateRequired()}>
-            {({ input, meta, onChange }) => (
-                <FormGroup>
-                    <Label for={isAltToken ? 'altTokenProfileSelect' : 'tokenProfileSelect'}>
-                        {isAltToken ? 'Alternative Token Profile' : 'Token Profile'}
-                    </Label>
-
+        <Controller
+            control={control}
+            name={name}
+            rules={{ required: true }}
+            render={({ field: { value, onChange }, fieldState: { error } }) => (
+                <div>
+                    <Label htmlFor={`${name}Select`}>{type === 'alt' ? 'Alternative Token Profile' : 'Token Profile'}</Label>
                     <Select
-                        {...input}
-                        id={isAltToken ? 'altTokenProfile' : 'tokenProfile'}
-                        inputId={isAltToken ? 'altTokenProfileSelect' : 'tokenProfileSelect'}
-                        maxMenuHeight={140}
-                        menuPlacement="auto"
+                        id={name}
                         options={tokenProfileOptions}
-                        placeholder={isAltToken ? 'Select Alternative Token Profile' : 'Select Token Profile'}
-                        onChange={(e) => {
-                            onTokenProfileChange(e, type);
-                            input.onChange(e);
+                        value={value ?? ''}
+                        onChange={(selected) => {
+                            if (selected === '__add_new__') {
+                                handleAddNew();
+                                return;
+                            }
+                            handleTokenProfileChange(selected as string);
+                            onChange(selected);
                         }}
-                        components={{
-                            Menu: renderTokenSelectMenu,
-                        }}
+                        placeholder={type === 'alt' ? 'Select Alternative Token Profile' : 'Select Token Profile'}
                     />
-
-                    <FormFeedback>{meta.error}</FormFeedback>
-                </FormGroup>
+                    {error && <div className="text-red-500 mt-1">{error.message ?? 'Token profile is required.'}</div>}
+                </div>
             )}
-        </Field>
+        />
     );
 };
 

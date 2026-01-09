@@ -1,4 +1,4 @@
-export function jsxInnerText(obj: JSX.Element): string {
+export function jsxInnerText(obj: React.ReactNode): string {
     var buf = '';
 
     if (obj) {

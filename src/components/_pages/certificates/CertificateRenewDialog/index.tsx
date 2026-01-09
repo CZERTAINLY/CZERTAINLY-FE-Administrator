@@ -1,7 +1,6 @@
 import { actions as utilsActuatorActions, selectors as utilsActuatorSelectors } from 'ducks/utilsActuator';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, ButtonGroup, FormGroup, Label } from 'reactstrap';
 import { ParseRequestRequestDtoParseTypeEnum } from 'types/openapi/utils';
 import { transformParseRequestResponseDtoToCertificateResponseDetailModel } from '../../../../ducks/transform/utilsCertificateRequest';
 import {
@@ -11,6 +10,9 @@ import {
 import { CertificateDetailResponseModel } from '../../../../types/certificate';
 import CertificateAttributes from '../../../CertificateAttributes';
 import FileUpload from '../../../Input/FileUpload/FileUpload';
+import Button from 'components/Button';
+import Container from 'components/Container';
+import Switch from 'components/Switch';
 
 interface Props {
     onCancel: () => void;
@@ -43,24 +45,11 @@ export default function CertificateRenewDialog({ onCancel, allowWithoutFile, onR
 
     return (
         <div>
-            <FormGroup>
-                {allowWithoutFile ? (
-                    <>
-                        <Label for="uploadCsr">Upload new CSR ?</Label>
-                        &nbsp;&nbsp;
-                        <input
-                            id="uploadCsr"
-                            type="checkbox"
-                            placeholder="Select Option"
-                            onChange={(e) => {
-                                setUploadCsr(e.target.checked);
-                            }}
-                        />
-                    </>
-                ) : (
-                    <></>
-                )}
-            </FormGroup>
+            {allowWithoutFile ? (
+                <div className="mb-4">
+                    <Switch id="uploadCsr" label="Upload new CSR ?" checked={uploadCsr} onChange={setUploadCsr} />
+                </div>
+            ) : null}
 
             {!allowWithoutFile || uploadCsr ? (
                 <>
@@ -91,18 +80,14 @@ export default function CertificateRenewDialog({ onCancel, allowWithoutFile, onR
                 <></>
             )}
 
-            <br />
-
-            <div className="d-flex justify-content-end">
-                <ButtonGroup>
-                    <Button color="primary" onClick={() => onRenew({ fileContent: fileContent })}>
-                        Renew
-                    </Button>
-                    <Button color="default" onClick={onCancel}>
-                        Cancel
-                    </Button>
-                </ButtonGroup>
-            </div>
+            <Container className="flex-row justify-end modal-footer mt-4" gap={4}>
+                <Button variant="outline" onClick={onCancel}>
+                    Cancel
+                </Button>
+                <Button color="primary" onClick={() => onRenew({ fileContent: fileContent })}>
+                    Renew
+                </Button>
+            </Container>
         </div>
     );
 }

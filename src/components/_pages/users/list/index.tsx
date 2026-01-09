@@ -1,7 +1,6 @@
-import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router';
-import { Badge, Container } from 'reactstrap';
+import { Link } from 'react-router';
 
 import { actions, selectors } from 'ducks/users';
 
@@ -10,11 +9,12 @@ import Dialog from 'components/Dialog';
 import StatusBadge from 'components/StatusBadge';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
+import UserForm from '../form';
 import { LockWidgetNameEnum } from 'types/user-interface';
+import Badge from 'components/Badge';
 
 export default function UsersList() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const checkedRows = useSelector(selectors.usersListCheckedRows);
     const users = useSelector(selectors.users);
@@ -24,10 +24,13 @@ export default function UsersList() {
     const isUpdating = useSelector(selectors.isUpdating);
     const isEnabling = useSelector(selectors.isEnabling);
     const isDisabling = useSelector(selectors.isDisabling);
+    const isCreating = useSelector(selectors.isCreating);
 
     const isBusy = isFetching || isDeleting || isUpdating || isEnabling || isDisabling;
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+    const [editingUserId, setEditingUserId] = useState<string | undefined>(undefined);
 
     const getFreshData = useCallback(() => {
         dispatch(actions.resetState());
@@ -39,9 +42,37 @@ export default function UsersList() {
         getFreshData();
     }, [getFreshData]);
 
+    const wasCreating = useRef(isCreating);
+    const wasUpdating = useRef(isUpdating);
+
+    useEffect(() => {
+        if (wasCreating.current && !isCreating) {
+            setIsAddModalOpen(false);
+            getFreshData();
+        }
+        wasCreating.current = isCreating;
+    }, [isCreating, getFreshData]);
+
+    useEffect(() => {
+        if (wasUpdating.current && !isUpdating) {
+            setEditingUserId(undefined);
+            getFreshData();
+        }
+        wasUpdating.current = isUpdating;
+    }, [isUpdating, getFreshData]);
+
+    const handleOpenAddModal = useCallback(() => {
+        setIsAddModalOpen(true);
+    }, []);
+
+    const handleCloseAddModal = useCallback(() => {
+        setIsAddModalOpen(false);
+        setEditingUserId(undefined);
+    }, []);
+
     const onAddClick = useCallback(() => {
-        navigate(`./add`);
-    }, [navigate]);
+        handleOpenAddModal();
+    }, [handleOpenAddModal]);
 
     const onEnableClick = useCallback(() => {
         checkedRows.forEach((uuid) => dispatch(actions.enable({ uuid })));
@@ -91,9 +122,7 @@ export default function UsersList() {
                 icon: 'plus',
                 disabled: false,
                 tooltip: 'Create',
-                onClick: () => {
-                    onAddClick();
-                },
+                onClick: handleOpenAddModal,
             },
             {
                 icon: 'trash',
@@ -120,7 +149,7 @@ export default function UsersList() {
                 },
             },
         ],
-        [checkedRows.length, isSystemUserSelected, canEnable, canDisable, onAddClick, onEnableClick, onDisableClick],
+        [checkedRows.length, isSystemUserSelected, canEnable, canDisable, handleOpenAddModal, onEnableClick, onDisableClick],
     );
 
     const userTableHeader: TableHeader[] = useMemo(
@@ -216,7 +245,7 @@ export default function UsersList() {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <div>
             <Widget
                 title="List of Users"
                 busy={isBusy}
@@ -225,7 +254,6 @@ export default function UsersList() {
                 titleSize="large"
                 refreshAction={getFreshData}
             >
-                <br />
                 <CustomTable
                     headers={userTableHeader}
                     data={userTableData}
@@ -241,11 +269,20 @@ export default function UsersList() {
                 caption={`Delete ${checkedRows.length > 1 ? 'Users' : 'an User'}`}
                 body={`You are about to delete ${checkedRows.length > 1 ? 'Users' : 'an User'}. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                 ]}
             />
-        </Container>
+
+            <Dialog
+                isOpen={isAddModalOpen || !!editingUserId}
+                toggle={handleCloseAddModal}
+                caption={editingUserId ? 'Edit User' : 'Create User'}
+                size="xl"
+                body={<UserForm userId={editingUserId} onCancel={handleCloseAddModal} />}
+            />
+        </div>
     );
 }

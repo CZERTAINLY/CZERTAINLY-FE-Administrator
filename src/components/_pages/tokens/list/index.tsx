@@ -1,12 +1,13 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router';
-import { Badge, Container } from 'reactstrap';
+import { Link } from 'react-router';
+import Badge from 'components/Badge';
 
 import { actions, selectors } from 'ducks/tokens';
 
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
+import TokenForm from '../form';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import TokenStatusBadge from 'components/_pages/tokens/TokenStatusBadge';
@@ -15,7 +16,6 @@ import TokenActivationDialogBody from '../TokenActivationDialogBody';
 
 function TokenList() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const checkedRows = useSelector(selectors.checkedRows);
     const tokens = useSelector(selectors.tokens);
@@ -24,12 +24,15 @@ function TokenList() {
     const isDeleting = useSelector(selectors.isDeleting);
     const isUpdating = useSelector(selectors.isUpdating);
     const isBulkDeleting = useSelector(selectors.isBulkDeleting);
+    const isCreating = useSelector(selectors.isCreating);
+
+    const isBusy = isFetching || isDeleting || isUpdating || isBulkDeleting;
 
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [confirmDeactivation, setConfirmDeactivation] = useState<boolean>(false);
     const [activateToken, setActivateToken] = useState<boolean>(false);
-
-    const isBusy = isFetching || isDeleting || isUpdating || isBulkDeleting;
+    const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+    const [editingTokenId, setEditingTokenId] = useState<string | undefined>(undefined);
 
     const getFreshData = useCallback(() => {
         dispatch(actions.setCheckedRows({ checkedRows: [] }));
@@ -41,9 +44,37 @@ function TokenList() {
         getFreshData();
     }, [getFreshData]);
 
+    const wasCreating = useRef(isCreating);
+    const wasUpdating = useRef(isUpdating);
+
+    useEffect(() => {
+        if (wasCreating.current && !isCreating) {
+            setIsAddModalOpen(false);
+            getFreshData();
+        }
+        wasCreating.current = isCreating;
+    }, [isCreating, getFreshData]);
+
+    useEffect(() => {
+        if (wasUpdating.current && !isUpdating) {
+            setEditingTokenId(undefined);
+            getFreshData();
+        }
+        wasUpdating.current = isUpdating;
+    }, [isUpdating, getFreshData]);
+
+    const handleOpenAddModal = useCallback(() => {
+        setIsAddModalOpen(true);
+    }, []);
+
+    const handleCloseAddModal = useCallback(() => {
+        setIsAddModalOpen(false);
+        setEditingTokenId(undefined);
+    }, []);
+
     const onAddClick = useCallback(() => {
-        navigate('./add');
-    }, [navigate]);
+        handleOpenAddModal();
+    }, [handleOpenAddModal]);
 
     const setCheckedRows = useCallback(
         (rows: (string | number)[]) => {
@@ -72,9 +103,7 @@ function TokenList() {
                 icon: 'plus',
                 disabled: false,
                 tooltip: 'Create',
-                onClick: () => {
-                    onAddClick();
-                },
+                onClick: handleOpenAddModal,
             },
             {
                 icon: 'trash',
@@ -101,7 +130,7 @@ function TokenList() {
                 },
             },
         ],
-        [checkedRows, onAddClick],
+        [checkedRows, handleOpenAddModal],
     );
 
     const tokenRowHeader: TableHeader[] = useMemo(
@@ -170,7 +199,7 @@ function TokenList() {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <>
             <Widget
                 title="Token Store"
                 busy={isBusy}
@@ -196,9 +225,10 @@ function TokenList() {
                 caption={`Delete ${checkedRows.length > 1 ? 'Tokens' : 'a Token'}`}
                 body={`You are about to delete ${checkedRows.length > 1 ? 'Tokens' : 'a Token'}. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
 
@@ -210,7 +240,7 @@ function TokenList() {
                 toggle={() => setConfirmDeactivation(false)}
                 buttons={[
                     { color: 'danger', onClick: onDeactivationConfirmed, body: 'Deactivate' },
-                    { color: 'secondary', onClick: () => setConfirmDeactivation(false), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDeactivation(false), body: 'Cancel' },
                 ]}
             />
 
@@ -225,7 +255,15 @@ function TokenList() {
                 toggle={() => setActivateToken(false)}
                 buttons={[]}
             />
-        </Container>
+
+            <Dialog
+                isOpen={isAddModalOpen || !!editingTokenId}
+                toggle={handleCloseAddModal}
+                caption={editingTokenId ? 'Edit Token' : 'Create Token'}
+                size="xl"
+                body={<TokenForm tokenId={editingTokenId} onCancel={handleCloseAddModal} onSuccess={handleCloseAddModal} />}
+            />
+        </>
     );
 }
 

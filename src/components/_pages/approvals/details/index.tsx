@@ -1,21 +1,23 @@
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
-import GoBackButton from 'components/GoBackButton';
 import StatusBadge from 'components/StatusBadge';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as approvalActions, selectors as approvalSelectors } from 'ducks/approvals';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-
+import Breadcrumb from 'components/Breadcrumb';
+import Container from 'components/Container';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router';
-import { Button, Col, Container, Input, Row } from 'reactstrap';
+import Button from 'components/Button';
+import TextArea from 'components/TextArea';
 import { ApproverType, ProfileApprovalStepModel } from 'types/approval-profiles';
 import { DetailApprovalStepModel } from 'types/approvals';
 import { ApprovalDetailDtoStatusEnum, PlatformEnum, Resource } from 'types/openapi';
 import { dateFormatter } from 'utils/dateUtil';
 import { createWidgetDetailHeaders } from 'utils/widget';
+import { ArrowRightCircle } from 'lucide-react';
 
 export default function ApprovalDetails() {
     const dispatch = useDispatch();
@@ -139,14 +141,13 @@ export default function ApprovalDetails() {
                               <>
                                   <StatusBadge textStatus={approvalDetails.status} />
                                   <Button
-                                      color="white"
-                                      size="sm"
-                                      className="p-0 ms-1"
+                                      variant="transparent"
+                                      className="p-0 ml-1"
                                       onClick={() => {
                                           navigate(`../../${approvalDetails.resource}/detail/${approvalDetails.objectUuid}`);
                                       }}
                                   >
-                                      <i className="fa fa-circle-arrow-right"></i>
+                                      <ArrowRightCircle size={16} />
                                   </Button>
                               </>,
                           ],
@@ -284,58 +285,53 @@ export default function ApprovalDetails() {
     );
 
     return (
-        <Container className="themed-container" fluid>
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                forcedPath="/approvals"
-                text={`${getEnumLabel(resourceEnum, Resource.Approvals)} Inventory`}
-            />
-            <Row>
-                <Col>
-                    <Widget title="Approval Details" busy={isBusy} titleSize="large" widgetButtons={buttons} refreshAction={getFreshData}>
-                        <CustomTable headers={detailHeaders} data={detailData} />
-                    </Widget>
-                </Col>
-            </Row>
-            <Row>
-                <Col>
-                    <Widget title="Approval Steps" busy={isBusy}>
-                        <CustomTable headers={stepsHeaders} data={stepsRows} hasDetails={true} />
-                    </Widget>
-                </Col>
-            </Row>
-
-            <Dialog
-                isOpen={recipientApproveDialog}
-                body={
-                    <div>
-                        <span>Comment (optional) :</span>
-                        <Input type="textarea" value={comment} onChange={(e) => setcomment(e.currentTarget.value)} />
-                    </div>
-                }
-                caption="Accept approval?"
-                toggle={() => setRecipientApproveDialog(false)}
-                buttons={[
-                    { color: 'primary', onClick: onApproveRecipient, body: 'Yes, approve' },
-                    { color: 'secondary', onClick: () => setRecipientApproveDialog(false), body: 'Cancel' },
+        <div>
+            <Breadcrumb
+                items={[
+                    { label: `${getEnumLabel(resourceEnum, Resource.Approvals)} Inventory`, href: '/approvals' },
+                    { label: approvalDetails?.approvalUuid || 'Approval Details', href: '' },
                 ]}
             />
+            <Container>
+                <Widget title="Approval Details" busy={isBusy} titleSize="large" widgetButtons={buttons} refreshAction={getFreshData}>
+                    <CustomTable headers={detailHeaders} data={detailData} />
+                </Widget>
+                <Widget title="Approval Steps" busy={isBusy}>
+                    <CustomTable headers={stepsHeaders} data={stepsRows} hasDetails={true} />
+                </Widget>
 
-            <Dialog
-                isOpen={recipientRejectDialog}
-                caption="Reject approval?"
-                toggle={() => setRecipientRejectDialog(false)}
-                body={
-                    <div>
-                        <span>Comment (optional) :</span>
-                        <Input type="textarea" value={comment} onChange={(e) => setcomment(e.currentTarget.value)} />
-                    </div>
-                }
-                buttons={[
-                    { color: 'primary', onClick: onRejectRecipient, body: 'Yes, reject' },
-                    { color: 'secondary', onClick: () => setRecipientRejectDialog(false), body: 'Cancel' },
-                ]}
-            />
-        </Container>
+                <Dialog
+                    isOpen={recipientApproveDialog}
+                    body={
+                        <div>
+                            <span>Comment (optional) :</span>
+                            <TextArea value={comment} onChange={(value) => setcomment(value)} />
+                        </div>
+                    }
+                    caption="Accept approval?"
+                    toggle={() => setRecipientApproveDialog(false)}
+                    buttons={[
+                        { color: 'secondary', variant: 'outline', onClick: () => setRecipientApproveDialog(false), body: 'Cancel' },
+                        { color: 'primary', onClick: onApproveRecipient, body: 'Yes, approve' },
+                    ]}
+                />
+
+                <Dialog
+                    isOpen={recipientRejectDialog}
+                    caption="Reject approval?"
+                    toggle={() => setRecipientRejectDialog(false)}
+                    body={
+                        <div>
+                            <span>Comment (optional) :</span>
+                            <TextArea value={comment} onChange={(value) => setcomment(value)} />
+                        </div>
+                    }
+                    buttons={[
+                        { color: 'primary', onClick: onRejectRecipient, body: 'Yes, reject' },
+                        { color: 'secondary', variant: 'outline', onClick: () => setRecipientRejectDialog(false), body: 'Cancel' },
+                    ]}
+                />
+            </Container>
+        </div>
     );
 }

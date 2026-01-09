@@ -6,19 +6,17 @@ import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router';
-import Select from 'react-select';
-import { Container } from 'reactstrap';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Link } from 'react-router';
+import Select from 'components/Select';
 import { PlatformEnum, Resource } from 'types/openapi';
 
 import { useHasEventsResourceOptions, useRuleEvaluatorResourceOptions } from 'utils/rules';
-import styles from './triggerList.module.scss';
+import TriggerForm from '../form';
 
 const TriggerList = () => {
     const triggers = useSelector(rulesSelectors.triggers);
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const eventNameEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ResourceEvent));
@@ -26,23 +24,42 @@ const TriggerList = () => {
     const [selectedResource, setSelectedResource] = useState<Resource>();
     const isFetchingList = useSelector(rulesSelectors.isFetchingTriggers);
     const isDeleting = useSelector(rulesSelectors.isDeletingTrigger);
+    const isCreatingTrigger = useSelector(rulesSelectors.isCreatingTrigger);
 
     const [checkedRows, setCheckedRows] = useState<string[]>([]);
     const [confirmDelete, setConfirmDelete] = useState(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
     const { resourceOptionsWithEvents } = useHasEventsResourceOptions();
 
     const isBusy = useMemo(() => isFetchingList || isDeleting, [isFetchingList, isDeleting]);
+
+    const wasCreating = useRef(isCreatingTrigger);
+    const getFreshList = useCallback(() => {
+        dispatch(rulesActions.listTriggers({ resource: selectedResource }));
+    }, [dispatch, selectedResource]);
+
+    useEffect(() => {
+        if (wasCreating.current && !isCreatingTrigger) {
+            setIsAddModalOpen(false);
+            getFreshList();
+        }
+        wasCreating.current = isCreatingTrigger;
+    }, [isCreatingTrigger, getFreshList]);
+
+    const handleOpenAddModal = useCallback(() => {
+        setIsAddModalOpen(true);
+    }, []);
+
+    const handleCloseAddModal = useCallback(() => {
+        setIsAddModalOpen(false);
+    }, []);
 
     const onDeleteConfirmed = useCallback(() => {
         dispatch(rulesActions.deleteTrigger({ triggerUuid: checkedRows[0] }));
         setConfirmDelete(false);
         setCheckedRows([]);
     }, [dispatch, checkedRows]);
-
-    const getFreshList = useCallback(() => {
-        dispatch(rulesActions.listTriggers({ resource: selectedResource }));
-    }, [dispatch, selectedResource]);
 
     useEffect(() => {
         getFreshList();
@@ -54,41 +71,41 @@ const TriggerList = () => {
                 content: 'Name',
                 align: 'left',
                 id: 'name',
-                width: '12%',
+                width: '25%',
                 sortable: true,
             },
             {
                 content: 'Ignore Trigger',
                 align: 'left',
                 id: 'ignoreTrigger',
-                width: '12%',
+                width: '15%',
             },
             {
                 content: 'Trigger Type',
                 align: 'left',
                 id: 'triggerType',
-                width: '12%',
+                width: '15%',
                 sortable: true,
             },
             {
                 content: 'Event Name',
                 align: 'left',
                 id: 'eventName',
-                width: '12%',
+                width: '15%',
                 sortable: true,
             },
             {
                 content: 'Resource',
                 align: 'left',
                 id: 'resource',
-                width: '12%',
+                width: '15%',
                 sortable: true,
             },
             {
                 content: 'Description',
                 align: 'left',
                 id: 'description',
-                width: '12%',
+                width: '15%',
             },
         ],
         [],
@@ -120,25 +137,22 @@ const TriggerList = () => {
                 tooltip: 'Select Resource',
                 onClick: () => {},
                 custom: (
-                    <div className={styles.listSelectContainer}>
-                        <Select
-                            isClearable
-                            maxMenuHeight={140}
-                            menuPlacement="auto"
-                            options={resourceOptionsWithEvents}
-                            placeholder="Select Resource"
-                            onChange={(event) => {
-                                setSelectedResource(event?.value as Resource);
-                            }}
-                        />
-                    </div>
+                    <Select
+                        placeholder="Select Resource"
+                        id="resource"
+                        options={resourceOptionsWithEvents}
+                        value={selectedResource || 'Select Resource'}
+                        onChange={(value) => {
+                            setSelectedResource(value as Resource);
+                        }}
+                    />
                 ),
             },
             {
                 icon: 'plus',
                 disabled: false,
                 tooltip: 'Create',
-                onClick: () => navigate(`./add`),
+                onClick: handleOpenAddModal,
             },
             {
                 icon: 'trash',
@@ -147,13 +161,13 @@ const TriggerList = () => {
                 onClick: () => setConfirmDelete(true),
             },
         ],
-        [checkedRows, navigate, resourceOptionsWithEvents],
+        [checkedRows, resourceOptionsWithEvents, selectedResource, handleOpenAddModal],
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <>
             <Widget
-                titleSize="larger"
+                titleSize="large"
                 title="Triggers"
                 refreshAction={getFreshList}
                 busy={isBusy}
@@ -163,7 +177,6 @@ const TriggerList = () => {
                     description: 'Triggers are defined to trigger actions based on certain conditions of a resource',
                 }}
             >
-                <br />
                 <CustomTable
                     checkedRows={checkedRows}
                     hasCheckboxes
@@ -183,12 +196,22 @@ const TriggerList = () => {
                 caption={`Delete a Trigger`}
                 body={`You are about to delete a Trigger. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
             />
-        </Container>
+
+            <Dialog
+                isOpen={isAddModalOpen}
+                toggle={handleCloseAddModal}
+                caption="Create Trigger"
+                size="xl"
+                body={<TriggerForm onCancel={handleCloseAddModal} onSuccess={handleCloseAddModal} />}
+                noBorder
+            />
+        </>
     );
 };
 

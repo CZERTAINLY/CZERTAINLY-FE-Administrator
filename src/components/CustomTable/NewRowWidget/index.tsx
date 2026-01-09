@@ -1,8 +1,8 @@
-import cx from 'classnames';
+import cn from 'classnames';
 import { useEffect, useState } from 'react';
-import Select from 'react-select';
-import { Button, ButtonGroup } from 'reactstrap';
-import styles from './NewRowWidget.module.scss';
+import Select from 'components/Select';
+import Button from 'components/Button';
+import { Plus } from 'lucide-react';
 interface SelectChangeValue {
     value: string;
     label: string;
@@ -27,34 +27,32 @@ const NewRowWidget = ({ newItemsList, isBusy, onAddClick, immediateAdd, selectHi
     }, [immediateAdd, selectedItems, onAddClick]);
 
     return (
-        <div className="d-flex">
-            <div className="w-100">
-                <Select
-                    onChange={(event) => {
-                        setSelectedItems(event.map((e) => e));
-                    }}
-                    isMulti
-                    value={selectedItems}
-                    options={newItemsList}
-                    placeholder={selectHint || 'Select items to add'}
-                />
-            </div>
+        <div className="flex">
+            <Select
+                onChange={(values) => {
+                    setSelectedItems(values || []);
+                }}
+                isMulti
+                value={selectedItems}
+                options={newItemsList}
+                placeholder={selectHint || 'Select items to add'}
+                id="newRowWidgetSelect"
+            />
             <div>
                 {selectedItems?.length && !immediateAdd ? (
-                    <ButtonGroup>
+                    <div className="flex gap-2 ml-1">
                         <Button
                             disabled={isBusy}
-                            className={cx('btn btn-link ms-1', styles.addButton)}
-                            size="sm"
+                            variant="transparent"
                             color="secondary"
                             onClick={() => {
                                 onAddClick(selectedItems);
                                 setSelectedItems([]);
                             }}
                         >
-                            <i className="fa fa-plus" />
+                            <Plus />
                         </Button>
-                    </ButtonGroup>
+                    </div>
                 ) : null}
             </div>
         </div>

@@ -11,11 +11,12 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router';
 
-import { Container } from 'reactstrap';
 import { PlatformEnum, ResourceEvent } from 'types/openapi';
 import { EventSettingsDto } from 'types/settings';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { TriggerDto } from 'types/rules';
+import Container from 'components/Container';
+import Breadcrumb from 'components/Breadcrumb';
 
 export default function EventDetail() {
     const { event } = useParams();
@@ -165,20 +166,28 @@ export default function EventDetail() {
         [eventSettings, triggers, triggerTypeEnum, resourceTypeEnum, resourceEventEnum],
     );
     return (
-        <Container className="themed-container" fluid>
-            <Widget
-                title="Event Settings"
-                busy={isBusy}
-                widgetButtons={widgetButtons}
-                widgetLockName={LockWidgetNameEnum.EventSettings}
-                titleSize="large"
-                refreshAction={getFreshData}
-            >
-                <CustomTable headers={headers} data={profileData} />
-            </Widget>
-            <Widget title="Assigned Triggers" busy={isBusy} widgetLockName={LockWidgetNameEnum.EventSettings} titleSize="large">
-                <CustomTable headers={triggerHeaders} data={triggerTableData} />
-            </Widget>
-        </Container>
+        <div>
+            <Breadcrumb
+                items={[
+                    { label: 'Events Settings', href: '/eventssettings' },
+                    { label: eventSettings?.event || 'Event Settings', href: '' },
+                ]}
+            />
+            <Container>
+                <Widget
+                    title="Event Settings"
+                    busy={isBusy}
+                    widgetButtons={widgetButtons}
+                    widgetLockName={LockWidgetNameEnum.EventSettings}
+                    titleSize="large"
+                    refreshAction={getFreshData}
+                >
+                    <CustomTable headers={headers} data={profileData} />
+                </Widget>
+                <Widget title="Assigned Triggers" busy={isBusy} widgetLockName={LockWidgetNameEnum.EventSettings} titleSize="large">
+                    <CustomTable headers={triggerHeaders} data={triggerTableData} />
+                </Widget>
+            </Container>
+        </div>
     );
 }

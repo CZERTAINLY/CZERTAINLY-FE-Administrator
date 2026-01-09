@@ -1,6 +1,7 @@
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import { Copy } from 'lucide-react';
 import React, { useCallback, useMemo } from 'react';
-import { Button } from 'reactstrap';
+import Button from 'components/Button';
 import { JwkModel } from 'types/auth-settings';
 import { useCopyToClipboard } from 'utils/common-hooks';
 
@@ -54,8 +55,8 @@ const JwkSetKeysTable = ({ jwkSetKeys }: Props) => {
     const renderCopyKeyButton = useCallback(
         (publicKey: string) => (
             <Button
-                className="btn btn-link py-0 px-1 ms-2"
-                color="white"
+                variant="transparent"
+                color="primary"
                 title="Public Key"
                 key="copy"
                 onClick={() =>
@@ -66,7 +67,7 @@ const JwkSetKeysTable = ({ jwkSetKeys }: Props) => {
                     )
                 }
             >
-                <i className="fa fa-copy" style={{ color: 'auto' }} />
+                <Copy size={16} />
             </Button>
         ),
         [copyToClipboard],

@@ -1,20 +1,20 @@
 import { useCallback, useMemo } from 'react';
-import { Form } from 'react-final-form';
+import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { ButtonGroup, Form as BootstrapForm, Button, Label } from 'reactstrap';
+import Button from 'components/Button';
 import { validateNonZeroInteger, validatePositiveInteger } from 'utils/validators';
 
 import Spinner from 'components/Spinner';
 
 import { actions, selectors } from 'ducks/ra-profiles';
 import { RaProfileResponseModel } from 'types/ra-profiles';
-import TextField from 'components/Input/TextField';
-import SwitchField from 'components/Input/SwitchField';
+import TextInput from 'components/TextInput';
+import Switch from 'components/Switch';
+import { buildValidationRules } from 'utils/validators-helper';
 import ProgressButton from 'components/ProgressButton';
 import { isObjectSame } from 'utils/common-utils';
 import { SettingsPlatformModel } from 'types/settings';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
-import SwitchWidget from 'components/SwitchWidget';
 import { renderExpiringThresholdLabel, renderValidationFrequencyLabel } from 'utils/certificate-validation';
 
 type FormValues = {
@@ -36,16 +36,30 @@ export default function CertificateValidationDialogBody({ raProfile, platformSet
     const isUpdating = useSelector(selectors.isUpdating);
     const isBusy = useMemo(() => isUpdating, [isUpdating]);
 
-    const initialValues = useMemo(() => {
-        if (!raProfile?.certificateValidationSettings) return {};
+    const defaultValues: FormValues = useMemo(() => {
+        if (!raProfile?.certificateValidationSettings) {
+            return {
+                usePlatformSettings: false,
+                enabled: false,
+                frequency: undefined,
+                expiringThreshold: undefined,
+            };
+        }
 
         return {
             usePlatformSettings: raProfile.certificateValidationSettings.usePlatformSettings,
             enabled: raProfile.certificateValidationSettings.enabled,
-            frequency: raProfile.certificateValidationSettings.frequency?.toString(),
-            expiringThreshold: raProfile.certificateValidationSettings.expiringThreshold?.toString(),
-        } as FormValues;
+            frequency: raProfile.certificateValidationSettings.frequency,
+            expiringThreshold: raProfile.certificateValidationSettings.expiringThreshold,
+        };
     }, [raProfile]);
+
+    const methods = useForm<FormValues>({
+        mode: 'onTouched',
+        defaultValues,
+    });
+
+    const { control, handleSubmit, formState, watch } = methods;
 
     const onSubmit = useCallback(
         (values: FormValues) => {
@@ -68,13 +82,11 @@ export default function CertificateValidationDialogBody({ raProfile, platformSet
         [dispatch, raProfile, onClose],
     );
 
-    const areDefaultValuesSame = useCallback(
-        (values: FormValues) => {
-            const areValuesSame = isObjectSame(values, initialValues);
-            return areValuesSame;
-        },
-        [initialValues],
-    );
+    const watchedValues = useWatch({ control });
+    const areDefaultValuesSame = useCallback(() => {
+        const areValuesSame = isObjectSame(watchedValues, defaultValues);
+        return areValuesSame;
+    }, [watchedValues, defaultValues]);
     const certificateValidationHeaders: TableHeader[] = useMemo(
         () => [
             {
@@ -99,7 +111,13 @@ export default function CertificateValidationDialogBody({ raProfile, platformSet
                 id: 'enabled',
                 columns: [
                     'Enable Validation',
-                    <SwitchWidget key="validationEnabled" disabled checked={platformSettings.certificates?.validation?.enabled} />,
+                    <Switch
+                        key="validationEnabled"
+                        id="validationEnabled"
+                        disabled
+                        checked={platformSettings.certificates?.validation?.enabled}
+                        onChange={() => {}}
+                    />,
                 ],
             },
             {
@@ -115,61 +133,113 @@ export default function CertificateValidationDialogBody({ raProfile, platformSet
         return data;
     }, [platformSettings]);
 
+    const watchedUsePlatformSettings = useWatch({ control, name: 'usePlatformSettings' });
+    const watchedEnabled = useWatch({ control, name: 'enabled' });
+
     if (!raProfile) return <></>;
 
     return (
         <>
-            <Form initialValues={initialValues} onSubmit={onSubmit}>
-                {({ handleSubmit, pristine, submitting, valid, values }) => (
-                    <BootstrapForm onSubmit={handleSubmit} className="mt-2">
-                        <SwitchField id="usePlatformSettings" label="Use Platform Certificate Validation Settings" />
-                        {values.usePlatformSettings ? (
-                            <>
-                                <Label>Current Platform Settings</Label>
-                                <CustomTable headers={certificateValidationHeaders} data={certificateValidationData} />
-                            </>
-                        ) : (
-                            <>
-                                <SwitchField id="enabled" label="Enable Certificate Validation" />
-                                {values.enabled && (
-                                    <>
-                                        <TextField
-                                            id="frequency"
-                                            label="Validation Frequency"
-                                            description="Validation frequency of certificates specified in days."
-                                            validators={[validateNonZeroInteger(), validatePositiveInteger()]}
-                                            inputType="number"
-                                        />
-                                        <TextField
-                                            id="expiringThreshold"
-                                            label="Expiring Threshold"
-                                            description="How many days before expiration should certificate's validation status change to Expiring."
-                                            validators={[validateNonZeroInteger(), validatePositiveInteger()]}
-                                            inputType="number"
-                                        />
-                                    </>
-                                )}
-                            </>
+            <FormProvider {...methods}>
+                <form onSubmit={handleSubmit(onSubmit)} className="mt-2">
+                    <Controller
+                        name="usePlatformSettings"
+                        control={control}
+                        render={({ field }) => (
+                            <Switch
+                                id="usePlatformSettings"
+                                label="Use Platform Certificate Validation Settings"
+                                checked={field.value || false}
+                                onChange={field.onChange}
+                            />
                         )}
-                        {
-                            <div className="d-flex justify-content-end">
-                                <ButtonGroup>
-                                    <ProgressButton
-                                        title={'Save'}
-                                        inProgressTitle={'Saving...'}
-                                        disabled={submitting || isBusy || areDefaultValuesSame(values)}
-                                        inProgress={submitting || isBusy}
-                                        type="submit"
+                    />
+                    {watchedUsePlatformSettings ? (
+                        <>
+                            <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
+                                Current Platform Settings
+                            </label>
+                            <CustomTable headers={certificateValidationHeaders} data={certificateValidationData} />
+                        </>
+                    ) : (
+                        <>
+                            <Controller
+                                name="enabled"
+                                control={control}
+                                render={({ field }) => (
+                                    <Switch
+                                        id="enabled"
+                                        label="Enable Certificate Validation"
+                                        checked={field.value || false}
+                                        onChange={field.onChange}
                                     />
-                                    <Button type="button" color="secondary" disabled={submitting} onClick={onClose}>
-                                        Cancel
-                                    </Button>
-                                </ButtonGroup>
-                            </div>
-                        }
-                    </BootstrapForm>
-                )}
-            </Form>
+                                )}
+                            />
+                            {watchedEnabled && (
+                                <>
+                                    <Controller
+                                        name="frequency"
+                                        control={control}
+                                        rules={buildValidationRules([validateNonZeroInteger(), validatePositiveInteger()])}
+                                        render={({ field, fieldState }) => (
+                                            <div>
+                                                <TextInput
+                                                    id="frequency"
+                                                    label="Validation Frequency"
+                                                    value={field.value?.toString() || ''}
+                                                    onChange={(value) => field.onChange(value ? Number(value) : undefined)}
+                                                    onBlur={field.onBlur}
+                                                    type="number"
+                                                    invalid={!!fieldState.error && fieldState.isTouched}
+                                                    error={fieldState.error?.message}
+                                                />
+                                                <p className="mt-1 text-sm text-gray-600">
+                                                    Validation frequency of certificates specified in days.
+                                                </p>
+                                            </div>
+                                        )}
+                                    />
+                                    <Controller
+                                        name="expiringThreshold"
+                                        control={control}
+                                        rules={buildValidationRules([validateNonZeroInteger(), validatePositiveInteger()])}
+                                        render={({ field, fieldState }) => (
+                                            <div>
+                                                <TextInput
+                                                    id="expiringThreshold"
+                                                    label="Expiring Threshold"
+                                                    value={field.value?.toString() || ''}
+                                                    onChange={(value) => field.onChange(value ? Number(value) : undefined)}
+                                                    onBlur={field.onBlur}
+                                                    type="number"
+                                                    invalid={!!fieldState.error && fieldState.isTouched}
+                                                    error={fieldState.error?.message}
+                                                />
+                                                <p className="mt-1 text-sm text-gray-600">
+                                                    How many days before expiration should certificate's validation status change to
+                                                    Expiring.
+                                                </p>
+                                            </div>
+                                        )}
+                                    />
+                                </>
+                            )}
+                        </>
+                    )}
+                    <div className="flex justify-end gap-2">
+                        <ProgressButton
+                            title={'Save'}
+                            inProgressTitle={'Saving...'}
+                            disabled={formState.isSubmitting || isBusy || areDefaultValuesSame()}
+                            inProgress={formState.isSubmitting || isBusy}
+                            type="submit"
+                        />
+                        <Button type="button" variant="outline" color="secondary" disabled={formState.isSubmitting} onClick={onClose}>
+                            Cancel
+                        </Button>
+                    </div>
+                </form>
+            </FormProvider>
 
             <Spinner active={isBusy} />
         </>

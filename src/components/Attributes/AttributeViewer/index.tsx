@@ -1,10 +1,9 @@
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { useCallback, useMemo, useState } from 'react';
-import { Form } from 'react-final-form';
+import { FormProvider, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
-import { Form as BootstrapForm, Button } from 'reactstrap';
 import {
     AttributeDescriptorModel,
     AttributeResponseModel,
@@ -19,12 +18,38 @@ import { useCopyToClipboard } from 'utils/common-hooks';
 import { actions as userInterfaceActions } from '../../../ducks/user-interface';
 import ContentValueField from '../../Input/DynamicContent/ContentValueField';
 import WidgetButtons, { WidgetButtonProps } from '../../WidgetButtons';
+import { InfoIcon } from 'lucide-react';
+import Button from 'components/Button';
+import Popover from 'components/Popover';
+import Widget from 'components/Widget';
 
 export enum ATTRIBUTE_VIEWER_TYPE {
     ATTRIBUTE,
     METADATA,
     METADATA_FLAT,
     ATTRIBUTE_EDIT,
+}
+
+function AttributeEditForm({
+    descriptor,
+    initialContent,
+    onSubmit,
+}: {
+    descriptor: CustomAttributeModel;
+    initialContent?: BaseAttributeContentModel[];
+    onSubmit: (uuid: string, content: BaseAttributeContentModel[]) => void;
+}) {
+    const methods = useForm<any>({
+        defaultValues: {},
+    });
+
+    return (
+        <FormProvider {...methods}>
+            <form onSubmit={(e) => e.preventDefault()} className="mt-3">
+                <ContentValueField id={descriptor.name} descriptor={descriptor} initialContent={initialContent} onSubmit={onSubmit} />
+            </form>
+        </FormProvider>
+    );
 }
 
 export interface Props {
@@ -46,7 +71,7 @@ export default function AttributeViewer({
     onSubmit,
     onRemove,
 }: Props) {
-    const getContent = useCallback(getAttributeContent, []);
+    const getContent = getAttributeContent;
     const [editingAttributesNames, setEditingAttributesNames] = useState<string[]>([]);
     const contentTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AttributeContentType));
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
@@ -156,25 +181,17 @@ export default function AttributeViewer({
 
             if ('sourceObjects' in attribute && attribute.sourceObjects.length > 0 && resource) {
                 return (
-                    <Button
-                        data-testid="source-button"
-                        className="btn btn-link p-0 ms-2"
-                        color="white"
-                        title="Source objects"
-                        onClick={() => {
-                            dispatch(
-                                userInterfaceActions.showGlobalModal({
-                                    content: <CustomTable headers={headers} data={attribute.sourceObjects.map(createData)} />,
-                                    isOpen: true,
-                                    showCloseButton: true,
-                                    title: 'Source objects',
-                                    size: 'lg',
-                                }),
-                            );
-                        }}
+                    <Popover
+                        content={
+                            <Widget title="Source objects" noBorder className="!bg-[#F7F6F2]">
+                                <CustomTable headers={headers} data={attribute.sourceObjects.map(createData)} />
+                            </Widget>
+                        }
                     >
-                        <i className="fa fa-info" style={{ color: 'auto', marginBottom: '9.5px', marginLeft: '4px', fontSize: '14px' }} />
-                    </Button>
+                        <Button data-testid="source-button" variant="transparent" className="!p-1 ml-1 relative top-[3px]">
+                            <InfoIcon size={16} />
+                        </Button>
+                    </Popover>
                 );
             }
             return null;
@@ -290,21 +307,14 @@ export default function AttributeViewer({
                             a.label || '',
                             getEnumLabel(contentTypeEnum, a.contentType),
                             onSubmit && descriptor && editingAttributesNames.find((n) => n === a.name) ? (
-                                <Form onSubmit={() => {}}>
-                                    {({ values }) => (
-                                        <BootstrapForm className="mt-3">
-                                            <ContentValueField
-                                                id={descriptor.name}
-                                                descriptor={descriptor}
-                                                initialContent={a.content}
-                                                onSubmit={(uuid, content) => {
-                                                    setEditingAttributesNames(editingAttributesNames.filter((n) => n !== descriptor.name));
-                                                    onSubmit(uuid, content);
-                                                }}
-                                            />
-                                        </BootstrapForm>
-                                    )}
-                                </Form>
+                                <AttributeEditForm
+                                    descriptor={descriptor}
+                                    initialContent={a.content}
+                                    onSubmit={(uuid, content) => {
+                                        setEditingAttributesNames(editingAttributesNames.filter((n) => n !== descriptor.name));
+                                        onSubmit(uuid, content);
+                                    }}
+                                />
                             ) : (
                                 getContent(a.contentType, a.content)
                             ),

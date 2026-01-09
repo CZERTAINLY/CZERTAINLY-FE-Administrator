@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useMemo } from 'react';
-import { Field, useForm } from 'react-final-form';
-import Select from 'react-select';
-import { Col, FormFeedback, FormGroup, Input, InputGroup } from 'reactstrap';
+import { Controller, useFormContext } from 'react-hook-form';
 import { getStepValue } from 'utils/common-utils';
 import { getFormattedDateTime } from 'utils/dateUtil';
 import { BaseAttributeContentModel, CustomAttributeModel } from '../../../../types/attributes';
@@ -9,6 +7,11 @@ import { AttributeContentType } from '../../../../types/openapi';
 import { composeValidators, validateRequired } from '../../../../utils/validators';
 import WidgetButtons from '../../../WidgetButtons';
 import { ContentFieldConfiguration } from '../index';
+import Select from 'components/Select';
+import TextInput from 'components/TextInput';
+import DatePicker from 'components/DatePicker';
+import Container from 'components/Container';
+import cn from 'classnames';
 
 type Props = {
     id?: string;
@@ -18,7 +21,7 @@ type Props = {
 };
 
 export default function ContentValueField({ id, descriptor, initialContent, onSubmit }: Props) {
-    const form = useForm();
+    const { control, setValue } = useFormContext();
 
     const options = useMemo(
         () =>
@@ -28,7 +31,7 @@ export default function ContentValueField({ id, descriptor, initialContent, onSu
                     : descriptor.contentType === AttributeContentType.Datetime
                       ? getFormattedDateTime(a.data.toString())
                       : a.data.toString(),
-                value: a,
+                value: a.data.toString(),
             })),
         [descriptor],
     );
@@ -37,15 +40,25 @@ export default function ContentValueField({ id, descriptor, initialContent, onSu
         const initialValue =
             initialContent && initialContent.length > 0
                 ? descriptor.properties.list
-                    ? options?.filter((o) =>
-                          initialContent.find((i) => {
+                    ? descriptor.properties.multiSelect
+                        ? options?.filter((o) =>
+                              initialContent.find((i) => {
+                                  if (descriptor.contentType === AttributeContentType.Datetime) {
+                                      return getFormattedDateTime(i.data.toString()) === getFormattedDateTime(o.value.toString());
+                                  } else {
+                                      return i.data === o.value;
+                                  }
+                              }),
+                          )
+                        : options?.find((o) => {
                               if (descriptor.contentType === AttributeContentType.Datetime) {
-                                  return getFormattedDateTime(i.data.toString()) === getFormattedDateTime(o.value.data.toString());
+                                  return (
+                                      getFormattedDateTime(initialContent[0].data.toString()) === getFormattedDateTime(o.value.toString())
+                                  );
                               } else {
-                                  return i.data === o.value.data;
+                                  return initialContent[0].data === o.value;
                               }
-                          }),
-                      )
+                          })?.value
                     : initialContent[0].data
                 : undefined;
 
@@ -55,8 +68,8 @@ export default function ContentValueField({ id, descriptor, initialContent, onSu
                 : undefined
             : undefined;
 
-        form.change(descriptor.name, initialValue ?? descriptorValue ?? ContentFieldConfiguration[descriptor.contentType].initial);
-    }, [descriptor, form, initialContent, options]);
+        setValue(descriptor.name, initialValue ?? descriptorValue ?? ContentFieldConfiguration[descriptor.contentType].initial);
+    }, [descriptor, setValue, initialContent, options]);
 
     const fieldStepValue = useMemo(() => {
         const stepValue = getStepValue(descriptor.contentType);
@@ -104,12 +117,12 @@ export default function ContentValueField({ id, descriptor, initialContent, onSu
         }
         if (descriptor.properties.list) {
             if (descriptor.properties.multiSelect) {
-                return input.value.map((v: any) => transformObjectContent(descriptor.contentType, v.value));
+                return input.value.map((v: any) => transformObjectContent(descriptor.contentType, { data: v.value }));
             } else {
                 if (Array.isArray(input.value)) {
-                    return input.value.map((v: any) => transformObjectContent(descriptor.contentType, v.value));
+                    return input.value.map((v: any) => transformObjectContent(descriptor.contentType, { data: v.value }));
                 } else {
-                    return [transformObjectContent(descriptor.contentType, input.value.value)];
+                    return [transformObjectContent(descriptor.contentType, { data: input.value })];
                 }
             }
         }
@@ -127,73 +140,104 @@ export default function ContentValueField({ id, descriptor, initialContent, onSu
         return result.length === 0 ? undefined : composeValidators(...result);
     }, [descriptor]);
 
-    return ContentFieldConfiguration[descriptor.contentType].type ? (
-        <Field
+    if (!ContentFieldConfiguration[descriptor.contentType].type) {
+        return null;
+    }
+
+    return (
+        <Controller
             key={descriptor.name}
             name={descriptor.name}
-            validate={validators ?? undefined}
-            type={ContentFieldConfiguration[descriptor.contentType].type}
-        >
-            {({ input, meta }) => {
-                const inputContent = getFieldContent(input);
+            control={control}
+            rules={{
+                validate: validators,
+            }}
+            render={({ field, fieldState }) => {
+                console.log('field', field);
+                const inputContent = getFieldContent(field);
+                const inputType = ContentFieldConfiguration[descriptor.contentType].type;
+                const isDateTime = inputType === 'datetime-local';
+                const needsStep = inputType === 'number';
+                const displayValue =
+                    descriptor.contentType === AttributeContentType.Datetime ? getFormattedDateTime(field.value) : field.value;
+
                 const inputComponent = descriptor.properties.list ? (
-                    <Col xs="10" sm="10" md="10" lg="10" xl="10">
-                        <Select
-                            {...input}
-                            inputId={descriptor.name}
-                            options={options}
-                            menuPortalTarget={document.body}
-                            styles={{
-                                control: (provided) =>
-                                    meta.touched && meta.invalid
-                                        ? {
-                                              ...provided,
-                                              border: 'solid 1px red',
-                                              '&:hover': { border: 'solid 1px red' },
-                                          }
-                                        : { ...provided },
-                            }}
-                            isMulti={descriptor.properties.multiSelect}
-                            isDisabled={descriptor.properties.readOnly}
-                            isClearable={!descriptor.properties.required}
-                        />
-                    </Col>
-                ) : (
-                    <Input
+                    <Select
+                        {...field}
+                        id={descriptor.name}
+                        options={options ?? []}
+                        isMulti={descriptor.properties.multiSelect}
                         disabled={descriptor.properties.readOnly}
-                        {...input}
-                        valid={!meta.error && meta.touched}
-                        invalid={!!meta.error && meta.touched}
-                        type={ContentFieldConfiguration[descriptor.contentType].type}
+                        isClearable={!descriptor.properties.required}
+                    />
+                ) : isDateTime ? (
+                    <DatePicker
+                        id={descriptor.name}
+                        value={field.value ? (field.value.includes('T') ? field.value : field.value.replace(' ', 'T')) : undefined}
+                        onChange={(value) => {
+                            field.onChange(value);
+                        }}
+                        onBlur={field.onBlur}
+                        disabled={descriptor.properties.readOnly}
+                        invalid={fieldState.isTouched && !!fieldState.invalid}
+                        error={
+                            fieldState.isTouched && fieldState.invalid
+                                ? typeof fieldState.error === 'string'
+                                    ? fieldState.error
+                                    : fieldState.error?.message || 'Invalid value'
+                                : undefined
+                        }
+                        required={descriptor.properties.required}
+                        timePicker
+                    />
+                ) : needsStep ? (
+                    <input
+                        {...field}
+                        disabled={descriptor.properties.readOnly}
+                        type={inputType}
                         id={descriptor.name}
                         step={fieldStepValue}
-                        value={descriptor.contentType === AttributeContentType.Datetime ? getFormattedDateTime(input.value) : input.value}
+                        value={displayValue || ''}
+                        className={cn(
+                            'py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600',
+                            {
+                                'border-red-500 focus:border-red-500 focus:ring-red-500': fieldState.isTouched && fieldState.invalid,
+                            },
+                        )}
+                    />
+                ) : (
+                    <TextInput
+                        id={descriptor.name}
+                        type={inputType as 'text' | 'textarea' | 'number' | 'email' | 'password' | 'date' | 'time'}
+                        disabled={descriptor.properties.readOnly}
+                        value={displayValue || ''}
+                        onChange={(value) => field.onChange(value)}
+                        invalid={fieldState.isTouched && !!fieldState.invalid}
+                        error={fieldState.isTouched && fieldState.invalid ? fieldState.error?.message : undefined}
                     />
                 );
-                const feedbackComponent = <FormFeedback>{meta.error}</FormFeedback>;
+                const feedbackComponent = <div className="text-red-500 mt-2">{fieldState.error?.message}</div>;
 
                 return (
-                    <FormGroup>
-                        <InputGroup>
-                            {inputComponent}
+                    <>
+                        <Container className="flex-row !gap-0 items-center justify-center">
+                            <div className="grow">{inputComponent}</div>
                             <WidgetButtons
                                 buttons={[
                                     {
                                         id: 'save',
                                         icon: 'plus',
-                                        disabled: !inputContent || !meta.valid,
+                                        disabled: !inputContent || fieldState.invalid,
                                         tooltip: 'Save',
                                         onClick: () => beforeOnSubmit(descriptor.uuid, inputContent),
                                     },
                                 ]}
                             />
-                            {feedbackComponent}
-                        </InputGroup>
-                    </FormGroup>
+                        </Container>
+                        {feedbackComponent}
+                    </>
                 );
             }}
-        </Field>
-    ) : (
-        <></>
+        />
     );
 }

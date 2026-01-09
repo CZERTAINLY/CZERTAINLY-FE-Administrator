@@ -2,13 +2,15 @@ import DOMPurify from 'dompurify';
 import parse from 'html-react-parser';
 import { marked } from 'marked';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Field, useForm, useFormState } from 'react-final-form';
+import { Controller, useFormContext, useWatch } from 'react-hook-form';
 
-import Select from 'react-select';
+import Select from 'components/Select';
+import Label from 'components/Label';
+import TextInput from 'components/TextInput';
+import DatePicker from 'components/DatePicker';
+import Switch from 'components/Switch';
 import Editor from 'react-simple-code-editor';
-
-import { Card, CardBody, CardHeader, FormFeedback, FormGroup, FormText, Input, Label } from 'reactstrap';
-import { InputType } from 'reactstrap/types/lib/Input';
+import cn from 'classnames';
 import {
     CustomAttributeModel,
     DataAttributeModel,
@@ -19,7 +21,6 @@ import {
 } from 'types/attributes';
 import { AttributeConstraintType, AttributeContentType, RangeAttributeConstraintData } from 'types/openapi';
 
-import CustomSelectComponent from 'components/CustomSelectComponent';
 import { useDispatch, useSelector } from 'react-redux';
 import { AddNewAttributeList, AddNewAttributeType } from 'types/user-interface';
 import { getStepValue } from 'utils/common-utils';
@@ -35,7 +36,7 @@ interface Props {
     options?: { label: string; value: any }[];
     busy?: boolean;
     userInteractedRef?: React.MutableRefObject<boolean>;
-    deleteButton?: JSX.Element;
+    deleteButton?: React.ReactNode;
 }
 
 export function Attribute({
@@ -45,9 +46,9 @@ export function Attribute({
     busy = false,
     userInteractedRef: userInteractionRef,
     deleteButton,
-}: Props): JSX.Element {
-    const form = useForm();
-    const formState = useFormState();
+}: Props): React.ReactNode {
+    const { setValue, watch, control } = useFormContext<Record<string, any>>();
+    const formValues = watch();
     const [addNewAttributeValue, setIsAddNewAttributeValue] = useState<AddNewAttributeType | undefined>();
     const attributeCallbackValue = useSelector(userInterfaceSelectors.selectAttributeCallbackValue);
     const initiateAttributeCallback = useSelector(userInterfaceSelectors.selectInitiateAttributeCallback);
@@ -59,6 +60,18 @@ export function Attribute({
             setIsAddNewAttributeValue(addNewAttributeValue);
         }
     }, [descriptor]);
+
+    const handleAddNew = useCallback(() => {
+        if (!addNewAttributeValue) return;
+        dispatch(
+            userInterfaceActions.showGlobalModal({
+                content: addNewAttributeValue.content,
+                isOpen: true,
+                size: 'lg',
+                title: `Add New ${addNewAttributeValue.name}`,
+            }),
+        );
+    }, [dispatch, addNewAttributeValue]);
 
     const onUserInteraction = useCallback(() => {
         if (userInteractionRef) {
@@ -75,11 +88,11 @@ export function Attribute({
             const contentType = fileInfo.split(',')[0].split(':')[1].split(';')[0];
             const fileContent = fileInfo.split(',')[1];
 
-            form.mutators.setAttribute(`${name}.content`, fileContent);
-            form.mutators.setAttribute(`${name}.fileName`, fileName);
-            form.mutators.setAttribute(`${name}.mimeType`, contentType);
+            setValue(`${name}.content`, fileContent);
+            setValue(`${name}.fileName`, fileName);
+            setValue(`${name}.mimeType`, contentType);
         },
-        [form.mutators, name],
+        [setValue, name],
     );
 
     const onFileChanged = useCallback(
@@ -120,16 +133,18 @@ export function Attribute({
         if (initiateAttributeCallback && attributeCallbackValue && options) {
             const newOption = options.find((option) => option.label === attributeCallbackValue);
             if (newOption) {
-                form.change(name, newOption);
+                setValue(name, newOption);
                 dispatch(userInterfaceActions.clearAttributeCallbackValue());
                 dispatch(userInterfaceActions.setInitiateAttributeCallback(false));
             }
         }
-    }, [attributeCallbackValue, dispatch, options, form, initiateAttributeCallback, name]);
+    }, [attributeCallbackValue, dispatch, options, setValue, initiateAttributeCallback, name]);
 
     if (!descriptor) return <></>;
 
-    const getFormTypeFromAttributeContentType = (type: AttributeContentType): InputType => {
+    const getFormTypeFromAttributeContentType = (
+        type: AttributeContentType,
+    ): 'text' | 'number' | 'date' | 'time' | 'datetime-local' | 'password' | 'checkbox' | 'textarea' => {
         switch (type) {
             case AttributeContentType.Boolean:
                 return 'checkbox';
@@ -149,10 +164,10 @@ export function Attribute({
                 return 'time';
             case AttributeContentType.Datetime:
                 return 'datetime-local';
-            case AttributeContentType.File:
-                return 'file';
             case AttributeContentType.Secret:
                 return 'password';
+            default:
+                return 'text';
         }
     };
 
@@ -203,130 +218,147 @@ export function Attribute({
         return options;
     };
 
-    const createSelect = (descriptor: DataAttributeModel | CustomAttributeModel): JSX.Element => {
-        const errorStyles = {
-            border: 'solid 1px red',
-            '&:hover': { border: 'solid 1px red' },
-            '&:active': {
-                border: 'solid 1px red',
-                boxShadow: '0 0 3px red',
-            },
-            '&:focus-within': { border: 'solid 1px red', boxShadow: '0 0 3px red' },
-        };
+    const createSelect = (descriptor: DataAttributeModel | CustomAttributeModel): React.ReactNode => {
         return (
-            <Field name={name} validate={buildValidators()} type={getFormTypeFromAttributeContentType(descriptor.contentType)}>
-                {({ input, meta }) => (
-                    <>
-                        {descriptor.properties.visible ? (
-                            <Label for={`${name}Select`}>
-                                {descriptor.properties.label}
-                                {descriptor.properties.required ? ' *' : ''}
-                            </Label>
-                        ) : (
-                            <></>
-                        )}
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                            {!addNewAttributeValue ? (
-                                <Select
-                                    {...input}
-                                    onChange={(e) => {
-                                        input.onChange(e);
-                                        onUserInteraction();
-                                    }}
-                                    inputId={`${name}Select`}
-                                    maxMenuHeight={140}
-                                    menuPlacement="auto"
-                                    options={getUpdatedOptionsForEditSelect(input.value, options)}
-                                    placeholder={`Select ${descriptor.properties.label}`}
-                                    styles={{
-                                        control: (provided) => ({
-                                            ...provided,
-                                            width: '100%',
-                                            ...(meta.touched && meta.invalid ? errorStyles : {}),
-                                        }),
-                                        container: (provided) => ({
-                                            ...provided,
-                                            width: '100%',
-                                        }),
-                                    }}
-                                    isDisabled={descriptor.properties.readOnly || busy}
-                                    isMulti={descriptor.properties.multiSelect}
-                                    isClearable={!descriptor.properties.required}
-                                    id={`${name}Select`}
-                                />
+            <Controller
+                name={name}
+                control={control}
+                rules={{ validate: buildValidators() }}
+                render={({ field, fieldState }) => {
+                    // Convert field.value to the format expected by custom Select component
+                    const getSelectValue = () => {
+                        if (descriptor.properties.multiSelect) {
+                            // For multi-select, convert to { value, label }[] format
+                            if (!field.value) return [];
+                            if (Array.isArray(field.value)) {
+                                return field.value.map((v: any) => {
+                                    if (typeof v === 'object' && v.value !== undefined) {
+                                        return { value: v.value, label: v.label || String(v.value) };
+                                    }
+                                    // If it's already in the right format, return as is
+                                    return typeof v === 'object' ? v : { value: v, label: String(v) };
+                                });
+                            }
+                            return [];
+                        } else {
+                            // For single select, extract primitive value
+                            if (!field.value) return '';
+                            if (typeof field.value === 'object' && field.value.value !== undefined) {
+                                return field.value.value;
+                            }
+                            return field.value;
+                        }
+                    };
+
+                    // Convert options to the format expected by custom Select component
+                    const baseSelectOptions = (options || []).map((opt) => ({
+                        value: typeof opt.value === 'object' && opt.value !== null ? JSON.stringify(opt.value) : opt.value,
+                        label: opt.label || String(opt.value),
+                    }));
+
+                    // Add "+" option for Add New functionality if available
+                    const selectOptions = addNewAttributeValue
+                        ? [
+                              ...baseSelectOptions,
+                              {
+                                  label: '+',
+                                  value: '__add_new__',
+                                  disabled: false,
+                              },
+                          ]
+                        : baseSelectOptions;
+
+                    const selectValue = getSelectValue();
+
+                    return (
+                        <>
+                            {descriptor.properties.visible ? (
+                                <Label htmlFor={`${name}Select`} required={descriptor.properties.required}>
+                                    {descriptor.properties.label}
+                                </Label>
                             ) : (
-                                <Select
-                                    {...input}
-                                    onChange={(e) => {
-                                        input.onChange(e);
-                                        onUserInteraction();
-                                    }}
-                                    inputId={`${name}Select`}
-                                    id={`${name}Select`}
-                                    maxMenuHeight={140}
-                                    menuPlacement="auto"
-                                    options={options}
-                                    placeholder={`Select ${descriptor.properties.label}`}
-                                    styles={{
-                                        control: (provided) => ({
-                                            ...provided,
-                                            width: '100%',
-                                            ...(meta.touched && meta.invalid ? errorStyles : {}),
-                                        }),
-                                        container: (provided) => ({
-                                            ...provided,
-                                            width: '100%',
-                                        }),
-                                    }}
-                                    isDisabled={descriptor.properties.readOnly}
-                                    isMulti={descriptor.properties.multiSelect}
-                                    isClearable={!descriptor.properties.required}
-                                    components={{
-                                        Menu: (props) => (
-                                            <CustomSelectComponent
-                                                onAddNew={() => {
-                                                    dispatch(
-                                                        userInterfaceActions.showGlobalModal({
-                                                            content: addNewAttributeValue.content,
-                                                            isOpen: true,
-                                                            size: 'lg',
-                                                            title: `Add New ${addNewAttributeValue.name}`,
-                                                        }),
-                                                    );
-                                                }}
-                                                {...props}
-                                            />
-                                        ),
-                                    }}
-                                />
+                                <></>
                             )}
-                            {deleteButton}
-                        </div>
-
-                        {descriptor.properties.visible ? (
-                            <>
-                                <FormText style={{ marginTop: '0.2em' }}>{descriptor.description}</FormText>
-
-                                <div className="invalid-feedback" style={meta.touched && meta.invalid ? { display: 'block' } : {}}>
-                                    {meta.error}
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <div style={{ flex: 1, position: 'relative' }}>
+                                    {descriptor.properties.multiSelect ? (
+                                        <Select
+                                            id={`${name}Select`}
+                                            value={selectValue as { value: string | number; label: string }[]}
+                                            onChange={(newValue) => {
+                                                if (Array.isArray(newValue) && newValue.some((v) => v.value === '__add_new__')) {
+                                                    handleAddNew();
+                                                    // Remove the "__add_new__" option from the selection
+                                                    const filteredValue = newValue.filter((v) => v.value !== '__add_new__');
+                                                    field.onChange(filteredValue.length > 0 ? filteredValue : undefined);
+                                                    return;
+                                                }
+                                                field.onChange(newValue);
+                                                onUserInteraction();
+                                            }}
+                                            options={selectOptions}
+                                            placeholder={`Select ${descriptor.properties.label}`}
+                                            isDisabled={descriptor.properties.readOnly || busy}
+                                            isMulti={true}
+                                            isClearable={!descriptor.properties.required}
+                                            className={fieldState.isTouched && fieldState.invalid ? 'border-red-500' : ''}
+                                        />
+                                    ) : (
+                                        <Select
+                                            id={`${name}Select`}
+                                            value={selectValue as string | number}
+                                            onChange={(newValue) => {
+                                                // Handle Add New option
+                                                if (newValue === '__add_new__') {
+                                                    handleAddNew();
+                                                    return;
+                                                }
+                                                // For single select, find the full option object
+                                                const fullOption = options?.find((opt) => {
+                                                    const optValue = typeof opt.value === 'object' ? JSON.stringify(opt.value) : opt.value;
+                                                    return optValue === newValue;
+                                                });
+                                                field.onChange(fullOption || newValue);
+                                                onUserInteraction();
+                                            }}
+                                            options={selectOptions}
+                                            placeholder={`Select ${descriptor.properties.label}`}
+                                            isDisabled={descriptor.properties.readOnly || busy}
+                                            isMulti={false}
+                                            isClearable={!descriptor.properties.required}
+                                            className={fieldState.isTouched && fieldState.invalid ? 'border-red-500' : ''}
+                                        />
+                                    )}
                                 </div>
-                            </>
-                        ) : (
-                            <></>
-                        )}
-                    </>
-                )}
-            </Field>
+                                {deleteButton}
+                            </div>
+
+                            {descriptor.properties.visible ? (
+                                <>
+                                    {descriptor.description && (
+                                        <p className="text-xs text-gray-400 mt-1 dark:text-neutral-400">{descriptor.description}</p>
+                                    )}
+
+                                    {fieldState.isTouched && fieldState.invalid && (
+                                        <div className="mt-1 text-sm text-red-600">{fieldState.error?.message}</div>
+                                    )}
+                                </>
+                            ) : (
+                                <></>
+                            )}
+                        </>
+                    );
+                }}
+            />
         );
     };
 
-    const createFile = (descriptor: DataAttributeModel | CustomAttributeModel): JSX.Element => {
+    const createFile = (descriptor: DataAttributeModel | CustomAttributeModel): React.ReactNode => {
         return (
             <>
                 {descriptor.properties.visible ? (
-                    <Label for={`${name}-content`}>
+                    <Label htmlFor={`${name}-content`} required={descriptor.properties.required}>
                         {descriptor.properties.label}
-                        {descriptor.properties.required ? ' *' : ''}
                     </Label>
                 ) : (
                     <></>
@@ -337,85 +369,98 @@ export function Attribute({
                 ) : (
                     <div
                         id={`${name}-dragAndDrop`}
-                        className="border border-light rounded mb-0"
-                        style={{ display: 'flex', flexWrap: 'wrap', padding: '1em', borderStyle: 'dashed !important' }}
+                        className="border-2 border-dashed border-gray-200 rounded-lg p-4 dark:border-neutral-700"
+                        style={{ display: 'flex', flexWrap: 'wrap' }}
                         onDrop={onFileDrop}
                         onDragOver={onFileDragOver}
                     >
-                        <div style={{ flexGrow: 1 }}>
-                            <Label for={`${name}-content`}>File content</Label>
+                        <div className="flex-grow">
+                            <Label htmlFor={`${name}-content`}>File content</Label>
 
-                            <Field
+                            <Controller
                                 name={`${name}.content`}
-                                validate={buildValidators()}
-                                type={getFormTypeFromAttributeContentType(descriptor.contentType)}
-                            >
-                                {({ input, meta }) => (
+                                control={control}
+                                rules={{ validate: buildValidators() }}
+                                render={({ field, fieldState }) => (
                                     <>
-                                        <Input
-                                            {...input}
+                                        <input
+                                            {...field}
                                             id={`${name}-content`}
-                                            valid={!meta.error && meta.touched}
-                                            invalid={!!meta.error && meta.touched}
                                             type={descriptor.properties.visible ? 'text' : 'hidden'}
                                             placeholder={`Select or drag & drop ${descriptor.properties.label} File`}
-                                            readOnly={true}
+                                            readOnly
+                                            className={cn(
+                                                'py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600',
+                                                {
+                                                    'border-red-500 focus:border-red-500 focus:ring-red-500':
+                                                        fieldState.isTouched && fieldState.invalid,
+                                                },
+                                            )}
                                         />
 
-                                        <FormFeedback>{meta.error}</FormFeedback>
+                                        {fieldState.isTouched && fieldState.invalid && (
+                                            <div className="mt-1 text-sm text-red-600">{fieldState.error?.message}</div>
+                                        )}
                                     </>
                                 )}
-                            </Field>
+                            />
 
-                            <FormText>{descriptor.description}</FormText>
+                            {descriptor.description && (
+                                <p className="text-xs text-gray-400 mt-1 dark:text-neutral-400">{descriptor.description}</p>
+                            )}
                         </div>
-                        &nbsp;
-                        <div style={{ width: '13rem' }}>
-                            <Label for={`${name}-mimeType`}>Content type</Label>
+                        <div className="w-52 ml-4">
+                            <Label htmlFor={`${name}-mimeType`}>Content type</Label>
 
-                            <Field name={`${name}.mimeType`}>
-                                {({ input, meta }) => (
-                                    <Input
-                                        {...input}
+                            <Controller
+                                name={`${name}.mimeType`}
+                                control={control}
+                                render={({ field }) => (
+                                    <TextInput
+                                        {...field}
                                         id={`${name}-mimeType`}
-                                        type={descriptor.properties.visible ? 'text' : 'hidden'}
+                                        type="text"
                                         placeholder="File not selected"
-                                        disabled={true}
-                                        style={{ textAlign: 'center' }}
+                                        disabled
+                                        value={field.value || ''}
+                                        onChange={() => {}}
+                                        className="text-center"
                                     />
                                 )}
-                            </Field>
+                            />
                         </div>
-                        &nbsp;
-                        <div style={{ width: '10rem' }}>
-                            <Label for={`${name}-fileName`}>File name</Label>
+                        <div className="w-40 ml-4">
+                            <Label htmlFor={`${name}-fileName`}>File name</Label>
 
-                            <Field name={`${name}.fileName`}>
-                                {({ input }) => (
-                                    <Input
-                                        {...input}
+                            <Controller
+                                name={`${name}.fileName`}
+                                control={control}
+                                render={({ field }) => (
+                                    <TextInput
+                                        {...field}
                                         id={`${name}-fileName`}
-                                        type={descriptor.properties.visible ? 'text' : 'hidden'}
+                                        type="text"
                                         placeholder="File not selected"
-                                        disabled={true}
-                                        style={{ textAlign: 'center' }}
+                                        disabled
+                                        value={field.value || ''}
+                                        onChange={() => {}}
+                                        className="text-center"
                                     />
                                 )}
-                            </Field>
+                            />
                         </div>
-                        &nbsp;
-                        <div>
-                            <Label for={name}>&nbsp;</Label>
-                            <br />
-
-                            <Label className="btn btn-default" for={name} style={{ margin: 0 }}>
+                        <div className="ml-4 flex items-center">
+                            <label
+                                htmlFor={name}
+                                className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-lg hover:bg-gray-50 cursor-pointer dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
+                            >
                                 Select file...
-                            </Label>
+                            </label>
 
-                            <Input id={name} type="file" style={{ display: 'none' }} onChange={onFileChanged} />
+                            <input id={name} type="file" className="hidden" onChange={onFileChanged} />
                         </div>
-                        <div style={{ flexBasis: '100%', height: 0 }}></div>
-                        <div className="text-muted" style={{ textAlign: 'center', flexBasis: '100%', marginTop: '1rem' }}>
+                        <div className="w-full h-0"></div>
+                        <div className="text-sm text-gray-400 text-center w-full mt-4 dark:text-neutral-400">
                             Select or Drag &amp; Drop file to Drop Zone.
                         </div>
                         {deleteButton}
@@ -425,9 +470,10 @@ export function Attribute({
         );
     };
 
-    const createInput = (descriptor: DataAttributeModel | CustomAttributeModel): JSX.Element => {
+    const createInput = (descriptor: DataAttributeModel | CustomAttributeModel): React.ReactNode => {
         if (descriptor.contentType === AttributeContentType.Codeblock) {
-            const attributes = formState.values[name.slice(0, name.indexOf('.'))];
+            const attributeKey = name.slice(0, name.indexOf('.'));
+            const attributes = formValues[attributeKey];
             const language = getCodeBlockLanguage(
                 attributes ? (attributes[descriptor.name]?.language ?? undefined) : undefined,
                 descriptor.content,
@@ -435,23 +481,24 @@ export function Attribute({
 
             return (
                 <>
-                    <Label for={`${name}.codeTextArea`}>
+                    <Label htmlFor={`${name}.codeTextArea`} required={descriptor.properties.required}>
                         {descriptor.properties.label}
-                        {descriptor.properties.required ? ' *' : ''}
-                        <span style={{ fontStyle: 'italic' }}> ({language})</span>
+                        <span className="italic"> ({language})</span>
                     </Label>
                     &nbsp;
                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <Field name={`${name}.code`} type={getFormTypeFromAttributeContentType(descriptor.contentType)}>
-                            {({ input }) => {
+                        <Controller
+                            name={`${name}.code`}
+                            control={control}
+                            render={({ field }) => {
                                 return (
                                     <Editor
-                                        {...input}
+                                        {...field}
                                         textareaId={`${name}.codeTextArea`}
                                         id={`${name}.code`}
-                                        value={input.value}
+                                        value={field.value || ''}
                                         onValueChange={(code) => {
-                                            form.change(`${name}.code`, code);
+                                            setValue(`${name}.code`, code);
                                         }}
                                         highlight={(code) => getHighLightedCode(code, language)}
                                         padding={10}
@@ -465,7 +512,7 @@ export function Attribute({
                                     />
                                 );
                             }}
-                        </Field>
+                        />
                         {deleteButton}
                     </div>
                 </>
@@ -482,92 +529,159 @@ export function Attribute({
         }
 
         return (
-            <Field name={name} validate={buildValidators()} type={getFormTypeFromAttributeContentType(descriptor.contentType)}>
-                {({ input, meta }) => (
+            <Controller
+                name={name}
+                control={control}
+                rules={{ validate: buildValidators() }}
+                render={({ field, fieldState }) => (
                     <>
                         {descriptor.properties.visible && descriptor.contentType !== AttributeContentType.Boolean ? (
-                            <Label for={name}>
+                            <Label htmlFor={name} required={descriptor.properties.required}>
                                 {descriptor.properties.label}
-                                {descriptor.properties.required ? ' *' : ''}
                             </Label>
                         ) : (
                             <></>
                         )}
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <Input
-                                {...input}
-                                id={name}
-                                valid={!meta.error && meta.touched}
-                                invalid={!!meta.error && meta.touched}
-                                type={
-                                    descriptor.properties.visible ? getFormTypeFromAttributeContentType(descriptor.contentType) : 'hidden'
-                                }
-                                placeholder={`Enter ${descriptor.properties.label}`}
-                                disabled={descriptor.properties.readOnly || busy}
-                                step={getStepValue(descriptor.contentType)}
-                                value={transformInputValue(input.value)}
-                            />
-                            {deleteButton}
+                        <div className="flex items-center">
+                            {descriptor.contentType === AttributeContentType.Boolean ? (
+                                <div className="flex items-center mb-3">
+                                    <Switch
+                                        id={name}
+                                        checked={transformInputValue(field.value) ?? false}
+                                        onChange={(checked) => field.onChange(checked)}
+                                        disabled={descriptor.properties.readOnly || busy}
+                                        secondaryLabel={descriptor.properties.label}
+                                    />
+                                    {deleteButton}
+                                </div>
+                            ) : descriptor.contentType === AttributeContentType.Text ? (
+                                <>
+                                    <textarea
+                                        {...field}
+                                        id={name}
+                                        placeholder={`Enter ${descriptor.properties.label}`}
+                                        disabled={descriptor.properties.readOnly || busy}
+                                        value={transformInputValue(field.value) || ''}
+                                        rows={4}
+                                        className={cn(
+                                            'py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600',
+                                            {
+                                                'border-red-500 focus:border-red-500 focus:ring-red-500':
+                                                    fieldState.isTouched && fieldState.invalid,
+                                            },
+                                        )}
+                                    />
+                                    {deleteButton}
+                                </>
+                            ) : (
+                                <>
+                                    {descriptor.contentType === AttributeContentType.Datetime ? (
+                                        <DatePicker
+                                            id={name}
+                                            value={
+                                                field.value
+                                                    ? field.value.includes('T')
+                                                        ? field.value
+                                                        : field.value.replace(' ', 'T')
+                                                    : undefined
+                                            }
+                                            onChange={(value) => {
+                                                field.onChange(value);
+                                            }}
+                                            onBlur={field.onBlur}
+                                            disabled={descriptor.properties.readOnly || busy}
+                                            invalid={fieldState.isTouched && !!fieldState.invalid}
+                                            error={
+                                                fieldState.isTouched && fieldState.invalid
+                                                    ? typeof fieldState.error === 'string'
+                                                        ? fieldState.error
+                                                        : fieldState.error?.message || 'Invalid value'
+                                                    : undefined
+                                            }
+                                            required={descriptor.properties.required}
+                                            timePicker
+                                        />
+                                    ) : (
+                                        <TextInput
+                                            id={name}
+                                            type={
+                                                descriptor.properties.visible
+                                                    ? (getFormTypeFromAttributeContentType(descriptor.contentType) as
+                                                          | 'text'
+                                                          | 'number'
+                                                          | 'date'
+                                                          | 'time'
+                                                          | 'password')
+                                                    : 'text'
+                                            }
+                                            placeholder={`Enter ${descriptor.properties.label}`}
+                                            disabled={descriptor.properties.readOnly || busy}
+                                            value={transformInputValue(field.value) || ''}
+                                            onChange={(value) => field.onChange(value)}
+                                            invalid={fieldState.isTouched && !!fieldState.invalid}
+                                            error={fieldState.isTouched && fieldState.invalid ? fieldState.error?.message : undefined}
+                                        />
+                                    )}
+                                    {deleteButton}
+                                </>
+                            )}
                         </div>
 
-                        {descriptor.properties.visible && descriptor.contentType === AttributeContentType.Boolean ? (
-                            <>
-                                &nbsp;
-                                <Label for={name}>
-                                    {descriptor.properties.label}
-                                    {descriptor.properties.required ? ' *' : ''}
-                                </Label>
-                            </>
-                        ) : (
-                            <></>
-                        )}
                         {descriptor.properties.visible ? (
                             <>
-                                <FormText
-                                    style={
-                                        descriptor.contentType === AttributeContentType.Boolean
-                                            ? { display: 'block', marginTop: '-0.8em' }
-                                            : { marginTop: '0.2em' }
-                                    }
-                                >
-                                    {descriptor.description}
-                                </FormText>
+                                {descriptor.description && (
+                                    <p
+                                        className={cn('text-xs text-gray-400 dark:text-neutral-400', {
+                                            'block -mt-2': descriptor.contentType === AttributeContentType.Boolean,
+                                            'mt-1': descriptor.contentType !== AttributeContentType.Boolean,
+                                        })}
+                                    >
+                                        {descriptor.description}
+                                    </p>
+                                )}
 
-                                <FormFeedback>{meta.error}</FormFeedback>
+                                {fieldState.isTouched && fieldState.invalid && descriptor.contentType !== AttributeContentType.Boolean && (
+                                    <div className="mt-1 text-sm text-red-600">{fieldState.error?.message}</div>
+                                )}
                             </>
                         ) : (
                             <></>
                         )}
                     </>
                 )}
-            </Field>
+            />
         );
     };
 
-    const createField = (descriptor: DataAttributeModel | CustomAttributeModel): JSX.Element => {
+    const createField = (descriptor: DataAttributeModel | CustomAttributeModel): React.ReactNode => {
         if (descriptor.properties.list) return createSelect(descriptor);
         if (descriptor.contentType === AttributeContentType.File) return createFile(descriptor);
         return createInput(descriptor);
     };
 
-    const createInfo = (descriptor: InfoAttributeModel): JSX.Element => {
+    const createInfo = (descriptor: InfoAttributeModel): React.ReactNode => {
         return (
-            <Card color="default" id={`${descriptor.name}Info`}>
-                <CardHeader>{descriptor.properties.label}</CardHeader>
-                <CardBody>
+            <div
+                id={`${descriptor.name}Info`}
+                className="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl dark:bg-neutral-900 dark:border-neutral-700 dark:shadow-neutral-700/70"
+            >
+                <div className="p-4 border-b border-gray-200 dark:border-neutral-700">
+                    <h3 className="text-gray-800 dark:text-white text-sm">{descriptor.properties.label}</h3>
+                </div>
+                <div className="p-4 text-sm text-[var(--dark-gray-color)] server-content">
                     {parse(
                         DOMPurify.sanitize(
                             marked.parse(getAttributeContent(descriptor.contentType, descriptor.content).toString()) as string,
                         ),
                     )}
-                </CardBody>
-            </Card>
+                </div>
+            </div>
         );
     };
 
     return (
-        <FormGroup>
+        <div>
             {isDataAttributeModel(descriptor) || isCustomAttributeModel(descriptor) ? createField(descriptor) : createInfo(descriptor)}
-        </FormGroup>
+        </div>
     );
 }

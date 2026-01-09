@@ -4,10 +4,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { actions } from 'ducks/certificates';
 import { actions as raProfileActions, selectors as raProfileSelectors } from 'ducks/ra-profiles';
 
-import Select, { SingleValue } from 'react-select';
+import Select from 'components/Select';
 
 import Spinner from 'components/Spinner';
-import { Button, ButtonGroup, FormGroup, Label } from 'reactstrap';
+import Button from 'components/Button';
+import Container from 'components/Container';
 
 interface Props {
     uuids: string[];
@@ -22,7 +23,7 @@ export default function CertificateGroupDialog({ uuids, onCancel, onUpdate }: Pr
 
     const isFetchingRaProffiles = useSelector(raProfileSelectors.isFetchingList);
 
-    const [selectedRaProfile, setSelectedRaProfile] = useState<SingleValue<{ value: string; label: string }>>();
+    const [selectedRaProfile, setSelectedRaProfile] = useState<string>();
 
     useEffect(() => {
         dispatch(raProfileActions.listRaProfiles());
@@ -37,8 +38,8 @@ export default function CertificateGroupDialog({ uuids, onCancel, onUpdate }: Pr
         if (!selectedRaProfile) return;
         dispatch(
             actions.bulkUpdateRaProfile({
-                raProfileRequest: { certificateUuids: uuids, raProfileUuid: selectedRaProfile.value.split(':#')[0], filters: [] },
-                authorityUuid: selectedRaProfile.value.split(':#')[1],
+                raProfileRequest: { certificateUuids: uuids, raProfileUuid: selectedRaProfile.split(':#')[0], filters: [] },
+                authorityUuid: selectedRaProfile.split(':#')[1],
             }),
         );
         onUpdate();
@@ -46,36 +47,30 @@ export default function CertificateGroupDialog({ uuids, onCancel, onUpdate }: Pr
 
     return (
         <>
-            <FormGroup>
-                <Label for="raProfileSelect">RA Profile</Label>
-
+            <div className="mb-4">
                 <Select
                     id="raProfile"
-                    inputId="raProfileSelect"
                     options={raProfiles.map((raProfile) => ({
                         value: raProfile.uuid + ':#' + raProfile.authorityInstanceUuid,
                         label: raProfile.name,
                     }))}
-                    value={selectedRaProfile}
-                    onChange={(e) => setSelectedRaProfile(e)}
+                    value={selectedRaProfile || ''}
+                    onChange={(value) => setSelectedRaProfile(value as string)}
+                    label="RA Profile"
                 />
-            </FormGroup>
-
-            <div className="d-flex justify-content-end">
-                <ButtonGroup>
-                    <Button color="danger" onClick={removeRaprofile}>
-                        <span className="text-white">Remove</span>
-                    </Button>
-
-                    <Button color="primary" onClick={updateRaProfile} disabled={!selectedRaProfile}>
-                        Update
-                    </Button>
-
-                    <Button color="default" onClick={onCancel}>
-                        Cancel
-                    </Button>
-                </ButtonGroup>
             </div>
+
+            <Container className="flex-row justify-end modal-footer" gap={4}>
+                <Button color="secondary" variant="outline" onClick={onCancel} className="mr-auto">
+                    Cancel
+                </Button>
+                <Button color="danger" onClick={removeRaprofile}>
+                    Remove
+                </Button>
+                <Button color="primary" onClick={updateRaProfile} disabled={!selectedRaProfile}>
+                    Update
+                </Button>
+            </Container>
 
             <Spinner active={isFetchingRaProffiles} />
         </>

@@ -1,120 +1,131 @@
-import CustomSelectComponent from 'components/CustomSelectComponent';
+import Select from 'components/Select';
+import Label from 'components/Label';
 import CryptographicKeyForm from 'components/_pages/cryptographic-keys/form';
 import { selectors as keySelectors } from 'ducks/cryptographic-keys';
 import { actions as cryptographyOperationActions } from 'ducks/cryptographic-operations';
 import { useCallback, useEffect, useMemo } from 'react';
-import { Field, useForm } from 'react-final-form';
+import { Controller, useFormContext } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import Select, { GroupBase, MenuProps, SingleValue } from 'react-select';
-import { FormFeedback, FormGroup, Label } from 'reactstrap';
-import { CryptographicKeyPairResponseModel } from 'types/cryptographic-keys';
-import { validateRequired } from 'utils/validators';
-import { FormValues } from '.';
 import { actions as userInterfaceActions, selectors as userInterfaceSelectors } from '../../../../ducks/user-interface';
 import { KeyType } from '../../../../types/openapi';
 
-const RenderRequestKey = ({ type, values }: { type: 'alt' | 'normal'; values: FormValues }) => {
-    const form = useForm();
+type Props = {
+    type: 'alt' | 'normal';
+    name: string;
+    tokenProfileField: string;
+};
+
+const RenderRequestKey = ({ type, name, tokenProfileField }: Props) => {
+    const dispatch = useDispatch();
+    const { control, watch, setValue } = useFormContext();
     const initiateFormCallback = useSelector(userInterfaceSelectors.selectInitiateFormCallback);
     const formCallbackValue = useSelector(userInterfaceSelectors.selectCallbackValue);
     const keys = useSelector(keySelectors.cryptographicKeyPairs);
     const altKeys = useSelector(keySelectors.altCryptographicKeyPairs);
-
-    const dispatch = useDispatch();
     const isAltKey = type === 'alt';
 
-    const keyOptions = useMemo(
-        () =>
-            (isAltKey ? altKeys : keys).map((key) => ({
-                label: key.name,
-                value: key,
-            })),
-        [keys, altKeys, isAltKey],
+    const selectedTokenProfileUuid: string | undefined = watch(tokenProfileField);
+
+    const availableKeys = useMemo(
+        () => (isAltKey ? altKeys : keys).filter((key) => key.tokenProfileUuid === selectedTokenProfileUuid),
+        [altKeys, isAltKey, keys, selectedTokenProfileUuid],
     );
 
-    const onKeyChange = useCallback(
-        (event: SingleValue<{ label: string; value: CryptographicKeyPairResponseModel }>) => {
-            if (!event) return;
-            if (!event.value.tokenProfileUuid) return;
-            if (!event.value.tokenInstanceUuid) return;
-            if (event.value.items.filter((e) => e.type === KeyType.Private).length === 0) return;
+    const keyOptions = useMemo(
+        () => [
+            ...availableKeys.map((key) => ({
+                label: key.name,
+                value: key.uuid,
+            })),
+            {
+                label: '+',
+                value: '__add_new__',
+                disabled: false,
+            },
+        ],
+        [availableKeys],
+    );
+
+    const handleKeyChange = useCallback(
+        (keyUuid: string | number | undefined) => {
+            if (!keyUuid || typeof keyUuid !== 'string') return;
+            const selectedKey = availableKeys.find((key) => key.uuid === keyUuid);
+            if (!selectedKey) return;
+
+            const privateKeyItem = selectedKey.items.find((item) => item.type === KeyType.Private);
+            if (!privateKeyItem) return;
+
+            if (!selectedKey.tokenProfileUuid || !selectedKey.tokenInstanceUuid) return;
+
             dispatch(cryptographyOperationActions.clearSignatureAttributeDescriptors(type));
             dispatch(
                 cryptographyOperationActions.listSignatureAttributeDescriptors({
-                    uuid: event.value.uuid,
-                    tokenProfileUuid: event.value.tokenInstanceUuid,
-                    tokenInstanceUuid: event.value.tokenInstanceUuid,
-                    keyItemUuid: event.value.items.filter((e) => e.type === KeyType.Private)[0].uuid,
-                    algorithm: event.value.items.filter((e) => e.type === KeyType.Private)[0].keyAlgorithm,
+                    uuid: selectedKey.uuid,
+                    tokenProfileUuid: selectedKey.tokenProfileUuid,
+                    tokenInstanceUuid: selectedKey.tokenInstanceUuid,
+                    keyItemUuid: privateKeyItem.uuid,
+                    algorithm: privateKeyItem.keyAlgorithm,
                     store: type,
                 }),
             );
         },
-        [dispatch, type],
+        [availableKeys, dispatch, type],
     );
+
+    const handleAddNewKey = useCallback(() => {
+        dispatch(
+            userInterfaceActions.showGlobalModal({
+                content: <CryptographicKeyForm usesGlobalModal />,
+                isOpen: true,
+                size: 'lg',
+                title: 'Add New Key',
+            }),
+        );
+    }, [dispatch]);
 
     useEffect(() => {
-        if (initiateFormCallback && formCallbackValue) {
-            const newOption = keyOptions.find((option) => option.label === formCallbackValue);
-            if (newOption) {
-                form.change(isAltKey ? 'altKey' : 'key', newOption);
-                dispatch(userInterfaceActions.clearFormCallbackValue());
-                dispatch(userInterfaceActions.setInitiateFormCallback(false));
-                onKeyChange(newOption);
-            }
+        if (!initiateFormCallback || !formCallbackValue) return;
+        const newOption = keyOptions.find((option) => option.label === formCallbackValue);
+        if (newOption) {
+            setValue(name, newOption.value, { shouldDirty: true, shouldTouch: true });
+            handleKeyChange(newOption.value);
+            dispatch(userInterfaceActions.clearFormCallbackValue());
+            dispatch(userInterfaceActions.setInitiateFormCallback(false));
         }
-    }, [initiateFormCallback, onKeyChange, formCallbackValue, dispatch, keyOptions, form, isAltKey]);
+    }, [dispatch, formCallbackValue, handleKeyChange, initiateFormCallback, keyOptions, name, setValue]);
 
-    const renderKeySelectMenu = useCallback(
-        (props: MenuProps<any, false, GroupBase<any>>) => (
-            <CustomSelectComponent
-                onAddNew={() => {
-                    dispatch(
-                        userInterfaceActions.showGlobalModal({
-                            content: <CryptographicKeyForm usesGlobalModal />,
-                            isOpen: true,
-                            size: 'lg',
-                            title: 'Add New Key',
-                        }),
-                    );
-                }}
-                {...props}
-            />
-        ),
-        [dispatch],
-    );
+    if (!selectedTokenProfileUuid) {
+        return null;
+    }
 
-    return (values.tokenProfile && !isAltKey) || (values.altTokenProfile && isAltKey) ? (
-        <Field name={isAltKey ? 'altKey' : 'key'} validate={validateRequired()}>
-            {({ input, meta }) => (
-                <FormGroup>
-                    <Label for={isAltKey ? 'renderRequestAltKeySelect' : 'renderRequestKeySelect'}>
-                        {isAltKey ? 'Alternative Key' : 'Key'}
-                    </Label>
-
-                    <Select
-                        {...input}
-                        id={isAltKey ? 'altKey' : 'key'}
-                        inputId={isAltKey ? 'renderRequestAltKeySelect' : 'renderRequestKeySelect'}
-                        maxMenuHeight={140}
-                        menuPlacement="auto"
-                        options={keyOptions}
-                        placeholder={isAltKey ? 'Select Alternative Key' : 'Select Key'}
-                        onChange={(e) => {
-                            onKeyChange(e);
-                            input.onChange(e);
-                        }}
-                        components={{
-                            Menu: renderKeySelectMenu,
-                        }}
-                    />
-
-                    <FormFeedback>{meta.error}</FormFeedback>
-                </FormGroup>
-            )}
-        </Field>
-    ) : (
-        <></>
+    return (
+        <Controller
+            name={name}
+            control={control}
+            rules={{ required: true }}
+            render={({ field: { value, onChange }, fieldState: { error } }) => {
+                return (
+                    <div>
+                        <Label htmlFor={`${name}Select`}>{isAltKey ? 'Alternative Key' : 'Key'}</Label>
+                        <Select
+                            id={name}
+                            options={keyOptions}
+                            value={value ?? ''}
+                            onChange={(selected) => {
+                                if (selected === '__add_new__') {
+                                    handleAddNewKey();
+                                    return;
+                                }
+                                onChange(selected);
+                                handleKeyChange(selected as string);
+                            }}
+                            placeholder={isAltKey ? 'Select Alternative Key' : 'Select Key'}
+                        />
+                        {error && <div className="text-red-500 mt-1">{error.message ?? 'Key is required.'}</div>}
+                    </div>
+                );
+            }}
+        />
     );
 };
 

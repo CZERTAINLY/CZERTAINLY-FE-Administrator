@@ -15,8 +15,7 @@ import { downloadFile } from 'utils/certificate';
 import { PlatformEnum } from 'types/openapi';
 
 import DropDownListForm from 'components/DropDownForm';
-import SwitchWidget from 'components/SwitchWidget';
-import { Container, Label } from 'reactstrap';
+import Switch from 'components/Switch';
 
 interface ChainDownloadSwitchState {
     isDownloadTriggered: boolean;
@@ -173,15 +172,12 @@ const CertificateDownloadForm = () => {
 
     return (
         <>
-            <Container className="ps-5 mb-3">
-                <div className="d-flex">
-                    <Label className="my-1 me-2">Certificate Chain</Label>
-                    <SwitchWidget
-                        checked={isDownloadFormCertificateChain ?? false}
-                        onClick={() => setIsDownloadFormCertificateChain(!isDownloadFormCertificateChain)}
-                    />
-                </div>
-            </Container>
+            <Switch
+                id="certificateChainSwitch"
+                label="Certificate Chain"
+                checked={isDownloadFormCertificateChain ?? false}
+                onChange={() => setIsDownloadFormCertificateChain(!isDownloadFormCertificateChain)}
+            />
 
             <DropDownListForm
                 isBusy={isFetchingCertificateDownloadContent || isFetchingCertificateChainDownloadContent}
@@ -191,12 +187,18 @@ const CertificateDownloadForm = () => {
                 onSubmit={(values) => {
                     if (!isDownloadFormCertificateChain) {
                         if (values.certificateFormat && values.certificateEncoding && certificate?.uuid) {
-                            downloadCertificateContent(values.certificateFormat.value, values.certificateEncoding.value);
+                            downloadCertificateContent(
+                                values.certificateFormat as CertificateFormat,
+                                values.certificateEncoding as CertificateFormatEncoding,
+                            );
                         }
                     }
                     if (isDownloadFormCertificateChain) {
                         if (values.certificateFormat && values.certificateEncoding && certificate?.uuid) {
-                            downloadCertificateChainContent(values.certificateFormat.value, values.certificateEncoding.value);
+                            downloadCertificateChainContent(
+                                values.certificateFormat as CertificateFormat,
+                                values.certificateEncoding as CertificateFormatEncoding,
+                            );
                         }
                     }
                 }}
@@ -209,8 +211,8 @@ const CertificateDownloadForm = () => {
                     {
                         formLabel: isDownloadFormCertificateChain ? 'Certificate Chain Encoding' : 'Certificate Encoding',
                         formValue: 'certificateEncoding',
-
                         options: certificateEncodingOptions,
+                        placement: 'top',
                     },
                 ]}
             />

@@ -1,4 +1,4 @@
-import { Badge } from 'reactstrap';
+import Badge from 'components/Badge';
 
 type ResourceBadgesProps<T extends string> = {
     resources: T[];
@@ -20,7 +20,7 @@ export function ResourceBadges<T extends string>({ resources, selected, onSelect
             {resources.map((resource) => (
                 <Badge
                     key={resource}
-                    color={selected === resource ? 'primary' : 'light'}
+                    color={selected === resource ? 'primary' : 'secondary'}
                     onClick={() => onSelect(resource)}
                     style={{
                         cursor: 'pointer',
