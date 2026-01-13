@@ -189,13 +189,12 @@ function CustomTable({
                 return;
             }
 
-            const ps = paginationData ? paginationData.pageSize : pageSize;
-            const checkedRows = tblData.slice((page - 1) * ps, page * ps).map((row) => row.id);
+            const checkedRows = tblData.map((row) => row.id);
 
             setTblCheckedRows(checkedRows);
             if (onCheckedRowsChanged) onCheckedRowsChanged(checkedRows);
         },
-        [paginationData, pageSize, tblData, page, onCheckedRowsChanged],
+        [tblData, onCheckedRowsChanged],
     );
 
     const onRowToggleSelection = useCallback(
@@ -314,9 +313,8 @@ function CustomTable({
     );
 
     const checkAllChecked = useMemo(() => {
-        const ps = paginationData ? paginationData.pageSize : pageSize;
-        return tblCheckedRows.length === tblData.slice((page - 1) * ps, page * ps).length && tblData.length > 0;
-    }, [tblData, tblCheckedRows, paginationData, pageSize, page]);
+        return tblCheckedRows.length === tblData.length && tblData.length > 0;
+    }, [tblData, tblCheckedRows]);
 
     const getSortIcon = useCallback((sort: 'asc' | 'desc' | undefined) => {
         return (
