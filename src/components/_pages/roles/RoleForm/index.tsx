@@ -20,7 +20,7 @@ import TextInput from 'components/TextInput';
 
 interface RoleFormProps {
     roleId?: string;
-    onCancel?: () => void;
+    onCancel: () => void;
     onSuccess?: () => void;
 }
 
@@ -32,7 +32,6 @@ interface FormValues {
 
 function RoleForm({ roleId, onCancel, onSuccess }: RoleFormProps) {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const { id } = useParams();
 
@@ -248,7 +247,7 @@ function RoleForm({ roleId, onCancel, onSuccess }: RoleFormProps) {
                             ]}
                         />
                         <Container className="flex-row justify-end modal-footer" gap={4}>
-                            <Button variant="outline" onClick={() => navigate(-1)} disabled={isSubmitting} type="button">
+                            <Button variant="outline" onClick={onCancel} disabled={isSubmitting} type="button">
                                 Cancel
                             </Button>
                             <ProgressButton
