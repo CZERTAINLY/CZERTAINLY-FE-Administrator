@@ -188,6 +188,16 @@ export default function DiscoveryForm({ onSuccess, onCancel }: DiscoveryFormProp
         watch,
     } = methods;
 
+    const handleAttributeValuesChange = useCallback(
+        (values: Record<string, any> | null) => {
+            if (!values) return;
+            Object.keys(values).forEach((key) => {
+                setValue(key as any, values[key]);
+            });
+        },
+        [setValue],
+    );
+
     const watchedScheduled = useWatch({
         control,
         name: 'scheduled',
@@ -439,6 +449,7 @@ export default function DiscoveryForm({ onSuccess, onCancel }: DiscoveryFormProp
                                                 kind={watchedStoreKind}
                                                 groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
                                                 setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
+                                                onValuesChange={handleAttributeValuesChange}
                                             />
                                         ) : (
                                             <></>
@@ -451,6 +462,7 @@ export default function DiscoveryForm({ onSuccess, onCancel }: DiscoveryFormProp
                                             id="customDiscovery"
                                             attributeDescriptors={resourceCustomAttributes}
                                             attributes={discoveryProvider?.customAttributes}
+                                            onValuesChange={handleAttributeValuesChange}
                                         />
                                     ),
                                 },
