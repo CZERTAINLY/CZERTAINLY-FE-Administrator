@@ -223,7 +223,7 @@ export default function CryptographicKeyForm({ keyId, onSuccess, onCancel, usesG
                     cryptographicKeysActions.updateCryptographicKey({
                         profileUuid: id!,
                         cryptographicKeyEditRequest: {
-                            description: values.description,
+                            description: values.description || '',
                             tokenProfileUuid: values.tokenProfile || undefined,
                             ownerUuid: values.owner || undefined,
                             groupUuids: values?.selectedGroups?.length ? values?.selectedGroups?.map((group) => group.value) : [],
@@ -245,7 +245,7 @@ export default function CryptographicKeyForm({ keyId, onSuccess, onCancel, usesG
                         cryptographicKeyAddRequest: {
                             groupUuids: values?.selectedGroups?.length ? values?.selectedGroups?.map((group) => group.value) : [],
                             name: values.name,
-                            description: values.description,
+                            description: values.description || '',
                             attributes: collectFormAttributes(
                                 'cryptographicKey',
                                 [...(cryptographicKeyAttributeDescriptors ?? []), ...groupAttributesCallbackAttributes],

@@ -369,6 +369,10 @@ export default function CmpProfileForm({ cmpProfileId, onCancel, onSuccess }: Cm
         };
     };
 
+    const normalizeOptionalValue = (value: string | undefined): string | undefined => {
+        return value && value.trim() !== '' ? value : undefined;
+    };
+
     const onSubmit = useCallback(
         (values: FormValues) => {
             const customAttributes = collectFormAttributes(
@@ -377,7 +381,7 @@ export default function CmpProfileForm({ cmpProfileId, onCancel, onSuccess }: Cm
                 values,
             );
             const certificateAssociations = {
-                ownerUuid: values.owner,
+                ownerUuid: normalizeOptionalValue(values.owner),
                 groupUuids: values.groups.map((group) => group.value),
                 customAttributes: collectFormAttributes(
                     'certificateAssociatedAttributes',
@@ -388,14 +392,19 @@ export default function CmpProfileForm({ cmpProfileId, onCancel, onSuccess }: Cm
             if (editMode && cmpProfile && cmpProfile?.uuid === id) {
                 const valuesToSubmit: CmpProfileEditRequestModel = {
                     name: values.name,
-                    description: values.description,
+                    description: normalizeOptionalValue(values.description),
                     variant: values.variant as CmpProfileEditRequestDtoVariantEnum,
                     requestProtectionMethod: values.requestProtectionMethod as ProtectionMethod,
                     responseProtectionMethod: values.responseProtectionMethod as ProtectionMethod,
-                    raProfileUuid: values.raProfileUuid,
-                    sharedSecret: values.requestProtectionMethod === ProtectionMethod.SharedSecret ? values.sharedSecret : undefined,
+                    raProfileUuid: normalizeOptionalValue(values.raProfileUuid),
+                    sharedSecret:
+                        values.requestProtectionMethod === ProtectionMethod.SharedSecret
+                            ? normalizeOptionalValue(values.sharedSecret)
+                            : undefined,
                     signingCertificateUuid:
-                        values.responseProtectionMethod === ProtectionMethod.Signature ? values.signingCertificateUuid : undefined,
+                        values.responseProtectionMethod === ProtectionMethod.Signature
+                            ? normalizeOptionalValue(values.signingCertificateUuid)
+                            : undefined,
 
                     issueCertificateAttributes: collectFormAttributes(
                         'issuanceAttributes',
@@ -414,14 +423,19 @@ export default function CmpProfileForm({ cmpProfileId, onCancel, onSuccess }: Cm
             } else {
                 const valuesToSubmit: CmpProfileRequestModel = {
                     name: values.name,
-                    description: values.description,
+                    description: normalizeOptionalValue(values.description),
                     variant: values.variant as CmpProfileRequestDtoVariantEnum,
                     requestProtectionMethod: values.requestProtectionMethod as ProtectionMethod,
                     responseProtectionMethod: values.responseProtectionMethod as ProtectionMethod,
-                    raProfileUuid: values.raProfileUuid,
-                    sharedSecret: values.requestProtectionMethod === ProtectionMethod.SharedSecret ? values.sharedSecret : undefined,
+                    raProfileUuid: normalizeOptionalValue(values.raProfileUuid),
+                    sharedSecret:
+                        values.requestProtectionMethod === ProtectionMethod.SharedSecret
+                            ? normalizeOptionalValue(values.sharedSecret)
+                            : undefined,
                     signingCertificateUuid:
-                        values.responseProtectionMethod === ProtectionMethod.Signature ? values.signingCertificateUuid : undefined,
+                        values.responseProtectionMethod === ProtectionMethod.Signature
+                            ? normalizeOptionalValue(values.signingCertificateUuid)
+                            : undefined,
 
                     issueCertificateAttributes: collectFormAttributes(
                         'issuanceAttributes',
@@ -551,7 +565,7 @@ export default function CmpProfileForm({ cmpProfileId, onCancel, onSuccess }: Cm
     });
 
     const areDefaultValuesSame = useCallback(
-        (values: FormValues) => {
+        (values: any) => {
             const areValuesSame = isObjectSame(
                 values as unknown as Record<string, unknown>,
                 defaultValues as unknown as Record<string, unknown>,
