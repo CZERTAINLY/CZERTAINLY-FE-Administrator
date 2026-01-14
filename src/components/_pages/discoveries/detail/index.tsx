@@ -244,7 +244,7 @@ export default function DiscoveryDetail() {
                             <div>
                                 <Container className="md:flex-row items-start">
                                     <Widget
-                                        title="Certificate Discovery Details"
+                                        title="Discovery Details"
                                         busy={isBusy}
                                         widgetButtons={buttons}
                                         titleSize="large"
