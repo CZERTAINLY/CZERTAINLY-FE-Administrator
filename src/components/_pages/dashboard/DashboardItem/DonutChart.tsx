@@ -90,13 +90,11 @@ function DonutChart({ title, colorOptions, data = {}, entity, redirect, onSetFil
         },
     };
 
-    if (colorOptions) {
-        options.colors = colorOptions.colors;
-    }
-
     const values = getValues(data);
     const chartLabels = useGetLabels(data);
     const chartColors = colorOptions?.colors || getDefaultColors();
+
+    options.colors = chartColors;
 
     return (
         <Widget title={title} titleBoldness="bold" className="flex-1">
