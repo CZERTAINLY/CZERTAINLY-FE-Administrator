@@ -239,7 +239,7 @@ export default function UserDetail() {
             <Dialog
                 isOpen={confirmDelete}
                 caption="Delete User"
-                body="You are about to delete an User. Is this what you want to do?"
+                body="You are about to delete a User. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[
