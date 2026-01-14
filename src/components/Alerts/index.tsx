@@ -8,11 +8,10 @@ import Container from 'components/Container';
 
 function Alerts() {
     const alerts = useSelector(selectors.selectMessages);
-    console.log('alerts', alerts);
     const dispatch = useDispatch();
 
     return (
-        <Container className="sticky bottom-12 !gap-2 z-9999 w-[calc(100%+2rem)] ml-[-1rem]" data-testid="alerts-container">
+        <Container className="sticky bottom-12 !gap-2 z-9999 px-2 md:px-4" data-testid="alerts-container">
             {alerts.map((alert) => (
                 <div
                     key={alert.id}
@@ -32,9 +31,9 @@ function Alerts() {
                     <div className="absolute top-5 left-4 translate-y-[2px]">
                         {alert.color === 'success' ? <CircleCheck size={14} /> : <CircleX size={14} />}
                     </div>
-                    <span
+                    <div
                         id="hs-soft-color-warning-label"
-                        className="text-lg font-semibold"
+                        className="text-lg font-semibold overflow-hidden"
                         dangerouslySetInnerHTML={{ __html: alert.message }}
                     />
                     <button
