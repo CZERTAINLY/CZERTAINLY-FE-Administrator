@@ -307,7 +307,7 @@ export default function ConnectorList() {
                 caption={`Approve ${checkedRows.length > 1 ? 'Connectors' : 'a Connector'}`}
                 body={
                     <span className="text-center">
-                        You are about to approve a ${checkedRows.length > 1 ? 'Connectors' : 'a Connector'}. Is this what you want to do?
+                        {`You are about to approve a ${checkedRows.length > 1 ? 'Connectors' : 'a Connector'}. Is this what you want to do?`}
                     </span>
                 }
                 toggle={() => setConfirmAuthorize(false)}
