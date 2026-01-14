@@ -576,7 +576,7 @@ function RolePermissionsEditor({
                 caption="Edit Object Level Permissions"
                 body={
                     <CustomTable
-                        hasCheckboxes={true}
+                        hasCheckboxes
                         headers={objectsToSelect}
                         data={objectsToSelectRows}
                         onCheckedRowsChanged={(rows) => setObjectsToAdd(rows as string[])}
