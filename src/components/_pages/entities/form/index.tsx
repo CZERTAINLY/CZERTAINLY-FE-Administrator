@@ -82,7 +82,6 @@ export default function EntityForm({ entityId, onCancel, onSuccess }: EntityForm
     );
 
     useEffect(() => {
-        dispatch(entityActions.resetState());
         dispatch(connectorActions.clearCallbackData());
         dispatch(entityActions.listEntityProviders());
         dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Entities));

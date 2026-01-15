@@ -91,8 +91,6 @@ export default function LocationForm({ locationId, entityId: propEntityId, onCan
         dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Locations));
 
         if (init) {
-            dispatch(locationActions.resetState());
-            dispatch(entityActions.resetState());
             dispatch(entityActions.listEntities({}));
             setInit(false);
         }

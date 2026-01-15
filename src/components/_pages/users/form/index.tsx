@@ -16,7 +16,7 @@ import { actions as userActions, selectors as userSelectors } from 'ducks/users'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router';
+import { useParams } from 'react-router';
 import Select from 'components/Select';
 import Button from 'components/Button';
 import Container from 'components/Container';
@@ -56,7 +56,6 @@ interface FormValues {
 
 function UserForm({ userId, onCancel, onSuccess }: UserFormProps) {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const { id: routeId } = useParams();
     const id = userId || routeId;
@@ -147,7 +146,6 @@ function UserForm({ userId, onCancel, onSuccess }: UserFormProps) {
     useEffect(() => {
         dispatch(certActions.resetState());
         dispatch(rolesActions.resetState());
-        dispatch(userActions.resetState());
         dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Users));
 
         dispatch(

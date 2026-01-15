@@ -109,7 +109,7 @@ function AttributeEditorInner({
     let opts: { [attributeName: string]: { label: string; value: any }[] } = {};
 
     useEffect(() => {
-        dispatch(connectorActions.resetState());
+        dispatch(connectorActions.clearCallbackData());
     }, [dispatch]);
     /**
      * Handles deletion of an attribute from the grouped attributes

@@ -103,7 +103,6 @@ export default function NotificationProfileForm({
                 previousVersionRef.current = version;
             }
         } else {
-            dispatch(actions.resetState());
             previousIdRef.current = undefined;
             previousVersionRef.current = undefined;
         }

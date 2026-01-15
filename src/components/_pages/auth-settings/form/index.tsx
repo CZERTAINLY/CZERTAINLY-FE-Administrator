@@ -86,7 +86,6 @@ export default function OAuth2ProviderForm({ providerName, onCancel, onSuccess }
     );
 
     useEffect(() => {
-        dispatch(actions.resetState());
         if (!providerName) return;
         dispatch(actions.getOAuth2ProviderSettings({ providerName }));
     }, [dispatch, providerName]);
