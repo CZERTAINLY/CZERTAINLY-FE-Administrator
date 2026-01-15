@@ -465,7 +465,7 @@ export default function ConnectorDetail() {
             <Dialog
                 isOpen={confirmDelete}
                 caption="Delete Connector"
-                body="You are about to delete an Connector. Is this what you want to do?"
+                body="You are about to delete a Connector. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[
