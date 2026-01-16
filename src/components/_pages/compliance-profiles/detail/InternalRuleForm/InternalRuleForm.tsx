@@ -13,6 +13,7 @@ import ConditionFormFilter from 'components/ConditionFormFilter';
 import { actions as complianceActions, selectors as complianceSelectors } from 'ducks/compliance-profiles';
 import cn from 'classnames';
 import Label from 'components/Label';
+import Container from 'components/Container';
 
 type Props = {
     rule?: ComplianceRuleListDto;
@@ -221,7 +222,7 @@ export default function InternalRuleForm({ rule, onCancel }: Props) {
                     <ConditionFormFilter formType="conditionItem" resource={watchedResource} />
                 )}
 
-                <div className="flex justify-end gap-2">
+                <Container className="flex-row justify-end modal-footer" gap={4}>
                     <ProgressButton
                         title={rule ? 'Update' : 'Create'}
                         inProgressTitle={rule ? 'Updating...' : 'Creating...'}
@@ -232,7 +233,7 @@ export default function InternalRuleForm({ rule, onCancel }: Props) {
                     <Button variant="outline" color="secondary" onClick={onCancel} disabled={formState.isSubmitting} type="button">
                         Cancel
                     </Button>
-                </div>
+                </Container>
             </form>
         </FormProvider>
     );

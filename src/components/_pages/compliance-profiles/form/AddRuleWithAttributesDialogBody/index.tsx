@@ -10,6 +10,7 @@ import { AttributeDescriptorModel } from 'types/attributes';
 
 import { collectFormAttributes } from 'utils/attributes/attributes';
 import TabLayout from '../../../../Layout/TabLayout';
+import Container from 'components/Container';
 
 interface Props {
     complianceProfileUuid?: string;
@@ -101,7 +102,7 @@ export default function AddRuleWithAttributesDialogBody({
                         </div>
                     )}
 
-                    <div className="flex justify-end gap-2">
+                    <Container className="flex-row justify-end modal-footer" gap={4}>
                         <Button
                             type="submit"
                             color="primary"
@@ -114,7 +115,7 @@ export default function AddRuleWithAttributesDialogBody({
                         <Button type="button" color="secondary" disabled={formState.isSubmitting} onClick={onClose}>
                             Cancel
                         </Button>
-                    </div>
+                    </Container>
                 </form>
             </FormProvider>
         </>

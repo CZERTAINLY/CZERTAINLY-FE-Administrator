@@ -1085,8 +1085,8 @@ export default function RaProfileDetail() {
                 body="You are about to deactivate ACME protocol for the RA profile. Is this what you want to do?"
                 toggle={() => setConfirmDeactivateAcme(false)}
                 buttons={[
-                    { color: 'danger', onClick: onDeactivateAcmeConfirmed, body: 'Yes, deactivate' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDeactivateAcme(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeactivateAcmeConfirmed, body: 'Yes, deactivate' },
                 ]}
             />
 
@@ -1096,8 +1096,8 @@ export default function RaProfileDetail() {
                 body="You are about to deactivate CMP protocol for the RA profile. Is this what you want to do?"
                 toggle={() => setConfirmDeactivateCmp(false)}
                 buttons={[
-                    { color: 'danger', onClick: onDeactivateCmpConfirmed, body: 'Yes, deactivate' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDeactivateCmp(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeactivateCmpConfirmed, body: 'Yes, deactivate' },
                 ]}
             />
 
@@ -1107,8 +1107,8 @@ export default function RaProfileDetail() {
                 body="You are about to deactivate SCEP protocol for the RA profile. Is this what you want to do?"
                 toggle={() => setConfirmDeactivateScep(false)}
                 buttons={[
-                    { color: 'danger', onClick: onDeactivateScepConfirmed, body: 'Yes, deactivate' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDeactivateScep(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeactivateScepConfirmed, body: 'Yes, deactivate' },
                 ]}
             />
 
@@ -1124,6 +1124,7 @@ export default function RaProfileDetail() {
                 })}
                 toggle={() => setActivateAcmeDialog(false)}
                 buttons={[]}
+                size="xl"
             />
 
             <Dialog
@@ -1138,6 +1139,7 @@ export default function RaProfileDetail() {
                 })}
                 toggle={() => setActivateCmpDialog(false)}
                 buttons={[]}
+                size="xl"
             />
 
             <Dialog
@@ -1152,6 +1154,7 @@ export default function RaProfileDetail() {
                 })}
                 toggle={() => setActivateScepDialog(false)}
                 buttons={[]}
+                size="xl"
             />
 
             <Dialog

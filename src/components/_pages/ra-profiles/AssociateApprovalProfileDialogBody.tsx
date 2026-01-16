@@ -11,6 +11,7 @@ import { buildValidationRules } from 'utils/validators-helper';
 import { validateRequired } from 'utils/validators';
 import cn from 'classnames';
 import Label from 'components/Label';
+import Container from 'components/Container';
 
 interface Props {
     visible: boolean;
@@ -107,7 +108,10 @@ const AssociateApprovalProfileDialogBody = ({ raProfile, visible, onClose, avail
                         )}
                     />
 
-                    <div className="flex justify-end gap-2">
+                    <Container className="flex-row justify-end modal-footer" gap={4}>
+                        <Button type="button" variant="outline" color="secondary" disabled={formState.isSubmitting} onClick={onClose}>
+                            Cancel
+                        </Button>
                         <Button
                             type="submit"
                             color="primary"
@@ -116,11 +120,7 @@ const AssociateApprovalProfileDialogBody = ({ raProfile, visible, onClose, avail
                         >
                             Associate
                         </Button>
-
-                        <Button type="button" variant="outline" color="secondary" disabled={formState.isSubmitting} onClick={onClose}>
-                            Cancel
-                        </Button>
-                    </div>
+                    </Container>
                 </form>
             </FormProvider>
         </>

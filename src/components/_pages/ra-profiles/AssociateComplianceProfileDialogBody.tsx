@@ -15,6 +15,7 @@ import { actions, selectors } from 'ducks/compliance-profiles';
 import { RaProfileResponseModel } from 'types/ra-profiles';
 import { Resource } from 'types/openapi/models/Resource';
 import { TestableControl, TestableMenu } from 'utils/HOC/withDataTestId';
+import Container from 'components/Container';
 
 interface Props {
     raProfile?: RaProfileResponseModel;
@@ -117,7 +118,10 @@ export default function AssociateComplianceProfileDialogBody({ raProfile, availa
                         )}
                     />
 
-                    <div className="flex justify-end gap-2">
+                    <Container className="flex-row justify-end modal-footer" gap={4}>
+                        <Button type="button" variant="outline" color="secondary" disabled={formState.isSubmitting} onClick={onClose}>
+                            Cancel
+                        </Button>
                         <Button
                             type="submit"
                             color="primary"
@@ -126,11 +130,7 @@ export default function AssociateComplianceProfileDialogBody({ raProfile, availa
                         >
                             Associate
                         </Button>
-
-                        <Button type="button" variant="outline" color="secondary" disabled={formState.isSubmitting} onClick={onClose}>
-                            Cancel
-                        </Button>
-                    </div>
+                    </Container>
                 </form>
             </FormProvider>
 
