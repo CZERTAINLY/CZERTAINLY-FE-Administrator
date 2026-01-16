@@ -12,7 +12,7 @@ import {
 
 import { transformParseRequestResponseDtoToCertificateResponseDetailModelToAsn1String } from 'ducks/transform/utilsCertificateRequest';
 import { ParseCertificateRequestDtoParseTypeEnum, ParseRequestRequestDtoParseTypeEnum } from '../../../../types/openapi/utils';
-import Dialog from '../../../Dialog';
+import { actions as userInterfaceActions } from 'ducks/user-interface';
 
 interface Props {
     content: string;
@@ -46,20 +46,45 @@ export default function Asn1Dialog({ content, isCSR }: Props) {
 
     useEffect(() => {
         if (parsedCertificate && !isCSR) {
-            setAsn1(transformParseCertificateResponseDtoToAsn1String(parsedCertificate));
+            const asn1String = transformParseCertificateResponseDtoToAsn1String(parsedCertificate);
+            setAsn1(asn1String);
+            if (asn1String) {
+                dispatch(
+                    userInterfaceActions.showGlobalModal({
+                        isOpen: true,
+                        size: 'xl',
+                        title: 'ASN.1 Structure',
+                        content: <pre className="text-sm overflow-x-auto text-[var(--dark-gray-color)]">{asn1String}</pre>,
+                        showCloseButton: true,
+                    }),
+                );
+            }
         }
-    }, [parsedCertificate, isCSR]);
+    }, [parsedCertificate, isCSR, dispatch]);
 
     useEffect(() => {
         if (parsedCertificateRequest && isCSR) {
-            setAsn1(transformParseRequestResponseDtoToCertificateResponseDetailModelToAsn1String(parsedCertificateRequest));
+            const asn1String = transformParseRequestResponseDtoToCertificateResponseDetailModelToAsn1String(parsedCertificateRequest);
+            setAsn1(asn1String);
+            if (asn1String) {
+                dispatch(
+                    userInterfaceActions.showGlobalModal({
+                        isOpen: true,
+                        size: 'xl',
+                        title: 'ASN.1 Structure',
+                        content: <pre className="text-sm overflow-x-auto text-[var(--dark-gray-color)]">{asn1String}</pre>,
+                        showCloseButton: true,
+                    }),
+                );
+            }
         }
-    }, [parsedCertificateRequest, isCSR]);
+    }, [parsedCertificateRequest, isCSR, dispatch]);
 
     const onClose = useCallback(() => {
         resetParsedData();
         setAsn1(undefined);
-    }, [resetParsedData]);
+        dispatch(userInterfaceActions.hideGlobalModal());
+    }, [resetParsedData, dispatch]);
 
     return (
         <>
@@ -91,14 +116,6 @@ export default function Asn1Dialog({ content, isCSR }: Props) {
             >
                 Show
             </Button>
-            <Dialog
-                isOpen={!!asn1}
-                size="xl"
-                caption="ASN.1 Structure"
-                body={<pre className="text-sm overflow-x-auto text-[var(--dark-gray-color)]">{asn1}</pre>}
-                toggle={onClose}
-                buttons={[{ color: 'secondary', variant: 'outline', onClick: onClose, body: 'Close' }]}
-            />
         </>
     );
 }
