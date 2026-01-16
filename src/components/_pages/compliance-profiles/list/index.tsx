@@ -127,7 +127,7 @@ export default function AdministratorsList() {
         () => (
             <div>
                 <div>
-                    Failed to delete {checkedRows.length > 1 ? 'Compliance Profiles' : 'an Compliance Profile'}. Please find the details
+                    Failed to delete {checkedRows.length > 1 ? 'Compliance Profiles' : 'a Compliance Profile'}. Please find the details
                     below:
                 </div>
 
@@ -245,7 +245,7 @@ export default function AdministratorsList() {
                 body={`You are about to delete ${
                     checkedRows.length > 1 ? 'Compliance Profiles' : 'a Compliance Profile'
                 } which may have associated RA
-                   Profiles(s). Is this what you want to do?`}
+                   Profile(s). Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[
