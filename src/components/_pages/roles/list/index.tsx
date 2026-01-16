@@ -225,8 +225,8 @@ export default function RolesList() {
 
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete ${checkedRows.length > 1 ? 'Roles' : 'an Role'}`}
-                body={`You are about to delete ${checkedRows.length > 1 ? 'Roles' : 'an Role'}. Is this what you want to do?`}
+                caption={`Delete ${checkedRows.length > 1 ? 'Roles' : 'a Role'}`}
+                body={`You are about to delete ${checkedRows.length > 1 ? 'Roles' : 'a Role'}. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[

@@ -176,7 +176,7 @@ function CredentialDetail() {
                 <Dialog
                     isOpen={confirmDelete}
                     caption="Delete Credential"
-                    body="You are about to delete an Credential. Is this what you want to do?"
+                    body="You are about to delete a Credential. Is this what you want to do?"
                     toggle={() => setConfirmDelete(false)}
                     icon="delete"
                     buttons={[

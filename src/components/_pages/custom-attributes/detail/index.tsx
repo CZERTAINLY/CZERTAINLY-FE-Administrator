@@ -211,7 +211,7 @@ export default function CustomAttributeDetail() {
             <Dialog
                 isOpen={confirmDelete}
                 caption="Delete Custom Attribute"
-                body="You are about to delete an Custom Attribute. Is this what you want to do?"
+                body="You are about to delete a Custom Attribute. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[

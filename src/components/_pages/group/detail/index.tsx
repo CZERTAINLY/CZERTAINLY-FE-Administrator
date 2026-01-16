@@ -157,7 +157,7 @@ export default function GroupDetail() {
                 <Dialog
                     isOpen={confirmDelete}
                     caption="Delete Group"
-                    body="You are about to delete an Group. Is this what you want to do?"
+                    body="You are about to delete a Group. Is this what you want to do?"
                     toggle={() => setConfirmDelete(false)}
                     icon="delete"
                     buttons={[
