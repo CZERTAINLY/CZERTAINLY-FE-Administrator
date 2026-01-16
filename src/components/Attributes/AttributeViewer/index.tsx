@@ -182,6 +182,7 @@ export default function AttributeViewer({
             if ('sourceObjects' in attribute && attribute.sourceObjects.length > 0 && resource) {
                 return (
                     <Popover
+                        width={500}
                         content={
                             <Widget title="Source objects" noBorder className="!bg-[#F7F6F2]">
                                 <CustomTable headers={headers} data={attribute.sourceObjects.map(createData)} />
