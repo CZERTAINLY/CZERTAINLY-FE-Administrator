@@ -20,6 +20,7 @@ import { validateRequired } from 'utils/validators';
 import TabLayout from '../../Layout/TabLayout';
 import cn from 'classnames';
 import Label from 'components/Label';
+import Container from 'components/Container';
 
 export enum Protocol {
     ACME = 'ACME',
@@ -274,7 +275,10 @@ export default function ProtocolActivationDialogBody({ protocol, raProfileUuid, 
 
                     <TabLayout tabs={attributeTabs} />
 
-                    <div className="flex justify-end gap-2">
+                    <Container className="flex-row justify-end modal-footer" gap={4}>
+                        <Button type="button" variant="outline" color="secondary" onClick={onClose}>
+                            Cancel
+                        </Button>
                         <Button
                             type="submit"
                             color="primary"
@@ -283,11 +287,7 @@ export default function ProtocolActivationDialogBody({ protocol, raProfileUuid, 
                         >
                             Activate
                         </Button>
-
-                        <Button type="button" variant="outline" color="secondary" onClick={onClose}>
-                            Cancel
-                        </Button>
-                    </div>
+                    </Container>
                 </form>
             </FormProvider>
 

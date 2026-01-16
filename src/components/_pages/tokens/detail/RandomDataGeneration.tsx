@@ -11,6 +11,7 @@ import { AttributeDescriptorModel, AttributeRequestModel } from 'types/attribute
 import { collectFormAttributes } from 'utils/attributes/attributes';
 import TabLayout from '../../../Layout/TabLayout';
 import TextInput from 'components/TextInput';
+import Container from 'components/Container';
 
 interface Props {
     tokenUuid?: string;
@@ -121,7 +122,7 @@ export default function RandomDataGeneration({ tokenUuid, visible, onClose }: Pr
                         </div>
                     )}
 
-                    <div className="flex justify-end gap-2">
+                    <Container className="flex-row justify-end modal-footer" gap={4}>
                         <Button type="button" variant="outline" onClick={onClose}>
                             Cancel
                         </Button>
@@ -133,7 +134,7 @@ export default function RandomDataGeneration({ tokenUuid, visible, onClose }: Pr
                         >
                             Generate
                         </Button>
-                    </div>
+                    </Container>
                 </form>
             </FormProvider>
 
