@@ -191,11 +191,7 @@ export default function Dialog({ isOpen, toggle, caption, body, buttons, size = 
                         {body}
                     </div>
                     {buttons && buttons.length > 0 && (
-                        <div
-                            className={cn(
-                                'flex justify-end items-center gap-4 py-4 mt-2 dark:border-neutral-700 border-t border-gray-200 modal-footer',
-                            )}
-                        >
+                        <div className={cn('flex justify-end items-center gap-4 py-4 mt-2 dark:border-neutral-700 modal-footer')}>
                             {buttons.map((button, index) => (
                                 <Button
                                     key={index}

@@ -76,6 +76,7 @@ table .preline-badge {
     padding-bottom: 1rem;
     padding-top: 1rem;
     border-radius: 0 0 1rem 1rem;
+    @apply border-t border-gray-200;
 }
 
 .text-one-row-ellipsis {
