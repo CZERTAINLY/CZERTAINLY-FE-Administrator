@@ -24,7 +24,7 @@ interface BaseProps {
 
 interface SingleSelectProps extends BaseProps {
     isMulti?: false;
-    value: string | number;
+    value: string | number | { value: string | number; label: string };
     onChange: (value: string | number) => void;
 }
 
@@ -56,8 +56,21 @@ function Select({
 }: Props) {
     const selectRef = useRef<HTMLSelectElement>(null);
     const previousOptionsRef = useRef<string>('');
-    const previousValueRef = useRef<string | number | { value: string | number; label: string }[] | undefined>(undefined);
+    const previousValueRef = useRef<
+        string | number | { value: string | number; label: string } | { value: string | number; label: string }[] | undefined
+    >(undefined);
     const isInitializedRef = useRef(false);
+
+    const getValueFromProp = useMemo(() => {
+        if (isMulti) {
+            return undefined; // Multi-select doesn't need this
+        }
+        const singleValue = value as SingleSelectProps['value'];
+        if (singleValue && typeof singleValue === 'object' && 'value' in singleValue) {
+            return singleValue.value;
+        }
+        return singleValue as string | number | undefined;
+    }, [isMulti, value]);
 
     const optionsKey = useMemo(() => {
         return JSON.stringify(options?.map((opt) => ({ value: opt.value, label: opt.label, disabled: opt.disabled })));
@@ -116,6 +129,7 @@ function Select({
                 <select
                     ref={selectRef}
                     multiple={isMulti}
+                    value={isMulti ? undefined : (getValueFromProp?.toString() ?? '')}
                     data-hs-select={JSON.stringify({
                         placeholder: hasOptions ? placeholder : 'No options',
                         toggleTag: '<button type="button" aria-expanded="false"></button>',
@@ -137,10 +151,6 @@ function Select({
                     id={id}
                     disabled={isDisabled || !hasOptions}
                     className={className}
-                    // className={cn(
-                    //     'py-3 px-4 pe-9 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600',
-                    //     className,
-                    // )}
                     onChange={(e) => {
                         if (isMulti) {
                             const selectedOptions = Array.from(e.target.selectedOptions);
@@ -153,10 +163,13 @@ function Select({
                             const result = newValues.length > 0 ? newValues : undefined;
                             (onChange as MultiSelectProps['onChange'])(result);
                         } else {
-                            const value = e.target.value;
-                            (onChange as SingleSelectProps['onChange'])(
-                                value === '' ? (options || []).find((opt) => opt.value.toString() === value)?.value || value : value,
-                            );
+                            const selectedValue = e.target.value;
+                            if (selectedValue === '') {
+                                (onChange as SingleSelectProps['onChange'])('' as any);
+                                return;
+                            }
+                            const matchedOption = (options || []).find((opt) => opt.value.toString() === selectedValue);
+                            (onChange as SingleSelectProps['onChange'])(matchedOption ? matchedOption.value : (selectedValue as any));
                         }
                     }}
                 >
@@ -164,9 +177,14 @@ function Select({
                     {(options || []).map((option) => {
                         const isSelected = isMulti
                             ? !!value && (value as { value: string | number; label: string }[]).some((v) => v.value === option.value)
-                            : option.value === value;
+                            : option.value === getValueFromProp;
+                        if (id === 'valueSelect') {
+                            console.log('option.value', option.value);
+                            console.log('getValueFromProp', getValueFromProp);
+                            console.log('isSelected', isSelected);
+                        }
                         return (
-                            <option key={option.value} value={option.value} selected={isSelected} disabled={option.disabled}>
+                            <option key={option.value} value={option.value.toString()} selected={isSelected} disabled={option.disabled}>
                                 {option.label}
                             </option>
                         );
