@@ -9,8 +9,8 @@ import Select, {
     ActionMeta,
     GroupBase,
 } from 'react-select';
-import { FormFeedback, FormGroup, FormText, Label } from 'reactstrap';
-import styles from './CustomSelect.module.scss';
+import Label from 'components/Label';
+import { Plus } from 'lucide-react';
 
 type OptionType = { label: string; value: string; isNew?: boolean };
 
@@ -109,10 +109,9 @@ export default function CustomSelect({
         setError(propError ?? null);
     }, [propError]);
     return (
-        <FormGroup className={styles.customSelectContainer}>
-            <Label for={props.inputId ?? props.id}>
+        <div>
+            <Label htmlFor={props.inputId ?? props.id} required={required}>
                 {props.label}
-                {required ? '*' : ''}
             </Label>
             <Select
                 {...props}
@@ -122,13 +121,11 @@ export default function CustomSelect({
                 onInputChange={handleInputChange}
                 onChange={handleChange}
                 components={{ Option: CustomOption }}
-                styles={{ menu: (provided) => ({ ...provided, zIndex: 5 }) }}
-                classNames={{ control: () => (error ? styles.customSelectStylingError : '') }}
                 noOptionsMessage={allowTextInput ? () => 'Type in to create an option' : undefined}
             />
-            {description && <FormText>{description}</FormText>}
-            {error && <FormFeedback style={{ display: 'block' }}>{error}</FormFeedback>}
-        </FormGroup>
+            {description && <p className="mt-1 text-sm text-gray-600">{description}</p>}
+            {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+        </div>
     );
 }
 
@@ -138,7 +135,7 @@ function CustomOption(props: CustomOptionProps) {
     const { data } = props;
     return (
         <components.Option {...props}>
-            {data.isNew && <i className="fa fa-add" style={{ marginRight: '8px' }} />}
+            {data.isNew && <Plus size={16} style={{ marginRight: '8px' }} />}
             {data.label}
         </components.Option>
     );

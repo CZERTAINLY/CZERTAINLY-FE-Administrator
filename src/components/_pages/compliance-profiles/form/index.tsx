@@ -3,27 +3,34 @@ import ProgressButton from 'components/ProgressButton';
 import Widget from 'components/Widget';
 
 import { actions, selectors } from 'ducks/compliance-profiles';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
-import { Field, Form } from 'react-final-form';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
-import { Form as BootstrapForm, Button, ButtonGroup, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
-
-import { mutators } from 'utils/attributes/attributeEditorMutators';
+import Button from 'components/Button';
+import Container from 'components/Container';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
 import { Resource } from '../../../../types/openapi';
 import { collectFormAttributes } from '../../../../utils/attributes/attributes';
 import AttributeEditor from '../../../Attributes/AttributeEditor';
 import TabLayout from '../../../Layout/TabLayout';
+import Label from 'components/Label';
+import TextInput from 'components/TextInput';
+
+interface ComplianceProfileFormProps {
+    complianceProfileId?: string;
+    onCancel?: () => void;
+    onSuccess?: () => void;
+}
 
 interface FormValues {
     name: string;
     description: string;
 }
 
-function ComplianceProfileForm() {
+function ComplianceProfileForm({ complianceProfileId, onCancel, onSuccess }: ComplianceProfileFormProps) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -50,10 +57,6 @@ function ComplianceProfileForm() {
         [dispatch, resourceCustomAttributes],
     );
 
-    const onCancelClick = useCallback(() => {
-        navigate(-1);
-    }, [navigate]);
-
     const defaultValues: FormValues = useMemo(
         () => ({
             name: '',
@@ -62,78 +65,122 @@ function ComplianceProfileForm() {
         [],
     );
 
-    return (
-        <Widget title="Add Compliance Profile" busy={isBusy}>
-            <Form initialValues={defaultValues} onSubmit={onSubmit} mutators={{ ...mutators<FormValues>() }}>
-                {({ handleSubmit, pristine, submitting, valid, form }) => (
-                    <BootstrapForm onSubmit={handleSubmit}>
-                        <Field name="name" validate={composeValidators(validateRequired(), validateAlphaNumericWithSpecialChars())}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="name">Profile Name</Label>
+    const methods = useForm<FormValues>({
+        defaultValues,
+        mode: 'onChange',
+    });
 
-                                    <Input
-                                        {...input}
-                                        valid={!meta.error && meta.touched}
-                                        invalid={!!meta.error && meta.touched}
-                                        type="text"
+    const {
+        handleSubmit,
+        control,
+        formState: { isDirty, isSubmitting, isValid },
+        reset,
+    } = methods;
+
+    const wasCreating = useRef(isCreating);
+
+    useEffect(() => {
+        if (wasCreating.current && !isCreating) {
+            if (onSuccess) {
+                onSuccess();
+            }
+        }
+        wasCreating.current = isCreating;
+    }, [isCreating, onSuccess]);
+
+    // Helper function to convert validators for react-hook-form
+    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
+        return {
+            validate: (value: any) => {
+                const composed = composeValidators(...validators);
+                return composed(value);
+            },
+        };
+    };
+
+    return (
+        <FormProvider {...methods}>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <Widget noBorder busy={isBusy}>
+                    <div className="space-y-4">
+                        <div>
+                            <Label htmlFor="name" required>
+                                Profile Name
+                            </Label>
+                            <Controller
+                                name="name"
+                                control={control}
+                                rules={buildValidationRules([validateRequired(), validateAlphaNumericWithSpecialChars()])}
+                                render={({ field, fieldState }) => (
+                                    <TextInput
+                                        value={field.value}
+                                        onChange={field.onChange}
                                         id="name"
                                         placeholder="Compliance Profile Name"
+                                        invalid={fieldState.error && fieldState.isTouched}
+                                        error={
+                                            fieldState.error && fieldState.isTouched
+                                                ? typeof fieldState.error === 'string'
+                                                    ? fieldState.error
+                                                    : fieldState.error?.message || 'Invalid value'
+                                                : undefined
+                                        }
                                     />
+                                )}
+                            />
+                        </div>
 
-                                    <FormFeedback>{meta.error}</FormFeedback>
-                                </FormGroup>
-                            )}
-                        </Field>
-
-                        <Field name="description" validate={composeValidators(validateLength(0, 300))}>
-                            {({ input, meta }) => (
-                                <FormGroup>
-                                    <Label for="description">Profile Description</Label>
-
-                                    <Input
-                                        {...input}
-                                        valid={!meta.error && meta.touched}
-                                        invalid={!!meta.error && meta.touched}
-                                        type="text"
+                        <div>
+                            <Label htmlFor="description">Profile Description</Label>
+                            <Controller
+                                name="description"
+                                control={control}
+                                rules={buildValidationRules([validateLength(0, 300)])}
+                                render={({ field, fieldState }) => (
+                                    <TextInput
+                                        value={field.value}
+                                        onChange={field.onChange}
                                         id="description"
                                         placeholder="Compliance Profile Description"
+                                        invalid={fieldState.error && fieldState.isTouched}
+                                        error={
+                                            fieldState.error && fieldState.isTouched
+                                                ? typeof fieldState.error === 'string'
+                                                    ? fieldState.error
+                                                    : fieldState.error?.message || 'Invalid value'
+                                                : undefined
+                                        }
                                     />
-                                </FormGroup>
-                            )}
-                        </Field>
-
-                        <>
-                            <br />
-
-                            <TabLayout
-                                tabs={[
-                                    {
-                                        title: 'Custom Attributes',
-                                        content: <AttributeEditor id="customCompliance" attributeDescriptors={resourceCustomAttributes} />,
-                                    },
-                                ]}
+                                )}
                             />
-                        </>
-
-                        <div className="d-flex justify-content-end">
-                            <ButtonGroup>
-                                <ProgressButton
-                                    title={'Create'}
-                                    inProgressTitle={'Creating...'}
-                                    inProgress={submitting}
-                                    disabled={pristine || submitting || !valid}
-                                />
-
-                                <Button color="default" onClick={onCancelClick} disabled={submitting}>
-                                    Cancel
-                                </Button>
-                            </ButtonGroup>
                         </div>
-                    </BootstrapForm>
-                )}
-            </Form>
-        </Widget>
+
+                        <TabLayout
+                            noBorder
+                            tabs={[
+                                {
+                                    title: 'Custom Attributes',
+                                    content: <AttributeEditor id="customCompliance" attributeDescriptors={resourceCustomAttributes} />,
+                                },
+                            ]}
+                        />
+
+                        <Container className="flex-row justify-end modal-footer" gap={4}>
+                            <Button variant="outline" onClick={onCancel} disabled={isSubmitting} type="button">
+                                Cancel
+                            </Button>
+                            <ProgressButton
+                                title={'Create'}
+                                inProgressTitle={'Creating...'}
+                                inProgress={isSubmitting}
+                                disabled={!isDirty || isSubmitting || !isValid}
+                                type="submit"
+                            />
+                        </Container>
+                    </div>
+                </Widget>
+            </form>
+        </FormProvider>
     );
 }
 

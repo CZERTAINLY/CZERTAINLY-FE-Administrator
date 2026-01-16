@@ -81,13 +81,13 @@ export function getCertificateDonutChartColors(certificateStatByStatus?: { [key:
 }
 
 const colorMapByDaysOfExpiration: { [key: string]: string } = {
-    '10': '#632828',
-    '20': '#9c0012',
-    '30': '#f37d63',
-    '60': '#7fa2c1',
-    '90': '#008ffb',
-    More: '#1ab394',
-    Expired: '#eb3349',
+    '10': '#6B7280',
+    '20': '#1F2937',
+    '30': '#EAB308',
+    '60': '#14B8A6',
+    '90': '#2798E7',
+    More: '#14B8A6',
+    Expired: '#EF4444',
 };
 
 export function getCertificateDonutChartColorsByDaysOfExpiration(certificateStatByExpirationDays?: {
@@ -104,7 +104,7 @@ export function getCertificateDonutChartColorsByDaysOfExpiration(certificateStat
     return { colors: Object.keys(certificateStatByExpirationDays).map((key) => getColorByDaysOfExpiration(key)) };
 }
 
-const baseColors = ['#5d80f9', '#00a0e3', '#2b2a29', '#eb3349', '#1ab394', '#f3c363', '#6c757d', '#3754a5', '#3fb24d', '#1473b5'];
+const baseColors = ['#5d80f9', '#00a0e3', '#2b2a29', '#EF4444', '#14B8A6', '#f3c363', '#6c757d', '#3754a5', '#3fb24d', '#1473b5'];
 
 function hslToHex(h: number, s: number, l: number): string {
     l /= 100;

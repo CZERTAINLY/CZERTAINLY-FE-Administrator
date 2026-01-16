@@ -1,26 +1,31 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router';
-import { Container } from 'reactstrap';
+import { Link } from 'react-router';
 
 import { actions as profileApprovalActions, selectors as profileApprovalSelector } from 'ducks/approval-profiles';
 
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import Dialog from 'components/Dialog';
+import ApprovalProfileForm from '../form';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { LockWidgetNameEnum } from 'types/user-interface';
 
 export default function ApprovalProfilesList() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
     const [pageNumber, setPageNumber] = useState<number>(1);
     const [pageSize, setPageSize] = useState<number>(10);
 
     const profileApprovalList = useSelector(profileApprovalSelector.profileApprovalList);
     const profileApprovalListTotalItems = useSelector(profileApprovalSelector.totalItems);
     const isFetchingList = useSelector(profileApprovalSelector.isFetchingList);
+    const isCreating = useSelector(profileApprovalSelector.isCreating);
+    const isUpdating = useSelector(profileApprovalSelector.isUpdating);
 
     const isBusy = useMemo(() => isFetchingList, [isFetchingList]);
+
+    const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+    const [editingApprovalProfileId, setEditingApprovalProfileId] = useState<string | undefined>(undefined);
 
     const getFreshData = useCallback(() => {
         dispatch(profileApprovalActions.listApprovalProfiles({ itemsPerPage: pageSize, pageNumber }));
@@ -30,9 +35,37 @@ export default function ApprovalProfilesList() {
         getFreshData();
     }, [getFreshData]);
 
+    const wasCreating = useRef(isCreating);
+    const wasUpdating = useRef(isUpdating);
+
+    useEffect(() => {
+        if (wasCreating.current && !isCreating) {
+            setIsAddModalOpen(false);
+            getFreshData();
+        }
+        wasCreating.current = isCreating;
+    }, [isCreating, getFreshData]);
+
+    useEffect(() => {
+        if (wasUpdating.current && !isUpdating) {
+            setEditingApprovalProfileId(undefined);
+            getFreshData();
+        }
+        wasUpdating.current = isUpdating;
+    }, [isUpdating, getFreshData]);
+
+    const handleOpenAddModal = useCallback(() => {
+        setIsAddModalOpen(true);
+    }, []);
+
+    const handleCloseAddModal = useCallback(() => {
+        setIsAddModalOpen(false);
+        setEditingApprovalProfileId(undefined);
+    }, []);
+
     const onAddClick = useCallback(() => {
-        navigate(`./add`);
-    }, [navigate]);
+        handleOpenAddModal();
+    }, [handleOpenAddModal]);
 
     const buttons: WidgetButtonProps[] = useMemo(
         () => [
@@ -40,12 +73,10 @@ export default function ApprovalProfilesList() {
                 icon: 'plus',
                 disabled: false,
                 tooltip: 'Create',
-                onClick: () => {
-                    onAddClick();
-                },
+                onClick: handleOpenAddModal,
             },
         ],
-        [onAddClick],
+        [handleOpenAddModal],
     );
 
     const approvalProfilesTableHeader: TableHeader[] = useMemo(
@@ -98,32 +129,43 @@ export default function ApprovalProfilesList() {
     );
 
     return (
-        <Container className="themed-container" fluid>
-            <Widget
-                title="List of Approval Profiles"
-                busy={isBusy}
-                widgetLockName={LockWidgetNameEnum.ListOfApprovalProfiles}
-                widgetButtons={buttons}
-                titleSize="large"
-                refreshAction={getFreshData}
-            >
-                <br />
-                <CustomTable
-                    headers={approvalProfilesTableHeader}
-                    data={approvalProfilesTableData}
-                    hasPagination={true}
-                    onPageChanged={setPageNumber}
-                    onPageSizeChanged={setPageSize}
-                    paginationData={{
-                        pageSize: pageSize,
-                        totalItems: profileApprovalListTotalItems || 0,
-                        itemsPerPageOptions: [10, 20, 50, 100],
-                        loadedPageSize: pageSize,
-                        totalPages: profileApprovalListTotalItems ? Math.ceil(profileApprovalListTotalItems / pageSize) : 0,
-                        page: pageNumber,
-                    }}
-                />
-            </Widget>
-        </Container>
+        <Widget
+            title="List of Approval Profiles"
+            busy={isBusy}
+            widgetLockName={LockWidgetNameEnum.ListOfApprovalProfiles}
+            widgetButtons={buttons}
+            titleSize="large"
+            refreshAction={getFreshData}
+        >
+            <CustomTable
+                headers={approvalProfilesTableHeader}
+                data={approvalProfilesTableData}
+                hasPagination={true}
+                onPageChanged={setPageNumber}
+                onPageSizeChanged={setPageSize}
+                paginationData={{
+                    pageSize: pageSize,
+                    totalItems: profileApprovalListTotalItems || 0,
+                    itemsPerPageOptions: [10, 20, 50, 100],
+                    loadedPageSize: pageSize,
+                    totalPages: profileApprovalListTotalItems ? Math.ceil(profileApprovalListTotalItems / pageSize) : 0,
+                    page: pageNumber,
+                }}
+            />
+
+            <Dialog
+                isOpen={isAddModalOpen || !!editingApprovalProfileId}
+                toggle={handleCloseAddModal}
+                caption={editingApprovalProfileId ? 'Edit Approval Profile' : 'Create Approval Profile'}
+                size="xl"
+                body={
+                    <ApprovalProfileForm
+                        approvalProfileId={editingApprovalProfileId}
+                        onCancel={handleCloseAddModal}
+                        onSuccess={handleCloseAddModal}
+                    />
+                }
+            />
+        </Widget>
     );
 }

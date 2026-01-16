@@ -135,11 +135,21 @@ const updateTokenProfile: AppEpic = (action$, state$, deps) => {
 
                                 appRedirectActions.redirect({ url: action.payload.redirect! }),
                             ),
-                            of(
-                                slice.actions.updateTokenProfileSuccess({
-                                    tokenProfile: transformTokenProfileDetailResponseDtoToModel(tokenProfileDto),
-                                    redirect: action.payload.redirect,
-                                }),
+                            iif(
+                                () => !!action.payload.usesGlobalModal,
+                                of(
+                                    slice.actions.updateTokenProfileSuccess({
+                                        tokenProfile: transformTokenProfileDetailResponseDtoToModel(tokenProfileDto),
+                                        redirect: action.payload.redirect,
+                                    }),
+                                    userInterfaceActions.resetState(),
+                                ),
+                                of(
+                                    slice.actions.updateTokenProfileSuccess({
+                                        tokenProfile: transformTokenProfileDetailResponseDtoToModel(tokenProfileDto),
+                                        redirect: action.payload.redirect,
+                                    }),
+                                ),
                             ),
                         ),
                     ),

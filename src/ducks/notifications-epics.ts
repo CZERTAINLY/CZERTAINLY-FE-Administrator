@@ -213,7 +213,7 @@ const createNotificationInstance: AppEpic = (action$, state$, deps) => {
                     mergeMap((res) =>
                         of(
                             slice.actions.createNotificationInstanceSuccess(),
-                            alertActions.success('Notifications Instance added successfully.'),
+                            'Notifications Instance added successfully.',
                             appRedirectActions.redirect({ url: `/notificationinstances/detail/${res.uuid}` }),
                         ),
                     ),
@@ -243,7 +243,7 @@ const editNotificationInstance: AppEpic = (action$, state$, deps) => {
                     mergeMap((res) =>
                         of(
                             slice.actions.editNotificationInstanceSuccess(),
-                            alertActions.success('Notifications Instance updated successfully.'),
+                            'Notifications Instance updated successfully.',
                             appRedirectActions.redirect({ url: `/notificationinstances/detail/${res.uuid}` }),
                         ),
                     ),
@@ -301,7 +301,7 @@ const deleteNotificationInstance: AppEpic = (action$, state$, deps) => {
                 mergeMap((res) =>
                     of(
                         slice.actions.deleteNotificationInstanceSuccess({ uuid: action.payload.uuid }),
-                        alertActions.success('Notifications Instance deleted successfully.'),
+                        'Notifications Instance deleted successfully.',
                         appRedirectActions.redirect({ url: `../../../events` }),
                     ),
                 ),
@@ -369,6 +369,7 @@ const bulkMarkNotificationAsRead: AppEpic = (action$, state$, deps) => {
                     of(
                         slice.actions.bulkMarkNotificationAsReadSuccess({ markedNotificationUuids: action.payload.uuids }),
                         slice.actions.listOverviewNotifications(),
+                        `Notifications marked as read successfully`,
                     ),
                 ),
 

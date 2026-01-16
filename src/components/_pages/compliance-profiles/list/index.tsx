@@ -1,19 +1,20 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router';
-import { Badge, Container, Table } from 'reactstrap';
+import { Link } from 'react-router';
+import Container from 'components/Container';
 
 import { actions, selectors } from 'ducks/compliance-profiles';
 
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
+import ComplianceProfileForm from '../form';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { LockWidgetNameEnum } from 'types/user-interface';
+import Badge from 'components/Badge';
 
 export default function AdministratorsList() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const checkedRows = useSelector(selectors.checkedRows);
     const complianceProfiles = useSelector(selectors.complianceProfiles);
@@ -24,11 +25,13 @@ export default function AdministratorsList() {
     const isDeleting = useSelector(selectors.isDeleting);
     const isBulkDeleting = useSelector(selectors.isBulkDeleting);
     const isBulkForceDeleting = useSelector(selectors.isBulkForceDeleting);
+    const isCreating = useSelector(selectors.isCreating);
 
     const isBusy = isFetching || isDeleting || isBulkDeleting || isBulkForceDeleting;
 
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
     const [confirmForceDelete, setConfirmForceDelete] = useState<boolean>(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
 
     const [complianceCheck, setComplianceCheck] = useState<boolean>(false);
 
@@ -45,9 +48,27 @@ export default function AdministratorsList() {
         setConfirmForceDelete(bulkDeleteErrorMessages.length > 0);
     }, [bulkDeleteErrorMessages]);
 
+    const wasCreating = useRef(isCreating);
+
+    useEffect(() => {
+        if (wasCreating.current && !isCreating) {
+            setIsAddModalOpen(false);
+            getFreshData();
+        }
+        wasCreating.current = isCreating;
+    }, [isCreating, getFreshData]);
+
+    const handleOpenAddModal = useCallback(() => {
+        setIsAddModalOpen(true);
+    }, []);
+
+    const handleCloseAddModal = useCallback(() => {
+        setIsAddModalOpen(false);
+    }, []);
+
     const onAddClick = useCallback(() => {
-        navigate(`./add`);
-    }, [navigate]);
+        handleOpenAddModal();
+    }, [handleOpenAddModal]);
 
     const onDeleteConfirmed = useCallback(() => {
         dispatch(actions.bulkDeleteComplianceProfiles({ uuids: checkedRows }));
@@ -77,9 +98,7 @@ export default function AdministratorsList() {
                 icon: 'plus',
                 disabled: false,
                 tooltip: 'Create',
-                onClick: () => {
-                    onAddClick();
-                },
+                onClick: handleOpenAddModal,
                 id: 'create-compliance-profile',
             },
             {
@@ -101,38 +120,40 @@ export default function AdministratorsList() {
                 id: 'delete-compliance-profile',
             },
         ],
-        [checkedRows, onAddClick],
+        [checkedRows, handleOpenAddModal],
     );
 
     const forceDeleteBody = useMemo(
         () => (
             <div>
                 <div>
-                    Failed to delete {checkedRows.length > 1 ? 'Compliance Profiles' : 'an Compliance Profile'}. Please find the details
+                    Failed to delete {checkedRows.length > 1 ? 'Compliance Profiles' : 'a Compliance Profile'}. Please find the details
                     below:
                 </div>
 
-                <Table className="table-hover" size="sm">
+                <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
                     <thead>
                         <tr>
-                            <th>
+                            <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
                                 <b>Name</b>
                             </th>
-                            <th>
+                            <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
                                 <b>Dependencies</b>
                             </th>
                         </tr>
                     </thead>
 
-                    <tbody>
+                    <tbody className="divide-y divide-gray-200 dark:divide-neutral-700">
                         {bulkDeleteErrorMessages?.map((message) => (
-                            <tr>
-                                <td>{message.name}</td>
-                                <td>{message.message}</td>
+                            <tr className="hover:bg-gray-50 dark:hover:bg-neutral-800">
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200">{message.name}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200">
+                                    {message.message}
+                                </td>
                             </tr>
                         ))}
                     </tbody>
-                </Table>
+                </table>
             </div>
         ),
         [bulkDeleteErrorMessages, checkedRows.length],
@@ -180,16 +201,16 @@ export default function AdministratorsList() {
                         {complianceProfile.name}
                     </Link>,
                     complianceProfile.description || '',
-                    <Badge key={complianceProfile.uuid} color="secondary" searchvalue={complianceProfile.providerRulesCount}>
+                    <Badge key={complianceProfile.uuid} color="secondary">
                         {complianceProfile.providerRulesCount.toString()}
                     </Badge>,
-                    <Badge key={complianceProfile.uuid} color="secondary" searchvalue={complianceProfile.providerGroupsCount}>
+                    <Badge key={complianceProfile.uuid} color="secondary">
                         {complianceProfile.providerGroupsCount.toString()}
                     </Badge>,
-                    <Badge key={complianceProfile.uuid} color="secondary" searchvalue={complianceProfile.internalRulesCount}>
+                    <Badge key={complianceProfile.uuid} color="secondary">
                         {complianceProfile.internalRulesCount.toString()}
                     </Badge>,
-                    <Badge key={complianceProfile.uuid} color="secondary" searchvalue={complianceProfile.associations}>
+                    <Badge key={complianceProfile.uuid} color="secondary">
                         {complianceProfile.associations.toString()}
                     </Badge>,
                 ],
@@ -198,7 +219,7 @@ export default function AdministratorsList() {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <Container>
             <Widget
                 title="List of Compliance Profiles"
                 busy={isBusy}
@@ -208,7 +229,6 @@ export default function AdministratorsList() {
                 refreshAction={getFreshData}
                 dataTestId="compliance-profile-list"
             >
-                <br />
                 <CustomTable
                     headers={complianceProfilesTableHeader}
                     data={complianceProfilesTableData}
@@ -225,11 +245,12 @@ export default function AdministratorsList() {
                 body={`You are about to delete ${
                     checkedRows.length > 1 ? 'Compliance Profiles' : 'a Compliance Profile'
                 } which may have associated RA
-                   Profiles(s). Is this what you want to do?`}
+                   Profile(s). Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
+                icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                 ]}
                 dataTestId="delete-compliance-profile-dialog"
             />
@@ -241,7 +262,7 @@ export default function AdministratorsList() {
                 toggle={() => setConfirmForceDelete(false)}
                 buttons={[
                     { color: 'danger', onClick: onForceDeleteConfirmed, body: 'Force delete' },
-                    { color: 'secondary', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
+                    { color: 'secondary', variant: 'outline', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
                 ]}
                 dataTestId="force-delete-compliance-profile-dialog"
             />
@@ -251,11 +272,20 @@ export default function AdministratorsList() {
                 caption={`Initiate Compliance Check`}
                 body={'Initiate the compliance check for the selected Compliance Profile(s)?'}
                 toggle={() => setComplianceCheck(false)}
+                noBorder
                 buttons={[
+                    { color: 'primary', variant: 'outline', onClick: () => setComplianceCheck(false), body: 'Cancel' },
                     { color: 'primary', onClick: onComplianceCheckConfirmed, body: 'Yes' },
-                    { color: 'secondary', onClick: () => setComplianceCheck(false), body: 'Cancel' },
                 ]}
                 dataTestId="compliance-check-dialog"
+            />
+
+            <Dialog
+                isOpen={isAddModalOpen}
+                toggle={handleCloseAddModal}
+                caption="Create Compliance Profile"
+                size="xl"
+                body={<ComplianceProfileForm onCancel={handleCloseAddModal} />}
             />
         </Container>
     );

@@ -24,6 +24,6 @@
             "ducks/*": ["./src/ducks/*"]
         }
     },
-    "include": ["src", "cypress", "cypress.d.ts", "."],
+    "include": ["src", "."],
     "files": ["src/types/global.d.ts", "src/react-app-env.d.ts"]
 }

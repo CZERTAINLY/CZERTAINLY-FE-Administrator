@@ -1,27 +1,27 @@
-export function inventoryStatus(status: String) {
+export function inventoryStatus(status: string) {
     switch (status) {
         case 'Success':
-            return ['Success', 'success'];
+            return ['Success', 'var(--status-success-color)'];
 
         case 'registered':
-            return ['Reistered', 'success'];
+            return ['Reistered', 'var(--status-success-color)'];
 
         case 'connected':
-            return ['Connected', 'success'];
+            return ['Connected', 'var(--status-success-color)'];
 
         case 'failed':
-            return ['Failed', 'danger'];
+            return ['Failed', 'var(--status-danger-color)'];
 
         case 'Failed':
-            return ['Failed', 'danger'];
+            return ['Failed', 'var(--status-danger-color)'];
 
         case 'offline':
-            return ['Offline', 'danger'];
+            return ['Offline', 'var(--status-danger-color)'];
 
         case 'waitingForApproval':
-            return ['Waiting for Approval', 'warning'];
+            return ['Waiting for Approval', 'var(--status-warning-color)'];
 
         default:
-            return [status || 'Unknown', 'dark'];
+            return [status || 'Unknown', 'var(--status-gray-color)'];
     }
 }

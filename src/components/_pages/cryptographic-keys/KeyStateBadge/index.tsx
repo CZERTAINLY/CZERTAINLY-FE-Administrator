@@ -1,6 +1,6 @@
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { useSelector } from 'react-redux';
-import { Badge } from 'reactstrap';
+import Badge from 'components/Badge';
 import { KeyState, PlatformEnum } from 'types/openapi';
 
 interface Props {

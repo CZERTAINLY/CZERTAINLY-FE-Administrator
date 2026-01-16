@@ -105,6 +105,7 @@ jobs:
             -Dsonar.pullrequest.key=${{ env.PR_NUMBER }}
             -Dsonar.pullrequest.branch=${{ env.PR_BRANCH }}
             -Dsonar.pullrequest.base=${{ env.BASE_BRANCH }}
+            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
 
       - name: Finalize GitHub Check
         if: always()

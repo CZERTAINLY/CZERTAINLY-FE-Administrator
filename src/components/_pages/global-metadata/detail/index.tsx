@@ -7,18 +7,19 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions, selectors } from 'ducks/globalMetadata';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router';
+import { useParams } from 'react-router';
 
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import { Badge, Container } from 'reactstrap';
+import Badge from 'components/Badge';
 import { PlatformEnum, Resource } from 'types/openapi';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { getEditAndDeleteWidgetButtons, createWidgetDetailHeaders } from 'utils/widget';
-import GoBackButton from 'components/GoBackButton';
+import Container from 'components/Container';
+import Breadcrumb from 'components/Breadcrumb';
+import GlobalMetadataForm from '../form';
 
 export default function GlobalMetadataDetail() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const { id } = useParams();
 
@@ -27,6 +28,7 @@ export default function GlobalMetadataDetail() {
     const attributeContentTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.AttributeContentType));
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
     const getFreshGlobalMetadata = useCallback(() => {
         if (!id) return;
@@ -40,9 +42,18 @@ export default function GlobalMetadataDetail() {
         }
     }, [dispatch, globalMetadata, id]);
 
+    const handleOpenEditModal = useCallback(() => {
+        setIsEditModalOpen(true);
+    }, []);
+
+    const handleCloseEditModal = useCallback(() => {
+        setIsEditModalOpen(false);
+        getFreshGlobalMetadata();
+    }, [getFreshGlobalMetadata]);
+
     const onEditClick = useCallback(() => {
-        navigate(`../../edit/${globalMetadata?.uuid}`, { relative: 'path' });
-    }, [globalMetadata, navigate]);
+        handleOpenEditModal();
+    }, [handleOpenEditModal]);
 
     const onDeleteConfirmed = useCallback(() => {
         if (!globalMetadata) return;
@@ -95,33 +106,52 @@ export default function GlobalMetadataDetail() {
     );
 
     return (
-        <Container className="themed-container" fluid>
-            <GoBackButton
-                style={{ marginBottom: '10px' }}
-                forcedPath="/globalmetadata"
-                text={`${getEnumLabel(resourceEnum, Resource.GlobalMetadata)} Inventory`}
-            />
-            <Widget
-                title="Global Metadata Details"
-                busy={isFetchingDetail}
-                widgetButtons={buttons}
-                titleSize="large"
-                refreshAction={getFreshGlobalMetadata}
-                widgetLockName={LockWidgetNameEnum.GlobalMetadataDetails}
-            >
-                <CustomTable headers={detailHeaders} data={detailData} />
-            </Widget>
-
-            <Dialog
-                isOpen={confirmDelete}
-                caption="Delete Global Metadata"
-                body="You are about to delete a Global Metadata. Is this what you want to do?"
-                toggle={() => setConfirmDelete(false)}
-                buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Yes, delete' },
-                    { color: 'secondary', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+        <div>
+            <Breadcrumb
+                items={[
+                    { label: `${getEnumLabel(resourceEnum, Resource.GlobalMetadata)} Inventory`, href: '/globalmetadata' },
+                    { label: globalMetadata?.name || 'Global Metadata Details', href: '' },
                 ]}
             />
-        </Container>
+
+            <Container>
+                <Widget
+                    title="Global Metadata Details"
+                    busy={isFetchingDetail}
+                    widgetButtons={buttons}
+                    titleSize="large"
+                    refreshAction={getFreshGlobalMetadata}
+                    widgetLockName={LockWidgetNameEnum.GlobalMetadataDetails}
+                >
+                    <CustomTable headers={detailHeaders} data={detailData} />
+                </Widget>
+
+                <Dialog
+                    isOpen={confirmDelete}
+                    caption="Delete Global Metadata"
+                    body="You are about to delete a Global Metadata. Is this what you want to do?"
+                    toggle={() => setConfirmDelete(false)}
+                    icon="delete"
+                    buttons={[
+                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                        { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    ]}
+                />
+
+                <Dialog
+                    isOpen={isEditModalOpen}
+                    toggle={handleCloseEditModal}
+                    caption="Edit Global Metadata"
+                    size="xl"
+                    body={
+                        <GlobalMetadataForm
+                            globalMetadataId={globalMetadata?.uuid}
+                            onCancel={handleCloseEditModal}
+                            onSuccess={handleCloseEditModal}
+                        />
+                    }
+                />
+            </Container>
+        </div>
     );
 }

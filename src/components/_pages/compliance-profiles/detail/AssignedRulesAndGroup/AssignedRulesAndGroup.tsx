@@ -1,8 +1,8 @@
 import Widget from 'components/Widget';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import Select, { ClearIndicatorProps, components } from 'react-select';
-import { Badge, Col, Label, Row, UncontrolledTooltip } from 'reactstrap';
+import Select from 'components/Select';
+import Label from 'components/Label';
 import { actions, selectors } from 'ducks/compliance-profiles';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { ComplianceProfileDtoV2, ComplianceRuleAvailabilityStatus, PlatformEnum, Resource } from 'types/openapi';
@@ -23,6 +23,7 @@ import {
 import { ResourceBadges } from 'components/_pages/compliance-profiles/detail/Components/ResourceBadges';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { TRuleGroupType } from 'types/complianceProfiles';
+import Badge from 'components/Badge';
 
 interface Props {
     profile: ComplianceProfileDtoV2 | undefined;
@@ -84,9 +85,14 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
                                 {capitalize(ruleOrGroup.availabilityStatus as ComplianceRuleAvailabilityStatus)}
                             </Badge>
                             {ruleOrGroup.updatedReason && (
-                                <UncontrolledTooltip target={`status-${ruleOrGroup.uuid.replaceAll('-', '_')}`}>
-                                    {truncateText(capitalize(ruleOrGroup.updatedReason), 100)}
-                                </UncontrolledTooltip>
+                                <div className="hs-tooltip inline-block">
+                                    <div
+                                        className="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 invisible transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded shadow-sm dark:bg-neutral-700"
+                                        role="tooltip"
+                                    >
+                                        {truncateText(capitalize(ruleOrGroup.updatedReason), 100)}
+                                    </div>
+                                </div>
                             )}
                         </div>,
                         getTypeTableColumn(ruleOrGroup, setSelectedEntityDetails, setIsEntityDetailMenuOpen),
@@ -246,17 +252,6 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
         }
     }, [assignedRulesSource, getListOfKinds]);
 
-    type AssignedRulesSourceClearProps = ClearIndicatorProps<any, false>;
-    const AssignedRulesSourceClear = useCallback(
-        (props: AssignedRulesSourceClearProps) => (
-            <components.ClearIndicator
-                {...props}
-                innerProps={{ ...props.innerProps, 'data-testid': 'assigned-rules-source-clear-button' } as any}
-            />
-        ),
-        [],
-    );
-
     return (
         <Widget
             title="Assigned Rules & Groups"
@@ -266,63 +261,47 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
             lockSize="large"
             dataTestId="assigned-rules-and-group-widget"
         >
-            <Row xs="1" sm="1" md="2" lg="2" xl="2">
-                <Col style={{ width: '100%' }}>
-                    <Label for="assignedRulesSource">Rules Source</Label>
-                    <Select
-                        id="assignedRulesSource"
-                        inputId="assignedRulesSource"
-                        placeholder="Select..."
-                        maxMenuHeight={140}
-                        options={rulesSourceOptions}
-                        value={rulesSourceOptions.find((opt) => opt.value === assignedRulesSource) || null}
-                        menuPlacement="auto"
-                        onChange={(event) => {
-                            setAssignedResourceType('All');
-                            setAssignedRulesSource((event?.value as 'Internal' | 'Provider') || null);
-                        }}
-                        isClearable
-                        components={{
-                            ClearIndicator: AssignedRulesSourceClear,
-                        }}
-                    />
-                </Col>
-            </Row>
+            <Label htmlFor="assignedRulesSource">Rules Source</Label>
+            <Select
+                id="assignedRulesSource"
+                placeholder="Select..."
+                options={rulesSourceOptions}
+                value={assignedRulesSource || ''}
+                onChange={(value) => {
+                    setAssignedResourceType('All');
+                    setAssignedRulesSource((value as 'Internal' | 'Provider') || null);
+                }}
+                isClearable
+            />
             {assignedRulesSource === 'Provider' && (
-                <Row xs="1" sm="1" md="2" lg="2" xl="2" style={{ marginTop: '10px' }}>
-                    <Col>
-                        <Label for="assignedProvider">Provider</Label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2.5">
+                    <div>
+                        <Label htmlFor="assignedProvider">Provider</Label>
                         <Select
                             id="assignedProvider"
-                            inputId="assignedProvider"
                             placeholder="Select..."
-                            maxMenuHeight={140}
                             options={assignedProvidersList}
-                            value={assignedProvidersList.find((opt) => opt.value === selectedAssignedProvider) || null}
-                            menuPlacement="auto"
-                            onChange={(event) => {
-                                setSelectedAssignedProvider(event?.value || null);
+                            value={selectedAssignedProvider || ''}
+                            onChange={(value) => {
+                                setSelectedAssignedProvider((value as string) || null);
                             }}
                             isClearable
                         />
-                    </Col>
-                    <Col>
-                        <Label for="assignedKind">Kind</Label>
+                    </div>
+                    <div>
+                        <Label htmlFor="assignedKind">Kind</Label>
                         <Select
                             id="assignedKind"
-                            inputId="assignedKind"
                             placeholder="Select..."
-                            maxMenuHeight={140}
                             options={assignedKindsList}
-                            value={assignedKindsList.find((opt) => opt.value === selectedAssignedKind) || null}
-                            onChange={(event) => {
-                                setSelectedAssignedKind(event?.value || null);
+                            value={selectedAssignedKind || ''}
+                            onChange={(value) => {
+                                setSelectedAssignedKind((value as string) || null);
                             }}
-                            menuPlacement="auto"
                             isClearable
                         />
-                    </Col>
-                </Row>
+                    </div>
+                </div>
             )}
             <ResourceBadges
                 resources={assignedRulesAndGroupsResources}
@@ -334,7 +313,7 @@ export default function AssignedRulesAndGroup({ profile, setSelectedEntityDetail
                 <CustomTable
                     headers={tableHeadersAssignedRulesAndGroups}
                     data={tableDataAssignedRulesAndGroups}
-                    hasPagination={true}
+                    hasPagination
                     canSearch={true}
                 />
             </Widget>

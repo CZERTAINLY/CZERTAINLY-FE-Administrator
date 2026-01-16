@@ -5,9 +5,6 @@
 /.pnp
 .pnp.js
 
-# testing
-/coverage
-
 # production
 /build
 
@@ -31,6 +28,11 @@ yarn-error.log*
 src/*.pem
 src/setupProxy.cjs
 
-# Cypress
-cypress.env.json
-.nyc_output/
+# Playwright
+/playwright-report/
+/playwright/.cache/
+/test-results/
+
+# Coverage
+/coverage/
+/monocart-report/

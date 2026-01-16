@@ -1,12 +1,10 @@
-import cx from 'classnames';
 import { selectors as enumSelectors } from 'ducks/enums';
 import { EntityType, selectors } from 'ducks/filters';
 import { selectors as rulesSelectors } from 'ducks/rules';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { Spinner } from 'reactstrap';
+import Spinner from 'components/Spinner';
 import { ConditionItemDto, PlatformEnum } from 'types/openapi';
-import styles from './conditionsItemsList.module.scss';
 import { renderConditionItems } from 'utils/condition-badges';
 
 interface ConditionsTableViewerProps {
@@ -30,37 +28,35 @@ const ConditionsItemsList = ({ conditionItems = [], conditionName, conditionUuid
         [isFetchingAvailableFiltersConditions, isFetchingConditionDetails],
     );
 
-    if (isLoading) return <Spinner color="gray" active={isFetchingConditionDetails} />;
+    if (isLoading) return <Spinner active={isFetchingConditionDetails} />;
 
     return smallerBadges ? (
-        <div>
-            <h6 className={cx('text-muted', styles.groupConditionTitle)}>{`${conditionName}'s Condition Items`}</h6>
-            <div className="d-flex flex-wrap">
+        <div className="flex gap-2 items-center">
+            <h6 className="text-gray-500">{`${conditionName}'s Condition Items`}</h6>
+            <div className="flex flex-wrap">
                 {renderConditionItems(
                     conditionItems,
                     availableFilters,
                     platformEnums,
                     searchGroupEnum,
                     filterConditionOperatorEnum,
-                    styles.groupConditionBadgeOnly,
+                    '',
                     'small',
                 )}
             </div>
         </div>
     ) : (
-        <div className={styles.groupConditionContainerDiv} key={conditionUuid}>
-            <h6 className={cx('text-muted', styles.groupConditionTitle)}>{`${conditionName}`}</h6>
-            <div className="ms-3">
-                {renderConditionItems(
-                    conditionItems,
-                    availableFilters,
-                    platformEnums,
-                    searchGroupEnum,
-                    filterConditionOperatorEnum,
-                    styles.groupConditionBadge,
-                    'badge',
-                )}
-            </div>
+        <div key={conditionUuid} className="flex gap-2 items-center">
+            <h6 className="text-gray-500">{`${conditionName}`}</h6>
+            {renderConditionItems(
+                conditionItems,
+                availableFilters,
+                platformEnums,
+                searchGroupEnum,
+                filterConditionOperatorEnum,
+                '',
+                'badge',
+            )}
         </div>
     );
 };

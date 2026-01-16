@@ -1,5 +1,5 @@
-import cx from 'classnames';
-import React, { useCallback, useState } from 'react';
+import cn from 'classnames';
+import React, { useCallback, useMemo, useState } from 'react';
 
 import Spinner from 'components/Spinner';
 import WidgetButtons, { WidgetButtonProps } from 'components/WidgetButtons';
@@ -7,9 +7,9 @@ import WidgetLock from 'components/WidgetLock';
 import { selectors } from 'ducks/user-interface';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router';
-import { Button, Card, CardBody, CardHeader, Collapse } from 'reactstrap';
 import { LockWidgetNameEnum } from 'types/user-interface';
-import style from './Widget.module.scss';
+import { RefreshCw } from 'lucide-react';
+import Button from 'components/Button';
 
 interface WidgetInfoCard {
     title: string;
@@ -23,7 +23,8 @@ interface Props {
     title?: string;
     titleLink?: string;
     titleSize?: 'small' | 'medium' | 'large' | 'larger';
-    titleBoldness?: 'normal' | 'bold' | 'bolder';
+    titleBoldness?: 'normal' | 'bold' | 'semi-bold';
+    titleColor?: string;
     className?: string;
     children?: React.ReactNode | React.ReactNode[];
     busy?: boolean;
@@ -36,6 +37,7 @@ interface Props {
     widgetInfoCard?: WidgetInfoCard;
     innerContainerProps?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
     dataTestId?: string;
+    noBorder?: boolean;
 }
 
 function Widget({
@@ -44,7 +46,8 @@ function Widget({
     titleLink,
     titleSize = 'medium',
     widgetButtons,
-    titleBoldness = 'normal',
+    titleBoldness = 'bold',
+    titleColor = 'var(--dark-gray-color)',
     className,
     children = [],
     busy = false,
@@ -56,8 +59,10 @@ function Widget({
     widgetInfoCard,
     innerContainerProps,
     dataTestId,
+    noBorder = false,
 }: Props) {
-    const widgetLock = useSelector(selectors.selectWidgetLocks).find(
+    const widgetLocks = useSelector(selectors.selectWidgetLocks) || [];
+    const widgetLock = widgetLocks.find(
         (lock) => lock.widgetName === widgetLockName || (Array.isArray(widgetLockName) && widgetLockName.includes(lock.widgetName)),
     );
     const [showWidgetInfo, setShowWidgetInfo] = useState(false);
@@ -65,34 +70,35 @@ function Widget({
     const getTitleText = () =>
         title ? (
             <h5
-                className={cx(
-                    style.title,
-                    { 'fw-bold': titleBoldness === 'bold' },
-                    { 'fw-bolder': titleBoldness === 'bolder' },
-                    { 'fw-normal': titleBoldness === 'normal' },
-                    { [style.titleMedium]: titleSize === 'medium' },
-                    { [style.titleLarge]: titleSize === 'large' },
-                    { [style.titleSmall]: titleSize === 'small' },
-                    { [style.titleXL]: titleSize === 'larger' },
+                className={cn(
+                    `text-[${titleColor}]`,
+                    { 'font-bold': titleBoldness === 'bold' },
+                    { 'font-semibold': titleBoldness === 'semi-bold' },
+                    { 'font-normal': titleBoldness === 'normal' },
+                    { 'text-base': titleSize === 'medium' },
+                    { 'text-lg font-bold': titleSize === 'large' },
+                    { 'text-sm': titleSize === 'small' },
+                    { 'text-xl font-bold': titleSize === 'larger' },
                 )}
             >
                 {title}
             </h5>
         ) : null;
 
-    const renderTitle = () => (titleLink ? <Link to={titleLink}>{getTitleText()}</Link> : getTitleText());
+    const renderTitle = () =>
+        titleLink ? (
+            <Link to={titleLink} className="text-blue-600">
+                {getTitleText()}
+            </Link>
+        ) : (
+            getTitleText()
+        );
 
     const renderRefreshButton = () =>
         refreshAction ? (
-            <div className="ms-2 mb-1 me-auto">
-                <Button
-                    onClick={refreshAction}
-                    data-testid="refresh-icon"
-                    style={{ backgroundColor: 'transparent', border: 'none', padding: '1px 5px' }}
-                >
-                    <i className={cx(style.refreshIcon, 'fa fa-refresh ')} />
-                </Button>
-            </div>
+            <Button onClick={refreshAction} data-testid="refresh-icon" variant="transparent" title="Refresh">
+                <RefreshCw size={16} />
+            </Button>
         ) : null;
 
     const renderWidgetButtons = useCallback(() => {
@@ -107,41 +113,73 @@ function Widget({
         if (!updatedWidgetButtons.length) return null;
         if (hideWidgetButtons) return null;
         else {
-            return (
-                <div className="ms-auto">
-                    <WidgetButtons buttons={updatedWidgetButtons} />
-                </div>
-            );
+            return <WidgetButtons buttons={updatedWidgetButtons} justify="end" />;
         }
     }, [widgetButtons, hideWidgetButtons, widgetLock, widgetInfoCard, showWidgetInfo]);
 
+    const hasHeaderContent = useMemo(() => {
+        const hasTitle = !!title;
+        const hasRefreshButton = !!refreshAction;
+        const hasButtons = !!(widgetButtons?.length || widgetInfoCard) && !hideWidgetButtons;
+        return !!(hasTitle || hasRefreshButton || hasButtons || widgetExtraTopNode);
+    }, [title, refreshAction, widgetButtons, widgetInfoCard, hideWidgetButtons, widgetExtraTopNode]);
+
     return (
-        <section data-testid={dataTestId} className={cx(style.widget, className)} id={id}>
-            <div className="d-flex align-items-center">
-                <div>{renderTitle()}</div>
-                {renderRefreshButton()}
-                {renderWidgetButtons()}
-                {widgetExtraTopNode}
-            </div>
+        <section
+            data-testid={dataTestId}
+            className={cn(
+                'relative flex flex-col bg-white rounded-xl dark:bg-neutral-900 dark:text-neutral-400 w-full',
+                {
+                    'border border-gray-200 dark:border-neutral-700 p-4 md:p-5 shadow-2xs': !noBorder,
+                },
+                className,
+            )}
+            id={id}
+        >
+            {hasHeaderContent && (
+                <div className={cn('flex items-center justify-between flex-wrap gap-2', { 'mb-3': !!widgetLock || !!children })}>
+                    <div className="flex items-center gap-2">
+                        {renderTitle()}
+                        {renderRefreshButton()}
+                    </div>
+
+                    <div className="flex-1 flex items-center gap-2 justify-end">
+                        {renderWidgetButtons()}
+                        {widgetExtraTopNode}
+                    </div>
+                </div>
+            )}
 
             {widgetInfoCard && (
-                <Collapse isOpen={showWidgetInfo}>
-                    <Card color="default" className="my-2">
-                        <CardHeader>{widgetInfoCard.title}</CardHeader>
-                        {widgetInfoCard.heading && <h2 className="ms-3 mb-0 mt-3">{widgetInfoCard.heading}</h2>}
-                        <CardBody>
-                            {widgetInfoCard.description && <p>{widgetInfoCard.description}</p>}
+                <div
+                    className={cn('overflow-hidden transition-all duration-300 ease-in-out my-2', {
+                        'max-h-0 opacity-0': !showWidgetInfo,
+                        'max-h-[1000px] opacity-100': showWidgetInfo,
+                    })}
+                >
+                    <div className="my-2 border border-gray-200 dark:border-neutral-700 rounded-lg">
+                        {widgetInfoCard.heading && (
+                            <h2 className="px-4 pt-3 mb-0 text-base font-semibold text-gray-800 dark:text-white">
+                                {widgetInfoCard.heading}
+                            </h2>
+                        )}
+                        <div className="px-4 py-3">
+                            {widgetInfoCard.description && (
+                                <p className="text-sm text-gray-700 dark:text-neutral-300 mb-0">
+                                    {widgetInfoCard.title}: {widgetInfoCard.description}
+                                </p>
+                            )}
 
                             {widgetInfoCard.notesList && (
-                                <ul>
+                                <ul className="mt-2 space-y-1 list-disc list-inside text-sm text-gray-700 dark:text-neutral-300">
                                     {widgetInfoCard.notesList.map((note, index) => (
                                         <li key={index}>{note}</li>
                                     ))}
                                 </ul>
                             )}
-                        </CardBody>
-                    </Card>
-                </Collapse>
+                        </div>
+                    </div>
+                </div>
             )}
             {widgetLock ? (
                 <WidgetLock
