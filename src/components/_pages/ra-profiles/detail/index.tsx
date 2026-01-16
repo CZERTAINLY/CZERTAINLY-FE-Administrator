@@ -1190,6 +1190,7 @@ export default function RaProfileDetail() {
                 })}
                 toggle={() => setCertificateValidationDialog(false)}
                 buttons={[]}
+                size="md"
             />
 
             <Dialog

@@ -10,12 +10,13 @@ interface Props {
     children?: React.ReactNode;
     required?: boolean;
     className?: string;
+    onClick?: () => void;
 }
 
-function Label({ htmlFor, title, children, required, className }: Props) {
+function Label({ htmlFor, title, children, required, className, onClick }: Props) {
     const defaultClasses = 'block text-left text-sm font-medium mb-2 text-center dark:text-white text-[var(--dark-gray-color)]';
     return (
-        <label htmlFor={htmlFor} className={cn(defaultClasses, className)}>
+        <label htmlFor={htmlFor} className={cn(defaultClasses, className)} onClick={onClick}>
             {title || children}
             {required && <span className="text-red-500"> *</span>}
         </label>

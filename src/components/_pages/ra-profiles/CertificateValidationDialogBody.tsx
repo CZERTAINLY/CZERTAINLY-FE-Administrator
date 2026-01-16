@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import Button from 'components/Button';
@@ -10,6 +10,8 @@ import { actions, selectors } from 'ducks/ra-profiles';
 import { RaProfileResponseModel } from 'types/ra-profiles';
 import TextInput from 'components/TextInput';
 import Switch from 'components/Switch';
+import Container from 'components/Container';
+import Label from 'components/Label';
 import { buildValidationRules } from 'utils/validators-helper';
 import ProgressButton from 'components/ProgressButton';
 import { isObjectSame } from 'utils/common-utils';
@@ -59,7 +61,11 @@ export default function CertificateValidationDialogBody({ raProfile, platformSet
         defaultValues,
     });
 
-    const { control, handleSubmit, formState, watch } = methods;
+    const { control, handleSubmit, formState, watch, reset } = methods;
+
+    useEffect(() => {
+        reset(defaultValues);
+    }, [raProfile?.uuid, reset, defaultValues]);
 
     const onSubmit = useCallback(
         (values: FormValues) => {
@@ -147,18 +153,17 @@ export default function CertificateValidationDialogBody({ raProfile, platformSet
                         control={control}
                         render={({ field }) => (
                             <Switch
-                                id="usePlatformSettings"
-                                label="Use Platform Certificate Validation Settings"
+                                id="usePlatformSettingsEdit"
+                                secondaryLabel="Use Platform Certificate Validation Settings"
                                 checked={field.value || false}
                                 onChange={field.onChange}
+                                className="!mb-4"
                             />
                         )}
                     />
                     {watchedUsePlatformSettings ? (
                         <>
-                            <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
-                                Current Platform Settings
-                            </label>
+                            <Label className="!text-base">Current Platform Settings</Label>
                             <CustomTable headers={certificateValidationHeaders} data={certificateValidationData} />
                         </>
                     ) : (
@@ -169,14 +174,14 @@ export default function CertificateValidationDialogBody({ raProfile, platformSet
                                 render={({ field }) => (
                                     <Switch
                                         id="enabled"
-                                        label="Enable Certificate Validation"
+                                        secondaryLabel="Enable Certificate Validation"
                                         checked={field.value || false}
                                         onChange={field.onChange}
                                     />
                                 )}
                             />
                             {watchedEnabled && (
-                                <>
+                                <div className="mt-4">
                                     <Controller
                                         name="frequency"
                                         control={control}
@@ -222,11 +227,14 @@ export default function CertificateValidationDialogBody({ raProfile, platformSet
                                             </div>
                                         )}
                                     />
-                                </>
+                                </div>
                             )}
                         </>
                     )}
-                    <div className="flex justify-end gap-2">
+                    <Container className="flex-row justify-end modal-footer" gap={4}>
+                        <Button type="button" variant="outline" color="secondary" disabled={formState.isSubmitting} onClick={onClose}>
+                            Cancel
+                        </Button>
                         <ProgressButton
                             title={'Save'}
                             inProgressTitle={'Saving...'}
@@ -234,10 +242,7 @@ export default function CertificateValidationDialogBody({ raProfile, platformSet
                             inProgress={formState.isSubmitting || isBusy}
                             type="submit"
                         />
-                        <Button type="button" variant="outline" color="secondary" disabled={formState.isSubmitting} onClick={onClose}>
-                            Cancel
-                        </Button>
-                    </div>
+                    </Container>
                 </form>
             </FormProvider>
 
