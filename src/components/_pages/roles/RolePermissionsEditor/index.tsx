@@ -255,6 +255,7 @@ function RolePermissionsEditor({
                                     const allowAllActions =
                                         permissions?.resources.find((r) => r.name === currentResource.name)?.allowAllActions || false;
                                     const isChecked =
+                                        allowAllResources ||
                                         allowAllActions ||
                                         permissions?.resources
                                             .find((r) => r.name === currentResource.name)
