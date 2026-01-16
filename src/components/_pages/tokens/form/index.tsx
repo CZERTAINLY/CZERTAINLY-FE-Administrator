@@ -82,7 +82,6 @@ export default function TokenForm({ tokenId, onCancel, onSuccess }: TokenFormPro
     );
 
     useEffect(() => {
-        dispatch(tokenActions.resetState());
         dispatch(connectorActions.clearCallbackData());
         dispatch(tokenActions.listTokenProviders());
         dispatch(customAttributesActions.listResourceCustomAttributes(Resource.Tokens));
