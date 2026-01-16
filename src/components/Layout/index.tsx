@@ -27,11 +27,11 @@ function Layout() {
                         <Outlet />
                     </ErrorBoundary>
                     <div className="grow-1" />
-                    <Alerts />
                     <Footer />
                 </main>
                 <GlobalModal />
             </div>
+            <Alerts />
         </div>
     );
 }

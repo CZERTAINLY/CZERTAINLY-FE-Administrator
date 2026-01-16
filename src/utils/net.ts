@@ -4,7 +4,14 @@ import { ErrorCodeDetailMap, ErrorCodeTexteMap, LockTypeEnum, WidgetLockErrorMod
 export function extractError(err: Error, headline: string): string {
     if (!err) return headline;
 
-    if (err instanceof AjaxError) return `${headline} (${err.status}): ${err.response?.message ?? err.response ?? err.message}`;
+    if (err instanceof AjaxError) {
+        // If backend returns a user-friendly message, use it directly
+        const backendMessage = err.response?.message;
+        if (backendMessage && typeof backendMessage === 'string' && backendMessage.trim()) {
+            return backendMessage;
+        }
+        return `${headline} (${err.status}): ${err.response ?? err.message}`;
+    }
     if (err instanceof Event) return `${headline}: Network connection failure`;
 
     return `${headline}. ${err.message}`;
