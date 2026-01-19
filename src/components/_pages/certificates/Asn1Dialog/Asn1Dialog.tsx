@@ -34,6 +34,12 @@ export default function Asn1Dialog({ content, isCSR }: Props) {
         dispatch(utilsCertificateRequestActions.reset());
     }, [dispatch]);
 
+    const onClose = useCallback(() => {
+        resetParsedData();
+        setAsn1(undefined);
+        dispatch(userInterfaceActions.hideGlobalModal());
+    }, [resetParsedData, dispatch]);
+
     useEffect(() => {
         resetParsedData();
     }, [resetParsedData]);
@@ -56,11 +62,12 @@ export default function Asn1Dialog({ content, isCSR }: Props) {
                         title: 'ASN.1 Structure',
                         content: <pre className="text-sm overflow-x-auto text-[var(--dark-gray-color)]">{asn1String}</pre>,
                         showCloseButton: true,
+                        cancelButtonCallback: onClose,
                     }),
                 );
             }
         }
-    }, [parsedCertificate, isCSR, dispatch]);
+    }, [parsedCertificate, isCSR, dispatch, onClose]);
 
     useEffect(() => {
         if (parsedCertificateRequest && isCSR) {
@@ -74,17 +81,12 @@ export default function Asn1Dialog({ content, isCSR }: Props) {
                         title: 'ASN.1 Structure',
                         content: <pre className="text-sm overflow-x-auto text-[var(--dark-gray-color)]">{asn1String}</pre>,
                         showCloseButton: true,
+                        cancelButtonCallback: onClose,
                     }),
                 );
             }
         }
-    }, [parsedCertificateRequest, isCSR, dispatch]);
-
-    const onClose = useCallback(() => {
-        resetParsedData();
-        setAsn1(undefined);
-        dispatch(userInterfaceActions.hideGlobalModal());
-    }, [resetParsedData, dispatch]);
+    }, [parsedCertificateRequest, isCSR, dispatch, onClose]);
 
     return (
         <>
