@@ -236,12 +236,14 @@ export function Attribute({
                                         return { value: v.value, label: v.label || String(v.value) };
                                     }
                                     // If it's already in the right format, return as is
-                                    return typeof v === 'object' ? v : { value: v, label: String(v) };
+                                    return typeof v === 'object'
+                                        ? { value: v, label: String(v.reference ?? v.data ?? JSON.stringify(v)) }
+                                        : { value: v, label: String(v) };
                                 });
                             }
                             return [];
                         } else {
-                            // For single select, extract primitive value
+                            // For single select, return value as-is (Select handles object comparison)
                             if (!field.value) return '';
                             if (typeof field.value === 'object' && field.value.value !== undefined) {
                                 return field.value.value;
@@ -251,10 +253,8 @@ export function Attribute({
                     };
 
                     // Convert options to the format expected by custom Select component
-                    const baseSelectOptions = (options || []).map((opt) => ({
-                        value: typeof opt.value === 'object' && opt.value !== null ? JSON.stringify(opt.value) : opt.value,
-                        label: opt.label || String(opt.value),
-                    }));
+                    // Keep options as-is (with objects) - Select component handles it
+                    const baseSelectOptions = options || [];
 
                     // Add "+" option for Add New functionality if available
                     const selectOptions = addNewAttributeValue
@@ -269,6 +269,12 @@ export function Attribute({
                         : baseSelectOptions;
 
                     const selectValue = getSelectValue();
+
+                    const isTargeted = descriptor.name === 'authority_credential';
+                    if (isTargeted) {
+                        console.log('options1111', options);
+                        console.log('selectOptions', selectOptions);
+                    }
 
                     return (
                         <>
@@ -306,19 +312,14 @@ export function Attribute({
                                     ) : (
                                         <Select
                                             id={`${name}Select`}
-                                            value={selectValue as string | number}
+                                            value={selectValue as string | number | object}
                                             onChange={(newValue) => {
                                                 // Handle Add New option
                                                 if (newValue === '__add_new__') {
                                                     handleAddNew();
                                                     return;
                                                 }
-                                                // For single select, find the full option object
-                                                const fullOption = options?.find((opt) => {
-                                                    const optValue = typeof opt.value === 'object' ? JSON.stringify(opt.value) : opt.value;
-                                                    return optValue === newValue;
-                                                });
-                                                field.onChange(fullOption || newValue);
+                                                field.onChange(newValue);
                                                 onUserInteraction();
                                             }}
                                             options={selectOptions}
@@ -472,12 +473,8 @@ export function Attribute({
 
     const createInput = (descriptor: DataAttributeModel | CustomAttributeModel): React.ReactNode => {
         if (descriptor.contentType === AttributeContentType.Codeblock) {
-            const attributeKey = name.slice(0, name.indexOf('.'));
-            const attributes = formValues[attributeKey];
-            const language = getCodeBlockLanguage(
-                attributes ? (attributes[descriptor.name]?.language ?? undefined) : undefined,
-                descriptor.content,
-            );
+            const attributeValue = formValues[name];
+            const language = getCodeBlockLanguage(attributeValue?.language ?? undefined, descriptor.content);
 
             return (
                 <>
