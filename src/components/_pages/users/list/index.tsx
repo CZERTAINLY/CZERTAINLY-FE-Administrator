@@ -266,8 +266,8 @@ export default function UsersList() {
 
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete ${checkedRows.length > 1 ? 'Users' : 'an User'}`}
-                body={`You are about to delete ${checkedRows.length > 1 ? 'Users' : 'an User'}. Is this what you want to do?`}
+                caption={`Delete ${checkedRows.length > 1 ? 'Users' : 'a User'}`}
+                body={`You are about to delete ${checkedRows.length > 1 ? 'Users' : 'a User'}. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[

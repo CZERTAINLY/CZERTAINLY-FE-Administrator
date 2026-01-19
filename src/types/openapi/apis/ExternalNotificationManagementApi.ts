@@ -108,7 +108,7 @@ export class ExternalNotificationManagementApi extends BaseAPI {
     };
 
     /**
-     * Details of an Notification instance
+     * Details of a Notification instance
      */
     getNotificationInstance({ uuid }: GetNotificationInstanceRequest): Observable<NotificationInstanceDto>
     getNotificationInstance({ uuid }: GetNotificationInstanceRequest, opts?: OperationOpts): Observable<AjaxResponse<NotificationInstanceDto>>
