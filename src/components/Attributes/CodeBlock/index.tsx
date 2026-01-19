@@ -2,8 +2,9 @@ import DOMPurify from 'dompurify';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github.css';
 import parse from 'html-react-parser';
+import { useDispatch } from 'react-redux';
 import Button from 'components/Button';
-import Popover from 'components/Popover';
+import { actions } from 'ducks/user-interface';
 import { Info } from 'lucide-react';
 import { base64ToUtf8 } from 'utils/common-utils';
 import { CodeBlockAttributeContentModel } from '../../../types/attributes';
@@ -23,12 +24,13 @@ export const getHighLightedCode = (code: string, language: ProgrammingLanguageEn
 };
 
 export default function CodeBlock({ content }: Props) {
-    return (
-        <>
-            {content.data.language}&nbsp;
-            <Popover
-                title={`${content.data.language} code block`}
-                content={
+    const dispatch = useDispatch();
+
+    const handleOpenDialog = () => {
+        dispatch(
+            actions.showGlobalModal({
+                title: `${content.data.language} code block`,
+                content: (
                     <pre className="overflow-y-auto max-h-[60vh] py-2">
                         <code
                             className={`language-${content.data.language}`}
@@ -46,12 +48,20 @@ export default function CodeBlock({ content }: Props) {
                             )}
                         </code>
                     </pre>
-                }
-            >
-                <Button variant="transparent" className="!p-1 relative ml-1 top-[3px]">
-                    <Info size={14} />
-                </Button>
-            </Popover>
+                ),
+                size: 'xl',
+                showCloseButton: true,
+                isOpen: true,
+            }),
+        );
+    };
+
+    return (
+        <>
+            {content.data.language}&nbsp;
+            <Button variant="transparent" className="!p-1 relative ml-1 top-[3px]" onClick={handleOpenDialog}>
+                <Info size={14} />
+            </Button>
         </>
     );
 }
