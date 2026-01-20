@@ -174,9 +174,13 @@ export default function ComplianceProfileDetail() {
                 id: 'resource',
                 columns: [
                     'Resource',
-                    <Link key={selectedEntityDetails?.uuid} to={`../../${selectedEntityDetails?.resource}`}>
-                        {getEnumLabel(resourceEnum, selectedEntityDetails?.resource) || ''}
-                    </Link>,
+                    selectedEntityDetails?.resource === Resource.CertificateRequests ? (
+                        getEnumLabel(resourceEnum, selectedEntityDetails?.resource) || ''
+                    ) : (
+                        <Link key={selectedEntityDetails?.uuid} to={`../../${selectedEntityDetails?.resource}`}>
+                            {getEnumLabel(resourceEnum, selectedEntityDetails?.resource) || ''}
+                        </Link>
+                    ),
                 ],
             },
             { id: 'format', columns: ['Format', selectedEntityDetails?.format || ''] },
