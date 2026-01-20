@@ -160,9 +160,7 @@ export default function CustomAttributeWidget({ resource, resourceUuid, attribut
                                                 addCustomAttribute(uuid, content);
                                             }}
                                         />
-                                        {/* <p className={`text-sm text-gray-600 dark:text-gray-400 mt-2 ${style.formatTextStyle}`}>
-                                            {selectedAttribute.description}
-                                        </p> */}
+                                        <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">{selectedAttribute.description}</p>
                                     </div>
                                 )}
                             </Container>

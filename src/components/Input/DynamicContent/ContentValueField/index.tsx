@@ -12,6 +12,7 @@ import TextInput from 'components/TextInput';
 import DatePicker from 'components/DatePicker';
 import Container from 'components/Container';
 import cn from 'classnames';
+import Switch from 'components/Switch';
 
 type Props = {
     id?: string;
@@ -110,7 +111,8 @@ export default function ContentValueField({ id, descriptor, initialContent, onSu
 
     const getFieldContent = (input: any) => {
         if (ContentFieldConfiguration[descriptor.contentType].type === 'checkbox') {
-            return [{ data: input.checked }];
+            const booleanValue = input.checked !== undefined ? input.checked : input.value;
+            return [{ data: booleanValue }];
         }
         if (!input.value) {
             return undefined;
@@ -153,7 +155,6 @@ export default function ContentValueField({ id, descriptor, initialContent, onSu
                 validate: validators,
             }}
             render={({ field, fieldState }) => {
-                console.log('field', field);
                 const inputContent = getFieldContent(field);
                 const inputType = ContentFieldConfiguration[descriptor.contentType].type;
                 const isDateTime = inputType === 'datetime-local';
@@ -205,6 +206,13 @@ export default function ContentValueField({ id, descriptor, initialContent, onSu
                             },
                         )}
                     />
+                ) : inputType === 'checkbox' ? (
+                    <Switch
+                        id={id || descriptor.name || 'checkbox'}
+                        checked={field.value}
+                        onChange={(checked) => field.onChange(checked)}
+                        disabled={descriptor.properties.readOnly}
+                    />
                 ) : (
                     <TextInput
                         id={descriptor.name}
@@ -220,8 +228,8 @@ export default function ContentValueField({ id, descriptor, initialContent, onSu
 
                 return (
                     <>
-                        <Container className="flex-row !gap-0 items-center justify-center">
-                            <div className="grow">{inputComponent}</div>
+                        <Container className={cn('flex-row !gap-0 items-center', { 'justify-center': inputType !== 'checkbox' })}>
+                            <div className={cn({ grow: inputType !== 'checkbox' })}>{inputComponent}</div>
                             <WidgetButtons
                                 buttons={[
                                     {

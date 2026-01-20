@@ -146,7 +146,11 @@ export default function ContentDescriptorField({ isList, contentType }: Props) {
                                         }
                                     />
                                 );
-                                const labelComponent = <Label htmlFor={name}>Default Content</Label>;
+                                const labelComponent = (
+                                    <Label htmlFor={name} className="!mb-0">
+                                        Default Content
+                                    </Label>
+                                );
                                 const buttonComponent = (
                                     <WidgetButtons
                                         justify="start"

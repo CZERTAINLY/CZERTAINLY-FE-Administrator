@@ -368,7 +368,7 @@ export default function CryptographicKeyDetail() {
             setSelectedTab(keyTab < 0 ? 0 : keyTab);
         }
     }, [cryptographicKey, keyItemUuid]);
-    console.log('itemTabs', itemTabs);
+
     return (
         <>
             <Breadcrumb
