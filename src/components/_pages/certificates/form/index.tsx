@@ -249,18 +249,6 @@ export default function CertificateForm({ onCancel }: CertificateFormProps = {})
         ],
     );
 
-    const handleAttributeValuesChange = useCallback((editorId: string, values: Record<string, any> | null) => {
-        setAttributeValuesMap((prev) => {
-            const next = { ...prev };
-            if (values === null) {
-                delete next[editorId];
-            } else {
-                next[editorId] = values;
-            }
-            return next;
-        });
-    }, []);
-
     const onSubmit = useCallback(
         (values: CertificateFormValues) => {
             submitCallback(values);
@@ -412,9 +400,6 @@ export default function CertificateForm({ onCancel }: CertificateFormProps = {})
                                                             attributeDescriptors={csrAttributeDescriptors ?? []}
                                                             groupAttributesCallbackAttributes={csrAttributesCallbackAttributes}
                                                             setGroupAttributesCallbackAttributes={setCsrAttributesCallbackAttributes}
-                                                            onValuesChange={(values) =>
-                                                                handleAttributeValuesChange('csrAttributes', values)
-                                                            }
                                                         />
                                                     ),
                                                 },
@@ -426,9 +411,6 @@ export default function CertificateForm({ onCancel }: CertificateFormProps = {})
                                                             attributeDescriptors={signatureAttributeDescriptors ?? []}
                                                             groupAttributesCallbackAttributes={signatureAttributesCallbackAttributes}
                                                             setGroupAttributesCallbackAttributes={setSignatureAttributesCallbackAttributes}
-                                                            onValuesChange={(values) =>
-                                                                handleAttributeValuesChange('signatureAttributes', values)
-                                                            }
                                                         />
                                                     ),
                                                 },
@@ -445,9 +427,6 @@ export default function CertificateForm({ onCancel }: CertificateFormProps = {})
                                                                       }
                                                                       setGroupAttributesCallbackAttributes={
                                                                           setAltSignatureAttributesCallbackAttributes
-                                                                      }
-                                                                      onValuesChange={(values) =>
-                                                                          handleAttributeValuesChange('altSignatureAttributes', values)
                                                                       }
                                                                   />
                                                               ),
@@ -475,7 +454,6 @@ export default function CertificateForm({ onCancel }: CertificateFormProps = {})
                                                 callbackResource={Resource.RaProfiles}
                                                 groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
                                                 setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
-                                                onValuesChange={(values) => handleAttributeValuesChange('issuance_attributes', values)}
                                             />
                                         ),
                                     },
@@ -486,7 +464,6 @@ export default function CertificateForm({ onCancel }: CertificateFormProps = {})
                                                 id="customCertificate"
                                                 attributeDescriptors={resourceCustomAttributes}
                                                 attributes={selectedRaProfile?.customAttributes}
-                                                onValuesChange={(values) => handleAttributeValuesChange('customCertificate', values)}
                                             />
                                         ),
                                     },

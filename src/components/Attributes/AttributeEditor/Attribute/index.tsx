@@ -271,10 +271,6 @@ export function Attribute({
                     const selectValue = getSelectValue();
 
                     const isTargeted = descriptor.name === 'authority_credential';
-                    if (isTargeted) {
-                        console.log('options1111', options);
-                        console.log('selectOptions', selectOptions);
-                    }
 
                     return (
                         <>
@@ -312,7 +308,7 @@ export function Attribute({
                                     ) : (
                                         <Select
                                             id={`${name}Select`}
-                                            value={selectValue as string | number | object}
+                                            value={selectValue as string | number | { value: string | number; label: string }}
                                             onChange={(newValue) => {
                                                 // Handle Add New option
                                                 if (newValue === '__add_new__') {
