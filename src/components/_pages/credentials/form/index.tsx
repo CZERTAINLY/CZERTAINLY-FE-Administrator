@@ -158,18 +158,6 @@ export default function CredentialForm({ credentialId, onCancel, onSuccess, uses
         [attributeValuesMap],
     );
 
-    const handleAttributeValuesChange = useCallback((editorId: string, values: Record<string, any> | null) => {
-        setAttributeValuesMap((prev) => {
-            const next = { ...prev };
-            if (values === null) {
-                delete next[editorId];
-            } else {
-                next[editorId] = values;
-            }
-            return next;
-        });
-    }, []);
-
     const onSubmit = useCallback(
         (values: FormValues) => {
             const combinedValues = { ...values, ...combinedAttributeValues };
@@ -341,10 +329,9 @@ export default function CredentialForm({ credentialId, onCancel, onSuccess, uses
                 id="customCredential"
                 attributeDescriptors={resourceCustomAttributes}
                 attributes={credential?.customAttributes}
-                onValuesChange={(values) => handleAttributeValuesChange('customCredential', values)}
             />
         );
-    }, [resourceCustomAttributes, credential, isBusy, handleAttributeValuesChange]);
+    }, [resourceCustomAttributes, credential, isBusy]);
 
     const wasCreating = useRef(isCreating);
     const wasUpdating = useRef(isUpdating);
@@ -495,7 +482,6 @@ export default function CredentialForm({ credentialId, onCancel, onSuccess, uses
                                                 attributes={credential?.attributes}
                                                 groupAttributesCallbackAttributes={groupAttributesCallbackAttributes}
                                                 setGroupAttributesCallbackAttributes={setGroupAttributesCallbackAttributes}
-                                                onValuesChange={(values) => handleAttributeValuesChange('credential', values)}
                                             />
                                         ) : (
                                             <></>

@@ -99,7 +99,7 @@ function LocationPushForm({
     const handleFormSubmit = (values: any) => {
         onSubmit(allFormValues);
     };
-
+    console.log('formState.isValid', formState.isValid);
     return (
         <FormProvider {...methods}>
             <form onSubmit={handleSubmit(handleFormSubmit)}>
@@ -132,7 +132,7 @@ function LocationPushForm({
                     ]}
                 />
 
-                <Container className="flex-row justify-end modal-footer" gap={4}>
+                <Container className="flex-row justify-end modal-footer mt-4" gap={4}>
                     <Button variant="outline" onClick={onCancel} disabled={isPushing} type="button">
                         Cancel
                     </Button>

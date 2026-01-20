@@ -4,7 +4,7 @@ import { actions as connectorActions, selectors as connectorSelectors } from 'du
 import { selectors as userInterfaceSelectors } from 'ducks/user-interface';
 import debounce from 'lodash.debounce';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { FormProvider, useForm, useFormContext, useWatch, UseFormReturn } from 'react-hook-form';
+import { useFormContext } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     AttributeCallbackMappingModel,
@@ -67,10 +67,7 @@ export interface Props {
     callbackResource?: Resource;
     callbackParentUuid?: string;
     withRemoveAction?: boolean;
-    onValuesChange?: (values: Record<string, any> | null) => void;
 }
-
-type AttributeEditorInnerProps = Omit<Props, 'onValuesChange'>;
 
 function AttributeEditorInner({
     id,
@@ -84,7 +81,7 @@ function AttributeEditorInner({
     groupAttributesCallbackAttributes = emptyGroupAttributesCallbackAttributes,
     setGroupAttributesCallbackAttributes = () => emptyGroupAttributesCallbackAttributes,
     withRemoveAction = true,
-}: AttributeEditorInnerProps) {
+}: Props) {
     const dispatch = useDispatch();
 
     const { setValue, watch } = useFormContext<Record<string, any>>();
@@ -998,78 +995,16 @@ function AttributeEditorInner({
     return <>{attrs}</>;
 }
 
-type AttributeEditorFormBridgeProps = {
-    values: Record<string, any>;
-    onValuesChange?: (values: Record<string, any> | null) => void;
-    children: React.ReactNode;
-};
-
-function AttributeEditorFormBridge({ values, onValuesChange, children }: AttributeEditorFormBridgeProps) {
-    const previousValuesRef = useRef<Record<string, any> | null>(null);
-    const onValuesChangeRef = useRef(onValuesChange);
-
-    // Keep the ref updated with the latest callback
-    useEffect(() => {
-        onValuesChangeRef.current = onValuesChange;
-    }, [onValuesChange]);
-
-    useEffect(() => {
-        if (!onValuesChangeRef.current) return;
-        if (previousValuesRef.current && deepEqual(previousValuesRef.current, values)) {
-            return;
-        }
-        previousValuesRef.current = values;
-        onValuesChangeRef.current(values);
-    }, [values]);
-
-    useEffect(() => {
-        return () => {
-            onValuesChangeRef.current?.(null);
-        };
-    }, []);
-
+function AttributeEditorFormBridge({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
 }
 
-function AttributeEditorWithContext(props: Omit<Props, 'onValuesChange'>) {
-    const methods = useFormContext<Record<string, any>>();
-    const formValues = useWatch({ control: methods.control });
+export default function AttributeEditor(props: Props) {
+    useFormContext<Record<string, any>>();
 
     return (
-        <AttributeEditorFormBridge values={formValues ?? {}} onValuesChange={undefined}>
+        <AttributeEditorFormBridge>
             <AttributeEditorInner {...props} />
         </AttributeEditorFormBridge>
     );
-}
-
-function AttributeEditorStandalone(props: Props) {
-    const { onValuesChange, ...rest } = props;
-    const methods = useForm<Record<string, any>>({
-        defaultValues: {},
-    });
-    const formValues = useWatch({ control: methods.control });
-
-    return (
-        <FormProvider {...methods}>
-            <AttributeEditorFormBridge values={formValues ?? {}} onValuesChange={onValuesChange}>
-                <AttributeEditorInner {...rest} />
-            </AttributeEditorFormBridge>
-        </FormProvider>
-    );
-}
-
-export default function AttributeEditor(props: Props) {
-    let hasContext = false;
-    try {
-        useFormContext();
-        hasContext = true;
-    } catch {
-        // No context available
-    }
-
-    if (hasContext) {
-        return <AttributeEditorWithContext {...props} />;
-    }
-
-    return <AttributeEditorStandalone {...props} />;
 }

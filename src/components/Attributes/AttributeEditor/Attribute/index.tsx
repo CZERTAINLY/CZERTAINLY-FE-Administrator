@@ -271,10 +271,6 @@ export function Attribute({
                     const selectValue = getSelectValue();
 
                     const isTargeted = descriptor.name === 'authority_credential';
-                    if (isTargeted) {
-                        console.log('options1111', options);
-                        console.log('selectOptions', selectOptions);
-                    }
 
                     return (
                         <>
