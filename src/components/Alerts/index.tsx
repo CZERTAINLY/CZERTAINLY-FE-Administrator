@@ -11,7 +11,7 @@ function Alerts() {
     const dispatch = useDispatch();
 
     return (
-        <Container className="sticky bottom-12 !gap-2 z-9999 px-2 md:px-4" data-testid="alerts-container">
+        <Container className="sticky bottom-12 !gap-2 z-9999 px-2 md:px-4 max-w-[1200px] mx-auto" data-testid="alerts-container">
             {alerts.map((alert) => (
                 <div
                     key={alert.id}
