@@ -1,4 +1,5 @@
 import cn from 'classnames';
+import { useRef, useEffect } from 'react';
 import Label from 'components/Label';
 import DatePicker from 'components/DatePicker';
 import TextArea from 'components/TextArea';
@@ -34,6 +35,32 @@ function TextInput({
     required = false,
     buttonRight,
 }: Props) {
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    // Disable autofill by making field readOnly on mount, then removing it on focus
+    useEffect(() => {
+        if (inputRef.current && type !== 'password' && type !== 'date') {
+            inputRef.current.setAttribute('readonly', 'readonly');
+            const handleFocus = () => {
+                if (inputRef.current) {
+                    inputRef.current.removeAttribute('readonly');
+                }
+            };
+            const input = inputRef.current;
+            input.addEventListener('focus', handleFocus);
+            return () => {
+                input.removeEventListener('focus', handleFocus);
+            };
+        }
+    }, [type]);
+
+    const getAutoComplete = () => {
+        if (type === 'password') {
+            return 'new-password';
+        }
+        return 'off';
+    };
+
     if (type === 'date') {
         return (
             <>
@@ -90,6 +117,7 @@ function TextInput({
             )}
             <div className="relative w-full">
                 <input
+                    ref={inputRef}
                     type={type}
                     className={cn(
                         'text-[var(--dark-gray-color)] py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600',
@@ -108,6 +136,8 @@ function TextInput({
                     onBlur={onBlur}
                     disabled={disabled}
                     id={id}
+                    autoComplete={getAutoComplete()}
+                    data-form-type="other"
                 />
                 {buttonRight && (
                     <div className="absolute right-0 top-[50%] translate-y-[-50%] h-full flex items-center justify-center w-[40px] border-l border-gray-200">
