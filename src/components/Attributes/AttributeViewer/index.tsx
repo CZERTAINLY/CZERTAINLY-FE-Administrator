@@ -165,8 +165,8 @@ export default function AttributeViewer({
     const renderSourceObjectsButton = useCallback(
         (attribute: AttributeResponseModel | MetadataItemModel, resource: Resource) => {
             const headers = [
-                { id: 'sourceObject', content: 'Name', sortable: true },
-                { id: 'uuid', content: 'UUID', sortable: true },
+                { id: 'sourceObject', content: 'Name' },
+                { id: 'uuid', content: 'UUID' },
             ];
 
             const createData = (so: NameAndUuidDto) => ({
@@ -182,7 +182,7 @@ export default function AttributeViewer({
             if ('sourceObjects' in attribute && attribute.sourceObjects.length > 0 && resource) {
                 return (
                     <Popover
-                        width={500}
+                        width={600}
                         content={
                             <Widget title="Source objects" noBorder className="!bg-[#F7F6F2]">
                                 <CustomTable headers={headers} data={attribute.sourceObjects.map(createData)} />
