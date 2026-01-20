@@ -61,6 +61,10 @@ function Select({
     isClearable,
     error,
 }: Props) {
+    if (id === '__attributes__entity__.credentialSelect') {
+        console.log('value', value);
+        console.log('options', options);
+    }
     const selectRef = useRef<HTMLSelectElement>(null);
     const previousOptionsRef = useRef<string>('');
     const previousValueRef = useRef<

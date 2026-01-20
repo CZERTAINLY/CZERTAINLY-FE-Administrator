@@ -49,7 +49,13 @@ export default function GlobalModal() {
         buttons.push({
             color: 'secondary',
             variant: 'outline',
-            onClick: () => dispatch(actions.resetState()),
+            onClick: () => {
+                if (cancelButtonCallback) {
+                    cancelButtonCallback();
+                } else {
+                    dispatch(actions.resetState());
+                }
+            },
             body: 'Close',
         });
     }
@@ -57,7 +63,13 @@ export default function GlobalModal() {
     return (
         <Dialog
             isOpen={isOpen}
-            toggle={() => dispatch(actions.resetState())}
+            toggle={() => {
+                if (cancelButtonCallback) {
+                    cancelButtonCallback();
+                } else {
+                    dispatch(actions.resetState());
+                }
+            }}
             size={size || undefined}
             buttons={buttons}
             caption={title}

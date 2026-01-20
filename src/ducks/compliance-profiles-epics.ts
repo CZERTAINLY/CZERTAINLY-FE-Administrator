@@ -95,12 +95,16 @@ const bulkDeleteComplianceProfiles: AppEpic = (action$, state$, deps) => {
 
         switchMap((action) =>
             deps.apiClients.complianceProfile.bulkDeleteComplianceProfilesV2({ requestBody: action.payload.uuids }).pipe(
-                mergeMap((errors) =>
-                    of(
-                        slice.actions.bulkDeleteComplianceProfilesSuccess({ uuids: action.payload.uuids, errors }),
-                        alertActions.success('Selected compliance profiles successfully deleted.'),
-                    ),
-                ),
+                mergeMap((errors) => {
+                    // Only show success message if there are no errors
+                    if (!errors || errors.length === 0) {
+                        return of(
+                            slice.actions.bulkDeleteComplianceProfilesSuccess({ uuids: action.payload.uuids, errors }),
+                            alertActions.success('Selected compliance profiles successfully deleted.'),
+                        );
+                    }
+                    return of(slice.actions.bulkDeleteComplianceProfilesSuccess({ uuids: action.payload.uuids, errors }));
+                }),
 
                 catchError((error) =>
                     of(

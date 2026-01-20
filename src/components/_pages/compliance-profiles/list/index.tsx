@@ -66,10 +66,6 @@ export default function AdministratorsList() {
         setIsAddModalOpen(false);
     }, []);
 
-    const onAddClick = useCallback(() => {
-        handleOpenAddModal();
-    }, [handleOpenAddModal]);
-
     const onDeleteConfirmed = useCallback(() => {
         dispatch(actions.bulkDeleteComplianceProfiles({ uuids: checkedRows }));
         setConfirmDelete(false);
@@ -123,40 +119,40 @@ export default function AdministratorsList() {
         [checkedRows, handleOpenAddModal],
     );
 
+    const forceDeleteErrorTableHeaders: TableHeader[] = useMemo(
+        () => [
+            {
+                id: 'name',
+                content: 'Name',
+            },
+            {
+                id: 'dependencies',
+                content: 'Dependencies',
+            },
+        ],
+        [],
+    );
+
+    const forceDeleteErrorTableData: TableDataRow[] = useMemo(
+        () =>
+            bulkDeleteErrorMessages?.map((message) => ({
+                id: message.uuid || message.name,
+                columns: [message.name, message.message],
+            })) || [],
+        [bulkDeleteErrorMessages],
+    );
+
     const forceDeleteBody = useMemo(
         () => (
             <div>
-                <div>
+                <div className="mb-4">
                     Failed to delete {checkedRows.length > 1 ? 'Compliance Profiles' : 'a Compliance Profile'}. Please find the details
                     below:
                 </div>
-
-                <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
-                    <thead>
-                        <tr>
-                            <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
-                                <b>Name</b>
-                            </th>
-                            <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
-                                <b>Dependencies</b>
-                            </th>
-                        </tr>
-                    </thead>
-
-                    <tbody className="divide-y divide-gray-200 dark:divide-neutral-700">
-                        {bulkDeleteErrorMessages?.map((message) => (
-                            <tr className="hover:bg-gray-50 dark:hover:bg-neutral-800">
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200">{message.name}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200">
-                                    {message.message}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                <CustomTable headers={forceDeleteErrorTableHeaders} data={forceDeleteErrorTableData} />
             </div>
         ),
-        [bulkDeleteErrorMessages, checkedRows.length],
+        [checkedRows.length, forceDeleteErrorTableHeaders, forceDeleteErrorTableData],
     );
 
     const complianceProfilesTableHeader: TableHeader[] = useMemo(
@@ -249,8 +245,8 @@ export default function AdministratorsList() {
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                 ]}
                 dataTestId="delete-compliance-profile-dialog"
             />
@@ -261,10 +257,11 @@ export default function AdministratorsList() {
                 body={forceDeleteBody}
                 toggle={() => setConfirmForceDelete(false)}
                 buttons={[
-                    { color: 'danger', onClick: onForceDeleteConfirmed, body: 'Force delete' },
                     { color: 'secondary', variant: 'outline', onClick: () => dispatch(actions.clearDeleteErrorMessages()), body: 'Cancel' },
+                    { color: 'danger', onClick: onForceDeleteConfirmed, body: 'Force delete' },
                 ]}
                 dataTestId="force-delete-compliance-profile-dialog"
+                size="xl"
             />
 
             <Dialog
