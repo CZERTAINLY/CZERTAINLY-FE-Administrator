@@ -286,13 +286,18 @@ export default function CustomOIDForm({ oidId, onCancel, onSuccess }: CustomOIDF
                                         <>
                                             <MultipleValueTextInput
                                                 id="alternativeCode"
-                                                value={field.value}
-                                                onChange={(values) => {
-                                                    field.onChange(values);
-                                                }}
-                                                onBlur={field.onBlur}
-                                                isValid={!fieldState.error && fieldState.isTouched}
-                                                isInvalid={!!fieldState.error && fieldState.isTouched}
+                                                selectedValues={field.value || []}
+                                                onValuesChange={field.onChange}
+                                                placeholder="Select or add alternative codes"
+                                                addPlaceholder="Add code"
+                                                initialOptions={
+                                                    editMode && oid?.additionalProperties?.altCodes
+                                                        ? oid.additionalProperties.altCodes.map((code) => ({
+                                                              label: code,
+                                                              value: code,
+                                                          }))
+                                                        : []
+                                                }
                                             />
                                             {fieldState.error && fieldState.isTouched && (
                                                 <p className="mt-1 text-sm text-red-600">
