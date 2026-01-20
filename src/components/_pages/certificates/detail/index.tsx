@@ -44,7 +44,6 @@ import { downloadFile, formatPEM } from 'utils/certificate';
 import { dateFormatter } from 'utils/dateUtil';
 import CustomAttributeWidget from '../../../Attributes/CustomAttributeWidget';
 import TabLayout from '../../../Layout/TabLayout';
-import Asn1Dialog from '../Asn1Dialog/Asn1Dialog';
 
 import FlowChart, { CustomNode } from 'components/FlowChart';
 import { transformCertificateObjectToNodesAndEdges } from 'ducks/transform/certificates';
@@ -72,7 +71,7 @@ interface LocationPushFormProps {
     setSelectLocationCheckedRows: (rows: string[]) => void;
     locationAttributeDescriptors?: AttributeDescriptorModel[];
     groupAttributesCallbackAttributes: AttributeDescriptorModel[];
-    setGroupAttributesCallbackAttributes: (attributes: AttributeDescriptorModel[]) => void;
+    setGroupAttributesCallbackAttributes: React.Dispatch<React.SetStateAction<AttributeDescriptorModel[]>>;
     onCancel: () => void;
     isPushing: boolean;
 }

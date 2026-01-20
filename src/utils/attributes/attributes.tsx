@@ -150,7 +150,18 @@ const getAttributeFormValue = (
         } as SecretAttributeContent;
     }
 
-    return item.value ?? { data: item };
+    if (item && typeof item === 'object' && ('data' in item || 'reference' in item)) {
+        return item;
+    }
+
+    if (item && typeof item === 'object' && 'value' in item) {
+        if (item.value && typeof item.value === 'object' && ('data' in item.value || 'reference' in item.value)) {
+            return item.value;
+        }
+        return { data: item.value };
+    }
+
+    return { data: item };
 };
 
 /**

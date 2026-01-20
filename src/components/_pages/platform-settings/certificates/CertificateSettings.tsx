@@ -31,7 +31,7 @@ const CertificateSettings = ({ platformSettings }: Props) => {
                 id: 'enabled',
                 columns: [
                     'Validation Enabled',
-                    <Switch key="enabled" id="enabled" disabled checked={validation.enabled} onChange={() => {}} />,
+                    <Switch key="enabled" id="validationEnabled" disabled checked={validation.enabled} onChange={() => {}} />,
                 ],
             },
         ];

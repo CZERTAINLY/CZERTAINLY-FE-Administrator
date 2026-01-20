@@ -7,7 +7,7 @@ export type MultiValue<T> = T[] | undefined;
 interface BaseProps {
     id: string;
     options?: {
-        value: string | number;
+        value: string | number | object;
         label: string;
         disabled?: boolean;
     }[];
@@ -34,8 +34,15 @@ interface MultiSelectProps extends BaseProps {
     onChange: (value: { value: string | number; label: string }[] | undefined) => void;
 }
 
-type OptionValue = string | number;
+type OptionValue = string | number | object;
 type Option = { value: OptionValue; label: string; disabled?: boolean };
+
+const getOptionValueString = (val: OptionValue): string => {
+    if (typeof val === 'object' && val !== null) {
+        return JSON.stringify(val);
+    }
+    return String(val);
+};
 
 type Props = SingleSelectProps | MultiSelectProps;
 
@@ -54,6 +61,10 @@ function Select({
     isClearable,
     error,
 }: Props) {
+    if (id === '__attributes__entity__.credentialSelect') {
+        console.log('value', value);
+        console.log('options', options);
+    }
     const selectRef = useRef<HTMLSelectElement>(null);
     const previousOptionsRef = useRef<string>('');
     const previousValueRef = useRef<
@@ -80,7 +91,6 @@ function Select({
         if (!selectRef.current || !(window as any).HSSelect) return;
 
         const optionsChanged = previousOptionsRef.current !== optionsKey;
-        const valueChanged = previousValueRef.current !== value;
 
         if (optionsChanged) {
             const instance = (window as any).HSSelect.getInstance(selectRef.current);
@@ -156,7 +166,7 @@ function Select({
                             const selectedOptions = Array.from(e.target.selectedOptions);
                             const newValues = selectedOptions
                                 .map((option) => {
-                                    const matchedOption = (options || []).find((opt) => opt.value.toString() === option.value);
+                                    const matchedOption = (options || []).find((opt) => getOptionValueString(opt.value) === option.value);
                                     return matchedOption ? { value: matchedOption.value, label: matchedOption.label } : null;
                                 })
                                 .filter((val) => val !== null) as { value: string | number; label: string }[]; // Filter out null values and placeholder
@@ -168,23 +178,36 @@ function Select({
                                 (onChange as SingleSelectProps['onChange'])('' as any);
                                 return;
                             }
-                            const matchedOption = (options || []).find((opt) => opt.value.toString() === selectedValue);
+                            const matchedOption = (options || []).find((opt) => getOptionValueString(opt.value) === selectedValue);
                             (onChange as SingleSelectProps['onChange'])(matchedOption ? matchedOption.value : (selectedValue as any));
                         }
                     }}
                 >
                     <option value="">Choose</option>
-                    {(options || []).map((option) => {
+                    {(options || []).map((option, index) => {
+                        const optionValueString = getOptionValueString(option.value);
                         const isSelected = isMulti
-                            ? !!value && (value as { value: string | number; label: string }[]).some((v) => v.value === option.value)
-                            : option.value === getValueFromProp;
-                        if (id === 'valueSelect') {
-                            console.log('option.value', option.value);
-                            console.log('getValueFromProp', getValueFromProp);
-                            console.log('isSelected', isSelected);
-                        }
+                            ? !!value &&
+                              (value as { value: string | number; label: string }[]).some((v) => {
+                                  if (typeof v.value === 'object' && typeof option.value === 'object') {
+                                      return JSON.stringify(v.value) === JSON.stringify(option.value);
+                                  }
+                                  return v.value === option.value;
+                              })
+                            : (() => {
+                                  const currentValue = getValueFromProp;
+                                  if (typeof option.value === 'object' && typeof currentValue === 'object') {
+                                      return JSON.stringify(option.value) === JSON.stringify(currentValue);
+                                  }
+                                  return option.value === currentValue;
+                              })();
                         return (
-                            <option key={option.value} value={option.value.toString()} selected={isSelected} disabled={option.disabled}>
+                            <option
+                                key={optionValueString || index}
+                                value={optionValueString}
+                                selected={isSelected}
+                                disabled={option.disabled}
+                            >
                                 {option.label}
                             </option>
                         );

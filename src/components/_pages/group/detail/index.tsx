@@ -165,6 +165,14 @@ export default function GroupDetail() {
                         { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
                     ]}
                 />
+
+                <Dialog
+                    isOpen={isEditModalOpen}
+                    toggle={handleCloseEditModal}
+                    caption="Edit Group"
+                    size="xl"
+                    body={<GroupForm groupId={group?.uuid} onCancel={handleCloseEditModal} onSuccess={handleCloseEditModal} />}
+                />
             </Container>
         </div>
     );

@@ -4,7 +4,7 @@ import { actions as connectorActions, selectors as connectorSelectors } from 'du
 import { selectors as userInterfaceSelectors } from 'ducks/user-interface';
 import debounce from 'lodash.debounce';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { FormProvider, useForm, useFormContext, useWatch } from 'react-hook-form';
+import { FormProvider, useForm, useFormContext, useWatch, UseFormReturn } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     AttributeCallbackMappingModel,
@@ -31,6 +31,24 @@ import { mapAttributeContentToOptionValue } from 'utils/attributes/attributes';
 import { deepEqual } from 'utils/deep-equal';
 import Button from 'components/Button';
 import { Trash } from 'lucide-react';
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+    if (typeof value !== 'object' || value === null) return false;
+    const proto = Object.getPrototypeOf(value);
+    return proto === Object.prototype || proto === null;
+}
+
+function cloneForCompare<T>(value: T): T {
+    if (Array.isArray(value)) return value.map((v) => cloneForCompare(v)) as T;
+    if (isPlainObject(value)) {
+        const out: Record<string, unknown> = {};
+        Object.keys(value).forEach((k) => {
+            out[k] = cloneForCompare((value as Record<string, unknown>)[k]);
+        });
+        return out as T;
+    }
+    return value;
+}
 
 // same empty array is used to prevent re-rendering of the component
 // !!! never modify the attributes field inside of the component !!!
@@ -88,9 +106,7 @@ function AttributeEditorInner({
     // options for selects
     const [options, setOptions] = useState<{ [attributeName: string]: { label: string; value: any }[] }>({});
 
-    // stores previous values of form in order to be possible to detect attribute changes
-    const [previousFormValues, setPreviousFormValues] = useState<{ [name: string]: any }>({});
-
+    const previousAttributesRef = useRef<Record<string, any>>({});
     // stores previous callback data in order to be possible to detect what data changed
     const [previousCallbackData, setPreviousCallbackData] = useState<{ [callbackId: string]: any }>({});
 
@@ -647,9 +663,6 @@ function AttributeEditorInner({
         // eslint-disable-next-line react-hooks/exhaustive-deps
         opts = { ...opts, ...newOptions };
         setOptions({ ...options, ...opts });
-
-        // now all fields are loaded in form, so set those form values as previousFormValues to prevent calling doCallback on form change
-        setPreviousFormValues(formValues);
     }, [
         id,
         attributeDescriptors,
@@ -707,8 +720,6 @@ function AttributeEditorInner({
         if (Object.keys(newOptions).length > 0) {
             setOptions((prevOptions) => ({ ...prevOptions, ...newOptions }));
         }
-
-        setPreviousFormValues(formValues);
     }, [
         id,
         formValues,
@@ -727,9 +738,13 @@ function AttributeEditorInner({
      * Evaluates changed attributes and eventually performs a callback whenever necessary
      */
     const doCallbacks = useCallback(() => {
-        if (previousFormValues === formValues) return;
+        const attributesKey = `__attributes__${id}__`;
+        const currentAttributes = (formValues?.[attributesKey] ?? {}) as Record<string, any>;
+        const previousAttributes = previousAttributesRef.current;
 
-        setPreviousFormValues(formValues);
+        if (deepEqual(previousAttributes, currentAttributes)) return;
+
+        previousAttributesRef.current = cloneForCompare(currentAttributes);
 
         // I am not really sure about this. It is currently preventing other callbacks when the form is open in "edit" mode and data loaded to it
         // It works, but this state should be managed in a different way
@@ -738,25 +753,14 @@ function AttributeEditorInner({
         const changedAttributes: { [name: string]: { previous: any; current: any } } = {};
 
         // get changed attributes and their current values
-        for (const key in formValues) {
-            if (key.startsWith(`__attributes__${id}__`)) {
-                for (const attrKey in formValues[key]) {
-                    if (
-                        previousFormValues[key] === undefined ||
-                        previousFormValues[key][attrKey] === undefined ||
-                        previousFormValues[key][attrKey] !== formValues[key][attrKey]
-                    ) {
-                        changedAttributes[attrKey] = {
-                            previous:
-                                previousFormValues[key] !== undefined && previousFormValues[key][attrKey] !== undefined
-                                    ? previousFormValues[key][attrKey]
-                                    : undefined,
-                            current: formValues[key][attrKey],
-                        };
-                    }
-                }
+        const keys = new Set([...Object.keys(previousAttributes || {}), ...Object.keys(currentAttributes || {})]);
+        keys.forEach((attrKey) => {
+            const prev = previousAttributes?.[attrKey];
+            const cur = currentAttributes?.[attrKey];
+            if (!deepEqual(prev, cur)) {
+                changedAttributes[attrKey] = { previous: prev, current: cur };
             }
-        }
+        });
 
         // for each changed attribute check if there are mappings depending on it and if so perform the callback
         [...attributeDescriptors, ...groupAttributesCallbackAttributes].forEach((descriptor) => {
@@ -787,21 +791,23 @@ function AttributeEditorInner({
                 }
             }
         });
-    }, [
-        attributeDescriptors,
-        groupAttributesCallbackAttributes,
-        buildCallbackMappings,
-        formValues,
-        id,
-        isRunningCb,
-        previousFormValues,
-        executeCallback,
-    ]);
-    const ref = useRef(debounce((doCallbacksParam) => doCallbacksParam(), 600));
+    }, [attributeDescriptors, groupAttributesCallbackAttributes, buildCallbackMappings, formValues, id, isRunningCb, executeCallback]);
+
+    const doCallbacksLatestRef = useRef(doCallbacks);
+    useEffect(() => {
+        doCallbacksLatestRef.current = doCallbacks;
+    }, [doCallbacks]);
+
+    const debouncedDoCallbacksRef = useRef(debounce(() => doCallbacksLatestRef.current(), 600));
 
     useEffect(() => {
-        ref.current(doCallbacks);
-    }, [doCallbacks]);
+        const debouncedDoCallbacks = debouncedDoCallbacksRef.current;
+        debouncedDoCallbacks();
+
+        return () => {
+            debouncedDoCallbacks.cancel();
+        };
+    }, [formValues]);
 
     useEffect(() => {
         if (!initiateAttributeCallback) return;
@@ -1025,7 +1031,18 @@ function AttributeEditorFormBridge({ values, onValuesChange, children }: Attribu
     return <>{children}</>;
 }
 
-export default function AttributeEditor(props: Props) {
+function AttributeEditorWithContext(props: Omit<Props, 'onValuesChange'>) {
+    const methods = useFormContext<Record<string, any>>();
+    const formValues = useWatch({ control: methods.control });
+
+    return (
+        <AttributeEditorFormBridge values={formValues ?? {}} onValuesChange={undefined}>
+            <AttributeEditorInner {...props} />
+        </AttributeEditorFormBridge>
+    );
+}
+
+function AttributeEditorStandalone(props: Props) {
     const { onValuesChange, ...rest } = props;
     const methods = useForm<Record<string, any>>({
         defaultValues: {},
@@ -1039,4 +1056,20 @@ export default function AttributeEditor(props: Props) {
             </AttributeEditorFormBridge>
         </FormProvider>
     );
+}
+
+export default function AttributeEditor(props: Props) {
+    let hasContext = false;
+    try {
+        useFormContext();
+        hasContext = true;
+    } catch {
+        // No context available
+    }
+
+    if (hasContext) {
+        return <AttributeEditorWithContext {...props} />;
+    }
+
+    return <AttributeEditorStandalone {...props} />;
 }
