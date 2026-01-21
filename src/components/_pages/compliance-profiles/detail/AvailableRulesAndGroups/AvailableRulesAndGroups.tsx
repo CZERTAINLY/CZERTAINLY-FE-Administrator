@@ -360,6 +360,7 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
                 widgetLockName={LockWidgetNameEnum.ListOfAvailableRulesAndGroups}
                 lockSize="large"
                 dataTestId="available-rules-and-groups-widget"
+                noBorder
             >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="w-full">
