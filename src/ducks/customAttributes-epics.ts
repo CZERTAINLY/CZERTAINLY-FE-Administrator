@@ -199,7 +199,7 @@ const updateCustomAttributeContent: AppEpic = (action$, state$, deps) => {
                     resourceName: action.payload.resource,
                     objectUuid: action.payload.resourceUuid,
                     attributeUuid: action.payload.attributeUuid,
-                    baseAttributeContentDto: action.payload.content,
+                    attributeContent: action.payload.content,
                 })
                 .pipe(
                     map((response) =>

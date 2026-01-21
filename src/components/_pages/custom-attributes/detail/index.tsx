@@ -1,4 +1,3 @@
-import cn from 'classnames';
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import StatusBadge from 'components/StatusBadge';
@@ -18,6 +17,7 @@ import { createWidgetDetailHeaders } from 'utils/widget';
 import Breadcrumb from 'components/Breadcrumb';
 import { Copy } from 'lucide-react';
 import CustomAttributeForm from '../form';
+import Button from 'components/Button';
 
 export default function CustomAttributeDetail() {
     const dispatch = useDispatch();
@@ -165,10 +165,17 @@ export default function CustomAttributeDetail() {
                           id: 'content',
                           columns: [
                               'Content',
-                              <>
+                              <div className="flex items-center gap-2">
                                   {getAttributeContent(customAttribute.contentType, customAttribute.content)}
-                                  {customAttribute?.content?.length ? <Copy size={16} onClick={onContentCopyClick} /> : <> </>}
-                              </>,
+                                  {customAttribute?.content?.length ? (
+                                      <Button variant="transparent" onClick={onContentCopyClick}>
+                                          {' '}
+                                          <Copy size={16} />{' '}
+                                      </Button>
+                                  ) : (
+                                      <> </>
+                                  )}
+                              </div>,
                           ],
                       },
                       {

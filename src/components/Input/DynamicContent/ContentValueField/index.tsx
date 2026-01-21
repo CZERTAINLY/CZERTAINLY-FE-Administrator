@@ -12,6 +12,7 @@ import TextInput from 'components/TextInput';
 import DatePicker from 'components/DatePicker';
 import Container from 'components/Container';
 import cn from 'classnames';
+import Switch from 'components/Switch';
 
 type Props = {
     id?: string;
@@ -77,7 +78,11 @@ export default function ContentValueField({ id, descriptor, initialContent, onSu
     }, [descriptor]);
 
     const beforeOnSubmit = useCallback(
-        (attributeUuid: string, content: BaseAttributeContentModel[]) => {
+        (attributeUuid: string, content: BaseAttributeContentModel[] | undefined) => {
+            if (!content || content.length === 0) {
+                return;
+            }
+
             const updatedContent = content.map((contentObject) => {
                 if (descriptor.contentType === 'date') {
                     const updatedDate = new Date(contentObject.data as string);
@@ -110,9 +115,10 @@ export default function ContentValueField({ id, descriptor, initialContent, onSu
 
     const getFieldContent = (input: any) => {
         if (ContentFieldConfiguration[descriptor.contentType].type === 'checkbox') {
-            return [{ data: input.checked }];
+            const booleanValue = input.checked !== undefined ? input.checked : (input.value ?? false);
+            return [{ data: booleanValue }];
         }
-        if (!input.value) {
+        if (!input.value && input.value !== 0 && input.value !== false) {
             return undefined;
         }
         if (descriptor.properties.list) {
@@ -153,7 +159,6 @@ export default function ContentValueField({ id, descriptor, initialContent, onSu
                 validate: validators,
             }}
             render={({ field, fieldState }) => {
-                console.log('field', field);
                 const inputContent = getFieldContent(field);
                 const inputType = ContentFieldConfiguration[descriptor.contentType].type;
                 const isDateTime = inputType === 'datetime-local';
@@ -205,6 +210,13 @@ export default function ContentValueField({ id, descriptor, initialContent, onSu
                             },
                         )}
                     />
+                ) : inputType === 'checkbox' ? (
+                    <Switch
+                        id={id || descriptor.name || 'checkbox'}
+                        checked={field.value}
+                        onChange={(checked) => field.onChange(checked)}
+                        disabled={descriptor.properties.readOnly}
+                    />
                 ) : (
                     <TextInput
                         id={descriptor.name}
@@ -216,12 +228,14 @@ export default function ContentValueField({ id, descriptor, initialContent, onSu
                         error={fieldState.isTouched && fieldState.invalid ? fieldState.error?.message : undefined}
                     />
                 );
-                const feedbackComponent = <div className="text-red-500 mt-2">{fieldState.error?.message}</div>;
+                const feedbackComponent = fieldState.error?.message ? (
+                    <div className="text-red-500 mt-2">{fieldState.error?.message}</div>
+                ) : null;
 
                 return (
                     <>
-                        <Container className="flex-row !gap-0 items-center justify-center">
-                            <div className="grow">{inputComponent}</div>
+                        <Container className={cn('flex-row !gap-0 items-center', { 'justify-center': inputType !== 'checkbox' })}>
+                            <div className={cn({ grow: inputType !== 'checkbox' })}>{inputComponent}</div>
                             <WidgetButtons
                                 buttons={[
                                     {
