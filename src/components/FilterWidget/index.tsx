@@ -514,6 +514,7 @@ export default function FilterWidget({
                         setFilterValue({ label: e, value: e });
                     }}
                     isDisabled={!filterField || !filterCondition || noValue[filterCondition.value]}
+                    isSearchable
                 />
             );
         }
@@ -526,9 +527,10 @@ export default function FilterWidget({
                     onChange={(e) => {
                         setFilterValue(e);
                     }}
-                    // isMulti={currentField?.multiValue}
+                    isMulti={currentField?.multiValue}
                     // isClearable
                     isDisabled={!filterField || !filterCondition || noValue[filterCondition.value]}
+                    isSearchable
                 />
             );
         }
@@ -618,6 +620,7 @@ export default function FilterWidget({
                                 }}
                                 value={filterField || null}
                                 isDisabled={!filterGroup}
+                                isSearchable
                                 // isClearable
                             />
 
@@ -639,6 +642,7 @@ export default function FilterWidget({
                                 }}
                                 value={filterCondition || null}
                                 isDisabled={!filterField}
+                                isSearchable
                             />
 
                             <div>

@@ -20,6 +20,7 @@ interface BaseProps {
     isClearable?: boolean;
     required?: boolean;
     error?: string;
+    isSearchable?: boolean;
 }
 
 interface SingleSelectProps extends BaseProps {
@@ -59,12 +60,9 @@ function Select({
     placement,
     isMulti = false,
     isClearable,
+    isSearchable = false,
     error,
 }: Props) {
-    if (id === '__attributes__entity__.credentialSelect') {
-        console.log('value', value);
-        console.log('options', options);
-    }
     const selectRef = useRef<HTMLSelectElement>(null);
     const previousOptionsRef = useRef<string>('');
     const previousValueRef = useRef<
@@ -132,6 +130,8 @@ function Select({
 
     const hasOptions = options && options.length > 0;
 
+    const hasSearch = isSearchable && options.length > 5;
+
     return (
         <div>
             {label && <Label htmlFor={id} title={label} required={required} />}
@@ -141,12 +141,16 @@ function Select({
                     multiple={isMulti}
                     value={isMulti ? undefined : (getValueFromProp?.toString() ?? '')}
                     data-hs-select={JSON.stringify({
+                        hasSearch: hasSearch,
+                        searchPlaceholder: 'Search...',
+                        searchClasses:
+                            'block w-full sm:text-sm !border-gray-200 rounded-lg focus:ring-transparent dark:bg-neutral-900 dark:!border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 py-1.5 sm:py-2 px-3',
+                        searchWrapperClasses: 'bg-white p-2 -mx-1 sticky top-0 dark:bg-neutral-900',
                         placeholder: hasOptions ? placeholder : 'No options',
                         toggleTag: '<button type="button" aria-expanded="false"></button>',
                         toggleClasses:
                             'hs-select-disabled:pointer-events-none text-[var(--dark-gray-color)] hs-select-disabled:opacity-50 relative py-3 ps-4 pe-9 flex gap-x-2 text-nowrap w-full cursor-pointer bg-white border border-gray-200 rounded-lg text-start text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:focus:outline-hidden dark:focus:ring-1 dark:focus:ring-neutral-600',
-                        dropdownClasses:
-                            'mt-2 z-[100] w-full max-h-72 p-1 space-y-0.5 bg-white border border-gray-200 rounded-lg overflow-hidden overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 dark:bg-neutral-900 dark:border-neutral-700',
+                        dropdownClasses: `mt-2 z-[100] w-full max-h-72 space-y-0.5 bg-white border border-gray-200 rounded-lg overflow-hidden overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 dark:bg-neutral-900 dark:border-neutral-700 ${hasSearch ? ' px-1 pb-1' : 'p-1'}`,
                         optionClasses:
                             'py-2 px-4 w-full text-sm cursor-pointer hover:bg-gray-100 rounded-lg focus:outline-hidden focus:bg-gray-100 hs-select-disabled:pointer-events-none hs-select-disabled:opacity-50 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:text-neutral-200 dark:focus:bg-neutral-800',
                         optionTemplate:
