@@ -228,7 +228,9 @@ export default function ContentValueField({ id, descriptor, initialContent, onSu
                         error={fieldState.isTouched && fieldState.invalid ? fieldState.error?.message : undefined}
                     />
                 );
-                const feedbackComponent = <div className="text-red-500 mt-2">{fieldState.error?.message}</div>;
+                const feedbackComponent = fieldState.error?.message ? (
+                    <div className="text-red-500 mt-2">{fieldState.error?.message}</div>
+                ) : null;
 
                 return (
                     <>

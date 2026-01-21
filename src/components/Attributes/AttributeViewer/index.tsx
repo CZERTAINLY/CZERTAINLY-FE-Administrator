@@ -45,7 +45,7 @@ function AttributeEditForm({
 
     return (
         <FormProvider {...methods}>
-            <form onSubmit={(e) => e.preventDefault()} className="mt-3">
+            <form onSubmit={(e) => e.preventDefault()}>
                 <ContentValueField id={descriptor.name} descriptor={descriptor} initialContent={initialContent} onSubmit={onSubmit} />
             </form>
         </FormProvider>
