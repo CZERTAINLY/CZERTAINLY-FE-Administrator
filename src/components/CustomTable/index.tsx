@@ -1,11 +1,12 @@
 import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { jsxInnerText } from 'utils/jsxInnerText';
+import { useDispatch } from 'react-redux';
+import { actions as userInterfaceActions } from 'ducks/user-interface';
 
 import NewRowWidget, { NewRowWidgetProps } from './NewRowWidget';
 import Select from 'components/Select';
 import Pagination from 'components/Pagination';
 import Checkbox from 'components/Checkbox';
-import Dialog from 'components/Dialog';
 import Button from 'components/Button';
 import SimpleBar from 'simplebar-react';
 import cn from 'classnames';
@@ -89,7 +90,54 @@ function CustomTable({
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
     const [expandedRow, setExpandedRow] = useState<string | number>();
-    const [dialogOpenRowId, setDialogOpenRowId] = useState<string | number | undefined>();
+    const dispatch = useDispatch();
+
+    const handleRowDetailClick = useCallback(
+        (rowId: string | number) => {
+            const row = tblData.find((r) => r.id === rowId);
+            if (!row || !row.detailColumns || row.detailColumns.length === 0) {
+                return;
+            }
+
+            const detailTableHeaders: TableHeader[] =
+                detailHeaders && detailHeaders.length === row.detailColumns.length
+                    ? detailHeaders
+                    : row.detailColumns.map((_, index) => ({
+                          id: `detail-${index}`,
+                          content: '',
+                          sortable: false,
+                      }));
+
+            const processedColumns = row.detailColumns.map((col, index) => {
+                if (Array.isArray(col)) {
+                    return <div key={`detail-col-${index}`}>{col}</div>;
+                }
+                return col;
+            });
+
+            const detailData: TableDataRow[] = [
+                {
+                    id: 'detail-row',
+                    columns: processedColumns,
+                },
+            ];
+
+            const caption = typeof row.columns[0] === 'string' ? row.columns[0] : jsxInnerText(row.columns[0] as React.ReactNode);
+
+            dispatch(
+                userInterfaceActions.showGlobalModal({
+                    isOpen: true,
+                    size: 'xl',
+                    title: caption,
+                    content: (
+                        <CustomTable headers={detailTableHeaders} data={detailData} hasHeader={!!detailHeaders} hasPagination={false} />
+                    ),
+                    showCloseButton: true,
+                }),
+            );
+        },
+        [tblData, detailHeaders, dispatch],
+    );
 
     useEffect(() => {
         setTblCheckedRows(checkedRows || emptyCheckedRows);
@@ -439,7 +487,7 @@ function CustomTable({
                                             variant="transparent"
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                setDialogOpenRowId(row.id);
+                                                handleRowDetailClick(row.id);
                                             }}
                                             className="!p-0 hover:bg-transparent text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 p-0 h-auto font-medium"
                                         >
@@ -467,42 +515,8 @@ function CustomTable({
         onRowCheckboxClick,
         tblHeaders,
         getRowStyle,
+        handleRowDetailClick,
     ]);
-
-    const detailDialogRow = useMemo(() => {
-        return tblData.find((row) => row.id === dialogOpenRowId);
-    }, [tblData, dialogOpenRowId]);
-
-    const detailDialogContent = useMemo(() => {
-        if (!detailDialogRow || !detailDialogRow.detailColumns || detailDialogRow.detailColumns.length === 0) {
-            return null;
-        }
-
-        const detailTableHeaders: TableHeader[] =
-            detailHeaders && detailHeaders.length === detailDialogRow.detailColumns.length
-                ? detailHeaders
-                : detailDialogRow.detailColumns.map((_, index) => ({
-                      id: `detail-${index}`,
-                      content: '',
-                      sortable: false,
-                  }));
-
-        const processedColumns = detailDialogRow.detailColumns.map((col, index) => {
-            if (Array.isArray(col)) {
-                return <div key={`detail-col-${index}`}>{col}</div>;
-            }
-            return col;
-        });
-
-        const detailData: TableDataRow[] = [
-            {
-                id: 'detail-row',
-                columns: processedColumns,
-            },
-        ];
-
-        return <CustomTable headers={detailTableHeaders} data={detailData} hasHeader={!!detailHeaders} hasPagination={false} />;
-    }, [detailDialogRow, detailHeaders]);
 
     return (
         <div data-testid="custom-table">
@@ -600,27 +614,6 @@ function CustomTable({
                     isBusy={newRowWidgetProps.isBusy}
                     newItemsList={newRowWidgetProps.newItemsList}
                     onAddClick={newRowWidgetProps.onAddClick}
-                />
-            )}
-            {hasDetails && detailDialogRow && (
-                <Dialog
-                    isOpen={!!dialogOpenRowId}
-                    toggle={() => setDialogOpenRowId(undefined)}
-                    caption={
-                        typeof detailDialogRow.columns[0] === 'string'
-                            ? detailDialogRow.columns[0]
-                            : jsxInnerText(detailDialogRow.columns[0] as React.ReactNode)
-                    }
-                    body={detailDialogContent}
-                    size="xl"
-                    buttons={[
-                        {
-                            color: 'secondary',
-                            variant: 'outline',
-                            onClick: () => setDialogOpenRowId(undefined),
-                            body: 'Close',
-                        },
-                    ]}
                 />
             )}
         </div>

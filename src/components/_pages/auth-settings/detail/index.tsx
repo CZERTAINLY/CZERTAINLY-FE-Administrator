@@ -13,6 +13,7 @@ import { useParams } from 'react-router';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { renderOAuth2StateBadges } from 'utils/oauth2Providers';
 import Container from 'components/Container';
+import Breadcrumb from 'components/Breadcrumb';
 
 export default function OAuth2ProviderDetail() {
     const { providerName } = useParams();
@@ -42,14 +43,15 @@ export default function OAuth2ProviderDetail() {
     const handleOpenEditDialog = useCallback(() => {
         if (!providerName) return;
         setIsEditDialogOpen(true);
-        dispatch(actions.resetOAuth2ProviderSettings());
         dispatch(actions.getOAuth2ProviderSettings({ providerName }));
     }, [dispatch, providerName]);
 
     const handleCloseEditDialog = useCallback(() => {
         setIsEditDialogOpen(false);
-        dispatch(actions.resetOAuth2ProviderSettings());
-    }, [dispatch]);
+        if (!oauth2Provider) {
+            getFreshData();
+        }
+    }, [oauth2Provider, getFreshData]);
 
     // Track update state and close dialog on success
     useEffect(() => {
@@ -139,33 +141,41 @@ export default function OAuth2ProviderDetail() {
         [oauth2Provider],
     );
     return (
-        <Container>
-            <Widget
-                title="Provider Details"
-                busy={isFetchingProvider}
-                widgetLockName={LockWidgetNameEnum.AuthenticationProviderDetails}
-                widgetButtons={buttons}
-                titleSize="large"
-                refreshAction={getFreshData}
-            >
-                <CustomTable headers={headers} data={data} />
-            </Widget>
-            <Widget
-                title="JWK Set Keys"
-                busy={isFetchingProvider}
-                widgetLockName={LockWidgetNameEnum.AuthenticationProviderDetails}
-                titleSize="large"
-                refreshAction={getFreshData}
-            >
-                <JwkSetKeysTable jwkSetKeys={oauth2Provider?.jwkSetKeys} />
-            </Widget>
-            <Dialog
-                isOpen={isEditDialogOpen}
-                toggle={handleCloseEditDialog}
-                caption="Edit OAuth2 Provider"
-                size="xl"
-                body={<OAuth2ProviderForm providerName={providerName} onCancel={handleCloseEditDialog} />}
+        <div>
+            <Breadcrumb
+                items={[
+                    { label: 'Authentication Settings', href: '/authenticationsettings' },
+                    { label: oauth2Provider?.name || 'Provider Details', href: '' },
+                ]}
             />
-        </Container>
+            <Container>
+                <Widget
+                    title="Provider Details"
+                    busy={isFetchingProvider}
+                    widgetLockName={LockWidgetNameEnum.AuthenticationProviderDetails}
+                    widgetButtons={buttons}
+                    titleSize="large"
+                    refreshAction={getFreshData}
+                >
+                    <CustomTable headers={headers} data={data} />
+                </Widget>
+                <Widget
+                    title="JWK Set Keys"
+                    busy={isFetchingProvider}
+                    widgetLockName={LockWidgetNameEnum.AuthenticationProviderDetails}
+                    titleSize="large"
+                    refreshAction={getFreshData}
+                >
+                    <JwkSetKeysTable jwkSetKeys={oauth2Provider?.jwkSetKeys} />
+                </Widget>
+                <Dialog
+                    isOpen={isEditDialogOpen}
+                    toggle={handleCloseEditDialog}
+                    caption="Edit OAuth2 Provider"
+                    size="xl"
+                    body={<OAuth2ProviderForm providerName={providerName} onCancel={handleCloseEditDialog} />}
+                />
+            </Container>
+        </div>
     );
 }
