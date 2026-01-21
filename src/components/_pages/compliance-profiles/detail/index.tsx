@@ -279,7 +279,11 @@ export default function ComplianceProfileDetail() {
 
     const entityDetailMenuContent = useMemo(
         () => (
-            <Widget titleSize="large" busy={selectedEntityDetails?.entityDetails?.entityType === 'group' ? isFetchingGroupRules : false}>
+            <Widget
+                noBorder
+                titleSize="large"
+                busy={selectedEntityDetails?.entityDetails?.entityType === 'group' ? isFetchingGroupRules : false}
+            >
                 {selectedEntityDetails?.entityDetails?.entityType === 'rule' && (
                     <TabLayout
                         noBorder

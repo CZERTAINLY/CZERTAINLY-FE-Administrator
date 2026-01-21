@@ -392,47 +392,45 @@ export default function FilterWidget({
         return true;
     }, [filterCondition, filterValue, regexError]);
 
-    const objectValueOptions: ObjectValueOptions[] = useMemo(
-        () => {
-            if (!currentField) return [];
+    const objectValueOptions: ObjectValueOptions[] = useMemo(() => {
+        if (!currentField) return [];
 
-            if (Array.isArray(currentField?.value)) {
-                const objectOptions = currentField?.value?.map((v, i) => {
-                    let label = '';
-                    let value = '';
-                    if (typeof v === 'string') {
-                        if (checkIfFieldAttributeTypeIsDate(currentField)) {
-                            label = getFormattedDateTime(v);
-                        } else {
-                            label = currentField?.platformEnum ? getEnumLabel(platformEnums[currentField.platformEnum], v) : v;
-                        }
-                        value = v;
+        if (Array.isArray(currentField?.value)) {
+            const objectOptions = currentField?.value?.map((v, i) => {
+                let label = '';
+                let value = '';
+                if (typeof v === 'string') {
+                    if (checkIfFieldAttributeTypeIsDate(currentField)) {
+                        label = getFormattedDateTime(v);
                     } else {
-                        label = v?.name || JSON.stringify(v);
-                        value = v;
+                        label = currentField?.platformEnum ? getEnumLabel(platformEnums[currentField.platformEnum], v) : v;
                     }
+                    value = v;
+                } else {
+                    label = v?.name || JSON.stringify(v);
+                    value = v;
+                }
 
-                    return { label, value };
-                });
+                return { label, value };
+            });
 
-                if (selectedFilter === -1) return objectOptions;
+            if (selectedFilter === -1) return objectOptions;
 
-                const currentValue = currentFilters[selectedFilter].value;
-                const filteredOptions = objectOptions.filter((o) => {
-                    if (Array.isArray(currentValue)) {
-                        return !currentValue.some((a) => a?.name === o?.label);
-                    } else {
-                        return JSON.stringify(currentValue) !== o?.value;
-                    }
-                });
-                return filteredOptions;
-            }
+            const currentValue = currentFilters[selectedFilter].value;
 
-            return [];
-        },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [currentField, currentFilters, selectedFilter],
-    );
+            const filteredOptions = objectOptions.filter((o) => {
+                if (Array.isArray(currentValue)) {
+                    return !currentValue.some((a) => a?.name === o?.label);
+                } else {
+                    return JSON.stringify(currentValue) !== o?.value;
+                }
+            });
+
+            return filteredOptions;
+        }
+
+        return [];
+    }, [currentField, currentFilters, selectedFilter, platformEnums]);
 
     const getBadgeContent = useCallback(
         (itemNumber: number, fieldSource: string, fieldCondition: string, label: string, value: string) => {
@@ -514,6 +512,7 @@ export default function FilterWidget({
                         setFilterValue({ label: e, value: e });
                     }}
                     isDisabled={!filterField || !filterCondition || noValue[filterCondition.value]}
+                    isSearchable
                 />
             );
         }
@@ -526,9 +525,10 @@ export default function FilterWidget({
                     onChange={(e) => {
                         setFilterValue(e);
                     }}
-                    // isMulti={currentField?.multiValue}
+                    isMulti={currentField?.multiValue}
                     // isClearable
                     isDisabled={!filterField || !filterCondition || noValue[filterCondition.value]}
+                    isSearchable
                 />
             );
         }
@@ -618,6 +618,7 @@ export default function FilterWidget({
                                 }}
                                 value={filterField || null}
                                 isDisabled={!filterGroup}
+                                isSearchable
                                 // isClearable
                             />
 
@@ -639,6 +640,7 @@ export default function FilterWidget({
                                 }}
                                 value={filterCondition || null}
                                 isDisabled={!filterField}
+                                isSearchable
                             />
 
                             <div>

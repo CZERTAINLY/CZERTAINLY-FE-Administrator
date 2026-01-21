@@ -77,9 +77,6 @@ export default function OAuth2ProviderForm({ providerName, onCancel, onSuccess }
     const isUpdatingProvider = useSelector(selectors.isUpdatingProvider);
     const isCreatingProvider = useSelector(selectors.isCreatingProvider);
 
-    const [audienceOptions, setAudienceOptions] = useState<OptionType[]>([]);
-    const [scopeOptions, setScopeOptions] = useState<OptionType[]>([]);
-
     const isBusy = useMemo(
         () => isFetchingProvider || isUpdatingProvider || isCreatingProvider,
         [isFetchingProvider, isUpdatingProvider, isCreatingProvider],
@@ -89,11 +86,6 @@ export default function OAuth2ProviderForm({ providerName, onCancel, onSuccess }
         if (!providerName) return;
         dispatch(actions.getOAuth2ProviderSettings({ providerName }));
     }, [dispatch, providerName]);
-
-    useEffect(() => {
-        setAudienceOptions(oauth2Provider?.audiences?.map((el) => ({ label: el, value: el })) || []);
-        setScopeOptions(oauth2Provider?.scope?.map((el) => ({ label: el, value: el })) || []);
-    }, [oauth2Provider]);
 
     const defaultValues: FormValues = useMemo(() => {
         if (editMode && oauth2Provider) {
@@ -152,8 +144,7 @@ export default function OAuth2ProviderForm({ providerName, onCancel, onSuccess }
     const {
         handleSubmit,
         control,
-        formState: { isDirty, isSubmitting, isValid },
-        setValue,
+        formState: { isSubmitting },
     } = methods;
 
     const formValues = useWatch({ control });
@@ -191,11 +182,11 @@ export default function OAuth2ProviderForm({ providerName, onCancel, onSuccess }
                 tokenUrl: values.tokenUrl || undefined,
                 jwkSetUrl: values.jwkSetUrl || undefined,
                 jwkSet: values.jwkSet || undefined,
-                scope: values.scope.length > 0 ? values.scope : undefined,
+                scope: values.scope && values.scope.length > 0 ? values.scope : undefined,
                 logoutUrl: values.logoutUrl || undefined,
                 postLogoutUrl: values.postLogoutUrl || undefined,
                 userInfoUrl: values.userInfoUrl || undefined,
-                audiences: values.audiences.length > 0 ? values.audiences : undefined,
+                audiences: values.audiences && values.audiences.length > 0 ? values.audiences : undefined,
                 skew: values.skew ? parseInt(values.skew) : undefined,
                 sessionMaxInactiveInterval: values.sessionMaxInactiveInterval ? parseInt(values.sessionMaxInactiveInterval) : undefined,
             };
@@ -456,9 +447,15 @@ export default function OAuth2ProviderForm({ providerName, onCancel, onSuccess }
                                         render={({ field }) => (
                                             <MultipleValueTextInput
                                                 id="scope"
-                                                value={field.value || []}
-                                                onChange={(values) => field.onChange(values)}
-                                                placeholder="Enter scope and press Enter"
+                                                selectedValues={field.value || []}
+                                                onValuesChange={field.onChange}
+                                                placeholder="Select or add scopes"
+                                                addPlaceholder="Add scope"
+                                                initialOptions={
+                                                    oauth2Provider?.scope
+                                                        ? oauth2Provider.scope.map((el) => ({ label: el, value: el }))
+                                                        : []
+                                                }
                                             />
                                         )}
                                     />
@@ -476,9 +473,15 @@ export default function OAuth2ProviderForm({ providerName, onCancel, onSuccess }
                                         render={({ field }) => (
                                             <MultipleValueTextInput
                                                 id="audiences"
-                                                value={field.value || []}
-                                                onChange={(values) => field.onChange(values)}
-                                                placeholder="Enter audience and press Enter"
+                                                selectedValues={field.value || []}
+                                                onValuesChange={field.onChange}
+                                                placeholder="Select or add audiences"
+                                                addPlaceholder="Add audience"
+                                                initialOptions={
+                                                    oauth2Provider?.audiences
+                                                        ? oauth2Provider.audiences.map((el) => ({ label: el, value: el }))
+                                                        : []
+                                                }
                                             />
                                         )}
                                     />
@@ -666,10 +669,6 @@ export default function OAuth2ProviderForm({ providerName, onCancel, onSuccess }
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <p className="text-sm text-gray-500 mb-2">
-                                            The allowed time skew, in seconds, for token validation. This accounts for clock differences
-                                            between systems. Default value is 30 seconds.
-                                        </p>
                                         <Controller
                                             name="skew"
                                             control={control}
@@ -692,13 +691,13 @@ export default function OAuth2ProviderForm({ providerName, onCancel, onSuccess }
                                                 />
                                             )}
                                         />
+                                        <p className="text-sm text-gray-500 mt-2">
+                                            The allowed time skew, in seconds, for token validation. This accounts for clock differences
+                                            between systems. Default value is 30 seconds.
+                                        </p>
                                     </div>
 
                                     <div>
-                                        <p className="text-sm text-gray-500 mb-2">
-                                            Duration in seconds after which will inactive user's session be terminated. Default value is 15
-                                            minutes.
-                                        </p>
                                         <Controller
                                             name="sessionMaxInactiveInterval"
                                             control={control}
@@ -721,6 +720,10 @@ export default function OAuth2ProviderForm({ providerName, onCancel, onSuccess }
                                                 />
                                             )}
                                         />
+                                        <p className="text-sm text-gray-500 mt-2">
+                                            Duration in seconds after which will inactive user's session be terminated. Default value is 15
+                                            minutes.
+                                        </p>
                                     </div>
                                 </div>
                             </>

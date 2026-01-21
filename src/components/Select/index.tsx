@@ -20,12 +20,13 @@ interface BaseProps {
     isClearable?: boolean;
     required?: boolean;
     error?: string;
+    isSearchable?: boolean;
 }
 
 interface SingleSelectProps extends BaseProps {
     isMulti?: false;
-    value: string | number | { value: string | number; label: string };
-    onChange: (value: string | number) => void;
+    value: string | number | object | { value: string | number | object; label: string };
+    onChange: (value: string | number | object | { value: string | number | object; label: string }) => void;
 }
 
 interface MultiSelectProps extends BaseProps {
@@ -35,13 +36,43 @@ interface MultiSelectProps extends BaseProps {
 }
 
 type OptionValue = string | number | object;
-type Option = { value: OptionValue; label: string; disabled?: boolean };
 
 const getOptionValueString = (val: OptionValue): string => {
     if (typeof val === 'object' && val !== null) {
+        if ('reference' in val && typeof val.reference === 'string') {
+            return val.reference;
+        }
+        const uuid = getUuidFromValue(val);
+        if (uuid) {
+            return uuid;
+        }
         return JSON.stringify(val);
     }
     return String(val);
+};
+
+const getUuidFromValue = (val: any): string | null => {
+    if (typeof val === 'object' && val !== null) {
+        if (val.uuid && typeof val.uuid === 'string') {
+            return val.uuid;
+        }
+        if (val.data && typeof val.data === 'object' && val.data.uuid && typeof val.data.uuid === 'string') {
+            return val.data.uuid;
+        }
+    }
+    return null;
+};
+
+const valuesMatch = (val1: any, val2: any): boolean => {
+    if (typeof val1 !== 'object' || typeof val2 !== 'object' || val1 === null || val2 === null) {
+        return val1 === val2;
+    }
+
+    if (val1?.reference && val2?.reference) {
+        return val1.reference === val2.reference;
+    }
+
+    return JSON.stringify(val1) === JSON.stringify(val2);
 };
 
 type Props = SingleSelectProps | MultiSelectProps;
@@ -59,16 +90,18 @@ function Select({
     placement,
     isMulti = false,
     isClearable,
+    isSearchable = false,
     error,
 }: Props) {
-    if (id === '__attributes__entity__.credentialSelect') {
-        console.log('value', value);
-        console.log('options', options);
-    }
     const selectRef = useRef<HTMLSelectElement>(null);
     const previousOptionsRef = useRef<string>('');
     const previousValueRef = useRef<
-        string | number | { value: string | number; label: string } | { value: string | number; label: string }[] | undefined
+        | string
+        | number
+        | object
+        | { value: string | number | object; label: string }
+        | { value: string | number; label: string }[]
+        | undefined
     >(undefined);
     const isInitializedRef = useRef(false);
 
@@ -78,9 +111,9 @@ function Select({
         }
         const singleValue = value as SingleSelectProps['value'];
         if (singleValue && typeof singleValue === 'object' && 'value' in singleValue) {
-            return singleValue.value;
+            return (singleValue as { value: string | number | object; label: string }).value;
         }
-        return singleValue as string | number | undefined;
+        return singleValue as string | number | object | undefined;
     }, [isMulti, value]);
 
     const optionsKey = useMemo(() => {
@@ -91,16 +124,24 @@ function Select({
         if (!selectRef.current || !(window as any).HSSelect) return;
 
         const optionsChanged = previousOptionsRef.current !== optionsKey;
+        const valueChanged = (() => {
+            if (isMulti) {
+                const prev = previousValueRef.current as { value: string | number; label: string }[] | undefined;
+                const curr = value as { value: string | number; label: string }[];
+                if (!prev && !curr) return false;
+                if (!prev || !curr) return true;
+                if (prev.length !== curr.length) return true;
+                return prev.some((p, i) => !valuesMatch(p.value, curr[i]?.value));
+            } else {
+                const prev = previousValueRef.current;
+                const curr = getValueFromProp;
+                return !valuesMatch(prev, curr);
+            }
+        })();
 
         if (optionsChanged) {
             const instance = (window as any).HSSelect.getInstance(selectRef.current);
             if (instance) {
-                const isOpen = instance.isOpened && typeof instance.isOpened === 'function' && instance.isOpened();
-                if (isOpen) {
-                    previousOptionsRef.current = optionsKey;
-                    previousValueRef.current = value;
-                    return;
-                }
                 instance.destroy();
                 isInitializedRef.current = false;
             }
@@ -116,6 +157,44 @@ function Select({
             previousValueRef.current = value;
 
             return () => cancelAnimationFrame(frameId);
+        } else if (valueChanged) {
+            const instance = (window as any).HSSelect.getInstance(selectRef.current);
+            if (instance) {
+                const isOpen = instance.isOpened && typeof instance.isOpened === 'function' && instance.isOpened();
+                if (isOpen) {
+                    instance.close();
+                }
+                instance.destroy();
+                isInitializedRef.current = false;
+            }
+
+            if (selectRef.current) {
+                if (isMulti) {
+                    const curr = value as { value: string | number; label: string }[];
+                    Array.from(selectRef.current.options).forEach((option) => {
+                        if (option.value === '') {
+                            option.selected = false;
+                            return;
+                        }
+                        const isSelected = curr?.some((v) => getOptionValueString(v.value) === option.value);
+                        option.selected = isSelected || false;
+                    });
+                } else {
+                    const valueString = getValueFromProp != null ? getOptionValueString(getValueFromProp as OptionValue) : '';
+                    selectRef.current.value = valueString;
+                }
+            }
+
+            const frameId = requestAnimationFrame(() => {
+                if (selectRef.current && (window as any).HSSelect) {
+                    (window as any).HSSelect.autoInit();
+                    isInitializedRef.current = true;
+                }
+            });
+
+            previousValueRef.current = value;
+
+            return () => cancelAnimationFrame(frameId);
         } else if (!isInitializedRef.current) {
             const frameId = requestAnimationFrame(() => {
                 if (selectRef.current && (window as any).HSSelect) {
@@ -128,9 +207,11 @@ function Select({
         } else {
             previousValueRef.current = value;
         }
-    }, [optionsKey, value]);
+    }, [optionsKey, value, id, isMulti, getValueFromProp]);
 
     const hasOptions = options && options.length > 0;
+
+    const hasSearch = isSearchable && options.length > 5;
 
     return (
         <div>
@@ -139,14 +220,18 @@ function Select({
                 <select
                     ref={selectRef}
                     multiple={isMulti}
-                    value={isMulti ? undefined : (getValueFromProp?.toString() ?? '')}
+                    value={isMulti ? undefined : getValueFromProp != null ? getOptionValueString(getValueFromProp as OptionValue) : ''}
                     data-hs-select={JSON.stringify({
+                        hasSearch: hasSearch,
+                        searchPlaceholder: 'Search...',
+                        searchClasses:
+                            'block w-full sm:text-sm !border-gray-200 rounded-lg focus:ring-transparent dark:bg-neutral-900 dark:!border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 py-1.5 sm:py-2 px-3',
+                        searchWrapperClasses: 'bg-white p-2 -mx-1 sticky top-0 dark:bg-neutral-900',
                         placeholder: hasOptions ? placeholder : 'No options',
                         toggleTag: '<button type="button" aria-expanded="false"></button>',
                         toggleClasses:
                             'hs-select-disabled:pointer-events-none text-[var(--dark-gray-color)] hs-select-disabled:opacity-50 relative py-3 ps-4 pe-9 flex gap-x-2 text-nowrap w-full cursor-pointer bg-white border border-gray-200 rounded-lg text-start text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:focus:outline-hidden dark:focus:ring-1 dark:focus:ring-neutral-600',
-                        dropdownClasses:
-                            'mt-2 z-[100] w-full max-h-72 p-1 space-y-0.5 bg-white border border-gray-200 rounded-lg overflow-hidden overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 dark:bg-neutral-900 dark:border-neutral-700',
+                        dropdownClasses: `mt-2 z-[100] w-full max-h-72 space-y-0.5 bg-white border border-gray-200 rounded-lg overflow-hidden overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 dark:bg-neutral-900 dark:border-neutral-700 ${hasSearch ? ' px-1 pb-1' : 'p-1'}`,
                         dropdownScope: 'window',
                         optionClasses:
                             'py-2 px-4 w-full text-sm cursor-pointer hover:bg-gray-100 rounded-lg focus:outline-hidden focus:bg-gray-100 hs-select-disabled:pointer-events-none hs-select-disabled:opacity-50 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:text-neutral-200 dark:focus:bg-neutral-800',
@@ -190,17 +275,11 @@ function Select({
                         const isSelected = isMulti
                             ? !!value &&
                               (value as { value: string | number; label: string }[]).some((v) => {
-                                  if (typeof v.value === 'object' && typeof option.value === 'object') {
-                                      return JSON.stringify(v.value) === JSON.stringify(option.value);
-                                  }
-                                  return v.value === option.value;
+                                  return valuesMatch(v.value, option.value);
                               })
                             : (() => {
                                   const currentValue = getValueFromProp;
-                                  if (typeof option.value === 'object' && typeof currentValue === 'object') {
-                                      return JSON.stringify(option.value) === JSON.stringify(currentValue);
-                                  }
-                                  return option.value === currentValue;
+                                  return valuesMatch(option.value, currentValue);
                               })();
                         return (
                             <option

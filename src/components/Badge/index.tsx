@@ -12,9 +12,10 @@ interface Props {
     title?: string;
     size?: 'small' | 'medium' | 'large';
     dataTestId?: string;
+    id?: string;
 }
 
-function Badge({ color = 'secondary', onClick, onRemove, children, style, className, title, size = 'small', dataTestId }: Props) {
+function Badge({ color = 'secondary', onClick, onRemove, children, style, className, title, size = 'small', dataTestId, id }: Props) {
     const colorClasses = {
         gray: 'bg-gray-800 text-white dark:bg-white dark:text-neutral-800',
         secondary: 'bg-gray-500 text-white',
@@ -42,6 +43,7 @@ function Badge({ color = 'secondary', onClick, onRemove, children, style, classN
             )}
             style={style}
             title={title}
+            id={id}
         >
             {children}
             {onRemove && (

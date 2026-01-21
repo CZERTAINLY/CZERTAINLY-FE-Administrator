@@ -93,8 +93,18 @@ function LocationPushForm({
         defaultValues: {},
     });
 
-    const { control, handleSubmit, formState } = methods;
+    const { control, handleSubmit, formState, trigger } = methods;
     const allFormValues = useWatch({ control });
+    const previousIsPushingRef = useRef(isPushing);
+
+    useEffect(() => {
+        if (previousIsPushingRef.current !== isPushing) {
+            previousIsPushingRef.current = isPushing;
+            if (locationAttributeDescriptors) {
+                trigger();
+            }
+        }
+    }, [isPushing, locationAttributeDescriptors, trigger]);
 
     const handleFormSubmit = (values: any) => {
         onSubmit(allFormValues);
@@ -105,16 +115,19 @@ function LocationPushForm({
             <form onSubmit={handleSubmit(handleFormSubmit)}>
                 <Label htmlFor="locations">Locations</Label>
 
-                <CustomTable
-                    hasPagination={false}
-                    headers={selectLocationsHeaders}
-                    data={selectLocationsData}
-                    hasCheckboxes={true}
-                    multiSelect={false}
-                    onCheckedRowsChanged={(rows) => setSelectLocationCheckedRows(rows as string[])}
-                />
+                <div className="mb-4">
+                    <CustomTable
+                        hasPagination={false}
+                        headers={selectLocationsHeaders}
+                        data={selectLocationsData}
+                        hasCheckboxes={true}
+                        multiSelect={false}
+                        onCheckedRowsChanged={(rows) => setSelectLocationCheckedRows(rows as string[])}
+                    />
+                </div>
 
                 <TabLayout
+                    noBorder
                     tabs={[
                         {
                             title: 'Location Attributes',
@@ -1192,7 +1205,7 @@ export default function CertificateDetail() {
                                 <CustomTable
                                     headers={locationsHeaders}
                                     data={locationsData}
-                                    hasCheckboxes={true}
+                                    hasCheckboxes
                                     onCheckedRowsChanged={(rows) => setLocationCheckedRows(rows as string[])}
                                 />
                             </Widget>

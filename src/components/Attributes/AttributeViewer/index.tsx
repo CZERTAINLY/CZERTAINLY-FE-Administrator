@@ -20,8 +20,6 @@ import ContentValueField from '../../Input/DynamicContent/ContentValueField';
 import WidgetButtons, { WidgetButtonProps } from '../../WidgetButtons';
 import { InfoIcon } from 'lucide-react';
 import Button from 'components/Button';
-import Popover from 'components/Popover';
-import Widget from 'components/Widget';
 
 export enum ATTRIBUTE_VIEWER_TYPE {
     ATTRIBUTE,
@@ -181,18 +179,24 @@ export default function AttributeViewer({
 
             if ('sourceObjects' in attribute && attribute.sourceObjects.length > 0 && resource) {
                 return (
-                    <Popover
-                        width={600}
-                        content={
-                            <Widget title="Source objects" noBorder className="!bg-[#F7F6F2]">
-                                <CustomTable headers={headers} data={attribute.sourceObjects.map(createData)} />
-                            </Widget>
-                        }
+                    <Button
+                        data-testid="source-button"
+                        variant="transparent"
+                        className="!p-1 ml-1 relative top-[3px]"
+                        onClick={() => {
+                            dispatch(
+                                userInterfaceActions.showGlobalModal({
+                                    isOpen: true,
+                                    size: 'xl',
+                                    title: 'Source objects',
+                                    content: <CustomTable headers={headers} data={attribute.sourceObjects.map(createData)} />,
+                                    showCloseButton: true,
+                                }),
+                            );
+                        }}
                     >
-                        <Button data-testid="source-button" variant="transparent" className="!p-1 ml-1 relative top-[3px]">
-                            <InfoIcon size={16} />
-                        </Button>
-                    </Popover>
+                        <InfoIcon size={16} />
+                    </Button>
                 );
             }
             return null;

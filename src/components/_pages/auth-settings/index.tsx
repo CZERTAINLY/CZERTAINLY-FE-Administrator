@@ -38,10 +38,8 @@ const AuthenticationSettings = () => {
     const [selectedProvider, setSelectedProvider] = useState<string | null>(null);
     const [jwkSetKeysDialog, setJwkSetKeysDialog] = useState(false);
     const [isOAuth2FormDialogOpen, setIsOAuth2FormDialogOpen] = useState(false);
-    const [editingProviderName, setEditingProviderName] = useState<string | undefined>(undefined);
 
     const wasCreating = useRef(isCreatingProvider);
-    const wasUpdating = useRef(isUpdatingProvider);
 
     const getAuthenticationSettings = useCallback(() => {
         dispatch(authSettingsActions.getAuthenticationSettings());
@@ -81,27 +79,16 @@ const AuthenticationSettings = () => {
         setJwkSetKeysDialog(false);
     }, []);
 
-    const handleOpenOAuth2FormDialog = useCallback(
-        (providerName?: string) => {
-            setEditingProviderName(providerName);
-            setIsOAuth2FormDialogOpen(true);
-            if (providerName) {
-                dispatch(authSettingsActions.resetOAuth2ProviderSettings());
-                dispatch(authSettingsActions.getOAuth2ProviderSettings({ providerName }));
-            } else {
-                dispatch(authSettingsActions.resetOAuth2ProviderSettings());
-            }
-        },
-        [dispatch],
-    );
-
-    const handleCloseOAuth2FormDialog = useCallback(() => {
-        setIsOAuth2FormDialogOpen(false);
-        setEditingProviderName(undefined);
+    const handleOpenOAuth2FormDialog = useCallback(() => {
+        setIsOAuth2FormDialogOpen(true);
         dispatch(authSettingsActions.resetOAuth2ProviderSettings());
     }, [dispatch]);
 
-    // Track creation/update state and close dialog on success
+    const handleCloseOAuth2FormDialog = useCallback(() => {
+        setIsOAuth2FormDialogOpen(false);
+        dispatch(authSettingsActions.resetOAuth2ProviderSettings());
+    }, [dispatch]);
+
     useEffect(() => {
         if (wasCreating.current && !isCreatingProvider && isOAuth2FormDialogOpen) {
             handleCloseOAuth2FormDialog();
@@ -110,20 +97,12 @@ const AuthenticationSettings = () => {
         wasCreating.current = isCreatingProvider;
     }, [isCreatingProvider, isOAuth2FormDialogOpen, handleCloseOAuth2FormDialog, getAuthenticationSettings]);
 
-    useEffect(() => {
-        if (wasUpdating.current && !isUpdatingProvider && isOAuth2FormDialogOpen) {
-            handleCloseOAuth2FormDialog();
-            getAuthenticationSettings();
-        }
-        wasUpdating.current = isUpdatingProvider;
-    }, [isUpdatingProvider, isOAuth2FormDialogOpen, handleCloseOAuth2FormDialog, getAuthenticationSettings]);
-
     const providersButtons: WidgetButtonProps[] = useMemo(
         () => [
             {
                 icon: 'plus',
                 disabled: false,
-                tooltip: 'Create Authentication Provider',
+                tooltip: 'Create',
                 onClick: () => {
                     handleOpenOAuth2FormDialog();
                 },
@@ -287,9 +266,9 @@ const AuthenticationSettings = () => {
             <Dialog
                 isOpen={isOAuth2FormDialogOpen}
                 toggle={handleCloseOAuth2FormDialog}
-                caption={editingProviderName ? 'Edit OAuth2 Provider' : 'Create OAuth2 Provider'}
+                caption="Create OAuth2 Provider"
                 size="xl"
-                body={<OAuth2ProviderForm providerName={editingProviderName} onCancel={handleCloseOAuth2FormDialog} />}
+                body={<OAuth2ProviderForm onCancel={handleCloseOAuth2FormDialog} />}
             />
         </Container>
     );
