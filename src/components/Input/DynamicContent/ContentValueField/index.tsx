@@ -78,7 +78,11 @@ export default function ContentValueField({ id, descriptor, initialContent, onSu
     }, [descriptor]);
 
     const beforeOnSubmit = useCallback(
-        (attributeUuid: string, content: BaseAttributeContentModel[]) => {
+        (attributeUuid: string, content: BaseAttributeContentModel[] | undefined) => {
+            if (!content || content.length === 0) {
+                return;
+            }
+
             const updatedContent = content.map((contentObject) => {
                 if (descriptor.contentType === 'date') {
                     const updatedDate = new Date(contentObject.data as string);
@@ -111,10 +115,10 @@ export default function ContentValueField({ id, descriptor, initialContent, onSu
 
     const getFieldContent = (input: any) => {
         if (ContentFieldConfiguration[descriptor.contentType].type === 'checkbox') {
-            const booleanValue = input.checked !== undefined ? input.checked : input.value;
+            const booleanValue = input.checked !== undefined ? input.checked : (input.value ?? false);
             return [{ data: booleanValue }];
         }
-        if (!input.value) {
+        if (!input.value && input.value !== 0 && input.value !== false) {
             return undefined;
         }
         if (descriptor.properties.list) {
