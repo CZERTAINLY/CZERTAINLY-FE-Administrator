@@ -17,7 +17,6 @@ const RulesList = () => {
     return (
         <TabLayout
             selectedTab={activeTab}
-            onlyActiveTabContent
             tabs={[
                 {
                     title: 'Actions',

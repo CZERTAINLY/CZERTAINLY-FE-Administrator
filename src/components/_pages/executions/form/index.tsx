@@ -150,164 +150,166 @@ const ExecutionForm = () => {
         <>
             <Breadcrumb
                 items={[
-                    { label: 'Executions', href: '/executions' },
+                    { label: `${getEnumLabel(resourceEnum, Resource.Actions)} Inventory`, href: '/actions/1' },
                     { label: title, href: '' },
                 ]}
             />
             <FormProvider {...methods}>
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <form onSubmit={handleSubmit(onSubmit)}>
                     <Widget title={title} busy={isBusy}>
-                        <Controller
-                            name="name"
-                            control={control}
-                            rules={buildValidationRules([validateRequired(), validateAlphaNumericWithSpecialChars()])}
-                            render={({ field, fieldState }) => (
-                                <TextInput
-                                    {...field}
-                                    id="name"
-                                    type="text"
-                                    label="Execution Name"
-                                    required
-                                    placeholder="Enter the Execution Name"
-                                    invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
-                                />
-                            )}
-                        />
-
-                        <Controller
-                            name="description"
-                            control={control}
-                            render={({ field, fieldState }) => (
-                                <TextInput
-                                    {...field}
-                                    id="description"
-                                    type="text"
-                                    label="Description"
-                                    placeholder="Enter the Description"
-                                    invalid={fieldState.error && fieldState.isTouched}
-                                    error={
-                                        fieldState.error && fieldState.isTouched
-                                            ? typeof fieldState.error === 'string'
-                                                ? fieldState.error
-                                                : fieldState.error?.message || 'Invalid value'
-                                            : undefined
-                                    }
-                                />
-                            )}
-                        />
-
-                        <div>
+                        <div className="space-y-4">
                             <Controller
-                                name="type"
+                                name="name"
                                 control={control}
-                                rules={buildValidationRules([validateRequired()])}
+                                rules={buildValidationRules([validateRequired(), validateAlphaNumericWithSpecialChars()])}
                                 render={({ field, fieldState }) => (
-                                    <>
-                                        <Select
-                                            id="typeSelect"
-                                            label="Execution Type"
-                                            value={field.value || ''}
-                                            onChange={(value) => {
-                                                field.onChange(value);
-                                                setValue('resource', Resource.Any);
-                                            }}
-                                            options={executionTypeOptions}
-                                            placeholder="Select Execution Type"
-                                            isClearable
-                                            placement="bottom"
-                                        />
-                                        {fieldState.error && fieldState.isTouched && (
-                                            <p className="mt-1 text-sm text-red-600">
-                                                {typeof fieldState.error === 'string'
+                                    <TextInput
+                                        {...field}
+                                        id="name"
+                                        type="text"
+                                        label="Execution Name"
+                                        required
+                                        placeholder="Enter the Execution Name"
+                                        invalid={fieldState.error && fieldState.isTouched}
+                                        error={
+                                            fieldState.error && fieldState.isTouched
+                                                ? typeof fieldState.error === 'string'
                                                     ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'}
-                                            </p>
-                                        )}
-                                    </>
-                                )}
-                            />
-                        </div>
-
-                        <div>
-                            <Controller
-                                name="resource"
-                                control={control}
-                                rules={buildValidationRules([validateRequired()])}
-                                render={({ field, fieldState }) => (
-                                    <>
-                                        <Select
-                                            id="resourceSelect"
-                                            label="Resource"
-                                            value={field.value || ''}
-                                            onChange={(value) => {
-                                                field.onChange(value);
-                                                setValue('items', []);
-                                            }}
-                                            options={resourceOptionsWithRuleEvaluator || []}
-                                            placeholder="Select Resource"
-                                            isClearable
-                                            disabled={watchedType === ExecutionType.SendNotification}
-                                            placement="bottom"
-                                        />
-                                        {fieldState.error && fieldState.isTouched && (
-                                            <p className="mt-1 text-sm text-red-600">
-                                                {typeof fieldState.error === 'string'
-                                                    ? fieldState.error
-                                                    : fieldState.error?.message || 'Invalid value'}
-                                            </p>
-                                        )}
-                                    </>
-                                )}
-                            />
-                        </div>
-
-                        {watchedType === ExecutionType.SetField && watchedResource && (
-                            <ConditionFormFilter formType="executionItem" resource={watchedResource} />
-                        )}
-
-                        {watchedType === ExecutionType.SendNotification && (
-                            <Controller
-                                name="notificationProfileItems"
-                                control={control}
-                                render={({ field }) => (
-                                    <SendNotificationExecutionItems
-                                        mode="form"
-                                        notificationProfileItems={field.value}
-                                        onNotificationProfileItemsChange={(newItems) => {
-                                            field.onChange(newItems);
-                                        }}
+                                                    : fieldState.error?.message || 'Invalid value'
+                                                : undefined
+                                        }
                                     />
                                 )}
                             />
-                        )}
 
-                        <Container className="flex-row justify-end mt-4">
-                            <ProgressButton
-                                title={submitTitle}
-                                inProgressTitle={inProgressTitle}
-                                inProgress={isSubmitting}
-                                disabled={
-                                    areDefaultValuesSame(formValues) ||
-                                    (formValues.resource === Resource.None && formValues.type !== ExecutionType.SendNotification) ||
-                                    isSubmitting ||
-                                    !isValid ||
-                                    isBusy ||
-                                    (!formValues.items.length && !formValues.notificationProfileItems?.length)
-                                }
-                                type="submit"
+                            <Controller
+                                name="description"
+                                control={control}
+                                render={({ field, fieldState }) => (
+                                    <TextInput
+                                        {...field}
+                                        id="description"
+                                        type="text"
+                                        label="Description"
+                                        placeholder="Enter the Description"
+                                        invalid={fieldState.error && fieldState.isTouched}
+                                        error={
+                                            fieldState.error && fieldState.isTouched
+                                                ? typeof fieldState.error === 'string'
+                                                    ? fieldState.error
+                                                    : fieldState.error?.message || 'Invalid value'
+                                                : undefined
+                                        }
+                                    />
+                                )}
                             />
 
-                            <Button variant="outline" onClick={onCancel} disabled={isSubmitting} type="button">
-                                Cancel
-                            </Button>
-                        </Container>
+                            <div>
+                                <Controller
+                                    name="type"
+                                    control={control}
+                                    rules={buildValidationRules([validateRequired()])}
+                                    render={({ field, fieldState }) => (
+                                        <>
+                                            <Select
+                                                id="typeSelect"
+                                                label="Execution Type"
+                                                value={field.value || ''}
+                                                onChange={(value) => {
+                                                    field.onChange(value);
+                                                    setValue('resource', Resource.Any);
+                                                }}
+                                                options={executionTypeOptions}
+                                                placeholder="Select Execution Type"
+                                                isClearable
+                                                placement="bottom"
+                                            />
+                                            {fieldState.error && fieldState.isTouched && (
+                                                <p className="mt-1 text-sm text-red-600">
+                                                    {typeof fieldState.error === 'string'
+                                                        ? fieldState.error
+                                                        : fieldState.error?.message || 'Invalid value'}
+                                                </p>
+                                            )}
+                                        </>
+                                    )}
+                                />
+                            </div>
+
+                            <div>
+                                <Controller
+                                    name="resource"
+                                    control={control}
+                                    rules={buildValidationRules([validateRequired()])}
+                                    render={({ field, fieldState }) => (
+                                        <>
+                                            <Select
+                                                id="resourceSelect"
+                                                label="Resource"
+                                                value={field.value || ''}
+                                                onChange={(value) => {
+                                                    field.onChange(value);
+                                                    setValue('items', []);
+                                                }}
+                                                options={resourceOptionsWithRuleEvaluator || []}
+                                                placeholder="Select Resource"
+                                                isClearable
+                                                disabled={watchedType === ExecutionType.SendNotification}
+                                                placement="bottom"
+                                            />
+                                            {fieldState.error && fieldState.isTouched && (
+                                                <p className="mt-1 text-sm text-red-600">
+                                                    {typeof fieldState.error === 'string'
+                                                        ? fieldState.error
+                                                        : fieldState.error?.message || 'Invalid value'}
+                                                </p>
+                                            )}
+                                        </>
+                                    )}
+                                />
+                            </div>
+
+                            {watchedType === ExecutionType.SetField && watchedResource && (
+                                <ConditionFormFilter formType="executionItem" resource={watchedResource} />
+                            )}
+
+                            {watchedType === ExecutionType.SendNotification && (
+                                <Controller
+                                    name="notificationProfileItems"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <SendNotificationExecutionItems
+                                            mode="form"
+                                            notificationProfileItems={field.value}
+                                            onNotificationProfileItemsChange={(newItems) => {
+                                                field.onChange(newItems);
+                                            }}
+                                        />
+                                    )}
+                                />
+                            )}
+
+                            <Container className="flex-row justify-end mt-4">
+                                <ProgressButton
+                                    title={submitTitle}
+                                    inProgressTitle={inProgressTitle}
+                                    inProgress={isSubmitting}
+                                    disabled={
+                                        areDefaultValuesSame(formValues) ||
+                                        (formValues.resource === Resource.None && formValues.type !== ExecutionType.SendNotification) ||
+                                        isSubmitting ||
+                                        !isValid ||
+                                        isBusy ||
+                                        (!formValues.items.length && !formValues.notificationProfileItems?.length)
+                                    }
+                                    type="submit"
+                                />
+
+                                <Button variant="outline" onClick={onCancel} disabled={isSubmitting} type="button">
+                                    Cancel
+                                </Button>
+                            </Container>
+                        </div>
                     </Widget>
                 </form>
             </FormProvider>
