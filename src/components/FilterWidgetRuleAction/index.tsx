@@ -644,7 +644,7 @@ export default function FilterWidgetRuleAction({
                         </div>
                     </div>
 
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-wrap">
                         {actions.map((f, i) => {
                             const field = availableFilters
                                 .find((a) => a.filterFieldSource === f.fieldSource)
