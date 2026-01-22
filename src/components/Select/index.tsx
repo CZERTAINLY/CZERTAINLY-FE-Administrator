@@ -1,5 +1,6 @@
 import { useEffect, useRef, useMemo } from 'react';
 import Label from 'components/Label';
+import cn from 'classnames';
 
 export type SingleValue<T> = T | undefined;
 export type MultiValue<T> = T[] | undefined;
@@ -21,6 +22,7 @@ interface BaseProps {
     required?: boolean;
     error?: string;
     isSearchable?: boolean;
+    minWidth?: number;
 }
 
 interface SingleSelectProps extends BaseProps {
@@ -92,6 +94,7 @@ function Select({
     isClearable,
     isSearchable = false,
     error,
+    minWidth,
 }: Props) {
     const selectRef = useRef<HTMLSelectElement>(null);
     const previousOptionsRef = useRef<string>('');
@@ -216,7 +219,7 @@ function Select({
     return (
         <div>
             {label && <Label htmlFor={id} title={label} required={required} />}
-            <div>
+            <div className={cn(`min-w-[${minWidth}px]`, className)}>
                 <select
                     ref={selectRef}
                     multiple={isMulti}

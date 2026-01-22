@@ -124,6 +124,7 @@ const ConditionsList = () => {
                 custom: (
                     <Select
                         placeholder="Select Resource"
+                        minWidth={165}
                         id="resource"
                         options={resourceOptionsWithRuleEvaluator}
                         value={selectedResource || 'Select Resource'}

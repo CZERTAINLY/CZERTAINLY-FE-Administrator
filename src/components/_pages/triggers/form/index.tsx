@@ -287,6 +287,7 @@ const TriggerForm = ({ onCancel, onSuccess }: TriggerFormProps = {}) => {
                                             }}
                                             options={resourceOptions.map((opt) => ({ value: opt.value, label: opt.label }))}
                                             placeholder="Select Resource"
+                                            minWidth={165}
                                             placement="bottom"
                                         />
                                         {fieldState.error && fieldState.isTouched && (
