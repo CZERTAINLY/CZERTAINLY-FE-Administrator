@@ -8,7 +8,7 @@ import Switch from 'components/Switch';
 import { selectors } from 'ducks/auth';
 import { actions as uiActions, selectors as uiSelectors } from 'ducks/user-interface';
 
-import logo from '../../../resources/images/czertainly_white_H.svg';
+import logo from '../../../resources/images/ilm-logo-white.svg';
 
 interface Props {
     sidebarToggle: () => void;
@@ -27,7 +27,7 @@ function Header({ sidebarToggle }: Props) {
             data-testid="header"
         >
             <Link to="/dashboard" data-testid="header-logo-link">
-                <img src={logo} alt="CZERTAINLY Logo" className="h-9" data-testid="header-logo" />
+                <img src={logo} alt="ILM Logo" className="h-9" data-testid="header-logo" />
             </Link>
             <div className="flex items-center gap-2">
                 <div className="flex items-center gap-2 text-white hidden">
