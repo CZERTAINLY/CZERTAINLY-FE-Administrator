@@ -659,7 +659,7 @@ export default function FilterWidget({
                             {selectedFilter === -1 ? 'Add' : 'Update'}
                         </Button>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-wrap">
                         {currentFilters.map((f, i) => {
                             const field = availableFilters
                                 .find((a) => a.filterFieldSource === f.fieldSource)

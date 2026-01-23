@@ -251,6 +251,7 @@ const ConditionForm = ({ onCancel, onSuccess }: ConditionFormProps = {}) => {
                                                 })) || []
                                             }
                                             placeholder="Select Resource"
+                                            minWidth={165}
                                             isClearable
                                             placement="bottom"
                                         />

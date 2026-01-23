@@ -139,6 +139,7 @@ const TriggerList = () => {
                 custom: (
                     <Select
                         placeholder="Select Resource"
+                        minWidth={165}
                         id="resource"
                         options={resourceOptionsWithEvents}
                         value={selectedResource || 'Select Resource'}

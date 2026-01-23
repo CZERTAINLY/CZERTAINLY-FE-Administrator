@@ -215,6 +215,7 @@ const RulesForm = ({ onCancel, onSuccess }: RulesFormProps = {}) => {
                                                 })) || []
                                             }
                                             placeholder="Select Resource"
+                                            minWidth={165}
                                             isClearable
                                             placement="bottom"
                                         />
