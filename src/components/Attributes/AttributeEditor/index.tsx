@@ -268,6 +268,9 @@ function AttributeEditorInner({
                 descriptor.attributeCallback?.mappings.forEach((mapping) => {
                     let value = mapping.value || getCurrentFromMappingValue(mapping);
                     if (typeof value === 'object' && value.hasOwnProperty('data')) value = value.data;
+                    if (typeof value === 'object' && value !== null && value.hasOwnProperty('uuid') && typeof value.uuid === 'string') {
+                        value = value.uuid;
+                    }
                     if (value === undefined) hasUndefinedMapping = true;
 
                     mapping.targets.forEach((target) => {
