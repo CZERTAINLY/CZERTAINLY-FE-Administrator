@@ -413,6 +413,10 @@ function AttributeEditorInner({
             });
             return grouped;
         }, [orderedAttributeDescriptors]);
+
+    const descriptorsKey = useMemo(() => attributeDescriptors.map((d) => d.uuid).join(','), [attributeDescriptors]);
+    const attributesKey = useMemo(() => attributes.map((a) => a.uuid).join(','), [attributes]);
+
     /**
      * Clean form attributes, callback data and previous form state whenever passed attribute descriptors or attributes changed
      */
@@ -421,10 +425,10 @@ function AttributeEditorInner({
         const currentValues = watch();
         const keysToClear = Object.keys(currentValues).filter((k) => k.startsWith(`__attributes__${id}__`));
         keysToClear.forEach((key) => {
-            setValue(key, undefined);
+            setValue(key, undefined, { shouldDirty: false, shouldValidate: false });
         });
         dispatch(connectorActions.clearCallbackData());
-    }, [attributeDescriptors, attributes, dispatch, setValue, watch, id]);
+    }, [descriptorsKey, attributesKey, dispatch, setValue, watch, id]);
 
     /**
      * Synchronize local deletedAttributes state with form state after clearAttributes
