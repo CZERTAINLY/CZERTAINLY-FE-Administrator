@@ -142,6 +142,7 @@ const NotificationProfilesList = () => {
                 pageWidgetLockName={LockWidgetNameEnum.ListOfNotificationProfiles}
                 addHidden
                 additionalButtons={additionalButtons}
+                hasCheckboxes={false}
             />
 
             <Dialog
