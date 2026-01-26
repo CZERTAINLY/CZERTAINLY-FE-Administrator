@@ -229,7 +229,7 @@ function Select({
     return (
         <div>
             {label && <Label htmlFor={id} title={label} required={required} />}
-            <div className={cn(`min-w-[${minWidth}px]`, className)}>
+            <div className={cn(className)} style={{ minWidth: `${minWidth}px` }}>
                 <select
                     ref={selectRef}
                     multiple={isMulti}
