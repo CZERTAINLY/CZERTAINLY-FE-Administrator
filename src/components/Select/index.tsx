@@ -23,6 +23,7 @@ interface BaseProps {
     error?: string;
     isSearchable?: boolean;
     minWidth?: number;
+    dropdownScope?: 'window';
 }
 
 interface SingleSelectProps extends BaseProps {
@@ -66,6 +67,14 @@ const getUuidFromValue = (val: any): string | null => {
 };
 
 const valuesMatch = (val1: any, val2: any): boolean => {
+    if (typeof val1 === 'object' && val1 !== null && typeof val2 === 'string' && val1?.name) {
+        return val1.name === val2;
+    }
+
+    if (typeof val1 === 'string' && typeof val2 === 'object' && val2 !== null && val2?.name) {
+        return val1 === val2.name;
+    }
+
     if (typeof val1 !== 'object' || typeof val2 !== 'object' || val1 === null || val2 === null) {
         return val1 === val2;
     }
@@ -95,6 +104,7 @@ function Select({
     isSearchable = false,
     error,
     minWidth,
+    dropdownScope,
 }: Props) {
     const selectRef = useRef<HTMLSelectElement>(null);
     const previousOptionsRef = useRef<string>('');
@@ -235,7 +245,7 @@ function Select({
                         toggleClasses:
                             'hs-select-disabled:pointer-events-none text-[var(--dark-gray-color)] hs-select-disabled:opacity-50 relative py-3 ps-4 pe-9 flex gap-x-2 text-nowrap w-full cursor-pointer bg-white border border-gray-200 rounded-lg text-start text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:focus:outline-hidden dark:focus:ring-1 dark:focus:ring-neutral-600',
                         dropdownClasses: `mt-2 z-[100] w-full max-h-72 space-y-0.5 bg-white border border-gray-200 rounded-lg overflow-hidden overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 dark:bg-neutral-900 dark:border-neutral-700 ${hasSearch ? ' px-1 pb-1' : 'p-1'}`,
-                        dropdownScope: 'window',
+                        ...(dropdownScope && { dropdownScope }),
                         optionClasses:
                             'py-2 px-4 w-full text-sm cursor-pointer hover:bg-gray-100 rounded-lg focus:outline-hidden focus:bg-gray-100 hs-select-disabled:pointer-events-none hs-select-disabled:opacity-50 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:text-neutral-200 dark:focus:bg-neutral-800',
                         optionTemplate:
