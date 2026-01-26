@@ -311,7 +311,7 @@ function TokenProfileList() {
                 isOpen={confirmDelete}
                 caption={`Delete Token ${checkedRows.length > 1 ? 'Profiles' : 'Profile'}`}
                 body={`You are about to delete ${
-                    checkedRows.length > 1 ? 'a Token Profile' : 'Token Profiles'
+                    checkedRows.length > 1 ? 'Token Profiles' : 'a Token Profile'
                 }. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"

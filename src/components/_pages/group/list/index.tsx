@@ -159,8 +159,8 @@ export default function GroupList() {
 
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete ${checkedRows.length > 1 ? 'Groups' : 'Profile'}`}
-                body={`You are about to delete ${checkedRows.length > 1 ? 'a Group' : 'Groups'}. Is this what you want to do?`}
+                caption={`Delete ${checkedRows.length > 1 ? 'Groups' : 'a Group'}`}
+                body={`You are about to delete ${checkedRows.length > 1 ? 'Groups' : 'a Group'}. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[
