@@ -10,9 +10,9 @@
   <defs>
     <style type="text/css">
       <![CDATA[
-      .primary {fill:#0072CF}
-      .secondary {fill:#B3B3B3}
-      .tertiary {fill:#000000}
+      .primary {fill:#FFFFFF}
+      .secondary {fill:#FFFFFF}
+      .tertiary {fill:#FFFFFF}
       ]]>
     </style>
   </defs>
