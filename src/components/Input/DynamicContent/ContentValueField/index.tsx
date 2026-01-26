@@ -174,6 +174,7 @@ export default function ContentValueField({ id, descriptor, initialContent, onSu
                         isMulti={descriptor.properties.multiSelect}
                         disabled={descriptor.properties.readOnly}
                         isClearable={!descriptor.properties.required}
+                        dropdownScope="window"
                     />
                 ) : isDateTime ? (
                     <DatePicker

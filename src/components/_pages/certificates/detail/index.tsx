@@ -52,7 +52,6 @@ import { Edge } from 'reactflow';
 import { LockWidgetNameEnum } from 'types/user-interface';
 import { DeviceType, useCopyToClipboard, useDeviceType } from 'utils/common-hooks';
 import CertificateStatus from '../CertificateStatus';
-import { createWidgetDetailHeaders } from 'utils/widget';
 import CertificateList from 'components/_pages/certificates/list';
 import { capitalize } from 'utils/common-utils';
 import ComplianceCheckResultWidget from 'components/_pages/certificates/ComplianceCheckResultWidget/ComplianceCheckResultWidget';
