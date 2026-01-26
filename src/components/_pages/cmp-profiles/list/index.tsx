@@ -150,7 +150,7 @@ export default function AdministratorsList() {
     const forceDeleteBody = useMemo(
         () => (
             <div>
-                <div>Failed to delete {checkedRows.length > 1 ? 'CMP Profiles' : 'an CMP Profile'}. Please find the details below:</div>
+                <div>Failed to delete {checkedRows.length > 1 ? 'CMP Profiles' : 'a CMP Profile'}. Please find the details below:</div>
 
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
                     <thead>
@@ -275,8 +275,8 @@ export default function AdministratorsList() {
 
             <Dialog
                 isOpen={confirmDelete}
-                caption={`Delete ${checkedRows.length > 1 ? 'CMP Profiles' : 'an CMP Profile'}`}
-                body={`You are about to delete ${checkedRows.length > 1 ? 'CMP Profiles' : 'an CMP Profile'}. Is this what you want to do?`}
+                caption={`Delete ${checkedRows.length > 1 ? 'CMP Profiles' : 'a CMP Profile'}`}
+                body={`You are about to delete ${checkedRows.length > 1 ? 'CMP Profiles' : 'a CMP Profile'}. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[
@@ -287,7 +287,7 @@ export default function AdministratorsList() {
 
             <Dialog
                 isOpen={confirmForceDelete}
-                caption={`Force Delete ${checkedRows.length > 1 ? 'CMP Profiles' : 'an CMP Profile'}`}
+                caption={`Force Delete ${checkedRows.length > 1 ? 'CMP Profiles' : 'a CMP Profile'}`}
                 body={forceDeleteBody}
                 toggle={() => setConfirmForceDelete(false)}
                 buttons={[

@@ -192,7 +192,7 @@ function AuthorityList() {
             <Dialog
                 isOpen={confirmDelete}
                 caption={`Delete ${checkedRows.length > 1 ? 'Authorities' : 'an Authority'}`}
-                body={`You are about to delete ${checkedRows.length > 1 ? 'Authorities' : 'a Authority'}. Is this what you want to do?`}
+                body={`You are about to delete ${checkedRows.length > 1 ? 'Authorities' : 'an Authority'}. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[
