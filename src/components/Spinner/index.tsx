@@ -2,7 +2,7 @@ import cn from 'classnames';
 interface Props {
     active?: boolean;
     color?: 'light' | 'primary';
-    size?: 'sm' | 'md' | 'lg';
+    size?: 'sm' | 'md' | 'lg' | 'xl';
     dataTestId?: string;
 }
 
@@ -19,6 +19,7 @@ function Spinner({ active = true, color = 'primary', size = 'md', dataTestId }: 
                         'size-4': size === 'sm',
                         'size-6': size === 'md',
                         'size-8': size === 'lg',
+                        'size-10': size === 'xl',
                         'text-blue-600': color === 'primary',
                         'text-white': color === 'light',
                     },
