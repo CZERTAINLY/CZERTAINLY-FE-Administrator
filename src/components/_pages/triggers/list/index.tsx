@@ -188,7 +188,7 @@ const TriggerList = () => {
                     onCheckedRowsChanged={(checkedRows) => {
                         setCheckedRows(checkedRows as string[]);
                     }}
-                    hasPagination={true}
+                    hasPagination
                 />
             </Widget>
 
@@ -199,8 +199,8 @@ const TriggerList = () => {
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                 ]}
             />
 

@@ -91,7 +91,7 @@ type Props = SingleSelectProps | MultiSelectProps;
 function Select({
     id,
     required,
-    options = [],
+    options: optionsProp = [],
     value,
     onChange,
     className,
@@ -128,6 +128,11 @@ function Select({
         }
         return singleValue as string | number | object | undefined;
     }, [isMulti, value]);
+
+    // Remove duplicate options
+    const options = useMemo(() => {
+        return Array.from(new Map(optionsProp.map((o) => [o.value, o])).values());
+    }, [optionsProp]);
 
     const optionsKey = useMemo(() => {
         return JSON.stringify(options?.map((opt) => ({ value: opt.value, label: opt.label, disabled: opt.disabled })));
