@@ -258,7 +258,7 @@ function RaProfileList() {
             <Dialog
                 isOpen={confirmDelete}
                 caption={`Delete RA ${checkedRows.length > 1 ? 'Profiles' : 'Profile'}`}
-                body={`You are about to delete ${checkedRows.length > 1 ? 'RA profilesa' : 'this RA Profile'}. Is this what you want to do?`}
+                body={`You are about to delete ${checkedRows.length > 1 ? 'RA profiles' : 'this RA Profile'}. Is this what you want to do?`}
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[
