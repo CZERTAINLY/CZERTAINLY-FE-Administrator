@@ -377,61 +377,57 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
 
                     {data.otherProperties && (
                         <div className={cn('w-full py-2', { hidden: !isNodeExpanded })}>
-                            <div className="max-h-[150px]overflow-auto w-full [scrollbar-width:thin] [scrollbar-color:#9ca3af_#e5e7eb] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-thumb]:rounded [&::-webkit-scrollbar-track]:bg-gray-200 [&::-webkit-scrollbar-track]:rounded">
+                            <div
+                                className="max-h-[150px] overflow-auto w-full [scrollbar-width:thin] [scrollbar-color:#9ca3af_#e5e7eb] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-thumb]:rounded [&::-webkit-scrollbar-track]:bg-gray-200 [&::-webkit-scrollbar-track]:rounded"
+                                onWheelCapture={(e) => {
+                                    // Prevent React Flow from capturing the wheel event so inner table can scroll
+                                    e.stopPropagation();
+                                }}
+                            >
                                 <div className="border border-gray-100 rounded-md">
-                                    <CustomTable
-                                        headers={[
-                                            {
-                                                id: 'property',
-                                                content: 'Property',
-                                                align: 'left',
-                                            },
-                                            {
-                                                id: 'value',
-                                                content: 'Value',
-                                                align: 'left',
-                                            },
-                                        ]}
-                                        data={data.otherProperties.map((property, index) => {
-                                            const valueContent = (
-                                                <div className="flex items-center gap-2 text-wrap">
-                                                    {property?.propertyValue && <span>{property.propertyValue}</span>}
-                                                    {property?.copyable && property?.propertyValue && (
-                                                        <span
-                                                            onClick={() => {
-                                                                if (typeof property.propertyValue === 'string') {
-                                                                    copyToClipboard(
-                                                                        property.propertyValue,
-                                                                        `${property.propertyName} copied to clipboard`,
-                                                                        `Failed to copy ${property.propertyName} to clipboard`,
-                                                                    );
-                                                                }
-                                                            }}
-                                                            className="cursor-pointer"
-                                                        >
-                                                            <Copy size={14} />
-                                                        </span>
-                                                    )}
-                                                    {property?.propertyContent && <>{property.propertyContent}</>}
-                                                </div>
-                                            );
+                                    <div className="min-w-full inline-block align-middle">
+                                        {/* header */}
+                                        <div className="grid grid-cols-3 bg-[#F8FAFC] text-xs font-medium text-gray-500 uppercase px-3 py-2 rounded-t-md">
+                                            <div className="col-span-1">Property</div>
+                                            <div className="col-span-2">Value</div>
+                                        </div>
+                                        {/* rows */}
+                                        <div className="divide-y divide-gray-100 bg-white rounded-b-md">
+                                            {data.otherProperties.map((property, index) => {
+                                                const valueContent = (
+                                                    <div className="flex items-center gap-2 break-all whitespace-normal">
+                                                        {property?.propertyValue && <span>{property.propertyValue}</span>}
+                                                        {property?.copyable && property?.propertyValue && (
+                                                            <span
+                                                                onClick={() => {
+                                                                    if (typeof property.propertyValue === 'string') {
+                                                                        copyToClipboard(
+                                                                            property.propertyValue,
+                                                                            `${property.propertyName} copied to clipboard`,
+                                                                            `Failed to copy ${property.propertyName} to clipboard`,
+                                                                        );
+                                                                    }
+                                                                }}
+                                                                className="cursor-pointer"
+                                                            >
+                                                                <Copy size={14} />
+                                                            </span>
+                                                        )}
+                                                        {property?.propertyContent && <>{property.propertyContent}</>}
+                                                    </div>
+                                                );
 
-                                            return {
-                                                id: index,
-                                                columns: [
-                                                    property?.propertyName ? (
-                                                        <span className="font-medium text-[#64748B]">{property.propertyName}</span>
-                                                    ) : (
-                                                        ''
-                                                    ),
-                                                    valueContent,
-                                                ],
-                                            };
-                                        })}
-                                        hasHeader={false}
-                                        hasCheckboxes={false}
-                                        hasPagination={false}
-                                    />
+                                                return (
+                                                    <div key={index} className="grid grid-cols-3 px-3 py-2 text-sm text-gray-800">
+                                                        <div className="col-span-1 font-medium text-[#64748B]">
+                                                            {property?.propertyName || ''}
+                                                        </div>
+                                                        <div className="col-span-2">{valueContent}</div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
