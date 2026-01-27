@@ -151,12 +151,6 @@ export default function Dialog({ isOpen, toggle, caption, body, buttons, size = 
             tabIndex={-1}
             aria-labelledby="hs-scale-animation-modal-label"
             data-testid={dataTestId}
-            onClick={(e) => {
-                const target = e.target as HTMLElement;
-                if ((target === e.currentTarget || target.classList?.contains('hs-overlay-animation-target')) && toggle) {
-                    toggle();
-                }
-            }}
         >
             <div
                 className={cn(
