@@ -517,6 +517,7 @@ export default function FilterWidget({
             );
         }
         function renderDefaultInput() {
+            const isLongValue = ['SCHEDULED_JOB_CLASS_NAME'].includes(currentField?.fieldIdentifier || '');
             return (
                 <Select
                     id="valueSelect"
@@ -529,6 +530,7 @@ export default function FilterWidget({
                     // isClearable
                     isDisabled={!filterField || !filterCondition || noValue[filterCondition.value]}
                     isSearchable
+                    dropdownWidth={isLongValue ? 400 : undefined}
                 />
             );
         }
