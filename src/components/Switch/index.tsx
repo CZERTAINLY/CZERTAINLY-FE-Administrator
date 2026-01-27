@@ -18,7 +18,7 @@ function Switch({ checked, onChange, id, label, secondaryLabel, disabled = false
     return (
         <div className={cn('flex items-center gap-x-3', className)}>
             {label && (
-                <Label htmlFor={id} className={cn('text-sm text-gray-800 dark:text-neutral-200 !mb-0', labelClassName)}>
+                <Label htmlFor={id} className={cn('text-sm !mb-0', labelClassName)}>
                     {label}
                 </Label>
             )}
@@ -49,7 +49,7 @@ function Switch({ checked, onChange, id, label, secondaryLabel, disabled = false
                 </Label>
             </div>
             {secondaryLabel && (
-                <Label htmlFor={id} className="text-sm text-gray-800 dark:text-neutral-200 !mb-0">
+                <Label htmlFor={id} className="text-sm !mb-0">
                     {secondaryLabel}
                 </Label>
             )}
