@@ -241,7 +241,7 @@ function Dashboard() {
                                 fieldSource: FilterFieldSource.Property,
                                 condition: FilterConditionOperator.Equals,
                                 fieldIdentifier: 'KEY_SIZE',
-                                value: JSON.parse(JSON.stringify(labels[index])),
+                                value: [Number(labels[index])],
                             },
                         ]}
                         redirect="../certificates"
@@ -262,7 +262,7 @@ function Dashboard() {
                                           fieldSource: FilterFieldSource.Property,
                                           condition: FilterConditionOperator.Empty,
                                           fieldIdentifier: 'RA_PROFILE_NAME',
-                                          value: JSON.parse(JSON.stringify('')),
+                                          value: [''],
                                       },
                                   ]
                                 : [
@@ -270,7 +270,7 @@ function Dashboard() {
                                           fieldSource: FilterFieldSource.Property,
                                           condition: FilterConditionOperator.Equals,
                                           fieldIdentifier: 'RA_PROFILE_NAME',
-                                          value: JSON.parse(JSON.stringify(labels[index])),
+                                          value: [labels[index]],
                                       },
                                   ]
                         }
@@ -285,14 +285,14 @@ function Dashboard() {
                         )}
                         data={dashboard?.groupStatByCertificateCount}
                         entity={EntityType.CERTIFICATE}
-                        onSetFilter={(index, labels) =>
-                            labels[index] === 'Unassigned'
+                        onSetFilter={(index, labels) => {
+                            return labels[index] === 'Unassigned'
                                 ? [
                                       {
                                           fieldSource: FilterFieldSource.Property,
                                           condition: FilterConditionOperator.Empty,
                                           fieldIdentifier: 'GROUP_NAME',
-                                          value: JSON.parse(JSON.stringify('')),
+                                          value: [''],
                                       },
                                   ]
                                 : [
@@ -300,10 +300,10 @@ function Dashboard() {
                                           fieldSource: FilterFieldSource.Property,
                                           condition: FilterConditionOperator.Equals,
                                           fieldIdentifier: 'GROUP_NAME',
-                                          value: JSON.parse(JSON.stringify(labels[index])),
+                                          value: [labels[index]],
                                       },
-                                  ]
-                        }
+                                  ];
+                        }}
                         redirect="../certificates"
                     />
                 )}
