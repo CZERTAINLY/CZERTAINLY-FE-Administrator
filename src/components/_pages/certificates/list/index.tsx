@@ -13,6 +13,7 @@ import { Link, useNavigate } from 'react-router';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 
 import Dropdown from 'components/Dropdown';
+import Badge from 'components/Badge';
 
 import { ApiClients } from '../../../../api';
 import PagedList from 'components/PagedList/PagedList';
@@ -392,20 +393,15 @@ export default function CertificateList({
                             certificate.issuerCommonName || ''
                         ),
                         certificate.certificateType ? (
-                            <span
-                                className={`inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-xs font-medium text-white ${certificate.certificateType === CertificateType.X509 ? 'bg-blue-600' : 'bg-gray-500'}`}
-                            >
+                            <Badge color={certificate.certificateType === CertificateType.X509 ? 'primary' : 'gray'} size="small">
                                 {getEnumLabel(certificateTypeEnum, certificate.certificateType)}
-                            </span>
+                            </Badge>
                         ) : (
                             ''
                         ),
-                        <span
-                            key="archivationStatus"
-                            className={`inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-xs font-medium text-white ${certificate.archived ? 'bg-gray-500' : 'bg-teal-500'}`}
-                        >
+                        <Badge key="archivationStatus" color={certificate.archived ? 'gray' : 'success'} size="small">
                             {certificate.archived ? 'Yes' : 'No'}
-                        </span>,
+                        </Badge>,
                     ],
                 };
             }),
