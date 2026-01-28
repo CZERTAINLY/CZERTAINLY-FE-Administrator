@@ -151,11 +151,6 @@ export default function Dialog({ isOpen, toggle, caption, body, buttons, size = 
             tabIndex={-1}
             aria-labelledby="hs-scale-animation-modal-label"
             data-testid={dataTestId}
-            onClick={(e) => {
-                if (e.target === e.currentTarget && toggle) {
-                    toggle();
-                }
-            }}
         >
             <div
                 className={cn(
@@ -178,7 +173,10 @@ export default function Dialog({ isOpen, toggle, caption, body, buttons, size = 
                         })}
                     >
                         {renderIcon()}
-                        <h3 id="hs-scale-animation-modal-label" className="font-bold text-gray-800 dark:text-white text-2xl">
+                        <h3
+                            id="hs-scale-animation-modal-label"
+                            className="font-bold text-[var(--dark-gray-color)] dark:text-white text-2xl"
+                        >
                             {caption}
                         </h3>
                     </div>
