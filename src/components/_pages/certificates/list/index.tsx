@@ -421,10 +421,10 @@ export default function CertificateList({
     );
 
     useEffect(() => {
-        if (withPreservedFilters && preservedFilters.length > 0) {
+        if (withPreservedFilters && preservedFilters.length > 0 && currentFilters.length === 0) {
             dispatch(filterActions.setCurrentFilters({ entity: EntityType.CERTIFICATE, currentFilters: preservedFilters }));
         }
-    }, [preservedFilters, dispatch, withPreservedFilters]);
+    }, [preservedFilters, currentFilters.length, dispatch, withPreservedFilters]);
 
     return (
         <>
