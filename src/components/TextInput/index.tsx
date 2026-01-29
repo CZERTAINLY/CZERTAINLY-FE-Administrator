@@ -18,6 +18,7 @@ interface Props {
     className?: string;
     required?: boolean;
     buttonRight?: React.ReactNode;
+    dataTestId?: string;
 }
 
 function TextInput({
@@ -34,6 +35,7 @@ function TextInput({
     className,
     required = false,
     buttonRight,
+    dataTestId,
 }: Props) {
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -138,6 +140,7 @@ function TextInput({
                     id={id}
                     autoComplete={getAutoComplete()}
                     data-form-type="other"
+                    data-testid={dataTestId ?? (id ? `text-input-${id}` : 'text-input')}
                 />
                 {buttonRight && (
                     <div className="absolute right-0 top-[50%] translate-y-[-50%] h-full flex items-center justify-center w-[40px] border-l border-gray-200">

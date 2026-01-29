@@ -50,7 +50,7 @@ function Dashboard() {
 
     return (
         <div>
-            <div className="flex flex-row gap-4 md:gap-8 mb-4 md:mb-8 flex-wrap">
+            <div className="flex flex-row gap-4 md:gap-8 mb-4 md:mb-8 flex-wrap" data-testid="dashboard-counts">
                 <div className="flex-1">
                     <CountBadge
                         data={dashboard?.totalCertificates}
@@ -78,7 +78,7 @@ function Dashboard() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-8" data-testid="dashboard-charts">
                 {!isEmpty(dashboard?.certificateStatByState) && (
                     <DonutChart
                         colorOptions={certificatesStateColorOptions}
