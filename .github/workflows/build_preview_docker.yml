@@ -91,7 +91,7 @@ jobs:
           images: |
             harbor.3key.company/czertainly/czertainly-frontend-administrator
           tags: |
-            type=sha,prefix=pr-${{ github.event.pull_request.number }}-,format=long
+            type=raw,value=pr-${{ inputs.pr_number }}-${{ inputs.head_sha }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
