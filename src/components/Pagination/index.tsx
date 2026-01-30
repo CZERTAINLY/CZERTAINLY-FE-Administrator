@@ -2,9 +2,10 @@ interface Props {
     page: number;
     totalPages: number;
     onPageChange: (page: number) => void;
+    dataTestId?: string;
 }
 
-function Pagination({ page, totalPages, onPageChange }: Props) {
+function Pagination({ page, totalPages, onPageChange, dataTestId }: Props) {
     const getPageNumbers = () => {
         const pages: (number | 'ellipsis')[] = [];
         const maxPagesToShow = 7; // Max page buttons to show
@@ -46,7 +47,7 @@ function Pagination({ page, totalPages, onPageChange }: Props) {
     const pageNumbers = getPageNumbers();
 
     return (
-        <div className="grid justify-center sm:flex sm:justify-start sm:items-center gap-2">
+        <div className="grid justify-center sm:flex sm:justify-start sm:items-center gap-2" data-testid={dataTestId ?? 'pagination'}>
             <nav className="flex items-center gap-x-1" aria-label="Pagination">
                 <button
                     type="button"
@@ -54,6 +55,7 @@ function Pagination({ page, totalPages, onPageChange }: Props) {
                     aria-label="Previous"
                     onClick={() => onPageChange(page - 1)}
                     disabled={page === 1}
+                    data-testid={dataTestId ? `${dataTestId}-prev` : 'pagination-prev'}
                 >
                     <svg
                         className="shrink-0 size-3.5"
@@ -94,6 +96,7 @@ function Pagination({ page, totalPages, onPageChange }: Props) {
                                 }
                                 onClick={() => onPageChange(pageNum)}
                                 aria-current={pageNum === page ? 'page' : undefined}
+                                data-testid={dataTestId ? `${dataTestId}-page-${pageNum}` : `pagination-page-${pageNum}`}
                             >
                                 {pageNum}
                             </button>
@@ -106,6 +109,7 @@ function Pagination({ page, totalPages, onPageChange }: Props) {
                     aria-label="Next"
                     onClick={() => onPageChange(page + 1)}
                     disabled={page === totalPages}
+                    data-testid={dataTestId ? `${dataTestId}-next` : 'pagination-next'}
                 >
                     <span>Next</span>
                     <svg
