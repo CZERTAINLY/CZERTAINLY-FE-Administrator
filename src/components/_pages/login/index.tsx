@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Navigate, useSearchParams } from 'react-router';
+import { useSearchParams } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { actions, selectors } from 'ducks/login';
 import Button from 'components/Button';

@@ -7,6 +7,7 @@ import Button from 'components/Button';
 import Label from 'components/Label';
 import Badge from 'components/Badge';
 import { selectors as notificationProfileSelectors, actions as notificationProfileActions } from 'ducks/notification-profiles';
+import Container from 'components/Container';
 
 interface SelectChangeValue {
     value: string;
@@ -76,10 +77,10 @@ export function SendNotificationExecutionItems({ mode, isUpdating, notificationP
 
     return (
         <Widget title="Execution Items" busy={isFetchingList || isUpdating} titleSize="large">
-            <div style={{ width: '99%', borderBottom: 'solid 1px silver', marginBottom: '1rem' }}>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="md:col-span-3">
-                        <Label htmlFor="fieldSelectInput">Notification Profile</Label>
+            <div>
+                <Label htmlFor="fieldSelectInput">Notification Profile</Label>
+                <Container gap={2} className="flex-row">
+                    <div className="grow">
                         <Select
                             id="field"
                             placeholder="Select Notification Profile"
@@ -98,17 +99,10 @@ export function SendNotificationExecutionItems({ mode, isUpdating, notificationP
                         />
                     </div>
 
-                    <div className="flex items-end">
-                        <Button
-                            className="w-full"
-                            color="primary"
-                            disabled={isFetchingList || !selectedProfile}
-                            onClick={onAddProfileClick}
-                        >
-                            Add
-                        </Button>
-                    </div>
-                </div>
+                    <Button color="primary" disabled={isFetchingList || !selectedProfile} onClick={onAddProfileClick}>
+                        Add
+                    </Button>
+                </Container>
             </div>
 
             {selectedProfiles.map((profile, i) => (
