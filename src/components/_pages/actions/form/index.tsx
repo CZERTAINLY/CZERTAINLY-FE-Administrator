@@ -230,8 +230,7 @@ const ActionsForm = ({ onCancel, onSuccess }: ActionsFormProps = {}) => {
                                                 })) || []
                                             }
                                             placeholder="Select Resource"
-                                            minWidth={165}
-                                            isClearable
+                                            minWidth={180}
                                             placement="bottom"
                                         />
                                         {fieldState.error && fieldState.isTouched && (

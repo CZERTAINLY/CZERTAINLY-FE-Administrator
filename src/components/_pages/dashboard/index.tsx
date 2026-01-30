@@ -1,7 +1,7 @@
 import Spinner from 'components/Spinner';
 import { selectors as enumSelectors } from 'ducks/enums';
 import { actions as certificatesActions, selectors as certificatesSelectors } from 'ducks/certificates';
-import { EntityType } from 'ducks/filters';
+import { actions as filterActions, EntityType } from 'ducks/filters';
 import { actions, selectors } from 'ducks/statisticsDashboard';
 import { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -50,7 +50,7 @@ function Dashboard() {
 
     return (
         <div>
-            <div className="flex flex-row gap-4 md:gap-8 mb-4 md:mb-8 flex-wrap">
+            <div className="flex flex-row gap-4 md:gap-8 mb-4 md:mb-8 flex-wrap" data-testid="dashboard-counts">
                 <div className="flex-1">
                     <CountBadge
                         data={dashboard?.totalCertificates}
@@ -78,7 +78,7 @@ function Dashboard() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-8" data-testid="dashboard-charts">
                 {!isEmpty(dashboard?.certificateStatByState) && (
                     <DonutChart
                         colorOptions={certificatesStateColorOptions}
@@ -154,7 +154,10 @@ function Dashboard() {
                         title={'Certificates by Type'}
                         data={dashboard?.certificateStatByType}
                         entity={EntityType.CERTIFICATE}
-                        onSetFilter={(_index, _labels) => []}
+                        onSetFilter={(_index, _labels) => {
+                            dispatch(filterActions.setPreservedFilters({ entity: EntityType.CERTIFICATE, preservedFilters: [] }));
+                            return [];
+                        }}
                         redirect="../certificates"
                     />
                 )}
