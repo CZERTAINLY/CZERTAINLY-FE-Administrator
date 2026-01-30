@@ -58,7 +58,7 @@ const EventsList = () => {
                             isClearable
                             options={resourceOptionsWithEvents}
                             placeholder="Select Resource"
-                            minWidth={165}
+                            minWidth={180}
                             value={selectedResource || ''}
                             onChange={(value) => {
                                 setSelectedResource(value as Resource);

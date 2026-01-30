@@ -253,8 +253,7 @@ const ExecutionForm = () => {
                                                 }}
                                                 options={resourceOptionsWithRuleEvaluator || []}
                                                 placeholder="Select Resource"
-                                                minWidth={165}
-                                                isClearable
+                                                minWidth={180}
                                                 disabled={watchedType === ExecutionType.SendNotification}
                                                 placement="bottom"
                                             />
