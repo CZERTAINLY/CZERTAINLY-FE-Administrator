@@ -1,6 +1,8 @@
 import { useEffect, useRef, useMemo } from 'react';
 import Label from 'components/Label';
+import Button from 'components/Button';
 import cn from 'classnames';
+import { X } from 'lucide-react';
 
 export type SingleValue<T> = T | undefined;
 export type MultiValue<T> = T[] | undefined;
@@ -24,6 +26,7 @@ interface BaseProps {
     isSearchable?: boolean;
     minWidth?: number;
     dropdownScope?: 'window';
+    dataTestId?: string;
 }
 
 interface SingleSelectProps extends BaseProps {
@@ -105,6 +108,7 @@ function Select({
     error,
     minWidth,
     dropdownScope,
+    dataTestId,
 }: Props) {
     const selectRef = useRef<HTMLSelectElement>(null);
     const previousOptionsRef = useRef<string>('');
@@ -231,13 +235,19 @@ function Select({
 
     const hasSearch = isSearchable && options.length > 5;
 
+    // Check if there's a selected value for clear button
+    const hasValue = isMulti
+        ? Array.isArray(value) && value.length > 0
+        : getValueFromProp != null && getValueFromProp !== '' && getValueFromProp !== placeholder;
+
     return (
-        <div>
+        <div data-testid={dataTestId ?? `select-${id}`}>
             {label && <Label htmlFor={id} title={label} required={required} />}
-            <div className={cn(className)} style={{ minWidth: `${minWidth}px` }}>
+            <div className={cn('relative', className)} style={minWidth ? { minWidth: `${minWidth}px` } : undefined}>
                 <select
                     ref={selectRef}
                     multiple={isMulti}
+                    data-testid={dataTestId ? `${dataTestId}-input` : `select-${id}-input`}
                     value={isMulti ? undefined : getValueFromProp != null ? getOptionValueString(getValueFromProp as OptionValue) : ''}
                     data-hs-select={JSON.stringify({
                         hasSearch: hasSearch,
@@ -247,8 +257,7 @@ function Select({
                         searchWrapperClasses: 'bg-white p-2 -mx-1 sticky top-0 dark:bg-neutral-900',
                         placeholder: hasOptions ? placeholder : 'No options',
                         toggleTag: '<button type="button" aria-expanded="false"></button>',
-                        toggleClasses:
-                            'hs-select-disabled:pointer-events-none text-[var(--dark-gray-color)] hs-select-disabled:opacity-50 relative py-3 ps-4 pe-9 flex gap-x-2 text-nowrap w-full cursor-pointer bg-white border border-gray-200 rounded-lg text-start text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:focus:outline-hidden dark:focus:ring-1 dark:focus:ring-neutral-600',
+                        toggleClasses: `${isClearable && hasValue ? 'pe-14' : 'pe-9'} hs-select-disabled:pointer-events-none text-[var(--dark-gray-color)] hs-select-disabled:opacity-50 relative py-3 ps-4 flex gap-x-2 text-nowrap w-full cursor-pointer bg-white border border-gray-200 rounded-lg text-start text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:focus:outline-hidden dark:focus:ring-1 dark:focus:ring-neutral-600`,
                         dropdownClasses: `mt-2 z-[100] w-full max-h-72 space-y-0.5 bg-white border border-gray-200 rounded-lg overflow-hidden overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 dark:bg-neutral-900 dark:border-neutral-700 ${hasSearch ? ' px-1 pb-1' : 'p-1'}`,
                         ...(dropdownScope && { dropdownScope }),
                         optionClasses:
@@ -311,6 +320,22 @@ function Select({
                         );
                     })}
                 </select>
+                {isClearable && hasValue && (
+                    <Button
+                        id={`${id}-clear`}
+                        type="button"
+                        variant="transparent"
+                        color="lightGray"
+                        className="!p-0 absolute top-1/2 end-8 -translate-y-1/2"
+                        data-testid={dataTestId ? `${dataTestId}-clear` : `select-${id}-clear`}
+                        onClick={() => {
+                            (onChange as MultiSelectProps['onChange'])(undefined);
+                        }}
+                        aria-label="Clear selection"
+                    >
+                        <X size={12} />
+                    </Button>
+                )}
             </div>
             {error && <div className="text-red-500 mt-1">{error}</div>}
         </div>

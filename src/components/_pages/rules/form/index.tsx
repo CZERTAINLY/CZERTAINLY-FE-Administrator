@@ -215,8 +215,7 @@ const RulesForm = ({ onCancel, onSuccess }: RulesFormProps = {}) => {
                                                 })) || []
                                             }
                                             placeholder="Select Resource"
-                                            minWidth={165}
-                                            isClearable
+                                            minWidth={180}
                                             placement="bottom"
                                         />
                                         {fieldState.error && fieldState.isTouched && (
