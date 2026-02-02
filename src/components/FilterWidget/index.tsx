@@ -530,7 +530,7 @@ export default function FilterWidget({
                         setFilterValue(e);
                     }}
                     isMulti={currentField?.multiValue}
-                    // isClearable
+                    isClearable
                     isDisabled={!filterField || !filterCondition || noValue[filterCondition.value]}
                     isSearchable
                     dropdownWidth={isLongValue ? 400 : undefined}
