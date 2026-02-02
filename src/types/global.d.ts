@@ -10,3 +10,5 @@ interface Window {
 }
 
 declare const __ENV__: Env;
+
+declare const __BUILD_TIME__: string;

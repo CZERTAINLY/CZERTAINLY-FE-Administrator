@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useCopyToClipboard } from 'utils/common-hooks';
 import Button from 'components/Button';
 import { Copy } from 'lucide-react';
+import packageJson from '../../../../package.json';
 
 const PlatformInfoDialogLink = () => {
     const dispatch = useDispatch();
@@ -36,6 +37,14 @@ const PlatformInfoDialogLink = () => {
         [],
     );
 
+    const buildTimeFormatted =
+        typeof __BUILD_TIME__ !== 'undefined'
+            ? new Date(__BUILD_TIME__).toLocaleString(undefined, {
+                  dateStyle: 'medium',
+                  timeStyle: 'short',
+              })
+            : '—';
+
     const data: TableDataRow[] = useMemo(
         () =>
             !platformInfo
@@ -49,13 +58,21 @@ const PlatformInfoDialogLink = () => {
                           id: 'db',
                           columns: [platformInfo.db.system, platformInfo.db.version],
                       },
+                      {
+                          id: 'frontend',
+                          columns: ['Frontend', packageJson.version],
+                      },
+                      {
+                          id: 'deployed',
+                          columns: ['Last deployed', buildTimeFormatted],
+                      },
                   ],
-        [platformInfo],
+        [platformInfo, buildTimeFormatted],
     );
 
     const content = useMemo(() => {
         if (!platformInfo) return;
-        const copyText = `${platformInfo.app.name}: ${platformInfo.app.version}\n${platformInfo.db.system}: ${platformInfo.db.version}`;
+        const copyText = `Frontend (${packageJson.name}): ${packageJson.version}\n${platformInfo.app.name}: ${platformInfo.app.version}\n${platformInfo.db.system}: ${platformInfo.db.version}\nLast deployed: ${buildTimeFormatted}`;
         return (
             <div>
                 <CustomTable data={data} headers={headers} />
@@ -78,7 +95,7 @@ const PlatformInfoDialogLink = () => {
                 </div>
             </div>
         );
-    }, [platformInfo, copyToClipboard, data, headers]);
+    }, [platformInfo, copyToClipboard, data, headers, buildTimeFormatted]);
 
     return (
         <>
