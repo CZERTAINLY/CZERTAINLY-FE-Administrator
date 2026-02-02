@@ -37,6 +37,8 @@ import Badge from 'components/Badge';
 import { validateDuration, validatePostgresPosixRegex } from 'utils/validators';
 import Label from 'components/Label';
 
+const deepCopy = <T,>(value: T): T => (value == null ? value : JSON.parse(JSON.stringify(value)));
+
 const noValue: { [condition in FilterConditionOperator]: boolean } = {
     [FilterConditionOperator.Equals]: false,
     [FilterConditionOperator.NotEquals]: false,
@@ -102,10 +104,11 @@ export default function FilterWidget({
         undefined,
     );
     const [filterValue, setFilterValue] = useState<
+        | string
+        | number
         | object
         | SingleValue<object | object[] | { label: string; value: object }>
         | MultiValue<object | object[] | { label: string; value: object }>
-        | number
         | undefined
     >(undefined);
     const [regexError, setRegexError] = useState<string>('');
@@ -169,12 +172,12 @@ export default function FilterWidget({
         if (checkIfFieldAttributeTypeIsDate(field)) {
             if (field.attributeContentType === AttributeContentType.Date) {
                 const dateVal = getFormattedDate(currentFilters[selectedFilter].value as unknown as string);
-                setFilterValue(JSON.parse(JSON.stringify(dateVal)));
+                setFilterValue(deepCopy(dateVal));
                 return;
             }
             if (field.attributeContentType === AttributeContentType.Datetime) {
                 const dateTimeVal = getFormattedDateTime(currentFilters[selectedFilter].value as unknown as string);
-                setFilterValue(JSON.parse(JSON.stringify(dateTimeVal)));
+                setFilterValue(deepCopy(dateTimeVal));
                 return;
             }
         }
@@ -187,17 +190,17 @@ export default function FilterWidget({
         ) {
             if (checkIfFieldOperatorIsInterval(currentFilters[selectedFilter].condition)) {
                 const duration = getDurationStringFromIso8601String(currentFilters[selectedFilter].value as unknown as string);
-                setFilterValue(JSON.parse(JSON.stringify(duration)));
+                setFilterValue(deepCopy(duration));
                 return;
             }
             if (field.type === FilterFieldType.Datetime) {
                 const dateTimeVal = getFormattedDateTime(currentFilters[selectedFilter].value as unknown as string);
-                setFilterValue(JSON.parse(JSON.stringify(dateTimeVal)));
+                setFilterValue(deepCopy(dateTimeVal));
                 return;
             }
             if (field.type === FilterFieldType.Date) {
                 const dateVal = getFormattedDate(currentFilters[selectedFilter].value as unknown as string);
-                setFilterValue(JSON.parse(JSON.stringify(dateVal)));
+                setFilterValue(deepCopy(dateVal));
                 return;
             }
             setFilterValue(currentFilters[selectedFilter].value);
@@ -455,7 +458,7 @@ export default function FilterWidget({
                         type="text"
                         value={filterValue?.toString() ?? ''}
                         onChange={(value) => {
-                            setFilterValue(JSON.parse(JSON.stringify(value)));
+                            setFilterValue(deepCopy(value));
                         }}
                         placeholder="eg. 2d 30m"
                     />
@@ -485,7 +488,7 @@ export default function FilterWidget({
                         }
                         value={filterValue?.toString() ?? ''}
                         onChange={(value: string) => {
-                            setFilterValue(JSON.parse(JSON.stringify(value)));
+                            setFilterValue(deepCopy(value));
 
                             if (isRegex) {
                                 const error = validatePostgresPosixRegex(value);
