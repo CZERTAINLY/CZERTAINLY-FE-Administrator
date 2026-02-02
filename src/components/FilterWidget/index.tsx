@@ -520,7 +520,7 @@ export default function FilterWidget({
             );
         }
         function renderDefaultInput() {
-            const isLongValue = ['SCHEDULED_JOB_CLASS_NAME'].includes(currentField?.fieldIdentifier || '');
+            const isLongValue = objectValueOptions.some((o) => o.label.length > 50);
             return (
                 <Select
                     id="valueSelect"
