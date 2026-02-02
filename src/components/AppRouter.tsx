@@ -112,7 +112,7 @@ import SchedulerJobsList from './_pages/scheduler/list';
 
 import AppRedirect from './AppRedirect';
 import Layout from './Layout';
-// import Spinner from './Spinner';
+import Spinner from './Spinner';
 
 import { Resource } from 'types/openapi';
 import CustomOIDList from 'components/_pages/custom-oid/list';
@@ -332,7 +332,7 @@ export default function AppRouter() {
 
             <Routes>
                 <Route path="/login" element={<Login />} />
-                {profile ? appRoutes : <Route path="*" element={null} />}
+                {profile ? appRoutes : <Route path="*" element={<Spinner size="xl" />} />}
             </Routes>
         </HashRouter>
     );

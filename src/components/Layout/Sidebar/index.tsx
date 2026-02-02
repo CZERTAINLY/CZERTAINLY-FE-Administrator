@@ -395,6 +395,7 @@ export default function Sidebar({ allowedResources }: Props) {
                         setMenuSize('small');
                         setOpenMenuItems([]);
                     }}
+                    data-testid="sidebar-flying"
                 >
                     <SimpleBar
                         forceVisible="y"
@@ -418,6 +419,7 @@ export default function Sidebar({ allowedResources }: Props) {
                     top: 'var(--header-height)',
                     zIndex: 10,
                 }}
+                data-testid="sidebar-sticky"
             >
                 <div className="p-4 w-full h-full dark:bg-neutral-900">
                     <nav className="pb-4">

@@ -139,13 +139,14 @@ const TriggerList = () => {
                 custom: (
                     <Select
                         placeholder="Select Resource"
-                        minWidth={165}
+                        minWidth={180}
                         id="resource"
                         options={resourceOptionsWithEvents}
                         value={selectedResource || 'Select Resource'}
                         onChange={(value) => {
                             setSelectedResource(value as Resource);
                         }}
+                        isClearable
                     />
                 ),
             },
@@ -188,7 +189,7 @@ const TriggerList = () => {
                     onCheckedRowsChanged={(checkedRows) => {
                         setCheckedRows(checkedRows as string[]);
                     }}
-                    hasPagination={true}
+                    hasPagination
                 />
             </Widget>
 
@@ -199,8 +200,8 @@ const TriggerList = () => {
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                 ]}
             />
 

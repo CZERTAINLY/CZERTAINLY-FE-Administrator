@@ -86,6 +86,13 @@ export default function FilterWidgetRuleAction({
         dispatch(filterActions.getAvailableFilters({ entity, getAvailableFiltersApi }));
     }, [dispatch, entity, getAvailableFiltersApi]);
 
+    useEffect(() => {
+        setFilterValue(undefined);
+        setFilterField(undefined);
+        setFieldSource(undefined);
+        setSelectedFilter({ filterNumber: -1, isEditEnabled: false });
+    }, [getAvailableFiltersApi]);
+
     const onUnselectFiltersClick = useCallback(
         (e: React.MouseEvent<HTMLDivElement>) => {
             if ((e.target as HTMLDivElement).id === 'unselectFilters') {

@@ -1053,15 +1053,15 @@ export default function RaProfileDetail() {
             <Dialog
                 isOpen={confirmDelete}
                 caption="Delete RA Profile"
-                body="You are about to delete RA Profiles which may have existing
+                body="You are about to delete this RA Profile which may have existing
                   authorizations from clients. If you continue, these authorizations
                   will be deleted as well. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
                 size="lg"
                 icon="delete"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                 ]}
             />
 

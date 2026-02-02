@@ -204,71 +204,66 @@ const ExecutionForm = () => {
                                 )}
                             />
 
-                            <div>
-                                <Controller
-                                    name="type"
-                                    control={control}
-                                    rules={buildValidationRules([validateRequired()])}
-                                    render={({ field, fieldState }) => (
-                                        <>
-                                            <Select
-                                                id="typeSelect"
-                                                label="Execution Type"
-                                                value={field.value || ''}
-                                                onChange={(value) => {
-                                                    field.onChange(value);
-                                                    setValue('resource', Resource.Any);
-                                                }}
-                                                options={executionTypeOptions}
-                                                placeholder="Select Execution Type"
-                                                isClearable
-                                                placement="bottom"
-                                            />
-                                            {fieldState.error && fieldState.isTouched && (
-                                                <p className="mt-1 text-sm text-red-600">
-                                                    {typeof fieldState.error === 'string'
-                                                        ? fieldState.error
-                                                        : fieldState.error?.message || 'Invalid value'}
-                                                </p>
-                                            )}
-                                        </>
-                                    )}
-                                />
-                            </div>
+                            <Controller
+                                name="type"
+                                control={control}
+                                rules={buildValidationRules([validateRequired()])}
+                                render={({ field, fieldState }) => (
+                                    <>
+                                        <Select
+                                            id="typeSelect"
+                                            label="Execution Type"
+                                            value={field.value || ''}
+                                            onChange={(value) => {
+                                                field.onChange(value);
+                                                setValue('resource', Resource.Any);
+                                            }}
+                                            options={executionTypeOptions}
+                                            placeholder="Select Execution Type"
+                                            isClearable
+                                            placement="bottom"
+                                        />
+                                        {fieldState.error && fieldState.isTouched && (
+                                            <p className="mt-1 text-sm text-red-600">
+                                                {typeof fieldState.error === 'string'
+                                                    ? fieldState.error
+                                                    : fieldState.error?.message || 'Invalid value'}
+                                            </p>
+                                        )}
+                                    </>
+                                )}
+                            />
 
-                            <div>
-                                <Controller
-                                    name="resource"
-                                    control={control}
-                                    rules={buildValidationRules([validateRequired()])}
-                                    render={({ field, fieldState }) => (
-                                        <>
-                                            <Select
-                                                id="resourceSelect"
-                                                label="Resource"
-                                                value={field.value || ''}
-                                                onChange={(value) => {
-                                                    field.onChange(value);
-                                                    setValue('items', []);
-                                                }}
-                                                options={resourceOptionsWithRuleEvaluator || []}
-                                                placeholder="Select Resource"
-                                                minWidth={165}
-                                                isClearable
-                                                disabled={watchedType === ExecutionType.SendNotification}
-                                                placement="bottom"
-                                            />
-                                            {fieldState.error && fieldState.isTouched && (
-                                                <p className="mt-1 text-sm text-red-600">
-                                                    {typeof fieldState.error === 'string'
-                                                        ? fieldState.error
-                                                        : fieldState.error?.message || 'Invalid value'}
-                                                </p>
-                                            )}
-                                        </>
-                                    )}
-                                />
-                            </div>
+                            <Controller
+                                name="resource"
+                                control={control}
+                                rules={buildValidationRules([validateRequired()])}
+                                render={({ field, fieldState }) => (
+                                    <>
+                                        <Select
+                                            id="resourceSelect"
+                                            label="Resource"
+                                            value={field.value || ''}
+                                            onChange={(value) => {
+                                                field.onChange(value);
+                                                setValue('items', []);
+                                            }}
+                                            options={resourceOptionsWithRuleEvaluator || []}
+                                            placeholder="Select Resource"
+                                            minWidth={180}
+                                            disabled={watchedType === ExecutionType.SendNotification}
+                                            placement="bottom"
+                                        />
+                                        {fieldState.error && fieldState.isTouched && (
+                                            <p className="mt-1 text-sm text-red-600">
+                                                {typeof fieldState.error === 'string'
+                                                    ? fieldState.error
+                                                    : fieldState.error?.message || 'Invalid value'}
+                                            </p>
+                                        )}
+                                    </>
+                                )}
+                            />
 
                             {watchedType === ExecutionType.SetField && watchedResource && (
                                 <ConditionFormFilter formType="executionItem" resource={watchedResource} />

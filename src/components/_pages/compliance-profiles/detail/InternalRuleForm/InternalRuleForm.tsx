@@ -204,7 +204,7 @@ export default function InternalRuleForm({ rule, onCancel }: Props) {
                                     dispatch(filterActions.setCurrentFilters({ currentFilters: [], entity: EntityType.CONDITIONS }));
                                 }}
                                 placeholder="Select Resource"
-                                minWidth={165}
+                                minWidth={180}
                                 isClearable
                                 className={cn({
                                     'border-red-500': fieldState.error && fieldState.isTouched,

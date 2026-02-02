@@ -14,7 +14,6 @@ import Switch from 'components/Switch';
 import Select from 'components/Select';
 import Button from 'components/Button';
 import Container from 'components/Container';
-import Breadcrumb from 'components/Breadcrumb';
 import { PlatformEnum, Resource, ResourceEvent, TriggerType } from 'types/openapi';
 import { isObjectSame } from 'utils/common-utils';
 import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
@@ -287,7 +286,7 @@ const TriggerForm = ({ onCancel, onSuccess }: TriggerFormProps = {}) => {
                                             }}
                                             options={resourceOptions.map((opt) => ({ value: opt.value, label: opt.label }))}
                                             placeholder="Select Resource"
-                                            minWidth={165}
+                                            minWidth={180}
                                             placement="bottom"
                                         />
                                         {fieldState.error && fieldState.isTouched && (
@@ -389,51 +388,45 @@ const TriggerForm = ({ onCancel, onSuccess }: TriggerFormProps = {}) => {
 
                         {watchedResource && watchedResource !== Resource.None && (
                             <>
-                                <div>
-                                    <Controller
-                                        name="rulesUuids"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Select
-                                                id="ruleSelect"
-                                                label="Rules"
-                                                isMulti
-                                                value={field.value || []}
-                                                onChange={(value) => {
-                                                    field.onChange(value);
-                                                }}
-                                                options={rulesOptions}
-                                                placeholder="Select Rule"
-                                                isClearable
-                                                isDisabled={watchedResource === Resource.None || !watchedResource || !rulesOptions.length}
-                                                placement="bottom"
-                                            />
-                                        )}
-                                    />
-                                </div>
+                                <Controller
+                                    name="rulesUuids"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Select
+                                            id="ruleSelect"
+                                            label="Rules"
+                                            isMulti
+                                            value={field.value || []}
+                                            onChange={(value) => {
+                                                field.onChange(value);
+                                            }}
+                                            options={rulesOptions}
+                                            placeholder="Select Rule"
+                                            isClearable
+                                            isDisabled={watchedResource === Resource.None || !watchedResource || !rulesOptions.length}
+                                        />
+                                    )}
+                                />
 
-                                <div>
-                                    <Controller
-                                        name="actionsUuids"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Select
-                                                id="actionsSelect"
-                                                label="Actions"
-                                                isMulti
-                                                value={field.value || []}
-                                                onChange={(value) => {
-                                                    field.onChange(value);
-                                                }}
-                                                options={actionsOptions}
-                                                placeholder="Select Actions"
-                                                isClearable
-                                                isDisabled={watchedResource === Resource.None || !watchedResource || watchedIgnoreTrigger}
-                                                placement="bottom"
-                                            />
-                                        )}
-                                    />
-                                </div>
+                                <Controller
+                                    name="actionsUuids"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Select
+                                            id="actionsSelect"
+                                            label="Actions"
+                                            isMulti
+                                            value={field.value || []}
+                                            onChange={(value) => {
+                                                field.onChange(value);
+                                            }}
+                                            options={actionsOptions}
+                                            placeholder="Select Actions"
+                                            isClearable
+                                            isDisabled={watchedResource === Resource.None || !watchedResource || watchedIgnoreTrigger}
+                                        />
+                                    )}
+                                />
                             </>
                         )}
 

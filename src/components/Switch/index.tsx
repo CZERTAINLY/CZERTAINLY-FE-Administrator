@@ -12,13 +12,14 @@ interface Props {
     disabled?: boolean;
     className?: string;
     labelClassName?: string;
+    dataTestId?: string;
 }
 
-function Switch({ checked, onChange, id, label, secondaryLabel, disabled = false, className, labelClassName }: Props) {
+function Switch({ checked, onChange, id, label, secondaryLabel, disabled = false, className, labelClassName, dataTestId }: Props) {
     return (
-        <div className={cn('flex items-center gap-x-3', className)}>
+        <div className={cn('flex items-center gap-x-3', className)} data-testid={dataTestId ?? `switch-${id}`}>
             {label && (
-                <Label htmlFor={id} className={cn('text-sm text-gray-800 dark:text-neutral-200 !mb-0', labelClassName)}>
+                <Label htmlFor={id} className={cn('text-sm !mb-0', labelClassName)}>
                     {label}
                 </Label>
             )}
@@ -37,6 +38,7 @@ function Switch({ checked, onChange, id, label, secondaryLabel, disabled = false
                             onChange(e.target.checked);
                         }}
                         disabled={disabled}
+                        data-testid={dataTestId ? `${dataTestId}-input` : `switch-${id}-input`}
                     />
                     <span className="absolute inset-0 bg-gray-200 rounded-full transition-colors duration-200 ease-in-out peer-checked:bg-blue-600 dark:bg-neutral-700 dark:peer-checked:bg-blue-500 peer-disabled:opacity-50 peer-disabled:pointer-events-none"></span>
                     <span className="absolute top-1/2 start-0.5 -translate-y-1/2 size-6 bg-white rounded-full shadow-xs transition-transform duration-200 ease-in-out peer-checked:translate-x-full dark:bg-neutral-400 dark:peer-checked:bg-white"></span>
@@ -49,7 +51,7 @@ function Switch({ checked, onChange, id, label, secondaryLabel, disabled = false
                 </Label>
             </div>
             {secondaryLabel && (
-                <Label htmlFor={id} className="text-sm text-gray-800 dark:text-neutral-200 !mb-0">
+                <Label htmlFor={id} className="text-sm !mb-0">
                     {secondaryLabel}
                 </Label>
             )}

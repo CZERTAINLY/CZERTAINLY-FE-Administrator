@@ -11,12 +11,18 @@ interface Props {
     required?: boolean;
     className?: string;
     onClick?: () => void;
+    dataTestId?: string;
 }
 
-function Label({ htmlFor, title, children, required, className, onClick }: Props) {
+function Label({ htmlFor, title, children, required, className, onClick, dataTestId }: Props) {
     const defaultClasses = 'block text-left text-sm font-medium mb-2 text-center dark:text-white text-[var(--dark-gray-color)]';
     return (
-        <label htmlFor={htmlFor} className={cn(defaultClasses, className)} onClick={onClick}>
+        <label
+            htmlFor={htmlFor}
+            className={cn(defaultClasses, className)}
+            onClick={onClick}
+            data-testid={dataTestId ?? (htmlFor ? `label-${htmlFor}` : 'label')}
+        >
             {title || children}
             {required && <span className="text-red-500"> *</span>}
         </label>
