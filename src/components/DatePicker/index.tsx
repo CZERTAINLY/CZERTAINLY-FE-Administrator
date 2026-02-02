@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import cn from 'classnames';
 import { CalendarRange } from 'lucide-react';
+import { inputBaseClassName } from 'components/TextInput/inputStyles';
+import Button from 'components/Button';
+import Container from 'components/Container';
 
 interface Props {
     value?: string;
@@ -126,7 +130,10 @@ function DatePicker({ value, onChange, onBlur, disabled, id, invalid, error, cla
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+            const target = event.target as Node;
+            const clickedInput = containerRef.current?.contains(target);
+            const clickedDropdown = dropdownRef.current?.contains(target);
+            if (!clickedInput && !clickedDropdown) {
                 setIsOpen(false);
                 if (onBlur) {
                     onBlur();
@@ -289,184 +296,196 @@ function DatePicker({ value, onChange, onBlur, disabled, id, invalid, error, cla
                     onClick={() => !disabled && setIsOpen(!isOpen)}
                     placeholder={timePicker ? 'dd.mm.yyyy 00:00:00' : 'dd.mm.yyyy'}
                     className={cn(
-                        'py-2.5 sm:py-3 pl-10 pr-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600 cursor-pointer',
+                        inputBaseClassName,
+                        'pl-10 cursor-pointer',
                         {
                             'border-red-500 focus:border-red-500 focus:ring-red-500': invalid,
                         },
                         {
                             'bg-[#F8FAFC]': disabled,
+                            'bg-white dark:bg-neutral-900': !disabled,
                         },
                     )}
                 />
             </div>
-            {isOpen && !disabled && dropdownPosition && (
-                <div
-                    ref={dropdownRef}
-                    className="fixed z-50 w-80 flex flex-col bg-white border border-gray-200 shadow-lg rounded-xl overflow-hidden dark:bg-neutral-900 dark:border-neutral-700"
-                    style={{
-                        top: `${dropdownPosition.top}px`,
-                        left: `${dropdownPosition.left}px`,
-                    }}
-                >
-                    <div className="p-3 space-y-0.5">
-                        {/* Month/Year Navigation */}
-                        <div className="grid grid-cols-5 items-center gap-x-3 mx-1.5 pb-3">
-                            {/* Prev Button */}
-                            <div className="col-span-1">
-                                <button
-                                    type="button"
-                                    className="size-8 flex justify-center items-center text-gray-800 hover:bg-gray-100 rounded-full disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:focus:bg-neutral-800"
-                                    aria-label="Previous"
-                                    onClick={handlePrevMonth}
-                                >
-                                    <svg
-                                        className="shrink-0 size-4"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="24"
-                                        height="24"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="2"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
+            {isOpen &&
+                !disabled &&
+                dropdownPosition &&
+                createPortal(
+                    <div
+                        ref={dropdownRef}
+                        className="fixed z-[9999] w-80 flex flex-col bg-white border border-gray-200 shadow-lg rounded-xl overflow-hidden dark:bg-neutral-900 dark:border-neutral-700"
+                        style={{
+                            top: `${dropdownPosition.top}px`,
+                            left: `${dropdownPosition.left}px`,
+                        }}
+                    >
+                        <div className="p-3 space-y-0.5">
+                            {/* Month/Year Navigation */}
+                            <div className="grid grid-cols-5 items-center gap-x-3 mx-1.5 pb-3">
+                                {/* Prev Button */}
+                                <div className="col-span-1">
+                                    <button
+                                        type="button"
+                                        className="size-8 flex justify-center items-center text-[var(--dark-gray-color)] hover:bg-gray-100 rounded-full disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:focus:bg-neutral-800"
+                                        aria-label="Previous"
+                                        onClick={handlePrevMonth}
                                     >
-                                        <path d="m15 18-6-6 6-6" />
-                                    </svg>
-                                </button>
-                            </div>
+                                        <svg
+                                            className="shrink-0 size-4"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="24"
+                                            height="24"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        >
+                                            <path d="m15 18-6-6 6-6" />
+                                        </svg>
+                                    </button>
+                                </div>
 
-                            {/* Month / Year */}
-                            <div className="col-span-3 flex justify-center items-center gap-x-1">
-                                <span className="text-sm font-medium text-gray-800 dark:text-neutral-200">{MONTHS[currentMonth]}</span>
-                                <span className="text-gray-800 dark:text-neutral-200">/</span>
-                                <span className="text-sm font-medium text-gray-800 dark:text-neutral-200">{currentYear}</span>
-                            </div>
+                                {/* Month / Year */}
+                                <div className="col-span-3 flex justify-center items-center gap-x-1">
+                                    <span className="text-sm font-medium text-[var(--dark-gray-color)] dark:text-neutral-200">
+                                        {MONTHS[currentMonth]}
+                                    </span>
+                                    <span className="text-[var(--dark-gray-color)] dark:text-neutral-200">/</span>
+                                    <span className="text-sm font-medium text-[var(--dark-gray-color)] dark:text-neutral-200">
+                                        {currentYear}
+                                    </span>
+                                </div>
 
-                            {/* Next Button */}
-                            <div className="col-span-1 flex justify-end">
-                                <button
-                                    type="button"
-                                    className="size-8 flex justify-center items-center text-gray-800 hover:bg-gray-100 rounded-full disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:focus:bg-neutral-800"
-                                    aria-label="Next"
-                                    onClick={handleNextMonth}
-                                >
-                                    <svg
-                                        className="shrink-0 size-4"
-                                        width="24"
-                                        height="24"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="2"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
+                                {/* Next Button */}
+                                <div className="col-span-1 flex justify-end">
+                                    <button
+                                        type="button"
+                                        className="size-8 flex justify-center items-center text-[var(--dark-gray-color)] hover:bg-gray-100 rounded-full disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:focus:bg-neutral-800"
+                                        aria-label="Next"
+                                        onClick={handleNextMonth}
                                     >
-                                        <path d="m9 18 6-6-6-6" />
-                                    </svg>
-                                </button>
+                                        <svg
+                                            className="shrink-0 size-4"
+                                            width="24"
+                                            height="24"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        >
+                                            <path d="m9 18 6-6-6-6" />
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
-                        </div>
 
-                        {/* Weekday Headers */}
-                        <div className="flex pb-1.5">
-                            {WEEKDAYS.map((day) => (
-                                <span key={day} className="m-px w-10 block text-center text-sm text-gray-500 dark:text-neutral-500">
-                                    {day}
-                                </span>
+                            {/* Weekday Headers */}
+                            <div className="flex pb-1.5">
+                                {WEEKDAYS.map((day) => (
+                                    <span
+                                        key={day}
+                                        className="m-px w-10 block text-center text-sm text-[var(--dark-gray-color)] dark:text-neutral-500"
+                                    >
+                                        {day}
+                                    </span>
+                                ))}
+                            </div>
+
+                            {/* Calendar Days */}
+                            {calendarRows.map((row, rowIndex) => (
+                                <div key={rowIndex} className="flex">
+                                    {row.map((dayInfo, dayIndex) => {
+                                        const { day, isCurrentMonth } = dayInfo;
+                                        const isSelected = isSelectedDate(day, isCurrentMonth);
+
+                                        return (
+                                            <div key={`${rowIndex}-${dayIndex}`}>
+                                                <button
+                                                    type="button"
+                                                    className={cn(
+                                                        'm-px size-10 flex justify-center items-center border-[1.5px] border-transparent text-sm rounded-full disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden',
+                                                        {
+                                                            'bg-blue-600 border-transparent text-white font-medium hover:border-blue-600 dark:bg-blue-500':
+                                                                isSelected,
+                                                            'text-[var(--dark-gray-color)] hover:border-blue-600 hover:text-blue-600 focus:border-blue-600 focus:text-blue-600 dark:text-neutral-200 dark:hover:border-blue-500 dark:hover:text-blue-500 dark:focus:border-blue-500 dark:focus:text-blue-500':
+                                                                !isSelected && isCurrentMonth,
+                                                            'text-[var(--dark-gray-color)] hover:border-blue-600 hover:text-blue-600 rounded-full disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-100 dark:text-neutral-200 dark:hover:border-neutral-500 dark:focus:bg-neutral-700':
+                                                                !isCurrentMonth,
+                                                        },
+                                                    )}
+                                                    onClick={() => isCurrentMonth && handleDateSelect(day)}
+                                                    disabled={!isCurrentMonth}
+                                                >
+                                                    {day}
+                                                </button>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
                             ))}
                         </div>
 
-                        {/* Calendar Days */}
-                        {calendarRows.map((row, rowIndex) => (
-                            <div key={rowIndex} className="flex">
-                                {row.map((dayInfo, dayIndex) => {
-                                    const { day, isCurrentMonth } = dayInfo;
-                                    const isSelected = isSelectedDate(day, isCurrentMonth);
-
-                                    return (
-                                        <div key={`${rowIndex}-${dayIndex}`}>
-                                            <button
-                                                type="button"
-                                                className={cn(
-                                                    'm-px size-10 flex justify-center items-center border-[1.5px] border-transparent text-sm rounded-full disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden',
-                                                    {
-                                                        'bg-blue-600 border-transparent text-white font-medium hover:border-blue-600 dark:bg-blue-500':
-                                                            isSelected,
-                                                        'text-gray-800 hover:border-blue-600 hover:text-blue-600 focus:border-blue-600 focus:text-blue-600 dark:text-neutral-200 dark:hover:border-blue-500 dark:hover:text-blue-500 dark:focus:border-blue-500 dark:focus:text-blue-500':
-                                                            !isSelected && isCurrentMonth,
-                                                        'text-gray-800 hover:border-blue-600 hover:text-blue-600 rounded-full disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-100 dark:text-neutral-200 dark:hover:border-neutral-500 dark:focus:bg-neutral-700':
-                                                            !isCurrentMonth,
-                                                    },
-                                                )}
-                                                onClick={() => isCurrentMonth && handleDateSelect(day)}
-                                                disabled={!isCurrentMonth}
-                                            >
-                                                {day}
-                                            </button>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Time Picker */}
-                    {timePicker && (
-                        <div className="border-t border-gray-200 dark:border-neutral-700 p-3">
-                            <div className="flex items-center justify-center gap-2">
-                                <label className="text-sm font-medium text-gray-700 dark:text-neutral-300">Time:</label>
-                                <div className="flex items-center gap-1">
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        max="23"
-                                        value={selectedTime.hours}
-                                        onChange={(e) => {
-                                            const val = parseInt(e.target.value) || 0;
-                                            handleTimeChange('hours', Math.max(0, Math.min(23, val)));
-                                        }}
-                                        className="w-12 px-2 py-1 text-sm border border-gray-300 rounded-md text-center focus:outline-hidden focus:ring-2 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-600 dark:text-neutral-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                    />
-                                    <span className="text-gray-500 dark:text-neutral-400">:</span>
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        max="59"
-                                        value={selectedTime.minutes}
-                                        onChange={(e) => {
-                                            const val = parseInt(e.target.value) || 0;
-                                            handleTimeChange('minutes', Math.max(0, Math.min(59, val)));
-                                        }}
-                                        className="w-12 px-2 py-1 text-sm border border-gray-300 rounded-md text-center focus:outline-hidden focus:ring-2 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-600 dark:text-neutral-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                    />
-                                    <span className="text-gray-500 dark:text-neutral-400">:</span>
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        max="59"
-                                        value={selectedTime.seconds}
-                                        onChange={(e) => {
-                                            const val = parseInt(e.target.value) || 0;
-                                            handleTimeChange('seconds', Math.max(0, Math.min(59, val)));
-                                        }}
-                                        className="w-12 px-2 py-1 text-sm border border-gray-300 rounded-md text-center focus:outline-hidden focus:ring-2 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-600 dark:text-neutral-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                    />
+                        {/* Time Picker */}
+                        {timePicker && (
+                            <div className="border-t border-gray-200 dark:border-neutral-700 p-3">
+                                <div className="flex items-center justify-center gap-2">
+                                    <label className="text-sm font-medium text-[var(--dark-gray-color)] dark:text-neutral-300">Time:</label>
+                                    <div className="flex items-center gap-1">
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            max="23"
+                                            value={selectedTime.hours}
+                                            onChange={(e) => {
+                                                const val = parseInt(e.target.value) || 0;
+                                                handleTimeChange('hours', Math.max(0, Math.min(23, val)));
+                                            }}
+                                            className="w-12 px-2 py-1 text-sm border border-gray-300 rounded-md text-center focus:outline-hidden focus:ring-2 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-600 dark:text-neutral-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                        />
+                                        <span className="text-[var(--dark-gray-color)] dark:text-neutral-400">:</span>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            max="59"
+                                            value={selectedTime.minutes}
+                                            onChange={(e) => {
+                                                const val = parseInt(e.target.value) || 0;
+                                                handleTimeChange('minutes', Math.max(0, Math.min(59, val)));
+                                            }}
+                                            className="w-12 px-2 py-1 text-sm border border-gray-300 rounded-md text-center focus:outline-hidden focus:ring-2 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-600 dark:text-neutral-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                        />
+                                        <span className="text-[var(--dark-gray-color)] dark:text-neutral-400">:</span>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            max="59"
+                                            value={selectedTime.seconds}
+                                            onChange={(e) => {
+                                                const val = parseInt(e.target.value) || 0;
+                                                handleTimeChange('seconds', Math.max(0, Math.min(59, val)));
+                                            }}
+                                            className="w-12 px-2 py-1 text-sm border border-gray-300 rounded-md text-center focus:outline-hidden focus:ring-2 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-600 dark:text-neutral-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                        />
+                                    </div>
                                 </div>
+                                <Container className="flex-row justify-end pt-4" gap={2}>
+                                    <Button variant="outline" color="primary" className="!py-2 !px-3" onClick={() => setIsOpen(false)}>
+                                        Cancel
+                                    </Button>
+                                    <Button variant="solid" color="primary" className="!py-2 !px-3" onClick={handleConfirm}>
+                                        Confirm
+                                    </Button>
+                                </Container>
                             </div>
-                            <div className="flex justify-end mt-3">
-                                <button
-                                    type="button"
-                                    onClick={handleConfirm}
-                                    className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-hidden focus:ring-2 focus:ring-blue-500 dark:bg-blue-500 dark:hover:bg-blue-600"
-                                >
-                                    Confirm
-                                </button>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            )}
+                        )}
+                    </div>,
+                    document.body,
+                )}
             {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
         </div>
     );
