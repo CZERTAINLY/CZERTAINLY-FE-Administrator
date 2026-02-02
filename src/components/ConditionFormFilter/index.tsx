@@ -65,11 +65,7 @@ const ConditionFormFilter = ({ resource, formType, includeIgnoreAction }: Condit
         );
     }, [resource, form, formType, actionGroupForm, includeIgnoreAction]);
 
-    return (
-        <>
-            <div>{renderFilterWidget}</div>
-        </>
-    );
+    return <div data-testid="condition-form-filter">{renderFilterWidget}</div>;
 };
 
 export default ConditionFormFilter;
