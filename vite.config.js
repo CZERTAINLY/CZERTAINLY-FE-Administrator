@@ -16,6 +16,9 @@ async function loadProxyConfig() {
 export default defineConfig(async () => {
     const proxyConfig = await loadProxyConfig();
     return {
+        define: {
+            __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+        },
         server: {
             open: true,
             proxy: proxyConfig,

@@ -556,7 +556,7 @@ function CustomTable({
             {hasPagination && (
                 <div className="flex justify-between items-center gap-2 mt-6">
                     <div>
-                        {tblData?.length > 0 && (
+                        {(paginationData ? paginationData.totalItems > 0 : (tblData?.length ?? 0) > 0) && (
                             <Select
                                 id="pageSize"
                                 options={(paginationData?.itemsPerPageOptions || [10, 20, 50, 100]).map((option: number) => ({
@@ -569,7 +569,7 @@ function CustomTable({
                         )}
                     </div>
 
-                    {tblData?.length > 1 && (paginationData || totalPages > 1) && (
+                    {(paginationData ? paginationData.totalPages > 1 : totalPages > 1) && (
                         <Pagination
                             page={paginationData?.page || page}
                             totalPages={paginationData?.totalPages || totalPages}

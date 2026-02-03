@@ -520,6 +520,7 @@ export default function FilterWidget({
             );
         }
         function renderDefaultInput() {
+            const isLongValue = objectValueOptions.some((o) => o.label.length > 50);
             return (
                 <Select
                     id="valueSelect"
@@ -529,9 +530,10 @@ export default function FilterWidget({
                         setFilterValue(e);
                     }}
                     isMulti={currentField?.multiValue}
-                    // isClearable
+                    isClearable
                     isDisabled={!filterField || !filterCondition || noValue[filterCondition.value]}
                     isSearchable
+                    dropdownWidth={isLongValue ? 400 : undefined}
                 />
             );
         }
