@@ -29,7 +29,7 @@ import CertificateOwnerDialog from '../CertificateOwnerDialog';
 import CertificateRAProfileDialog from '../CertificateRAProfileDialog';
 import CertificateStatus from '../CertificateStatus';
 import CertificateUploadDialog from '../CertificateUploadDialog';
-import { ArrowDownToLine, Plug, Plus, KeyRound } from 'lucide-react';
+import { ArrowDownToLine, KeyRound } from 'lucide-react';
 import Switch from 'components/Switch';
 import { Resource } from '../../../../types/openapi';
 
@@ -521,7 +521,7 @@ export default function CertificateList({
                 toggle={() => setUpdateRaProfile(false)}
                 buttons={[]}
                 size="md"
-                icon={<Plug size={26} strokeWidth={1} />}
+                icon="plug"
             />
         </>
     );

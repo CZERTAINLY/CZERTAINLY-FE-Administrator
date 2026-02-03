@@ -22,9 +22,9 @@ import { dateFormatter } from 'utils/dateUtil';
 import { actions, selectors } from 'ducks/certificates';
 import { actions as userInterfaceActions } from 'ducks/user-interface';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import { selectors as groupSelectors } from 'ducks/certificateGroups';
-import { selectors as userSelectors } from 'ducks/users';
-import { selectors as raProfileSelectors } from 'ducks/ra-profiles';
+import { actions as certificateGroupActions, selectors as groupSelectors } from 'ducks/certificateGroups';
+import { actions as userActions, selectors as userSelectors } from 'ducks/users';
+import { actions as raProfileActions, selectors as raProfileSelectors } from 'ducks/ra-profiles';
 import { CertificateDetailResponseModel } from 'types/certificate';
 import {
     CertificateValidationResultDto,
@@ -671,6 +671,7 @@ export default function CertificateDetailsContent({ certificate, validationResul
                                   onClick={() => {
                                       setOwnerUuid(undefined);
                                       setUpdateOwner(true);
+                                      dispatch(userActions.list());
                                   }}
                                   title="Update Owner"
                               >
@@ -711,14 +712,16 @@ export default function CertificateDetailsContent({ certificate, validationResul
                                   disabled={isCertificateArchived}
                                   variant="transparent"
                                   color="secondary"
-                                  onClick={() => setUpdateGroup(true)}
+                                  onClick={() => {
+                                      setUpdateGroup(true);
+                                      dispatch(certificateGroupActions.listGroups());
+                                  }}
                                   title="Update Group"
                               >
                                   <EditIcon size={16} />
                               </Button>
                               <Button
                                   variant="transparent"
-                                  color="danger"
                                   disabled={!certificate?.groups?.length || isCertificateArchived}
                                   onClick={() => {
                                       if (!certificate?.uuid) return;
@@ -752,14 +755,16 @@ export default function CertificateDetailsContent({ certificate, validationResul
                                   disabled={isCertificateArchived}
                                   variant="transparent"
                                   color="secondary"
-                                  onClick={() => setUpdateRaProfile(true)}
+                                  onClick={() => {
+                                      setUpdateRaProfile(true);
+                                      dispatch(raProfileActions.listRaProfiles());
+                                  }}
                                   title="Update RA Profile"
                               >
                                   <EditIcon size={16} />
                               </Button>
                               <Button
                                   variant="transparent"
-                                  color="danger"
                                   disabled={!certificate?.raProfile?.uuid || isCertificateArchived}
                                   onClick={() => {
                                       if (!certificate?.raProfile?.authorityInstanceUuid || !certificate?.uuid) return;
@@ -874,6 +879,8 @@ export default function CertificateDetailsContent({ certificate, validationResul
             <Dialog
                 isOpen={updateGroup}
                 caption="Update Groups"
+                icon="users"
+                size="md"
                 body={
                     <Select
                         id="updateGroups"
@@ -888,8 +895,8 @@ export default function CertificateDetailsContent({ certificate, validationResul
                 }
                 toggle={onCancelGroupUpdate}
                 buttons={[
-                    { color: 'secondary', variant: 'outline', onClick: onCancelGroupUpdate, body: 'Cancel' },
-                    { color: 'primary', onClick: onUpdateGroup, body: 'Update', disabled: isUpdatingGroup },
+                    { color: 'primary', variant: 'outline', onClick: onCancelGroupUpdate, body: 'Cancel' },
+                    { color: 'primary', onClick: onUpdateGroup, body: 'Update', disabled: isUpdatingGroup || groups.length === 0 },
                 ]}
             />
 
@@ -909,7 +916,7 @@ export default function CertificateDetailsContent({ certificate, validationResul
                 size="md"
                 toggle={onCancelOwnerUpdate}
                 buttons={[
-                    { color: 'secondary', variant: 'outline', onClick: onCancelOwnerUpdate, body: 'Cancel' },
+                    { color: 'primary', variant: 'outline', onClick: onCancelOwnerUpdate, body: 'Cancel' },
                     { color: 'primary', onClick: onUpdateOwner, body: 'Update', disabled: ownerUuid === undefined || isUpdatingOwner },
                 ]}
             />
@@ -918,20 +925,22 @@ export default function CertificateDetailsContent({ certificate, validationResul
                 isOpen={updateRaProfile}
                 caption={`Update RA Profile`}
                 body={
-                    <div>
-                        <Select
-                            id="updateRaProfile"
-                            options={raProfileOptions}
-                            placeholder={`Select RA Profile`}
-                            value={raProfile || ''}
-                            onChange={(value) => updateRaAndAuthorityState((value as string) || '')}
-                            label="RA Profile"
-                        />
-                    </div>
+                    <Select
+                        id="updateRaProfile"
+                        options={raProfileOptions}
+                        placeholder={`Select RA Profile`}
+                        value={raProfileOptions.find((option) => option.value === raProfile) || ''}
+                        onChange={(value) => {
+                            updateRaAndAuthorityState((value as string) || '');
+                        }}
+                        label="RA Profile"
+                    />
                 }
+                icon="plug"
+                size="md"
                 toggle={onCancelRaProfileUpdate}
                 buttons={[
-                    { color: 'secondary', variant: 'outline', onClick: onCancelRaProfileUpdate, body: 'Cancel' },
+                    { color: 'primary', variant: 'outline', onClick: onCancelRaProfileUpdate, body: 'Cancel' },
                     {
                         color: 'primary',
                         onClick: onUpdateRaProfile,

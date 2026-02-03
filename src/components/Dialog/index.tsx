@@ -14,11 +14,12 @@ import {
     Shuffle,
     SquareMinus,
     Check,
+    Plug,
 } from 'lucide-react';
 import { useEffect } from 'react';
 
 export type ModalSize = 'sm' | 'md' | 'lg' | 'xl';
-export type ModalIcon = 'delete' | 'info' | 'warning' | 'success' | 'error' | 'users' | 'user' | 'download' | React.ReactNode;
+export type ModalIcon = 'delete' | 'info' | 'warning' | 'success' | 'error' | 'users' | 'user' | 'download' | 'plug' | React.ReactNode;
 
 export interface DialogButton {
     color: ButtonColor;
@@ -111,6 +112,9 @@ export default function Dialog({ isOpen, toggle, caption, body, buttons, size = 
                 break;
             case 'check':
                 iconElement = <Check {...buttonProps} />;
+                break;
+            case 'plug':
+                iconElement = <Plug {...buttonProps} />;
                 break;
             default:
                 iconElement = icon as React.ReactNode;
