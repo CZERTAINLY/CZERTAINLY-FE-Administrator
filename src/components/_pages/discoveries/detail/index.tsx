@@ -315,9 +315,10 @@ export default function DiscoveryDetail() {
                 body="You are about to delete Discovery. Is this what you want to do?"
                 toggle={() => setConfirmDelete(false)}
                 icon="delete"
+                size="md"
                 buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                     { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
                 ]}
             />
         </div>
