@@ -174,8 +174,6 @@ function ApprovalProfileForm({ approvalProfileId, onCancel, onSuccess }: Approva
         onCancel?.();
     }, [onCancel]);
 
-    const approvalStepsError = validateApprovalSteps(formValues);
-
     return (
         <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -274,8 +272,6 @@ function ApprovalProfileForm({ approvalProfileId, onCancel, onSuccess }: Approva
                             onCancelClick={handleCancel}
                         />
 
-                        {approvalStepsError && <p className="mt-1 text-sm text-red-600">{approvalStepsError}</p>}
-
                         <Container className="flex-row justify-end modal-footer" gap={4}>
                             <Button variant="outline" onClick={handleCancel} disabled={isSubmitting} type="button">
                                 Cancel
@@ -284,7 +280,7 @@ function ApprovalProfileForm({ approvalProfileId, onCancel, onSuccess }: Approva
                                 title={editMode ? 'Update' : 'Create'}
                                 inProgressTitle={editMode ? 'Updating...' : 'Creating...'}
                                 inProgress={isSubmitting}
-                                disabled={isSubmitting || !isValid || !!approvalStepsError || areDefaultValuesSame(formValues)}
+                                disabled={isSubmitting || !isValid || areDefaultValuesSame(formValues)}
                                 type="submit"
                             />
                         </Container>
