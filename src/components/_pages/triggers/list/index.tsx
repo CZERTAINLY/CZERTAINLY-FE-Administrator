@@ -11,7 +11,7 @@ import { Link } from 'react-router';
 import Select from 'components/Select';
 import { PlatformEnum, Resource } from 'types/openapi';
 
-import { useHasEventsResourceOptions, useRuleEvaluatorResourceOptions } from 'utils/rules';
+import { actions as resourceActions, selectors as resourceSelectors } from 'ducks/resource';
 import TriggerForm from '../form';
 
 const TriggerList = () => {
@@ -21,6 +21,7 @@ const TriggerList = () => {
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const eventNameEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ResourceEvent));
     const triggerTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.TriggerType));
+    const allResourceEvents = useSelector(resourceSelectors.allResourceEvents);
     const [selectedResource, setSelectedResource] = useState<Resource>();
     const isFetchingList = useSelector(rulesSelectors.isFetchingTriggers);
     const isDeleting = useSelector(rulesSelectors.isDeletingTrigger);
@@ -30,7 +31,18 @@ const TriggerList = () => {
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-    const { resourceOptionsWithEvents } = useHasEventsResourceOptions();
+    useEffect(() => {
+        dispatch(resourceActions.listAllResourceEvents());
+    }, [dispatch]);
+
+    const triggerResourceOptions = useMemo(() => {
+        if (!allResourceEvents?.length) return [];
+        const resourcesSet = new Set(allResourceEvents.map((event) => event.producedResource).filter((el) => el));
+        return [...resourcesSet].map((resource) => ({
+            value: resource as Resource,
+            label: getEnumLabel(resourceTypeEnum, resource as Resource),
+        }));
+    }, [allResourceEvents, resourceTypeEnum]);
 
     const isBusy = useMemo(() => isFetchingList || isDeleting, [isFetchingList, isDeleting]);
 
@@ -141,7 +153,7 @@ const TriggerList = () => {
                         placeholder="Select Resource"
                         minWidth={180}
                         id="resource"
-                        options={resourceOptionsWithEvents}
+                        options={triggerResourceOptions}
                         value={selectedResource || 'Select Resource'}
                         onChange={(value) => {
                             setSelectedResource(value as Resource);
@@ -163,7 +175,7 @@ const TriggerList = () => {
                 onClick: () => setConfirmDelete(true),
             },
         ],
-        [checkedRows, resourceOptionsWithEvents, selectedResource, handleOpenAddModal],
+        [checkedRows, triggerResourceOptions, selectedResource, handleOpenAddModal],
     );
 
     return (
