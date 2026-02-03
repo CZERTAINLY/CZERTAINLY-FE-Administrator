@@ -4,7 +4,7 @@ import FilterWidget from 'components/FilterWidget';
 import FilterWidgetRuleAction from 'components/FilterWidgetRuleAction';
 import { ExecutionFormValues } from 'components/_pages/executions/form';
 import { EntityType, actions as filterActions } from 'ducks/filters';
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { Resource } from 'types/openapi';
@@ -28,18 +28,23 @@ const ConditionFormFilter = ({ resource, formType, includeIgnoreAction }: Condit
             dispatch(filterActions.setCurrentFilters({ currentFilters: [], entity: EntityType.CONDITIONS }));
         };
     }, [dispatch]);
+
+    const getAvailableFiltersApi = useCallback(
+        (apiClients: ApiClients) =>
+            apiClients.resources.listResourceRuleFilterFields({
+                resource,
+                ...(formType === 'executionItem' ? { settable: true } : {}),
+            }),
+        [resource, formType],
+    );
+
     const renderFilterWidget = useMemo(() => {
         return formType === 'executionItem' ? (
             <div>
                 <FilterWidgetRuleAction
                     entity={EntityType.ACTIONS}
                     title="Execution Items"
-                    getAvailableFiltersApi={(apiClients: ApiClients) =>
-                        apiClients.resources.listResourceRuleFilterFields({
-                            resource,
-                            settable: true,
-                        })
-                    }
+                    getAvailableFiltersApi={getAvailableFiltersApi}
                     includeIgnoreAction={includeIgnoreAction}
                     onActionsUpdate={(currentActions) => {
                         actionGroupForm.setValue('items', currentActions);
@@ -51,11 +56,7 @@ const ConditionFormFilter = ({ resource, formType, includeIgnoreAction }: Condit
                 <FilterWidget
                     entity={EntityType.CONDITIONS}
                     title={'Condition Items'}
-                    getAvailableFiltersApi={(apiClients: ApiClients) =>
-                        apiClients.resources.listResourceRuleFilterFields({
-                            resource,
-                        })
-                    }
+                    getAvailableFiltersApi={getAvailableFiltersApi}
                     onFilterUpdate={(currentFilters) => {
                         const currentConditionItems = filterToConditionItems(currentFilters);
                         form.setValue('items', currentConditionItems);
@@ -63,7 +64,7 @@ const ConditionFormFilter = ({ resource, formType, includeIgnoreAction }: Condit
                 />
             </div>
         );
-    }, [resource, form, formType, actionGroupForm, includeIgnoreAction]);
+    }, [form, formType, actionGroupForm, includeIgnoreAction, getAvailableFiltersApi]);
 
     return <div data-testid="condition-form-filter">{renderFilterWidget}</div>;
 };
