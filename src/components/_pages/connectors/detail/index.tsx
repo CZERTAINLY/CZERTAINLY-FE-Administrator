@@ -46,6 +46,7 @@ export default function ConnectorDetail() {
     const isBulkReconnecting = useSelector(selectors.isBulkReconnecting);
     const isAuthorizing = useSelector(selectors.isAuthorizing);
     const resourceEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
+    const functionGroupCodeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.FunctionGroupCode));
     const deleteErrorMessage = useSelector(selectors.deleteErrorMessage);
 
     const [currentFunctionGroup, setFunctionGroup] = useState<FunctionGroupModel | undefined>();
@@ -260,7 +261,7 @@ export default function ConnectorDetail() {
             (connector?.functionGroups || []).map((functionGroup) => ({
                 id: functionGroup.name,
                 columns: [
-                    functionGroup.name,
+                    getEnumLabel(functionGroupCodeEnum, functionGroup.functionGroupCode ?? functionGroup.name),
                     <>
                         {functionGroup.kinds?.map((kind) => (
                             <div key={kind}>
@@ -270,7 +271,7 @@ export default function ConnectorDetail() {
                     </>,
                 ],
             })),
-        [connector],
+        [connector, functionGroupCodeEnum],
     );
 
     const renderStatusBadge = useCallback((status?: HealthStatus) => {
