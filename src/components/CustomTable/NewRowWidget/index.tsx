@@ -27,34 +27,34 @@ const NewRowWidget = ({ newItemsList, isBusy, onAddClick, immediateAdd, selectHi
     }, [immediateAdd, selectedItems, onAddClick]);
 
     return (
-        <div className="flex">
-            <Select
-                onChange={(values) => {
-                    setSelectedItems(values || []);
-                }}
-                isMulti
-                value={selectedItems}
-                options={newItemsList}
-                placeholder={selectHint || 'Select items to add'}
-                id="newRowWidgetSelect"
-            />
-            <div>
-                {selectedItems?.length && !immediateAdd ? (
-                    <div className="flex gap-2 ml-1">
-                        <Button
-                            disabled={isBusy}
-                            variant="transparent"
-                            color="secondary"
-                            onClick={() => {
-                                onAddClick(selectedItems);
-                                setSelectedItems([]);
-                            }}
-                        >
-                            <Plus />
-                        </Button>
-                    </div>
-                ) : null}
+        <div className="flex gap-1">
+            <div className="grow">
+                <Select
+                    onChange={(values) => {
+                        setSelectedItems(values || []);
+                    }}
+                    isMulti
+                    value={selectedItems}
+                    options={newItemsList}
+                    placeholder={selectHint || 'Select items to add'}
+                    id="newRowWidgetSelect"
+                />
             </div>
+            {selectedItems?.length && !immediateAdd ? (
+                <div className="flex">
+                    <Button
+                        disabled={isBusy}
+                        variant="transparent"
+                        color="secondary"
+                        onClick={() => {
+                            onAddClick(selectedItems);
+                            setSelectedItems([]);
+                        }}
+                    >
+                        <Plus />
+                    </Button>
+                </div>
+            ) : null}
         </div>
     );
 };
