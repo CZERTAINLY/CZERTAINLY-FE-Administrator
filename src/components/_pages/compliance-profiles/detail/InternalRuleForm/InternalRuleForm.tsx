@@ -12,7 +12,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import ConditionFormFilter from 'components/ConditionFormFilter';
 import { actions as complianceActions, selectors as complianceSelectors } from 'ducks/compliance-profiles';
 import cn from 'classnames';
-import Label from 'components/Label';
+import TextInput from 'components/TextInput';
 import Container from 'components/Container';
 
 type Props = {
@@ -126,73 +126,61 @@ export default function InternalRuleForm({ rule, onCancel }: Props) {
     return (
         <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)}>
-                <Controller
-                    name="name"
-                    control={control}
-                    rules={buildValidationRules([validateRequired()])}
-                    render={({ field, fieldState }) => (
-                        <div className="mb-4">
-                            <Label htmlFor="name" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
-                                Internal Rule Name
-                            </Label>
-                            <input
-                                {...field}
+                <div className="space-y-4">
+                    <Controller
+                        name="name"
+                        control={control}
+                        rules={buildValidationRules([validateRequired()])}
+                        render={({ field, fieldState }) => (
+                            <TextInput
                                 id="name"
                                 type="text"
+                                label="Internal Rule Name"
                                 placeholder="Enter the Rule Name"
-                                className={cn(
-                                    'py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600',
-                                    {
-                                        'border-red-500 focus:border-red-500 focus:ring-red-500': fieldState.error && fieldState.isTouched,
-                                    },
-                                )}
+                                value={field.value}
+                                onChange={(value) => field.onChange(value)}
+                                onBlur={field.onBlur}
+                                required
+                                invalid={fieldState.error && fieldState.isTouched}
+                                error={
+                                    fieldState.error && fieldState.isTouched
+                                        ? typeof fieldState.error === 'string'
+                                            ? fieldState.error
+                                            : fieldState.error?.message || 'Invalid value'
+                                        : undefined
+                                }
                             />
-                            {fieldState.error && fieldState.isTouched && (
-                                <p className="mt-1 text-sm text-red-600">
-                                    {typeof fieldState.error === 'string' ? fieldState.error : fieldState.error?.message || 'Invalid value'}
-                                </p>
-                            )}
-                        </div>
-                    )}
-                />
-                <Controller
-                    name="description"
-                    control={control}
-                    rules={buildValidationRules([composeValidators(validateLength(0, 300))])}
-                    render={({ field, fieldState }) => (
-                        <div className="mb-4">
-                            <Label htmlFor="description" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
-                                Description
-                            </Label>
-                            <input
-                                {...field}
+                        )}
+                    />
+                    <Controller
+                        name="description"
+                        control={control}
+                        rules={buildValidationRules([composeValidators(validateLength(0, 300))])}
+                        render={({ field, fieldState }) => (
+                            <TextInput
                                 id="description"
                                 type="text"
+                                label="Description"
                                 placeholder="Enter Description / Comment"
-                                className={cn(
-                                    'py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600',
-                                    {
-                                        'border-red-500 focus:border-red-500 focus:ring-red-500': fieldState.error && fieldState.isTouched,
-                                    },
-                                )}
+                                value={field.value}
+                                onChange={(value) => field.onChange(value)}
+                                onBlur={field.onBlur}
+                                invalid={fieldState.error && fieldState.isTouched}
+                                error={
+                                    fieldState.error && fieldState.isTouched
+                                        ? typeof fieldState.error === 'string'
+                                            ? fieldState.error
+                                            : fieldState.error?.message || 'Invalid value'
+                                        : undefined
+                                }
                             />
-                            {fieldState.error && fieldState.isTouched && (
-                                <p className="mt-1 text-sm text-red-600">
-                                    {typeof fieldState.error === 'string' ? fieldState.error : fieldState.error?.message || 'Invalid value'}
-                                </p>
-                            )}
-                        </div>
-                    )}
-                />
-                <Controller
-                    name="resource"
-                    control={control}
-                    rules={buildValidationRules([validateRequired()])}
-                    render={({ field, fieldState }) => (
-                        <div className="mb-4">
-                            <Label htmlFor="resource" className="block text-sm font-medium mb-2 text-gray-700 dark:text-white">
-                                Resource
-                            </Label>
+                        )}
+                    />
+                    <Controller
+                        name="resource"
+                        control={control}
+                        rules={buildValidationRules([validateRequired()])}
+                        render={({ field, fieldState }) => (
                             <Select
                                 id="resourceSelect"
                                 options={selectOptions}
@@ -209,32 +197,32 @@ export default function InternalRuleForm({ rule, onCancel }: Props) {
                                 className={cn({
                                     'border-red-500': fieldState.error && fieldState.isTouched,
                                 })}
+                                label="Resource"
+                                error={
+                                    fieldState.error && fieldState.isTouched
+                                        ? typeof fieldState.error === 'string'
+                                            ? fieldState.error
+                                            : fieldState.error?.message || 'Invalid value'
+                                        : undefined
+                                }
                             />
-                            {fieldState.error && fieldState.isTouched && (
-                                <p className="mt-1 text-sm text-red-600">
-                                    {typeof fieldState.error === 'string' ? fieldState.error : fieldState.error?.message || 'Invalid value'}
-                                </p>
-                            )}
-                        </div>
-                    )}
-                />
-
-                {watchedResource && watchedResource !== Resource.None && (
-                    <ConditionFormFilter formType="conditionItem" resource={watchedResource} />
-                )}
-
-                <Container className="flex-row justify-end modal-footer" gap={4}>
-                    <ProgressButton
-                        title={rule ? 'Update' : 'Create'}
-                        inProgressTitle={rule ? 'Updating...' : 'Creating...'}
-                        inProgress={formState.isSubmitting}
-                        disabled={watchedResource === Resource.None || formState.isSubmitting || !formState.isValid || isBusy}
+                        )}
                     />
 
-                    <Button variant="outline" color="secondary" onClick={onCancel} disabled={formState.isSubmitting} type="button">
-                        Cancel
-                    </Button>
-                </Container>
+                    <ConditionFormFilter formType="conditionItem" resource={watchedResource} />
+
+                    <Container className="flex-row justify-end modal-footer" gap={4}>
+                        <Button variant="outline" color="primary" onClick={onCancel} disabled={formState.isSubmitting} type="button">
+                            Cancel
+                        </Button>
+                        <ProgressButton
+                            title={rule ? 'Update' : 'Create'}
+                            inProgressTitle={rule ? 'Updating...' : 'Creating...'}
+                            inProgress={formState.isSubmitting}
+                            disabled={watchedResource === Resource.None || formState.isSubmitting || !formState.isValid || isBusy}
+                        />
+                    </Container>
+                </div>
             </form>
         </FormProvider>
     );
