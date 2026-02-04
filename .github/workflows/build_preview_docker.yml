@@ -20,11 +20,20 @@ permissions:
   checks: write
   pull-requests: read
 
-jobs:
-  build_preview_image:
-    name: Build docker preview • PR #${{ inputs.pr_number }}
-    runs-on: ubuntu-latest
+env:
+  REGISTRY: harbor.3key.company
+  IMAGE: harbor.3key.company/czertainly/czertainly-frontend-administrator
+  PREVIEW_TAG: pr-${{ inputs.pr_number }}-${{ inputs.head_sha }}
+  # cache scope so both jobs share the same cache namespace
+  CACHE_SCOPE: czertainly-fe-admin-preview
 
+jobs:
+  # Create the GitHub check once, and reuse the check_id in other jobs
+  create_check:
+    name: Create GitHub Check
+    runs-on: ubuntu-latest
+    outputs:
+      check_id: ${{ steps.create_check.outputs.check_id }}
     steps:
       - name: Export context
         run: |
@@ -56,6 +65,22 @@ jobs:
             });
             core.setOutput("check_id", check.data.id);
 
+  build_amd64:
+    name: Build amd64 • PR #${{ inputs.pr_number }}
+    runs-on: ubuntu-latest
+    needs: [create_check]
+    outputs:
+      digest: ${{ steps.build.outputs.digest }}
+
+    steps:
+      - name: Export context
+        run: |
+          echo "PR_NUMBER=${{ inputs.pr_number }}"   >> $GITHUB_ENV
+          echo "HEAD_SHA=${{ inputs.head_sha }}"     >> $GITHUB_ENV
+          echo "HEAD_REPO=${{ inputs.head_repo }}"   >> $GITHUB_ENV
+          echo "PR_BRANCH=${{ inputs.head_branch }}" >> $GITHUB_ENV
+          echo "BASE_BRANCH=${{ inputs.base_ref }}"  >> $GITHUB_ENV
+
       # Checkout fork PR branch + fetch base to compute diff
       - uses: actions/checkout@v4
         with:
@@ -71,8 +96,58 @@ jobs:
           git checkout "$PR_BRANCH"
           git clean -ffdx && git reset --hard HEAD
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Harbor
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.HARBOR_3KEY_USERNAME }}
+          password: ${{ secrets.HARBOR_3KEY_PASSWORD }}
+
+      - name: Build + push (amd64)
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:${{ env.PREVIEW_TAG }}-amd64
+          # Fast repeat builds
+          cache-from: type=gha,scope=${{ env.CACHE_SCOPE }}
+          cache-to: type=gha,mode=max,scope=${{ env.CACHE_SCOPE }}
+
+  build_arm64:
+    name: Build arm64 • PR #${{ inputs.pr_number }}
+    runs-on: ubuntu-24.04-arm
+    needs: [create_check]
+    outputs:
+      digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - name: Export context
+        run: |
+          echo "PR_NUMBER=${{ inputs.pr_number }}"   >> $GITHUB_ENV
+          echo "HEAD_SHA=${{ inputs.head_sha }}"     >> $GITHUB_ENV
+          echo "HEAD_REPO=${{ inputs.head_repo }}"   >> $GITHUB_ENV
+          echo "PR_BRANCH=${{ inputs.head_branch }}" >> $GITHUB_ENV
+          echo "BASE_BRANCH=${{ inputs.base_ref }}"  >> $GITHUB_ENV
+
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ env.HEAD_REPO }}
+          ref: ${{ env.PR_BRANCH }}
+          fetch-depth: 0
+
+      - name: Fetch base branch
+        run: |
+          git remote add upstream ${{ github.event.repository.clone_url }}
+          git fetch upstream $BASE_BRANCH
+          git checkout -B "$BASE_BRANCH" "upstream/$BASE_BRANCH"
+          git checkout "$PR_BRANCH"
+          git clean -ffdx && git reset --hard HEAD
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -80,28 +155,96 @@ jobs:
       - name: Log in to Harbor
         uses: docker/login-action@v3
         with:
-          registry: harbor.3key.company
+          registry: ${{ env.REGISTRY }}
           username: ${{ secrets.HARBOR_3KEY_USERNAME }}
           password: ${{ secrets.HARBOR_3KEY_PASSWORD }}
 
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: |
-            harbor.3key.company/czertainly/czertainly-frontend-administrator
-          tags: |
-            type=raw,value=pr-${{ inputs.pr_number }}-${{ inputs.head_sha }}
-
-      - name: Build and push Docker image
+      - name: Build + push (arm64)
+        id: build
         uses: docker/build-push-action@v6
-        id: build-and-push
         with:
           context: .
-          platforms: linux/amd64,linux/arm64
           file: ./Dockerfile
+          platforms: linux/arm64
           push: true
-          provenance: mode=max
-          sbom: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: |
+            ${{ env.IMAGE }}:${{ env.PREVIEW_TAG }}-arm64
+          cache-from: type=gha,scope=${{ env.CACHE_SCOPE }}
+          cache-to: type=gha,mode=max,scope=${{ env.CACHE_SCOPE }}
+
+  publish_manifest:
+    name: Publish multiarch manifest • PR #${{ inputs.pr_number }}
+    runs-on: ubuntu-latest
+    needs: [create_check, build_amd64, build_arm64]
+    steps:
+      - name: Log in to Harbor
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.HARBOR_3KEY_USERNAME }}
+          password: ${{ secrets.HARBOR_3KEY_PASSWORD }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Create + push multiarch manifest (single tag)
+        run: |
+          AMD_DIGEST="${{ needs.build_amd64.outputs.digest }}"
+          ARM_DIGEST="${{ needs.build_arm64.outputs.digest }}"
+          
+          echo "amd64 digest: ${AMD_DIGEST}"
+          echo "arm64 digest: ${ARM_DIGEST}"
+          
+          docker buildx imagetools create \
+            --tag "${IMAGE}:${PREVIEW_TAG}" \
+            "${IMAGE}:${PREVIEW_TAG}-amd64@${AMD_DIGEST}" \
+            "${IMAGE}:${PREVIEW_TAG}-arm64@${ARM_DIGEST}"
+          
+          docker buildx imagetools inspect "${IMAGE}:${PREVIEW_TAG}"
+
+      - name: Generate token (for check update)
+        id: app_token
+        uses: tibdex/github-app-token@v1
+        with:
+          app_id: ${{ secrets.SONAR_GH_APP_ID }}
+          private_key: ${{ secrets.SONAR_GH_APP_PRIVATE_KEY }}
+
+      - name: Mark GitHub Check as success
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ steps.app_token.outputs.token }}
+          script: |
+            await github.rest.checks.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              check_run_id: Number("${{ needs.create_check.outputs.check_id }}"),
+              status: "completed",
+              conclusion: "success"
+            });
+
+  finalize_check_failure:
+    name: Finalize Check (failure)
+    runs-on: ubuntu-latest
+    needs: [create_check, build_amd64, build_arm64, publish_manifest]
+    if: failure()
+    steps:
+      - name: Generate token
+        id: app_token
+        uses: tibdex/github-app-token@v1
+        with:
+          app_id: ${{ secrets.SONAR_GH_APP_ID }}
+          private_key: ${{ secrets.SONAR_GH_APP_PRIVATE_KEY }}
+
+      - name: Mark GitHub Check as failure
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ steps.app_token.outputs.token }}
+          script: |
+            await github.rest.checks.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              check_run_id: Number("${{ needs.create_check.outputs.check_id }}"),
+              status: "completed",
+              conclusion: "failure"
+            });
