@@ -106,17 +106,15 @@ jobs:
           username: ${{ secrets.HARBOR_3KEY_USERNAME }}
           password: ${{ secrets.HARBOR_3KEY_PASSWORD }}
 
-      - name: Build + push (amd64)
+      - name: Build + push (amd64) by digest only (no tags)
         id: build
         uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Dockerfile
           platforms: linux/amd64
-          push: true
-          tags: |
-            ${{ env.IMAGE }}:${{ env.PREVIEW_TAG }}-amd64
-          # Fast repeat builds
+          # Push without creating an extra tag
+          outputs: type=image,name=${{ env.IMAGE }},push-by-digest=true,name-canonical=true,push=true
           cache-from: type=gha,scope=${{ env.CACHE_SCOPE }}
           cache-to: type=gha,mode=max,scope=${{ env.CACHE_SCOPE }}
 
@@ -159,16 +157,14 @@ jobs:
           username: ${{ secrets.HARBOR_3KEY_USERNAME }}
           password: ${{ secrets.HARBOR_3KEY_PASSWORD }}
 
-      - name: Build + push (arm64)
+      - name: Build + push (arm64) by digest only (no tags)
         id: build
         uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Dockerfile
           platforms: linux/arm64
-          push: true
-          tags: |
-            ${{ env.IMAGE }}:${{ env.PREVIEW_TAG }}-arm64
+          outputs: type=image,name=${{ env.IMAGE }},push-by-digest=true,name-canonical=true,push=true
           cache-from: type=gha,scope=${{ env.CACHE_SCOPE }}
           cache-to: type=gha,mode=max,scope=${{ env.CACHE_SCOPE }}
 
@@ -191,15 +187,15 @@ jobs:
         run: |
           AMD_DIGEST="${{ needs.build_amd64.outputs.digest }}"
           ARM_DIGEST="${{ needs.build_arm64.outputs.digest }}"
-          
+
           echo "amd64 digest: ${AMD_DIGEST}"
           echo "arm64 digest: ${ARM_DIGEST}"
-          
+
           docker buildx imagetools create \
             --tag "${IMAGE}:${PREVIEW_TAG}" \
-            "${IMAGE}:${PREVIEW_TAG}-amd64@${AMD_DIGEST}" \
-            "${IMAGE}:${PREVIEW_TAG}-arm64@${ARM_DIGEST}"
-          
+            "${IMAGE}@${AMD_DIGEST}" \
+            "${IMAGE}@${ARM_DIGEST}"
+
           docker buildx imagetools inspect "${IMAGE}:${PREVIEW_TAG}"
 
       - name: Generate token (for check update)
