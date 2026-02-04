@@ -26,7 +26,7 @@ export interface ExecutionFormValues {
     description: string;
     items: ExecutionItemRequestModel[];
     notificationProfileItems: { value: string; label: string }[];
-    type: ExecutionType;
+    type: ExecutionType | '';
 }
 
 const ExecutionForm = () => {
@@ -53,7 +53,7 @@ const ExecutionForm = () => {
             description: '',
             items: [],
             notificationProfileItems: [],
-            type: ExecutionType.SetField,
+            type: '',
         };
     }, []);
 
@@ -285,7 +285,10 @@ const ExecutionForm = () => {
                                 />
                             )}
 
-                            <Container className="flex-row justify-end mt-4">
+                            <Container className="flex-row justify-end" gap={4}>
+                                <Button variant="outline" onClick={onCancel} disabled={isSubmitting} type="button">
+                                    Cancel
+                                </Button>
                                 <ProgressButton
                                     title={submitTitle}
                                     inProgressTitle={inProgressTitle}
@@ -300,10 +303,6 @@ const ExecutionForm = () => {
                                     }
                                     type="submit"
                                 />
-
-                                <Button variant="outline" onClick={onCancel} disabled={isSubmitting} type="button">
-                                    Cancel
-                                </Button>
                             </Container>
                         </div>
                     </Widget>
