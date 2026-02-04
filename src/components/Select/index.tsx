@@ -53,6 +53,15 @@ const getOptionValueString = (val: OptionValue): string => {
         if (uuid) {
             return uuid;
         }
+        if ('data' in val && val.data !== undefined) {
+            const d = (val as { data: unknown }).data;
+            if (typeof d === 'string' || typeof d === 'number' || typeof d === 'boolean') {
+                return String(d);
+            }
+            if (typeof d === 'object' && d !== null) {
+                return JSON.stringify(d);
+            }
+        }
         return JSON.stringify(val);
     }
     return String(val);
@@ -85,6 +94,15 @@ const valuesMatch = (val1: any, val2: any): boolean => {
 
     if (val1?.reference && val2?.reference) {
         return val1.reference === val2.reference;
+    }
+
+    if ('data' in val1 && 'data' in val2) {
+        const d1 = val1.data;
+        const d2 = val2.data;
+        if (typeof d1 === 'object' && d1 !== null && typeof d2 === 'object' && d2 !== null) {
+            return JSON.stringify(d1) === JSON.stringify(d2);
+        }
+        return d1 === d2;
     }
 
     return JSON.stringify(val1) === JSON.stringify(val2);
