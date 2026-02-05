@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { useEffect } from 'react';
 
-export type ModalSize = 'sm' | 'md' | 'lg' | 'xl';
+export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
 export type ModalIcon = 'delete' | 'info' | 'warning' | 'success' | 'error' | 'users' | 'user' | 'download' | 'plug' | React.ReactNode;
 
 export interface DialogButton {
@@ -47,6 +47,7 @@ export default function Dialog({ isOpen, toggle, caption, body, buttons, size = 
         md: 'sm:max-w-lg',
         lg: 'sm:max-w-xl',
         xl: 'sm:max-w-4xl',
+        xxl: 'sm:max-w-6xl',
     };
 
     // Lock body scroll when modal is open

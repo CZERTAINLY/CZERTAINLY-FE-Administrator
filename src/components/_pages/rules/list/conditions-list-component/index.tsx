@@ -195,7 +195,7 @@ const ConditionsList = () => {
                 isOpen={isAddModalOpen}
                 toggle={handleCloseAddModal}
                 caption="Create Condition"
-                size="xl"
+                size="xxl"
                 body={<ConditionForm onCancel={handleCloseAddModal} onSuccess={handleCloseAddModal} />}
                 noBorder
             />

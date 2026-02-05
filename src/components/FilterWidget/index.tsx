@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { ApiClients } from '../../api';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
+import { actions as alertActions } from 'ducks/alerts';
 import { EntityType, actions, selectors } from 'ducks/filters';
 import { useDispatch, useSelector } from 'react-redux';
 import Select, { SingleValue, MultiValue } from 'components/Select';
@@ -273,6 +274,18 @@ export default function FilterWidget({
 
         if (selectedFilter >= currentFilters.length) {
             setSelectedFilter(-1);
+            return;
+        }
+
+        const isDuplicate = currentFilters.some(
+            (f, i) =>
+                i !== selectedFilter &&
+                f.fieldSource === filterGroup.value &&
+                f.fieldIdentifier === filterField.value &&
+                f.condition === filterCondition.value,
+        );
+        if (isDuplicate) {
+            dispatch(alertActions.error('A filter with the same field and condition already exists'));
             return;
         }
 
