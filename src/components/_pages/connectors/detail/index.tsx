@@ -390,7 +390,7 @@ export default function ConnectorDetail() {
             <Breadcrumb
                 items={[
                     { label: `${getEnumLabel(resourceEnum, Resource.Connectors)} Inventory`, href: '/connectors' },
-                    { label: 'Connector Details' },
+                    { label: connector?.name || 'Connector Details', href: '' },
                 ]}
             />
             <Container className="md:grid grid-cols-2">

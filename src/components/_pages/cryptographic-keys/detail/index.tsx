@@ -372,7 +372,10 @@ export default function CryptographicKeyDetail() {
     return (
         <>
             <Breadcrumb
-                items={[{ label: `${getEnumLabel(resourceEnum, Resource.Keys)} Inventory`, href: '/keys' }, { label: 'Key Details' }]}
+                items={[
+                    { label: `${getEnumLabel(resourceEnum, Resource.Keys)} Inventory`, href: '/keys' },
+                    { label: cryptographicKey?.name || 'Key Details' },
+                ]}
             />
             <Container className="md:flex-row">
                 <Widget

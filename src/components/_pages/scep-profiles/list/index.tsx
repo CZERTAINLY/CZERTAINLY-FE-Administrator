@@ -252,7 +252,7 @@ export default function ScepProfiles() {
     );
 
     return (
-        <Container className="themed-container" fluid>
+        <Container>
             <Widget
                 title="List of SCEP Profiles"
                 busy={isBusy}

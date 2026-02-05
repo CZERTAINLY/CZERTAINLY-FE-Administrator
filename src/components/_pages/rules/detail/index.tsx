@@ -316,11 +316,11 @@ const RuleDetails = () => {
     }, [ruleDetails]);
 
     return (
-        <Container className="themed-container" fluid>
+        <Container>
             <Breadcrumb
                 items={[
                     { label: `${getEnumLabel(resourceTypeEnum, Resource.Rules)} Inventory`, href: '/rules' },
-                    { label: 'Rule Details' },
+                    { label: ruleDetails?.name || 'Rule Details', href: '' },
                 ]}
             />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

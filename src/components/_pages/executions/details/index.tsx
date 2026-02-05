@@ -241,7 +241,7 @@ const ExecutionDetails = () => {
             <Breadcrumb
                 items={[
                     { label: `${getEnumLabel(resourceEnum, Resource.Actions)} Inventory`, href: '/actions/1' },
-                    { label: 'Execution Details' },
+                    { label: executionDetails?.name || 'Execution Details', href: '' },
                 ]}
             />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
