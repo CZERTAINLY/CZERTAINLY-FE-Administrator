@@ -670,7 +670,6 @@ export default function FilterWidget({
                         </Button>
                     </div>
                     <div className="flex gap-2 flex-wrap">
-                        {console.log('currentFilters', currentFilters)}
                         {currentFilters.map((f, i) => {
                             const field = availableFilters
                                 .find((a) => a.filterFieldSource === f.fieldSource)
