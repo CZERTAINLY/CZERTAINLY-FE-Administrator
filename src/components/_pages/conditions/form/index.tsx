@@ -39,7 +39,7 @@ const ConditionForm = ({ onCancel, onSuccess }: ConditionFormProps = {}) => {
     const navigate = useNavigate();
     const isCreatingCondition = useSelector(rulesSelectors.isCreatingCondition);
     const conditionTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.ConditionType));
-    const { resourceOptionsWithRuleEvaluator, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
+    const { resourceOptionsWithRuleEvaluator, isFetchingResourcesList } = useRuleEvaluatorResourceOptions({ includeAny: false });
 
     const isBusy = useMemo(() => isCreatingCondition || isFetchingResourcesList, [isCreatingCondition, isFetchingResourcesList]);
 

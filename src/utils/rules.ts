@@ -47,7 +47,8 @@ export const useResourceOptions = () => {
     return { resourceOptions, isFetchingResourcesList };
 };
 
-export const useRuleEvaluatorResourceOptions = () => {
+export const useRuleEvaluatorResourceOptions = (options?: { includeAny?: boolean }) => {
+    const includeAny = options?.includeAny !== false;
     const resourceList = useSelector(resourceSelectors.resourcesList);
     const resourceTypeEnum = useSelector(enumSelectors.platformEnum(PlatformEnum.Resource));
     const isFetchingResourcesList = useSelector(resourceSelectors.isFetchingResourcesList);
@@ -60,16 +61,20 @@ export const useRuleEvaluatorResourceOptions = () => {
     const resourceOptionsWithRuleEvaluator = useMemo(() => {
         if (!resourceList.length) return [];
         const resourceListWithRuleEvaluator = resourceList.filter((resource) => resource.hasRuleEvaluator);
-        return [
-            ...resourceListWithRuleEvaluator.map((resource) => {
-                return { value: resource.resource, label: getEnumLabel(resourceTypeEnum, resource.resource) };
-            }),
-            {
-                label: 'Any',
-                value: Resource.Any,
-            },
-        ];
-    }, [resourceList, resourceTypeEnum]);
+        const baseOptions = resourceListWithRuleEvaluator.map((resource) => {
+            return { value: resource.resource, label: getEnumLabel(resourceTypeEnum, resource.resource) };
+        });
+        if (includeAny) {
+            return [
+                ...baseOptions,
+                {
+                    label: 'Any',
+                    value: Resource.Any,
+                },
+            ];
+        }
+        return baseOptions;
+    }, [resourceList, resourceTypeEnum, includeAny]);
 
     return { resourceOptionsWithRuleEvaluator, isFetchingResourcesList };
 };
