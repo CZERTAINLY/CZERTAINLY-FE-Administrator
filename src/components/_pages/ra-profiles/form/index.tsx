@@ -234,8 +234,6 @@ export default function RaProfileForm({ raProfileId, authorityId: propAuthorityI
         [dispatch, editMode, id, raProfile, raProfileAttributeDescriptors, groupAttributesCallbackAttributes, resourceCustomAttributes],
     );
 
-    const title = useMemo(() => (editMode ? 'Edit RA Profile' : 'Create RA Profile'), [editMode]);
-
     const renderCustomAttributesEditor = useMemo(() => {
         if (isBusy) return <></>;
         return (
