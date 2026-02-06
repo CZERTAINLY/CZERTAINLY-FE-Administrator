@@ -267,9 +267,29 @@ function AttributeEditorInner({
             if (isDataAttributeModel(descriptor) || isGroupAttributeModel(descriptor)) {
                 descriptor.attributeCallback?.mappings.forEach((mapping) => {
                     let value = mapping.value || getCurrentFromMappingValue(mapping);
-                    if (typeof value === 'object' && value.hasOwnProperty('data')) value = value.data;
-                    if (typeof value === 'object' && value !== null && value.hasOwnProperty('uuid') && typeof value.uuid === 'string') {
-                        value = value.uuid;
+                    if (typeof value === 'object' && value !== null) {
+                        // Resolve dot path from mapping.from (e.g. "endEntityProfile.data.id" -> extract value at data.id)
+                        if (mapping.from && mapping.from.includes('.')) {
+                            const pathParts = mapping.from.split('.').slice(1);
+                            const tryResolve = (obj: any, parts: string[]): any => {
+                                let resolved = obj;
+                                for (const part of parts) {
+                                    if (resolved === undefined || resolved === null) return undefined;
+                                    resolved = Array.isArray(resolved) ? resolved[0]?.[part] : resolved[part];
+                                }
+                                return resolved;
+                            };
+                            const resolved =
+                                tryResolve(value, pathParts) ??
+                                (value?.value !== undefined ? tryResolve(value, ['value', ...pathParts]) : undefined);
+                            if (resolved !== undefined && (typeof resolved !== 'object' || resolved === null)) {
+                                value = resolved;
+                            }
+                        }
+                        if (typeof value === 'object' && value !== null && value.hasOwnProperty('data')) value = value.data;
+                        if (typeof value === 'object' && value !== null && value.hasOwnProperty('uuid') && typeof value.uuid === 'string') {
+                            value = value.uuid;
+                        }
                     }
                     if (value === undefined) hasUndefinedMapping = true;
 
