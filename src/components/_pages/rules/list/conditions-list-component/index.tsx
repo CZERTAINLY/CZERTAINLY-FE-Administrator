@@ -28,7 +28,7 @@ const ConditionsList = () => {
     const [checkedRows, setCheckedRows] = useState<string[]>([]);
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-    const { resourceOptionsWithRuleEvaluator, isFetchingResourcesList } = useRuleEvaluatorResourceOptions();
+    const { resourceOptionsWithRuleEvaluator, isFetchingResourcesList } = useRuleEvaluatorResourceOptions({ includeAny: false });
 
     const isBusy = useMemo(
         () => isFetchingList || isDeleting || isFetchingResourcesList,
