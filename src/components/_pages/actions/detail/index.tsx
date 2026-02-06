@@ -319,55 +319,63 @@ const RuleDetails = () => {
     }, [actionDetails]);
 
     return (
-        <Container className="themed-container">
+        <div>
             <Breadcrumb
                 items={[
                     { label: `${getEnumLabel(resourceTypeEnum, Resource.Actions)} Inventory`, href: '/actions' },
-                    { label: 'Action Details' },
+                    { label: actionDetails?.name || 'Action Details', href: '' },
                 ]}
             />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <Widget refreshAction={getFreshDetails} busy={isBusy} title="Action Details" titleSize="large" widgetButtons={buttons}>
-                        <CustomTable data={conditionGroupsDetailData} headers={tableHeader} />
-                    </Widget>
-                </div>
-                <div>
-                    <Widget
-                        busy={isBusy}
-                        title="Executions"
-                        titleSize="large"
-                        widgetInfoCard={{
-                            title: 'Information',
-                            description: 'Execution is named set of execution items',
-                        }}
-                    >
-                        <CustomTable
-                            data={executionsData}
-                            headers={executionDataHeaders}
-                            newRowWidgetProps={{
-                                isBusy: isUpdatingAction,
-                                newItemsList: executionsOptions,
-                                onAddClick: onUpdateExecutionsConfirmed,
+            <Container>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <Widget
+                            refreshAction={getFreshDetails}
+                            busy={isBusy}
+                            title="Action Details"
+                            titleSize="large"
+                            widgetButtons={buttons}
+                        >
+                            <CustomTable data={conditionGroupsDetailData} headers={tableHeader} />
+                        </Widget>
+                    </div>
+                    <div>
+                        <Widget
+                            busy={isBusy}
+                            title="Executions"
+                            titleSize="large"
+                            widgetInfoCard={{
+                                title: 'Information',
+                                description: 'Execution is named set of execution items',
                             }}
-                        />
-                    </Widget>
+                        >
+                            <CustomTable
+                                data={executionsData}
+                                headers={executionDataHeaders}
+                                newRowWidgetProps={{
+                                    isBusy: isUpdatingAction,
+                                    newItemsList: executionsOptions,
+                                    onAddClick: onUpdateExecutionsConfirmed,
+                                }}
+                            />
+                        </Widget>
+                    </div>
                 </div>
-            </div>
 
-            {renderActionExecutions}
-            <Dialog
-                isOpen={confirmDelete}
-                caption={`Delete an Action`}
-                body={`You are about to delete an action. Is this what you want to do?`}
-                toggle={() => setConfirmDelete(false)}
-                icon="delete"
-                buttons={[
-                    { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
-                    { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
-                ]}
-            />
-        </Container>
+                {renderActionExecutions}
+                <Dialog
+                    isOpen={confirmDelete}
+                    caption={`Delete an Action`}
+                    body={`You are about to delete an action. Is this what you want to do?`}
+                    toggle={() => setConfirmDelete(false)}
+                    icon="delete"
+                    buttons={[
+                        { color: 'danger', onClick: onDeleteConfirmed, body: 'Delete' },
+                        { color: 'secondary', variant: 'outline', onClick: () => setConfirmDelete(false), body: 'Cancel' },
+                    ]}
+                />
+            </Container>
+        </div>
     );
 };
 

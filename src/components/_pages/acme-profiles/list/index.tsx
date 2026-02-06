@@ -239,7 +239,7 @@ export default function AdministratorsList() {
     );
 
     return (
-        <Container className="themed-container">
+        <Container gap={4}>
             <Widget
                 title="List of ACME Profiles"
                 busy={isBusy}

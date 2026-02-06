@@ -233,7 +233,7 @@ export default function DiscoveryDetail() {
             <Breadcrumb
                 items={[
                     { label: `${getEnumLabel(resourceEnum, Resource.Discoveries)} Inventory`, href: '/discoveries' },
-                    { label: 'Discovery Details' },
+                    { label: discovery?.name || 'Discovery Details' },
                 ]}
             />
             <TabLayout

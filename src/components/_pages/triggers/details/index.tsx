@@ -505,7 +505,7 @@ const TriggerDetails = () => {
             <Breadcrumb
                 items={[
                     { label: `${getEnumLabel(resourceEnum, Resource.Triggers)} Inventory`, href: '/triggers' },
-                    { label: 'Trigger Details' },
+                    { label: triggerDetails?.name || 'Trigger Details', href: '' },
                 ]}
             />
             <TabLayout
