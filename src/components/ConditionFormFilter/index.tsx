@@ -61,6 +61,7 @@ const ConditionFormFilter = ({ resource, formType, includeIgnoreAction }: Condit
                         const currentConditionItems = filterToConditionItems(currentFilters);
                         form.setValue('items', currentConditionItems);
                     }}
+                    filterGridCols={2}
                 />
             </div>
         );
