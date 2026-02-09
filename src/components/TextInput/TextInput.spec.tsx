@@ -25,6 +25,7 @@ test.describe('TextInput', () => {
         const component = await mount(<TextInput value="" onChange={handleChange} />);
 
         const input = component.getByRole('textbox');
+        await input.focus(); // TextInput removes readonly on focus to allow editing (anti-autofill)
         await input.fill('New text');
         await expect.poll(() => newValue, { timeout: 2000 }).toBe('New text');
     });

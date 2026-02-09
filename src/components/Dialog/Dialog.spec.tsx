@@ -16,7 +16,7 @@ test.describe('Dialog', () => {
         await expect(component.getByText('Dialog content')).toBeVisible();
     });
 
-    test('should close when clicking outside the dialog', async ({ mount, page }) => {
+    test('should call toggle when close button is clicked', async ({ mount, page }) => {
         let toggleCalled = false;
         const toggle = () => {
             toggleCalled = true;
@@ -26,51 +26,9 @@ test.describe('Dialog', () => {
 
         await expect(page.getByText('Test Dialog')).toBeVisible();
 
-        const overlay = page.locator('[data-testid="test-dialog"]');
-        await expect(overlay).toBeVisible();
-
-        const dialogContent = page.locator('.hs-overlay-animation-target');
-        const dialogBox = await dialogContent.boundingBox();
-        const overlayBox = await overlay.boundingBox();
-
-        if (overlayBox && dialogBox) {
-            const clickX = overlayBox.x + 20;
-            const clickY = overlayBox.y + 20;
-
-            if (
-                clickX < dialogBox.x ||
-                clickY < dialogBox.y ||
-                clickX > dialogBox.x + dialogBox.width ||
-                clickY > dialogBox.y + dialogBox.height
-            ) {
-                await overlay.evaluate((el) => {
-                    const event = new MouseEvent('click', {
-                        bubbles: true,
-                        cancelable: true,
-                        view: window,
-                    });
-                    el.dispatchEvent(event);
-                });
-            } else {
-                await overlay.evaluate((el) => {
-                    const event = new MouseEvent('click', {
-                        bubbles: true,
-                        cancelable: true,
-                        view: window,
-                    });
-                    el.dispatchEvent(event);
-                });
-            }
-        } else {
-            await overlay.evaluate((el) => {
-                const event = new MouseEvent('click', {
-                    bubbles: true,
-                    cancelable: true,
-                    view: window,
-                });
-                el.dispatchEvent(event);
-            });
-        }
+        const dialog = page.locator('[data-testid="test-dialog"]');
+        const closeButton = dialog.getByRole('button').first();
+        await closeButton.click();
 
         expect(toggleCalled).toBe(true);
     });

@@ -1,5 +1,6 @@
 import { test, expect } from '../../../playwright/ct-test';
 import CustomTable, { TableHeader, TableDataRow } from './index';
+import { withProviders } from 'utils/test-helpers';
 
 test.describe('CustomTable', () => {
     const mockHeaders: TableHeader[] = [
@@ -15,7 +16,7 @@ test.describe('CustomTable', () => {
     ];
 
     test('should render table with headers and data', async ({ mount }) => {
-        const component = await mount(<CustomTable headers={mockHeaders} data={mockData} />);
+        const component = await mount(withProviders(<CustomTable headers={mockHeaders} data={mockData} />));
 
         const table = component.locator('table');
         await expect(table).toBeVisible();
@@ -26,21 +27,21 @@ test.describe('CustomTable', () => {
     });
 
     test('should render table without header when hasHeader is false', async ({ mount }) => {
-        const component = await mount(<CustomTable headers={mockHeaders} data={mockData} hasHeader={false} />);
+        const component = await mount(withProviders(<CustomTable headers={mockHeaders} data={mockData} hasHeader={false} />));
 
         const table = component.locator('table');
         await expect(table).toBeVisible();
     });
 
     test('should render search input when canSearch is true', async ({ mount }) => {
-        const component = await mount(<CustomTable headers={mockHeaders} data={mockData} canSearch={true} />);
+        const component = await mount(withProviders(<CustomTable headers={mockHeaders} data={mockData} canSearch={true} />));
 
         const searchInput = component.getByPlaceholder('Search');
         await expect(searchInput).toBeVisible();
     });
 
     test('should filter data when search is used', async ({ mount }) => {
-        const component = await mount(<CustomTable headers={mockHeaders} data={mockData} canSearch={true} />);
+        const component = await mount(withProviders(<CustomTable headers={mockHeaders} data={mockData} canSearch={true} />));
 
         const searchInput = component.getByPlaceholder('Search');
         await searchInput.fill('John');
@@ -52,7 +53,7 @@ test.describe('CustomTable', () => {
     });
 
     test('should render checkboxes when hasCheckboxes is true', async ({ mount }) => {
-        const component = await mount(<CustomTable headers={mockHeaders} data={mockData} hasCheckboxes={true} />);
+        const component = await mount(withProviders(<CustomTable headers={mockHeaders} data={mockData} hasCheckboxes={true} />));
 
         const checkboxes = component.locator('input[type="checkbox"]');
         const count = await checkboxes.count();
@@ -66,7 +67,9 @@ test.describe('CustomTable', () => {
         };
 
         const component = await mount(
-            <CustomTable headers={mockHeaders} data={mockData} hasCheckboxes={true} onCheckedRowsChanged={handleCheckedChange} />,
+            withProviders(
+                <CustomTable headers={mockHeaders} data={mockData} hasCheckboxes={true} onCheckedRowsChanged={handleCheckedChange} />,
+            ),
         );
 
         const firstCheckbox = component.locator('input[type="checkbox"]').nth(1);
@@ -86,7 +89,7 @@ test.describe('CustomTable', () => {
         };
 
         const component = await mount(
-            <CustomTable headers={mockHeaders} data={mockData} hasPagination={true} paginationData={paginationData} />,
+            withProviders(<CustomTable headers={mockHeaders} data={mockData} hasPagination={true} paginationData={paginationData} />),
         );
 
         await expect(component.getByText(/Showing.*items of/)).toBeVisible();
@@ -108,13 +111,15 @@ test.describe('CustomTable', () => {
         };
 
         const component = await mount(
-            <CustomTable
-                headers={mockHeaders}
-                data={mockData}
-                hasPagination={true}
-                paginationData={paginationData}
-                onPageChanged={handlePageChange}
-            />,
+            withProviders(
+                <CustomTable
+                    headers={mockHeaders}
+                    data={mockData}
+                    hasPagination={true}
+                    paginationData={paginationData}
+                    onPageChanged={handlePageChange}
+                />,
+            ),
         );
 
         const nextButton = component.getByRole('button', { name: /next|>/i }).or(component.locator('a').filter({ hasText: /2/ }));
@@ -139,13 +144,15 @@ test.describe('CustomTable', () => {
         };
 
         const component = await mount(
-            <CustomTable
-                headers={mockHeaders}
-                data={mockData}
-                hasPagination={true}
-                paginationData={paginationData}
-                onPageSizeChanged={handlePageSizeChange}
-            />,
+            withProviders(
+                <CustomTable
+                    headers={mockHeaders}
+                    data={mockData}
+                    hasPagination={true}
+                    paginationData={paginationData}
+                    onPageSizeChanged={handlePageSizeChange}
+                />,
+            ),
         );
 
         const selectButton = component.locator('button[aria-expanded]').first();
@@ -155,7 +162,7 @@ test.describe('CustomTable', () => {
     });
 
     test('should sort columns when sortable header is clicked', async ({ mount }) => {
-        const component = await mount(<CustomTable headers={mockHeaders} data={mockData} />);
+        const component = await mount(withProviders(<CustomTable headers={mockHeaders} data={mockData} />));
 
         const nameHeader = component.getByText('Name');
         await nameHeader.click();
@@ -165,7 +172,7 @@ test.describe('CustomTable', () => {
     });
 
     test('should handle empty data array', async ({ mount }) => {
-        const component = await mount(<CustomTable headers={mockHeaders} data={[]} />);
+        const component = await mount(withProviders(<CustomTable headers={mockHeaders} data={[]} />));
 
         await expect(component.getByText('Name')).toBeVisible();
         await expect(component.getByText('Email')).toBeVisible();
@@ -180,7 +187,7 @@ test.describe('CustomTable', () => {
             },
         ];
 
-        const component = await mount(<CustomTable headers={mockHeaders} data={dataWithDetails} hasDetails={true} />);
+        const component = await mount(withProviders(<CustomTable headers={mockHeaders} data={dataWithDetails} hasDetails={true} />));
 
         const table = component.locator('table');
         await expect(table).toBeVisible();
@@ -193,13 +200,15 @@ test.describe('CustomTable', () => {
         };
 
         const component = await mount(
-            <CustomTable
-                headers={mockHeaders}
-                data={mockData}
-                hasCheckboxes={true}
-                multiSelect={true}
-                onCheckedRowsChanged={handleCheckedChange}
-            />,
+            withProviders(
+                <CustomTable
+                    headers={mockHeaders}
+                    data={mockData}
+                    hasCheckboxes={true}
+                    multiSelect={true}
+                    onCheckedRowsChanged={handleCheckedChange}
+                />,
+            ),
         );
 
         const checkboxes = component.locator('input[type="checkbox"]');
@@ -219,13 +228,15 @@ test.describe('CustomTable', () => {
         };
 
         const component = await mount(
-            <CustomTable
-                headers={mockHeaders}
-                data={mockData}
-                hasCheckboxes={true}
-                multiSelect={false}
-                onCheckedRowsChanged={handleCheckedChange}
-            />,
+            withProviders(
+                <CustomTable
+                    headers={mockHeaders}
+                    data={mockData}
+                    hasCheckboxes={true}
+                    multiSelect={false}
+                    onCheckedRowsChanged={handleCheckedChange}
+                />,
+            ),
         );
 
         const checkboxes = component.locator('input[type="checkbox"]');
