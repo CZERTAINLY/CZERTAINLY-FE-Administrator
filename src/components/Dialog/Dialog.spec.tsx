@@ -125,4 +125,22 @@ test.describe('Dialog', () => {
         const bodyStyle = await page.evaluate(() => document.body.style.overflow);
         expect(bodyStyle).toBe('hidden');
     });
+
+    test('should support noBorder prop', async ({ mount }) => {
+        const component = await mount(<Dialog isOpen={true} caption="No Border" body="Content" noBorder={true} dataTestId="test-dialog" />);
+        await expect(component.getByText('No Border')).toBeVisible();
+    });
+
+    test('should support size md', async ({ mount }) => {
+        const component = await mount(<Dialog isOpen={true} caption="Medium" body="Content" size="md" dataTestId="test-dialog" />);
+        await expect(component.getByText('Medium')).toBeVisible();
+    });
+
+    test('should render body as React node', async ({ mount }) => {
+        const component = await mount(
+            <Dialog isOpen={true} caption="Test" body={<span data-testid="custom-body">Custom body</span>} dataTestId="test-dialog" />,
+        );
+        await expect(component.getByTestId('custom-body')).toBeVisible();
+        await expect(component.getByText('Custom body')).toBeVisible();
+    });
 });
