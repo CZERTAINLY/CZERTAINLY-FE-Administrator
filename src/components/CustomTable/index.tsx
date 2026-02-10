@@ -565,6 +565,7 @@ function CustomTable({
                                 }))}
                                 value={(paginationData ? paginationData.pageSize : pageSize).toString()}
                                 onChange={onPageSizeChange}
+                                minWidth={90}
                             />
                         )}
                     </div>
