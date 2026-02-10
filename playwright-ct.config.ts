@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename);
 
 export default defineConfig({
     testDir: './src',
-    testMatch: '**/*.spec.tsx',
+    testMatch: ['**/*.spec.tsx', '**/*.spec.ts'],
     use: {
         ctPort: 3100,
         ctViteConfig: {

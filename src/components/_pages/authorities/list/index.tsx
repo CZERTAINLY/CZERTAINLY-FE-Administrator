@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
 import Container from 'components/Container';
@@ -26,7 +26,6 @@ function AuthorityList() {
     const isUpdating = useSelector(selectors.isUpdating);
     const isBulkDeleting = useSelector(selectors.isBulkDeleting);
     const isBulkForceDeleting = useSelector(selectors.isBulkForceDeleting);
-    const isCreating = useSelector(selectors.isCreating);
 
     const isBusy = isFetching || isDeleting || isUpdating || isBulkDeleting || isBulkForceDeleting;
 

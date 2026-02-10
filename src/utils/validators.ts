@@ -1,5 +1,5 @@
 import cronValidator from 'cron-expression-validator';
-import { parse } from 'regexp-tree';
+import regexpTree from 'regexp-tree';
 
 export const composeValidators =
     (...validators: any[]) =>
@@ -213,7 +213,7 @@ export const validatePostgresPosixRegex = (value: string): string => {
     // 0) Quick JS parse for gross syntax errors (not authoritative for POSIX,
     //    but catches obviously broken inputs like stray backslash at the end).
     try {
-        parse(`/${value}/`);
+        regexpTree.parse(`/${value}/`);
     } catch (error: any) {
         return `Invalid regex pattern: ${error?.message ?? error}`;
     }
