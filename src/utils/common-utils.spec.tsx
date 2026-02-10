@@ -1,5 +1,15 @@
 import { test, expect } from '../../playwright/ct-test';
-import { removeNullValues, capitalize, getStepValue, isObjectSame, utf8ToBase64, base64ToUtf8 } from './common-utils';
+import {
+    removeNullValues,
+    capitalize,
+    getStepValue,
+    isObjectSame,
+    utf8ToBase64,
+    base64ToUtf8,
+    getFormTypeFromAttributeContentType,
+    getFormTypeFromFilterFieldType,
+} from './common-utils';
+import { AttributeContentType, FilterFieldType } from 'types/openapi';
 
 test.describe('common-utils', () => {
     test.describe('removeNullValues', () => {
@@ -86,6 +96,52 @@ test.describe('common-utils', () => {
             const original = 'Привіт';
             const encoded = utf8ToBase64(original);
             expect(base64ToUtf8(encoded)).toBe(original);
+        });
+    });
+
+    test.describe('getFormTypeFromAttributeContentType', () => {
+        test('should map Boolean to checkbox', () => {
+            expect(getFormTypeFromAttributeContentType(AttributeContentType.Boolean)).toBe('checkbox');
+        });
+
+        test('should map Integer and Float to number', () => {
+            expect(getFormTypeFromAttributeContentType(AttributeContentType.Integer)).toBe('number');
+            expect(getFormTypeFromAttributeContentType(AttributeContentType.Float)).toBe('number');
+        });
+
+        test('should map Date to date', () => {
+            expect(getFormTypeFromAttributeContentType(AttributeContentType.Date)).toBe('date');
+        });
+
+        test('should map Secret to password', () => {
+            expect(getFormTypeFromAttributeContentType(AttributeContentType.Secret)).toBe('password');
+        });
+
+        test('should map Text and Codeblock to textarea', () => {
+            expect(getFormTypeFromAttributeContentType(AttributeContentType.Text)).toBe('textarea');
+            expect(getFormTypeFromAttributeContentType(AttributeContentType.Codeblock)).toBe('textarea');
+        });
+
+        test('should default to text for unknown', () => {
+            expect(getFormTypeFromAttributeContentType('unknown' as AttributeContentType)).toBe('text');
+        });
+    });
+
+    test.describe('getFormTypeFromFilterFieldType', () => {
+        test('should map Date to date', () => {
+            expect(getFormTypeFromFilterFieldType(FilterFieldType.Date)).toBe('date');
+        });
+
+        test('should map Datetime to datetime-local', () => {
+            expect(getFormTypeFromFilterFieldType(FilterFieldType.Datetime)).toBe('datetime-local');
+        });
+
+        test('should map Number to number', () => {
+            expect(getFormTypeFromFilterFieldType(FilterFieldType.Number)).toBe('number');
+        });
+
+        test('should default to text for unknown', () => {
+            expect(getFormTypeFromFilterFieldType('unknown' as FilterFieldType)).toBe('text');
         });
     });
 });

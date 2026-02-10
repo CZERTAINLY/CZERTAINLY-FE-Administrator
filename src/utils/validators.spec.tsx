@@ -4,14 +4,17 @@ import {
     validatePattern,
     validateInteger,
     validatePositiveInteger,
+    validateNonZeroInteger,
     validateFloat,
     validateEmail,
     validateLength,
+    validateDuration,
     composeValidators,
     validateRoutelessUrl,
     validateUrlWithRoute,
     validateCustomIp,
     validateAlphaNumericWithoutAccents,
+    validateAlphaNumericWithSpecialChars,
     validateOid,
     validateOidCode,
 } from './validators';
@@ -85,6 +88,36 @@ test.describe('validators', () => {
         });
     });
 
+    test.describe('validateNonZeroInteger', () => {
+        test('should accept non-zero integers', () => {
+            expect(validateNonZeroInteger()('123')).toBeUndefined();
+            expect(validateNonZeroInteger()('-5')).toBeUndefined();
+        });
+
+        test('should reject zero and non-integers', () => {
+            expect(validateNonZeroInteger()('0')).toBe('Value must be a non-zero integer');
+            expect(validateNonZeroInteger()('12.5')).toBe('Value must be a non-zero integer');
+        });
+    });
+
+    test.describe('validateDuration', () => {
+        test('should accept valid duration strings', () => {
+            expect(validateDuration()('1d')).toBeUndefined();
+            expect(validateDuration()('2h 30m')).toBeUndefined();
+            expect(validateDuration()('1s')).toBeUndefined();
+        });
+
+        test('should accept empty value', () => {
+            expect(validateDuration()('')).toBeUndefined();
+            expect(validateDuration()('   ')).toBeUndefined();
+        });
+
+        test('should reject invalid duration', () => {
+            expect(validateDuration()('invalid')).toBeTruthy();
+            expect(validateDuration()('1x')).toBeTruthy();
+        });
+    });
+
     test.describe('validateFloat', () => {
         test('should accept valid floats', () => {
             expect(validateFloat()('123.45')).toBeUndefined();
@@ -146,6 +179,10 @@ test.describe('validators', () => {
             expect(validateRoutelessUrl()('localhost:8443')).toBeUndefined();
             expect(validateRoutelessUrl()('https://example.com')).toBeUndefined();
         });
+
+        test('should reject invalid urls', () => {
+            expect(validateRoutelessUrl()('https://example.com/path')).toBeTruthy();
+        });
     });
 
     test.describe('validateUrlWithRoute', () => {
@@ -155,6 +192,21 @@ test.describe('validators', () => {
 
         test('should accept valid url with path', () => {
             expect(validateUrlWithRoute('https://example.com/path')).toBeUndefined();
+        });
+
+        test('should reject invalid url', () => {
+            expect(validateUrlWithRoute('invalid url with spaces')).toBe('Value must be a valid url');
+        });
+    });
+
+    test.describe('validateAlphaNumericWithSpecialChars', () => {
+        test('should accept valid strings with spaces and separators', () => {
+            expect(validateAlphaNumericWithSpecialChars()('John Doe')).toBeUndefined();
+            expect(validateAlphaNumericWithSpecialChars()(`O\'Brien`)).toBeUndefined();
+        });
+
+        test('should reject invalid format', () => {
+            expect(validateAlphaNumericWithSpecialChars()('invalid@char')).toBeTruthy();
         });
     });
 
