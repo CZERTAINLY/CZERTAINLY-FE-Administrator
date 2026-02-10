@@ -254,6 +254,7 @@ export default function ScepProfiles() {
     return (
         <Container>
             <Widget
+                dataTestId="scep-profiles-list-widget"
                 title="List of SCEP Profiles"
                 busy={isBusy}
                 widgetLockName={LockWidgetNameEnum.ListOfSCEPProfiles}

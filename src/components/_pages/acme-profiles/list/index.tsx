@@ -241,6 +241,7 @@ export default function AdministratorsList() {
     return (
         <Container gap={4}>
             <Widget
+                dataTestId="acme-profiles-list-widget"
                 title="List of ACME Profiles"
                 busy={isBusy}
                 widgetLockName={LockWidgetNameEnum.ListOfACMEProfiles}

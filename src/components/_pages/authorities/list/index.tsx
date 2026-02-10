@@ -169,7 +169,7 @@ function AuthorityList() {
     );
 
     return (
-        <Container>
+        <Container data-testid="authority-list">
             <Widget
                 title="Authority Store"
                 busy={isBusy}
@@ -177,6 +177,7 @@ function AuthorityList() {
                 widgetButtons={buttons}
                 titleSize="large"
                 refreshAction={getFreshData}
+                dataTestId="authority-list-widget"
             >
                 <CustomTable
                     headers={authoritiesRowHeaders}

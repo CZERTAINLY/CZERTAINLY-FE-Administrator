@@ -1,11 +1,20 @@
 interface EditIconProps {
     size?: number;
     className?: string;
+    dataTestId?: string;
 }
 
-function EditIcon({ size = 16, className }: EditIconProps) {
+function EditIcon({ size = 16, className, dataTestId = 'edit-icon' }: EditIconProps) {
     return (
-        <svg width={size} height={size} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+        <svg
+            width={size}
+            height={size}
+            viewBox="0 0 16 16"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className={className}
+            data-testid={dataTestId}
+        >
             <path
                 d="M2.66663 8.99998V2.66665C2.66663 2.31302 2.8071 1.97389 3.05715 1.72384C3.3072 1.47379 3.64634 1.33331 3.99996 1.33331H9.66663L13.3333 4.99998V13.3333C13.3333 13.6869 13.1928 14.0261 12.9428 14.2761C12.6927 14.5262 12.3536 14.6666 12 14.6666H8.33329"
                 stroke="currentColor"

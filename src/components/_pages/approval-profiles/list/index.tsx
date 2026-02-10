@@ -130,6 +130,7 @@ export default function ApprovalProfilesList() {
 
     return (
         <Widget
+            dataTestId="approval-profiles-list-widget"
             title="List of Approval Profiles"
             busy={isBusy}
             widgetLockName={LockWidgetNameEnum.ListOfApprovalProfiles}

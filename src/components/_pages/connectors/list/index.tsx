@@ -273,6 +273,7 @@ export default function ConnectorList() {
     return (
         <div>
             <Widget
+                dataTestId="connectors-list-widget"
                 title="Connector Store"
                 busy={isBusy}
                 widgetLockName={LockWidgetNameEnum.ConnectorStore}

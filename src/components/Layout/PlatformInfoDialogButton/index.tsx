@@ -102,6 +102,7 @@ const PlatformInfoDialogLink = () => {
             <a
                 href="#"
                 className="text-blue-600"
+                data-testid="footer-version-info-link"
                 onClick={(e) => {
                     e.preventDefault();
                     setIsOpen(true);
