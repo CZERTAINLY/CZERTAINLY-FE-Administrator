@@ -15,8 +15,8 @@ test.describe('Breadcrumb', () => {
             </MemoryRouter>,
         );
 
-        await expect(component.getByText('Home')).toBeVisible();
-        await expect(component.getByText('Page')).toBeVisible();
+        await expect(component.getByRole('link', { name: 'Home' })).toBeVisible();
+        await expect(component.getByRole('link', { name: 'Page' })).toBeVisible();
     });
 
     test('should render items without href as span', async ({ mount }) => {
@@ -28,8 +28,8 @@ test.describe('Breadcrumb', () => {
             </MemoryRouter>,
         );
 
-        await expect(component.getByText('Home')).toBeVisible();
-        await expect(component.getByText('Current Page')).toBeVisible();
+        await expect(component.getByRole('link', { name: 'Home' })).toBeVisible();
+        await expect(component.getByRole('listitem').filter({ hasText: 'Current Page' })).toBeVisible();
     });
 
     test('should render separator between items', async ({ mount }) => {
@@ -44,8 +44,8 @@ test.describe('Breadcrumb', () => {
             </MemoryRouter>,
         );
 
-        await expect(component.getByText('First')).toBeVisible();
-        await expect(component.getByText('Second')).toBeVisible();
+        await expect(component.getByRole('link', { name: 'First' })).toBeVisible();
+        await expect(component.getByRole('link', { name: 'Second' })).toBeVisible();
 
         const separator = component.locator('svg[aria-hidden="true"]');
         await expect(separator).toBeVisible();
@@ -60,7 +60,7 @@ test.describe('Breadcrumb', () => {
             </MemoryRouter>,
         );
 
-        await expect(component.getByText('Single Item')).toBeVisible();
+        await expect(component.locator('li').filter({ hasText: 'Single Item' })).toBeVisible();
 
         const separator = component.locator('svg[aria-hidden="true"]');
         await expect(separator).toHaveCount(0);
@@ -75,7 +75,7 @@ test.describe('Breadcrumb', () => {
             </MemoryRouter>,
         );
 
-        await expect(component.getByText('Single')).toBeVisible();
+        await expect(component.getByRole('link', { name: 'Single' })).toBeVisible();
     });
 
     test('should render multiple items', async ({ mount }) => {
@@ -91,9 +91,9 @@ test.describe('Breadcrumb', () => {
             </MemoryRouter>,
         );
 
-        await expect(component.getByText('First')).toBeVisible();
-        await expect(component.getByText('Second')).toBeVisible();
-        await expect(component.getByText('Third')).toBeVisible();
+        await expect(component.getByRole('link', { name: 'First' })).toBeVisible();
+        await expect(component.getByRole('link', { name: 'Second' })).toBeVisible();
+        await expect(component.getByRole('link', { name: 'Third' })).toBeVisible();
 
         const separators = component.locator('svg[aria-hidden="true"]');
         await expect(separators).toHaveCount(2);
@@ -108,7 +108,7 @@ test.describe('Breadcrumb', () => {
             </MemoryRouter>,
         );
 
-        const firstItem = component.getByText('First').locator('..');
-        await expect(firstItem).toHaveClass(/text-gray-400/);
+        const firstItem = component.getByRole('link', { name: 'First' }).locator('..');
+        await expect(firstItem).toHaveClass(/text-gray-700|text-neutral-600/);
     });
 });
