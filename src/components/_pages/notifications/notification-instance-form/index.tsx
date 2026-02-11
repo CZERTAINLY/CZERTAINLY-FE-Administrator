@@ -6,6 +6,7 @@ import { selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { actions as connectorActions } from 'ducks/connectors';
 import { selectors as notificationSelectors, actions as notificationsActions } from 'ducks/notifications';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
@@ -186,22 +187,8 @@ const NotificationInstanceForm = ({ notificationInstanceId, onCancel, onSuccess 
         onCancel?.();
     }, [clearNotificationInstanceDetail, onCancel]);
 
-    const wasCreating = useRef(isCreatingNotificationInstance);
-    const wasUpdating = useRef(isEditingNotificationInstance);
-
-    useEffect(() => {
-        if (wasCreating.current && !isCreatingNotificationInstance) {
-            onSuccess?.();
-        }
-        wasCreating.current = isCreatingNotificationInstance;
-    }, [isCreatingNotificationInstance, onSuccess, editMode]);
-
-    useEffect(() => {
-        if (wasUpdating.current && !isEditingNotificationInstance) {
-            onSuccess?.();
-        }
-        wasUpdating.current = isEditingNotificationInstance;
-    }, [isEditingNotificationInstance, onSuccess, editMode]);
+    useRunOnFinished(isCreatingNotificationInstance, onSuccess);
+    useRunOnFinished(isEditingNotificationInstance, onSuccess);
 
     const optionsForNotificationProviders = useMemo(
         () =>

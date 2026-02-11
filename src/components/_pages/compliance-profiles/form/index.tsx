@@ -4,6 +4,7 @@ import Widget from 'components/Widget';
 
 import { actions, selectors } from 'ducks/compliance-profiles';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -77,16 +78,7 @@ function ComplianceProfileForm({ complianceProfileId, onCancel, onSuccess }: Com
         reset,
     } = methods;
 
-    const wasCreating = useRef(isCreating);
-
-    useEffect(() => {
-        if (wasCreating.current && !isCreating) {
-            if (onSuccess) {
-                onSuccess();
-            }
-        }
-        wasCreating.current = isCreating;
-    }, [isCreating, onSuccess]);
+    useRunOnFinished(isCreating, onSuccess);
 
     // Helper function to convert validators for react-hook-form
     const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {

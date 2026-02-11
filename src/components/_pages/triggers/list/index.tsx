@@ -6,7 +6,8 @@ import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { Link } from 'react-router';
 import Select from 'components/Select';
 import { PlatformEnum, Resource } from 'types/openapi';
@@ -46,18 +47,14 @@ const TriggerList = () => {
 
     const isBusy = useMemo(() => isFetchingList || isDeleting, [isFetchingList, isDeleting]);
 
-    const wasCreating = useRef(isCreatingTrigger);
     const getFreshList = useCallback(() => {
         dispatch(rulesActions.listTriggers({ resource: selectedResource }));
     }, [dispatch, selectedResource]);
 
-    useEffect(() => {
-        if (wasCreating.current && !isCreatingTrigger) {
-            setIsAddModalOpen(false);
-            getFreshList();
-        }
-        wasCreating.current = isCreatingTrigger;
-    }, [isCreatingTrigger, getFreshList]);
+    useRunOnFinished(isCreatingTrigger, () => {
+        setIsAddModalOpen(false);
+        getFreshList();
+    });
 
     const handleOpenAddModal = useCallback(() => {
         setIsAddModalOpen(true);

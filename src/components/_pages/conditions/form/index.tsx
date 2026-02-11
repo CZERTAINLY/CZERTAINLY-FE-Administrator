@@ -2,6 +2,7 @@ import Widget from 'components/Widget';
 import { EntityType, actions as filterActions } from 'ducks/filters';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 
@@ -49,16 +50,7 @@ const ConditionForm = ({ onCancel, onSuccess }: ConditionFormProps = {}) => {
         };
     }, [dispatch]);
 
-    const wasCreating = useRef(isCreatingCondition);
-
-    useEffect(() => {
-        if (wasCreating.current && !isCreatingCondition) {
-            if (onSuccess) {
-                onSuccess();
-            }
-        }
-        wasCreating.current = isCreatingCondition;
-    }, [isCreatingCondition, onSuccess]);
+    useRunOnFinished(isCreatingCondition, onSuccess);
 
     const defaultValues: ConditionFormValues = useMemo(() => {
         return {

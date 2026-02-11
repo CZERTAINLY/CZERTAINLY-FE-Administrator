@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { actions as alertActions } from 'ducks/alerts';
 
@@ -76,3 +76,14 @@ export const useCopyToClipboard = () => {
 
     return copyToClipboard;
 };
+
+export function useRunOnFinished(flag: boolean, callback?: () => void) {
+    const wasTrue = useRef(flag);
+
+    useEffect(() => {
+        if (wasTrue.current && !flag) {
+            callback?.();
+        }
+        wasTrue.current = flag;
+    }, [flag, callback]);
+}

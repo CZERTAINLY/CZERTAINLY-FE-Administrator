@@ -5,7 +5,8 @@ import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
 import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { Link } from 'react-router';
 import { PlatformEnum, Resource } from 'types/openapi';
 
@@ -34,18 +35,14 @@ const RulesList = () => {
         [isFetchingList, isDeleting, isFetchingResourcesList],
     );
 
-    const wasCreating = useRef(isCreatingRule);
     const getFreshList = useCallback(() => {
         dispatch(rulesActions.listRules({ resource: selectedResource }));
     }, [dispatch, selectedResource]);
 
-    useEffect(() => {
-        if (wasCreating.current && !isCreatingRule) {
-            setIsAddModalOpen(false);
-            getFreshList();
-        }
-        wasCreating.current = isCreatingRule;
-    }, [isCreatingRule, getFreshList]);
+    useRunOnFinished(isCreatingRule, () => {
+        setIsAddModalOpen(false);
+        getFreshList();
+    });
 
     const handleOpenAddModal = useCallback(() => {
         setIsAddModalOpen(true);

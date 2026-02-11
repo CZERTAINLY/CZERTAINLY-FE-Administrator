@@ -2,6 +2,7 @@ import Widget from 'components/Widget';
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
 import { actions as rulesActions, selectors as rulesSelectors } from 'ducks/rules';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 
@@ -187,16 +188,7 @@ const TriggerForm = ({ onCancel, onSuccess }: TriggerFormProps = {}) => {
         [dispatch],
     );
 
-    const wasCreating = useRef(isCreatingTrigger);
-
-    useEffect(() => {
-        if (wasCreating.current && !isCreatingTrigger) {
-            if (onSuccess) {
-                onSuccess();
-            }
-        }
-        wasCreating.current = isCreatingTrigger;
-    }, [isCreatingTrigger, onSuccess]);
+    useRunOnFinished(isCreatingTrigger, onSuccess);
 
     const areDefaultValuesSame = useCallback(
         (values: TriggerFormValues) => {

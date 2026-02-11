@@ -7,7 +7,8 @@ import RoleForm from '../RoleForm';
 import RoleUsersForm from '../RoleUsersForm';
 
 import { actions, selectors } from 'ducks/roles';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router';
 
@@ -63,15 +64,10 @@ export default function UserDetail() {
         getFreshPermissions();
     }, [getFreshPermissions]);
 
-    const wasUpdating = useRef(isUpdating);
-
-    useEffect(() => {
-        if (wasUpdating.current && !isUpdating) {
-            setIsEditModalOpen(false);
-            getFreshDetails();
-        }
-        wasUpdating.current = isUpdating;
-    }, [isUpdating, getFreshDetails]);
+    useRunOnFinished(isUpdating, () => {
+        setIsEditModalOpen(false);
+        getFreshDetails();
+    });
 
     const handleCloseEditModal = useCallback(() => {
         setIsEditModalOpen(false);

@@ -9,7 +9,8 @@ import { WidgetButtonProps } from 'components/WidgetButtons';
 import CmpProfileForm from '../form';
 
 import { actions, selectors } from 'ducks/cmp-profiles';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 import { LockWidgetNameEnum } from 'types/user-interface';
@@ -60,15 +61,10 @@ export default function AdministratorDetail() {
         dispatch(groupsActions.listGroups());
     }, [dispatch]);
 
-    const wasUpdating = useRef(isUpdating);
-
-    useEffect(() => {
-        if (wasUpdating.current && !isUpdating) {
-            setIsEditModalOpen(false);
-            getFreshCmpProfile();
-        }
-        wasUpdating.current = isUpdating;
-    }, [isUpdating, getFreshCmpProfile]);
+    useRunOnFinished(isUpdating, () => {
+        setIsEditModalOpen(false);
+        getFreshCmpProfile();
+    });
 
     const handleCloseEditModal = useCallback(() => {
         setIsEditModalOpen(false);

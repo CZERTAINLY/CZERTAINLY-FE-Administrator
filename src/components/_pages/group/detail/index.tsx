@@ -5,7 +5,8 @@ import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 
 import { actions, selectors } from 'ducks/certificateGroups';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 import GroupForm from '../form';
@@ -41,15 +42,10 @@ export default function GroupDetail() {
         getFreshGroupDetails();
     }, [getFreshGroupDetails, id]);
 
-    const wasUpdating = useRef(isUpdating);
-
-    useEffect(() => {
-        if (wasUpdating.current && !isUpdating) {
-            setIsEditModalOpen(false);
-            getFreshGroupDetails();
-        }
-        wasUpdating.current = isUpdating;
-    }, [isUpdating, getFreshGroupDetails]);
+    useRunOnFinished(isUpdating, () => {
+        setIsEditModalOpen(false);
+        getFreshGroupDetails();
+    });
 
     const handleOpenEditModal = useCallback(() => {
         if (!group) return;

@@ -10,7 +10,8 @@ import { actions as certActions, selectors as certSelectors } from 'ducks/certif
 
 import { selectors as customAttributesSelectors } from 'ducks/customAttributes';
 import { actions, selectors } from 'ducks/users';
-import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 import Badge from 'components/Badge';
@@ -63,15 +64,10 @@ export default function UserDetail() {
         getFreshCertificateDetails();
     }, [getFreshCertificateDetails, id]);
 
-    const wasUpdating = useRef(isUpdating);
-
-    useEffect(() => {
-        if (wasUpdating.current && !isUpdating) {
-            setIsEditModalOpen(false);
-            getFreshUserDetails();
-        }
-        wasUpdating.current = isUpdating;
-    }, [isUpdating, getFreshUserDetails]);
+    useRunOnFinished(isUpdating, () => {
+        setIsEditModalOpen(false);
+        getFreshUserDetails();
+    });
 
     const handleCloseEditModal = useCallback(() => {
         setIsEditModalOpen(false);

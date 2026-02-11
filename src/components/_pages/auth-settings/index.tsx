@@ -8,7 +8,8 @@ import Spinner from 'components/Spinner';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
 import { actions as authSettingsActions, selectors as authSettingsSelectors } from 'ducks/auth-settings';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useForm, Controller } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
@@ -38,8 +39,6 @@ const AuthenticationSettings = () => {
     const [selectedProvider, setSelectedProvider] = useState<string | null>(null);
     const [jwkSetKeysDialog, setJwkSetKeysDialog] = useState(false);
     const [isOAuth2FormDialogOpen, setIsOAuth2FormDialogOpen] = useState(false);
-
-    const wasCreating = useRef(isCreatingProvider);
 
     const getAuthenticationSettings = useCallback(() => {
         dispatch(authSettingsActions.getAuthenticationSettings());
@@ -89,13 +88,12 @@ const AuthenticationSettings = () => {
         dispatch(authSettingsActions.resetOAuth2ProviderSettings());
     }, [dispatch]);
 
-    useEffect(() => {
-        if (wasCreating.current && !isCreatingProvider && isOAuth2FormDialogOpen) {
+    useRunOnFinished(isCreatingProvider, () => {
+        if (isOAuth2FormDialogOpen) {
             handleCloseOAuth2FormDialog();
             getAuthenticationSettings();
         }
-        wasCreating.current = isCreatingProvider;
-    }, [isCreatingProvider, isOAuth2FormDialogOpen, handleCloseOAuth2FormDialog, getAuthenticationSettings]);
+    });
 
     const providersButtons: WidgetButtonProps[] = useMemo(
         () => [

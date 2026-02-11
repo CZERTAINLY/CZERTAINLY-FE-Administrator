@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
 
@@ -137,25 +138,15 @@ function LocationList() {
 
     const onListCallback = useCallback((filters: SearchRequestModel) => dispatch(actions.listLocations(filters)), [dispatch]);
 
-    const wasCreating = useRef(isCreating);
-    const wasUpdating = useRef(isUpdating);
-
-    useEffect(() => {
-        if (wasCreating.current && !isCreating) {
-            setIsAddModalOpen(false);
-            onListCallback({ itemsPerPage: 10, pageNumber: 1, filters: [] });
-        }
-        wasCreating.current = isCreating;
-    }, [isCreating, onListCallback]);
-
-    useEffect(() => {
-        if (wasUpdating.current && !isUpdating) {
-            setEditingLocationId(undefined);
-            setEditingEntityId(undefined);
-            onListCallback({ itemsPerPage: 10, pageNumber: 1, filters: [] });
-        }
-        wasUpdating.current = isUpdating;
-    }, [isUpdating, onListCallback]);
+    useRunOnFinished(isCreating, () => {
+        setIsAddModalOpen(false);
+        onListCallback({ itemsPerPage: 10, pageNumber: 1, filters: [] });
+    });
+    useRunOnFinished(isUpdating, () => {
+        setEditingLocationId(undefined);
+        setEditingEntityId(undefined);
+        onListCallback({ itemsPerPage: 10, pageNumber: 1, filters: [] });
+    });
 
     const handleOpenAddModal = useCallback(() => {
         setIsAddModalOpen(true);

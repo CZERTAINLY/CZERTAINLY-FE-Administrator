@@ -12,7 +12,8 @@ import { actions as raProfilesActions, selectors as raProfilesSelectors } from '
 import { actions as settingsActions, selectors as settingsSelectors } from 'ducks/settings';
 import { actions as complianceProfileActions, selectors as complianceProfileSelectors } from 'ducks/compliance-profiles';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRunOnFinished } from 'utils/common-hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router';
 import RaProfileForm from '../form';
@@ -198,15 +199,10 @@ export default function RaProfileDetail() {
         };
     }, [dispatch]);
 
-    const wasUpdating = useRef(isUpdating);
-
-    useEffect(() => {
-        if (wasUpdating.current && !isUpdating) {
-            setIsEditModalOpen(false);
-            getFreshRaProfileDetail();
-        }
-        wasUpdating.current = isUpdating;
-    }, [isUpdating, getFreshRaProfileDetail]);
+    useRunOnFinished(isUpdating, () => {
+        setIsEditModalOpen(false);
+        getFreshRaProfileDetail();
+    });
 
     const handleCloseEditModal = useCallback(() => {
         setIsEditModalOpen(false);
