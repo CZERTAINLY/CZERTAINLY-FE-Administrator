@@ -6,6 +6,7 @@ import Container from 'components/Container';
 import { actions, selectors } from 'ducks/authorities';
 
 import CustomTable, { TableDataRow, TableHeader } from 'components/CustomTable';
+import ForceDeleteErrorTable from 'components/ForceDeleteErrorTable';
 import Dialog from 'components/Dialog';
 import Widget from 'components/Widget';
 import { WidgetButtonProps } from 'components/WidgetButtons';
@@ -135,37 +136,13 @@ function AuthorityList() {
         [authorities],
     );
 
-    const forceDeleteBody = useMemo(
-        () => (
-            <div>
-                <div>Failed to delete {checkedRows.length > 1 ? 'Authorities' : 'an Authority'}. Please find the details below:</div>
-
-                <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
-                    <thead>
-                        <tr>
-                            <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
-                                <b>Name</b>
-                            </th>
-                            <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
-                                <b>Dependencies</b>
-                            </th>
-                        </tr>
-                    </thead>
-
-                    <tbody className="divide-y divide-gray-200 dark:divide-neutral-700">
-                        {bulkDeleteErrorMessages?.map((message) => (
-                            <tr className="hover:bg-gray-50 dark:hover:bg-neutral-800">
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200">{message.name}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200">
-                                    {message.message}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        ),
-        [bulkDeleteErrorMessages, checkedRows.length],
+    const forceDeleteBody = (
+        <ForceDeleteErrorTable
+            items={bulkDeleteErrorMessages}
+            entityNameSingular="an Authority"
+            entityNamePlural="Authorities"
+            itemsCount={checkedRows.length}
+        />
     );
 
     return (
