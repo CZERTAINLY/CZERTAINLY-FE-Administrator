@@ -21,6 +21,18 @@ function Label({ htmlFor, title, children, required, className, onClick, dataTes
             htmlFor={htmlFor}
             className={cn(defaultClasses, className)}
             onClick={onClick}
+            role={onClick ? 'button' : undefined}
+            tabIndex={onClick ? 0 : undefined}
+            onKeyDown={
+                onClick
+                    ? (event) => {
+                          if (event.key === 'Enter' || event.key === ' ') {
+                              event.preventDefault();
+                              onClick();
+                          }
+                      }
+                    : undefined
+            }
             data-testid={dataTestId ?? (htmlFor ? `label-${htmlFor}` : 'label')}
         >
             {title || children}

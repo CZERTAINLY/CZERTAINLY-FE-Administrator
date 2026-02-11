@@ -1,4 +1,5 @@
 import React from 'react';
+import Button from 'components/Button';
 import { LegendItem } from '..';
 import { Rocket, Book, Filter, Zap, Settings, FileText, Award, User, KeyRound, Users, CreditCard, Stamp, MapPin } from 'lucide-react';
 
@@ -37,9 +38,16 @@ const LegendComponent: React.FC<LegendComponentProps> = ({ legends }) => {
                 const IconComponent = iconMap[legend.icon];
                 return (
                     <div key={index} className="flex items-center gap-2">
-                        <div style={{ color: legend.color }} onClick={legend.onClick}>
+                        <Button
+                            type="button"
+                            variant="transparent"
+                            color="lightGray"
+                            onClick={legend.onClick}
+                            className="!p-0 !border-none !bg-transparent hover:!bg-transparent focus:!bg-transparent"
+                            title={typeof legend.label === 'string' ? legend.label : undefined}
+                        >
                             {IconComponent ? <IconComponent size={16} color={legend.color} /> : 'No icon'}
-                        </div>
+                        </Button>
                         <span>{legend.label}</span>
                     </div>
                 );

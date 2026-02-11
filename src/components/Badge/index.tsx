@@ -26,9 +26,20 @@ function Badge({ color = 'secondary', onClick, onRemove, children, style, classN
         info: 'bg-[var(--status-info-color)] text-white',
         transparent: 'bg-white text-gray-600',
     };
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLSpanElement>) => {
+        if (!onClick) return;
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            onClick();
+        }
+    };
+
     return (
         <span
             onClick={onClick}
+            onKeyDown={handleKeyDown}
+            role={onClick ? 'button' : undefined}
+            tabIndex={onClick ? 0 : undefined}
             data-testid={dataTestId || 'badge'}
             className={cn(
                 'preline-badge inline-flex items-center justify-center gap-x-1.5 rounded-md font-medium min-w-[24px]',
