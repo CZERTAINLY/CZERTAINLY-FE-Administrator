@@ -144,6 +144,7 @@ const EditableTableCell = <TValue,>({
 
     return isEditing ? (
         <div
+            data-testid="editable-cell-editing"
             data-editable-cell-opened={isEditing}
             ref={blurListenerWrapperRef}
             onBlur={handleBlur}
@@ -171,11 +172,12 @@ const EditableTableCell = <TValue,>({
             />
         </div>
     ) : (
-        <div>
+        <div data-testid="editable-cell-display">
             {typeof renderValue === 'function' ? renderValue(value) : (value as React.ReactNode)}
             <Spinner active={busy} />
             <Button
                 title="Edit"
+                data-testid="editable-cell-edit-btn"
                 variant="transparent"
                 onClick={(e) => {
                     e.preventDefault();

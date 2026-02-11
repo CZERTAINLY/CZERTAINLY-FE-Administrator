@@ -57,11 +57,16 @@ export default function CodeBlock({ content }: Props) {
     };
 
     return (
-        <>
+        <span data-testid="code-block">
             {content.data.language}&nbsp;
-            <Button variant="transparent" className="!p-1 relative ml-1 top-[3px]" onClick={handleOpenDialog}>
+            <Button
+                variant="transparent"
+                className="!p-1 relative ml-1 top-[3px]"
+                onClick={handleOpenDialog}
+                data-testid="code-block-open-btn"
+            >
                 <Info size={14} />
             </Button>
-        </>
+        </span>
     );
 }
