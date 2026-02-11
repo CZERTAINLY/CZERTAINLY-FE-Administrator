@@ -14,6 +14,9 @@ export default defineConfig({
     use: {
         ctPort: 3100,
         ctViteConfig: {
+            define: {
+                __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+            },
             plugins: [react(), tailwindcss()],
             resolve: {
                 alias: [
@@ -78,6 +81,7 @@ export default defineConfig({
                         if (p.includes('/assets/') || p.includes('assets/')) return false;
                         if (p.endsWith('.css')) return false;
                         if (p.includes('node_modules')) return false;
+                        if (p.includes('/_pages/')) return false;
 
                         return /^src\/.*\.(ts|tsx|js|jsx)$/.test(p);
                     },

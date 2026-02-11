@@ -62,6 +62,7 @@ export default function GlobalModal() {
 
     return (
         <Dialog
+            dataTestId="global-modal"
             isOpen={isOpen}
             toggle={() => {
                 if (cancelButtonCallback) {

@@ -12,7 +12,13 @@ function Footer({ className }: Props) {
             <div className="text-sm font-semibold">
                 <span>© 2018-{new Date().getFullYear()} &nbsp;Identity Lifecycle Management </span>
                 <span className="mx-2">·</span>
-                <a href="https://docs.czertainly.com/docs" target="_blank" rel="noopener noreferrer" className="text-blue-600">
+                <a
+                    href="https://docs.czertainly.com/docs"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600"
+                    data-testid="footer-docs-link"
+                >
                     Documentation
                 </a>
                 <span className="mx-2">·</span>
@@ -21,11 +27,18 @@ function Footer({ className }: Props) {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-600"
+                    data-testid="footer-support-link"
                 >
                     Support
                 </a>
                 <span className="mx-2">·</span>
-                <a href="https://www.czertainly.com" target="_blank" rel="noopener noreferrer" className="text-blue-600">
+                <a
+                    href="https://www.czertainly.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600"
+                    data-testid="footer-about-link"
+                >
                     About Us
                 </a>
                 <span className="mx-2">·</span>
