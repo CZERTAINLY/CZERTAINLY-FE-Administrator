@@ -47,7 +47,12 @@ export default function CustomAttributesList() {
         setIsAddModalOpen(true);
     }, []);
 
-    const handleCloseAddModal = useCallback(() => {
+    const handleCancelAddModal = useCallback(() => {
+        setIsAddModalOpen(false);
+        setEditingCustomAttributeId(undefined);
+    }, []);
+
+    const handleSuccessAddModal = useCallback(() => {
         setIsAddModalOpen(false);
         setEditingCustomAttributeId(undefined);
         getFreshData();
@@ -185,14 +190,14 @@ export default function CustomAttributesList() {
 
             <Dialog
                 isOpen={isAddModalOpen || !!editingCustomAttributeId}
-                toggle={handleCloseAddModal}
+                toggle={handleCancelAddModal}
                 caption={editingCustomAttributeId ? 'Edit Custom Attribute' : 'Create Custom Attribute'}
                 size="xl"
                 body={
                     <CustomAttributeForm
                         customAttributeId={editingCustomAttributeId}
-                        onCancel={handleCloseAddModal}
-                        onSuccess={handleCloseAddModal}
+                        onCancel={handleCancelAddModal}
+                        onSuccess={handleSuccessAddModal}
                     />
                 }
             />

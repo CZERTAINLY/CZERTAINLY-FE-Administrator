@@ -49,7 +49,11 @@ export default function CustomAttributeDetail() {
         setIsEditModalOpen(true);
     }, []);
 
-    const handleCloseEditModal = useCallback(() => {
+    const handleCancelEditModal = useCallback(() => {
+        setIsEditModalOpen(false);
+    }, []);
+
+    const handleSuccessEditModal = useCallback(() => {
         setIsEditModalOpen(false);
         getFreshCustomAttribute();
     }, [getFreshCustomAttribute]);
@@ -229,14 +233,14 @@ export default function CustomAttributeDetail() {
 
             <Dialog
                 isOpen={isEditModalOpen}
-                toggle={handleCloseEditModal}
+                toggle={handleCancelEditModal}
                 caption="Edit Custom Attribute"
                 size="xl"
                 body={
                     <CustomAttributeForm
                         customAttributeId={customAttribute?.uuid}
-                        onCancel={handleCloseEditModal}
-                        onSuccess={handleCloseEditModal}
+                        onCancel={handleCancelEditModal}
+                        onSuccess={handleSuccessEditModal}
                     />
                 }
             />
