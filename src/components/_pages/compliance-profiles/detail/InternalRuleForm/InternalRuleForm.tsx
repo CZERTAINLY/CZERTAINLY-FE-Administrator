@@ -113,6 +113,7 @@ export default function InternalRuleForm({ rule, onCancel }: Props) {
 
     const { control, handleSubmit, setValue, formState } = methods;
     const watchedResource = useWatch({ control, name: 'resource' });
+    const watchedItems = useWatch({ control, name: 'items' });
 
     const selectOptions = useMemo(
         () =>
@@ -219,7 +220,13 @@ export default function InternalRuleForm({ rule, onCancel }: Props) {
                             title={rule ? 'Update' : 'Create'}
                             inProgressTitle={rule ? 'Updating...' : 'Creating...'}
                             inProgress={formState.isSubmitting}
-                            disabled={watchedResource === Resource.None || formState.isSubmitting || !formState.isValid || isBusy}
+                            disabled={
+                                watchedResource === Resource.None ||
+                                formState.isSubmitting ||
+                                !formState.isValid ||
+                                isBusy ||
+                                !watchedItems?.length
+                            }
                         />
                     </Container>
                 </div>

@@ -76,6 +76,7 @@ interface Props {
     disableBadgeRemove?: boolean;
     busyBadges?: boolean;
     extraFilterComponent?: React.ReactNode;
+    filterGridCols?: 2 | 4;
 }
 
 export default function FilterWidget({
@@ -86,6 +87,7 @@ export default function FilterWidget({
     disableBadgeRemove,
     busyBadges,
     extraFilterComponent,
+    filterGridCols = 4,
 }: Props) {
     const dispatch = useDispatch();
 
@@ -226,7 +228,7 @@ export default function FilterWidget({
         }
 
         if (Array.isArray(currentFilters[selectedFilter].value)) {
-            const currentValue = currentFilters[selectedFilter].value as Array<object>;
+            const currentValue = currentFilters[selectedFilter]?.value as Array<object>;
             const newFilterValue = currentValue.map((v: any) => {
                 let label = '';
                 let value = '';
@@ -437,7 +439,7 @@ export default function FilterWidget({
 
             if (selectedFilter === -1) return objectOptions;
 
-            const currentValue = currentFilters[selectedFilter].value;
+            const currentValue = currentFilters[selectedFilter]?.value;
 
             const filteredOptions = objectOptions.filter((o) => {
                 if (Array.isArray(currentValue)) {
@@ -611,7 +613,7 @@ export default function FilterWidget({
             <Widget title={title} busy={isFetchingAvailableFilters} titleSize="large">
                 <div id="unselectFilters" onClick={onUnselectFiltersClick}>
                     <div className="flex flex-row gap-2 mb-4 items-end">
-                        <div className="grid grid-cols-4 gap-2 w-full">
+                        <div className={`grid w-full ${filterGridCols === 2 ? 'grid-cols-2 gap-4' : 'grid-cols-4 gap-2'}`}>
                             <Select
                                 id="group"
                                 label="Filter Field Source"
