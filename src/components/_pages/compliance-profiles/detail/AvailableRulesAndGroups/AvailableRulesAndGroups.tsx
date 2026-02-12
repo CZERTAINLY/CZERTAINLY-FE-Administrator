@@ -463,7 +463,7 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
             />
 
             <Dialog
-                size="xl"
+                size="xxl"
                 isOpen={isAddingInternalRule}
                 caption="Create Internal Rule"
                 body={<InternalRuleForm onCancel={() => setIsAddingInternalRule(false)} />}
@@ -485,7 +485,7 @@ export default function AvailableRulesAndGroups({ profile, setSelectedEntityDeta
             <Dialog
                 isOpen={deletingInternalRuleId !== null}
                 caption="Delete Internal Rule"
-                body="You are about to delete a Internal Rule. Is this what you want to do?"
+                body="You are about to delete an Internal Rule. Is this what you want to do?"
                 toggle={() => setDeletingInternalRuleId(null)}
                 icon="delete"
                 buttons={[

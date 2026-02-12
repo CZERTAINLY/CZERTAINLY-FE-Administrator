@@ -258,7 +258,10 @@ function Select({
         const setTitlesAndTooltips = () => {
             const container = select.closest('[data-testid]')?.parentElement ?? select.parentNode;
             const root = container as Element;
-            const dropdown = root.querySelector?.('.hs-select-dropdown');
+
+            // Try to get dropdown from HSSelect instance (works also when dropdownScope === 'window')
+            const hsInstance = (window as any).HSSelect?.getInstance?.(select);
+            const dropdown: Element | null = (hsInstance && hsInstance.dropdown) || root.querySelector?.('.hs-select-dropdown');
             dropdown?.querySelectorAll?.('.hs-select-option-row').forEach((row) => {
                 const titleEl = row.querySelector?.('[data-title]');
                 const tooltipContentEl = row.querySelector?.('[data-tooltip-content]');
@@ -282,7 +285,7 @@ function Select({
         observer.observe(select.parentNode, { childList: true, subtree: true });
         requestAnimationFrame(() => setTitlesAndTooltips());
         return () => observer.disconnect();
-    }, [options, isMulti]);
+    }, [options, isMulti, id]);
 
     const hasOptions = options && options.length > 0;
 
@@ -327,7 +330,7 @@ function Select({
                         }`,
                         ...(dropdownScope && { dropdownScope }),
                         optionClasses:
-                            'hs-select-option-row py-2 px-4 w-full text-sm cursor-pointer hover:bg-gray-100 rounded-lg focus:outline-hidden focus:bg-gray-100 hs-select-disabled:pointer-events-none hs-select-disabled:opacity-50 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:text-neutral-200 dark:focus:bg-neutral-800 overflow-hidden',
+                            'hs-select-option-row py-2 px-3 w-full text-sm cursor-pointer hover:bg-gray-100 rounded-lg focus:outline-hidden focus:bg-gray-100 hs-select-disabled:pointer-events-none hs-select-disabled:opacity-50 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:text-neutral-200 dark:focus:bg-neutral-800 overflow-hidden',
                         optionTemplate:
                             '<div class="flex justify-between items-center w-full text-[var(--dark-gray-color)] min-w-0"><div class="hs-tooltip [--placement:top] inline-block min-w-0 flex-1"><span class="hs-tooltip-toggle truncate block min-w-0 cursor-pointer" data-title></span><span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 invisible transition-opacity inline-block absolute z-[110] py-1 px-2 bg-[var(--tooltip-background-color)] text-xs font-medium text-white rounded-md shadow-2xs dark:bg-neutral-700" data-tooltip-content role="tooltip"></span></div><span class="hidden hs-selected:block shrink-0"><svg class="shrink-0 size-3.5 text-blue-600 dark:text-blue-500 ml-2" xmlns="http:.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></div>',
                         extraMarkup:
