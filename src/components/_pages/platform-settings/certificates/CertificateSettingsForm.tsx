@@ -8,7 +8,8 @@ import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { actions, selectors } from 'ducks/settings';
 import { isObjectSame } from 'utils/common-utils';
-import { composeValidators, validateNonZeroInteger, validatePositiveInteger } from 'utils/validators';
+import { validateNonZeroInteger, validatePositiveInteger } from 'utils/validators';
+import { buildValidationRules } from 'utils/validators-helper';
 
 type FormValues = {
     enabled: boolean;
@@ -109,16 +110,6 @@ const CertificateSettingsForm = ({ onCancel, onSuccess }: CertificateSettingsFor
         }
         wasUpdating.current = isUpdating;
     }, [isUpdating, onSuccess]);
-
-    // Helper function to convert validators for react-hook-form
-    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
-        return {
-            validate: (value: any) => {
-                const composed = composeValidators(...validators);
-                return composed(value);
-            },
-        };
-    };
 
     const areDefaultValuesSame = useCallback(
         (values: FormValues) => {

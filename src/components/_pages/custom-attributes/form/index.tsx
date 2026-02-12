@@ -17,7 +17,8 @@ import TextInput from 'components/TextInput';
 import { CustomAttributeCreateRequestModel, CustomAttributeUpdateRequestModel } from 'types/customAttributes';
 import { AttributeContentType, PlatformEnum } from 'types/openapi';
 import { isObjectSame } from 'utils/common-utils';
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
+import { validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
+import { buildValidationRules } from 'utils/validators-helper';
 
 interface CustomAttributeFormProps {
     customAttributeId?: string;
@@ -91,15 +92,6 @@ export default function CustomAttributeForm({ customAttributeId, onCancel, onSuc
     const formValues = useWatch({ control });
     const watchedList = useWatch({ control, name: 'list' });
 
-    // Helper function to convert validators for react-hook-form
-    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
-        return {
-            validate: (value: any) => {
-                const composed = composeValidators(...validators);
-                return composed(value);
-            },
-        };
-    };
     const areDefaultValuesSame = useCallback(
         (values: FormValues) => {
             if (editMode) {

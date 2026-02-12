@@ -18,7 +18,8 @@ import { RaProfileResponseModel } from 'types/ra-profiles';
 
 import { collectFormAttributes } from 'utils/attributes/attributes';
 
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
+import { validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
+import { buildValidationRules } from 'utils/validators-helper';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
 import { Resource } from '../../../../types/openapi';
 import TabLayout from '../../../Layout/TabLayout';
@@ -165,16 +166,6 @@ export default function RaProfileForm({ raProfileId, authorityId: propAuthorityI
             });
         }
     }, [editMode, raProfile, id, reset, isFetchingDetail, authorityId]);
-
-    // Helper function to convert validators for react-hook-form
-    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
-        return {
-            validate: (value: any) => {
-                const composed = composeValidators(...validators);
-                return composed(value);
-            },
-        };
-    };
 
     const onAuthorityChange = useCallback(
         (authorityUuid: string) => {

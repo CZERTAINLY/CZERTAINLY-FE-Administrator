@@ -15,13 +15,13 @@ import TextInput from 'components/TextInput';
 import { ApprovalStepRequestModel, ProfileApprovalRequestModel } from 'types/approval-profiles';
 import { isObjectSame } from 'utils/common-utils';
 import {
-    composeValidators,
     validateAlphaNumericWithSpecialChars,
     validateLength,
     validateNonZeroInteger,
     validatePositiveInteger,
     validateRequired,
 } from 'utils/validators';
+import { buildValidationRules } from 'utils/validators-helper';
 import ApprovalStepField from './approval-step-field';
 
 const defaultApprovalSteps: ApprovalStepRequestModel[] = [
@@ -98,16 +98,6 @@ function ApprovalProfileForm({ approvalProfileId, onCancel, onSuccess }: Approva
     } = methods;
 
     const formValues = useWatch({ control });
-
-    // Helper function to convert validators for react-hook-form
-    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
-        return {
-            validate: (value: any) => {
-                const composed = composeValidators(...validators);
-                return composed(value);
-            },
-        };
-    };
 
     const validateApprovalSteps = useCallback((values: ProfileApprovalRequestModel) => {
         const hasInvalidSteps = values.approvalSteps.some((step) => {

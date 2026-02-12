@@ -10,7 +10,8 @@ import { useParams } from 'react-router';
 import Select from 'components/Select';
 import TextInput from 'components/TextInput';
 import { ApprovalStepRequestModel, ApproverType, ProfileApprovalRequestModel } from 'types/approval-profiles';
-import { composeValidators, validateLength, validateNonZeroInteger, validatePositiveInteger, validateRequired } from 'utils/validators';
+import { validateLength, validateNonZeroInteger, validatePositiveInteger, validateRequired } from 'utils/validators';
+import { buildValidationRules } from 'utils/validators-helper';
 import { Plus, X } from 'lucide-react';
 
 type Props = {
@@ -39,16 +40,6 @@ export default function ApprovalStepField({ approvalSteps }: Props) {
     const { id } = useParams();
     const editMode = useMemo(() => !!id, [id]);
     const [selectedTab, setSelectedTab] = useState<number>(0);
-
-    // Helper function to convert validators for react-hook-form
-    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
-        return {
-            validate: (value: any) => {
-                const composed = composeValidators(...validators);
-                return composed(value);
-            },
-        };
-    };
 
     useEffect(() => {
         dispatch(userAction.list());

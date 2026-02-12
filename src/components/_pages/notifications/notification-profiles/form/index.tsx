@@ -17,13 +17,13 @@ import Switch from 'components/Switch';
 import { isObjectSame } from 'utils/common-utils';
 import Label from 'components/Label';
 import {
-    composeValidators,
     validateAlphaNumericWithSpecialChars,
     validatePositiveInteger,
     validateRequired,
     validateNonZeroInteger,
     validateDuration,
 } from 'utils/validators';
+import { buildValidationRules } from 'utils/validators-helper';
 import { PlatformEnum, RecipientType } from 'types/openapi';
 import { NotificationProfileUpdateRequestModel } from 'types/notification-profiles';
 import { LockWidgetNameEnum } from 'types/user-interface';
@@ -152,16 +152,6 @@ export default function NotificationProfileForm({
     } = methods;
 
     const formValues = useWatch({ control });
-
-    // Helper function to convert validators for react-hook-form
-    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
-        return {
-            validate: (value: any) => {
-                const composed = composeValidators(...validators);
-                return composed(value);
-            },
-        };
-    };
 
     const onSubmit = useCallback(
         (values: FormValues) => {
@@ -423,16 +413,6 @@ function RecipientTypeFields() {
             })),
         [recipientTypeEnum],
     );
-
-    // Helper function to convert validators for react-hook-form
-    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
-        return {
-            validate: (value: any) => {
-                const composed = composeValidators(...validators);
-                return composed(value);
-            },
-        };
-    };
 
     const renderRecipientField = useCallback(() => {
         let props: { options: { value: string; label: string }[]; description: string; placeholder: string } | null = null;

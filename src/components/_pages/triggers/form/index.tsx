@@ -17,7 +17,8 @@ import Button from 'components/Button';
 import Container from 'components/Container';
 import { PlatformEnum, Resource, ResourceEvent, TriggerType } from 'types/openapi';
 import { isObjectSame } from 'utils/common-utils';
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
+import { validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
+import { buildValidationRules } from 'utils/validators-helper';
 import TextInput from 'components/TextInput';
 
 export interface TriggerFormValues {
@@ -153,16 +154,6 @@ const TriggerForm = ({ onCancel, onSuccess }: TriggerFormProps = {}) => {
         fetchActions(watchedResource as Resource);
         fetchRules(watchedResource as Resource);
     }, [dispatch, watchedResource, fetchActions, fetchRules]);
-
-    // Helper function to convert validators for react-hook-form
-    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
-        return {
-            validate: (value: any) => {
-                const composed = composeValidators(...validators);
-                return composed(value);
-            },
-        };
-    };
 
     const submitTitle = 'Create';
     const inProgressTitle = 'Creating...';

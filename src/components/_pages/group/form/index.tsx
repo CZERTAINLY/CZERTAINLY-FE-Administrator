@@ -16,7 +16,8 @@ import Container from 'components/Container';
 import { CertificateGroupResponseModel } from 'types/certificateGroups';
 import { Resource } from 'types/openapi';
 import { collectFormAttributes } from 'utils/attributes/attributes';
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateEmail, validateLength, validateRequired } from 'utils/validators';
+import { validateAlphaNumericWithSpecialChars, validateEmail, validateLength, validateRequired } from 'utils/validators';
+import { buildValidationRules } from 'utils/validators-helper';
 import TabLayout from '../../../Layout/TabLayout';
 
 interface GroupFormProps {
@@ -125,16 +126,6 @@ export default function GroupForm({ groupId, onCancel, onSuccess }: GroupFormPro
         formState: { isDirty, isSubmitting, isValid },
         reset,
     } = methods;
-
-    // Helper function to convert validators for react-hook-form
-    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
-        return {
-            validate: (value: any) => {
-                const composed = composeValidators(...validators);
-                return composed(value);
-            },
-        };
-    };
 
     const title = useMemo(() => (editMode ? 'Edit Group' : 'Add Group'), [editMode]);
     const renderCustomAttributesEditor = useMemo(() => {

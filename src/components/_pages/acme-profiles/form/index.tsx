@@ -27,7 +27,6 @@ import { RaProfileSimplifiedModel } from 'types/ra-profiles';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 
 import {
-    composeValidators,
     validateAlphaNumericWithoutAccents,
     validateCustomIp,
     validateUrlWithRoute,
@@ -35,6 +34,7 @@ import {
     validateLength,
     validateRequired,
 } from 'utils/validators';
+import { buildValidationRules } from 'utils/validators-helper';
 import { Resource } from '../../../../types/openapi';
 import useAttributeEditor, { buildGroups, buildOwner } from 'utils/widget';
 import CertificateAssociationsFormWidget from 'components/CertificateAssociationsFormWidget/CertificateAssociationsFormWidget';
@@ -222,16 +222,6 @@ export default function AcmeProfileForm({ acmeProfileId, onCancel, onSuccess }: 
         getValues,
         reset,
     } = methods;
-
-    // Helper function to convert validators for react-hook-form
-    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
-        return {
-            validate: (value: any) => {
-                const composed = composeValidators(...validators);
-                return composed(value);
-            },
-        };
-    };
 
     const onSubmit = useCallback(
         (values: FormValues) => {

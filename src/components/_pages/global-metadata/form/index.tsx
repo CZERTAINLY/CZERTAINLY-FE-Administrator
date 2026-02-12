@@ -13,7 +13,8 @@ import Checkbox from 'components/Checkbox';
 import TextInput from 'components/TextInput';
 import { GlobalMetadataCreateRequestModel, GlobalMetadataUpdateRequestModel } from 'types/globalMetadata';
 import { AttributeContentType, PlatformEnum } from 'types/openapi';
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
+import { validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
+import { buildValidationRules } from 'utils/validators-helper';
 import Select from 'components/Select';
 import Label from 'components/Label';
 import { useRunOnFinished } from 'utils/common-hooks';
@@ -66,16 +67,6 @@ export default function GlobalMetadataForm({ globalMetadataId, onCancel, onSucce
         control,
         formState: { isDirty, isSubmitting, isValid },
     } = methods;
-
-    // Helper function to convert validators for react-hook-form
-    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
-        return {
-            validate: (value: any) => {
-                const composed = composeValidators(...validators);
-                return composed(value);
-            },
-        };
-    };
 
     const onSubmit = useCallback(
         (values: GlobalMetadataCreateRequestModel) =>

@@ -28,7 +28,8 @@ import { selectors as enumSelectors } from 'ducks/enums';
 
 import { collectFormAttributes } from 'utils/attributes/attributes';
 
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
+import { validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
+import { buildValidationRules } from 'utils/validators-helper';
 
 interface AuthorityFormProps {
     authorityId?: string;
@@ -294,15 +295,6 @@ export default function AuthorityForm({ authorityId, onCancel, onSuccess }: Auth
             });
         }
     }, [editMode, authority, id, reset, isFetchingAuthorityDetail]);
-
-    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
-        return {
-            validate: (value: any) => {
-                const composed = composeValidators(...validators);
-                return composed(value);
-            },
-        };
-    };
 
     const onSubmit = useCallback(
         (values: FormValues) => {

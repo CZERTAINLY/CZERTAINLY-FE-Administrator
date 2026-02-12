@@ -24,7 +24,8 @@ import { ScepProfileAddRequestModel, ScepProfileEditRequestModel, ScepProfileRes
 
 import { collectFormAttributes, mapProfileAttribute, transformAttributes } from 'utils/attributes/attributes';
 
-import { composeValidators, validateAlphaNumericWithoutAccents, validateInteger, validateLength, validateRequired } from 'utils/validators';
+import { validateAlphaNumericWithoutAccents, validateInteger, validateLength, validateRequired } from 'utils/validators';
+import { buildValidationRules } from 'utils/validators-helper';
 import { KeyAlgorithm, Resource } from '../../../../types/openapi';
 import CertificateField from '../CertificateField';
 import useAttributeEditor, { buildGroups, buildOwner } from 'utils/widget';
@@ -217,16 +218,6 @@ export default function ScepProfileForm({ scepProfileId, onCancel, onSuccess }: 
     useEffect(() => {
         setIntune(watchedEnableIntune);
     }, [watchedEnableIntune]);
-
-    // Helper function to convert validators for react-hook-form
-    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
-        return {
-            validate: (value: any) => {
-                const composed = composeValidators(...validators);
-                return composed(value);
-            },
-        };
-    };
 
     const onSubmit = useCallback(
         (values: FormValues) => {

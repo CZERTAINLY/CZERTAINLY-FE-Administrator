@@ -25,7 +25,8 @@ import { TokenDetailResponseDto } from 'types/tokens';
 
 import { collectFormAttributes } from 'utils/attributes/attributes';
 
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
+import { validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
+import { buildValidationRules } from 'utils/validators-helper';
 
 interface TokenFormProps {
     tokenId?: string;
@@ -179,16 +180,6 @@ export default function TokenForm({ tokenId, onCancel, onSuccess }: TokenFormPro
         control,
         name: 'storeKind',
     });
-
-    // Helper function to convert validators for react-hook-form
-    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
-        return {
-            validate: (value: any) => {
-                const composed = composeValidators(...validators);
-                return composed(value);
-            },
-        };
-    };
 
     const onTokenProviderChange = useCallback(
         (value: string) => {

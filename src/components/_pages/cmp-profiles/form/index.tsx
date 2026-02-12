@@ -28,7 +28,8 @@ import {
 import { RaProfileSimplifiedModel } from 'types/ra-profiles';
 import { collectFormAttributes, mapProfileAttribute, transformAttributes } from 'utils/attributes/attributes';
 import { isObjectSame } from 'utils/common-utils';
-import { composeValidators, validateAlphaNumericWithoutAccents, validateLength, validateRequired } from 'utils/validators';
+import { validateAlphaNumericWithoutAccents, validateLength, validateRequired } from 'utils/validators';
+import { buildValidationRules } from 'utils/validators-helper';
 import useAttributeEditor, { buildGroups, buildOwner, buildSelectedOption } from 'utils/widget';
 import CertificateAssociationsFormWidget from 'components/CertificateAssociationsFormWidget/CertificateAssociationsFormWidget';
 import { deepEqual } from 'utils/deep-equal';
@@ -358,16 +359,6 @@ export default function CmpProfileForm({ cmpProfileId, onCancel, onSuccess }: Cm
             }
         }
     }, [editMode, cmpProfile, id, reset, isFetchingDetail, userOptions, groupOptions, multipleResourceCustomAttributes]);
-
-    // Helper function to convert validators for react-hook-form
-    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
-        return {
-            validate: (value: any) => {
-                const composed = composeValidators(...validators);
-                return composed(value);
-            },
-        };
-    };
 
     const normalizeOptionalValue = (value: string | undefined): string | undefined => {
         return value && value.trim() !== '' ? value : undefined;

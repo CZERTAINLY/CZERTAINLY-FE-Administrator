@@ -27,7 +27,8 @@ import { UserDetailModel } from 'types/auth';
 import { CertificateDetailResponseModel, CertificateListResponseModel } from 'types/certificate';
 
 import { EntityType } from 'ducks/filters';
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateEmail, validateLength, validateRequired } from 'utils/validators';
+import { validateAlphaNumericWithSpecialChars, validateEmail, validateLength, validateRequired } from 'utils/validators';
+import { buildValidationRules } from 'utils/validators-helper';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
 import { CertificateState as CertStatus, Resource } from '../../../../types/openapi';
 import { collectFormAttributes } from '../../../../utils/attributes/attributes';
@@ -385,16 +386,6 @@ function UserForm({ userId, onCancel, onSuccess }: UserFormProps) {
             });
         }
     }, [editMode, user, id, reset, isFetchingUserDetail]);
-
-    // Helper function to convert validators for react-hook-form
-    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
-        return {
-            validate: (value: any) => {
-                const composed = composeValidators(...validators);
-                return composed(value);
-            },
-        };
-    };
 
     const rolesTableHeader: TableHeader[] = useMemo(
         () => [

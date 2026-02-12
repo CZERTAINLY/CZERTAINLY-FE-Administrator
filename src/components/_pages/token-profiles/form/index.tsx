@@ -20,7 +20,8 @@ import { TokenProfileDetailResponseModel } from 'types/token-profiles';
 import { collectFormAttributes } from 'utils/attributes/attributes';
 
 import { selectors as enumSelectors, getEnumLabel } from 'ducks/enums';
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
+import { validateAlphaNumericWithSpecialChars, validateLength, validateRequired } from 'utils/validators';
+import { buildValidationRules } from 'utils/validators-helper';
 import { actions as customAttributesActions, selectors as customAttributesSelectors } from '../../../../ducks/customAttributes';
 import { KeyUsage, PlatformEnum, Resource } from '../../../../types/openapi';
 import TabLayout from '../../../Layout/TabLayout';
@@ -174,16 +175,6 @@ export default function TokenProfileForm({
             });
         }
     }, [editMode, tokenProfile, id, reset, isFetchingDetail, tokenId, keyUsageEnum]);
-
-    // Helper function to convert validators for react-hook-form
-    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
-        return {
-            validate: (value: any) => {
-                const composed = composeValidators(...validators);
-                return composed(value);
-            },
-        };
-    };
 
     const onTokenChange = useCallback(
         (tokenUuid: string) => {

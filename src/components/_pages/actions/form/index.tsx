@@ -16,7 +16,8 @@ import TextInput from 'components/TextInput';
 import { Resource } from 'types/openapi';
 import { isObjectSame } from 'utils/common-utils';
 import { useRuleEvaluatorResourceOptions } from 'utils/rules';
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
+import { validateAlphaNumericWithSpecialChars, validateRequired } from 'utils/validators';
+import { buildValidationRules } from 'utils/validators-helper';
 
 export interface ActionFormValues {
     name: string;
@@ -130,16 +131,6 @@ const ActionsForm = ({ onCancel, onSuccess }: ActionsFormProps = {}) => {
         },
         [defaultValues],
     );
-
-    // Helper function to convert validators for react-hook-form
-    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
-        return {
-            validate: (value: any) => {
-                const composed = composeValidators(...validators);
-                return composed(value);
-            },
-        };
-    };
 
     return (
         <FormProvider {...methods}>

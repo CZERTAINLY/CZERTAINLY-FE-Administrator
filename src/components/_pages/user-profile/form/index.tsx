@@ -10,7 +10,8 @@ import TextInput from 'components/TextInput';
 
 import { actions, selectors } from 'ducks/auth';
 
-import { composeValidators, validateAlphaNumericWithSpecialChars, validateEmail, validateLength } from 'utils/validators';
+import { validateAlphaNumericWithSpecialChars, validateEmail, validateLength } from 'utils/validators';
+import { buildValidationRules } from 'utils/validators-helper';
 
 interface FormValues {
     description: string;
@@ -84,15 +85,6 @@ export default function UserProfileForm({ onCancel, onSuccess }: UserProfileForm
         control,
         formState: { isDirty, isSubmitting, isValid },
     } = methods;
-
-    const buildValidationRules = (validators: Array<(value: any) => string | undefined>) => {
-        return {
-            validate: (value: any) => {
-                const composed = composeValidators(...validators);
-                return composed(value);
-            },
-        };
-    };
 
     return (
         <Container>
