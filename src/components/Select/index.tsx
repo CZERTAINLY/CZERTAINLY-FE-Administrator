@@ -258,7 +258,10 @@ function Select({
         const setTitlesAndTooltips = () => {
             const container = select.closest('[data-testid]')?.parentElement ?? select.parentNode;
             const root = container as Element;
-            const dropdown = root.querySelector?.('.hs-select-dropdown');
+
+            // Try to get dropdown from HSSelect instance (works also when dropdownScope === 'window')
+            const hsInstance = (window as any).HSSelect?.getInstance?.(select);
+            const dropdown: Element | null = (hsInstance && hsInstance.dropdown) || root.querySelector?.('.hs-select-dropdown');
             dropdown?.querySelectorAll?.('.hs-select-option-row').forEach((row) => {
                 const titleEl = row.querySelector?.('[data-title]');
                 const tooltipContentEl = row.querySelector?.('[data-tooltip-content]');
@@ -282,7 +285,7 @@ function Select({
         observer.observe(select.parentNode, { childList: true, subtree: true });
         requestAnimationFrame(() => setTitlesAndTooltips());
         return () => observer.disconnect();
-    }, [options, isMulti]);
+    }, [options, isMulti, id]);
 
     const hasOptions = options && options.length > 0;
 
