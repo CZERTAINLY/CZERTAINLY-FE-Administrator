@@ -289,15 +289,30 @@ export default function Sidebar({ allowedResources }: Props) {
     const allowedMenuItems = useMemo(() => getAllowedMenuItems(allowedResources), [allowedResources]);
     const [openMenuItems, setOpenMenuItems] = useState<string[]>([]);
 
+    const activeSectionKey = useMemo(() => {
+        const pathname = location.pathname;
+        const item = allowedMenuItems.find(
+            (m): m is MenuItemMapping & { children: Array<{ link: string }> } =>
+                'children' in m && m.children.some((c) => c.link === pathname),
+        );
+        return item ? item._key : null;
+    }, [location.pathname, allowedMenuItems]);
+
     useEffect(() => {
         if (menuSize === 'flying') return;
         document.documentElement.style.setProperty('--sidebar-width', menuSize === 'small' ? '84px' : '260px');
     }, [menuSize]);
 
+    useEffect(() => {
+        if (menuSize === 'large' && activeSectionKey) {
+            setOpenMenuItems((prev) => (prev.includes(activeSectionKey) ? prev : [...prev, activeSectionKey]));
+        }
+    }, [menuSize, activeSectionKey]);
+
     function toggleMenuSize() {
         const newMenuSize = menuSize === 'small' ? 'large' : 'small';
         setMenuSize(newMenuSize);
-        setOpenMenuItems([]);
+        setOpenMenuItems(newMenuSize === 'large' && activeSectionKey ? [activeSectionKey] : []);
         setDefaultMenuSize(newMenuSize);
     }
 
