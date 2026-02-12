@@ -58,13 +58,19 @@ export const nodeWidth = 400;
 export const nodeHeight = 100;
 
 const getLayoutedElements = (nodes: CustomNode[], edges: Edge[], direction = 'TB') => {
+    const baseNodes: CustomNode[] = nodes.map((node) => ({
+        ...node,
+        position: node.position ? { ...node.position } : { x: 0, y: 0 },
+        data: { ...node.data },
+    }));
+
     if (direction === 'STAR') {
         const centerX = window.innerWidth / 2;
         const centerY = window.innerHeight / 2;
         const minRadius = 250; // Minimum radius
-        const mainNode = nodes.find((node) => node.data.isMainNode);
-        const surroundingNodes = nodes.filter((node) => !node.data.isMainNode && !node.hidden);
-        const angleIncrement = (2 * Math.PI) / surroundingNodes.length;
+        const mainNode = baseNodes.find((node) => node.data.isMainNode);
+        const surroundingNodes = baseNodes.filter((node) => !node.data.isMainNode && !node.hidden);
+        const angleIncrement = (2 * Math.PI) / Math.max(surroundingNodes.length, 1);
 
         // Calculate dynamic radius based on the number of nodes to ensure minimum distance of 200px
         let dynamicRadius = surroundingNodes.length * 60; // Example calculation, adjust as needed
@@ -73,8 +79,9 @@ const getLayoutedElements = (nodes: CustomNode[], edges: Edge[], direction = 'TB
         if (mainNode) {
             const currentNodeHeight = mainNode.data?.description ? nodeHeight + 35 : nodeHeight;
             // Position the main node at the center
-            mainNode.position = { x: centerX - nodeWidth / 2, y: centerY - currentNodeHeight / 2 };
-            mainNodePosition = mainNode.position;
+            const mainPosition = { x: centerX - nodeWidth / 2, y: centerY - currentNodeHeight / 2 };
+            mainNode.position = mainPosition;
+            mainNodePosition = mainPosition;
         }
 
         const someGroupedNodes = surroundingNodes.some((node) => node.data.group);
@@ -97,12 +104,10 @@ const getLayoutedElements = (nodes: CustomNode[], edges: Edge[], direction = 'TB
             // Assuming mainNodePosition is the position of the main node
             const radius = 450; // Distance from the main node
             const groupKeys = Object.keys(nodesByGroups);
-            const angleIncrement = (2 * Math.PI) / groupKeys.length; // Divide the circle based on the number of groups
+            const groupAngleIncrement = (2 * Math.PI) / Math.max(groupKeys.length, 1); // Divide the circle based on the number of groups
 
             groupKeys.forEach((groupKey, index) => {
-                const angle = angleIncrement * index;
-                // check if it is a odd index
-                // const isOdd = index % 2 === 1;
+                const angle = groupAngleIncrement * index;
                 const groupPosition = {
                     x: mainNodePosition.x + radius * 1.75 * Math.cos(angle),
                     y: mainNodePosition.y + radius * Math.sin(angle),
@@ -110,9 +115,8 @@ const getLayoutedElements = (nodes: CustomNode[], edges: Edge[], direction = 'TB
 
                 // Position each node in the group around the group's central position
                 nodesByGroups[groupKey].forEach((node, nodeIndex) => {
-                    const nodeAngle = ((2 * Math.PI) / nodesByGroups[groupKey].length) * nodeIndex;
+                    const nodeAngle = ((2 * Math.PI) / Math.max(nodesByGroups[groupKey].length, 1)) * nodeIndex;
                     const nodeRadius = 125 * (nodesByGroups[groupKey].length * 0.3); // Smaller radius for nodes within a group
-                    // const lastOutOfTwoNodes = nodesByGroups[groupKey].length % 2 === 0;
                     const onlyTwoNodes = nodesByGroups[groupKey].length === 2;
                     let yOffset = 0;
                     if (onlyTwoNodes && nodeIndex === 1) {
@@ -139,13 +143,12 @@ const getLayoutedElements = (nodes: CustomNode[], edges: Edge[], direction = 'TB
                 node.sourcePosition = Position.Bottom;
             });
         }
-        return { nodes, edges };
+        return { nodes: baseNodes, edges };
     } else {
         const isHorizontal = direction === 'LR';
         dagreGraph.setGraph({ rankdir: direction });
 
-        nodes.forEach((node) => {
-            // const currentNodeHeight = node.data.otherProperties?.length ? nodeHeight + node.data.otherProperties?.length * 20 : nodeHeight;
+        baseNodes.forEach((node) => {
             const currentNodeHeight = node.data?.description ? nodeHeight + 35 : nodeHeight;
             dagreGraph.setNode(node.id, { width: nodeWidth, height: currentNodeHeight });
         });
@@ -156,7 +159,7 @@ const getLayoutedElements = (nodes: CustomNode[], edges: Edge[], direction = 'TB
 
         dagre.layout(dagreGraph);
 
-        const updatedNodes = nodes.map((node: CustomNode) => {
+        const updatedNodes = baseNodes.map((node: CustomNode) => {
             const nodeWithPosition = dagreGraph.node(node.id);
             const currentNodeHeight = node.data?.description ? nodeHeight + 35 : nodeHeight;
             return {
@@ -238,13 +241,6 @@ const FlowChartContent = ({
             }),
         );
     }, [flowChartEdges, flowChartNodes, flowDirection, dispatch]);
-
-    // unmounting effect
-    useEffect(() => {
-        return () => {
-            dispatch(userInterfaceActions.clearReactFlowUI());
-        };
-    }, [dispatch]);
 
     return (
         <Widget busy={busy}>

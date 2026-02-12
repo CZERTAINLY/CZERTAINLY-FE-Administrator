@@ -116,7 +116,6 @@ export default function CustomFlowNode({ data, dragging, selected, xPos, yPos, i
 
     const getIconComponent = () => {
         if (!data.icon) return null;
-        console.log('data.icon', data.icon);
         // Normalize icon string (remove extra spaces, handle both 'fa fa-icon' and 'fa-icon' formats)
         const normalizedIcon = data.icon.trim().replace(/\s+/g, ' ');
 
